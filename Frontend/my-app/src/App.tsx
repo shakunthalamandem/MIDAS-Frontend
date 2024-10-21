@@ -9,8 +9,8 @@ const App = () => {
     <Router>
       <Routes>
         {/* Home route will render the Dashboard component */}
-        {/* <Route path="/" element={<DashboardLayoutBasic />} /> */}
-        <Route path="/" element={<ChatWithLLM />} />
+        <Route path="/" element={<DashboardLayoutBasic />} />
+        {/* <Route path="/" element={<ChatWithLLM />} /> */}
       </Routes>
     </Router>
   );
