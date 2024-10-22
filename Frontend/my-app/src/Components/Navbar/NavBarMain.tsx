@@ -104,7 +104,7 @@ const NavbarMain: React.FC = () => {
           </>
         ) : (
           <Box sx={{ flexGrow: 2, display: 'flex', justifyContent: 'center' }}>
-            <Tabs value={getTabIndex()} textColor="inherit" indicatorColor="secondary">
+            <Tabs value={getTabIndex()} textColor="inherit"  indicatorColor="secondary">
               {pages.map((page) => (
                 <Tab
                   key={page}
