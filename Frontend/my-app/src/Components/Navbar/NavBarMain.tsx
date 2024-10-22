@@ -1,23 +1,17 @@
+// NavbarMain.tsx
 import React, { useState } from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
+import { AppBar, Toolbar, Typography, Tabs, Tab, Button, Box, IconButton, Menu, MenuItem } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 
 const pages = ['Capital Markets', 'Monashee Deals', 'Strategies'];
 
 const NavbarMain: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
 
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 
@@ -27,6 +21,13 @@ const NavbarMain: React.FC = () => {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+  };
+
+  const handleNavigate = (page: string) => {
+    if (page === 'Capital Markets') navigate('/capital-markets');
+    if (page === 'Monashee Deals') navigate('/monashee-deals');
+    if (page === 'Strategies') navigate('/strategies');
+    handleCloseNavMenu();
   };
 
   return (
@@ -71,7 +72,7 @@ const NavbarMain: React.FC = () => {
               onClose={handleCloseNavMenu}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={() => handleNavigate(page)}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
@@ -82,14 +83,21 @@ const NavbarMain: React.FC = () => {
           <Box sx={{ flexGrow: 2, display: 'flex', justifyContent: 'center' }}>
             <Tabs value={0} textColor="inherit" indicatorColor="secondary">
               {pages.map((page) => (
-                <Tab key={page} label={page} sx={{ minWidth: 100, fontWeight: 'bold' }} />
+                <Tab
+                  key={page}
+                  label={page}
+                  onClick={() => handleNavigate(page)}
+                  sx={{ minWidth: 100, fontWeight: 'bold' }}
+                />
               ))}
             </Tabs>
           </Box>
         )}
 
         {/* Login and Signup */}
-        <Button sx={{ color: 'white', fontWeight: 'bold' }}>Login</Button>
+        <Button sx={{ color: 'white', fontWeight: 'bold' }} onClick={() => navigate('/login')}>
+          Login
+        </Button>
         <Button
           sx={{
             color: 'white',
@@ -97,6 +105,7 @@ const NavbarMain: React.FC = () => {
             ml: 2,
             border: '1px solid white',
           }}
+          onClick={() => navigate('/signup')}
         >
           Sign Up
         </Button>
