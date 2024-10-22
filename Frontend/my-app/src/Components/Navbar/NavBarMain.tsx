@@ -1,10 +1,12 @@
-// NavbarMain.tsx
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Tabs, Tab, Button, Box, IconButton, Menu, MenuItem } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+
+// Make sure to import your logo image
+import logo from '../../Assets/images/logomidas.png'; // Adjust the path as necessary
 
 const pages = ['Capital Markets', 'Monashee Deals', 'Strategies'];
 
@@ -12,6 +14,7 @@ const NavbarMain: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 
@@ -30,29 +33,48 @@ const NavbarMain: React.FC = () => {
     handleCloseNavMenu();
   };
 
+  const getTabIndex = () => {
+    switch (location.pathname) {
+      case '/capital-markets':
+        return 0;
+      case '/monashee-deals':
+        return 1;
+      case '/strategies':
+        return 2;
+      default:
+        return false;
+    }
+  };
+
   return (
-    <AppBar position="static" color="primary">
+    <AppBar position="static" sx={{ backgroundColor: '#1A237E' }}>
       <Toolbar>
-        {/* Logo */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 'bold',
-            fontSize: '24px',
-            color: 'white',
-            flexGrow: 1,
-          }}
-        >
-          MIDAS
-        </Typography>
+        {/* Logo and Title */}
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#FFEB3B' }}>
+          <img
+            src={logo} // Make sure to adjust this path to your logo file
+            alt="MIDAS Logo"
+            style={{ width: '40px', height: '40px', marginRight: '10px' }} // Adjust the size as needed
+          />
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              fontSize: '24px',
+              flexGrow: 1,
+              fontFamily: 'Roboto, sans-serif',
+            }}
+          >
+            MIDAS
+          </Typography>
+        </Link>
 
         {isMobile ? (
           <>
-            {/* Hamburger Menu for mobile */}
             <IconButton
               edge="start"
               color="inherit"
-              aria-label="menu"
+              aria-label="Open navigation menu"
               onClick={handleOpenNavMenu}
             >
               <MenuIcon />
@@ -73,37 +95,54 @@ const NavbarMain: React.FC = () => {
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={() => handleNavigate(page)}>
-                  <Typography textAlign="center">{page}</Typography>
+                  <Typography textAlign="center" sx={{ color: '#1A237E', fontFamily: 'Roboto, sans-serif' }}>
+                    {page}
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
           </>
         ) : (
-          // Tabs for desktop view
           <Box sx={{ flexGrow: 2, display: 'flex', justifyContent: 'center' }}>
-            <Tabs value={0} textColor="inherit" indicatorColor="secondary">
+            <Tabs value={getTabIndex()} textColor="inherit" indicatorColor="secondary">
               {pages.map((page) => (
                 <Tab
                   key={page}
                   label={page}
                   onClick={() => handleNavigate(page)}
-                  sx={{ minWidth: 100, fontWeight: 'bold' }}
+                  sx={{
+                    minWidth: 100,
+                    fontWeight: 'bold',
+                    color: '#FFEB3B',
+                    '&.Mui-selected': {
+                      color: '#FFEB3B',
+                      backgroundColor: '#3949AB',
+                      borderRadius: '4px',
+                    },
+                    '&:hover': {
+                      backgroundColor: '#3949AB',
+                      borderRadius: '4px',
+                    },
+                  }}
                 />
               ))}
             </Tabs>
           </Box>
         )}
 
-        {/* Login and Signup */}
-        <Button sx={{ color: 'white', fontWeight: 'bold' }} onClick={() => navigate('/login')}>
+        <Button sx={{ color: '#FFEB3B', fontWeight: 'bold', fontFamily: 'Roboto, sans-serif' }} onClick={() => navigate('/login')}>
           Login
         </Button>
         <Button
           sx={{
-            color: 'white',
+            color: '#FFEB3B',
             fontWeight: 'bold',
             ml: 2,
-            border: '1px solid white',
+            border: '1px solid #FFEB3B',
+            '&:hover': {
+              backgroundColor: '#FFEB3B',
+              color: '#1A237E',
+            },
           }}
           onClick={() => navigate('/signup')}
         >
