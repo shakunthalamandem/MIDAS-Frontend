@@ -1,19 +1,17 @@
 // AppRouters.tsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import SignUp from '../Components/Main/HomePage/Authentication/SignUp';
 import CapitalMarkets from '../Components/Main/HomePage/Dashboard/CapitalMarkets';
 import MonasheeDeals from '../Components/Main/HomePage/Dashboard/MonasheeDeals';
 import Strategies from '../Components/Main/HomePage/Dashboard/Strategies';
-import HomePage from '../Components/Main/HomePage/HomePage';
 import Login from '../Components/Main/HomePage/Authentication/Login';
 
 
 const AppRouters: React.FC = () => {
   return (
-    <Router>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<CapitalMarkets />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/capital-markets" element={<CapitalMarkets />} />
@@ -21,7 +19,6 @@ const AppRouters: React.FC = () => {
         <Route path="/strategies" element={<Strategies />} />
 
       </Routes>
-    </Router>
   );
 };
 
