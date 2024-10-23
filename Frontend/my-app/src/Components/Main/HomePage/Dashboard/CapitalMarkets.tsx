@@ -1,8 +1,12 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import DealGraph from '../../MonasheeGraphs/DealGraph';
+import DealVolume from '../../MonasheeGraphs/DealVolume';
+import OpportunityMain from '../../MonasheeGraphs/OpportunityMain';
 
 const CapitalMarkets: React.FC = () => {
   return (
+    <>
     <Box
       sx={{
         display: 'flex',
@@ -37,6 +41,11 @@ const CapitalMarkets: React.FC = () => {
         Welcome to the Capital Markets page. Here, you will find the latest information about financial markets, investment strategies, and more. Stay updated on global market trends and insights.
       </Typography>
     </Box>
+    <DealGraph />
+    <DealVolume />
+    <OpportunityMain />
+    </>
+    
   );
 };
 
