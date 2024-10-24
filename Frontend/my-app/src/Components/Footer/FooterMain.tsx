@@ -11,9 +11,9 @@ const FooterMain: React.FC = () => {
   return (
     <Box
       sx={{
-        backgroundColor: '#1A237E',
+        backgroundColor: '#d3d290',
         padding: isMobile ? '10px 0' : '20px 0',
-        color: 'white',
+        color: '#293c3d',
         textAlign: 'center',
       }}
     >

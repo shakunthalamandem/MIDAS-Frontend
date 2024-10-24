@@ -47,10 +47,10 @@ const NavbarMain: React.FC = () => {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#1A237E' }}>
+    <AppBar position="static" sx={{ backgroundColor: '#d3d290' }}>
       <Toolbar>
         {/* Logo and Title */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#FFEB3B' }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#293c3d' }}>
           <img
             src={logo} // Make sure to adjust this path to your logo file
             alt="MIDAS Logo"
@@ -95,7 +95,7 @@ const NavbarMain: React.FC = () => {
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={() => handleNavigate(page)}>
-                  <Typography textAlign="center" sx={{ color: '#1A237E', fontFamily: 'Roboto, sans-serif' }}>
+                  <Typography textAlign="center" sx={{ color: '#d3d290', fontFamily: 'Roboto, sans-serif' }}>
                     {page}
                   </Typography>
                 </MenuItem>
@@ -113,14 +113,14 @@ const NavbarMain: React.FC = () => {
                   sx={{
                     minWidth: 100,
                     fontWeight: 'bold',
-                    color: '#FFEB3B',
+                    color: '#293c3d',
                     '&.Mui-selected': {
-                      color: '#FFEB3B',
-                      backgroundColor: '#3949AB',
+                      color: '#293c3d',
+                      backgroundColor: '#f0ffcc',
                       borderRadius: '4px',
                     },
                     '&:hover': {
-                      backgroundColor: '#3949AB',
+                      backgroundColor: '#f0ffcc',
                       borderRadius: '4px',
                     },
                   }}
@@ -130,18 +130,18 @@ const NavbarMain: React.FC = () => {
           </Box>
         )}
 
-        <Button sx={{ color: '#FFEB3B', fontWeight: 'bold', fontFamily: 'Roboto, sans-serif' }} onClick={() => navigate('/login')}>
+        <Button sx={{ color: '#293c3d', fontWeight: 'bold', fontFamily: 'Roboto, sans-serif' }} onClick={() => navigate('/login')}>
           Login
         </Button>
         <Button
           sx={{
-            color: '#FFEB3B',
+            color: '#293c3d',
             fontWeight: 'bold',
             ml: 2,
-            border: '1px solid #FFEB3B',
+            border: '1px solid #293c3d',
             '&:hover': {
-              backgroundColor: '#FFEB3B',
-              color: '#1A237E',
+              backgroundColor: '#293c3d',
+              color: '#d3d290',
             },
           }}
           onClick={() => navigate('/signup')}
