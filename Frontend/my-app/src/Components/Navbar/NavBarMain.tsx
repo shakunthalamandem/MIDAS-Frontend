@@ -104,7 +104,7 @@ const NavbarMain: React.FC = () => {
           </>
         ) : (
           <Box sx={{ flexGrow: 2, display: 'flex', justifyContent: 'center' }}>
-            <Tabs value={getTabIndex()} textColor="inherit"  indicatorColor="secondary">
+            <Tabs value={getTabIndex()} textColor="inherit" >
               {pages.map((page) => (
                 <Tab
                   key={page}
@@ -113,7 +113,10 @@ const NavbarMain: React.FC = () => {
                   sx={{
                     minWidth: 100,
                     fontWeight: 'bold',
+                    fontSize: '16px', // Set font size to avoid blurriness
                     color: '#293c3d',
+                  
+                    textTransform: 'none', // Disable uppercase transformation
                     '&.Mui-selected': {
                       color: '#293c3d',
                       backgroundColor: '#f0ffcc',
