@@ -6,7 +6,7 @@ import { BsEyeSlash, BsEye } from "react-icons/bs";
 import { Link } from "react-router-dom";
 
 const Login: React.FC = () => {
-  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(true);
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
 
@@ -50,7 +50,14 @@ const Login: React.FC = () => {
               "&.Mui-focused fieldset": {
                 borderColor: "#6d7f40",
               },
+            
             },
+            "& .MuiInputLabel-root": {
+                color: "#d3d290", // Default label color
+                "&.Mui-focused": {
+                  color: "#6d7f40", // Focused label color
+                },
+              },
           }}
         />
 
@@ -73,12 +80,20 @@ const Login: React.FC = () => {
                 "&.Mui-focused fieldset": {
                   borderColor: "#6d7f40",
                 },
+               
               },
+              "& .MuiInputLabel-root": {
+                color: "#d3d290", // Default label color
+                "&.Mui-focused": {
+                  color: "#6d7f40", // Focused label color
+                },
+              },
+              
             }}
           />
           <IconButton
             onClick={togglePasswordVisibility}
-            sx={{ position: "absolute", top: "30%", right: 10, color: "#6d7f40" }}
+            sx={{ position: "absolute", top: "10%", right: 10, color: "#6d7f40" }}
           >
             {passwordVisible ? <BsEyeSlash /> : <BsEye />}
           </IconButton>

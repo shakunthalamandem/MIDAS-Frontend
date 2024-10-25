@@ -184,7 +184,7 @@ const Signup: React.FC = () => {
             </Typography>
           </Grid>
           <Grid item>
-            <Link to="/signin" style={{ textDecoration: "none" }}>
+            <Link to="/login" style={{ textDecoration: "none" }}>
               <Typography variant="body1" color="primary">
                 Sign In
               </Typography>
