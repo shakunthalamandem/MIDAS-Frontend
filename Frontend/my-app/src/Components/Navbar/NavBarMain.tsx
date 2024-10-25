@@ -5,8 +5,8 @@ import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
-// Make sure to import your logo image
-import logo from '../../Assets/images/logomidas.png'; // Adjust the path as necessary
+// Import your logo
+import logo from '../../Assets/images/logomidas.png';
 
 const pages = ['Capital Markets', 'Monashee Deals', 'Strategies'];
 
@@ -47,15 +47,11 @@ const NavbarMain: React.FC = () => {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#d3d290' }}>
-      <Toolbar>
+    <AppBar position="static" sx={{ backgroundColor: '#001E3C', paddingX: { xs: 2, sm: 5 } }}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {/* Logo and Title */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#293c3d' }}>
-          <img
-            src={logo} // Make sure to adjust this path to your logo file
-            alt="MIDAS Logo"
-            style={{ width: '40px', height: '40px', marginRight: '10px' }} // Adjust the size as needed
-          />
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#FFFFFF' }}>
+          <img src={logo} alt="MIDAS Logo" style={{ width: '40px', height: '40px', marginRight: '10px' }} />
           <Typography
             variant="h6"
             sx={{
@@ -63,6 +59,7 @@ const NavbarMain: React.FC = () => {
               fontSize: '24px',
               flexGrow: 1,
               fontFamily: 'Roboto, sans-serif',
+              color: '#FFFFFF',
             }}
           >
             MIDAS
@@ -71,31 +68,20 @@ const NavbarMain: React.FC = () => {
 
         {isMobile ? (
           <>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="Open navigation menu"
-              onClick={handleOpenNavMenu}
-            >
+            <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleOpenNavMenu}>
               <MenuIcon />
             </IconButton>
             <Menu
               anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
               keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={() => handleNavigate(page)}>
-                  <Typography textAlign="center" sx={{ color: '#d3d290', fontFamily: 'Roboto, sans-serif' }}>
+                  <Typography textAlign="center" sx={{ color: '#001E3C', fontWeight: 'bold' }}>
                     {page}
                   </Typography>
                 </MenuItem>
@@ -103,8 +89,16 @@ const NavbarMain: React.FC = () => {
             </Menu>
           </>
         ) : (
-          <Box sx={{ flexGrow: 2, display: 'flex', justifyContent: 'center' }}>
-            <Tabs value={getTabIndex()} textColor="inherit" >
+          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+            <Tabs
+              value={getTabIndex()}
+              textColor="inherit"
+              sx={{
+                '& .MuiTabs-indicator': {
+                  backgroundColor: '#FFEB3B', // Set the custom indicator color here
+                },
+              }}
+            >
               {pages.map((page) => (
                 <Tab
                   key={page}
@@ -113,38 +107,47 @@ const NavbarMain: React.FC = () => {
                   sx={{
                     minWidth: 100,
                     fontWeight: 'bold',
-                    fontSize: '16px', // Set font size to avoid blurriness
-                    color: '#293c3d',
-                  
-                    textTransform: 'none', // Disable uppercase transformation
+                    fontSize: '16px',
+                    color: '#B2DFDB',
+                    textTransform: 'none',
                     '&.Mui-selected': {
-                      color: '#293c3d',
-                      backgroundColor: '#f0ffcc',
+                      color: '#FFEB3B',
+                      backgroundColor: '#0A1929',
                       borderRadius: '4px',
                     },
                     '&:hover': {
-                      backgroundColor: '#f0ffcc',
+                      backgroundColor: '#0A1929',
                       borderRadius: '4px',
+                      color: '#FFEB3B',
                     },
                   }}
                 />
               ))}
             </Tabs>
+
           </Box>
         )}
 
-        <Button sx={{ color: '#293c3d', fontWeight: 'bold', fontFamily: 'Roboto, sans-serif' }} onClick={() => navigate('/login')}>
+        <Button
+          sx={{
+            color: '#FFEB3B',
+            fontWeight: 'bold',
+            fontFamily: 'Roboto, sans-serif',
+            '&:hover': { backgroundColor: '#0A1929' },
+          }}
+          onClick={() => navigate('/login')}
+        >
           Login
         </Button>
         <Button
           sx={{
-            color: '#293c3d',
-            fontWeight: 'bold',
             ml: 2,
-            border: '1px solid #293c3d',
+            border: '1px solid #FFEB3B',
+            color: '#FFEB3B',
+            fontWeight: 'bold',
             '&:hover': {
-              backgroundColor: '#293c3d',
-              color: '#d3d290',
+              backgroundColor: '#FFEB3B',
+              color: '#001E3C',
             },
           }}
           onClick={() => navigate('/signup')}

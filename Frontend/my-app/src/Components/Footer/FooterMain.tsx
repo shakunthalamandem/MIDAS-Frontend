@@ -11,19 +11,28 @@ const FooterMain: React.FC = () => {
   return (
     <Box
       sx={{
-        backgroundColor: '#d3d290',
+        backgroundColor: '#0A1929', // Darker background color
         padding: isMobile ? '10px 0' : '20px 0',
-        color: '#293c3d',
+        color: '#FFEB3B', // Text color to match the brand accent
         textAlign: 'center',
+        boxShadow: '0px -2px 10px rgba(0, 0, 0, 0.3)', // Subtle top shadow for depth
       }}
     >
       <Typography
         variant={isMobile ? 'body1' : 'h6'}
-        sx={{ fontWeight: 'bold' }}
+        sx={{
+          fontWeight: 'bold',
+          color: '#FFEB3B', // Accent color for main text
+        }}
       >
         Stock Screener & Data Visualization
       </Typography>
-      <Typography variant="body2">
+      <Typography
+        variant="body2"
+        sx={{
+          color: '#B2DFDB', // Muted accent for secondary text
+        }}
+      >
         © 2024 MIDAS - Your trusted source for market data and analytics.
       </Typography>
     </Box>

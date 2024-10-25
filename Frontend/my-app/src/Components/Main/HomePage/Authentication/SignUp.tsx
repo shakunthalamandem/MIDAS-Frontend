@@ -13,21 +13,24 @@ const Signup: React.FC = () => {
   const toggleConfirmPasswordVisibility = () => setConfirmPasswordVisible(!confirmPasswordVisible);
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="xs">
       <Box
         sx={{
-          backgroundColor: "white",
-          borderRadius: 2,
-          boxShadow: 3,
+          backgroundColor: "#f8f9fa",
+          borderRadius: 4,
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
           padding: 4,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 2,
-          marginTop: 5
+          gap: 1,
+          mt: 2, // Reduce top margin for less gap at the top
+          mb: 8, // Increase bottom margin for more gap at the bottom
+          border: "1px solid #e0e0e0",
+          width: "100%",
         }}
       >
-        <Typography variant="h4" fontWeight="700" gutterBottom>
+        <Typography variant="h4" fontWeight="700" color="#293c3d" gutterBottom>
           Sign Up
         </Typography>
 
@@ -36,7 +39,20 @@ const Signup: React.FC = () => {
           fullWidth
           label="Full Name"
           variant="outlined"
-          sx={{ marginBottom: 2 }}
+          sx={{
+            marginBottom: 2,
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#d3d290",
+              },
+              "&:hover fieldset": {
+                borderColor: "#aab56b",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#6d7f40",
+              },
+            },
+          }}
         />
 
         {/* Email */}
@@ -45,7 +61,20 @@ const Signup: React.FC = () => {
           label="Email"
           variant="outlined"
           type="email"
-          sx={{ marginBottom: 2 }}
+          sx={{
+            marginBottom: 2,
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#d3d290",
+              },
+              "&:hover fieldset": {
+                borderColor: "#aab56b",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#6d7f40",
+              },
+            },
+          }}
         />
 
         {/* Password */}
@@ -55,10 +84,24 @@ const Signup: React.FC = () => {
             label="Password"
             variant="outlined"
             type={passwordVisible ? "text" : "password"}
+            sx={{
+              marginBottom: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#d3d290",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#aab56b",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#6d7f40",
+                },
+              },
+            }}
           />
           <IconButton
             onClick={togglePasswordVisibility}
-            sx={{ position: "absolute", top: "30%", right: 10 }}
+            sx={{ position: "absolute", top: "10%", right: 10, color: "#6d7f40" }}
           >
             {passwordVisible ? <BsEyeSlash /> : <BsEye />}
           </IconButton>
@@ -71,11 +114,24 @@ const Signup: React.FC = () => {
             label="Confirm Password"
             variant="outlined"
             type={confirmPasswordVisible ? "text" : "password"}
-            sx={{ marginTop: 2 }}
+            sx={{
+              marginTop: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#d3d290",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#aab56b",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#6d7f40",
+                },
+              },
+            }}
           />
           <IconButton
             onClick={toggleConfirmPasswordVisibility}
-            sx={{ position: "absolute", top: "30%", right: 10 }}
+            sx={{ position: "absolute", top: "30%", right: 10, color: "#6d7f40" }}
           >
             {confirmPasswordVisible ? <BsEyeSlash /> : <BsEye />}
           </IconButton>
@@ -86,14 +142,20 @@ const Signup: React.FC = () => {
           fullWidth
           variant="contained"
           color="primary"
-          sx={{ marginTop: 2 }}
+          sx={{
+            mt: 2,
+            backgroundColor: "#6d7f40",
+            "&:hover": {
+              backgroundColor: "#54662a",
+            },
+          }}
         >
           Sign Up
         </Button>
 
         <Grid container justifyContent="center" alignItems="center" spacing={1}>
           <Grid item>
-            <Typography variant="body1">
+            <Typography variant="body1" color="#293c3d">
               Already have an account?
             </Typography>
           </Grid>
@@ -106,25 +168,48 @@ const Signup: React.FC = () => {
           </Grid>
         </Grid>
 
-        <Divider sx={{ width: "100%", my: 2 }}>or</Divider>
+        <Divider sx={{ width: "100%", my: 2, color: "#aab56b" }}>or</Divider>
 
         {/* Social Sign Up Buttons */}
-        <Button
-          fullWidth
-          startIcon={<FaFacebook />}
-          variant="contained"
-          sx={{ backgroundColor: "#4267b2", color: "white", marginBottom: 1 }}
-        >
-          Sign Up with Facebook
-        </Button>
-        <Button
-          fullWidth
-          startIcon={<FcGoogle />}
-          variant="outlined"
-          sx={{ marginBottom: 2 }}
-        >
-          Sign Up with Google
-        </Button>
+        <Grid container spacing={1} sx={{ width: "100%" }}>
+          <Grid item xs={6}>
+            <Button
+              fullWidth
+              startIcon={<FaFacebook />}
+              variant="contained"
+              sx={{
+                backgroundColor: "#4267b2",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#3b5998",
+                },
+                fontSize: "0.875rem",
+                py: 1,
+              }}
+            >
+              Facebook
+            </Button>
+          </Grid>
+          <Grid item xs={6}>
+            <Button
+              fullWidth
+              startIcon={<FcGoogle />}
+              variant="outlined"
+              sx={{
+                color: "#293c3d",
+                borderColor: "#d3d290",
+                "&:hover": {
+                  borderColor: "#6d7f40",
+                  backgroundColor: "#f5f5f5",
+                },
+                fontSize: "0.875rem",
+                py: 1,
+              }}
+            >
+              Google
+            </Button>
+          </Grid>
+        </Grid>
       </Box>
     </Container>
   );
