@@ -43,13 +43,19 @@ const Signup: React.FC = () => {
             marginBottom: 2,
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
-                borderColor: "#d3d290",
+                borderColor: "#d3d290", // Default border color
               },
               "&:hover fieldset": {
-                borderColor: "#aab56b",
+                borderColor: "#aab56b", // Border color on hover
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#6d7f40",
+                borderColor: "#aab56b", // Changed focus color
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "#d3d290", // Default label color
+              "&.Mui-focused": {
+                color: "#6d7f40", // Focused label color
               },
             },
           }}
@@ -65,13 +71,19 @@ const Signup: React.FC = () => {
             marginBottom: 2,
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
-                borderColor: "#d3d290",
+                borderColor: "#d3d290", // Default border color
               },
               "&:hover fieldset": {
-                borderColor: "#aab56b",
+                borderColor: "#aab56b", // Border color on hover
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#6d7f40",
+                borderColor: "#aab56b", // Changed focus color
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "#d3d290", // Default label color
+              "&.Mui-focused": {
+                color: "#6d7f40", // Focused label color
               },
             },
           }}
@@ -88,13 +100,19 @@ const Signup: React.FC = () => {
               marginBottom: 2,
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#d3d290",
+                  borderColor: "#d3d290", // Default border color
                 },
                 "&:hover fieldset": {
-                  borderColor: "#aab56b",
+                  borderColor: "#aab56b", // Border color on hover
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#6d7f40",
+                  borderColor: "#aab56b", // Changed focus color
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "#d3d290", // Default label color
+                "&.Mui-focused": {
+                  color: "#6d7f40", // Focused label color
                 },
               },
             }}
@@ -118,13 +136,19 @@ const Signup: React.FC = () => {
               marginTop: 2,
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#d3d290",
+                  borderColor: "#d3d290", // Default border color
                 },
                 "&:hover fieldset": {
-                  borderColor: "#aab56b",
+                  borderColor: "#aab56b", // Border color on hover
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#6d7f40",
+                  borderColor: "#aab56b", // Changed focus color
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "#d3d290", // Default label color
+                "&.Mui-focused": {
+                  color: "#6d7f40", // Focused label color
                 },
               },
             }}
