@@ -95,7 +95,7 @@ const Login: React.FC = () => {
             onClick={togglePasswordVisibility}
             sx={{ position: "absolute", top: "10%", right: 10, color: "#6d7f40" }}
           >
-            {passwordVisible ? <BsEyeSlash /> : <BsEye />}
+            {passwordVisible ? <BsEye /> : < BsEyeSlash/>}
           </IconButton>
         </Box>
 
