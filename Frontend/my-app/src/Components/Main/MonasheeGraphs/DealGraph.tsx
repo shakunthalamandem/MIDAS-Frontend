@@ -7,7 +7,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  LabelList,
 } from "recharts";
 import {
   Container,
@@ -33,10 +32,9 @@ interface ApiResponse {
 // Define the type for chart data
 interface ChartData {
   name: string;
-  ipoInternational?: number;
-  ipoUS?: number;
-  foInternational?: number;
-  foUS?: number;
+  IPO?: number;
+  FO?: number;
+  total?: number; // Add total to ChartData
 }
 
 const DealGraph: React.FC = () => {
@@ -53,8 +51,9 @@ const DealGraph: React.FC = () => {
         period,
         region,
       });
+      console.log(response.data); // Debugging line
       const transformedData = transformData(response.data);
-      setData(transformedData); // Now response.data is typed correctly
+      setData(transformedData); // Set transformed data
     } catch (error) {
       console.error("Error fetching data from API:", error);
     }
@@ -62,13 +61,35 @@ const DealGraph: React.FC = () => {
 
   // Transform API response data into a format suitable for Recharts
   const transformData = (apiData: ApiResponse): ChartData[] => {
-    return Object.keys(apiData).map((key) => ({
-      name: key,
-      ipoInternational: apiData[key].IPO?.International,
-      ipoUS: apiData[key].IPO?.US,
-      foInternational: apiData[key].FO?.International,
-      foUS: apiData[key].FO?.US,
-    }));
+    return Object.keys(apiData).map((key) => {
+      const ipoUS = apiData[key].IPO.US || 0;
+      const ipoInternational = apiData[key].IPO.International || 0;
+      const foUS = apiData[key].FO.US || 0;
+      const foInternational = apiData[key].FO.International || 0;
+
+      const combinedIPO =
+        region === "all"
+          ? ipoUS + ipoInternational
+          : region === "US"
+          ? ipoUS
+          : ipoInternational;
+
+      const combinedFO =
+        region === "all"
+          ? foUS + foInternational
+          : region === "US"
+          ? foUS
+          : foInternational;
+
+      const totalDeals = combinedIPO + combinedFO; // Calculate total deals
+
+      return {
+        name: key,
+        IPO: combinedIPO,
+        FO: combinedFO,
+        total: totalDeals, // Include total in the returned data
+      };
+    });
   };
 
   // Call fetchData whenever a dropdown selection changes
@@ -80,6 +101,22 @@ const DealGraph: React.FC = () => {
   const handleTypeChange = (event: SelectChangeEvent) => setType(event.target.value);
   const handlePeriodChange = (event: SelectChangeEvent) => setPeriod(event.target.value);
   const handleRegionChange = (event: SelectChangeEvent) => setRegion(event.target.value);
+
+  // Custom tooltip component
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const { name, IPO, FO, total } = payload[0].payload;
+      return (
+        <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '10px' }}>
+          <h4>{name}</h4>
+          {type === "ipo" || type === "all" ? <p>IPO: {IPO}</p> : null}
+          {type === "fo" || type === "all" ? <p>FO: {FO}</p> : null}
+          <p>Total Deals: {total}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
@@ -147,36 +184,14 @@ const DealGraph: React.FC = () => {
           >
             <XAxis dataKey="name" />
             <YAxis />
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} /> {/* Use custom tooltip */}
             <Legend />
-            {/* Stacked Bars for IPO and FO based on selected type */}
+            {/* Conditional rendering of bars based on type */}
             {type === "ipo" || type === "all" ? (
-              <>
-                {region !== "US" && (
-                  <Bar dataKey="ipoInternational" stackId="a" fill="#8884d8">
-                    <LabelList dataKey="ipoInternational" position="inside" fill="white" />
-                  </Bar>
-                )}
-                {region !== "International" && (
-                  <Bar dataKey="ipoUS" stackId="a" fill="#8dd1e1">
-                    <LabelList dataKey="ipoUS" position="inside" fill="white" />
-                  </Bar>
-                )}
-              </>
+              <Bar dataKey="IPO" stackId="a" fill="#8884d8" name="IPO" />
             ) : null}
             {type === "fo" || type === "all" ? (
-              <>
-                {region !== "US" && (
-                  <Bar dataKey="foInternational" stackId="a" fill="#82ca9d">
-                    <LabelList dataKey="foInternational" position="inside" fill="white" />
-                  </Bar>
-                )}
-                {region !== "International" && (
-                  <Bar dataKey="foUS" stackId="a" fill="#a4de6c">
-                    <LabelList dataKey="foUS" position="inside" fill="white" />
-                  </Bar>
-                )}
-              </>
+              <Bar dataKey="FO" stackId="a" fill="#82ca9d" name="FO" />
             ) : null}
           </BarChart>
         </ResponsiveContainer>
