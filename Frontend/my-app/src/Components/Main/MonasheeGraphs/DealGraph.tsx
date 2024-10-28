@@ -21,29 +21,28 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-// Define the type for the nested data response
 interface ApiResponse {
   [key: string]: {
-    FO: { International: number; US: number };
-    IPO: { International: number; US: number };
+    FO: { US: { [sector: string]: number }; International: { [sector: string]: number } };
+    IPO: { US: { [sector: string]: number }; International: { [sector: string]: number } };
   };
 }
 
-// Define the type for chart data
 interface ChartData {
   name: string;
   IPO?: number;
   FO?: number;
-  total?: number; // Add total to ChartData
+  total?: number;
 }
 
 const DealGraph: React.FC = () => {
-  const [data, setData] = useState<ChartData[]>([]); // Chart data after transformation
-  const [type, setType] = useState("all"); // IPO, FO, All
-  const [period, setPeriod] = useState("yearly"); // Yearly, Quarterly, Monthly
-  const [region, setRegion] = useState("all"); // US, International, All
+  const [data, setData] = useState<ChartData[]>([]);
+  const [type, setType] = useState("all");
+  const [period, setPeriod] = useState("yearly");
+  const [region, setRegion] = useState("all");
+  const [sector, setSector] = useState("all");
+  const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
-  // Function to fetch data from API based on selected filters
   const fetchData = async () => {
     try {
       const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", {
@@ -51,58 +50,63 @@ const DealGraph: React.FC = () => {
         period,
         region,
       });
-      console.log(response.data); // Debugging line
-      const transformedData = transformData(response.data);
-      setData(transformedData); // Set transformed data
+      console.log(response.data);
+
+      // Collect unique sectors
+      const sectors = new Set<string>();
+      Object.values(response.data).forEach((deal) => {
+        (["FO", "IPO"] as const).forEach((category) => {
+          (["US", "International"] as const).forEach((regionKey) => {
+            Object.keys(deal[category][regionKey] || {}).forEach((sec) => sectors.add(sec));
+          });
+        });
+      });
+
+      setSectorOptions(Array.from(sectors));
+      setData(transformData(response.data));
     } catch (error) {
       console.error("Error fetching data from API:", error);
     }
   };
 
-  // Transform API response data into a format suitable for Recharts
   const transformData = (apiData: ApiResponse): ChartData[] => {
     return Object.keys(apiData).map((key) => {
-      const ipoUS = apiData[key].IPO.US || 0;
-      const ipoInternational = apiData[key].IPO.International || 0;
-      const foUS = apiData[key].FO.US || 0;
-      const foInternational = apiData[key].FO.International || 0;
+      const ipoData = apiData[key].IPO;
+      const foData = apiData[key].FO;
 
-      const combinedIPO =
-        region === "all"
-          ? ipoUS + ipoInternational
-          : region === "US"
-          ? ipoUS
-          : ipoInternational;
+      const filterBySector = (regionData: any) =>
+        Object.entries(regionData || {})
+          .filter(([sect]) => sector === "all" || sect === sector)
+          .reduce((sum, [, count]) => sum + (count as number), 0);
 
-      const combinedFO =
-        region === "all"
-          ? foUS + foInternational
-          : region === "US"
-          ? foUS
-          : foInternational;
+      const ipoUS = filterBySector(ipoData.US);
+      const ipoInternational = filterBySector(ipoData.International);
+      const foUS = filterBySector(foData.US);
+      const foInternational = filterBySector(foData.International);
 
-      const totalDeals = combinedIPO + combinedFO; // Calculate total deals
+      const combinedIPO = region === "all" ? ipoUS + ipoInternational : region === "US" ? ipoUS : ipoInternational;
+      const combinedFO = region === "all" ? foUS + foInternational : region === "US" ? foUS : foInternational;
+
+      const totalDeals = combinedIPO + combinedFO;
 
       return {
         name: key,
         IPO: combinedIPO,
         FO: combinedFO,
-        total: totalDeals, // Include total in the returned data
+        total: totalDeals,
       };
     });
   };
 
-  // Call fetchData whenever a dropdown selection changes
   useEffect(() => {
     fetchData();
-  }, [type, period, region]);
+  }, [type, period, region, sector]);
 
-  // Event handlers for dropdown selections
   const handleTypeChange = (event: SelectChangeEvent) => setType(event.target.value);
   const handlePeriodChange = (event: SelectChangeEvent) => setPeriod(event.target.value);
   const handleRegionChange = (event: SelectChangeEvent) => setRegion(event.target.value);
+  const handleSectorChange = (event: SelectChangeEvent) => setSector(event.target.value);
 
-  // Custom tooltip component
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const { name, IPO, FO, total } = payload[0].payload;
@@ -134,10 +138,9 @@ const DealGraph: React.FC = () => {
         # Of Deals Graph
       </Typography>
 
-      {/* Dropdowns Row */}
-      <Grid container spacing={2} sx={{ marginBottom: 2 }}>
-        <Grid item xs={12} sm={4} md={3}>
-          <FormControl fullWidth variant="outlined" size="small">
+      <Grid container spacing={2} sx={{ justifyContent: "flex-start" }}>
+      <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
+      <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
             <InputLabel>Type</InputLabel>
             <Select value={type} onChange={handleTypeChange} label="Type">
               <MenuItem value="ipo">IPO</MenuItem>
@@ -147,8 +150,8 @@ const DealGraph: React.FC = () => {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={4} md={3}>
-          <FormControl fullWidth variant="outlined" size="small">
+        <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
+        <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
             <InputLabel>Period</InputLabel>
             <Select value={period} onChange={handlePeriodChange} label="Period">
               <MenuItem value="yearly">Yearly</MenuItem>
@@ -158,8 +161,8 @@ const DealGraph: React.FC = () => {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={4} md={3}>
-          <FormControl fullWidth variant="outlined" size="small">
+        <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
+        <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
             <InputLabel>Region</InputLabel>
             <Select value={region} onChange={handleRegionChange} label="Region">
               <MenuItem value="US">US</MenuItem>
@@ -168,9 +171,22 @@ const DealGraph: React.FC = () => {
             </Select>
           </FormControl>
         </Grid>
+
+        <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
+        <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 200 }}>
+            <InputLabel>Sector</InputLabel>
+            <Select value={sector} onChange={handleSectorChange} label="Sector">
+              <MenuItem value="all">All</MenuItem>
+              {sectorOptions.map((sectorName) => (
+                <MenuItem key={sectorName} value={sectorName}>
+                  {sectorName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
 
-      {/* Bar Chart */}
       <Box sx={{ width: "100%", height: 400 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -184,9 +200,8 @@ const DealGraph: React.FC = () => {
           >
             <XAxis dataKey="name" />
             <YAxis />
-            <Tooltip content={<CustomTooltip />} /> {/* Use custom tooltip */}
+            <Tooltip content={<CustomTooltip />} />
             <Legend />
-            {/* Conditional rendering of bars based on type */}
             {type === "ipo" || type === "all" ? (
               <Bar dataKey="IPO" stackId="a" fill="#8884d8" name="IPO" />
             ) : null}
