@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -9,84 +9,94 @@ import {
   ResponsiveContainer,
   LabelList,
 } from "recharts";
-import { Container, Grid, Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
+import {
+  Container,
+  Grid,
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Typography,
+} from "@mui/material";
+import axios from "axios";
 
-// Mock data
-const initialData = [
-  { name: "2001", ipo: 3200, fo: 2500, us: false },
-  { name: "2002", ipo: 2700, fo: 2400, us: true },
-  { name: "2003", ipo: 3500, fo: 2900, us: false },
-  { name: "2004", ipo: 3100, fo: 2100, us: true },
-  { name: "2005", ipo: 2800, fo: 3000, us: false },
-  { name: "2006", ipo: 4000, fo: 3300, us: true },
-  { name: "2007", ipo: 3700, fo: 3600, us: false },
-  { name: "2008", ipo: 2900, fo: 2200, us: true },
-  { name: "2009", ipo: 2600, fo: 1800, us: false },
-  { name: "2010", ipo: 3100, fo: 2400, us: true },
-  { name: "2011", ipo: 3400, fo: 2600, us: true },
-  { name: "2012", ipo: 3900, fo: 2800, us: false },
-  { name: "2013", ipo: 3600, fo: 2900, us: true },
-  { name: "2014", ipo: 3300, fo: 3000, us: false },
-  { name: "2015", ipo: 4100, fo: 3200, us: true },
-  { name: "2016", ipo: 3800, fo: 2700, us: false },
-  { name: "2017", ipo: 3200, fo: 2300, us: true },
-  { name: "2018", ipo: 2900, fo: 2400, us: false },
-  { name: "2019", ipo: 3700, fo: 3000, us: true },
-  { name: "2020", ipo: 4000, fo: 2400, us: true },
-  { name: "2021", ipo: 3000, fo: 1398, us: false },
-  { name: "2022", ipo: 2000, fo: 9800, us: true },
-  { name: "2023", ipo: 2780, fo: 3908, us: true },
-  { name: "2024", ipo: 1890, fo: 4800, us: false }
-];
+// Define the type for the nested data response
+interface ApiResponse {
+  [key: string]: {
+    FO: { International: number; US: number };
+    IPO: { International: number; US: number };
+  };
+}
+
+// Define the type for chart data
+interface ChartData {
+  name: string;
+  ipoInternational?: number;
+  ipoUS?: number;
+  foInternational?: number;
+  foUS?: number;
+}
 
 const DealGraph: React.FC = () => {
+  const [data, setData] = useState<ChartData[]>([]); // Chart data after transformation
   const [type, setType] = useState("all"); // IPO, FO, All
-  const [period, setPeriod] = useState("yearly"); // Year, Quarterly, Monthly
+  const [period, setPeriod] = useState("yearly"); // Yearly, Quarterly, Monthly
   const [region, setRegion] = useState("all"); // US, International, All
 
-  // Function to filter data based on selected region
-  const filterData = () => {
-    let filteredData = initialData;
-
-    // Filter by region
-    if (region === "US") {
-      filteredData = filteredData.filter((d) => d.us);
-    } else if (region === "International") {
-      filteredData = filteredData.filter((d) => !d.us);
+  // Function to fetch data from API based on selected filters
+  const fetchData = async () => {
+    try {
+      const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", {
+        type,
+        period,
+        region,
+      });
+      const transformedData = transformData(response.data);
+      setData(transformedData); // Now response.data is typed correctly
+    } catch (error) {
+      console.error("Error fetching data from API:", error);
     }
-
-    return filteredData;
   };
+
+  // Transform API response data into a format suitable for Recharts
+  const transformData = (apiData: ApiResponse): ChartData[] => {
+    return Object.keys(apiData).map((key) => ({
+      name: key,
+      ipoInternational: apiData[key].IPO?.International,
+      ipoUS: apiData[key].IPO?.US,
+      foInternational: apiData[key].FO?.International,
+      foUS: apiData[key].FO?.US,
+    }));
+  };
+
+  // Call fetchData whenever a dropdown selection changes
+  useEffect(() => {
+    fetchData();
+  }, [type, period, region]);
 
   // Event handlers for dropdown selections
-  const handleTypeChange = (event: SelectChangeEvent) => {
-    setType(event.target.value);
-  };
-
-  const handlePeriodChange = (event: SelectChangeEvent) => {
-    setPeriod(event.target.value);
-  };
-
-  const handleRegionChange = (event: SelectChangeEvent) => {
-    setRegion(event.target.value);
-  };
+  const handleTypeChange = (event: SelectChangeEvent) => setType(event.target.value);
+  const handlePeriodChange = (event: SelectChangeEvent) => setPeriod(event.target.value);
+  const handleRegionChange = (event: SelectChangeEvent) => setRegion(event.target.value);
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <Typography
         variant="h6"
         sx={{
-          maxWidth: '600px',
-          fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' },
-          lineHeight: '1.6',
-          marginBottom: '10px',
-          color: '#002060',
-          fontWeight: 'bold'
+          maxWidth: "600px",
+          fontSize: { xs: "1rem", sm: "1.2rem", md: "1.5rem" },
+          lineHeight: "1.6",
+          marginBottom: "10px",
+          color: "#002060",
+          fontWeight: "bold",
         }}
       >
         # Of Deals Graph
       </Typography>
-      
+
       {/* Dropdowns Row */}
       <Grid container spacing={2} sx={{ marginBottom: 2 }}>
         <Grid item xs={12} sm={4} md={3}>
@@ -127,7 +137,7 @@ const DealGraph: React.FC = () => {
       <Box sx={{ width: "100%", height: 400 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={filterData()}
+            data={data}
             margin={{
               top: 20,
               right: 30,
@@ -139,16 +149,34 @@ const DealGraph: React.FC = () => {
             <YAxis />
             <Tooltip />
             <Legend />
-            {/* Stacked Bars for IPO and FO */}
+            {/* Stacked Bars for IPO and FO based on selected type */}
             {type === "ipo" || type === "all" ? (
-              <Bar dataKey="ipo" stackId="a" fill="#8884d8">
-                <LabelList dataKey="ipo" position="inside" fill="white" />
-              </Bar>
+              <>
+                {region !== "US" && (
+                  <Bar dataKey="ipoInternational" stackId="a" fill="#8884d8">
+                    <LabelList dataKey="ipoInternational" position="inside" fill="white" />
+                  </Bar>
+                )}
+                {region !== "International" && (
+                  <Bar dataKey="ipoUS" stackId="a" fill="#8dd1e1">
+                    <LabelList dataKey="ipoUS" position="inside" fill="white" />
+                  </Bar>
+                )}
+              </>
             ) : null}
             {type === "fo" || type === "all" ? (
-              <Bar dataKey="fo" stackId="a" fill="#82ca9d">
-                <LabelList dataKey="fo" position="inside" fill="white" />
-              </Bar>
+              <>
+                {region !== "US" && (
+                  <Bar dataKey="foInternational" stackId="a" fill="#82ca9d">
+                    <LabelList dataKey="foInternational" position="inside" fill="white" />
+                  </Bar>
+                )}
+                {region !== "International" && (
+                  <Bar dataKey="foUS" stackId="a" fill="#a4de6c">
+                    <LabelList dataKey="foUS" position="inside" fill="white" />
+                  </Bar>
+                )}
+              </>
             ) : null}
           </BarChart>
         </ResponsiveContainer>
