@@ -138,10 +138,10 @@ const OpportunityMain: React.FC = () => {
           fontWeight: "bold",
         }}
       >
-        # Of Deals Graph
+        Opportunity Value on excess
       </Typography>
 
-      <Grid container spacing={2} sx={{ justifyContent: "flex-start", paddingLeft: '50px' }}>
+      <Grid container spacing={2} sx={{ justifyContent: "flex-start", paddingLeft: '50px',marginBottom:'10px' }}>
         <Grid item xs={6} sm={3} md={2}>
           <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
             <InputLabel>Type</InputLabel>
