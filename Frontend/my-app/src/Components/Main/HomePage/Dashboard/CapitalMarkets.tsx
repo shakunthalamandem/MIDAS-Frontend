@@ -3,6 +3,8 @@ import { Box, Typography, Tabs, Tab } from '@mui/material';
 import DealGraph from '../../MonasheeGraphs/DealGraph';
 import DealVolume from '../../MonasheeGraphs/DealVolume';
 import OpportunityMain from '../../MonasheeGraphs/OpportunityMain';
+import OpportunityAbsBasis from '../../MonasheeGraphs/OpportunityAbsBasis';
+import SkewMain from '../../MonasheeGraphs/SkewMain';
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -72,7 +74,21 @@ const CapitalMarkets: React.FC = () => {
             }}
           />
           <Tab
-            label="Opportunity Main"
+            label="Opportunity Value Ex"
+            sx={{
+              color: value === 2 ? '#3F51B5' : '#777',
+              '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
+            }}
+          />
+          <Tab
+            label="Opportunity Value Abs"
+            sx={{
+              color: value === 2 ? '#3F51B5' : '#777',
+              '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
+            }}
+          />
+            <Tab
+            label="Skew Table"
             sx={{
               color: value === 2 ? '#3F51B5' : '#777',
               '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
@@ -83,6 +99,9 @@ const CapitalMarkets: React.FC = () => {
         {value === 0 && <DealGraph />}
         {value === 1 && <DealVolume />}
         {value === 2 && <OpportunityMain />}
+        {value === 3 && <OpportunityAbsBasis />}
+        {value === 3 && <SkewMain />}
+
       </Box>
     </>
   );

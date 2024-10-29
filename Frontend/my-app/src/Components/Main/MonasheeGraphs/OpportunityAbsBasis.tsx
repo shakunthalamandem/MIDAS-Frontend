@@ -23,8 +23,8 @@ import axios from "axios";
 
 interface ApiResponse {
   [key: string]: {
-    FO: { US: { [sector: string]: { opportunity_value_ex: number } }; International: { [sector: string]: { opportunity_value_ex: number } } };
-    IPO: { US: { [sector: string]: { opportunity_value_ex: number } }; International: { [sector: string]: { opportunity_value_ex: number } } };
+    FO: { US: { [sector: string]: { opportunity_value_on_abs_basis: number } }; International: { [sector: string]: { opportunity_value_on_abs_basis: number } } };
+    IPO: { US: { [sector: string]: { opportunity_value_on_abs_basis: number } }; International: { [sector: string]: { opportunity_value_on_abs_basis: number } } };
   };
 }
 
@@ -35,7 +35,7 @@ interface ChartData {
   total?: number;
 }
 
-const OpportunityMain: React.FC = () => {
+const OpportunityAbsBasis: React.FC = () => {
   const [data, setData] = useState<ChartData[]>([]);
   const [type, setType] = useState("all");
   const [period, setPeriod] = useState("yearly");
@@ -47,7 +47,7 @@ const OpportunityMain: React.FC = () => {
     try {
       const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", {
         period,
-        opportunity_value_ex: "true",
+        opportunity_value_on_abs_basis: "true",
       });
       console.log(response.data);
 
@@ -73,10 +73,10 @@ const OpportunityMain: React.FC = () => {
       const ipoData = apiData[key].IPO;
       const foData = apiData[key].FO;
 
-      const filterBySector = (regionData: Record<string, { opportunity_value_ex: number }>) =>
+      const filterBySector = (regionData: Record<string, { opportunity_value_on_abs_basis: number }>) =>
         Object.entries(regionData || {})
           .filter(([sect]) => sector === "all" || sect === sector)
-          .reduce((sum, [, { opportunity_value_ex }]) => sum + opportunity_value_ex, 0);
+          .reduce((sum, [, { opportunity_value_on_abs_basis }]) => sum + opportunity_value_on_abs_basis, 0);
 
       const ipoUS = filterBySector(ipoData.US);
       const ipoInternational = filterBySector(ipoData.International);
@@ -218,4 +218,4 @@ const OpportunityMain: React.FC = () => {
   );
 };
 
-export default OpportunityMain;
+export default OpportunityAbsBasis;
