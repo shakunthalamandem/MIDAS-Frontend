@@ -83,14 +83,14 @@ const CapitalMarkets: React.FC = () => {
           <Tab
             label="Opportunity Value Abs"
             sx={{
-              color: value === 2 ? '#3F51B5' : '#777',
+              color: value === 3 ? '#3F51B5' : '#777',
               '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
             }}
           />
             <Tab
             label="Skew Table"
             sx={{
-              color: value === 2 ? '#3F51B5' : '#777',
+              color: value === 4 ? '#3F51B5' : '#777',
               '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
             }}
           />
@@ -100,7 +100,7 @@ const CapitalMarkets: React.FC = () => {
         {value === 1 && <DealVolume />}
         {value === 2 && <OpportunityMain />}
         {value === 3 && <OpportunityAbsBasis />}
-        {value === 3 && <SkewMain />}
+        {value === 4 && <SkewMain />}
 
       </Box>
     </>
