@@ -23,8 +23,8 @@ import axios from "axios";
 
 interface ApiResponse {
   [key: string]: {
-    FO: { US: { [sector: string]: number }; International: { [sector: string]: number } };
-    IPO: { US: { [sector: string]: number }; International: { [sector: string]: number } };
+    FO: { US: { [sector: string]: { count: number } }; International: { [sector: string]: { count: number } } };
+    IPO: { US: { [sector: string]: { count: number } }; International: { [sector: string]: { count: number } } };
   };
 }
 
@@ -69,34 +69,40 @@ const DealGraph: React.FC = () => {
     }
   };
 
-  const transformData = (apiData: ApiResponse): ChartData[] => {
-    return Object.keys(apiData).map((key) => {
-      const ipoData = apiData[key].IPO;
-      const foData = apiData[key].FO;
+// Define a type for the sector count
+interface SectorCount {
+  count: number;
+}
 
-      const filterBySector = (regionData: any) =>
-        Object.entries(regionData || {})
-          .filter(([sect]) => sector === "all" || sect === sector)
-          .reduce((sum, [, count]) => sum + (count as number), 0);
+const transformData = (apiData: ApiResponse): ChartData[] => {
+  return Object.keys(apiData).map((key) => {
+    const ipoData = apiData[key].IPO;
+    const foData = apiData[key].FO;
 
-      const ipoUS = filterBySector(ipoData.US);
-      const ipoInternational = filterBySector(ipoData.International);
-      const foUS = filterBySector(foData.US);
-      const foInternational = filterBySector(foData.International);
+    const filterBySector = (regionData: Record<string, SectorCount>) =>
+      Object.entries(regionData || {})
+        .filter(([sect]) => sector === "all" || sect === sector)
+        .reduce((sum, [, { count }]) => sum + count, 0);
 
-      const combinedIPO = region === "all" ? ipoUS + ipoInternational : region === "US" ? ipoUS : ipoInternational;
-      const combinedFO = region === "all" ? foUS + foInternational : region === "US" ? foUS : foInternational;
+    const ipoUS = filterBySector(ipoData.US);
+    const ipoInternational = filterBySector(ipoData.International);
+    const foUS = filterBySector(foData.US);
+    const foInternational = filterBySector(foData.International);
 
-      const totalDeals = combinedIPO + combinedFO;
+    const combinedIPO = region === "all" ? ipoUS + ipoInternational : region === "US" ? ipoUS : ipoInternational;
+    const combinedFO = region === "all" ? foUS + foInternational : region === "US" ? foUS : foInternational;
 
-      return {
-        name: key,
-        IPO: combinedIPO,
-        FO: combinedFO,
-        total: totalDeals,
-      };
-    });
-  };
+    const totalDeals = combinedIPO + combinedFO;
+
+    return {
+      name: key,
+      IPO: combinedIPO,
+      FO: combinedFO,
+      total: totalDeals,
+    };
+  });
+};
+
 
   useEffect(() => {
     fetchData();
@@ -173,7 +179,7 @@ const DealGraph: React.FC = () => {
         </Grid>
 
         <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
-        <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 200 }}>
+        <FormControl fullWidth variant="outlined" size="small" sx={{ minWidth: 250 }}>
             <InputLabel>Sector</InputLabel>
             <Select value={sector} onChange={handleSectorChange} label="Sector">
               <MenuItem value="all">All</MenuItem>
