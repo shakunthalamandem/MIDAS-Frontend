@@ -138,7 +138,7 @@ const DealGraph: React.FC = () => {
         # Of Deals Graph
       </Typography>
 
-      <Grid container spacing={2} sx={{ justifyContent: "flex-start" }}>
+      <Grid container spacing={2} sx={{ justifyContent: "flex-start" ,paddingLeft:'50px'}}>
       <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
       <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
             <InputLabel>Type</InputLabel>
