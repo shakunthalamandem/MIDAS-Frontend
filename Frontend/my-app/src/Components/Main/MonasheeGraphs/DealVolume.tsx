@@ -90,9 +90,9 @@ const DealVolume: React.FC = () => {
 
       return {
         name: key,
-        IPO: combinedIPO,
-        FO: combinedFO,
-        total: totalDeals,
+        IPO: combinedIPO / 1e9, // Convert to billions
+        FO: combinedFO / 1e9, // Convert to billions
+        total: totalDeals / 1e9, // Convert to billions
       };
     });
   };
@@ -112,13 +112,17 @@ const DealVolume: React.FC = () => {
       return (
         <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '10px' }}>
           <h4>{name}</h4>
-          {type === "ipo" || type === "all" ? <p>IPO: {IPO}</p> : null}
-          {type === "fo" || type === "all" ? <p>FO: {FO}</p> : null}
-          <p>Total Deals: {total}</p>
+          {type === "ipo" || type === "all" ? <p>IPO: {IPO.toFixed(2)}B</p> : null}
+          {type === "fo" || type === "all" ? <p>FO: {FO.toFixed(2)}B</p> : null}
+          <p>Total Deals: {total.toFixed(2)}B</p>
         </div>
       );
     }
     return null;
+  };
+
+  const formatYAxisTick = (value: number) => {
+    return `${value.toFixed(0)}B`; // Format Y-axis tick values in billions
   };
 
   return (
@@ -137,7 +141,7 @@ const DealVolume: React.FC = () => {
         # Of Deals Graph
       </Typography>
 
-      <Grid container spacing={2} sx={{ justifyContent: "flex-start" ,paddingLeft:'50px'}}>
+      <Grid container spacing={2} sx={{ justifyContent: "flex-start", paddingLeft: '50px' }}>
         <Grid item xs={6} sm={3} md={2}>
           <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
             <InputLabel>Type</InputLabel>
@@ -198,7 +202,7 @@ const DealVolume: React.FC = () => {
             }}
           >
             <XAxis dataKey="name" />
-            <YAxis />
+            <YAxis tickFormatter={formatYAxisTick} />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             {type === "ipo" || type === "all" ? (
