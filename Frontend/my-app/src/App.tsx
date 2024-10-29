@@ -13,7 +13,6 @@ const App: React.FC = () => {
   return (
       <Router>
           <NavbarMain />
-          <div style={{ paddingTop: '100px' }}> </div>
           <AppRouters />
           <FooterMain />
           <ScrollToTopButton />
