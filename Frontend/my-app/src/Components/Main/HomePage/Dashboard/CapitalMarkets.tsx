@@ -50,7 +50,7 @@ const CapitalMarkets: React.FC = () => {
         </Typography>
       </Box>
 
-      <Box sx={{ width: '100%', padding: '2rem', backgroundColor: '#fff' }}>
+      <Box sx={{ width: '100%', backgroundColor: '#fff' }}>
         <Tabs
           value={value}
           onChange={handleChange}
