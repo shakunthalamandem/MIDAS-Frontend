@@ -129,6 +129,7 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
   };
 
   return (
+    <>
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <Typography
         variant="h6"
@@ -218,6 +219,7 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
         </ResponsiveContainer>
       </Box>
     </Container>
+    </>
   );
 };
 
