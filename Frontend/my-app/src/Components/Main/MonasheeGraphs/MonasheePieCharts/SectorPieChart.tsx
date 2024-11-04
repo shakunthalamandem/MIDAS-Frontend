@@ -40,28 +40,13 @@ const SectorPieChart: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [years, setYears] = useState<number[]>([]);
 
-  useEffect(() => {
-    const currentYear = new Date().getFullYear();
-    const yearList = Array.from(
-      { length: currentYear - 2000 },
-      (_, i) => 2001 + i
-    );
-    setYears(yearList);
-  }, []);
-
   const fetchData = useCallback(async () => {
     setError(null);
-
-    if (startYear >= endYear) {
-      setError("Start year must be less than End year.");
-      return;
-    }
 
     try {
       const requestData = {
         type,
-        startYear,
-        endYear,
+        year_range: [startYear, endYear],
         region,
       };
       console.log("Sending request with data:", requestData);
@@ -71,21 +56,30 @@ const SectorPieChart: React.FC = () => {
         requestData
       );
 
-      transformSectorData(response.data);
-      console.log("API Response:", response.data);
+      const apiData = response.data;
+      transformSectorData(apiData);
+      extractYears(apiData);
+      console.log("API Response:", apiData);
     } catch (error) {
       console.error("Error fetching data:", error);
-      // if (axios.isAxiosError(error) && error.response) {
-      //   console.error("Response data:", error.response.data);
-      //   console.error("Response status:", error.response.status);
-      //   console.error("Response headers:", error.response.headers);
-      // }
       setError("Failed to fetch data. Please try again later.");
     }
   }, [startYear, endYear, type, region]);
 
+  const extractYears = (apiData: ApiResponse) => {
+    const yearList = Object.keys(apiData)
+      .map(year => parseInt(year))
+      .sort((a, b) => a - b);
+
+    setYears(yearList);
+    if (yearList.length > 0) {
+      setStartYear(yearList[0]);
+      setEndYear(yearList[yearList.length - 1]);
+    }
+  };
+
   const transformSectorData = (apiData: ApiResponse) => {
-    const sectorData: Record<string, number> = {};
+    const aggregatedData: Record<string, number> = {};
 
     Object.keys(apiData).forEach((year) => {
       const yearData = apiData[year];
@@ -100,7 +94,7 @@ const SectorPieChart: React.FC = () => {
             const regionData = categoryData[regionKey as keyof typeof categoryData];
             if (regionData) {
               Object.entries(regionData).forEach(([sector, { count }]) => {
-                sectorData[sector] = (sectorData[sector] || 0) + count;
+                aggregatedData[sector] = (aggregatedData[sector] || 0) + count;
               });
             }
           });
@@ -108,10 +102,10 @@ const SectorPieChart: React.FC = () => {
       });
     });
 
-    const transformedSectorData = Object.entries(sectorData).map(
+    const transformedData = Object.entries(aggregatedData).map(
       ([name, value]) => ({ name, value })
     );
-    setSectorData(transformedSectorData);
+    setSectorData(transformedData);
   };
 
   useEffect(() => {
