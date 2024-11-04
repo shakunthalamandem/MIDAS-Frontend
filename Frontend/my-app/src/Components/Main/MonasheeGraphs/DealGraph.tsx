@@ -50,7 +50,7 @@ const DealGraph: React.FC = () => {
         period,
         region,
       });
-      console.log(response.data);
+      console.log("result set",response.data);
 
       // Collect unique sectors
       const sectors = new Set<string>();
