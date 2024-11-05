@@ -13,17 +13,10 @@ import {
 
 interface ApiResponse {
   [year: string]: {
-    FO: {
-      US: Record<string, { count: number }>;
-      International: Record<string, { count: number }>;
-    };
-    IPO: {
-      US: Record<string, { count: number }>;
-      International: Record<string, { count: number }>;
-    };
+    FO: { US: { [sector: string]: Record<string, number> }; International: { [sector: string]: Record<string, number> } };
+    IPO: { US: { [sector: string]: Record<string, number> }; International: { [sector: string]: Record<string, number> } };
   };
 }
-
 interface YearResponse {
   years: number[]; // Assuming the API returns an object with a years array
 }
@@ -36,17 +29,26 @@ interface ChartData {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 interface SectorPieChartProps {
-  initialData: ChartData[]; // New prop for initial data
+  opportunity_value_on_abs_basis?: string;
+  opportunity_value_ex?: string;
+  deal_value?: string;
+  deal_count?: string;
 }
 
-const SectorPieChart: React.FC<SectorPieChartProps> = ({ initialData }) => {
-  const [sectorData, setSectorData] = useState<ChartData[]>(initialData);
-  const [startYear, setStartYear] = useState<number | undefined>();
-  const [endYear, setEndYear] = useState<number | undefined>(); // End year to be calculated based on start year
+const SectorPieChart: React.FC<SectorPieChartProps> = ({ 
+  opportunity_value_on_abs_basis = "false",
+  opportunity_value_ex = "false",
+  deal_value = "false",
+  deal_count = "true",
+}) => {
+  const [sectorData, setSectorData] = useState<ChartData[]>([]);
+  const [startYear, setStartYear] = useState<number >();
+  const [endYear, setEndYear] = useState<number >(); // End year to be calculated based on start year
   const [type, setType] = useState<"IPO" | "FO" | "all">("all");
   const [region, setRegion] = useState<"US" | "International" | "all">("all");
   const [error, setError] = useState<string | null>(null);
   const [years, setYears] = useState<number[]>([]);
+  const [regions, setRegions] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   // Fetch distinct years from API
@@ -73,9 +75,13 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({ initialData }) => {
     try {
       const requestData = {
         type,
-        year_range: [startYear, endYear], // Ensure these are numbers
-        period: "monthly",
+        year_range: [startYear, endYear],
+        period: "yearly",
         region,
+        opportunity_value_on_abs_basis,
+        opportunity_value_ex,
+        deal_value,
+        deal_count,
       };
 
       const response = await axios.post<ApiResponse>(
@@ -85,12 +91,30 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({ initialData }) => {
 
       const apiData = response.data;
       transformSectorData(apiData);
+      extractRegions(apiData);
+
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
     }
-  }, [startYear, endYear, type, region]);
+  }, [startYear, endYear, type, region, opportunity_value_on_abs_basis, opportunity_value_ex, deal_value, deal_count]);
 
+  const extractRegions = (apiData: ApiResponse) => {
+    const allRegions = new Set<string>();
+
+    Object.values(apiData).forEach((yearData) => {
+      Object.values(yearData).forEach((categoryData) => {
+        ["US", "International"].forEach((region) => {
+          const sectorData = categoryData[region as keyof typeof categoryData];
+          if (sectorData) {
+            Object.keys(sectorData).forEach((region) => allRegions.add(region));
+          }
+        });
+      });
+    });
+
+    setRegions(Array.from(allRegions));
+  };
   const transformSectorData = (apiData: ApiResponse) => {
     const aggregatedData: Record<string, number> = {};
 
@@ -103,9 +127,9 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({ initialData }) => {
           const regions = region === "all" ? ["US", "International"] : [region];
 
           regions.forEach((regionKey) => {
-            const regionData = categoryData[regionKey as keyof typeof categoryData];
-            if (regionData) {
-              Object.entries(regionData).forEach(([sector, { count }]) => {
+            const sectorData = categoryData[regionKey as keyof typeof categoryData];
+            if (sectorData) {
+              Object.entries(sectorData).forEach(([sector, { count }]) => {
                 aggregatedData[sector] = (aggregatedData[sector] || 0) + count;
               });
             }
@@ -125,8 +149,14 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({ initialData }) => {
   }, [fetchYears]);
 
   useEffect(() => {
-    fetchData(); // Fetch data when the year, type, or region changes
-  }, [fetchData]);
+    if (startYear) {
+      setEndYear(startYear + 1);
+    }
+  }, [startYear]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData, startYear, endYear, type, region, opportunity_value_on_abs_basis, opportunity_value_ex, deal_value, deal_count]);
 
   const onPieEnter = (_: any, index: number) => setActiveIndex(index);
 
