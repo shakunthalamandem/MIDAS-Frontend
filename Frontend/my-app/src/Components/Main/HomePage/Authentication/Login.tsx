@@ -1,187 +1,159 @@
-import React, { useState } from "react";
-import { TextField, Button, IconButton, Typography, Box, Container, Divider, Grid } from "@mui/material";
-import { FaFacebook } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-import { BsEyeSlash, BsEye } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Box, Button, TextField, Typography, Snackbar, Link, IconButton, InputAdornment, Grid } from '@mui/material';
+import StartIcon from '@mui/icons-material/Start';  // Import the StartIcon
+// import { useAuth } from './AuthContext';
+import { useNavigate } from 'react-router-dom';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useAuth } from './AuthContext';
 
 const Login: React.FC = () => {
-  const [passwordVisible, setPasswordVisible] = useState(true);
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const { login, error, successMessage, clearMessages } = useAuth();
+    const navigate = useNavigate();
 
-  const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        await login(username, password);
+    };
 
-  return (
-    <Container maxWidth="xs">
-      <Box
-        sx={{
-          backgroundColor: "#f8f9fa",
-          borderRadius: 4,
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-          padding: 4,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 3,
-          mt: 2, // Reduce top margin for less gap at the top
-          mb: 8, // Increase bottom margin for more gap at the bottom
-          border: "1px solid #e0e0e0",
-          width: "100%",
-        }}
-      >
-        <Typography variant="h4" fontWeight="700" color="#293c3d" gutterBottom>
-          Sign In
-        </Typography>
+    const handleSignupRedirect = () => {
+        navigate('/signup');
+    };
 
-        {/* Email Input */}
-        <TextField
-          fullWidth
-          label="Email"
-          variant="outlined"
-          type="email"
-          sx={{
-            marginBottom: 2,
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: "#d3d290",
-              },
-              "&:hover fieldset": {
-                borderColor: "#aab56b",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "#6d7f40",
-              },
-            
-            },
-            "& .MuiInputLabel-root": {
-                color: "#d3d290", // Default label color
-                "&.Mui-focused": {
-                  color: "#6d7f40", // Focused label color
-                },
-              },
-          }}
-        />
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
-        {/* Password Input */}
-        <Box position="relative" width="100%">
-          <TextField
-            fullWidth
-            label="Password"
-            variant="outlined"
-            type={passwordVisible ? "text" : "password"}
-            sx={{
-              marginBottom: 2,
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#d3d290",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#aab56b",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#6d7f40",
-                },
-               
-              },
-              "& .MuiInputLabel-root": {
-                color: "#d3d290", // Default label color
-                "&.Mui-focused": {
-                  color: "#6d7f40", // Focused label color
-                },
-              },
-              
-            }}
-          />
-          <IconButton
-            onClick={togglePasswordVisibility}
-            sx={{ position: "absolute", top: "10%", right: 10, color: "#6d7f40" }}
-          >
-            {passwordVisible ? <BsEye /> : < BsEyeSlash/>}
-          </IconButton>
-        </Box>
-
-        {/* Forget Password Link */}
-        <Link to="/forgot-password" style={{ textDecoration: "none", alignSelf: "flex-end" }}>
-          <Typography variant="body2" color="primary">
-            Forget Password?
-          </Typography>
-        </Link>
-
-        {/* Login Button */}
-        <Button
-          fullWidth
-          variant="contained"
-          color="primary"
-          sx={{
-            mt: 2,
-            backgroundColor: "#6d7f40",
-            "&:hover": {
-              backgroundColor: "#54662a",
-            },
-          }}
-        >
-          Login
-        </Button>
-
-        <Grid container justifyContent="center" alignItems="center" spacing={1}>
-          <Grid item>
-            <Typography variant="body1" color="#293c3d">
-              Don't have an account?
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Link to="/signup" style={{ textDecoration: "none" }}>
-              <Typography variant="body1" color="primary">
-                Sign Up
-              </Typography>
-            </Link>
-          </Grid>
+    return (
+        <Grid container spacing={2} sx={{ mt: 4, p: 2, maxWidth: '1200px', justifyContent: 'center', mx: 'auto' }}>
+            <Grid item xs={12} md={6}>
+                <Box sx={{ pr: { xs: 0, md: 2 }, mb: { xs: 4, md: 0 } }}>
+                    <Typography
+                        variant="h4"
+                        component="h1"
+                        gutterBottom
+                        sx={{ color: '#6b0f0f' }}  // Set color for main heading
+                    >
+                        Start Investing Like a PRO with Expert Cryptocurrency Analysis and Tools
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        gutterBottom
+                        sx={{ display: 'flex', alignItems: 'center', color: '#3f4c5d' }}  // Set color for subheadings
+                    >
+                        <StartIcon sx={{ mr: 1 }} /> Crypto Screener
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        gutterBottom
+                        sx={{ display: 'flex', alignItems: 'center', color: '#3f4c5d' }}  // Set color for subheadings
+                    >
+                        <StartIcon sx={{ mr: 1 }} /> Sector Signals
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        gutterBottom
+                        sx={{ display: 'flex', alignItems: 'center', color: '#3f4c5d' }}  // Set color for subheadings
+                    >
+                        <StartIcon sx={{ mr: 1 }} /> Cryptocurrency Technical Analysis
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        gutterBottom
+                        sx={{ display: 'flex', alignItems: 'center', color: '#3f4c5d' }}  // Set color for subheadings
+                    >
+                        <StartIcon sx={{ mr: 1 }} /> Crypto Lists & Coin Analyzer
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        gutterBottom
+                        sx={{ display: 'flex', alignItems: 'center', color: '#3f4c5d' }}  // Set color for subheadings
+                    >
+                        <StartIcon sx={{ mr: 1 }} /> Portfolio X-Ray Analyzer
+                    </Typography>
+                </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+                <Box sx={{ maxWidth: 400, mx: 'auto' }}>
+                    <Typography variant="h4" component="h1" gutterBottom>
+                        Login
+                    </Typography>
+                    <form onSubmit={handleSubmit}>
+                        <TextField
+                            label="Username"
+                            fullWidth
+                            margin="normal"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                        <TextField
+                            label="Password"
+                            type={showPassword ? 'text' : 'password'}
+                            fullWidth
+                            margin="normal"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={handleClickShowPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                            Login
+                        </Button>
+                    </form>
+                    <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+                        Don't have an account?{' '}
+                        <Link component="button" onClick={handleSignupRedirect} color="primary">
+                            Signup
+                        </Link>
+                    </Typography>
+                    {error && (
+                        <Snackbar
+                            open={true}
+                            autoHideDuration={6000}
+                            onClose={clearMessages}
+                            message={error}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            }}
+                        />
+                    )}
+                    {successMessage && (
+                        <Snackbar
+                            open={true}
+                            autoHideDuration={6000}
+                            onClose={clearMessages}
+                            message={successMessage}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            }}
+                        />
+                    )}
+                </Box>
+            </Grid>
         </Grid>
-
-        <Divider sx={{ width: "100%", my: 2, color: "#aab56b" }}>or</Divider>
-
-        {/* Social Login Buttons */}
-        <Grid container spacing={1} sx={{ width: "100%" }}>
-          <Grid item xs={6}>
-            <Button
-              fullWidth
-              startIcon={<FaFacebook />}
-              variant="contained"
-              sx={{
-                backgroundColor: "#4267b2",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#3b5998",
-                },
-                fontSize: "0.875rem",
-                py: 1,
-              }}
-            >
-              Facebook
-            </Button>
-          </Grid>
-          <Grid item xs={6}>
-            <Button
-              fullWidth
-              startIcon={<FcGoogle />}
-              variant="outlined"
-              sx={{
-                color: "#293c3d",
-                borderColor: "#d3d290",
-                "&:hover": {
-                  borderColor: "#6d7f40",
-                  backgroundColor: "#f5f5f5",
-                },
-                fontSize: "0.875rem",
-                py: 1,
-              }}
-            >
-              Google
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
-    </Container>
-  );
+    );
 };
 
 export default Login;
