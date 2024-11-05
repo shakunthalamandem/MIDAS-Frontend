@@ -10,16 +10,16 @@ const api = axios.create({
 });
 
 // Request interceptor to add token to headers
-// api.interceptors.request.use(
-//     (config) => {
-//         const token = localStorage.getItem('token');
-//         if (token) {
-//             config.headers.Authorization = `Bearer ${token}`;
-//         }
-//         return config;
-//     },
-//     (error) => Promise.reject(error)
-// );
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
 // Response interceptor to handle token refresh
 api.interceptors.response.use(
@@ -51,10 +51,10 @@ api.interceptors.response.use(
                     }
                 );
 
-                // const newToken = response.data.access;
-                // localStorage.setItem('token', newToken);
-                // api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-                // originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+                const newToken = response.data.access;
+                localStorage.setItem('token', newToken);
+                api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+                originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
                 console.error('Error refreshing token:', refreshError);
