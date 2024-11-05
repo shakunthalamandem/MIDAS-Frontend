@@ -20,6 +20,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import DealPieChart from "./MonasheePieCharts/DealPieChart";
 
 interface ApiResponse {
   [key: string]: {
@@ -126,6 +127,7 @@ const DealVolume: React.FC = () => {
   };
 
   return (
+    <>
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <Typography
         variant="h6"
@@ -215,6 +217,8 @@ const DealVolume: React.FC = () => {
         </ResponsiveContainer>
       </Box>
     </Container>
+          <DealPieChart />
+</>
   );
 };
 

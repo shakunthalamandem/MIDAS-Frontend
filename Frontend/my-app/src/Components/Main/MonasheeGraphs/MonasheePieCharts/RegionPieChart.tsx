@@ -1,70 +1,119 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer, Legend } from "recharts";
+import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer, Legend, Sector, Label } from "recharts";
 import {
   Container,
-  Grid,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Typography,
+  Box,
 } from "@mui/material";
+
+interface ApiResponse {
+  [year: string]: {
+    FO: {
+      US: Record<string, { count: number }>;
+      International: Record<string, { count: number }>;
+    };
+    IPO: {
+      US: Record<string, { count: number }>;
+      International: Record<string, { count: number }>;
+    };
+  };
+}
 
 interface ChartData {
   name: string;
   value: number;
 }
 
-interface ApiResponse {
-  [year: string]: {
-    FO: { US: Record<string, { count: number }>; International: Record<string, { count: number }> };
-    IPO: { US: Record<string, { count: number }>; International: Record<string, { count: number }> };
-  };
-}
-
-const COLORS = ["#0088FE", "#00C49F"];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const RegionPieChart: React.FC = () => {
   const [regionData, setRegionData] = useState<ChartData[]>([]);
-  const [type, setType] = useState("all");
-  const [startYear, setStartYear] = useState("2020");
-  const [endYear, setEndYear] = useState("2023");
-  const [sector, setSector] = useState("all");
+  const [startYear, setStartYear] = useState<number>(2001);
+  const [endYear, setEndYear] = useState<number>(2024);
+  const [type, setType] = useState<"IPO" | "FO" | "all">("all");
+  const [sector, setSector] = useState<string | "all">("all");
+  const [error, setError] = useState<string | null>(null);
+  const [years, setYears] = useState<number[]>([]);
+  const [sectors, setSectors] = useState<string[]>([]);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    setError(null);
+
     try {
-      const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", {
+      const requestData = {
         type,
-        startYear,
-        endYear,
+        year_range: [startYear, endYear],
+        period: "monthly",
         sector,
-      });
-      transformRegionData(response.data);
+      };
+
+      const response = await axios.post<ApiResponse>(
+        "http://192.168.1.59:9000/api/deals_graph/",
+        requestData
+      );
+
+      const apiData = response.data;
+      transformRegionData(apiData);
+      extractYears(apiData);
+      extractSectors(apiData);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setError("Failed to fetch data. Please try again later.");
+    }
+  }, [startYear, endYear, type, sector]);
+
+  const extractYears = (apiData: ApiResponse) => {
+    const yearList = Object.keys(apiData)
+      .map((year) => parseInt(year))
+      .sort((a, b) => a - b);
+
+    setYears(yearList);
+    if (yearList.length > 0) {
+      setStartYear(yearList[0]);
+      setEndYear(yearList[yearList.length - 1]);
     }
   };
 
+  const extractSectors = (apiData: ApiResponse) => {
+    const allSectors = new Set<string>();
+
+    Object.values(apiData).forEach((yearData) => {
+      Object.values(yearData).forEach((categoryData) => {
+        ["US", "International"].forEach((region) => {
+          const regionData = categoryData[region as keyof typeof categoryData];
+          if (regionData) {
+            Object.keys(regionData).forEach((sector) => allSectors.add(sector));
+          }
+        });
+      });
+    });
+
+    setSectors(Array.from(allSectors));
+  };
+
   const transformRegionData = (apiData: ApiResponse) => {
-    const regionData = { US: 0, International: 0 };
+    const aggregatedData: Record<string, number> = {};
 
-    const years = Object.keys(apiData)
-      .map(Number)
-      .filter((year) => year >= parseInt(startYear) && year <= parseInt(endYear));
+    Object.values(apiData).forEach((yearData) => {
+      const categories = type === "all" ? ["FO", "IPO"] : [type];
 
-    years.forEach((year) => {
-      const yearData = apiData[year as keyof ApiResponse];
-      (type === "all" ? ["FO", "IPO"] : [type]).forEach((category) => {
+      categories.forEach((category) => {
         const categoryData = yearData[category as keyof typeof yearData];
         if (categoryData) {
-          ["US", "International"].forEach((regionKey) => {
-            const regionCounts = categoryData[regionKey as keyof typeof categoryData];
-            if (regionCounts) {
-              Object.entries(regionCounts).forEach(([sec, { count }]) => {
-                if (sector === "all" || sec === sector) {
-                  regionData[regionKey as keyof typeof regionData] += count;
+          const regions = ["US", "International"];
+
+          regions.forEach((region) => {
+            const regionData = categoryData[region as keyof typeof categoryData];
+            if (regionData) {
+              Object.entries(regionData).forEach(([sectorName, { count }]) => {
+                if (sector === "all" || sector === sectorName) {
+                  aggregatedData[region] = (aggregatedData[region] || 0) + count;
                 }
               });
             }
@@ -73,61 +122,122 @@ const RegionPieChart: React.FC = () => {
       });
     });
 
-    setRegionData([
-      { name: "US", value: regionData.US },
-      { name: "International", value: regionData.International },
-    ]);
+    const transformedData = Object.entries(aggregatedData).map(
+      ([name, value]) => ({ name, value })
+    );
+    setRegionData(transformedData);
   };
 
   useEffect(() => {
     fetchData();
-  }, [type, startYear, endYear, sector]);
+  }, [fetchData]);
+
+  const onPieEnter = (_: any, index: number) => setActiveIndex(index);
+
+  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name }: any) => {
+    const RADIAN = Math.PI / 180;
+    const x = cx + (outerRadius + 10) * Math.cos(-RADIAN * midAngle);
+    const y = cy + (outerRadius + 10) * Math.sin(-RADIAN * midAngle);
+
+    return (
+      <text x={x} y={y} fill="#333" textAnchor="middle" dominantBaseline="middle">
+        {`${name}: ${(value * 100 / regionData.reduce((acc, { value }) => acc + value, 0)).toFixed(1)}%`}
+      </text>
+    );
+  };
 
   return (
-    <Container maxWidth="sm">
-      <Typography variant="h6" sx={{ marginBottom: 2 }}>
+    <Container maxWidth="lg" sx={{ paddingY: 4 }}>
+      <Typography
+        variant="h6"
+        sx={{ color: "#002060", fontWeight: "bold", marginBottom: "20px" }}
+      >
         Region Distribution
       </Typography>
-      <Grid container spacing={2} sx={{ marginBottom: 3 }}>
-        <Grid item xs={4}>
-          <FormControl fullWidth size="small">
-            <InputLabel>Type</InputLabel>
-            <Select value={type} onChange={(e) => setType(e.target.value)} label="Type">
-              <MenuItem value="ipo">IPO</MenuItem>
-              <MenuItem value="fo">FO</MenuItem>
-              <MenuItem value="all">All</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl fullWidth size="small">
-            <InputLabel>Start Year</InputLabel>
-            <Select value={startYear} onChange={(e) => setStartYear(e.target.value)} label="Start Year">
-              <MenuItem value="2020">2020</MenuItem>
-              <MenuItem value="2021">2021</MenuItem>
-              <MenuItem value="2022">2022</MenuItem>
-              <MenuItem value="2023">2023</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl fullWidth size="small">
-            <InputLabel>End Year</InputLabel>
-            <Select value={endYear} onChange={(e) => setEndYear(e.target.value)} label="End Year">
-              <MenuItem value="2020">2020</MenuItem>
-              <MenuItem value="2021">2021</MenuItem>
-              <MenuItem value="2022">2022</MenuItem>
-              <MenuItem value="2023">2023</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      </Grid>
+
+      <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#ffebee" }}>
+          <InputLabel>Start Year</InputLabel>
+          <Select
+            value={startYear}
+            onChange={(e) => setStartYear(Number(e.target.value))}
+            label="Start Year"
+            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+          >
+            {years.map((year) => (
+              <MenuItem key={year} value={year}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#e3f2fd" }}>
+          <InputLabel>End Year</InputLabel>
+          <Select
+            value={endYear}
+            onChange={(e) => setEndYear(Number(e.target.value))}
+            label="End Year"
+            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+          >
+            {years.map((year) => (
+              <MenuItem key={year} value={year}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 120, bgcolor: "#e8f5e9" }}>
+          <InputLabel>Type</InputLabel>
+          <Select
+            value={type}
+            onChange={(e) => setType(e.target.value as "IPO" | "FO" | "all")}
+            label="Type"
+            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+          >
+            <MenuItem value="IPO">IPO</MenuItem>
+            <MenuItem value="FO">FO</MenuItem>
+            <MenuItem value="all">All</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 220, bgcolor: "#fff3e0" }}>
+          <InputLabel>Sector</InputLabel>
+          <Select
+            value={sector}
+            onChange={(e) => setSector(e.target.value as string | "all")}
+            label="Sector"
+            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+          >
+            <MenuItem value="all">All</MenuItem>
+            {sectors.map((sec) => (
+              <MenuItem key={sec} value={sec}>
+                {sec}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {error && <Typography color="error">{error}</Typography>}
 
       <ResponsiveContainer width="100%" height={400}>
         <PieChart>
-          <Pie data={regionData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+          <Pie
+            activeIndex={activeIndex}
+            data={regionData}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={100}
+            fill="#82ca9d"
+            onMouseEnter={onPieEnter}
+            label={renderLabel} // Add this line to render labels
+          >
             {regionData.map((entry, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip />

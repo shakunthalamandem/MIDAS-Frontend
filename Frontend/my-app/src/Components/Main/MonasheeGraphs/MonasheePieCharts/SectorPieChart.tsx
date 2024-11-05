@@ -35,8 +35,8 @@ const SectorPieChart: React.FC = () => {
   const [sectorData, setSectorData] = useState<ChartData[]>([]);
   const [startYear, setStartYear] = useState<number>(2001);
   const [endYear, setEndYear] = useState<number>(2021);
-  const [type, setType] = useState("all");
-  const [region, setRegion] = useState("all");
+  const [type, setType] = useState<"IPO" | "FO" | "all">("all");
+  const [region, setRegion] = useState<"US" | "International" | "all">("all");
   const [error, setError] = useState<string | null>(null);
   const [years, setYears] = useState<number[]>([]);
 
@@ -47,6 +47,7 @@ const SectorPieChart: React.FC = () => {
       const requestData = {
         type,
         year_range: [startYear, endYear],
+        period: "monthly",
         region,
       };
       console.log("Sending request with data:", requestData);
@@ -81,8 +82,7 @@ const SectorPieChart: React.FC = () => {
   const transformSectorData = (apiData: ApiResponse) => {
     const aggregatedData: Record<string, number> = {};
 
-    Object.keys(apiData).forEach((year) => {
-      const yearData = apiData[year];
+    Object.values(apiData).forEach((yearData) => {
       const categories = type === "all" ? ["FO", "IPO"] : [type];
 
       categories.forEach((category) => {
@@ -121,8 +121,8 @@ const SectorPieChart: React.FC = () => {
         Sector Distribution
       </Typography>
 
-      <Box sx={{ display: "flex", justifyContent: "space-around", mb: 3 }}>
-        <FormControl variant="outlined" size="small">
+      <Box sx={{ display: "flex", justifyContent: "space-around", mb: 1 }}>
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#ffebee", marginRight: 1 }}>
           <InputLabel>Start Year</InputLabel>
           <Select
             value={startYear}
@@ -137,7 +137,7 @@ const SectorPieChart: React.FC = () => {
           </Select>
         </FormControl>
 
-        <FormControl variant="outlined" size="small">
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#e3f2fd", marginRight: 1 }}>
           <InputLabel>End Year</InputLabel>
           <Select
             value={endYear}
@@ -152,11 +152,11 @@ const SectorPieChart: React.FC = () => {
           </Select>
         </FormControl>
 
-        <FormControl variant="outlined" size="small">
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 120, bgcolor: "#e8f5e9", marginRight: 1 }}>
           <InputLabel>Type</InputLabel>
           <Select
             value={type}
-            onChange={(e) => setType(e.target.value)}
+            onChange={(e) => setType(e.target.value as "IPO" | "FO" | "all")}
             label="Type"
           >
             <MenuItem value="IPO">IPO</MenuItem>
@@ -165,11 +165,11 @@ const SectorPieChart: React.FC = () => {
           </Select>
         </FormControl>
 
-        <FormControl variant="outlined" size="small">
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 220, bgcolor: "#fff3e0" }}>
           <InputLabel>Region</InputLabel>
           <Select
             value={region}
-            onChange={(e) => setRegion(e.target.value)}
+            onChange={(e) => setRegion(e.target.value as "US" | "International" | "all")}
             label="Region"
           >
             <MenuItem value="US">US</MenuItem>
@@ -191,6 +191,8 @@ const SectorPieChart: React.FC = () => {
             cy="50%"
             outerRadius={100}
             fill="#82ca9d"
+            labelLine={false}
+            label={({ percent }) => `${(percent * 100).toFixed(0)}%`} // Show only percentage
           >
             {sectorData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

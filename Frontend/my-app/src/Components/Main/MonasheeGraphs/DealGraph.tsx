@@ -20,6 +20,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import DealPieChart from "./MonasheePieCharts/DealPieChart";
 
 interface ApiResponse {
   [key: string]: {
@@ -219,6 +220,8 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
         </ResponsiveContainer>
       </Box>
     </Container>
+    <DealPieChart />
+
     </>
   );
 };
