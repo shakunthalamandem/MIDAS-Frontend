@@ -24,6 +24,10 @@ interface ApiResponse {
   };
 }
 
+interface YearResponse {
+  years: number[]; // Assuming the API returns an object with a years array
+}
+
 interface ChartData {
   name: string;
   value: number;
@@ -31,10 +35,14 @@ interface ChartData {
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-const RegionPieChart: React.FC = () => {
-  const [regionData, setRegionData] = useState<ChartData[]>([]);
-  const [startYear, setStartYear] = useState<number>(2001);
-  const [endYear, setEndYear] = useState<number>(2024);
+interface RegionPieChartProps {
+  initialData: ChartData[]; // New prop for initial data
+}
+
+const RegionPieChart: React.FC<RegionPieChartProps> = ({ initialData }) => {
+  const [regionData, setRegionData] = useState<ChartData[]>(initialData);
+  const [startYear, setStartYear] = useState<number>();
+  const [endYear, setEndYear] = useState<number>(); // Set end year as undefined initially
   const [type, setType] = useState<"IPO" | "FO" | "all">("all");
   const [sector, setSector] = useState<string | "all">("all");
   const [error, setError] = useState<string | null>(null);
@@ -42,13 +50,43 @@ const RegionPieChart: React.FC = () => {
   const [sectors, setSectors] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
+  // Fetch distinct years from API
+  const fetchYears = useCallback(async () => {
+    try {
+      const response = await axios.get<YearResponse>("http://192.168.1.59:9000/api/distinct_years/");
+      const yearList = response.data.years;
+      setYears(yearList);
+      if (yearList.length > 0) {
+        // Filter out values that are true from the yearList
+        const filteredYears = yearList
+    
+        if (filteredYears.length > 0) {
+            setStartYear(filteredYears[0]); // Set start year to the first filtered year
+    
+            // Set end year to start year + 1
+            const newEndYear = filteredYears[0] + 1;
+            if (filteredYears[0] < newEndYear) { // Ensure startYear < endYear
+                setEndYear(newEndYear);
+            }
+        }
+    }
+    
+    
+    } catch (error) {
+      console.error("Error fetching years:", error);
+      setError("Failed to fetch years. Please try again later.");
+    }
+  }, []);
+
+  // Fetch the deal data based on selected years, type, and sector
   const fetchData = useCallback(async () => {
     setError(null);
+    if (startYear === undefined || endYear === undefined) return; // Don't fetch if years are not set
 
     try {
       const requestData = {
         type,
-        year_range: [startYear, endYear],
+        year_range: [startYear, endYear], // Ensure these are numbers
         period: "monthly",
         sector,
       };
@@ -60,25 +98,12 @@ const RegionPieChart: React.FC = () => {
 
       const apiData = response.data;
       transformRegionData(apiData);
-      extractYears(apiData);
       extractSectors(apiData);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
     }
   }, [startYear, endYear, type, sector]);
-
-  const extractYears = (apiData: ApiResponse) => {
-    const yearList = Object.keys(apiData)
-      .map((year) => parseInt(year))
-      .sort((a, b) => a - b);
-
-    setYears(yearList);
-    if (yearList.length > 0) {
-      setStartYear(yearList[0]);
-      setEndYear(yearList[yearList.length - 1]);
-    }
-  };
 
   const extractSectors = (apiData: ApiResponse) => {
     const allSectors = new Set<string>();
@@ -129,12 +154,20 @@ const RegionPieChart: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchYears(); // Fetch years on component mount
+  }, [fetchYears]);
+
+  useEffect(() => {
+    if (startYear) {
+      setEndYear(startYear + 1); // Set end year to start year + 1 whenever start year changes
+    }
+  }, [startYear]);
+
+  useEffect(() => {
+    fetchData(); // Fetch data when the year, type, or sector changes
   }, [fetchData]);
 
   const onPieEnter = (_: any, index: number) => setActiveIndex(index);
-
-
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
@@ -149,7 +182,7 @@ const RegionPieChart: React.FC = () => {
         <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#e8f5e9" }}>
           <InputLabel>Start Year</InputLabel>
           <Select
-            value={startYear}
+            value={startYear || ""}
             onChange={(e) => setStartYear(Number(e.target.value))}
             label="Start Year"
             MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
@@ -165,7 +198,7 @@ const RegionPieChart: React.FC = () => {
         <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#ffebee" }}>
           <InputLabel>End Year</InputLabel>
           <Select
-            value={endYear}
+            value={endYear || ""}
             onChange={(e) => setEndYear(Number(e.target.value))}
             label="End Year"
             MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}

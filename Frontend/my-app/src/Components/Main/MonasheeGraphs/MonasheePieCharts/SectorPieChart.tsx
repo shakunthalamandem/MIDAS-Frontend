@@ -24,6 +24,10 @@ interface ApiResponse {
   };
 }
 
+interface YearResponse {
+  years: number[]; // Assuming the API returns an object with a years array
+}
+
 interface ChartData {
   name: string;
   value: number;
@@ -31,26 +35,48 @@ interface ChartData {
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-const SectorPieChart: React.FC = () => {
-  const [sectorData, setSectorData] = useState<ChartData[]>([]);
-  const [startYear, setStartYear] = useState<number>(2001);
-  const [endYear, setEndYear] = useState<number>(2021);
+interface SectorPieChartProps {
+  initialData: ChartData[]; // New prop for initial data
+}
+
+const SectorPieChart: React.FC<SectorPieChartProps> = ({ initialData }) => {
+  const [sectorData, setSectorData] = useState<ChartData[]>(initialData);
+  const [startYear, setStartYear] = useState<number | undefined>();
+  const [endYear, setEndYear] = useState<number | undefined>(); // End year to be calculated based on start year
   const [type, setType] = useState<"IPO" | "FO" | "all">("all");
   const [region, setRegion] = useState<"US" | "International" | "all">("all");
   const [error, setError] = useState<string | null>(null);
   const [years, setYears] = useState<number[]>([]);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
+  // Fetch distinct years from API
+  const fetchYears = useCallback(async () => {
+    try {
+      const response = await axios.get<YearResponse>("http://192.168.1.59:9000/api/distinct_years/");
+      const yearList = response.data.years.sort((a, b) => a - b);
+      setYears(yearList);
+      if (yearList.length > 0) {
+        setStartYear(yearList[0]);
+        setEndYear(yearList[0] + 1); // Set default end year as start year + 1
+      }
+    } catch (error) {
+      console.error("Error fetching years:", error);
+      setError("Failed to fetch years. Please try again later.");
+    }
+  }, []);
+
+  // Fetch data based on selected years, type, and region
   const fetchData = useCallback(async () => {
     setError(null);
+    if (startYear === undefined || endYear === undefined) return; // Don't fetch if years are not set
 
     try {
       const requestData = {
         type,
-        year_range: [startYear, endYear],
+        year_range: [startYear, endYear], // Ensure these are numbers
         period: "monthly",
         region,
       };
-      console.log("Sending request with data:", requestData);
 
       const response = await axios.post<ApiResponse>(
         "http://192.168.1.59:9000/api/deals_graph/",
@@ -59,25 +85,11 @@ const SectorPieChart: React.FC = () => {
 
       const apiData = response.data;
       transformSectorData(apiData);
-      extractYears(apiData);
-      console.log("API Response:", apiData);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
     }
   }, [startYear, endYear, type, region]);
-
-  const extractYears = (apiData: ApiResponse) => {
-    const yearList = Object.keys(apiData)
-      .map(year => parseInt(year))
-      .sort((a, b) => a - b);
-
-    setYears(yearList);
-    if (yearList.length > 0) {
-      setStartYear(yearList[0]);
-      setEndYear(yearList[yearList.length - 1]);
-    }
-  };
 
   const transformSectorData = (apiData: ApiResponse) => {
     const aggregatedData: Record<string, number> = {};
@@ -109,8 +121,14 @@ const SectorPieChart: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchYears(); // Fetch years on component mount
+  }, [fetchYears]);
+
+  useEffect(() => {
+    fetchData(); // Fetch data when the year, type, or region changes
   }, [fetchData]);
+
+  const onPieEnter = (_: any, index: number) => setActiveIndex(index);
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
@@ -121,13 +139,18 @@ const SectorPieChart: React.FC = () => {
         Sector Distribution
       </Typography>
 
-      <Box sx={{ display: "flex", justifyContent: "space-around", mb: 1 }}>
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#e8f5e9", marginRight: 1 }}>
+      <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#e8f5e9" }}>
           <InputLabel>Start Year</InputLabel>
           <Select
-            value={startYear}
-            onChange={(e) => setStartYear(Number(e.target.value))}
+            value={startYear || ""}
+            onChange={(e) => {
+              const newStartYear = Number(e.target.value);
+              setStartYear(newStartYear);
+              setEndYear(newStartYear + 1); // Update end year when start year changes
+            }}
             label="Start Year"
+            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
           >
             {years.map((year) => (
               <MenuItem key={year} value={year}>
@@ -137,12 +160,13 @@ const SectorPieChart: React.FC = () => {
           </Select>
         </FormControl>
 
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#ffebee", marginRight: 1 }}>
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#ffebee" }}>
           <InputLabel>End Year</InputLabel>
           <Select
-            value={endYear}
+            value={endYear || ""}
             onChange={(e) => setEndYear(Number(e.target.value))}
             label="End Year"
+            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
           >
             {years.map((year) => (
               <MenuItem key={year} value={year}>
@@ -152,12 +176,13 @@ const SectorPieChart: React.FC = () => {
           </Select>
         </FormControl>
 
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 120, bgcolor: "#e3f2fd", marginRight: 1 }}>
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 120, bgcolor: "#e3f2fd" }}>
           <InputLabel>Type</InputLabel>
           <Select
             value={type}
             onChange={(e) => setType(e.target.value as "IPO" | "FO" | "all")}
             label="Type"
+            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
           >
             <MenuItem value="IPO">IPO</MenuItem>
             <MenuItem value="FO">FO</MenuItem>
@@ -184,6 +209,7 @@ const SectorPieChart: React.FC = () => {
       <ResponsiveContainer width="100%" height={400}>
         <PieChart>
           <Pie
+            activeIndex={activeIndex}
             data={sectorData}
             dataKey="value"
             nameKey="name"
@@ -191,6 +217,7 @@ const SectorPieChart: React.FC = () => {
             cy="50%"
             outerRadius={100}
             fill="#82ca9d"
+            onMouseEnter={onPieEnter}
             labelLine={true} // Enable lines to labels
             label={({ percent }) => `${(percent * 100).toFixed(0)}%`} // Show only percentage
           >
