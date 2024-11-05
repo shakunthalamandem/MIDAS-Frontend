@@ -1,9 +1,12 @@
 import React from 'react'
-import DealPieChart from './MonasheePieCharts/DealPieChart'
+import { Typography } from '@mui/material'
 
 const SkewMain = () => {
   return (
     <>  
+    <Typography>
+      Data is Not Avaiable
+    </Typography>
 </>
   )
 }
