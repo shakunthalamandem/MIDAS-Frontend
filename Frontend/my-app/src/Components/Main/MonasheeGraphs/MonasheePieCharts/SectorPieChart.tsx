@@ -227,9 +227,12 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
             onChange={(e) => setRegion(e.target.value as "US" | "International" | "all")}
             label="Region"
           >
-            <MenuItem value="US">US</MenuItem>
-            <MenuItem value="International">International</MenuItem>
-            <MenuItem value="all">All</MenuItem>
+        <MenuItem value="all">All</MenuItem>
+            {regions.map((sec) => (
+              <MenuItem key={sec} value={sec}>
+                {sec}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>
