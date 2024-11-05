@@ -257,7 +257,7 @@ const OpportunityMain: React.FC = () => {
           </ResponsiveContainer>
         </Box>
       </Container>
-      <DealPieChart data={pieChartData} /> {/* Pass the pie chart data here */}
+      <DealPieChart opportunity_value_ex = {"true"} /> {/* Pass the pie chart data here */}
     </>
   );
 };

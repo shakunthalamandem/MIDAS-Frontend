@@ -256,7 +256,7 @@ const DealVolume: React.FC = () => {
           </ResponsiveContainer>
         </Box>
       </Container>
-      <DealPieChart data={pieChartData} /> {/* Pass the pie chart data here */}
+      <DealPieChart deal_value={"true"} /> {/* Pass the pie chart data here */}
     </>
   );
 };

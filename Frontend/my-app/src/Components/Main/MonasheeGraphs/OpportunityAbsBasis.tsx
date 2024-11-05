@@ -263,7 +263,7 @@ const OpportunityAbsBasis: React.FC = () => {
           </ResponsiveContainer>
         </Box>
       </Container>
-      <DealPieChart data={pieChartData} /> {/* Pass the pie chart data here */}
+      <DealPieChart opportunity_value_on_abs_basis = {"true"} /> {/* Pass the pie chart data here */}
     </>
   );
 };

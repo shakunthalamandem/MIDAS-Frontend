@@ -260,7 +260,7 @@ const DealGraph: React.FC = () => {
           </ResponsiveContainer>
         </Box>
       </Container>
-      <DealPieChart data={pieChartData} /> {/* Pass the pie chart data here */}
+      <DealPieChart deal_count={"true"} /> {/* Pass the pie chart data here */}
     </>
   );
 };

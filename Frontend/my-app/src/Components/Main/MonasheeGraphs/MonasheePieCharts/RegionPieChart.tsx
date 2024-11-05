@@ -13,19 +13,13 @@ import {
 
 interface ApiResponse {
   [year: string]: {
-    FO: {
-      US: Record<string, { count: number }>;
-      International: Record<string, { count: number }>;
-    };
-    IPO: {
-      US: Record<string, { count: number }>;
-      International: Record<string, { count: number }>;
-    };
+    FO: { US: { [sector: string]: Record<string, number> }; International: { [sector: string]: Record<string, number> } };
+    IPO: { US: { [sector: string]: Record<string, number> }; International: { [sector: string]: Record<string, number> } };
   };
 }
 
 interface YearResponse {
-  years: number[]; // Assuming the API returns an object with a years array
+  years: number[];
 }
 
 interface ChartData {
@@ -36,13 +30,21 @@ interface ChartData {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 interface RegionPieChartProps {
-  initialData: ChartData[]; // New prop for initial data
+  opportunity_value_on_abs_basis?: string;
+  opportunity_value_ex?: string;
+  deal_value?: string;
+  deal_count?: string;
 }
 
-const RegionPieChart: React.FC<RegionPieChartProps> = ({ initialData }) => {
-  const [regionData, setRegionData] = useState<ChartData[]>(initialData);
+const RegionPieChart: React.FC<RegionPieChartProps> = ({
+  opportunity_value_on_abs_basis = "false",
+  opportunity_value_ex = "false",
+  deal_value = "false",
+  deal_count = "true",
+}) => {
+  const [regionData, setRegionData] = useState<ChartData[]>([]);
   const [startYear, setStartYear] = useState<number>();
-  const [endYear, setEndYear] = useState<number>(); // Set end year as undefined initially
+  const [endYear, setEndYear] = useState<number>();
   const [type, setType] = useState<"IPO" | "FO" | "all">("all");
   const [sector, setSector] = useState<string | "all">("all");
   const [error, setError] = useState<string | null>(null);
@@ -50,51 +52,38 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({ initialData }) => {
   const [sectors, setSectors] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
-  // Fetch distinct years from API
   const fetchYears = useCallback(async () => {
     try {
       const response = await axios.get<YearResponse>("http://192.168.1.59:9000/api/distinct_years/");
       const yearList = response.data.years;
       setYears(yearList);
       if (yearList.length > 0) {
-        // Filter out values that are true from the yearList
-        const filteredYears = yearList
-    
-        if (filteredYears.length > 0) {
-            setStartYear(filteredYears[0]); // Set start year to the first filtered year
-    
-            // Set end year to start year + 1
-            const newEndYear = filteredYears[0] + 1;
-            if (filteredYears[0] < newEndYear) { // Ensure startYear < endYear
-                setEndYear(newEndYear);
-            }
-        }
-    }
-    
-    
+        setStartYear(yearList[0]);
+        setEndYear(yearList[0] + 1);
+      }
     } catch (error) {
       console.error("Error fetching years:", error);
       setError("Failed to fetch years. Please try again later.");
     }
   }, []);
 
-  // Fetch the deal data based on selected years, type, and sector
   const fetchData = useCallback(async () => {
     setError(null);
-    if (startYear === undefined || endYear === undefined) return; // Don't fetch if years are not set
+    if (startYear === undefined || endYear === undefined) return;
 
     try {
       const requestData = {
         type,
-        year_range: [startYear, endYear], // Ensure these are numbers
-        period: "monthly",
+        year_range: [startYear, endYear],
+        period: "yearly",
         sector,
+        opportunity_value_on_abs_basis,
+        opportunity_value_ex,
+        deal_value,
+        deal_count,
       };
 
-      const response = await axios.post<ApiResponse>(
-        "http://192.168.1.59:9000/api/deals_graph/",
-        requestData
-      );
+      const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", requestData);
 
       const apiData = response.data;
       transformRegionData(apiData);
@@ -103,7 +92,7 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({ initialData }) => {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
     }
-  }, [startYear, endYear, type, sector]);
+  }, [startYear, endYear, type, sector, opportunity_value_on_abs_basis, opportunity_value_ex, deal_value, deal_count]);
 
   const extractSectors = (apiData: ApiResponse) => {
     const allSectors = new Set<string>();
@@ -136,9 +125,15 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({ initialData }) => {
           regions.forEach((region) => {
             const regionData = categoryData[region as keyof typeof categoryData];
             if (regionData) {
-              Object.entries(regionData).forEach(([sectorName, { count }]) => {
+              Object.entries(regionData).forEach(([sectorName, data]) => {
                 if (sector === "all" || sector === sectorName) {
-                  aggregatedData[region] = (aggregatedData[region] || 0) + count;
+                  const value = 
+                    opportunity_value_on_abs_basis === "true" ? data.opportunity_value_on_abs_basis :
+                    opportunity_value_ex === "true" ? data.opportunity_value_ex :
+                    deal_value === "true" ? data.deal_value :
+                    deal_count === "true" ? data.count : 0;
+                    
+                  aggregatedData[region] = (aggregatedData[region] || 0) + value;
                 }
               });
             }
@@ -147,34 +142,29 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({ initialData }) => {
       });
     });
 
-    const transformedData = Object.entries(aggregatedData).map(
-      ([name, value]) => ({ name, value })
-    );
+    const transformedData = Object.entries(aggregatedData).map(([name, value]) => ({ name, value }));
     setRegionData(transformedData);
   };
 
   useEffect(() => {
-    fetchYears(); // Fetch years on component mount
+    fetchYears();
   }, [fetchYears]);
 
   useEffect(() => {
     if (startYear) {
-      setEndYear(startYear + 1); // Set end year to start year + 1 whenever start year changes
+      setEndYear(startYear + 1);
     }
   }, [startYear]);
 
   useEffect(() => {
-    fetchData(); // Fetch data when the year, type, or sector changes
-  }, [fetchData]);
+    fetchData();
+  }, [fetchData, startYear, endYear, type, sector, opportunity_value_on_abs_basis, opportunity_value_ex, deal_value, deal_count]);
 
   const onPieEnter = (_: any, index: number) => setActiveIndex(index);
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
-      <Typography
-        variant="h6"
-        sx={{ color: "#002060", fontWeight: "bold", marginBottom: "30px" }}
-      >
+      <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold", marginBottom: "30px" }}>
         Region Distribution
       </Typography>
 
@@ -257,8 +247,8 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({ initialData }) => {
             outerRadius={100}
             fill="#82ca9d"
             onMouseEnter={onPieEnter}
-            labelLine={true} // Enable lines to labels
-            label={({ percent }) => `${(percent * 100).toFixed(0)}%`} // Show only percentage
+            labelLine={true}
+            label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
           >
             {regionData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
