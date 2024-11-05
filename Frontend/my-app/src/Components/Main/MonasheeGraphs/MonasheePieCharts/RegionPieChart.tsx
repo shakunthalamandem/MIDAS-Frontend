@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer, Legend, Sector, Label } from "recharts";
+import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer, Legend } from "recharts";
 import {
   Container,
   FormControl,
@@ -134,17 +134,7 @@ const RegionPieChart: React.FC = () => {
 
   const onPieEnter = (_: any, index: number) => setActiveIndex(index);
 
-  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name }: any) => {
-    const RADIAN = Math.PI / 180;
-    const x = cx + (outerRadius + 10) * Math.cos(-RADIAN * midAngle);
-    const y = cy + (outerRadius + 10) * Math.sin(-RADIAN * midAngle);
 
-    return (
-      <text x={x} y={y} fill="#333" textAnchor="middle" dominantBaseline="middle">
-        {`${name}: ${(value * 100 / regionData.reduce((acc, { value }) => acc + value, 0)).toFixed(1)}%`}
-      </text>
-    );
-  };
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
@@ -234,7 +224,8 @@ const RegionPieChart: React.FC = () => {
             outerRadius={100}
             fill="#82ca9d"
             onMouseEnter={onPieEnter}
-            label={renderLabel} // Add this line to render labels
+            labelLine={true} // Enable lines to labels
+            label={({ percent }) => `${(percent * 100).toFixed(0)}%`} // Show only percentage
           >
             {regionData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

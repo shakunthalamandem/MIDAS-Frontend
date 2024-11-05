@@ -191,7 +191,7 @@ const SectorPieChart: React.FC = () => {
             cy="50%"
             outerRadius={100}
             fill="#82ca9d"
-            labelLine={false}
+            labelLine={true} // Enable lines to labels
             label={({ percent }) => `${(percent * 100).toFixed(0)}%`} // Show only percentage
           >
             {sectorData.map((entry, index) => (
