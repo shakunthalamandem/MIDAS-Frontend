@@ -122,7 +122,7 @@ const SectorPieChart: React.FC = () => {
       </Typography>
 
       <Box sx={{ display: "flex", justifyContent: "space-around", mb: 1 }}>
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#ffebee", marginRight: 1 }}>
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#e8f5e9", marginRight: 1 }}>
           <InputLabel>Start Year</InputLabel>
           <Select
             value={startYear}
@@ -137,7 +137,7 @@ const SectorPieChart: React.FC = () => {
           </Select>
         </FormControl>
 
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#e3f2fd", marginRight: 1 }}>
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#ffebee", marginRight: 1 }}>
           <InputLabel>End Year</InputLabel>
           <Select
             value={endYear}
@@ -152,7 +152,7 @@ const SectorPieChart: React.FC = () => {
           </Select>
         </FormControl>
 
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 120, bgcolor: "#e8f5e9", marginRight: 1 }}>
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 120, bgcolor: "#e3f2fd", marginRight: 1 }}>
           <InputLabel>Type</InputLabel>
           <Select
             value={type}
