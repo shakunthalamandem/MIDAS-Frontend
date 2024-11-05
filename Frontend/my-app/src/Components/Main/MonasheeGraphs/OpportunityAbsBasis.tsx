@@ -24,8 +24,8 @@ import DealPieChart from "./MonasheePieCharts/DealPieChart";
 
 interface ApiResponse {
   [key: string]: {
-    FO: { US: { [sector: string]: { count: number } }; International: { [sector: string]: { count: number } } };
-    IPO: { US: { [sector: string]: { count: number } }; International: { [sector: string]: { count: number } } };
+    FO: { US: { [sector: string]: { opportunity_value_on_abs_basis: number } }; International: { [sector: string]: { opportunity_value_on_abs_basis: number } } };
+    IPO: { US: { [sector: string]: { opportunity_value_on_abs_basis: number } }; International: { [sector: string]: { opportunity_value_on_abs_basis: number } } };
   };
 }
 
@@ -36,7 +36,7 @@ interface ChartData {
   total?: number;
 }
 
-const DealGraph: React.FC = () => {
+const OpportunityAbsBasis: React.FC = () => {
   const [data, setData] = useState<ChartData[]>([]);
   const [type, setType] = useState("all");
   const [period, setPeriod] = useState("yearly");
@@ -47,11 +47,10 @@ const DealGraph: React.FC = () => {
   const fetchData = async () => {
     try {
       const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", {
-        type,
         period,
-        region,
+        opportunity_value_on_abs_basis: "true",
       });
-      console.log("result set",response.data);
+      console.log(response.data);
 
       // Collect unique sectors
       const sectors = new Set<string>();
@@ -70,40 +69,34 @@ const DealGraph: React.FC = () => {
     }
   };
 
-// Define a type for the sector count
-interface SectorCount {
-  count: number;
-}
+  const transformData = (apiData: ApiResponse): ChartData[] => {
+    return Object.keys(apiData).map((key) => {
+      const ipoData = apiData[key].IPO;
+      const foData = apiData[key].FO;
 
-const transformData = (apiData: ApiResponse): ChartData[] => {
-  return Object.keys(apiData).map((key) => {
-    const ipoData = apiData[key].IPO;
-    const foData = apiData[key].FO;
+      const filterBySector = (regionData: Record<string, { opportunity_value_on_abs_basis: number }>) =>
+        Object.entries(regionData || {})
+          .filter(([sect]) => sector === "all" || sect === sector)
+          .reduce((sum, [, { opportunity_value_on_abs_basis }]) => sum + opportunity_value_on_abs_basis, 0);
 
-    const filterBySector = (regionData: Record<string, SectorCount>) =>
-      Object.entries(regionData || {})
-        .filter(([sect]) => sector === "all" || sect === sector)
-        .reduce((sum, [, { count }]) => sum + count, 0);
+      const ipoUS = filterBySector(ipoData.US);
+      const ipoInternational = filterBySector(ipoData.International);
+      const foUS = filterBySector(foData.US);
+      const foInternational = filterBySector(foData.International);
 
-    const ipoUS = filterBySector(ipoData.US);
-    const ipoInternational = filterBySector(ipoData.International);
-    const foUS = filterBySector(foData.US);
-    const foInternational = filterBySector(foData.International);
+      const combinedIPO = region === "all" ? ipoUS + ipoInternational : region === "US" ? ipoUS : ipoInternational;
+      const combinedFO = region === "all" ? foUS + foInternational : region === "US" ? foUS : foInternational;
 
-    const combinedIPO = region === "all" ? ipoUS + ipoInternational : region === "US" ? ipoUS : ipoInternational;
-    const combinedFO = region === "all" ? foUS + foInternational : region === "US" ? foUS : foInternational;
+      const totalDeals = combinedIPO + combinedFO;
 
-    const totalDeals = combinedIPO + combinedFO;
-
-    return {
-      name: key,
-      IPO: combinedIPO,
-      FO: combinedFO,
-      total: totalDeals,
-    };
-  });
-};
-
+      return {
+        name: key,
+        IPO: combinedIPO / 1e9, // Convert to billions
+        FO: combinedFO / 1e9, // Convert to billions
+        total: totalDeals / 1e9, // Convert to billions
+      };
+    });
+  };
 
   useEffect(() => {
     fetchData();
@@ -120,13 +113,17 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
       return (
         <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '10px' }}>
           <h4>{name}</h4>
-          {type === "ipo" || type === "all" ? <p>IPO: {IPO}</p> : null}
-          {type === "fo" || type === "all" ? <p>FO: {FO}</p> : null}
-          <p>Total Deals: {total}</p>
+          {type === "ipo" || type === "all" ? <p>IPO: {IPO.toFixed(2)}B</p> : null}
+          {type === "fo" || type === "all" ? <p>FO: {FO.toFixed(2)}B</p> : null}
+          <p>Total Deals: {total.toFixed(2)}B</p>
         </div>
       );
     }
     return null;
+  };
+
+  const formatYAxisTick = (value: number) => {
+    return `${value.toFixed(0)}B`; // Format Y-axis tick values in billions
   };
 
   return (
@@ -143,12 +140,12 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
           fontWeight: "bold",
         }}
       >
-        # Of Deals
+        Opportunity Value on Abs Basis
       </Typography>
 
-      <Grid container spacing={2} sx={{ justifyContent: "flex-start" ,paddingLeft:'50px',marginBottom:'10px'}}>
-      <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
-      <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
+      <Grid container spacing={2} sx={{ justifyContent: "flex-start", paddingLeft: '50px',marginBottom:'10px' }}>
+        <Grid item xs={6} sm={3} md={2}>
+          <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
             <InputLabel>Type</InputLabel>
             <Select value={type} onChange={handleTypeChange} label="Type">
               <MenuItem value="ipo">IPO</MenuItem>
@@ -158,8 +155,8 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
           </FormControl>
         </Grid>
 
-        <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
-        <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
+        <Grid item xs={6} sm={3} md={2}>
+          <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
             <InputLabel>Period</InputLabel>
             <Select value={period} onChange={handlePeriodChange} label="Period">
               <MenuItem value="yearly">Yearly</MenuItem>
@@ -169,8 +166,8 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
           </FormControl>
         </Grid>
 
-        <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
-        <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
+        <Grid item xs={6} sm={3} md={2}>
+          <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
             <InputLabel>Region</InputLabel>
             <Select value={region} onChange={handleRegionChange} label="Region">
               <MenuItem value="US">US</MenuItem>
@@ -180,8 +177,8 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
           </FormControl>
         </Grid>
 
-        <Grid item xs={6} sm={3} md={2}> {/* Adjust xs and sm as needed */}
-        <FormControl fullWidth variant="outlined" size="small" sx={{ minWidth: 250 }}>
+        <Grid item xs={6} sm={3} md={2}>
+          <FormControl fullWidth variant="outlined" size="small" sx={{ minWidth: 250 }}>
             <InputLabel>Sector</InputLabel>
             <Select value={sector} onChange={handleSectorChange} label="Sector">
               <MenuItem value="all">All</MenuItem>
@@ -207,7 +204,7 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
             }}
           >
             <XAxis dataKey="name" />
-            <YAxis />
+            <YAxis tickFormatter={formatYAxisTick} />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             {type === "ipo" || type === "all" ? (
@@ -221,9 +218,8 @@ const transformData = (apiData: ApiResponse): ChartData[] => {
       </Box>
     </Container>
     <DealPieChart />
-
     </>
   );
 };
 
-export default DealGraph;
+export default OpportunityAbsBasis;

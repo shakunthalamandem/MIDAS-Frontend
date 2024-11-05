@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { env } from 'process';
-// import env from './env';
+import env from './env';
 
 // Create an Axios instance
 const api = axios.create({
