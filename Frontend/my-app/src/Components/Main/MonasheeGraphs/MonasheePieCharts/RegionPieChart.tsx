@@ -140,7 +140,7 @@ const RegionPieChart: React.FC = () => {
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <Typography
         variant="h6"
-        sx={{ color: "#002060", fontWeight: "bold", marginBottom: "20px" }}
+        sx={{ color: "#002060", fontWeight: "bold", marginBottom: "30px" }}
       >
         Region Distribution
       </Typography>
