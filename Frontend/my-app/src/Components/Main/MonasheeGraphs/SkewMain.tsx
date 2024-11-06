@@ -33,7 +33,7 @@ const SkewMain: React.FC = () => {
       setYears(yearList);
       if (yearList.length > 0) {
         setStartYear(yearList[0]);
-        setEndYear(yearList[0] + 5); // default to 6-year range
+        setEndYear(yearList[0] + 9); // default to 10-year range
       }
     } catch (error) {
       console.error("Error fetching years:", error);
@@ -62,7 +62,7 @@ const SkewMain: React.FC = () => {
   useEffect(() => {
     if (startYear && endYear) {
       const filtered = skewData.filter(data => {
-        const year = parseInt(data.Year, 10);  // Convert Year (string) to number
+        const year = parseInt(data.Year, 10);
         return year >= startYear && year <= endYear;
       });
       setFilteredData(filtered);
@@ -72,20 +72,26 @@ const SkewMain: React.FC = () => {
   const handleStartYearChange = (event: SelectChangeEvent<number>) => {
     const newStartYear = Number(event.target.value);
     setStartYear(newStartYear);
-    setEndYear(newStartYear + 5);
+    setEndYear(newStartYear + 9);
   };
 
   const handleEndYearChange = (event: SelectChangeEvent<number>) => {
     setEndYear(Number(event.target.value));
   };
 
+  // Calculate totals and averages for the summary row
+  const totalDealCount = filteredData.reduce((acc, row) => acc + row.Total_Deal_Count, 0);
+  const avgPositivelyPerformingDeals = filteredData.reduce((acc, row) => acc + row.Positively_Performing_Deals_Percentage, 0) / filteredData.length;
+  const avgNegativelyPerformingDeals = filteredData.reduce((acc, row) => acc + row.Negatively_Performing_Deals_Percentage, 0) / filteredData.length;
+  const avgReturnPositively = filteredData.reduce((acc, row) => acc + row["Average_T+1M_Abs_Return of Positively"], 0) / filteredData.length;
+  const avgReturnNegatively = filteredData.reduce((acc, row) => acc + row["Average_T+1M_Abs_Return of Negatively"], 0) / filteredData.length;
+  const avgExpectedReturns = filteredData.reduce((acc, row) => acc + row.Expected_Returns, 0) / filteredData.length;
+  const totalLongOpportunityValue = filteredData.reduce((acc, row) => acc + row.Long_Opportunity_Value, 0);
+
   return (
     <>
       <Container maxWidth="lg" sx={{ paddingY: 4, backgroundColor: '#f4f4f9' }}>
         <Box sx={{ padding: 3, width: '100%', backgroundColor: '#ffffff', borderRadius: 2 }}>
-          {/* <Typography variant="h6" gutterBottom sx={{ color: '#00bfae', fontWeight: 'bold' }}>
-            Skew Table
-          </Typography> */}
           <Box sx={{ display: 'flex', gap: 2, marginBottom: 3, flexWrap: 'wrap', justifyContent: 'space-between' }}>
             <FormControl variant="outlined" size="small" sx={{ minWidth: 120, maxHeight: 40, backgroundColor: '#e0f2f1', borderRadius: 1 }}>
               <InputLabel sx={{ color: '#004d40' }}>Start Year</InputLabel>
@@ -166,6 +172,18 @@ const SkewMain: React.FC = () => {
                       <TableCell>{row.Long_Opportunity_Value}</TableCell>
                     </TableRow>
                   ))}
+                  {/* Summary Row */}
+                  <TableRow sx={{ backgroundColor: '#e0f2f1' }}>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{totalDealCount}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{avgPositivelyPerformingDeals.toFixed(1)}%</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{avgNegativelyPerformingDeals.toFixed(1)}%</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnPositively.toFixed(1)}%</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnNegatively.toFixed(1)}%</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{avgExpectedReturns.toFixed(1)}%</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{totalLongOpportunityValue.toFixed(1)}</TableCell>
+                  </TableRow>
+
                 </TableBody>
               </Table>
             </TableContainer>
