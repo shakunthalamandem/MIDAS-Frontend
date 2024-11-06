@@ -6,6 +6,7 @@ import {
   TableHead, TableRow, Paper, SelectChangeEvent, Container, Snackbar, Alert,
   Card, CardContent
 } from '@mui/material';
+import SectorSkewData from './SectorSkewData';
 
 // Define the SkewData type based on the structure
 interface SkewData {
@@ -126,11 +127,11 @@ const SkewMain: React.FC = () => {
                   fontSize: { xs: "1rem", sm: "1.2rem", md: "1.5rem" },
                   lineHeight: "1.6",
                   marginBottom: "10px",
-                  color: "#002060",
+                  color: "#333333",
                   fontWeight: "bold",
                 }}
               >
-                Skew Table
+                Yearly Performance Skew Analysis
               </Typography>
 
               <Box sx={{ display: 'flex', gap: 1, marginBottom: 3, flexWrap: 'wrap', justifyContent: 'flex-start' }}>
@@ -190,10 +191,10 @@ const SkewMain: React.FC = () => {
               ) : (
                 <TableContainer component={Paper} sx={{ maxHeight: 500, overflow: 'auto' }}>
                   <Table size="small" stickyHeader aria-label="skew table">
-                  <TableHead sx={{ backgroundColor: '#002060' }}>
-                  <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Year</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Total Deal Count</TableCell>
+                    <TableHead sx={{ backgroundColor: '#002060' }}>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Year</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Total Deal Count</TableCell>
                         <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Positively Performing Deals (%)</TableCell>
                         <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Negatively Performing Deals (%)</TableCell>
                         <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Average Return (Positively) (%)</TableCell>
@@ -240,6 +241,8 @@ const SkewMain: React.FC = () => {
           End Year should not be less than Start Year!
         </Alert>
       </Snackbar>
+      <SectorSkewData />
+
     </>
   );
 };
