@@ -3,7 +3,9 @@ import axios from 'axios';
 import {
   Box, Select, MenuItem, FormControl, InputLabel, Typography,
   CircularProgress, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, SelectChangeEvent, Container, Snackbar, Alert
+  TableHead, TableRow, Paper, SelectChangeEvent, Container, Snackbar, Alert,
+  Card,
+  CardContent
 } from '@mui/material';
 
 interface SkewData {
@@ -86,7 +88,7 @@ const SkewMain: React.FC = () => {
       setEndYear(newEndYear);
     }
   };
-  
+
   const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
@@ -105,117 +107,120 @@ const SkewMain: React.FC = () => {
   return (
     <>
       <Container maxWidth="lg" sx={{ paddingY: 4, backgroundColor: '#f4f4f9' }}>
-        <Box sx={{ padding: 3, width: '100%', backgroundColor: '#ffffff', borderRadius: 2 }}>
-          <Box sx={{ display: 'flex', gap: 2, marginBottom: 3, flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <FormControl variant="outlined" size="small" sx={{ minWidth: 120, maxHeight: 40, backgroundColor: '#e0f2f1', borderRadius: 1 }}>
-              <InputLabel sx={{ color: '#004d40' }}>Start Year</InputLabel>
-              <Select
-                value={startYear ?? ''}
-                onChange={handleStartYearChange}
-                label="Start Year"
-                MenuProps={{ PaperProps: { style: { maxHeight: 200 } } }}
-                sx={{
-                  backgroundColor: '#e0f2f1', 
-                  color: '#004d40', 
-                  '& .MuiOutlinedInput-root': { borderRadius: '8px' },
-                  '& .MuiInputLabel-root': { color: '#004d40' }
-                }}
-              >
-                {years.map((year) => (
-                  <MenuItem key={year} value={year} sx={{ color: '#004d40' }}>
-                    {year}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+        <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+          <CardContent>
+            <Box sx={{ padding: 3, width: '100%', backgroundColor: '#ffffff', borderRadius: 2 }}>
+              <Box sx={{ display: 'flex', gap: 1, marginBottom: 3, flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+                <FormControl variant="outlined" size="small" sx={{ minWidth: 120, maxHeight: 40, backgroundColor: '#e0f2f1', borderRadius: 1 }}>
+                  <InputLabel sx={{ color: '#004d40' }}>Start Year</InputLabel>
+                  <Select
+                    value={startYear ?? ''}
+                    onChange={handleStartYearChange}
+                    label="Start Year"
+                    MenuProps={{ PaperProps: { style: { maxHeight: 200 } } }}
+                    sx={{
+                      backgroundColor: '#e0f2f1',
+                      color: '#004d40',
+                      '& .MuiOutlinedInput-root': { borderRadius: '8px' },
+                      '& .MuiInputLabel-root': { color: '#004d40' }
+                    }}
+                  >
+                    {years.map((year) => (
+                      <MenuItem key={year} value={year} sx={{ color: '#004d40' }}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
-            <FormControl variant="outlined" size="small" sx={{ minWidth: 120, maxHeight: 40, backgroundColor: '#e0f2f1', borderRadius: 1 }}>
-              <InputLabel sx={{ color: '#004d40' }}>End Year</InputLabel>
-              <Select
-                value={endYear ?? ''}
-                onChange={handleEndYearChange}
-                label="End Year"
-                MenuProps={{ PaperProps: { style: { maxHeight: 200 } } }}
-                sx={{
-                  backgroundColor: '#e0f2f1', 
-                  color: '#004d40', 
-                  '& .MuiOutlinedInput-root': { borderRadius: '8px' },
-                  '& .MuiInputLabel-root': { color: '#004d40' }
-                }}
-              >
-                {years.map((year) => (
-                  <MenuItem key={year} value={year} sx={{ color: '#004d40' }}>
-                    {year}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
+                <FormControl variant="outlined" size="small" sx={{ minWidth: 120, maxHeight: 40, backgroundColor: '#e0f2f1', borderRadius: 1 }}>
+                  <InputLabel sx={{ color: '#004d40' }}>End Year</InputLabel>
+                  <Select
+                    value={endYear ?? ''}
+                    onChange={handleEndYearChange}
+                    label="End Year"
+                    MenuProps={{ PaperProps: { style: { maxHeight: 200 } } }}
+                    sx={{
+                      backgroundColor: '#e0f2f1',
+                      color: '#004d40',
+                      '& .MuiOutlinedInput-root': { borderRadius: '8px' },
+                      '& .MuiInputLabel-root': { color: '#004d40' }
+                    }}
+                  >
+                    {years.map((year) => (
+                      <MenuItem key={year} value={year} sx={{ color: '#004d40' }}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
 
-          {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <CircularProgress />
+
+              {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center">
+                  <CircularProgress />
+                </Box>
+              ) : error ? (
+                <Typography color="error">{error}</Typography>
+              ) : (
+                <TableContainer component={Paper} sx={{ maxHeight: 600, overflow: 'auto', marginTop: 2, borderRadius: 2 }}>
+                  <Table size="small" stickyHeader aria-label="skew table">
+                    <TableHead sx={{ backgroundColor: '#002060' }}>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Year</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Total Deal Count</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>% of Positively Performing Deals</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>% of Negatively Performing Deals</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Avg T+1M Abs. Return Pos</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Avg T+1M Abs. Return Neg</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Expected Return</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Long Only Opportunity Value</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredData.map((row) => (
+                        <TableRow key={row.Year}>
+                          <TableCell>{row.Year}</TableCell>
+                          <TableCell>{row.Total_Deal_Count}</TableCell>
+                          <TableCell>{row.Positively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
+                          <TableCell>{row.Negatively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
+                          <TableCell>{row["Average_T+1M_Abs_Return of Positively"].toFixed(1)}</TableCell>
+                          <TableCell>{row["Average_T+1M_Abs_Return of Negatively"].toFixed(1)}</TableCell>
+                          <TableCell>{row.Expected_Returns.toFixed(1)}</TableCell>
+                          <TableCell>${row.Long_Opportunity_Value.toFixed(1)}B</TableCell>
+                        </TableRow>
+                      ))}
+                      {/* Summary Row */}
+                      <TableRow sx={{ backgroundColor: '#e0f2f1' }}>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{totalDealCount}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{avgPositivelyPerformingDeals.toFixed(0)}%</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{avgNegativelyPerformingDeals.toFixed(0)}%</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnPositively.toFixed(1)}%</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnNegatively.toFixed(1)}%</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{avgExpectedReturns.toFixed(1)}%</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>${totalLongOpportunityValue.toFixed(1)}B</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </Box>
-          ) : error ? (
-            <Typography color="error">{error}</Typography>
-          ) : (
-            <TableContainer component={Paper} sx={{ maxHeight: 600, overflow: 'auto', marginTop: 2, borderRadius: 2 }}>
-              <Table size="small" stickyHeader aria-label="skew table">
-                <TableHead sx={{ backgroundColor: '#002060' }}>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Year</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Total Deal Count</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>% of Positively Performing Deals</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>% of Negatively Performing Deals</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Avg T+1M Abs. Return Pos</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Avg T+1M Abs. Return Neg</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Expected Return</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#002060' }}>Long Only Opportunity Value</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredData.map((row) => (
-                    <TableRow key={row.Year}>
-                      <TableCell>{row.Year}</TableCell>
-                      <TableCell>{row.Total_Deal_Count}</TableCell>
-                      <TableCell>{row.Positively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
-                      <TableCell>{row.Negatively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
-                      <TableCell>{row["Average_T+1M_Abs_Return of Positively"].toFixed(1)}</TableCell>
-                      <TableCell>{row["Average_T+1M_Abs_Return of Negatively"].toFixed(1)}</TableCell>
-                      <TableCell>{row.Expected_Returns.toFixed(1)}</TableCell>
-                      <TableCell>${row.Long_Opportunity_Value.toFixed(1)}B</TableCell>
-                    </TableRow>
-                  ))}
-                  {/* Summary Row */}
-                  <TableRow sx={{ backgroundColor: '#e0f2f1' }}>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{totalDealCount}</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{avgPositivelyPerformingDeals.toFixed(0)}%</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{avgNegativelyPerformingDeals.toFixed(0)}%</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnPositively.toFixed(1)}%</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnNegatively.toFixed(1)}%</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{avgExpectedReturns.toFixed(1)}%</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>${totalLongOpportunityValue.toFixed(1)}B</TableCell>
-                  </TableRow>
-
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </Box>
+          </CardContent>
+        </Card>
       </Container>
 
       <Snackbar
-  open={openSnackbar}
-  onClose={handleCloseSnackbar}
-  autoHideDuration={4000} // Adjust duration for better visibility
-  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Optional: to control position
->
-  <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
-    End year cannot be earlier than the start year!
-  </Alert>
-</Snackbar>
-
+        open={openSnackbar}
+        onClose={handleCloseSnackbar}
+        autoHideDuration={4000} // Adjust duration for better visibility
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Optional: to control position
+      >
+        <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
+          End year cannot be earlier than the start year!
+        </Alert>
+      </Snackbar>
     </>
   );
 };
