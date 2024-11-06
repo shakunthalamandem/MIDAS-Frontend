@@ -81,16 +81,18 @@ const SkewMain: React.FC = () => {
   const handleEndYearChange = (event: SelectChangeEvent<number>) => {
     const newEndYear = Number(event.target.value);
     if (startYear && newEndYear < startYear) {
-      setOpenSnackbar(true);
+      setOpenSnackbar(true); // Open the Snackbar if endYear is less than startYear
     } else {
       setEndYear(newEndYear);
     }
   };
-
-  const handleCloseSnackbar = () => {
+  
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
     setOpenSnackbar(false);
   };
-
   // Calculate totals and averages for the summary row
   const totalDealCount = filteredData.reduce((acc, row) => acc + row.Total_Deal_Count, 0);
   const avgPositivelyPerformingDeals = filteredData.reduce((acc, row) => acc + row.Positively_Performing_Deals_Percentage, 0) / filteredData.length;
@@ -203,11 +205,17 @@ const SkewMain: React.FC = () => {
         </Box>
       </Container>
 
-      <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
-          End year cannot be earlier than the start year!
-        </Alert>
-      </Snackbar>
+      <Snackbar
+  open={openSnackbar}
+  onClose={handleCloseSnackbar}
+  autoHideDuration={4000} // Adjust duration for better visibility
+  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Optional: to control position
+>
+  <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
+    End year cannot be earlier than the start year!
+  </Alert>
+</Snackbar>
+
     </>
   );
 };
