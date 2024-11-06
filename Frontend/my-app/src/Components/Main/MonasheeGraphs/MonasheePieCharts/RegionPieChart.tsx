@@ -27,7 +27,23 @@ interface ChartData {
   value: number;
 }
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORS = [
+  "#0088FE", // Blue
+  "#00C49F", // Green
+  "#FFBB28", // Yellow
+  "#FF8042", // Orange
+  "#FF6633", // Coral
+  "#D1E6FF", // Light Blue
+  "#FBB3FF", // Light Purple
+  "#7ED321", // Lime Green
+  "#FFD700", // Gold
+  "#FF69B4", // Hot Pink
+  "#9B59B6", // Purple
+  "#2ECC71", // Emerald Green
+  "#E74C3C", // Red
+  "#3498DB", // Light Blue
+  "#1ABC9C", // Turquoise
+];
 
 interface RegionPieChartProps {
   opportunity_value_on_abs_basis?: string;
