@@ -116,6 +116,8 @@ const SkewMain: React.FC = () => {
 
   return (
     <>
+          <SectorSkewData />
+
       <Container maxWidth="lg" sx={{ paddingY: 4, backgroundColor: '#f4f4f9' }}>
         <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
           <CardContent>
@@ -241,7 +243,6 @@ const SkewMain: React.FC = () => {
           End Year should not be less than Start Year!
         </Alert>
       </Snackbar>
-      <SectorSkewData />
 
     </>
   );
