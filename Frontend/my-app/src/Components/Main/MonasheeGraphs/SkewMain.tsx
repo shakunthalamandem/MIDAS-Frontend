@@ -164,12 +164,12 @@ const SkewMain: React.FC = () => {
                     <TableRow key={row.Year}>
                       <TableCell>{row.Year}</TableCell>
                       <TableCell>{row.Total_Deal_Count}</TableCell>
-                      <TableCell>{row.Positively_Performing_Deals_Percentage}%</TableCell>
-                      <TableCell>{row.Negatively_Performing_Deals_Percentage}%</TableCell>
-                      <TableCell>{row["Average_T+1M_Abs_Return of Positively"]}</TableCell>
-                      <TableCell>{row["Average_T+1M_Abs_Return of Negatively"]}</TableCell>
-                      <TableCell>{row.Expected_Returns}</TableCell>
-                      <TableCell>{row.Long_Opportunity_Value}</TableCell>
+                      <TableCell>{row.Positively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
+                      <TableCell>{row.Negatively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
+                      <TableCell>{row["Average_T+1M_Abs_Return of Positively"].toFixed(1)}</TableCell>
+                      <TableCell>{row["Average_T+1M_Abs_Return of Negatively"].toFixed(1)}</TableCell>
+                      <TableCell>{row.Expected_Returns.toFixed(1)}</TableCell>
+                      <TableCell>${row.Long_Opportunity_Value.toFixed(1)}B</TableCell>
                     </TableRow>
                   ))}
                   {/* Summary Row */}
@@ -181,7 +181,7 @@ const SkewMain: React.FC = () => {
                     <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnPositively.toFixed(1)}%</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnNegatively.toFixed(1)}%</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>{avgExpectedReturns.toFixed(1)}%</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{totalLongOpportunityValue.toFixed(1)}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>${totalLongOpportunityValue.toFixed(1)}B</TableCell>
                   </TableRow>
 
                 </TableBody>
