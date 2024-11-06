@@ -176,8 +176,8 @@ const SkewMain: React.FC = () => {
                   <TableRow sx={{ backgroundColor: '#e0f2f1' }}>
                     <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>{totalDealCount}</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{avgPositivelyPerformingDeals.toFixed(1)}%</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{avgNegativelyPerformingDeals.toFixed(1)}%</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{avgPositivelyPerformingDeals.toFixed(0)}%</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{avgNegativelyPerformingDeals.toFixed(0)}%</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnPositively.toFixed(1)}%</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>{avgReturnNegatively.toFixed(1)}%</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>{avgExpectedReturns.toFixed(1)}%</TableCell>
