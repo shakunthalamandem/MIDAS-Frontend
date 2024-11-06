@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Box, Select, MenuItem, FormControl, InputLabel, Typography, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, SelectChangeEvent, Container } from '@mui/material';
+import {
+  Box, Select, MenuItem, FormControl, InputLabel, Typography,
+  CircularProgress, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, SelectChangeEvent, Container, Snackbar, Alert
+} from '@mui/material';
 
 interface SkewData {
-  Year: string;  // Changed to string as per the new structure
+  Year: string;
   Total_Deal_Count: number;
   Positively_Performing_Deals_Percentage: number;
   Negatively_Performing_Deals_Percentage: number;
@@ -25,6 +29,7 @@ const SkewMain: React.FC = () => {
   const [endYear, setEndYear] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const fetchYears = useCallback(async () => {
     try {
@@ -70,13 +75,20 @@ const SkewMain: React.FC = () => {
   }, [skewData, startYear, endYear]);
 
   const handleStartYearChange = (event: SelectChangeEvent<number>) => {
-    const newStartYear = Number(event.target.value);
-    setStartYear(newStartYear);
-    setEndYear(newStartYear + 9);
+    setStartYear(Number(event.target.value));
   };
 
   const handleEndYearChange = (event: SelectChangeEvent<number>) => {
-    setEndYear(Number(event.target.value));
+    const newEndYear = Number(event.target.value);
+    if (startYear && newEndYear < startYear) {
+      setOpenSnackbar(true);
+    } else {
+      setEndYear(newEndYear);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   // Calculate totals and averages for the summary row
@@ -190,6 +202,12 @@ const SkewMain: React.FC = () => {
           )}
         </Box>
       </Container>
+
+      <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
+          End year cannot be earlier than the start year!
+        </Alert>
+      </Snackbar>
     </>
   );
 };
