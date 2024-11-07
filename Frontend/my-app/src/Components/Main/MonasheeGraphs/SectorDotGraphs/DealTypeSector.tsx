@@ -154,17 +154,32 @@ const DealTypeSector: React.FC = () => {
           <Box sx={{ marginBottom: 3 }}>
         <FormGroup row>
           {Object.keys(sectorNameMap).map((sectorDisplayName) => (
-            <FormControlLabel
-              key={sectorDisplayName}
-              control={
-                <Checkbox
-                  checked={selectedSectors.includes(sectorDisplayName)}
-                  onChange={() => handleCheckboxChange(sectorDisplayName)}
-                  name={sectorDisplayName}
-                />
-              }
-              label={sectorDisplayName}
-            />
+         <FormControlLabel
+         key={sectorDisplayName}
+         control={
+           <Checkbox
+             checked={selectedSectors.includes(sectorDisplayName)}
+             onChange={() => handleCheckboxChange(sectorDisplayName)}
+             name={sectorDisplayName}
+             sx={{
+               color: '#166802',
+               '&.Mui-checked': {
+                 color: '#166802',
+               },
+               '&:hover': {
+                 color: '#166802',
+               },
+             }}
+           />
+         }
+         label={sectorDisplayName}
+         sx={{
+           color: '#002060',
+           fontSize: 12,
+           fontWeight: 'bold',
+           fontFamily: 'Roboto, Arial, sans-serif', // Add your preferred font family here
+         }}
+       />       
           ))}
         </FormGroup>
       </Box>
