@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Box, CircularProgress, Typography, Card, CardContent, CardHeader, Paper } from '@mui/material';
+import { Box, CircularProgress, Typography, Paper } from '@mui/material';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 // Define the structure of the API response

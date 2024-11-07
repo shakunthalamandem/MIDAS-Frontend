@@ -27,22 +27,23 @@ interface ChartData {
 }
 
 const COLORS = [
-  "#0088FE", // Blue
-  "#00C49F", // Green
-  "#FFBB28", // Yellow
-  "#FF8042", // Orange
-  "#FF6633", // Coral
-  "#D1E6FF", // Light Blue
-  "#FBB3FF", // Light Purple
-  "#7ED321", // Lime Green
-  "#FFD700", // Gold
-  "#FF69B4", // Hot Pink
-  "#9B59B6", // Purple
-  "#2ECC71", // Emerald Green
-  "#E74C3C", // Red
-  "#3498DB", // Light Blue
-  "#1ABC9C", // Turquoise
+  "#0A4D91", // Dark Blue
+  "#006F3D", // Dark Green
+  "#E59400", // Mustard Yellow
+  "#D45D26", // Dark Orange
+  "#B84C38", // Dark Coral
+  "#80A9C2", // Steel Blue
+  "#9B59B6", // Dark Purple
+  "#5A8D31", // Dark Lime Green
+  "#D68F00", // Dark Gold
+  "#D5006A", // Fuchsia Pink
+  "#6A3D9A", // Deep Purple
+  "#145A32", // Dark Emerald Green
+  "#C0392B", // Dark Red
+  "#2980B9", // Bright Blue
+  "#16A085", // Deep Turquoise
 ];
+
 
 interface SectorPieChartProps {
   opportunity_value_on_abs_basis?: string;
