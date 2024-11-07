@@ -6,6 +6,7 @@ import OpportunityMain from '../../MonasheeGraphs/OpportunityMain';
 import OpportunityAbsBasis from '../../MonasheeGraphs/OpportunityAbsBasis';
 import SkewMain from '../../MonasheeGraphs/SkewMain';
 import DealTypeSector from '../../MonasheeGraphs/SectorDotGraphs/DealTypeSector';
+import AreaChartComponent from '../../MonasheeGraphs/SectorDotGraphs/AreaChartComponent';
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -103,6 +104,7 @@ const CapitalMarkets: React.FC = () => {
         {value === 3 && <OpportunityAbsBasis />}
         {value === 4 && <SkewMain />}
         <DealTypeSector />
+        <AreaChartComponent />
 
       </Box>
     </>

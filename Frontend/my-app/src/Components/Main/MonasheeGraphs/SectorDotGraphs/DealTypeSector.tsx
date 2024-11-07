@@ -132,12 +132,26 @@ const DealTypeSector: React.FC = () => {
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        Sector-wise Data Over the Years
-      </Typography>
-      <Box sx={{ marginBottom: 3 }}>
-       
+    <>
+    <Box sx={{ padding: { xs: 2, sm: 3 }, width: "100%" }}>
+    <Typography variant="h6" gutterBottom align="center" color="#002060">
+  Sector-wise Data Over the Years
+</Typography>
+
+      
+
+      {/* Fully responsive Box container */}
+      <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+        <Paper
+          elevation={3}
+          sx={{
+            padding: { xs: 2, sm: 3 },
+            width: "100%",
+            maxWidth: "1200px", // Max width on large screens
+            margin: "0 auto", // Center the Paper on the screen
+          }}
+        >
+          <Box sx={{ marginBottom: 3 }}>
         <FormGroup row>
           {Object.keys(sectorNameMap).map((sectorDisplayName) => (
             <FormControlLabel
@@ -154,9 +168,6 @@ const DealTypeSector: React.FC = () => {
           ))}
         </FormGroup>
       </Box>
-
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Paper elevation={3} sx={{ padding: 3, width: "100%", maxWidth: 1200 }}>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={formattedData}>
               <XAxis dataKey="year" />
@@ -181,6 +192,7 @@ const DealTypeSector: React.FC = () => {
         </Paper>
       </Box>
     </Box>
+    </>
   );
 };
 
