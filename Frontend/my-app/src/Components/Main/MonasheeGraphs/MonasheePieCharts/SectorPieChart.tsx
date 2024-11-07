@@ -119,19 +119,23 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
   const extractRegions = (apiData: ApiResponse) => {
     const allRegions = new Set<string>();
 
+    // Iterate over each year
     Object.values(apiData).forEach((yearData) => {
-      Object.values(yearData).forEach((categoryData) => {
-        ["US", "International"].forEach((region) => {
-          const sectorData = categoryData[region as keyof typeof categoryData];
-          if (sectorData) {
-            Object.keys(sectorData).forEach((region) => allRegions.add(region));
-          }
+        // Iterate over each category (FO, IPO, etc.)
+        Object.values(yearData).forEach((categoryData) => {
+            // Iterate through each region within the categoryData
+            Object.keys(categoryData).forEach((region) => {
+                if (region === "US" || region === "International") {
+                    allRegions.add(region);
+                }
+            });
         });
-      });
     });
 
     setRegions(Array.from(allRegions));
-  };
+};
+
+  
   const transformSectorData = (apiData: ApiResponse) => {
     const aggregatedData: Record<string, number> = {};
 
