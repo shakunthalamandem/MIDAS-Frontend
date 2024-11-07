@@ -133,7 +133,7 @@ const DealTypeSector: React.FC = () => {
 
   return (
     <>
-    <Box sx={{ padding: { xs: 2, sm: 3 }, width: "100%" }}>
+    <Box sx={{ width: "100%",marginBottom:'30px' }}>
     <Typography variant="h6" gutterBottom align="center" color="#002060">
   Sector-wise Data Over the Years
 </Typography>
