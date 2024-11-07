@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Box, CircularProgress, Typography, Card, CardContent, CardHeader } from '@mui/material';
+import { Box, CircularProgress, Typography, Card, CardContent, CardHeader, Paper } from '@mui/material';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 // Define the structure of the API response
@@ -59,41 +59,46 @@ const AreaChartComponent: React.FC = () => {
   }
 
   return (
-    <Box sx={{ padding: { xs: 2, sm: 3 }, width: '100%' }}>
+    <Box sx={{ padding: { xs: 2, sm: 3 }, width: "100%" }}>
       <Typography variant="h6" gutterBottom align="center" color="#002060">
         US Region Percentage (Area Chart)
       </Typography>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-        <Card
+      <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+      <Paper
+          elevation={3}
           sx={{
-            width: '100%',
-            maxWidth: '1200px', // Max width on large screens
-            margin: '0 auto', // Center the Card on the screen
             padding: { xs: 2, sm: 3 },
+            width: "100%",
+            maxWidth: "1200px", // Max width on large screens
+            margin: "0 auto", // Center the Paper on the screen
           }}
         >
-          <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <AreaChart data={data}>
-                <XAxis dataKey="year" />
+ <ResponsiveContainer width="100%" height={400}>
+                  <AreaChart data={data}>
+              <XAxis 
+                dataKey="year" 
+                tick={{ fill: "#002060", fontSize: 12 }}  // Adjust font size and color
+                />
                 <YAxis
                   domain={[0, 100]} // Set Y-axis range to 0 to 100
-                  tickFormatter={(tick) => `${tick}%`} // Add % symbol to the ticks
+                  tickFormatter={(tick) => `${tick}%`} 
+                  tick={{ fill: "#002060", fontSize: 12 }}  // Adjust font size and color
+                  // Add % symbol to the ticks
                 />
                 <Tooltip />
                 <Legend />
                 <Area
                   type="monotone"
                   dataKey="us"
-                  stroke="#8884d8"
+                  stroke="#166103"
                   fillOpacity={0.3}
-                  fill="#8884d8"
+                  fill="#c0d8ba"
                 />
               </AreaChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+            </Paper>
+
       </Box>
     </Box>
   );

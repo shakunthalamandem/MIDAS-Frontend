@@ -170,8 +170,10 @@ const DealTypeSector: React.FC = () => {
       </Box>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={formattedData}>
-              <XAxis dataKey="year" />
-              <YAxis />
+              <XAxis dataKey="year"
+                tick={{ fill: "#002060", fontSize: 12 }}  // Adjust font size and color
+               />
+              <YAxis tick={{ fill: "#002060", fontSize: 12 }}   />
               <Tooltip />
               <Legend />
               {/* Remove the CartesianGrid to hide the grid lines */}
