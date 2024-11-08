@@ -186,37 +186,46 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
       </Typography>
 
       <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#e8f5e9" }}>
-          <InputLabel>Start Year</InputLabel>
-          <Select
-            value={startYear || ""}
-            onChange={(e) => setStartYear(Number(e.target.value))}
-            label="Start Year"
-            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
-          >
-            {years.map((year) => (
-              <MenuItem key={year} value={year}>
-                {year}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#e8f5e9" }}>
+  <InputLabel>Start Year</InputLabel>
+  <Select
+    value={startYear || ""}
+    onChange={(e) => setStartYear(Number(e.target.value))}
+    label="Start Year"
+    MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+  >
+    {years
+      .slice() // create a copy to avoid mutating the original array
+      .sort((a, b) => a - b) // sort in ascending order
+      .map((year) => (
+        <MenuItem key={year} value={year}>
+          {year}
+        </MenuItem>
+      ))}
+  </Select>
+</FormControl>
 
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#ffebee" }}>
-          <InputLabel>End Year</InputLabel>
-          <Select
-            value={endYear || ""}
-            onChange={(e) => setEndYear(Number(e.target.value))}
-            label="End Year"
-            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
-          >
-            {years.map((year) => (
-              <MenuItem key={year} value={year}>
-                {year}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+<FormControl variant="outlined" size="small" sx={{ minWidth: 100, bgcolor: "#ffebee" }}>
+  <InputLabel>End Year</InputLabel>
+  <Select
+    value={endYear || ""}
+    onChange={(e) => setEndYear(Number(e.target.value))}
+    label="End Year"
+    MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+  >
+    {years
+      .slice() // create a copy to avoid mutating the original array
+      .sort((a, b) => a - b) // sort in ascending order
+      .filter((year) => year >= (startYear || years[0])) // only years >= startYear
+      .map((year) => (
+        <MenuItem key={year} value={year}>
+          {year}
+        </MenuItem>
+      ))}
+  </Select>
+</FormControl>
+
+
 
         <FormControl variant="outlined" size="small" sx={{ minWidth: 120, bgcolor: "#e3f2fd" }}>
           <InputLabel>Type</InputLabel>
