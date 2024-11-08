@@ -21,7 +21,7 @@ const AreaChartComponent: React.FC = () => {
       try {
         // Fetch the data and type the response
         const response = await axios.get<APIResponse>(
-          'http://192.168.1.59:9000/api/regionwise_data'
+          'http://192.168.1.59:9000/api/regionwise_data/'
         );
         
         // Transform the data to the format required for the chart

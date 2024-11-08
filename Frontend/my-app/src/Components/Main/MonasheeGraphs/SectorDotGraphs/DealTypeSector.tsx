@@ -85,7 +85,7 @@ const DealTypeSector: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get<APIResponse>(
-          "http://192.168.1.59:9000/api/sectorwise_data"
+          "http://192.168.1.59:9000/api/sectorwise_data/"
         );
         setData(response.data);
       } catch (err) {
