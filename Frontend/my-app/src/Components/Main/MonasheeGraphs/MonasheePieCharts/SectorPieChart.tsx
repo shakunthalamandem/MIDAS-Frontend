@@ -62,7 +62,7 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
   const [startYear, setStartYear] = useState<number >();
   const [endYear, setEndYear] = useState<number >(); // End year to be calculated based on start year
   const [type, setType] = useState<"IPO" | "FO" | "all">("all");
-  const [region, setRegion] = useState<"US" | "International" | "all">("all");
+  const [region, setRegion] = useState<string  | "all">("all");
   const [error, setError] = useState<string | null>(null);
   const [years, setYears] = useState<number[]>([]);
   const [regions, setRegions] = useState<string[]>([]);
@@ -245,7 +245,7 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
           <InputLabel>Region</InputLabel>
           <Select
             value={region}
-            onChange={(e) => setRegion(e.target.value as "US" | "International" | "all")}
+            onChange={(e) => setRegion(e.target.value as string | "all")}
             label="Region"
           >
         <MenuItem value="all">All</MenuItem>
