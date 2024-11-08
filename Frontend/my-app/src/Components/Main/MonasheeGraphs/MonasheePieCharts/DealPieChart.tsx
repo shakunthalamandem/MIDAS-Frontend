@@ -22,17 +22,14 @@ const DealPieChart: React.FC<DealPieChartProps> = ({
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
-          {/* Pass region data and new props to RegionPieChart */}
           <RegionPieChart
             opportunity_value_on_abs_basis={opportunity_value_on_abs_basis}
             opportunity_value_ex={opportunity_value_ex}
             deal_value={deal_value}
             deal_count={deal_count}
-            // initialData={data.regionData}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          {/* Pass sector data to SectorPieChart */}
           <SectorPieChart 
           opportunity_value_on_abs_basis={opportunity_value_on_abs_basis}
           opportunity_value_ex={opportunity_value_ex}
