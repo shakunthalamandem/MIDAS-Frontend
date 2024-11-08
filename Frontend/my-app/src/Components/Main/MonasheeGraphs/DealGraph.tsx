@@ -203,7 +203,7 @@ const DealGraph: React.FC = () => {
               <Select value={period} onChange={handlePeriodChange} label="Period">
                 <MenuItem value="yearly">Yearly</MenuItem>
                 <MenuItem value="quarterly">Quarterly</MenuItem>
-                <MenuItem value="monthly">Monthly</MenuItem>
+                {/* <MenuItem value="monthly">Monthly</MenuItem> */}
               </Select>
             </FormControl>
           </Grid>
