@@ -21,6 +21,8 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import DealPieChart from "./MonasheePieCharts/DealPieChart";
+import AreaChartComponent from "./SectorDotGraphs/AreaChartComponent";
+import DealTypeSector from "./SectorDotGraphs/DealTypeSector";
 
 interface ApiResponse {
   [key: string]: {
@@ -264,6 +266,8 @@ const OpportunityAbsBasis: React.FC = () => {
         </Box>
       </Container>
       <DealPieChart opportunity_value_on_abs_basis = {"true"} /> {/* Pass the pie chart data here */}
+      <DealTypeSector />
+      <AreaChartComponent />
     </>
   );
 };
