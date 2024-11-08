@@ -55,7 +55,7 @@ const SkewMain: React.FC = () => {
   const fetchSkewData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get<{ Year_Statistics: SkewData[] }>("http://192.168.1.59:9000/api/skew-table/calculations/");
+      const response = await axios.get<{ Year_Statistics: SkewData[] }>("http://192.168.1.59:9000/api/skewtable/calculations/");
       setSkewData(response.data.Year_Statistics); // Extract the Year_Statistics array from the response
     } catch (error) {
       console.error("Error fetching skew data:", error);

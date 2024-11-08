@@ -29,7 +29,7 @@ const SectorSkewData: React.FC = () => {
   const fetchSectorData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get<{ Sector_Statistics: SectorStatistics[] }>("http://192.168.1.59:9000/api/skew-table/calculations/");
+      const response = await axios.get<{ Sector_Statistics: SectorStatistics[] }>("http://192.168.1.59:9000/api/skewtable/calculations/");
       setSectorStatistics(response.data.Sector_Statistics);
       setFilteredData(response.data.Sector_Statistics); // Initialize filtered data with all sectors
     } catch (error) {
