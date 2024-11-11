@@ -150,10 +150,18 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
           regions.forEach((regionKey) => {
             const sectorData = categoryData[regionKey as keyof typeof categoryData];
             if (sectorData) {
-              Object.entries(sectorData).forEach(([sector, { count }]) => {
-                aggregatedData[sector] = (aggregatedData[sector] || 0) + count;
+              Object.entries(sectorData).forEach(([sector, data]) => {
+                const value = 
+                  opportunity_value_on_abs_basis === "true" ? data.opportunity_value_on_abs_basis :
+                  opportunity_value_ex === "true" ? data.opportunity_value_ex :
+                  deal_value === "true" ? data.deal_value :
+                  deal_count === "true" ? data.count :
+                  0;  // Default to 0 if none of the conditions match
+            
+                aggregatedData[sector] = (aggregatedData[sector] || 0) + value;
               });
             }
+            
           });
         }
       });
