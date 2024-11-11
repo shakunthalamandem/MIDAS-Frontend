@@ -259,7 +259,7 @@ const DealVolume: React.FC = () => {
         </Box>
       </Container>
       <DealPieChart deal_value={"true"} /> {/* Pass the pie chart data here */}
-      <DealTypeSector />
+      <DealTypeSector yAxisType="deal_value" />
       <AreaChartComponent />
     </>
   );

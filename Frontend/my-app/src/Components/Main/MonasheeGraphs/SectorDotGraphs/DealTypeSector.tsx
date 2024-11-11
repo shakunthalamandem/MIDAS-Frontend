@@ -21,32 +21,25 @@ import {
 
 // Define the data types
 type SectorData = {
-  CommunicationServices: number;
-  ConsumerDiscretionary: number;
-  ConsumerStaples: number;
-  Energy: number;
-  Financials: number;
-  HealthCare: number;
-  Industrials: number;
-  InformationTechnology: number;
-  Materials: number;
-  RealEstate: number;
-  Utilities: number;
+  deal_count: number;
+  total_deal_value: number;
+  total_opportunity_value_ex: number;
+  total_opportunity_value_on_abs_basis: number;
 };
 
 type APIResponse = {
-  [key: string]: SectorData;
+  [key: string]: Record<string, SectorData>;
 };
 
 const sectorNameMap: Record<string, string> = {
-  CommunicationServices: "Communication Services",
-  ConsumerDiscretionary: "Consumer Discretionary",
-  ConsumerStaples: "Consumer Staples",
+  "Communication Services": "Communication Services",
+  "Consumer Discretionary": "Consumer Discretionary",
+  "Consumer Staples": "Consumer Staples",
   Energy: "Energy",
   Financials: "Financials",
-  HealthCare: "Health Care",
+  "Health Care": "Health Care",
   Industrials: "Industrials",
-  InformationTechnology: "Information Technology",
+  "Information Technology": "Information Technology",
   Materials: "Materials",
   RealEstate: "Real Estate",
   Utilities: "Utilities",
@@ -54,33 +47,35 @@ const sectorNameMap: Record<string, string> = {
 
 // Define colors for each sector
 const sectorColors: Record<string, string> = {
-  "Communication Services": "#3B2A45", // Dark purple
-  "Consumer Discretionary": "#a70278", // Deep teal
-  "Consumer Staples": "#090078", // Dark violet
-  Energy: "#fd0110", // Deep red
-  Financials: "#590005", // Dark slate blue
-  "Health Care": "#320059", // Olive green
-  Industrials: "#027f53", // Dark cyan
-  "Information Technology": "#dfc100", // Charcoal gray
-  Materials: "#7a3a01", // Slate gray
-  RealEstate: "#1f5d5e", // Golden yellow
-  Utilities: "#7334a7", // Dark green
+  "Communication Services": "#3B2A45",
+  "Consumer Discretionary": "#a70278",
+  "Consumer Staples": "#090078",
+  Energy: "#fd0110",
+  Financials: "#590005",
+  "Health Care": "#320059",
+  Industrials: "#027f53",
+  "Information Technology": "#dfc100",
+  Materials: "#7a3a01",
+  RealEstate: "#1f5d5e",
+  Utilities: "#7334a7",
 };
 
-// Mapping between displayed names and API keys (no spaces)
-const DealTypeSector: React.FC = () => {
+interface DealTypeSectorProps {
+  yAxisType: "deal_count" | "deal_value" | "opportunity_value_ex" | "opportunity_value_on_abs_basis"; // New prop to decide which data to show on the Y-axis
+}
+
+const DealTypeSector: React.FC<DealTypeSectorProps> = ({ yAxisType }) => {
   const [data, setData] = useState<APIResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSectors, setSelectedSectors] = useState<string[]>([
-    "InformationTechnology",
-    "ConsumerDiscretionary",
+    "Information Technology",
+    "Consumer Discretionary",
     "Energy",
     "Financials",
-    "HealthCare",
-  ]); // Default selected sectors
+    "Health Care",
+  ]);
 
-  // Fetch the data from the API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -100,7 +95,15 @@ const DealTypeSector: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Paper elevation={3} sx={{ padding: 3, display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <Paper
+        elevation={3}
+        sx={{
+          padding: 3,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <CircularProgress />
       </Paper>
     );
@@ -114,13 +117,32 @@ const DealTypeSector: React.FC = () => {
     );
   }
 
-  // Format the data for recharts
-  const formattedData = Object.keys(data || {}).map((year) => ({
-    year,
-    ...data?.[year],
-  }));
+  // Format the data for recharts based on yAxisType (deal_count, deal_value, opportunity_value_ex, opportunity_value_on_abs_basis)
+  const formattedData = Object.keys(data || {}).map((year) => {
+    const yearData = data?.[year];
+    const yearFormattedData: any = { year };
 
-  // Handle checkbox change
+    // Loop through the selected sectors and format the data
+    selectedSectors.forEach((sector) => {
+      const sectorData = yearData?.[sector];
+
+      if (sectorData) {
+        // Depending on the yAxisType prop, we will display the corresponding data
+        if (yAxisType === "deal_count") {
+          yearFormattedData[sectorNameMap[sector]] = sectorData.deal_count;
+        } else if (yAxisType === "deal_value") {
+          yearFormattedData[sectorNameMap[sector]] = sectorData.total_deal_value;
+        } else if (yAxisType === "opportunity_value_ex") {
+          yearFormattedData[sectorNameMap[sector]] = sectorData.total_opportunity_value_ex;
+        } else if (yAxisType === "opportunity_value_on_abs_basis") {
+          yearFormattedData[sectorNameMap[sector]] = sectorData.total_opportunity_value_on_abs_basis;
+        }
+      }
+    });
+
+    return yearFormattedData;
+  });
+
   const handleCheckboxChange = (sector: string) => {
     setSelectedSectors((prevSelectedSectors) => {
       if (prevSelectedSectors.includes(sector)) {
@@ -133,82 +155,77 @@ const DealTypeSector: React.FC = () => {
 
   return (
     <>
-    <Box sx={{ width: "100%",marginBottom:'30px' }}>
-    <Typography variant="h6" gutterBottom align="center" color="#002060">
-  Sector-wise Data Over the Years
-</Typography>
+      <Box sx={{ width: "100%", marginBottom: "30px" }}>
+        <Typography variant="h6" gutterBottom align="center" color="#002060">
+          Sector-wise Data Over the Years
+        </Typography>
 
-      
-
-      {/* Fully responsive Box container */}
-      <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-        <Paper
-          elevation={3}
-          sx={{
-            padding: { xs: 2, sm: 3 },
-            width: "100%",
-            maxWidth: "1200px", // Max width on large screens
-            margin: "0 auto", // Center the Paper on the screen
-          }}
-        >
-          <Box sx={{ marginBottom: 3 }}>
-        <FormGroup row>
-          {Object.keys(sectorNameMap).map((sectorDisplayName) => (
-         <FormControlLabel
-         key={sectorDisplayName}
-         control={
-           <Checkbox
-             checked={selectedSectors.includes(sectorDisplayName)}
-             onChange={() => handleCheckboxChange(sectorDisplayName)}
-             name={sectorDisplayName}
-             sx={{
-               color: '#166802',
-               '&.Mui-checked': {
-                 color: '#166802',
-               },
-               '&:hover': {
-                 color: '#166802',
-               },
-             }}
-           />
-         }
-         label={sectorDisplayName}
-         sx={{
-           color: '#002060',
-           fontSize: 12,
-           fontWeight: 'bold',
-           fontFamily: 'Roboto, Arial, sans-serif', // Add your preferred font family here
-         }}
-       />       
-          ))}
-        </FormGroup>
-      </Box>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={formattedData}>
-              <XAxis dataKey="year"
-                tick={{ fill: "#002060", fontSize: 12 }}  // Adjust font size and color
-               />
-              <YAxis tick={{ fill: "#002060", fontSize: 12 }}   />
-              <Tooltip />
-              <Legend />
-              {/* Remove the CartesianGrid to hide the grid lines */}
-              {selectedSectors.map((sectorDisplayName) => {
-                const sectorKey = sectorNameMap[sectorDisplayName];
-                return (
-                  <Line
-                    key={sectorKey}
-                    type="monotone"
-                    dataKey={sectorKey}
-                    stroke={sectorColors[sectorKey]}
-                    activeDot={{ r: 8 }}
+        {/* Fully responsive Box container */}
+        <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+          <Paper
+            elevation={3}
+            sx={{
+              padding: { xs: 2, sm: 3 },
+              width: "100%",
+              maxWidth: "1200px",
+              margin: "0 auto",
+            }}
+          >
+            <Box sx={{ marginBottom: 3 }}>
+              <FormGroup row>
+                {Object.keys(sectorNameMap).map((sectorDisplayName) => (
+                  <FormControlLabel
+                    key={sectorDisplayName}
+                    control={
+                      <Checkbox
+                        checked={selectedSectors.includes(sectorDisplayName)}
+                        onChange={() => handleCheckboxChange(sectorDisplayName)}
+                        name={sectorDisplayName}
+                        sx={{
+                          color: "#166802",
+                          "&.Mui-checked": {
+                            color: "#166802",
+                          },
+                          "&:hover": {
+                            color: "#166802",
+                          },
+                        }}
+                      />
+                    }
+                    label={sectorDisplayName}
+                    sx={{
+                      color: "#002060",
+                      fontSize: 12,
+                      fontWeight: "bold",
+                      fontFamily: "Roboto, Arial, sans-serif",
+                    }}
                   />
-                );
-              })}
-            </LineChart>
-          </ResponsiveContainer>
-        </Paper>
+                ))}
+              </FormGroup>
+            </Box>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={formattedData}>
+                <XAxis dataKey="year" tick={{ fill: "#002060", fontSize: 12 }} />
+                <YAxis tick={{ fill: "#002060", fontSize: 12 }} />
+                <Tooltip />
+                <Legend />
+                {selectedSectors.map((sectorDisplayName) => {
+                  const sectorKey = sectorNameMap[sectorDisplayName];
+                  return (
+                    <Line
+                      key={sectorKey}
+                      type="monotone"
+                      dataKey={sectorKey}
+                      stroke={sectorColors[sectorKey]}
+                      activeDot={{ r: 8 }}
+                    />
+                  );
+                })}
+              </LineChart>
+            </ResponsiveContainer>
+          </Paper>
+        </Box>
       </Box>
-    </Box>
     </>
   );
 };

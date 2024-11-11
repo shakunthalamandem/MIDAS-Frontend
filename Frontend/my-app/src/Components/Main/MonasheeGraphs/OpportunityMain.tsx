@@ -260,7 +260,7 @@ const OpportunityMain: React.FC = () => {
         </Box>
       </Container>
       <DealPieChart opportunity_value_ex = {"true"} /> {/* Pass the pie chart data here */}
-      <DealTypeSector />
+      <DealTypeSector yAxisType="opportunity_value_ex" />
       <AreaChartComponent />
     </>
   );
