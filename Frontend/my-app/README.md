@@ -44,3 +44,84 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+'''API Strcture '''
+{
+  "2001": {
+    "FO": {
+      "International": {
+        "Communication Services": {
+          "count": 15,
+          "deal_value": 12023663396,
+          "opportunity_value_ex": 616853058.4153085,
+          "opportunity_value_on_abs_basis": 626525029.7249
+        }
+      },
+      "US": {
+        "Communication Services": {
+          "count": 15,
+          "deal_value": 12023663396,
+          "opportunity_value_ex": 616853058.4153085,
+          "opportunity_value_on_abs_basis": 626525029.7249
+        }
+      }
+    },
+    "IPO": {
+      "International": {
+        "Communication Services": {
+          "count": 15,
+          "deal_value": 12023663396,
+          "opportunity_value_ex": 616853058.4153085,
+          "opportunity_value_on_abs_basis": 626525029.7249
+        }
+      },
+      "US": {
+        "Communication Services": {
+          "count": 15,
+          "deal_value": 12023663396,
+          "opportunity_value_ex": 616853058.4153085,
+          "opportunity_value_on_abs_basis": 626525029.7249
+        }
+      }
+    }
+  },
+  "2002": {
+    "FO": {
+      "International": {
+        "Communication Services": {
+          "count": 15,
+          "deal_value": 12023663396,
+          "opportunity_value_ex": 616853058.4153085,
+          "opportunity_value_on_abs_basis": 626525029.7249
+        }
+      },
+      "US": {
+        "Communication Services": {
+          "count": 15,
+          "deal_value": 12023663396,
+          "opportunity_value_ex": 616853058.4153085,
+          "opportunity_value_on_abs_basis": 626525029.7249
+        }
+      }
+    },
+    "IPO": {
+      "International": {
+        "Communication Services": {
+          "count": 15,
+          "deal_value": 12023663396,
+          "opportunity_value_ex": 616853058.4153085,
+          "opportunity_value_on_abs_basis": 626525029.7249
+        }
+      },
+      "US": {
+        "Communication Services": {
+          "count": 15,
+          "deal_value": 12023663396,
+          "opportunity_value_ex": 616853058.4153085,
+          "opportunity_value_on_abs_basis": 626525029.7249
+        }
+      }
+    }
+  }
+}
