@@ -6,12 +6,31 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, Legend } f
 // Define the structure of the API response
 interface APIResponse {
   [year: string]: {
-    us: string;
-    international: string;
+    count: {
+      international: string;
+      us: string;
+    };
+    deal_value: {
+      international: string;
+      us: string;
+    };
+    opportunity_value_ex: {
+      international: string;
+      us: string;
+    };
+    opportunity_value_on_abs_basis: {
+      international: string;
+      us: string;
+    };
   };
 }
 
-const AreaChartComponent: React.FC = () => {
+// Define props for the component to select the data category dynamically
+interface AreaChartComponentProps {
+  dataCategory: 'count' | 'deal_value' | 'opportunity_value_ex' | 'opportunity_value_on_abs_basis';
+}
+
+const AreaChartComponent: React.FC<AreaChartComponentProps> = ({ dataCategory }) => {
   const [data, setData] = useState<any[]>([]); // Chart data
   const [isLoading, setIsLoading] = useState<boolean>(true); // Loading state
   const [error, setError] = useState<string | null>(null); // Error state
@@ -23,11 +42,12 @@ const AreaChartComponent: React.FC = () => {
         const response = await axios.get<APIResponse>(
           'http://192.168.1.59:9000/api/regionwise_data/'
         );
-        
+
         // Transform the data to the format required for the chart
         const chartData = Object.keys(response.data).map((year) => ({
           year,
-          us: parseFloat(response.data[year].us), // Convert percentage string to number
+          us: parseFloat(response.data[year][dataCategory].us), // Convert percentage string to number
+          international: parseFloat(response.data[year][dataCategory].international),
         }));
 
         // Set the data for the chart
@@ -40,7 +60,7 @@ const AreaChartComponent: React.FC = () => {
     };
 
     fetchData();
-  }, []); // Empty dependency array to run once when the component mounts
+  }, [dataCategory]); // Dependency on dataCategory to refetch if it changes
 
   if (isLoading) {
     return (
@@ -59,13 +79,13 @@ const AreaChartComponent: React.FC = () => {
   }
 
   return (
-    <Box sx={{  width: "100%",marginBottom:'30px'  }}>
+    <Box sx={{ width: "100%", marginBottom: '30px' }}>
       <Typography variant="h6" gutterBottom align="center" color="#002060">
-        US Region Percentage (Area Chart)
+        {`US & International ${dataCategory.replace(/_/g, ' ').toUpperCase()} (Area Chart)`}
       </Typography>
 
       <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-      <Paper
+        <Paper
           elevation={3}
           sx={{
             padding: { xs: 2, sm: 3 },
@@ -74,31 +94,36 @@ const AreaChartComponent: React.FC = () => {
             margin: "0 auto", // Center the Paper on the screen
           }}
         >
- <ResponsiveContainer width="100%" height={400}>
-                  <AreaChart data={data}>
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart data={data}>
               <XAxis 
                 dataKey="year" 
-                tick={{ fill: "#002060", fontSize: 12 }}  // Adjust font size and color
-                />
-                <YAxis
-                  domain={[0, 100]} // Set Y-axis range to 0 to 100
-                  tickFormatter={(tick) => `${tick}%`} 
-                  tick={{ fill: "#002060", fontSize: 12 }}  // Adjust font size and color
-                  // Add % symbol to the ticks
-                />
-                <Tooltip />
-                <Legend />
-                <Area
-                  type="monotone"
-                  dataKey="us"
-                  stroke="#166103"
-                  fillOpacity={0.3}
-                  fill="#c0d8ba"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-            </Paper>
-
+                tick={{ fill: "#002060", fontSize: 12 }} // Adjust font size and color
+              />
+              <YAxis
+                domain={[0, 100]} // Set Y-axis range to 0 to 100
+                tickFormatter={(tick) => `${tick}%`} 
+                tick={{ fill: "#002060", fontSize: 12 }} // Adjust font size and color
+              />
+              <Tooltip />
+              <Legend />
+              <Area
+                type="monotone"
+                dataKey="us"
+                stroke="#166103"
+                fillOpacity={0.3}
+                fill="#c0d8ba"
+              />
+              <Area
+                type="monotone"
+                dataKey="international"
+                stroke="#1b6ca8"
+                fillOpacity={0.3}
+                fill="#a0c4e2"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </Paper>
       </Box>
     </Box>
   );

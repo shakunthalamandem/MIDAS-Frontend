@@ -263,7 +263,7 @@ const DealGraph: React.FC = () => {
       </Container>
       <DealPieChart deal_count={"true"} /> {/* Pass the pie chart data here */}
       <DealTypeSector yAxisType="deal_count" />
-      <AreaChartComponent />
+      <AreaChartComponent dataCategory="count" />
     </>
   );
 };

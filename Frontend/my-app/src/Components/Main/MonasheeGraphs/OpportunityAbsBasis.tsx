@@ -270,7 +270,7 @@ const OpportunityAbsBasis: React.FC = () => {
       </Container>
       <DealPieChart opportunity_value_on_abs_basis = {"true"} /> {/* Pass the pie chart data here */}
       <DealTypeSector yAxisType="opportunity_value_on_abs_basis" />
-      <AreaChartComponent />
+      <AreaChartComponent dataCategory="opportunity_value_on_abs_basis" />
     </>
   );
 };
