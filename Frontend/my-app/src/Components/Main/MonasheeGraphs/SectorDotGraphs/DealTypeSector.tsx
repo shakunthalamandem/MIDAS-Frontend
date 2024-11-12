@@ -22,13 +22,47 @@ import {
 // Define the data types
 type SectorData = {
   deal_count: number;
-  total_deal_value: number;
-  total_opportunity_value_ex: number;
-  total_opportunity_value_on_abs_basis: number;
+  total_deal_value: string; // Changed to string to accommodate values like "9.61B"
+  total_opportunity_value_ex: string; // Changed to string to accommodate values like "805.35M"
+  total_opportunity_value_on_abs_basis: string; // Changed to string to accommodate values like "507.97M"
 };
 
 type APIResponse = {
   [key: string]: Record<string, SectorData>;
+};
+
+// Helper function to parse values with units (B, M)
+const parseValue = (value: string): number => {
+  const unit = value.slice(-1);
+  const number = parseFloat(value.slice(0, -1));
+
+  switch (unit) {
+    case "B":
+      return number * 1e9;
+    case "M":
+      return number * 1e6;
+    default:
+      return number;
+  }
+};
+
+// Helper function to format values back to string with suffixes (B, M)
+const formatValue = (value: number): string => {
+  const isNegative = value < 0;
+  const absValue = Math.abs(value); // Get the absolute value for formatting
+
+  let formattedValue = '';
+
+  if (absValue >= 1e9) {
+    formattedValue = `${(absValue / 1e9).toFixed(2)}B`;
+  } else if (absValue >= 1e6) {
+    formattedValue = `${(absValue / 1e6).toFixed(2)}M`;
+  } else {
+    formattedValue = absValue.toString();
+  }
+
+  // If the value is negative, prepend a negative sign
+  return isNegative ? `-${formattedValue}` : formattedValue;
 };
 
 const sectorNameMap: Record<string, string> = {
@@ -131,11 +165,11 @@ const DealTypeSector: React.FC<DealTypeSectorProps> = ({ yAxisType }) => {
         if (yAxisType === "deal_count") {
           yearFormattedData[sectorNameMap[sector]] = sectorData.deal_count;
         } else if (yAxisType === "deal_value") {
-          yearFormattedData[sectorNameMap[sector]] = sectorData.total_deal_value;
+          yearFormattedData[sectorNameMap[sector]] = parseValue(sectorData.total_deal_value);
         } else if (yAxisType === "opportunity_value_ex") {
-          yearFormattedData[sectorNameMap[sector]] = sectorData.total_opportunity_value_ex;
+          yearFormattedData[sectorNameMap[sector]] = parseValue(sectorData.total_opportunity_value_ex);
         } else if (yAxisType === "opportunity_value_on_abs_basis") {
-          yearFormattedData[sectorNameMap[sector]] = sectorData.total_opportunity_value_on_abs_basis;
+          yearFormattedData[sectorNameMap[sector]] = parseValue(sectorData.total_opportunity_value_on_abs_basis);
         }
       }
     });
@@ -206,8 +240,8 @@ const DealTypeSector: React.FC<DealTypeSectorProps> = ({ yAxisType }) => {
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={formattedData}>
                 <XAxis dataKey="year" tick={{ fill: "#002060", fontSize: 12 }} />
-                <YAxis tick={{ fill: "#002060", fontSize: 12 }} />
-                <Tooltip />
+                <YAxis tickFormatter={formatValue} tick={{ fill: "#002060", fontSize: 12 }} />
+                <Tooltip formatter={(value: any) => formatValue(value)} />
                 <Legend />
                 {selectedSectors.map((sectorDisplayName) => {
                   const sectorKey = sectorNameMap[sectorDisplayName];
