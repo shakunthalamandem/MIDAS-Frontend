@@ -134,45 +134,70 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
 
     setRegions(Array.from(allRegions));
 };
+ // Utility function to format numbers with units
+ const formatNumberWithUnits = (value: number): string => {
+  const absValue = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
 
-  
+  if (absValue >= 1e12) return sign + (absValue / 1e12).toFixed(1) + "T"; // Trillion
+  if (absValue >= 1e9) return sign + (absValue / 1e9).toFixed(1) + "B";   // Billion
+  if (absValue >= 1e6) return sign + (absValue / 1e6).toFixed(1) + "M";   // Million
+  // if (absValue >= 1e3) return sign + (absValue / 1e3).toFixed(1) + "K"; // Thousand
+  return sign + absValue.toString();                                       // No unit
+};
+
+  const convertToNumber = (value: string): number => {
+    if (value.endsWith("B")) {
+      return parseFloat(value) * 1e9;
+    } else if (value.endsWith("M")) {
+      return parseFloat(value) * 1e6;
+    } else if (value.endsWith("T")) {
+      return parseFloat(value) * 1e12;
+    } else {
+      return parseFloat(value);
+    }
+  };
+  const tooltipFormatter = (value: number) => formatNumberWithUnits(value);
+
+ 
   const transformSectorData = (apiData: ApiResponse) => {
     const aggregatedData: Record<string, number> = {};
-
+  
     Object.values(apiData).forEach((yearData) => {
       const categories = type === "all" ? ["FO", "IPO"] : [type];
-
+  
       categories.forEach((category) => {
         const categoryData = yearData[category as keyof typeof yearData];
         if (categoryData) {
           const regions = region === "all" ? ["US", "International"] : [region];
-
+  
           regions.forEach((regionKey) => {
             const sectorData = categoryData[regionKey as keyof typeof categoryData];
             if (sectorData) {
               Object.entries(sectorData).forEach(([sector, data]) => {
                 const value = 
-                  opportunity_value_on_abs_basis === "true" ? data.opportunity_value_on_abs_basis :
-                  opportunity_value_ex === "true" ? data.opportunity_value_ex :
-                  deal_value === "true" ? data.deal_value :
-                  deal_count === "true" ? data.count :
-                  0;  // Default to 0 if none of the conditions match
-            
+                  opportunity_value_on_abs_basis === "true" && typeof data.opportunity_value_on_abs_basis === 'string'
+                    ? convertToNumber(data.opportunity_value_on_abs_basis)
+                  : opportunity_value_ex === "true" && typeof data.opportunity_value_ex === 'string'
+                    ? convertToNumber(data.opportunity_value_ex)
+                  : deal_value === "true" && typeof data.deal_value === 'string'
+                    ? convertToNumber(data.deal_value)
+                  : deal_count === "true"
+                    ? data.count
+                  : 0;
+  
                 aggregatedData[sector] = (aggregatedData[sector] || 0) + value;
               });
             }
-            
           });
         }
       });
     });
-
-    const transformedData = Object.entries(aggregatedData).map(
-      ([name, value]) => ({ name, value })
-    );
+  
+    const transformedData = Object.entries(aggregatedData).map(([name, value]) => ({ name, value }));
     setSectorData(transformedData);
   };
-
+  
   useEffect(() => {
     fetchYears(); // Fetch years on component mount
   }, [fetchYears]);
@@ -280,13 +305,13 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
             fill="#82ca9d"
             onMouseEnter={onPieEnter}
             labelLine={true} // Enable lines to labels
-            label={({ percent }) => `${(percent * 100).toFixed(0)}%`} // Show only percentage
+            label={({ value }) => formatNumberWithUnits(value)} // Format label
           >
             {sectorData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip />
+          <Tooltip formatter={tooltipFormatter} />
           <Legend />
         </PieChart>
       </ResponsiveContainer>

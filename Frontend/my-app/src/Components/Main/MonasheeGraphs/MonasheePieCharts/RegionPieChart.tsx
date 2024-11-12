@@ -72,7 +72,7 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
   const fetchYears = useCallback(async () => {
     try {
       const response = await axios.get<YearResponse>("http://192.168.1.59:9000/api/distinct_years/");
-      const yearList = response.data.years;
+      const yearList = response.data.years.sort((a, b) => a - b);
       setYears(yearList);
       if (yearList.length > 0) {
         setStartYear(yearList[0]);
@@ -128,13 +128,17 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
     setSectors(Array.from(allSectors));
   };
   // Utility function to format numbers with units
-const formatNumberWithUnits = (value: number): string => {
-  if (value >= 1e12) return (value / 1e12).toFixed(1) + "T"; // Trillion
-  if (value >= 1e9) return (value / 1e9).toFixed(1) + "B";   // Billion
-  if (value >= 1e6) return (value / 1e6).toFixed(1) + "M";   // Million
-  // if (value >= 1e3) return (value / 1e3).toFixed(1) + "K";   // Thousand
-  return value.toString();                                   // No unit
-};
+  const formatNumberWithUnits = (value: number): string => {
+    const absValue = Math.abs(value);
+    const sign = value < 0 ? "-" : "";
+  
+    if (absValue >= 1e12) return sign + (absValue / 1e12).toFixed(1) + "T"; // Trillion
+    if (absValue >= 1e9) return sign + (absValue / 1e9).toFixed(1) + "B";   // Billion
+    if (absValue >= 1e6) return sign + (absValue / 1e6).toFixed(1) + "M";   // Million
+    // if (absValue >= 1e3) return sign + (absValue / 1e3).toFixed(1) + "K"; // Thousand
+    return sign + absValue.toString();                                       // No unit
+  };
+  
   const convertToNumber = (value: string): number => {
     if (value.endsWith("B")) {
       return parseFloat(value) * 1e9;
