@@ -65,6 +65,8 @@ const DealVolume: React.FC = () => {
       return parseFloat(value) * 1e9;
     } else if (value.endsWith("M")) {
       return parseFloat(value) * 1e6;
+    } else if (value.endsWith("T")) {
+      return parseFloat(value) * 1e3;
     } else {
       return parseFloat(value);
     }

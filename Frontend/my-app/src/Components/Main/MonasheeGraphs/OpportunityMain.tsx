@@ -65,11 +65,12 @@ const OpportunityMain: React.FC = () => {
       return parseFloat(value) * 1e9;
     } else if (value.endsWith("M")) {
       return parseFloat(value) * 1e6;
+    } else if (value.endsWith("T")) {
+      return parseFloat(value) * 1e3;
     } else {
       return parseFloat(value);
     }
   };
-
   const fetchData = async () => {
     try {
       const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", {
