@@ -127,29 +127,54 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
 
     setSectors(Array.from(allSectors));
   };
+  // Utility function to format numbers with units
+const formatNumberWithUnits = (value: number): string => {
+  if (value >= 1e12) return (value / 1e12).toFixed(1) + "T"; // Trillion
+  if (value >= 1e9) return (value / 1e9).toFixed(1) + "B";   // Billion
+  if (value >= 1e6) return (value / 1e6).toFixed(1) + "M";   // Million
+  // if (value >= 1e3) return (value / 1e3).toFixed(1) + "K";   // Thousand
+  return value.toString();                                   // No unit
+};
+  const convertToNumber = (value: string): number => {
+    if (value.endsWith("B")) {
+      return parseFloat(value) * 1e9;
+    } else if (value.endsWith("M")) {
+      return parseFloat(value) * 1e6;
+    } else if (value.endsWith("T")) {
+      return parseFloat(value) * 1e12;
+    } else {
+      return parseFloat(value);
+    }
+  };
+  const tooltipFormatter = (value: number) => formatNumberWithUnits(value);
 
   const transformRegionData = (apiData: ApiResponse) => {
     const aggregatedData: Record<string, number> = {};
-
+  
     Object.values(apiData).forEach((yearData) => {
       const categories = type === "all" ? ["FO", "IPO"] : [type];
-
+  
       categories.forEach((category) => {
         const categoryData = yearData[category as keyof typeof yearData];
         if (categoryData) {
           const regions = ["US", "International"];
-
+  
           regions.forEach((region) => {
             const regionData = categoryData[region as keyof typeof categoryData];
             if (regionData) {
               Object.entries(regionData).forEach(([sectorName, data]) => {
                 if (sector === "all" || sector === sectorName) {
-                  const value = 
-                    opportunity_value_on_abs_basis === "true" ? data.opportunity_value_on_abs_basis :
-                    opportunity_value_ex === "true" ? data.opportunity_value_ex :
-                    deal_value === "true" ? data.deal_value :
-                    deal_count === "true" ? data.count : 0;
-                    
+                  const value =
+                    opportunity_value_on_abs_basis === "true" && typeof data.opportunity_value_on_abs_basis === 'string'
+                      ? convertToNumber(data.opportunity_value_on_abs_basis)
+                      : opportunity_value_ex === "true" && typeof data.opportunity_value_ex === 'string'
+                      ? convertToNumber(data.opportunity_value_ex)
+                      : deal_value === "true" && typeof data.deal_value === 'string'
+                      ? convertToNumber(data.deal_value)
+                      : deal_count === "true"
+                      ? data.count
+                      : 0;
+  
                   aggregatedData[region] = (aggregatedData[region] || 0) + value;
                 }
               });
@@ -158,11 +183,11 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
         }
       });
     });
-
+  
     const transformedData = Object.entries(aggregatedData).map(([name, value]) => ({ name, value }));
     setRegionData(transformedData);
   };
-
+  
   useEffect(() => {
     fetchYears();
   }, [fetchYears]);
@@ -274,13 +299,13 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
             fill="#82ca9d"
             onMouseEnter={onPieEnter}
             labelLine={true}
-            label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+            label={({ value }) => formatNumberWithUnits(value)} // Format label
           >
             {regionData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip />
+          <Tooltip formatter={tooltipFormatter} />
           <Legend />
         </PieChart>
       </ResponsiveContainer>

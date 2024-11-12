@@ -191,7 +191,7 @@ const OpportunityMain: React.FC = () => {
             fontWeight: "bold",
           }}
         >
-          Opportunity Value on Abs Basis
+          Opportunity Value on Excess Basis
         </Typography>
 
         <Grid container spacing={2} sx={{ justifyContent: "flex-start", paddingLeft: '50px', marginBottom: '10px' }}>
