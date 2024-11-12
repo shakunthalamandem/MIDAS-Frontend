@@ -26,8 +26,8 @@ import DealTypeSector from "./SectorDotGraphs/DealTypeSector";
 
 interface ApiResponse {
   [key: string]: {
-    FO: { US: { [sector: string]: { opportunity_value_ex: number } }; International: { [sector: string]: { opportunity_value_ex: number } } };
-    IPO: { US: { [sector: string]: { opportunity_value_ex: number } }; International: { [sector: string]: { opportunity_value_ex: number } } };
+    FO: { US: { [sector: string]: { opportunity_value_ex: string } }; International: { [sector: string]: { opportunity_value_ex: string } } };
+    IPO: { US: { [sector: string]: { opportunity_value_ex: string } }; International: { [sector: string]: { opportunity_value_ex: string } } };
   };
 }
 
@@ -60,6 +60,16 @@ const OpportunityMain: React.FC = () => {
   const [sector, setSector] = useState("all");
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
+  const parseDealValue = (value: string): number => {
+    if (value.endsWith("B")) {
+      return parseFloat(value) * 1e9;
+    } else if (value.endsWith("M")) {
+      return parseFloat(value) * 1e6;
+    } else {
+      return parseFloat(value);
+    }
+  };
+
   const fetchData = async () => {
     try {
       const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", {
@@ -91,10 +101,10 @@ const OpportunityMain: React.FC = () => {
       const ipoData = apiData[key].IPO;
       const foData = apiData[key].FO;
 
-      const filterBySector = (regionData: Record<string, { opportunity_value_ex: number }>) =>
+      const filterBySector = (regionData: Record<string, { opportunity_value_ex: string }>) =>
         Object.entries(regionData || {})
           .filter(([sect]) => sector === "all" || sect === sector)
-          .reduce((sum, [, { opportunity_value_ex }]) => sum + opportunity_value_ex, 0);
+          .reduce((sum, [, { opportunity_value_ex }]) => sum + parseDealValue(opportunity_value_ex), 0);
 
       const ipoUS = filterBySector(ipoData.US);
       const ipoInternational = filterBySector(ipoData.International);
@@ -123,19 +133,17 @@ const OpportunityMain: React.FC = () => {
       (["FO", "IPO"] as const).forEach((category) => {
         (["US", "International"] as const).forEach((regionKey) => {
           Object.entries(deal[category][regionKey] || {}).forEach(([sector, { opportunity_value_ex }]) => {
-            // Accumulate sector data
-            sectorDataMap[sector] = (sectorDataMap[sector] || 0) + opportunity_value_ex;
+            sectorDataMap[sector] = (sectorDataMap[sector] || 0) + parseDealValue(opportunity_value_ex);
 
-            // Accumulate region data
             const regionKeyCount = regionKey === "US" ? "US" : "International";
-            regionDataMap[regionKeyCount] = (regionDataMap[regionKeyCount] || 0) + opportunity_value_ex;
+            regionDataMap[regionKeyCount] = (regionDataMap[regionKeyCount] || 0) + parseDealValue(opportunity_value_ex);
           });
         });
       });
     });
 
-    const sectorData = Object.entries(sectorDataMap).map(([name, value]) => ({ name, value: value / 1e9 })); // Convert to billions
-    const regionData = Object.entries(regionDataMap).map(([name, value]) => ({ name, value: value / 1e9 })); // Convert to billions
+    const sectorData = Object.entries(sectorDataMap).map(([name, value]) => ({ name, value: value / 1e9 }));
+    const regionData = Object.entries(regionDataMap).map(([name, value]) => ({ name, value: value / 1e9 }));
 
     return { sectorData, regionData };
   };
@@ -182,7 +190,7 @@ const OpportunityMain: React.FC = () => {
             fontWeight: "bold",
           }}
         >
-          Opportunity Value on Excess
+          Opportunity Value on Abs Basis
         </Typography>
 
         <Grid container spacing={2} sx={{ justifyContent: "flex-start", paddingLeft: '50px', marginBottom: '10px' }}>
@@ -203,7 +211,6 @@ const OpportunityMain: React.FC = () => {
               <Select value={period} onChange={handlePeriodChange} label="Period">
                 <MenuItem value="yearly">Yearly</MenuItem>
                 <MenuItem value="quarterly">Quarterly</MenuItem>
-                {/* <MenuItem value="monthly">Monthly</MenuItem> */}
               </Select>
             </FormControl>
           </Grid>
