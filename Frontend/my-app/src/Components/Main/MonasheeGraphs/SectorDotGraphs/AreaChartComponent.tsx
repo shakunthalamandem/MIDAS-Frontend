@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Box, CircularProgress, Typography, Paper } from '@mui/material';
+import { Box, CircularProgress, Typography, Paper, Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 // Define the structure of the API response
@@ -34,6 +34,8 @@ const AreaChartComponent: React.FC<AreaChartComponentProps> = ({ dataCategory })
   const [data, setData] = useState<any[]>([]); // Chart data
   const [isLoading, setIsLoading] = useState<boolean>(true); // Loading state
   const [error, setError] = useState<string | null>(null); // Error state
+  const [showUS, setShowUS] = useState<boolean>(true); // Show US line by default
+  const [showInternational, setShowInternational] = useState<boolean>(false); // Hide International line by default
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +64,14 @@ const AreaChartComponent: React.FC<AreaChartComponentProps> = ({ dataCategory })
     fetchData();
   }, [dataCategory]); // Dependency on dataCategory to refetch if it changes
 
+  const handleUSChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShowUS(event.target.checked);
+  };
+
+  const handleInternationalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShowInternational(event.target.checked);
+  };
+
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -83,6 +93,32 @@ const AreaChartComponent: React.FC<AreaChartComponentProps> = ({ dataCategory })
       <Typography variant="h6" gutterBottom align="center" color="#002060">
         {`US & International ${dataCategory.replace(/_/g, ' ').toUpperCase()} (Area Chart)`}
       </Typography>
+
+      {/* Checkbox to toggle US and International lines */}
+      <Box display="flex" justifyContent="center" mb={2}>
+        <FormGroup row>
+          <FormControlLabel
+            control={
+              <Checkbox 
+                checked={showUS} 
+                onChange={handleUSChange} 
+                color="primary" 
+              />
+            }
+            label="US"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox 
+                checked={showInternational} 
+                onChange={handleInternationalChange} 
+                color="primary" 
+              />
+            }
+            label="International"
+          />
+        </FormGroup>
+      </Box>
 
       <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
         <Paper
@@ -107,20 +143,26 @@ const AreaChartComponent: React.FC<AreaChartComponentProps> = ({ dataCategory })
               />
               <Tooltip />
               <Legend />
-              <Area
-                type="monotone"
-                dataKey="us"
-                stroke="#166103"
-                fillOpacity={0.3}
-                fill="#c0d8ba"
-              />
-              <Area
-                type="monotone"
-                dataKey="international"
-                stroke="#1b6ca8"
-                fillOpacity={0.3}
-                fill="#a0c4e2"
-              />
+
+              {/* Conditionally render US and International lines based on checkbox states */}
+              {showUS && (
+                <Area
+                  type="monotone"
+                  dataKey="us"
+                  stroke="#166103"
+                  fillOpacity={0.3}
+                  fill="#c0d8ba"
+                />
+              )}
+              {showInternational && (
+                <Area
+                  type="monotone"
+                  dataKey="international"
+                  stroke="#1b6ca8"
+                  fillOpacity={0.3}
+                  fill="#a0c4e2"
+                />
+              )}
             </AreaChart>
           </ResponsiveContainer>
         </Paper>
