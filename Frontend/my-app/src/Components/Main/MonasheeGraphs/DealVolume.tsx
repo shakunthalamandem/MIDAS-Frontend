@@ -26,8 +26,8 @@ import DealTypeSector from "./SectorDotGraphs/DealTypeSector";
 
 interface ApiResponse {
   [key: string]: {
-    FO: { US: { [sector: string]: { deal_value: number } }; International: { [sector: string]: { deal_value: number } } };
-    IPO: { US: { [sector: string]: { deal_value: number } }; International: { [sector: string]: { deal_value: number } } };
+    FO: { US: { [sector: string]: { deal_value: string } }; International: { [sector: string]: { deal_value: string } } };
+    IPO: { US: { [sector: string]: { deal_value: string } }; International: { [sector: string]: { deal_value: string } } };
   };
 }
 
@@ -60,6 +60,16 @@ const DealVolume: React.FC = () => {
   const [sector, setSector] = useState("all");
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
+  const parseDealValue = (value: string): number => {
+    if (value.endsWith("B")) {
+      return parseFloat(value) * 1e9;
+    } else if (value.endsWith("M")) {
+      return parseFloat(value) * 1e6;
+    } else {
+      return parseFloat(value);
+    }
+  };
+
   const fetchData = async () => {
     try {
       const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", {
@@ -91,10 +101,10 @@ const DealVolume: React.FC = () => {
       const ipoData = apiData[key].IPO;
       const foData = apiData[key].FO;
 
-      const filterBySector = (regionData: Record<string, { deal_value: number }>) =>
+      const filterBySector = (regionData: Record<string, { deal_value: string }>) =>
         Object.entries(regionData || {})
           .filter(([sect]) => sector === "all" || sect === sector)
-          .reduce((sum, [, { deal_value }]) => sum + deal_value, 0);
+          .reduce((sum, [, { deal_value }]) => sum + parseDealValue(deal_value), 0);
 
       const ipoUS = filterBySector(ipoData.US);
       const ipoInternational = filterBySector(ipoData.International);
@@ -123,20 +133,17 @@ const DealVolume: React.FC = () => {
       (["FO", "IPO"] as const).forEach((category) => {
         (["US", "International"] as const).forEach((regionKey) => {
           Object.entries(deal[category][regionKey] || {}).forEach(([sector, { deal_value }]) => {
-            // Accumulate sector data based on deal value
-            sectorDataMap[sector] = (sectorDataMap[sector] || 0) + deal_value;
+            sectorDataMap[sector] = (sectorDataMap[sector] || 0) + parseDealValue(deal_value);
 
-            // Accumulate region data based on deal value
             const regionKeyCount = regionKey === "US" ? "US" : "International";
-            regionDataMap[regionKeyCount] = (regionDataMap[regionKeyCount] || 0) + deal_value;
+            regionDataMap[regionKeyCount] = (regionDataMap[regionKeyCount] || 0) + parseDealValue(deal_value);
           });
         });
       });
     });
 
-    // Prepare sector and region data for the pie chart, converting to billions
-    const sectorData = Object.entries(sectorDataMap).map(([name, value]) => ({ name, value: value / 1e9 })); // Convert to billions
-    const regionData = Object.entries(regionDataMap).map(([name, value]) => ({ name, value: value / 1e9 })); // Convert to billions
+    const sectorData = Object.entries(sectorDataMap).map(([name, value]) => ({ name, value: value / 1e9 }));
+    const regionData = Object.entries(regionDataMap).map(([name, value]) => ({ name, value: value / 1e9 }));
 
     return { sectorData, regionData };
   };
@@ -204,7 +211,6 @@ const DealVolume: React.FC = () => {
               <Select value={period} onChange={handlePeriodChange} label="Period">
                 <MenuItem value="yearly">Yearly</MenuItem>
                 <MenuItem value="quarterly">Quarterly</MenuItem>
-                {/* <MenuItem value="monthly">Monthly</MenuItem> */}
               </Select>
             </FormControl>
           </Grid>

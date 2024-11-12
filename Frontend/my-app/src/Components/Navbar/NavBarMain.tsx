@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 // Import your logo
-import logo from '../../Assets/images/logomidas.png';
+import logo from '../../Assets/images/monashee_logo.png';
 
 const pages = ['Capital Markets', 'Monashee Deals', 'Strategies'];
 
@@ -51,7 +51,7 @@ const NavbarMain: React.FC = () => {
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {/* Logo and Title */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#FFFFFF' }}>
-          <img src={logo} alt="MIDAS Logo" style={{ width: '40px', height: '40px', marginRight: '10px' }} />
+          <img src={logo} alt="MIDAS Logo" style={{ width: '130px', height: '60px', marginRight: '10px' }} />
           <Typography
             variant="h6"
             sx={{
