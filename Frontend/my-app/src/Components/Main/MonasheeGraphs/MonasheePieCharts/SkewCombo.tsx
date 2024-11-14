@@ -125,12 +125,12 @@ const SkewCombo: React.FC = () => {
   };
   
   // Function to filter options based on the "All" selection
-  const getFilteredOptions = (selectedValue: string, options: string[]) => {
-    if (selectedValue === 'All') {
-      return options;
-    }
-    return options.filter(option => option === selectedValue);
-  };
+  // const getFilteredOptions = (selectedValue: string, options: string[]) => {
+  //   if (selectedValue === 'All') {
+  //     return options;
+  //   }
+  //   return options.filter(option => option === selectedValue);
+  // };
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0 }}>
@@ -203,7 +203,7 @@ const SkewCombo: React.FC = () => {
                     sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
                   >
                     <MenuItem value="All">All</MenuItem>
-                    {getFilteredOptions(dealType, dealTypeOptions).map((type) => (
+                    {dealTypeOptions.map((type) => (
                       <MenuItem key={type} value={type}>
                         {type}
                       </MenuItem>
@@ -222,7 +222,7 @@ const SkewCombo: React.FC = () => {
                     sx={{ backgroundColor: '#ffe0b2', color: '#e65100' }}
                   >
                     <MenuItem value="All">All</MenuItem>
-                    {getFilteredOptions(region, regionOptions).map((region) => (
+                    { regionOptions.map((region) => (
                       <MenuItem key={region} value={region}>
                         {region}
                       </MenuItem>
@@ -241,7 +241,7 @@ const SkewCombo: React.FC = () => {
                     sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
                   >
                     <MenuItem value="All">All</MenuItem>
-                    {getFilteredOptions(sector, sectorOptions).map((sec) => (
+                    {sectorOptions.map((sec) => (
                       <MenuItem key={sec} value={sec}>
                         {sec}
                       </MenuItem>
@@ -260,7 +260,7 @@ const SkewCombo: React.FC = () => {
                     sx={{ backgroundColor: '#fce4ec', color: '#880e4f' }}
                   >
                     <MenuItem value="Absolute">Absolute</MenuItem>
-                    {getFilteredOptions(expectedReturn, expectedReturnsOptions).map((ret) => (
+                    { expectedReturnsOptions.map((ret) => (
                       <MenuItem key={ret} value={ret}>
                         {ret}
                       </MenuItem>
