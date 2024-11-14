@@ -118,19 +118,13 @@ const SkewCombo: React.FC = () => {
         'http://192.168.1.59:9000/api/skewtable/calculations/',
         requestData
       );
-      console.log('Response Data:', response.data);
+      console.log('reResponse Data:', response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
   
-  // Function to filter options based on the "All" selection
-  // const getFilteredOptions = (selectedValue: string, options: string[]) => {
-  //   if (selectedValue === 'All') {
-  //     return options;
-  //   }
-  //   return options.filter(option => option === selectedValue);
-  // };
+
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0 }}>
