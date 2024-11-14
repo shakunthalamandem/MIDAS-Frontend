@@ -1,281 +1,292 @@
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import {
-//   Box,
-//   FormControl,
-//   InputLabel,
-//   Select,
-//   MenuItem,
-//   Grid,
-//   Typography,
-//   Button,
-// } from "@mui/material";
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Typography,
+  Grid,
+  Container,
+  Card,
+  CardContent,
+} from '@mui/material';
+import axios from 'axios';
 
-// // Define types for API data and Year response
-// interface ApiData {
-//   [key: string]: {
-//     [key: string]: {
-//       [key: string]: {
-//         [key: string]: {
-//           Total_Deal_Count: number;
-//           Positively_Performing_Deals_Percentage: number;
-//           Negatively_Performing_Deals_Percentage: number;
-//           Average_T_1M_Abs_Return_of_Positively: number;
-//           Average_T_1M_Abs_Return_of_Negatively: number;
-//           Expected_Returns_Absolute?: number;
-//           Expected_Returns_Excess?: number;
-//           Long_Opportunity_Value: number;
-//         };
-//       };
-//     };
-//   };
-// }
-
-// interface YearResponse {
-//   years: number[];
-// }
-
-// const ComboForm: React.FC = () => {
-//   const [apiData, setApiData] = useState<ApiData | null>(null);
-//   const [years, setYears] = useState<number[]>([]);
-//   const [nameType, setNameType] = useState<string>("ALL");
-//   const [expectedReturn, setExpectedReturn] = useState<string>("All");
-//   const [region, setRegion] = useState<string>("All");
-//   const [sector, setSector] = useState<string>("All");
-//   const [startYear, setStartYear] = useState<number | string>("All");
-//   const [endYear, setEndYear] = useState<number | string>("All");
-
-//   // Fetch API data for the sectors and years
-//   const fetchData = async () => {
-//     try {
-//       // Fetch sectors data
-//       const response = await axios.post<ApiData>("http://192.168.1.59:9000/api/skewtable/calculations/", {
-//         // Request body, if needed
-//       });
-//       setApiData(response.data);  // TypeScript will now know that response.data is of type ApiData
-
-//       // Fetch distinct years
-//       const yearResponse = await axios.get<YearResponse>("http://192.168.1.59:9000/api/distinct_years/");
-//       const yearList = yearResponse.data.years.sort((a, b) => a - b); // Sort years
-//       setYears(yearList);
-
-//     } catch (error) {
-//       console.error("Error fetching data: ", error);
-//     }
-//   };
-
-//   // Get sectors dynamically from the API data
-//   const getSectors = (): string[] => {
-//     if (apiData) {
-//       const sectors = Object.keys(apiData["2001"]["FO"]["International"]);
-//       if (sectors.length === 0) return [];  // No sectors, return an empty array
-//       return sectors;
-//     }
-//     return [];
-//   };
-
-//   useEffect(() => {
-//     fetchData();
-//   }, []);
-
-//   // Filter the data based on selected filter values
-//   const filterData = () => {
-//     if (!apiData) return [];
-  
-//     const filteredData = Object.keys(apiData).map((year) => {
-//       const yearData = apiData[year]["FO"][region];
-  
-//       return Object.keys(yearData).map((sectorName) => {
-//         const sectorData = yearData[sectorName];
-  
-//         return Object.keys(sectorData).map((category) => {
-//           // Use type assertion to tell TypeScript that category is a valid key
-//           const categoryData = sectorData[category as keyof typeof sectorData];
-  
-//           // Apply filters here
-//           if (
-//             (nameType === "ALL" || nameType === category) &&
-//             (expectedReturn === "All" ||
-//               (expectedReturn === "Absolute" && categoryData.Expected_Returns_Absolute) ||
-//               (expectedReturn === "Excess" && categoryData.Expected_Returns_Excess)) &&
-//             (sector === "All" || sector === sectorName) &&
-//             (startYear === "All" || parseInt(year) >= startYear) &&
-//             (endYear === "All" || parseInt(year) <= endYear)
-//           ) {
-//             return categoryData; // This category matches the filters
-//           }
-//           return null; // This category does not match the filters
-//         }).filter((data) => data !== null);
-//       }).flat();
-//     }).flat();
-  
-//     return filteredData;
-//   };
-  
-//   const handleSubmit = () => {
-//     const filteredData = filterData();
-//     console.log("Filtered Data:", filteredData);
-//   };
-
-//   return (
-//     <Box sx={{ padding: 3 }}>
-//       <Typography variant="h4" gutterBottom>
-//         Dynamic Combo Fields Form
-//       </Typography>
-//       <Grid container spacing={3}>
-//         <Grid item xs={12} sm={6}>
-//           <FormControl fullWidth>
-//             <InputLabel>Name Type</InputLabel>
-//             <Select value={nameType} onChange={(e) => setNameType(e.target.value)}>
-//               <MenuItem value="ALL">ALL</MenuItem>
-//               <MenuItem value="IPO">IPO</MenuItem>
-//               <MenuItem value="FO">FO</MenuItem>
-//             </Select>
-//           </FormControl>
-//         </Grid>
-
-//         <Grid item xs={12} sm={6}>
-//           <FormControl fullWidth>
-//             <InputLabel>Expected Returns</InputLabel>
-//             <Select
-//               value={expectedReturn}
-//               onChange={(e) => setExpectedReturn(e.target.value)}
-//               MenuProps={{
-//                 PaperProps: {
-//                   style: {
-//                     maxHeight: 200, // Set max height for the dropdown
-//                     overflowY: 'auto', // Make it scrollable
-//                   },
-//                 },
-//               }}
-//             >
-//               <MenuItem value="All">All</MenuItem>
-//               <MenuItem value="Absolute">Absolute</MenuItem>
-//               <MenuItem value="Excess">Excess</MenuItem>
-//             </Select>
-//           </FormControl>
-//         </Grid>
-
-//         <Grid item xs={12} sm={6}>
-//           <FormControl fullWidth>
-//             <InputLabel>Region</InputLabel>
-//             <Select
-//               value={region}
-//               onChange={(e) => setRegion(e.target.value)}
-//               MenuProps={{
-//                 PaperProps: {
-//                   style: {
-//                     maxHeight: 200, // Set max height for the dropdown
-//                     overflowY: 'auto', // Make it scrollable
-//                   },
-//                 },
-//               }}
-//             >
-//               <MenuItem value="All">All</MenuItem>
-//               <MenuItem value="US">US</MenuItem>
-//               <MenuItem value="International">International</MenuItem>
-//             </Select>
-//           </FormControl>
-//         </Grid>
-
-//         <Grid item xs={12} sm={6}>
-//           <FormControl fullWidth>
-//             <InputLabel>Sector</InputLabel>
-//             <Select
-//               value={sector}
-//               onChange={(e) => setSector(e.target.value)}
-//               MenuProps={{
-//                 PaperProps: {
-//                   style: {
-//                     maxHeight: 200, // Set max height for the dropdown
-//                     overflowY: 'auto', // Make it scrollable
-//                   },
-//                 },
-//               }}
-//             >
-//               <MenuItem value="All">All</MenuItem>
-//               <MenuItem value="Others">Others</MenuItem>
-//               {getSectors().map((sectorName) => (
-//                 <MenuItem key={sectorName} value={sectorName}>
-//                   {sectorName}
-//                 </MenuItem>
-//               ))}
-//             </Select>
-//           </FormControl>
-//         </Grid>
-
-//         {/* Show Year fields if no sectors */}
-//         {getSectors().length === 0 && (
-//           <>
-//             <Grid item xs={12} sm={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Start Year</InputLabel>
-//                 <Select
-//                   value={startYear}
-//                   onChange={(e) => setStartYear(e.target.value)}
-//                   MenuProps={{
-//                     PaperProps: {
-//                       style: {
-//                         maxHeight: 200, // Set max height for the dropdown
-//                         overflowY: 'auto', // Make it scrollable
-//                       },
-//                     },
-//                   }}
-//                 >
-//                   <MenuItem value="All">All</MenuItem>
-//                   {years.map((year) => (
-//                     <MenuItem key={year} value={year}>
-//                       {year}
-//                     </MenuItem>
-//                   ))}
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             <Grid item xs={12} sm={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>End Year</InputLabel>
-//                 <Select
-//                   value={endYear}
-//                   onChange={(e) => setEndYear(e.target.value)}
-//                   MenuProps={{
-//                     PaperProps: {
-//                       style: {
-//                         maxHeight: 200, // Set max height for the dropdown
-//                         overflowY: 'auto', // Make it scrollable
-//                       },
-//                     },
-//                   }}
-//                 >
-//                   <MenuItem value="All">All</MenuItem>
-//                   {years.map((year) => (
-//                     <MenuItem key={year} value={year}>
-//                       {year}
-//                     </MenuItem>
-//                   ))}
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-//           </>
-//         )}
-
-//         <Grid item xs={12}>
-//           <Button variant="contained" color="primary" onClick={handleSubmit}>
-//             Submit
-//           </Button>
-//         </Grid>
-//       </Grid>
-//     </Box>
-//   );
-// };
-
-// export default ComboForm;
-import React from 'react'
-
-const SkewCombo = () => {
-  return (
-    <div>SkewCombo</div>
-  )
+// Define the expected structure of the API response
+interface SkewTableOptions {
+  'start year': number[];
+  'end year': number[];
+  dealType: string[];
+  region: string[];
+  sector: string[];
+  expectedReturns: string[];
 }
 
-export default SkewCombo
+const SkewCombo: React.FC = () => {
+  // Default values
+  const [startYear, setStartYear] = useState<number>(2001); // Default to 2001
+  const [endYear, setEndYear] = useState<number | string>(2002); // Default to 2002
+  const [dealType, setDealType] = useState<string>('All'); // Default to "All"
+  const [region, setRegion] = useState<string>('All'); // Default to "All"
+  const [sector, setSector] = useState<string>('All'); // Default to "All"
+  const [expectedReturn, setExpectedReturn] = useState<string>('Absolute'); // Default to Absolute
+
+  const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
+  const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
+  const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
+  const [regionOptions, setRegionOptions] = useState<string[]>([]);
+  const [sectorOptions, setSectorOptions] = useState<string[]>([]);
+  const [expectedReturnsOptions, setExpectedReturnsOptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const response = await axios.get('http://192.168.1.59:9000/api/skew_table_filters/');
+        const data = response.data as SkewTableOptions;
+
+        setStartYearOptions(data['start year']);
+        setEndYearOptions(data['end year']);
+        setDealTypeOptions(data['dealType']);
+        setRegionOptions(data['region']);
+        setSectorOptions(data['sector']);
+        setExpectedReturnsOptions(data['expectedReturns']);
+      } catch (error) {
+        console.error('Error fetching filter options:', error);
+      }
+    };
+
+    fetchFilterOptions();
+  }, []);
+
+  // Filter end year options based on selected start year
+  useEffect(() => {
+    if (startYear) {
+      // Filter end years to only show years greater than or equal to the selected start year
+      setEndYearOptions(endYearOptions.filter((year) => year >= startYear));
+    } else {
+      // If no start year is selected, show all end year options
+      setEndYearOptions(endYearOptions);
+    }
+  }, [startYear, endYearOptions]);
+
+  const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
+    // Ensure startYear is treated as a number
+    const newStartYear = Number(event.target.value);
+    setStartYear(newStartYear);
+    setEndYear(''); // Reset end year when start year is changed
+  };
+
+  const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
+    // Ensure endYear is treated as a number
+    const newEndYear = Number(event.target.value);
+    setEndYear(newEndYear);
+  };
+
+  const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
+    setDealType(event.target.value);
+  };
+
+  const handleRegionChange = (event: SelectChangeEvent<string>) => {
+    setRegion(event.target.value);
+  };
+
+  const handleSectorChange = (event: SelectChangeEvent<string>) => {
+    setSector(event.target.value);
+  };
+
+  const handleExpectedReturnChange = (event: SelectChangeEvent<string>) => {
+    setExpectedReturn(event.target.value);
+  };
+
+  const handleSubmit = async () => {
+    // Construct the filters object
+    const requestData = {
+      filters: {
+        year_range: [startYear, endYear], // Combine start and end year
+        deal_type: dealType === 'All' ? dealTypeOptions : [dealType], // If 'All' selected, send all deal types
+        region: region === 'All' ? regionOptions : [region], // If 'All' selected, send all regions
+        sector: sector === 'All' ? sectorOptions : [sector], // If 'All' selected, send all sectors
+        expected_returns: expectedReturn === 'All' ? expectedReturnsOptions : [expectedReturn], // If 'All' selected, send all expected returns
+      },
+    };
+  
+    try {
+      const response = await axios.post(
+        'http://192.168.1.59:9000/api/skewtable/calculations/',
+        requestData
+      );
+      console.log('Response Data:', response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+  
+  // Function to filter options based on the "All" selection
+  const getFilteredOptions = (selectedValue: string, options: string[]) => {
+    if (selectedValue === 'All') {
+      return options;
+    }
+    return options.filter(option => option === selectedValue);
+  };
+
+  return (
+    <Container maxWidth="lg" sx={{ padding: 0 }}>
+      <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
+        <CardContent>
+          <Box p={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
+              Filter Data
+            </Typography>
+            <Grid container spacing={2}>
+              {/* Start Year Selector */}
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Start Year</InputLabel>
+                  <Select
+                    value={startYear}
+                    onChange={handleStartYearChange}
+                    sx={{ backgroundColor: '#e0f7fa', color: '#006064' }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200, // Adjust the height as needed
+                          overflow: 'auto',
+                        },
+                      },
+                    }}
+                  >
+                    {startYearOptions.map((year) => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* End Year Selector */}
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>End Year</InputLabel>
+                  <Select
+                    value={endYear}
+                    onChange={handleEndYearChange}
+                    sx={{ backgroundColor: '#e8eaf6', color: '#1a237e' }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200, // Adjust the height as needed
+                          overflow: 'auto',
+                        },
+                      },
+                    }}
+                  >
+                    {endYearOptions.map((year) => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Deal Type Selector */}
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Deal Type</InputLabel>
+                  <Select
+                    value={dealType}
+                    onChange={handleDealTypeChange}
+                    sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
+                  >
+                    <MenuItem value="All">All</MenuItem>
+                    {getFilteredOptions(dealType, dealTypeOptions).map((type) => (
+                      <MenuItem key={type} value={type}>
+                        {type}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Region Selector */}
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Region</InputLabel>
+                  <Select
+                    value={region}
+                    onChange={handleRegionChange}
+                    sx={{ backgroundColor: '#ffe0b2', color: '#e65100' }}
+                  >
+                    <MenuItem value="All">All</MenuItem>
+                    {getFilteredOptions(region, regionOptions).map((region) => (
+                      <MenuItem key={region} value={region}>
+                        {region}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Sector Selector */}
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Sector</InputLabel>
+                  <Select
+                    value={sector}
+                    onChange={handleSectorChange}
+                    sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
+                  >
+                    <MenuItem value="All">All</MenuItem>
+                    {getFilteredOptions(sector, sectorOptions).map((sec) => (
+                      <MenuItem key={sec} value={sec}>
+                        {sec}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Expected Returns Selector */}
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Expected Returns</InputLabel>
+                  <Select
+                    value={expectedReturn}
+                    onChange={handleExpectedReturnChange}
+                    sx={{ backgroundColor: '#fce4ec', color: '#880e4f' }}
+                  >
+                    <MenuItem value="Absolute">Absolute</MenuItem>
+                    {getFilteredOptions(expectedReturn, expectedReturnsOptions).map((ret) => (
+                      <MenuItem key={ret} value={ret}>
+                        {ret}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            <Button
+              variant="contained"
+              sx={{
+                mt: 3,
+                backgroundColor: '#6a1b9a',
+                color: '#fff',
+                '&:hover': { backgroundColor: '#4a148c' },
+              }}
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </Container>
+  );
+};
+
+export default SkewCombo;

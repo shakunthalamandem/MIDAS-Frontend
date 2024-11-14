@@ -5,6 +5,7 @@ import DealVolume from '../../MonasheeGraphs/DealVolume';
 import OpportunityMain from '../../MonasheeGraphs/OpportunityMain';
 import OpportunityAbsBasis from '../../MonasheeGraphs/OpportunityAbsBasis';
 import SkewMain from '../../MonasheeGraphs/SkewMain';
+import SkewCombo from '../../MonasheeGraphs/MonasheePieCharts/SkewCombo';
 
 
 const CapitalMarkets: React.FC = () => {
@@ -101,7 +102,7 @@ const CapitalMarkets: React.FC = () => {
         {value === 1 && <DealVolume />}
         {value === 2 && <OpportunityMain />}
         {value === 3 && <OpportunityAbsBasis />}
-        {value === 4 && <SkewMain />}
+        {value === 4 && <SkewCombo />}
 
 
       </Box>
