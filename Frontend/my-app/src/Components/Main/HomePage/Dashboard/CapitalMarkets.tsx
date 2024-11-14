@@ -6,6 +6,7 @@ import OpportunityMain from '../../MonasheeGraphs/OpportunityMain';
 import OpportunityAbsBasis from '../../MonasheeGraphs/OpportunityAbsBasis';
 import SkewMain from '../../MonasheeGraphs/SkewMain';
 import SkewCombo from '../../MonasheeGraphs/MonasheePieCharts/SkewCombo';
+import SkewTableMain from '../../MonasheeGraphs/SkewTableMain';
 
 
 const CapitalMarkets: React.FC = () => {
@@ -102,9 +103,7 @@ const CapitalMarkets: React.FC = () => {
         {value === 1 && <DealVolume />}
         {value === 2 && <OpportunityMain />}
         {value === 3 && <OpportunityAbsBasis />}
-        {value === 4 && <SkewCombo onSubmit={function (data: any): void {
-          throw new Error('Function not implemented.');
-        } } />}
+        {value === 4 && <SkewTableMain />}
 
 
       </Box>
