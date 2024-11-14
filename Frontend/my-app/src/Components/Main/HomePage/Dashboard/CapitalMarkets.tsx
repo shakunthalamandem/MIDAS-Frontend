@@ -102,7 +102,9 @@ const CapitalMarkets: React.FC = () => {
         {value === 1 && <DealVolume />}
         {value === 2 && <OpportunityMain />}
         {value === 3 && <OpportunityAbsBasis />}
-        {value === 4 && <SkewCombo />}
+        {value === 4 && <SkewCombo onSubmit={function (data: any): void {
+          throw new Error('Function not implemented.');
+        } } />}
 
 
       </Box>

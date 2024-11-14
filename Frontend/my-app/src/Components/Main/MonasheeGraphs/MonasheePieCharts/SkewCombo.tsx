@@ -7,11 +7,11 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  Typography,
   Grid,
   Container,
   Card,
   CardContent,
+  Typography,
 } from '@mui/material';
 import axios from 'axios';
 
@@ -25,15 +25,20 @@ interface SkewTableOptions {
   expectedReturns: string[];
 }
 
-const SkewCombo: React.FC = () => {
-  // Default values
-  const [startYear, setStartYear] = useState<number>(2001); // Default to 2001
-  const [endYear, setEndYear] = useState<number | string>(2002); // Default to 2002
-  const [dealType, setDealType] = useState<string>('All'); // Default to "All"
-  const [region, setRegion] = useState<string>('All'); // Default to "All"
-  const [sector, setSector] = useState<string>('All'); // Default to "All"
-  const [expectedReturn, setExpectedReturn] = useState<string>('Absolute'); // Default to Absolute
+interface SkewComboProps {
+  onSubmit: (data: any) => void; // Callback function passed from parent to handle the response
+}
 
+const SkewCombo: React.FC<SkewComboProps> = ({ onSubmit }) => {
+  // State for form values
+  const [startYear, setStartYear] = useState<number>(2001);
+  const [endYear, setEndYear] = useState<number | string>(2002);
+  const [dealType, setDealType] = useState<string>('All');
+  const [region, setRegion] = useState<string>('All');
+  const [sector, setSector] = useState<string>('All');
+  const [expectedReturn, setExpectedReturn] = useState<string>('Absolute');
+
+  // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
@@ -41,6 +46,7 @@ const SkewCombo: React.FC = () => {
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
   const [expectedReturnsOptions, setExpectedReturnsOptions] = useState<string[]>([]);
 
+  // Fetch the filter options on component mount
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
@@ -64,23 +70,20 @@ const SkewCombo: React.FC = () => {
   // Filter end year options based on selected start year
   useEffect(() => {
     if (startYear) {
-      // Filter end years to only show years greater than or equal to the selected start year
       setEndYearOptions(endYearOptions.filter((year) => year >= startYear));
     } else {
-      // If no start year is selected, show all end year options
       setEndYearOptions(endYearOptions);
     }
   }, [startYear, endYearOptions]);
 
+  // Handle form value changes
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
-    // Ensure startYear is treated as a number
     const newStartYear = Number(event.target.value);
     setStartYear(newStartYear);
     setEndYear(''); // Reset end year when start year is changed
   };
 
   const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
-    // Ensure endYear is treated as a number
     const newEndYear = Number(event.target.value);
     setEndYear(newEndYear);
   };
@@ -101,24 +104,25 @@ const SkewCombo: React.FC = () => {
     setExpectedReturn(event.target.value);
   };
 
+  // Submit the form and call onSubmit with the response data
   const handleSubmit = async () => {
-    // Construct the filters object
     const requestData = {
       filters: {
-        year_range: [startYear, endYear], // Combine start and end year
-        deal_type: dealType === 'All' ? dealTypeOptions : [dealType], // If 'All' selected, send all deal types
-        region: region === 'All' ? regionOptions : [region], // If 'All' selected, send all regions
-        sector: sector === 'All' ? sectorOptions : [sector], // If 'All' selected, send all sectors
-        expected_returns: expectedReturn === 'All' ? expectedReturnsOptions : [expectedReturn], // If 'All' selected, send all expected returns
+        year_range: [startYear, endYear],
+        deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
+        region: region === 'All' ? regionOptions : [region],
+        sector: sector === 'All' ? sectorOptions : [sector],
+        expected_returns: expectedReturn === 'All' ? expectedReturnsOptions : [expectedReturn],
       },
     };
-  
+
     try {
       const response = await axios.post(
         'http://192.168.1.59:9000/api/skewtable/calculations/',
         requestData
       );
-      console.log('reResponse Data:', response.data);
+      console.log('Response Data:', response.data);
+      onSubmit(response.data); // Pass response data to parent component
     } catch (error) {
       console.error('Error fetching data:', error);
     }
