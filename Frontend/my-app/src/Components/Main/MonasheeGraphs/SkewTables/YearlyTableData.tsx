@@ -65,7 +65,7 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
             const row = sectorwiseData[sector];
             return (
               <TableRow key={sector}>
-                <TableCell sx={{ padding: '4px 8px' }}>{sector}</TableCell>
+                <TableCell sx={{ padding: '4px 8px',width:'200px' }}>{sector}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Positively_Performing_Deals_Percentage}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Negatively_Performing_Deals_Percentage}%</TableCell>
