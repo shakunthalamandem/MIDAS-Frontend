@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -14,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import axios from 'axios';
+import SectorTableData from './SectorTableData';
 
 // Define the expected structure of the API response
 interface SkewTableOptions {
@@ -24,14 +24,10 @@ interface SkewTableOptions {
   sector: string[];
 }
 
-interface SectorBasedTableProps {
-  onSubmit: (data: any) => void; // Callback function passed from parent to handle the response
-}
-
-const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
+const SectorBasedTable: React.FC = () => {
   // State for form values
-  const [startYear, setStartYear] = useState<number >(2001);
-  const [endYear, setEndYear] = useState<number | string >(2024);
+  const [startYear, setStartYear] = useState<number>(2001);
+  const [endYear, setEndYear] = useState<number | string>(2024);
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
@@ -42,6 +38,9 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
+
+  // State to store the response data
+  const [responseData, setResponseData] = useState<any>(null);
 
   // Fetch the filter options on component mount
   useEffect(() => {
@@ -63,6 +62,35 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
     fetchFilterOptions();
   }, []);
 
+  // Fetch data when any filter changes
+  useEffect(() => {
+    const fetchData = async () => {
+      const requestData = {
+        filters: {
+          year_range: [startYear, endYear],
+          deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
+          region: region === 'All' ? regionOptions : [region],
+          sector: sector === 'All' ? sectorOptions : [sector],
+        },
+      };
+
+      try {
+        const response = await axios.post(
+          'http://192.168.1.59:9000/api/skewtable/calculations/',
+          requestData
+        );
+        console.log('Response data:', response.data);
+        setResponseData(response.data); // Store the response data in state
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    // Only fetch data when all required filters are selected
+    if (dealType && region && sector) {
+      fetchData();
+    }
+  }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
 
   const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
     setDealType(event.target.value);
@@ -76,45 +104,15 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
     setSector(event.target.value);
   };
 
- 
-
-  // Submit the form and call onSubmit with the response data
-  const handleSubmit = async () => {
-    const requestData = {
-      filters: {
-        year_range: [startYear, endYear],
-        deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
-        region: region === 'All' ? regionOptions : [region],
-        sector: sector === 'All' ? sectorOptions : [sector],
-      },
-    };
-
-    try {
-      const response = await axios.post(
-        'http://192.168.1.59:9000/api/skewtable/calculations/',
-        requestData
-      );
-      console.log('Response Data:', response.data);
-      onSubmit(response.data); // Pass response data to parent component
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-  
-
-
   return (
     <Container maxWidth="lg" sx={{ padding: 0 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box p={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
-              Yearly  Based  Filtered Data 
+              Yearly Based Filtered Data
             </Typography>
             <Grid container spacing={2}>
-              {/* Start Year Selector */}
-              
-
               {/* Deal Type Selector */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
@@ -144,7 +142,7 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
                     sx={{ backgroundColor: '#ffe0b2', color: '#e65100' }}
                   >
                     <MenuItem value="All">All</MenuItem>
-                    { regionOptions.map((region) => (
+                    {regionOptions.map((region) => (
                       <MenuItem key={region} value={region}>
                         {region}
                       </MenuItem>
@@ -171,23 +169,11 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
                   </Select>
                 </FormControl>
               </Grid>
-
-              {/* Expected Returns Selector */}
             </Grid>
-
-            <Button
-              variant="contained"
-              sx={{
-                mt: 3,
-                backgroundColor: '#6a1b9a',
-                color: '#fff',
-                '&:hover': { backgroundColor: '#4a148c' },
-              }}
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
           </Box>
+
+          {/* Pass responseData to SectorTableData */}
+          {responseData && <SectorTableData data={responseData} />}
         </CardContent>
       </Card>
     </Container>

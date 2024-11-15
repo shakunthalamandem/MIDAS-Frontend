@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -14,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import axios from 'axios';
+import YearlyTableData from './YearlyTableData'; // Import YearlyTableData component
 
 // Define the expected structure of the API response
 interface SkewTableOptions {
@@ -24,39 +24,36 @@ interface SkewTableOptions {
   sector: string[];
 }
 
-interface YearlyBasedTableProps {
-  onSubmit: (data: any) => void; // Callback function passed from parent to handle the response
-}
-
-const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
+const YearlyBasedTable: React.FC = () => {
   // State for form values
   const [startYear, setStartYear] = useState<number>(2001);
   const [endYear, setEndYear] = useState<number | string>(2002);
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
-  const [sector, setSector] = useState<string[]>(); // Initially undefined, but will hold all sectors
+  const [sector, setSector] = useState<string[]>([]); // Holds selected sectors
 
   // State for the filter options
-  const [startYearOptions, setStartYearOptions] = useState<number[]>([]); 
-  const [endYearOptions, setEndYearOptions] = useState<number[]>([]); 
+  const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
+  const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
-  const [regionOptions, setRegionOptions] = useState<string[]>([]); 
-  const [sectorOptions, setSectorOptions] = useState<string[]>([]); 
+  const [regionOptions, setRegionOptions] = useState<string[]>([]);
+  const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
-  // Fetch the filter options on component mount
+  const [sectorwiseData, setSectorwiseData] = useState<any>(null); // Store the fetched data
+
+  // Fetch the filter options and data
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
         const response = await axios.get('http://192.168.1.59:9000/api/skew_table_filters/');
         const data = response.data as SkewTableOptions;
-        console.log("Response Data ",data)
 
         setStartYearOptions(data['start year']);
         setEndYearOptions(data['end year']);
         setDealTypeOptions(data['dealType']);
         setRegionOptions(data['region']);
         setSectorOptions(data['sector']);
-        setSector(data['sector']); // Set the sector state with all sectors by default
+        setSector(data['sector']); // Set default sectors
       } catch (error) {
         console.error('Error fetching filter options:', error);
       }
@@ -65,25 +62,39 @@ const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
     fetchFilterOptions();
   }, []);
 
-  // Filter end year options based on selected start year
+  // Fetch the data based on the selected filters
   useEffect(() => {
-    if (startYear) {
-      setEndYearOptions(endYearOptions.filter((year) => year >= startYear));
-    } else {
-      setEndYearOptions(endYearOptions);
-    }
-  }, [startYear, endYearOptions]);
+    const fetchData = async () => {
+      const requestData = {
+        filters: {
+          year_range: [startYear, endYear],
+          deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
+          region: region === 'All' ? regionOptions : [region],
+          sector: sector.length > 0 ? sector : sectorOptions, // Use selected sectors
+        },
+      };
+
+      try {
+        const response = await axios.post(
+          'http://192.168.1.59:9000/api/skewtable/calculations/',
+          requestData
+        );
+        setSectorwiseData(response.data); // Extract and store only Sectorwise data
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [startYear, endYear, dealType, region, sector, sectorOptions]);
 
   // Handle form value changes
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
-    const newStartYear = Number(event.target.value);
-    setStartYear(newStartYear);
-    setEndYear(''); // Reset end year when start year is changed
+    setStartYear(Number(event.target.value));
   };
 
   const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
-    const newEndYear = Number(event.target.value);
-    setEndYear(newEndYear);
+    setEndYear(Number(event.target.value));
   };
 
   const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
@@ -94,30 +105,6 @@ const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
     setRegion(event.target.value);
   };
 
-
-
-  // Submit the form and call onSubmit with the response data
-  const handleSubmit = async () => {
-    const requestData = {
-      filters: {
-        year_range: [startYear, endYear],
-        deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
-        region: region === 'All' ? regionOptions : [region],
-        sector: sector, // Passing all sectors by default
-      },
-    };
-
-    try {
-      const response = await axios.post(
-        'http://192.168.1.59:9000/api/skewtable/calculations/',
-        requestData
-      );
-      console.log('Response Data:', response.data);
-      onSubmit(response.data); // Pass response data to parent component
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0 }}>
@@ -221,22 +208,12 @@ const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
               {/* Expected Returns Selector */}
               
             </Grid>
-
-            <Button
-              variant="contained"
-              sx={{
-                mt: 3,
-                backgroundColor: '#6a1b9a',
-                color: '#fff',
-                '&:hover': { backgroundColor: '#4a148c' },
-              }}
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
           </Box>
         </CardContent>
       </Card>
+
+      {/* Pass the fetched data to YearlyTableData for rendering */}
+      <YearlyTableData data={{ Sectorwise: sectorwiseData }} />
     </Container>
   );
 };

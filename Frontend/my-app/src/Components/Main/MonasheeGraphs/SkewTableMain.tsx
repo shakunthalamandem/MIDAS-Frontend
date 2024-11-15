@@ -6,12 +6,8 @@ const SkewTableMain = () => {
   return (
   
     <>
-    <YearlyBasedTable onSubmit={function (data: any): void {
-          throw new Error('Function not implemented.');
-        } }  />
-    <SectorBasedTable onSubmit={function (data: any): void {
-          throw new Error('Function not implemented.');
-        } }  />
+    <YearlyBasedTable   />
+    <SectorBasedTable   />
     </>
   )
 }
