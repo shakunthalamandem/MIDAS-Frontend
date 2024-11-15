@@ -79,7 +79,6 @@ const SectorBasedTable: React.FC = () => {
           'http://192.168.1.59:9000/api/skewtable/calculations/',
           requestData
         );
-        console.log('Response data:', response.data);
         setResponseData(response.data); // Store the response data in state
       } catch (error) {
         console.error('Error fetching data:', error);

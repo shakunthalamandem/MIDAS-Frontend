@@ -39,7 +39,9 @@ const YearlyBasedTable: React.FC = () => {
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
-  const [sectorwiseData, setSectorwiseData] = useState<any>(null); // Store the fetched data
+  const [sectorwiseData, setSectorwiseData] = useState<any>(null); 
+  // const [responseData, setResponseData] = useState<any>(null);
+  // Store the fetched data
 
   // Fetch the filter options and data
   useEffect(() => {
@@ -53,7 +55,7 @@ const YearlyBasedTable: React.FC = () => {
         setDealTypeOptions(data['dealType']);
         setRegionOptions(data['region']);
         setSectorOptions(data['sector']);
-        setSector(data['sector']); // Set default sectors
+        // setSector(data['sector']); // Set default sectors
       } catch (error) {
         console.error('Error fetching filter options:', error);
       }
@@ -79,14 +81,18 @@ const YearlyBasedTable: React.FC = () => {
           'http://192.168.1.59:9000/api/skewtable/calculations/',
           requestData
         );
+        console.log('Response data:', response.data);
+
         setSectorwiseData(response.data); // Extract and store only Sectorwise data
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    fetchData();
-  }, [startYear, endYear, dealType, region, sector, sectorOptions]);
+    if (dealType && region && endYear && startYear ) {
+      fetchData();
+    }
+  }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
 
   // Handle form value changes
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
@@ -213,7 +219,8 @@ const YearlyBasedTable: React.FC = () => {
       </Card>
 
       {/* Pass the fetched data to YearlyTableData for rendering */}
-      <YearlyTableData data={{ Sectorwise: sectorwiseData }} />
+      {sectorwiseData && <YearlyTableData data={sectorwiseData} />}
+
     </Container>
   );
 };

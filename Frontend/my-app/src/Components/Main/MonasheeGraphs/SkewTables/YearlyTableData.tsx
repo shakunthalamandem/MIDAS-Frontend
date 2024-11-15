@@ -20,6 +20,7 @@ interface SectorTableDataProps {
 const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   // Extract the Sectorwise data
   const sectorwiseData = data?.Sectorwise;
+  console.log("sectorwiseData",sectorwiseData)
 
   // Define columns for the table
   const columns = [
