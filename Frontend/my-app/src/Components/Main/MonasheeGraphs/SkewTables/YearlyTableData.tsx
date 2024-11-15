@@ -20,7 +20,7 @@ interface SectorTableDataProps {
 const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   // Extract the Sectorwise data
   const sectorwiseData = data?.Sectorwise;
-  console.log("sectorwiseData",sectorwiseData)
+  console.log("sectorwiseData", sectorwiseData);
 
   // Define columns for the table
   const columns = [
@@ -41,12 +41,20 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   }
 
   return (
-    <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+    <TableContainer component={Paper} sx={{ marginTop: 2,marginBottom:4 }}>
       <Table>
         <TableHead>
           <TableRow>
             {columns.map((column) => (
-              <TableCell key={column} sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+              <TableCell
+                key={column}
+                sx={{
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  padding: '4px 8px', // Reduce padding for smaller cell size
+                  fontSize: '0.875rem', // Optional: Adjust font size if needed
+                }}
+              >
                 {column}
               </TableCell>
             ))}
@@ -57,15 +65,15 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
             const row = sectorwiseData[sector];
             return (
               <TableRow key={sector}>
-                <TableCell>{sector}</TableCell>
-                <TableCell>{row.Total_Deal_Count}</TableCell>
-                <TableCell>{row.Positively_Performing_Deals_Percentage}%</TableCell>
-                <TableCell>{row.Negatively_Performing_Deals_Percentage}%</TableCell>
-                <TableCell>{row.Average_T1M_Abs_Return_of_Positively}</TableCell>
-                <TableCell>{row.Average_T1M_Abs_Return_of_Negatively}</TableCell>
-                <TableCell>{row.Expected_Returns_Absolute}</TableCell>
-                <TableCell>{row.Expected_Returns_Excess}</TableCell>
-                <TableCell>{row.Long_Opportunity_Value}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{sector}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Positively_Performing_Deals_Percentage}%</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Negatively_Performing_Deals_Percentage}%</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Positively}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Negatively}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Absolute}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Excess}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Long_Opportunity_Value}</TableCell>
               </TableRow>
             );
           })}

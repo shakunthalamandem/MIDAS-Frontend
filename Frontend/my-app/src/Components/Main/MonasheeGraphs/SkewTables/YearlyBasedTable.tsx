@@ -113,7 +113,7 @@ const YearlyBasedTable: React.FC = () => {
 
 
   return (
-    <Container maxWidth="lg" sx={{ padding: 0 }}>
+    <Container maxWidth="lg" sx={{ padding: 0 ,marginBottom:4}}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box p={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>

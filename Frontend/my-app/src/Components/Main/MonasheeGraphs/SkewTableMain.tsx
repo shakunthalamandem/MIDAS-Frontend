@@ -6,8 +6,9 @@ const SkewTableMain = () => {
   return (
   
     <>
-    <YearlyBasedTable   />
     <SectorBasedTable   />
+    <YearlyBasedTable   />
+
     </>
   )
 }
