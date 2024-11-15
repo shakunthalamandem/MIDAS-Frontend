@@ -4,8 +4,6 @@ import DealGraph from '../../MonasheeGraphs/DealGraph';
 import DealVolume from '../../MonasheeGraphs/DealVolume';
 import OpportunityMain from '../../MonasheeGraphs/OpportunityMain';
 import OpportunityAbsBasis from '../../MonasheeGraphs/OpportunityAbsBasis';
-import SkewMain from '../../MonasheeGraphs/SkewMain';
-import SkewCombo from '../../MonasheeGraphs/MonasheePieCharts/SkewCombo';
 import SkewTableMain from '../../MonasheeGraphs/SkewTableMain';
 
 

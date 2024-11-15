@@ -68,11 +68,11 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Positively_Performing_Deals_Percentage}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Negatively_Performing_Deals_Percentage}%</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Positively}</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Negatively}</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Absolute}</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Excess}</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>{row.Long_Opportunity_Value}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Positively}%</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Negatively}%</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Absolute}%</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Excess}%</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>${row.Long_Opportunity_Value}B</TableCell>
               </TableRow>
             );
           })}
