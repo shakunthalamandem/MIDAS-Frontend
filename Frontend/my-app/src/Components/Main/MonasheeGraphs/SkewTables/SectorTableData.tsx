@@ -14,12 +14,12 @@ interface TableData {
 }
 
 interface SectorTableDataProps {
-  data: { yearwise: { [year: string]: TableData } }; // Data passed from parent component
+  data: { Yearwise: { [year: string]: TableData } }; // Data passed from parent component
 }
 
 const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   // Extract the Yearwise data
-  const yearwiseData = data?.yearwise;
+  const yearwiseData = data?.Yearwise;
 
   // Define columns for the table
   const columns = [
