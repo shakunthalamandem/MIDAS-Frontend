@@ -5,6 +5,7 @@ import DealVolume from '../../MonasheeGraphs/DealVolume';
 import OpportunityMain from '../../MonasheeGraphs/OpportunityMain';
 import OpportunityAbsBasis from '../../MonasheeGraphs/OpportunityAbsBasis';
 import SkewTableMain from '../../MonasheeGraphs/SkewTableMain';
+import SkewScreener from '../../MonasheeGraphs/ScreenerTable/SkewScreener';
 
 
 const CapitalMarkets: React.FC = () => {
@@ -95,6 +96,13 @@ const CapitalMarkets: React.FC = () => {
               '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
             }}
           />
+           <Tab
+            label="Screener"
+            sx={{
+              color: value === 5 ? '#3F51B5' : '#777',
+              '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
+            }}
+          />
         </Tabs>
 
         {value === 0 && <DealGraph />}
@@ -102,6 +110,8 @@ const CapitalMarkets: React.FC = () => {
         {value === 2 && <OpportunityMain />}
         {value === 3 && <OpportunityAbsBasis />}
         {value === 4 && <SkewTableMain />}
+        {value === 5 && <SkewScreener />}
+
 
 
       </Box>
