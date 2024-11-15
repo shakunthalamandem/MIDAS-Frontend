@@ -22,7 +22,6 @@ interface SkewTableOptions {
   dealType: string[];
   region: string[];
   sector: string[];
-  expectedReturns: string[];
 }
 
 interface YearlyBasedTableProps {
@@ -36,7 +35,6 @@ const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string[]>(); // Initially undefined, but will hold all sectors
-  const [expectedReturn, setExpectedReturn] = useState<string>('Absolute');
 
   // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]); 
@@ -44,7 +42,6 @@ const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]); 
   const [sectorOptions, setSectorOptions] = useState<string[]>([]); 
-  const [expectedReturnsOptions, setExpectedReturnsOptions] = useState<string[]>([]); 
 
   // Fetch the filter options on component mount
   useEffect(() => {
@@ -59,7 +56,6 @@ const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
         setDealTypeOptions(data['dealType']);
         setRegionOptions(data['region']);
         setSectorOptions(data['sector']);
-        setExpectedReturnsOptions(data['expectedReturns']);
         setSector(data['sector']); // Set the sector state with all sectors by default
       } catch (error) {
         console.error('Error fetching filter options:', error);
@@ -98,9 +94,7 @@ const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
     setRegion(event.target.value);
   };
 
-  const handleExpectedReturnChange = (event: SelectChangeEvent<string>) => {
-    setExpectedReturn(event.target.value);
-  };
+
 
   // Submit the form and call onSubmit with the response data
   const handleSubmit = async () => {
@@ -110,7 +104,6 @@ const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
         deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
         region: region === 'All' ? regionOptions : [region],
         sector: sector, // Passing all sectors by default
-        expected_returns: expectedReturn === 'All' ? expectedReturnsOptions : [expectedReturn],
       },
     };
 
@@ -226,23 +219,7 @@ const YearlyBasedTable: React.FC<YearlyBasedTableProps> = ({ onSubmit }) => {
               </Grid>
 
               {/* Expected Returns Selector */}
-              <Grid item xs={12} sm={6} md={3}>
-                <FormControl fullWidth variant="outlined" size="small">
-                  <InputLabel>Expected Returns</InputLabel>
-                  <Select
-                    value={expectedReturn}
-                    onChange={handleExpectedReturnChange}
-                    sx={{ backgroundColor: '#fce4ec', color: '#880e4f' }}
-                  >
-                    <MenuItem value="Absolute">Absolute</MenuItem>
-                    {expectedReturnsOptions.map((ret) => (
-                      <MenuItem key={ret} value={ret}>
-                        {ret}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+              
             </Grid>
 
             <Button

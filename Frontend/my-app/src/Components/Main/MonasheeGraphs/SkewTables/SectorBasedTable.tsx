@@ -22,7 +22,6 @@ interface SkewTableOptions {
   dealType: string[];
   region: string[];
   sector: string[];
-  expectedReturns: string[];
 }
 
 interface SectorBasedTableProps {
@@ -36,7 +35,6 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
-  const [expectedReturn, setExpectedReturn] = useState<string>('Absolute');
 
   // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
@@ -44,7 +42,6 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
-  const [expectedReturnsOptions, setExpectedReturnsOptions] = useState<string[]>([]);
 
   // Fetch the filter options on component mount
   useEffect(() => {
@@ -58,7 +55,6 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
         setDealTypeOptions(data['dealType']);
         setRegionOptions(data['region']);
         setSectorOptions(data['sector']);
-        setExpectedReturnsOptions(data['expectedReturns']);
       } catch (error) {
         console.error('Error fetching filter options:', error);
       }
@@ -80,9 +76,7 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
     setSector(event.target.value);
   };
 
-  const handleExpectedReturnChange = (event: SelectChangeEvent<string>) => {
-    setExpectedReturn(event.target.value);
-  };
+ 
 
   // Submit the form and call onSubmit with the response data
   const handleSubmit = async () => {
@@ -92,7 +86,6 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
         deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
         region: region === 'All' ? regionOptions : [region],
         sector: sector === 'All' ? sectorOptions : [sector],
-        expected_returns: expectedReturn === 'All' ? expectedReturnsOptions : [expectedReturn],
       },
     };
 
@@ -180,23 +173,6 @@ const SectorBasedTable: React.FC<SectorBasedTableProps> = ({ onSubmit }) => {
               </Grid>
 
               {/* Expected Returns Selector */}
-              <Grid item xs={12} sm={6} md={3}>
-                <FormControl fullWidth variant="outlined" size="small">
-                  <InputLabel>Expected Returns</InputLabel>
-                  <Select
-                    value={expectedReturn}
-                    onChange={handleExpectedReturnChange}
-                    sx={{ backgroundColor: '#fce4ec', color: '#880e4f' }}
-                  >
-                    <MenuItem value="Absolute">Absolute</MenuItem>
-                    { expectedReturnsOptions.map((ret) => (
-                      <MenuItem key={ret} value={ret}>
-                        {ret}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
             </Grid>
 
             <Button
