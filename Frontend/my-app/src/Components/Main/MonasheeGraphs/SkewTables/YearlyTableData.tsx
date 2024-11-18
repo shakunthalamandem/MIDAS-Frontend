@@ -18,11 +18,14 @@ interface SectorTableDataProps {
 }
 
 const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
-  // Extract the Sectorwise data
   const sectorwiseData = data?.Sectorwise;
   console.log("sectorwiseData", sectorwiseData);
 
-  // Define columns for the table
+  if (!sectorwiseData) {
+    return <div>No data available</div>;
+  }
+
+  // Columns for the table
   const columns = [
     'Sector',
     'Total Deal Count',
@@ -35,13 +38,41 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
     'Long Opportunity Value',
   ];
 
-  // Render the table only if Sectorwise data exists
-  if (!sectorwiseData) {
-    return <div>No data available</div>;
-  }
+  // Initialize totals and counters for average calculations
+  let totalDealCount = 0;
+  let totalLongOpportunityValue = 0;
+  let totalPositivelyPerformingDealsPercentage = 0;
+  let totalNegativelyPerformingDealsPercentage = 0;
+  let totalAvgT1MAbsReturnPositively = 0;
+  let totalAvgT1MAbsReturnNegatively = 0;
+  let totalExpectedReturnsAbsolute = 0;
+  let totalExpectedReturnsExcess = 0;
+  const rowCount = Object.keys(sectorwiseData).length;
+
+  // Loop through the data and accumulate totals for averages
+  Object.values(sectorwiseData).forEach((row) => {
+    totalDealCount += row.Total_Deal_Count;
+    totalLongOpportunityValue += row.Long_Opportunity_Value;
+    totalPositivelyPerformingDealsPercentage += row.Positively_Performing_Deals_Percentage;
+    totalNegativelyPerformingDealsPercentage += row.Negatively_Performing_Deals_Percentage;
+    totalAvgT1MAbsReturnPositively += row.Average_T1M_Abs_Return_of_Positively;
+    totalAvgT1MAbsReturnNegatively += row.Average_T1M_Abs_Return_of_Negatively;
+    totalExpectedReturnsAbsolute += row.Expected_Returns_Absolute;
+    totalExpectedReturnsExcess += row.Expected_Returns_Excess;
+  });
+
+  // Calculate averages for the columns (ignoring "Total Deal Count" and "Long Opportunity Value")
+  const avgPositivelyPerformingDealsPercentage =
+    totalPositivelyPerformingDealsPercentage / rowCount;
+  const avgNegativelyPerformingDealsPercentage =
+    totalNegativelyPerformingDealsPercentage / rowCount;
+  const avgAvgT1MAbsReturnPositively = totalAvgT1MAbsReturnPositively / rowCount;
+  const avgAvgT1MAbsReturnNegatively = totalAvgT1MAbsReturnNegatively / rowCount;
+  const avgExpectedReturnsAbsolute = totalExpectedReturnsAbsolute / rowCount;
+  const avgExpectedReturnsExcess = totalExpectedReturnsExcess / rowCount;
 
   return (
-    <TableContainer component={Paper} sx={{ marginTop: 2,marginBottom:4 }}>
+    <TableContainer component={Paper} sx={{ marginTop: 2, marginBottom: 4 }}>
       <Table>
         <TableHead>
           <TableRow>
@@ -61,11 +92,12 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
           </TableRow>
         </TableHead>
         <TableBody>
+          {/* Render data rows */}
           {Object.keys(sectorwiseData).map((sector) => {
             const row = sectorwiseData[sector];
             return (
               <TableRow key={sector}>
-                <TableCell sx={{ padding: '4px 8px',width:'200px' }}>{sector}</TableCell>
+                <TableCell sx={{ padding: '4px 8px', width: '200px' }}>{sector}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Positively_Performing_Deals_Percentage}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Negatively_Performing_Deals_Percentage}%</TableCell>
@@ -77,6 +109,35 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               </TableRow>
             );
           })}
+
+          {/* Last row with sum and averages */}
+          <TableRow key="total">
+            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', textAlign: 'center' }}>
+              Total
+            </TableCell>
+            <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>{totalDealCount}</TableCell>
+            <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
+              {avgPositivelyPerformingDealsPercentage.toFixed(2)}%
+            </TableCell>
+            <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
+              {avgNegativelyPerformingDealsPercentage.toFixed(2)}%
+            </TableCell>
+            <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
+              {avgAvgT1MAbsReturnPositively.toFixed(2)}%
+            </TableCell>
+            <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
+              {avgAvgT1MAbsReturnNegatively.toFixed(2)}%
+            </TableCell>
+            <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
+              {avgExpectedReturnsAbsolute.toFixed(2)}%
+            </TableCell>
+            <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
+              {avgExpectedReturnsExcess.toFixed(2)}%
+            </TableCell>
+            <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
+              ${totalLongOpportunityValue.toFixed(2)}B
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </TableContainer>
