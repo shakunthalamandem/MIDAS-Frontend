@@ -15,7 +15,6 @@ import {
 import axios from 'axios';
 import YearlyTableData from './YearlyTableData'; // Import YearlyTableData component
 
-// Define the expected structure of the API response
 interface SkewTableOptions {
   'start year': number[];
   'end year': number[];
@@ -25,25 +24,19 @@ interface SkewTableOptions {
 }
 
 const YearlyBasedTable: React.FC = () => {
-  // State for form values
   const [startYear, setStartYear] = useState<number>(2001);
-  const [endYear, setEndYear] = useState<number | string>(2002);
+  const [endYear, setEndYear] = useState<number>(2002);
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
-  const [sector, setSector] = useState<string[]>([]); // Holds selected sectors
+  const [sector, setSector] = useState<string[]>([]);
 
-  // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
+  const [sectorwiseData, setSectorwiseData] = useState<any>(null);
 
-  const [sectorwiseData, setSectorwiseData] = useState<any>(null); 
-  // const [responseData, setResponseData] = useState<any>(null);
-  // Store the fetched data
-
-  // Fetch the filter options and data
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
@@ -55,7 +48,6 @@ const YearlyBasedTable: React.FC = () => {
         setDealTypeOptions(data['dealType']);
         setRegionOptions(data['region']);
         setSectorOptions(data['sector']);
-        // setSector(data['sector']); // Set default sectors
       } catch (error) {
         console.error('Error fetching filter options:', error);
       }
@@ -64,7 +56,6 @@ const YearlyBasedTable: React.FC = () => {
     fetchFilterOptions();
   }, []);
 
-  // Fetch the data based on the selected filters
   useEffect(() => {
     const fetchData = async () => {
       const requestData = {
@@ -72,7 +63,7 @@ const YearlyBasedTable: React.FC = () => {
           year_range: [startYear, endYear],
           deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
           region: region === 'All' ? regionOptions : [region],
-          sector: sector.length > 0 ? sector : sectorOptions, // Use selected sectors
+          sector: sector.length > 0 ? sector : sectorOptions,
         },
       };
 
@@ -81,22 +72,23 @@ const YearlyBasedTable: React.FC = () => {
           'http://192.168.1.59:9000/api/skewtable/calculations/',
           requestData
         );
-        console.log('Response data:', response.data);
-
-        setSectorwiseData(response.data); // Extract and store only Sectorwise data
+        setSectorwiseData(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    if (dealType && region && endYear && startYear ) {
+    if (dealType && region && endYear && startYear) {
       fetchData();
     }
   }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
 
-  // Handle form value changes
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
-    setStartYear(Number(event.target.value));
+    const newStartYear = Number(event.target.value);
+    setStartYear(newStartYear);
+    
+    // Set end year to the next year after the selected start year
+    setEndYear(newStartYear + 1);
   };
 
   const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
@@ -111,14 +103,16 @@ const YearlyBasedTable: React.FC = () => {
     setRegion(event.target.value);
   };
 
+  // Filter end year options based on the selected start year
+  const filteredEndYearOptions = endYearOptions.filter(year => year > startYear);
 
   return (
-    <Container maxWidth="lg" sx={{ padding: 0 ,marginBottom:4}}>
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box p={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
-            Sector  Based  Filtered Data 
+              Sector Based Filtered Data 
             </Typography>
             <Grid container spacing={2}>
               {/* Start Year Selector */}
@@ -163,8 +157,9 @@ const YearlyBasedTable: React.FC = () => {
                         },
                       },
                     }}
+                    disabled={filteredEndYearOptions.length === 0} // Disable if no valid options
                   >
-                    {endYearOptions.map((year) => (
+                    {filteredEndYearOptions.map((year) => (
                       <MenuItem key={year} value={year}>
                         {year}
                       </MenuItem>
@@ -210,17 +205,12 @@ const YearlyBasedTable: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-
-              {/* Expected Returns Selector */}
-              
             </Grid>
           </Box>
         </CardContent>
       </Card>
 
-      {/* Pass the fetched data to YearlyTableData for rendering */}
       {sectorwiseData && <YearlyTableData data={sectorwiseData} />}
-
     </Container>
   );
 };

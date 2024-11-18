@@ -113,8 +113,16 @@ const SkewScreener: React.FC = () => {
     sectorOptions,
   ]);
 
+  // const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
+  //   setStartYear(Number(event.target.value));
+  // };
+  
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
-    setStartYear(Number(event.target.value));
+    const newStartYear = Number(event.target.value);
+    setStartYear(newStartYear);
+    
+    // Set end year to the next year after the selected start year
+    setEndYear(newStartYear + 1);
   };
 
   const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
@@ -187,6 +195,7 @@ const SkewScreener: React.FC = () => {
     setT1Return(["All"]);
     setTmReturn(["All"]);
   };
+  const filteredEndYearOptions = endYearOptions.filter(year => year > startYear);
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
@@ -243,8 +252,11 @@ const SkewScreener: React.FC = () => {
                         },
                       },
                     }}
+                    disabled={filteredEndYearOptions.length === 0} // Disable if no valid options
+
                   >
-                    {endYearOptions.map((year) => (
+
+                    {filteredEndYearOptions.map((year) => (
                       <MenuItem key={year} value={year}>
                         {year}
                       </MenuItem>
