@@ -16,7 +16,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import axios from "axios";
-import YearlyTableData from "../SkewTables/YearlyTableData";
+import ScreenerDataTable from "./ScreenerDataTable";
 
 interface SkewTableOptions {
   "start year": number[];
@@ -402,8 +402,8 @@ const SkewScreener: React.FC = () => {
       </Card>
 
       {/* Pass the fetched data to YearlyTableData for rendering */}
-      {sectorwiseData && <YearlyTableData data={sectorwiseData} />}
-    </Container>
+      {sectorwiseData && <ScreenerDataTable sectorwiseData={sectorwiseData} />}
+      </Container>
   );
 };
 
