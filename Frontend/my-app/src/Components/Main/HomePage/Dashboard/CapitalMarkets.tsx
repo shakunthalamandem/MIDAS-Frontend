@@ -7,7 +7,6 @@ import OpportunityAbsBasis from '../../MonasheeGraphs/OpportunityAbsBasis';
 import SkewTableMain from '../../MonasheeGraphs/SkewTableMain';
 import SkewScreener from '../../MonasheeGraphs/ScreenerTable/SkewScreener';
 
-
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState(0);
 
@@ -58,49 +57,90 @@ const CapitalMarkets: React.FC = () => {
           onChange={handleChange}
           centered
           TabIndicatorProps={{
-            style: { backgroundColor: value === 0 ? '#FF5722' : value === 1 ? '#4CAF50' : '#3F51B5' },
+            style: {
+              display: 'none', // This removes the default underline (bottom line)
+            },
+          }}
+          sx={{
+            '& .MuiTab-root': {
+              borderRadius: '8px',
+              padding: '6px 16px', // Reduced padding to reduce the height of the tabs
+              fontSize: '0.7rem', // Smaller font size
+              fontWeight: 'bold',
+              transition: 'background-color 0.3s ease, transform 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.05)',
+                background: 'rgba(0, 0, 0, 0.08)',
+                color: '#000000',
+              },
+            },
+            height: '40px', // You can also set a fixed height for the tabs
           }}
         >
           <Tab
             label="Deal Graph"
             sx={{
-              color: value === 0 ? '#FF5722' : '#777',
-              '&.Mui-selected': { color: '#FF5722', fontWeight: 'bold' },
+              backgroundColor: value === 0 ? '#FF5722' : '#f5f5f5',
+              color: value === 0 ? '#fff' : '#777',
+              '&.Mui-selected': {
+                backgroundColor: '#FF5722',
+                color: '#fff',
+              },
             }}
           />
           <Tab
             label="Deal Volume"
             sx={{
-              color: value === 1 ? '#4CAF50' : '#777',
-              '&.Mui-selected': { color: '#4CAF50', fontWeight: 'bold' },
+              backgroundColor: value === 1 ? '#4CAF50' : '#f5f5f5',
+              color: value === 1 ? '#fff' : '#777',
+              '&.Mui-selected': {
+                backgroundColor: '#4CAF50',
+                color: '#fff',
+              },
             }}
           />
           <Tab
             label="Opportunity Value Ex"
             sx={{
-              color: value === 2 ? '#3F51B5' : '#777',
-              '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
+              backgroundColor: value === 2 ? '#3F51B5' : '#f5f5f5',
+              color: value === 2 ? '#fff' : '#777',
+              '&.Mui-selected': {
+                backgroundColor: '#3F51B5',
+                color: '#fff',
+              },
             }}
           />
           <Tab
             label="Opportunity Value Abs"
             sx={{
-              color: value === 3 ? '#3F51B5' : '#777',
-              '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
+              backgroundColor: value === 3 ? '#00BCD4' : '#f5f5f5',
+              color: value === 3 ? '#fff' : '#777',
+              '&.Mui-selected': {
+                backgroundColor: '#00BCD4',
+                color: '#fff',
+              },
             }}
           />
-            <Tab
+          <Tab
             label="Skew Table"
             sx={{
-              color: value === 4 ? '#3F51B5' : '#777',
-              '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
+              backgroundColor: value === 4 ? '#9C27B0' : '#f5f5f5',
+              color: value === 4 ? '#fff' : '#777',
+              '&.Mui-selected': {
+                backgroundColor: '#9C27B0',
+                color: '#fff',
+              },
             }}
           />
-           <Tab
+          <Tab
             label="Screener"
             sx={{
-              color: value === 5 ? '#3F51B5' : '#777',
-              '&.Mui-selected': { color: '#3F51B5', fontWeight: 'bold' },
+              backgroundColor: value === 5 ? '#FF9800' : '#f5f5f5',
+              color: value === 5 ? '#fff' : '#777',
+              '&.Mui-selected': {
+                backgroundColor: '#FF9800',
+                color: '#fff',
+              },
             }}
           />
         </Tabs>
@@ -111,9 +151,6 @@ const CapitalMarkets: React.FC = () => {
         {value === 3 && <OpportunityAbsBasis />}
         {value === 4 && <SkewTableMain />}
         {value === 5 && <SkewScreener />}
-
-
-
       </Box>
     </>
   );
