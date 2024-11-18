@@ -138,7 +138,15 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <TableCell key={column.id} align="left">
+                <TableCell
+                  key={column.id}
+                  align="left"
+                  style={{
+                    fontWeight: 'bold', // Bold font for headers
+                    color: '#002060',   // Column header text color
+                    minWidth: '150px',   // Increase column width
+                  }}
+                >
                   {column.label}
                 </TableCell>
               ))}
@@ -147,9 +155,13 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
           <TableBody>
             {rows.length > 0 ? (
               rows.map((row, index) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                <TableRow hover role="checkbox" tabIndex={-1} key={index} style={{ height: '35px' }}> {/* Decreased row height */}
                   {columns.map((column) => (
-                    <TableCell key={column.id} align="left">
+                    <TableCell
+                      key={column.id}
+                      align="left"
+                      style={{ minWidth: '150px' }} // Increase column width
+                    >
                       {row[column.id as keyof ScreenerDataRow] || '-'}
                     </TableCell>
                   ))}
