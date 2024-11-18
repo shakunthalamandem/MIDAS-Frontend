@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination } from '@mui/material';
 
 // Define the type for each row of data
 interface ScreenerDataRow {
@@ -42,16 +42,20 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10); // You can adjust this number as needed
+  const [totalRows, setTotalRows] = useState(0); // Total rows from API
 
   useEffect(() => {
-    // Send the data to the API when the component is mounted or when sectorwiseData changes
     if (sectorwiseData) {
-      fetchDataFromApi(sectorwiseData);
+      fetchDataFromApi(sectorwiseData, page, pageSize);
       console.log(sectorwiseData, "+++++++++++++++++++++")
     }
-  }, [sectorwiseData]);
+  }, [sectorwiseData, page, pageSize]); // Re-fetch data when sectorwiseData, page, or pageSize change
 
-  const fetchDataFromApi = async (data: ScreenerDataTableProps['sectorwiseData']) => {
+  const fetchDataFromApi = async (data: ScreenerDataTableProps['sectorwiseData'], page: number, pageSize: number) => {
     setLoading(true);
     setError(null); // Reset error state
 
@@ -61,7 +65,9 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
       sector: data.sector,
       t1return: data.t1return,
       tmreturn: data.tmreturn,
-      year_range: data.year_range
+      year_range: data.year_range,
+      page, // Page number
+      pageSize, // Number of rows per page
     };
 
     try {
@@ -75,7 +81,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
 
       if (response.ok) {
         const result = await response.json();
-        setRows(result); // Assuming the API response is an array of rows
+        setRows(result.data); // Assuming the response contains a 'data' field with the rows
+        setTotalRows(result.totalCount); // Assuming the response contains 'totalCount' for total rows
       } else {
         throw new Error('Failed to fetch data');
       }
@@ -110,6 +117,17 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
     { id: 't1d_returns_index_returns', label: 'T1D Index Returns' },
     { id: 't1d_returns_excess_returns', label: 'T1D Excess Returns' },
   ];
+
+  // Handle page change
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPage(newPage);
+  };
+
+  // Handle rows per page change
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0); // Reset to the first page
+  };
 
   return (
     <div>
@@ -147,6 +165,15 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 50, 100]} // Options for page sizes
+        component="div"
+        count={totalRows}
+        rowsPerPage={pageSize}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </div>
   );
 };
