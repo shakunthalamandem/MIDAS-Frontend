@@ -42,7 +42,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Pagination state
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10); // You can adjust this number as needed
@@ -51,7 +51,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
   useEffect(() => {
     if (sectorwiseData) {
       fetchDataFromApi(sectorwiseData, page, pageSize);
-      console.log(sectorwiseData, "+++++++++++++++++++++")
+      console.log(sectorwiseData, "+++++++++++++++++++++");
     }
   }, [sectorwiseData, page, pageSize]); // Re-fetch data when sectorwiseData, page, or pageSize change
 
@@ -82,7 +82,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
       if (response.ok) {
         const result = await response.json();
         setRows(result.data); // Assuming the response contains a 'data' field with the rows
-        setTotalRows(result.totalCount); // Assuming the response contains 'totalCount' for total rows
+        setTotalRows(result.pagination.total_items); // Assuming the response contains 'pagination.total_items' for total rows
       } else {
         throw new Error('Failed to fetch data');
       }
