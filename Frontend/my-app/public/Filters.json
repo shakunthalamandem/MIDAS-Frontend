@@ -1,0 +1,97 @@
+{
+    "screener": [
+      {
+        "year": {
+          "options": [
+            2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+            2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
+            2021, 2022, 2023, 2024
+          ],
+          "label": "StartYear",
+          "description": ""
+        }
+      },
+      {
+        "year": {
+          "options": [
+            2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+            2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
+            2021, 2022, 2023, 2024
+          ],
+          "label": "EndYear",
+          "description": ""
+        }
+      },
+      {
+        "deal_type": {
+          "options": ["IPO", "FO"],
+          "label": "DealType",
+          "description": ""
+        }
+      },
+      {
+        "us_international": {
+          "options": ["US", "INTERNATIONAL"],
+          "label": "Region",
+          "description": ""
+        }
+      },
+      {
+        "gics_sector": {
+          "options": [
+            "Communication Services",
+            "Consumer Discretionary",
+            "Consumer Staples",
+            "Energy",
+            "Financials",
+            "Health Care",
+            "Industrials",
+            "Information Technology",
+            "Materials",
+            "Real Estate",
+            "Utilities"
+          ],
+          "label": "Sector",
+          "description": ""
+        }
+      },
+      {
+        "t1_return": {
+          "options": [
+            ">4",
+            "2% to 4%",
+            "0% to 2%",
+            "-2% to 0%",
+            "<-2%"
+          ],
+          "label": "T+1D Returns",
+          "description": ""
+        }
+      },
+      {
+        "t1m_returns": {
+          "options": [
+            ">4",
+            "2% to 4%",
+            "0% to 2%",
+            "-2% to 0%",
+            "<-2%"
+          ],
+          "label": "T+1M Returns",
+          "description": ""
+        }
+      },
+      {
+        "deal_value": {
+          "options": [
+            "0 to $100M",
+            "$100M to $200M",
+            "$200M to $500M",
+            ">$500M"
+          ],
+          "label": "DealValue",
+          "description": ""
+        }
+      }
+    ]
+  }
