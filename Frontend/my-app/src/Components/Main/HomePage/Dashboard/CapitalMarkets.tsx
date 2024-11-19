@@ -6,6 +6,7 @@ import OpportunityMain from '../../MonasheeGraphs/OpportunityMain';
 import OpportunityAbsBasis from '../../MonasheeGraphs/OpportunityAbsBasis';
 import SkewTableMain from '../../MonasheeGraphs/SkewTableMain';
 import SkewScreener from '../../MonasheeGraphs/ScreenerTable/SkewScreener';
+import Filters from '../../MonasheeGraphs/ScreenerTable/Filters';
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -150,7 +151,7 @@ const CapitalMarkets: React.FC = () => {
         {value === 2 && <OpportunityMain />}
         {value === 3 && <OpportunityAbsBasis />}
         {value === 4 && <SkewTableMain />}
-        {value === 5 && <SkewScreener />}
+        {value === 5 && <Filters />}
       </Box>
     </>
   );
