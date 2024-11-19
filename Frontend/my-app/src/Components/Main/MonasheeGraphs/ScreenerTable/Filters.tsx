@@ -34,12 +34,21 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
 
   useEffect(() => {
-    // Initialize selected values with all options selected for each filter
+    // Initialize selected values with default values
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
+
     filtersData.forEach((filter) => {
       const key = Object.keys(filter)[0]; // Get the key (e.g., "year", "deal_type")
-      initialSelectedValues[key] = filter[key].options; // Set all options as selected
+      const { options } = filter[key];
+
+      // Set default value for year
+      if (key === "year") {
+        initialSelectedValues[key] = [2024]; // Default year to 2024
+      } else {
+        initialSelectedValues[key] = ["All"]; // Default other filters to "All"
+      }
     });
+
     setSelectedValues(initialSelectedValues);
   }, [filtersData]); // Runs when filtersData changes
 
@@ -55,12 +64,21 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   };
 
   const handleCancel = () => {
-    // Reset to default values (all selected)
+    // Reset to default values
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
+
     filtersData.forEach((filter) => {
       const key = Object.keys(filter)[0];
-      resetSelectedValues[key] = filter[key].options; // Set all options as selected
+      const { options } = filter[key];
+
+      // Set default value for year
+      if (key === "year") {
+        resetSelectedValues[key] = [2024]; // Default year to 2024
+      } else {
+        resetSelectedValues[key] = ["All"]; // Default other filters to "All"
+      }
     });
+
     setSelectedValues(resetSelectedValues);
   };
 
@@ -102,28 +120,67 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
                           <ListItem {...props} style={{ padding: '4px' }}>
                             <Checkbox
                               checked={selected}
-                              sx={{ padding: '4px', '& .MuiSvgIcon-root': { fontSize: '1.25rem' } }}
+                              sx={{ padding: '4px', '& .MuiSvgIcon-root': { fontSize: '1rem' } }}
                             />
-                            <ListItemText primary={option.toString()} />
+                            <ListItemText
+                              primary={option.toString()}
+                              sx={{
+                                fontSize: '0.875rem', // Reduce font size of the options
+                              }}
+                            />
                           </ListItem>
                         )}
                         renderTags={(value: (string | number)[], getTagProps) => {
-                          return value.map((tag, idx) => (
-                            <div
-                              key={idx}
-                              style={{
-                                backgroundColor: '#e0e0e0',
-                                borderRadius: '4px',
-                                padding: '4px 8px',
-                                margin: '2px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                              }}
-                            >
-                              {tag.toString()} {/* Ensure tag is rendered as a string */}
-                            </div>
-                          ));
+                          return value.length <= 1 ? (
+                            value.map((tag, idx) => (
+                              <div
+                                key={idx}
+                                style={{
+                                  backgroundColor: '#e0e0e0',
+                                  borderRadius: '4px',
+                                  padding: '4px 8px',
+                                  margin: '2px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                }}
+                              >
+                                {tag.toString()} {/* Ensure tag is rendered as a string */}
+                              </div>
+                            ))
+                          ) : (
+                            <>
+                              {value.slice(0, 1).map((tag, idx) => (
+                                <div
+                                  key={idx}
+                                  style={{
+                                    backgroundColor: '#e0e0e0',
+                                    borderRadius: '4px',
+                                    padding: '4px 8px',
+                                    margin: '2px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                  }}
+                                >
+                                  {tag.toString()}
+                                </div>
+                              ))}
+                              <div
+                                style={{
+                                  backgroundColor: '#e0e0e0',
+                                  borderRadius: '4px',
+                                  padding: '4px 8px',
+                                  margin: '2px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                }}
+                              >
+                                +{value.length - 1} {/* Display additional selected items as +N */}
+                              </div>
+                            </>
+                          );
                         }}
                       />
                     </Box>
