@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -33,6 +33,16 @@ interface FiltersProps {
 const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
 
+  useEffect(() => {
+    // Initialize selected values with all options selected for each filter
+    const initialSelectedValues: { [key: string]: (string | number)[] } = {};
+    filtersData.forEach((filter) => {
+      const key = Object.keys(filter)[0]; // Get the key (e.g., "year", "deal_type")
+      initialSelectedValues[key] = filter[key].options; // Set all options as selected
+    });
+    setSelectedValues(initialSelectedValues);
+  }, [filtersData]); // Runs when filtersData changes
+
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
       ...prevState,
@@ -45,7 +55,13 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   };
 
   const handleCancel = () => {
-    setSelectedValues({});
+    // Reset to default values (all selected)
+    const resetSelectedValues: { [key: string]: (string | number)[] } = {};
+    filtersData.forEach((filter) => {
+      const key = Object.keys(filter)[0];
+      resetSelectedValues[key] = filter[key].options; // Set all options as selected
+    });
+    setSelectedValues(resetSelectedValues);
   };
 
   return (

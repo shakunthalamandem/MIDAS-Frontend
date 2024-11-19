@@ -13,14 +13,14 @@
       },
       {
         "deal_type": {
-          "options": ["IPO", "FO"],
+          "options": [ "All","IPO", "FO"],
           "label": "DealType",
           "description": ""
         }
       },
       {
         "us_international": {
-          "options": ["US", "INTERNATIONAL"],
+          "options": ["All", "US", "INTERNATIONAL"],
           "label": "Region",
           "description": ""
         }
@@ -28,6 +28,7 @@
       {
         "gics_sector": {
           "options": [
+            "All",
             "Communication Services",
             "Consumer Discretionary",
             "Consumer Staples",
@@ -47,6 +48,7 @@
       {
         "t1_return": {
           "options": [
+            "All",
             ">4",
             "2% to 4%",
             "0% to 2%",
@@ -60,6 +62,7 @@
       {
         "t1m_returns": {
           "options": [
+            "All",
             ">4",
             "2% to 4%",
             "0% to 2%",
@@ -73,6 +76,7 @@
       {
         "deal_value": {
           "options": [
+            "All",
             "0 to $100M",
             "$100M to $200M",
             "$200M to $500M",
