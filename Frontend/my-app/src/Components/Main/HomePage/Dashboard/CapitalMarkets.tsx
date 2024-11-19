@@ -150,7 +150,7 @@ const CapitalMarkets: React.FC = () => {
         {value === 2 && <OpportunityMain />}
         {value === 3 && <OpportunityAbsBasis />}
         {value === 4 && <SkewTableMain />}
-        {value === 5 && <SkewScreener />}
+        {value === 5 && <SkewTableMain />}
       </Box>
     </>
   );

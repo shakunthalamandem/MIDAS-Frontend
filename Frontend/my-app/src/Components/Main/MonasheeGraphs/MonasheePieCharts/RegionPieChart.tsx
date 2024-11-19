@@ -71,7 +71,12 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
 
   const fetchYears = useCallback(async () => {
     try {
-      const response = await axios.get<YearResponse>("http://192.168.1.59:9000/api/distinct_years/");
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
+      const response = await axios.get<YearResponse>(`${apiUrl}/api/distinct_years/`);
       const yearList = response.data.years.sort((a, b) => a - b);
       setYears(yearList);
       if (yearList.length > 0) {
@@ -99,8 +104,13 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
         deal_value,
         deal_count,
       };
+      const apiUrl = process.env.REACT_APP_API_URL;
 
-      const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", requestData);
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
+
+      const response = await axios.post<ApiResponse>(`${apiUrl}/api/deals_graph/`, requestData);
 
       const apiData = response.data;
       transformRegionData(apiData);

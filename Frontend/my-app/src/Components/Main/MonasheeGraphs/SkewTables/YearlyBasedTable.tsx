@@ -40,7 +40,12 @@ const YearlyBasedTable: React.FC = () => {
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
-        const response = await axios.get('http://192.168.1.59:9000/api/skew_table_filters/');
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
+        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`);
         const data = response.data as SkewTableOptions;
 
         setStartYearOptions(data['start year']);
@@ -68,8 +73,13 @@ const YearlyBasedTable: React.FC = () => {
       };
 
       try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
         const response = await axios.post(
-          'http://192.168.1.59:9000/api/skewtable/calculations/',
+          `${apiUrl}/api/skewtable/calculations/`,
           requestData
         );
         setSectorwiseData(response.data);

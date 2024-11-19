@@ -41,8 +41,13 @@ const AreaChartComponent: React.FC<AreaChartComponentProps> = ({ dataCategory })
     const fetchData = async () => {
       try {
         // Fetch the data and type the response
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
         const response = await axios.get<APIResponse>(
-          'http://192.168.1.59:9000/api/regionwise_data/'
+          `${apiUrl}/api/regionwise_data/`
         );
 
         // Transform the data to the format required for the chart

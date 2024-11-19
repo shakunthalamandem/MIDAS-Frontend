@@ -73,7 +73,12 @@ const OpportunityMain: React.FC = () => {
   };
   const fetchData = async () => {
     try {
-      const response = await axios.post<ApiResponse>("http://192.168.1.59:9000/api/deals_graph/", {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
+      const response = await axios.post<ApiResponse>(`${apiUrl}/api/deals_graph/`, {
         period,
         opportunity_value_ex: "true",
       });

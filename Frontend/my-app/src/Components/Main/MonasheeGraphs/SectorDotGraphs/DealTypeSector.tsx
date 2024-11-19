@@ -113,8 +113,13 @@ const DealTypeSector: React.FC<DealTypeSectorProps> = ({ yAxisType }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
         const response = await axios.get<APIResponse>(
-          "http://192.168.1.59:9000/api/sectorwise_data/"
+          `${apiUrl}/api/sectorwise_data/`
         );
         setData(response.data);
       } catch (err) {

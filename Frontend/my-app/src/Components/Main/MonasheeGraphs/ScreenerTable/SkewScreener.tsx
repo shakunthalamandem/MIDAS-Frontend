@@ -46,8 +46,13 @@ const SkewScreener: React.FC = () => {
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
         const response = await axios.get(
-          "http://192.168.1.59:9000/api/skew_table_filters/"
+          `${apiUrl}/api/skew_table_filters/`
         );
         const data = response.data as SkewTableOptions;
 
@@ -87,8 +92,13 @@ const SkewScreener: React.FC = () => {
       console.log("Filter Data:", requestData.filters);
 
       try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
         const response = await axios.post(
-          "http://192.168.1.59:9000/api/skewtable/calculations/",
+          `${apiUrl}/api/skewtable/calculations/`,
           requestData
         );
         setSectorwiseData(response.data);
@@ -172,8 +182,13 @@ const SkewScreener: React.FC = () => {
       console.log("Submitting Filter Data:", requestData.filters);
 
       try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
         const response = await axios.post(
-          "http://192.168.1.59:9000/api/skewtable/calculations/",
+          `${apiUrl}/api/skewtable/calculations/`,
           requestData
         );
         setSectorwiseData(response.data);

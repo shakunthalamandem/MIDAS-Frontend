@@ -71,7 +71,12 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
     };
 
     try {
-      const response = await fetch('http://192.168.1.59:9000/api/super-screener/', {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
+      const response = await fetch(`${apiUrl}/api/super-screener/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
