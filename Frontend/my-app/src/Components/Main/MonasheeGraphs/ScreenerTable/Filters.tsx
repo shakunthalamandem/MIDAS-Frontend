@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Grid,
@@ -26,17 +26,12 @@ interface Filter {
   [key: string]: FilterOption;
 }
 
-const Filters: React.FC = () => {
-  const [filters, setFilters] = useState<Filter[]>([]);
-  const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
+interface FiltersProps {
+  filtersData: Filter[]; // Accept filters as prop
+}
 
-  useEffect(() => {
-    // Fetch the filters.json file
-    fetch("/Filters.json")
-      .then((response) => response.json())
-      .then((data) => setFilters(data.screener))
-      .catch((error) => console.error("Error loading filters:", error));
-  }, []);
+const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
+  const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
@@ -62,7 +57,7 @@ const Filters: React.FC = () => {
               Screener Filters
             </Typography>
             <Grid container spacing={2} sx={{ backgroundColor: '#f7f8f8', maxHeight: '370px', overflowY: 'scroll' }}>
-              {filters.map((filter, index) => {
+              {filtersData.map((filter, index) => {
                 const key = Object.keys(filter)[0]; // Get the key (e.g., "year", "deal_type")
                 const { options, label, description } = filter[key];
 
