@@ -124,10 +124,10 @@ const Filters: React.FC = () => {
             {/* Center the buttons */}
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ mr: 2 }}>
-                Submit
+                Apply
               </Button>
               <Button variant="outlined" color="secondary" onClick={handleCancel}>
-                Cancel
+                Reset
               </Button>
             </Box>
           </Box>
