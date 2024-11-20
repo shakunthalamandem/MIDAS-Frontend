@@ -39,12 +39,6 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
     // Initialize selected values with default values
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
 
-    filtersData.forEach((filter) => {
-      const key = Object.keys(filter)[0]; // Get the key (e.g., "year", "deal_type")
-      const { options } = filter[key];
-
-   
-    });
 
     setSelectedValues(initialSelectedValues);
   }, [filtersData]); // Runs when filtersData changes
@@ -65,12 +59,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
     // Reset to default values
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
 
-    filtersData.forEach((filter) => {
-      const key = Object.keys(filter)[0];
-      const { options } = filter[key];
-
-    });
-
+  
     setSelectedValues(resetSelectedValues);
     setAppliedFilters(null); // Clear applied filters
   };
