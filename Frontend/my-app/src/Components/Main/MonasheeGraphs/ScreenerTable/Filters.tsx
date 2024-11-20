@@ -33,10 +33,10 @@ interface FiltersProps {
 
 const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   const [selectedValues, setSelectedValues] = useState<{
-    [key: string]: (string | number)[];
+    [key: string]: (string | number)[]; // Store selected filter options
   }>({});
   const [appliedFilters, setAppliedFilters] = useState<{
-    [key: string]: (string | number)[];
+    [key: string]: (string | number)[]; // Applied filters to pass to the table
   } | null>(null);
 
   useEffect(() => {
@@ -63,6 +63,14 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
     setSelectedValues(resetSelectedValues);
     setAppliedFilters(resetSelectedValues); // Clear applied filters
+  };
+
+  // Format the selected tags to display +X for multiple selections
+  const formatSelectedTags = (values: (string | number)[]) => {
+    if (values.length === 0) return [];
+    const firstValue = values[0];
+    if (values.length === 1) return [firstValue];
+    return [firstValue, `+${values.length - 1}`];
   };
 
   return (
@@ -101,9 +109,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
                         <span>{label}:</span>
                         {description && (
                           <Tooltip title={description} arrow>
-                            <InfoIcon
-                              sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
-                            />
+                            <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
                           </Tooltip>
                         )}
                       </Typography>
@@ -114,46 +120,48 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
                         disableCloseOnSelect
                         value={selectedValues[key] || []}
                         onChange={(_, value) =>
-                          handleSelectionChange(
-                            key,
-                            value as (string | number)[]
-                          )
+                          handleSelectionChange(key, value as (string | number)[])
                         }
                         renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            placeholder="Any"
-                          />
+                          <TextField {...params} variant="outlined" size="small" fullWidth placeholder="Any" />
                         )}
-                        renderOption={(props, option, { selected }) => {
-                          // Extract the key to pass it explicitly
-                          const { key: optionKey, ...restProps } = props;
-
-                          return (
-                            <ListItem
-                              key={optionKey}
-                              {...restProps}
-                              style={{ padding: "4px" }}
+                        renderTags={(value, getTagProps) => {
+                          // Use the formatSelectedTags function to display +X for multiple selections
+                          const formattedTags = formatSelectedTags(value);
+                          return formattedTags.map((tag, idx) => (
+                            <div
+                              key={idx} // Ensure unique key
+                              style={{
+                                backgroundColor: '#e0e0e0',
+                                borderRadius: '4px',
+                                padding: '4px 8px',
+                                margin: '2px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px', // Space between items
+                              }}
                             >
-                              <Checkbox
-                                checked={selected}
-                                sx={{
-                                  padding: "4px",
-                                  "& .MuiSvgIcon-root": { fontSize: "1rem" },
-                                }}
-                              />
-                              <ListItemText
-                                primary={option.toString()}
-                                sx={{
-                                  fontSize: "0.875rem", // Reduce font size of the options
-                                }}
-                              />
-                            </ListItem>
-                          );
+                              {tag}
+                            </div>
+                          ));
                         }}
+                        renderOption={(props, option, { selected }) => (
+                          <ListItem {...props} style={{ padding: "4px" }}>
+                            <Checkbox
+                              checked={selected}
+                              sx={{
+                                padding: "4px",
+                                "& .MuiSvgIcon-root": { fontSize: "1rem" },
+                              }}
+                            />
+                            <ListItemText
+                              primary={option.toString()}
+                              sx={{
+                                fontSize: "0.875rem", // Reduce font size of the options
+                              }}
+                            />
+                          </ListItem>
+                        )}
                       />
                     </Box>
                   </Grid>
@@ -166,15 +174,11 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
               <Button
                 variant="contained"
                 onClick={handleSubmit}
-                sx={{ mr: 2 , bgcolor:"#002060"                }}
+                sx={{ mr: 2, bgcolor: "#002060" }}
               >
                 Apply
               </Button>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleCancel}
-              >
+              <Button variant="outlined" color="secondary" onClick={handleCancel}>
                 Reset
               </Button>
             </Box>
