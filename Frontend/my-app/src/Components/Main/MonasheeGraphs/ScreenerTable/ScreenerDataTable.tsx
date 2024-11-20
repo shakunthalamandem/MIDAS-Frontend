@@ -105,10 +105,10 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
     { id: 'us_international', label: 'Region' },
     { id: 'deal_type', label: 'Deal Type' },
     { id: 'deal_value', label: 'Deal Value' },
-    { id: 't1m_returns', label: 'T1M Returns' },
-    { id: 't1_return', label: 'T1 Return' },
-    { id: 't1m_returns_index_returns', label: 'T1M Index Returns' },
-    { id: 't1d_returns_index_returns', label: 'T1D Index Returns' },
+    { id: 't1m_returns', label: 'T + 1M Returns' },
+    { id: 't1_return', label: 'T +1 Return' },
+    { id: 't1m_returns_index_returns', label: 'T + 1M Index Returns' },
+    { id: 't1d_returns_index_returns', label: 'T + 1D Index Returns' },
     { id: 'opportunity_value_ex', label: 'Opportunity Value Ex' },
   ];
 
