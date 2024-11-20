@@ -141,50 +141,58 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
     <div>
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <TableContainer component={Paper}>
-        <Table aria-label="Screener Data Table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align="left"
-                  style={{
-                    fontWeight: 'bold',
-                    color: '#002060',
-                    minWidth: '150px',
-                  }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.length > 0 ? (
-              rows.map((row, index) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                  {columns.map((column) => (
-                    <TableCell
-                      key={column.id}
-                      align="left"
-                      style={{ minWidth: '150px' }}
-                    >
-                      {row[column.id as keyof ScreenerDataRow] ?? '-'}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align="center">
-                  No data available.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <TableContainer
+  component={Paper}
+  style={{ maxHeight: '500px', overflowY: 'auto' }}
+>
+  <Table stickyHeader aria-label="Screener Data Table">
+    <TableHead>
+      <TableRow>
+        {columns.map((column) => (
+          <TableCell
+            key={column.id}
+            align="left"
+            style={{
+              fontWeight: 'bold',
+              color: '#002060',
+              minWidth: '180px', // Increase column width
+              padding: '6px 10px', // Reduce padding to decrease cell height
+            }}
+          >
+            {column.label}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {rows.length > 0 ? (
+        rows.map((row, index) => (
+          <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+            {columns.map((column) => (
+              <TableCell
+                key={column.id}
+                align="left"
+                style={{
+                  minWidth: '180px', // Increase column width
+                  padding: '6px 10px', // Reduce padding to decrease cell height
+                }}
+              >
+                {row[column.id as keyof ScreenerDataRow] ?? '-'}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))
+      ) : (
+        <TableRow>
+          <TableCell colSpan={columns.length} align="center">
+            No data available.
+          </TableCell>
+        </TableRow>
+      )}
+    </TableBody>
+  </Table>
+</TableContainer>
+
       <TablePagination
         rowsPerPageOptions={[10, 25, 50, 100]}
         component="div"
