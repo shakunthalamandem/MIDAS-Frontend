@@ -43,12 +43,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
       const key = Object.keys(filter)[0]; // Get the key (e.g., "year", "deal_type")
       const { options } = filter[key];
 
-      // Set default value for year
-      if (key === "year") {
-        initialSelectedValues[key] = [2024]; // Default year to 2024
-      } else {
-        initialSelectedValues[key] = ["All"]; // Default other filters to "All"
-      }
+   
     });
 
     setSelectedValues(initialSelectedValues);
@@ -74,12 +69,6 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
       const key = Object.keys(filter)[0];
       const { options } = filter[key];
 
-      // Set default value for year
-      if (key === "year") {
-        resetSelectedValues[key] = [2024]; // Default year to 2024
-      } else {
-        resetSelectedValues[key] = ["All"]; // Default other filters to "All"
-      }
     });
 
     setSelectedValues(resetSelectedValues);
