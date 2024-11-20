@@ -20,7 +20,7 @@
       },
       {
         "region": {
-          "options": [ "US", "INTERNATIONAL"],
+          "options": [ "US", "International"],
           "label": "Region",
           "description": ""
         }
