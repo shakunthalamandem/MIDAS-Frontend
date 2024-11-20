@@ -417,7 +417,7 @@ const SkewScreener: React.FC = () => {
       </Card>
 
       {/* Pass the fetched data to YearlyTableData for rendering */}
-      {sectorwiseData && <ScreenerDataTable sectorwiseData={sectorwiseData} />}
+      {/* {sectorwiseData && <ScreenerDataTable sectorwiseData={sectorwiseData} />} */}
       </Container>
   );
 };

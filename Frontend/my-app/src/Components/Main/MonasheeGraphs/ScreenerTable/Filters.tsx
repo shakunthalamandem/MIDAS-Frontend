@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { Autocomplete } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import ScreenerDataTable from "./ScreenerDataTable"; // Import the ScreenerDataTable component
 
 interface FilterOption {
   options: (string | number)[]; // Options can be either string or number
@@ -32,6 +33,7 @@ interface FiltersProps {
 
 const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
+  const [appliedFilters, setAppliedFilters] = useState<{ [key: string]: (string | number)[] } | null>(null);
 
   useEffect(() => {
     // Initialize selected values with default values
@@ -60,7 +62,8 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   };
 
   const handleSubmit = () => {
-    console.log("Selected Filters:", selectedValues);
+    console.log("Applied Filters:", selectedValues);
+    setAppliedFilters(selectedValues); // Save applied filters
   };
 
   const handleCancel = () => {
@@ -80,6 +83,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
     });
 
     setSelectedValues(resetSelectedValues);
+    setAppliedFilters(null); // Clear applied filters
   };
 
   return (
@@ -90,19 +94,27 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
             <Typography variant="h6" gutterBottom>
               Screener Filters
             </Typography>
-            <Grid container spacing={2} sx={{ backgroundColor: '#f7f8f8', maxHeight: '370px', overflowY: 'scroll' }}>
-              {filtersData.map((filter, index) => {
+            <Grid container spacing={2} sx={{ backgroundColor: "#f7f8f8", maxHeight: "370px", overflowY: "scroll" }}>
+              {filtersData.map((filter) => {
                 const key = Object.keys(filter)[0]; // Get the key (e.g., "year", "deal_type")
                 const { options, label, description } = filter[key];
 
                 return (
-                  <Grid item xs={12} sm={6} md={3} key={key}> {/* Updated layout to 4x3 grid */}
+                  <Grid item xs={12} sm={6} md={3} key={key}>
+                    {/* Updated layout to 4x3 grid */}
                     <Box mb={2} width="100%">
-                      <Typography style={{ fontSize: '0.75rem', marginBottom: '4px', display: 'flex', alignItems: 'center' }}>
+                      <Typography
+                        style={{
+                          fontSize: "0.75rem",
+                          marginBottom: "4px",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
                         <span>{label}:</span>
                         {description && (
                           <Tooltip title={description} arrow>
-                            <InfoIcon sx={{ ml: 1, fontSize: '1rem', color: '#cfcfcf' }} />
+                            <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
                           </Tooltip>
                         )}
                       </Typography>
@@ -117,71 +129,19 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
                           <TextField {...params} variant="outlined" size="small" fullWidth placeholder="Any" />
                         )}
                         renderOption={(props, option, { selected }) => (
-                          <ListItem {...props} style={{ padding: '4px' }}>
+                          <ListItem {...props} style={{ padding: "4px" }}>
                             <Checkbox
                               checked={selected}
-                              sx={{ padding: '4px', '& .MuiSvgIcon-root': { fontSize: '1rem' } }}
+                              sx={{ padding: "4px", "& .MuiSvgIcon-root": { fontSize: "1rem" } }}
                             />
                             <ListItemText
                               primary={option.toString()}
                               sx={{
-                                fontSize: '0.875rem', // Reduce font size of the options
+                                fontSize: "0.875rem", // Reduce font size of the options
                               }}
                             />
                           </ListItem>
                         )}
-                        renderTags={(value: (string | number)[], getTagProps) => {
-                          return value.length <= 1 ? (
-                            value.map((tag, idx) => (
-                              <div
-                                key={idx}
-                                style={{
-                                  backgroundColor: '#e0e0e0',
-                                  borderRadius: '4px',
-                                  padding: '4px 8px',
-                                  margin: '2px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px',
-                                }}
-                              >
-                                {tag.toString()} {/* Ensure tag is rendered as a string */}
-                              </div>
-                            ))
-                          ) : (
-                            <>
-                              {value.slice(0, 1).map((tag, idx) => (
-                                <div
-                                  key={idx}
-                                  style={{
-                                    backgroundColor: '#e0e0e0',
-                                    borderRadius: '4px',
-                                    padding: '4px 8px',
-                                    margin: '2px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px',
-                                  }}
-                                >
-                                  {tag.toString()}
-                                </div>
-                              ))}
-                              <div
-                                style={{
-                                  backgroundColor: '#e0e0e0',
-                                  borderRadius: '4px',
-                                  padding: '4px 8px',
-                                  margin: '2px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px',
-                                }}
-                              >
-                                +{value.length - 1} {/* Display additional selected items as +N */}
-                              </div>
-                            </>
-                          );
-                        }}
                       />
                     </Box>
                   </Grid>
@@ -201,6 +161,13 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Render ScreenerDataTable */}
+      {appliedFilters && (
+        <Box mt={4}>
+          <ScreenerDataTable sectorwiseData={appliedFilters} />
+        </Box>
+      )}
     </Container>
   );
 };
