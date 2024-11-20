@@ -1,7 +1,7 @@
 {
     "screener": [
       {
-        "year": {
+        "year_range": {
           "options": [
             2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
             2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
@@ -12,21 +12,21 @@
         }
       },
       {
-        "deal_type": {
+        "dealType": {
           "options": [ "All","IPO", "FO"],
           "label": "DealType",
           "description": ""
         }
       },
       {
-        "us_international": {
+        "region": {
           "options": ["All", "US", "INTERNATIONAL"],
           "label": "Region",
           "description": ""
         }
       },
       {
-        "gics_sector": {
+        "sector": {
           "options": [
             "All",
             "Communication Services",
