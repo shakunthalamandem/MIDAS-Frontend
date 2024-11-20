@@ -32,8 +32,12 @@ interface FiltersProps {
 }
 
 const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
-  const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
-  const [appliedFilters, setAppliedFilters] = useState<{ [key: string]: (string | number)[] } | null>(null);
+  const [selectedValues, setSelectedValues] = useState<{
+    [key: string]: (string | number)[];
+  }>({});
+  const [appliedFilters, setAppliedFilters] = useState<{
+    [key: string]: (string | number)[];
+  } | null>(null);
 
   useEffect(() => {
     // Initialize selected values with default values
@@ -69,7 +73,15 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
             <Typography variant="h6" gutterBottom>
               Screener Filters
             </Typography>
-            <Grid container spacing={2} sx={{ backgroundColor: "#f7f8f8", maxHeight: "370px", overflowY: "scroll" }}>
+            <Grid
+              container
+              spacing={2}
+              sx={{
+                backgroundColor: "#f7f8f8",
+                maxHeight: "370px",
+                overflowY: "scroll",
+              }}
+            >
               {filtersData.map((filter) => {
                 const key = Object.keys(filter)[0]; // Get the key (e.g., "year", "deal_type")
                 const { options, label, description } = filter[key];
@@ -89,7 +101,9 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
                         <span>{label}:</span>
                         {description && (
                           <Tooltip title={description} arrow>
-                            <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
+                            <InfoIcon
+                              sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
+                            />
                           </Tooltip>
                         )}
                       </Typography>
@@ -99,24 +113,47 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
                         getOptionLabel={(option) => option.toString()} // Ensure the option is treated as string
                         disableCloseOnSelect
                         value={selectedValues[key] || []}
-                        onChange={(_, value) => handleSelectionChange(key, value as (string | number)[])}
+                        onChange={(_, value) =>
+                          handleSelectionChange(
+                            key,
+                            value as (string | number)[]
+                          )
+                        }
                         renderInput={(params) => (
-                          <TextField {...params} variant="outlined" size="small" fullWidth placeholder="Any" />
+                          <TextField
+                            {...params}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            placeholder="Any"
+                          />
                         )}
-                        renderOption={(props, option, { selected }) => (
-                          <ListItem {...props} style={{ padding: "4px" }}>
-                            <Checkbox
-                              checked={selected}
-                              sx={{ padding: "4px", "& .MuiSvgIcon-root": { fontSize: "1rem" } }}
-                            />
-                            <ListItemText
-                              primary={option.toString()}
-                              sx={{
-                                fontSize: "0.875rem", // Reduce font size of the options
-                              }}
-                            />
-                          </ListItem>
-                        )}
+                        renderOption={(props, option, { selected }) => {
+                          // Extract the key to pass it explicitly
+                          const { key: optionKey, ...restProps } = props;
+
+                          return (
+                            <ListItem
+                              key={optionKey}
+                              {...restProps}
+                              style={{ padding: "4px" }}
+                            >
+                              <Checkbox
+                                checked={selected}
+                                sx={{
+                                  padding: "4px",
+                                  "& .MuiSvgIcon-root": { fontSize: "1rem" },
+                                }}
+                              />
+                              <ListItemText
+                                primary={option.toString()}
+                                sx={{
+                                  fontSize: "0.875rem", // Reduce font size of the options
+                                }}
+                              />
+                            </ListItem>
+                          );
+                        }}
                       />
                     </Box>
                   </Grid>
@@ -126,10 +163,19 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
 
             {/* Center the buttons */}
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ mr: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+                sx={{ mr: 2 }}
+              >
                 Apply
               </Button>
-              <Button variant="outlined" color="secondary" onClick={handleCancel}>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleCancel}
+              >
                 Reset
               </Button>
             </Box>
