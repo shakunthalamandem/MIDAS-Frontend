@@ -165,9 +165,8 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <Button
                 variant="contained"
-                color="primary"
                 onClick={handleSubmit}
-                sx={{ mr: 2 }}
+                sx={{ mr: 2 , bgcolor:"#002060"                }}
               >
                 Apply
               </Button>
