@@ -25,11 +25,11 @@ interface ScreenerDataRow {
   t1d_returns_index_returns: number;
   opportunity_value_ex: number;
 }
+
 interface ScreenerDataTableProps {
   sectorwiseData: { [key: string]: (string | number)[] }; // Add this prop
   // Add any other existing props here
 }
-
 
 const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData }) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
@@ -84,8 +84,9 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
 
       if (response.ok) {
         const result = await response.json();
-        setRows(result.data); // Assuming the response contains a 'data' field with the rows
-        setTotalRows(result.pagination.total_items); // Assuming pagination info is available
+        console.log(result); // Log the API response for debugging
+        setRows(result.data || []); // Default to empty array if data is undefined
+        setTotalRows(result.pagination?.total_items || 0); // Ensure total_items is available
       } else {
         throw new Error('Failed to fetch data');
       }
@@ -127,57 +128,58 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
     <div>
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
+      
       <TableContainer
-  component={Paper}
-  style={{ maxHeight: '500px', overflowY: 'auto' }}
->
-  <Table stickyHeader aria-label="Screener Data Table">
-    <TableHead>
-      <TableRow>
-        {columns.map((column) => (
-          <TableCell
-            key={column.id}
-            align="left"
-            style={{
-              fontWeight: 'bold',
-              color: '#002060',
-              minWidth: '180px', // Increase column width
-              padding: '6px 10px', // Reduce padding to decrease cell height
-            }}
-          >
-            {column.label}
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {rows.length > 0 ? (
-        rows.map((row, index) => (
-          <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-            {columns.map((column) => (
-              <TableCell
-                key={column.id}
-                align="left"
-                style={{
-                  minWidth: '180px', // Increase column width
-                  padding: '6px 10px', // Reduce padding to decrease cell height
-                }}
-              >
-                {row[column.id as keyof ScreenerDataRow] ?? '-'}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))
-      ) : (
-        <TableRow>
-          <TableCell colSpan={columns.length} align="center">
-            No data available.
-          </TableCell>
-        </TableRow>
-      )}
-    </TableBody>
-  </Table>
-</TableContainer>
+        component={Paper}
+        style={{ maxHeight: '500px', overflowY: 'auto' }}
+      >
+        <Table stickyHeader aria-label="Screener Data Table">
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell
+                  key={column.id}
+                  align="left"
+                  style={{
+                    fontWeight: 'bold',
+                    color: '#002060',
+                    minWidth: '180px', // Increase column width
+                    padding: '6px 10px', // Reduce padding to decrease cell height
+                  }}
+                >
+                  {column.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {(rows || []).length > 0 ? (
+              rows.map((row, index) => (
+                <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.id}
+                      align="left"
+                      style={{
+                        minWidth: '180px', // Increase column width
+                        padding: '6px 10px', // Reduce padding to decrease cell height
+                      }}
+                    >
+                      {row[column.id as keyof ScreenerDataRow] ?? '-'}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} align="center">
+                  No data available.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <TablePagination
         rowsPerPageOptions={[10, 25, 50, 100]}
