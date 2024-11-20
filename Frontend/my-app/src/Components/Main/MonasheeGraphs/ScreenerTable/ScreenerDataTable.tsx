@@ -30,20 +30,6 @@ interface ScreenerDataTableProps {
   // Add any other existing props here
 }
 
-// // Define the type for the ScreenerDataTableProps
-// interface ScreenerDataTableProps {
-//   filterParams: {
-//     year_range: number[];
-//     dealType: string[];
-//     region: string[];
-//     sector: string[];
-//     deal_value: string;
-//     t1_return: string;
-//     t1m_returns: string;
-//     page: number;
-//     pageSize: number;
-//   };
-// }
 
 const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData }) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
