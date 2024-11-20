@@ -38,9 +38,8 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   useEffect(() => {
     // Initialize selected values with default values
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-
-
     setSelectedValues(initialSelectedValues);
+    setAppliedFilters(initialSelectedValues); // Show initial filters on page render
   }, [filtersData]); // Runs when filtersData changes
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
@@ -58,10 +57,8 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   const handleCancel = () => {
     // Reset to default values
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
-
-  
     setSelectedValues(resetSelectedValues);
-    setAppliedFilters(null); // Clear applied filters
+    setAppliedFilters(resetSelectedValues); // Clear applied filters
   };
 
   return (
@@ -141,11 +138,9 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
       </Card>
 
       {/* Render ScreenerDataTable */}
-      {appliedFilters && (
-        <Box mt={4}>
-          <ScreenerDataTable sectorwiseData={appliedFilters} />
-        </Box>
-      )}
+      <Box mt={4}>
+        <ScreenerDataTable sectorwiseData={appliedFilters || selectedValues} />
+      </Box>
     </Container>
   );
 };
