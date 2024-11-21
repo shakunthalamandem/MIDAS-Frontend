@@ -65,7 +65,7 @@ const CapitalMarkets: React.FC = () => {
             '& .MuiTab-root': {
               borderRadius: '8px',
               padding: '6px 16px', // Reduced padding to reduce the height of the tabs
-              fontSize: '0.7rem', // Smaller font size
+              fontSize: '0.9rem', // Smaller font size
               fontWeight: 'bold',
               transition: 'background-color 0.3s ease, transform 0.3s ease',
               '&:hover': {
@@ -78,7 +78,7 @@ const CapitalMarkets: React.FC = () => {
           }}
         >
           <Tab
-            label="Deal Graph"
+            label="Deal Count"
             sx={{
               backgroundColor: value === 0 ? '#FF5722' : '#f5f5f5',
               color: value === 0 ? '#fff' : '#777',
@@ -100,7 +100,7 @@ const CapitalMarkets: React.FC = () => {
             }}
           />
           <Tab
-            label="Opportunity Value Ex"
+            label="Opportunity Value Excess"
             sx={{
               backgroundColor: value === 2 ? '#3F51B5' : '#f5f5f5',
               color: value === 2 ? '#fff' : '#777',
@@ -110,7 +110,7 @@ const CapitalMarkets: React.FC = () => {
               },
             }}
           />
-          <Tab
+          {/* <Tab
             label="Opportunity Value Abs"
             sx={{
               backgroundColor: value === 3 ? '#00BCD4' : '#f5f5f5',
@@ -120,12 +120,12 @@ const CapitalMarkets: React.FC = () => {
                 color: '#fff',
               },
             }}
-          />
+          /> */}
           <Tab
             label="Skew Table"
             sx={{
-              backgroundColor: value === 4 ? '#9C27B0' : '#f5f5f5',
-              color: value === 4 ? '#fff' : '#777',
+              backgroundColor: value === 3 ? '#9C27B0' : '#f5f5f5',
+              color: value === 3 ? '#fff' : '#777',
               '&.Mui-selected': {
                 backgroundColor: '#9C27B0',
                 color: '#fff',
@@ -135,8 +135,8 @@ const CapitalMarkets: React.FC = () => {
           <Tab
             label="Screener"
             sx={{
-              backgroundColor: value === 5 ? '#FF9800' : '#f5f5f5',
-              color: value === 5 ? '#fff' : '#777',
+              backgroundColor: value === 4 ? '#FF9800' : '#f5f5f5',
+              color: value === 4 ? '#fff' : '#777',
               '&.Mui-selected': {
                 backgroundColor: '#FF9800',
                 color: '#fff',
@@ -148,9 +148,9 @@ const CapitalMarkets: React.FC = () => {
         {value === 0 && <DealGraph />}
         {value === 1 && <DealVolume />}
         {value === 2 && <OpportunityMain />}
-        {value === 3 && <OpportunityAbsBasis />}
-        {value === 4 && <SkewTableMain />}
-        {value === 5 && <ScreenerMain />}
+        {/* {value === 3 && <OpportunityAbsBasis />} */}
+        {value === 3 && <SkewTableMain />}
+        {value === 4 && <ScreenerMain />}
       </Box>
     </>
   );

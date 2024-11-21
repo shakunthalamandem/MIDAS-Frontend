@@ -25,8 +25,8 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   const columns = [
     'Year',
     'Total Deal Count',
-    'Positively Performing Deals Percentage',
-    'Negatively Performing Deals Percentage',
+    '% of Positively Performing Deals ',
+    '% of Negatively Performing Deals ',
     'Avg T+1M Abs Return (Positively)',
     'Avg T+1M Abs Return (Negatively)',
     'Expected Returns Absolute',
