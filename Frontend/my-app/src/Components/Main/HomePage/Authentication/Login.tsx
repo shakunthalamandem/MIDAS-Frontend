@@ -158,10 +158,14 @@
 
 // export default Login;
 import React from 'react'
+import SignInCard from '../../../Homepage/SinginSIde/SignInCard'
 
 const Login = () => {
   return (
-    <div>Login</div>
+    <>
+    <SignInCard />
+
+    </>
   )
 }
 
