@@ -52,7 +52,7 @@ const NavbarMain: React.FC = () => {
         {/* Logo and Title */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#FFFFFF' }}>
           <img src={logo} alt="MIDAS Logo" style={{ width: '130px', height: '60px', marginRight: '10px' }} />
-          <Typography
+          {/* <Typography
             variant="h6"
             sx={{
               fontWeight: 'bold',
@@ -62,8 +62,7 @@ const NavbarMain: React.FC = () => {
               color: '#FFFFFF',
             }}
           >
-            MIDAS
-          </Typography>
+          </Typography> */}
         </Link>
 
         {isMobile ? (
