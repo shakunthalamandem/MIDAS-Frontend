@@ -3,12 +3,14 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import SignInCard from './SignInCard';
 import Content from './Content';
-
+import AppTheme from '../SharedTheme/AppTheme';
+import ColorModeSelect from '../SharedTheme/ColorModeSelect';
 
 export default function SignInSide(props: { disableCustomTheme?: boolean }) {
   return (
-    <>
+    <AppTheme {...props}>
       <CssBaseline enableColorScheme />
+      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <Stack
         direction="column"
         component="main"
@@ -60,6 +62,6 @@ export default function SignInSide(props: { disableCustomTheme?: boolean }) {
           </Stack>
         </Stack>
       </Stack>
-      </>
-        );
+    </AppTheme>
+  );
 }

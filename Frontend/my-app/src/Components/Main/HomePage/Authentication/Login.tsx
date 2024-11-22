@@ -158,7 +158,7 @@
 
 // export default Login;
 import React from 'react'
-import SignInCard from '../../../Homepage/SinginSIde/SignInCard'
+import SignInCard from '../../../Homepage/SigninSIde/SignInCard'
 
 const Login = () => {
   return (
