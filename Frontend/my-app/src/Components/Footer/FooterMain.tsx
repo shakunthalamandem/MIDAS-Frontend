@@ -25,7 +25,7 @@ const FooterMain: React.FC = () => {
           color: '#FFEB3B', // Accent color for main text
         }}
       >
-        Stock Screener & Data Visualization
+        Monashee Insights & Data Application System
       </Typography>
       <Typography
         variant="body2"
@@ -33,7 +33,7 @@ const FooterMain: React.FC = () => {
           color: '#B2DFDB', // Muted accent for secondary text
         }}
       >
-        © 2024 MIDAS - Your trusted source for market data and analytics.
+        © 2024 MIDAS , Developed in Collobaration with Golden Hills Capital India Pvt Ltd.
       </Typography>
     </Box>
   );
