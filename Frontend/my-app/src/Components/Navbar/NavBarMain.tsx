@@ -8,7 +8,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 // Import your logo
 import logo from '../../Assets/images/monashee_logo.png';
 
-const pages = ['Capital Markets', 'Monashee Deals', 'Strategies'];
+const pages = ['New Issue Equity Market', 'Monashee Deal Insights', 'Strategies'];
 
 const NavbarMain: React.FC = () => {
   const theme = useTheme();
@@ -27,8 +27,8 @@ const NavbarMain: React.FC = () => {
   };
 
   const handleNavigate = (page: string) => {
-    if (page === 'Capital Markets') navigate('/capital-markets');
-    if (page === 'Monashee Deals') navigate('/monashee-deals');
+    if (page === 'New Issue Equity Market') navigate('/capital-markets');
+    if (page === 'Monashee Deal Insights') navigate('/monashee-deals');
     if (page === 'Strategies') navigate('/strategies');
     handleCloseNavMenu();
   };
@@ -47,47 +47,15 @@ const NavbarMain: React.FC = () => {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#001E3C', paddingX: { xs: 2, sm: 5 } }}>
+    <AppBar position="static" sx={{ backgroundColor: '#FFFFFF', paddingX: { xs: 2, sm: 5 } }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {/* Logo and Title */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#FFFFFF' }}>
           <img src={logo} alt="MIDAS Logo" style={{ width: '130px', height: '60px', marginRight: '10px' }} />
-          {/* <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 'bold',
-              fontSize: '24px',
-              flexGrow: 1,
-              fontFamily: 'Roboto, sans-serif',
-              color: '#FFFFFF',
-            }}
-          >
-          </Typography> */}
+        
         </Link>
 
-        {isMobile ? (
-          <>
-            <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleOpenNavMenu}>
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              anchorEl={anchorElNav}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              keepMounted
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-            >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={() => handleNavigate(page)}>
-                  <Typography textAlign="center" sx={{ color: '#001E3C', fontWeight: 'bold' }}>
-                    {page}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </>
-        ) : (
+       
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
             <Tabs
               value={getTabIndex()}
@@ -125,8 +93,7 @@ const NavbarMain: React.FC = () => {
             </Tabs>
 
           </Box>
-        )}
-
+        
         <Button
           sx={{
             color: '#FFEB3B',

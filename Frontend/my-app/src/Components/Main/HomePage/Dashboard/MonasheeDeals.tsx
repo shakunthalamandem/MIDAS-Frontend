@@ -24,7 +24,7 @@ const MonasheeDeals: React.FC = () => {
           fontSize: { xs: '1.8rem', sm: '2.4rem', md: '3rem' }, // Responsive font size
         }}
       >
-        Monashee Deals
+        Monashee Deals 
       </Typography>
       <Typography
         variant="body1"

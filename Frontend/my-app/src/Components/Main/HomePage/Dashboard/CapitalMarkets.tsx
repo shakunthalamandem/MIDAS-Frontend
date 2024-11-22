@@ -24,7 +24,7 @@ const CapitalMarkets: React.FC = () => {
           justifyContent: 'center',
           minHeight: '80vh',
           padding: '2rem',
-          backgroundColor: '#f5f5f5',
+          backgroundColor: '#002060',
           textAlign: 'center',
         }}
       >
@@ -33,6 +33,7 @@ const CapitalMarkets: React.FC = () => {
           component="h1"
           sx={{
             fontWeight: 'bold',
+            color:"#FFFFFF",
             marginBottom: '1rem',
             fontSize: { xs: '1.8rem', sm: '2.4rem', md: '3rem' },
           }}
@@ -43,6 +44,7 @@ const CapitalMarkets: React.FC = () => {
           variant="body1"
           sx={{
             maxWidth: '600px',
+            color:"#FFFFFF",
             fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' },
             lineHeight: '1.6',
           }}
