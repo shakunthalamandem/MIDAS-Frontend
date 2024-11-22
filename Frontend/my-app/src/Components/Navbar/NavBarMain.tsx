@@ -62,7 +62,8 @@ const NavbarMain: React.FC = () => {
               textColor="inherit"
               sx={{
                 '& .MuiTabs-indicator': {
-                  backgroundColor: '#FFEB3B', // Set the custom indicator color here
+                  backgroundColor: '#002060', 
+                  display:'none'// Set the custom indicator color here
                 },
               }}
             >
@@ -75,19 +76,20 @@ const NavbarMain: React.FC = () => {
                     minWidth: 100,
                     fontWeight: 'bold',
                     fontSize: '16px',
-                    color: '#B2DFDB',
+                    color: '#002060', // Dark gray for unselected tabs
                     textTransform: 'none',
                     '&.Mui-selected': {
-                      color: '#FFEB3B',
-                      backgroundColor: '#0A1929',
-                      borderRadius: '4px',
+                      color: '#FFFFFF', // White text for the selected tab
+                      backgroundColor: '#002060', // Deep maroon background for selected tab
+                      borderRadius: '6px',
                     },
                     '&:hover': {
-                      backgroundColor: '#0A1929',
-                      borderRadius: '4px',
-                      color: '#FFEB3B',
+                      backgroundColor: '#002060', // Soft taupe for hover effect
+                      borderRadius: '6px',
+                      color: '#FFFFFF', // Deep maroon text for hover state
                     },
                   }}
+                  
                 />
               ))}
             </Tabs>
@@ -96,10 +98,11 @@ const NavbarMain: React.FC = () => {
         
         <Button
           sx={{
-            color: '#FFEB3B',
+            color: '#FFFFFF',
+            backgroundColor: '#002060',
             fontWeight: 'bold',
             fontFamily: 'Roboto, sans-serif',
-            '&:hover': { backgroundColor: '#0A1929' },
+            '&:hover': { backgroundColor: '#002060' },
           }}
           onClick={() => navigate('/login')}
         >
@@ -108,12 +111,13 @@ const NavbarMain: React.FC = () => {
         <Button
           sx={{
             ml: 2,
-            border: '1px solid #FFEB3B',
-            color: '#FFEB3B',
-            fontWeight: 'bold',
+            border: '1px solid #FFFFFF',
+            color: '#FFFFFF',
+            backgroundColor: '#002060',
+                        fontWeight: 'bold',
             '&:hover': {
-              backgroundColor: '#FFEB3B',
-              color: '#001E3C',
+              backgroundColor: '#FFFFFF',
+              color: '#002060',
             },
           }}
           onClick={() => navigate('/signup')}
