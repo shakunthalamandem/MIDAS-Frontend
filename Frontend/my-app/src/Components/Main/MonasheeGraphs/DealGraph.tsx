@@ -189,7 +189,7 @@ const DealGraph: React.FC = () => {
             fontWeight: "bold",
           }}
         >
-          # Of Deals
+          Number Of Deals
         </Typography>
 
         <Grid container spacing={2} sx={{ justifyContent: "flex-start", paddingLeft: '50px', marginBottom: '10px' }}>
