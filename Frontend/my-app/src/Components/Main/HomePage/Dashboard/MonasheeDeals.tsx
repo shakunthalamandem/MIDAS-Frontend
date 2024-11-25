@@ -1,41 +1,164 @@
-import React from 'react';
-import { Box, Typography } from '@mui/material';
+import React, { useState } from "react";
+import { Box, Typography, Tabs, Tab } from "@mui/material";
+import MDDDealCount from "../../MonasheeDeals/MddGraphs/MDDDealCount";
+import MDDDealVolume from "../../MonasheeDeals/MddGraphs/MDDDealVolume";
 
 const MonasheeDeals: React.FC = () => {
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '80vh', // Ensure it takes up most of the page height
-        padding: '2rem',
-        backgroundColor: '#f9f9f9',
-        textAlign: 'center',
-      }}
-    >
+    <Box sx={{ width: "100%", backgroundColor: "#fff" }}>
+      {/* Heading */}
       <Typography
         variant="h3"
-        component="h1"
         sx={{
-          fontWeight: 'bold',
-          marginBottom: '1rem',
-          fontSize: { xs: '1.8rem', sm: '2.4rem', md: '3rem' }, // Responsive font size
+          fontWeight: "bold",
+          color: "#FFFFFF",
+          fontSize: { xs: "2rem" },
+          backgroundColor: "#002060",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "5vh",
+          textAlign: "center",
+          marginBottom: "10px",
+          animation: "fadeInScale 2s ease-out",
+          "@keyframes fadeInScale": {
+            "0%": { opacity: 0, transform: "scale(0.8)" },
+            "100%": { opacity: 1, transform: "scale(1)" },
+          },
         }}
       >
-        Monashee Deals 
+        Monashee Deals
       </Typography>
-      <Typography
-        variant="body1"
+
+      {/* Tabs */}
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        centered
+        TabIndicatorProps={{
+          style: { display: "none" },
+        }}
         sx={{
-          maxWidth: '600px',
-          fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' }, // Responsive text size
-          lineHeight: '1.6',
+          "& .MuiTab-root": {
+            borderRadius: "8px",
+            padding: "6px 16px",
+            fontSize: "0.8rem", // Adjusted for shorter labels
+            fontWeight: "bold",
+            transition: "background-color 0.3s ease, transform 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.05)",
+              background: "rgba(0, 0, 0, 0.08)",
+              color: "#000000",
+            },
+          },
+          height: "40px",
         }}
       >
-        Here are the latest deals from Monashee. Stay tuned for exciting investment opportunities and market insights curated by our experts.
-      </Typography>
+        <Tab
+          label="Deals"
+          sx={{
+            backgroundColor: value === 0 ? "#FF5722" : "#f5f5f5",
+            color: value === 0 ? "#fff" : "#777",
+            "&.Mui-selected": {
+              backgroundColor: "#FF5722",
+              color: "#fff",
+            },
+          }}
+        />
+        <Tab
+          label="Volume"
+          sx={{
+            backgroundColor: value === 1 ? "#4CAF50" : "#f5f5f5",
+            color: value === 1 ? "#fff" : "#777",
+            "&.Mui-selected": {
+              backgroundColor: "#4CAF50",
+              color: "#fff",
+            },
+          }}
+        />
+        <Tab
+          label="Avg Size"
+          sx={{
+            backgroundColor: value === 2 ? "#3F51B5" : "#f5f5f5",
+            color: value === 2 ? "#fff" : "#777",
+            "&.Mui-selected": {
+              backgroundColor: "#3F51B5",
+              color: "#fff",
+            },
+          }}
+        />
+        <Tab
+          label="Alloc % DS"
+          sx={{
+            backgroundColor: value === 3 ? "#00BCD4" : "#f5f5f5",
+            color: value === 3 ? "#fff" : "#777",
+            "&.Mui-selected": {
+              backgroundColor: "#00BCD4",
+              color: "#fff",
+            },
+          }}
+        />
+        <Tab
+          label="Alloc % IOI"
+          sx={{
+            backgroundColor: value === 4 ? "#9C27B0" : "#f5f5f5",
+            color: value === 4 ? "#fff" : "#777",
+            "&.Mui-selected": {
+              backgroundColor: "#9C27B0",
+              color: "#fff",
+            },
+          }}
+        />
+        <Tab
+          label="Alloc Capture"
+          sx={{
+            backgroundColor: value === 5 ? "#FF9800" : "#f5f5f5",
+            color: value === 5 ? "#fff" : "#777",
+            "&.Mui-selected": {
+              backgroundColor: "#FF9800",
+              color: "#fff",
+            },
+          }}
+        />
+        <Tab
+          label="F.O Diff"
+          sx={{
+            backgroundColor: value === 6 ? "#8BC34A" : "#f5f5f5",
+            color: value === 6 ? "#fff" : "#777",
+            "&.Mui-selected": {
+              backgroundColor: "#8BC34A",
+              color: "#fff",
+            },
+          }}
+        />
+        <Tab
+          label="Screener"
+          sx={{
+            backgroundColor: value === 7 ? "#9E9E9E" : "#f5f5f5",
+            color: value === 7 ? "#fff" : "#777",
+            "&.Mui-selected": {
+              backgroundColor: "#9E9E9E",
+              color: "#fff",
+            },
+          }}
+        />
+      </Tabs>
+
+      {/* Tab Content */}
+      {value === 0 && <MDDDealCount />}
+      {value === 1 && <MDDDealVolume />}
+      {value === 2 && <div>Avg Deal Size</div>}
+      {value === 3 && <div>Allocation % of Deal Size</div>}
+      {value === 4 && <div>Allocation % of IOI</div>}
+      {value === 5 && <div>Allocation Capture by Return</div>}
+      {value === 6 && <div>F.O Difference</div>}
+      {value === 7 && <div>Screener</div>}
     </Box>
   );
 };
