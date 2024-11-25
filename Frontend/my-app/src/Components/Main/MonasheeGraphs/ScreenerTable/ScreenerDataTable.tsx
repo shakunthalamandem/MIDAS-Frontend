@@ -38,7 +38,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
 
   // Pagination state
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10); // Default rows per page
+  const [pageSize, setPageSize] = useState(100); // Default rows per page
   const [totalRows, setTotalRows] = useState(0); // Total rows from API
 
   useEffect(() => {
