@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 // Import your logo
-import logo from '../../Assets/images/monashee_logo.png';
+import logo from '../../Assets/images/Monashee-Cap-Logo.png';
 
 const pages = ['New Issue Equity Market', 'Monashee Deal Insights', 'Investment Strategies'];
 
