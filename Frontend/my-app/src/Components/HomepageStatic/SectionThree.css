@@ -1,0 +1,31 @@
+.section-three {
+    display: flex;
+    padding: 50px;
+    background-color: #e0e0e0;
+  }
+  
+  .section-image,
+  .section-content {
+    flex: 1;
+  }
+  
+  .section-image img {
+    width: 100%;
+    height: auto;
+  }
+  
+  .fade-in {
+    animation: fadeIn 2s ease-in;
+  }
+  
+  @media (max-width: 768px) {
+    .section-three {
+      flex-direction: column;
+    }
+  
+    .section-image,
+    .section-content {
+      margin-bottom: 20px;
+    }
+  }
+  

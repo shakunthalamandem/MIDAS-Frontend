@@ -6,12 +6,13 @@ import CapitalMarkets from '../Components/Main/HomePage/Dashboard/CapitalMarkets
 import MonasheeDeals from '../Components/Main/HomePage/Dashboard/MonasheeDeals';
 import Strategies from '../Components/Main/HomePage/Dashboard/Strategies';
 import Login from '../Components/Main/HomePage/Authentication/Login';
+import CapitalMarketsStatic from '../Components/HomepageStatic/CapitalMarketsStatic';
 
 
 const AppRouters: React.FC = () => {
   return (
       <Routes>
-        <Route path="/" element={<CapitalMarkets />} />
+        <Route path="/" element={<CapitalMarketsStatic />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/capital-markets" element={<CapitalMarkets />} />
