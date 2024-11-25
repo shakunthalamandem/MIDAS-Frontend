@@ -1,5 +1,5 @@
 import React from 'react';
-import HomePageVideo from '../../Assets/videos/midasvideo.mp4';
+import HomePageVideo from '../../Assets/videos/midas_3.mp4';
 
 const SectionOne = () => {
   return (
