@@ -16,42 +16,59 @@ const CapitalMarkets: React.FC = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '80vh',
-          padding: '2rem',
-          backgroundColor: '#002060',
-          textAlign: 'center',
-        }}
-      >
-        <Typography
-          variant="h3"
-          component="h1"
-          sx={{
-            fontWeight: 'bold',
-            color:"#FFFFFF",
-            marginBottom: '1rem',
-            fontSize: { xs: '1.8rem', sm: '2.4rem', md: '3rem' },
-          }}
-        >
-          Capital Markets
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{
-            maxWidth: '600px',
-            color:"#FFFFFF",
-            fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' },
-            lineHeight: '1.6',
-          }}
-        >
-          Welcome to the Capital Markets page. Here, you will find the latest information about financial markets, investment strategies, and more. Stay updated on global market trends and insights.
-        </Typography>
-      </Box>
+     <Box
+  sx={{
+    display: 'flex',
+    flexDirection: { xs: 'column', md: 'row' }, // Stack on smaller screens, side-by-side on larger screens
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    minHeight: '15vh',
+    padding: '2rem',
+    backgroundColor: '#002060',
+  }}
+>
+  {/* Left Side - Heading */}
+  <Box
+    sx={{
+      flex: 1, // Adjust space occupied
+      textAlign: 'left',
+      marginBottom: { xs: '1rem', md: 0 }, // Add spacing for smaller screens
+    }}
+  >
+    <Typography
+      variant="h3"
+      component="h1"
+      sx={{
+        fontWeight: 'bold',
+        color: "#FFFFFF",
+        fontSize: { xs: '1.8rem', sm: '2.4rem', md: '3rem' },
+      }}
+    >
+      Capital Markets
+    </Typography>
+  </Box>
+
+  {/* Right Side - Description */}
+  <Box
+    sx={{
+      flex: 2, // Adjust space occupied
+      textAlign: 'left',
+    }}
+  >
+    <Typography
+      variant="body1"
+      sx={{
+        maxWidth: '1200px',
+        color: "#FFFFFF",
+        fontSize: { xs: '1rem'},
+        lineHeight: '1.6',
+      }}
+    >
+      Welcome to the Capital Markets page. Here, you will find the latest information about financial markets, investment strategies, and more. Stay updated on global market trends and insights.
+    </Typography>
+  </Box>
+</Box>
+
 
       <Box sx={{ width: '100%', backgroundColor: '#fff' }}>
         <Tabs

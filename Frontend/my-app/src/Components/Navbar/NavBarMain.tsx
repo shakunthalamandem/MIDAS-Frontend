@@ -8,7 +8,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 // Import your logo
 import logo from '../../Assets/images/monashee_logo.png';
 
-const pages = ['New Issue Equity Market', 'Monashee Deal Insights', 'Strategies'];
+const pages = ['New Issue Equity Market', 'Monashee Deal Insights', 'Investment Strategies'];
 
 const NavbarMain: React.FC = () => {
   const theme = useTheme();
@@ -29,7 +29,7 @@ const NavbarMain: React.FC = () => {
   const handleNavigate = (page: string) => {
     if (page === 'New Issue Equity Market') navigate('/capital-markets');
     if (page === 'Monashee Deal Insights') navigate('/monashee-deals');
-    if (page === 'Strategies') navigate('/strategies');
+    if (page === 'Investment Strategies') navigate('/strategies');
     handleCloseNavMenu();
   };
 
