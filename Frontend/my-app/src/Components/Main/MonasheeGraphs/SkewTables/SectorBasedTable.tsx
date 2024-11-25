@@ -128,6 +128,7 @@ const SectorBasedTable: React.FC = () => {
                   <InputLabel>Deal Type</InputLabel>
                   <Select
                     value={dealType}
+                    label="Deal Type"
                     onChange={handleDealTypeChange}
                     sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
                   >
@@ -148,6 +149,7 @@ const SectorBasedTable: React.FC = () => {
                   <Select
                     value={region}
                     onChange={handleRegionChange}
+                    label="Region"
                     sx={{ backgroundColor: '#ffe0b2', color: '#e65100' }}
                   >
                     <MenuItem value="All">All</MenuItem>
@@ -167,6 +169,7 @@ const SectorBasedTable: React.FC = () => {
                   <Select
                     value={sector}
                     onChange={handleSectorChange}
+                    label="Sector"
                     sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
                   >
                     <MenuItem value="All">All</MenuItem>

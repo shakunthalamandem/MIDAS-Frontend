@@ -132,6 +132,7 @@ const YearlyBasedTable: React.FC = () => {
                   <Select
                     value={startYear}
                     onChange={handleStartYearChange}
+                    label="Start Year"
                     sx={{ backgroundColor: '#e0f7fa', color: '#006064' }}
                     MenuProps={{
                       PaperProps: {
@@ -158,6 +159,7 @@ const YearlyBasedTable: React.FC = () => {
                   <Select
                     value={endYear}
                     onChange={handleEndYearChange}
+                    label="End Year"
                     sx={{ backgroundColor: '#e8eaf6', color: '#1a237e' }}
                     MenuProps={{
                       PaperProps: {
@@ -185,6 +187,7 @@ const YearlyBasedTable: React.FC = () => {
                   <Select
                     value={dealType}
                     onChange={handleDealTypeChange}
+                    label="Deal Type"
                     sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
                   >
                     <MenuItem value="All">All</MenuItem>
@@ -204,6 +207,7 @@ const YearlyBasedTable: React.FC = () => {
                   <Select
                     value={region}
                     onChange={handleRegionChange}
+                    label="Region"
                     sx={{ backgroundColor: '#ffe0b2', color: '#e65100' }}
                   >
                     <MenuItem value="All">All</MenuItem>
