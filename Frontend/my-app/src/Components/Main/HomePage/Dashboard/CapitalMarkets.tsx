@@ -17,23 +17,32 @@ const CapitalMarkets: React.FC = () => {
   return (
     <>
       <Box sx={{ width: "100%", backgroundColor: "#fff" }}>
-        <Typography
-          variant="h3"
-          sx={{
-            fontWeight: "bold",
-            color: "#FFFFFF", // Text color is now white
-            fontSize: { xs: "2rem" },
-            backgroundColor: "#002060", // Matching navbar color for the background
-            display: "flex",
-            alignItems: "center", // Vertically center the text
-            justifyContent: "center", // Horizontally center the text
-            height: "5vh", // Full viewport height
-            textAlign: "center", // Ensure text is centered
-            margin: 0, // Remove any default margins
-          }}
-        >
-          Capital Markets
-        </Typography>
+      <Typography
+  variant="h3"
+  sx={{
+    fontWeight: "bold",
+    color: "#FFFFFF", // Text color is now white
+    fontSize: { xs: "2rem" },
+    backgroundColor: "#002060", // Matching navbar color for the background
+    display: "flex",
+    alignItems: "center", // Vertically center the text
+    justifyContent: "center", // Horizontally center the text
+    height: "5vh", // Full viewport height
+    textAlign: "center", // Ensure text is centered
+    marginBottom: '10px', // Remove any default margins
+
+    // Add animation
+    animation: "fadeInScale 2s ease-out",
+
+    "@keyframes fadeInScale": {
+      "0%": { opacity: 0, transform: "scale(0.8)" },
+      "100%": { opacity: 1, transform: "scale(1)" },
+    },
+  }}
+>
+  Capital Markets
+</Typography>
+
 
         <Tabs
           value={value}
