@@ -1,10 +1,10 @@
 import React from 'react'
-import MddMain from '../MDDSettings/MddMain'
+import ScreenerMain from '../../MonasheeGraphs/ScreenerTable/ScreenerMain'
 
 const MDDScreener = () => {
   return (
 <>
-<MddMain />
+<ScreenerMain />
 </>   )
 }
 
