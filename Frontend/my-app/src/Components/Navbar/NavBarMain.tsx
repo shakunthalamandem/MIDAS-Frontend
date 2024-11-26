@@ -76,7 +76,7 @@ const NavbarMain: React.FC = () => {
                     minWidth: 100,
                     fontWeight: 'bold',
                     fontSize: '16px',
-                    color: '#002060', // Dark gray for unselected tabs
+                    color: '#DD6d2f', // Dark gray for unselected tabs
                     textTransform: 'none',
                     '&.Mui-selected': {
                       color: '#FFFFFF', // White text for the selected tab
