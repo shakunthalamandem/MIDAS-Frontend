@@ -81,7 +81,7 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
                 key={column}
                 sx={{
                   fontWeight: 'bold',
-                  textAlign: 'center',
+                  textAlign: 'left',
                   padding: '4px 8px', // Reduce padding for smaller cell size
                   fontSize: '0.875rem',
                   bgcolor:'#002060' ,

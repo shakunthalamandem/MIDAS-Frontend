@@ -82,7 +82,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
                 key={column}
                 sx={{
                   fontWeight: 'bold',
-                  textAlign: 'center',
+                  textAlign: 'left',
                   padding: '4px 8px', // Reduced padding
                   fontSize: '0.875rem', // Optional: Reduce font size
                   bgcolor:'#002060' ,
