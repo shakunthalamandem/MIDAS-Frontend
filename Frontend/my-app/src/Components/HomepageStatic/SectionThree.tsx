@@ -50,7 +50,7 @@ const SectionThree = () => {
   }, []);
 
   return (
-    <Box sx={{ padding: 4, backgroundColor: "#060d78" }}>
+    <Box sx={{ padding: 4, backgroundColor: "#060d78" ,mt:4}}>
       <Grid container spacing={3} justifyContent="center">
         {cardData.map((card, index) => (
           <Grid item key={index}>
