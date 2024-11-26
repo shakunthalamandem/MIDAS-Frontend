@@ -26,6 +26,7 @@ const SectionThree = () => {
                 justifyContent: "center",
                 boxShadow: 3,
                 borderRadius: 2,
+                color:'#002060'
               }}
             >
               <CardContent>
