@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import logo from '../../Assets/images/GHC_Logo.png';
+import logo from '../../Assets/images/GHC_logoNew.png';
 
 
 const FooterMain: React.FC = () => {
@@ -49,8 +49,8 @@ const FooterMain: React.FC = () => {
     src={logo} // Replace with the actual path to your logo
     alt="GHC Logo"
     style={{
-      width: '60px',
-      height: '30px',
+      width: '100px',
+      height: '50px',
     }}
   />
 </Box>
