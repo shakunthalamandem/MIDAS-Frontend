@@ -59,7 +59,7 @@ const NavbarMain: React.FC = () => {
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
             <Tabs
               value={getTabIndex()}
-              textColor="inherit"
+              // textColor="inherit"
               sx={{
                 '& .MuiTabs-indicator': {
                   backgroundColor: '#002060', 
@@ -76,7 +76,7 @@ const NavbarMain: React.FC = () => {
                     minWidth: 100,
                     fontWeight: 'bold',
                     fontSize: '16px',
-                    color: '#DD6d2f', // Dark gray for unselected tabs
+                    color: '#bb4401', // Dark gray for unselected tabs
                     textTransform: 'none',
                     '&.Mui-selected': {
                       color: '#FFFFFF', // White text for the selected tab
