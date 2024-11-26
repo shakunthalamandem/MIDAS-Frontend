@@ -14,7 +14,8 @@ const SectionOne: React.FC = () => {
               className="section-one-heading"
               gutterBottom
             >
-              Your Lens Into the Entire Cryptoeconomy
+              {/* Your Lens Into the Entire Cryptoeconomy */}
+              Your Comprehensive Platform for New Issue Market
             </Typography>
             <Typography
               variant="body1"

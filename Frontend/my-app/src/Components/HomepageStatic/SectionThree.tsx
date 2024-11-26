@@ -1,16 +1,49 @@
-import React from 'react';
-import './SectionThree.css';
+import React from "react";
+import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
 
-const SectionThree: React.FC = () => (
-  <div className="section-three">
-    <div className="section-content left fade-in">
-      <h2>Title of Section</h2>
-      <p>Left side content goes here. Information, description, etc.</p>
-    </div>
-    <div className="section-image right fade-in">
-      <img src="your-image-url.jpg" alt="Image" />
-    </div>
-  </div>
-);
+
+const SectionThree = () => {
+  const cards = [
+    { title: "IPOs" },
+    { title: "FOs" },
+    { title: "Opportunity Value" },
+    { title: "US & International Markets" },
+  ];
+
+  return (
+    <>
+    <Box sx={{ padding: 4 ,backgroundColor:'#060d78'}} >
+      <Grid container spacing={3} justifyContent="center">
+        {cards.map((card, index) => (
+          <Grid item key={index}>
+            <Card
+              sx={{
+                width: 240,
+                height: 190,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: 3,
+                borderRadius: 2,
+              }}
+            >
+              <CardContent>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  align="center"
+                  sx={{ fontWeight: "bold" }}
+                >
+                  {card.title}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+    </>  );
+};
 
 export default SectionThree;

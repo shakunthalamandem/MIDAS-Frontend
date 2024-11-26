@@ -3,7 +3,7 @@ import SectionOne from './SectionOne';
 import SectionTwo from './SectionTwo';
 import SectionFive from './SectionFive';
 import SectionFour from './SectionFour';
-// import SectionThree from './SectionThree';
+import SectionThree from './SectionThree';
 
 
 
@@ -13,7 +13,7 @@ const CapitalMarketsStatic = () => {
     <div>
       <SectionOne />
       <SectionTwo />
-      {/* <SectionThree /> */}
+      <SectionThree />
       <SectionFour />
       <SectionFive />
     </div>
