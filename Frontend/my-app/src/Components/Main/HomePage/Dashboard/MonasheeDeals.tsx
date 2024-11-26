@@ -127,7 +127,7 @@ const MonasheeDeals: React.FC = () => {
           }}
         />
         <Tab
-          label="F.O Diff"
+          label="FOllow On Discount"
           sx={{
             backgroundColor: value === 6 ? "#8BC34A" : "#f5f5f5",
             color: value === 6 ? "#fff" : "#777",
@@ -157,7 +157,7 @@ const MonasheeDeals: React.FC = () => {
       {value === 3 && <div>Allocation % of Deal Size</div>}
       {value === 4 && <div>Allocation % of IOI</div>}
       {value === 5 && <div>Allocation Capture by Return</div>}
-      {value === 6 && <div>F.O Difference</div>}
+      {value === 6 && <div>F.O Discount</div>}
       {value === 7 && <div>Screener</div>}
     </Box>
   );
