@@ -52,14 +52,14 @@ const SectionTwo: React.FC = () => (
           justifyContent: "center",
         }}
       >
-        <Typography className="section-title" variant="h4" gutterBottom>
-        Monashee introduces new MIDAS platform 
+        <Typography className="section-title" variant="h4" style={{color:'#002060',fontWeight:'bold'}}>
+        Monashee Introduces New MIDAS Platform 
         </Typography>
         <Typography className="section-text" variant="body1">
         Monashee's new real-time data platform enables investment decisions based on performance of similar new issue transactions (by sub-sector, by bank, by strategy) and utilizing Artificial Intelligence (AI) based machine learning models to predict the potential returns and help improve the overall skew of the portfolio towards positively performing investments.
         </Typography>
         <br/>
-        <Typography className="section-text" variant="body1" style={{fontWeight:'bold'}}>
+        <Typography className="section-text" variant="body1" style={{fontWeight:'bold',color:'#002060'}}>
         Stay tuned for our risk management tools. 
         </Typography>
         <Box
