@@ -53,14 +53,14 @@ const SectionTwo: React.FC = () => (
         }}
       >
         <Typography className="section-title" variant="h4" gutterBottom>
-          Amberdata Introduces Digital Asset Portfolio Management
+        Monashee introduces new MIDAS platform 
         </Typography>
         <Typography className="section-text" variant="body1">
-          Amberdata’s new portfolio management suite offers a seamless way to
-          view holdings across supported blockchains and exchanges. From balance
-          updates to profit-and-loss details, portfolio managers have access to
-          the most accurate and up-to-date information about their assets,
-          helping them stay on top of evolving market conditions.
+        Monashee's new real-time data platform enables investment decisions based on performance of similar new issue transactions (by sub-sector, by bank, by strategy) and utilizing Artificial Intelligence (AI) based machine learning models to predict the potential returns and help improve the overall skew of the portfolio towards positively performing investments.
+        </Typography>
+        <br/>
+        <Typography className="section-text" variant="body1" style={{fontWeight:'bold'}}>
+        Stay tuned for our risk management tools. 
         </Typography>
         <Box
           sx={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}

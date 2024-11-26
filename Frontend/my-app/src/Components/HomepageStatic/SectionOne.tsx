@@ -18,14 +18,11 @@ const SectionOne: React.FC = () => {
               Your Comprehensive Platform for New Issue Market
             </Typography>
             <Typography
-              variant="body1"
+              variant="h4"
               className="section-one-text"
               gutterBottom
             >
-              Amberdata delivers comprehensive digital asset data and insights
-              into blockchain networks, crypto markets, and decentralized
-              finance, empowering financial institutions with critical data for
-              research, trading, risk, analytics, reporting, and compliance.
+             Monashee Insights & Data Application System "MIDAS"
             </Typography>
             <Box
               className="section-one-buttons"
