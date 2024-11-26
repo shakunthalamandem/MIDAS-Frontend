@@ -69,9 +69,8 @@ const SectionThree = () => {
             >
               <CardContent>
                 <Typography variant="h4" component="div" align="center" sx={{ fontWeight: "bold" }}>
-                  {card.prefix} {/* Add prefix */}
-                  {card.suffix
-                    ? `${counts[index]} ${card.suffix}` // Display with suffix for "Opportunity Value"
+                  {card.prefix}{card.suffix
+                    ? `${counts[index]}${card.suffix}` // Display with suffix for "Opportunity Value"
                     : counts[index]}+ {/* Display the number */}
                 </Typography>
                 <Typography variant="h6" component="div" align="center" sx={{ fontWeight: "bold" }}>
