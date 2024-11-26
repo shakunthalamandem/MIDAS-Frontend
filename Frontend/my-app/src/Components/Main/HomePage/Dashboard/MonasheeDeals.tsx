@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
 import MDDDealCount from "../../MonasheeDeals/MddGraphs/MDDDealCount";
 import MDDDealVolume from "../../MonasheeDeals/MddGraphs/MDDDealVolume";
+import DealAllocation from "../../MonasheeDeals/MddGraphs/DealAllocation";
 
 const MonasheeDeals: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -154,7 +155,7 @@ const MonasheeDeals: React.FC = () => {
       {value === 0 && <MDDDealCount />}
       {value === 1 && <MDDDealVolume />}
       {value === 2 && <div>Avg Deal Size</div>}
-      {value === 3 && <div>Allocation % of Deal Size</div>}
+      {value === 3 &&  <DealAllocation />}
       {value === 4 && <div>Allocation % of IOI</div>}
       {value === 5 && <div>Allocation Capture by Return</div>}
       {value === 6 && <div>F.O Discount</div>}

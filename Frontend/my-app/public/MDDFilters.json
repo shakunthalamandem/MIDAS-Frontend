@@ -1,0 +1,84 @@
+{
+  "screener": [
+
+    {
+      "year": {
+        "options": [
+          2012,
+          2013,
+          2014,
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "label": "Year",
+        "description": ""
+      }
+    },
+    {
+      "deal_type": {
+        "options": [
+          "FO",
+          "IPO",
+          "OTHER",
+          "PRIVATE"
+        ],
+        "label": "Deal Type",
+        "description": ""
+      }
+    },
+    {
+      "broad_region": {
+        "options": [
+          "APAC",
+          "EMEA",
+          "Non-US America",
+          "US"
+        ],
+        "label": "Broad Region",
+        "description": ""
+      }
+    },
+    {
+      "gics_sector": {
+        "options": [
+          "Communication Services",
+          "Consumer Discretionary",
+          "Consumer Staples",
+          "Energy",
+          "Financials",
+          "Health Care",
+          "Industrials",
+          "Information Technology",
+          "Materials",
+          "Others",
+          "Real Estate",
+          "Utilities"
+        ],
+        "label": "GICS Sector",
+        "description": ""
+      }
+    },
+    {
+      "deal_captain": {
+        "options": [
+          "Block",
+          "HC",
+          "Jay",
+          "Others",
+          "Robin",
+          "Tom"
+        ],
+        "label": "Deal Captain",
+        "description": ""
+      }
+    }
+  ]
+}
