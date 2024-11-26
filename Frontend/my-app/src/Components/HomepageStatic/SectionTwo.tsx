@@ -1,16 +1,25 @@
 import React from 'react';
+import { Card, CardMedia, CardContent, Typography } from '@mui/material';
 import './SectionTwo.css';
 
 const SectionTwo: React.FC = () => (
-  <div className="section-two">
-    <div className="section-image left fade-in">
-      <img src="your-image-url.jpg" alt="Image" />
-    </div>
-    <div className="section-content right fade-in">
-      <h2>Title of Section</h2>
-      <p>Right side content goes here. Information, description, etc.</p>
-    </div>
-  </div>
+  <Card className="section-card">
+    {/* Left Image */}
+    <CardMedia
+      className="section-image"
+      image="your-image-url.jpg"
+      title="Descriptive Alt Text"
+    />
+    {/* Right Content */}
+    <CardContent className="section-content">
+      <Typography className="section-title" variant="h5" gutterBottom>
+        Title of Section
+      </Typography>
+      <Typography className="section-text" variant="body1">
+        Right-side content goes here. Information, description, etc.
+      </Typography>
+    </CardContent>
+  </Card>
 );
 
 export default SectionTwo;

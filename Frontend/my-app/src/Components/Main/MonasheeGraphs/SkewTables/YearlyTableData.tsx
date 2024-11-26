@@ -8,7 +8,7 @@ interface TableData {
   Negatively_Performing_Deals_Percentage: number;
   Average_T1M_Abs_Return_of_Positively: number;
   Average_T1M_Abs_Return_of_Negatively: number;
-  Expected_Returns_Absolute: number;
+  // Expected_Returns_Absolute: number;
   Expected_Returns_Excess: number;
   Long_Opportunity_Value: number;
 }
@@ -33,7 +33,7 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
     '% of Negatively Performing Deals ',
     'Avg T+1M Excess Return (Positively)',
     'Avg T+1M Excess Return (Negatively)',
-    'Expected Returns Absolute',
+    // 'Expected Returns Absolute',
     'Expected Returns Excess',
     'Long Opportunity Value',
   ];
@@ -57,7 +57,7 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
     totalNegativelyPerformingDealsPercentage += row.Negatively_Performing_Deals_Percentage;
     totalAvgT1MAbsReturnPositively += row.Average_T1M_Abs_Return_of_Positively;
     totalAvgT1MAbsReturnNegatively += row.Average_T1M_Abs_Return_of_Negatively;
-    totalExpectedReturnsAbsolute += row.Expected_Returns_Absolute;
+    // totalExpectedReturnsAbsolute += row.Expected_Returns_Absolute;
     totalExpectedReturnsExcess += row.Expected_Returns_Excess;
   });
 
@@ -68,7 +68,7 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
     totalNegativelyPerformingDealsPercentage / rowCount;
   const avgAvgT1MAbsReturnPositively = totalAvgT1MAbsReturnPositively / rowCount;
   const avgAvgT1MAbsReturnNegatively = totalAvgT1MAbsReturnNegatively / rowCount;
-  const avgExpectedReturnsAbsolute = totalExpectedReturnsAbsolute / rowCount;
+  // const avgExpectedReturnsAbsolute = totalExpectedReturnsAbsolute / rowCount;
   const avgExpectedReturnsExcess = totalExpectedReturnsExcess / rowCount;
 
   return (
@@ -105,7 +105,7 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Negatively_Performing_Deals_Percentage}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Positively}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Negatively}%</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Absolute}%</TableCell>
+                {/* <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Absolute}%</TableCell> */}
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Excess}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>${row.Long_Opportunity_Value}B</TableCell>
               </TableRow>
@@ -130,9 +130,9 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
             <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
               {avgAvgT1MAbsReturnNegatively.toFixed(2)}%
             </TableCell>
-            <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
+            {/* <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
               {avgExpectedReturnsAbsolute.toFixed(2)}%
-            </TableCell>
+            </TableCell> */}
             <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
               {avgExpectedReturnsExcess.toFixed(2)}%
             </TableCell>
