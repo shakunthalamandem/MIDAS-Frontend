@@ -32,9 +32,8 @@ const SectionTwo: React.FC = () => (
       >
         <Typography
           className="section-title"
-          variant="h4"
           gutterBottom
-          style={{ fontWeight: "bold" }} // Makes text bold
+          style={{ fontWeight: "bold",fontSize:'28px' }} // Makes text bold
         >
           Monashee Proprietary Database for insights into IPO's and Follow-on's
         </Typography>
