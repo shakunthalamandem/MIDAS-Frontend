@@ -3,6 +3,11 @@ import { Box, Typography, Tabs, Tab } from "@mui/material";
 import MDDDealCount from "../../MonasheeDeals/MddGraphs/MDDDealCount";
 import MDDDealVolume from "../../MonasheeDeals/MddGraphs/MDDDealVolume";
 import DealAllocation from "../../MonasheeDeals/MddGraphs/DealAllocation";
+import DealMDDIOI from "../../MonasheeDeals/MddGraphs/DealMDDIOI";
+import AvgDealSize from "../../MonasheeDeals/MddGraphs/AvgDealSize";
+import MDDScreener from "../../MonasheeDeals/MddGraphs/MDDScreener";
+import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCaptureReturn";
+import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
 
 const MonasheeDeals: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -154,12 +159,12 @@ const MonasheeDeals: React.FC = () => {
       {/* Tab Content */}
       {value === 0 && <MDDDealCount />}
       {value === 1 && <MDDDealVolume />}
-      {value === 2 && <div>Avg Deal Size</div>}
+      {value === 2 && <AvgDealSize />}
       {value === 3 &&  <DealAllocation />}
-      {value === 4 && <div>Allocation % of IOI</div>}
-      {value === 5 && <div>Allocation Capture by Return</div>}
-      {value === 6 && <div>F.O Discount</div>}
-      {value === 7 && <div>Screener</div>}
+      {value === 4 &&  <DealMDDIOI />}
+      {value === 5 && <AllocationCaptureReturn />}
+      {value === 6 && <FOllowOnDiscount />}
+      {value === 7 && <MDDScreener />}
     </Box>
   );
 };

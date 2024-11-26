@@ -42,7 +42,7 @@
           "Non-US America",
           "US"
         ],
-        "label": "Broad Region",
+        "label": "Region",
         "description": ""
       }
     },
@@ -62,7 +62,7 @@
           "Real Estate",
           "Utilities"
         ],
-        "label": "GICS Sector",
+        "label": "Sector",
         "description": ""
       }
     },
