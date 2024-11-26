@@ -1,25 +1,83 @@
 import React from 'react';
-import { Card, CardMedia, CardContent, Typography } from '@mui/material';
+import { Typography, Grid, Container, Button, Box } from '@mui/material';
 import './SectionTwo.css';
+import Imagecard from '../../Assets/images/Section_two.png'; // Corrected import
 
 const SectionTwo: React.FC = () => (
-  <Card className="section-card">
-    {/* Left Image */}
-    <CardMedia
-      className="section-image"
-      image="your-image-url.jpg"
-      title="Descriptive Alt Text"
-    />
-    {/* Right Content */}
-    <CardContent className="section-content">
-      <Typography className="section-title" variant="h5" gutterBottom>
-        Title of Section
-      </Typography>
-      <Typography className="section-text" variant="body1">
-        Right-side content goes here. Information, description, etc.
-      </Typography>
-    </CardContent>
-  </Card>
+  <Container maxWidth="lg" className="section-container">
+    <Grid 
+      container 
+      spacing={2} 
+      // mt={4} 
+      alignItems="stretch" // Ensure all child grids have the same height
+      className="section-content"
+    >
+      {/* Left Column */}
+      <Grid 
+        item 
+        xs={12} 
+        md={6} 
+        sx={{
+          backgroundImage: `url(${Imagecard})`,
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          color: 'white',
+          padding: '1rem',
+          display: 'flex', // Aligns content vertically
+          alignItems: 'center', 
+          justifyContent: 'center',
+        }}
+      >
+        <Typography
+          className="section-title"
+          variant="h4"
+          gutterBottom
+        >
+          Amberdata New Digital Portfolio
+        </Typography>
+      </Grid>
+
+      {/* Right Column */}
+      <Grid 
+        item 
+        xs={12} 
+        md={6} 
+        sx={{
+          display: 'flex', // Align content to match Left Column
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography className="section-title" variant="h4" gutterBottom>
+          Amberdata Introduces Digital Asset Portfolio Management
+        </Typography>
+        <Typography className="section-text" variant="body1">
+          Amberdata’s new portfolio management suite offers a seamless way to view holdings across supported blockchains and exchanges.
+          From balance updates to profit-and-loss details, portfolio managers have access to the most accurate and up-to-date information
+          about their assets, helping them stay on top of evolving market conditions.
+        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+          <Button
+            variant="contained"
+            sx={{
+              width: '200px',
+              border: "1px solid #c55e28",
+              color: '#dd6d2f',
+              backgroundColor: '#ffffff',
+              fontWeight: 'bold',
+              "&:hover": {
+                border: "1px solid #c55e28",
+                backgroundColor: '#ffffff',
+              },
+            }}
+          >
+            Learn More
+          </Button>
+        </Box>
+      </Grid>
+    </Grid>
+  </Container>
 );
 
 export default SectionTwo;
