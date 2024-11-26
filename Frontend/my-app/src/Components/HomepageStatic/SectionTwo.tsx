@@ -26,7 +26,7 @@ const SectionTwo: React.FC = () => (
           color: "white",
           padding: "1rem",
           display: "flex", // Aligns content vertically
-          alignItems: "center",
+          alignItems: "left",
           justifyContent: "center",
         }}
       >

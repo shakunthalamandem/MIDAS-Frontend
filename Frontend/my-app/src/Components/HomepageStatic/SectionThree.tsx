@@ -3,11 +3,11 @@ import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
 
 const SectionThree = () => {
   const cardData = [
-    { title: "IPOs", value: 8113 },
-    { title: "FOs", value: 18624 },
-    { title: "Opportunity Value", value: 968, suffix: "B" },
-    { title: "US Markets", value: 14306 },
-    { title: "International Markets", value: 12431 },
+    { title: "IPOs", value: 8113, prefix: "" },
+    { title: "FOs", value: 18624, prefix: "" },
+    { title: "Opportunity Value", value: 968, suffix: "B", prefix: "$" },
+    { title: "US Markets", value: 14306, prefix: "" },
+    { title: "International Markets", value: 12431, prefix: "" },
   ];
 
   const [counts, setCounts] = useState(cardData.map(() => 0));
@@ -50,7 +50,7 @@ const SectionThree = () => {
   }, []);
 
   return (
-    <Box sx={{ padding: 4, backgroundColor: "#060d78" ,mt:4}}>
+    <Box sx={{ padding: 4, backgroundColor: "#060d78", mt: 4 }}>
       <Grid container spacing={3} justifyContent="center">
         {cardData.map((card, index) => (
           <Grid item key={index}>
@@ -68,13 +68,14 @@ const SectionThree = () => {
               }}
             >
               <CardContent>
-                <Typography variant="h6" component="div" align="center" sx={{ fontWeight: "bold" }}>
-                  {card.title}
-                </Typography>
                 <Typography variant="h4" component="div" align="center" sx={{ fontWeight: "bold" }}>
+                  {card.prefix} {/* Add prefix */}
                   {card.suffix
                     ? `${counts[index]} ${card.suffix}` // Display with suffix for "Opportunity Value"
-                    : counts[index]} {/* Display the number */}
+                    : counts[index]}+ {/* Display the number */}
+                </Typography>
+                <Typography variant="h6" component="div" align="center" sx={{ fontWeight: "bold" }}>
+                  {card.title}
                 </Typography>
               </CardContent>
             </Card>
