@@ -93,7 +93,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData }) => {
                 const { options, label, description } = filter[key];
 
                 return (
-                  <Grid item xs={12} sm={6} md={3} key={key}>
+                  <Grid item xs={12} sm={6} md={3} key={key} sx={{overflowY:'-moz-hidden-unscrollable'}}>
                     {/* Updated layout to 4x3 grid */}
                     <Box mb={2} width="100%">
                       <Typography
