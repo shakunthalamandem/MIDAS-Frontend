@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import logo from '../../Assets/images/GHC_logoNew.png';
+import logo from '../../Assets/images/whitelogoghc.png';
 
 
 const FooterMain: React.FC = () => {
@@ -13,9 +13,9 @@ const FooterMain: React.FC = () => {
   return (
     <Box
       sx={{
-        backgroundColor: '#0A1929', // Darker background color
+        backgroundColor: '#2a2e39', // Darker background color
         padding: isMobile ? '10px 0' : '20px 0',
-        color: '#FFEB3B', // Text color to match the brand accent
+        color: '#FFFFFF', // Text color to match the brand accent
         textAlign: 'center',
         boxShadow: '0px -2px 10px rgba(0, 0, 0, 0.3)', // Subtle top shadow for depth
       }}
@@ -24,7 +24,7 @@ const FooterMain: React.FC = () => {
         variant={isMobile ? 'body1' : 'h6'}
         sx={{
           fontWeight: 'bold',
-          color: '#FFEB3B', // Accent color for main text
+          color: '#FFFFFF', // Accent color for main text
         }}
       >
         Monashee Insights & Data Application System
@@ -40,7 +40,7 @@ const FooterMain: React.FC = () => {
   <Typography
     variant="body2"
     sx={{
-      color: '#B2DFDB', // Muted accent for secondary text
+      color: '#FFFFFF', // Muted accent for secondary text
     }}
   >
     © 2024 MIDAS , Developed in Collaboration with Golden Hills Capital India Pvt Ltd.
@@ -49,7 +49,7 @@ const FooterMain: React.FC = () => {
     src={logo} // Replace with the actual path to your logo
     alt="GHC Logo"
     style={{
-      width: '100px',
+      width: '130px',
       height: '50px',
     }}
   />

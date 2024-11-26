@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SectionOne from './SectionOne';
 import SectionTwo from './SectionTwo';
-import SectionFive from './SectionFive';
-import SectionFour from './SectionFour';
+// import SectionFive from './SectionFive';
+// import SectionFour from './SectionFour';
 import SectionThree from './SectionThree';
 
 
@@ -14,8 +14,8 @@ const CapitalMarketsStatic = () => {
       <SectionOne />
       <SectionTwo />
       <SectionThree />
-      <SectionFour />
-      <SectionFive />
+      {/* <SectionFour /> */}
+      {/* <SectionFive /> */}
     </div>
   );
 };
