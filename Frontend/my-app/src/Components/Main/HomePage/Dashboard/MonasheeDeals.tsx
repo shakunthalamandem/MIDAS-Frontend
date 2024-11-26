@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
-import MDDDealCount from "../../MonasheeDeals/MddGraphs/MDDDealCount";
-import MDDDealVolume from "../../MonasheeDeals/MddGraphs/MDDDealVolume";
 import DealAllocation from "../../MonasheeDeals/MddGraphs/DealAllocation";
 import DealMDDIOI from "../../MonasheeDeals/MddGraphs/DealMDDIOI";
 import AvgDealSize from "../../MonasheeDeals/MddGraphs/AvgDealSize";
 import MDDScreener from "../../MonasheeDeals/MddGraphs/MDDScreener";
 import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
+import DealCount from "../../MonasheeDeals/MddGraphs/DealCount";
+import DealVolumeMDD from "../../MonasheeDeals/MddGraphs/DealVolumeMDD";
 
 const MonasheeDeals: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -157,8 +157,8 @@ const MonasheeDeals: React.FC = () => {
       </Tabs>
 
       {/* Tab Content */}
-      {value === 0 && <MDDDealCount />}
-      {value === 1 && <MDDDealVolume />}
+      {value === 0 && <DealCount />}
+      {value === 1 && <DealVolumeMDD />}
       {value === 2 && <AvgDealSize />}
       {value === 3 &&  <DealAllocation />}
       {value === 4 &&  <DealMDDIOI />}
