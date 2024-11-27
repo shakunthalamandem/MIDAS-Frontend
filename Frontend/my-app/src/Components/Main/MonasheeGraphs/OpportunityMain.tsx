@@ -179,7 +179,7 @@ const OpportunityMain: React.FC = () => {
   };
 
   const formatYAxisTick = (value: number) => {
-    return `${value.toFixed(0)}B`; // Format Y-axis tick values in billions
+    return `$${value.toFixed(0)}B`; // Format Y-axis tick values in billions
   };
 
   return (
