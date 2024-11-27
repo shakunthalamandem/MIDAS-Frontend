@@ -100,7 +100,7 @@ const MonasheeDeals: React.FC = () => {
           }}
         />
         <Tab
-          label="Alloc % DS"
+          label="Allocation % DealSize"
           sx={{
             backgroundColor: value === 3 ? "#00BCD4" : "#f5f5f5",
             color: value === 3 ? "#fff" : "#777",
@@ -111,7 +111,7 @@ const MonasheeDeals: React.FC = () => {
           }}
         />
         <Tab
-          label="Alloc % IOI"
+          label="Allocation % IOI"
           sx={{
             backgroundColor: value === 4 ? "#9C27B0" : "#f5f5f5",
             color: value === 4 ? "#fff" : "#777",
@@ -122,7 +122,7 @@ const MonasheeDeals: React.FC = () => {
           }}
         />
         <Tab
-          label="Alloc Capture"
+          label="Allocation Capture"
           sx={{
             backgroundColor: value === 5 ? "#FF9800" : "#f5f5f5",
             color: value === 5 ? "#fff" : "#777",
