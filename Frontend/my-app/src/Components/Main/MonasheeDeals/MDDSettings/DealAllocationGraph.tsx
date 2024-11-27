@@ -17,16 +17,21 @@ interface DealAllocationGraphProps {
 }
 
 // Function to format numbers into human-readable formats like "M" for millions and "B" for billions
-const formatValue = (value: number): string => {
-  const absValue = Math.abs(value);
-  if (absValue >= 1_000_000_000) {
-    return `${(value / 1_000_000_000).toFixed(2)}B`;
-  } else if (absValue >= 1_000_000) {
-    return `${(value / 1_000_000).toFixed(2)}M`;
-  } else if (absValue >= 1_000) {
-    return `${(value / 1_000).toFixed(2)}K`;
+const formatValue = (value: number, apiName: string): string => {
+  if (apiName === "mdd_deals_volume" || apiName === "avg_deal_size") {
+    const absValue = Math.abs(value);
+    if (absValue >= 1_000_000_000) {
+      return `$${(value / 1_000_000_000).toFixed(2)}B`;
+    } else if (absValue >= 1_000_000) {
+      return `$${(value / 1_000_000).toFixed(2)}M`;
+    } else if (absValue >= 1_000) {
+      return `$${(value / 1_000).toFixed(2)}K`;
+    }
+    return `$${value.toFixed(2)}`;
+  } else if (apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") {
+    return `${value.toFixed(2)}%`;
   }
-  return value.toFixed(2);
+  return value.toFixed(0); // Return integer for mdd_deals_graph
 };
 
 const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiName }) => {
@@ -72,7 +77,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
   const chartData = responseData ? formatChartData(responseData) : [];
 
   // Tooltip formatter
-  const tooltipFormatter = (value: number) => formatValue(value);
+  const tooltipFormatter = (value: number) => formatValue(value, apiName);
 
   return (
     <div>
@@ -90,7 +95,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
             <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
             <XAxis dataKey="quarter" />
             <YAxis
-              tickFormatter={(value) => formatValue(value)} // Format Y-axis labels
+              tickFormatter={(value) => formatValue(value, apiName)} // Format Y-axis labels
             />
             <Tooltip formatter={(value) => tooltipFormatter(Number(value))} />
             <Legend />

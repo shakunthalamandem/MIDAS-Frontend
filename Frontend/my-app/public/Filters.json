@@ -83,7 +83,7 @@
             ">$500M"
           ],
           "label": "DealValue",
-          "description": ""
+          "description": "The total $ value of the offering or Deal offered"
         }
       }
     ]
