@@ -12,10 +12,13 @@ import {
   Card,
   CardContent,
   Container,
+  CircularProgress,
 } from "@mui/material";
 import { Autocomplete } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import DealAllocationGraph from "./DealAllocationGraph";
+import { LoadingButton } from "@mui/lab"; // Import LoadingButton
+
 // import ScreenerDataTable from "./ScreenerDataTable"; // Import the ScreenerDataTable component
 
 interface FilterOption {
@@ -34,6 +37,7 @@ interface FiltersProps {
 }
 
 const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
+  const [loading, setLoading] = useState(false); // Add loading state
   const [selectedValues, setSelectedValues] = useState<{
     [key: string]: (string | number)[]; // Store selected filter options
   }>({});
@@ -58,40 +62,42 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   };
 
   const handleSubmit = async (filters = selectedValues) => {
-  try {
-    const payload = {
-      years: filters.year,
-      dealType: filters.deal_type,
-      region: filters.broad_region,
-      sector: filters.gics_sector,
-      deal_captain: filters.deal_captain,
-    };
+    try {
+      setLoading(true); // Show spinner
+      const payload = {
+        years: filters.year,
+        dealType: filters.deal_type,
+        region: filters.broad_region,
+        sector: filters.gics_sector,
+        deal_captain: filters.deal_captain,
+      };
 
-    const apiUrl = process.env.REACT_APP_API_URL;
+      const apiUrl = process.env.REACT_APP_API_URL;
 
-    if (!apiUrl) {
-      throw new Error("API URL is not defined in environment variables");
+      if (!apiUrl) {
+        throw new Error("API URL is not defined in environment variables");
+      }
+
+      const response = await fetch(`${apiUrl}/api/${apiName}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setApiData(result);
+      } else {
+        throw new Error("Failed to fetch data");
+      }
+    } catch (error: any) {
+      console.error(error.message || "An error occurred while fetching data");
+    } finally {
+      setLoading(false); // Hide spinner
     }
-
-    const response = await fetch(`${apiUrl}/api/${apiName}/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      console.log("Applied Filters:", filters);
-      setApiData(result); // Save API response for DealAllocationGraph
-    } else {
-      throw new Error("Failed to fetch data");
-    }
-  } catch (error: any) {
-    console.error(error.message || "An error occurred while fetching data");
-  }
-};
+  };
 
   
 
@@ -204,25 +210,38 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
               })}
             </Grid>
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-            <Button
+            <LoadingButton
               variant="contained"
+              loading={loading} // Spinner activates when true
               onClick={() => handleSubmit()}
               sx={{ mr: 2, bgcolor: "#002060" }}
             >
               Apply
+            </LoadingButton>
+            <Button variant="outlined" color="secondary" onClick={handleCancel}>
+              Reset
             </Button>
-              <Button variant="outlined" color="secondary" onClick={handleCancel}>
-                Reset
-              </Button>
             </Box>
           </Box>
         </CardContent>
       </Card>
-
-      {/* Render ScreenerDataTable */}
       <Box mt={4}>
-        {/* <DealAllocationGraph sectorwiseData={appliedFilters || selectedValues} /> */}
-        <DealAllocationGraph responseData={apiData} apiName={apiName} />
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress color="primary"/>
+            <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem", alignContent: "center" }}>
+              Loading... Please Wait
+            </Typography>
+          </Box>
+        ) : (
+          <DealAllocationGraph responseData={apiData} apiName={apiName} />
+        )}
       </Box>
     </Container>
   );
