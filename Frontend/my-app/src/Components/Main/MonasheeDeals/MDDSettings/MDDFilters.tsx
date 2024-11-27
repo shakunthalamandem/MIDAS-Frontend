@@ -47,37 +47,40 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   const [apiData, setApiData] = useState({})
 
   useEffect(() => {
-    // Initialize selected values with default values
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
+    filtersData.forEach((filter) => {
+      const key = Object.keys(filter)[0];
+      initialSelectedValues[key] = [];
+    });
     setSelectedValues(initialSelectedValues);
-    setAppliedFilters(initialSelectedValues); // Show initial filters on page render
+    setAppliedFilters(initialSelectedValues);
     handleSubmit(initialSelectedValues);
-  }, [filtersData]); // Runs when filtersData changes
+  }, [filtersData]);
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
       ...prevState,
       [key]: value,
     }));
-  };
+  };  
 
   const handleSubmit = async (filters = selectedValues) => {
     try {
-      setLoading(true); // Show spinner
-      const payload = {
-        years: filters.year,
-        dealType: filters.deal_type,
-        region: filters.broad_region,
-        sector: filters.gics_sector,
-        deal_captain: filters.deal_captain,
-      };
-
+      setLoading(true);
+  
+      const payload: { [key: string]: (string | number)[] } = {};
+      Object.keys(filters).forEach((key) => {
+        payload[key] = filters[key] || [];
+      });
+  
+      console.log("Payload sent to API:", JSON.stringify(payload, null, 2)); // Debugging
+  
       const apiUrl = process.env.REACT_APP_API_URL;
-
+  
       if (!apiUrl) {
         throw new Error("API URL is not defined in environment variables");
       }
-
+  
       const response = await fetch(`${apiUrl}/api/${apiName}/`, {
         method: "POST",
         headers: {
@@ -85,7 +88,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         },
         body: JSON.stringify(payload),
       });
-
+  
       if (response.ok) {
         const result = await response.json();
         setApiData(result);
@@ -95,18 +98,22 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     } catch (error: any) {
       console.error(error.message || "An error occurred while fetching data");
     } finally {
-      setLoading(false); // Hide spinner
+      setLoading(false);
     }
   };
 
   
 
   const handleCancel = () => {
-    // Reset to default values
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
+    filtersData.forEach((filter) => {
+      const key = Object.keys(filter)[0];
+      resetSelectedValues[key] = []; // Reset each key to an empty array
+    });
     setSelectedValues(resetSelectedValues);
-    setAppliedFilters(resetSelectedValues); // Clear applied filters
+    setAppliedFilters(resetSelectedValues);
   };
+  
 
   // Format the selected tags to display +X for multiple selections
   const formatSelectedTags = (values: (string | number)[]) => {
