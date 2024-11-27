@@ -73,7 +73,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
             <XAxis dataKey="quarter" />
             <YAxis />
             <Tooltip />
