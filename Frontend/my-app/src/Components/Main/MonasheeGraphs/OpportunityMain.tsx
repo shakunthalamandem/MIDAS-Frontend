@@ -171,7 +171,7 @@ const OpportunityMain: React.FC = () => {
           <h4>{name}</h4>
           {type === "ipo" || type === "all" ? <p>IPO: {IPO.toFixed(2)}B</p> : null}
           {type === "fo" || type === "all" ? <p>FO: {FO.toFixed(2)}B</p> : null}
-          <p>Total Deals: {total.toFixed(2)}B</p>
+          <p>Total: {total.toFixed(2)}B</p>
         </div>
       );
     }
