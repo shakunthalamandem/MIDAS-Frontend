@@ -1,118 +1,126 @@
-// // src/components/AllocationDealsize.tsx
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Console } from 'console';
+import React, { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-// interface AllocationData {
-//   year_quarter: string;
-//   deal_type: string;
-//   allocation_deal_size_percentage: number;
-// }
-
-// interface AllocationResponse {
-//   [key: string]: {
-//     [region: string]: {
-//       [sector: string]: {
-//         allocation_deal_size_percentage: string;
-//       };
-//     };
-//   };
-// }
-
-// interface FilterParams {
-//   broad_region: string[];
-//   deal_captain: string[];
-//   deal_type: string[];
-//   gics_sector: string[];
-//   years: number[];
-// }
-
-// const AllocationDealsize = ({ filters }: { filters: FilterParams }) => {
-//   const [chartData, setChartData] = useState<any[]>([]);
-//   const [loading, setLoading] = useState<boolean>(false);
-//   const [error, setError] = useState<string | null>(null);
-
-//   // Fetch data from the API based on filters
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       setLoading(true);
-//       try {
-//         const response = await axios.post('http://192.168.1.59:9000/api/mdd_allocation_percentage/', filters);
-//         processData(response.data);
-//       } catch (err) {
-//         setError('Failed to fetch data');
-//         console.error(err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, [filters]);
-
-//   const processData = (data: AllocationResponse) => {
-//     // Process the data to create the chart data structure
-//     const processedData: any[] = [];
-
-//     Object.keys(data).forEach((yearQuarter) => {
-//       const yearQuarterData: any = { year_quarter: yearQuarter };
-
-//       const dealTypes = ['FO', 'IPO']; // Deal types based on the API response structure
-
-//       dealTypes.forEach((dealType) => {
-//         if (data[yearQuarter][dealType]) {
-//           Object.keys(data[yearQuarter][dealType]).forEach((sector) => {
-//             const allocationPercentage = parseFloat(
-//               data[yearQuarter][dealType][sector].allocation_deal_size_percentage
-//             );
-//             const sectorKey = `${dealType}_${sector}`;
-//             if (!yearQuarterData[sectorKey]) {
-//               yearQuarterData[sectorKey] = 0;
-//             }
-//             yearQuarterData[sectorKey] += allocationPercentage;
-//           });
-//         }
-//       });
-
-//       processedData.push(yearQuarterData);
-//     });
-
-//     setChartData(processedData);
-//   };
-
-//   if (loading) return <div>Loading...</div>;
-//   if (error) return <div>{error}</div>;
-
-//   return (
-//     <div>
-//       <h2>Allocation Deal Size Percentage</h2>
-//       <ResponsiveContainer width="100%" height={400}>
-//         <BarChart data={chartData}>
-//           <CartesianGrid strokeDasharray="3 3" />
-//           <XAxis dataKey="year_quarter" />
-//           <YAxis />
-//           <Tooltip />
-//           <Legend />
-//           <Bar dataKey="FO_Communication Services" stackId="a" fill="#8884d8" />
-//           <Bar dataKey="FO_Consumer Discretionary" stackId="a" fill="#82ca9d" />
-//           <Bar dataKey="FO_Consumer Staples" stackId="a" fill="#ffc658" />
-//           <Bar dataKey="IPO_Communication Services" stackId="a" fill="#ff7300" />
-//           <Bar dataKey="IPO_Consumer Discretionary" stackId="a" fill="#d0ed57" />
-//           <Bar dataKey="IPO_Consumer Staples" stackId="a" fill="#413ea0" />
-//         </BarChart>
-//       </ResponsiveContainer>
-//     </div>
-//   );
-// };
-
-// export default AllocationDealsize;
-
-import React from 'react'
-
-const DealAllocationGraph = () => {
-  return (
-    <div>DealAllocationGraph</div>
-  )
+interface ScreenerDataRow {
+  allocation_deal_size_percentage: number;
 }
 
-export default DealAllocationGraph
+interface DealAllocationGraphProps {
+  sectorwiseData: { [key: string]: (string | number)[] };
+}
+
+const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ sectorwiseData }) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [apiData, setApiData] = useState<any>(null);
+
+  useEffect(() => {
+    if (sectorwiseData) {
+      fetchDataFromApi(sectorwiseData);
+    }
+  }, [sectorwiseData]);
+
+  const fetchDataFromApi = async (
+    data: DealAllocationGraphProps['sectorwiseData']
+  ) => {
+    console.log("shhs",data)
+    setLoading(true);
+    setError(null);
+    const payload = {
+      years: data.year,
+      dealType: data.deal_type,
+      region: data.broad_region,
+      sector: data.gics_sector,
+      deal_captain: data.deal_captain,
+    };
+
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+      if (!apiUrl) {
+        throw new Error('API URL is not defined in environment variables');
+      }
+
+      const response = await fetch(`${apiUrl}/api/mdd_allocation_percentage/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setApiData(result);
+      } else {
+        throw new Error('Failed to fetch data');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while fetching data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatChartData = (data: any) => {
+    // Initialize an array to hold the formatted chart data
+    const formattedData: any[] = [];
+
+    // Iterate through each quarter (e.g., "2012 Q1", "2012 Q2", etc.)
+    for (const quarter in data) {
+      const sectors = data[quarter];
+      const chartRow: any = { quarter }; // Each row will have the quarter as the key
+
+      // Iterate through each deal type (FO, IPO, Others) and sum the allocation percentages for each sector
+      ['FO', 'IPO', 'OTHER', 'PRIVATE'].forEach(dealType => {
+        let dealTypeTotal = 0;
+        
+        if (sectors[dealType]) {
+          for (const region in sectors[dealType]) {
+            for (const sector in sectors[dealType][region]) {
+              const allocation = sectors[dealType][region][sector].allocation_deal_size_percentage;
+              dealTypeTotal += parseFloat(allocation);
+            }
+          }
+        }
+
+        // Store the total allocation for this dealType in the chart row
+        chartRow[dealType] = dealTypeTotal;
+      });
+
+      formattedData.push(chartRow);
+    }
+
+    return formattedData;
+  };
+
+  const chartData = apiData ? formatChartData(apiData) : [];
+
+  return (
+    <div>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {/* Conditionally render the bar chart */}
+      {chartData.length > 0 && (
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="quarter" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="FO" stackId="a" fill="#8884d8" />
+            <Bar dataKey="IPO" stackId="a" fill="#82ca9d" />
+            <Bar dataKey="OTHER" stackId="a" fill="#ffc658" />
+            <Bar dataKey="PRIVATE" stackId="a" fill="#002060" />
+
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
+};
+
+export default DealAllocationGraph;
