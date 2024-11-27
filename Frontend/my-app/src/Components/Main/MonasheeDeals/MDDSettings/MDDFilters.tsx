@@ -47,6 +47,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
     setSelectedValues(initialSelectedValues);
     setAppliedFilters(initialSelectedValues); // Show initial filters on page render
+    handleSubmit(initialSelectedValues);
   }, [filtersData]); // Runs when filtersData changes
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
@@ -56,41 +57,42 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     }));
   };
 
-  const handleSubmit = async () => {
-    try {
-      const payload = {
-        years: selectedValues.year,
-        dealType: selectedValues.deal_type,
-        region: selectedValues.broad_region,
-        sector: selectedValues.gics_sector,
-        deal_captain: selectedValues.deal_captain,
-      };
-  
-      const apiUrl = process.env.REACT_APP_API_URL;
-  
-      if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables");
-      }
-  
-      const response = await fetch(`${apiUrl}/api/${apiName}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-  
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Applied Filters:", selectedValues);
-        setApiData(result); // Save API response for DealAllocationGraph
-      } else {
-        throw new Error("Failed to fetch data");
-      }
-    } catch (error: any) {
-      console.error(error.message || "An error occurred while fetching data");
+  const handleSubmit = async (filters = selectedValues) => {
+  try {
+    const payload = {
+      years: filters.year,
+      dealType: filters.deal_type,
+      region: filters.broad_region,
+      sector: filters.gics_sector,
+      deal_captain: filters.deal_captain,
+    };
+
+    const apiUrl = process.env.REACT_APP_API_URL;
+
+    if (!apiUrl) {
+      throw new Error("API URL is not defined in environment variables");
     }
-  };
+
+    const response = await fetch(`${apiUrl}/api/${apiName}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("Applied Filters:", filters);
+      setApiData(result); // Save API response for DealAllocationGraph
+    } else {
+      throw new Error("Failed to fetch data");
+    }
+  } catch (error: any) {
+    console.error(error.message || "An error occurred while fetching data");
+  }
+};
+
   
 
   const handleCancel = () => {
@@ -201,16 +203,14 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                 );
               })}
             </Grid>
-
-            {/* Center the buttons */}
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                sx={{ mr: 2, bgcolor: "#002060" }}
-              >
-                Apply
-              </Button>
+            <Button
+              variant="contained"
+              onClick={() => handleSubmit()}
+              sx={{ mr: 2, bgcolor: "#002060" }}
+            >
+              Apply
+            </Button>
               <Button variant="outlined" color="secondary" onClick={handleCancel}>
                 Reset
               </Button>
