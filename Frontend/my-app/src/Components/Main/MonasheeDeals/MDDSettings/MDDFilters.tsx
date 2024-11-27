@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { Autocomplete } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import DealAllocationGraph from "./DealAllocationGraph";
 // import ScreenerDataTable from "./ScreenerDataTable"; // Import the ScreenerDataTable component
 
 interface FilterOption {
@@ -187,7 +188,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
 
       {/* Render ScreenerDataTable */}
       <Box mt={4}>
-        {/* <ScreenerDataTable sectorwiseData={appliedFilters || selectedValues} /> */}
+        <DealAllocationGraph sectorwiseData={appliedFilters || selectedValues} />
       </Box>
     </Container>
   );
