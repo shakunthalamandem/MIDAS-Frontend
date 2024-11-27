@@ -16,15 +16,27 @@ interface DealAllocationGraphProps {
   apiName: string; // The API name that determines the key
 }
 
+// Function to format numbers into human-readable formats like "M" for millions and "B" for billions
+const formatValue = (value: number): string => {
+  const absValue = Math.abs(value);
+  if (absValue >= 1_000_000_000) {
+    return `${(value / 1_000_000_000).toFixed(2)}B`;
+  } else if (absValue >= 1_000_000) {
+    return `${(value / 1_000_000).toFixed(2)}M`;
+  } else if (absValue >= 1_000) {
+    return `${(value / 1_000).toFixed(2)}K`;
+  }
+  return value.toFixed(2);
+};
+
 const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiName }) => {
   // Dynamic key mapping based on the API name
   const allocationKeyMap: { [key: string]: string } = {
-    "mdd_deals_graph": "count",
-    "mdd_deals_volume": "deal_size",
-    "avg_deal_size": "deal_size",
-    "mdd_allocation_percentage": "allocation_deal_size_percentage",
-    "mdd_allocation_ioi": "allocation_percentage",
-    // Add other mappings here for different APIs
+    mdd_deals_graph: "count",
+    mdd_deals_volume: "deal_size",
+    avg_deal_size: "deal_size",
+    mdd_allocation_percentage: "allocation_deal_size_percentage",
+    mdd_allocation_ioi: "allocation_percentage",
   };
 
   const allocationKey = allocationKeyMap[apiName] || "allocation_deal_size_percentage";
@@ -59,24 +71,28 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
 
   const chartData = responseData ? formatChartData(responseData) : [];
 
+  // Tooltip formatter
+  const tooltipFormatter = (value: number) => formatValue(value);
+
   return (
     <div>
       {chartData.length === 0 ? (
-        <Typography 
-        variant="body1" 
-        align="center" 
-        sx={{ mt: 5, color: "#002060", fontWeight: "bold" }}
-      >
-        Please select the filters to show the plots.
-      </Typography>
-      
+        <Typography
+          variant="body1"
+          align="center"
+          sx={{ mt: 5, color: "#002060", fontWeight: "bold" }}
+        >
+          Please select the filters to show the plots.
+        </Typography>
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
             <XAxis dataKey="quarter" />
-            <YAxis />
-            <Tooltip />
+            <YAxis
+              tickFormatter={(value) => formatValue(value)} // Format Y-axis labels
+            />
+            <Tooltip formatter={(value) => tooltipFormatter(Number(value))} />
             <Legend />
             <Bar dataKey="FO" stackId="a" fill="#8884d8" />
             <Bar dataKey="IPO" stackId="a" fill="#82ca9d" />
