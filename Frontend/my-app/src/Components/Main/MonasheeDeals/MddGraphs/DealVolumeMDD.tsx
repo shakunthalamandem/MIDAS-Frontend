@@ -4,7 +4,7 @@ import MddMain from '../MDDSettings/MddMain'
 const DealVolumeMDD = () => {
   return (
 <>
-<MddMain apiName='dealvolume' />
+<MddMain apiName='mdd_deals_volume' />
 </>   )
 }
 

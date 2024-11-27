@@ -40,6 +40,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   const [appliedFilters, setAppliedFilters] = useState<{
     [key: string]: (string | number)[]; // Applied filters to pass to the table
   } | null>(null);
+  const [apiData, setApiData] = useState({})
 
   useEffect(() => {
     // Initialize selected values with default values
@@ -55,10 +56,42 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log("Applied Filters:", selectedValues);
-    setAppliedFilters(selectedValues); // Save applied filters
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        years: selectedValues.year,
+        dealType: selectedValues.deal_type,
+        region: selectedValues.broad_region,
+        sector: selectedValues.gics_sector,
+        deal_captain: selectedValues.deal_captain,
+      };
+  
+      const apiUrl = process.env.REACT_APP_API_URL;
+  
+      if (!apiUrl) {
+        throw new Error("API URL is not defined in environment variables");
+      }
+  
+      const response = await fetch(`${apiUrl}/api/${apiName}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Applied Filters:", selectedValues);
+        setApiData(result); // Save API response for DealAllocationGraph
+      } else {
+        throw new Error("Failed to fetch data");
+      }
+    } catch (error: any) {
+      console.error(error.message || "An error occurred while fetching data");
+    }
   };
+  
 
   const handleCancel = () => {
     // Reset to default values
@@ -188,7 +221,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
 
       {/* Render ScreenerDataTable */}
       <Box mt={4}>
-        <DealAllocationGraph sectorwiseData={appliedFilters || selectedValues} />
+        {/* <DealAllocationGraph sectorwiseData={appliedFilters || selectedValues} /> */}
+        <DealAllocationGraph responseData={apiData} apiName={apiName} />
       </Box>
     </Container>
   );

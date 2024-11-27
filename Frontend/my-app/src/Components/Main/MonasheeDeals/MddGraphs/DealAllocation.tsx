@@ -4,7 +4,7 @@ import MddMain from '../MDDSettings/MddMain'
 const DealAllocation = () => {
   return (
 <>
-<MddMain apiName='dealallocation'/>
+<MddMain apiName='mdd_allocation_percentage'/>
 </>  )
 }
 

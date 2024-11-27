@@ -4,7 +4,7 @@ import MddMain from '../MDDSettings/MddMain'
 const DealCount = () => {
   return (
 <>
-<MddMain apiName='count' />
+<MddMain apiName='mdd_deals_graph' />
 </>   )
 }
 
