@@ -4,7 +4,7 @@ import MddMain from '../MDDSettings/MddMain'
 const AvgDealSize = () => {
   return (
 <>
-<MddMain />
+<MddMain apiName='avgdealsize'/>
 </>   )
 }
 

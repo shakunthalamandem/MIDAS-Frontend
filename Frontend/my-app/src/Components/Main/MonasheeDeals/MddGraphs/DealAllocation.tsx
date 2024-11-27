@@ -4,7 +4,7 @@ import MddMain from '../MDDSettings/MddMain'
 const DealAllocation = () => {
   return (
 <>
-<MddMain />
+<MddMain apiName='dealallocation'/>
 </>  )
 }
 

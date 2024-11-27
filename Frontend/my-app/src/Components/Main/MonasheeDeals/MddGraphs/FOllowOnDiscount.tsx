@@ -4,7 +4,7 @@ import MddMain from '../MDDSettings/MddMain'
 const FOllowOnDiscount = () => {
   return (
     <>
-<MddMain />
+<MddMain apiName='fodiscount'/>
 </> 
   )
 }

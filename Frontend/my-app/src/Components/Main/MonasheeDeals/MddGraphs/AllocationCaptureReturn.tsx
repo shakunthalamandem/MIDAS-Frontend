@@ -4,7 +4,7 @@ import MddMain from '../MDDSettings/MddMain'
 const AllocationCaptureReturn = () => {
   return (
         <>
-        <MddMain />
+        <MddMain apiName='allocation capture'/>
         </>   )
 }
 

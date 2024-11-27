@@ -4,7 +4,7 @@ import MddMain from '../MDDSettings/MddMain'
 const DealCount = () => {
   return (
 <>
-<MddMain />
+<MddMain apiName='count' />
 </>   )
 }
 

@@ -4,7 +4,7 @@ import MddMain from '../MDDSettings/MddMain'
 const DealMDDIOI = () => {
   return (
 <>
-<MddMain />
+<MddMain apiName = "ioi"/>
 </>  )
 }
 

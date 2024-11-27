@@ -29,9 +29,10 @@ interface Filter {
 
 interface FiltersProps {
   filtersData: Filter[]; // Accept filters as prop
+  apiName: string;
 }
 
-const MDDFilters: React.FC<FiltersProps> = ({ filtersData }) => {
+const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   const [selectedValues, setSelectedValues] = useState<{
     [key: string]: (string | number)[]; // Store selected filter options
   }>({});
