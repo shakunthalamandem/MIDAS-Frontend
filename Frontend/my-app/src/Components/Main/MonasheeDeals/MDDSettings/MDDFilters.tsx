@@ -219,7 +219,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
             <LoadingButton
               variant="contained"
-              loading={loading} // Spinner activates when true
+              // loading={loading} // Spinner activates when true
               onClick={() => handleSubmit()}
               sx={{ mr: 2, bgcolor: "#002060" }}
             >
