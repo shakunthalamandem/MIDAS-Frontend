@@ -121,7 +121,7 @@ const MonasheeDeals: React.FC = () => {
             },
           }}
         />
-        {/* <Tab
+        <Tab
           label="Allocation Capture"
           sx={{
             backgroundColor: value === 5 ? "#FF9800" : "#f5f5f5",
@@ -131,7 +131,7 @@ const MonasheeDeals: React.FC = () => {
               color: "#fff",
             },
           }}
-        /> */}
+        />
         <Tab
           label="FOllow On Discount"
           sx={{
