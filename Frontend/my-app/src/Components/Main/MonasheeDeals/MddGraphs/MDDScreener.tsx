@@ -15,7 +15,6 @@ const MDDScreener: React.FC = () => {
   }, []);
   return (
     <>
-          {/* <Filters filtersData={filtersData} /> */}
           <MDDScreenerFilters filtersData={filtersData} />
           
 
