@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Filters from './Filters';
+import MDDScreenerFilters from "../../MonasheeDeals/MDDSettings/MDDScreenerFilters";
 
 const ScreenerMain: React.FC = () => {
   const [filtersData, setFiltersData] = useState([]);
@@ -14,6 +15,8 @@ const ScreenerMain: React.FC = () => {
   return (
     <>
           <Filters filtersData={filtersData} />
+          {/* <MDDScreenerFilters filtersData={filtersData} /> */}
+          
 
     </>
   )
