@@ -23,6 +23,7 @@ import axios from "axios";
 import DealPieChart from "./MonasheePieCharts/DealPieChart";
 import AreaChartComponent from "./SectorDotGraphs/AreaChartComponent";
 import DealTypeSector from "./SectorDotGraphs/DealTypeSector";
+import DealsDataFilter from "../MonasheeDeals/DeoLogicData/DealsDataFilter";
 
 interface ApiResponse {
   [key: string]: {
