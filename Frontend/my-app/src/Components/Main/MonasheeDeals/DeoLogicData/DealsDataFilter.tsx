@@ -80,6 +80,11 @@ const DealsDataFilter: React.FC = () => {
             <Checkbox
               checked={selected.includes(option)}
               onChange={() => handleChange(option, setSelected, selected)}
+              sx={{
+                '&.Mui-checked': {
+                  color: '#002060',  // Set the color of the checkbox tick when checked
+                },
+              }}
             />
           }
           label={option}
@@ -102,6 +107,11 @@ const DealsDataFilter: React.FC = () => {
             <Checkbox
               checked={selected.includes(option)}
               onChange={() => handleChange(option, setSelected, selected)}
+              sx={{
+                '&.Mui-checked': {
+                  color: '#002060',  // Set the color of the checkbox tick when checked
+                },
+              }}
             />
           }
           label={option}
@@ -170,8 +180,8 @@ const DealsDataFilter: React.FC = () => {
       onChange={() => setExpanded(expanded === section.label ? false : section.label)}  // Toggle expand/collapse
     >
       <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        aria-controls={`${section.label}-content`}
+  expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}  // Set the icon color to white
+  aria-controls={`${section.label}-content`}
         id={`${section.label}-header`}
         sx={{
           backgroundColor: '#002060', // Set the background color for the header
@@ -181,9 +191,18 @@ const DealsDataFilter: React.FC = () => {
           },
         }}
       >
-        <Typography>{section.label}</Typography>
+        <Typography >{section.label}</Typography>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails 
+       sx={{
+        backgroundColor: 'white', // Set the background color for the header
+        color: '#515050', // Set the text color to white for better contrast
+        '& .MuiAccordionSummary-content': {
+          color: '#515050', 
+          justifyContent: 'flex-start',  // Align the content to the left
+          // Ensure the text inside the summary is white
+        },
+      }}>
         {section.render(
           section.label,
           section.options,
