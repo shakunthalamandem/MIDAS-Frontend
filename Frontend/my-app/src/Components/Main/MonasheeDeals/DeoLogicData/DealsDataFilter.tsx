@@ -7,7 +7,6 @@ import {
   AccordionDetails,
   Checkbox,
   FormControlLabel,
-
   CircularProgress,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -64,6 +63,23 @@ const DealsDataFilter: React.FC = () => {
     } else {
       setter([...currentValues, value]);
     }
+
+    // Log the selected filter data in JSON format
+    logSelectedData();
+  };
+
+  const logSelectedData = () => {
+    // Create the filtered data JSON
+    const filteredData = {
+      years: selectedYears,
+      regions: selectedRegions,
+      sectors: selectedSectors,
+      deal_types: selectedDealTypes,
+      period: selectedPeriod,
+    };
+    
+    // Log it to the console
+    console.log(JSON.stringify(filteredData, null, 2));
   };
 
   const renderMultiSelect = (
@@ -173,47 +189,46 @@ const DealsDataFilter: React.FC = () => {
 
   return (
     <Box width={'300px'}>
-  {sections.map((section, index) => (
-    <Accordion
-      key={index}
-      expanded={expanded === section.label}  // Control the expanded state dynamically
-      onChange={() => setExpanded(expanded === section.label ? false : section.label)}  // Toggle expand/collapse
-    >
-      <AccordionSummary
-  expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}  // Set the icon color to white
-  aria-controls={`${section.label}-content`}
-        id={`${section.label}-header`}
-        sx={{
-          backgroundColor: '#002060', // Set the background color for the header
-          color: 'white', // Set the text color to white for better contrast
-          '& .MuiAccordionSummary-content': {
-            color: 'white', // Ensure the text inside the summary is white
-          },
-        }}
-      >
-        <Typography >{section.label}</Typography>
-      </AccordionSummary>
-      <AccordionDetails 
-       sx={{
-        backgroundColor: 'white', // Set the background color for the header
-        color: '#515050', // Set the text color to white for better contrast
-        '& .MuiAccordionSummary-content': {
-          color: '#515050', 
-          justifyContent: 'flex-start',  // Align the content to the left
-          // Ensure the text inside the summary is white
-        },
-      }}>
-        {section.render(
-          section.label,
-          section.options,
-          section.selected,
-          section.setSelected
-        )}
-      </AccordionDetails>
-    </Accordion>
-  ))}
-</Box>
-
+      {sections.map((section, index) => (
+        <Accordion
+          key={index}
+          expanded={expanded === section.label}  // Control the expanded state dynamically
+          onChange={() => setExpanded(expanded === section.label ? false : section.label)}  // Toggle expand/collapse
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}  // Set the icon color to white
+            aria-controls={`${section.label}-content`}
+            id={`${section.label}-header`}
+            sx={{
+              backgroundColor: '#002060', // Set the background color for the header
+              color: 'white', // Set the text color to white for better contrast
+              '& .MuiAccordionSummary-content': {
+                color: 'white', // Ensure the text inside the summary is white
+              },
+            }}
+          >
+            <Typography>{section.label}</Typography>
+          </AccordionSummary>
+          <AccordionDetails
+            sx={{
+              backgroundColor: 'white',
+              color: '#515050', // Set the text color to white for better contrast
+              '& .MuiAccordionSummary-content': {
+                color: '#515050',
+                justifyContent: 'flex-start',  // Align the content to the left
+              },
+            }}
+          >
+            {section.render(
+              section.label,
+              section.options,
+              section.selected,
+              section.setSelected
+            )}
+          </AccordionDetails>
+        </Accordion>
+      ))}
+    </Box>
   );
 };
 
