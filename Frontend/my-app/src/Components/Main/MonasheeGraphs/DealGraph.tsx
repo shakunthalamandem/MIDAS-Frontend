@@ -270,7 +270,9 @@ const DealGraph: React.FC = () => {
       <DealTypeSector yAxisType="deal_count" />
       <AreaChartComponent dataCategory="count" />
     </>
+    
   );
 };
+
 
 export default DealGraph;
