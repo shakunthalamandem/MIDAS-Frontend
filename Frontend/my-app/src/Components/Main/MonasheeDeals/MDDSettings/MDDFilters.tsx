@@ -96,14 +96,14 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       setLoading(false);
     }
   };
-
   const handleCancel = () => {
-    // Reset to the initial values stored in the ref
     const resetSelectedValues = { ...initialSelectedValuesRef.current };
-    setSelectedValues(resetSelectedValues);
-    setAppliedFilters(resetSelectedValues);
+    setSelectedValues(resetSelectedValues); // Reset the selected filters
+    setAppliedFilters(resetSelectedValues); // Reset the applied filters
+    console.log("Reset state: ", resetSelectedValues); // Debugging
   };
-
+  
+  
   const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
   };
@@ -140,19 +140,21 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                           key={option}
                           control={
                             <Checkbox
-                              checked={selectedValues[key]?.includes(option)}
-                              onChange={() => {
-                                const newValues = selectedValues[key]?.includes(option)
-                                  ? selectedValues[key]?.filter((item) => item !== option)
-                                  : [...(selectedValues[key] || []), option];
-                                handleSelectionChange(key, newValues || []);
-                              }}
-                              sx={{
-                                "&.Mui-checked": {
-                                  color: "#002060", // Match the checkbox color with header
-                                },
-                              }}
-                            />
+                            key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
+                            checked={selectedValues[key]?.includes(option)}
+                            onChange={() => {
+                              const newValues = selectedValues[key]?.includes(option)
+                                ? selectedValues[key]?.filter((item) => item !== option)
+                                : [...(selectedValues[key] || []), option];
+                              handleSelectionChange(key, newValues || []);
+                            }}
+                            sx={{
+                              "&.Mui-checked": {
+                                color: "#002060", // Match the checkbox color with header
+                              },
+                            }}
+                          />
+                          
                           }
                           label={option}
                         />
