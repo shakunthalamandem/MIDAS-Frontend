@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Grid,
   Button,
   Typography,
   Checkbox,
@@ -110,64 +109,71 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
 
   return (
     <Container maxWidth="xl" sx={{ padding: 0, marginBottom: 4 ,display: "flex",marginLeft:0}}>
-            <Box width="300px" sx={{ marginRight: 10 }}>
+      <Box width="400px" sx={{ marginRight: 10 }}>
+        <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
+          <CardContent>
+          <Box width="300px" sx={{ p: 2 }}>
+  {filtersData.map((filter) => {
+    const key = Object.keys(filter)[0];
+    const { options, label, description } = filter[key];
 
-      <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
-        <CardContent>
-          <Box sx={{ p: 2 }}>
-            <Grid container spacing={2}>
-              {filtersData.map((filter) => {
-                const key = Object.keys(filter)[0];
-                const { options, label, description } = filter[key];
+    return (
+      <Accordion expanded={expanded === key} onChange={() => setExpanded(expanded === key ? false : key)}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
+          aria-controls={`${key}-content`}
+          id={`${key}-header`}
+          sx={{
+            backgroundColor: "#002060", // Set the background color to #002060
+            color: "white", // Set the text color to white
+            "& .MuiAccordionSummary-content": {
+              color: "white", // Ensuring text is white in the summary
+            },
+          }}
+        >
+          <Typography>{label}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {options.map((option) => (
+            <FormControlLabel
+              key={option}
+              control={
+                <Checkbox
+                  checked={selectedValues[key]?.includes(option)}
+                  onChange={() => {
+                    const newValues = selectedValues[key]?.includes(option)
+                      ? selectedValues[key]?.filter((item) => item !== option)
+                      : [...(selectedValues[key] || []), option];
+                    handleSelectionChange(key, newValues || []);
+                  }}
+                  sx={{
+                    "&.Mui-checked": {
+                      color: "#002060", // Match the checkbox color with header
+                    },
+                  }}
+                />
+              }
+              label={option}
+            />
+          ))}
+        </AccordionDetails>
+      </Accordion>
+    );
+  })}
+  <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+    <LoadingButton variant="contained" onClick={() => handleSubmit()} sx={{ mr: 2, bgcolor: "#002060" }}>
+      Apply
+    </LoadingButton>
+    <Button variant="outlined" color="secondary" onClick={handleCancel}>
+      Reset
+    </Button>
+  </Box>
+</Box>
 
-                return (
-                  <Grid item xs={12} sm={6} md={3} key={key}>
-                    <Accordion expanded={expanded === key} onChange={handleAccordionChange(key)}>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls={`${key}-content`} id={`${key}-header`}>
-                        <Typography>{label}</Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        {options.map((option) => (
-                          <FormControlLabel
-                            key={option}
-                            control={
-                              <Checkbox
-                                checked={selectedValues[key]?.includes(option)}
-                                onChange={() => {
-                                  const newValues = selectedValues[key]?.includes(option)
-                                    ? selectedValues[key]?.filter((item) => item !== option)
-                                    : [...(selectedValues[key] || []), option];
-                                  handleSelectionChange(key, newValues || []);
-                                }}
-                                sx={{
-                                  "&.Mui-checked": {
-                                    color: "#002060",
-                                  },
-                                }}
-                              />
-                            }
-                            label={option}
-                          />
-                        ))}
-                      </AccordionDetails>
-                    </Accordion>
-                  </Grid>
-                );
-              })}
-            </Grid>
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <LoadingButton variant="contained" onClick={() => handleSubmit()} sx={{ mr: 2, bgcolor: "#002060" }}>
-                Apply
-              </LoadingButton>
-              <Button variant="outlined" color="secondary" onClick={handleCancel}>
-                Reset
-              </Button>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
       </Box>
-      <Box mt={4}  flex={1}>
+      <Box mt={4} flex={1}>
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress color="primary" />
