@@ -181,7 +181,7 @@ interface DealsDataFilterProps {
               aria-controls={`${section.label}-content`}
               id={`${section.label}-header`}
               sx={{
-                backgroundColor: "#002060",
+                backgroundColor: "#3a507d",
                 color: "white",
                 "& .MuiAccordionSummary-content": {
                   color: "white",
