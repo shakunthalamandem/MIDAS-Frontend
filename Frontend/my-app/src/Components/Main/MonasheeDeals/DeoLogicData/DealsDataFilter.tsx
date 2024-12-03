@@ -7,9 +7,6 @@ import {
   AccordionDetails,
   Checkbox,
   FormControlLabel,
-  FormGroup,
-  TextField,
-  MenuItem,
   CircularProgress,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -20,7 +17,7 @@ interface ApiData {
   regions: string[];
   sectors: string[];
   deal_types: string[];
-  period: string[];
+  periods: string[];
 }
 
 // Component
@@ -33,15 +30,17 @@ const DealsDataFilter: React.FC = () => {
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState<string[]>([]);
 
+  const [expanded, setExpanded] = useState<string | false>(false); // Track expanded state
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
-  
+
         if (!apiUrl) {
           throw new Error("API URL is not defined in environment variables");
         }
-  
+
         const response = await axios.get<ApiData>(`${apiUrl}/api/deals_data/`);
         setApiData(response.data);
       } catch (error) {
@@ -50,10 +49,9 @@ const DealsDataFilter: React.FC = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
-  
 
   const handleChange = (
     value: string,
@@ -65,6 +63,23 @@ const DealsDataFilter: React.FC = () => {
     } else {
       setter([...currentValues, value]);
     }
+
+    // Log the selected filter data in JSON format
+    logSelectedData();
+  };
+
+  const logSelectedData = () => {
+    // Create the filtered data JSON
+    const filteredData = {
+      years: selectedYears,
+      regions: selectedRegions,
+      sectors: selectedSectors,
+      deal_types: selectedDealTypes,
+      period: selectedPeriod,
+    };
+    
+    // Log it to the console
+    console.log(JSON.stringify(filteredData, null, 2));
   };
 
   const renderMultiSelect = (
@@ -74,28 +89,23 @@ const DealsDataFilter: React.FC = () => {
     setSelected: React.Dispatch<React.SetStateAction<string[]>>
   ) => (
     <Box>
-      <Typography variant="subtitle1">{label}</Typography>
-      <TextField
-        select
-        SelectProps={{
-          multiple: true,
-          value: selected,
-          onChange: (e) => {
-            const value = e.target.value as string[]; // Ensure correct typing
-            setSelected(value);
-          },
-        }}
-        variant="outlined"
-        size="small"
-        fullWidth
-      >
-        {options.map((option) => (
-          <MenuItem key={option} value={option}>
-            <Checkbox checked={selected.includes(option)} />
-            {option}
-          </MenuItem>
-        ))}
-      </TextField>
+      {options.map((option) => (
+        <FormControlLabel
+          key={option}
+          control={
+            <Checkbox
+              checked={selected.includes(option)}
+              onChange={() => handleChange(option, setSelected, selected)}
+              sx={{
+                '&.Mui-checked': {
+                  color: '#002060',  // Set the color of the checkbox tick when checked
+                },
+              }}
+            />
+          }
+          label={option}
+        />
+      ))}
     </Box>
   );
 
@@ -106,21 +116,23 @@ const DealsDataFilter: React.FC = () => {
     setSelected: React.Dispatch<React.SetStateAction<string[]>>
   ) => (
     <Box>
-      <Typography variant="subtitle1">{label}</Typography>
-      <FormGroup>
-        {options.map((option) => (
-          <FormControlLabel
-            key={option}
-            control={
-              <Checkbox
-                checked={selected.includes(option)}
-                onChange={() => handleChange(option, setSelected, selected)}
-              />
-            }
-            label={option}
-          />
-        ))}
-      </FormGroup>
+      {options.map((option) => (
+        <FormControlLabel
+          key={option}
+          control={
+            <Checkbox
+              checked={selected.includes(option)}
+              onChange={() => handleChange(option, setSelected, selected)}
+              sx={{
+                '&.Mui-checked': {
+                  color: '#002060',  // Set the color of the checkbox tick when checked
+                },
+              }}
+            />
+          }
+          label={option}
+        />
+      ))}
     </Box>
   );
 
@@ -136,62 +148,83 @@ const DealsDataFilter: React.FC = () => {
     return <Typography variant="h6">Failed to load data.</Typography>;
   }
 
+  // Dynamically create sections based on API data
+  const sections = [
+    {
+      label: "Years",
+      options: apiData?.years?.map(String) || [],  // Ensure the array is always present
+      selected: selectedYears,
+      setSelected: setSelectedYears,
+      render: renderCheckboxGroup,  // Use checkboxes for "Years"
+    },
+    {
+      label: "Regions",
+      options: apiData?.regions || [],  // Default to an empty array if undefined
+      selected: selectedRegions,
+      setSelected: setSelectedRegions,
+      render: renderMultiSelect,  // Use multi-select for "Regions"
+    },
+    {
+      label: "Sectors",
+      options: apiData?.sectors || [],
+      selected: selectedSectors,
+      setSelected: setSelectedSectors,
+      render: renderMultiSelect,  // Use multi-select for "Sectors"
+    },
+    {
+      label: "Deal Types",
+      options: apiData?.deal_types || [],
+      selected: selectedDealTypes,
+      setSelected: setSelectedDealTypes,
+      render: renderMultiSelect,  // Use multi-select for "Deal Types"
+    },
+    {
+      label: "Period",
+      options: apiData?.periods || [],
+      selected: selectedPeriod,
+      setSelected: setSelectedPeriod,
+      render: renderMultiSelect,  // Use multi-select for "Period"
+    },
+  ];
+
   return (
-    <Box>
-      {[
-        {
-          label: "Years",
-          options: apiData.years.map(String),
-          selected: selectedYears,
-          setSelected: setSelectedYears,
-        },
-        {
-          label: "Regions",
-          options: apiData.regions,
-          selected: selectedRegions,
-          setSelected: setSelectedRegions,
-        },
-        {
-          label: "Sectors",
-          options: apiData.sectors,
-          selected: selectedSectors,
-          setSelected: setSelectedSectors,
-        },
-        {
-          label: "Deal Types",
-          options: apiData.deal_types,
-          selected: selectedDealTypes,
-          setSelected: setSelectedDealTypes,
-        },
-        {
-          label: "Period",
-          options: apiData.period,
-          selected: selectedPeriod,
-          setSelected: setSelectedPeriod,
-        },
-      ].map((section, index) => (
-        <Accordion key={index}>
+    <Box width={'300px'}>
+      {sections.map((section, index) => (
+        <Accordion
+          key={index}
+          expanded={expanded === section.label}  // Control the expanded state dynamically
+          onChange={() => setExpanded(expanded === section.label ? false : section.label)}  // Toggle expand/collapse
+        >
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
+            expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}  // Set the icon color to white
             aria-controls={`${section.label}-content`}
             id={`${section.label}-header`}
+            sx={{
+              backgroundColor: '#002060', // Set the background color for the header
+              color: 'white', // Set the text color to white for better contrast
+              '& .MuiAccordionSummary-content': {
+                color: 'white', // Ensure the text inside the summary is white
+              },
+            }}
           >
             <Typography>{section.label}</Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            {section.label === "Years"
-              ? renderCheckboxGroup(
-                  section.label,
-                  section.options,
-                  section.selected,
-                  section.setSelected
-                )
-              : renderMultiSelect(
-                  section.label,
-                  section.options,
-                  section.selected,
-                  section.setSelected
-                )}
+          <AccordionDetails
+            sx={{
+              backgroundColor: 'white',
+              color: '#515050', // Set the text color to white for better contrast
+              '& .MuiAccordionSummary-content': {
+                color: '#515050',
+                justifyContent: 'flex-start',  // Align the content to the left
+              },
+            }}
+          >
+            {section.render(
+              section.label,
+              section.options,
+              section.selected,
+              section.setSelected
+            )}
           </AccordionDetails>
         </Accordion>
       ))}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import DealsDataFilter from '../../MonasheeDeals/DeoLogicData/DealsDataFilter';
 
 const Strategies: React.FC = () => {
   return (
@@ -36,6 +37,8 @@ const Strategies: React.FC = () => {
       >
         Learn about various strategies here, including investment, growth, and market entry strategies tailored for diverse market conditions.
       </Typography>
+      <DealsDataFilter />
+
     </Box>
   );
 };
