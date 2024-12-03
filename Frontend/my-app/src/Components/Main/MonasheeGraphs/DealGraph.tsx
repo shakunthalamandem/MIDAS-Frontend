@@ -109,9 +109,9 @@ const DealGraph: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ paddingY: 4, display: "flex" }}>
+    <Container maxWidth="xl" sx={{ paddingY: 4, display: "flex",marginLeft:0 }}>
       {/* Filters Section */}
-      <Box width="300px" sx={{ marginRight: 4 }}>
+      <Box width="300px" sx={{ marginRight: 10 }}>
       <DealsDataFilter appliedFilters={filters} onFiltersChange={handleFilterChange} />
       </Box>
 
