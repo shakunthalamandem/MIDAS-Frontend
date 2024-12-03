@@ -21,11 +21,11 @@ const formatValue = (value: number, apiName: string): string => {
   if (apiName === "mdd_deals_volume" || apiName === "avg_deal_size") {
     const absValue = Math.abs(value);
     if (absValue >= 1_000_000_000) {
-      return `$${(value / 1_000_000_000).toFixed(2)}B`;
+      return `$${(value / 1_000_000_000).toFixed(1)}B`;
     } else if (absValue >= 1_000_000) {
-      return `$${(value / 1_000_000).toFixed(2)}M`;
+      return `$${(value / 1_000_000).toFixed(1)}M`;
     } else if (absValue >= 1_000) {
-      return `$${(value / 1_000).toFixed(2)}K`;
+      return `$${(value / 1_000).toFixed(1)}K`;
     }
     return `$${value.toFixed(2)}`;
   } else if (apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") {
