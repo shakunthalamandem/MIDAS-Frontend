@@ -31,7 +31,7 @@ const formatValue = (value: number, apiName: string): string => {
   } else if (apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") {
     return `${value.toFixed(2)}%`;
   }
-  return value.toFixed(0); // Return integer for mdd_deals_graph
+  return value.toFixed(0); // Default to integer for other APIs
 };
 
 const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiName }) => {
@@ -44,7 +44,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
     mdd_allocation_ioi: "allocation_percentage",
   };
 
-  const allocationKey = allocationKeyMap[apiName] || "allocation_deal_size_percentage";
+  const allocationKey = allocationKeyMap[apiName] || "deal_size"; // Default to "deal_size"
 
   const formatChartData = (data: any) => {
     const formattedData: any[] = [];
@@ -53,19 +53,10 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
       const sectors = data[quarter];
       const chartRow: any = { quarter };
 
-      ["FO", "IPO", "OTHER", "PRIVATE"].forEach((dealType) => {
-        let dealTypeTotal = 0;
-
-        if (sectors[dealType]) {
-          for (const region in sectors[dealType]) {
-            for (const sector in sectors[dealType][region]) {
-              const allocation = sectors[dealType][region][sector][allocationKey];
-              dealTypeTotal += parseFloat(allocation);
-            }
-          }
-        }
-
-        chartRow[dealType] = dealTypeTotal;
+      // Include all deal types dynamically
+      Object.keys(sectors).forEach((dealType) => {
+        const dealData = sectors[dealType]?.[allocationKey];
+        chartRow[dealType] = dealData ? parseFloat(dealData) : 0; // Ensure valid numbers
       });
 
       formattedData.push(chartRow);
@@ -99,10 +90,23 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
             />
             <Tooltip formatter={(value) => tooltipFormatter(Number(value))} />
             <Legend />
-            <Bar dataKey="FO" stackId="a" fill="#8884d8" />
-            <Bar dataKey="IPO" stackId="a" fill="#82ca9d" />
-            <Bar dataKey="OTHER" stackId="a" fill="#ffc658" />
-            <Bar dataKey="PRIVATE" stackId="a" fill="#002060" />
+            {Object.keys(chartData[0] || {})
+              .filter((key) => key !== "quarter")
+              .map((dealType) => (
+                <Bar
+                  key={dealType}
+                  dataKey={dealType}
+                  stackId="a"
+                  fill={
+                    {
+                      FO: "#8884d8",
+                      IPO: "#82ca9d",
+                      OTHER: "#ffc658",
+                      PRIVATE: "#002060",
+                    }[dealType] || "#ccc"
+                  }
+                />
+              ))}
           </BarChart>
         </ResponsiveContainer>
       )}
