@@ -8,18 +8,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import {
-  Container,
-  Grid,
-  Box,
-  Typography,
-} from "@mui/material";
+import { Container, Box, Typography } from "@mui/material";
 import axios from "axios";
-import DealPieChart from "./MonasheePieCharts/DealPieChart";
-import AreaChartComponent from "./SectorDotGraphs/AreaChartComponent";
-import DealTypeSector from "./SectorDotGraphs/DealTypeSector";
 import DealsDataFilter from "../MonasheeDeals/DeoLogicData/DealsDataFilter";
 
+// Define interfaces for API response and chart data
 interface ApiResponse {
   [key: string]: {
     FO: {
@@ -40,12 +33,8 @@ interface ChartData {
   total?: number;
 }
 
-interface DealPieChartData {
-  sectorData: { name: string; value: number }[];
-  regionData: { name: string; value: number }[];
-}
-
 const DealGraph: React.FC = () => {
+  // State for chart data and filters
   const [data, setData] = useState<ChartData[]>([]);
   const [filters, setFilters] = useState({
     years: [] as string[],
@@ -55,7 +44,8 @@ const DealGraph: React.FC = () => {
     period: [] as string[],
   });
 
-  const fetchData = async () => {
+  // Fetch data from the API based on the applied filters
+  const fetchData = async (appliedFilters: typeof filters) => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -63,22 +53,24 @@ const DealGraph: React.FC = () => {
         throw new Error("API URL is not defined in environment variables");
       }
 
-      const response = await axios.post<ApiResponse>(`${apiUrl}/api/deals_graph/`, filters);
+      const response = await axios.post<ApiResponse>(`${apiUrl}/api/deals_graph/`, appliedFilters);
       setData(transformData(response.data));
     } catch (error) {
       console.error("Error fetching data from API:", error);
     }
   };
 
+  // Transform API response data into a format suitable for the chart
   const transformData = (apiData: ApiResponse): ChartData[] => {
     return Object.keys(apiData).map((key) => {
-      const ipoData = apiData[key].IPO;
-      const foData = apiData[key].FO;
+      const { IPO, FO } = apiData[key];
 
-      const ipoTotal = Object.values(ipoData.US || {}).reduce((sum, { count }) => sum + count, 0) +
-                       Object.values(ipoData.International || {}).reduce((sum, { count }) => sum + count, 0);
-      const foTotal = Object.values(foData.US || {}).reduce((sum, { count }) => sum + count, 0) +
-                      Object.values(foData.International || {}).reduce((sum, { count }) => sum + count, 0);
+      const ipoTotal =
+        Object.values(IPO.US || {}).reduce((sum, { count }) => sum + count, 0) +
+        Object.values(IPO.International || {}).reduce((sum, { count }) => sum + count, 0);
+      const foTotal =
+        Object.values(FO.US || {}).reduce((sum, { count }) => sum + count, 0) +
+        Object.values(FO.International || {}).reduce((sum, { count }) => sum + count, 0);
 
       return {
         name: key,
@@ -89,14 +81,17 @@ const DealGraph: React.FC = () => {
     });
   };
 
+  // Fetch data whenever filters change
   useEffect(() => {
-    fetchData();
+    fetchData(filters);
   }, [filters]);
 
+  // Handle filter changes
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
   };
 
+  // Custom Tooltip for the chart
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const { name, IPO, FO, total } = payload[0].payload;
@@ -113,21 +108,13 @@ const DealGraph: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ paddingY: 4, display: "flex" }}>
-      {/* Filters on the left */}
+    <Container maxWidth="xl" sx={{ paddingY: 4, display: "flex" }}>
+      {/* Filters Section */}
       <Box width="300px" sx={{ marginRight: 4 }}>
-        <DealsDataFilter appliedFilters={{
-          years: [],
-          regions: [],
-          sectors: [],
-          deal_types: [],
-          period: []
-        }} onFiltersChange={function (newFilters: { years: string[]; regions: string[]; sectors: string[]; deal_types: string[]; period: string[]; }): void {
-          throw new Error("Function not implemented.");
-        } } />
+        <DealsDataFilter appliedFilters={filters} onFiltersChange={handleFilterChange} />
       </Box>
 
-      {/* Graphs on the right */}
+      {/* Chart Section */}
       <Box flex={1}>
         <Typography
           variant="h6"
