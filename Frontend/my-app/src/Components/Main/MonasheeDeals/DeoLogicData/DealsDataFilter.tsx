@@ -24,20 +24,27 @@ interface ApiData {
 }
 
 interface DealsDataFilterProps {
-  appliedFilters?: {
-    years: string[];
-    regions: string[];
-    sectors: string[];
-    deal_types: string[];
-    period: string[];
-  };
-}
-
+    appliedFilters?: {
+      years: string[];
+      regions: string[];
+      sectors: string[];
+      deal_types: string[];
+      period: string[];
+    };
+    onFiltersChange: (newFilters: {
+      years: string[];
+      regions: string[];
+      sectors: string[];
+      deal_types: string[];
+      period: string[];
+    }) => void; // Add this line to accept filter change callback
+  }
+  
 const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters }) => {
   const [apiData, setApiData] = useState<ApiData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Filters state
+  // Initialize filter states with appliedFilters or set default to all values
   const [selectedYears, setSelectedYears] = useState<string[]>(appliedFilters?.years || []);
   const [selectedRegions, setSelectedRegions] = useState<string[]>(appliedFilters?.regions || []);
   const [selectedSectors, setSelectedSectors] = useState<string[]>(appliedFilters?.sectors || []);
@@ -72,12 +79,25 @@ const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters }) => 
     setter: React.Dispatch<React.SetStateAction<string[]>>,
     currentValues: string[]
   ) => {
+    let updatedValues;
     if (currentValues.includes(value)) {
-      setter(currentValues.filter((v) => v !== value));
+      updatedValues = currentValues.filter((v) => v !== value);
     } else {
-      setter([...currentValues, value]);
+      updatedValues = [...currentValues, value];
     }
+    setter(updatedValues);
+    
+    // Call onFiltersChange to pass the updated filters back to the parent
+    onFiltersChange({
+      years: selectedYears,
+      regions: selectedRegions,
+      sectors: selectedSectors,
+      deal_types: selectedDealTypes,
+      period: selectedPeriod,
+    });
   };
+  
+
   const handleReset = () => {
     setSelectedYears([]);
     setSelectedRegions([]);
@@ -85,7 +105,6 @@ const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters }) => 
     setSelectedDealTypes([]);
     setSelectedPeriod([]);
   };
-  
 
   const handleApply = () => {
     const appliedFilters = {
@@ -110,6 +129,7 @@ const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters }) => 
     return <Typography variant="h6">Failed to load data.</Typography>;
   }
 
+  // Sections mapping and filtering
   const sections = [
     {
       label: "Years",
@@ -191,10 +211,14 @@ const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters }) => 
           </Accordion>
         ))}
         <Box display="flex" justifyContent="space-between" mt={2}>
-        <Button variant="contained" color="primary" onClick={handleApply} sx={{ mr: 2, bgcolor: "#002060" }}
-        >
-          Apply 
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleApply}
+            sx={{ mr: 2, bgcolor: "#002060" }}
+          >
+            Apply
+          </Button>
           <Button variant="outlined" color="secondary" onClick={handleReset}>
             Reset
           </Button>

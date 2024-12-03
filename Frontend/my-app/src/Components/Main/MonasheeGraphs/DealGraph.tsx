@@ -33,6 +33,7 @@ interface ChartData {
   total?: number;
 }
 
+
 const DealGraph: React.FC = () => {
   // State for chart data and filters
   const [data, setData] = useState<ChartData[]>([]);
@@ -88,7 +89,7 @@ const DealGraph: React.FC = () => {
 
   // Handle filter changes
   const handleFilterChange = (newFilters: typeof filters) => {
-    setFilters(newFilters);
+    setFilters(newFilters); // Update the filters state when user changes them
   };
 
   // Custom Tooltip for the chart
@@ -111,7 +112,7 @@ const DealGraph: React.FC = () => {
     <Container maxWidth="xl" sx={{ paddingY: 4, display: "flex" }}>
       {/* Filters Section */}
       <Box width="300px" sx={{ marginRight: 4 }}>
-        <DealsDataFilter appliedFilters={filters} onFiltersChange={handleFilterChange} />
+      <DealsDataFilter appliedFilters={filters} onFiltersChange={handleFilterChange} />
       </Box>
 
       {/* Chart Section */}
