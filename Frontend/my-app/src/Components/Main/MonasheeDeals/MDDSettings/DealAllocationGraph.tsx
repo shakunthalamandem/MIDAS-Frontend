@@ -78,7 +78,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
           align="center"
           sx={{ mt: 5, color: "#002060", fontWeight: "bold" }}
         >
-          Please select the filters to show the plots.
+          No Data Available for the above filters. Please change the selected filters to show the plots.
         </Typography>
       ) : (
         <ResponsiveContainer width="100%" height={400}>
