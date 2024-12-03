@@ -40,8 +40,8 @@ interface DealsDataFilterProps {
     }) => void; // Add this line to accept filter change callback
   }
   
-const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters }) => {
-  const [apiData, setApiData] = useState<ApiData | null>(null);
+  const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters, onFiltersChange }) => {
+    const [apiData, setApiData] = useState<ApiData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Initialize filter states with appliedFilters or set default to all values
@@ -86,16 +86,17 @@ const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters }) => 
       updatedValues = [...currentValues, value];
     }
     setter(updatedValues);
-    
-    // Call onFiltersChange to pass the updated filters back to the parent
+  
+    // Use the updated values after the state is set
     onFiltersChange({
-      years: selectedYears,
+      years: selectedYears, // Use the updated state value
       regions: selectedRegions,
       sectors: selectedSectors,
       deal_types: selectedDealTypes,
       period: selectedPeriod,
     });
   };
+  
   
 
   const handleReset = () => {
