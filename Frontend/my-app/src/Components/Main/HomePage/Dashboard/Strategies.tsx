@@ -37,7 +37,7 @@ const Strategies: React.FC = () => {
       >
         Learn about various strategies here, including investment, growth, and market entry strategies tailored for diverse market conditions.
       </Typography>
-      <DealsDataFilter />
+      {/* <DealsDataFilter /> */}
 
     </Box>
   );
