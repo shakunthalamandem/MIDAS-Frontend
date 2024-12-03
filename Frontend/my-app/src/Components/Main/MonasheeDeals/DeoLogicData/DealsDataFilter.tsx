@@ -191,7 +191,7 @@ const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters }) => 
           </Accordion>
         ))}
         <Box display="flex" justifyContent="space-between" mt={2}>
-        <Button variant="contained" color="primary" onClick={handleApply}                 sx={{ mr: 2, bgcolor: "#002060" }}
+        <Button variant="contained" color="primary" onClick={handleApply} sx={{ mr: 2, bgcolor: "#002060" }}
         >
           Apply 
         </Button>
