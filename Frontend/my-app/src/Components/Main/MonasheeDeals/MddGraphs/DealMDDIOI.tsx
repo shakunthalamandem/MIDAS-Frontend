@@ -9,7 +9,7 @@ const DealMDDIOI = () => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      height="100vh" // Ensures full-page centering
+      marginTop={15}
       textAlign="center"
     >
       <Typography 
