@@ -8,11 +8,22 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Container, Box, Typography } from "@mui/material";
+import {
+  Container,
+  Grid,
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
-import DealsDataFilter from "../MonasheeDeals/DeoLogicData/DealsDataFilter";
+import DealPieChart from "./MonasheePieCharts/DealPieChart";
+import AreaChartComponent from "./SectorDotGraphs/AreaChartComponent";
+import DealTypeSector from "./SectorDotGraphs/DealTypeSector";
 
-// Define interfaces for API response and chart data
 interface ApiResponse {
   [key: string]: {
     FO: {
@@ -33,74 +44,130 @@ interface ChartData {
   total?: number;
 }
 
+interface PieChartData {
+  name: string;
+  value: number;
+}
+
+// New interface for the expected pie chart data structure
+interface DealPieChartData {
+  sectorData: PieChartData[];
+  regionData: PieChartData[];
+}
 
 const DealGraph: React.FC = () => {
-  // State for chart data and filters
   const [data, setData] = useState<ChartData[]>([]);
-  const [filters, setFilters] = useState({
-    years: [] as string[],
-    regions: [] as string[],
-    sectors: [] as string[],
-    deal_types: [] as string[],
-    period: [] as string[],
+  const [pieChartData, setPieChartData] = useState<DealPieChartData>({
+    sectorData: [],
+    regionData: [],
   });
+  const [type, setType] = useState("all");
+  const [period, setPeriod] = useState("yearly");
+  const [region, setRegion] = useState("all");
+  const [sector, setSector] = useState("all");
+  const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
-  // Fetch data from the API based on the applied filters
-  const fetchData = async (appliedFilters: typeof filters) => {
+  const fetchData = async () => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
 
-      if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables");
-      }
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
+      const response = await axios.post<ApiResponse>(`${apiUrl}/api/deals_graph/`, {
+        type,
+        period,
+        region,
+      });
 
-      const response = await axios.post<ApiResponse>(`${apiUrl}/api/deals_graph/`, appliedFilters);
+      // Collect unique sectors
+      const sectors = new Set<string>();
+      Object.values(response.data).forEach((deal) => {
+        (["FO", "IPO"] as const).forEach((category) => {
+          (["US", "International"] as const).forEach((regionKey) => {
+            Object.keys(deal[category][regionKey] || {}).forEach((sec) => sectors.add(sec));
+          });
+        });
+      });
+
+      setSectorOptions(Array.from(sectors));
       setData(transformData(response.data));
+      setPieChartData(transformPieChartData(response.data)); // Set the pie chart data
     } catch (error) {
       console.error("Error fetching data from API:", error);
     }
   };
 
-  // Transform API response data into a format suitable for the chart
   const transformData = (apiData: ApiResponse): ChartData[] => {
     return Object.keys(apiData).map((key) => {
-      const { IPO, FO } = apiData[key];
+      const ipoData = apiData[key].IPO;
+      const foData = apiData[key].FO;
 
-      const ipoTotal =
-        Object.values(IPO.US || {}).reduce((sum, { count }) => sum + count, 0) +
-        Object.values(IPO.International || {}).reduce((sum, { count }) => sum + count, 0);
-      const foTotal =
-        Object.values(FO.US || {}).reduce((sum, { count }) => sum + count, 0) +
-        Object.values(FO.International || {}).reduce((sum, { count }) => sum + count, 0);
+      const filterBySector = (regionData: Record<string, { count: number }>) =>
+        Object.entries(regionData || {})
+          .filter(([sect]) => sector === "all" || sect === sector)
+          .reduce((sum, [, { count }]) => sum + count, 0);
+
+      const ipoUS = filterBySector(ipoData.US);
+      const ipoInternational = filterBySector(ipoData.International);
+      const foUS = filterBySector(foData.US);
+      const foInternational = filterBySector(foData.International);
+
+      const combinedIPO = region === "all" ? ipoUS + ipoInternational : region === "US" ? ipoUS : ipoInternational;
+      const combinedFO = region === "all" ? foUS + foInternational : region === "US" ? foUS : foInternational;
+
+      const totalDeals = combinedIPO + combinedFO;
 
       return {
         name: key,
-        IPO: ipoTotal,
-        FO: foTotal,
-        total: ipoTotal + foTotal,
+        IPO: combinedIPO,
+        FO: combinedFO,
+        total: totalDeals,
       };
     });
   };
 
-  // Fetch data whenever filters change
-  useEffect(() => {
-    fetchData(filters);
-  }, [filters]);
+  const transformPieChartData = (apiData: ApiResponse): DealPieChartData => {
+    const sectorDataMap: Record<string, number> = {};
+    const regionDataMap: Record<string, number> = {};
 
-  // Handle filter changes
-  const handleFilterChange = (newFilters: typeof filters) => {
-    setFilters(newFilters); // Update the filters state when user changes them
+    Object.values(apiData).forEach((deal) => {
+      (["FO", "IPO"] as const).forEach((category) => {
+        (["US", "International"] as const).forEach((regionKey) => {
+          Object.entries(deal[category][regionKey] || {}).forEach(([sector, { count }]) => {
+            sectorDataMap[sector] = (sectorDataMap[sector] || 0) + count;
+
+            // Accumulate region data
+            const regionKeyCount = regionKey === "US" ? "US" : "International";
+            regionDataMap[regionKeyCount] = (regionDataMap[regionKeyCount] || 0) + count;
+          });
+        });
+      });
+    });
+
+    const sectorData = Object.entries(sectorDataMap).map(([name, value]) => ({ name, value }));
+    const regionData = Object.entries(regionDataMap).map(([name, value]) => ({ name, value }));
+
+    return { sectorData, regionData };
   };
 
-  // Custom Tooltip for the chart
+  useEffect(() => {
+    fetchData();
+  }, [type, period, region, sector]);
+
+  const handleTypeChange = (event: SelectChangeEvent) => setType(event.target.value);
+  const handlePeriodChange = (event: SelectChangeEvent) => setPeriod(event.target.value);
+  const handleRegionChange = (event: SelectChangeEvent) => setRegion(event.target.value);
+  const handleSectorChange = (event: SelectChangeEvent) => setSector(event.target.value);
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const { name, IPO, FO, total } = payload[0].payload;
       return (
-        <div style={{ backgroundColor: "white", border: "1px solid #ccc", padding: "10px" }}>
+        <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '10px' }}>
           <h4>{name}</h4>
-          {IPO !== undefined && <p>IPO: {IPO}</p>}
-          {FO !== undefined && <p>FO: {FO}</p>}
+          {type === "ipo" || type === "all" ? <p>IPO: {IPO}</p> : null}
+          {type === "fo" || type === "all" ? <p>FO: {FO}</p> : null}
           <p>Total Deals: {total}</p>
         </div>
       );
@@ -109,14 +176,8 @@ const DealGraph: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ paddingY: 4, display: "flex",marginLeft:0 }}>
-      {/* Filters Section */}
-      <Box width="300px" sx={{ marginRight: 10 }}>
-      <DealsDataFilter appliedFilters={filters} onFiltersChange={handleFilterChange} />
-      </Box>
-
-      {/* Chart Section */}
-      <Box flex={1}>
+    <>
+      <Container maxWidth="lg" sx={{ paddingY: 4 }}>
         <Typography
           variant="h6"
           sx={{
@@ -130,6 +191,55 @@ const DealGraph: React.FC = () => {
         >
           Number Of Deals
         </Typography>
+
+        <Grid container spacing={2} sx={{ justifyContent: "flex-start", paddingLeft: '50px', marginBottom: '10px' }}>
+          <Grid item xs={6} sm={3} md={2}>
+            <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
+              <InputLabel>Type</InputLabel>
+              <Select value={type} onChange={handleTypeChange} label="Type">
+                <MenuItem value="ipo">IPO</MenuItem>
+                <MenuItem value="fo">FO</MenuItem>
+                <MenuItem value="all">All</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={6} sm={3} md={2}>
+            <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
+              <InputLabel>Period</InputLabel>
+              <Select value={period} onChange={handlePeriodChange} label="Period">
+                <MenuItem value="yearly">Yearly</MenuItem>
+                <MenuItem value="quarterly">Quarterly</MenuItem>
+                {/* <MenuItem value="monthly">Monthly</MenuItem> */}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={6} sm={3} md={2}>
+            <FormControl fullWidth variant="outlined" size="small" sx={{ maxWidth: 150 }}>
+              <InputLabel>Region</InputLabel>
+              <Select value={region} onChange={handleRegionChange} label="Region">
+                <MenuItem value="US">US</MenuItem>
+                <MenuItem value="International">International</MenuItem>
+                <MenuItem value="all">All</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={6} sm={3} md={2}>
+            <FormControl fullWidth variant="outlined" size="small" sx={{ minWidth: 250 }}>
+              <InputLabel>Sector</InputLabel>
+              <Select value={sector} onChange={handleSectorChange} label="Sector">
+                <MenuItem value="all">All</MenuItem>
+                {sectorOptions.map((sectorName) => (
+                  <MenuItem key={sectorName} value={sectorName}>
+                    {sectorName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
 
         <Box sx={{ width: "100%", height: 400 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -146,14 +256,23 @@ const DealGraph: React.FC = () => {
               <YAxis />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Bar dataKey="IPO" stackId="a" fill="#8884d8" name="IPO" />
-              <Bar dataKey="FO" stackId="a" fill="#82ca9d" name="FO" />
+              {type === "ipo" || type === "all" ? (
+                <Bar dataKey="IPO" stackId="a" fill="#8884d8" name="IPO" />
+              ) : null}
+              {type === "fo" || type === "all" ? (
+                <Bar dataKey="FO" stackId="a" fill="#82ca9d" name="FO" />
+              ) : null}
             </BarChart>
           </ResponsiveContainer>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+      <DealPieChart deal_count={"true"} /> {/* Pass the pie chart data here */}
+      <DealTypeSector yAxisType="deal_count" />
+      <AreaChartComponent dataCategory="count" />
+    </>
+    
   );
 };
+
 
 export default DealGraph;
