@@ -152,27 +152,48 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
 
       {/* Checkboxes for selecting normal or weighted values */}
       {(apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") && (
-        <div style={{ textAlign: "center", marginTop: "10px" }}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={selectedValue === "normal"}
-                onChange={() => setSelectedValue("normal")}
-              />
-            }
-            label="Normal"
-            sx={{ marginRight: "10px" }}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={selectedValue === "weighted"}
-                onChange={() => setSelectedValue("weighted")}
-              />
-            }
-            label="Weighted"
-          />
-        </div>
+       <div style={{ textAlign: "center", marginTop: "10px" }}>
+       <FormControlLabel
+         control={
+           <Checkbox
+             checked={selectedValue === "normal"}
+             onChange={() => setSelectedValue("normal")}
+             sx={{
+               color: "#002060", // Set the checkbox tick color
+               "&.Mui-checked": {
+                 color: "#002060", // Set the color when checkbox is checked
+               },
+             }}
+           />
+         }
+         label={
+           <Typography sx={{ fontWeight: "bold", color: "#002060" }}>
+             Normal
+           </Typography>
+         }
+         sx={{ marginRight: "10px" }}
+       />
+       <FormControlLabel
+         control={
+           <Checkbox
+             checked={selectedValue === "weighted"}
+             onChange={() => setSelectedValue("weighted")}
+             sx={{
+               color: "#002060", // Set the checkbox tick color
+               "&.Mui-checked": {
+                 color: "#002060", // Set the color when checkbox is checked
+               },
+             }}
+           />
+         }
+         label={
+           <Typography sx={{ fontWeight: "bold", color: "#002060" }}>
+             Weighted
+           </Typography>
+         }
+       />
+     </div>
+     
       )}
 
       {/* Popup Dialog */}
