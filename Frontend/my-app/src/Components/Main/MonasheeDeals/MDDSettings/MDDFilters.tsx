@@ -109,7 +109,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ padding: 0, marginBottom: 4 ,display: "flex",marginLeft:0,marginTop:40}}>
+    <Container maxWidth="xl" sx={{ padding: 0, marginBottom: 4 ,display: "flex",marginLeft:0,marginTop:15}}>
       <Box width="400px" sx={{ marginRight: 10 }}>
         <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
           <CardContent>
