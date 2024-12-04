@@ -53,16 +53,16 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName
                       <TableHead>
                         <TableRow sx={{ backgroundColor: '#1976d2', color: 'white' }}>
                           <TableCell sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'100px' }}>T+1M Excess Returns</TableCell>
-                          <TableCell align="right" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px' }}>
+                          <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'60px' }}>
                             No of Deals
                           </TableCell>
-                          <TableCell align="right" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px' }}>
+                          <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'80px' }}>
                             Allocation as % of Deal Size
                           </TableCell>
-                          <TableCell align="right" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px' }}>
+                          <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'80px' }}>
                             Allocation as % of IOI
                           </TableCell>
-                          <TableCell align="right" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px' }}>
+                          <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'80px' }}>
                             Deal Volume
                           </TableCell>
                         </TableRow>
@@ -76,16 +76,16 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName
                               <TableCell component="th" scope="row" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
                                 {range}
                               </TableCell>
-                              <TableCell align="right" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
+                              <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
                                 {data['Number of deals']}
                               </TableCell>
-                              <TableCell align="right" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
+                              <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
                                 {data['Allocation as % of Deal Size'].toFixed(2)}%
                               </TableCell>
-                              <TableCell align="right" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
+                              <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
                                 {data['Allocation as % of IOI'].toFixed(2)}%
                               </TableCell>
-                              <TableCell align="right" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
+                              <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
                                 {formatValue(data['Deal volume'])}
                               </TableCell>
                             </TableRow>
