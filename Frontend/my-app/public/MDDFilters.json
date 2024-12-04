@@ -26,9 +26,7 @@
       "deal_type": {
         "options": [
           "FO",
-          "IPO",
-          "OTHER",
-          "PRIVATE"
+          "IPO"
         ],
         "label": "Deal Type",
         "description": ""
