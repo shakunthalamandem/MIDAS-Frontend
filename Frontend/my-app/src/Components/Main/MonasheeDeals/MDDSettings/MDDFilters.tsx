@@ -109,7 +109,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ padding: 0, marginBottom: 4 ,display: "flex",marginLeft:0}}>
+    <Container maxWidth="xl" sx={{ padding: 0, marginBottom: 4 ,display: "flex",marginLeft:0,marginTop:40}}>
       <Box width="400px" sx={{ marginRight: 10 }}>
         <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
           <CardContent>
@@ -182,7 +182,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
             <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>Loading... Please Wait</Typography>
           </Box>
         ) : (
+          <>
           <DealAllocationGraph responseData={apiData} apiName={apiName} />
+          </>
         )}
       </Box>
     </Container>
