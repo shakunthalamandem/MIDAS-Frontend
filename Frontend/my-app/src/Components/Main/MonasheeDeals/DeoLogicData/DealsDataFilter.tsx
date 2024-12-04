@@ -168,7 +168,7 @@ interface DealsDataFilterProps {
     <Card sx={{ width: 350, padding: 2, margin: "auto" }}>
       <CardContent>
         <Typography variant="h6" align="center" gutterBottom>
-          Deals Data Filter
+          Filters
         </Typography>
         {sections.map((section, index) => (
           <Accordion
