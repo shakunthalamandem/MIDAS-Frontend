@@ -66,7 +66,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
     mdd_deals_graph: "count",
     mdd_deals_volume: "deal_size",
     avg_deal_size: "deal_size",
-    mdd_allocation_percentage: "allocation_percentage",
+    mdd_allocation_percentage: "allocation_deal_size_percentage",
     mdd_allocation_ioi: "allocation_percentage",
   };
 
@@ -85,20 +85,28 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
 
       // If the selected API is related to allocation, apply the checkbox logic
       allowedDealTypes.forEach((dealType) => {
-        // If the API name is related to allocation, toggle between normal and weighted
-        if (apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") {
-          const allocationKeyForDealType =
+        let allocationKeyForDealType = "";
+      
+        // Check the API name and adjust the allocation key based on selectedValue
+        if (apiName === "mdd_allocation_ioi") {
+          // For "mdd_allocation_ioi", use either allocation_percentage or weighted_allocation_percentage
+          allocationKeyForDealType =
             selectedValue === "normal" ? "allocation_percentage" : "weighted_allocation_percentage";
-          chartRow[dealType] = sectors[dealType]?.[allocationKeyForDealType]
-            ? parseFloat(sectors[dealType][allocationKeyForDealType])
-            : 0;
+        } else if (apiName === "mdd_allocation_percentage") {
+          // For "mdd_allocation_percentage", use either allocation_deal_size_percentage or weighted_allocation_deal_size_percentage
+          allocationKeyForDealType =
+            selectedValue === "normal" ? "allocation_deal_size_percentage" : "weighted_allocation_deal_size_percentage";
         } else {
-          // For non-allocation APIs, use the appropriate key without checkbox filtering
-          chartRow[dealType] = sectors[dealType]?.[allocationKey]
-            ? parseFloat(sectors[dealType][allocationKey])
-            : 0;
+          // For other APIs, use the allocationKey as defined earlier
+          allocationKeyForDealType = allocationKey;
         }
+      
+        // Set the value for the deal type in the chartRow
+        chartRow[dealType] = sectors[dealType]?.[allocationKeyForDealType]
+          ? parseFloat(sectors[dealType][allocationKeyForDealType])
+          : 0;
       });
+      
 
       return chartRow;
     });
