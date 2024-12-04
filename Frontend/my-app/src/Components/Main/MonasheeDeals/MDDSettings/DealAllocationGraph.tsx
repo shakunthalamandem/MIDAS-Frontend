@@ -72,6 +72,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
 
   const allocationKey = allocationKeyMap[apiName] || "deal_size"; // Default to "deal_size"
 
+  // Format the chart data, considering allocation data or other data based on the API
   const formatChartData = (data: any) => {
     if (!data || typeof data !== "object") return [];
 
@@ -82,14 +83,21 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
       const sectors = data[quarter];
       const chartRow: any = { quarter };
 
-      // Populate data for allowed deal types
+      // If the selected API is related to allocation, apply the checkbox logic
       allowedDealTypes.forEach((dealType) => {
-        const allocationKeyForDealType =
-          selectedValue === "normal" ? "allocation_percentage" : "weighted_allocation_percentage";
-
-        chartRow[dealType] = sectors[dealType]?.[allocationKeyForDealType]
-          ? parseFloat(sectors[dealType][allocationKeyForDealType])
-          : 0;
+        // For allocation-related APIs, apply checkbox selection logic
+        if (apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") {
+          const allocationKeyForDealType =
+            selectedValue === "normal" ? "allocation_percentage" : "weighted_allocation_percentage";
+          chartRow[dealType] = sectors[dealType]?.[allocationKeyForDealType]
+            ? parseFloat(sectors[dealType][allocationKeyForDealType])
+            : 0;
+        } else {
+          // For non-allocation APIs, use the appropriate key without checkbox filtering
+          chartRow[dealType] = sectors[dealType]?.[allocationKey]
+            ? parseFloat(sectors[dealType][allocationKey])
+            : 0;
+        }
       });
 
       return chartRow;
