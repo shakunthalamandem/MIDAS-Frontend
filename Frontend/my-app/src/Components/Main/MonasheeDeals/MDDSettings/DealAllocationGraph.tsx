@@ -49,7 +49,6 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
   const handleDialogClose = () => {
     setDialogOpen(false);
     window.location.reload(); // Refresh the page
-
   };
 
   // Automatically open the dialog if responseData contains a message
@@ -73,21 +72,15 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
   const formatChartData = (data: any) => {
     if (!data || typeof data !== "object") return [];
 
-    // Collect all deal types across all quarters
-    const allDealTypes = new Set<string>();
-    Object.values(data).forEach((sectors: any) => {
-      Object.keys(sectors).forEach((dealType) => {
-        allDealTypes.add(dealType);
-      });
-    });
+    // Collect only "FO" and "IPO" deal types
+    const allowedDealTypes = new Set(["FO", "IPO"]);
 
-    // Format chart data
     return Object.keys(data).map((quarter) => {
       const sectors = data[quarter];
       const chartRow: any = { quarter };
 
-      // Populate data for each deal type, even if missing for this quarter
-      allDealTypes.forEach((dealType) => {
+      // Populate data for allowed deal types
+      allowedDealTypes.forEach((dealType) => {
         chartRow[dealType] = sectors[dealType]?.[allocationKey]
           ? parseFloat(sectors[dealType][allocationKey])
           : 0;
@@ -130,8 +123,6 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
                   fill={{
                     FO: "#8884d8",
                     IPO: "#82ca9d",
-                    OTHER: "#ffc658",
-                    PRIVATE: "#002060",
                   }[dealType] || "#ccc"}
                 />
               ))}
