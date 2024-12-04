@@ -66,7 +66,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
     mdd_deals_graph: "count",
     mdd_deals_volume: "deal_size",
     avg_deal_size: "deal_size",
-    mdd_allocation_percentage: "allocation_deal_size_percentage",
+    mdd_allocation_percentage: "allocation_percentage",
     mdd_allocation_ioi: "allocation_percentage",
   };
 
@@ -85,7 +85,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
 
       // If the selected API is related to allocation, apply the checkbox logic
       allowedDealTypes.forEach((dealType) => {
-        // For allocation-related APIs, apply checkbox selection logic
+        // If the API name is related to allocation, toggle between normal and weighted
         if (apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") {
           const allocationKeyForDealType =
             selectedValue === "normal" ? "allocation_percentage" : "weighted_allocation_percentage";
