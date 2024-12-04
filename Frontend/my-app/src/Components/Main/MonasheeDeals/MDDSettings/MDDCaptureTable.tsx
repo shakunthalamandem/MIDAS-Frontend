@@ -6,18 +6,22 @@ interface MDDCaptureTableProps {
   apiName: string; // The API name that determines the key
 }
 
-
 const formatValue = (value: number): string => {
-      const absValue = Math.abs(value);
-      if (absValue >= 1_000_000_000) {
-        return `$${(value / 1_000_000_000).toFixed(1)}B`;
-      } else if (absValue >= 1_000_000) {
-        return `$${(value / 1_000_000).toFixed(1)}M`;
-      } else if (absValue >= 1_000) {
-        return `$${(value / 1_000).toFixed(1)}K`;
-      }
-      return `$${value.toFixed(2)}`;
-    };
+    const absValue = Math.abs(value);
+    if (absValue >= 1_000_000_000) {
+      return `$${(value / 1_000_000_000).toFixed(1)}B`;
+    } else if (absValue >= 1_000_000) {
+      return `$${(value / 1_000_000).toFixed(1)}M`;
+    } else if (absValue >= 1_000) {
+      return `$${(value / 1_000).toFixed(1)}K`;
+    }
+    return `$${value.toFixed(2)}`;
+  };
+
+const categoryOrder = [
+  '> 40%', '20% to 40%', '10% to 20%', '0% to 10%', '-10% to 0%',
+  '-10% to -20%', '< -20%'
+];
 
 const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName }) => {
   return (
@@ -31,6 +35,9 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName
           <Grid container spacing={2}>
             {['FO', 'IPO'].map((category) => {
               const categoryData = responseData[year][category];
+
+              // Sort the ranges according to the category_order
+              const sortedCategoryData = categoryOrder.map((range) => categoryData[range]);
 
               return (
                 <Grid item xs={12} sm={6} key={category}>
@@ -58,8 +65,8 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {Object.keys(categoryData).map((range) => {
-                          const data = categoryData[range];
+                        {sortedCategoryData.map((data, index) => {
+                          const range = categoryOrder[index];
 
                           return (
                             <TableRow key={range}>
@@ -70,10 +77,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName
                                 {data['Number of deals']}
                               </TableCell>
                               <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
-                                {data['Allocation as % of Deal Size'].toFixed(2)}%
+                                {data['Allocation as % of Deal Size'].toFixed(2)}
                               </TableCell>
                               <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
-                                {data['Allocation as % of IOI'].toFixed(2)}%
+                                {data['Allocation as % of IOI'].toFixed(2)}
                               </TableCell>
                               <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
                                 {formatValue(data['Deal volume'])}
