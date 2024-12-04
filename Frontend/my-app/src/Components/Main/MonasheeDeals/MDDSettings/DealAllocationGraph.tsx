@@ -1,5 +1,13 @@
-import React, { useState } from "react";
-import { Typography, Snackbar, Alert } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  Typography,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -35,22 +43,23 @@ const formatValue = (value: number, apiName: string): string => {
 };
 
 const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiName }) => {
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Handle Snackbar close
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
+  // Handle closing the dialog
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    window.location.reload(); // Refresh the page
+
   };
 
-  // Check if the response contains a message indicating no data
-  if (responseData?.message) {
-    setTimeout(() => {
-      setErrorMessage(responseData.message);
-      setSnackbarOpen(true);
-    }, 0); // Trigger snackbar on next render
-  }
+  // Automatically open the dialog if responseData contains a message
+  useEffect(() => {
+    if (responseData?.message) {
+      setDialogOpen(true);
+    }
+  }, [responseData]);
 
+  // Dynamic key mapping based on the API name
   const allocationKeyMap: { [key: string]: string } = {
     mdd_deals_graph: "count",
     mdd_deals_volume: "deal_size",
@@ -64,7 +73,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
   const formatChartData = (data: any) => {
     if (!data || typeof data !== "object") return [];
 
-    // Get all possible deal types across all quarters
+    // Collect all deal types across all quarters
     const allDealTypes = new Set<string>();
     Object.values(data).forEach((sectors: any) => {
       Object.keys(sectors).forEach((dealType) => {
@@ -72,14 +81,16 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
       });
     });
 
-    // Create chart data
+    // Format chart data
     return Object.keys(data).map((quarter) => {
       const sectors = data[quarter];
-      const chartRow: any = { quarter }; // Initialize row with the quarter
+      const chartRow: any = { quarter };
 
-      // Add each deal type to the row, even if missing in this quarter
+      // Populate data for each deal type, even if missing for this quarter
       allDealTypes.forEach((dealType) => {
-        chartRow[dealType] = sectors[dealType]?.[allocationKey] ? parseFloat(sectors[dealType][allocationKey]) : 0;
+        chartRow[dealType] = sectors[dealType]?.[allocationKey]
+          ? parseFloat(sectors[dealType][allocationKey])
+          : 0;
       });
 
       return chartRow;
@@ -87,9 +98,6 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
   };
 
   const chartData = responseData && !responseData.message ? formatChartData(responseData) : [];
-
-  // Tooltip formatter
-  const tooltipFormatter = (value: number) => formatValue(value, apiName);
 
   return (
     <div>
@@ -99,7 +107,8 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
           align="center"
           sx={{ mt: 5, color: "#002060", fontWeight: "bold" }}
         >
-          No Data Available for the above filters. Please change the selected filters to show the plots.
+          No Data Available for the above filters. Please change the selected filters to show the
+          plots.
         </Typography>
       ) : (
         <ResponsiveContainer width="100%" height={400}>
@@ -109,7 +118,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
             <YAxis
               tickFormatter={(value) => formatValue(value, apiName)} // Format Y-axis labels
             />
-            <Tooltip formatter={(value) => tooltipFormatter(Number(value))} />
+            <Tooltip formatter={(value) => formatValue(Number(value), apiName)} />
             <Legend />
             {Object.keys(chartData[0] || {})
               .filter((key) => key !== "quarter")
@@ -130,17 +139,25 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
         </ResponsiveContainer>
       )}
 
-      {/* Snackbar for the error message */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      {/* Popup Dialog */}
+      <Dialog
+        open={dialogOpen}
+        onClose={handleDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
       >
-        <Alert onClose={handleSnackbarClose} severity="warning" sx={{ width: "100%" }}>
-          {errorMessage}
-        </Alert>
-      </Snackbar>
+        <DialogTitle id="alert-dialog-title">No Data Available</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Please change the filters. No data available for the given filters.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} autoFocus>
+            Okay
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
