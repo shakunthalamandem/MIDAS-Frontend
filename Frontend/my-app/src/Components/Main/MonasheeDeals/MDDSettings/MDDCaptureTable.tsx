@@ -1,10 +1,23 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import { Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
 
 interface MDDCaptureTableProps {
   responseData: any; // The response data from the API
   apiName: string; // The API name that determines the key
 }
+
+
+const formatValue = (value: number): string => {
+      const absValue = Math.abs(value);
+      if (absValue >= 1_000_000_000) {
+        return `$${(value / 1_000_000_000).toFixed(1)}B`;
+      } else if (absValue >= 1_000_000) {
+        return `$${(value / 1_000_000).toFixed(1)}M`;
+      } else if (absValue >= 1_000) {
+        return `$${(value / 1_000).toFixed(1)}K`;
+      }
+      return `$${value.toFixed(2)}`;
+    };
 
 const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName }) => {
   return (
@@ -15,48 +28,66 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName
             {year}
           </Typography>
 
-          {['FO', 'IPO'].map((category) => {
-            const categoryData = responseData[year][category];
+          <Grid container spacing={2}>
+            {['FO', 'IPO'].map((category) => {
+              const categoryData = responseData[year][category];
 
-            return (
-              <div key={category} style={{ marginBottom: '20px' }}>
-                <Typography variant="h5" gutterBottom>
-                  {category}
-                </Typography>
+              return (
+                <Grid item xs={12} sm={6} key={category}>
+                  <Typography variant="h5" gutterBottom>
+                    {category}
+                  </Typography>
 
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650 }} aria-label={`${category} table`}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Range</TableCell>
-                        <TableCell align="right">Number of Deals</TableCell>
-                        <TableCell align="right">Allocation as % of Deal Size</TableCell>
-                        <TableCell align="right">Allocation as % of IOI</TableCell>
-                        <TableCell align="right">Deal Volume</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {Object.keys(categoryData).map((range) => {
-                        const data = categoryData[range];
+                  <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 300 }} aria-label={`${category} table`}>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontSize: '0.85rem' }}>Range</TableCell>
+                          <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                            Number of Deals
+                          </TableCell>
+                          <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                            Allocation as % of Deal Size
+                          </TableCell>
+                          <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                            Allocation as % of IOI
+                          </TableCell>
+                          <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                            Deal Volume
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {Object.keys(categoryData).map((range) => {
+                          const data = categoryData[range];
 
-                        return (
-                          <TableRow key={range}>
-                            <TableCell component="th" scope="row">
-                              {range}
-                            </TableCell>
-                            <TableCell align="right">{data['Number of deals']}</TableCell>
-                            <TableCell align="right">{data['Allocation as % of Deal Size'].toFixed(2)}</TableCell>
-                            <TableCell align="right">{data['Allocation as % of IOI'].toFixed(2)}</TableCell>
-                            <TableCell align="right">{data['Deal volume'].toLocaleString()}</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </div>
-            );
-          })}
+                          return (
+                            <TableRow key={range}>
+                              <TableCell component="th" scope="row" sx={{ fontSize: '0.85rem' }}>
+                                {range}
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                                {data['Number of deals']}
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                                {data['Allocation as % of Deal Size'].toFixed(2)}%
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                                {data['Allocation as % of IOI'].toFixed(2)}%
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                                {formatValue(data['Deal volume'])}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+              );
+            })}
+          </Grid>
         </div>
       ))}
     </div>
