@@ -41,62 +41,64 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName
               const sortedCategoryData = categoryOrder.map((range) => categoryData[range]);
 
               return (
-                 <Card sx={{ width: 1200, padding: 2, margin: "auto" }}>
-                <CardContent>
                 <Grid item xs={12} sm={6} key={category}>
-                  <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '15px' }}>
-                    {category}
-                  </Typography>
+                  <Card sx={{ padding: 2 }}>
+                    <CardContent>
+                      <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '15px' }}>
+                        {category}
+                      </Typography>
 
-                  <TableContainer component={Paper} sx={{ border: '2px solid #1976d2', borderRadius: '8px' }}>
-                    <Table sx={{ minWidth: 300 }} aria-label={`${category} table`}>
-                      <TableHead>
-                        <TableRow sx={{ backgroundColor: '#1976d2', color: 'white' }}>
-                          <TableCell sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'100px' }}>T+1M Excess Returns</TableCell>
-                          <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'60px' }}>
-                            No of Deals
-                          </TableCell>
-                          <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'80px' }}>
-                            Allocation as % of Deal Size
-                          </TableCell>
-                          <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'80px' }}>
-                            Allocation as % of IOI
-                          </TableCell>
-                          <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px',width:'80px' }}>
-                            Deal Volume
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {sortedCategoryData.map((data, index) => {
-                          const range = categoryOrder[index];
-
-                          return (
-                            <TableRow key={range} sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' } }}>
-                              <TableCell component="th" scope="row" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
-                                {range}
+                      <TableContainer component={Paper} sx={{ border: '2px solid #1976d2', borderRadius: '8px' }}>
+                        <Table sx={{ minWidth: 300 }} aria-label={`${category} table`}>
+                          <TableHead>
+                            <TableRow sx={{ backgroundColor: '#1976d2', color: 'white' }}>
+                              <TableCell sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px', width: '100px' }}>
+                                T+1M Excess Returns
                               </TableCell>
-                              <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
-                                {data['Number of deals']}
+                              <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px', width: '60px' }}>
+                                No of Deals
                               </TableCell>
-                              <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
-                                {data['Allocation as % of Deal Size'].toFixed(2)}%
+                              <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px', width: '80px' }}>
+                                Allocation as % of Deal Size
                               </TableCell>
-                              <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
-                                {data['Allocation as % of IOI'].toFixed(2)}%
+                              <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px', width: '80px' }}>
+                                Allocation as % of IOI
                               </TableCell>
-                              <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
-                                {formatValue(data['Deal volume'])}
+                              <TableCell align="left" sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px', width: '80px' }}>
+                                Deal Volume
                               </TableCell>
                             </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                          </TableHead>
+                          <TableBody>
+                            {sortedCategoryData.map((data, index) => {
+                              const range = categoryOrder[index];
+
+                              return (
+                                <TableRow key={range} sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' } }}>
+                                  <TableCell component="th" scope="row" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
+                                    {range}
+                                  </TableCell>
+                                  <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
+                                    {data['Number of deals']}
+                                  </TableCell>
+                                  <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
+                                    {data['Allocation as % of Deal Size'].toFixed(2)}%
+                                  </TableCell>
+                                  <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
+                                    {data['Allocation as % of IOI'].toFixed(2)}%
+                                  </TableCell>
+                                  <TableCell align="left" sx={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '4px 8px' }}>
+                                    {formatValue(data['Deal volume'])}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </CardContent>
+                  </Card>
                 </Grid>
-                </CardContent>
-                </Card>
               );
             })}
           </Grid>
