@@ -16,6 +16,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { LoadingButton } from "@mui/lab"; // Import LoadingButton
 import DealAllocationGraph from "./DealAllocationGraph";
+import MDDCaptureTable from "./MDDCaptureTable";
 
 interface FilterOption {
   options: (string | number)[]; // Options can be either string or number
@@ -219,11 +220,14 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
             <CircularProgress color="primary" />
             <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>Loading... Please Wait</Typography>
           </Box>
+        ) : <>
+        {apiName === 'allocation_capture' ? (
+          <MDDCaptureTable responseData={apiData} apiName={apiName} />
         ) : (
-          <>
-            <DealAllocationGraph responseData={apiData} apiName={apiName} />
-          </>
+          <DealAllocationGraph responseData={apiData} apiName={apiName} />
         )}
+      </>
+      }
       </Box>
     </Container>
   );

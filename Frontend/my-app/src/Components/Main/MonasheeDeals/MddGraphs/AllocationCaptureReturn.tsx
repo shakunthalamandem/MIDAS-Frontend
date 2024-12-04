@@ -18,7 +18,7 @@ const AllocationCaptureReturn = () => {
       >
         Allocation Graph
       </Typography>
-      <MddMain apiName="allocation capture" />
+      <MddMain apiName="allocation_capture" />
     </Box>
   );
 };
