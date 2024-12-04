@@ -7,6 +7,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import {
   BarChart,
@@ -44,6 +46,7 @@ const formatValue = (value: number, apiName: string): string => {
 
 const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiName }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState("normal"); // Tracks if normal or weighted is selected
 
   // Handle closing the dialog
   const handleDialogClose = () => {
@@ -81,8 +84,11 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
 
       // Populate data for allowed deal types
       allowedDealTypes.forEach((dealType) => {
-        chartRow[dealType] = sectors[dealType]?.[allocationKey]
-          ? parseFloat(sectors[dealType][allocationKey])
+        const allocationKeyForDealType =
+          selectedValue === "normal" ? "allocation_percentage" : "weighted_allocation_percentage";
+
+        chartRow[dealType] = sectors[dealType]?.[allocationKeyForDealType]
+          ? parseFloat(sectors[dealType][allocationKeyForDealType])
           : 0;
       });
 
@@ -108,9 +114,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
             <XAxis dataKey="quarter" />
-            <YAxis
-              tickFormatter={(value) => formatValue(value, apiName)} // Format Y-axis labels
-            />
+            <YAxis tickFormatter={(value) => formatValue(value, apiName)} />
             <Tooltip formatter={(value) => formatValue(Number(value), apiName)} />
             <Legend />
             {Object.keys(chartData[0] || {})
@@ -128,6 +132,31 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
               ))}
           </BarChart>
         </ResponsiveContainer>
+      )}
+
+      {/* Checkboxes for selecting normal or weighted values */}
+      {(apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") && (
+        <div style={{ textAlign: "center", marginTop: "10px" }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={selectedValue === "normal"}
+                onChange={() => setSelectedValue("normal")}
+              />
+            }
+            label="Normal"
+            sx={{ marginRight: "10px" }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={selectedValue === "weighted"}
+                onChange={() => setSelectedValue("weighted")}
+              />
+            }
+            label="Weighted"
+          />
+        </div>
       )}
 
       {/* Popup Dialog */}
