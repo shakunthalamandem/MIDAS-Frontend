@@ -1,5 +1,5 @@
-import { Typography } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
+import { Typography, Snackbar, Alert } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -35,7 +35,22 @@ const formatValue = (value: number, apiName: string): string => {
 };
 
 const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiName }) => {
-  // Dynamic key mapping based on the API name
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Handle Snackbar close
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  // Check if the response contains a message indicating no data
+  if (responseData?.message) {
+    setTimeout(() => {
+      setErrorMessage(responseData.message);
+      setSnackbarOpen(true);
+    }, 0); // Trigger snackbar on next render
+  }
+
   const allocationKeyMap: { [key: string]: string } = {
     mdd_deals_graph: "count",
     mdd_deals_volume: "deal_size",
@@ -71,14 +86,14 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
     });
   };
 
-  const chartData = responseData ? formatChartData(responseData) : [];
+  const chartData = responseData && !responseData.message ? formatChartData(responseData) : [];
 
   // Tooltip formatter
   const tooltipFormatter = (value: number) => formatValue(value, apiName);
 
   return (
     <div>
-      {chartData.length === 0 ? (
+      {chartData.length === 0 && !responseData?.message ? (
         <Typography
           variant="body1"
           align="center"
@@ -114,6 +129,18 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
           </BarChart>
         </ResponsiveContainer>
       )}
+
+      {/* Snackbar for the error message */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleSnackbarClose} severity="warning" sx={{ width: "100%" }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
