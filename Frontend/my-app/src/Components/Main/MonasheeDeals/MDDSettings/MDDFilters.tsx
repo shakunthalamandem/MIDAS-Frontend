@@ -96,20 +96,20 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       setLoading(false);
     }
   };
+
   const handleCancel = () => {
     const resetSelectedValues = { ...initialSelectedValuesRef.current };
     setSelectedValues(resetSelectedValues); // Reset the selected filters
     setAppliedFilters(resetSelectedValues); // Reset the applied filters
     console.log("Reset state: ", resetSelectedValues); // Debugging
   };
-  
-  
+
   const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
   };
 
   return (
-    <Container maxWidth="xl" sx={{ padding: 0, marginBottom: 4 ,display: "flex",marginLeft:0,marginTop:15}}>
+    <Container maxWidth="xl" sx={{ padding: 0, marginBottom: 4, display: "flex", marginLeft: 0, marginTop: 15 }}>
       <Box width="400px" sx={{ marginRight: 10 }}>
         <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
           <CardContent>
@@ -119,42 +119,60 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                 const { options, label, description } = filter[key];
 
                 return (
-                  <Accordion expanded={expanded === key} onChange={() => setExpanded(expanded === key ? false : key)}>
+                  <Accordion
+                    expanded={expanded === key}
+                    onChange={() => setExpanded(expanded === key ? false : key)}
+                    sx={{
+                      marginBottom: "10px", // Space between accordions
+                      "&:before": {
+                        display: "none", // Hide default divider
+                      },
+                    }}
+                  >
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
                       aria-controls={`${key}-content`}
                       id={`${key}-header`}
                       sx={{
-                        backgroundColor: "#3a507d", // Set the background color to #002060
-                        color: "white", // Set the text color to white
+                        backgroundColor: "#002060", // Accordion header background
+                        color: "white", // Text color in the header
                         "& .MuiAccordionSummary-content": {
-                          color: "white", // Ensuring text is white in the summary
+                          color: "white",
+                        },
+                        transition: "background-color 0.3s ease", // Smooth transition on hover
+                        "&:hover": {
+                          backgroundColor: "#004080", // Darker shade on hover
                         },
                       }}
                     >
-                      <Typography>{label}</Typography>
+                      <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
                     </AccordionSummary>
-                    <AccordionDetails>
+                    <AccordionDetails
+                      sx={{
+                        backgroundColor: "#f1f1f1", // Light background for the details
+                        padding: "10px 20px", // Padding inside accordion details
+                        borderRadius: "5px", // Rounded corners for accordion details
+                      }}
+                    >
                       {options.map((option) => (
                         <FormControlLabel
                           key={option}
                           control={
                             <Checkbox
-                            key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
-                            checked={selectedValues[key]?.includes(option)}
-                            onChange={() => {
-                              const newValues = selectedValues[key]?.includes(option)
-                                ? selectedValues[key]?.filter((item) => item !== option)
-                                : [...(selectedValues[key] || []), option];
-                              handleSelectionChange(key, newValues || []);
-                            }}
-                            sx={{
-                              "&.Mui-checked": {
-                                color: "#002060", // Match the checkbox color with header
-                              },
-                            }}
-                          />
-                          
+                              checked={selectedValues[key]?.includes(option)}
+                              onChange={() => {
+                                const newValues = selectedValues[key]?.includes(option)
+                                  ? selectedValues[key]?.filter((item) => item !== option)
+                                  : [...(selectedValues[key] || []), option];
+                                handleSelectionChange(key, newValues || []);
+                              }}
+                              sx={{
+                                "&.Mui-checked": {
+                                  color: "#FF8C00", // Checkbox checked color
+                                },
+                                transition: "all 0.3s ease", // Smooth transition for checkbox color
+                              }}
+                            />
                           }
                           label={option}
                         />
@@ -164,10 +182,29 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                 );
               })}
               <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                <LoadingButton variant="contained" onClick={() => handleSubmit()} sx={{ mr: 2, bgcolor: "#002060" }}>
+                <LoadingButton
+                  variant="contained"
+                  onClick={() => handleSubmit()}
+                  sx={{
+                    mr: 2,
+                    bgcolor: "#002060",
+                    "&:hover": {
+                      backgroundColor: "#004080", // Hover effect for the apply button
+                    },
+                  }}
+                >
                   Apply
                 </LoadingButton>
-                <Button variant="outlined" color="secondary" onClick={handleCancel}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleCancel}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#FF8C00", // Hover effect for the reset button
+                    },
+                  }}
+                >
                   Reset
                 </Button>
               </Box>
@@ -183,7 +220,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </Box>
         ) : (
           <>
-          <DealAllocationGraph responseData={apiData} apiName={apiName} />
+            <DealAllocationGraph responseData={apiData} apiName={apiName} />
           </>
         )}
       </Box>
