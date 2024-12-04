@@ -47,22 +47,28 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
   const allocationKey = allocationKeyMap[apiName] || "deal_size"; // Default to "deal_size"
 
   const formatChartData = (data: any) => {
-    const formattedData: any[] = [];
+    if (!data || typeof data !== "object") return [];
 
-    for (const quarter in data) {
-      const sectors = data[quarter];
-      const chartRow: any = { quarter };
-
-      // Include all deal types dynamically
+    // Get all possible deal types across all quarters
+    const allDealTypes = new Set<string>();
+    Object.values(data).forEach((sectors: any) => {
       Object.keys(sectors).forEach((dealType) => {
-        const dealData = sectors[dealType]?.[allocationKey];
-        chartRow[dealType] = dealData ? parseFloat(dealData) : 0; // Ensure valid numbers
+        allDealTypes.add(dealType);
+      });
+    });
+
+    // Create chart data
+    return Object.keys(data).map((quarter) => {
+      const sectors = data[quarter];
+      const chartRow: any = { quarter }; // Initialize row with the quarter
+
+      // Add each deal type to the row, even if missing in this quarter
+      allDealTypes.forEach((dealType) => {
+        chartRow[dealType] = sectors[dealType]?.[allocationKey] ? parseFloat(sectors[dealType][allocationKey]) : 0;
       });
 
-      formattedData.push(chartRow);
-    }
-
-    return formattedData;
+      return chartRow;
+    });
   };
 
   const chartData = responseData ? formatChartData(responseData) : [];
@@ -97,14 +103,12 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
                   key={dealType}
                   dataKey={dealType}
                   stackId="a"
-                  fill={
-                    {
-                      FO: "#8884d8",
-                      IPO: "#82ca9d",
-                      OTHER: "#ffc658",
-                      PRIVATE: "#002060",
-                    }[dealType] || "#ccc"
-                  }
+                  fill={{
+                    FO: "#8884d8",
+                    IPO: "#82ca9d",
+                    OTHER: "#ffc658",
+                    PRIVATE: "#002060",
+                  }[dealType] || "#ccc"}
                 />
               ))}
           </BarChart>
