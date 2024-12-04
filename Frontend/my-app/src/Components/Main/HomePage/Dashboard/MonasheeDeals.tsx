@@ -51,117 +51,49 @@ const MonasheeDeals: React.FC = () => {
           style: { display: "none" },
         }}
         sx={{
+          display: "flex",
+          justifyContent: "center",
+          margin: "10px 0",
           "& .MuiTab-root": {
-            borderRadius: "8px",
-            padding: "6px 16px",
-            fontSize: "0.8rem", // Adjusted for shorter labels
-            fontWeight: "bold",
-            transition: "background-color 0.3s ease, transform 0.3s ease",
+            backgroundColor: "#E3E6F0", // Neutral background for unselected tabs
+            color: "#002060", // Dark blue text for contrast
+            borderRadius: "12px",
+            padding: "10px 20px",
+            fontSize: "0.9rem",
+            fontWeight: "600",
+            margin: "0 5px",
+            textTransform: "none", // Avoid all caps
+            transition: "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
             "&:hover": {
-              transform: "scale(1.05)",
-              background: "rgba(0, 0, 0, 0.08)",
-              color: "#000000",
+              backgroundColor: "#DCE6F0", // Slightly lighter shade on hover
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
             },
           },
-          height: "40px",
+          "& .Mui-selected": {
+            backgroundColor: "#FF8C00", // Vibrant orange for selected tab
+            color: "#ffffff", // White text for selected tab
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)", // Stronger shadow for selected tab
+            transform: "translateY(-2px)", // Lifted effect
+          },
         }}
       >
-        <Tab
-          label="Deals"
-          sx={{
-            backgroundColor: value === 0 ? "#FF5722" : "#f5f5f5",
-            color: value === 0 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#FF5722",
-              color: "#fff",
-            },
-          }}
-        />
-        <Tab
-          label="Volume"
-          sx={{
-            backgroundColor: value === 1 ? "#4CAF50" : "#f5f5f5",
-            color: value === 1 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#4CAF50",
-              color: "#fff",
-            },
-          }}
-        />
-        <Tab
-          label="Avg Size"
-          sx={{
-            backgroundColor: value === 2 ? "#3F51B5" : "#f5f5f5",
-            color: value === 2 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#3F51B5",
-              color: "#fff",
-            },
-          }}
-        />
-        <Tab
-          label="Allocation % DealSize"
-          sx={{
-            backgroundColor: value === 3 ? "#00BCD4" : "#f5f5f5",
-            color: value === 3 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#00BCD4",
-              color: "#fff",
-            },
-          }}
-        />
-        <Tab
-          label="Allocation % IOI"
-          sx={{
-            backgroundColor: value === 4 ? "#9C27B0" : "#f5f5f5",
-            color: value === 4 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#9C27B0",
-              color: "#fff",
-            },
-          }}
-        />
-        <Tab
-          label="Allocation Capture"
-          sx={{
-            backgroundColor: value === 5 ? "#FF9800" : "#f5f5f5",
-            color: value === 5 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#FF9800",
-              color: "#fff",
-            },
-          }}
-        />
-        <Tab
-          label="FOllow On Discount"
-          sx={{
-            backgroundColor: value === 6 ? "#8BC34A" : "#f5f5f5",
-            color: value === 6 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#8BC34A",
-              color: "#fff",
-            },
-          }}
-        />
-        <Tab
-          label="Screener"
-          sx={{
-            backgroundColor: value === 7 ? "#9E9E9E" : "#f5f5f5",
-            color: value === 7 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#9E9E9E",
-              color: "#fff",
-            },
-          }}
-        />
+        <Tab label="Deals" />
+        <Tab label="Volume" />
+        <Tab label="Avg Size" />
+        <Tab label="Allocation % DealSize" />
+        <Tab label="Allocation % IOI" />
+        <Tab label="Allocation Capture" />
+        <Tab label="Follow-On Discount" />
+        <Tab label="Screener" />
       </Tabs>
 
       {/* Tab Content */}
       {value === 0 && <DealCount />}
       {value === 1 && <DealVolumeMDD />}
       {value === 2 && <AvgDealSize />}
-      {value === 3 &&  <DealAllocation />}
-      {value === 4 &&  <DealMDDIOI />}
+      {value === 3 && <DealAllocation />}
+      {value === 4 && <DealMDDIOI />}
       {value === 5 && <AllocationCaptureReturn />}
       {value === 6 && <FOllowOnDiscount />}
       {value === 7 && <MDDScreener />}
