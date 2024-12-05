@@ -115,7 +115,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         <Card sx={{ borderRadius: 2, boxShadow: 3 ,backgroundColor:'#e6ebf5'}}>
           <CardContent>
             <Box width="250px" sx={{ p: 2 }}>
-              <Typography variant="h5" color="#002060">Filters</Typography>
+              <Typography variant="h5" color="#002060" mb={4}>MDD Filters</Typography>
               {filtersData.map((filter) => {
                 const key = Object.keys(filter)[0];
                 const { options, label, description } = filter[key];
