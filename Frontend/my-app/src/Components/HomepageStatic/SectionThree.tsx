@@ -3,11 +3,11 @@ import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
 
 const SectionThree = () => {
   const cardData = [
-    { title: "IPOs", value: 8100, prefix: "" },
-    { title: "FOs", value: 18600, prefix: "" },
-    { title: "Opportunity Value", value: 960, suffix: "B", prefix: "$" },
-    { title: "US Markets", value: 14300, prefix: "" },
-    { title: "International Markets", value: 12400, prefix: "" },
+    { title: " IPOs globally", value: 8100, prefix: "" },
+    { title: "Follow-Ons globally", value: 18600, prefix: "" },
+    { title: " Billion of Opportunity Value", value: 960, suffix: "", prefix: "$" },
+    { title: "US New Issue Deals", value: 14300, prefix: "" },
+    { title: "International New Issue Deals", value: 12400, prefix: "" },
   ];
 
   const [counts, setCounts] = useState(cardData.map(() => 0));
@@ -80,7 +80,10 @@ const SectionThree = () => {
             </Card>
           </Grid>
         ))}
+
       </Grid>
+      <Typography mt={4} sx={{textAlign:'center',color:'#FFFFFF',fontWeight:'bold',fontSize:'30px'}}> SINCE 2001</Typography>
+
     </Box>
   );
 };
