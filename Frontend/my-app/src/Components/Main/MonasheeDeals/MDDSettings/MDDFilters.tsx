@@ -35,13 +35,19 @@ interface FiltersProps {
 
 const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   const [loading, setLoading] = useState(false);
-  const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
-  const [appliedFilters, setAppliedFilters] = useState<{ [key: string]: (string | number)[] } | null>(null);
+  const [selectedValues, setSelectedValues] = useState<{
+    [key: string]: (string | number)[];
+  }>({});
+  const [appliedFilters, setAppliedFilters] = useState<{
+    [key: string]: (string | number)[];
+  } | null>(null);
   const [expanded, setExpanded] = useState<string | false>(false); // Track expanded state
   const [apiData, setApiData] = useState({});
-  
+
   // Store the initial selected values using useRef to persist across renders
-  const initialSelectedValuesRef = useRef<{ [key: string]: (string | number)[] }>({});
+  const initialSelectedValuesRef = useRef<{
+    [key: string]: (string | number)[];
+  }>({});
 
   useEffect(() => {
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
@@ -105,17 +111,31 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     console.log("Reset state: ", resetSelectedValues); // Debugging
   };
 
-  const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-    setExpanded(isExpanded ? panel : false);
-  };
+  const handleAccordionChange =
+    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
 
   return (
-    <Container maxWidth="xl" sx={{ padding: 0, marginBottom: 20, display: "flex", marginLeft: 0, marginTop: 10 }}>
+    <Container
+      maxWidth="xl"
+      sx={{
+        padding: 0,
+        marginBottom: 20,
+        display: "flex",
+        marginLeft: 0,
+        marginTop: 10,
+      }}
+    >
       <Box width="320px" sx={{ marginRight: 10 }}>
-        <Card sx={{ borderRadius: 2, boxShadow: 3 ,backgroundColor:'#e6ebf5'}}>
+        <Card
+          sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}
+        >
           <CardContent>
             <Box width="250px" sx={{ p: 2 }}>
-              <Typography variant="h5" color="#002060" mb={4}>MDD Filters</Typography>
+              <Typography variant="h5" color="#002060" mb={4}>
+                MDD Filters
+              </Typography>
               {filtersData.map((filter) => {
                 const key = Object.keys(filter)[0];
                 const { options, label, description } = filter[key];
@@ -147,47 +167,55 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                         },
                       }}
                     >
-                      <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
+                      <Typography sx={{ fontWeight: "bold" }}>
+                        {label}
+                      </Typography>
                     </AccordionSummary>
                     <AccordionDetails
-  sx={{
-    backgroundColor: "#f1f1f1", // Light background for the details
-    padding: "10px 20px", // Padding inside accordion details
-    borderRadius: "5px", // Rounded corners for accordion details
-    textAlign: "left", // Align all content to the left
-  }}
->
-  {options.map((option) => (
-    <FormControlLabel
-      key={option}
-      control={
-        <Checkbox
-          key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
-          checked={selectedValues[key]?.includes(option)} // Checkbox reflects `selectedValues`
-          onChange={() => {
-            const newValues = selectedValues[key]?.includes(option)
-              ? selectedValues[key].filter((item) => item !== option) // Deselect
-              : [...(selectedValues[key] || []), option]; // Select
-            handleSelectionChange(key, newValues || []);
-          }}
-          sx={{
-            "&.Mui-checked": {
-              color: "#FF8C00", // Checkbox checked color
-            },
-            transition: "all 0.3s ease", // Smooth transition
-            paddingLeft: 0, // Remove padding on the left to make it align better
-          }}
-        />
-      }
-      label={option}
-      sx={{
-        display: "flex", // Align checkbox and label horizontally
-        justifyContent: "flex-start", // Ensure label is aligned to the left
-      }}
-    />
-  ))}
-</AccordionDetails>
-
+                      sx={{
+                        backgroundColor: "#f1f1f1", // Light background for the details
+                        padding: "10px 20px", // Padding inside accordion details
+                        borderRadius: "5px", // Rounded corners for accordion details
+                        textAlign: "left", 
+                        maxHeight:'200px',
+                        overflowY:'scroll'
+                        // Align all content to the left
+                      }}
+                    >
+                      {options.map((option) => (
+                        <FormControlLabel
+                          key={option}
+                          control={
+                            <Checkbox
+                              key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
+                              checked={selectedValues[key]?.includes(option)} // Checkbox reflects `selectedValues`
+                              onChange={() => {
+                                const newValues = selectedValues[key]?.includes(
+                                  option
+                                )
+                                  ? selectedValues[key].filter(
+                                      (item) => item !== option
+                                    ) // Deselect
+                                  : [...(selectedValues[key] || []), option]; // Select
+                                handleSelectionChange(key, newValues || []);
+                              }}
+                              sx={{
+                                "&.Mui-checked": {
+                                  color: "#FF8C00", // Checkbox checked color
+                                },
+                                transition: "all 0.3s ease", // Smooth transition
+                                paddingLeft: 0, // Remove padding on the left to make it align better
+                              }}
+                            />
+                          }
+                          label={option}
+                          sx={{
+                            display: "flex", // Align checkbox and label horizontally
+                            justifyContent: "flex-start", // Ensure label is aligned to the left
+                          }}
+                        />
+                      ))}
+                    </AccordionDetails>
                   </Accordion>
                 );
               })}
@@ -224,18 +252,27 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       </Box>
       <Box mt={4} flex={1}>
         {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <CircularProgress color="primary" />
-            <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>Loading... Please Wait</Typography>
+            <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
+              Loading... Please Wait
+            </Typography>
           </Box>
-        ) : <>
-        {apiName === 'allocation_capture' ? (
-          <MDDCaptureTable responseData={apiData} apiName={apiName} />
         ) : (
-          <DealAllocationGraph responseData={apiData} apiName={apiName} />
+          <>
+            {apiName === "allocation_capture" ? (
+              <MDDCaptureTable responseData={apiData} apiName={apiName} />
+            ) : (
+              <DealAllocationGraph responseData={apiData} apiName={apiName} />
+            )}
+          </>
         )}
-      </>
-      }
       </Box>
     </Container>
   );
