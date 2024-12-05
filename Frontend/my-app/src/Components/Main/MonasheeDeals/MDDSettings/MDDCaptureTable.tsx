@@ -75,7 +75,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
             <Card
               elevation={4}
               sx={{
-                backgroundColor: "#e6ebf5",
+                backgroundColor: "#fdfff8",
                 marginBottom: "30px",
                 padding: 2,
                 width:"1400px",
