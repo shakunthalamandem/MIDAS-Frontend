@@ -158,7 +158,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           width: "80px",
                                         }}
                                       >
-                                        Allocation as % of Deal Size
+                                        Allocation as % of Deal Size(Simple)
                                       </TableCell>
                                       <TableCell
                                         align="left"
@@ -170,7 +170,31 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           width: "80px",
                                         }}
                                       >
-                                        Allocation as % of IOI
+                                        Allocation as % of Deal Size(Weighted)
+                                      </TableCell>
+                                      <TableCell
+                                        align="left"
+                                        sx={{
+                                          fontSize: "0.85rem",
+                                          fontWeight: "bold",
+                                          border: "1px solid #ddd",
+                                          padding: "4px 8px",
+                                          width: "80px",
+                                        }}
+                                      >
+                                        Allocation as % of IOI(simple)
+                                      </TableCell>
+                                      <TableCell
+                                        align="left"
+                                        sx={{
+                                          fontSize: "0.85rem",
+                                          fontWeight: "bold",
+                                          border: "1px solid #ddd",
+                                          padding: "4px 8px",
+                                          width: "80px",
+                                        }}
+                                      >
+                                        Allocation as % of IOI(Weighted)
                                       </TableCell>
                                       <TableCell
                                         align="left"
@@ -242,7 +266,33 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             }}
                                           >
                                             {data[
+                                              "Weighted Allocation as % of Deal Size"
+                                            ].toFixed(2)}
+                                            %
+                                          </TableCell>
+                                          <TableCell
+                                            align="left"
+                                            sx={{
+                                              fontSize: "0.85rem",
+                                              border: "1px solid #ddd",
+                                              padding: "4px 8px",
+                                            }}
+                                          >
+                                            {data[
                                               "Allocation as % of IOI"
+                                            ].toFixed(2)}
+                                            %
+                                          </TableCell>
+                                          <TableCell
+                                            align="left"
+                                            sx={{
+                                              fontSize: "0.85rem",
+                                              border: "1px solid #ddd",
+                                              padding: "4px 8px",
+                                            }}
+                                          >
+                                            {data[
+                                              "Weighted Allocation as % of IOI"
                                             ].toFixed(2)}
                                             %
                                           </TableCell>
