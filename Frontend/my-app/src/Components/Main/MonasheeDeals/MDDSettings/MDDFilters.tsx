@@ -150,38 +150,44 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                       <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
                     </AccordionSummary>
                     <AccordionDetails
-                      sx={{
-                        backgroundColor: "#f1f1f1", // Light background for the details
-                        padding: "10px 20px", // Padding inside accordion details
-                        borderRadius: "5px", // Rounded corners for accordion details
-                      }}
-                    >
-                      {options.map((option) => (
-                        <FormControlLabel
-                        key={option}
-                        control={
-                          <Checkbox
-                          key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
-                            checked={selectedValues[key]?.includes(option)} // Checkbox reflects `selectedValues`
-                            onChange={() => {
-                              const newValues = selectedValues[key]?.includes(option)
-                                ? selectedValues[key].filter((item) => item !== option) // Deselect
-                                : [...(selectedValues[key] || []), option]; // Select
-                              handleSelectionChange(key, newValues || []);
-                            }}
-                            sx={{
-                              "&.Mui-checked": {
-                                color: "#FF8C00", // Checkbox checked color
-                              },
-                              transition: "all 0.3s ease", // Smooth transition
-                            }}
-                          />
-                        }
-                        label={option}
-                      />
-                      
-                      ))}
-                    </AccordionDetails>
+  sx={{
+    backgroundColor: "#f1f1f1", // Light background for the details
+    padding: "10px 20px", // Padding inside accordion details
+    borderRadius: "5px", // Rounded corners for accordion details
+    textAlign: "left", // Align all content to the left
+  }}
+>
+  {options.map((option) => (
+    <FormControlLabel
+      key={option}
+      control={
+        <Checkbox
+          key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
+          checked={selectedValues[key]?.includes(option)} // Checkbox reflects `selectedValues`
+          onChange={() => {
+            const newValues = selectedValues[key]?.includes(option)
+              ? selectedValues[key].filter((item) => item !== option) // Deselect
+              : [...(selectedValues[key] || []), option]; // Select
+            handleSelectionChange(key, newValues || []);
+          }}
+          sx={{
+            "&.Mui-checked": {
+              color: "#FF8C00", // Checkbox checked color
+            },
+            transition: "all 0.3s ease", // Smooth transition
+            paddingLeft: 0, // Remove padding on the left to make it align better
+          }}
+        />
+      }
+      label={option}
+      sx={{
+        display: "flex", // Align checkbox and label horizontally
+        justifyContent: "flex-start", // Ensure label is aligned to the left
+      }}
+    />
+  ))}
+</AccordionDetails>
+
                   </Accordion>
                 );
               })}
