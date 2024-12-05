@@ -3,11 +3,11 @@ import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
 
 const SectionThree = () => {
   const cardData = [
-    { title: "IPOs", value: 8113, prefix: "" },
-    { title: "FOs", value: 18624, prefix: "" },
-    { title: "Opportunity Value", value: 968, suffix: "B", prefix: "$" },
-    { title: "US Markets", value: 14306, prefix: "" },
-    { title: "International Markets", value: 12431, prefix: "" },
+    { title: "IPOs", value: 8100, prefix: "" },
+    { title: "FOs", value: 18600, prefix: "" },
+    { title: "Opportunity Value", value: 960, suffix: "B", prefix: "$" },
+    { title: "US Markets", value: 14300, prefix: "" },
+    { title: "International Markets", value: 12400, prefix: "" },
   ];
 
   const [counts, setCounts] = useState(cardData.map(() => 0));
