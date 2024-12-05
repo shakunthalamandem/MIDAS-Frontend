@@ -116,17 +116,33 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
         sx={{
-          '& .MuiDataGrid-columnHeaders': {
-            color: '#002060', // Set text color
-            fontSize: '14px', // Optional: Adjust font size
-            fontWeight: 'bold' 
-             // Optional: Make the text bold
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "transparent",
+            fontWeight:'bold',
+            color:'#002060'
           },
-          '& .MuiDataGrid-cell': {
-            // padding: '4px',
-            color:'#383937'
-             // Optional: Adjust cell padding
+          '& .MuiDataGrid-columnHeaderTitle': {
+            fontWeight: 'bold', // Ensure this targets the header title
           },
+          "& .MuiDataGrid-cell": {
+            color: "#000000",
+          },
+          "& .MuiDataGrid-cell--editing": {
+            border: "none",
+          },
+          "& .MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
+          "& .MuiDataGrid-row:nth-of-type(odd)": {
+            backgroundColor: "#F5F5F5",
+          },
+          "& .Mui-checked": {
+            color: "#002060 !important", // Change checkbox color when checked
+          },
+          "& .MuiCheckbox-root": {
+            color: "#002060", // Change default checkbox color
+          },
+        
         }}
       />
     </div>
