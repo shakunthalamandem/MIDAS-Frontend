@@ -9,7 +9,7 @@ const DealVolumeMDD = () => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      marginTop={15}
+      marginTop={10}
       textAlign="center"
     >
       <Typography 
