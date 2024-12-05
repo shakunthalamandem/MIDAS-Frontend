@@ -30,7 +30,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName
       {Object.keys(responseData).map((year) => (
         <Card key={year} elevation={4} sx={{ backgroundColor: '#e6ebf5', marginBottom: '30px', padding: 2 }}>
           <CardContent>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' ,color:'#002060'}}>
               {year}
             </Typography>
 
@@ -43,16 +43,16 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({ responseData, apiName
 
                 return (
                   <Grid item xs={12} sm={6} key={category}>
-                    <Card elevation={4} sx={{ backgroundColor: '#e6ebf5' }}>
+                    <Card elevation={4} sx={{ backgroundColor: '#f7edd8' }}>
                       <CardContent>
-                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '15px', textAlign: 'center' }}>
+                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '15px', textAlign: 'center',color:'#002060' }}>
                           {category}
                         </Typography>
 
-                        <TableContainer component={Paper} sx={{ border: '2px solid #1976d2', borderRadius: '8px' }}>
+                        <TableContainer component={Paper} sx={{ }}>
                           <Table sx={{ minWidth: 300 }} aria-label={`${category} table`}>
                             <TableHead>
-                              <TableRow sx={{ backgroundColor: '#1976d2', color: 'white' }}>
+                              <TableRow sx={{ backgroundColor: '#d8e2f7', color: 'white' }}>
                                 <TableCell sx={{ fontSize: '0.85rem', fontWeight: 'bold', border: '1px solid #ddd', padding: '4px 8px', width: '120px' }}>
                                   T+1M Excess Returns
                                 </TableCell>
