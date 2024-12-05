@@ -48,7 +48,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   apiName,
 }) => {
   return (
-    <Box mr={0}>
+    <Box mr={0} sx={{maxWidth:'2000px'}}>
       {Object.keys(responseData)
         .sort((a, b) => b.localeCompare(a)) // Sort years in descending order
         .map((year) => (
@@ -91,10 +91,6 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
                     return (
                       <Grid item xs={12} sm={6} key={category}>
-                        <motion.div
-                          whileHover={{ scale: 1.03 }}
-                          transition={{ duration: 0.3 }}
-                        >
                           <Card
                             elevation={4}
                             sx={{ backgroundColor: "#f7edd8" }}
@@ -314,7 +310,6 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                               </TableContainer>
                             </CardContent>
                           </Card>
-                        </motion.div>
                       </Grid>
                     );
                   })}
