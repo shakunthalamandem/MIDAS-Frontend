@@ -111,10 +111,10 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
 
   return (
     <Container maxWidth="xl" sx={{ padding: 0, marginBottom: 20, display: "flex", marginLeft: 0, marginTop: 10 }}>
-      <Box width="400px" sx={{ marginRight: 10 }}>
+      <Box width="320px" sx={{ marginRight: 10 }}>
         <Card sx={{ borderRadius: 2, boxShadow: 3 ,backgroundColor:'#e6ebf5'}}>
           <CardContent>
-            <Box width="300px" sx={{ p: 2 }}>
+            <Box width="250px" sx={{ p: 2 }}>
               <Typography variant="h5" color="#002060">Filters</Typography>
               {filtersData.map((filter) => {
                 const key = Object.keys(filter)[0];
