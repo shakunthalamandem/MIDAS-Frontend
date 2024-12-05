@@ -158,26 +158,28 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                     >
                       {options.map((option) => (
                         <FormControlLabel
-                          key={option}
-                          control={
-                            <Checkbox
-                              checked={selectedValues[key]?.includes(option)}
-                              onChange={() => {
-                                const newValues = selectedValues[key]?.includes(option)
-                                  ? selectedValues[key]?.filter((item) => item !== option)
-                                  : [...(selectedValues[key] || []), option];
-                                handleSelectionChange(key, newValues || []);
-                              }}
-                              sx={{
-                                "&.Mui-checked": {
-                                  color: "#FF8C00", // Checkbox checked color
-                                },
-                                transition: "all 0.3s ease", // Smooth transition for checkbox color
-                              }}
-                            />
-                          }
-                          label={option}
-                        />
+                        key={option}
+                        control={
+                          <Checkbox
+                          key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
+                            checked={selectedValues[key]?.includes(option)} // Checkbox reflects `selectedValues`
+                            onChange={() => {
+                              const newValues = selectedValues[key]?.includes(option)
+                                ? selectedValues[key].filter((item) => item !== option) // Deselect
+                                : [...(selectedValues[key] || []), option]; // Select
+                              handleSelectionChange(key, newValues || []);
+                            }}
+                            sx={{
+                              "&.Mui-checked": {
+                                color: "#FF8C00", // Checkbox checked color
+                              },
+                              transition: "all 0.3s ease", // Smooth transition
+                            }}
+                          />
+                        }
+                        label={option}
+                      />
+                      
                       ))}
                     </AccordionDetails>
                   </Accordion>
