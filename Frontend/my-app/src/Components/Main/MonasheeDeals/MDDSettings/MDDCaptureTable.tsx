@@ -18,13 +18,9 @@ import {
 // Format values to represent millions, billions, etc.
 const formatValue = (value: number): string => {
   const absValue = Math.abs(value);
-  if (absValue >= 1_000_000_000) {
-    return `$${(value / 1_000_000_000).toFixed(1)}B`;
-  } else if (absValue >= 1_000_000) {
-    return `$${(value / 1_000_000).toFixed(1)}M`;
-  } else if (absValue >= 1_000) {
-    return `$${(value / 1_000).toFixed(1)}K`;
-  }
+  if (absValue >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+  if (absValue >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (absValue >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
   return `$${value.toFixed(2)}`;
 };
 
@@ -38,8 +34,25 @@ const categoryOrder = [
   "< -20%",
 ];
 
+interface CategoryData {
+  "Number of deals": number;
+  "Allocation as % of Deal Size": number;
+  "Weighted Allocation as % of Deal Size": number;
+  "Allocation as % of IOI": number;
+  "Weighted Allocation as % of IOI": number;
+  "Deal volume": number;
+}
+
+interface ResponseData {
+  [year: string]: {
+    [category: string]: {
+      [range: string]: CategoryData;
+    };
+  };
+}
+
 interface MDDCaptureTableProps {
-  responseData: any;
+  responseData: ResponseData;
   apiName: string;
 }
 
@@ -82,12 +95,12 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
                 <Grid container spacing={2}>
                   {["FO", "IPO"].map((category) => {
-                    const categoryData = responseData[year][category];
+                    const categoryData = responseData[year]?.[category];
 
-                    // Sort the ranges according to the category_order
-                    const sortedCategoryData = categoryOrder.map(
-                      (range) => categoryData[range]
-                    );
+                    // Sort the ranges according to the categoryOrder and filter undefined entries
+                    const sortedCategoryData = categoryOrder
+                      .map((range) => categoryData?.[range])
+                      .filter((data) => data); // Skip undefined data
 
                     return (
                       <Grid item xs={12} sm={6} key={category}>
@@ -118,89 +131,28 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       color: "white",
                                     }}
                                   >
-                                    <TableCell
-                                      sx={{
-                                        fontSize: "0.85rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "200px",
-                                      }}
-                                    >
-                                      T+1M Excess Returns
-                                    </TableCell>
-                                    <TableCell
-                                      align="left"
-                                      sx={{
-                                        fontSize: "0.85rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "60px",
-                                      }}
-                                    >
-                                      No of Deals
-                                    </TableCell>
-                                    <TableCell
-                                      align="left"
-                                      sx={{
-                                        fontSize: "0.85rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "80px",
-                                      }}
-                                    >
-                                      Allocation as % of Deal Size(Simple)
-                                    </TableCell>
-                                    <TableCell
-                                      align="left"
-                                      sx={{
-                                        fontSize: "0.85rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "80px",
-                                      }}
-                                    >
-                                      Allocation as % of Deal Size(Weighted)
-                                    </TableCell>
-                                    <TableCell
-                                      align="left"
-                                      sx={{
-                                        fontSize: "0.85rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "80px",
-                                      }}
-                                    >
-                                      Allocation as % of IOI(simple)
-                                    </TableCell>
-                                    <TableCell
-                                      align="left"
-                                      sx={{
-                                        fontSize: "0.85rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "80px",
-                                      }}
-                                    >
-                                      Allocation as % of IOI(Weighted)
-                                    </TableCell>
-                                    <TableCell
-                                      align="left"
-                                      sx={{
-                                        fontSize: "0.85rem",
-                                        border: "1px solid #ddd",
-                                        fontWeight: "bold",
-                                        padding: "4px 8px",
-                                        width: "80px",
-                                      }}
-                                    >
-                                      Deal Volume
-                                    </TableCell>
+                                    {[
+                                      "T+1M Excess Returns",
+                                      "No of Deals",
+                                      "Allocation as % of Deal Size(Simple)",
+                                      "Allocation as % of Deal Size(Weighted)",
+                                      "Allocation as % of IOI(simple)",
+                                      "Allocation as % of IOI(Weighted)",
+                                      "Deal Volume",
+                                    ].map((header, idx) => (
+                                      <TableCell
+                                        key={idx}
+                                        sx={{
+                                          fontSize: "0.85rem",
+                                          fontWeight: "bold",
+                                          border: "1px solid #ddd",
+                                          padding: "4px 8px",
+                                          width: idx === 0 ? "200px" : "80px",
+                                        }}
+                                      >
+                                        {header}
+                                      </TableCell>
+                                    ))}
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -235,69 +187,34 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             padding: "4px 8px",
                                           }}
                                         >
-                                          {data["Number of deals"]}
+                                          {data["Number of deals"] || 0}
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.85rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
+                                        <TableCell align="left">
                                           {data[
                                             "Allocation as % of Deal Size"
-                                          ].toFixed(2)}
+                                          ]?.toFixed(2) || "0.00"}
                                           %
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.85rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
+                                        <TableCell align="left">
                                           {data[
                                             "Weighted Allocation as % of Deal Size"
-                                          ].toFixed(2)}
+                                          ]?.toFixed(2) || "0.00"}
                                           %
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.85rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
-                                          {data[
-                                            "Allocation as % of IOI"
-                                          ].toFixed(2)}
+                                        <TableCell align="left">
+                                          {data["Allocation as % of IOI"]?.toFixed(
+                                            2
+                                          ) || "0.00"}
                                           %
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.85rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
+                                        <TableCell align="left">
                                           {data[
                                             "Weighted Allocation as % of IOI"
-                                          ].toFixed(2)}
+                                          ]?.toFixed(2) || "0.00"}
                                           %
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.85rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
-                                          {formatValue(data["Deal volume"])}
+                                        <TableCell align="left">
+                                          {formatValue(data["Deal volume"] || 0)}
                                         </TableCell>
                                       </TableRow>
                                     );
