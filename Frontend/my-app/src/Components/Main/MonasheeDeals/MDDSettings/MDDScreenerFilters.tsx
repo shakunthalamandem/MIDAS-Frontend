@@ -78,8 +78,8 @@ const MDDScreenerFilters: React.FC<MDDScreenerFiltersProps> = ({ filtersData }) 
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-             MDD Screener Filters
+          <Typography variant="h5" gutterBottom color="#002060" mb={4}>
+              MDD Screener Filters
             </Typography>
             <Grid
               container
