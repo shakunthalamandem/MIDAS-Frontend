@@ -13,7 +13,7 @@ const DealCount = () => {
       textAlign="center"
     >
       <Typography 
-        variant="h4" 
+        variant="h5" 
         sx={{ fontWeight: "bold", color: "#002060" }}
       >
         Deal Count

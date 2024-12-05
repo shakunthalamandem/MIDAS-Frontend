@@ -67,7 +67,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
           >
             <CardContent>
               <Typography
-                variant="h4"
+                variant="h5"
                 gutterBottom
                 sx={{
                   fontWeight: "bold",
@@ -172,6 +172,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       sx={{
                                         fontSize: "0.85rem",
                                         border: "1px solid #ddd",
+                                        fontWeight: "bold",
                                         padding: "4px 8px",
                                         width: "80px",
                                       }}

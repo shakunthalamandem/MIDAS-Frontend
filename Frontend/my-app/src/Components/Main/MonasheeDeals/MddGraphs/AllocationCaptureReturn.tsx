@@ -13,10 +13,10 @@ const AllocationCaptureReturn = () => {
       textAlign="center"
     >
       <Typography 
-        variant="h4" 
+        variant="h5" 
         sx={{ fontWeight: "bold", color: "#002060" }}
       >
-        Allocation Graph
+        Allocation Capture
       </Typography>
       <MddMain apiName="allocation_capture" />
     </Box>
