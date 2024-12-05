@@ -16,7 +16,7 @@ const DealMDDIOI = () => {
         variant="h5" 
         sx={{ fontWeight: "bold", color: "#002060" }}
       >
-        Deal MDD IOI
+        Allocation % of IOI
       </Typography>
       <MddMain apiName="mdd_allocation_ioi" />
     </Box>
