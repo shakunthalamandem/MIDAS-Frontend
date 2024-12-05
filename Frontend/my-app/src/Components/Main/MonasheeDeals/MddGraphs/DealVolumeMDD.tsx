@@ -16,7 +16,7 @@ const DealVolumeMDD = () => {
         variant="h5" 
         sx={{ fontWeight: "bold", color: "#002060" }}
       >
-        Deal Volume MDD
+        Deal Volume
       </Typography>
       <MddMain apiName="mdd_deals_volume" />
     </Box>
