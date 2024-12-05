@@ -74,11 +74,11 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+    <Container maxWidth="lg"  sx={{ padding: 0, marginBottom: 4,marginTop:4 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h5" gutterBottom color="#002060" mb={4}>
               Screener Filters
             </Typography>
             <Grid
