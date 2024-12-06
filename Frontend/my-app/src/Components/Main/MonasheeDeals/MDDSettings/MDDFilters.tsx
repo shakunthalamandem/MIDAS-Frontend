@@ -17,6 +17,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { LoadingButton } from "@mui/lab"; // Import LoadingButton
 import DealAllocationGraph from "./DealAllocationGraph";
 import MDDCaptureTable from "./MDDCaptureTable";
+import AvgFoDiscountChart from "./AvgFoDiscountChart";
 
 interface FilterOption {
   options: (string | number)[]; // Options can be either string or number
@@ -268,6 +269,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           <>
             {apiName === "allocation_capture" ? (
               <MDDCaptureTable responseData={apiData} apiName={apiName} />
+            ) : apiName === "fo_discount" ? (
+              <AvgFoDiscountChart data={apiData} />
             ) : (
               <DealAllocationGraph responseData={apiData} apiName={apiName} />
             )}
