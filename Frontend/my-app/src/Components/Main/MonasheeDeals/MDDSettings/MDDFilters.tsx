@@ -134,91 +134,91 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           <CardContent>
             <Box width="250px" sx={{ p: 2 }}>
               <Typography variant="h5" color="#002060" mb={4}>
-                MDD Filters
+                Monashee Deal Filters
               </Typography>
-              {filtersData.map((filter) => {
-                const key = Object.keys(filter)[0];
-                const { options, label, description } = filter[key];
+              {filtersData
+                .filter((filter) => {
+                  const key = Object.keys(filter)[0];
+                  // Hide the 'deal type' filter if the API name is 'fo_discount'
+                  return !(apiName === "fo_discount" && key === "deal_type");
+                })
+                .map((filter) => {
+                  const key = Object.keys(filter)[0];
+                  const { options, label, description } = filter[key];
 
-                return (
-                  <Accordion
-                    expanded={expanded === key}
-                    onChange={() => setExpanded(expanded === key ? false : key)}
-                    sx={{
-                      marginBottom: "10px", // Space between accordions
-                      "&:before": {
-                        display: "none", // Hide default divider
-                      },
-                    }}
-                  >
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
-                      aria-controls={`${key}-content`}
-                      id={`${key}-header`}
+                  return (
+                    <Accordion
+                      expanded={expanded === key}
+                      onChange={() => setExpanded(expanded === key ? false : key)}
                       sx={{
-                        backgroundColor: "#002060", // Accordion header background
-                        color: "white", // Text color in the header
-                        "& .MuiAccordionSummary-content": {
-                          color: "white",
-                        },
-                        transition: "background-color 0.3s ease", // Smooth transition on hover
-                        "&:hover": {
-                          backgroundColor: "#004080", // Darker shade on hover
+                        marginBottom: "10px", // Space between accordions
+                        "&:before": {
+                          display: "none", // Hide default divider
                         },
                       }}
                     >
-                      <Typography sx={{ fontWeight: "bold" }}>
-                        {label}
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails
-                      sx={{
-                        backgroundColor: "#f1f1f1", // Light background for the details
-                        padding: "10px 20px", // Padding inside accordion details
-                        borderRadius: "5px", // Rounded corners for accordion details
-                        textAlign: "left", 
-                        maxHeight:'200px',
-                        overflowY:'scroll'
-                        // Align all content to the left
-                      }}
-                    >
-                      {options.map((option) => (
-                        <FormControlLabel
-                          key={option}
-                          control={
-                            <Checkbox
-                              key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
-                              checked={selectedValues[key]?.includes(option)} // Checkbox reflects `selectedValues`
-                              onChange={() => {
-                                const newValues = selectedValues[key]?.includes(
-                                  option
-                                )
-                                  ? selectedValues[key].filter(
-                                      (item) => item !== option
-                                    ) // Deselect
-                                  : [...(selectedValues[key] || []), option]; // Select
-                                handleSelectionChange(key, newValues || []);
-                              }}
-                              sx={{
-                                "&.Mui-checked": {
-                                  color: "#FF8C00", // Checkbox checked color
-                                },
-                                transition: "all 0.3s ease", // Smooth transition
-                                paddingLeft: 0, // Remove padding on the left to make it align better
-                              }}
-                            />
-                          }
-                          label={option}
-                          sx={{
-                            display: "flex", // Align checkbox and label horizontally
-                            justifyContent: "flex-start", // Ensure label is aligned to the left
-                          }}
-                        />
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                );
-              })}
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
+                        aria-controls={`${key}-content`}
+                        id={`${key}-header`}
+                        sx={{
+                          backgroundColor: "#002060", // Accordion header background
+                          color: "white", // Text color in the header
+                          "& .MuiAccordionSummary-content": {
+                            color: "white",
+                          },
+                          transition: "background-color 0.3s ease", // Smooth transition on hover
+                          "&:hover": {
+                            backgroundColor: "#004080", // Darker shade on hover
+                          },
+                        }}
+                      >
+                        <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails
+                        sx={{
+                          backgroundColor: "#f1f1f1", // Light background for the details
+                          padding: "10px 20px", // Padding inside accordion details
+                          borderRadius: "5px", // Rounded corners for accordion details
+                          textAlign: "left",
+                          maxHeight: "200px",
+                          overflowY: "scroll",
+                        }}
+                      >
+                        {options.map((option) => (
+                          <FormControlLabel
+                            key={option}
+                            control={
+                              <Checkbox
+                                key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
+                                checked={selectedValues[key]?.includes(option)} // Checkbox reflects `selectedValues`
+                                onChange={() => {
+                                  const newValues = selectedValues[key]?.includes(option)
+                                    ? selectedValues[key].filter((item) => item !== option) // Deselect
+                                    : [...(selectedValues[key] || []), option]; // Select
+                                  handleSelectionChange(key, newValues || []);
+                                }}
+                                sx={{
+                                  "&.Mui-checked": {
+                                    color: "#FF8C00", // Checkbox checked color
+                                  },
+                                  transition: "all 0.3s ease", // Smooth transition
+                                  paddingLeft: 0, // Remove padding on the left to make it align better
+                                }}
+                              />
+                            }
+                            label={option}
+                            sx={{
+                              display: "flex", // Align checkbox and label horizontally
+                              justifyContent: "flex-start", // Ensure label is aligned to the left
+                            }}
+                          />
+                        ))}
+                      </AccordionDetails>
+                    </Accordion>
+                  );
+                })}
+
               <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
                 <LoadingButton
                   variant="contained"

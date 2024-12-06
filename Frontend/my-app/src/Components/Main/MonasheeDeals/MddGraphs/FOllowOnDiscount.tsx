@@ -18,7 +18,7 @@ const FollowOnDiscount = () => {
       >
         Follow-On Discount
       </Typography>
-      <MddMain apiName="fodiscount" />
+      <MddMain apiName="fo_discount" />
     </Box>
   );
 };
