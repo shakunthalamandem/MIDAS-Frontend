@@ -14,12 +14,24 @@ interface Props {
 }
 
 const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
-  // Transform the data into an array format suitable for Recharts
   const chartData = Object.entries(data).map(([year, values]) => ({
     year,
     avgFoDiscount: values.avg_fo_discount,
     count: values.count,
   }));
+
+  if (chartData.length === 0) {
+    return (
+      <Box sx={{ textAlign: "center", padding: 4 }}>
+        <Typography variant="h6" color="textSecondary">
+          No Data Available for the selected filters.
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Please change the selected filters to show the Plot.
+        </Typography>
+      </Box>
+    );
+  }
 
   // Custom Tooltip component
   const CustomTooltip = ({ active, payload }: any) => {

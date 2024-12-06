@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  Box,
   Typography,
   Button,
   Dialog,
@@ -117,14 +118,14 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
   return (
     <div>
       {chartData.length === 0 && !responseData?.message ? (
-        <Typography
-          variant="body1"
-          align="center"
-          sx={{ mt: 5, color: "#002060", fontWeight: "bold" }}
-        >
-          No Data Available for the above filters. Please change the selected filters to show the
-          plots.
-        </Typography>
+          <Box sx={{ textAlign: "center", padding: 4 }}>
+          <Typography variant="h6" color="textSecondary">
+            No Data Available for the selected filters.
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            Please change the selected filters to show the Plot.
+          </Typography>
+        </Box>
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData}>
