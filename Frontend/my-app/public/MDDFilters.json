@@ -77,6 +77,17 @@
         "label": "Deal Captain",
         "description": "Others include Frank, HCFN, HCPP, Chris, Jason, Jerry, Rene, Rob, Will"
       }
+    },
+    {
+      "lead_bank": {
+        "options": [
+          "JP Morgan",
+          "Bank of America",
+          "Others"
+        ],
+        "label": "Lead Bank",
+        "description": "Others include Other Banks"
+      }
     }
   ]
 }
