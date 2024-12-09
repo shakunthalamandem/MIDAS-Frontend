@@ -169,7 +169,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
          }
          label={
            <Typography sx={{ fontWeight: "bold", color: "#002060" }}>
-             Normal
+             Simple Average
            </Typography>
          }
          sx={{ marginRight: "10px" }}
@@ -189,7 +189,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
          }
          label={
            <Typography sx={{ fontWeight: "bold", color: "#002060" }}>
-             Weighted
+             Deal Size Weighted Average
            </Typography>
          }
        />
