@@ -50,19 +50,20 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
         <Box
           sx={{
             padding: 2,
-            backgroundColor: theme.palette.background.paper,
+            backgroundColor: "#FFFFFF",
+            color:'#002060',
             border: `1px solid ${theme.palette.divider}`,
             borderRadius: "4px",
             boxShadow: theme.shadows[1],
           }}
         >
-          <Typography variant="body1" fontWeight="bold">
+          <Typography variant="body1" fontWeight="bold" color="#68021d">
             Year: {year}
           </Typography>
           <Typography variant="body2">
-            Avg FO Discount: {avgFoDiscount.toFixed(2)}
+            Avg FO Discount: <span style={{fontWeight:'bold'}}>{avgFoDiscount.toFixed(2)}</span>
           </Typography>
-          <Typography variant="body2">Count: {count}</Typography>
+          <Typography variant="body2">Count: <span style={{fontWeight:'bold'}}>{count}</span></Typography>
         </Box>
       );
     }
