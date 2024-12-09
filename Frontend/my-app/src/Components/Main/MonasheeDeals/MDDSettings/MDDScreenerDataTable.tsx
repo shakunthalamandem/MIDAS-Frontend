@@ -62,7 +62,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
         throw new Error('API URL is not defined in environment variables');
       }
 
-      const response = await fetch(`${apiUrl}/api/mddsuper-screener/`, {
+      const response = await fetch(`${apiUrl}/api/mdd_super_screener/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
