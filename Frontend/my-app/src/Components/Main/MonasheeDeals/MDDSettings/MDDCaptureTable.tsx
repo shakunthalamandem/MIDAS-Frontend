@@ -73,14 +73,14 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
       >
         <Button
           variant={selectedCategory === "IPO" ? "contained" : "outlined"}
-          color="primary"
+          color="secondary"
           onClick={() => setSelectedCategory("IPO")}
         >
           IPO
         </Button>
         <Button
           variant={selectedCategory === "FO" ? "contained" : "outlined"}
-          color="primary"
+          color="secondary"
           onClick={() => setSelectedCategory("FO")}
         >
           FO
