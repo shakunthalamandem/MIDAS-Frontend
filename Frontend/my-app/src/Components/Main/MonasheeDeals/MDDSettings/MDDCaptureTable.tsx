@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Grid,
@@ -13,6 +13,7 @@ import {
   Box,
   CardContent,
   Card,
+  Button,
 } from "@mui/material";
 
 // Format values to represent millions, billions, etc.
@@ -60,8 +61,32 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   responseData,
   apiName,
 }) => {
+  const [selectedCategory, setSelectedCategory] = useState<"IPO" | "FO">("IPO");
+
   return (
-    <Box mr={0} sx={{ Width: "100%",maxWidth:'2000px' }}>
+    <Box mr={0} sx={{ Width: "100%", maxWidth: "2000px" }}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        mb={3}
+        sx={{ gap: "10px" }}
+      >
+        <Button
+          variant={selectedCategory === "IPO" ? "contained" : "outlined"}
+          color="primary"
+          onClick={() => setSelectedCategory("IPO")}
+        >
+          IPO
+        </Button>
+        <Button
+          variant={selectedCategory === "FO" ? "contained" : "outlined"}
+          color="primary"
+          onClick={() => setSelectedCategory("FO")}
+        >
+          FO
+        </Button>
+      </Box>
+
       {Object.keys(responseData)
         .sort((a, b) => b.localeCompare(a)) // Sort years in descending order
         .map((year) => (
@@ -78,7 +103,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                 backgroundColor: "#fdfff8",
                 marginBottom: "30px",
                 padding: 2,
-                width:"1400px",
+                width: "1400px",
               }}
             >
               <CardContent>
@@ -95,172 +120,189 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                 </Typography>
 
                 <Grid container spacing={3}>
-  {["FO", "IPO"].map((category) => {
-    const categoryData = responseData[year]?.[category] || {};
+                  {(() => {
+                    const categoryData =
+                      responseData[year]?.[selectedCategory] || {};
 
-    // Sort the ranges according to the categoryOrder and fill missing data
-    const sortedCategoryData = categoryOrder.map((range) =>
-      categoryData[range] || {
-        "Number of deals": 0,
-        "Allocation as % of Deal Size": 0,
-        "Weighted Allocation as % of Deal Size": 0,
-        "Allocation as % of IOI": 0,
-        "Weighted Allocation as % of IOI": 0,
-        "Deal volume": 0,
-      }
-    );
-
-    return (
-      <Grid item xs={12} sm={6} key={category}> {/* Use full width for each item */}
-        <Card elevation={4} sx={{ backgroundColor: "#f7edd8" }}>
-          <CardContent>
-            <Typography
-              variant="h5"
-              gutterBottom
-              sx={{
-                fontWeight: "bold",
-                marginBottom: "15px",
-                textAlign: "center",
-                color: "#002060",
-              }}
-            >
-              {category}
-            </Typography>
-
-            <TableContainer component={Paper}>
-              <Table
-                sx={{
-                  // minWidth: 200,
-                  // tableLayout: "fixed", // Manage column widths
-                  width: "100%",
-                }}
-                aria-label={`${category} table`}
-              >
-                <TableHead>
-                  <TableRow
-                    sx={{
-                      backgroundColor: "#d8e2f7",
-                      color: "white",
-                    }}
-                  >
-                    {[
-                      "T+1M Excess Returns",
-                      "No of Deals",
-                      "Alloc as % of Deal Size(Simple)",
-                      "Alloc as % of Deal Size(Weighted)",
-                      "Alloc as % of IOI(Simple)",
-                      "Alloc as % of IOI(Weighted)",
-                      "Deal Volume",
-                    ].map((header, idx) => (
-                      <TableCell
-                        key={idx}
-                        sx={{
-                          fontSize: "0.725rem",
-                          fontWeight: "bold",
-                          border: "1px solid #ddd",
-                          padding: "4px 8px",
-                          width: idx === 0 ? "120px" : "80px",
-                        }}
-                      >
-                        {header}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {sortedCategoryData.map((data, index) => {
-                    const range = categoryOrder[index];
+                    // Sort the ranges according to the categoryOrder and fill missing data
+                    const sortedCategoryData = categoryOrder.map(
+                      (range) =>
+                        categoryData[range] || {
+                          "Number of deals": 0,
+                          "Allocation as % of Deal Size": 0,
+                          "Weighted Allocation as % of Deal Size": 0,
+                          "Allocation as % of IOI": 0,
+                          "Weighted Allocation as % of IOI": 0,
+                          "Deal volume": 0,
+                        }
+                    );
 
                     return (
-                      <TableRow
-                        key={range}
-                        sx={{
-                          "&:nth-of-type(odd)": {
-                            backgroundColor: "#f9f9f9",
-                          },
-                        }}
-                      >
-                        <TableCell
-                          component="th"
-                          scope="row"
-                          sx={{
-                            fontSize: "0.8rem",
-                            border: "1px solid #ddd",
-                            padding: "4px 8px"
-                          }}
-                        >
-                          {range}
-                        </TableCell>
-                        <TableCell
-                          align="left"
-                          sx={{
-                            fontSize: "0.8rem",
-                            border: "1px solid #ddd",
-                            padding: "4px 8px",
-                          }}
-                        >
-                          {data["Number of deals"] || 0}
-                        </TableCell>
-                        <TableCell align="left" 
-                         sx={{
-                          fontSize: "0.8rem",
-                          border: "1px solid #ddd",
-                          padding: "4px 8px",
-                        }}>
-                          {data["Allocation as % of Deal Size"]?.toFixed(2) ||
-                            "0.00"}
-                          %
-                        </TableCell>
-                        <TableCell align="left"
-                         sx={{
-                          fontSize: "0.8rem",
-                          border: "1px solid #ddd",
-                          padding: "4px 8px",
-                        }}>
-                          {data[
-                            "Weighted Allocation as % of Deal Size"
-                          ]?.toFixed(2) || "0.00"}
-                          %
-                        </TableCell>
-                        <TableCell align="left" 
-                         sx={{
-                          fontSize: "0.8rem",
-                          border: "1px solid #ddd",
-                          padding: "4px 8px",
-                        }}>
-                          {data["Allocation as % of IOI"]?.toFixed(2) || "0.00"}
-                          %
-                        </TableCell>
-                        <TableCell align="left"  sx={{
-                            fontSize: "0.8rem",
-                            border: "1px solid #ddd",
-                            padding: "4px 8px",
-                          }}>
-                          {data[
-                            "Weighted Allocation as % of IOI"
-                          ]?.toFixed(2) || "0.00"}
-                          %
-                        </TableCell>
-                        <TableCell align="left"  sx={{
-                            fontSize: "0.8rem",
-                            border: "1px solid #ddd",
-                            padding: "4px 8px",
-                          }}>
-                          {formatValue(data["Deal volume"] || 0)}
-                        </TableCell>
-                      </TableRow>
+                      <Grid item xs={12}>
+                        <Card elevation={4} sx={{ backgroundColor: "#f7edd8" }}>
+                          <CardContent>
+                            <Typography
+                              variant="h5"
+                              gutterBottom
+                              sx={{
+                                fontWeight: "bold",
+                                marginBottom: "15px",
+                                textAlign: "center",
+                                color: "#002060",
+                              }}
+                            >
+                              {selectedCategory}
+                            </Typography>
+
+                            <TableContainer component={Paper}>
+                              <Table
+                                sx={{
+                                  width: "100%",
+                                }}
+                                aria-label={`${selectedCategory} table`}
+                              >
+                                <TableHead>
+                                  <TableRow
+                                    sx={{
+                                      backgroundColor: "#d8e2f7",
+                                      color: "white",
+                                    }}
+                                  >
+                                    {[
+                                      "T+1M Excess Returns",
+                                      "No of Deals",
+                                      "Alloc as % of Deal Size(Simple)",
+                                      "Alloc as % of Deal Size(Weighted)",
+                                      "Alloc as % of IOI(Simple)",
+                                      "Alloc as % of IOI(Weighted)",
+                                      "Deal Volume",
+                                    ].map((header, idx) => (
+                                      <TableCell
+                                        key={idx}
+                                        sx={{
+                                          fontSize: "0.725rem",
+                                          fontWeight: "bold",
+                                          border: "1px solid #ddd",
+                                          padding: "4px 8px",
+                                          width: idx === 0 ? "120px" : "80px",
+                                        }}
+                                      >
+                                        {header}
+                                      </TableCell>
+                                    ))}
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {sortedCategoryData.map((data, index) => {
+                                    const range = categoryOrder[index];
+
+                                    return (
+                                      <TableRow
+                                        key={range}
+                                        sx={{
+                                          "&:nth-of-type(odd)": {
+                                            backgroundColor: "#f9f9f9",
+                                          },
+                                        }}
+                                      >
+                                        <TableCell
+                                          component="th"
+                                          scope="row"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            border: "1px solid #ddd",
+                                            padding: "4px 8px",
+                                          }}
+                                        >
+                                          {range}
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            border: "1px solid #ddd",
+                                            padding: "4px 8px",
+                                          }}
+                                        >
+                                          {data["Number of deals"] || 0}
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            border: "1px solid #ddd",
+                                            padding: "4px 8px",
+                                          }}
+                                        >
+                                          {data[
+                                            "Allocation as % of Deal Size"
+                                          ]?.toFixed(2) || "0.00"}
+                                          %
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            border: "1px solid #ddd",
+                                            padding: "4px 8px",
+                                          }}
+                                        >
+                                          {data[
+                                            "Weighted Allocation as % of Deal Size"
+                                          ]?.toFixed(2) || "0.00"}
+                                          %
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            border: "1px solid #ddd",
+                                            padding: "4px 8px",
+                                          }}
+                                        >
+                                          {data[
+                                            "Allocation as % of IOI"
+                                          ]?.toFixed(2) || "0.00"}
+                                          %
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            border: "1px solid #ddd",
+                                            padding: "4px 8px",
+                                          }}
+                                        >
+                                          {data[
+                                            "Weighted Allocation as % of IOI"
+                                          ]?.toFixed(2) || "0.00"}
+                                          %
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            border: "1px solid #ddd",
+                                            padding: "4px 8px",
+                                          }}
+                                        >
+                                          {formatValue(data["Deal volume"] || 0)}
+                                        </TableCell>
+                                      </TableRow>
+                                    );
+                                  })}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          </CardContent>
+                        </Card>
+                      </Grid>
                     );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </CardContent>
-        </Card>
-      </Grid>
-    );
-  })}
-</Grid>
-<Typography mt={4} sx={{fontWeight:'bold'}}>* Blocks are not included</Typography>
+                  })()}
+                </Grid>
+                <Typography mt={4} sx={{ fontWeight: "bold" }}>
+                  * Blocks are not included
+                </Typography>
               </CardContent>
             </Card>
           </motion.div>
