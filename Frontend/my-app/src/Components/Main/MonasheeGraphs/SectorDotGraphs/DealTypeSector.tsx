@@ -75,7 +75,7 @@ const sectorNameMap: Record<string, string> = {
   Industrials: "Industrials",
   "Information Technology": "Information Technology",
   Materials: "Materials",
-  RealEstate: "Real Estate",
+  "Real Estate": "Real Estate",
   Utilities: "Utilities",
 };
 
@@ -90,7 +90,7 @@ const sectorColors: Record<string, string> = {
   Industrials: "#027f53",
   "Information Technology": "#dfc100",
   Materials: "#7a3a01",
-  RealEstate: "#1f5d5e",
+  "Real Estate": "#1f5d5e",
   Utilities: "#7334a7",
 };
 
