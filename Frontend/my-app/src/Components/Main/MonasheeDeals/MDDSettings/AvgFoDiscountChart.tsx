@@ -1,6 +1,13 @@
 import React from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Box, Typography } from "@mui/material";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Box, Typography, useTheme, Card, CardContent } from "@mui/material";
 
 interface YearData {
   [year: string]: {
@@ -14,6 +21,8 @@ interface Props {
 }
 
 const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
+  const theme = useTheme(); // Use theme for consistent colors
+
   const chartData = Object.entries(data).map(([year, values]) => ({
     year,
     avgFoDiscount: values.avg_fo_discount,
@@ -38,11 +47,21 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
     if (active && payload && payload.length) {
       const { year, avgFoDiscount, count } = payload[0].payload;
       return (
-        <Box sx={{ padding: 2, backgroundColor: "#fff", border: "1px solid #ccc", borderRadius: "4px" }}>
+        <Box
+          sx={{
+            padding: 2,
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: "4px",
+            boxShadow: theme.shadows[1],
+          }}
+        >
           <Typography variant="body1" fontWeight="bold">
             Year: {year}
           </Typography>
-          <Typography variant="body2">Avg FO Discount: {avgFoDiscount}</Typography>
+          <Typography variant="body2">
+            Avg FO Discount: {avgFoDiscount.toFixed(2)}
+          </Typography>
           <Typography variant="body2">Count: {count}</Typography>
         </Box>
       );
@@ -51,17 +70,65 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
   };
 
   return (
-    <Box sx={{ width: "100%", height: 400 }}>
-      <ResponsiveContainer>
-        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="year" />
-          <YAxis />
-          <Tooltip content={<CustomTooltip />} />
-          <Bar dataKey="avgFoDiscount" fill="#8884d8" />
-        </BarChart>
-      </ResponsiveContainer>
-    </Box>
+    <Card
+      elevation={4}
+      sx={{
+        width: "100%",
+        maxWidth: 800,
+        margin: "auto",
+        padding: 2,
+        backgroundColor: theme.palette.background.default,
+        borderRadius: "8px",
+        boxShadow: theme.shadows[2],
+      }}
+    >
+      <CardContent>
+        <Typography
+          variant="h6"
+          sx={{
+            marginBottom: 2,
+            textAlign: "center",
+            fontWeight: "bold",
+            color: "#002060",
+          }}
+        >
+          Average FO Discount by Year
+        </Typography>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={chartData}>
+            <XAxis
+              dataKey="year"
+              tick={{
+                fill: "#002060",
+                fontSize: 12,
+              }}
+              tickLine={false}
+              axisLine={{ stroke: theme.palette.divider }}
+            />
+            <YAxis
+              tick={{
+                fill: "#002060",
+                fontSize: 12,
+
+              }}
+              tickLine={false}
+              axisLine={{ stroke: theme.palette.divider }}
+              width={50}
+            />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: theme.palette.action.hover }}
+            />
+            <Bar
+              dataKey="avgFoDiscount"
+              fill='#68021d'
+              radius={[4, 4, 0, 0]} // Rounded top corners
+              animationDuration={800} // Animation for bars
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
   );
 };
 
