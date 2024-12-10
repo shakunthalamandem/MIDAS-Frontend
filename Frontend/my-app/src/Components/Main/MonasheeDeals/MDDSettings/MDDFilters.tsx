@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -12,6 +12,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   FormControlLabel,
+  TextField,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { LoadingButton } from "@mui/lab"; // Import LoadingButton
@@ -44,11 +45,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   } | null>(null);
   const [expanded, setExpanded] = useState<string | false>(false); // Track expanded state
   const [apiData, setApiData] = useState({});
-
-  // Store the initial selected values using useRef to persist across renders
-  const initialSelectedValuesRef = useRef<{
-    [key: string]: (string | number)[];
-  }>({});
+  const [searchValue, setSearchValue] = useState<string>(""); // State for the search input
+  const [searchKey, setSearchKey] = useState<string | null>(null); // Track which filter's search bar is active
 
   useEffect(() => {
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
@@ -56,7 +54,6 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       const key = Object.keys(filter)[0];
       initialSelectedValues[key] = [];
     });
-    initialSelectedValuesRef.current = initialSelectedValues; // Save the initial selected values in the ref
     setSelectedValues(initialSelectedValues);
     setAppliedFilters(initialSelectedValues);
     handleSubmit(initialSelectedValues);
@@ -67,6 +64,11 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       ...prevState,
       [key]: value,
     }));
+  };
+
+  const handleSearchChange = (value: string, key: string) => {
+    setSearchValue(value.toLowerCase());
+    setSearchKey(key); // Keep track of the filter being searched
   };
 
   const handleSubmit = async (filters = selectedValues) => {
@@ -106,10 +108,15 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   };
 
   const handleCancel = () => {
-    const resetSelectedValues = { ...initialSelectedValuesRef.current };
+    const resetSelectedValues: { [key: string]: (string | number)[] } = {};
+    filtersData.forEach((filter) => {
+      const key = Object.keys(filter)[0];
+      resetSelectedValues[key] = [];
+    });
     setSelectedValues(resetSelectedValues); // Reset the selected filters
     setAppliedFilters(resetSelectedValues); // Reset the applied filters
-    console.log("Reset state: ", resetSelectedValues); // Debugging
+    setSearchValue(""); // Clear the search bar
+    setSearchKey(null); // Reset active search filter
   };
 
   const handleAccordionChange =
@@ -145,13 +152,22 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                     (apiName === "fo_discount" || apiName === "allocation_capture") &&
                     key === "deal_type"
                   );
-                                })
+                })
                 .map((filter) => {
                   const key = Object.keys(filter)[0];
-                  const { options, label, description } = filter[key];
+                  const { options, label } = filter[key];
+
+                  // Apply search filtering for "lead_bank"
+                  const filteredOptions =
+                    label === "Lead Bank" && searchKey === key
+                      ? options.filter((option) =>
+                          option.toString().toLowerCase().includes(searchValue)
+                        )
+                      : options;
 
                   return (
                     <Accordion
+                      key={key}
                       expanded={expanded === key}
                       onChange={() => setExpanded(expanded === key ? false : key)}
                       sx={{
@@ -189,13 +205,21 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                           overflowY: "scroll",
                         }}
                       >
-                        {options.map((option) => (
+                        {label === "Lead Bank" && (
+                          <TextField
+                            size="small"
+                            placeholder="Search"
+                            value={searchKey === key ? searchValue : ""}
+                            onChange={(e) => handleSearchChange(e.target.value, key)}
+                            sx={{ mb: 2 }}
+                          />
+                        )}
+                        {filteredOptions.map((option) => (
                           <FormControlLabel
                             key={option}
                             control={
                               <Checkbox
-                                key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
-                                checked={selectedValues[key]?.includes(option)} // Checkbox reflects `selectedValues`
+                                checked={selectedValues[key]?.includes(option)}
                                 onChange={() => {
                                   const newValues = selectedValues[key]?.includes(option)
                                     ? selectedValues[key].filter((item) => item !== option) // Deselect
