@@ -35,7 +35,10 @@ const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
     fetchFilters();
   }, []);
 
-  return <MDDFilters filtersData={filtersData} apiName={apiName} />;
+  return<>
+  <MDDFilters filtersData={filtersData} apiName={apiName} />;
+  
+  </> 
 };
 
 export default MddMain;

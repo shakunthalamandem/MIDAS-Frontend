@@ -16,6 +16,7 @@ import {
 import { Autocomplete } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import MDDScreenerDataTable from "./MDDScreenerDataTable";
+import MDDScreenerFiltersMain from "../MddGraphs/MDDScrenner/MDDScreenerFiltersMain";
 
 interface FilterOption {
   options: (string | number)[]; // Options can be either string or number
@@ -75,6 +76,8 @@ const MDDScreenerFilters: React.FC<MDDScreenerFiltersProps> = ({ filtersData }) 
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+      <MDDScreenerFiltersMain />
+
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box sx={{ p: 2 }}>
@@ -185,7 +188,6 @@ const MDDScreenerFilters: React.FC<MDDScreenerFiltersProps> = ({ filtersData }) 
           </Box>
         </CardContent>
       </Card>
-
       {/* Render ScreenerDataTable */}
       <Box mt={4}>
         <MDDScreenerDataTable sectorwiseData={appliedFilters || selectedValues} />
