@@ -219,21 +219,23 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                             key={option}
                             control={
                               <Checkbox
-                                checked={selectedValues[key]?.includes(option)}
-                                onChange={() => {
-                                  const newValues = selectedValues[key]?.includes(option)
-                                    ? selectedValues[key].filter((item) => item !== option) // Deselect
-                                    : [...(selectedValues[key] || []), option]; // Select
-                                  handleSelectionChange(key, newValues || []);
-                                }}
-                                sx={{
-                                  "&.Mui-checked": {
-                                    color: "#FF8C00", // Checkbox checked color
-                                  },
-                                  transition: "all 0.3s ease", // Smooth transition
-                                  paddingLeft: 0, // Remove padding on the left to make it align better
-                                }}
-                              />
+                              key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
+                              checked={selectedValues[key]?.includes(option)} // Reflect reset state here
+                              onChange={() => {
+                                const newValues = selectedValues[key]?.includes(option)
+                                  ? selectedValues[key].filter((item) => item !== option) // Deselect
+                                  : [...(selectedValues[key] || []), option]; // Select
+                                handleSelectionChange(key, newValues || []);
+                              }}
+                              sx={{
+                                "&.Mui-checked": {
+                                  color: "#FF8C00", // Checkbox checked color
+                                },
+                                transition: "all 0.3s ease", // Smooth transition
+                                paddingLeft: 0, // Remove padding on the left to make it align better
+                              }}
+                            />
+                            
                             }
                             label={option}
                             sx={{
