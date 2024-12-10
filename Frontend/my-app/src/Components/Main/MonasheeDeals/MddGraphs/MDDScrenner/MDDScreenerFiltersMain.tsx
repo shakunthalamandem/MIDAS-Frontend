@@ -1,5 +1,3 @@
-// src/components/FilterTabs/FilterTabs.tsx
-
 import React, { useState } from "react";
 import { Tab, Tabs, Box, Typography, Card, CardContent, Grid, Button } from "@mui/material";
 import DealSpecificTab from "./DealSpecificTab";
@@ -13,63 +11,82 @@ const MDDScreenerFiltersMain: React.FC = () => {
     setValue(newValue);
   };
 
+  const handleApply = () => {
+    console.log("Apply clicked");
+  };
+
+  const handleReset = () => {
+    setValue(0);
+    console.log("Reset clicked");
+  };
+
+  const yourFiltersData: { [key: string]: { options: (string | number)[]; label: string; description?: string } }[] = [
+    {
+      year: {
+        options: [2020, 2021, 2022],
+        label: "Year",
+        description: "Select the year",
+      },
+    },
+    {
+      deal_type: {
+        options: ["Equity", "Debt", "Hybrid"],
+        label: "Deal Type",
+        description: "Select the deal type",
+      },
+    },
+  ];
+  
+
   return (
-    <Box sx={{ width: '100%', padding: 2 }}>
+    <Box sx={{ width: "100%", padding: 2 }}>
       <Card sx={{ boxShadow: 3, borderRadius: 2, padding: 2 }}>
         <CardContent>
-          <Typography variant="h5" color="#002060" component="div" gutterBottom>
-           MDD Screener Filters          </Typography>
-           <Tabs 
-            value={value} 
-            onChange={handleTabChange} 
+          <Typography variant="h5" color="#002060" gutterBottom>
+            MDD Screener Filters
+          </Typography>
+          <Tabs
+            value={value}
+            onChange={handleTabChange}
             centered
             sx={{
               "& .MuiTab-root": {
-                fontWeight: 'bold',            // Make the tab label bold
-                color: '#828282',                 // Default color for inactive tabs (black or any color you prefer)
-                transition: 'color 0.3s ease', // Smooth color transition for inactive tabs
+                fontWeight: "bold",
+                color: "#828282",
+                transition: "color 0.3s ease",
               },
               "& .Mui-selected": {
-                color: '#AE0226',             // Set the color of the active (selected) tab label to #AE0226
-                transition: 'color 0.3s ease', // Smooth color transition when selected
+                color: "#AE0226",
+                transition: "color 0.3s ease",
               },
-              "& .MuiTabs-flexContainer": {
-                transition: 'background-color 0.3s ease', // Optional background color transition
-              },
-              // Customize the tab indicator (bottom line) color
-              indicatorColor: 'transparent', // Hide the default indicator
-              "& .MuiTabIndicator-root": {
-                backgroundColor: '#AE0226',   // Change the indicator color to #AE0226
+              "& .MuiTabs-indicator": {
+                backgroundColor: "#AE0226",
               },
             }}
           >
-          <Tab label="General" />
-            <Tab label="Deal Specific" />
-            <Tab label="Monashee Specific" />
+            <Tab label="General" aria-label="General Filters" />
+            <Tab label="Deal Specific" aria-label="Deal Specific Filters" />
+            <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
           </Tabs>
-
           <Box sx={{ paddingTop: 2 }}>
-            {value === 0 && <GeneralTab />}
+            {value === 0 && <GeneralTab filtersData={yourFiltersData} />}
             {value === 1 && <DealSpecificTab />}
             {value === 2 && <MonasheeSpecificTab />}
           </Box>
-       
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Button
-                variant="contained"
-                // onClick={handleSubmit}
-                sx={{ mr: 2, bgcolor: "#002060" }}
-              >
+          <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+            <Grid item>
+              <Button variant="contained" onClick={handleApply} sx={{ bgcolor: "#002060" }}>
                 Apply
               </Button>
-              <Button variant="outlined" color="secondary"
-            //    onClick={handleCancel}
-               >
+            </Grid>
+            <Grid item>
+              <Button variant="outlined" color="secondary" onClick={handleReset}>
                 Reset
               </Button>
-            </Box>
-            </CardContent>
-            </Card>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
     </Box>
   );
 };
