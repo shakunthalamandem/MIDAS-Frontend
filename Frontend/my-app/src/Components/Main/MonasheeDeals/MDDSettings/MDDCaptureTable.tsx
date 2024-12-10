@@ -52,24 +52,23 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   apiName,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<"IPO" | "FO">("IPO");
-  const [dynamicCategoryOrder, setDynamicCategoryOrder] = useState<string[]>([]);
+  const [dynamicCategoryByYear, setDynamicCategoryByYear] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
-    // Extract categories dynamically from the responseData for the selected category
-    const categories = responseData
-      ? Object.keys(responseData).reduce((acc: Set<string>, year) => {
-          if (responseData[year] && responseData[year][selectedCategory]) {
-            Object.keys(responseData[year][selectedCategory]).forEach((range) =>
-              acc.add(range)
-            );
-          }
-          return acc;
-        }, new Set<string>())
-      : new Set<string>();
+    if (!responseData) return;
 
-    // Convert the Set back into a sorted array for use
-    const sortedCategories = Array.from(categories).sort();
-    setDynamicCategoryOrder(sortedCategories);
+    const groupCategoriesByYear = Object.keys(responseData).reduce(
+      (acc: Record<string, string[]>, year) => {
+        if (responseData[year]?.[selectedCategory]) {
+          const categories = Object.keys(responseData[year][selectedCategory]);
+          acc[year] = Array.from(new Set(categories)).sort(); // Unique sorted categories
+        }
+        return acc;
+      },
+      {}
+    );
+
+    setDynamicCategoryByYear(groupCategoriesByYear);
   }, [responseData, selectedCategory]);
 
   return (
@@ -130,9 +129,8 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
                 <Grid container spacing={3}>
                   {(() => {
-                    const categoryData =
-                      responseData[year]?.[selectedCategory] || {};
-
+                    const categoryData = responseData[year]?.[selectedCategory] || {};
+                    const dynamicCategoryOrder = dynamicCategoryByYear[year] || [];
                     const sortedCategoryData = dynamicCategoryOrder.map(
                       (range) =>
                         categoryData[range] || {
@@ -223,76 +221,22 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         >
                                           {range}
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.8rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {data["Number of deals"] || 0}
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.8rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
-                                          {data[
-                                            "Allocation as % of Deal Size"
-                                          ]?.toFixed(2) || "0.00"}
-                                          %
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                          {data["Allocation as % of Deal Size"]?.toFixed(2) || "0.00"}%
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.8rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
-                                          {data[
-                                            "Weighted Allocation as % of Deal Size"
-                                          ]?.toFixed(2) || "0.00"}
-                                          %
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                          {data["Weighted Allocation as % of Deal Size"]?.toFixed(2) || "0.00"}%
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.8rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
-                                          {data[
-                                            "Allocation as % of IOI"
-                                          ]?.toFixed(2) || "0.00"}
-                                          %
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                          {data["Allocation as % of IOI"]?.toFixed(2) || "0.00"}%
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.8rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
-                                          {data[
-                                            "Weighted Allocation as % of IOI"
-                                          ]?.toFixed(2) || "0.00"}
-                                          %
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                          {data["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00"}%
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.8rem",
-                                            border: "1px solid #ddd",
-                                            padding: "4px 8px",
-                                          }}
-                                        >
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {formatValue(data["Deal volume"] || 0)}
                                         </TableCell>
                                       </TableRow>
