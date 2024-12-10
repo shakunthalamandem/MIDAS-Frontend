@@ -5,36 +5,33 @@ import InfoIcon from "@mui/icons-material/Info";
 interface GeneralTabProps {
   filtersData: {
     [key: string]: {
-      options: (string | number)[];
-      label: string;
-      description?: string;
+      options: (string | number)[]; // Options for the filter
+      label: string; // Label for the filter
+      description?: string; // Optional description for the filter
     };
-  }[];
+  };
 }
 
 const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
   const [selectedValues, setSelectedValues] = useState<{
-    [key: string]: (string | number)[];
+    [key: string]: (string | number)[]; // Store selected values for each filter
   }>({});
 
   const [appliedFilters, setAppliedFilters] = useState<{
     [key: string]: (string | number)[];
   } | null>(null);
 
+  // Initialize selected values when filtersData changes
   useEffect(() => {
-    if (filtersData.length > 0) {
-      const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-      filtersData.forEach((filter) => {
-        const key = Object.keys(filter)[0];
-        initialSelectedValues[key] = [];
-      });
-      console.log("Initial Selected Values:", initialSelectedValues); // Debug here
-      setSelectedValues(initialSelectedValues);
-      setAppliedFilters(initialSelectedValues);
-    }
+    const initialSelectedValues: { [key: string]: (string | number)[] } = {};
+    Object.keys(filtersData).forEach((key) => {
+      initialSelectedValues[key] = []; // Default value is an empty array
+    });
+    setSelectedValues(initialSelectedValues);
+    setAppliedFilters(initialSelectedValues); // Set initial values for applied filters
   }, [filtersData]);
-  
 
+  // Handle selection change for each filter
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
       ...prevState,
@@ -42,12 +39,14 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
     }));
   };
 
+  // Format tags when displaying selected values
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
     const firstValue = values[0];
     if (values.length === 1) return [firstValue];
     return [firstValue, `+${values.length - 1}`];
   };
+
   return (
     <FormControl fullWidth margin="normal">
       <Grid
@@ -59,9 +58,8 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
           overflowY: "scroll",
         }}
       >
-        {filtersData.map((filter) => {
-          const key = Object.keys(filter)[0];
-          const { options, label, description } = filter[key];
+        {Object.keys(filtersData).map((key) => {
+          const { options, label, description } = filtersData[key];
 
           return (
             <Grid item xs={12} sm={6} md={3} key={key}>

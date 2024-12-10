@@ -17,14 +17,14 @@ import MDDScreenerDataTable from "../../MDDSettings/MDDScreenerDataTable";
 
 interface FilterData {
   [key: string]: {
-    options: (string | number)[];
-    label: string;
-    description?: string;
+    options: (string | number)[]; // Options for dropdown/select input
+    label: string; // Display label for the filter
+    description?: string; // Optional description of the filter
   };
 }
 
 interface MDDScreenerFiltersMainProps {
-  filtersData: FilterData[];
+  filtersData: FilterData; // filtersData should be an object, not an array
 }
 
 const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({
@@ -43,86 +43,130 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
     setSelectedValues(initialSelectedValues);
     setAppliedFilters(initialSelectedValues); // Show initial filters on page render
-  }, [filtersData]); //
+  }, [filtersData]);
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   const handleApply = () => {
     console.log("Apply clicked", filtersData);
+    setAppliedFilters(selectedValues); // Apply filters
   };
 
   const handleReset = () => {
     setValue(0);
+    setSelectedValues({});
     console.log("Reset clicked");
   };
+
+  // Function to filter the data based on tab
+  const getFilteredDataForTab = (tabIndex: number) => {
+    const generalFilters = {
+      year_range: filtersData.year_range,
+      dealType: filtersData.dealType,
+      region: filtersData.region,
+      sector: filtersData.sector,
+    };
+
+    const dealSpecificFilters = {
+      Primary: filtersData.Primary,
+      LeadBank: filtersData.LeadBank,
+      Sponsor: filtersData.Sponsor,
+      FollowOnDiscount: filtersData.FollowOnDiscount,
+      TPlus1DayToIndexPercent: filtersData.TPlus1DayToIndexPercent,
+    };
+
+    const monasheeSpecificFilters = {
+      AllocationPercentOfDealSize: filtersData.AllocationPercentOfDealSize,
+      AllocationPercentOfIOI: filtersData.AllocationPercentOfIOI,
+      HoldPeriod: filtersData.HoldPeriod,
+      DealCaption: filtersData.DealCaption,
+    };
+
+    switch (tabIndex) {
+      case 0:
+        return generalFilters;
+      case 1:
+        return dealSpecificFilters;
+      case 2:
+        return monasheeSpecificFilters;
+      default:
+        return {};
+    }
+  };
+
   console.log("Filters Data in MDDScreenerFiltersMain:", filtersData); // Debug here
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
-
-    <Box sx={{ width: "100%", padding: 2 }}>
-      <Card sx={{ boxShadow: 3, borderRadius: 2, padding: 2 }}>
-        <CardContent>
-          <Typography variant="h5" color="#002060" gutterBottom>
-            MDD Screener Filters
-          </Typography>
-          <Tabs
-            value={value}
-            onChange={handleTabChange}
-            centered
-            sx={{
-              "& .MuiTab-root": {
-                fontWeight: "bold",
-                color: "#828282",
-                transition: "color 0.3s ease",
-              },
-              "& .Mui-selected": {
-                color: "#AE0226",
-                transition: "color 0.3s ease",
-              },
-              "& .MuiTabs-indicator": {
-                backgroundColor: "#AE0226",
-              },
-            }}
-          >
-            <Tab label="General" aria-label="General Filters" />
-            <Tab label="Deal Specific" aria-label="Deal Specific Filters" />
-            <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
-          </Tabs>
-          <Box sx={{ paddingTop: 2 }}>
-            {value === 0 && filtersData && <GeneralTab filtersData={filtersData} />}
-            {value === 1 && <DealSpecificTab />}
-            {value === 2 && <MonasheeSpecificTab />}
-          </Box>
-          <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
-            <Grid item>
-              <Button
-                variant="contained"
-                onClick={handleApply}
-                sx={{ bgcolor: "#002060" }}
-              >
-                Apply
-              </Button>
+      <Box sx={{ width: "100%", padding: 2 }}>
+        <Card sx={{ boxShadow: 3, borderRadius: 2, padding: 2 }}>
+          <CardContent>
+            <Typography variant="h5" color="#002060" gutterBottom>
+              MDD Screener Filters
+            </Typography>
+            <Tabs
+              value={value}
+              onChange={handleTabChange}
+              centered
+              sx={{
+                "& .MuiTab-root": {
+                  fontWeight: "bold",
+                  color: "#828282",
+                  transition: "color 0.3s ease",
+                },
+                "& .Mui-selected": {
+                  color: "#AE0226",
+                  transition: "color 0.3s ease",
+                },
+                "& .MuiTabs-indicator": {
+                  backgroundColor: "#AE0226",
+                },
+              }}
+            >
+              <Tab label="General" aria-label="General Filters" />
+              <Tab label="Deal Specific" aria-label="Deal Specific Filters" />
+              <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
+            </Tabs>
+            <Box sx={{ paddingTop: 2 }}>
+              {value === 0 && filtersData && (
+                <GeneralTab filtersData={getFilteredDataForTab(0)} />
+              )}
+              {value === 1 && (
+                <DealSpecificTab filtersData={getFilteredDataForTab(1)} />
+              )}
+              {value === 2 && (
+                <MonasheeSpecificTab filtersData={getFilteredDataForTab(2)} />
+              )}
+            </Box>
+            <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+              <Grid item>
+                <Button
+                  variant="contained"
+                  onClick={handleApply}
+                  sx={{ bgcolor: "#002060" }}
+                >
+                  Apply
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleReset}
+                >
+                  Reset
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleReset}
-              >
-                Reset
-              </Button>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-      <Box mt={4}>
-        <MDDScreenerDataTable sectorwiseData={appliedFilters || selectedValues} />
+          </CardContent>
+        </Card>
+        <Box mt={4}>
+          <MDDScreenerDataTable sectorwiseData={appliedFilters || selectedValues} />
+        </Box>
       </Box>
-    </Box>
     </Container>
-
   );
 };
 

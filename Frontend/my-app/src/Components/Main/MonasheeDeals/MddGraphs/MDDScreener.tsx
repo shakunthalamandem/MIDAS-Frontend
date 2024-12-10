@@ -10,7 +10,7 @@ const MDDScreener: React.FC = () => {
     // Fetch the filters.json or provide your filters data
     fetch("/Filters.json")
       .then((response) => response.json())
-      .then((data) => setFiltersData(data.screener))
+      .then((data) => setFiltersData(data))
       .catch((error) => console.error("Error loading filters:", error));
   }, []);
   return (
