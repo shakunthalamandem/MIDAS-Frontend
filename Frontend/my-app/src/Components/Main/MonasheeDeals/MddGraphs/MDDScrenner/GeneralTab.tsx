@@ -22,14 +22,18 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
   } | null>(null);
 
   useEffect(() => {
-    const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-    filtersData.forEach((filter) => {
-      const key = Object.keys(filter)[0];
-      initialSelectedValues[key] = [];
-    });
-    setSelectedValues(initialSelectedValues);
-    setAppliedFilters(initialSelectedValues);
+    if (filtersData.length > 0) {
+      const initialSelectedValues: { [key: string]: (string | number)[] } = {};
+      filtersData.forEach((filter) => {
+        const key = Object.keys(filter)[0];
+        initialSelectedValues[key] = [];
+      });
+      console.log("Initial Selected Values:", initialSelectedValues); // Debug here
+      setSelectedValues(initialSelectedValues);
+      setAppliedFilters(initialSelectedValues);
+    }
   }, [filtersData]);
+  
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
@@ -44,7 +48,6 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
     if (values.length === 1) return [firstValue];
     return [firstValue, `+${values.length - 1}`];
   };
-
   return (
     <FormControl fullWidth margin="normal">
       <Grid

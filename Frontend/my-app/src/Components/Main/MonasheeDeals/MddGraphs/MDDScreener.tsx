@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import MDDScreenerFilters from "../../MonasheeDeals/MDDSettings/MDDScreenerFilters";
+import MDDScreenerFiltersMain from "./MDDScrenner/MDDScreenerFiltersMain";
 
 
 
@@ -15,7 +15,9 @@ const MDDScreener: React.FC = () => {
   }, []);
   return (
     <>
-          <MDDScreenerFilters filtersData={filtersData} />
+          <MDDScreenerFiltersMain filtersData={filtersData} />
+
+
           
 
     </>
