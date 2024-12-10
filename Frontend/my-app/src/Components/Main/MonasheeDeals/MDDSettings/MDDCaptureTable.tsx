@@ -32,6 +32,8 @@ interface CategoryData {
   "Allocation as % of IOI": number;
   "Weighted Allocation as % of IOI": number;
   "Deal volume": number;
+  "Model Actual Return": number;
+  "Model Return 1% Allocation": number;
 }
 
 interface ResponseData {
@@ -135,11 +137,13 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                       (range) =>
                         categoryData[range] || {
                           "Number of deals": 0,
-                          "Allocation as % of Deal Size": 0,
+                          // "Allocation as % of Deal Size": 0,
                           "Weighted Allocation as % of Deal Size": 0,
-                          "Allocation as % of IOI": 0,
+                          // "Allocation as % of IOI": 0,
                           "Weighted Allocation as % of IOI": 0,
                           "Deal volume": 0,
+                          "Model Actual Return": 0,
+                          "Model Return 1% Allocation": 0,
                         }
                     );
 
@@ -177,11 +181,13 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                     {[
                                       "T+1M Excess Returns",
                                       "No of Deals",
-                                      "Alloc as % of Deal Size(Simple)",
+                                      // "Alloc as % of Deal Size(Simple)",
                                       "Alloc as % of Deal Size(Weighted)",
-                                      "Alloc as % of IOI(Simple)",
+                                      // "Alloc as % of IOI(Simple)",
                                       "Alloc as % of IOI(Weighted)",
                                       "Deal Volume",
+                                      "Model Actual Return",
+                                      "Model Return 1% Allocation",
                                     ].map((header, idx) => (
                                       <TableCell
                                         key={idx}
@@ -224,20 +230,26 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {data["Number of deals"] || 0}
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                        {/* <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {data["Allocation as % of Deal Size"]?.toFixed(2) || "0.00"}%
-                                        </TableCell>
+                                        </TableCell> */}
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {data["Weighted Allocation as % of Deal Size"]?.toFixed(2) || "0.00"}%
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                        {/* <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {data["Allocation as % of IOI"]?.toFixed(2) || "0.00"}%
-                                        </TableCell>
+                                        </TableCell> */}
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {data["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00"}%
                                         </TableCell>
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {formatValue(data["Deal volume"] || 0)}
+                                        </TableCell>
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                          {formatValue(data["Model Actual Return"] || 0)}
+                                        </TableCell>
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                          {formatValue(data["Model Return 1% Allocation"] || 0)}
                                         </TableCell>
                                       </TableRow>
                                     );
