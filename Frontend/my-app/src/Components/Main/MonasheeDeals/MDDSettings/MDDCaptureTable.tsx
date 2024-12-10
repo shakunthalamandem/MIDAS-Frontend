@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Grid,
@@ -24,16 +24,6 @@ const formatValue = (value: number): string => {
   if (absValue >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
   return `$${value.toFixed(2)}`;
 };
-
-const categoryOrder = [
-  "> 40%",
-  "20% to 40%",
-  "10% to 20%",
-  "0% to 10%",
-  "-10% to 0%",
-  "-10% to -20%",
-  "< -20%",
-];
 
 interface CategoryData {
   "Number of deals": number;
@@ -62,6 +52,25 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   apiName,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<"IPO" | "FO">("IPO");
+  const [dynamicCategoryOrder, setDynamicCategoryOrder] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Extract categories dynamically from the responseData for the selected category
+    const categories = responseData
+      ? Object.keys(responseData).reduce((acc: Set<string>, year) => {
+          if (responseData[year] && responseData[year][selectedCategory]) {
+            Object.keys(responseData[year][selectedCategory]).forEach((range) =>
+              acc.add(range)
+            );
+          }
+          return acc;
+        }, new Set<string>())
+      : new Set<string>();
+
+    // Convert the Set back into a sorted array for use
+    const sortedCategories = Array.from(categories).sort();
+    setDynamicCategoryOrder(sortedCategories);
+  }, [responseData, selectedCategory]);
 
   return (
     <Box mr={0} sx={{ Width: "100%", maxWidth: "2000px" }}>
@@ -124,8 +133,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                     const categoryData =
                       responseData[year]?.[selectedCategory] || {};
 
-                    // Sort the ranges according to the categoryOrder and fill missing data
-                    const sortedCategoryData = categoryOrder.map(
+                    const sortedCategoryData = dynamicCategoryOrder.map(
                       (range) =>
                         categoryData[range] || {
                           "Number of deals": 0,
@@ -194,8 +202,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                 </TableHead>
                                 <TableBody>
                                   {sortedCategoryData.map((data, index) => {
-                                    const range = categoryOrder[index];
-
+                                    const range = dynamicCategoryOrder[index];
                                     return (
                                       <TableRow
                                         key={range}
