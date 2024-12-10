@@ -1,0 +1,136 @@
+{
+    "screener": [
+      {
+        "year_range": {
+          "options": [
+            2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015,
+            2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005,
+            2004, 2003, 2002, 2001
+          ],
+          "label": "Year",
+          "description": "Select the year of the deal."
+        }
+      },
+      {
+        "dealType": {
+          "options": ["IPO", "FO"],
+          "label": "Deal Type",
+          "description": "Choose the type of deal."
+        }
+      },
+      {
+        "region": {
+          "options": ["US", "International"],
+          "label": "Region",
+          "description": "Select the region for the deal."
+        }
+      },
+      {
+        "sector": {
+          "options": [
+            "Communication Services", "Consumer Discretionary", "Consumer Staples",
+            "Energy", "Financials", "Health Care", "Industrials", "Information Technology",
+            "Materials", "Real Estate", "Utilities"
+          ],
+          "label": "Sector",
+          "description": "Select the sector of the deal."
+        }
+      },
+      {
+        "t1_return": {
+          "options": [
+            ">4", "2% to 4%", "0% to 2%", "-2% to 0%", "<-2%"
+          ],
+          "label": "T+1D Returns",
+          "description": "The return of deals on the first trade date from the pricing date."
+        }
+      },
+      {
+        "t1m_returns": {
+          "options": [
+            ">4", "2% to 4%", "0% to 2%", "-2% to 0%", "<-2%"
+          ],
+          "label": "T+1M Returns",
+          "description": "The return of deals on one month from the pricing date."
+        }
+      },
+      {
+        "deal_value": {
+          "options": [
+            "0 to $100M", "$100M to $200M", "$200M to $500M", ">$500M"
+          ],
+          "label": "Deal Value",
+          "description": "The total $ value of the offering or deal."
+        }
+      }
+    ],
+    
+    "DealSpecific": {
+      "Primary": {
+        "type": "dropdown",
+        "description": "Select a range or specific value for the primary category.",
+        "options": ["ALL", "=0", "=100", "0-20", "20-40", "40-60", "60-80", "80-100"]
+      },
+      "LeadBank": {
+        "type": "dropdown",
+        "description": "Select a lead bank from the available options fetched from the API.",
+        "api": "http://192.168.1.59:9000/api/mdd_distinct_values/",
+        "key": "lead_bank"
+      },
+      "Sponsor": {
+        "type": "dropdown",
+        "description": "Choose whether the sponsor is involved in the deal.",
+        "options": ["Yes", "No"]
+      },
+      "FollowOnDiscount": {
+        "type": "input",
+        "description": "Specify the discount for follow-on as a range using input fields.",
+        "fields": [
+          { "type": "number", "operator": ">", "label": "User Input >", "placeholder": "Enter minimum discount" },
+          { "type": "number", "operator": "<", "label": "User Input <", "placeholder": "Enter maximum discount" }
+        ]
+      },
+      "TPlus1DayToIndexPercent": {
+        "type": "input",
+        "description": "Specify the percentage change from T+1 day to the index.",
+        "fields": [
+          { "type": "number", "operator": ">", "label": "User Input >", "placeholder": "Enter minimum percentage" },
+          { "type": "number", "operator": "<", "label": "User Input <", "placeholder": "Enter maximum percentage" }
+        ]
+      }
+    },
+    
+    "MonahseeSpecific": {
+      "AllocationPercentOfDealSize": {
+        "type": "input",
+        "description": "Enter the allocation percentage of the deal size as a range.",
+        "fields": [
+          { "type": "number", "operator": ">", "label": "User Input >", "placeholder": "Enter minimum percentage" },
+          { "type": "number", "operator": "<", "label": "User Input <", "placeholder": "Enter maximum percentage" }
+        ]
+      },
+      "AllocationPercentOfIOI": {
+        "type": "input",
+        "description": "Enter the allocation percentage of IOI as a range.",
+        "fields": [
+          { "type": "number", "operator": ">", "label": "User Input >", "placeholder": "Enter minimum percentage" },
+          { "type": "number", "operator": "<", "label": "User Input <", "placeholder": "Enter maximum percentage" }
+        ]
+      },
+      "HoldPeriod": {
+        "type": "input",
+        "description": "Specify the hold period as a range using input fields.",
+        "fields": [
+          { "type": "number", "operator": ">", "label": "User Input >", "placeholder": "Enter minimum period" },
+          { "type": "number", "operator": "<", "label": "User Input <", "placeholder": "Enter maximum period" }
+        ]
+      },
+      "DealCaption": {
+        "type": "dropdown",
+        "description": "Select a deal caption from the options fetched from the API.",
+        "api": "http://192.168.1.59:9000/api/mdd_distinct_values/",
+        "key": "DealCaption"
+      }
+    }
+  }
+  
