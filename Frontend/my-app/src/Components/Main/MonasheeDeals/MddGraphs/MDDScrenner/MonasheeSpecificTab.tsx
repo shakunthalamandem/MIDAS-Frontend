@@ -169,28 +169,6 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      {/* Dropdown Filters Grid */}
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          backgroundColor: "#f7f8f8",
-          maxHeight: "370px",
-          overflowY: "auto",
-          padding: 2,
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "wrap",
-        }}
-      >
-        {Object.keys(filtersData)
-          .filter((key) => filtersData[key].type === "dropdown")
-          .map((key) => {
-            const filter = filtersData[key];
-            return renderFilter(key, filter);
-          })}
-      </Grid>
-
       {/* Input Filters Grid */}
       <Grid
         container
@@ -206,12 +184,13 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
         }}
       >
         {Object.keys(filtersData)
-          .filter((key) => filtersData[key].type === "input")
           .map((key) => {
             const filter = filtersData[key];
             return renderFilter(key, filter);
           })}
       </Grid>
+    
+      
     </Box>
   );
 };
