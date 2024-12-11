@@ -70,7 +70,7 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
 
   const handleReset = () => {
     // Reset form to initial state
-    setAppliedFilters(null);
+    setAppliedFilters({});
   };
 
   // Returns the filtered data for the specific tab
@@ -119,42 +119,43 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
               <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
             </Tabs>
             <Box sx={{ paddingTop: 2 }}>
-              <Formik
-                initialValues={appliedFilters || {}}
-                enableReinitialize
-                onSubmit={handleApply}
-              >
-                {({ values, handleChange }) => (
-                  <Form>
-                    {value === 0 && <GeneralTab filtersData={getFilteredDataForTab(0)} />}
-                    {value === 1 && <DealSpecificTab filtersData={getFilteredDataForTab(1)} />}
-                    {value === 2 && <MonasheeSpecificTab filtersData={getFilteredDataForTab(2)} />}
-                    <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
-                      <Grid item>
-                        <Button
-                          variant="contained"
-                          type="submit"
-                          sx={{ bgcolor: "#002060" }}
-                          disabled={!filtersData || !Object.keys(filtersData).length}
-                        >
-                          Apply
-                        </Button>
-                      </Grid>
-                      <Grid item>
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          type="button"
-                          onClick={handleReset}
-                          disabled={!filtersData || !Object.keys(filtersData).length}
-                        >
-                          Reset
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </Form>
-                )}
-              </Formik>
+            <Formik
+  initialValues={appliedFilters || {}}
+  enableReinitialize
+  onSubmit={handleApply}
+>
+  {({ values, handleChange }) => (
+    <Form>
+      {value === 0 && <GeneralTab filtersData={getFilteredDataForTab(0)} />}
+      {value === 1 && <DealSpecificTab filtersData={getFilteredDataForTab(1)} />}
+      {value === 2 && <MonasheeSpecificTab filtersData={getFilteredDataForTab(2)} />}
+      <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+        <Grid item>
+          <Button
+            variant="contained"
+            type="submit"
+            sx={{ bgcolor: "#002060" }}
+            disabled={!filtersData || !Object.keys(filtersData).length}
+          >
+            Apply
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="outlined"
+            color="secondary"
+            type="button"
+            onClick={handleReset}
+            disabled={!filtersData || !Object.keys(filtersData).length}
+          >
+            Reset
+          </Button>
+        </Grid>
+      </Grid>
+    </Form>
+  )}
+</Formik>
+
             </Box>
           </CardContent>
         </Card>
