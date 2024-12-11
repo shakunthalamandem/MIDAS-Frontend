@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   TextField,
   FormControl,
@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import { Field, useFormikContext } from "formik";
 
 // Define the types for Monashee filtersData
 interface MonasheeSpecificFilterConfig {
@@ -36,23 +37,11 @@ interface MonasheeSpecificTabProps {
 }
 
 const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }) => {
-  const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
-  const [inputErrors, setInputErrors] = useState<{ [key: string]: string }>({});
+  const { values, setFieldValue, errors, touched } = useFormikContext<any>();
 
   useEffect(() => {
-    const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-    Object.keys(filtersData).forEach((key) => {
-      initialSelectedValues[key] = [];
-    });
-    setSelectedValues(initialSelectedValues);
+    // Optionally handle any side-effects when filtersData changes
   }, [filtersData]);
-
-  const handleSelectionChange = (key: string, value: (string | number)[]) => {
-    setSelectedValues((prevState) => ({
-      ...prevState,
-      [key]: value,
-    }));
-  };
 
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
@@ -60,33 +49,6 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
     return values.length === 1
       ? [firstValue]
       : [firstValue, `+${values.length - 1}`];
-  };
-
-  const handleInputChange = (key: string, value: string, index: number) => {
-    const parsedValue = parseInt(value, 10);
-
-    if (value === "" || (parsedValue >= -100 && parsedValue <= 100)) {
-      setInputErrors((prevErrors) => ({
-        ...prevErrors,
-        [key]: "", // Clear any previous error
-      }));
-
-      setSelectedValues((prevState) => {
-        const newState = { ...prevState };
-
-        if (!newState[key]) {
-          newState[key] = [];
-        }
-
-        newState[key][index] = value;
-        return newState;
-      });
-    } else {
-      setInputErrors((prevErrors) => ({
-        ...prevErrors,
-        [key]: "Value must be between -100 and 100", // Show error message
-      }));
-    }
   };
 
   const renderFilter = (key: string, filter: MonasheeSpecificFilterConfig) => {
@@ -110,89 +72,96 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                 )}
               </Typography>
               <FormControl fullWidth margin="normal">
-                <Select
-                  multiple
-                  value={selectedValues[key] || []}
-                  onChange={(e) => handleSelectionChange(key, e.target.value as (string | number)[])}
-                  sx={{
-                    "& .MuiSelect-select": {
-                      padding: "8px", // Decrease padding for smaller height
-                      fontSize: "0.875rem", // Adjust font size for smaller text
-                    },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderRadius: "4px", // Make border radius smaller if desired
-                    },
-                    maxWidth: "150px", // Decrease width of dropdown
-                  }}                  renderValue={(selected) => {
-                    const formattedTags = formatSelectedTags(selected as (string | number)[]);
-                    return formattedTags.join(", ");
-                  }}
-                >
-                  {filter.options?.map((option, index) => (
-                    <MenuItem key={index} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <Field name={key}>
+                  {({ field, form }: any) => (
+                    <Select
+                      multiple
+                      value={field.value || []}
+                      onChange={(e) => form.setFieldValue(key, e.target.value)}
+                      sx={{
+                        "& .MuiSelect-select": {
+                          padding: "8px", // Adjust padding for smaller height
+                          fontSize: "0.875rem", // Adjust font size for smaller text
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderRadius: "4px", // Adjust border radius
+                        },
+                        maxWidth: "150px", // Adjust dropdown width
+                      }}
+                      renderValue={(selected) => {
+                        const formattedTags = formatSelectedTags(selected as (string | number)[]);
+                        return formattedTags.join(", ");
+                      }}
+                    >
+                      {filter.options?.map((option, index) => (
+                        <MenuItem key={index} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                </Field>
               </FormControl>
             </Box>
           </Grid>
         );
-        case "input":
-          return (
-            <Grid item xs={12} sm={6} md={3} key={key}>
-              <Box>
-                <Typography
-                  sx={{
-                    fontSize: "0.75rem",
-                    marginBottom: "4px",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  {key}
-                  {filter.description && (
-                    <Tooltip title={filter.description} arrow>
-                      <InfoIcon
-                        sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
-                      />
-                    </Tooltip>
+
+      case "input":
+        return (
+          <Grid item xs={12} sm={6} md={3} key={key}>
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: "0.75rem",
+                  marginBottom: "4px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {key}
+                {filter.description && (
+                  <Tooltip title={filter.description} arrow>
+                    <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
+                  </Tooltip>
+                )}
+              </Typography>
+              {filter.fields?.map((field, index) => (
+                <Field key={index} name={`${key}[${index}]`}>
+                  {({ field, form }: any) => (
+                    <TextField
+                      {...field}
+                      type="number"
+                      label={field.label}
+                      placeholder={field.placeholder}
+                      fullWidth
+                      margin="normal"
+                      variant="outlined"
+                      size="small"
+                      value={field.value || ""}
+                      onChange={(e) => form.setFieldValue(`${key}[${index}]`, e.target.value)}
+                      sx={{
+                        maxWidth: "100px", // Set width of the input box
+                        "& input": {
+                          textAlign: "center",
+                        },
+                        marginBottom: "20px", // Space between input boxes
+                        marginRight: "20px",
+                      }}
+                      inputProps={{
+                        min: -100,
+                        max: 100,
+                        step: 1,
+                      }}
+                      error={!!(touched[key] && errors[key])} // Display error state
+                      helperText={touched[key] && errors[key]} // Show error message
+                    />
                   )}
-                </Typography>
-                {filter.fields?.map((field, index) => (
-                  <TextField
-                    key={index}
-                    type="number"
-                    label={field.label}
-                    placeholder={field.placeholder}
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                    size="small"
-                    value={selectedValues[key]?.[index] || ""} // Make sure each input field gets its own value
-                    onChange={(e) => handleInputChange(key, e.target.value, index)} // Pass the field index to update the correct field
-                    sx={{
-                      maxWidth: "100px", // Small size for the input box
-                      "& input": {
-                        textAlign: "center",
-                      },
-                      marginBottom: "20px", // At least 20px margin between input boxes
-                      marginRight: "20px"
-                    }}
-                    inputProps={{
-                      min: -100,
-                      max: 100,
-                      step: 1,
-                    }}
-                    error={!!inputErrors[key]} // Display error state
-                    helperText={inputErrors[key]} // Show error message
-                  />
-                ))}
-              </Box>
-            </Grid>
-          );
-    
-    
+                </Field>
+              ))}
+            </Box>
+          </Grid>
+        );
+
       default:
         return null;
     }
@@ -200,6 +169,27 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      {/* Dropdown Filters Grid */}
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          backgroundColor: "#f7f8f8",
+          maxHeight: "370px",
+          overflowY: "auto",
+          padding: 2,
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+        }}
+      >
+        {Object.keys(filtersData)
+          .filter((key) => filtersData[key].type === "dropdown")
+          .map((key) => {
+            const filter = filtersData[key];
+            return renderFilter(key, filter);
+          })}
+      </Grid>
 
       {/* Input Filters Grid */}
       <Grid
@@ -216,6 +206,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
         }}
       >
         {Object.keys(filtersData)
+          .filter((key) => filtersData[key].type === "input")
           .map((key) => {
             const filter = filtersData[key];
             return renderFilter(key, filter);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   TextField,
   FormControl,
@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import { Field, useFormikContext } from "formik";
 
 // Define the types for DealSpecific filtersData
 interface DealSpecificFilterConfig {
@@ -34,26 +35,11 @@ interface DealSpecificTabProps {
 }
 
 const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
-  const [selectedValues, setSelectedValues] = useState<{
-    [key: string]: (string | number)[];
-  }>({});
-  const [inputErrors, setInputErrors] = useState<{ [key: string]: string }>({});
-
+  const { values, setFieldValue, errors, touched } = useFormikContext<any>();
 
   useEffect(() => {
-    const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-    Object.keys(filtersData).forEach((key) => {
-      initialSelectedValues[key] = [];
-    });
-    setSelectedValues(initialSelectedValues);
+    // Initializing or handling any side-effects when filtersData changes
   }, [filtersData]);
-
-  const handleSelectionChange = (key: string, value: (string | number)[]) => {
-    setSelectedValues((prevState) => ({
-      ...prevState,
-      [key]: value,
-    }));
-  };
 
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
@@ -62,37 +48,17 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
       ? [firstValue]
       : [firstValue, `+${values.length - 1}`];
   };
+
   const handleInputChange = (key: string, value: string, index: number) => {
     const parsedValue = parseInt(value, 10);
-  
+
     // Check if the value is valid (empty or within range)
     if (value === "" || (parsedValue >= -100 && parsedValue <= 100)) {
-      setInputErrors((prevErrors) => ({
-        ...prevErrors,
-        [key]: "", // Clear any previous error
-      }));
-  
-      setSelectedValues((prevState) => {
-        const newState = { ...prevState };
-  
-        // Ensure the field has an array to store its values
-        if (!newState[key]) {
-          newState[key] = [];
-        }
-  
-        // Update the specific field value based on its index
-        newState[key][index] = value;
-        
-        return newState;
-      });
+      setFieldValue(`${key}[${index}]`, value);
     } else {
-      setInputErrors((prevErrors) => ({
-        ...prevErrors,
-        [key]: "Value must be between -100 and 100", // Show error message
-      }));
+      // Optionally, handle invalid input case, e.g., set a custom error message.
     }
   };
-  
 
   const renderFilter = (key: string, filter: DealSpecificFilterConfig) => {
     switch (filter.type) {
@@ -103,7 +69,6 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
               <Typography
                 sx={{
                   fontSize: "0.75rem",
-                  // marginBottom: "4px",
                   display: "flex",
                   alignItems: "center",
                 }}
@@ -111,130 +76,119 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                 {key}
                 {filter.description && (
                   <Tooltip title={filter.description} arrow>
-                    <InfoIcon
-                      sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
-                    />
+                    <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
                   </Tooltip>
                 )}
               </Typography>
               <FormControl fullWidth margin="normal">
-                <Autocomplete
-                  multiple
-                  options={filter.options || []}
-                  getOptionLabel={(option) => option.toString()}
-                  disableCloseOnSelect
-                  value={selectedValues[key] || []}
-                  sx={{
-                    "& .MuiSelect-select": {
-                      padding: "8px", // Decrease padding for smaller height
-                      fontSize: "0.875rem", // Adjust font size for smaller text
-                    },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderRadius: "4px", // Make border radius smaller if desired
-                    },
-                    maxWidth: "150px", // Decrease width of dropdown
-                  }} 
-                  onChange={(_, value) =>
-                    handleSelectionChange(key, value as (string | number)[])
-                    
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      size="small"
-                      fullWidth
+                <Field name={key}>
+                  {({ field, form }: any) => (
+                    <Autocomplete
+                      multiple
+                      options={filter.options || []}
+                      getOptionLabel={(option) => option.toString()}
+                      disableCloseOnSelect
+                      value={field.value || []}
+                      onChange={(_, value) => form.setFieldValue(key, value)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                        />
+                      )}
+                      renderTags={(value) => {
+                        const formattedTags = formatSelectedTags(value);
+                        return formattedTags.map((tag, idx) => (
+                          <Box
+                            key={idx}
+                            sx={{
+                              backgroundColor: "#e0e0e0",
+                              borderRadius: "4px",
+                              margin: "2px",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              fontSize: "0.875rem",
+                            }}
+                          >
+                            {tag}
+                          </Box>
+                        ));
+                      }}
+                      renderOption={(props, option, { selected }) => (
+                        <ListItem {...props} sx={{ padding: "4px" }}>
+                          <Checkbox checked={selected} sx={{ padding: "4px" }} />
+                          <ListItemText
+                            primary={option.toString()}
+                            sx={{ fontSize: "0.875rem" }}
+                          />
+                        </ListItem>
+                      )}
                     />
                   )}
-                  renderTags={(value) => {
-                    const formattedTags = formatSelectedTags(value);
-                    return formattedTags.map((tag, idx) => (
-                      <Box
-                        key={idx}
-                        sx={{
-                          backgroundColor: "#e0e0e0",
-                          borderRadius: "4px",
-                          // padding: "4px 8px",
-                          margin: "2px",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          fontSize: "0.875rem",
-                        }}
-                      >
-                        {tag}
-                      </Box>
-                    ));
-                  }}
-                  renderOption={(props, option, { selected }) => (
-                    <ListItem {...props} sx={{ padding: "4px" }}>
-                      <Checkbox checked={selected} sx={{ padding: "4px" }} />
-                      <ListItemText
-                        primary={option.toString()}
-                        sx={{ fontSize: "0.875rem" }}
-                      />
-                    </ListItem>
-                  )}
-                />
+                </Field>
               </FormControl>
             </Box>
           </Grid>
         );
 
-        case "input":
-      return (
-        <Grid item xs={12} sm={6} md={3} key={key}>
-          <Box>
-            <Typography
-              sx={{
-                fontSize: "0.75rem",
-                marginBottom: "4px",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              {key}
-              {filter.description && (
-                <Tooltip title={filter.description} arrow>
-                  <InfoIcon
-                    sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
-                  />
-                </Tooltip>
-              )}
-            </Typography>
-            {filter.fields?.map((field, index) => (
-              <TextField
-                key={index}
-                type="number"
-                label={field.label}
-                placeholder={field.placeholder}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                size="small"
-                value={selectedValues[key]?.[index] || ""} // Make sure each input field gets its own value
-                onChange={(e) => handleInputChange(key, e.target.value, index)} // Pass the field index to update the correct field
+      case "input":
+        return (
+          <Grid item xs={12} sm={6} md={3} key={key}>
+            <Box>
+              <Typography
                 sx={{
-                  maxWidth: "100px", // Small size for the input box
-                  "& input": {
-                    textAlign: "center",
-                  },
-                  marginBottom: "20px", // At least 20px margin between input boxes
-                  marginRight: "20px"
+                  fontSize: "0.75rem",
+                  marginBottom: "4px",
+                  display: "flex",
+                  alignItems: "center",
                 }}
-                inputProps={{
-                  min: -100,
-                  max: 100,
-                  step: 1,
-                }}
-                error={!!inputErrors[key]} // Display error state
-                helperText={inputErrors[key]} // Show error message
-              />
-            ))}
-          </Box>
-        </Grid>
-      );
-
+              >
+                {key}
+                {filter.description && (
+                  <Tooltip title={filter.description} arrow>
+                    <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
+                  </Tooltip>
+                )}
+              </Typography>
+              {filter.fields?.map((field, index) => (
+                <Field name={`${key}[${index}]`} key={index}>
+                  {({ field, form }: any) => (
+                    <TextField
+                      {...field}
+                      type="number"
+                      label={field.label}
+                      placeholder={field.placeholder}
+                      fullWidth
+                      margin="normal"
+                      variant="outlined"
+                      size="small"
+                      value={field.value || ""}
+                      onChange={(e) => handleInputChange(key, e.target.value, index)}
+                      sx={{
+                        maxWidth: "100px",
+                        "& input": {
+                          textAlign: "center",
+                        },
+                        marginBottom: "20px",
+                        marginRight: "20px",
+                      }}
+                      inputProps={{
+                        min: -100,
+                        max: 100,
+                        step: 1,
+                      }}
+                      error={!!(touched[key] && errors[key])}
+                      helperText={touched[key] && errors[key]}
+                    />
+                  )}
+                </Field>
+              ))}
+            </Box>
+          </Grid>
+        );
 
       default:
         return null;
@@ -254,7 +208,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
           padding: 2,
           display: "flex",
           flexDirection: "row",
-          flexWrap: "wrap", // Allow wrapping of items
+          flexWrap: "wrap",
         }}
       >
         {Object.keys(filtersData)
@@ -276,7 +230,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
           padding: 2,
           display: "flex",
           flexDirection: "row",
-          flexWrap: "wrap", // Allow wrapping of items
+          flexWrap: "wrap",
         }}
       >
         {Object.keys(filtersData)
