@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import {
   TextField,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Box,
   Grid,
   Tooltip,
   Typography,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { Field, useFormikContext } from "formik";
@@ -118,7 +119,8 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                     >
                       {filter.options?.map((option, index) => (
                         <MenuItem key={index} value={option}>
-                          {option}
+                          <Checkbox checked={field.value?.includes(option) || false} />
+                          <ListItemText primary={option} />
                         </MenuItem>
                       ))}
                     </Select>
@@ -252,7 +254,8 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                   >
                     {dealCaptainOptions.map((option, index) => (
                       <MenuItem key={index} value={option}>
-                        {option}
+                        <Checkbox checked={values["deal_captain"]?.includes(option) || false} />
+                        <ListItemText primary={option} />
                       </MenuItem>
                     ))}
                   </Select>

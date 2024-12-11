@@ -2,25 +2,18 @@ import React, { useEffect, useState } from "react";
 import {
   TextField,
   FormControl,
-  Autocomplete,
   Box,
-  Checkbox,
   Grid,
-  ListItem,
-  ListItemText,
   Tooltip,
   Typography,
+  MenuItem,
+  Select,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { Field, useFormikContext } from "formik";
 import axios from "axios";
-
-// Define the expected structure of the API response
-interface LeadBankData {
-  lead_bank?: {
-    options: string[];
-  };
-}
 
 // Define the types for DealSpecific filtersData
 interface DealSpecificFilterConfig {
@@ -52,7 +45,9 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
     const fetchLeadBankOptions = async () => {
       setLoading(true); // Set loading to true before the API request
       try {
-        const response = await axios.get<LeadBankData>("http://192.168.1.59:9000/api/mdd_screener_filters/");
+        const response = await axios.get<{ lead_bank?: { options: string[] } }>(
+          "http://192.168.1.59:9000/api/mdd_screener_filters/"
+        );
         console.log(response.data); // Log to check the response structure
 
         const leadBankData = response.data?.lead_bank;
@@ -80,17 +75,6 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
       : [firstValue, `+${values.length - 1}`];
   };
 
-  const handleInputChange = (key: string, value: string, index: number) => {
-    const parsedValue = parseInt(value, 10);
-
-    // Check if the value is valid (empty or within range)
-    if (value === "" || (parsedValue >= -100 && parsedValue <= 100)) {
-      setFieldValue(`${key}[${index}]`, value);
-    } else {
-      // Optionally, handle invalid input case, e.g., set a custom error message.
-    }
-  };
-
   const renderFilter = (key: string, filter: DealSpecificFilterConfig) => {
     switch (filter.type) {
       case "dropdown":
@@ -114,50 +98,32 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
               <FormControl fullWidth margin="normal">
                 <Field name={key}>
                   {({ field, form }: any) => (
-                    <Autocomplete
+                    <Select
                       multiple
-                      options={filter.options || []}
-                      getOptionLabel={(option) => option.toString()}
-                      disableCloseOnSelect
                       value={field.value || []}
-                      onChange={(_, value) => form.setFieldValue(key, value)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          variant="outlined"
-                          size="small"
-                          fullWidth
-                        />
-                      )}
-                      renderTags={(value) => {
-                        const formattedTags = formatSelectedTags(value);
-                        return formattedTags.map((tag, idx) => (
-                          <Box
-                            key={idx}
-                            sx={{
-                              backgroundColor: "#e0e0e0",
-                              borderRadius: "4px",
-                              margin: "2px",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "4px",
-                              fontSize: "0.875rem",
-                            }}
-                          >
-                            {tag}
-                          </Box>
-                        ));
+                      onChange={(e) => form.setFieldValue(key, e.target.value)}
+                      sx={{
+                        "& .MuiSelect-select": {
+                          padding: "8px", // Adjust padding for smaller height
+                          fontSize: "0.875rem", // Adjust font size for smaller text
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderRadius: "4px", // Adjust border radius
+                        },
+                        maxWidth: "150px", // Adjust dropdown width
                       }}
-                      renderOption={(props, option, { selected }) => (
-                        <ListItem {...props} sx={{ padding: "4px" }}>
-                          <Checkbox checked={selected} sx={{ padding: "4px" }} />
-                          <ListItemText
-                            primary={option.toString()}
-                            sx={{ fontSize: "0.875rem" }}
-                          />
-                        </ListItem>
-                      )}
-                    />
+                      renderValue={(selected) => {
+                        const formattedTags = formatSelectedTags(selected as (string | number)[]);
+                        return formattedTags.join(", ");
+                      }}
+                    >
+                      {filter.options?.map((option, index) => (
+                        <MenuItem key={index} value={option}>
+                          <Checkbox checked={field.value.includes(option)|| false} />
+                          <ListItemText primary={option} />
+                        </MenuItem>
+                      ))}
+                    </Select>
                   )}
                 </Field>
               </FormControl>
@@ -197,7 +163,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                       variant="outlined"
                       size="small"
                       value={field.value || ""}
-                      onChange={(e) => handleInputChange(key, e.target.value, index)}
+                      onChange={(e) => form.setFieldValue(`${key}[${index}]`, e.target.value)}
                       sx={{
                         maxWidth: "100px",
                         "& input": {
@@ -266,26 +232,32 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                   Lead Bank
                 </Typography>
                 <FormControl fullWidth margin="normal">
-                  <Autocomplete
+                  <Select
                     multiple
-                    options={leadBankOptions}
-                    getOptionLabel={(option) => option.toString()}
-                    disableCloseOnSelect
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                      />
-                    )}
-                    renderOption={(props, option, { selected }) => (
-                      <ListItem {...props} sx={{ padding: "4px" }}>
-                        <Checkbox checked={selected} sx={{ padding: "4px" }} />
+                    value={values["lead_bank"] || []}
+                    onChange={(e) => setFieldValue("lead_bank", e.target.value)}
+                    sx={{
+                      "& .MuiSelect-select": {
+                        padding: "8px", // Adjust padding for smaller height
+                        fontSize: "0.875rem", // Adjust font size for smaller text
+                      },
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderRadius: "4px", // Adjust border radius
+                      },
+                      maxWidth: "150px", // Adjust dropdown width
+                    }}
+                    renderValue={(selected) => {
+                      const formattedTags = formatSelectedTags(selected as (string | number)[]);
+                      return formattedTags.join(", ");
+                    }}
+                  >
+                    {leadBankOptions.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        <Checkbox checked={values["lead_bank"]?.includes(option)|| false} />
                         <ListItemText primary={option} />
-                      </ListItem>
-                    )}
-                  />
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </FormControl>
               </Box>
             </Grid>
