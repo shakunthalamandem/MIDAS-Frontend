@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   FormControl,
@@ -6,15 +6,13 @@ import {
   Select,
   MenuItem,
   Box,
-  Checkbox,
   Grid,
-  ListItem,
-  ListItemText,
   Tooltip,
   Typography,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { Field, useFormikContext } from "formik";
+import axios from "axios";
 
 // Define the types for Monashee filtersData
 interface MonasheeSpecificFilterConfig {
@@ -38,10 +36,35 @@ interface MonasheeSpecificTabProps {
 
 const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }) => {
   const { values, setFieldValue, errors, touched } = useFormikContext<any>();
+  const [dealCaptainOptions, setDealCaptainOptions] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Optionally handle any side-effects when filtersData changes
-  }, [filtersData]);
+    // Fetch deal_captain options from API
+    const fetchDealCaptainOptions = async () => {
+      setLoading(true); // Set loading to true before the API request
+      try {
+        const response = await axios.get<{ deal_captain?: { options: string[] } }>(
+          "http://192.168.1.59:9000/api/mdd_screener_filters/"
+        );
+        console.log(response.data); // Log to check the response structure
+
+        const dealCaptainData = response.data?.deal_captain;
+
+        if (dealCaptainData?.options) {
+          setDealCaptainOptions(dealCaptainData.options);
+        } else {
+          console.warn("Deal Captain options not found in the API response.");
+        }
+      } catch (error) {
+        console.error("Error fetching deal_captain options:", error);
+      } finally {
+        setLoading(false); // Set loading to false after the API request
+      }
+    };
+
+    fetchDealCaptainOptions();
+  }, []);
 
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
@@ -183,14 +206,62 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
           flexWrap: "wrap",
         }}
       >
-        {Object.keys(filtersData)
-          .map((key) => {
-            const filter = filtersData[key];
-            return renderFilter(key, filter);
-          })}
+        {/* Render existing filters */}
+        {Object.keys(filtersData).map((key) => {
+          const filter = filtersData[key];
+          return renderFilter(key, filter);
+        })}
+
+        {/* Render Deal Captain Dropdown */}
+        {loading ? (
+          <Grid item xs={12}>
+            <Typography>Loading Deal Captain options...</Typography>
+          </Grid>
+        ) : (
+          dealCaptainOptions.length > 0 && (
+            <Grid item xs={12} sm={6} md={3}>
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: "0.75rem",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  Deal Captain
+                </Typography>
+                <FormControl fullWidth margin="normal">
+                  <Select
+                    multiple
+                    value={values["deal_captain"] || []}
+                    onChange={(e) => setFieldValue("deal_captain", e.target.value)}
+                    sx={{
+                      "& .MuiSelect-select": {
+                        padding: "8px", // Adjust padding for smaller height
+                        fontSize: "0.875rem", // Adjust font size for smaller text
+                      },
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderRadius: "4px", // Adjust border radius
+                      },
+                      maxWidth: "150px", // Adjust dropdown width
+                    }}
+                    renderValue={(selected) => {
+                      const formattedTags = formatSelectedTags(selected as (string | number)[]);
+                      return formattedTags.join(", ");
+                    }}
+                  >
+                    {dealCaptainOptions.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </Grid>
+          )
+        )}
       </Grid>
-    
-      
     </Box>
   );
 };
