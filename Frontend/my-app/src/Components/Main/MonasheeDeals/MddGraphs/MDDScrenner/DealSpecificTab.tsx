@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   FormControl,
@@ -13,6 +13,14 @@ import {
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { Field, useFormikContext } from "formik";
+import axios from "axios";
+
+// Define the expected structure of the API response
+interface LeadBankData {
+  lead_bank?: {
+    options: string[];
+  };
+}
 
 // Define the types for DealSpecific filtersData
 interface DealSpecificFilterConfig {
@@ -36,10 +44,33 @@ interface DealSpecificTabProps {
 
 const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
   const { values, setFieldValue, errors, touched } = useFormikContext<any>();
+  const [leadBankOptions, setLeadBankOptions] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Initializing or handling any side-effects when filtersData changes
-  }, [filtersData]);
+    // Fetch lead_bank options from API
+    const fetchLeadBankOptions = async () => {
+      setLoading(true); // Set loading to true before the API request
+      try {
+        const response = await axios.get<LeadBankData>("http://192.168.1.59:9000/api/mdd_screener_filters/");
+        console.log(response.data); // Log to check the response structure
+
+        const leadBankData = response.data?.lead_bank;
+
+        if (leadBankData?.options) {
+          setLeadBankOptions(leadBankData.options);
+        } else {
+          console.warn("Lead Bank options not found in the API response.");
+        }
+      } catch (error) {
+        console.error("Error fetching lead_bank options:", error);
+      } finally {
+        setLoading(false); // Set loading to false after the API request
+      }
+    };
+
+    fetchLeadBankOptions();
+  }, []);
 
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
@@ -197,7 +228,6 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      {/* Dropdown Filters Grid */}
       <Grid
         container
         spacing={2}
@@ -211,14 +241,57 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
           flexWrap: "wrap",
         }}
       >
-        {Object.keys(filtersData)
-          .map((key) => {
-            const filter = filtersData[key];
-            return renderFilter(key, filter);
-          })}
-      </Grid>
+        {/* Render existing filters */}
+        {Object.keys(filtersData).map((key) => {
+          const filter = filtersData[key];
+          return renderFilter(key, filter);
+        })}
 
-      
+        {/* Render Lead Bank Dropdown */}
+        {loading ? (
+          <Grid item xs={12}>
+            <Typography>Loading Lead Bank options...</Typography>
+          </Grid>
+        ) : (
+          leadBankOptions.length > 0 && (
+            <Grid item xs={12} sm={6} md={3}>
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: "0.75rem",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  Lead Bank
+                </Typography>
+                <FormControl fullWidth margin="normal">
+                  <Autocomplete
+                    multiple
+                    options={leadBankOptions}
+                    getOptionLabel={(option) => option.toString()}
+                    disableCloseOnSelect
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                      />
+                    )}
+                    renderOption={(props, option, { selected }) => (
+                      <ListItem {...props} sx={{ padding: "4px" }}>
+                        <Checkbox checked={selected} sx={{ padding: "4px" }} />
+                        <ListItemText primary={option} />
+                      </ListItem>
+                    )}
+                  />
+                </FormControl>
+              </Box>
+            </Grid>
+          )
+        )}
+      </Grid>
     </Box>
   );
 };
