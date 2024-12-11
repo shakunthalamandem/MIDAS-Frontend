@@ -1,37 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { TextField, FormControl, Autocomplete, Box, Checkbox, Grid, ListItem, ListItemText, Tooltip, Typography } from "@mui/material";
+import {
+  TextField,
+  FormControl,
+  Autocomplete,
+  Box,
+  Checkbox,
+  Grid,
+  ListItem,
+  ListItemText,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 
+// Define types for filtersData
+interface FilterConfig {
+  options: (string | number)[];
+  label: string;
+  description?: string;
+}
+
+interface FiltersData {
+  [key: string]: FilterConfig;
+}
+
 interface GeneralTabProps {
-  filtersData: {
-    [key: string]: {
-      options: (string | number)[]; // Options for the filter
-      label: string; // Label for the filter
-      description?: string; // Optional description for the filter
-    };
-  };
+  filtersData: FiltersData;
 }
 
 const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
-  const [selectedValues, setSelectedValues] = useState<{
-    [key: string]: (string | number)[]; // Store selected values for each filter
-  }>({});
+  const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
 
-  const [appliedFilters, setAppliedFilters] = useState<{
-    [key: string]: (string | number)[];
-  } | null>(null);
-
-  // Initialize selected values when filtersData changes
   useEffect(() => {
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
     Object.keys(filtersData).forEach((key) => {
-      initialSelectedValues[key] = []; // Default value is an empty array
+      initialSelectedValues[key] = [];
     });
     setSelectedValues(initialSelectedValues);
-    setAppliedFilters(initialSelectedValues); // Set initial values for applied filters
   }, [filtersData]);
 
-  // Handle selection change for each filter
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
       ...prevState,
@@ -39,40 +46,23 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
     }));
   };
 
-  // Format tags when displaying selected values
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
     const firstValue = values[0];
-    if (values.length === 1) return [firstValue];
-    return [firstValue, `+${values.length - 1}`];
+    return values.length === 1 ? [firstValue] : [firstValue, `+${values.length - 1}`];
   };
 
   return (
     <FormControl fullWidth margin="normal">
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          backgroundColor: "#f7f8f8",
-          maxHeight: "370px",
-          overflowY: "scroll",
-        }}
-      >
+      <Grid container spacing={2} sx={{ backgroundColor: "#f7f8f8", maxHeight: "370px", overflowY: "auto", padding: 2 }}>
         {Object.keys(filtersData).map((key) => {
           const { options, label, description } = filtersData[key];
 
           return (
             <Grid item xs={12} sm={6} md={3} key={key}>
               <Box mb={2} width="100%">
-                <Typography
-                  style={{
-                    fontSize: "0.75rem",
-                    marginBottom: "4px",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <span>{label}:</span>
+                <Typography sx={{ fontSize: "0.75rem", marginBottom: "4px", display: "flex", alignItems: "center" }}>
+                  {label}
                   {description && (
                     <Tooltip title={description} arrow>
                       <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
@@ -86,15 +76,13 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
                   disableCloseOnSelect
                   value={selectedValues[key] || []}
                   onChange={(_, value) => handleSelectionChange(key, value as (string | number)[])}
-                  renderInput={(params) => (
-                    <TextField {...params} variant="outlined" size="small" fullWidth placeholder="Any" />
-                  )}
+                  renderInput={(params) => <TextField {...params} variant="outlined" size="small" fullWidth />}
                   renderTags={(value) => {
                     const formattedTags = formatSelectedTags(value);
                     return formattedTags.map((tag, idx) => (
-                      <div
+                      <Box
                         key={idx}
-                        style={{
+                        sx={{
                           backgroundColor: "#e0e0e0",
                           borderRadius: "4px",
                           padding: "4px 8px",
@@ -102,27 +90,17 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
                           display: "flex",
                           alignItems: "center",
                           gap: "4px",
+                          fontSize: "0.875rem",
                         }}
                       >
                         {tag}
-                      </div>
+                      </Box>
                     ));
                   }}
                   renderOption={(props, option, { selected }) => (
-                    <ListItem {...props} style={{ padding: "4px" }}>
-                      <Checkbox
-                        checked={selected}
-                        sx={{
-                          padding: "4px",
-                          "& .MuiSvgIcon-root": { fontSize: "1rem" },
-                        }}
-                      />
-                      <ListItemText
-                        primary={option.toString()}
-                        sx={{
-                          fontSize: "0.875rem",
-                        }}
-                      />
+                    <ListItem {...props} sx={{ padding: "4px" }}>
+                      <Checkbox checked={selected} sx={{ padding: "4px" }} />
+                      <ListItemText primary={option.toString()} sx={{ fontSize: "0.875rem" }} />
                     </ListItem>
                   )}
                 />

@@ -15,88 +15,86 @@ import GeneralTab from "./GeneralTab";
 import MonasheeSpecificTab from "./MonasheeSpecificTab";
 import MDDScreenerDataTable from "../../MDDSettings/MDDScreenerDataTable";
 
+// Define the structure for filters data
 interface FilterData {
   [key: string]: {
-    options: (string | number)[]; // Options for dropdown/select input
-    label: string; // Display label for the filter
-    description?: string; // Optional description of the filter
+    options: (string | number)[];  // Options for filters (could be strings or numbers)
+    label: string;                 // Label for the filter
+    description?: string;         // Optional description for the filter
   };
 }
 
 interface MDDScreenerFiltersMainProps {
-  filtersData: FilterData; // filtersData should be an object, not an array
+  filtersData: FilterData;
 }
 
-const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({
-  filtersData,
-}) => {
-  const [value, setValue] = useState<number>(0);
-  const [selectedValues, setSelectedValues] = useState<{
-    [key: string]: (string | number)[]; // Store selected filter options
-  }>({});
-  const [appliedFilters, setAppliedFilters] = useState<{
-    [key: string]: (string | number)[]; // Applied filters to pass to the table
-  } | null>(null);
+const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filtersData }) => {
+  const [value, setValue] = useState<number>(0);  // Tab index state
+  const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({}); // Selected filters
+  const [appliedFilters, setAppliedFilters] = useState<{ [key: string]: (string | number)[] } | null>(null); // Applied filters
 
   useEffect(() => {
-    // Initialize selected values with default values
+    // Initialize selected values with empty arrays for all filters
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
+    Object.keys(filtersData || {}).forEach((key) => {
+      initialSelectedValues[key] = []; // Initialize each filter as an empty array
+    });
     setSelectedValues(initialSelectedValues);
-    setAppliedFilters(initialSelectedValues); // Show initial filters on page render
-  }, [filtersData]);
+    setAppliedFilters(initialSelectedValues);
+  }, [filtersData]);  // Runs whenever filtersData is updated
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+    setValue(newValue);  // Switch tab
   };
 
   const handleApply = () => {
-    console.log("Apply clicked", filtersData);
-    setAppliedFilters(selectedValues); // Apply filters
+    console.log("Applied Filters:", selectedValues);  // Debugging applied filters
+    setAppliedFilters(selectedValues);  // Save the selected values as applied filters
   };
 
   const handleReset = () => {
-    setValue(0);
-    setSelectedValues({});
-    console.log("Reset clicked");
+    // Reset selected filters and applied filters to their initial empty state
+    const resetValues: { [key: string]: (string | number)[] } = {};
+    Object.keys(filtersData || {}).forEach((key) => {
+      resetValues[key] = [];
+    });
+    setSelectedValues(resetValues);
+    setAppliedFilters(resetValues);
+    setValue(0);  // Reset to first tab
+    console.log("Filters Reset");
   };
 
-  // Function to filter the data based on tab
+  // Returns the filtered data for the specific tab
   const getFilteredDataForTab = (tabIndex: number) => {
-    const generalFilters = {
-      year_range: filtersData.year_range,
-      dealType: filtersData.dealType,
-      region: filtersData.region,
-      sector: filtersData.sector,
-    };
-
-    const dealSpecificFilters = {
-      Primary: filtersData.Primary,
-      LeadBank: filtersData.LeadBank,
-      Sponsor: filtersData.Sponsor,
-      FollowOnDiscount: filtersData.FollowOnDiscount,
-      TPlus1DayToIndexPercent: filtersData.TPlus1DayToIndexPercent,
-    };
-
-    const monasheeSpecificFilters = {
-      AllocationPercentOfDealSize: filtersData.AllocationPercentOfDealSize,
-      AllocationPercentOfIOI: filtersData.AllocationPercentOfIOI,
-      HoldPeriod: filtersData.HoldPeriod,
-      DealCaption: filtersData.DealCaption,
-    };
+    if (!filtersData) return {};  // If no filter data, return an empty object
 
     switch (tabIndex) {
       case 0:
-        return generalFilters;
+        return {
+          year_range: filtersData.year_range,
+          dealType: filtersData.dealType,
+          region: filtersData.region,
+          sector: filtersData.sector,
+        };
       case 1:
-        return dealSpecificFilters;
+        return {
+          Primary: filtersData.Primary,
+          LeadBank: filtersData.LeadBank,
+          Sponsor: filtersData.Sponsor,
+          FollowOnDiscount: filtersData.FollowOnDiscount,
+          TPlus1DayToIndexPercent: filtersData.TPlus1DayToIndexPercent,
+        };
       case 2:
-        return monasheeSpecificFilters;
+        return {
+          AllocationPercentOfDealSize: filtersData.AllocationPercentOfDealSize,
+          AllocationPercentOfIOI: filtersData.AllocationPercentOfIOI,
+          HoldPeriod: filtersData.HoldPeriod,
+          DealCaption: filtersData.DealCaption,
+        };
       default:
-        return {};
+        return {};  // Return empty object for invalid tab index
     }
   };
-
-  console.log("Filters Data in MDDScreenerFiltersMain:", filtersData); // Debug here
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
@@ -130,15 +128,9 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({
               <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
             </Tabs>
             <Box sx={{ paddingTop: 2 }}>
-              {value === 0 && filtersData && (
-                <GeneralTab filtersData={getFilteredDataForTab(0)} />
-              )}
-              {value === 1 && (
-                <DealSpecificTab filtersData={getFilteredDataForTab(1)} />
-              )}
-              {value === 2 && (
-                <MonasheeSpecificTab filtersData={getFilteredDataForTab(2)} />
-              )}
+              {value === 0 && <GeneralTab filtersData={getFilteredDataForTab(0)} />}
+              {value === 1 && <DealSpecificTab filtersData={getFilteredDataForTab(1)} />}
+              {value === 2 && <MonasheeSpecificTab filtersData={getFilteredDataForTab(2)} />}
             </Box>
             <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
               <Grid item>
@@ -146,6 +138,7 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({
                   variant="contained"
                   onClick={handleApply}
                   sx={{ bgcolor: "#002060" }}
+                  disabled={!filtersData || !Object.keys(filtersData).length}
                 >
                   Apply
                 </Button>
@@ -155,6 +148,7 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({
                   variant="outlined"
                   color="secondary"
                   onClick={handleReset}
+                  disabled={!filtersData || !Object.keys(filtersData).length}
                 >
                   Reset
                 </Button>

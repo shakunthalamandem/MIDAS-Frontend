@@ -1,21 +1,58 @@
-// src/components/FilterTabs/MonasheeSpecificTab.tsx
-
 import React from "react";
-import { TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { TextField, FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
 
-const MonasheeSpecificTab: React.FC = () => {
+interface MonasheeSpecificTabProps {
+  filtersData: {
+    [key: string]: {
+      type: string;
+      description: string;
+      options?: string[];
+      fields?: { type: string; operator: string; label: string; placeholder: string }[];
+      api?: string;
+    };
+  };
+}
+
+const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }) => {
+  const renderFilter = (key: string, filter: any) => {
+    switch (filter.type) {
+      case "dropdown":
+        return (
+          <FormControl fullWidth margin="normal" key={key}>
+            <InputLabel>{key}</InputLabel>
+            <Select defaultValue="" label={key}>
+              {filter.options?.map((option: string, index: number) => (
+                <MenuItem key={index} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      case "input":
+        return (
+          <Box key={key} marginY={2}>
+            <InputLabel>{filter.description}</InputLabel>
+            {filter.fields?.map((field: any, index: number) => (
+              <TextField
+                key={index}
+                type={field.type}
+                label={field.label}
+                placeholder={field.placeholder}
+                fullWidth
+                margin="normal"
+              />
+            ))}
+          </Box>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div>
-      <TextField label="Monashee Specific Field 1" fullWidth margin="normal" />
-      <TextField label="Monashee Specific Field 2" fullWidth margin="normal" />
-
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Monashee Combo</InputLabel>
-        <Select defaultValue="" label="Monashee Combo">
-          <MenuItem value={10}>Monashee Option 1</MenuItem>
-          <MenuItem value={20}>Monashee Option 2</MenuItem>
-        </Select>
-      </FormControl>
+      {Object.entries(filtersData).map(([key, filter]) => renderFilter(key, filter))}
     </div>
   );
 };

@@ -1,52 +1,58 @@
-// src/components/FilterTabs/DealSpecificTab.tsx
+import React from "react";
+import { TextField, FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
 
-import React, { useEffect, useState } from "react";
-import { TextField, FormControl, InputLabel, Select, MenuItem, CircularProgress } from "@mui/material";
-
-const DealSpecificTab: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [apiOptions, setApiOptions] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchApiOptions = async () => {
-      setLoading(true);
-      setTimeout(() => {
-        setApiOptions(["API Option 1", "API Option 2", "API Option 3"]);
-        setLoading(false);
-      }, 2000);
+interface DealSpecificTabProps {
+  filtersData: {
+    [key: string]: {
+      type: string;
+      description: string;
+      options?: string[];
+      fields?: { type: string; operator: string; label: string; placeholder: string }[];
+      api?: string;
     };
+  };
+}
 
-    fetchApiOptions();
-  }, []);
+const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
+  const renderFilter = (key: string, filter: any) => {
+    switch (filter.type) {
+      case "dropdown":
+        return (
+          <FormControl fullWidth margin="normal" key={key}>
+            <InputLabel>{key}</InputLabel>
+            <Select defaultValue="" label={key}>
+              {filter.options?.map((option: string, index: number) => (
+                <MenuItem key={index} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      case "input":
+        return (
+          <Box key={key} marginY={2}>
+            <InputLabel>{filter.description}</InputLabel>
+            {filter.fields?.map((field: any, index: number) => (
+              <TextField
+                key={index}
+                type={field.type}
+                label={field.label}
+                placeholder={field.placeholder}
+                fullWidth
+                margin="normal"
+              />
+            ))}
+          </Box>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div>
-      <TextField label="Deal Specific Field 1" fullWidth margin="normal" />
-      <TextField label="Deal Specific Field 2" fullWidth margin="normal" />
-
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Deal Specific Combo</InputLabel>
-        <Select defaultValue="" label="Deal Specific Combo">
-          <MenuItem value={10}>Deal Option 1</MenuItem>
-          <MenuItem value={20}>Deal Option 2</MenuItem>
-        </Select>
-      </FormControl>
-
-      {/* API Combo */}
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        <FormControl fullWidth margin="normal">
-          <InputLabel>API Combo</InputLabel>
-          <Select defaultValue="" label="API Combo">
-            {apiOptions.map((option, index) => (
-              <MenuItem key={index} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
+      {Object.entries(filtersData).map(([key, filter]) => renderFilter(key, filter))}
     </div>
   );
 };

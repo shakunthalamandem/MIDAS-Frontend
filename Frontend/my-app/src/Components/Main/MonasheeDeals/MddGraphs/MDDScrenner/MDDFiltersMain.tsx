@@ -1,19 +1,14 @@
 import React from "react";
-import { Box, Typography, Tabs, Tab, Container, Card, CardContent, Button, Grid } from "@mui/material";
-import GeneralTab from "./GeneralTab";  // Assuming you have these components
+import { Grid, Box, Typography, Card, CardContent, Button, Container, Tabs, Tab } from "@mui/material";
+import GeneralTab from "./GeneralTab";  // Assumes these components are defined
 import DealSpecificTab from "./DealSpecificTab";
 import MonasheeSpecificTab from "./MonasheeSpecificTab";
 import MDDScreenerDataTable from "../../MDDSettings/MDDScreenerDataTable";
 
+// Define the type for the props that MDDScreenerFiltersMain expects
 interface MDDScreenerFiltersMainProps {
   filtersData: {
-    screener: {
-      [key: string]: {
-        options: (string | number)[];
-        label: string;
-        description?: string;
-      };
-    }[];
+    screener: any[];
     DealSpecific: any;
     MonasheeSpecific: any;
   };
@@ -36,20 +31,6 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
     console.log("Filters Reset");
   };
 
-  // Get the filtered data for each tab
-  const getFilteredDataForTab = (tabIndex: number) => {
-    switch (tabIndex) {
-      case 0:
-        return filtersData.screener;
-      case 1:
-        return filtersData.DealSpecific;
-      case 2:
-        return filtersData.MonasheeSpecific;
-      default:
-        return {};
-    }
-  };
-
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Box sx={{ width: "100%", padding: 2 }}>
@@ -65,9 +46,9 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
             </Tabs>
 
             <Box sx={{ paddingTop: 2 }}>
-              {value === 0 && <GeneralTab filtersData={getFilteredDataForTab(0)} />}
-              {value === 1 && <DealSpecificTab filtersData={getFilteredDataForTab(1)} />}
-              {value === 2 && <MonasheeSpecificTab filtersData={getFilteredDataForTab(2)} />}
+              {value === 0 && <GeneralTab filtersData={filtersData.screener} />}
+              {value === 1 && <DealSpecificTab filtersData={filtersData.DealSpecific} />}
+              {value === 2 && <MonasheeSpecificTab filtersData={filtersData.MonasheeSpecific} />}
             </Box>
 
             <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
