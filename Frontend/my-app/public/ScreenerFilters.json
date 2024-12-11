@@ -17,7 +17,7 @@
         },
     
         "region": {
-          "options": ["US", "International"],
+          "options": ["US", "Non-US America", "APAC", "EMEA"],
           "label": "Region",
           "description": "Select the region for the deal."
         },
