@@ -1,11 +1,30 @@
 import React, { useEffect, useState } from "react";
 import MDDScreenerFiltersMain from "./MDDScrenner/MDDScreenerFiltersMain";
 
-// Define the FiltersConfig interface here
+// Define the FiltersConfig interface to match the JSON structure
 interface FiltersConfig {
-  screener: Record<string, any>[];  // Array of records with string keys and any type of value
-  DealSpecific: Record<string, any>; // A single record with string keys and any type of value
-  MonasheeSpecific: Record<string, any>; // Another single record similar to DealSpecific
+  screener: {
+    year_range: { options: number[]; label: string; description: string };
+    dealType: { options: string[]; label: string; description: string };
+    region: { options: string[]; label: string; description: string };
+    sector: { options: string[]; label: string; description: string };
+    t1_return: { options: string[]; label: string; description: string };
+    t1m_returns: { options: string[]; label: string; description: string };
+    deal_value: { options: string[]; label: string; description: string };
+  };
+  DealSpecific: {
+    Primary: { type: string; description: string; options: string[] };
+    LeadBank: { type: string; description: string; api: string; key: string };
+    Sponsor: { type: string; description: string; options: string[] };
+    FollowOnDiscount: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    TPlus1DayToIndexPercent: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+  };
+  MonahseeSpecific: {
+    AllocationPercentOfDealSize: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    AllocationPercentOfIOI: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    HoldPeriod: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    DealCaption: { type: string; description: string; api: string; key: string };
+  };
 }
 
 const MDDScreener: React.FC = () => {

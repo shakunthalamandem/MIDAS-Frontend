@@ -1,6 +1,5 @@
 {
-    "screener": [
-      {
+    "screener":  {
         "year_range": {
           "options": [
             2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015,
@@ -9,23 +8,20 @@
           ],
           "label": "Year",
           "description": "Select the year of the deal."
-        }
-      },
-      {
+        },
+     
         "dealType": {
           "options": ["IPO", "FO"],
           "label": "Deal Type",
           "description": "Choose the type of deal."
-        }
-      },
-      {
+        },
+    
         "region": {
           "options": ["US", "International"],
           "label": "Region",
           "description": "Select the region for the deal."
-        }
-      },
-      {
+        },
+
         "sector": {
           "options": [
             "Communication Services", "Consumer Discretionary", "Consumer Staples",
@@ -34,27 +30,24 @@
           ],
           "label": "Sector",
           "description": "Select the sector of the deal."
-        }
-      },
-      {
+        },
+     
         "t1_return": {
           "options": [
             ">4", "2% to 4%", "0% to 2%", "-2% to 0%", "<-2%"
           ],
           "label": "T+1D Returns",
           "description": "The return of deals on the first trade date from the pricing date."
-        }
-      },
-      {
+        },
+      
         "t1m_returns": {
           "options": [
             ">4", "2% to 4%", "0% to 2%", "-2% to 0%", "<-2%"
           ],
           "label": "T+1M Returns",
           "description": "The return of deals on one month from the pricing date."
-        }
-      },
-      {
+        },
+     
         "deal_value": {
           "options": [
             "0 to $100M", "$100M to $200M", "$200M to $500M", ">$500M"
@@ -62,8 +55,8 @@
           "label": "Deal Value",
           "description": "The total $ value of the offering or deal."
         }
-      }
-    ],
+      },
+    
     
     "DealSpecific": {
       "Primary": {

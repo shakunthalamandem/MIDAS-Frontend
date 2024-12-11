@@ -17,10 +17,27 @@ import MDDScreenerDataTable from "../../MDDSettings/MDDScreenerDataTable";
 
 // Define the structure for filters data
 interface FilterData {
-  [key: string]: {
-    options: (string | number)[];  // Options for filters (could be strings or numbers)
-    label: string;                 // Label for the filter
-    description?: string;         // Optional description for the filter
+  screener: {
+    year_range: { options: number[]; label: string; description: string };
+    dealType: { options: string[]; label: string; description: string };
+    region: { options: string[]; label: string; description: string };
+    sector: { options: string[]; label: string; description: string };
+    t1_return: { options: string[]; label: string; description: string };
+    t1m_returns: { options: string[]; label: string; description: string };
+    deal_value: { options: string[]; label: string; description: string };
+  };
+  DealSpecific: {
+    Primary: { type: string; description: string; options: string[] };
+    LeadBank: { type: string; description: string; api: string; key: string };
+    Sponsor: { type: string; description: string; options: string[] };
+    FollowOnDiscount: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    TPlus1DayToIndexPercent: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+  };
+  MonahseeSpecific: {
+    AllocationPercentOfDealSize: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    AllocationPercentOfIOI: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    HoldPeriod: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    DealCaption: { type: string; description: string; api: string; key: string };
   };
 }
 
@@ -36,8 +53,14 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
   useEffect(() => {
     // Initialize selected values with empty arrays for all filters
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-    Object.keys(filtersData || {}).forEach((key) => {
+    Object.keys(filtersData.screener || {}).forEach((key) => {
       initialSelectedValues[key] = []; // Initialize each filter as an empty array
+    });
+    Object.keys(filtersData.DealSpecific || {}).forEach((key) => {
+      initialSelectedValues[key] = [];
+    });
+    Object.keys(filtersData.MonahseeSpecific || {}).forEach((key) => {
+      initialSelectedValues[key] = [];
     });
     setSelectedValues(initialSelectedValues);
     setAppliedFilters(initialSelectedValues);
@@ -55,7 +78,13 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
   const handleReset = () => {
     // Reset selected filters and applied filters to their initial empty state
     const resetValues: { [key: string]: (string | number)[] } = {};
-    Object.keys(filtersData || {}).forEach((key) => {
+    Object.keys(filtersData.screener || {}).forEach((key) => {
+      resetValues[key] = [];
+    });
+    Object.keys(filtersData.DealSpecific || {}).forEach((key) => {
+      resetValues[key] = [];
+    });
+    Object.keys(filtersData.MonahseeSpecific || {}).forEach((key) => {
       resetValues[key] = [];
     });
     setSelectedValues(resetValues);
@@ -70,27 +99,11 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
 
     switch (tabIndex) {
       case 0:
-        return {
-          year_range: filtersData.year_range,
-          dealType: filtersData.dealType,
-          region: filtersData.region,
-          sector: filtersData.sector,
-        };
+        return filtersData.screener;
       case 1:
-        return {
-          Primary: filtersData.Primary,
-          LeadBank: filtersData.LeadBank,
-          Sponsor: filtersData.Sponsor,
-          FollowOnDiscount: filtersData.FollowOnDiscount,
-          TPlus1DayToIndexPercent: filtersData.TPlus1DayToIndexPercent,
-        };
+        return filtersData.DealSpecific;
       case 2:
-        return {
-          AllocationPercentOfDealSize: filtersData.AllocationPercentOfDealSize,
-          AllocationPercentOfIOI: filtersData.AllocationPercentOfIOI,
-          HoldPeriod: filtersData.HoldPeriod,
-          DealCaption: filtersData.DealCaption,
-        };
+        return filtersData.MonahseeSpecific;
       default:
         return {};  // Return empty object for invalid tab index
     }
