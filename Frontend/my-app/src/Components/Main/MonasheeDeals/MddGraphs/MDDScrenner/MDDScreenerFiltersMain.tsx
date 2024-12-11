@@ -1,21 +1,12 @@
 import React, { useEffect, useState } from "react";
-import {
-  Tab,
-  Tabs,
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  Button,
-  Container,
-} from "@mui/material";
+import { Tab, Tabs, Box, Typography, Card, CardContent, Grid, Button, Container } from "@mui/material";
+import { Formik, Form, Field } from "formik";
 import DealSpecificTab from "./DealSpecificTab";
 import GeneralTab from "./GeneralTab";
 import MonasheeSpecificTab from "./MonasheeSpecificTab";
 import MDDScreenerDataTable from "../../MDDSettings/MDDScreenerDataTable";
 
-// Define the structure for filters data
+// Define the structure for filters data (same as your initial code)
 interface FilterData {
   screener: {
     year_range: { options: number[]; label: string; description: string };
@@ -46,57 +37,44 @@ interface MDDScreenerFiltersMainProps {
 }
 
 const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filtersData }) => {
-  const [value, setValue] = useState<number>(0);  // Tab index state
-  const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({}); // Selected filters
+  const [value, setValue] = useState<number>(0); // Tab index state
   const [appliedFilters, setAppliedFilters] = useState<{ [key: string]: (string | number)[] } | null>(null); // Applied filters
 
   useEffect(() => {
-    // Initialize selected values with empty arrays for all filters
-    const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-    Object.keys(filtersData.screener || {}).forEach((key) => {
-      initialSelectedValues[key] = []; // Initialize each filter as an empty array
-    });
-    Object.keys(filtersData.DealSpecific || {}).forEach((key) => {
-      initialSelectedValues[key] = [];
-    });
-    Object.keys(filtersData.MonahseeSpecific || {}).forEach((key) => {
-      initialSelectedValues[key] = [];
-    });
-    setSelectedValues(initialSelectedValues);
-    setAppliedFilters(initialSelectedValues);
-  }, [filtersData]);  // Runs whenever filtersData is updated
+    // Initialize applied filters when filtersData changes
+    if (filtersData) {
+      const initialValues: { [key: string]: (string | number)[] } = {};
+      Object.keys(filtersData.screener || {}).forEach((key) => {
+        initialValues[key] = [];
+      });
+      Object.keys(filtersData.DealSpecific || {}).forEach((key) => {
+        initialValues[key] = [];
+      });
+      Object.keys(filtersData.MonahseeSpecific || {}).forEach((key) => {
+        initialValues[key] = [];
+      });
+      setAppliedFilters(initialValues);
+    }
+  }, [filtersData]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);  // Switch tab
+    setValue(newValue); // Switch tab
   };
 
-  const handleApply = () => {
-    console.log("Applied Filters:", selectedValues);  // Debugging applied filters
-    setAppliedFilters(selectedValues);  // Save the selected values as applied filters
+  const handleApply = (values: { [key: string]: any }) => {
+    console.log("Applied Filters:", values); // API call with applied filters
+    setAppliedFilters(values); // Save selected values as applied filters
+    // Trigger API call here with values
+    // Example: apiCall(values);
   };
 
   const handleReset = () => {
-    // Reset selected filters and applied filters to their initial empty state
-    const resetValues: { [key: string]: (string | number)[] } = {};
-    Object.keys(filtersData.screener || {}).forEach((key) => {
-      resetValues[key] = [];
-    });
-    Object.keys(filtersData.DealSpecific || {}).forEach((key) => {
-      resetValues[key] = [];
-    });
-    Object.keys(filtersData.MonahseeSpecific || {}).forEach((key) => {
-      resetValues[key] = [];
-    });
-    setSelectedValues(resetValues);
-    setAppliedFilters(resetValues);
-    setValue(0);  // Reset to first tab
-    console.log("Filters Reset");
+    // Reset form to initial state
+    setAppliedFilters(null);
   };
 
   // Returns the filtered data for the specific tab
   const getFilteredDataForTab = (tabIndex: number) => {
-    if (!filtersData) return {};  // If no filter data, return an empty object
-
     switch (tabIndex) {
       case 0:
         return filtersData.screener;
@@ -105,7 +83,7 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
       case 2:
         return filtersData.MonahseeSpecific;
       default:
-        return {};  // Return empty object for invalid tab index
+        return {}; // Return empty object for invalid tab index
     }
   };
 
@@ -141,36 +119,47 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
               <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
             </Tabs>
             <Box sx={{ paddingTop: 2 }}>
-              {value === 0 && <GeneralTab filtersData={getFilteredDataForTab(0)} />}
-              {value === 1 && <DealSpecificTab filtersData={getFilteredDataForTab(1)} />}
-              {value === 2 && <MonasheeSpecificTab filtersData={getFilteredDataForTab(2)} />}
+              <Formik
+                initialValues={appliedFilters || {}}
+                enableReinitialize
+                onSubmit={handleApply}
+              >
+                {({ values, handleChange }) => (
+                  <Form>
+                    {value === 0 && <GeneralTab filtersData={getFilteredDataForTab(0)} />}
+                    {value === 1 && <DealSpecificTab filtersData={getFilteredDataForTab(1)} />}
+                    {value === 2 && <MonasheeSpecificTab filtersData={getFilteredDataForTab(2)} />}
+                    <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+                      <Grid item>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          sx={{ bgcolor: "#002060" }}
+                          disabled={!filtersData || !Object.keys(filtersData).length}
+                        >
+                          Apply
+                        </Button>
+                      </Grid>
+                      <Grid item>
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          type="button"
+                          onClick={handleReset}
+                          disabled={!filtersData || !Object.keys(filtersData).length}
+                        >
+                          Reset
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Form>
+                )}
+              </Formik>
             </Box>
-            <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  onClick={handleApply}
-                  sx={{ bgcolor: "#002060" }}
-                  disabled={!filtersData || !Object.keys(filtersData).length}
-                >
-                  Apply
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleReset}
-                  disabled={!filtersData || !Object.keys(filtersData).length}
-                >
-                  Reset
-                </Button>
-              </Grid>
-            </Grid>
           </CardContent>
         </Card>
         <Box mt={4}>
-          <MDDScreenerDataTable sectorwiseData={appliedFilters || selectedValues} />
+          <MDDScreenerDataTable sectorwiseData={appliedFilters || {}} />
         </Box>
       </Box>
     </Container>

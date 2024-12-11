@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import { Field, FieldArray } from "formik";
 
 // Define types for filtersData
 interface FilterConfig {
@@ -29,22 +30,8 @@ interface GeneralTabProps {
 }
 
 const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
-  const [selectedValues, setSelectedValues] = useState<{ [key: string]: (string | number)[] }>({});
-
-  useEffect(() => {
-    const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-    Object.keys(filtersData).forEach((key) => {
-      initialSelectedValues[key] = [];
-    });
-    setSelectedValues(initialSelectedValues);
-  }, [filtersData]);
-
-  const handleSelectionChange = (key: string, value: (string | number)[]) => {
-    setSelectedValues((prevState) => ({
-      ...prevState,
-      [key]: value,
-    }));
-  };
+  // Initial state is managed by Formik, so we don't need a local state for selected values
+  // Formik handles it
 
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
@@ -69,41 +56,45 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
                     </Tooltip>
                   )}
                 </Typography>
-                <Autocomplete
-                  multiple
-                  options={options}
-                  getOptionLabel={(option) => option.toString()}
-                  disableCloseOnSelect
-                  value={selectedValues[key] || []}
-                  onChange={(_, value) => handleSelectionChange(key, value as (string | number)[])}
-                  renderInput={(params) => <TextField {...params} variant="outlined" size="small" fullWidth />}
-                  renderTags={(value) => {
-                    const formattedTags = formatSelectedTags(value);
-                    return formattedTags.map((tag, idx) => (
-                      <Box
-                        key={idx}
-                        sx={{
-                          backgroundColor: "#e0e0e0",
-                          borderRadius: "4px",
-                          padding: "4px 8px",
-                          margin: "2px",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          fontSize: "0.875rem",
-                        }}
-                      >
-                        {tag}
-                      </Box>
-                    ));
-                  }}
-                  renderOption={(props, option, { selected }) => (
-                    <ListItem {...props} sx={{ padding: "4px" }}>
-                      <Checkbox checked={selected} sx={{ padding: "4px" }} />
-                      <ListItemText primary={option.toString()} sx={{ fontSize: "0.875rem" }} />
-                    </ListItem>
+                <Field name={key}>
+                  {({ field, form }: any) => (
+                    <Autocomplete
+                      multiple
+                      options={options}
+                      getOptionLabel={(option) => option.toString()}
+                      disableCloseOnSelect
+                      value={field.value || []}
+                      onChange={(_, value) => form.setFieldValue(key, value)}
+                      renderInput={(params) => <TextField {...params} variant="outlined" size="small" fullWidth />}
+                      renderTags={(value) => {
+                        const formattedTags = formatSelectedTags(value);
+                        return formattedTags.map((tag, idx) => (
+                          <Box
+                            key={idx}
+                            sx={{
+                              backgroundColor: "#e0e0e0",
+                              borderRadius: "4px",
+                              padding: "4px 8px",
+                              margin: "2px",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              fontSize: "0.875rem",
+                            }}
+                          >
+                            {tag}
+                          </Box>
+                        ));
+                      }}
+                      renderOption={(props, option, { selected }) => (
+                        <ListItem {...props} sx={{ padding: "4px" }}>
+                          <Checkbox checked={selected} sx={{ padding: "4px" }} />
+                          <ListItemText primary={option.toString()} sx={{ fontSize: "0.875rem" }} />
+                        </ListItem>
+                      )}
+                    />
                   )}
-                />
+                </Field>
               </Box>
             </Grid>
           );
