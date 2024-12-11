@@ -77,7 +77,7 @@
           { "type": "number", "operator": ">", "label": "Max", "placeholder": "Enter maximum discount" }
         ]
       },
-      "TPlus1DayToIndexPercent": {
+      "Tplus1DIssuePrice": {
         "type": "input",
         "description": "Specify the percentage change from T+1 day to the index.",
         "fields": [

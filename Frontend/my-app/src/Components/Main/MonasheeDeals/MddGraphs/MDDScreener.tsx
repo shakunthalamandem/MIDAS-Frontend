@@ -17,7 +17,7 @@ interface FiltersConfig {
     LeadBank: { type: string; description: string; api: string; key: string };
     Sponsor: { type: string; description: string; options: string[] };
     FollowOnDiscount: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
-    TPlus1DayToIndexPercent: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    Tplus1DIssuePrice: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
   };
   MonahseeSpecific: {
     AllocationPercentOfDealSize: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };

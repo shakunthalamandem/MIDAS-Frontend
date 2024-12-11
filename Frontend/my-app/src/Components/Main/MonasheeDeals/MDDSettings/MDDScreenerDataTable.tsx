@@ -14,7 +14,13 @@ interface ScreenerDataRow {
   issue_price_lcl: number;
   t1m_excess_returns: number;
   t1d_return_from_bloomberg: number;
-  t1m_return_from_dealogic: number;
+  discount_from_announcement_price: number;
+  allocation_deal_size_percentage: number;
+  average_hold_period: number;
+  last_price_t1: number;
+  issue_offer_price: number;
+  subscription_bid_shares: number;
+  allocated_shares: number;
 }
 
 interface MDDScreenerDataTableProps {
@@ -45,12 +51,21 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
 
     const payload = {
       year_range: data.year_range,
-      dealType: data.dealType,
+      deal_type: data.deal_type,
       region: data.region,
       sector: data.sector,
+      deal_captain:data.deal_captain,
       deal_value: data.deal_value,
-      t1_return: data.t1_return,
+      lead_bank:data.lead_bank,
+      fo_discount:data.fo_discount,
+      t1d_returns: data.t1d_returns,
       t1m_returns: data.t1m_returns,
+      allocation_deal_size:data.allocation_deal_size,
+      average_hold_period:data.average_hold_period,
+      allocation_ioi:data.allocation_ioi,
+      t_1d_issue_price:data.t_1d_issue_price,
+      percentage_primary:data.percentage_primary,
+      sponsor:data.sponsor,
       page: paginationModel.page + 1, // API pages are often 1-indexed
       pageSize: paginationModel.pageSize,
     };
@@ -98,10 +113,14 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
     { field: 'broad_region', headerName: 'Region', width: 150 },
     { field: 'deal_type', headerName: 'Deal Type', width: 150 },
     { field: 'deal_size', headerName: 'Deal Size', width: 180 },
-    { field: 'issue_price_lcl', headerName: 'Issue Price (Local Currency)', width: 180 },
-    { field: 't1m_excess_returns', headerName: 'T + 1M Excess Returns', width: 200 },
-    { field: 't1d_return_from_bloomberg', headerName: 'T + 1D Return (From Bloomberg)', width: 220 },
-    { field: 't1m_return_from_dealogic', headerName: 'T + 1M Return (From Dealogic)', width: 220 },
+    { field: 'fo_discount', headerName: 'Follow On Discount', width: 180 },
+    { field: 'T+1M_returns', headerName: 'T + 1M Excess Returns', width: 200 },
+    { field: 'T+1D_returns', headerName: 'T + 1D Return (From Bloomberg)', width: 220 },
+    { field: 'allocation_deal_size', headerName: 'Allocation Deal Size Percentage', width: 250 },
+    { field: 'allocation_ioi', headerName: 'Allocation of IOI', width: 180 },
+    { field: 'average_hold_period', headerName: 'Average Hold Period', width: 180 },
+    { field: 'T+1D_issueprice', headerName: 'T + 1D issueprice', width: 180 },
+
   ];
 
   return (
