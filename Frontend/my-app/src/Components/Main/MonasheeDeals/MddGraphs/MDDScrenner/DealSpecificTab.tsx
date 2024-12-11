@@ -124,8 +124,19 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                   getOptionLabel={(option) => option.toString()}
                   disableCloseOnSelect
                   value={selectedValues[key] || []}
+                  sx={{
+                    "& .MuiSelect-select": {
+                      padding: "8px", // Decrease padding for smaller height
+                      fontSize: "0.875rem", // Adjust font size for smaller text
+                    },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderRadius: "4px", // Make border radius smaller if desired
+                    },
+                    maxWidth: "150px", // Decrease width of dropdown
+                  }} 
                   onChange={(_, value) =>
                     handleSelectionChange(key, value as (string | number)[])
+                    
                   }
                   renderInput={(params) => (
                     <TextField

@@ -79,16 +79,16 @@
         "type": "input",
         "description": "Specify the discount for follow-on as a range using input fields.",
         "fields": [
-          { "type": "number", "operator": "<", "label": "Input <", "placeholder": "Enter minimum discount" },
-          { "type": "number", "operator": ">", "label": "Input >", "placeholder": "Enter maximum discount" }
+          { "type": "number", "operator": "<", "label": "Value <", "placeholder": "Enter minimum discount" },
+          { "type": "number", "operator": ">", "label": "Value >", "placeholder": "Enter maximum discount" }
         ]
       },
       "TPlus1DayToIndexPercent": {
         "type": "input",
         "description": "Specify the percentage change from T+1 day to the index.",
         "fields": [
-          { "type": "number", "operator": "<", "label": "Input <", "placeholder": "Enter minimum percentage" },
-          { "type": "number", "operator": ">", "label": "Input >", "placeholder": "Enter maximum percentage" }
+          { "type": "number", "operator": "<", "label": "Value <", "placeholder": "Value" },
+          { "type": "number", "operator": ">", "label": "Value >", "placeholder": "Value" }
         ]
       }
     },
@@ -98,24 +98,24 @@
         "type": "input",
         "description": "Enter the allocation percentage of the deal size as a range.",
         "fields": [
-          { "type": "number", "operator": ">", "label": "User Input >", "placeholder": "Enter minimum percentage" },
-          { "type": "number", "operator": "<", "label": "User Input <", "placeholder": "Enter maximum percentage" }
+          { "type": "number", "operator": "<", "label": "Value <", "placeholder": "Value" },
+          { "type": "number", "operator": ">", "label": "Value >", "placeholder": "Value" }
         ]
       },
       "AllocationPercentOfIOI": {
         "type": "input",
         "description": "Enter the allocation percentage of IOI as a range.",
         "fields": [
-          { "type": "number", "operator": ">", "label": "User Input >", "placeholder": "Enter minimum percentage" },
-          { "type": "number", "operator": "<", "label": "User Input <", "placeholder": "Enter maximum percentage" }
+          { "type": "number", "operator": "<", "label": "Value <", "placeholder": "Value" },
+          { "type": "number", "operator": ">", "label": "Value >", "placeholder": "Value" }
         ]
       },
       "HoldPeriod": {
         "type": "input",
         "description": "Specify the hold period as a range using input fields.",
         "fields": [
-          { "type": "number", "operator": ">", "label": "User Input >", "placeholder": "Enter minimum period" },
-          { "type": "number", "operator": "<", "label": "User Input <", "placeholder": "Enter maximum period" }
+          { "type": "number", "operator": "<", "label": "Value <", "placeholder": "Value" },
+          { "type": "number", "operator": ">", "label": "Value >", "placeholder": "Value" }
         ]
       },
       "DealCaption": {
