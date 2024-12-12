@@ -11,7 +11,7 @@
         },
      
         "dealType": {
-          "options": ["IPO", "FO"],
+          "options": ["IPO", "FO","PRIVATE","OTHER"],
           "label": "Deal Type",
           "description": "Choose the type of deal."
         },
@@ -59,7 +59,7 @@
     
     
     "DealSpecific": {
-      "Primary": {
+      "Primary(%)": {
         "type": "dropdown",
         "description": "Select a range or specific value for the primary category.",
         "options": ["ALL", "=0", "=100", "0-20", "20-40", "40-60", "60-80", "80-100"]
