@@ -57,6 +57,7 @@ interface MDDCaptureTableProps {
   responseData: ResponseData;
   apiName: string;
 }
+
 const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   responseData,
   apiName,
@@ -247,7 +248,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             fontWeight: isSummary ? "bold" : "normal",
                                           }}
                                         >
-                                          {index + 1} {/* Serial Number for Quantiles */}
+                                          {isSummary ? "" : index + 1}
                                         </TableCell>
                                         <TableCell
                                           component="th"
