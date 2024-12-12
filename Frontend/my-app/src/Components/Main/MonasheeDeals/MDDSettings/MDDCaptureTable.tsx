@@ -57,7 +57,6 @@ interface MDDCaptureTableProps {
   responseData: ResponseData;
   apiName: string;
 }
-
 const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   responseData,
   apiName,
@@ -81,6 +80,20 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
     setDynamicCategoryByYear(groupCategoriesByYear);
   }, [responseData, selectedCategory]);
+
+  // Function to move "Summary" row to the end after sorting
+  const sortRangesWithSummaryAtEnd = (ranges: string[]): string[] => {
+    const sortedRanges = ranges.filter((range) => range !== "Summary").sort((a, b) => {
+      const getValue = (range: string) => {
+        const match = range.match(/-?\d+(\.\d+)?%/);
+        return match ? parseFloat(match[0].replace("%", "")) : 0;
+      };
+      return getValue(b) - getValue(a); // Sort in descending order
+    });
+    // Push the "Summary" row to the end
+    sortedRanges.push("Summary");
+    return sortedRanges;
+  };
 
   return (
     <Box mr={0} sx={{ Width: "100%", maxWidth: "2000px" }}>
@@ -142,7 +155,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                   {(() => {
                     const categoryData = responseData[year]?.[selectedCategory] || {};
                     const dynamicCategoryOrder = dynamicCategoryByYear[year] || [];
-                    const sortedCategoryData = sortRangesDescending(dynamicCategoryOrder).map(
+                    const sortedCategoryData = sortRangesWithSummaryAtEnd(dynamicCategoryOrder).map(
                       (range) =>
                         categoryData[range] || {
                           "Number of deals": 0,
@@ -212,7 +225,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                 </TableHead>
                                 <TableBody>
                                   {sortedCategoryData.map((data, index) => {
-                                    const range = sortRangesDescending(dynamicCategoryOrder)[index];
+                                    const range = sortRangesWithSummaryAtEnd(dynamicCategoryOrder)[index];
                                     const isSummary = range === "Summary"; // Check if it's the summary row
                                     return (
                                       <TableRow
