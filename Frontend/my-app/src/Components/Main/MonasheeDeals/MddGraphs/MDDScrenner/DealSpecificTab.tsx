@@ -232,33 +232,65 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                   Lead Bank
                 </Typography>
                 <FormControl fullWidth margin="normal">
-                  <Select
-                    multiple
-                    value={values["lead_bank"] || []}
-                    onChange={(e) => setFieldValue("lead_bank", e.target.value)}
-                    sx={{
-                      "& .MuiSelect-select": {
-                        padding: "8px", // Adjust padding for smaller height
-                        fontSize: "0.875rem", // Adjust font size for smaller text
-                      },
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderRadius: "4px", // Adjust border radius
-                      },
-                      maxWidth: "150px", // Adjust dropdown width
-                    }}
-                    renderValue={(selected) => {
-                      const formattedTags = formatSelectedTags(selected as (string | number)[]);
-                      return formattedTags.join(", ");
-                    }}
-                  >
-                    {leadBankOptions.map((option, index) => (
-                      <MenuItem key={index} value={option}>
-                        <Checkbox checked={values["lead_bank"]?.includes(option)|| false} />
-                        <ListItemText primary={option} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+  <Select
+    multiple
+    value={values["lead_bank"] || []}
+    onChange={(e) => setFieldValue("lead_bank", e.target.value)}
+    sx={{
+      "& .MuiSelect-select": {
+        padding: "8px", // Adjust padding for smaller height
+        fontSize: "0.75rem", // Reduce font size for selected values
+      },
+      "& .MuiOutlinedInput-notchedOutline": {
+        borderRadius: "4px", // Adjust border radius
+      },
+      maxWidth: "150px", // Adjust dropdown width
+    }}
+    renderValue={(selected) => {
+      const formattedTags = formatSelectedTags(selected as (string | number)[]);
+      return formattedTags.join(", ");
+    }}
+    MenuProps={{
+      PaperProps: {
+        style: {
+          maxHeight: 300, // Set max height of dropdown
+          width: 250, // Set a smaller dropdown width
+        },
+      },
+    }}
+  >
+    {leadBankOptions.map((option, index) => (
+      <MenuItem
+        key={index}
+        value={option}
+        sx={{
+          fontSize: "0.75rem", // Decrease font size of dropdown items
+        }}
+      >
+        <Checkbox
+          checked={values["lead_bank"]?.includes(option) || false}
+          sx={{
+            "& .MuiSvgIcon-root": {
+              fontSize: "1.25rem", // Slightly increase checkbox icon size
+            },
+          }}
+        />
+        <ListItemText
+          primary={option}
+          sx={{
+            "& .MuiTypography-root": {
+              fontSize: "0.8rem", // Set typography font size explicitly
+            },
+          }}
+        />
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
+
+
+
               </Box>
             </Grid>
           )
