@@ -119,7 +119,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                     >
                       {filter.options?.map((option, index) => (
                         <MenuItem key={index} value={option}>
-                          <Checkbox checked={field.value.includes(option)|| false} />
+                          <Checkbox checked={field.value?.includes(option) || false} />
                           <ListItemText primary={option} />
                         </MenuItem>
                       ))}
