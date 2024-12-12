@@ -125,7 +125,7 @@ const CapitalMarkets: React.FC = () => {
             }}
           />
           <Tab
-            label="Screener"
+            label="Deal Search"
             sx={{
               backgroundColor: value === 4 ? "#FF9800" : "#f5f5f5",
               color: value === 4 ? "#fff" : "#777",

@@ -79,7 +79,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
         <CardContent>
           <Box sx={{ p: 2 }}>
             <Typography variant="h5" gutterBottom color="#002060" mb={4}>
-              Screener Filters
+              Deal Search Filters
             </Typography>
             <Grid
               container
