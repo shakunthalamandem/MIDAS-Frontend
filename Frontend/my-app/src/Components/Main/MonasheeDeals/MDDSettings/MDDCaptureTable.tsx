@@ -25,11 +25,22 @@ const formatValue = (value: number): string => {
   return `$${value.toFixed(2)}`;
 };
 
+// Function to sort the ranges in descending order
+const sortRangesDescending = (ranges: string[]): string[] => {
+  return ranges.sort((a, b) => {
+    // Extract the numeric value from the range
+    const getValue = (range: string) => {
+      const match = range.match(/-?\d+(\.\d+)?%/);
+      return match ? parseFloat(match[0].replace("%", "")) : 0;
+    };
+
+    return getValue(b) - getValue(a); // Sort in descending order
+  });
+};
+
 interface CategoryData {
   "Number of deals": number;
-  "Allocation as % of Deal Size": number;
   "Weighted Allocation as % of Deal Size": number;
-  "Allocation as % of IOI": number;
   "Weighted Allocation as % of IOI": number;
   "Deal volume": number;
   "Model Actual Return": number;
@@ -133,13 +144,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                   {(() => {
                     const categoryData = responseData[year]?.[selectedCategory] || {};
                     const dynamicCategoryOrder = dynamicCategoryByYear[year] || [];
-                    const sortedCategoryData = dynamicCategoryOrder.map(
+                    const sortedCategoryData = sortRangesDescending(dynamicCategoryOrder).map(
                       (range) =>
                         categoryData[range] || {
                           "Number of deals": 0,
-                          // "Allocation as % of Deal Size": 0,
                           "Weighted Allocation as % of Deal Size": 0,
-                          // "Allocation as % of IOI": 0,
                           "Weighted Allocation as % of IOI": 0,
                           "Deal volume": 0,
                           "Model Actual Return": 0,
@@ -181,9 +190,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                     {[
                                       "T+1M Excess Returns",
                                       "No of Deals",
-                                      // "Alloc as % of Deal Size(Simple)",
                                       "Alloc as % of Deal Size(Weighted)",
-                                      // "Alloc as % of IOI(Simple)",
                                       "Alloc as % of IOI(Weighted)",
                                       "Deal Volume",
                                       "Model Actual Return",
@@ -206,7 +213,8 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                 </TableHead>
                                 <TableBody>
                                   {sortedCategoryData.map((data, index) => {
-                                    const range = dynamicCategoryOrder[index];
+                                    const range = sortRangesDescending(dynamicCategoryOrder)[index];
+                                    const isSummary = range === "Summary"; // Check if it's the summary row
                                     return (
                                       <TableRow
                                         key={range}
@@ -214,6 +222,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           "&:nth-of-type(odd)": {
                                             backgroundColor: "#f9f9f9",
                                           },
+                                          backgroundColor: isSummary ? "#d1f7d1" : "inherit", // Highlight the summary row
                                         }}
                                       >
                                         <TableCell
@@ -223,6 +232,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             fontSize: "0.8rem",
                                             border: "1px solid #ddd",
                                             padding: "4px 8px",
+                                            fontWeight: isSummary ? "bold" : "normal",
                                           }}
                                         >
                                           {range}
@@ -230,15 +240,9 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {data["Number of deals"] || 0}
                                         </TableCell>
-                                        {/* <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                          {data["Allocation as % of Deal Size"]?.toFixed(2) || "0.00"}%
-                                        </TableCell> */}
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {data["Weighted Allocation as % of Deal Size"]?.toFixed(2) || "0.00"}%
                                         </TableCell>
-                                        {/* <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                          {data["Allocation as % of IOI"]?.toFixed(2) || "0.00"}%
-                                        </TableCell> */}
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {data["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00"}%
                                         </TableCell>
