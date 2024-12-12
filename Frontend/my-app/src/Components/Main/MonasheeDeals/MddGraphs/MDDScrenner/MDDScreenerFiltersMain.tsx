@@ -159,7 +159,7 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
             </Box>
           </CardContent>
         </Card>
-        <Box mt={4}>
+        <Box mt={4} mb={4}>
           <MDDScreenerDataTable sectorwiseData={appliedFilters || {}} />
         </Box>
       </Box>
