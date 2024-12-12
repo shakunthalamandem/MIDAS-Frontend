@@ -51,24 +51,26 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
 
     const payload = {
       year_range: data.year_range,
-      deal_type: data.deal_type,
+      deal_type: data.dealType,
       region: data.region,
       sector: data.sector,
       deal_captain:data.deal_captain,
       deal_value: data.deal_value,
       lead_bank:data.lead_bank,
-      fo_discount:data.fo_discount,
-      t1d_returns: data.t1d_returns,
+      fo_discount:data.FollowOnDiscount,
+      t1d_returns: data.t1_return,
       t1m_returns: data.t1m_returns,
-      allocation_deal_size:data.allocation_deal_size,
-      average_hold_period:data.average_hold_period,
-      allocation_ioi:data.allocation_ioi,
-      t_1d_issue_price:data.t_1d_issue_price,
-      percentage_primary:data.percentage_primary,
-      sponsor:data.sponsor,
+      allocation_deal_size:data.AllocationPercentOfDealSize,
+      average_hold_period:data.HoldPeriod,
+      allocation_ioi:data.AllocationPercentOfIOI,
+      t_1d_issue_price:data.Tplus1DIssuePrice,
+      percentage_primary:data.Primary,
+      sponsor:data.Sponsor,
       page: paginationModel.page + 1, // API pages are often 1-indexed
       pageSize: paginationModel.pageSize,
     };
+console.log("Payload",payload)
+console.log("Data",data)
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
@@ -90,7 +92,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
         setRows(
           (result.data || []).map((item: ScreenerDataRow, index: number) => ({
             ...item,
-            id: index + 1, // Ensure each row has a unique ID
+            id: index + 1, 
           }))
         );
         setTotalRows(result.pagination?.total_items || 0); // Set total rows
