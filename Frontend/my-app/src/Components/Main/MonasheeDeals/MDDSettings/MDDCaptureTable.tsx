@@ -28,12 +28,10 @@ const formatValue = (value: number): string => {
 // Function to sort the ranges in descending order
 const sortRangesDescending = (ranges: string[]): string[] => {
   return ranges.sort((a, b) => {
-    // Extract the numeric value from the range
     const getValue = (range: string) => {
       const match = range.match(/-?\d+(\.\d+)?%/);
       return match ? parseFloat(match[0].replace("%", "")) : 0;
     };
-
     return getValue(b) - getValue(a); // Sort in descending order
   });
 };
@@ -188,6 +186,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                     }}
                                   >
                                     {[
+                                      "Quantiles", // New column for serial numbers
                                       "T+1M Excess Returns",
                                       "No of Deals",
                                       "Alloc as % of Deal Size(Weighted)",
@@ -203,7 +202,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           fontWeight: "bold",
                                           border: "1px solid #ddd",
                                           padding: "4px 8px",
-                                          width: idx === 0 ? "120px" : "80px",
+                                          width: idx === 0 ? "80px" : "90px", // Adjust width for Quantiles
                                         }}
                                       >
                                         {header}
@@ -225,6 +224,18 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           backgroundColor: isSummary ? "#d1f7d1" : "inherit", // Highlight the summary row
                                         }}
                                       >
+                                        <TableCell
+                                          component="th"
+                                          scope="row"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            border: "1px solid #ddd",
+                                            padding: "4px 8px",
+                                            fontWeight: isSummary ? "bold" : "normal",
+                                          }}
+                                        >
+                                          {index + 1} {/* Serial Number for Quantiles */}
+                                        </TableCell>
                                         <TableCell
                                           component="th"
                                           scope="row"
