@@ -42,6 +42,13 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   useEffect(() => {
     // Initialize selected values with default values
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
+
+    // Check for 'year' filter and set it to 2024 by default if available in options
+    const yearFilter = filtersData.find((filter) => filter['year_range']);
+    if (yearFilter) {
+      initialSelectedValues['year_range'] = [2024]; // Default to 2024
+    }
+
     setSelectedValues(initialSelectedValues);
     setAppliedFilters(initialSelectedValues); // Show initial filters on page render
   }, [filtersData]); // Runs when filtersData changes
@@ -74,7 +81,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   };
 
   return (
-    <Container maxWidth="lg"  sx={{ padding: 0, marginBottom: 4,marginTop:4 }}>
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4, marginTop: 4 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box sx={{ p: 2 }}>
@@ -95,7 +102,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
                 const { options, label, description } = filter[key];
 
                 return (
-                  <Grid item xs={12} sm={6} md={3} key={key} sx={{overflowY:'-moz-hidden-unscrollable'}}>
+                  <Grid item xs={12} sm={6} md={3} key={key} sx={{ overflowY: '-moz-hidden-unscrollable' }}>
                     {/* Updated layout to 4x3 grid */}
                     <Box mb={2} width="100%">
                       <Typography

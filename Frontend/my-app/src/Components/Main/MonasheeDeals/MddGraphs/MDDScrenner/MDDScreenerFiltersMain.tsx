@@ -5,6 +5,7 @@ import DealSpecificTab from "./DealSpecificTab";
 import GeneralTab from "./GeneralTab";
 import MonasheeSpecificTab from "./MonasheeSpecificTab";
 import MDDScreenerDataTable from "../../MDDSettings/MDDScreenerDataTable";
+// import SummaryCard from "./SummaryCard";
 
 // Define the structure for filters data (same as your initial code)
 interface FilterData {
@@ -159,8 +160,11 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
             </Box>
           </CardContent>
         </Card>
-        <Box mt={4}>
+        <Box mt={4} mb={4}>
           <MDDScreenerDataTable sectorwiseData={appliedFilters || {}} />
+          {/* <SummaryCard sectorwiseData={appliedFilters || {}} /> */}
+
+
         </Box>
       </Box>
     </Container>
