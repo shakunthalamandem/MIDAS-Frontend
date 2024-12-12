@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
+import React, { useState, useEffect } from "react";
+import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
+import { Typography } from "@mui/material";
 
 interface ScreenerDataRow {
   id: number; // Add a unique ID field required for the DataGrid
@@ -21,7 +22,9 @@ interface ScreenerDataTableProps {
   sectorwiseData: { [key: string]: (string | number)[] };
 }
 
-const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData }) => {
+const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
+  sectorwiseData,
+}) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +40,9 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
     }
   }, [sectorwiseData, paginationModel]);
 
-  const fetchDataFromApi = async (data: ScreenerDataTableProps['sectorwiseData']) => {
+  const fetchDataFromApi = async (
+    data: ScreenerDataTableProps["sectorwiseData"]
+  ) => {
     setLoading(true);
     setError(null);
 
@@ -57,13 +62,13 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
       const apiUrl = process.env.REACT_APP_API_URL;
 
       if (!apiUrl) {
-        throw new Error('API URL is not defined in environment variables');
+        throw new Error("API URL is not defined in environment variables");
       }
 
       const response = await fetch(`${apiUrl}/api/super-screener/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
@@ -78,33 +83,53 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
         );
         setTotalRows(result.pagination?.total_items || 0);
       } else {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred while fetching data');
+      setError(err.message || "An error occurred while fetching data");
     } finally {
       setLoading(false);
     }
   };
 
   const columns: GridColDef[] = [
-    { field: 'pricing_date', headerName: 'Pricing Date', width: 150 },
-    { field: 'issuer_name', headerName: 'Issuer Name', width: 200 },
-    { field: 'ticker_symbol', headerName: 'Ticker Symbol', width: 150 },
-    { field: 'gics_sector', headerName: 'Sector', width: 180 },
-    { field: 'us_international', headerName: 'Region', width: 110 },
-    { field: 'deal_type', headerName: 'Deal Type', width: 100 },
-    { field: 'deal_value', headerName: 'Deal Value', width: 180 },
-    { field: 't1_return', headerName: 'T + 1D Return', width: 180 },
-    { field: 't1d_returns_index_returns', headerName: 'T + 1D Index Returns', width: 200 },
-    { field: 't1m_returns', headerName: 'T + 1M Returns', width: 180 },
-    { field: 't1m_returns_index_returns', headerName: 'T + 1M Index Returns', width: 200 },
-    { field: 'opportunity_value_ex', headerName: 'Opportunity Value Excess', width: 220 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 150 },
+    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
+    { field: "ticker_symbol", headerName: "Ticker Symbol", width: 150 },
+    { field: "gics_sector", headerName: "Sector", width: 180 },
+    { field: "us_international", headerName: "Region", width: 110 },
+    { field: "deal_type", headerName: "Deal Type", width: 100 },
+    { field: "deal_value", headerName: "Deal Value", width: 180 },
+    { field: "t1_return", headerName: "T + 1D Return", width: 180 },
+    {
+      field: "t1d_returns_index_returns",
+      headerName: "T + 1D Index Returns",
+      width: 200,
+    },
+    { field: "t1m_returns", headerName: "T + 1M Returns", width: 180 },
+    {
+      field: "t1m_returns_index_returns",
+      headerName: "T + 1M Index Returns",
+      width: 200,
+    },
+    {
+      field: "opportunity_value_ex",
+      headerName: "Opportunity Value Excess",
+      width: 220,
+    },
   ];
 
   return (
-    <div style={{ height: 600, width: '100%' }}>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div style={{ height: 600, width: "100%" }}>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <Typography
+        align="center"
+        style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
+      >
+        Total No of Deals:
+        <span style={{ color: "#004b33" }}>{totalRows}</span>
+      </Typography>
+
       <DataGrid
         rows={rows}
         columns={columns}
@@ -118,11 +143,11 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
         sx={{
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "transparent",
-            fontWeight:'bold',
-            color:'#002060'
+            fontWeight: "bold",
+            color: "#002060",
           },
-          '& .MuiDataGrid-columnHeaderTitle': {
-            fontWeight: 'bold', // Ensure this targets the header title
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold", // Ensure this targets the header title
           },
           "& .MuiDataGrid-cell": {
             color: "#000000",
@@ -142,7 +167,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
           "& .MuiCheckbox-root": {
             color: "#002060", // Change default checkbox color
           },
-        
         }}
       />
     </div>

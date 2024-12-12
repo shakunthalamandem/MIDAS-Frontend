@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
+import React, { useState, useEffect } from "react";
+import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
+import { Typography } from "@mui/material";
 
 // Define the type for each row of data with updated column names
 interface ScreenerDataRow {
@@ -27,7 +28,9 @@ interface MDDScreenerDataTableProps {
   sectorwiseData: { [key: string]: (string | number)[] };
 }
 
-const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseData }) => {
+const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
+  sectorwiseData,
+}) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +48,9 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
     }
   }, [sectorwiseData, paginationModel]);
 
-  const fetchDataFromApi = async (data: MDDScreenerDataTableProps['sectorwiseData']) => {
+  const fetchDataFromApi = async (
+    data: MDDScreenerDataTableProps["sectorwiseData"]
+  ) => {
     setLoading(true);
     setError(null);
 
@@ -54,35 +59,35 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
       deal_type: data.dealType,
       region: data.region,
       sector: data.sector,
-      deal_captain:data.deal_captain,
+      deal_captain: data.deal_captain,
       deal_value: data.deal_value,
-      lead_bank:data.lead_bank,
-      fo_discount:data.FollowOnDiscount,
+      lead_bank: data.lead_bank,
+      fo_discount: data.FollowOnDiscount,
       t1d_returns: data.t1_return,
       t1m_returns: data.t1m_returns,
-      allocation_deal_size:data.AllocationPercentOfDealSize,
-      average_hold_period:data.HoldPeriod,
-      allocation_ioi:data.AllocationPercentOfIOI,
-      t_1d_issue_price:data.Tplus1DIssuePrice,
-      percentage_primary:data.Primary,
-      sponsor:data.Sponsor,
+      allocation_deal_size: data.AllocationPercentOfDealSize,
+      average_hold_period: data.HoldPeriod,
+      allocation_ioi: data.AllocationPercentOfIOI,
+      t_1d_issue_price: data.Tplus1DIssuePrice,
+      percentage_primary: data.Primary,
+      sponsor: data.Sponsor,
       page: paginationModel.page + 1, // API pages are often 1-indexed
       pageSize: paginationModel.pageSize,
     };
-console.log("Payload",payload)
-console.log("Data",data)
+    console.log("Payload", payload);
+    console.log("Data", data);
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
 
       if (!apiUrl) {
-        throw new Error('API URL is not defined in environment variables');
+        throw new Error("API URL is not defined in environment variables");
       }
 
       const response = await fetch(`${apiUrl}/api/mdd_super_screener/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
@@ -92,15 +97,15 @@ console.log("Data",data)
         setRows(
           (result.data || []).map((item: ScreenerDataRow, index: number) => ({
             ...item,
-            id: index + 1, 
+            id: index + 1,
           }))
         );
         setTotalRows(result.pagination?.total_items || 0); // Set total rows
       } else {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred while fetching data');
+      setError(err.message || "An error occurred while fetching data");
     } finally {
       setLoading(false);
     }
@@ -108,28 +113,50 @@ console.log("Data",data)
 
   // Updated columns with new field names
   const columns: GridColDef[] = [
-    { field: 'pricing_date', headerName: 'Pricing Date', width: 150 },
-    { field: 'issuer_name', headerName: 'Issuer Name', width: 200 },
-    { field: 'ticker', headerName: 'Ticker', width: 150 },
-    { field: 'gics_sector_from_bloomberg', headerName: 'Sector (From Bloomberg)', width: 180 },
-    { field: 'broad_region', headerName: 'Region', width: 150 },
-    { field: 'deal_type', headerName: 'Deal Type', width: 150 },
-    { field: 'deal_size', headerName: 'Deal Size', width: 180 },
-    { field: 'fo_discount', headerName: 'Follow On Discount', width: 180 },
-    { field: 'T+1M_returns', headerName: 'T + 1M Excess Returns', width: 200 },
-    { field: 'T+1D_returns', headerName: 'T + 1D Return (From Bloomberg)', width: 220 },
-    { field: 'allocation_deal_size', headerName: 'Allocation Deal Size Percentage', width: 250 },
-    { field: 'allocation_ioi', headerName: 'Allocation of IOI', width: 180 },
-    { field: 'average_hold_period', headerName: 'Average Hold Period', width: 180 },
-    { field: 'T+1D_issueprice', headerName: 'T + 1D issueprice', width: 180 },
-
+    { field: "pricing_date", headerName: "Pricing Date", width: 150 },
+    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
+    { field: "ticker", headerName: "Ticker", width: 150 },
+    {
+      field: "gics_sector_from_bloomberg",
+      headerName: "Sector (From Bloomberg)",
+      width: 180,
+    },
+    { field: "broad_region", headerName: "Region", width: 150 },
+    { field: "deal_type", headerName: "Deal Type", width: 150 },
+    { field: "deal_size", headerName: "Deal Size", width: 180 },
+    { field: "fo_discount", headerName: "Follow On Discount", width: 180 },
+    { field: "T+1M_returns", headerName: "T + 1M Excess Returns", width: 200 },
+    {
+      field: "T+1D_returns",
+      headerName: "T + 1D Return (From Bloomberg)",
+      width: 220,
+    },
+    {
+      field: "allocation_deal_size",
+      headerName: "Allocation Deal Size Percentage",
+      width: 250,
+    },
+    { field: "allocation_ioi", headerName: "Allocation of IOI", width: 180 },
+    {
+      field: "average_hold_period",
+      headerName: "Average Hold Period",
+      width: 180,
+    },
+    { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 180 },
   ];
 
   return (
-    <div style={{ height: 600, width: '100%' }}>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div style={{ height: 600, width: "100%" }}>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       {loading && <p>Loading...</p>}
-      
+      <Typography
+        align="center"
+        style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
+      >
+        Total No of Deals:
+        <span style={{ color: "#004b33" }}>{totalRows}</span>
+      </Typography>
+
       <DataGrid
         rows={rows}
         columns={columns}
@@ -142,11 +169,11 @@ console.log("Data",data)
         sx={{
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "transparent",
-            fontWeight: 'bold',
-            color: '#002060',
+            fontWeight: "bold",
+            color: "#002060",
           },
           "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: 'bold',
+            fontWeight: "bold",
           },
           "& .MuiDataGrid-cell": {
             color: "#000000",
