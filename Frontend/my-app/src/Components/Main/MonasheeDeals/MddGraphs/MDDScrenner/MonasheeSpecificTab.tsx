@@ -19,6 +19,7 @@ import axios from "axios";
 interface MonasheeSpecificFilterConfig {
   type: string;
   description: string;
+  label: string;
   options?: string[];
   fields?: {
     type: string;
@@ -88,7 +89,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                   alignItems: "center",
                 }}
               >
-                {key}
+                {filter.label}
                 {filter.description && (
                   <Tooltip title={filter.description} arrow>
                     <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
@@ -143,7 +144,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                   alignItems: "center",
                 }}
               >
-                {key}
+                {filter.label}
                 {filter.description && (
                   <Tooltip title={filter.description} arrow>
                     <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />

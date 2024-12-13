@@ -61,17 +61,20 @@
     "DealSpecific": {
       "Primary": {
         "type": "dropdown",
+        "label": "Primary Percentage",
         "description": "Select a range or specific value for the primary category.",
         "options": ["ALL", "=0", "=100", "0-20", "20-40", "40-60", "60-80", "80-100"]
       },
       "Sponsor": {
         "type": "dropdown",
+        "label": "Sponsor",
         "description": "Choose whether the sponsor is involved in the deal.",
         "options": ["Yes", "No"]
       },
       "FollowOnDiscount": {
         "type": "input",
-        "description": "Specify the discount for follow-on as a range using input fields.",
+        "label": "Follow-On Discount",
+        "description": "Specify the discount for follow-on discount as a range using input fields. Only for follow on's.",
         "fields": [
           { "type": "number", "operator": "<", "label": "Min", "placeholder": "Enter minimum discount" },
           { "type": "number", "operator": ">", "label": "Max", "placeholder": "Enter maximum discount" }
@@ -79,6 +82,7 @@
       },
       "Tplus1DIssuePrice": {
         "type": "input",
+        "label": "T+1D IssuePrice",
         "description": "Specify the percentage change from T+1 day to the index.",
         "fields": [
           { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
@@ -90,6 +94,7 @@
     "MonahseeSpecific": {
       "AllocationPercentOfDealSize": {
         "type": "input",
+        "label": "Allocation % DealSize (Weighted)",
         "description": "Enter the allocation percentage of the deal size as a range.",
         "fields": [
           { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
@@ -98,6 +103,7 @@
       },
       "AllocationPercentOfIOI": {
         "type": "input",
+        "label": "Allocation % IOI (Weighted)",
         "description": "Enter the allocation percentage of IOI as a range.",
         "fields": [
           { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
@@ -107,6 +113,7 @@
       "HoldPeriod": {
         "type": "input",
         "description": "Specify the hold period as a range using input fields.",
+        "label": "Hold Period",
         "fields": [
           { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
           { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
