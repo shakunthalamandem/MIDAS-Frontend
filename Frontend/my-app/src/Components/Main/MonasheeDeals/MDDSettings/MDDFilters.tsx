@@ -19,6 +19,7 @@ import { LoadingButton } from "@mui/lab"; // Import LoadingButton
 import DealAllocationGraph from "./DealAllocationGraph";
 import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
+import MDDScreenerDataTable from "./MDDScreenerDataTable"; // Import the new component
 
 interface FilterOption {
   options: (string | number)[]; // Options can be either string or number
@@ -303,7 +304,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
             ) : (
               <DealAllocationGraph responseData={apiData} apiName={apiName} />
             )}
-          </>
+          <MDDScreenerDataTable sectorwiseData={apiData || {}} />
+</>
         )}
       </Box>
     </Container>
