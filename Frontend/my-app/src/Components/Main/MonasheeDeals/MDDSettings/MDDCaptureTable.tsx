@@ -200,7 +200,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                     }}
                                   >
                                     {[
-                                      "Quantiles", // New column for serial numbers
+                                      "Quintile", // New column for serial numbers
                                       "T+1M Excess Returns",
                                       "No of Deals",
                                       "Alloc as % of Deal Size(Weighted)",
