@@ -151,14 +151,14 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                   </Tooltip>
                 )}
               </Typography>
-              {filter.fields?.map((field, index) => (
+              {filter.fields?.map((fieldConfig, index) => (
                 <Field key={index} name={`${key}[${index}]`}>
                   {({ field, form }: any) => (
                     <TextField
                       {...field}
                       type="number"
-                      label={field.label}
-                      placeholder={field.placeholder}
+                      label={fieldConfig.label}
+                      placeholder={fieldConfig.placeholder || "Enter a value"} // Add placeholder here
                       fullWidth
                       margin="normal"
                       variant="outlined"
