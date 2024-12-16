@@ -36,7 +36,9 @@ interface MonasheeSpecificTabProps {
   };
 }
 
-const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }) => {
+const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
+  filtersData,
+}) => {
   const { values, setFieldValue, errors, touched } = useFormikContext<any>();
   const [dealCaptainOptions, setDealCaptainOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,9 +48,9 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
     const fetchDealCaptainOptions = async () => {
       setLoading(true); // Set loading to true before the API request
       try {
-        const response = await axios.get<{ deal_captain?: { options: string[] } }>(
-          "http://192.168.1.59:9000/api/mdd_screener_filters/"
-        );
+        const response = await axios.get<{
+          deal_captain?: { options: string[] };
+        }>("http://192.168.1.59:9000/api/mdd_screener_filters/");
         console.log(response.data); // Log to check the response structure
 
         const dealCaptainData = response.data?.deal_captain;
@@ -92,7 +94,9 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                 {filter.label}
                 {filter.description && (
                   <Tooltip title={filter.description} arrow>
-                    <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
+                    <InfoIcon
+                      sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
+                    />
                   </Tooltip>
                 )}
               </Typography>
@@ -114,13 +118,17 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                         maxWidth: "150px", // Adjust dropdown width
                       }}
                       renderValue={(selected) => {
-                        const formattedTags = formatSelectedTags(selected as (string | number)[]);
+                        const formattedTags = formatSelectedTags(
+                          selected as (string | number)[]
+                        );
                         return formattedTags.join(", ");
                       }}
                     >
                       {filter.options?.map((option, index) => (
                         <MenuItem key={index} value={option}>
-                          <Checkbox checked={field.value?.includes(option) || false} />
+                          <Checkbox
+                            checked={field.value?.includes(option) || false}
+                          />
                           <ListItemText primary={option} />
                         </MenuItem>
                       ))}
@@ -147,7 +155,9 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                 {filter.label}
                 {filter.description && (
                   <Tooltip title={filter.description} arrow>
-                    <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
+                    <InfoIcon
+                      sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
+                    />
                   </Tooltip>
                 )}
               </Typography>
@@ -164,7 +174,9 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                       variant="outlined"
                       size="small"
                       value={field.value || ""}
-                      onChange={(e) => form.setFieldValue(`${key}[${index}]`, e.target.value)}
+                      onChange={(e) =>
+                        form.setFieldValue(`${key}[${index}]`, e.target.value)
+                      }
                       sx={{
                         maxWidth: "100px", // Set width of the input box
                         "& input": {
@@ -236,8 +248,11 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                 <FormControl fullWidth margin="normal">
                   <Select
                     multiple
+                    displayEmpty
                     value={values["deal_captain"] || []}
-                    onChange={(e) => setFieldValue("deal_captain", e.target.value)}
+                    onChange={(e) =>
+                      setFieldValue("deal_captain", e.target.value)
+                    }
                     sx={{
                       "& .MuiSelect-select": {
                         padding: "8px", // Adjust padding for smaller height
@@ -249,13 +264,20 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({ filtersData }
                       maxWidth: "150px", // Adjust dropdown width
                     }}
                     renderValue={(selected) => {
-                      const formattedTags = formatSelectedTags(selected as (string | number)[]);
+                      if (!selected.length) return "Select"; // Placeholder when no value is selected
+                      const formattedTags = formatSelectedTags(
+                        selected as (string | number)[]
+                      );
                       return formattedTags.join(", ");
                     }}
                   >
                     {dealCaptainOptions.map((option, index) => (
                       <MenuItem key={index} value={option}>
-                        <Checkbox checked={values["deal_captain"]?.includes(option) || false} />
+                        <Checkbox
+                          checked={
+                            values["deal_captain"]?.includes(option) || false
+                          }
+                        />
                         <ListItemText primary={option} />
                       </MenuItem>
                     ))}
