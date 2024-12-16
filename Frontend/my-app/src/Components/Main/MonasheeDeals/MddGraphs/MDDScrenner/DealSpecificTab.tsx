@@ -115,7 +115,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                         if (!selected || selected.length === 0) {
                           return (
                             <Typography sx={{ color: "#aaa", fontSize: "0.875rem" }}>
-                              {`Select ${filter.label.toLowerCase()}`}
+                              {`Select`}
                             </Typography>
                           );
                         }
@@ -160,14 +160,16 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                   </Tooltip>
                 )}
               </Typography>
-              {filter.fields?.map((field, index) => (
+              {filter.fields?.map((fieldConfig, index) => (
                 <Field name={`${key}[${index}]`} key={index}>
                   {({ field, form }: any) => (
                     <TextField
                       {...field}
                       type="number"
-                      label={field.label}
-                      placeholder={field.placeholder || `Enter ${field.label}`}
+                      // label={field.label}
+                      // placeholder={field.placeholder || `Enter `}
+                      label={fieldConfig.label}
+                      placeholder={fieldConfig.placeholder || "Enter a value"}
                       fullWidth
                       margin="normal"
                       variant="outlined"
@@ -263,7 +265,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                           <Typography
                             sx={{ color: "#aaa", fontSize: "0.875rem" }}
                           >
-                            Select Lead Bank
+                            Select
                           </Typography>
                         );
                       }
