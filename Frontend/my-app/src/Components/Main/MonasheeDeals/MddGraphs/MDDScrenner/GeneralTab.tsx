@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   TextField,
   FormControl,
@@ -12,13 +12,13 @@ import {
   Typography,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import { Field, FieldArray } from "formik";
+import { Field } from "formik";
 
-// Define types for filtersData
 interface FilterConfig {
   options: (string | number)[];
   label: string;
   description?: string;
+  placeholder?: string; // Added placeholder property to FilterConfig
 }
 
 interface FiltersData {
@@ -30,9 +30,6 @@ interface GeneralTabProps {
 }
 
 const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
-  // Initial state is managed by Formik, so we don't need a local state for selected values
-  // Formik handles it
-
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
     const firstValue = values[0];
@@ -43,7 +40,7 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
     <FormControl fullWidth margin="normal">
       <Grid container spacing={2} sx={{ backgroundColor: "#f7f8f8", maxHeight: "370px", overflowY: "auto", padding: 2 }}>
         {Object.keys(filtersData).map((key) => {
-          const { options, label, description } = filtersData[key];
+          const { options, label, description, placeholder } = filtersData[key];
 
           return (
             <Grid item xs={12} sm={6} md={3} key={key}>
@@ -65,7 +62,15 @@ const GeneralTab: React.FC<GeneralTabProps> = ({ filtersData }) => {
                       disableCloseOnSelect
                       value={field.value || []}
                       onChange={(_, value) => form.setFieldValue(key, value)}
-                      renderInput={(params) => <TextField {...params} variant="outlined" size="small" fullWidth />}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          placeholder={placeholder || `Select ${label.toLowerCase()}`} // Placeholder added
+                        />
+                      )}
                       renderTags={(value) => {
                         const formattedTags = formatSelectedTags(value);
                         return formattedTags.map((tag, idx) => (

@@ -15,7 +15,6 @@ import InfoIcon from "@mui/icons-material/Info";
 import { Field, useFormikContext } from "formik";
 import axios from "axios";
 
-// Define the types for DealSpecific filtersData
 interface DealSpecificFilterConfig {
   type: string;
   description: string;
@@ -42,14 +41,12 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Fetch lead_bank options from API
     const fetchLeadBankOptions = async () => {
-      setLoading(true); // Set loading to true before the API request
+      setLoading(true);
       try {
         const response = await axios.get<{ lead_bank?: { options: string[] } }>(
           "http://192.168.1.59:9000/api/mdd_screener_filters/"
         );
-        console.log(response.data); // Log to check the response structure
 
         const leadBankData = response.data?.lead_bank;
 
@@ -61,7 +58,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
       } catch (error) {
         console.error("Error fetching lead_bank options:", error);
       } finally {
-        setLoading(false); // Set loading to false after the API request
+        setLoading(false);
       }
     };
 
@@ -103,24 +100,36 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                       multiple
                       value={field.value || []}
                       onChange={(e) => form.setFieldValue(key, e.target.value)}
+                      displayEmpty
                       sx={{
                         "& .MuiSelect-select": {
-                          padding: "8px", // Adjust padding for smaller height
-                          fontSize: "0.875rem", // Adjust font size for smaller text
+                          padding: "8px",
+                          fontSize: "0.875rem",
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
-                          borderRadius: "4px", // Adjust border radius
+                          borderRadius: "4px",
                         },
-                        maxWidth: "150px", // Adjust dropdown width
+                        maxWidth: "150px",
                       }}
                       renderValue={(selected) => {
-                        const formattedTags = formatSelectedTags(selected as (string | number)[]);
+                        if (!selected || selected.length === 0) {
+                          return (
+                            <Typography sx={{ color: "#aaa", fontSize: "0.875rem" }}>
+                              {`Select ${filter.label.toLowerCase()}`}
+                            </Typography>
+                          );
+                        }
+                        const formattedTags = formatSelectedTags(
+                          selected as (string | number)[]
+                        );
                         return formattedTags.join(", ");
                       }}
                     >
                       {filter.options?.map((option, index) => (
                         <MenuItem key={index} value={option}>
-                          <Checkbox checked={field.value?.includes(option) || false} />
+                          <Checkbox
+                            checked={field.value?.includes(option) || false}
+                          />
                           <ListItemText primary={option} />
                         </MenuItem>
                       ))}
@@ -158,13 +167,15 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                       {...field}
                       type="number"
                       label={field.label}
-                      placeholder={field.placeholder}
+                      placeholder={field.placeholder || `Enter ${field.label}`}
                       fullWidth
                       margin="normal"
                       variant="outlined"
                       size="small"
                       value={field.value || ""}
-                      onChange={(e) => form.setFieldValue(`${key}[${index}]`, e.target.value)}
+                      onChange={(e) =>
+                        form.setFieldValue(`${key}[${index}]`, e.target.value)
+                      }
                       sx={{
                         maxWidth: "100px",
                         "& input": {
@@ -208,13 +219,11 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
           flexWrap: "wrap",
         }}
       >
-        {/* Render existing filters */}
         {Object.keys(filtersData).map((key) => {
           const filter = filtersData[key];
           return renderFilter(key, filter);
         })}
 
-        {/* Render Lead Bank Dropdown */}
         {loading ? (
           <Grid item xs={12}>
             <Typography>Loading Lead Bank options...</Typography>
@@ -233,65 +242,47 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                   Lead Bank
                 </Typography>
                 <FormControl fullWidth margin="normal">
-  <Select
-    multiple
-    value={values["lead_bank"] || []}
-    onChange={(e) => setFieldValue("lead_bank", e.target.value)}
-    sx={{
-      "& .MuiSelect-select": {
-        padding: "8px", // Adjust padding for smaller height
-        fontSize: "0.75rem", // Reduce font size for selected values
-      },
-      "& .MuiOutlinedInput-notchedOutline": {
-        borderRadius: "4px", // Adjust border radius
-      },
-      maxWidth: "150px", // Adjust dropdown width
-    }}
-    renderValue={(selected) => {
-      const formattedTags = formatSelectedTags(selected as (string | number)[]);
-      return formattedTags.join(", ");
-    }}
-    MenuProps={{
-      PaperProps: {
-        style: {
-          maxHeight: 300, // Set max height of dropdown
-          width: 250, // Set a smaller dropdown width
-        },
-      },
-    }}
-  >
-    {leadBankOptions.map((option, index) => (
-      <MenuItem
-        key={index}
-        value={option}
-        sx={{
-          fontSize: "0.75rem", // Decrease font size of dropdown items
-        }}
-      >
-        <Checkbox
-          checked={values["lead_bank"]?.includes(option) || false}
-          sx={{
-            "& .MuiSvgIcon-root": {
-              fontSize: "1.25rem", // Slightly increase checkbox icon size
-            },
-          }}
-        />
-        <ListItemText
-          primary={option}
-          sx={{
-            "& .MuiTypography-root": {
-              fontSize: "0.8rem", // Set typography font size explicitly
-            },
-          }}
-        />
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
-
-
-
-
+                  <Select
+                    multiple
+                    value={values["lead_bank"] || []}
+                    onChange={(e) => setFieldValue("lead_bank", e.target.value)}
+                    displayEmpty
+                    sx={{
+                      "& .MuiSelect-select": {
+                        padding: "8px",
+                        fontSize: "0.75rem",
+                      },
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderRadius: "4px",
+                      },
+                      maxWidth: "150px",
+                    }}
+                    renderValue={(selected) => {
+                      if (!selected || selected.length === 0) {
+                        return (
+                          <Typography
+                            sx={{ color: "#aaa", fontSize: "0.875rem" }}
+                          >
+                            Select Lead Bank
+                          </Typography>
+                        );
+                      }
+                      const formattedTags = formatSelectedTags(
+                        selected as (string | number)[]
+                      );
+                      return formattedTags.join(", ");
+                    }}
+                  >
+                    {leadBankOptions.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        <Checkbox
+                          checked={values["lead_bank"]?.includes(option) || false}
+                        />
+                        <ListItemText primary={option} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Box>
             </Grid>
           )
