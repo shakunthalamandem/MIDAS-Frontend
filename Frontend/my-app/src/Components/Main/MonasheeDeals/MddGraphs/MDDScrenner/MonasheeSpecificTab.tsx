@@ -166,7 +166,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
                   {({ field, form }: any) => (
                     <TextField
                       {...field}
-                      type="number"
+                      type="float"
                       label={fieldConfig.label}
                       placeholder={fieldConfig.placeholder || "Enter a value"} // Add placeholder here
                       fullWidth

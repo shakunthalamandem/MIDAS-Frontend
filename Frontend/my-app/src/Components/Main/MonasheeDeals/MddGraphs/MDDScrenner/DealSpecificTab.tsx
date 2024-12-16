@@ -165,7 +165,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                   {({ field, form }: any) => (
                     <TextField
                       {...field}
-                      type="number"
+                      type="float"
                       // label={field.label}
                       // placeholder={field.placeholder || `Enter `}
                       label={fieldConfig.label}
