@@ -207,7 +207,9 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       "Alloc as % of IOI(Weighted)",
                                       "Deal Volume",
                                       "Model Actual Return",
-                                      "Model Return 1% Allocation",
+                                      selectedCategory === "IPO"
+                                        ? "Model Return 0.5% Allocation"
+                                        : "Model Return 1% Allocation", // Dynamic header
                                     ].map((header, idx) => (
                                       <TableCell
                                         key={idx}
@@ -292,9 +294,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                     );
                   })()}
                 </Grid>
-                <Typography mt={4} sx={{ fontWeight: "bold" }}>
-                  * Blocks are not included
-                </Typography>
+                {selectedCategory === "FO" && (
+                  <Typography mt={4} sx={{ fontWeight: "bold" }}>
+                    * Blocks are not included
+                  </Typography>
+                )}
               </CardContent>
             </Card>
           </motion.div>
