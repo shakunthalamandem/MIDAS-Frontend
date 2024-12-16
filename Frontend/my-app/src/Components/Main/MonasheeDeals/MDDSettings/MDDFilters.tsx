@@ -19,7 +19,7 @@ import { LoadingButton } from "@mui/lab"; // Import LoadingButton
 import DealAllocationGraph from "./DealAllocationGraph";
 import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
-import MDDScreenerDataTable from "./MDDScreenerDataTable"; // Import the new component
+import MDDScreenergrid from "./MDDScreenergrid";
 
 interface FilterOption {
   options: (string | number)[]; // Options can be either string or number
@@ -98,6 +98,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       if (response.ok) {
         const result = await response.json();
         setApiData(result);
+        console.log("resultset ",result)
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -304,7 +305,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
             ) : (
               <DealAllocationGraph responseData={apiData} apiName={apiName} />
             )}
-          <MDDScreenerDataTable sectorwiseData={apiData || {}} />
+          <MDDScreenergrid sectorwiseData={apiData || {}} />
 </>
         )}
       </Box>
