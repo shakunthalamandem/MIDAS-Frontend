@@ -91,32 +91,71 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       setLoading(false);
     }
   };
-// Function to calculate the total deal value after filtering the data
-const calculateTotalDealValue = (result: ScreenerDataRow[]) => {
-  let totaldealvalue = 0;
 
-  result.forEach((row) => {
-    // Clean deal_value by removing non-numeric characters like $ and commas
-    const cleanedDealValue = row.deal_value
-      .toString()
-      .replace(/[^0-9.-]+/g, ''); // Removes any non-numeric characters (except decimal and minus)
+  // Function to calculate the total deal value after filtering the data
+  const calculateTotalDealValue = (result: ScreenerDataRow[]) => {
+    let totaldealvalue = 0;
 
-    // Parse cleaned value as a float
-    const dealValue = parseFloat(cleanedDealValue);
+    result.forEach((row) => {
+      // Clean deal_value by removing non-numeric characters like $ and commas
+      const cleanedDealValue = row.deal_value
+        .toString()
+        .replace(/[^0-9.-]+/g, ''); // Removes any non-numeric characters (except decimal and minus)
 
-    // Check if dealValue is a valid number before adding to the total
-    if (!isNaN(dealValue)) {
-      totaldealvalue += dealValue;
-    } else {
-      console.error(`Invalid deal value: ${row.deal_value}`); // Log any invalid deal_value for debugging
-    }
-  });
+      // Parse cleaned value as a float
+      const dealValue = parseFloat(cleanedDealValue);
 
-  return totaldealvalue;
-};
+      // Check if dealValue is a valid number before adding to the total
+      if (!isNaN(dealValue)) {
+        totaldealvalue += dealValue;
+      } else {
+        console.error(`Invalid deal value: ${row.deal_value}`); // Log any invalid deal_value for debugging
+      }
+    });
 
-// Calculate total deal value based on the current filtered data
-const totaldealvalue = calculateTotalDealValue(rows);
+    return totaldealvalue;
+  };
+
+  // Function to calculate the average deal value based on a dynamic column
+  const calculateAverageDealValue = (result: ScreenerDataRow[], columnName: keyof ScreenerDataRow) => {
+    let totalDealValue = 0;
+    let validCount = 0; 
+
+    result.forEach((row) => {
+      // Dynamically access the column value using the columnName
+      const cleanedDealValue = row[columnName]
+        .toString()
+        .replace(/[^0-9.-]+/g, '');  // Remove non-numeric characters
+      const dealValue = parseFloat(cleanedDealValue);
+
+      if (!isNaN(dealValue)) {
+        totalDealValue += dealValue;
+        validCount++; 
+      } else {
+        console.error(`Invalid deal value in column ${columnName}: ${row[columnName]}`);
+      }
+    });
+
+    return validCount > 0 ? totalDealValue / validCount : 0;
+  };
+
+  // Calculate the total deal value
+  const totaldealvalue = calculateTotalDealValue(rows);
+
+  // Calculate average for t1_return
+  const avgDealReturn = calculateAverageDealValue(rows, "t1_return");
+
+  // Calculate average for t1m_returns_index_returns
+  const avgT1mReturnsIndex = calculateAverageDealValue(rows, "t1m_returns_index_returns");
+
+  // Calculate average for t1d_returns_index_returns
+  const avgT1dReturnsIndex = calculateAverageDealValue(rows, "t1d_returns_index_returns");
+  
+   // Calculate average for t1d_returns_index_returns
+   const avgT1dReturnsIndexX = calculateAverageDealValue(rows, "opportunity_value_ex");
+   
+   const Avg_t1m_Return = calculateAverageDealValue(rows, "t1m_returns");
+
 
   // DataGrid columns definition
   const columns: GridColDef[] = [
@@ -150,49 +189,14 @@ const totaldealvalue = calculateTotalDealValue(rows);
   return (
     <div>
       {/* Box for displaying the summed total deal value */}
-      <Box
-        sx={{
-          height: "auto",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#f0f0f0",
-          padding: 2,
-          marginTop: 3,
-        }}
+      
+      <Typography
+        align="center"
+        style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
       >
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: "bold",
-            color: "black",
-            marginBottom: 2,
-          }}
-        >
-          Summary
-        </Typography>
-
-        {/* Display total deal value */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-            marginBottom: 1,
-            padding: "5px 10px",
-            backgroundColor: "#e6f7ff",
-            borderRadius: "4px",
-          }}
-        >
-          <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-  Total Deal Value: ${totaldealvalue.toLocaleString()}
-</Typography>
-
-        </Box>
-      </Box>
-
+        Total No of Deals:
+        <span style={{ color: "#004b33" }}>{totalRows}</span>
+      </Typography>
       {/* DataGrid below the summary */}
       <Box sx={{ height: 400, width: "100%", marginTop: 3 }}>
         <DataGrid
@@ -234,6 +238,70 @@ const totaldealvalue = calculateTotalDealValue(rows);
           }}
         />
       </Box>
+      <Box
+        sx={{
+          height: "auto",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#f0f0f0",
+          padding: 2,
+          marginTop: 3,
+        }}
+      >
+        
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: "bold",
+            color: "black",
+            marginBottom: 2,
+          }}
+        >
+          Summary
+        </Typography>
+
+        {/* Display total deal value */}
+       
+      </Box>
+      <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+            marginBottom: 1,
+            padding: "5px 10px",
+            backgroundColor: "#e6f7ff",
+            borderRadius: "4px",
+          }}
+        >
+          <Typography variant="body2">
+  <span style={{ fontWeight: "bold" }}>Total Deal Value:</span> ${totaldealvalue.toLocaleString()}
+</Typography>
+
+<Typography variant="body2">
+  <span style={{ fontWeight: "bold" }}>Avg T+1D:</span> ${avgDealReturn.toLocaleString()}
+</Typography>
+
+<Typography variant="body2">
+  <span style={{ fontWeight: "bold" }}>Avg T+1D returns index:</span> ${avgT1dReturnsIndex.toLocaleString()}
+</Typography>
+<Typography variant="body2">
+  <span style={{ fontWeight: "bold" }}>Avg T + 1M returns:</span> ${Avg_t1m_Return.toLocaleString()}
+</Typography>
+<Typography variant="body2">
+  <span style={{ fontWeight: "bold" }}>Avg T + 1M Index Returns
+  :</span> ${avgT1mReturnsIndex.toLocaleString()}
+</Typography>
+
+<Typography variant="body2">
+  <span style={{ fontWeight: "bold" }}>Avg Opportunity value:</span> ${avgT1dReturnsIndexX.toLocaleString()}
+</Typography>
+
+
+        </Box>
     </div>
   );
 };
