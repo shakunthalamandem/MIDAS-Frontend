@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { Box, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
-import { Typography } from "@mui/material";
 
 interface ScreenerDataRow {
-  id: number; // Add a unique ID field required for the DataGrid
+  id: number;
   pricing_date: string;
   issuer_name: string;
   ticker_symbol: string;
@@ -25,6 +25,7 @@ interface ScreenerDataTableProps {
 const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
   sectorwiseData,
 }) => {
+  const [result, setResult] = useState<ScreenerDataRow[]>([]);
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +61,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
-
       if (!apiUrl) {
         throw new Error("API URL is not defined in environment variables");
       }
@@ -91,8 +91,36 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       setLoading(false);
     }
   };
+// Function to calculate the total deal value after filtering the data
+const calculateTotalDealValue = (result: ScreenerDataRow[]) => {
+  let totaldealvalue = 0;
 
+  result.forEach((row) => {
+    // Clean deal_value by removing non-numeric characters like $ and commas
+    const cleanedDealValue = row.deal_value
+      .toString()
+      .replace(/[^0-9.-]+/g, ''); // Removes any non-numeric characters (except decimal and minus)
+
+    // Parse cleaned value as a float
+    const dealValue = parseFloat(cleanedDealValue);
+
+    // Check if dealValue is a valid number before adding to the total
+    if (!isNaN(dealValue)) {
+      totaldealvalue += dealValue;
+    } else {
+      console.error(`Invalid deal value: ${row.deal_value}`); // Log any invalid deal_value for debugging
+    }
+  });
+
+  return totaldealvalue;
+};
+
+// Calculate total deal value based on the current filtered data
+const totaldealvalue = calculateTotalDealValue(rows);
+
+  // DataGrid columns definition
   const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 150 },
     { field: "pricing_date", headerName: "Pricing Date", width: 150 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "ticker_symbol", headerName: "Ticker Symbol", width: 150 },
@@ -120,55 +148,92 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
   ];
 
   return (
-    <div style={{ height: 600, width: "100%" }}>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <Typography
-        align="center"
-        style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
-      >
-        Total No of Deals:
-        <span style={{ color: "#004b33" }}>{totalRows}</span>
-      </Typography>
-
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        paginationMode="server"
-        rowCount={totalRows}
-        loading={loading}
-        // disableSelectionOnClick
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 25, 50, 100]}
+    <div>
+      {/* Box for displaying the summed total deal value */}
+      <Box
         sx={{
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "transparent",
-            fontWeight: "bold",
-            color: "#002060",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: "bold", // Ensure this targets the header title
-          },
-          "& .MuiDataGrid-cell": {
-            color: "#000000",
-          },
-          "& .MuiDataGrid-cell--editing": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell:focus": {
-            outline: "none",
-          },
-          "& .MuiDataGrid-row:nth-of-type(odd)": {
-            backgroundColor: "#F5F5F5",
-          },
-          "& .Mui-checked": {
-            color: "#002060 !important", // Change checkbox color when checked
-          },
-          "& .MuiCheckbox-root": {
-            color: "#002060", // Change default checkbox color
-          },
+          height: "auto",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#f0f0f0",
+          padding: 2,
+          marginTop: 3,
         }}
-      />
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: "bold",
+            color: "black",
+            marginBottom: 2,
+          }}
+        >
+          Summary
+        </Typography>
+
+        {/* Display total deal value */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+            marginBottom: 1,
+            padding: "5px 10px",
+            backgroundColor: "#e6f7ff",
+            borderRadius: "4px",
+          }}
+        >
+          <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+  Total Deal Value: ${totaldealvalue.toLocaleString()}
+</Typography>
+
+        </Box>
+      </Box>
+
+      {/* DataGrid below the summary */}
+      <Box sx={{ height: 400, width: "100%", marginTop: 3 }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          paginationMode="server"
+          rowCount={totalRows}
+          loading={loading}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 25, 50, 100]}
+          sx={{
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "transparent",
+              fontWeight: "bold",
+              color: "#002060",
+            },
+            "& .MuiDataGrid-columnHeaderTitle": {
+              fontWeight: "bold",
+            },
+            "& .MuiDataGrid-cell": {
+              color: "#000000",
+            },
+            "& .MuiDataGrid-cell--editing": {
+              border: "none",
+            },
+            "& .MuiDataGrid-cell:focus": {
+              outline: "none",
+            },
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "#F5F5F5",
+            },
+            "& .Mui-checked": {
+              color: "#002060 !important",
+            },
+            "& .MuiCheckbox-root": {
+              color: "#002060",
+            },
+          }}
+        />
+      </Box>
     </div>
   );
 };
