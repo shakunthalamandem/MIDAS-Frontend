@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
-import { Typography } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 
 // Define the type for each row of data with updated column names
 interface ScreenerDataRow {
@@ -136,6 +136,8 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
   ];
 
   return (
+    <Container maxWidth="lg" sx={{ paddingY: 4 }}>
+
     <div style={{ height: 600, width: "100%" }}>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {loading && <p>Loading...</p>}
@@ -174,6 +176,8 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
         }}
       />
     </div>
+    </Container>
+
   );
 };
 
