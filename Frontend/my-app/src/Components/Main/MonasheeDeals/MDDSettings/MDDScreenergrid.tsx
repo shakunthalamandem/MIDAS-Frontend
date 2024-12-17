@@ -58,9 +58,9 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
         region: data.broad_region, // Array of regions
         deal_captain: data.deal_captain, // Array of deal captains
         deal_type: data.deal_type, // Array of deal types
-        gics_sector: data.gics_sector, // Array of sectors
+        sector: data.gics_sector, // Array of sectors
         lead_bank: data.lead_bank, // Array of lead banks
-        years: data.years, // Array of years
+        year_range: data.years, // Array of years
         page: paginationModel.page + 1, // API pages are often 1-indexed
         pageSize: paginationModel.pageSize,
       };
