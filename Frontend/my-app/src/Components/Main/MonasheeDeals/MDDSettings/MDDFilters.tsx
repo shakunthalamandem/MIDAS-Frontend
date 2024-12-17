@@ -305,7 +305,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
             ) : (
               <DealAllocationGraph responseData={apiData} apiName={apiName} />
             )}
-          <MDDScreenergrid sectorwiseData={apiData || {}} />
+          {/* <MDDScreenergrid sectorwiseData={apiData || {}} /> */}
 </>
         )}
       </Box>
