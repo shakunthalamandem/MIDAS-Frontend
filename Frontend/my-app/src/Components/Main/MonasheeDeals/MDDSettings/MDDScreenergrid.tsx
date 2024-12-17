@@ -150,31 +150,36 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       </Typography>
 
       <DataGrid
-        rows={rows}
-        columns={columns}
-        paginationMode="server"
-        rowCount={totalRows}
-        loading={loading}
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 25, 50, 100]}
-        sx={{
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "transparent",
-            fontWeight: "bold",
-            color: "#002060",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: "bold",
-          },
-          "& .MuiDataGrid-cell": {
-            color: "#000000",
-          },
-          "& .MuiDataGrid-row:nth-of-type(odd)": {
-            backgroundColor: "#F5F5F5",
-          },
-        }}
-      />
+  rows={rows}
+  columns={columns}
+  paginationMode="server"
+  rowCount={totalRows}
+  loading={loading}
+  paginationModel={paginationModel}
+  onPaginationModelChange={setPaginationModel}
+  pageSizeOptions={[10, 25, 50, 100]}
+  rowHeight={35}
+  sx={{
+    "& .MuiDataGrid-columnHeaders": {
+      backgroundColor: "transparent",
+      fontWeight: "bold",
+      color: "#002060",
+    },
+    "& .MuiDataGrid-columnHeaderTitle": {
+      fontWeight: "bold",
+      fontSize: "12px", // Decrease header font size
+    },
+    "& .MuiDataGrid-cell": {
+      color: "#000000",
+      fontSize: "12px", // Decrease font size for cell values
+      padding: "4px", // Optional: Reduce padding for compact look
+    },
+    "& .MuiDataGrid-row:nth-of-type(odd)": {
+      backgroundColor: "#F5F5F5",
+    },
+  }}
+/>
+
     </div>
     </Container>
 
