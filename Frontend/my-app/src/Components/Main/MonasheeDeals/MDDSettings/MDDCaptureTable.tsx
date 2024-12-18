@@ -97,7 +97,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   };
 
   return (
-    <Box mr={0} sx={{ Width: "100%", maxWidth: "2000px" }}>
+    <Box mr={0} sx={{ Width: "100%", maxWidth: "1000px" }}>
       <Box
         display="flex"
         justifyContent="center"
@@ -136,7 +136,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                 backgroundColor: "#fdfff8",
                 marginBottom: "30px",
                 padding: 2,
-                width: "1400px",
+                width: "1000px",
               }}
             >
               <CardContent>
