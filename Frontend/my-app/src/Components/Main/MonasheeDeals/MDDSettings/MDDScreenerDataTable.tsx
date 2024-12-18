@@ -113,36 +113,36 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
 
   // Updated columns with new field names
   const columns: GridColDef[] = [
-    { field: "pricing_date", headerName: "Pricing Date", width: 150 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
-    { field: "ticker", headerName: "Ticker", width: 150 },
+    { field: "ticker", headerName: "Ticker", width: 100 },
     {
       field: "gics_sector_from_bloomberg",
       headerName: "Sector (From Bloomberg)",
       width: 180,
     },
-    { field: "broad_region", headerName: "Region", width: 150 },
-    { field: "deal_type", headerName: "Deal Type", width: 150 },
-    { field: "deal_size", headerName: "Deal Size", width: 180 },
-    { field: "fo_discount", headerName: "Follow On Discount", width: 180 },
-    { field: "T+1M_returns", headerName: "T + 1M Excess Returns", width: 200 },
+    { field: "broad_region", headerName: "Region", width: 100 },
+    { field: "deal_type", headerName: "Deal Type", width: 100 },
+    { field: "deal_size", headerName: "Deal Size", width: 120 },
+    { field: "fo_discount", headerName: "Follow On Discount", width: 100 },
+    { field: "T+1M_returns", headerName: "T + 1M Excess Returns", width: 100 },
     {
       field: "T+1D_returns",
       headerName: "T + 1D Return (From Bloomberg)",
-      width: 220,
+      width: 100,
     },
     {
       field: "allocation_deal_size",
       headerName: "Allocation Deal Size Percentage",
-      width: 250,
+      width: 100,
     },
-    { field: "allocation_ioi", headerName: "Allocation of IOI", width: 180 },
+    { field: "allocation_ioi", headerName: "Allocation of IOI", width: 100 },
     {
       field: "average_hold_period",
       headerName: "Average Hold Period",
-      width: 180,
+      width: 100,
     },
-    { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 180 },
+    { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 100 },
   ];
 
   return (
@@ -166,6 +166,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
+        rowHeight={35}
         sx={{
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "transparent",
@@ -174,9 +175,12 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
           },
           "& .MuiDataGrid-columnHeaderTitle": {
             fontWeight: "bold",
+            fontSize: "12px", // Decrease header font size
           },
           "& .MuiDataGrid-cell": {
             color: "#000000",
+            fontSize: "12px", // Decrease font size for cell values
+            padding: "4px", // Optional: Reduce padding for compact look
           },
           "& .MuiDataGrid-row:nth-of-type(odd)": {
             backgroundColor: "#F5F5F5",
