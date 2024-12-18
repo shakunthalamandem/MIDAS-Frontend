@@ -3,7 +3,7 @@ import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
 import MDDScreenerSummary from "./MDDScrennerSummary";
 
-// Define the type for each row of data with updated column names
+// Define the type for each row of data
 interface ScreenerDataRow {
   id: number; // Unique ID for each row
   pricing_date: string;
@@ -36,7 +36,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [totalRows, setTotalRows] = useState(0); // Total rows from API
-  const [apiResponse, setApiResponse] = useState<any>(null); // Store the full API response
+  const [apiResponse, setApiResponse] = useState<any>(null); // Full API response for summary
 
   // Pagination state
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
@@ -46,11 +46,12 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
 
   useEffect(() => {
     if (sectorwiseData) {
-      fetchDataFromApi(sectorwiseData);
+      fetchPaginatedData(sectorwiseData); // Fetch data for DataGrid
+      fetchFullData(sectorwiseData); // Fetch full data for Summary
     }
   }, [sectorwiseData, paginationModel]);
 
-  const fetchDataFromApi = async (
+  const fetchPaginatedData = async (
     data: MDDScreenerDataTableProps["sectorwiseData"]
   ) => {
     setLoading(true);
@@ -100,19 +101,65 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
             id: index + 1,
           }))
         );
-        setTotalRows(result.pagination?.total_items || 0); // Set total rows
-        setApiResponse(result); // Save the full API response here
+        setTotalRows(result.pagination?.total_items || 0);
       } else {
-        throw new Error("Failed to fetch data");
+        throw new Error("Failed to fetch paginated data");
       }
     } catch (err: any) {
-      setError(err.message || "An error occurred while fetching data");
+      setError(err.message || "An error occurred while fetching paginated data");
     } finally {
       setLoading(false);
     }
   };
 
-  // Updated columns with new field names
+  const fetchFullData = async (
+    data: MDDScreenerDataTableProps["sectorwiseData"]
+  ) => {
+    const payload = {
+      year_range: data.year_range,
+      deal_type: data.dealType,
+      region: data.region,
+      sector: data.sector,
+      deal_captain: data.deal_captain,
+      deal_value: data.deal_value,
+      lead_bank: data.lead_bank,
+      fo_discount: data.FollowOnDiscount,
+      t1d_returns: data.t1_return,
+      t1m_returns: data.t1m_returns,
+      allocation_deal_size: data.AllocationPercentOfDealSize,
+      average_hold_period: data.HoldPeriod,
+      allocation_ioi: data.AllocationPercentOfIOI,
+      t_1d_issue_price: data.Tplus1DIssuePrice,
+      percentage_primary: data.Primary,
+      sponsor: data.Sponsor,
+    };
+
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+      if (!apiUrl) {
+        throw new Error("API URL is not defined in environment variables");
+      }
+
+      const response = await fetch(`${apiUrl}/api/mdd_super_screener/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setApiResponse(result); // Set full data for the summary
+      } else {
+        throw new Error("Failed to fetch full data");
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred while fetching full data");
+    }
+  };
+
   const columns: GridColDef[] = [
     { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
