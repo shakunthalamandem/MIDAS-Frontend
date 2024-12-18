@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 
 interface ScreenerDataRow {
@@ -100,7 +100,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           throw new Error("Failed to fetch data");
         }
       }
-      console.log(allResults,"finding the rows")
+      console.log(allResults, "finding the rows");
 
       setRows(allResults.map((item, index) => ({ ...item, id: index + 1 })));
       setTotalRows(allResults.length);
@@ -117,7 +117,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     result.forEach((row) => {
       const cleanedDealValue = row.deal_value
         .toString()
-        .replace(/[^0-9.-]+/g, ''); // Removes any non-numeric characters (except decimal and minus)
+        .replace(/[^0-9.-]+/g, ""); // Removes any non-numeric characters (except decimal and minus)
 
       const dealValue = parseFloat(cleanedDealValue);
 
@@ -131,21 +131,26 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     return totaldealvalue;
   };
 
-  const calculateAverageDealValue = (result: ScreenerDataRow[], columnName: keyof ScreenerDataRow) => {
+  const calculateAverageDealValue = (
+    result: ScreenerDataRow[],
+    columnName: keyof ScreenerDataRow
+  ) => {
     let totalDealValue = 0;
     let validCount = 0;
 
     result.forEach((row) => {
       const cleanedDealValue = row[columnName]
         .toString()
-        .replace(/[^0-9.-]+/g, '');  
+        .replace(/[^0-9.-]+/g, "");
       const dealValue = parseFloat(cleanedDealValue);
 
       if (!isNaN(dealValue)) {
         totalDealValue += dealValue;
-        validCount++; 
+        validCount++;
       } else {
-        console.error(`Invalid deal value in column ${columnName}: ${row[columnName]}`);
+        console.error(
+          `Invalid deal value in column ${columnName}: ${row[columnName]}`
+        );
       }
     });
 
@@ -154,9 +159,18 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
 
   const totaldealvalue = calculateTotalDealValue(rows);
   const avgDealReturn = calculateAverageDealValue(rows, "t1_return");
-  const avgT1mReturnsIndex = calculateAverageDealValue(rows, "t1m_returns_index_returns");
-  const avgT1dReturnsIndex = calculateAverageDealValue(rows, "t1d_returns_index_returns");
-  const avgT1dReturnsIndexX = calculateAverageDealValue(rows, "opportunity_value_ex");
+  const avgT1mReturnsIndex = calculateAverageDealValue(
+    rows,
+    "t1m_returns_index_returns"
+  );
+  const avgT1dReturnsIndex = calculateAverageDealValue(
+    rows,
+    "t1d_returns_index_returns"
+  );
+  const avgT1dReturnsIndexX = calculateAverageDealValue(
+    rows,
+    "opportunity_value_ex"
+  );
   const Avg_t1m_Return = calculateAverageDealValue(rows, "t1m_returns");
 
   const columns: GridColDef[] = [
@@ -169,15 +183,30 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     { field: "deal_type", headerName: "Deal Type", width: 100 },
     { field: "deal_value", headerName: "Deal Value", width: 180 },
     { field: "t1_return", headerName: "T + 1D Return", width: 180 },
-    { field: "t1d_returns_index_returns", headerName: "T + 1D Index Returns", width: 200 },
+    {
+      field: "t1d_returns_index_returns",
+      headerName: "T + 1D Index Returns",
+      width: 200,
+    },
     { field: "t1m_returns", headerName: "T + 1M Returns", width: 180 },
-    { field: "t1m_returns_index_returns", headerName: "T + 1M Index Returns", width: 200 },
-    { field: "opportunity_value_ex", headerName: "Opportunity Value Excess", width: 220 },
+    {
+      field: "t1m_returns_index_returns",
+      headerName: "T + 1M Index Returns",
+      width: 200,
+    },
+    {
+      field: "opportunity_value_ex",
+      headerName: "Opportunity Value Excess",
+      width: 220,
+    },
   ];
 
   return (
     <div>
-      <Typography align="center" style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}>
+      <Typography
+        align="center"
+        style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
+      >
         Total No of Deals:
         <span style={{ color: "#004b33" }}>{totalRows}</span>
       </Typography>
@@ -213,79 +242,96 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
 
       <Box
         sx={{
-          height: "auto",
           width: "100%",
           display: "flex",
-          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#f0f0f0",
           padding: 2,
           marginTop: 3,
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: "bold", color: "black", marginBottom: 2 }}>
-          Summary
-        </Typography>
-
-        <Box
+        <Card
           sx={{
-            display: "flex",
-            flexDirection: "column",
             width: "100%",
-            padding: "10px",
-            backgroundColor: "#f0f8ff",
-            borderRadius: "4px",
+            boxShadow: 3,
+            borderRadius: 2,
+            backgroundColor: "#ffffff",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              height: "40px",
-              padding: "5px 10px",
-              backgroundColor: "#e6f7ff",
-              borderRadius: "4px",
-              marginBottom: 2,
-            }}
-          >
-            <Typography variant="body2">
-              <span style={{ fontWeight: "bold" }}>Total Deal Value:</span> ${totaldealvalue.toLocaleString()}
-            </Typography>
-            <Typography variant="body2">
-              <span style={{ fontWeight: "bold" }}>Avg T+1D:</span> {avgDealReturn.toFixed(2)}%
-            </Typography>
-            <Typography variant="body2">
-              <span style={{ fontWeight: "bold" }}>Avg T+1D returns index:</span> {avgT1dReturnsIndex.toFixed(2)}%
-            </Typography>
-          </Box>
+          <CardContent>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: 2,
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#002060",
+                }}
+              >
+                Summary
+              </Typography>
+            </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              height: "40px",
-              padding: "5px 10px",
-              backgroundColor: "#e6f7ff",
-              borderRadius: "4px",
-              marginBottom: 3,
-            }}
-          >
-            <Typography variant="body2">
-              <span style={{ fontWeight: "bold" }}>Avg T + 1M returns:</span> {Avg_t1m_Return.toFixed(2)}%
-            </Typography>
+            {/* First Row */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 2,
+                padding: "10px",
+                backgroundColor: "#f0f8ff",
+                borderRadius: "8px",
+                boxShadow: 1,
+              }}
+            >
+              <Typography variant="body2">
+                <strong>Total Deal Value:</strong> $
+                {totaldealvalue.toLocaleString()}
+              </Typography>
+              <Typography variant="body2">
+                <strong>Average T+1D Return:</strong> {avgDealReturn.toFixed(2)}
+                %
+              </Typography>
+              <Typography variant="body2">
+                <strong>Average T+1D Index Returns:</strong>{" "}
+                {avgT1dReturnsIndex.toFixed(2)}%
+              </Typography>
+            </Box>
 
-            <Typography variant="body2">
-              <span style={{ fontWeight: "bold" }}>Avg T + 1M Index Returns:</span> {avgT1mReturnsIndex.toFixed(2)}%
-            </Typography>
-
-            <Typography variant="body2">
-              <span style={{ fontWeight: "bold" }}>Avg Opportunity value:</span> ${avgT1dReturnsIndexX.toLocaleString()}
-            </Typography>
-          </Box>
-        </Box>
+            {/* Second Row */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "10px",
+                backgroundColor: "#f0f8ff",
+                borderRadius: "8px",
+                boxShadow: 1,
+              }}
+            >
+              <Typography variant="body2">
+                <strong>Average T+1M Returns:</strong>{" "}
+                {Avg_t1m_Return.toFixed(2)}%
+              </Typography>
+              <Typography variant="body2">
+                <strong>Average T+1M Index Returns:</strong>{" "}
+                {avgT1mReturnsIndex.toFixed(2)}%
+              </Typography>
+              <Typography variant="body2">
+                <strong>Average Opportunity Value:</strong> $
+                {avgT1dReturnsIndexX.toLocaleString()}
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
       </Box>
     </div>
   );
