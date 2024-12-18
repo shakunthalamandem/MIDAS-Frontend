@@ -208,7 +208,9 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           rowCount={totalRows}
           loading={loading}
           paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
+          // onPaginationModelChange={setPaginationModel}
+          onPaginationModelChange={debouncedPaginationChange}
+
           pageSizeOptions={[10, 25, 50, 100]}
           rowHeight={35}
           // hideFooter // Hides the entire footer, including pagination controls
