@@ -46,6 +46,9 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
   ) => {
     setLoading(true);
     setError(null);
+    let allResults: ScreenerDataRow[] = [];
+    let page = 1;
+    const pageSize = paginationModel.pageSize;
 
     const payload = {
       year_range: data.year_range,
@@ -55,8 +58,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       deal_value: data.deal_value,
       t1_return: data.t1_return,
       t1m_returns: data.t1m_returns,
-      page: paginationModel.page + 1, // API pages are often 1-indexed
-      pageSize: paginationModel.pageSize,
+      pageSize,
     };
 
     try {
@@ -65,26 +67,43 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
         throw new Error("API URL is not defined in environment variables");
       }
 
-      const response = await fetch(`${apiUrl}/api/super-screener/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      while (true) {
+        const response = await fetch(`${apiUrl}/api/super-screener/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...payload,
+            page, // Page number
+          }),
+        });
 
-      if (response.ok) {
-        const result = await response.json();
-        setRows(
-          (result.data || []).map((item: ScreenerDataRow, index: number) => ({
-            ...item,
-            id: index + 1, // Ensure each row has a unique ID
-          }))
-        );
-        setTotalRows(result.pagination?.total_items || 0);
-      } else {
-        throw new Error("Failed to fetch data");
+        if (response.ok) {
+          const result = await response.json();
+          const newData = result.data || [];
+
+          // Add the current page data to allResults
+          allResults = [...allResults, ...newData];
+
+          // Check if we've fetched all pages based on the total count
+          const totalItems = result.pagination?.total_items || 0;
+          const totalPages = Math.ceil(totalItems / pageSize);
+
+          if (page >= totalPages) {
+            break; // No more pages left
+          }
+
+          // Increment page and continue fetching
+          page++;
+        } else {
+          throw new Error("Failed to fetch data");
+        }
       }
+      console.log(allResults,"finding the rows")
+
+      setRows(allResults.map((item, index) => ({ ...item, id: index + 1 })));
+      setTotalRows(allResults.length);
     } catch (err: any) {
       setError(err.message || "An error occurred while fetching data");
     } finally {
@@ -92,40 +111,34 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     }
   };
 
-  // Function to calculate the total deal value after filtering the data
   const calculateTotalDealValue = (result: ScreenerDataRow[]) => {
     let totaldealvalue = 0;
 
     result.forEach((row) => {
-      // Clean deal_value by removing non-numeric characters like $ and commas
       const cleanedDealValue = row.deal_value
         .toString()
         .replace(/[^0-9.-]+/g, ''); // Removes any non-numeric characters (except decimal and minus)
 
-      // Parse cleaned value as a float
       const dealValue = parseFloat(cleanedDealValue);
 
-      // Check if dealValue is a valid number before adding to the total
       if (!isNaN(dealValue)) {
         totaldealvalue += dealValue;
       } else {
-        console.error(`Invalid deal value: ${row.deal_value}`); // Log any invalid deal_value for debugging
+        console.error(`Invalid deal value: ${row.deal_value}`);
       }
     });
 
     return totaldealvalue;
   };
 
-  // Function to calculate the average deal value based on a dynamic column
   const calculateAverageDealValue = (result: ScreenerDataRow[], columnName: keyof ScreenerDataRow) => {
     let totalDealValue = 0;
-    let validCount = 0; 
+    let validCount = 0;
 
     result.forEach((row) => {
-      // Dynamically access the column value using the columnName
       const cleanedDealValue = row[columnName]
         .toString()
-        .replace(/[^0-9.-]+/g, '');  // Remove non-numeric characters
+        .replace(/[^0-9.-]+/g, '');  
       const dealValue = parseFloat(cleanedDealValue);
 
       if (!isNaN(dealValue)) {
@@ -139,25 +152,13 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     return validCount > 0 ? totalDealValue / validCount : 0;
   };
 
-  // Calculate the total deal value
   const totaldealvalue = calculateTotalDealValue(rows);
-
-  // Calculate average for t1_return
   const avgDealReturn = calculateAverageDealValue(rows, "t1_return");
-
-  // Calculate average for t1m_returns_index_returns
   const avgT1mReturnsIndex = calculateAverageDealValue(rows, "t1m_returns_index_returns");
-
-  // Calculate average for t1d_returns_index_returns
   const avgT1dReturnsIndex = calculateAverageDealValue(rows, "t1d_returns_index_returns");
-  
-   // Calculate average for t1d_returns_index_returns
-   const avgT1dReturnsIndexX = calculateAverageDealValue(rows, "opportunity_value_ex");
-   
-   const Avg_t1m_Return = calculateAverageDealValue(rows, "t1m_returns");
+  const avgT1dReturnsIndexX = calculateAverageDealValue(rows, "opportunity_value_ex");
+  const Avg_t1m_Return = calculateAverageDealValue(rows, "t1m_returns");
 
-
-  // DataGrid columns definition
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
     { field: "pricing_date", headerName: "Pricing Date", width: 150 },
@@ -168,36 +169,19 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     { field: "deal_type", headerName: "Deal Type", width: 100 },
     { field: "deal_value", headerName: "Deal Value", width: 180 },
     { field: "t1_return", headerName: "T + 1D Return", width: 180 },
-    {
-      field: "t1d_returns_index_returns",
-      headerName: "T + 1D Index Returns",
-      width: 200,
-    },
+    { field: "t1d_returns_index_returns", headerName: "T + 1D Index Returns", width: 200 },
     { field: "t1m_returns", headerName: "T + 1M Returns", width: 180 },
-    {
-      field: "t1m_returns_index_returns",
-      headerName: "T + 1M Index Returns",
-      width: 200,
-    },
-    {
-      field: "opportunity_value_ex",
-      headerName: "Opportunity Value Excess",
-      width: 220,
-    },
+    { field: "t1m_returns_index_returns", headerName: "T + 1M Index Returns", width: 200 },
+    { field: "opportunity_value_ex", headerName: "Opportunity Value Excess", width: 220 },
   ];
 
   return (
     <div>
-      {/* Box for displaying the summed total deal value */}
-      
-      <Typography
-        align="center"
-        style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
-      >
+      <Typography align="center" style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}>
         Total No of Deals:
         <span style={{ color: "#004b33" }}>{totalRows}</span>
       </Typography>
-      {/* DataGrid below the summary */}
+
       <Box sx={{ height: 400, width: "100%", marginTop: 3 }}>
         <DataGrid
           rows={rows}
@@ -220,24 +204,13 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
             "& .MuiDataGrid-cell": {
               color: "#000000",
             },
-            "& .MuiDataGrid-cell--editing": {
-              border: "none",
-            },
-            "& .MuiDataGrid-cell:focus": {
-              outline: "none",
-            },
             "& .MuiDataGrid-row:nth-of-type(odd)": {
               backgroundColor: "#F5F5F5",
-            },
-            "& .Mui-checked": {
-              color: "#002060 !important",
-            },
-            "& .MuiCheckbox-root": {
-              color: "#002060",
             },
           }}
         />
       </Box>
+
       <Box
         sx={{
           height: "auto",
@@ -251,57 +224,69 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           marginTop: 3,
         }}
       >
-        
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: "bold",
-            color: "black",
-            marginBottom: 2,
-          }}
-        >
+        <Typography variant="h6" sx={{ fontWeight: "bold", color: "black", marginBottom: 2 }}>
           Summary
         </Typography>
 
-        {/* Display total deal value */}
-       
-      </Box>
-      <Box
+        <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            flexDirection: "column",
             width: "100%",
-            marginBottom: 1,
-            padding: "5px 10px",
-            backgroundColor: "#e6f7ff",
+            padding: "10px",
+            backgroundColor: "#f0f8ff",
             borderRadius: "4px",
           }}
         >
-          <Typography variant="body2">
-  <span style={{ fontWeight: "bold" }}>Total Deal Value:</span> ${totaldealvalue.toLocaleString()}
-</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              height: "40px",
+              padding: "5px 10px",
+              backgroundColor: "#e6f7ff",
+              borderRadius: "4px",
+              marginBottom: 2,
+            }}
+          >
+            <Typography variant="body2">
+              <span style={{ fontWeight: "bold" }}>Total Deal Value:</span> ${totaldealvalue.toLocaleString()}
+            </Typography>
+            <Typography variant="body2">
+              <span style={{ fontWeight: "bold" }}>Avg T+1D:</span> {avgDealReturn.toFixed(2)}%
+            </Typography>
+            <Typography variant="body2">
+              <span style={{ fontWeight: "bold" }}>Avg T+1D returns index:</span> {avgT1dReturnsIndex.toFixed(2)}%
+            </Typography>
+          </Box>
 
-<Typography variant="body2">
-  <span style={{ fontWeight: "bold" }}>Avg T+1D:</span> ${avgDealReturn.toLocaleString()}
-</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              height: "40px",
+              padding: "5px 10px",
+              backgroundColor: "#e6f7ff",
+              borderRadius: "4px",
+              marginBottom: 3,
+            }}
+          >
+            <Typography variant="body2">
+              <span style={{ fontWeight: "bold" }}>Avg T + 1M returns:</span> {Avg_t1m_Return.toFixed(2)}%
+            </Typography>
 
-<Typography variant="body2">
-  <span style={{ fontWeight: "bold" }}>Avg T+1D returns index:</span> ${avgT1dReturnsIndex.toLocaleString()}
-</Typography>
-<Typography variant="body2">
-  <span style={{ fontWeight: "bold" }}>Avg T + 1M returns:</span> ${Avg_t1m_Return.toLocaleString()}
-</Typography>
-<Typography variant="body2">
-  <span style={{ fontWeight: "bold" }}>Avg T + 1M Index Returns
-  :</span> ${avgT1mReturnsIndex.toLocaleString()}
-</Typography>
+            <Typography variant="body2">
+              <span style={{ fontWeight: "bold" }}>Avg T + 1M Index Returns:</span> {avgT1mReturnsIndex.toFixed(2)}%
+            </Typography>
 
-<Typography variant="body2">
-  <span style={{ fontWeight: "bold" }}>Avg Opportunity value:</span> ${avgT1dReturnsIndexX.toLocaleString()}
-</Typography>
-
-
+            <Typography variant="body2">
+              <span style={{ fontWeight: "bold" }}>Avg Opportunity value:</span> ${avgT1dReturnsIndexX.toLocaleString()}
+            </Typography>
+          </Box>
         </Box>
+      </Box>
     </div>
   );
 };
