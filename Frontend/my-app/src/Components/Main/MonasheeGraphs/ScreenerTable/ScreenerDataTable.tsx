@@ -316,7 +316,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: 2,
                 padding: "10px",
                 backgroundColor: "#f0f8ff",
                 borderRadius: "8px",
