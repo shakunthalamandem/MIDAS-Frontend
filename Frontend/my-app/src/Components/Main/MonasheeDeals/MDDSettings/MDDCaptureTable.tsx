@@ -206,7 +206,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       "Alloc as % of Deal Size(Weighted)",
                                       "Alloc as % of IOI(Weighted)",
                                       "Deal Volume",
-                                      "Model Actual Return",
+                                      "Model Return With Actual Alloc",
                                       selectedCategory === "IPO"
                                         ? "Model Return 0.5% Allocation"
                                         : "Model Return 1% Allocation", // Dynamic header
