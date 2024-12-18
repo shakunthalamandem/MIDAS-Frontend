@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MDDFilters from "./MDDFilters";
+import MDDScreenergrid from "./MDDScreenergrid";
 
 interface MddMainProps {
   apiName: string;
@@ -27,6 +28,7 @@ const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
         const data = await response.json();
         // setFiltersData(data.screener || []);
         setFiltersData(data || []);
+        // console.log("rnajithmddfilters",data)
       } catch (error) {
         console.error("Error loading filters:", error);
       }
@@ -37,6 +39,8 @@ const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
 
   return<>
   <MDDFilters filtersData={filtersData} apiName={apiName} />;
+  {/* <MDDScreenergrid sectorwiseData={filtersData || {}} /> */}
+
   
   </> 
 };

@@ -19,6 +19,7 @@ import { LoadingButton } from "@mui/lab"; // Import LoadingButton
 import DealAllocationGraph from "./DealAllocationGraph";
 import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
+import MDDScreenergrid from "./MDDScreenergrid";
 
 interface FilterOption {
   options: (string | number)[]; // Options can be either string or number
@@ -44,6 +45,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     [key: string]: (string | number)[];
   } | null>(null);
   const [expanded, setExpanded] = useState<string | false>(false); // Track expanded state
+  const [payload, setPayload] = useState<{ [key: string]: (string | number)[] }>({});
   const [apiData, setApiData] = useState({});
   const [searchValue, setSearchValue] = useState<string>(""); // State for the search input
   const [searchKey, setSearchKey] = useState<string | null>(null); // Track which filter's search bar is active
@@ -70,22 +72,23 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     setSearchValue(value.toLowerCase());
     setSearchKey(key); // Keep track of the filter being searched
   };
-
   const handleSubmit = async (filters = selectedValues) => {
     try {
       setLoading(true);
-
+  
       const payload: { [key: string]: (string | number)[] } = {};
       Object.keys(filters).forEach((key) => {
         payload[key] = filters[key] || [];
       });
-
+  
+      setPayload(payload); // Store the payload
+  
       const apiUrl = process.env.REACT_APP_API_URL;
-
+  
       if (!apiUrl) {
         throw new Error("API URL is not defined in environment variables");
       }
-
+  
       const response = await fetch(`${apiUrl}/api/${apiName}/`, {
         method: "POST",
         headers: {
@@ -93,7 +96,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         },
         body: JSON.stringify(payload),
       });
-
+  
       if (response.ok) {
         const result = await response.json();
         setApiData(result);
@@ -106,6 +109,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       setLoading(false);
     }
   };
+  
 
   const handleCancel = () => {
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
@@ -281,31 +285,35 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         </Card>
       </Box>
       <Box mt={4} flex={1}>
-        {loading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <CircularProgress color="primary" />
-            <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
-              Loading... Please Wait
-            </Typography>
-          </Box>
-        ) : (
-          <>
-            {apiName === "allocation_capture" ? (
-              <MDDCaptureTable responseData={apiData} apiName={apiName} />
-            ) : apiName === "fo_discount" ? (
-              <AvgFoDiscountChart data={apiData} />
-            ) : (
-              <DealAllocationGraph responseData={apiData} apiName={apiName} />
-            )}
-          </>
-        )}
-      </Box>
+  {loading ? (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <CircularProgress color="primary" />
+      <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
+        Loading... Please Wait
+      </Typography>
+    </Box>
+  ) : (
+    <>
+      {apiName === "allocation_capture" ? (
+        <MDDCaptureTable responseData={apiData} apiName={apiName} />
+      ) : apiName === "fo_discount" ? (
+        <AvgFoDiscountChart data={apiData} />
+      ) : (
+        <>
+        <DealAllocationGraph responseData={apiData} apiName={apiName} />
+        <MDDScreenergrid sectorwiseData={payload} /> {/* Pass the payload here */}
+</>
+      )}
+    </>
+  )}
+</Box>
+
     </Container>
   );
 };
