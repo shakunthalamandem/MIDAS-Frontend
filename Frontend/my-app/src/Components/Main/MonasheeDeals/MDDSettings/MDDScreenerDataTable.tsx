@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import MDDScreenerSummary from "./MDDScrennerSummary";
 
 // Define the type for each row of data with updated column names
 interface ScreenerDataRow {
@@ -34,13 +35,14 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [totalRows, setTotalRows] = useState(0); // Total rows from API
+  const [apiResponse, setApiResponse] = useState<any>(null); // Store the full API response
 
   // Pagination state
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: 100,
   });
-  const [totalRows, setTotalRows] = useState(0); // Total rows from API
 
   useEffect(() => {
     if (sectorwiseData) {
@@ -74,8 +76,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       page: paginationModel.page + 1, // API pages are often 1-indexed
       pageSize: paginationModel.pageSize,
     };
-    console.log("Payload", payload);
-    console.log("Data", data);
+
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
@@ -101,6 +102,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
           }))
         );
         setTotalRows(result.pagination?.total_items || 0); // Set total rows
+        setApiResponse(result); // Save the full API response here
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -146,6 +148,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   ];
 
   return (
+    <>
     <div style={{ height: 600, width: "100%" }}>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {loading && <p>Loading...</p>}
@@ -187,7 +190,13 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
           },
         }}
       />
+      
+      {/* Pass the API response to the MDDScreenerSummary component */}
     </div>
+    <Box mt={2} mb={4}>
+    <MDDScreenerSummary apiResponse={apiResponse} />
+    </Box>
+    </>
   );
 };
 
