@@ -3,7 +3,6 @@ import { Box, Card, CardContent, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 
 interface ScreenerDataRow {
-  id: number;
   pricing_date: string;
   issuer_name: string;
   ticker_symbol: string;
@@ -25,7 +24,6 @@ interface ScreenerDataTableProps {
 const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
   sectorwiseData,
 }) => {
-  const [result, setResult] = useState<ScreenerDataRow[]>([]);
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -174,30 +172,29 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
   const Avg_t1m_Return = calculateAverageDealValue(rows, "t1m_returns");
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 150 },
-    { field: "pricing_date", headerName: "Pricing Date", width: 150 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
-    { field: "ticker_symbol", headerName: "Ticker Symbol", width: 150 },
+    { field: "ticker_symbol", headerName: "Ticker", width: 100 },
     { field: "gics_sector", headerName: "Sector", width: 180 },
-    { field: "us_international", headerName: "Region", width: 110 },
-    { field: "deal_type", headerName: "Deal Type", width: 100 },
-    { field: "deal_value", headerName: "Deal Value", width: 180 },
-    { field: "t1_return", headerName: "T + 1D Return", width: 180 },
+    { field: "us_international", headerName: "Region", width: 100 },
+    { field: "deal_type", headerName: "Deal Type", width: 80 },
+    { field: "deal_value", headerName: "Deal Value", width: 120 },
+    { field: "t1_return", headerName: "T + 1D Return", width: 100 },
     {
       field: "t1d_returns_index_returns",
       headerName: "T + 1D Index Returns",
-      width: 200,
+      width: 100,
     },
-    { field: "t1m_returns", headerName: "T + 1M Returns", width: 180 },
+    { field: "t1m_returns", headerName: "T + 1M Returns", width: 100 },
     {
       field: "t1m_returns_index_returns",
       headerName: "T + 1M Index Returns",
-      width: 200,
+      width: 100,
     },
     {
       field: "opportunity_value_ex",
       headerName: "Opportunity Value Excess",
-      width: 220,
+      width: 140,
     },
   ];
 
@@ -211,7 +208,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
         <span style={{ color: "#004b33" }}>{totalRows}</span>
       </Typography>
 
-      <Box sx={{ height: 400, width: "100%", marginTop: 3 }}>
+      <Box sx={{ height: 600, width: "100%", marginTop: 3 }}>
         <DataGrid
           rows={rows}
           columns={columns}
