@@ -77,7 +77,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       pageSize: paginationModel.pageSize,
     };
 
-
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -149,53 +148,53 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
 
   return (
     <>
-    <div style={{ height: 600, width: "100%" }}>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {loading && <p>Loading...</p>}
-      <Typography
-        align="center"
-        style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
-      >
-        Total No of Deals:
-        <span style={{ color: "#004b33" }}>{totalRows}</span>
-      </Typography>
+      <div style={{ height: 600, width: "100%" }}>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {loading && <p>Loading...</p>}
+        <Typography
+          align="center"
+          style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
+        >
+          Total No of Deals:
+          <span style={{ color: "#004b33" }}>{totalRows}</span>
+        </Typography>
 
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        paginationMode="server"
-        rowCount={totalRows}
-        loading={loading}
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 25, 50, 100]}
-        rowHeight={35}
-        sx={{
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "transparent",
-            fontWeight: "bold",
-            color: "#002060",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: "bold",
-            fontSize: "12px", // Decrease header font size
-          },
-          "& .MuiDataGrid-cell": {
-            color: "#000000",
-            fontSize: "12px", // Decrease font size for cell values
-            padding: "4px", // Optional: Reduce padding for compact look
-          },
-          "& .MuiDataGrid-row:nth-of-type(odd)": {
-            backgroundColor: "#F5F5F5",
-          },
-        }}
-      />
-      
-      {/* Pass the API response to the MDDScreenerSummary component */}
-    </div>
-    <Box mt={2} mb={4} >
-    <MDDScreenerSummary apiResponse={apiResponse} />
-    </Box>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          paginationMode="server"
+          rowCount={totalRows}
+          loading={loading}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 25, 50, 100]}
+          rowHeight={35}
+          sx={{
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "transparent",
+              fontWeight: "bold",
+              color: "#002060",
+            },
+            "& .MuiDataGrid-columnHeaderTitle": {
+              fontWeight: "bold",
+              fontSize: "12px", // Decrease header font size
+            },
+            "& .MuiDataGrid-cell": {
+              color: "#000000",
+              fontSize: "12px", // Decrease font size for cell values
+              padding: "4px", // Optional: Reduce padding for compact look
+            },
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "#F5F5F5",
+            },
+          }}
+        />
+
+        {/* Pass the API response to the MDDScreenerSummary component */}
+      </div>
+      <Box mt={2} mb={4}>
+        <MDDScreenerSummary apiResponse={apiResponse} />
+      </Box>
     </>
   );
 };
