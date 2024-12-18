@@ -27,31 +27,35 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({ apiResponse }) 
     let count = 0;
 
     data.forEach((item) => {
-      // Summing up deal size
+      // Correct mapping for the fields in API response
       const dealSize = item.deal_size ? parseFloat(item.deal_size.replace(/[^0-9.-]+/g, "")) : 0;
       if (!isNaN(dealSize)) totalDealSize += dealSize;
 
-      // Averaging other values
-      if (item.Tplus1DIssuePrice) {
-        const issuePrice = parseFloat(item.Tplus1DIssuePrice.replace(/[^0-9.-]+/g, ""));
+      // T+1D Issue Price
+      if (item["T+1D_issueprice"]) {
+        const issuePrice = parseFloat(item["T+1D_issueprice"].replace(/[^0-9.-]+/g, ""));
         if (!isNaN(issuePrice)) totalT1DIssuePrice += issuePrice;
       }
 
+      // FO Discount
       if (item.fo_discount) {
         const foDiscount = parseFloat(item.fo_discount.replace(/[^0-9.-]+/g, ""));
         if (!isNaN(foDiscount)) totalFoDiscount += foDiscount;
       }
 
-      if (item.Tplus1Mreturns) {
-        const t1mReturns = parseFloat(item.Tplus1Mreturns.replace(/[^0-9.-]+/g, ""));
+      // T+1M Returns
+      if (item["T+1M_returns"]) {
+        const t1mReturns = parseFloat(item["T+1M_returns"].replace(/[^0-9.-]+/g, ""));
         if (!isNaN(t1mReturns)) totalT1MReturns += t1mReturns;
       }
 
-      if (item.Tplus1Dreturns) {
-        const t1dReturns = parseFloat(item.Tplus1Dreturns.replace(/[^0-9.-]+/g, ""));
+      // T+1D Returns
+      if (item["T+1D_returns"]) {
+        const t1dReturns = parseFloat(item["T+1D_returns"].replace(/[^0-9.-]+/g, ""));
         if (!isNaN(t1dReturns)) totalT1DReturns += t1dReturns;
       }
 
+      // Allocation Deal Size
       if (item.allocation_deal_size) {
         const allocationDealSize = parseFloat(item.allocation_deal_size.replace(/[^0-9.-]+/g, ""));
         if (!isNaN(allocationDealSize)) totalAllocationDealSize += allocationDealSize;
@@ -103,9 +107,7 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({ apiResponse }) 
           <Typography variant="body1" gutterBottom>
             <strong>Avg T+1D Returns:</strong> {summary.avgT1DReturns.toFixed(2)}%
           </Typography>
-          <Typography variant="body1" gutterBottom>
-            <strong>Avg Allocation Deal Size:</strong> {summary.avgAllocationDealSize.toFixed(2)}%
-          </Typography>
+    
         </Box>
       </CardContent>
     </Card>
