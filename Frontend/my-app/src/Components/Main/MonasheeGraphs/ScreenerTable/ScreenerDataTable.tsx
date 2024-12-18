@@ -221,6 +221,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
           pageSizeOptions={[10, 25, 50, 100]}
+          rowHeight={35}
+
           sx={{
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "transparent",
@@ -229,9 +231,12 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
             },
             "& .MuiDataGrid-columnHeaderTitle": {
               fontWeight: "bold",
+              fontSize: "12px", // Decrease header font size
             },
             "& .MuiDataGrid-cell": {
               color: "#000000",
+              fontSize: "12px", // Decrease font size for cell values
+              padding: "4px", // Optional: Reduce padding for compact look
             },
             "& .MuiDataGrid-row:nth-of-type(odd)": {
               backgroundColor: "#F5F5F5",
