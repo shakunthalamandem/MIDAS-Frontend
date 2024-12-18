@@ -167,7 +167,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     rows,
     "t1d_returns_index_returns"
   );
-  const avgT1dReturnsIndexX = calculateAverageDealValue(
+  const TotalOpportunityValue = calculateAverageDealValue(
     rows,
     "opportunity_value_ex"
   );
@@ -327,7 +327,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
               </Typography>
               <Typography variant="body2">
                 <strong>Average Opportunity Value:</strong> $
-                {avgT1dReturnsIndexX.toLocaleString()}
+                {TotalOpportunityValue.toLocaleString()}
               </Typography>
             </Box>
           </CardContent>
