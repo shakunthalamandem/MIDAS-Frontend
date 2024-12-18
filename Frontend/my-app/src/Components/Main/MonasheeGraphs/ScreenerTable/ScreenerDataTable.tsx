@@ -200,14 +200,23 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
 
   return (
     <div>
-      <Typography
+    
+      <Card
+          sx={{
+            width: "100%",
+            boxShadow: 3,
+            borderRadius: 2,
+            backgroundColor: "#ffffff",
+          }}
+        >
+          <CardContent>
+          <Typography
         align="center"
         style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
       >
         Total No of Deals:
         <span style={{ color: "#004b33" }}>{totalRows}</span>
       </Typography>
-
       <Box sx={{ height: 500, width: "100%", marginTop: 3 }}>
         <DataGrid
           rows={rows}
@@ -241,6 +250,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           }}
         />
       </Box>
+      </CardContent>
+      </Card>
 
       <Box
         sx={{
@@ -248,8 +259,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          padding: 2,
-          marginTop: 3,
+          // padding: 2,
+          marginTop: 4,
         }}
       >
         <Card
