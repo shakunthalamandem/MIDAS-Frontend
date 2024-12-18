@@ -211,7 +211,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           onPaginationModelChange={setPaginationModel}
           pageSizeOptions={[10, 25, 50, 100]}
           rowHeight={35}
-          hideFooter // Hides the entire footer, including pagination controls
+          // hideFooter // Hides the entire footer, including pagination controls
           sx={{
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "transparent",
