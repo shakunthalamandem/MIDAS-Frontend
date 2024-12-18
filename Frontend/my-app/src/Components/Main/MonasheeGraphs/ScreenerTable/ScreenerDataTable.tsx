@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Box, Card, CardContent, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
+import { debounce } from "lodash";
 
 interface ScreenerDataRow {
   pricing_date: string;
@@ -44,9 +45,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
   ) => {
     setLoading(true);
     setError(null);
-    let allResults: ScreenerDataRow[] = [];
-    let page = 1;
-    const pageSize = paginationModel.pageSize;
 
     const payload = {
       year_range: data.year_range,
@@ -56,7 +54,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       deal_value: data.deal_value,
       t1_return: data.t1_return,
       t1m_returns: data.t1m_returns,
-      pageSize,
+      pageSize: paginationModel.pageSize,
+      page: paginationModel.page + 1,
     };
 
     try {
@@ -65,43 +64,26 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
         throw new Error("API URL is not defined in environment variables");
       }
 
-      while (true) {
-        const response = await fetch(`${apiUrl}/api/super-screener/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...payload,
-            page, // Page number
-          }),
-        });
+      const response = await fetch(`${apiUrl}/api/super-screener/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-        if (response.ok) {
-          const result = await response.json();
-          const newData = result.data || [];
-
-          // Add the current page data to allResults
-          allResults = [...allResults, ...newData];
-
-          // Check if we've fetched all pages based on the total count
-          const totalItems = result.pagination?.total_items || 0;
-          const totalPages = Math.ceil(totalItems / pageSize);
-
-          if (page >= totalPages) {
-            break; // No more pages left
-          }
-
-          // Increment page and continue fetching
-          page++;
-        } else {
-          throw new Error("Failed to fetch data");
-        }
+      if (response.ok) {
+        const result = await response.json();
+        setRows(
+          (result.data || []).map((item: ScreenerDataRow, index: number) => ({
+            ...item,
+            id: index + 1,
+          }))
+        );
+        setTotalRows(result.pagination?.total_items || 0);
+      } else {
+        throw new Error("Failed to fetch data");
       }
-      console.log(allResults, "finding the rows");
-
-      setRows(allResults.map((item, index) => ({ ...item, id: index + 1 })));
-      setTotalRows(allResults.length);
     } catch (err: any) {
       setError(err.message || "An error occurred while fetching data");
     } finally {
@@ -109,86 +91,68 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     }
   };
 
-  const calculateTotalDealValue = (result: ScreenerDataRow[]) => {
-    let totaldealvalue = 0;
-
-    result.forEach((row) => {
-      const cleanedDealValue = row.deal_value
-        .toString()
-        .replace(/[^0-9.-]+/g, ""); // Removes any non-numeric characters (except decimal and minus)
-
-      const dealValue = parseFloat(cleanedDealValue);
-
-      if (!isNaN(dealValue)) {
-        totaldealvalue += dealValue;
-      } else {
-        console.error(`Invalid deal value: ${row.deal_value}`);
-      }
-    });
-
-    return totaldealvalue;
-  };
-  const SumOpportunityValue = (result: ScreenerDataRow[]) => {
-    let totaldealvalue = 0;
-
-    result.forEach((row) => {
-      const cleanedDealValue = row.opportunity_value_ex
-        .toString()
-        .replace(/[^0-9.-]+/g, ""); // Removes any non-numeric characters (except decimal and minus)
-
-      const dealValue = parseFloat(cleanedDealValue);
-
-      if (!isNaN(dealValue)) {
-        totaldealvalue += dealValue;
-      } else {
-        console.error(`Invalid deal value: ${row.opportunity_value_ex}`);
-      }
-    });
-
-    return totaldealvalue;
-  };
-
-  const calculateAverageDealValue = (
-    result: ScreenerDataRow[],
-    columnName: keyof ScreenerDataRow
-  ) => {
-    let totalDealValue = 0;
-    let validCount = 0;
-
-    result.forEach((row) => {
-      const cleanedDealValue = row[columnName]
-        .toString()
-        .replace(/[^0-9.-]+/g, "");
-      const dealValue = parseFloat(cleanedDealValue);
-
-      if (!isNaN(dealValue)) {
-        totalDealValue += dealValue;
-        validCount++;
-      } else {
-        console.error(
-          `Invalid deal value in column ${columnName}: ${row[columnName]}`
-        );
-      }
-    });
-
-    return validCount > 0 ? totalDealValue / validCount : 0;
-  };
-
-  const totaldealvalue = calculateTotalDealValue(rows);
-  const avgDealReturn = calculateAverageDealValue(rows, "t1_return");
-  const avgT1mReturnsIndex = calculateAverageDealValue(
-    rows,
-    "t1m_returns_index_returns"
+  // Memoized calculations
+  const totaldealvalue = useMemo(
+    () =>
+      rows.reduce(
+        (sum, row) => sum + (parseFloat(row.deal_value.toString()) || 0),
+        0
+      ),
+    [rows]
   );
-  const avgT1dReturnsIndex = calculateAverageDealValue(
-    rows,
-    "t1d_returns_index_returns"
+
+  const avgDealReturn = useMemo(
+    () =>
+      rows.length
+        ? rows.reduce((sum, row) => sum + (row.t1_return || 0), 0) / rows.length
+        : 0,
+    [rows]
   );
-  const TotalOpportunityValue = SumOpportunityValue(
-    rows
-   
+
+  const avgT1mReturnsIndex = useMemo(
+    () =>
+      rows.length
+        ? rows.reduce(
+            (sum, row) => sum + (row.t1m_returns_index_returns || 0),
+            0
+          ) / rows.length
+        : 0,
+    [rows]
   );
-  const Avg_t1m_Return = calculateAverageDealValue(rows, "t1m_returns");
+
+  const avgT1dReturnsIndex = useMemo(
+    () =>
+      rows.length
+        ? rows.reduce(
+            (sum, row) => sum + (row.t1d_returns_index_returns || 0),
+            0
+          ) / rows.length
+        : 0,
+    [rows]
+  );
+
+  const TotalOpportunityValue = useMemo(
+    () =>
+      rows.reduce(
+        (sum, row) =>
+          sum + (parseFloat(row.opportunity_value_ex.toString()) || 0),
+        0
+      ),
+    [rows]
+  );
+
+  const Avg_t1m_Return = useMemo(
+    () =>
+      rows.length
+        ? rows.reduce((sum, row) => sum + (row.t1m_returns || 0), 0) /
+          rows.length
+        : 0,
+    [rows]
+  );
+
+  const debouncedPaginationChange = debounce((model: GridPaginationModel) => {
+    setPaginationModel(model);
+  }, 300);
 
   const columns: GridColDef[] = [
     { field: "pricing_date", headerName: "Pricing Date", width: 100 },
