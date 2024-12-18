@@ -15,7 +15,9 @@ interface MDDScreenerSummaryProps {
   apiResponse: any;
 }
 
-const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({ apiResponse }) => {
+const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
+  apiResponse,
+}) => {
   // Helper function to calculate the summary
   const calculateSummary = (data: any[]): Summary => {
     let totalDealSize = 0;
@@ -28,37 +30,50 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({ apiResponse }) 
 
     data.forEach((item) => {
       // Correct mapping for the fields in API response
-      const dealSize = item.deal_size ? parseFloat(item.deal_size.replace(/[^0-9.-]+/g, "")) : 0;
+      const dealSize = item.deal_size
+        ? parseFloat(item.deal_size.replace(/[^0-9.-]+/g, ""))
+        : 0;
       if (!isNaN(dealSize)) totalDealSize += dealSize;
 
       // T+1D Issue Price
       if (item["T+1D_issueprice"]) {
-        const issuePrice = parseFloat(item["T+1D_issueprice"].replace(/[^0-9.-]+/g, ""));
+        const issuePrice = parseFloat(
+          item["T+1D_issueprice"].replace(/[^0-9.-]+/g, "")
+        );
         if (!isNaN(issuePrice)) totalT1DIssuePrice += issuePrice;
       }
 
       // FO Discount
       if (item.fo_discount) {
-        const foDiscount = parseFloat(item.fo_discount.replace(/[^0-9.-]+/g, ""));
+        const foDiscount = parseFloat(
+          item.fo_discount.replace(/[^0-9.-]+/g, "")
+        );
         if (!isNaN(foDiscount)) totalFoDiscount += foDiscount;
       }
 
       // T+1M Returns
       if (item["T+1M_returns"]) {
-        const t1mReturns = parseFloat(item["T+1M_returns"].replace(/[^0-9.-]+/g, ""));
+        const t1mReturns = parseFloat(
+          item["T+1M_returns"].replace(/[^0-9.-]+/g, "")
+        );
         if (!isNaN(t1mReturns)) totalT1MReturns += t1mReturns;
       }
 
       // T+1D Returns
       if (item["T+1D_returns"]) {
-        const t1dReturns = parseFloat(item["T+1D_returns"].replace(/[^0-9.-]+/g, ""));
+        const t1dReturns = parseFloat(
+          item["T+1D_returns"].replace(/[^0-9.-]+/g, "")
+        );
         if (!isNaN(t1dReturns)) totalT1DReturns += t1dReturns;
       }
 
       // Allocation Deal Size
       if (item.allocation_deal_size) {
-        const allocationDealSize = parseFloat(item.allocation_deal_size.replace(/[^0-9.-]+/g, ""));
-        if (!isNaN(allocationDealSize)) totalAllocationDealSize += allocationDealSize;
+        const allocationDealSize = parseFloat(
+          item.allocation_deal_size.replace(/[^0-9.-]+/g, "")
+        );
+        if (!isNaN(allocationDealSize))
+          totalAllocationDealSize += allocationDealSize;
       }
 
       count += 1;
@@ -76,41 +91,106 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({ apiResponse }) 
   };
 
   // Ensure data exists and calculate the summary
-  const summary: Summary = apiResponse?.data ? calculateSummary(apiResponse.data) : {
-    totalDealSize: 0,
-    avgT1DIssuePrice: 0,
-    avgFoDiscount: 0,
-    avgT1MReturns: 0,
-    avgT1DReturns: 0,
-    avgAllocationDealSize: 0,
-  };
+  const summary: Summary = apiResponse?.data
+    ? calculateSummary(apiResponse.data)
+    : {
+        totalDealSize: 0,
+        avgT1DIssuePrice: 0,
+        avgFoDiscount: 0,
+        avgT1MReturns: 0,
+        avgT1DReturns: 0,
+        avgAllocationDealSize: 0,
+      };
 
   return (
-    <Card sx={{ maxWidth: 400, margin: "20px auto" }}>
-      <CardContent>
-        <Typography variant="h5" gutterBottom align="center">
-          Summary
-        </Typography>
-        <Box>
-          <Typography variant="body1" gutterBottom>
-            <strong>Total Deal Size:</strong> ${summary.totalDealSize.toLocaleString()}
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            <strong>Avg T+1D Issue Price:</strong> {summary.avgT1DIssuePrice.toFixed(2)}%
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            <strong>Avg FO Discount:</strong> {summary.avgFoDiscount.toFixed(2)}%
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            <strong>Avg T+1M Returns:</strong> {summary.avgT1MReturns.toFixed(2)}%
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            <strong>Avg T+1D Returns:</strong> {summary.avgT1DReturns.toFixed(2)}%
-          </Typography>
-    
-        </Box>
-      </CardContent>
-    </Card>
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 8,
+        
+      }}
+    >
+      <Card
+        sx={{
+          width: "100%",
+          boxShadow: 3,
+          borderRadius: 2,
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <CardContent>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 2,
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: "bold",
+                color: "#002060",
+              }}
+            >
+              Summary
+            </Typography>
+          </Box>
+          <Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "10px",
+                backgroundColor: "#f0f8ff",
+                borderRadius: "8px",
+                boxShadow: 1,
+              }}
+            >
+              <Typography variant="body1" gutterBottom>
+                <strong>Total Deal Size:</strong> $
+                {summary.totalDealSize.toLocaleString()}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>Avg T+1D Issue Price:</strong>{" "}
+                {summary.avgT1DIssuePrice.toFixed(2)}%
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>Avg FO Discount:</strong>{" "}
+                {summary.avgFoDiscount.toFixed(2)}%
+              </Typography>
+            </Box>
+
+            {/* Second Row */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "10px",
+                backgroundColor: "#f0f8ff",
+                borderRadius: "8px",
+                boxShadow: 1,
+              }}
+            >
+              <Typography variant="body1" gutterBottom>
+                <strong>Avg T+1M Returns:</strong>{" "}
+                {summary.avgT1MReturns.toFixed(2)}%
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>Avg T+1D Returns:</strong>{" "}
+                {summary.avgT1DReturns.toFixed(2)}%
+              </Typography>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

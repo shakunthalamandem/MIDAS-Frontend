@@ -193,7 +193,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       
       {/* Pass the API response to the MDDScreenerSummary component */}
     </div>
-    <Box mt={2} mb={4}>
+    <Box mt={2} mb={4} >
     <MDDScreenerSummary apiResponse={apiResponse} />
     </Box>
     </>
