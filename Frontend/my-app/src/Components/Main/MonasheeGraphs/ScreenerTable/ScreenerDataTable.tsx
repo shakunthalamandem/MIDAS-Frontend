@@ -128,6 +128,25 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
 
     return totaldealvalue;
   };
+  const SumOpportunityValue = (result: ScreenerDataRow[]) => {
+    let totaldealvalue = 0;
+
+    result.forEach((row) => {
+      const cleanedDealValue = row.opportunity_value_ex
+        .toString()
+        .replace(/[^0-9.-]+/g, ""); // Removes any non-numeric characters (except decimal and minus)
+
+      const dealValue = parseFloat(cleanedDealValue);
+
+      if (!isNaN(dealValue)) {
+        totaldealvalue += dealValue;
+      } else {
+        console.error(`Invalid deal value: ${row.opportunity_value_ex}`);
+      }
+    });
+
+    return totaldealvalue;
+  };
 
   const calculateAverageDealValue = (
     result: ScreenerDataRow[],
@@ -165,9 +184,9 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     rows,
     "t1d_returns_index_returns"
   );
-  const TotalOpportunityValue = calculateAverageDealValue(
-    rows,
-    "opportunity_value_ex"
+  const TotalOpportunityValue = SumOpportunityValue(
+    rows
+   
   );
   const Avg_t1m_Return = calculateAverageDealValue(rows, "t1m_returns");
 
