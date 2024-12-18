@@ -208,7 +208,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
         <span style={{ color: "#004b33" }}>{totalRows}</span>
       </Typography>
 
-      <Box sx={{ height: 600, width: "100%", marginTop: 3 }}>
+      <Box sx={{ height: 500, width: "100%", marginTop: 3 }}>
         <DataGrid
           rows={rows}
           columns={columns}
