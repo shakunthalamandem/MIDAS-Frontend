@@ -191,6 +191,8 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       width: 100,
     },
     { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 100 },
+    { field: "percentage_primary", headerName: "Primary %", width: 100 },
+
   ];
 
   return (
