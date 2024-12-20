@@ -43,6 +43,7 @@ interface CategoryData {
   "Deal volume": number;
   "Model Actual Return": number;
   "Model Return 1% Allocation": number;
+  "Net of Hedge": number;
 }
 
 interface ResponseData {
@@ -165,6 +166,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                           "Deal volume": 0,
                           "Model Actual Return": 0,
                           "Model Return 1% Allocation": 0,
+                          "Net of Hedge": 0,
                         }
                     );
 
@@ -210,7 +212,9 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       selectedCategory === "IPO"
                                         ? "Model Return 0.5% Allocation"
                                         : "Model Return 1% Allocation", // Dynamic header
-                                    ].map((header, idx) => (
+                                        year > "2018" ? "Net of Hedge" : null // Conditionally include "Net of Hedge"
+                                      // ].map((header, idx) => (
+                                      ].filter(Boolean).map((header, idx) => (
                                       <TableCell
                                         key={idx}
                                         sx={{
@@ -282,6 +286,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {formatValue(data["Model Return 1% Allocation"] || 0)}
                                         </TableCell>
+                                        {year > "2018" && (
+                                          <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                            {formatValue(data["Net of Hedge"] || 0)}
+                                          </TableCell>
+                                        )}
                                       </TableRow>
                                     );
                                   })}
