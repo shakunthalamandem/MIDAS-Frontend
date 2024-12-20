@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   TextField,
   FormControl,
@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { Field, useFormikContext } from "formik";
-import axios from "axios";
+import LeadBankFilter from "./LeadBankFilter"; // Import the LeadBankFilter component
 
 interface DealSpecificFilterConfig {
   type: string;
@@ -26,7 +26,6 @@ interface DealSpecificFilterConfig {
     label: string;
     placeholder: string;
   }[];
-  api?: string;
 }
 
 interface DealSpecificTabProps {
@@ -37,33 +36,6 @@ interface DealSpecificTabProps {
 
 const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
   const { values, setFieldValue, errors, touched } = useFormikContext<any>();
-  const [leadBankOptions, setLeadBankOptions] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const fetchLeadBankOptions = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get<{ lead_bank?: { options: string[] } }>(
-          "http://192.168.1.59:9000/api/mdd_screener_filters/"
-        );
-
-        const leadBankData = response.data?.lead_bank;
-
-        if (leadBankData?.options) {
-          setLeadBankOptions(leadBankData.options);
-        } else {
-          console.warn("Lead Bank options not found in the API response.");
-        }
-      } catch (error) {
-        console.error("Error fetching lead_bank options:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLeadBankOptions();
-  }, []);
 
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
@@ -115,7 +87,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                         if (!selected || selected.length === 0) {
                           return (
                             <Typography sx={{ color: "#aaa", fontSize: "0.875rem" }}>
-                              {`Select`}
+                              Select
                             </Typography>
                           );
                         }
@@ -166,8 +138,6 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                     <TextField
                       {...field}
                       type="float"
-                      // label={field.label}
-                      // placeholder={field.placeholder || `Enter `}
                       label={fieldConfig.label}
                       placeholder={fieldConfig.placeholder || "Enter a value"}
                       fullWidth
@@ -226,69 +196,8 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
           return renderFilter(key, filter);
         })}
 
-        {loading ? (
-          <Grid item xs={12}>
-            <Typography>Loading Lead Bank options...</Typography>
-          </Grid>
-        ) : (
-          leadBankOptions.length > 0 && (
-            <Grid item xs={12} sm={6} md={3}>
-              <Box>
-                <Typography
-                  sx={{
-                    fontSize: "0.75rem",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  Lead Bank
-                </Typography>
-                <FormControl fullWidth margin="normal">
-                  <Select
-                    multiple
-                    value={values["lead_bank"] || []}
-                    onChange={(e) => setFieldValue("lead_bank", e.target.value)}
-                    displayEmpty
-                    sx={{
-                      "& .MuiSelect-select": {
-                        padding: "8px",
-                        fontSize: "0.75rem",
-                      },
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderRadius: "4px",
-                      },
-                      maxWidth: "150px",
-                    }}
-                    renderValue={(selected) => {
-                      if (!selected || selected.length === 0) {
-                        return (
-                          <Typography
-                            sx={{ color: "#aaa", fontSize: "0.875rem" }}
-                          >
-                            Select
-                          </Typography>
-                        );
-                      }
-                      const formattedTags = formatSelectedTags(
-                        selected as (string | number)[]
-                      );
-                      return formattedTags.join(", ");
-                    }}
-                  >
-                    {leadBankOptions.map((option, index) => (
-                      <MenuItem key={index} value={option}>
-                        <Checkbox
-                          checked={values["lead_bank"]?.includes(option) || false}
-                        />
-                        <ListItemText primary={option} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-            </Grid>
-          )
-        )}
+        {/* LeadBankFilter will be used here */}
+        <LeadBankFilter values={values} setFieldValue={setFieldValue} />
       </Grid>
     </Box>
   );
