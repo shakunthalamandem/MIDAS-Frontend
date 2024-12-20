@@ -15,6 +15,14 @@ interface MDDScreenerSummaryProps {
   apiResponse: any;
 }
 
+const formatValue = (value: number): string => {
+  const absValue = Math.abs(value);
+  if (absValue >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+  if (absValue >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (absValue >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
+  return `$${value.toFixed(2)}`;
+};
+
 const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
   apiResponse,
 }) => {
@@ -153,8 +161,9 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
               }}
             >
               <Typography variant="body1" gutterBottom>
-                <strong>Total Deal Size:</strong> $
-                {summary.totalDealSize.toLocaleString()}
+                <strong>Total Deal Size:</strong> 
+                {/* {summary.totalDealSize.toLocaleString()} */}
+                {formatValue(summary.totalDealSize)}
               </Typography>
               <Typography variant="body1" gutterBottom>
                 <strong>Avg T+1D Issue Price:</strong>{" "}
