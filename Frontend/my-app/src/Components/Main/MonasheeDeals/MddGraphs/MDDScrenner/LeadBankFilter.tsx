@@ -4,14 +4,16 @@ import {
   Grid,
   Typography,
   TextField,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
   Checkbox,
-  FormControlLabel,
+  ListItemText,
+  InputAdornment,
 } from "@mui/material";
 import axios from "axios";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 interface LeadBankFilterProps {
   values: any;
@@ -58,6 +60,12 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
     setFilteredOptions(filtered);
   };
 
+  // Handle selection of multiple items
+  const handleSelectChange = (event: any) => {
+    const { value } = event.target;
+    setFieldValue("lead_bank", value);
+  };
+
   if (loading) {
     return (
       <Grid item xs={12}>
@@ -81,55 +89,52 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
           Lead Bank
         </Typography>
 
-            <TextField
-              size="small"
-              fullWidth
-              placeholder="Search"
-              value={searchKey}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              sx={{
-                marginBottom: 2,
-                backgroundColor: "#fff",
-                borderRadius: "4px",
-              }}
-            />
+        {/* Search input */}
+        <TextField
+          size="small"
+          fullWidth
+          placeholder="Search"
+          value={searchKey}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          sx={{
+            marginBottom: 2,
+            backgroundColor: "#fff",
+            borderRadius: "4px",
+          }}
+        />
 
+        {/* Select with Checkbox */}
+        <FormControl fullWidth sx={{ marginBottom: 2 }}>
+          <InputLabel id="lead-bank-label">Select Lead Banks</InputLabel>
+          <Select
+            labelId="lead-bank-label"
+            id="lead-bank-select"
+            multiple
+            value={values["lead_bank"] || []}
+            onChange={handleSelectChange}
+            input={<OutlinedInput label="Select Lead Banks" />}
+            renderValue={(selected) => selected.join(", ")}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 400,
+                  maxWidth:250, // Limit height of the dropdown
+                },
+              },
+            }}
+          >
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
-                <FormControlLabel
-                  key={option}
-                  control={
-                    <Checkbox
-                      checked={values["lead_bank"]?.includes(option) || false}
-                      onChange={() => {
-                        const newValues = values["lead_bank"]?.includes(option)
-                          ? values["lead_bank"].filter((item: string) => item !== option) // Deselect
-                          : [...(values["lead_bank"] || []), option]; // Select
-                        setFieldValue("lead_bank", newValues || []);
-                      }}
-                      sx={{
-                        "&.Mui-checked": {
-                          color: "#FF8C00", // Checkbox checked color
-                        },
-                        paddingLeft: 0, // Align checkbox better
-                      }}
-                    />
-                  }
-                  label={option}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    fontSize: "0.875rem",
-                    marginBottom: 1,
-                  }}
-                />
+                <MenuItem key={option} value={option}>
+                  <Checkbox checked={values["lead_bank"]?.includes(option) || false} />
+                  <ListItemText primary={option} />
+                </MenuItem>
               ))
             ) : (
-              <Typography sx={{ color: "#999", fontSize: "0.875rem" }}>
-                No options found
-              </Typography>
+              <MenuItem disabled>No options found</MenuItem>
             )}
-
+          </Select>
+        </FormControl>
       </Box>
     </Grid>
   );

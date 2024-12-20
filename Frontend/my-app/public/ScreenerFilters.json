@@ -94,7 +94,7 @@
     "MonahseeSpecific": {
       "AllocationPercentOfDealSize": {
         "type": "input",
-        "label": "Allocation % DealSize (Weighted)",
+        "label": "Allocation % DealSize (Simple)",
         "description": "Enter the allocation percentage of the deal size as a range.",
         "fields": [
           { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
@@ -103,7 +103,7 @@
       },
       "AllocationPercentOfIOI": {
         "type": "input",
-        "label": "Allocation % IOI (Weighted)",
+        "label": "Allocation % IOI (Simple)",
         "description": "Enter the allocation percentage of IOI as a range.",
         "fields": [
           { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
