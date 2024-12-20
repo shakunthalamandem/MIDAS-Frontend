@@ -90,7 +90,7 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
         </Typography>
 
         {/* Search input */}
-        <TextField
+        {/* <TextField
           size="small"
           fullWidth
           placeholder="Search"
@@ -101,7 +101,7 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
             backgroundColor: "#fff",
             borderRadius: "4px",
           }}
-        />
+        /> */}
 
         {/* Select with Checkbox */}
         <FormControl fullWidth sx={{ marginBottom: 2 }}>
@@ -127,7 +127,7 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
               filteredOptions.map((option) => (
                 <MenuItem key={option} value={option}>
                   <Checkbox checked={values["lead_bank"]?.includes(option) || false} />
-                  <ListItemText primary={option} />
+                  <ListItemText  primary={option} />
                 </MenuItem>
               ))
             ) : (
