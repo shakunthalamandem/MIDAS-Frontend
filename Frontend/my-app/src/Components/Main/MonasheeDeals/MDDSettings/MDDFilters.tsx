@@ -199,6 +199,23 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                       >
                         <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
                       </AccordionSummary>
+                      {label === "Lead Bank" && (
+                        <div  style={{
+                          backgroundColor: "#f1f1f1", // Light background for the details
+                          padding: "10px 20px", // Padding inside accordion details
+                          borderRadius: "5px", // Rounded corners for accordion details
+                          textAlign: "left",
+                          maxHeight: "200px",
+                        }}>
+                          <TextField
+                            size="small"
+                            placeholder="Search"
+                            value={searchKey === key ? searchValue : ""}
+                            onChange={(e) => handleSearchChange(e.target.value, key)}
+                            sx={{ mb: 2 }}
+                          />
+                          </div>
+                        )}
                       <AccordionDetails
                         sx={{
                           backgroundColor: "#f1f1f1", // Light background for the details
@@ -209,15 +226,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                           overflowY: "scroll",
                         }}
                       >
-                        {label === "Lead Bank" && (
-                          <TextField
-                            size="small"
-                            placeholder="Search"
-                            value={searchKey === key ? searchValue : ""}
-                            onChange={(e) => handleSearchChange(e.target.value, key)}
-                            sx={{ mb: 2 }}
-                          />
-                        )}
+                    
                         {filteredOptions.map((option) => (
                           <FormControlLabel
                             key={option}
