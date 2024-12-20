@@ -137,7 +137,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                   {({ field, form }: any) => (
                     <TextField
                       {...field}
-                      type="float"
+                      type="string"
                       label={fieldConfig.label}
                       placeholder={fieldConfig.placeholder || "Enter a value"}
                       fullWidth
@@ -145,9 +145,16 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                       variant="outlined"
                       size="small"
                       value={field.value || ""}
-                      onChange={(e) =>
-                        form.setFieldValue(`${key}[${index}]`, e.target.value)
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value ? parseFloat(e.target.value) : null;
+                        const currentValues = form.values[key] || [null, null];
+                        const updatedValues = [...currentValues];
+                        updatedValues[index] = value;
+                        form.setFieldValue(
+                          key,
+                          updatedValues.map((v, i) => (v === "" ? null : v))
+                        );
+                      }}
                       sx={{
                         maxWidth: "100px",
                         "& input": {
@@ -170,11 +177,12 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
             </Box>
           </Grid>
         );
-
+  
       default:
         return null;
     }
   };
+  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
