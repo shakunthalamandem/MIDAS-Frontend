@@ -133,6 +133,8 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       width: 180,
     },
     { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 180 },
+    { field: "percentage_primary", headerName: "Primary %", width: 100 },
+
   ];
 
   return (
