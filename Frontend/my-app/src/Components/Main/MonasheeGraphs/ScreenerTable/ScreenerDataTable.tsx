@@ -237,8 +237,10 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       </Box>
       </CardContent>
       </Card>
+ {/* hiding the summary  */}
 
-      <Box
+
+ {/* <Box
         sx={{
           width: "100%",
           display: "flex",
@@ -276,7 +278,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
               </Typography>
             </Box>
 
-            {/* First Row */}
             <Box
               sx={{
                 display: "flex",
@@ -302,7 +303,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
               </Typography>
             </Box>
 
-            {/* Second Row */}
             <Box
               sx={{
                 display: "flex",
@@ -329,8 +329,11 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
             </Box>
           </CardContent>
         </Card>
-      </Box>
-    </div>
+      </Box> */}
+
+
+
+         </div>
   );
 };
 
