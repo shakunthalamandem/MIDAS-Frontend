@@ -32,7 +32,7 @@ const MDDScreener: React.FC = () => {
 
   useEffect(() => {
     // Fetch the filters.json or provide your filters data
-    fetch("/ScreenerFilters.json")
+    fetch("/MDDFilters.json")
       .then((response) => {
         if (!response.ok) {
           console.error(`HTTP error! status: ${response.status}`);
