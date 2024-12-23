@@ -14,7 +14,7 @@ const TradingViewWidget: React.FC = () => {
     script.innerHTML = `
       {
         "autosize": true,
-        "symbol": "NASDAQ:AAPL",
+        "symbol": "CIVI",
         "interval": "D",
         "timezone": "Etc/UTC",
         "theme": "light",
