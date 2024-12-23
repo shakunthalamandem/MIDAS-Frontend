@@ -1,8 +1,12 @@
 import React from 'react'
+import TradingViewWidget from './Tradingview/TradingViewWidget'
 
 const InvestmentMain = () => {
-  return (
+  return (<>
     <div>InvestmentMain</div>
+    <TradingViewWidget />
+    </>
+
   )
 }
 

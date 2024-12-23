@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import DealsDataFilter from '../../MonasheeDeals/DeoLogicData/DealsDataFilter';
+import InvestmentMain from '../../InvestmentStrategy/InvestmentMain';
 
 const Strategies: React.FC = () => {
   return (
+    <>
     <Box
       sx={{
         display: 'flex',
@@ -40,6 +42,8 @@ const Strategies: React.FC = () => {
       {/* <DealsDataFilter /> */}
 
     </Box>
+    <InvestmentMain />
+  </>
   );
 };
 
