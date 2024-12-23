@@ -172,7 +172,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     { field: "broad_region", headerName: "Region", width: 100 },
     { field: "deal_type", headerName: "Deal Type", width: 100 },
     { field: "deal_size", headerName: "Deal Size", width: 120 },
-    { field: "fo_discount", headerName: "Follow On Discount", width: 100 },
     { field: "T+1M_returns", headerName: "T + 1M Excess Returns", width: 100 },
     {
       field: "T+1D_returns",
@@ -191,6 +190,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       width: 100,
     },
     { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 100 },
+    { field: "fo_discount", headerName: "Follow On Discount", width: 100 },
     { field: "percentage_primary", headerName: "Primary %", width: 100 },
 
   ];
