@@ -166,7 +166,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
                   {({ field, form }: any) => (
                     <TextField
                       {...field}
-                      type="float"
+                      type="string"
                       label={fieldConfig.label}
                       placeholder={fieldConfig.placeholder || "Enter a value"} // Add placeholder here
                       fullWidth
@@ -174,9 +174,16 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
                       variant="outlined"
                       size="small"
                       value={field.value || ""}
-                      onChange={(e) =>
-                        form.setFieldValue(`${key}[${index}]`, e.target.value)
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value ? parseFloat(e.target.value) : null;
+                        const currentValues = form.values[key] || [null, null];
+                        const updatedValues = [...currentValues];
+                        updatedValues[index] = value;
+                        form.setFieldValue(
+                          key,
+                          updatedValues.map((v, i) => (v === "" ? null : v))
+                        );
+                      }}
                       sx={{
                         maxWidth: "100px", // Set width of the input box
                         "& input": {
