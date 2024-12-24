@@ -89,13 +89,13 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
             </Tabs>
 
             <Box sx={{ marginTop: 2 }}>
-              {/* {value === 0 && (
+              {value === 0 && (
                 <MonasheeS3
                   data={filtersData['Monashee Specific']}
                   selectedValues={selectedValues.MonasheeSpecific}
                   onValueChange={(name, value) => handleFilterChange('MonasheeSpecific', name, value)}
                 />
-              )} */}
+              )}
               {value === 1 && (
                 <Fundamental
                   data={filtersData.Fundamentals}
