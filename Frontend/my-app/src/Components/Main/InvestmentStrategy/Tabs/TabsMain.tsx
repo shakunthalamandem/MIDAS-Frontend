@@ -74,11 +74,11 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
                   transition: "color 0.3s ease",
                 },
                 "& .Mui-selected": {
-                  color: "#fc0000",
+                  color: "#FC0000",
                   transition: "color 0.3s ease",
                 },
                 "& .MuiTabs-indicator": {
-                  backgroundColor: "#fc0000",
+                  backgroundColor: "#FC0000",
                 },
               }}
             >
