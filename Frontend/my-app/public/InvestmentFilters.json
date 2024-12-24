@@ -239,19 +239,19 @@
     }
     },
     "Risk": {
-      "market_risk": {
+      "beta": {
         "options": ["High", "Medium", "Low"],
-        "label": "Market Risk",
+        "label": " Beta",
         "description": "Select the market risk level associated with the deal."
       },
-      "credit_risk": {
+      "volatility": {
         "options": ["High", "Medium", "Low"],
-        "label": "Credit Risk",
+        "label": "Volatility",
         "description": "Select the credit risk level associated with the deal."
       },
-      "interest_rate_risk": {
+      "piotroski_score": {
         "options": ["High", "Medium", "Low"],
-        "label": "Interest Rate Risk",
+        "label": "Piotroski Score",
         "description": "Select the interest rate risk level associated with the deal."
       }
     }

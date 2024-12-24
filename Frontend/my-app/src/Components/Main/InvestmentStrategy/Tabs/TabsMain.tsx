@@ -8,8 +8,49 @@ import Risk from "./Risk";
 const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
   const [value, setValue] = useState(0); // Track the selected tab
 
+  // State to store user-selected values for all tabs
+  const [selectedValues, setSelectedValues] = useState({
+    MonasheeSpecific: {},
+    Technicals: {},
+    Fundamentals: {
+      profitability: "",
+      liquidity: "",
+    },
+    Risk: {},
+  });
+
   const handleChange = (event: any, newValue: number) => {
     setValue(newValue); // Update the selected tab
+  };
+
+  // Handle value change for each filter input
+  const handleFilterChange = (tab: string, filterName: string, value: any) => {
+    // setSelectedValues((prevState) => ({
+    //   ...prevState,
+    //   [tab]: {
+    //     ...prevState[tab],
+    //     [filterName]: value,
+    //   },
+    // }));
+  };
+
+  // Handle Apply button click
+  const handleApply = () => {
+    console.log("Selected Values:", selectedValues);
+    // Apply the selected values (e.g., make an API call or store them)
+  };
+
+  // Handle Reset button click
+  const handleReset = () => {
+    setSelectedValues({
+      MonasheeSpecific: {},
+      Technicals: {},
+      Fundamentals: {
+        profitability: "",
+        liquidity: "",
+      },
+      Risk: {},
+    });
   };
 
   return (
@@ -33,11 +74,11 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
                   transition: "color 0.3s ease",
                 },
                 "& .Mui-selected": {
-                  color: "#8f00f7",
+                  color: "#fc0000",
                   transition: "color 0.3s ease",
                 },
                 "& .MuiTabs-indicator": {
-                  backgroundColor: "#8f00f7",
+                  backgroundColor: "#fc0000",
                 },
               }}
             >
@@ -48,17 +89,45 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
             </Tabs>
 
             <Box sx={{ marginTop: 2 }}>
-              {value === 0 && <MonasheeS3 data={filtersData.MonasheeSpecific} />}
-              {value === 1 && <Technical data={filtersData.Technicals} />}
-              {value === 2 && <Fundamental data={filtersData.Fundamentals} />}
-              {value === 3 && <Risk data={filtersData.Risk} />}
+              {/* {value === 0 && (
+                <MonasheeS3
+                  data={filtersData['Monashee Specific']}
+                  selectedValues={selectedValues.MonasheeSpecific}
+                  onValueChange={(name, value) => handleFilterChange('MonasheeSpecific', name, value)}
+                />
+              )} */}
+              {value === 1 && (
+                <Fundamental
+                  data={filtersData.Fundamentals}
+                  selectedValues={selectedValues.Fundamentals}
+                  onValueChange={(name, value) => handleFilterChange('Fundamentals', name, value)}
+                />
+              )}
+              {value === 2 && (
+                <Technical
+                  data={filtersData.Technicals}
+                  selectedValues={selectedValues.Technicals}
+                  onValueChange={(name, value) => handleFilterChange('Technicals', name, value)}
+                />
+              )}
+              {value === 3 && (
+                <Risk
+                  data={filtersData.Risk}
+                  selectedValues={selectedValues.Risk}
+                  onValueChange={(name, value) => handleFilterChange('Risk', name, value)}
+                />
+              )}
             </Box>
 
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Button variant="contained" sx={{ mr: 2, bgcolor: "#002060" }}>
+              <Button
+                variant="contained"
+                sx={{ mr: 2, bgcolor: "#002060" }}
+                onClick={handleApply}
+              >
                 Apply
               </Button>
-              <Button variant="outlined" color="secondary">
+              <Button variant="outlined" color="secondary" onClick={handleReset}>
                 Reset
               </Button>
             </Box>
