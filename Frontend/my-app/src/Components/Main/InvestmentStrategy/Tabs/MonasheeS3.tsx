@@ -30,11 +30,19 @@ const MonasheeS3: React.FC<MonasheeS3Props> = ({ data, selectedValues, onValueCh
             {/* Select Dropdown */}
             <Grid item xs={8}>
               <FormControl variant="outlined" fullWidth>
-                <Select
+              <Select
                   value={selectedValues[key] || ''}
                   onChange={(e) => onValueChange(key, e.target.value)}
                   label={value.label}
                   sx={{ height: 30 }} // Adjust dropdown height
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 300, // Set max height of the dropdown
+                        overflowY: 'auto', // Enable vertical scrolling
+                      },
+                    },
+                  }}
                 >
             
                   {value.options.map((option, index) => (
