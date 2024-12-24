@@ -7,6 +7,7 @@ import MonasheeDeals from '../Components/Main/HomePage/Dashboard/MonasheeDeals';
 import Strategies from '../Components/Main/HomePage/Dashboard/Strategies';
 import Login from '../Components/Main/HomePage/Authentication/Login';
 import CapitalMarketsStatic from '../Components/HomepageStatic/CapitalMarketsStatic';
+import InvestmentMain from '../Components/Main/InvestmentStrategy/InvestmentMain';
 
 
 const AppRouters: React.FC = () => {
@@ -17,7 +18,7 @@ const AppRouters: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/capital-markets" element={<CapitalMarkets />} />
         <Route path="/monashee-deals" element={<MonasheeDeals />} />
-        <Route path="/strategies" element={<Strategies />} />
+        <Route path="/strategies" element={<InvestmentMain />} />
 
       </Routes>
   );
