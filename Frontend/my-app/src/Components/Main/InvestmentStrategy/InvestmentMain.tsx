@@ -1,49 +1,60 @@
-import React from 'react';
-import TickerDropdown from './Tradingview/TickerDropdown';
-import TabsMain from './Tabs/TabsMain';
-import { Typography } from '@mui/material';
+import React, { useState } from "react";
+import { Typography, Box } from "@mui/material";
+import TabsMain from "./Tabs/TabsMain";
+import TickerDropdown from "./Tradingview/TickerDropdown";
+import ScreenerJsonData from "./Tabs/ScreenerJsonData";
 
-const InvestmentMain = () => {
-  const filtersData = {
-    technical: {
-      label: 'Technical Filters',
-      description: 'Choose technical indicators',
-      options: ['Moving Average', 'RSI', 'MACD'],
-    },
-    fundamental: {
-      label: 'Fundamental Filters',
-      description: 'Choose fundamental parameters',
-      options: ['P/E Ratio', 'Market Cap', 'Dividend Yield'],
-    },
+const InvestmentMain: React.FC = () => {
+  const [filtersData, setFiltersData] = useState<any>(null); // State for storing fetched data
+
+  const handleDataLoaded = (data: any) => {
+    setFiltersData(data); // Update state when data is fetched
   };
 
   return (
     <>
-      <Typography
-        variant="h3"
+      {/* Header */}
+      <Box
         sx={{
-          fontWeight: 'bold',
-          color: '#FFFFFF',
-          fontSize: { xs: '2rem' },
-          backgroundColor: '#002060',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '5vh',
-          textAlign: 'center',
-          marginBottom: '10px',
-          animation: 'fadeInScale 2s ease-out',
-          '@keyframes fadeInScale': {
-            '0%': { opacity: 0, transform: 'scale(0.8)' },
-            '100%': { opacity: 1, transform: 'scale(1)' },
+          backgroundColor: "#002060",
+          padding: 2,
+          textAlign: "center",
+          marginBottom: 2,
+          animation: "fadeInScale 2s ease-out",
+          "@keyframes fadeInScale": {
+            "0%": { opacity: 0, transform: "scale(0.8)" },
+            "100%": { opacity: 1, transform: "scale(1)" },
           },
         }}
       >
-        Investment Strategies
-      </Typography>
-      <TabsMain filtersData={filtersData} />
-      <TickerDropdown />
-      {/* <TradingViewWidget /> */}
+        <Typography
+          variant="h3"
+          sx={{
+            fontWeight: "bold",
+            color: "#FFFFFF",
+            fontSize: { xs: "2rem", sm: "2.5rem" },
+          }}
+        >
+          Investment Strategies
+        </Typography>
+      </Box>
+
+      {/* Fetch Data */}
+      <ScreenerJsonData onDataLoaded={handleDataLoaded} />
+
+      {/* Show TabsMain if data is available */}
+      {filtersData ? (
+        <TabsMain filtersData={filtersData} />
+      ) : (
+        <Typography variant="h6" color="textSecondary" align="center">
+          Loading filters...
+        </Typography>
+      )}
+
+      {/* Additional Components */}
+      <Box sx={{ marginTop: 4 }}>
+        <TickerDropdown />
+      </Box>
     </>
   );
 };

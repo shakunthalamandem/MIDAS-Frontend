@@ -1,21 +1,20 @@
-import React, { useState } from 'react';
-import Technical from './Technical';
-import Fundamental from './Fundamental';
-import MonasheeS3 from './MonasheeS3';
-import { Box, Button, Card, CardContent, Container, Tab, Tabs, Typography } from '@mui/material';
-import Risk from './Risk';
+import React, { useState } from "react";
+import { Box, Button, Card, CardContent, Container, Tab, Tabs, Typography } from "@mui/material";
+import Technical from "./Technical";
+import Fundamental from "./Fundamental";
+import MonasheeS3 from "./MonasheeS3";
+import Risk from "./Risk";
 
-
-const TabsMain = ({ filtersData }: { filtersData: any }) => {
+const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
   const [value, setValue] = useState(0); // Track the selected tab
 
-  const handleChange = (event: any, newValue: any) => {
+  const handleChange = (event: any, newValue: number) => {
     setValue(newValue); // Update the selected tab
   };
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
-      <Box sx={{ width: '100%', padding: 2 }}>
+      <Box sx={{ width: "100%", padding: 2 }}>
         <Card sx={{ boxShadow: 3, borderRadius: 2, padding: 2 }}>
           <CardContent>
             <Typography variant="h5" color="#002060" gutterBottom>
@@ -26,19 +25,19 @@ const TabsMain = ({ filtersData }: { filtersData: any }) => {
               onChange={handleChange}
               centered
               sx={{
-                backgroundColor: '#000000', // Background color for tabs
-                borderRadius: 1, // Optional: Add rounded corners
+                backgroundColor: "#000000",
+                borderRadius: 1,
                 "& .MuiTab-root": {
-                  fontWeight: 'bold',
-                  color: '#828282',
-                  transition: 'color 0.3s ease',
+                  fontWeight: "bold",
+                  color: "#828282",
+                  transition: "color 0.3s ease",
                 },
                 "& .Mui-selected": {
-                  color: '#8f00f7',
-                  transition: 'color 0.3s ease',
+                  color: "#8f00f7",
+                  transition: "color 0.3s ease",
                 },
                 "& .MuiTabs-indicator": {
-                  backgroundColor: '#8f00f7',
+                  backgroundColor: "#8f00f7",
                 },
               }}
             >

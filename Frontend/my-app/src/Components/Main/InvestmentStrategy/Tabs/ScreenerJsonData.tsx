@@ -1,23 +1,21 @@
 import React, { useEffect, useState } from "react";
-import TabsMain from "./TabsMain";
 
-const ScreenerJsonData: React.FC = () => {
-    const [filtersData, setFiltersData] = useState<any>(null);
+const ScreenerJsonData: React.FC<{ onDataLoaded: (data: any) => void }> = ({ onDataLoaded }) => {
+  const [filtersData, setFiltersData] = useState<any>(null);
 
   useEffect(() => {
-    // Fetch the filters.json or provide your filters data
+    // Simulate fetching data from a JSON file or API
     fetch("/InvestmentFilters.json")
-    .then((response) => response.json())
-    .then((data) => setFiltersData(data))
-    .catch((error) => console.error("Error loading data:", error));
-}, []);
-  return (
-    <>
-{filtersData && <TabsMain filtersData={filtersData} />}
-          
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Fetched data:", data); // Debug log
+        setFiltersData(data);
+        onDataLoaded(data); // Notify parent with loaded data
+      })
+      .catch((error) => console.error("Error loading data:", error));
+  }, [onDataLoaded]);
 
-    </>
-  )
-}
+  return null; // Does not render UI directly
+};
 
-export default ScreenerJsonData
+export default ScreenerJsonData;
