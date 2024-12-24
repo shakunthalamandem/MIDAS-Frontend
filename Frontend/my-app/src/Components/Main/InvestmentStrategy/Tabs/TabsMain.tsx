@@ -3,11 +3,13 @@ import Technical from './Technical';
 import Fundamental from './Fundamental';
 import MonasheeS3 from './MonasheeS3';
 import { Box, Button, Card, CardContent, Container, Tab, Tabs, Typography } from '@mui/material';
+import Risk from './Risk';
 
-const TabsMain = () => {
+
+const TabsMain = ({ filtersData }: { filtersData: any }) => {
   const [value, setValue] = useState(0); // Track the selected tab
 
-  const handleChange:any = (event:any, newValue:any) => {
+  const handleChange = (event: any, newValue: any) => {
     setValue(newValue); // Update the selected tab
   };
 
@@ -40,25 +42,24 @@ const TabsMain = () => {
                 },
               }}
             >
+              <Tab label="Monashee Specific S3" aria-label="Monashee Specific S3 Filters" />
               <Tab label="Fundamentals" aria-label="Fundamentals Filters" />
               <Tab label="Technical" aria-label="Technical Filters" />
-              <Tab label="Monashee Specific S3" aria-label="Monashee Specific S3 Filters" />
+              <Tab label="Risk/Other" aria-label="Risk Filters" />
             </Tabs>
 
             <Box sx={{ marginTop: 2 }}>
-              {value === 0 && <Fundamental />}
-              {value === 1 && <Technical />}
-              {value === 2 && <MonasheeS3 />}
+              {value === 0 && <MonasheeS3 data={filtersData.MonasheeSpecific} />}
+              {value === 1 && <Technical data={filtersData.Technicals} />}
+              {value === 2 && <Fundamental data={filtersData.Fundamentals} />}
+              {value === 3 && <Risk data={filtersData.Risk} />}
             </Box>
+
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Button
-                variant="contained"
-                // onClick={handleSubmit}
-                sx={{ mr: 2, bgcolor: "#002060" }}
-              >
+              <Button variant="contained" sx={{ mr: 2, bgcolor: "#002060" }}>
                 Apply
               </Button>
-              <Button variant="outlined" color="secondary" >
+              <Button variant="outlined" color="secondary">
                 Reset
               </Button>
             </Box>

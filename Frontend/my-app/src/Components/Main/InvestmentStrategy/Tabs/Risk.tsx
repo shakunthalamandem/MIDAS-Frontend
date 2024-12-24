@@ -6,14 +6,14 @@ interface FilterOption {
   options: string[];
 }
 
-interface MonasheeS3Props {
+interface RiskProps {
   data: Record<string, FilterOption>; // Define the structure of the `data` prop
 }
 
-const MonasheeS3: React.FC<MonasheeS3Props> = ({ data }) => {
+const Risk: React.FC<RiskProps> = ({ data }) => {
   return (
     <div>
-      <h3>Monashee Specific Filters</h3>
+      <h3>Risk Filters</h3>
       {Object.entries(data).map(([key, value]) => (
         <div key={key}>
           <h4>{value.label}</h4>
@@ -32,4 +32,4 @@ const MonasheeS3: React.FC<MonasheeS3Props> = ({ data }) => {
   );
 };
 
-export default MonasheeS3;
+export default Risk;

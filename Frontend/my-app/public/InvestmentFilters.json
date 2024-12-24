@@ -1,0 +1,259 @@
+{
+    "Monashee Specific": {
+      "year_range": {
+        "options": [2024, 2023, 2022],
+        "label": "Issue Year",
+        "description": "Select the year of the deal."
+      },
+      "dealType": {
+        "options": ["IPO", "FO", "PRIVATE", "OTHER"],
+        "label": "Deal Type",
+        "description": "Choose the type of deal."
+      },
+      "sector": {
+        "options": [
+          "Communication Services", "Consumer Discretionary", "Consumer Staples", 
+          "Energy", "Financials", "Health Care", "Industrials", "Information Technology", 
+          "Materials", "Real Estate", "Utilities"
+        ],
+        "label": "Sector",
+        "description": "Select the sector of the deal."
+      },
+      "t1_return": {
+        "options": [">4", "2% to 4%", "0% to 2%", "-2% to 0%", "<-2%"],
+        "label": "T+1D Returns",
+        "description": "The return of deals on the first trade date from the pricing date."
+      },
+      "t1m_returns": {
+        "options": [">4", "2% to 4%", "0% to 2%", "-2% to 0%", "<-2%"],
+        "label": "T+1M Returns",
+        "description": "The return of deals one month from the pricing date."
+      },
+      "deal_value": {
+        "options": ["0 to $100M", "$100M to $200M", "$200M to $500M", ">$500M"],
+        "label": "Deal Value",
+        "description": "The total $ value of the offering or deal."
+      },
+      "Sponsor": {
+      "type": "dropdown",
+      "label": "Sponsor",
+      "description": "Choose whether the sponsor is involved in the deal.",
+      "options": ["Yes", "No"]
+    },
+    "Primary": {
+        "type": "dropdown",
+        "label": "Primary Percentage",
+        "description": "Select a range or specific value for the primary category.",
+        "options": ["ALL", "Equal to 0", "Equal to 100", "0-20", "20-40", "40-60", "60-80", "80-100"]
+      },
+      "AllocationPercentOfDealSize": {
+        "type": "input",
+        "label": "Allocation % DealSize (Simple)",
+        "description": "Enter the allocation percentage of the deal size as a range.",
+        "fields": [
+          { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
+          { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
+        ]
+      },
+      "AllocationPercentOfIOI": {
+        "type": "input",
+        "label": "Allocation % IOI (Simple)",
+        "description": "Enter the allocation percentage of IOI as a range.",
+        "fields": [
+          { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
+          { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
+        ]
+      },
+      "HoldPeriod": {
+        "type": "input",
+        "description": "Specify the hold period as a range using input fields.",
+        "label": "Hold Period",
+        "fields": [
+          { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
+          { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
+        ]
+      }
+    },
+    "Fundamentals": {
+     "profitability": {
+      "options": ["Positive", "Negative", "Break-even"],
+      "label": "Profitability",
+      "description": "Select the profitability status of the company."
+    },
+    "liquidity": {
+      "options": ["High", "Moderate", "Low"],
+      "label": "Liquidity",
+      "description": "Select the liquidity status of the company."
+    },
+    "growth": {
+      "options": ["High Growth", "Moderate Growth", "Low Growth"],
+      "label": "Growth",
+      "description": "Select the growth status of the company."
+    },
+    "price_to_earnings": {
+      "options": ["<10", "10-20", "20-30", "30-50", ">50"],
+      "label": "Price to Earnings (PE)",
+      "description": "The ratio of the company's share price to its earnings per share."
+    },
+    "price_to_book": {
+      "options": ["<1", "1-2", "2-3", "3-5", ">5"],
+      "label": "Price to Book (PB)",
+      "description": "The ratio of the company's market value to its book value."
+    },
+    "ev_sales": {
+      "options": ["<1", "1-2", "2-3", "3-5", ">5"],
+      "label": "EV/Sales",
+      "description": "The ratio of the company's enterprise value to its sales."
+    },
+    "ev_ebitda": {
+      "options": ["<5", "5-10", "10-20", "20-30", ">30"],
+      "label": "EV/EBITDA",
+      "description": "The ratio of the company's enterprise value to its EBITDA."
+    },
+    "div_yield": {
+      "options": ["<1%", "1%-2%", "2%-4%", "4%-6%", ">6%"],
+      "label": "Div Yield",
+      "description": "The dividend yield of the company."
+    },
+    "sales_growth": {
+      "options": ["<5%", "5%-10%", "10%-15%", "15%-20%", ">20%"],
+      "label": "Sales Growth",
+      "description": "The annual growth rate of the company's sales."
+    },
+    "sales_growth_3y_cagr": {
+      "options": ["<5%", "5%-10%", "10%-15%", "15%-20%", ">20%"],
+      "label": "Sales Growth 3Y/5R CAGR",
+      "description": "The 3-year or 5-year compound annual growth rate (CAGR) of the company's sales."
+    },
+    "eps_growth": {
+      "options": ["<5%", "5%-10%", "10%-15%", "15%-20%", ">20%"],
+      "label": "EPS Growth",
+      "description": "The growth rate of the company's earnings per share (EPS)."
+    },
+    "eps_growth_3y_cagr": {
+      "options": ["<5%", "5%-10%", "10%-15%", "15%-20%", ">20%"],
+      "label": "EPS Growth 3Y/5R CAGR",
+      "description": "The 3-year or 5-year compound annual growth rate (CAGR) of the company's earnings per share (EPS)."
+    },
+    "return_on_equity": {
+      "options": ["<5%", "5%-10%", "10%-15%", "15%-20%", ">20%"],
+      "label": "Return on Equity (ROE)",
+      "description": "The company's return on equity, a measure of financial performance."
+    },
+    "roce": {
+      "options": ["<5%", "5%-10%", "10%-15%", "15%-20%", ">20%"],
+      "label": "ROCE",
+      "description": "The company's return on capital employed, a measure of profitability."
+    },
+    "fcf_margin": {
+      "options": ["<5%", "5%-10%", "10%-15%", "15%-20%", ">20%"],
+      "label": "FCF Margin",
+      "description": "The company's free cash flow margin, indicating cash flow efficiency."
+    },
+    "sales_total_assets": {
+      "options": ["<0.5", "0.5-1", "1-2", "2-3", ">3"],
+      "label": "Sales/Total Assets",
+      "description": "The ratio of the company's sales to its total assets."
+    },
+    "net_debt_fcf": {
+      "options": ["<1", "1-2", "2-3", "3-5", ">5"],
+      "label": "Net Debt/FCF",
+      "description": "The ratio of the company's net debt to its free cash flow."
+    },
+    "net_debt_ebitda": {
+      "options": ["<1", "1-2", "2-3", "3-5", ">5"],
+      "label": "Net Debt/EBITDA",
+      "description": "The ratio of the company's net debt to its EBITDA."
+    },
+    "debt_equity": {
+      "options": ["<0.5", "0.5-1", "1-2", "2-3", ">3"],
+      "label": "Debt/Equity",
+      "description": "The ratio of the company's total debt to its equity."
+    }
+    },
+    "Technicals": {
+      "52_week_high": {
+      "options": ["Above 52W High", "Near 52W High", "Below 52W High"],
+      "label": "52 Week High",
+      "description": "The current price in relation to the 52-week high."
+    },
+    "52_week_low": {
+      "options": ["Above 52W Low", "Near 52W Low", "Below 52W Low"],
+      "label": "52 Week Low",
+      "description": "The current price in relation to the 52-week low."
+    },
+    "dma_20": {
+      "options": ["Above DMA 20", "Near DMA 20", "Below DMA 20"],
+      "label": "DMA 20",
+      "description": "The current price in relation to the 20-day moving average."
+    },
+    "dma_50": {
+      "options": ["Above DMA 50", "Near DMA 50", "Below DMA 50"],
+      "label": "DMA 50",
+      "description": "The current price in relation to the 50-day moving average."
+    },
+    "dma_200": {
+      "options": ["Above DMA 200", "Near DMA 200", "Below DMA 200"],
+      "label": "DMA 200",
+      "description": "The current price in relation to the 200-day moving average."
+    },
+    "rsi_14d": {
+      "options": ["Overbought", "Neutral", "Oversold"],
+      "label": "RSI (14D)",
+      "description": "Relative Strength Index (RSI) for the last 14 days."
+    },
+    "mtd": {
+      "options": ["Positive", "Neutral", "Negative"],
+      "label": "MTD",
+      "description": "Month-to-date performance."
+    },
+    "qtd": {
+      "options": ["Positive", "Neutral", "Negative"],
+      "label": "QTD",
+      "description": "Quarter-to-date performance."
+    },
+    "ytd": {
+      "options": ["Positive", "Neutral", "Negative"],
+      "label": "YTD",
+      "description": "Year-to-date performance."
+    },
+    "1m": {
+      "options": ["Positive", "Neutral", "Negative"],
+      "label": "1M",
+      "description": "Performance over the last 1 month."
+    },
+    "3m": {
+      "options": ["Positive", "Neutral", "Negative"],
+      "label": "3M",
+      "description": "Performance over the last 3 months."
+    },
+    "6m": {
+      "options": ["Positive", "Neutral", "Negative"],
+      "label": "6M",
+      "description": "Performance over the last 6 months."
+    },
+    "1y": {
+      "options": ["Positive", "Neutral", "Negative"],
+      "label": "1Y",
+      "description": "Performance over the last 1 year."
+    }
+    },
+    "Risk": {
+      "market_risk": {
+        "options": ["High", "Medium", "Low"],
+        "label": "Market Risk",
+        "description": "Select the market risk level associated with the deal."
+      },
+      "credit_risk": {
+        "options": ["High", "Medium", "Low"],
+        "label": "Credit Risk",
+        "description": "Select the credit risk level associated with the deal."
+      },
+      "interest_rate_risk": {
+        "options": ["High", "Medium", "Low"],
+        "label": "Interest Rate Risk",
+        "description": "Select the interest rate risk level associated with the deal."
+      }
+    }
+  }
+  
