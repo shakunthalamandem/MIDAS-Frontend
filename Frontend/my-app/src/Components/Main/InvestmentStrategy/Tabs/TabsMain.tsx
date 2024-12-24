@@ -82,7 +82,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
                 },
               }}
             >
-              <Tab label="Monashee Specific S3" aria-label="Monashee Specific S3 Filters" />
+              <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
               <Tab label="Fundamentals" aria-label="Fundamentals Filters" />
               <Tab label="Technical" aria-label="Technical Filters" />
               <Tab label="Risk/Other" aria-label="Risk Filters" />
