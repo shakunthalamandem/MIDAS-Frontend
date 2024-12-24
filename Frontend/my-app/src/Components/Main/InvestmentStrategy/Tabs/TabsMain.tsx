@@ -24,7 +24,7 @@ const TabsMain = () => {
               onChange={handleChange}
               centered
               sx={{
-                backgroundColor: '#f5f5f5', // Background color for tabs
+                backgroundColor: '#000000', // Background color for tabs
                 borderRadius: 1, // Optional: Add rounded corners
                 "& .MuiTab-root": {
                   fontWeight: 'bold',
@@ -32,11 +32,11 @@ const TabsMain = () => {
                   transition: 'color 0.3s ease',
                 },
                 "& .Mui-selected": {
-                  color: '#AE0226',
+                  color: '#8f00f7',
                   transition: 'color 0.3s ease',
                 },
                 "& .MuiTabs-indicator": {
-                  backgroundColor: '#AE0226',
+                  backgroundColor: '#8f00f7',
                 },
               }}
             >
