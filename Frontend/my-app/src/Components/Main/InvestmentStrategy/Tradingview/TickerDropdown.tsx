@@ -13,6 +13,7 @@ const TickerDropdown: React.FC = () => {
   const [filteredTickers, setFilteredTickers] = useState<Ticker[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedTicker, setSelectedTicker] = useState<string>("");
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
   useEffect(() => {
     // Fetch tickers from API
@@ -50,11 +51,16 @@ const TickerDropdown: React.FC = () => {
   const handleSelectTicker = (ticker: string) => {
     setSelectedTicker(ticker);
     setSearchTerm(""); // Clear search term after selection
+    setShowDropdown(false); // Hide dropdown after selection
   };
 
   return (
     <Box sx={{ textAlign: "center", marginTop: "50px" }}>
-      <Box sx={{ display: "inline-block", textAlign: "left" }}>
+      <Box
+        sx={{ display: "inline-block", textAlign: "left", position: "relative" }}
+        onMouseEnter={() => setShowDropdown(true)}
+        onMouseLeave={() => setShowDropdown(false)}
+      >
         <TextField
           id="ticker-search"
           label="Search Ticker"
@@ -65,15 +71,18 @@ const TickerDropdown: React.FC = () => {
           onChange={handleSearchChange}
           sx={{ marginBottom: "10px", width: "300px" }}
         />
-        {searchTerm && (
+        {showDropdown && (
           <Box
             sx={{
               border: "1px solid #ccc",
               borderRadius: "4px",
-              maxHeight: "200px",
+              maxHeight: "250px",
               overflowY: "auto",
               backgroundColor: "#fff",
               boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+              position: "absolute",
+              width: "100%",
+              zIndex: 10,
             }}
           >
             {filteredTickers.map((ticker) => (
