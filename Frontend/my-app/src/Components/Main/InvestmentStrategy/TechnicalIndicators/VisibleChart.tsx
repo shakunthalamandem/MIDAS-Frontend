@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ComposedChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, TooltipProps } from 'recharts';
 import { Paper, Typography } from '@mui/material';
 
 interface MovingAverage {
-  name: string;
-  linewidth: number;
-  color: string;
-  data: [string, number][]; // Array of tuples where the first element is a date (string) and the second is a value (number)
+  date: string;
+  price: number;
+  dma9: number;
+  dma20: number;
+  dma26: number;
+  dma50: number;
+  dma100: number;
+  dma200: number;
 }
 
 interface VisibleChartProps {
   ticker: string;
-  data: { ticker: string; moving_averages: MovingAverage[] }; // Moving averages now use MovingAverage[] directly
+  data: { ticker: string; moving_averages: MovingAverage[] };
   visibleLines: Record<string, boolean>;
   handleLegendClick: (dataKey: string) => void;
 }
@@ -35,7 +39,6 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<any, any>) => {
 };
 
 const VisibleChart: React.FC<VisibleChartProps> = ({ ticker, data, visibleLines, handleLegendClick }) => {
-
   // Format date for the X-Axis
   const formatXAxisDate = (tickItem: string) => {
     const date = new Date(tickItem);
@@ -46,25 +49,40 @@ const VisibleChart: React.FC<VisibleChartProps> = ({ ticker, data, visibleLines,
     return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear().toString().slice(-2)}`;
   };
 
-  // Define the FormattedPoint interface to handle date as a string and the dynamic properties (like dma9, dma20, etc.)
+  // Define the FormattedPoint interface to handle known and dynamic properties
   interface FormattedPoint {
-    date: string; // The date is a string
-    [key: string]: number | null; // The other properties are number or null
+    date: string;  // The date is explicitly a string
+    dma9?: number | null;
+    dma20?: number | null;
+    dma26?: number | null;
+    dma50?: number | null;
+    dma100?: number | null;
+    dma200?: number | null;
+    [key: string]: number | null | undefined; // This allows for dynamic keys, but restricts values to numbers or null
   }
 
-  // Format data to match Recharts expected format for the X and Y values
-  const formattedData: FormattedPoint[] = data.moving_averages[0].data.map((point, index) => {
-    const formattedPoint: FormattedPoint = { date: point[0] }; // Date is a string
-    data.moving_averages.forEach((avg) => {
-      const matchingPoint = avg.data[index];
-      formattedPoint[avg.name] = matchingPoint ? matchingPoint[1] : null; // Add moving average value or null
+  // Memoize formattedData for optimization
+  const formattedData: FormattedPoint[] = useMemo(() => {
+    return data.moving_averages.map((point) => {
+      const formattedPoint: FormattedPoint = { date: point.date };
+
+      // Iterate through the keys of the MovingAverage interface
+      Object.keys(point).forEach((key) => {
+        if (key !== 'date') {
+          const movingAverageKey = key as keyof MovingAverage;
+
+          // Assign numeric values (default to null if undefined)
+          formattedPoint[movingAverageKey] = point[movingAverageKey] ?? null;
+        }
+      });
+
+      return formattedPoint;
     });
-    return formattedPoint;
-  });
+  }, [data.moving_averages]);
 
   return (
-    <Paper style={{ marginTop: '20px', padding: '20px' }}>
-      <Typography variant="h6" align="center" style={{ color: '#002060', fontWeight: 'bold', marginTop: '10px' }}>
+    <Paper sx={{ marginTop: 2, padding: 2 }}>
+      <Typography variant="h6" align="center" sx={{ color: '#002060', fontWeight: 'bold', marginTop: 2 }}>
         {ticker} - Moving Averages
       </Typography>
       <ComposedChart width={700} height={400} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -73,18 +91,25 @@ const VisibleChart: React.FC<VisibleChartProps> = ({ ticker, data, visibleLines,
         <Tooltip content={<CustomTooltip />} />
         <Legend onClick={(e) => handleLegendClick(e.dataKey as string)} />
         <CartesianGrid stroke="#f5f5f5" />
-        {data.moving_averages.map((avg) => (
-          <Line
-            key={avg.name}
-            type="monotone"
-            dataKey={avg.name}
-            data={formattedData}
-            stroke={avg.color} // Use the specified color
-            name={avg.name.toUpperCase()} // Capitalize the moving average name for legend
-            dot={false}
-            strokeWidth={avg.linewidth}
-          />
-        ))}
+        
+        {/* Render visible lines dynamically based on the visibleLines prop */}
+        {Object.keys(data.moving_averages[0]).map((avgKey) => {
+          if (avgKey !== 'date' && visibleLines[avgKey]) {
+            return (
+              <Line
+                key={avgKey}
+                type="monotone"
+                dataKey={avgKey}
+                data={formattedData}
+                stroke="#8884d8"
+                name={avgKey.toUpperCase()}
+                dot={false}
+                strokeWidth={2}
+              />
+            );
+          }
+          return null;
+        })}
       </ComposedChart>
     </Paper>
   );

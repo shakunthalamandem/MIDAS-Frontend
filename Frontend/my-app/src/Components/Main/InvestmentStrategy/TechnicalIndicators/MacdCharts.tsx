@@ -3,10 +3,14 @@ import { Typography } from '@mui/material';
 import VisibleChart from './VisibleChart';
 
 interface MovingAverage {
-  name: string;
-  linewidth: number;
-  color: string;
-  data: [string, number][]; // Array of tuples where the first element is a date (string) and the second is a value (number)
+  date: string;
+  price: number;   // Changed from string to number
+  dma9: number;    // Changed from string to number
+  dma20: number;   // Changed from string to number
+  dma26: number;   // Changed from string to number
+  dma50: number;   // Changed from string to number
+  dma100: number;  // Changed from string to number
+  dma200: number;  // Changed from string to number
 }
 
 interface MacdChartProps {
