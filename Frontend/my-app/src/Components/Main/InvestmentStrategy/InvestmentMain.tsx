@@ -18,12 +18,20 @@ const InvestmentMain: React.FC = () => {
   return (
     <>
       {/* Header */}
-      <Box
+   
+          <Typography
+        variant="h3"
         sx={{
+          fontWeight: "bold",
+          color: "#FFFFFF",
+          fontSize: { xs: "2rem" },
           backgroundColor: "#002060",
-          padding: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "5vh",
           textAlign: "center",
-          marginBottom: 2,
+          marginBottom: "10px",
           animation: "fadeInScale 2s ease-out",
           "@keyframes fadeInScale": {
             "0%": { opacity: 0, transform: "scale(0.8)" },
@@ -31,17 +39,8 @@ const InvestmentMain: React.FC = () => {
           },
         }}
       >
-        <Typography
-          variant="h3"
-          sx={{
-            fontWeight: "bold",
-            color: "#FFFFFF",
-            fontSize: { xs: "2rem", sm: "2.5rem" },
-          }}
-        >
           Investment Strategies
-        </Typography>
-      </Box>
+          </Typography>
 
       {/* Fetch Data */}
       <ScreenerJsonData onDataLoaded={handleDataLoaded} />
