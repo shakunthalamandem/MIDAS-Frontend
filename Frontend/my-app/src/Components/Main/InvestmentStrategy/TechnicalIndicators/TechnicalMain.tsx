@@ -23,8 +23,8 @@ const TechnicalMain = () => {
             Technical Analysis
           </Typography>
           <TickerDropdown onSelectTicker={handleTickerSelect} />
-          {selectedTicker && <MacdCharts ticker={selectedTicker} />}
           <TradingViewWidget />
+          {selectedTicker && <MacdCharts ticker={selectedTicker} />}
         </Box>
       </Container>
     </>
