@@ -30,25 +30,36 @@ const Risk: React.FC<RiskProps> = ({ data, selectedValues, onValueChange }) => {
             {/* Select Dropdown */}
             <Grid item xs={8}>
               <FormControl variant="outlined" fullWidth>
-              <InputLabel>{value.label}</InputLabel>
-
-              <Select
-                  value={selectedValues[key] || ''}
+              <InputLabel
+                  sx={{
+                    fontSize: "0.8rem", // Smaller font size
+                    top: "50%", // Place the label vertically centered
+                    transform: "translateY(-50%)",
+                    paddingLeft:2 // Adjust for centering
+                  }}
+                >
+                  {value.label}
+                </InputLabel>
+                <Select
+                  value={selectedValues[key] || ""}
                   onChange={(e) => onValueChange(key, e.target.value)}
                   label={value.label}
-                  sx={{ height: 30 }} // Adjust dropdown height
+                  sx={{
+                    height: 40, // Adjust dropdown height
+                    fontSize: "0.75rem", // Match placeholder font size
+                  }}
                   MenuProps={{
                     PaperProps: {
                       style: {
-                        maxHeight: 300, // Set max height of the dropdown
-                        overflowY: 'auto', // Enable vertical scrolling
+                        maxHeight: 300,
+                        overflowY: "auto",
                       },
                     },
                   }}
                 >
                   
                   {value.options.map((option, index) => (
-                    <MenuItem key={index} value={option}>
+                    <MenuItem key={index} value={option} sx={{fontSize:'0.8rem'}}>
                       {option}
                     </MenuItem>
                   ))}
