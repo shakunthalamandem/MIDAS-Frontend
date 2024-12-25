@@ -1,5 +1,14 @@
 import React, { useMemo } from 'react';
-import { ComposedChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, TooltipProps } from 'recharts';
+import {
+  ComposedChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid,
+  TooltipProps,
+} from 'recharts';
 import { Paper, Typography } from '@mui/material';
 
 interface MovingAverage {
@@ -37,7 +46,12 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<any, any>) => {
   return null;
 };
 
-const VisibleChart: React.FC<VisibleChartProps> = ({ ticker, data, visibleLines, handleLegendClick }) => {
+const VisibleChart: React.FC<VisibleChartProps> = ({
+  ticker,
+  data,
+  visibleLines,
+  handleLegendClick,
+}) => {
   // Format date for the X-Axis
   const formatXAxisDate = (tickItem: string) => {
     const date = new Date(tickItem);
@@ -48,50 +62,49 @@ const VisibleChart: React.FC<VisibleChartProps> = ({ ticker, data, visibleLines,
     return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear().toString().slice(-2)}`;
   };
 
-  // Define the FormattedPoint interface to handle known and dynamic properties
+  // Define the FormattedPoint interface
   interface FormattedPoint {
-    date: string;  // The date is explicitly a string
+    date: string;
     dma9?: number | null;
     dma20?: number | null;
     dma26?: number | null;
     dma50?: number | null;
     dma100?: number | null;
     dma200?: number | null;
-    [key: string]: number | null | undefined; // This allows for dynamic keys, but restricts values to numbers or null
   }
 
   // Memoize formattedData for optimization
   const formattedData: FormattedPoint[] = useMemo(() => {
-    return data.moving_averages.map((point) => {
-      const formattedPoint: FormattedPoint = { date: point.date };
-
-      // Iterate through the keys of the MovingAverage interface
-      Object.keys(point).forEach((key) => {
-        if (key !== 'date') {
-          const movingAverageKey = key as keyof MovingAverage;
-
-          // Assign numeric values (default to null if undefined)
-          formattedPoint[movingAverageKey] = point[movingAverageKey] ?? null;
-        }
-      });
-
-      return formattedPoint;
-    });
+    return data.moving_averages.map((point) => ({
+      date: point.date,
+      dma9: point.dma9 ?? null,
+      dma20: point.dma20 ?? null,
+      dma26: point.dma26 ?? null,
+      dma50: point.dma50 ?? null,
+      dma100: point.dma100 ?? null,
+      dma200: point.dma200 ?? null,
+    }));
   }, [data.moving_averages]);
 
-  // Define colors for each line (you can adjust this array as needed)
-  const lineColors = {
-    dma9: '#2b0045',   // Example color for DMA9
-    dma20: '#00A878',  // Example color for DMA20
-    dma26: '#F633FF',  // Example color for DMA26
-    dma50: '#0078FF',  // Example color for DMA50
-    dma100: '#FDCA40', // Example color for DMA100
-    dma200: '#FF3339'  // Example color for DMA200
+  // Define colors for each line
+  const lineColors: Record<keyof MovingAverage, string> = {
+      dma9: '#2b0045',
+      dma20: '#00A878',
+      dma26: '#F633FF',
+      dma50: '#0078FF',
+      dma100: '#FDCA40',
+      dma200: '#FF3339',
+      date: '#002060',
+      price: '#00A878'
   };
 
   return (
     <Paper sx={{ marginTop: 2, padding: 2 }}>
-      <Typography variant="h6" align="center" sx={{ color: '#002060', fontWeight: 'bold', marginTop: 2 }}>
+      <Typography
+        variant="h6"
+        align="center"
+        sx={{ color: '#002060', fontWeight: 'bold', marginTop: 2 }}
+      >
         {ticker} - Moving Averages
       </Typography>
       <ComposedChart width={700} height={400} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -100,17 +113,17 @@ const VisibleChart: React.FC<VisibleChartProps> = ({ ticker, data, visibleLines,
         <Tooltip content={<CustomTooltip />} />
         <Legend onClick={(e) => handleLegendClick(e.dataKey as string)} />
         <CartesianGrid stroke="#f5f5f5" />
-        
-        {/* Render visible lines dynamically based on the visibleLines prop */}
+
+        {/* Render visible lines dynamically */}
         {Object.keys(data.moving_averages[0]).map((avgKey) => {
           if (avgKey !== 'date' && visibleLines[avgKey]) {
             return (
               <Line
                 key={avgKey}
                 type="monotone"
-                dataKey={avgKey}
+                dataKey={avgKey as keyof FormattedPoint} // Type assertion
                 data={formattedData}
-                stroke={lineColors[avgKey] || '#8884d8'}  // Use the color from the map, or fallback to default
+                stroke={(lineColors as Record<string, string>)[avgKey] || '#8884d8'}
                 name={avgKey.toUpperCase()}
                 dot={false}
                 strokeWidth={2}
