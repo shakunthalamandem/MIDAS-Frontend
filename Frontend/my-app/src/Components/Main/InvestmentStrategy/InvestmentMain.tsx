@@ -56,7 +56,7 @@ const InvestmentMain: React.FC = () => {
 
       {/* Additional Components */}
       <Box sx={{ marginTop: 4 }}>
-        <TickerDropdown />
+        {/* <TickerDropdown /> */}
       </Box>
       <Box sx={{ marginTop: 4 }}>
         <TradingViewWidget />
