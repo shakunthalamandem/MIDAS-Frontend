@@ -65,6 +65,7 @@ const VisibleChart: React.FC<VisibleChartProps> = ({
   // Define the FormattedPoint interface
   interface FormattedPoint {
     date: string;
+    price?: number | null;  
     dma9?: number | null;
     dma20?: number | null;
     dma26?: number | null;
@@ -77,6 +78,7 @@ const VisibleChart: React.FC<VisibleChartProps> = ({
   const formattedData: FormattedPoint[] = useMemo(() => {
     return data.moving_averages.map((point) => ({
       date: point.date,
+      price: point.price ?? null,
       dma9: point.dma9 ?? null,
       dma20: point.dma20 ?? null,
       dma26: point.dma26 ?? null,
