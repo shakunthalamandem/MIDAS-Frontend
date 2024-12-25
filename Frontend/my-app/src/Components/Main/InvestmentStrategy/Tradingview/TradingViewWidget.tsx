@@ -14,7 +14,7 @@ const TradingViewWidget: React.FC = () => {
     script.async = true;
     script.innerHTML = `
       {
-        "width": "12  00",
+        "width": "1200",
         "height": "500",        
         "symbol": "CIVI",
         "interval": "D",
