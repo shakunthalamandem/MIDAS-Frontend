@@ -4,7 +4,6 @@ import { Routes, Route } from 'react-router-dom';
 import SignUp from '../Components/Main/HomePage/Authentication/SignUp';
 import CapitalMarkets from '../Components/Main/HomePage/Dashboard/CapitalMarkets';
 import MonasheeDeals from '../Components/Main/HomePage/Dashboard/MonasheeDeals';
-import Strategies from '../Components/Main/HomePage/Dashboard/Strategies';
 import Login from '../Components/Main/HomePage/Authentication/Login';
 import CapitalMarketsStatic from '../Components/HomepageStatic/CapitalMarketsStatic';
 import InvestmentMain from '../Components/Main/InvestmentStrategy/InvestmentMain';
