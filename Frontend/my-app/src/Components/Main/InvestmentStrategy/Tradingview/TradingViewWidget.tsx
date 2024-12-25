@@ -52,7 +52,7 @@ const TradingViewWidget: React.FC = () => {
           ref={container}
           className="tradingview-widget-container"
           sx={{
-            height: 800, // Fixed height
+            height: 500, // Fixed height
             width: "100%",
           }}
         >
