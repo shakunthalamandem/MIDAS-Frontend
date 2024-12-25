@@ -64,8 +64,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
         page: paginationModel.page + 1, // API pages are often 1-indexed
         pageSize: paginationModel.pageSize,
       };
-    console.log("TAble Payload", payload);
-    console.log("Table Data", data);
+
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
