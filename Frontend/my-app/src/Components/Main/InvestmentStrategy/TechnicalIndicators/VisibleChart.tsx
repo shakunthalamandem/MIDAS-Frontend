@@ -34,7 +34,6 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<any, any>) => {
       </div>
     );
   }
-
   return null;
 };
 
@@ -80,6 +79,16 @@ const VisibleChart: React.FC<VisibleChartProps> = ({ ticker, data, visibleLines,
     });
   }, [data.moving_averages]);
 
+  // Define colors for each line (you can adjust this array as needed)
+  const lineColors = {
+    dma9: '#2b0045',   // Example color for DMA9
+    dma20: '#00A878',  // Example color for DMA20
+    dma26: '#F633FF',  // Example color for DMA26
+    dma50: '#0078FF',  // Example color for DMA50
+    dma100: '#FDCA40', // Example color for DMA100
+    dma200: '#FF3339'  // Example color for DMA200
+  };
+
   return (
     <Paper sx={{ marginTop: 2, padding: 2 }}>
       <Typography variant="h6" align="center" sx={{ color: '#002060', fontWeight: 'bold', marginTop: 2 }}>
@@ -101,7 +110,7 @@ const VisibleChart: React.FC<VisibleChartProps> = ({ ticker, data, visibleLines,
                 type="monotone"
                 dataKey={avgKey}
                 data={formattedData}
-                stroke="#8884d8"
+                stroke={lineColors[avgKey] || '#8884d8'}  // Use the color from the map, or fallback to default
                 name={avgKey.toUpperCase()}
                 dot={false}
                 strokeWidth={2}
