@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ComposedChart,
   Line,
@@ -9,7 +9,8 @@ import {
   CartesianGrid,
   TooltipProps,
 } from 'recharts';
-import { Paper, Typography } from '@mui/material';
+import { Paper, Typography, Button, ButtonGroup } from '@mui/material';
+import { styled } from '@mui/system';
 
 interface MovingAverage {
   date: string;
@@ -46,12 +47,28 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<any, any>) => {
   return null;
 };
 
+// StyledButton component
+const StyledButton = styled(Button)<{ isActive: boolean; lineColor: string }>(
+  ({ isActive, lineColor }) => ({
+    backgroundColor: isActive ? lineColor : 'transparent',
+    border: `1px solid ${lineColor}`,
+    color: isActive ? '#fff' : lineColor,
+    fontWeight: 'bold',
+    marginBottom: '5px',
+    '&:hover': {
+      backgroundColor: isActive ? lineColor : `${lineColor}70`,
+    },
+  })
+);
+
 const VisibleChart: React.FC<VisibleChartProps> = ({
   ticker,
   data,
   visibleLines,
   handleLegendClick,
 }) => {
+  const [lineVisibility, setLineVisibility] = useState(visibleLines);
+
   // Format date for the X-Axis
   const formatXAxisDate = (tickItem: string) => {
     const date = new Date(tickItem);
@@ -65,7 +82,7 @@ const VisibleChart: React.FC<VisibleChartProps> = ({
   // Define the FormattedPoint interface
   interface FormattedPoint {
     date: string;
-    price?: number | null;  
+    price?: number | null;
     dma9?: number | null;
     dma20?: number | null;
     dma26?: number | null;
@@ -89,19 +106,26 @@ const VisibleChart: React.FC<VisibleChartProps> = ({
   }, [data.moving_averages]);
 
   // Define colors for each line
-  const lineColors: Record<keyof MovingAverage, string> = {
-      dma9: '#2b0045',
-      dma20: '#00A878',
-      dma26: '#F633FF',
-      dma50: '#0078FF',
-      dma100: '#FDCA40',
-      dma200: '#FF3339',
-      date: '#002060',
-      price: '#00A878'
+  const lineColors: Record<string, string> = {
+    close: '#413ea0', // Price line color
+    MA9: '#00A878',
+    MA20: '#002045',
+    MA26: '#F633FF',
+    MA50: '#0078FF',
+    MA100: '#FDCA40',
+    MA200: '#FF3339',
+  };
+
+  // Toggle the visibility of lines
+  const toggleLineVisibility = (key: string) => {
+    setLineVisibility((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
   };
 
   return (
-    <Paper sx={{ marginTop: 2, padding: 2 }}>
+    <Paper sx={{ marginTop: 2, padding: 2, position: 'relative' }}>
       <Typography
         variant="h6"
         align="center"
@@ -109,21 +133,38 @@ const VisibleChart: React.FC<VisibleChartProps> = ({
       >
         {ticker} - Moving Averages
       </Typography>
-      <ComposedChart width={700} height={400} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+
+      {/* Buttons to toggle line visibility */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+        {['close', 'MA9', 'MA20', 'MA26', 'MA50', 'MA100', 'MA200'].map((lineKey) => (
+          <StyledButton
+            key={lineKey}
+            isActive={lineVisibility[lineKey]}
+            onClick={() => toggleLineVisibility(lineKey)}
+            lineColor={lineColors[lineKey]}
+          >
+            {lineKey.toUpperCase()}
+          </StyledButton>
+        ))}
+      </div>
+
+      <ComposedChart width={1000} height={400} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
         <XAxis dataKey="date" tickFormatter={formatXAxisDate} />
-        <YAxis />
+        <YAxis
+          domain={['auto', 'auto']} // Dynamic scaling for Y-Axis
+        />
         <Tooltip content={<CustomTooltip />} />
         <Legend onClick={(e) => handleLegendClick(e.dataKey as string)} />
         <CartesianGrid stroke="#f5f5f5" />
 
         {/* Render visible lines dynamically */}
-        {Object.keys(data.moving_averages[0]).map((avgKey) => {
-          if (avgKey !== 'date' && visibleLines[avgKey]) {
+        {Object.keys(lineVisibility).map((avgKey) => {
+          if (lineVisibility[avgKey]) {
             return (
               <Line
                 key={avgKey}
                 type="monotone"
-                dataKey={avgKey as keyof FormattedPoint} // Type assertion
+                dataKey={avgKey as keyof FormattedPoint}
                 data={formattedData}
                 stroke={(lineColors as Record<string, string>)[avgKey] || '#8884d8'}
                 name={avgKey.toUpperCase()}
