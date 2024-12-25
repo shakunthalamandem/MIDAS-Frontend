@@ -64,8 +64,8 @@ const VisibleChart: React.FC<PriceChartProps> = ({ ticker, data, visibleLines, h
 
   return (
     <Paper style={{ marginTop: '20px', padding: '20px' }}>
-      <Typography variant="h6" align="center" style={{ color: '#002060', fontWeight: 'bold', marginTop: '10px' }}>
-        Price and Moving Averages
+      <Typography variant="h6" align="center" style={{ color: '#002060', fontWeight: 'bold', marginTop: '10px' ,marginBottom:'10px'}}>
+      Stock Price vs Moving Average
       </Typography>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
         <StyledButton isActive={visibleLines.close} onClick={() => handleLegendClick('close')} lineColor="#413ea0">
