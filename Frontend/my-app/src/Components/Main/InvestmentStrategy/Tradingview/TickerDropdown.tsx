@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import FundamentalMetricsCard from "../Tabs/FundamentalMetricsCard";
 
 // Define the type for the API response
 interface Ticker {
@@ -68,7 +69,9 @@ const TickerDropdown: React.FC = () => {
           }}
         >
           Selected Ticker: <strong>{selectedTicker}</strong>
+          <FundamentalMetricsCard ticker={selectedTicker} />
         </div>
+        
       )}
     </div>
   );
