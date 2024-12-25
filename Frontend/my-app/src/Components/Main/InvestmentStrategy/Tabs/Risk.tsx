@@ -33,9 +33,11 @@ const Risk: React.FC<RiskProps> = ({ data, selectedValues, onValueChange }) => {
               <InputLabel
                   sx={{
                     fontSize: "0.8rem", // Smaller font size
-                    top: "50%", // Place the label vertically centered
-                    transform: "translateY(-50%)",
-                    paddingLeft:2 // Adjust for centering
+                    top: selectedValues[key] ? "0" : "50%", // Adjust position based on selection
+                    transform: selectedValues[key] ? "translateY(-100%)" : "translateY(-50%)",
+                    transition: "all 0.2s ease-out", // Smooth transition
+                    visibility: selectedValues[key] ? "hidden" : "visible", // Hide when value is selected
+                    paddingLeft: 2, // Adjust for alignment
                   }}
                 >
                   {value.label}
