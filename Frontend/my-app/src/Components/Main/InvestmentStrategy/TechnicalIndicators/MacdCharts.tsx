@@ -4,13 +4,13 @@ import VisibleChart from './VisibleChart';
 
 interface MovingAverage {
   date: string;
-  price: number;   // Changed from string to number
-  dma9: number;    // Changed from string to number
-  dma20: number;   // Changed from string to number
-  dma26: number;   // Changed from string to number
-  dma50: number;   // Changed from string to number
-  dma100: number;  // Changed from string to number
-  dma200: number;  // Changed from string to number
+  price: number;
+  dma9: number;
+  dma20: number;
+  dma26: number;
+  dma50: number;
+  dma100: number;
+  dma200: number;
 }
 
 interface MacdChartProps {
@@ -18,15 +18,15 @@ interface MacdChartProps {
 }
 
 const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
-  const [data, setData] = useState<{ ticker: string; moving_averages: MovingAverage[] } | null>(null);
+  const [data, setData] = useState<{ output_ma_prices: any[] } | null>(null);  // Adjusted for the new API response format
   const [visibleLines, setVisibleLines] = useState({
     price: true,
-    dma9: true,
-    dma20: true,
-    dma26: true,
-    dma50: true,
-    dma100: true,
-    dma200: true,
+    MA9: true,
+    MA20: true,
+    MA26: true,
+    MA50: true,
+    MA100: true,
+    MA200: true,
   });
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
         }
 
         const jsonData = await response.json();
-        setData(jsonData); // Set the fetched data to state
+        setData(jsonData);  // Set the fetched data to state
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -78,7 +78,7 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
   return (
     <VisibleChart
       ticker={ticker}
-      data={data}
+      data={data}  // Pass the full data structure to VisibleChart
       visibleLines={visibleLines}
       handleLegendClick={handleLegendClick}
     />
