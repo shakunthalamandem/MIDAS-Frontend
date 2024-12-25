@@ -8,12 +8,14 @@ const TradingViewWidget: React.FC = () => {
     if (!container.current) return;
 
     const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
     script.type = "text/javascript";
     script.async = true;
     script.innerHTML = `
       {
-        "autosize": true,
+        "width": "12  00",
+        "height": "500",        
         "symbol": "CIVI",
         "interval": "D",
         "timezone": "Etc/UTC",
@@ -36,16 +38,11 @@ const TradingViewWidget: React.FC = () => {
   }, []);
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      padding={3}
-    >
+    <Box display="flex" justifyContent="center" alignItems="center" padding={3}>
       <Card
         sx={{
           width: "100%",
-          maxWidth: 900,
+          maxWidth: 1200,
           borderRadius: 2,
           boxShadow: 3, // MUI shadow level
           overflow: "hidden",
@@ -72,7 +69,9 @@ const TradingViewWidget: React.FC = () => {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <span className="blue-text">Track all markets on TradingView</span>
+              <span className="blue-text">
+                Track all markets on TradingView
+              </span>
             </a>
           </div>
         </Box>
