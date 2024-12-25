@@ -30,6 +30,8 @@ const Technical: React.FC<TechnicalProps> = ({ data, selectedValues, onValueChan
             {/* Select Dropdown */}
             <Grid item xs={8}>
               <FormControl variant="outlined" fullWidth>
+              <InputLabel>{value.label}</InputLabel>
+
               <Select
                   value={selectedValues[key] || ''}
                   onChange={(e) => onValueChange(key, e.target.value)}

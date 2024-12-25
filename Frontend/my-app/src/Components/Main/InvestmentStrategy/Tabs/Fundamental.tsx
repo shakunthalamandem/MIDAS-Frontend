@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormControl, Select, MenuItem, Typography, Grid } from '@mui/material';
+import { FormControl, Select, MenuItem, Typography, Grid, InputLabel } from '@mui/material';
 
 interface FilterOption {
   label: string;
@@ -30,6 +30,8 @@ const Fundamental: React.FC<FundamentalProps> = ({ data, selectedValues, onValue
             {/* Select Dropdown */}
             <Grid item xs={8}>
               <FormControl variant="outlined" fullWidth>
+              <InputLabel>{value.label}</InputLabel>
+
               <Select
                   value={selectedValues[key] || ''}
                   onChange={(e) => onValueChange(key, e.target.value)}

@@ -8,7 +8,6 @@ const ScreenerJsonData: React.FC<{ onDataLoaded: (data: any) => void }> = ({ onD
     fetch("/InvestmentFilters.json")
       .then((response) => response.json())
       .then((data) => {
-        console.log("Fetched data:", data); // Debug log
         setFiltersData(data);
         onDataLoaded(data); // Notify parent with loaded data
       })

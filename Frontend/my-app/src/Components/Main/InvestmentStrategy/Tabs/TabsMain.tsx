@@ -4,6 +4,12 @@ import Technical from "./Technical";
 import Fundamental from "./Fundamental";
 import MonasheeS3 from "./MonasheeS3";
 import Risk from "./Risk";
+interface SelectedValues {
+  MonasheeSpecific: Record<string, string>;
+  Technicals: Record<string, string>;
+  Fundamentals:  Record<string, string>;
+  Risk: Record<string, string>;
+}
 
 const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
   const [value, setValue] = useState(0); // Track the selected tab
@@ -12,10 +18,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
   const [selectedValues, setSelectedValues] = useState({
     MonasheeSpecific: {},
     Technicals: {},
-    Fundamentals: {
-      profitability: "",
-      liquidity: "",
-    },
+    Fundamentals: {},
     Risk: {},
   });
 
@@ -24,15 +27,16 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
   };
 
   // Handle value change for each filter input
-  const handleFilterChange = (tab: string, filterName: string, value: any) => {
-    // setSelectedValues((prevState) => ({
-    //   ...prevState,
-    //   [tab]: {
-    //     ...prevState[tab],
-    //     [filterName]: value,
-    //   },
-    // }));
+  const handleFilterChange = (tab: keyof SelectedValues, filterName: string, value: any) => {
+    setSelectedValues((prevState) => ({
+      ...prevState,
+      [tab]: {
+        ...prevState[tab],
+        [filterName]: value,
+      },
+    }));
   };
+  
 
   // Handle Apply button click
   const handleApply = () => {
@@ -45,10 +49,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
     setSelectedValues({
       MonasheeSpecific: {},
       Technicals: {},
-      Fundamentals: {
-        profitability: "",
-        liquidity: "",
-      },
+      Fundamentals: {},
       Risk: {},
     });
   };

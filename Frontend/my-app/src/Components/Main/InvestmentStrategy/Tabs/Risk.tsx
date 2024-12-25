@@ -30,6 +30,8 @@ const Risk: React.FC<RiskProps> = ({ data, selectedValues, onValueChange }) => {
             {/* Select Dropdown */}
             <Grid item xs={8}>
               <FormControl variant="outlined" fullWidth>
+              <InputLabel>{value.label}</InputLabel>
+
               <Select
                   value={selectedValues[key] || ''}
                   onChange={(e) => onValueChange(key, e.target.value)}
