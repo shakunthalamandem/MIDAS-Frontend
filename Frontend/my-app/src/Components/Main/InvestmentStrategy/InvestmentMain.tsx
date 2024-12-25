@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Typography, Box } from "@mui/material";
 import TabsMain from "./Tabs/TabsMain";
 import TickerDropdown from "./Tradingview/TickerDropdown";
@@ -7,10 +7,13 @@ import TradingViewWidget from "./Tradingview/TradingViewWidget";
 
 const InvestmentMain: React.FC = () => {
   const [filtersData, setFiltersData] = useState<any>(null); // State for storing fetched data
+  const [loading, setLoading] = useState<boolean>(true); // Loading state for better UI feedback
 
-  const handleDataLoaded = (data: any) => {
+  // Memoize the callback to avoid unnecessary re-renders
+  const handleDataLoaded = useCallback((data: any) => {
     setFiltersData(data); // Update state when data is fetched
-  };
+    setLoading(false); // Stop loading when data is received
+  }, []);
 
   return (
     <>
@@ -43,13 +46,13 @@ const InvestmentMain: React.FC = () => {
       {/* Fetch Data */}
       <ScreenerJsonData onDataLoaded={handleDataLoaded} />
 
-      {/* Show TabsMain if data is available */}
-      {filtersData ? (
-        <TabsMain filtersData={filtersData} />
-      ) : (
+      {/* Show TabsMain if data is available, else loading */}
+      {loading ? (
         <Typography variant="h6" color="textSecondary" align="center">
           Loading filters...
         </Typography>
+      ) : (
+        <TabsMain filtersData={filtersData} />
       )}
 
       {/* Additional Components */}
@@ -59,7 +62,6 @@ const InvestmentMain: React.FC = () => {
       <Box sx={{ marginTop: 4 }}>
         <TradingViewWidget />
       </Box>
-
     </>
   );
 };
