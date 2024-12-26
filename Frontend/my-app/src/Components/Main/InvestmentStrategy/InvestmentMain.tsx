@@ -59,7 +59,7 @@ const InvestmentMain: React.FC = () => {
         {/* <TickerDropdown /> */}
       </Box>
       <Box sx={{ marginTop: 4 }}>
-        <TradingViewWidget />
+        {/* <TradingViewWidget /> */}
       </Box>
     </>
   );
