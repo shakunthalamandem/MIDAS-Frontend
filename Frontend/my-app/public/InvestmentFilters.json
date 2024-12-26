@@ -12,9 +12,7 @@
     "dealType": {
       "options": [
         "IPO",
-        "FO",
-        "PRIVATE",
-        "OTHER"
+        "FO"
       ],
       "label": "Deal Type",
       "description": "Choose the type of deal."
@@ -924,9 +922,7 @@
       ],
       "label": "1Y",
       "description": "Performance over the last 1 year."
-    }
-  },
-  "Risk": {
+    },
     "beta": {
       "options": [
         "Any",
@@ -983,24 +979,6 @@
       ],
       "label": "Volatility",
       "description": "Select the credit risk level associated with the deal."
-    },
-    "piotroski_score": {
-      "options": [
-        "Any",
-        "Low (1 to 4)",
-        "Medium (5 to 6)",
-        "High (7 to 9)",
-        "Above 3",
-        "Above 5",
-        "Above 8",
-        "Under 3",
-        "Under 5",
-        "Under 8",
-        "1",
-        "9"
-      ],
-      "label": "Piotroski Score",
-      "description": "Select the interest rate risk level associated with the deal."
     }
   }
 }
