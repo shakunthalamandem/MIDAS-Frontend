@@ -3,12 +3,10 @@ import { Box, Button, Card, CardContent, Container, Tab, Tabs, Typography } from
 import Technical from "./Technical";
 import Fundamental from "./Fundamental";
 import MonasheeS3 from "./MonasheeS3";
-import Risk from "./Risk";
 interface SelectedValues {
   MonasheeSpecific: Record<string, string>;
   Technicals: Record<string, string>;
   Fundamentals:  Record<string, string>;
-  Risk: Record<string, string>;
 }
 
 const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
@@ -19,7 +17,6 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
     MonasheeSpecific: {},
     Technicals: {},
     Fundamentals: {},
-    Risk: {},
   });
 
   const handleChange = (event: any, newValue: number) => {
@@ -50,7 +47,6 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
       MonasheeSpecific: {},
       Technicals: {},
       Fundamentals: {},
-      Risk: {},
     });
   };
 
@@ -86,7 +82,6 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
               <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
               <Tab label="Fundamentals" aria-label="Fundamentals Filters" />
               <Tab label="Technical" aria-label="Technical Filters" />
-              <Tab label="Risk/Other" aria-label="Risk Filters" />
             </Tabs>
 
             <Box sx={{ marginTop: 2 }}>
@@ -111,13 +106,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
                   onValueChange={(name, value) => handleFilterChange('Technicals', name, value)}
                 />
               )}
-              {value === 3 && (
-                <Risk
-                  data={filtersData.Risk}
-                  selectedValues={selectedValues.Risk}
-                  onValueChange={(name, value) => handleFilterChange('Risk', name, value)}
-                />
-              )}
+             
             </Box>
 
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
