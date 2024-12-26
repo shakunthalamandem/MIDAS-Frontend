@@ -5,6 +5,7 @@ import { Box, Container, Typography } from "@mui/material";
 import MacdCharts from "./MacdCharts";
 import RsiMain from "./RsiMain";
 import TradingViewData from "../Tradingview/TradingViewData";
+import CompanyDetails from "./CompanyDetails";
 
 const TechnicalMain = () => {
   const [selectedTicker, setSelectedTicker] = useState<string>("");
@@ -34,6 +35,8 @@ const TechnicalMain = () => {
           <TradingViewWidget />
           {selectedTicker && <MacdCharts ticker={selectedTicker} />}
           {selectedTicker && <RsiMain ticker={selectedTicker} />}
+          {selectedTicker && <CompanyDetails ticker={selectedTicker} />}
+
 
 
 
