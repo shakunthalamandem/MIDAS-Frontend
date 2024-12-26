@@ -31,10 +31,15 @@ const MonasheeS3: React.FC<MonasheeS3Props> = ({ data, selectedValues, onValueCh
 
             {/* Select Dropdown */}
             <Grid item xs={8}>
-              <FormControl variant="outlined" fullWidth>
-                <InputLabel
+            <FormControl variant="outlined" fullWidth>
+              <InputLabel
                   sx={{
                     fontSize: "0.8rem", // Smaller font size
+                    top: selectedValues[key] ? "0" : "50%", // Adjust position based on selection
+                    transform: selectedValues[key] ? "translateY(-100%)" : "translateY(-50%)",
+                    transition: "all 0.2s ease-out", // Smooth transition
+                    visibility: selectedValues[key] ? "hidden" : "visible", // Hide when value is selected
+                    paddingLeft: 2, // Adjust for alignment
                   }}
                 >
                   {value.label}
@@ -45,7 +50,7 @@ const MonasheeS3: React.FC<MonasheeS3Props> = ({ data, selectedValues, onValueCh
                   label={value.label}
                   sx={{
                     height: 40, // Adjust dropdown height
-                    fontSize: "0.8rem", // Smaller font
+                    fontSize: "0.75rem", // Match placeholder font size
                   }}
                   MenuProps={{
                     PaperProps: {
@@ -56,8 +61,9 @@ const MonasheeS3: React.FC<MonasheeS3Props> = ({ data, selectedValues, onValueCh
                     },
                   }}
                 >
+            
                   {value.options.map((option, index) => (
-                    <MenuItem key={index} value={option} sx={{ fontSize: "0.8rem" }}>
+                    <MenuItem key={index} value={option} sx={{fontSize:'0.8rem'}}>
                       {option}
                     </MenuItem>
                   ))}
