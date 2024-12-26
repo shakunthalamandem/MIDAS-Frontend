@@ -63,9 +63,10 @@
             "Block",
             "HC",
             "Jay",
-            "Others",
             "Robin",
-            "Tom"
+            "Tom",
+            "Others"
+
         ],
         "label": "Deal Captain",
         "description": "Others include Frank, HCFN, HCPP, Chris, Jason, Jerry, Rene, Rob, Will"
