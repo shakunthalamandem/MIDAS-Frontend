@@ -4,6 +4,7 @@ import TabsMain from "./Tabs/TabsMain";
 import TickerDropdown from "./Tradingview/TickerDropdown";
 import ScreenerJsonData from "./Tabs/ScreenerJsonData";
 import TradingViewWidget from "./Tradingview/TradingViewWidget";
+import TradingViewData from "./Tradingview/TradingViewData";
 
 const InvestmentMain: React.FC = () => {
   const [filtersData, setFiltersData] = useState<any>(null); // State for storing fetched data
@@ -60,6 +61,7 @@ const InvestmentMain: React.FC = () => {
       </Box>
       <Box sx={{ marginTop: 4 }}>
         {/* <TradingViewWidget /> */}
+        
       </Box>
     </>
   );
