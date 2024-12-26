@@ -2,16 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Typography } from '@mui/material';
 import VisibleChart from './VisibleChart';
 
-interface MovingAverage {
-  date: string;
-  price: number;
-  dma9: number;
-  dma20: number;
-  dma26: number;
-  dma50: number;
-  dma100: number;
-  dma200: number;
-}
 
 interface MacdChartProps {
   ticker: string;

@@ -3,6 +3,7 @@ import TickerDropdown from "../Tradingview/TickerDropdown";
 import TradingViewWidget from "../Tradingview/TradingViewWidget";
 import { Box, Container, Typography } from "@mui/material";
 import MacdCharts from "./MacdCharts";
+import RsiMain from "./RsiMain";
 
 const TechnicalMain = () => {
   const [selectedTicker, setSelectedTicker] = useState<string>("");
@@ -25,6 +26,8 @@ const TechnicalMain = () => {
           <TickerDropdown onSelectTicker={handleTickerSelect} />
           <TradingViewWidget />
           {selectedTicker && <MacdCharts ticker={selectedTicker} />}
+          {selectedTicker && <RsiMain ticker={selectedTicker} />}
+
         </Box>
       </Container>
     </>
