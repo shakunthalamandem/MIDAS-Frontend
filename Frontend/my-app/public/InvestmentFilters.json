@@ -71,7 +71,7 @@
         "label": "Deal Captain",
         "description": "Others include Frank, HCFN, HCPP, Chris, Jason, Jerry, Rene, Rob, Will"
     },
-    "Primary": {
+    "primary": {
       "options": [
         "ALL",
         "Equal to 0",
