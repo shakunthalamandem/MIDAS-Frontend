@@ -1,11 +1,20 @@
 import React, { useEffect, useRef, memo } from "react";
 import { Card, Box } from "@mui/material";
 
-const TradingViewWidget: React.FC = () => {
+interface TradingViewWidgetProps {
+  ticker: string;
+}
+
+const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
+  const cleanedTicker = ticker.replace(/\s+US$/, '');
+
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!container.current) return;
+
+    // Clean up any existing widget before loading a new one
+    container.current.innerHTML = '';
 
     const script = document.createElement("script");
     script.src =
@@ -16,7 +25,7 @@ const TradingViewWidget: React.FC = () => {
       {
         "width": "1200",
         "height": "500",        
-        "symbol": "CIVI",
+        "symbol": "${cleanedTicker}",
         "interval": "D",
         "timezone": "Etc/UTC",
         "theme": "light",
@@ -35,7 +44,7 @@ const TradingViewWidget: React.FC = () => {
         container.current.innerHTML = ""; // Clear the widget container
       }
     };
-  }, []);
+  }, [cleanedTicker]); // Add ticker as a dependency to re-run effect on ticker change
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" padding={3}>

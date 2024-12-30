@@ -32,7 +32,9 @@ const TechnicalMain = () => {
           <TickerDropdown onSelectTicker={handleTickerSelect} />
           {ticker && <TradingViewData ticker={ticker} />}
 
-          <TradingViewWidget />
+          {/* <TradingViewWidget /> */}
+          {selectedTicker && <TradingViewWidget ticker={selectedTicker} />}
+
           {selectedTicker && <MacdCharts ticker={selectedTicker} />}
           {selectedTicker && <RsiMain ticker={selectedTicker} />}
           {selectedTicker && <CompanyDetails ticker={selectedTicker} />}
