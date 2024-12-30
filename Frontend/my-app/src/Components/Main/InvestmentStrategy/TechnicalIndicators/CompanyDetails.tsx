@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Card, CardContent, Box } from '@mui/material';
 import axios from 'axios';
 
-
 // Define types for the company details and RSI data
 interface CompanyDetailsResponse {
-  description: string;
-  exchange: string;
-  security_code: string;
-}
-
-interface RsiData {
-  date: string; // Assuming date is in "YYYY-MM-DD" format
-  value: number;
+  asofdate: string;
+  companies: {
+    fs_name: string;
+    security_code: string;
+    fs_ticker: string;
+    exchange: string;
+    companyName: string;
+    description: string;
+  }[];
 }
 
 interface CompanyDetailsProps {
@@ -21,7 +21,6 @@ interface CompanyDetailsProps {
 
 const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
   const [companyData, setCompanyData] = useState<CompanyDetailsResponse | null>(null);
-  const [rsiData, setRsiData] = useState<RsiData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +28,7 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
     const fetchCompanyData = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
       if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables.");
+        throw new Error('API URL is not defined in environment variables.');
       }
 
       const payload = { ticker };
@@ -46,22 +45,9 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
           }
         );
         setCompanyData(companyResponse.data);
-
-        // Fetch RSI data
-        const rsiResponse = await axios.post<{ rsi: RsiData[] }>(
-          `${apiUrl}/api/rsi/`,
-          payload,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        setRsiData(rsiResponse.data.rsi);
-
       } catch (err) {
-        setError("Failed to fetch the company details or RSI data.");
-        console.error("Error fetching data:", err);
+        setError('Failed to fetch the company details.');
+        console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
       }
@@ -72,14 +58,13 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
     }
   }, [ticker]);
 
-  // Helper function to format date for the RSI chart
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
-  };
+
+
+  // Access the first company from the companies array if available
+  const company = companyData?.companies[0];
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '30vh',maxWidth:'150vh' ,padding: 2 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '30vh', maxWidth: '150vh', padding: 2 }}>
       <Card sx={{ maxWidth: 800, width: '100%', padding: 2, boxShadow: 3 }}>
         <CardContent>
           <Typography variant="h5" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
@@ -87,18 +72,24 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
           </Typography>
 
           {/* Display company description and other details */}
-          {companyData ? (
+          {company ? (
             <>
-              <Typography variant="body1" sx={{ marginBottom: 1 }}>
-                {companyData.description || 'No description available.'}
+              <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                {company.companyName}
               </Typography>
-              
+              <Typography variant="body1" sx={{ marginBottom: 1 }}>
+                {company.description || 'No description available.'}
+              </Typography>
+              {/* <Typography variant="body2" sx={{ marginBottom: 1 }}>
+                Exchange: {company.exchange}
+              </Typography>
+              <Typography variant="body2" sx={{ marginBottom: 1 }}>
+                Security Code: {company.security_code}
+              </Typography> */}
             </>
           ) : (
             <Typography variant="body1">No company details available.</Typography>
           )}
-
-          
         </CardContent>
       </Card>
     </Box>
