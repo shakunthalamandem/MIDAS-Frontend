@@ -2,7 +2,6 @@ import React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
 
-// Define column structure for the DataGrid
 const columns = [
   { field: 'year_range', headerName: 'Year Range', width: 150 },
   { field: 'dealType', headerName: 'Deal Type', width: 150 },
