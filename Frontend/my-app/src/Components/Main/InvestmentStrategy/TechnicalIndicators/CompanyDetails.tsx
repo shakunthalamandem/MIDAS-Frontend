@@ -67,17 +67,17 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '30vh', maxWidth: '150vh', padding: 2 }}>
       <Card sx={{ maxWidth: 800, width: '100%', padding: 2, boxShadow: 3 }}>
         <CardContent>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', marginBottom: 2 ,  color:'#002060'}}>
             About {ticker}
           </Typography>
 
           {/* Display company description and other details */}
           {company ? (
             <>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1,  color:'#002060'}}>
                 {company.companyName}
               </Typography>
-              <Typography variant="body1" sx={{ marginBottom: 1 }}>
+              <Typography variant="body1" sx={{ marginBottom: 1 ,color:'#4b4b4b'}}>
                 {company.description || 'No description available.'}
               </Typography>
               {/* <Typography variant="body2" sx={{ marginBottom: 1 }}>
