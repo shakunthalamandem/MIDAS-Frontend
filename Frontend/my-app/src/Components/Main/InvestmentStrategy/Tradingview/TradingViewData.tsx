@@ -6,6 +6,11 @@ interface TradingViewDataProps {
 }
 
 const TradingViewData: React.FC<TradingViewDataProps> = ({ ticker }) => {
+  // Remove " US" or other country suffix from the ticker symbol
+  const cleanedTicker = ticker.replace(/\s+US$/, '');
+
+  console.log("Cleaned Ticker:", cleanedTicker);
+
   return (
     <div
       style={{
@@ -21,7 +26,7 @@ const TradingViewData: React.FC<TradingViewDataProps> = ({ ticker }) => {
       <div style={{ position: 'relative' }}>
         {/* Add styles to hide the TradingView watermark if using an appropriate plan */}
         <SingleTicker
-          symbol={ticker}
+          symbol={cleanedTicker}
           autosize={true}
         />
       </div>

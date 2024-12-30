@@ -422,8 +422,8 @@
         "-20% to -10%",
         "-50% to -20%"
       ],
-      "label": "Sales Growth 3Y/5R CAGR",
-      "description": "Select the Sales Growth 3Y/5R CAGR range."
+      "label": "Sales Growth 3Y CAGR",
+      "description": "Select the Sales Growth 3Y CAGR range."
     },
 
     "eps_growth_3y_cagr": {
@@ -450,8 +450,8 @@
         "-20% to -10%",
         "-50% to -20%"
       ],
-      "label": "EPS Growth 3Y/5R CAGR",
-      "description": "Select the EPS Growth 3Y/5R CAGR range."
+      "label": "EPS Growth 3Y CAGR",
+      "description": "Select the EPS Growth 3Y CAGR range."
     },
     "roe": {
       "options": [
