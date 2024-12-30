@@ -3,7 +3,8 @@ import { Box, Button, Card, CardContent, Container, Tab, Tabs, Typography } from
 import Technical from "./Technical";
 import Fundamental from "./Fundamental";
 import MonasheeS3 from "./MonasheeS3";
-import ScreenerMain from "./Screener/ScreenerMain";
+import ScreenerMain from "./Screener/InvestScreenerMain";
+import InvestScreenerMain from "./Screener/InvestScreenerMain";
 
 interface SelectedValues {
   MonasheeSpecific: Record<string, string>;
@@ -125,7 +126,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
         </Card>
 
         {/* Pass appliedValues as props to ScreenerMain */}
-        <ScreenerMain appliedValues={appliedValues} />
+        <InvestScreenerMain appliedValues={appliedValues} />
       </Box>
     </Container>
   );

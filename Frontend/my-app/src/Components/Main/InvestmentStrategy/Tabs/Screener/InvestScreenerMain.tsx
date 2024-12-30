@@ -48,8 +48,7 @@ const columns = [
   { field: 'volatility', headerName: 'Volatility', width: 150 },
 ];
 
-const ScreenerMain: React.FC<{ appliedValues: any }> = ({ appliedValues }) => {
-  // Example data (replace with your actual data)
+const InvestScreenerMain: React.FC<{ appliedValues: any }> = ({ appliedValues }) => {
 
   return (
     <Box sx={{ height: 500, width: '100%' }}>
@@ -65,4 +64,4 @@ const ScreenerMain: React.FC<{ appliedValues: any }> = ({ appliedValues }) => {
   );
 };
 
-export default ScreenerMain;
+export default InvestScreenerMain;
