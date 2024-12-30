@@ -65,7 +65,7 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '30vh', maxWidth: '150vh', padding: 2 }}>
-      <Card sx={{ maxWidth: 800, width: '100%', padding: 2, boxShadow: 3 }}>
+      <Card sx={{ maxWidth: 1200, width: '100%', padding: 2, boxShadow: 3 }}>
         <CardContent>
           <Typography variant="h5" sx={{ fontWeight: 'bold', marginBottom: 2 ,  color:'#002060'}}>
             About {ticker}
