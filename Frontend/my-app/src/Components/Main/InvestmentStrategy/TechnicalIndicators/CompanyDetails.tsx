@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Card, CardContent, Box } from '@mui/material';
 import axios from 'axios';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+
 
 // Define types for the company details and RSI data
 interface CompanyDetailsResponse {
