@@ -104,7 +104,7 @@ const VolumeChart: React.FC<VolumeChartProps> = ({ ticker }) => {
         {data.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
+              {/* <CartesianGrid strokeDasharray="3 3" /> */}
               <XAxis
                 dataKey="date"
                 tickFormatter={formatXAxisDate}
