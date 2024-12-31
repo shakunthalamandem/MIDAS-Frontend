@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Paper, Typography, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import {
@@ -27,16 +27,22 @@ interface VisibleChartProps {
 }
 
 const VisibleChart: React.FC<VisibleChartProps> = ({ ticker, data, visibleLines, handleLegendClick }) => {
+  // Map the data correctly
   const formattedData = data.price.map((item, index) => ({
     date: item.date,
     price: item.price,
-    dma9: data.dma9[index]?.value,
-    dma20: data.dma20[index]?.value,
-    dma26: data.dma26[index]?.value,
-    dma50: data.dma50[index]?.value,
-    dma100: data.dma100[index]?.value,
-    dma200: data.dma200[index]?.value,
+    dma9: data.dma9[index]?.value ?? null,  // Check for null values
+    dma20: data.dma20[index]?.value ?? null,
+    dma26: data.dma26[index]?.value ?? null,
+    dma50: data.dma50[index]?.value ?? null,
+    dma100: data.dma100[index]?.value ?? null,
+    dma200: data.dma200[index]?.value ?? null,
   }));
+
+  useEffect(() => {
+    // Debug: check formattedData in console to ensure all lines are included
+    console.log('Formatted Data:', formattedData);
+  }, [formattedData]);
 
   const StyledButton = styled(Button)(({ isActive, lineColor }: { isActive: boolean; lineColor: string }) => ({
     borderBottom: `2px solid ${isActive ? lineColor : 'transparent'}`,
