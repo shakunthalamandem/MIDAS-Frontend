@@ -147,11 +147,12 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
   }));
 
   return (
-    <Paper style={{ marginTop: '20px', padding: '20px' }}>
+    <Paper style={{ marginTop: '20px', padding: '20px' , boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15)', // Add shadow here
+    }}>
       <Typography variant="h6" align="center" style={{ color: '#002060', fontWeight: 'bold' }}>
         {ticker} - Price and Moving Averages
       </Typography>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' ,marginTop:'20px'}}>
         {Object.entries(visibleLines).map(([key, isVisible]) => (
           <StyledButton
             key={key}
