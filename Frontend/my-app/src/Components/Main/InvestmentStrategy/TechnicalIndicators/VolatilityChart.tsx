@@ -100,7 +100,7 @@ const VolatilityChart: React.FC<VolatilityChartProps> = ({ ticker }) => {
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke="#8884d8"
+                stroke="#dc0d03"
                 strokeWidth={1}
                 dot={false}
               />

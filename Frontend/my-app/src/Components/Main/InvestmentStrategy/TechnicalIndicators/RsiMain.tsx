@@ -100,7 +100,7 @@ const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke="#8884d8"
+                stroke="#018ba4"
                 strokeWidth={1}
                 dot={false}
               />

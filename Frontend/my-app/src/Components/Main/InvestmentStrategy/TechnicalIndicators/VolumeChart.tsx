@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 import {
-  LineChart,
+  ComposedChart,
+  Bar,
   Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid,
+  Legend,
 } from 'recharts';
 
 // Define the types
@@ -100,7 +103,8 @@ const VolumeChart: React.FC<VolumeChartProps> = ({ ticker }) => {
         </Typography>
         {data.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data}>
+            <ComposedChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
                 tickFormatter={formatXAxisDate}
@@ -108,23 +112,24 @@ const VolumeChart: React.FC<VolumeChartProps> = ({ ticker }) => {
               />
               <YAxis tickFormatter={formatYAxisNumber} />
               <Tooltip />
-              <Line
-                type="monotone"
+              <Legend />
+              {/* Volume as Bar */}
+              <Bar
                 dataKey="volume"
-                stroke="#8884d8"
-                strokeWidth={1}
-                dot={false}
+                fill="#dc4c03"
+                barSize={8} // Adjust the width of the bars
                 name="Volume"
               />
+              {/* 20 Day Volume as Line */}
               <Line
                 type="monotone"
                 dataKey="20day_volume"
-                stroke="#82ca9d"
-                strokeWidth={1}
+                stroke="#2e006c"
+                strokeWidth={2}
                 dot={false}
                 name="20 Day Volume"
               />
-            </LineChart>
+            </ComposedChart>
           </ResponsiveContainer>
         ) : (
           <Typography variant="body2" color="text.secondary">
