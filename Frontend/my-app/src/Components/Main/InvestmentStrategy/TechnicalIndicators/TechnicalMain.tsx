@@ -26,7 +26,10 @@ const TechnicalMain = () => {
           Technical Analysis
         </Typography>
         <TickerDropdown onSelectTicker={handleTickerSelect} />
+
         {ticker && <TradingViewData ticker={ticker} />}
+        {selectedTicker && <CompanyDetails ticker={selectedTicker} />}
+
 
         {/* TradingView Widget */}
         {selectedTicker && <TradingViewWidget ticker={selectedTicker} />}
@@ -48,7 +51,6 @@ const TechnicalMain = () => {
 
         {/* Company Details */}
         {selectedTicker && <VolatilityChart ticker={selectedTicker} />}
-        {selectedTicker && <CompanyDetails ticker={selectedTicker} />}
       </Box>
     </Container>
   );
