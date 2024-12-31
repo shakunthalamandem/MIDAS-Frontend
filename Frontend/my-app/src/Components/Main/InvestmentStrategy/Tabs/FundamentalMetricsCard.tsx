@@ -46,7 +46,7 @@ const FundamentalMetricsCard: React.FC<Props> = ({ ticker }) => {
           borderRadius: 2,
           boxShadow: 3,
           bgcolor: 'background.paper',
-          height: '100%',
+          height: '90%',
         }}
       >
         <Typography variant="subtitle1" color="#58002f" gutterBottom fontWeight="bold">
