@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, Typography, Grid, Box, Divider, CircularProgress } from '@mui/material';
-import { Skeleton } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Box,
+  Divider,
+  Skeleton,
+  Alert,
+} from '@mui/material';
 
 interface Props {
   ticker: string;
@@ -15,7 +23,7 @@ const FundamentalMetricsCard: React.FC<Props> = ({ ticker }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/fundamentals/CIVI`);
+        const response = await fetch(`${apiUrl}/api/fundamentals/${ticker}`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
@@ -31,15 +39,28 @@ const FundamentalMetricsCard: React.FC<Props> = ({ ticker }) => {
   }, [ticker]);
 
   const renderSection = (title: string, sectionData: Record<string, string>) => (
-    <Grid item xs={12} sm={6} md={3} key={title}>
-      <Box padding={2} borderRadius={2} boxShadow={2} bgcolor="#f5f5f5" height="100%">
-        <Typography variant="h6" gutterBottom color="primary" fontWeight="bold">
+    <Grid item xs={12} sm={6} md={4} lg={3} key={title}>
+      <Box
+        sx={{
+          padding: 2,
+          borderRadius: 2,
+          boxShadow: 3,
+          bgcolor: 'background.paper',
+          height: '100%',
+        }}
+      >
+        <Typography variant="subtitle1" color="#58002f" gutterBottom fontWeight="bold">
           {title}
         </Typography>
         <Divider sx={{ marginBottom: 2 }} />
         {Object.entries(sectionData).map(([key, value]) => (
-          <Typography key={key} variant="body2" color="textSecondary" gutterBottom>
-            <strong>{key}:</strong> {value !== null ? value : "Not available"}
+          <Typography
+            key={key}
+            variant="body2"
+            color="text.secondary"
+            gutterBottom
+          >
+            <strong>{key}:</strong> {value ?? 'Not available'}
           </Typography>
         ))}
       </Box>
@@ -48,31 +69,52 @@ const FundamentalMetricsCard: React.FC<Props> = ({ ticker }) => {
 
   if (loading) {
     return (
-      <Box sx={{ padding: 2 }}>
-        <Skeleton variant="rectangular" width="100%" height={140} />
-        <Skeleton width="60%" />
-        <Skeleton width="80%" />
-        <Skeleton width="40%" />
-      </Box>
+      <Grid container spacing={3} sx={{ padding: 2 }}>
+        {[...Array(4)].map((_, index) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            <Skeleton variant="rectangular" height={150} />
+            <Skeleton width="60%" sx={{ marginTop: 1 }} />
+            <Skeleton width="80%" />
+            <Skeleton width="40%" />
+          </Grid>
+        ))}
+      </Grid>
     );
   }
 
   if (error) {
     return (
       <Box sx={{ padding: 2 }}>
-        <Typography color="error" variant="body1" align="center">
+        <Alert severity="error" variant="outlined">
           {error}
-        </Typography>
+        </Alert>
       </Box>
     );
   }
 
   return (
-    <Card elevation={3} sx={{ maxWidth: '100%', marginTop: 2 }}>
+    <Card
+      elevation={3}
+      sx={{
+        maxWidth: '100%',
+        marginTop: 2,
+        borderRadius: 3,
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+      }}
+    >
       <CardContent>
-        <Grid container spacing={3} justifyContent="flex-start">
+        <Typography
+          variant="h5"
+          align="center"
+          sx={{ marginBottom: 3, color: '#002060', fontWeight: 'bold' }}
+        >
+          Fundamental Metrics for {ticker}
+        </Typography>
+        <Grid container spacing={3}>
           {data &&
-            Object.entries(data).map(([section, values]) => renderSection(section, values))}
+            Object.entries(data).map(([section, values]) =>
+              renderSection(section, values)
+            )}
         </Grid>
       </CardContent>
     </Card>

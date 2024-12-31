@@ -8,6 +8,7 @@ import TradingViewData from "../Tradingview/TradingViewData";
 import CompanyDetails from "./CompanyDetails";
 import VolumeChart from "./VolumeChart";
 import VolatilityChart from "./VolatilityChart";
+import FundamentalMetricsCard from "../Tabs/FundamentalMetricsCard";
 
 const TechnicalMain = () => {
   const [selectedTicker, setSelectedTicker] = useState<string>("");
@@ -29,6 +30,8 @@ const TechnicalMain = () => {
 
         {ticker && <TradingViewData ticker={ticker} />}
         {selectedTicker && <CompanyDetails ticker={selectedTicker} />}
+        {selectedTicker && <FundamentalMetricsCard ticker={selectedTicker} />}
+
 
 
         {/* TradingView Widget */}
