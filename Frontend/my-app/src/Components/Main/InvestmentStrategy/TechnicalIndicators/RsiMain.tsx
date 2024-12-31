@@ -26,28 +26,29 @@ const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
     const fetchData = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
       if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables");
+        throw new Error('API URL is not defined in environment variables');
       }
 
       const payload = { ticker };
 
       try {
-        const response = await fetch(`${apiUrl}/api/rsi/`, {
-          method: "POST",
+        const response = await fetch(`${apiUrl}/api/technical-analysis/`, {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch data");
+          throw new Error('Failed to fetch data');
         }
 
         const jsonData = await response.json();
-        setData(jsonData.rsi); // Assuming `rsi` array from response
+        const rsiGraphData = jsonData.technical_data?.rsi_graph || [];
+        setData(rsiGraphData); // Update the state with the extracted RSI graph data
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
@@ -63,16 +64,16 @@ const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
   };
 
   return (
-<Card
-  sx={{
-    maxWidth: 600,
-    margin: "auto",
-    mt: 4,
-    p: 2,
-    boxShadow: 3, // Adds shadow to the card
-  }}
-  elevation={4} // Additional shadow customization
->
+    <Card
+      sx={{
+        maxWidth: 600,
+        margin: 'auto',
+        mt: 4,
+        p: 2,
+        boxShadow: 3,
+      }}
+      elevation={4}
+    >
       <CardContent>
         <Typography
           variant="h6"
@@ -91,8 +92,8 @@ const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
             <LineChart data={data}>
               <XAxis
                 dataKey="date"
-                tickFormatter={formatDate} // Format date for X-axis
-                interval={Math.floor(data.length / 4)} // Show 4-month intervals
+                tickFormatter={formatDate}
+                interval={Math.floor(data.length / 4)}
               />
               <YAxis />
               <Tooltip />
@@ -100,8 +101,8 @@ const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
                 type="monotone"
                 dataKey="value"
                 stroke="#8884d8"
-                strokeWidth={1} // Tiny line
-                dot={false} // No dots
+                strokeWidth={1}
+                dot={false}
               />
             </LineChart>
           </ResponsiveContainer>
