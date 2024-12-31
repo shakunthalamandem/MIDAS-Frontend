@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Typography } from '@mui/material';
-import VisibleChart from './VisibleChart';
+import { Typography, Paper, Box, Button } from '@mui/material';
+import { styled } from '@mui/system';
+import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-// Define the structure of the data
 interface ChartData {
   price: { date: string; price: number }[];
   dma9: { date: string; value: number }[];
@@ -13,21 +13,20 @@ interface ChartData {
   dma200: { date: string; value: number }[];
 }
 
-// Props for the MacdChart component
 interface MacdChartProps {
   ticker: string;
 }
 
 const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
-  const [data, setData] = useState<ChartData | null>(null); // Correctly typed state for data
+  const [data, setData] = useState<ChartData | null>(null);
   const [visibleLines, setVisibleLines] = useState({
     price: true,
-    MA9: true,
-    MA20: true,
-    MA26: true,
-    MA50: true,
-    MA100: true,
-    MA200: true,
+    dma9: true,
+    dma20: true,
+    dma26: true,
+    dma50: true,
+    dma100: true,
+    dma200: true,
   });
 
   useEffect(() => {
@@ -57,44 +56,41 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
         // Debugging: Log the full API response to verify structure
         console.log('API Response:', jsonData);
 
-        // Access the nested `technical_data.output_ma_prices`
         const graphData = jsonData?.technical_data?.output_ma_prices;
-        console.log("graphData",graphData)
 
         if (!graphData) {
           throw new Error('Invalid data structure: Missing `technical_data.output_ma_prices`');
         }
 
-        // Transform the API response to match the ChartData structure
         const transformedData: ChartData = {
-          price: graphData.price?.map((item: any) => ({
+          price: graphData.map((item: any) => ({
             date: item.date,
             price: item.price,
-          })) || [],
-          dma9: graphData.dma9?.map((item: any) => ({
+          })),
+          dma9: graphData.map((item: any) => ({
             date: item.date,
-            value: item.value,
-          })) || [],
-          dma20: graphData.dma20?.map((item: any) => ({
+            value: item.dma9,
+          })),
+          dma20: graphData.map((item: any) => ({
             date: item.date,
-            value: item.value,
-          })) || [],
-          dma26: graphData.dma26?.map((item: any) => ({
+            value: item.dma20,
+          })),
+          dma26: graphData.map((item: any) => ({
             date: item.date,
-            value: item.value,
-          })) || [],
-          dma50: graphData.dma50?.map((item: any) => ({
+            value: item.dma26,
+          })),
+          dma50: graphData.map((item: any) => ({
             date: item.date,
-            value: item.value,
-          })) || [],
-          dma100: graphData.dma100?.map((item: any) => ({
+            value: item.dma50,
+          })),
+          dma100: graphData.map((item: any) => ({
             date: item.date,
-            value: item.value,
-          })) || [],
-          dma200: graphData.dma200?.map((item: any) => ({
+            value: item.dma100,
+          })),
+          dma200: graphData.map((item: any) => ({
             date: item.date,
-            value: item.value,
-          })) || [],
+            value: item.dma200,
+          })),
         };
 
         setData(transformedData);
@@ -116,17 +112,78 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
     }));
   };
 
+  const getLineColor = (key: string): string => {
+    const colors: Record<string, string> = {
+      price: '#413ea0',
+      dma9: '#00A878',
+      dma20: '#205011',
+      dma26: '#F633FF',
+      dma50: '#0078FF',
+      dma100: '#FDCA40',
+      dma200: '#FF3339',
+    };
+    return colors[key] || '#000';
+  };
+
   if (!data) {
     return <Typography>Loading...</Typography>;
   }
 
+  const formattedData = data.price.map((priceItem) => ({
+    date: priceItem.date,
+    price: priceItem.price,
+    dma9: data.dma9.find((item) => item.date === priceItem.date)?.value ?? null,
+    dma20: data.dma20.find((item) => item.date === priceItem.date)?.value ?? null,
+    dma26: data.dma26.find((item) => item.date === priceItem.date)?.value ?? null,
+    dma50: data.dma50.find((item) => item.date === priceItem.date)?.value ?? null,
+    dma100: data.dma100.find((item) => item.date === priceItem.date)?.value ?? null,
+    dma200: data.dma200.find((item) => item.date === priceItem.date)?.value ?? null,
+  }));
+
+  const StyledButton = styled(Button)(({ isActive, lineColor }: { isActive: boolean; lineColor: string }) => ({
+    borderBottom: `2px solid ${isActive ? lineColor : 'transparent'}`,
+    color: isActive ? lineColor : 'inherit',
+    margin: '0 8px',
+  }));
+
   return (
-    <VisibleChart
-      ticker={ticker}
-      data={data} // Pass the full data structure to VisibleChart
-      visibleLines={visibleLines}
-      handleLegendClick={handleLegendClick}
-    />
+    <Paper style={{ marginTop: '20px', padding: '20px' }}>
+      <Typography variant="h6" align="center" style={{ color: '#002060', fontWeight: 'bold' }}>
+        {ticker} - Price and Moving Averages
+      </Typography>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+        {Object.entries(visibleLines).map(([key, isVisible]) => (
+          <StyledButton
+            key={key}
+            isActive={isVisible}
+            onClick={() => handleLegendClick(key)}
+            lineColor={getLineColor(key)}
+          >
+            {key.toUpperCase()}
+          </StyledButton>
+        ))}
+      </div>
+      <ComposedChart width={1000} height={400} data={formattedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <CartesianGrid stroke="#f5f5f5" />
+        {Object.entries(visibleLines).map(
+          ([key, isVisible]) =>
+            isVisible && (
+              <Line
+                key={key}
+                type="monotone"
+                dataKey={key}
+                stroke={getLineColor(key)}
+                dot={false}
+                strokeWidth={2}
+              />
+            )
+        )}
+      </ComposedChart>
+    </Paper>
   );
 };
 
