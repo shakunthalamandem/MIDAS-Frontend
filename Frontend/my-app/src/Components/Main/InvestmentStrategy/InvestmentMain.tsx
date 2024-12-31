@@ -4,6 +4,7 @@ import TabsMain from "./Tabs/TabsMain";
 import TickerDropdown from "./Tradingview/TickerDropdown";
 import ScreenerJsonData from "./Tabs/ScreenerJsonData";
 import TradingViewWidget from "./Tradingview/TradingViewWidget";
+import TradingViewData from "./Tradingview/TradingViewData";
 
 const InvestmentMain: React.FC = () => {
   const [filtersData, setFiltersData] = useState<any>(null); // State for storing fetched data
@@ -18,12 +19,20 @@ const InvestmentMain: React.FC = () => {
   return (
     <>
       {/* Header */}
-      <Box
+   
+          <Typography
+        variant="h3"
         sx={{
+          fontWeight: "bold",
+          color: "#FFFFFF",
+          fontSize: { xs: "2rem" },
           backgroundColor: "#002060",
-          padding: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "5vh",
           textAlign: "center",
-          marginBottom: 2,
+          marginBottom: "10px",
           animation: "fadeInScale 2s ease-out",
           "@keyframes fadeInScale": {
             "0%": { opacity: 0, transform: "scale(0.8)" },
@@ -31,17 +40,8 @@ const InvestmentMain: React.FC = () => {
           },
         }}
       >
-        <Typography
-          variant="h3"
-          sx={{
-            fontWeight: "bold",
-            color: "#FFFFFF",
-            fontSize: { xs: "2rem", sm: "2.5rem" },
-          }}
-        >
           Investment Strategies
-        </Typography>
-      </Box>
+          </Typography>
 
       {/* Fetch Data */}
       <ScreenerJsonData onDataLoaded={handleDataLoaded} />
@@ -57,10 +57,11 @@ const InvestmentMain: React.FC = () => {
 
       {/* Additional Components */}
       <Box sx={{ marginTop: 4 }}>
-        <TickerDropdown />
+        {/* <TickerDropdown /> */}
       </Box>
       <Box sx={{ marginTop: 4 }}>
-        <TradingViewWidget />
+        {/* <TradingViewWidget /> */}
+        
       </Box>
     </>
   );

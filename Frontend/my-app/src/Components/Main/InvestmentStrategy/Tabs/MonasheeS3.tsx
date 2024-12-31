@@ -1,5 +1,6 @@
 import React from "react";
-import { FormControl, InputLabel, Select, MenuItem, Typography, Grid } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, Typography, Grid, Box } from "@mui/material";
+import MonasheeS3InputFields from "./MonasheeS3InputFields";
 
 interface FilterOption {
   label: string;
@@ -15,21 +16,23 @@ interface MonasheeS3Props {
 
 const MonasheeS3: React.FC<MonasheeS3Props> = ({ data, selectedValues, onValueChange }) => {
   return (
-    <div>
+    <Box sx={{ padding: 3 }}>
+      {/* Dropdown Filters */}
       <Grid container spacing={2}>
         {Object.entries(data).map(([key, value]) => (
-          <Grid item xs={12} sm={8} md={3} key={key} container alignItems="center">
+           <Grid item xs={12} sm={8} md={3} key={key} container alignItems="center">
+
             {/* Label */}
             <Grid item xs={4}>
-              <Typography variant="body2" color="#5a5959">
+              <Typography variant="body2" color="#5a5959" sx={{ fontSize: "0.8rem" }}>
                 {value.label}
               </Typography>
             </Grid>
 
             {/* Select Dropdown */}
             <Grid item xs={8}>
-              <FormControl variant="outlined" fullWidth>
-                <InputLabel
+            <FormControl variant="outlined" fullWidth>
+              <InputLabel
                   sx={{
                     fontSize: "0.8rem", // Smaller font size
                     top: selectedValues[key] ? "0" : "50%", // Adjust position based on selection
@@ -58,8 +61,9 @@ const MonasheeS3: React.FC<MonasheeS3Props> = ({ data, selectedValues, onValueCh
                     },
                   }}
                 >
+            
                   {value.options.map((option, index) => (
-                    <MenuItem key={index} value={option} sx={{ fontSize: "0.8rem" }}>
+                    <MenuItem key={index} value={option} sx={{fontSize:'0.8rem'}}>
                       {option}
                     </MenuItem>
                   ))}
@@ -69,7 +73,12 @@ const MonasheeS3: React.FC<MonasheeS3Props> = ({ data, selectedValues, onValueCh
           </Grid>
         ))}
       </Grid>
-    </div>
+
+      {/* Input Fields */}
+      <Box mt={4}>
+        {/* <MonasheeS3InputFields /> */}
+      </Box>
+    </Box>
   );
 };
 

@@ -12,30 +12,12 @@
     "dealType": {
       "options": [
         "IPO",
-        "FO",
-        "PRIVATE",
-        "OTHER"
+        "FO"
       ],
       "label": "Deal Type",
       "description": "Choose the type of deal."
     },
-    "sector": {
-      "options": [
-        "Communication Services",
-        "Consumer Discretionary",
-        "Consumer Staples",
-        "Energy",
-        "Financials",
-        "Health Care",
-        "Industrials",
-        "Information Technology",
-        "Materials",
-        "Real Estate",
-        "Utilities"
-      ],
-      "label": "Sector",
-      "description": "Select the sector of the deal."
-    },
+
     "t1_return": {
       "options": [
         ">4",
@@ -76,7 +58,20 @@
       "label": "Sponsor",
       "description": "Choose whether the sponsor is involved in the deal."
     },
-    "Primary": {
+    "deal_captain": {
+        "options": [
+            "Block",
+            "HC",
+            "Jay",
+            "Robin",
+            "Tom",
+            "Others"
+
+        ],
+        "label": "Deal Captain",
+        "description": "Others include Frank, HCFN, HCPP, Chris, Jason, Jerry, Rene, Rob, Will"
+    },
+    "primary": {
       "options": [
         "ALL",
         "Equal to 0",
@@ -90,48 +85,24 @@
       "label": "Primary Percentage",
       "description": "Select a range or specific value for the primary category."
     },
-    "AllocationPercentOfDealSize": {
+    "sector": {
       "options": [
-        "ALL",
-        "Equal to 0",
-        "Equal to 100",
-        "0-20",
-        "20-40",
-        "40-60",
-        "60-80",
-        "80-100"
+        "Communication Services",
+        "Consumer Discretionary",
+        "Consumer Staples",
+        "Energy",
+        "Financials",
+        "Health Care",
+        "Industrials",
+        "Information Technology",
+        "Materials",
+        "Real Estate",
+        "Utilities"
       ],
-      "label": "Allocation % DealSize (Simple)",
-      "description": "Select the allocation percentage of the deal size from the given options."
-    },
-    "AllocationPercentOfIOI": {
-      "options": [
-        "ALL",
-        "Equal to 0",
-        "Equal to 100",
-        "0-20",
-        "20-40",
-        "40-60",
-        "60-80",
-        "80-100"
-      ],
-      "label": "Allocation % IOI (Simple)",
-      "description": "Select the allocation percentage of IOI from the given options."
-    },
-    "HoldPeriod": {
-      "options": [
-        "ALL",
-        "Equal to 0",
-        "Equal to 100",
-        "0-20",
-        "20-40",
-        "40-60",
-        "60-80",
-        "80-100"
-      ],
-      "label": "Hold Period",
-      "description": "Select the hold period range from the given options."
+      "label": "Sector",
+      "description": "Select the sector of the deal."
     }
+
   },
   "Fundamentals": {
     "market_cap": {
@@ -151,36 +122,7 @@
       ],
       "description": "Select the market capitalization range from the given options."
     },
-    "sales_ttm": {
-      "label": "Sales (TTM)",
-      "options": [
-        "Any",
-        "Below $500000M",
-        "Below $200000M",
-        "Below $100000M",
-        "Below $50000M",
-        "Below $10000M",
-        "Below $5000M",
-        "Below $1000M",
-        "Below $500M",
-        "Above $200000M",
-        "Above $100000M",
-        "Above $50000M",
-        "Above $10000M",
-        "Above $5000M",
-        "Above $1000M",
-        "Above $500M",
-        "$500M to $1000M",
-        "$1000M to $5000M",
-        "$1000M to $10000M",
-        "$5000M to $10000M",
-        "$5000M to $20000M",
-        "$10000M to $20000M",
-        "$10000M to $50000M",
-        "200000M to $500000M"
-      ],
-      "description": "Select the total sales over the last 12 months (TTM) from the given options."
-    },
+    
     "sector": {
       "label": "Sector",
       "options": [
@@ -449,39 +391,7 @@
       "label": "Div Yield",
       "description": "Select the Dividend Yield range."
     },
-    "sales_growth": {
-      "options": [
-        "Any",
-        "Above 0%",
-        "Above 5%",
-        "Above 10%",
-        "Above 20%",
-        "Above 50%",
-        "Below 0%",
-        "Below 5%",
-        "Below 10%",
-        "Below 20%",
-        "Below 50%",
-        "Above -5%",
-        "Above -10%",
-        "Above -20%",
-        "Above -50%",
-        "Below -5%",
-        "Below -10%",
-        "Below -20%",
-        "Below -50%",
-        "20% to 50%",
-        "10% to 20%",
-        "5% to 10%",
-        "0% to 5%",
-        "-5% to 0%",
-        "-10% to -5%",
-        "-20% to -10%",
-        "-50% to -20%"
-      ],
-      "label": "Sales Growth",
-      "description": "Select the Sales Growth percentage range."
-    },
+
     "sales_growth_3y_cagr": {
       "options": [
         "Any",
@@ -512,36 +422,10 @@
         "-20% to -10%",
         "-50% to -20%"
       ],
-      "label": "Sales Growth 3Y/5R CAGR",
-      "description": "Select the Sales Growth 3Y/5R CAGR range."
+      "label": "Sales Growth 3Y CAGR",
+      "description": "Select the Sales Growth 3Y CAGR range."
     },
-    "eps_growth": {
-      "options": [
-        "Any",
-        "Above 0%",
-        "Above 10%",
-        "Above 20%",
-        "Above 50%",
-        "Below 0%",
-        "Below 10%",
-        "Below 20%",
-        "Below 50%",
-        "Above -10%",
-        "Above -20%",
-        "Above -50%",
-        "Below -10%",
-        "Below -20%",
-        "Below -50%",
-        "20% to 50%",
-        "10% to 20%",
-        "0% to 10%",
-        "-10% to 0%",
-        "-20% to -10%",
-        "-50% to -20%"
-      ],
-      "label": "EPS Growth",
-      "description": "Select the EPS Growth percentage range."
-    },
+
     "eps_growth_3y_cagr": {
       "options": [
         "Any",
@@ -566,8 +450,8 @@
         "-20% to -10%",
         "-50% to -20%"
       ],
-      "label": "EPS Growth 3Y/5R CAGR",
-      "description": "Select the EPS Growth 3Y/5R CAGR range."
+      "label": "EPS Growth 3Y CAGR",
+      "description": "Select the EPS Growth 3Y CAGR range."
     },
     "roe": {
       "options": [
@@ -611,97 +495,9 @@
       "label": "ROCE",
       "description": "Select the Return on Capital Employed (ROCE) percentage range."
     },
-    "fcf_margin": {
-      "options": [
-        "Any",
-        "Above 0%",
-        "Above 5%",
-        "Above 10%",
-        "Above 20%",
-        "Above 50%",
-        "Below 0%",
-        "Below 5%",
-        "Below 10%",
-        "Below 20%",
-        "Below 50%",
-        "Above -5%",
-        "Above -10%",
-        "Above -20%",
-        "Above -50%",
-        "Below -5%",
-        "Below -10%",
-        "Below -20%",
-        "Below -50%",
-        "20% to 50%",
-        "10% to 20%",
-        "5% to 10%",
-        "0% to 5%",
-        "-5% to 0%",
-        "-10% to -5%",
-        "-20% to -10%",
-        "-50% to -20%"
-      ],
-      "label": "FCF Margin",
-      "description": "Select the Free Cash Flow (FCF) Margin percentage range."
-    },
-    "total_any_assets": {
-      "options": [
-        "Any",
-        "Above 0%",
-        "Above 5%",
-        "Above 10%",
-        "Above 20%",
-        "Above 50%",
-        "Below 0%",
-        "Below 5%",
-        "Below 10%",
-        "Below 20%",
-        "Below 50%",
-        "Above -5%",
-        "Above -10%",
-        "Above -20%",
-        "Above -50%",
-        "Below -5%",
-        "Below -10%",
-        "Below -20%",
-        "Below -50%",
-        "20% to 50%",
-        "10% to 20%",
-        "5% to 10%",
-        "0% to 5%",
-        "-5% to 0%",
-        "-10% to -5%",
-        "-20% to -10%",
-        "-50% to -20%"
-      ],
-      "label": "Sales / Total Any Assets",
-      "description": "Select the Free Cash Flow (FCF) Margin percentage range."
-    },
-    "net_debt_fcf": {
-      "options": [
-        "Any",
-        "Cash rich (<0)",
-        "Under 0.5",
-        "Under 1",
-        "Under 2",
-        "Under 3",
-        "Under 4",
-        "Under 10",
-        "Over 0.5",
-        "Over 1",
-        "Over 2",
-        "Over 3",
-        "Over 4",
-        "Over 10",
-        "10 to 0.5",
-        "10.5 to 1",
-        "1 to 2",
-        "2 to 4",
-        "4 to 10"
-      ],
-      "label": "Net Debt/FCF",
-      "description": "Select the Net Debt to Free Cash Flow (FCF) ratio range."
-    },
+
+ 
+ 
     "net_debt_ebitda": {
       "options": [
         "Any",
@@ -1115,9 +911,7 @@
       ],
       "label": "1Y",
       "description": "Performance over the last 1 year."
-    }
-  },
-  "Risk": {
+    },
     "beta": {
       "options": [
         "Any",
@@ -1174,24 +968,6 @@
       ],
       "label": "Volatility",
       "description": "Select the credit risk level associated with the deal."
-    },
-    "piotroski_score": {
-      "options": [
-        "Any",
-        "Low (1 to 4)",
-        "Medium (5 to 6)",
-        "High (7 to 9)",
-        "Above 3",
-        "Above 5",
-        "Above 8",
-        "Under 3",
-        "Under 5",
-        "Under 8",
-        "1",
-        "9"
-      ],
-      "label": "Piotroski Score",
-      "description": "Select the interest rate risk level associated with the deal."
     }
   }
 }

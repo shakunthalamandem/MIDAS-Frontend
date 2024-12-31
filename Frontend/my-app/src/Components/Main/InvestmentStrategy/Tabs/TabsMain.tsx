@@ -3,12 +3,13 @@ import { Box, Button, Card, CardContent, Container, Tab, Tabs, Typography } from
 import Technical from "./Technical";
 import Fundamental from "./Fundamental";
 import MonasheeS3 from "./MonasheeS3";
-import Risk from "./Risk";
+import ScreenerMain from "./Screener/InvestScreenerMain";
+import InvestScreenerMain from "./Screener/InvestScreenerMain";
+
 interface SelectedValues {
   MonasheeSpecific: Record<string, string>;
   Technicals: Record<string, string>;
-  Fundamentals:  Record<string, string>;
-  Risk: Record<string, string>;
+  Fundamentals: Record<string, string>;
 }
 
 const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
@@ -19,14 +20,15 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
     MonasheeSpecific: {},
     Technicals: {},
     Fundamentals: {},
-    Risk: {},
   });
+
+  // State to store the applied values
+  const [appliedValues, setAppliedValues] = useState<SelectedValues | null>(null);
 
   const handleChange = (event: any, newValue: number) => {
     setValue(newValue); // Update the selected tab
   };
 
-  // Handle value change for each filter input
   const handleFilterChange = (tab: keyof SelectedValues, filterName: string, value: any) => {
     setSelectedValues((prevState) => ({
       ...prevState,
@@ -36,22 +38,18 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
       },
     }));
   };
-  
 
-  // Handle Apply button click
   const handleApply = () => {
-    console.log("Selected Values:", selectedValues);
-    // Apply the selected values (e.g., make an API call or store them)
+    setAppliedValues(selectedValues); // Set the applied values
   };
 
-  // Handle Reset button click
   const handleReset = () => {
     setSelectedValues({
       MonasheeSpecific: {},
       Technicals: {},
       Fundamentals: {},
-      Risk: {},
     });
+    setAppliedValues(null); // Clear the applied values
   };
 
   return (
@@ -86,36 +84,28 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
               <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
               <Tab label="Fundamentals" aria-label="Fundamentals Filters" />
               <Tab label="Technical" aria-label="Technical Filters" />
-              <Tab label="Risk/Other" aria-label="Risk Filters" />
             </Tabs>
 
             <Box sx={{ marginTop: 2 }}>
               {value === 0 && (
                 <MonasheeS3
-                  data={filtersData['Monashee Specific']}
+                  data={filtersData["Monashee Specific"]}
                   selectedValues={selectedValues.MonasheeSpecific}
-                  onValueChange={(name, value) => handleFilterChange('MonasheeSpecific', name, value)}
+                  onValueChange={(name, value) => handleFilterChange("MonasheeSpecific", name, value)}
                 />
               )}
               {value === 1 && (
                 <Fundamental
                   data={filtersData.Fundamentals}
                   selectedValues={selectedValues.Fundamentals}
-                  onValueChange={(name, value) => handleFilterChange('Fundamentals', name, value)}
+                  onValueChange={(name, value) => handleFilterChange("Fundamentals", name, value)}
                 />
               )}
               {value === 2 && (
                 <Technical
                   data={filtersData.Technicals}
                   selectedValues={selectedValues.Technicals}
-                  onValueChange={(name, value) => handleFilterChange('Technicals', name, value)}
-                />
-              )}
-              {value === 3 && (
-                <Risk
-                  data={filtersData.Risk}
-                  selectedValues={selectedValues.Risk}
-                  onValueChange={(name, value) => handleFilterChange('Risk', name, value)}
+                  onValueChange={(name, value) => handleFilterChange("Technicals", name, value)}
                 />
               )}
             </Box>
@@ -134,6 +124,9 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
             </Box>
           </CardContent>
         </Card>
+
+        {/* Pass appliedValues as props to ScreenerMain */}
+        <InvestScreenerMain appliedValues={appliedValues} />
       </Box>
     </Container>
   );
