@@ -45,8 +45,9 @@ const FundamentalMetricsCard: React.FC<Props> = ({ ticker }) => {
           padding: 2,
           borderRadius: 2,
           boxShadow: 3,
-          bgcolor: 'background.paper',
+          bgcolor: '#e5f0ee',
           height: '90%',
+          
         }}
       >
         <Typography variant="subtitle1" color="#58002f" gutterBottom fontWeight="bold">
@@ -100,15 +101,16 @@ const FundamentalMetricsCard: React.FC<Props> = ({ ticker }) => {
         marginTop: 2,
         borderRadius: 3,
         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+        bgcolor:'#fdf7ff'
       }}
     >
       <CardContent>
         <Typography
           variant="h5"
           align="center"
-          sx={{ marginBottom: 3, color: '#002060', fontWeight: 'bold' }}
+          sx={{ marginBottom: 3,  fontWeight: 'bold' }}
         >
-          Fundamental Metrics for {ticker}
+          <span style={{ color: '#002060'}}>Fundamental Metrics for</span> <span style={{color:'#006e18'}}>{ticker}</span>
         </Typography>
         <Grid container spacing={3}>
           {data &&
