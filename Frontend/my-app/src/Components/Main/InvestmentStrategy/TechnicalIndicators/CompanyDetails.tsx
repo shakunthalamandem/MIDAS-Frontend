@@ -74,7 +74,7 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
           {/* Display company description and other details */}
           {company ? (
             <>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1,  color:'#002060'}}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1,  color:'#6e0f00'}}>
                 {company.companyName}
               </Typography>
               <Typography variant="body1" sx={{ marginBottom: 1 ,color:'#4b4b4b'}}>
