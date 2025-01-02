@@ -15,10 +15,11 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
 
     // Clean up any existing widget before loading a new one
     container.current.innerHTML = '';
+    
 
     const script = document.createElement("script");
     script.src =
-      "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+      'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
     script.type = "text/javascript";
     script.async = true;
     script.innerHTML = `
