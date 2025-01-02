@@ -135,7 +135,7 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
   }, [appliedValues]);
 
   return (
-    <Box mb={10} sx={{ height: 500, width: "100%" }}>
+    <Box mb={10} sx={{ height: 600, width: "100%" }}>
       <Box mt={5} mb={5}>
        <Typography
           align="center"
