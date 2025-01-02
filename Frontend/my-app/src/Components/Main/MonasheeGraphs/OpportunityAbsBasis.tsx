@@ -83,7 +83,6 @@ const OpportunityAbsBasis: React.FC = () => {
         period,
         opportunity_value_on_abs_basis: "true",
       });
-      console.log(response.data);
 
       // Collect unique sectors
       const sectors = new Set<string>();

@@ -19,7 +19,6 @@ interface SectorTableDataProps {
 
 const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   const sectorwiseData = data?.Sectorwise;
-  console.log("sectorwiseData", sectorwiseData);
 
   if (!sectorwiseData) {
     return <div>No data available</div>;

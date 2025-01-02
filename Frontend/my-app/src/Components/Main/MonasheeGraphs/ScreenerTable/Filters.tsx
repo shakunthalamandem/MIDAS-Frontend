@@ -61,7 +61,6 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
   };
 
   const handleSubmit = () => {
-    console.log("Applied Filters:", selectedValues);
     setAppliedFilters(selectedValues); // Save applied filters
   };
 

@@ -54,7 +54,6 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
         const jsonData = await response.json();
 
         // Debugging: Log the full API response to verify structure
-        console.log('API Response:', jsonData);
 
         const graphData = jsonData?.technical_data?.output_ma_prices;
 
