@@ -10,23 +10,23 @@ interface InvestScreenerMainProps {
 
 const columns: GridColDef[] = [
   { field: 'ticker', headerName: 'Ticker', width: 150 },
-  { field: 'dealType', headerName: 'Deal Type', width: 150 },
-  { field: 't1_return', headerName: 'T1 Return', width: 130 },
-  { field: 't1m_returns', headerName: 'T1M Returns', width: 130 },
-  { field: 'deal_value', headerName: 'Deal Value', width: 150 },
+  { field: 'deal_type', headerName: 'Deal Type', width: 150 },
+  { field: 'T+1D_returns', headerName: 'T1 Return', width: 130 },
+  { field: 'T+1M_returns', headerName: 'T1M Returns', width: 130 },
+  { field: 'deal_size', headerName: 'Deal Size', width: 150 },
   { field: 'sponsor', headerName: 'Sponsor', width: 180 },
   { field: 'deal_captain', headerName: 'Deal Captain', width: 180 },
-  { field: 'allocation_percent_of_dealsize', headerName: 'Alloc % of Deal Size', width: 180 },
-  { field: 'allocation_percent_of_ioi', headerName: 'Alloc % of IOI', width: 180 },
-  { field: 'hold_period', headerName: 'Hold Period', width: 130 },
-  { field: 'primary', headerName: 'Primary', width: 130 },
+  { field: 'allocation_deal_size', headerName: 'Alloc % of Deal Size', width: 180 },
+  { field: 'allocation_ioi', headerName: 'Alloc % of IOI', width: 180 },
+  { field: 'average_hold_period', headerName: 'Hold Period', width: 130 },
+  { field: 'percentage_primary', headerName: 'Primary', width: 130 },
   { field: 'sector', headerName: 'Sector', width: 150 },
   { field: 'market_cap', headerName: 'Market Cap', width: 130 },
-  { field: 'target_price', headerName: 'Target Price', width: 150 },
+  { field: 'analyst_target_price', headerName: 'Target Price', width: 150 },
   { field: 'volume', headerName: 'Volume', width: 130 },
-  { field: 'industries', headerName: 'Industries', width: 150 },
-  { field: 'pe', headerName: 'PE', width: 130 },
-  { field: 'pb', headerName: 'PB', width: 130 },
+  { field: 'industry', headerName: 'Industries', width: 150 },
+  { field: 'price_to_earnings', headerName: 'PE', width: 130 },
+  { field: 'price_to_book', headerName: 'PB', width: 130 },
   { field: 'ev_sales', headerName: 'EV/Sales', width: 130 },
   { field: 'ev_ebitda', headerName: 'EV/EBITDA', width: 150 },
   { field: 'div_yield', headerName: 'Dividend Yield', width: 150 },
@@ -77,6 +77,7 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
         // Validate that response.data is an array
         const data = Array.isArray(response.data) ? response.data : [];
         setRows(data);
+        console.log("data",data)
       } catch (error) {
         console.error("Error fetching data:", error);
         setRows([]); // Reset rows on error
