@@ -139,7 +139,7 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
-        rowHeight={35}
+        rowHeight={40}
         sx={{
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "transparent",
