@@ -22,7 +22,7 @@ const TradingViewTickerTape: React.FC = () => {
                 { proName: 'SSE:000062', title: 'SSE' },
             ],
             showSymbolLogo: true,
-            colorTheme: 'light',
+            colorTheme: 'dark',
             isTransparent: false,
             displayMode: 'adaptive',
             locale: 'en',
