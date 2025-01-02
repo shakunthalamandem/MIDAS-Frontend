@@ -21,8 +21,17 @@ const TradingViewData: React.FC<TradingViewDataProps> = ({ ticker }) => {
         backgroundColor: '#fff',
         borderRadius: '8px',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        
       }}
+      
     >
+      <style>
+        {`
+          .tradingview-widget-copyright {
+            display: none !important;
+          }
+        `}
+      </style>
       <div style={{ position: 'relative' }}>
         {/* Add styles to hide the TradingView watermark if using an appropriate plan */}
         <SingleTicker

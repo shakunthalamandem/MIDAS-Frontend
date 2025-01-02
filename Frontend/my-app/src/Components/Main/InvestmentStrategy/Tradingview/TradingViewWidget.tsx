@@ -84,6 +84,13 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
             </a>
           </div>
         </Box>
+        <style>
+        {`
+          .tradingview-widget-copyright {
+            display: none !important;
+          }
+        `}
+      </style>
       </Card>
     </Box>
   );
