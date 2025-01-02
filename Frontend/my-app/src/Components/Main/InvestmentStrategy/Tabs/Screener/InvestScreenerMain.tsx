@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
