@@ -33,9 +33,9 @@ const TechnicalMain = () => {
         {selectedTicker && (
           <>
             <TradingViewData ticker={selectedTicker} />
-            <CompanyDetails ticker={selectedTicker} />
-            <FundamentalMetricsCard ticker={selectedTicker} />
             <TradingViewWidget ticker={selectedTicker} />
+
+            <FundamentalMetricsCard ticker={selectedTicker} />
             <MacdCharts ticker={selectedTicker} />
 
             {/* Display RSI and Volume side by side */}
@@ -49,6 +49,8 @@ const TechnicalMain = () => {
             </Grid>
 
             <VolatilityChart ticker={selectedTicker} />
+            <CompanyDetails ticker={selectedTicker} />
+
           </>
         )}
       </Box>
