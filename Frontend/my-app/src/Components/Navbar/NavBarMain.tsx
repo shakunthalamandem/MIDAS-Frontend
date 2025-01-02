@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Tabs, Tab, Button, Box, IconButton, Menu, MenuItem } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { AppBar, Toolbar, Typography, Tabs, Tab, Button, Box } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 // Import your logo
 import logo from '../../Assets/images/Monashee-Cap-Logos.png';
+import TradingViewTickerTape from '../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape';
 
 const pages = ['New Issue Equity Market', 'Monashee Deal Insights', 'Investment Strategies'];
 
@@ -47,23 +47,30 @@ const NavbarMain: React.FC = () => {
   };
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: '#FFFFFF', paddingX: { xs: 2, sm: 5 } }}>
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {/* Logo and Title */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#FFFFFF' }}>
-          <img src={logo} alt="MIDAS Logo" style={{ width: '130px', height: '60px', marginRight: '10px' }} />
-        
-        </Link>
+    <>
+      <AppBar position="sticky" sx={{ backgroundColor: '#FFFFFF', paddingX: { xs: 2, sm: 5 } }}>
+        {/* Conditionally show TradingViewTickerTape only when on the 'Investment Strategies' page */}
+        {location.pathname === '/strategies' && (
+  <Box sx={{ marginBottom: '50px' }}>
+    <TradingViewTickerTape />
+  </Box>
+)}
 
-       
+      
+
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Logo and Title */}
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#FFFFFF' }}>
+            <img src={logo} alt="MIDAS Logo" style={{ width: '130px', height: '60px', marginRight: '10px' }} />
+          </Link>
+
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
             <Tabs
               value={getTabIndex()}
-              // textColor="inherit"
               sx={{
                 '& .MuiTabs-indicator': {
-                  backgroundColor: '#002060', 
-                  display:'none'// Set the custom indicator color here
+                  backgroundColor: '#002060',
+                  display: 'none', // Set the custom indicator color here
                 },
               }}
             >
@@ -89,43 +96,42 @@ const NavbarMain: React.FC = () => {
                       color: '#FFFFFF', // Deep maroon text for hover state
                     },
                   }}
-                  
                 />
               ))}
             </Tabs>
-
           </Box>
-        
-        <Button
-          sx={{
-            color: '#FFFFFF',
-            backgroundColor: '#002060',
-            fontWeight: 'bold',
-            fontFamily: 'Roboto, sans-serif',
-            '&:hover': { backgroundColor: '#002060' },
-          }}
-          onClick={() => navigate('/login')}
-        >
-          Login
-        </Button>
-        <Button
-          sx={{
-            ml: 2,
-            border: '1px solid #FFFFFF',
-            color: '#FFFFFF',
-            backgroundColor: '#002060',
-                        fontWeight: 'bold',
-            '&:hover': {
-              backgroundColor: '#FFFFFF',
-              color: '#002060',
-            },
-          }}
-          onClick={() => navigate('/signup')}
-        >
-          Sign Up
-        </Button>
-      </Toolbar>
-    </AppBar>
+
+          <Button
+            sx={{
+              color: '#FFFFFF',
+              backgroundColor: '#002060',
+              fontWeight: 'bold',
+              fontFamily: 'Roboto, sans-serif',
+              '&:hover': { backgroundColor: '#002060' },
+            }}
+            onClick={() => navigate('/login')}
+          >
+            Login
+          </Button>
+          <Button
+            sx={{
+              ml: 2,
+              border: '1px solid #FFFFFF',
+              color: '#FFFFFF',
+              backgroundColor: '#002060',
+              fontWeight: 'bold',
+              '&:hover': {
+                backgroundColor: '#FFFFFF',
+                color: '#002060',
+              },
+            }}
+            onClick={() => navigate('/signup')}
+          >
+            Sign Up
+          </Button>
+        </Toolbar>
+      </AppBar>
+    </>
   );
 };
 
