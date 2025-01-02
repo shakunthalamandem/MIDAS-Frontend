@@ -18,7 +18,7 @@
       "description": "Choose the type of deal."
     },
 
-    "t1_return": {
+    "t1d_returns": {
       "options": [
         ">4",
         "2% to 4%",
@@ -50,7 +50,7 @@
       "label": "Deal Value",
       "description": "The total $ value of the offering or deal."
     },
-    "Sponsor": {
+    "sponsor": {
       "options": [
         "Yes",
         "No"
@@ -71,7 +71,7 @@
         "label": "Deal Captain",
         "description": "Others include Frank, HCFN, HCPP, Chris, Jason, Jerry, Rene, Rob, Will"
     },
-    "primary": {
+    "percentage_primary": {
       "options": [
         "ALL",
         "Equal to 0",
@@ -145,7 +145,7 @@
       ],
       "description": "Select the industry sector from the given options."
     },
-    "target_price": {
+    "analyst_target_price": {
       "label": "Target Price",
       "options": [
         "Any",
@@ -184,7 +184,7 @@
       ],
       "description": "Select the volume of shares traded from the given options."
     },
-    "industries": {
+    "industry": {
       "label": "Industries",
       "options": [
         "Any",
@@ -272,7 +272,7 @@
       ],
       "description": "Select the industry category from the given options."
     },
-    "pe": {
+    "price_to_earnings": {
       "options": [
         "Any",
         "Profitable (>0)",
@@ -301,7 +301,7 @@
       "label": "Price to Earnings (PE)",
       "description": "Select the Price to Earnings (PE) ratio range."
     },
-    "pb": {
+    "price_to_book": {
       "options": [
         "Any",
         "Under 1",
@@ -322,7 +322,7 @@
       "label": "Price to Book (PB)",
       "description": "Select the Price to Book (PB) ratio range."
     },
-    "ev_sales": {
+    "enterprise_value_to_revenue": {
       "options": [
         "Any",
         "Under 1",
@@ -343,7 +343,7 @@
       "label": "EV/Sales",
       "description": "Select the EV/Sales ratio range."
     },
-    "ev_ebitda": {
+    "enterprise_value_to_ebita": {
       "options": [
         "Any",
         "Under 5",
@@ -367,7 +367,7 @@
       "label": "EV/EBITDA",
       "description": "Select the EV/EBITDA ratio range."
     },
-    "div_yield": {
+    "dividend_yield": {
       "options": [
         "Any",
         "None (0%)",
@@ -392,7 +392,7 @@
       "description": "Select the Dividend Yield range."
     },
 
-    "sales_growth_3y_cagr": {
+    "revenue_growth_to_3y_cagr": {
       "options": [
         "Any",
         "Above 0%",
@@ -426,7 +426,7 @@
       "description": "Select the Sales Growth 3Y CAGR range."
     },
 
-    "eps_growth_3y_cagr": {
+    "eps_to_3yr_cagr": {
       "options": [
         "Any",
         "Above 0%",
@@ -453,7 +453,7 @@
       "label": "EPS Growth 3Y CAGR",
       "description": "Select the EPS Growth 3Y CAGR range."
     },
-    "roe": {
+    "return_on_equity": {
       "options": [
         "Any",
         "Over 0%",
@@ -498,7 +498,7 @@
 
  
  
-    "net_debt_ebitda": {
+    "net_debt_to_ebitda": {
       "options": [
         "Any",
         "Cash rich (<0)",
@@ -523,7 +523,7 @@
       "label": "Net Debt/EBITDA",
       "description": "Select the Net Debt to EBITDA ratio range."
     },
-    "debt_equity": {
+    "net_debt_to_equity": {
       "options": [
         "Any",
         "Zero (0)",
@@ -577,7 +577,7 @@
       "label": "52 Week Low",
       "description": "The current price in relation to the 52-week low."
     },
-    "dma_20": {
+    "dma20": {
       "options": [
         "Any",
         "Below Current Price",
@@ -598,7 +598,7 @@
       "label": "DMA 20",
       "description": "The current price in relation to the 20-day moving average."
     },
-    "dma_50": {
+    "dma50 ": {
       "options": [
         "Any",
         "Below Current Price",
@@ -619,7 +619,7 @@
       "label": "DMA 50",
       "description": "The current price in relation to the 50-day moving average."
     },
-    "dma_200": {
+    "dma200": {
       "options": [
         "Any",
         "Below Current Price",
