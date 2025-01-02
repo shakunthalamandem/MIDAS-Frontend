@@ -42,6 +42,7 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
     // Cleanup to remove the script on unmount
     return () => {
       if (container.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         container.current.innerHTML = ""; // Clear the widget container
       }
     };
