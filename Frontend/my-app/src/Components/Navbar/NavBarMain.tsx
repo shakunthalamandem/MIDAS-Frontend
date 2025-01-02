@@ -50,11 +50,11 @@ const NavbarMain: React.FC = () => {
     <>
       <AppBar position="sticky" sx={{ backgroundColor: '#FFFFFF', paddingX: { xs: 2, sm: 5 } }}>
         {/* Conditionally show TradingViewTickerTape only when on the 'Investment Strategies' page */}
-        {location.pathname === '/strategies' && (
-  <Box sx={{ marginBottom: '50px' }}>
-    <TradingViewTickerTape />
-  </Box>
-)}
+        {(location.pathname === '/strategies' || location.pathname.startsWith('/technical/')) && (
+          <Box sx={{ marginBottom: '50px' }}>
+            <TradingViewTickerTape />
+          </Box>
+        )}
 
       
 
