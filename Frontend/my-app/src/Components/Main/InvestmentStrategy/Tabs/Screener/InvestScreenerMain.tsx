@@ -55,6 +55,8 @@ const columns: GridColDef[] = [
 const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }) => {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [totalRows, setTotalRows] = useState(0); // Total rows from API
 
  // Pagination state
@@ -74,30 +76,48 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
     const fetchData = async () => {
       setLoading(true);
       try {
+        const apiUrl = process.env.REACT_APP_API_URL ;
+      
+        if (!apiUrl) {
+          throw new Error("API URL is not defined");
+        }
+      
         const transformedValues = transformAppliedValues(appliedValues);
-        const response = await axios.post(
-          "http://192.168.1.59:9000/api/investment_screener/",
-          transformedValues
-        );
+      
+        const response = await fetch(`${apiUrl}/api/investment_screener/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(transformedValues),
+        });
+     
+      
+        if (response.ok) {
+          const data = await response.json();
+          const rows = Array.isArray(data) ? data : [];
+          setRows(rows);
+          setTotalRows(data.pagination?.total_items || 0);
 
-        // Validate that response.data is an array
-        const data = Array.isArray(response.data) ? response.data : [];
-        setRows(data);
-        
-      } catch (error) {
+        } else {
+          throw new Error("Failed to fetch investment screener data");
+        }
+      } catch (error: any) {
         console.error("Error fetching data:", error);
         setRows([]); // Reset rows on error
-
+        setError(error.message || "An error occurred while fetching investment screener data");
       } finally {
         setLoading(false);
       }
+      
+      
     };
 
     fetchData();
   }, [appliedValues]);
 
   return (
-    <Box sx={{ height: 500, width: "100%" }}>
+    <Box mb={10} sx={{ height: 500, width: "100%" }}>
       <Box mt={5} mb={5}>
        <Typography
           align="center"
@@ -143,3 +163,5 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
 };
 
 export default InvestScreenerMain;
+
+
