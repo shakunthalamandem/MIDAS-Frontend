@@ -25,6 +25,7 @@ const columns: GridColDef[] = [
     )
   },  
   { field: 'deal_type', headerName: 'Deal Type', width: 100 },
+  { field: 'pricing_date', headerName: 'Date', width: 100 },
   { field: 'T+1D_returns', headerName: 'T1 Return', width: 100 },
   { field: 'T+1M_returns', headerName: 'T1M Returns', width: 100 },
   { field: 'deal_size', headerName: 'Deal Size', width: 130 },
