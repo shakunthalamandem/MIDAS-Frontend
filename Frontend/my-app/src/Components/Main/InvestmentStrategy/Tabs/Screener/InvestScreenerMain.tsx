@@ -65,12 +65,16 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
 });
   useEffect(() => {
     const transformAppliedValues = (values: any) => {
+      if (!values) {
+        return {}; // Return an empty object if values is null or undefined
+      }
       return {
         ...values.Fundamentals,
         ...values.MonasheeSpecific,
         ...values.Technicals,
       };
     };
+    
 
     const fetchData = async () => {
       setLoading(true);
