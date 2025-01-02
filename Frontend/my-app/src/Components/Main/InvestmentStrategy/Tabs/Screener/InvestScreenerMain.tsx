@@ -111,10 +111,9 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
           body: JSON.stringify(transformedValues),
         });
      
-      
         if (response.ok) {
           const data = await response.json();
-          const rows = Array.isArray(data) ? data : [];
+          const rows = Array.isArray(data.data) ? data.data : [];
           setRows(rows);
           setTotalRows(data.pagination?.total_items || 0);
 

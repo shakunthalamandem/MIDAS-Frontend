@@ -9,7 +9,7 @@
       "label": "Issue Year",
       "description": "Select the year of the deal."
     },
-    "dealType": {
+    "deal_type": {
       "options": [
         "IPO",
         "FO"
