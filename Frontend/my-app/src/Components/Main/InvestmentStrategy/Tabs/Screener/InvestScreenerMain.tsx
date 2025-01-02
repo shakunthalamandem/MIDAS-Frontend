@@ -10,19 +10,22 @@ interface InvestScreenerMainProps {
 
 const columns: GridColDef[] = [
   {
-    field: 'ticker', 
-    headerName: 'Ticker', 
-    width: 100,
+    field: 'ticker',
+    headerName: 'Ticker',
+    headerAlign: 'center', // Center-align the header
+    width: 120,
     renderCell: (params) => (
       // Create a link for the ticker that opens in a new tab
-      <Link 
-        to={`/technical/${params.value}`} 
-        style={{ color: '#1E88E5', textDecoration: 'none' }} 
-        target="_blank"
-      >
-        {params.value}
-      </Link>
-    )
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Link
+          to={`/technical/${params.value}`}
+          style={{ color: '#1E88E5', textDecoration: 'none' }}
+          target="_blank"
+        >
+          {params.value}
+        </Link>
+      </div>
+    ),
   },  
   { field: 'deal_type', headerName: 'Deal Type', width: 100 },
   { field: 'pricing_date', headerName: 'Date', width: 100 },
