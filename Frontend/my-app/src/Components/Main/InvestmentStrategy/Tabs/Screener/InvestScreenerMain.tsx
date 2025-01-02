@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 
 interface InvestScreenerMainProps {
   appliedValues: any;
@@ -55,7 +55,13 @@ const columns: GridColDef[] = [
 const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }) => {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [totalRows, setTotalRows] = useState(0); // Total rows from API
 
+ // Pagination state
+ const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+  page: 0,
+  pageSize: 100,
+});
   useEffect(() => {
     const transformAppliedValues = (values: any) => {
       return {
@@ -77,10 +83,11 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
         // Validate that response.data is an array
         const data = Array.isArray(response.data) ? response.data : [];
         setRows(data);
-        console.log("data",data)
+        
       } catch (error) {
         console.error("Error fetching data:", error);
         setRows([]); // Reset rows on error
+
       } finally {
         setLoading(false);
       }
@@ -91,16 +98,45 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
 
   return (
     <Box sx={{ height: 500, width: "100%" }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Screener Results
-      </Typography>
+      <Box mt={5} mb={5}>
+       <Typography
+          align="center"
+          style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
+        >
+          Total No of Deals:
+          <span style={{ color: "#004b33" }}>{totalRows}</span>
+        </Typography>
+        </Box>
       <DataGrid
         rows={rows.map((row, index) => ({ id: index, ...row }))}
         columns={columns}
+        rowCount={totalRows}
         loading={loading}
-        // pageSize={10}
-        // rowsPerPageOptions={[10, 20, 50]}
-        // disableSelectionOnClick
+        paginationMode="server"
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10, 25, 50, 100]}
+        rowHeight={35}
+        sx={{
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "transparent",
+            fontWeight: "bold",
+            color: "#002060",
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold",
+            fontSize: "12px", // Decrease header font size
+          },
+          "& .MuiDataGrid-cell": {
+            color: "#000000",
+            fontSize: "12px", // Decrease font size for cell values
+            padding: "4px", // Optional: Reduce padding for compact look
+          },
+          "& .MuiDataGrid-row:nth-of-type(odd)": {
+            backgroundColor: "#F5F5F5",
+          },
+        }}
+   
       />
     </Box>
   );
