@@ -82,7 +82,6 @@ const OpportunityMain: React.FC = () => {
         period,
         opportunity_value_ex: "true",
       });
-      console.log(response.data);
 
       // Collect unique sectors
       const sectors = new Set<string>();

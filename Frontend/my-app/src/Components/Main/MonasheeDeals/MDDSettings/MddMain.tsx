@@ -28,7 +28,6 @@ const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
         const data = await response.json();
         // setFiltersData(data.screener || []);
         setFiltersData(data || []);
-        // console.log("rnajithmddfilters",data)
       } catch (error) {
         console.error("Error loading filters:", error);
       }

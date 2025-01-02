@@ -41,7 +41,6 @@ const MDDScreener: React.FC = () => {
         return response.json();
       })
       .then((data) => {
-        console.log("Fetched Filters Data:", data); // Debugging the fetched data
         setFiltersData(data);
       })
       .catch((error) => console.error("Error loading filters:", error));

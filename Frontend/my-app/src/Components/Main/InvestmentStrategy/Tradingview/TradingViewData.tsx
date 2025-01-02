@@ -9,7 +9,6 @@ const TradingViewData: React.FC<TradingViewDataProps> = ({ ticker }) => {
   // Remove " US" or other country suffix from the ticker symbol
   const cleanedTicker = ticker.replace(/\s+US$/, '');
 
-  console.log("Cleaned Ticker:", cleanedTicker);
 
   return (
     <div

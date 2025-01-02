@@ -51,7 +51,6 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
         const response = await axios.get<{
           deal_captain?: { options: string[] };
         }>("http://192.168.1.59:9000/api/mdd_screener_filters/");
-        console.log(response.data); // Log to check the response structure
 
         const dealCaptainData = response.data?.deal_captain;
 

@@ -83,7 +83,6 @@ const DealVolume: React.FC = () => {
         period,
         deal_value: "true",
       });
-      console.log(response.data);
 
       // Collect unique sectors
       const sectors = new Set<string>();

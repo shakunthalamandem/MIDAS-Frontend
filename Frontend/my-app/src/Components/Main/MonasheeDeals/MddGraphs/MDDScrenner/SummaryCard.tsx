@@ -6,7 +6,6 @@ interface SummaryCardProps {
 }
 
 const SummaryCard: React.FC<SummaryCardProps> = ({ sectorwiseData }) => {
-    console.log("sectorwiseData",sectorwiseData)
   // Example summary calculation based on the provided data
   const calculateSummary = () => {
     const summary = {

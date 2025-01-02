@@ -63,7 +63,6 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
   };
 
   const handleApply = (values: { [key: string]: any }) => {
-    console.log("Applied Filters:", values); // API call with applied filters
     setAppliedFilters(values); // Save selected values as applied filters
     // Trigger API call here with values
     // Example: apiCall(values);
