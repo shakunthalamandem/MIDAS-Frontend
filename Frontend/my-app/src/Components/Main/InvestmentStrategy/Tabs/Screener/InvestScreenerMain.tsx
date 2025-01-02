@@ -1,9 +1,15 @@
-import React from "react";
-import { DataGrid } from "@mui/x-data-grid";
-import { Box, Typography } from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
-const columns = [
-  { field: 'year_range', headerName: 'Year Range', width: 150 },
+interface InvestScreenerMainProps {
+  appliedValues: any;
+}
+
+const columns: GridColDef[] = [
+  { field: 'ticker', headerName: 'Ticker', width: 150 },
   { field: 'dealType', headerName: 'Deal Type', width: 150 },
   { field: 't1_return', headerName: 'T1 Return', width: 130 },
   { field: 't1m_returns', headerName: 'T1M Returns', width: 130 },
@@ -46,18 +52,54 @@ const columns = [
   { field: 'beta', headerName: 'Beta', width: 130 },
   { field: 'volatility', headerName: 'Volatility', width: 150 },
 ];
+const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }) => {
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-const InvestScreenerMain: React.FC<{ appliedValues: any }> = ({ appliedValues }) => {
+  useEffect(() => {
+    const transformAppliedValues = (values: any) => {
+      return {
+        ...values.Fundamentals,
+        ...values.MonasheeSpecific,
+        ...values.Technicals,
+      };
+    };
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const transformedValues = transformAppliedValues(appliedValues);
+        const response = await axios.post(
+          "http://192.168.1.59:9000/api/investment_screener/",
+          transformedValues
+        );
+
+        // Validate that response.data is an array
+        const data = Array.isArray(response.data) ? response.data : [];
+        setRows(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setRows([]); // Reset rows on error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [appliedValues]);
 
   return (
-    <Box sx={{ height: 500, width: '100%' }}>
+    <Box sx={{ height: 500, width: "100%" }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
         Screener Results
       </Typography>
       <DataGrid
-        // rows={data.row}
+        rows={rows.map((row, index) => ({ id: index, ...row }))}
         columns={columns}
-        
+        loading={loading}
+        // pageSize={10}
+        // rowsPerPageOptions={[10, 20, 50]}
+        // disableSelectionOnClick
       />
     </Box>
   );
