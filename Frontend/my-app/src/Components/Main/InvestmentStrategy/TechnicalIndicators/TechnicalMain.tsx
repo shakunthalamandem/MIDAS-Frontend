@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom"; // Import useParams from react-router-dom
 import TickerDropdown from "../Tradingview/TickerDropdown";
 import TradingViewWidget from "../Tradingview/TradingViewWidget";
 import { Box, Container, Typography, Grid } from "@mui/material";
@@ -11,14 +12,14 @@ import VolatilityChart from "./VolatilityChart";
 import FundamentalMetricsCard from "../Tabs/FundamentalMetricsCard";
 
 const TechnicalMain = () => {
-  const [selectedTicker, setSelectedTicker] = useState<string>("");
-  const [ticker, setTicker] = useState<string>("");
+  const { ticker } = useParams(); // Get ticker from URL parameters
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(ticker || ""); // Initialize selectedTicker with the URL parameter or empty string
 
-  // Handle ticker selection
-  const handleTickerSelect = (ticker: string) => {
-    setSelectedTicker(ticker);
-    setTicker(ticker);
-  };
+  useEffect(() => {
+    if (ticker) {
+      setSelectedTicker(ticker); // Update the selectedTicker if the URL ticker changes
+    }
+  }, [ticker]); // Effect runs whenever the ticker parameter changes
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
@@ -26,34 +27,30 @@ const TechnicalMain = () => {
         <Typography variant="h4" style={{ color: "#002060", fontWeight: "bold" }}>
           Technical Analysis
         </Typography>
-        <TickerDropdown onSelectTicker={handleTickerSelect} />
+        {/* Display ticker dropdown only if no ticker is selected */}
+        {!selectedTicker && <TickerDropdown onSelectTicker={setSelectedTicker} />}
 
-        {ticker && <TradingViewData ticker={ticker} />}
-        {selectedTicker && <CompanyDetails ticker={selectedTicker} />}
-        {selectedTicker && <FundamentalMetricsCard ticker={selectedTicker} />}
-
-
-
-        {/* TradingView Widget */}
-        {selectedTicker && <TradingViewWidget ticker={selectedTicker} />}
-
-        {/* MACD Chart */}
-        {selectedTicker && <MacdCharts ticker={selectedTicker} />}
-
-        {/* Display RSI and Volume side by side */}
         {selectedTicker && (
-          <Grid container spacing={2} sx={{ marginTop: 3 }}>
-            <Grid item xs={12} sm={6}>
-              <RsiMain ticker={selectedTicker} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <VolumeChart ticker={selectedTicker} />
-            </Grid>
-          </Grid>
-        )}
+          <>
+            <TradingViewData ticker={selectedTicker} />
+            <CompanyDetails ticker={selectedTicker} />
+            <FundamentalMetricsCard ticker={selectedTicker} />
+            <TradingViewWidget ticker={selectedTicker} />
+            <MacdCharts ticker={selectedTicker} />
 
-        {/* Company Details */}
-        {selectedTicker && <VolatilityChart ticker={selectedTicker} />}
+            {/* Display RSI and Volume side by side */}
+            <Grid container spacing={2} sx={{ marginTop: 3 }}>
+              <Grid item xs={12} sm={6}>
+                <RsiMain ticker={selectedTicker} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <VolumeChart ticker={selectedTicker} />
+              </Grid>
+            </Grid>
+
+            <VolatilityChart ticker={selectedTicker} />
+          </>
+        )}
       </Box>
     </Container>
   );

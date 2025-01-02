@@ -2,13 +2,28 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
+import { Link } from 'react-router-dom';
 
 interface InvestScreenerMainProps {
   appliedValues: any;
 }
 
 const columns: GridColDef[] = [
-  { field: 'ticker', headerName: 'Ticker', width: 100 },
+  {
+    field: 'ticker', 
+    headerName: 'Ticker', 
+    width: 100,
+    renderCell: (params) => (
+      // Create a link for the ticker that opens in a new tab
+      <Link 
+        to={`/technical/${params.value}`} 
+        style={{ color: '#1E88E5', textDecoration: 'none' }} 
+        target="_blank"
+      >
+        {params.value}
+      </Link>
+    )
+  },  
   { field: 'deal_type', headerName: 'Deal Type', width: 100 },
   { field: 'T+1D_returns', headerName: 'T1 Return', width: 100 },
   { field: 'T+1M_returns', headerName: 'T1M Returns', width: 100 },

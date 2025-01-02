@@ -19,7 +19,7 @@ const AppRouters: React.FC = () => {
         <Route path="/capital-markets" element={<CapitalMarkets />} />
         <Route path="/monashee-deals" element={<MonasheeDeals />} />
         <Route path="/strategies" element={<InvestmentMain />} />
-        <Route path="/technicalanalysis" element={<TechnicalMain />} />
+        <Route path="/technical/:ticker" element={<TechnicalMain />} />
 
 
       </Routes>
