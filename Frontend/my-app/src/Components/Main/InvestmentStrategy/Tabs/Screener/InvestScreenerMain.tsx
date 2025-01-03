@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import React, { useState } from 'react';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { Link } from 'react-router-dom';
+import { Box, Typography } from '@mui/material';
 
 interface InvestScreenerMainProps {
-  appliedValues: any;
+  rows: any[];
+  loading: boolean;
+  totalRows: number;
 }
 
 const columns: GridColDef[] = [
   {
     field: 'ticker',
     headerName: 'Ticker',
-    headerAlign: 'center', // Center-align the header
+    headerAlign: 'center',
     width: 120,
     renderCell: (params) => (
-      // Create a link for the ticker that opens in a new tab
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
         <Link
           to={`/technical/${params.value}`}
@@ -70,76 +70,16 @@ const columns: GridColDef[] = [
   { field: 'beta', headerName: 'Beta', width: 100 },
   { field: 'volatility', headerName: 'Volatility', width: 100 },
 ];
-const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }) => {
-  const [rows, setRows] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const [totalRows, setTotalRows] = useState(0); // Total rows from API
-
- // Pagination state
- const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-  page: 0,
-  pageSize: 100,
-});
-  useEffect(() => {
-    const transformAppliedValues = (values: any) => {
-      if (!values) {
-        return {}; // Return an empty object if values is null or undefined
-      }
-      return {
-        ...values.Fundamentals,
-        ...values.MonasheeSpecific,
-        ...values.Technicals,
-      };
-    };
-    
-
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const apiUrl = process.env.REACT_APP_API_URL ;
-      
-        if (!apiUrl) {
-          throw new Error("API URL is not defined");
-        }
-      
-        const transformedValues = transformAppliedValues(appliedValues);
-      
-        const response = await fetch(`${apiUrl}/api/investment_screener/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(transformedValues),
-        });
-     
-        if (response.ok) {
-          const data = await response.json();
-          const rows = Array.isArray(data.data) ? data.data : [];
-          setRows(rows);
-          setTotalRows(data.pagination?.total_items || 0);
-
-        } else {
-          throw new Error("Failed to fetch investment screener data");
-        }
-      } catch (error: any) {
-        console.error("Error fetching data:", error);
-        setRows([]); // Reset rows on error
-        setError(error.message || "An error occurred while fetching investment screener data");
-      } finally {
-        setLoading(false);
-      }
-      
-      
-    };
-
-    fetchData();
-  }, [appliedValues]);
+const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ rows, loading, totalRows }) => {
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 100,
+  });
 
   return (
     <Box mb={10} sx={{ height: 600, width: "100%" }}>
-      <Box mt={5} mb={5}>
+      {/* <Box mt={5} mb={5}>
        <Typography
           align="center"
           style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
@@ -147,7 +87,7 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
           Total No of Deals:
           <span style={{ color: "#004b33" }}>{totalRows}</span>
         </Typography>
-        </Box>
+        </Box> */}
       <DataGrid
         rows={rows.map((row, index) => ({ id: index, ...row }))}
         columns={columns}
@@ -184,5 +124,3 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ appliedValues }
 };
 
 export default InvestScreenerMain;
-
-

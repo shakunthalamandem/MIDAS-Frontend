@@ -4,6 +4,7 @@ import Technical from "./Technical";
 import Fundamental from "./Fundamental";
 import MonasheeS3 from "./MonasheeS3";
 import InvestScreenerMain from "./Screener/InvestScreenerMain";
+import InvestScreenerAPI from "./Screener/InvestScreenerAPI";
 
 interface SelectedValues {
   MonasheeSpecific: Record<string, string>;
@@ -128,7 +129,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
         </Card>
 
         {/* Pass appliedValues as props to ScreenerMain */}
-        <InvestScreenerMain appliedValues={appliedValues} />
+        <InvestScreenerAPI appliedValues={appliedValues} />
       </Box>
     </Container>
   );

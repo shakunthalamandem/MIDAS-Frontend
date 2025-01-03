@@ -1,0 +1,83 @@
+import React, { useEffect, useState } from 'react';
+import { Box, Typography } from '@mui/material';
+import InvestScreenerMain from './InvestScreenerMain';
+
+interface InvestScreenerAPIProps {
+  appliedValues: any;
+}
+
+const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) => {
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalRows, setTotalRows] = useState(0); // Total rows from API
+
+  useEffect(() => {
+    const transformAppliedValues = (values: any) => {
+      if (!values) {
+        return {}; // Return an empty object if values is null or undefined
+      }
+      return {
+        ...values.Fundamentals,
+        ...values.MonasheeSpecific,
+        ...values.Technicals,
+      };
+    };
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error("API URL is not defined");
+        }
+
+        const transformedValues = transformAppliedValues(appliedValues);
+
+        const response = await fetch(`${apiUrl}/api/investment_screener/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(transformedValues),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const rows = Array.isArray(data.data) ? data.data : [];
+          setRows(rows);
+          setTotalRows(data.pagination?.total_items || 0);
+        } else {
+          throw new Error("Failed to fetch investment screener data");
+        }
+      } catch (error: any) {
+        console.error("Error fetching data:", error);
+        setRows([]); // Reset rows on error
+        setError(error.message || "An error occurred while fetching investment screener data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [appliedValues]);
+
+  return (
+    <Box mb={10}>
+      <Box mt={5} mb={5}>
+        <Typography
+          align="center"
+          style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
+        >
+          Total No of Deals:
+          <span style={{ color: "#004b33" }}>{totalRows}</span>
+        </Typography>
+      </Box>
+      {/* Pass the fetched data to the grid component */}
+      <InvestScreenerMain rows={rows} loading={loading} totalRows={totalRows} />
+    </Box>
+  );
+};
+
+export default InvestScreenerAPI;
