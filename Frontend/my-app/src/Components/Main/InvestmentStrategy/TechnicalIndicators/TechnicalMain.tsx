@@ -36,11 +36,10 @@ const TechnicalMain = () => {
           <>
             {/* TradingViewData and CompanyDetails side by side */}
             <Grid container spacing={2} sx={{ marginTop: 3 }}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
                 <TradingViewData ticker={selectedTicker} />
               </Grid>
-              <Grid item xs={12} md={6}>
-                <CompanyDetails ticker={selectedTicker} />
+              <Grid item xs={12} md={8}>
               </Grid>
             </Grid>
 
@@ -59,6 +58,8 @@ const TechnicalMain = () => {
             </Grid>
 
             <VolatilityChart ticker={selectedTicker} />
+            <CompanyDetails ticker={selectedTicker} />
+
           </>
         )}
       </Box>
