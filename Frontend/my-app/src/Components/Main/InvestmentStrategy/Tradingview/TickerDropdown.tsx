@@ -48,7 +48,7 @@ const TickerDropdown: React.FC<TickerDropdownProps> = ({ onSelectTicker }) => {
   };
 
   return (
-    <Box sx={{ textAlign: 'center', marginTop: '50px' }}>
+    <Box sx={{ textAlign: 'center' }}>
       <Box
         sx={{ display: 'inline-block', textAlign: 'left', position: 'relative' }}
         onMouseEnter={() => setShowDropdown(true)}

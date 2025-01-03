@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Paper, Box, Button } from '@mui/material';
-import { styled } from '@mui/system';
+import { Typography, Paper, Button } from '@mui/material';
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface ChartData {
@@ -41,9 +40,7 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
       try {
         const response = await fetch(`${apiUrl}/api/technical-analysis/`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
 
@@ -52,9 +49,6 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
         }
 
         const jsonData = await response.json();
-
-        // Debugging: Log the full API response to verify structure
-
         const graphData = jsonData?.technical_data?.output_ma_prices;
 
         if (!graphData) {
@@ -62,34 +56,13 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
         }
 
         const transformedData: ChartData = {
-          price: graphData.map((item: any) => ({
-            date: item.date,
-            price: item.price,
-          })),
-          dma9: graphData.map((item: any) => ({
-            date: item.date,
-            value: item.dma9,
-          })),
-          dma20: graphData.map((item: any) => ({
-            date: item.date,
-            value: item.dma20,
-          })),
-          dma26: graphData.map((item: any) => ({
-            date: item.date,
-            value: item.dma26,
-          })),
-          dma50: graphData.map((item: any) => ({
-            date: item.date,
-            value: item.dma50,
-          })),
-          dma100: graphData.map((item: any) => ({
-            date: item.date,
-            value: item.dma100,
-          })),
-          dma200: graphData.map((item: any) => ({
-            date: item.date,
-            value: item.dma200,
-          })),
+          price: graphData.map((item: any) => ({ date: item.date, price: item.price })),
+          dma9: graphData.map((item: any) => ({ date: item.date, value: item.dma9 })),
+          dma20: graphData.map((item: any) => ({ date: item.date, value: item.dma20 })),
+          dma26: graphData.map((item: any) => ({ date: item.date, value: item.dma26 })),
+          dma50: graphData.map((item: any) => ({ date: item.date, value: item.dma50 })),
+          dma100: graphData.map((item: any) => ({ date: item.date, value: item.dma100 })),
+          dma200: graphData.map((item: any) => ({ date: item.date, value: item.dma200 })),
         };
 
         setData(transformedData);
@@ -103,7 +76,6 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
     }
   }, [ticker]);
 
-  // Handle the visibility toggle for each line in the chart
   const handleLegendClick = (dataKey: string) => {
     setVisibleLines((prevState) => ({
       ...prevState,
@@ -139,28 +111,24 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
     dma200: data.dma200.find((item) => item.date === priceItem.date)?.value ?? null,
   }));
 
-  const StyledButton = styled(Button)(({ isActive, lineColor }: { isActive: boolean; lineColor: string }) => ({
-    borderBottom: `2px solid ${isActive ? lineColor : 'transparent'}`,
-    color: isActive ? lineColor : 'inherit',
-    margin: '0 8px',
-  }));
-
   return (
-    <Paper style={{ marginTop: '20px', padding: '20px' , boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15)', // Add shadow here
-    }}>
+    <Paper style={{ marginTop: '20px', padding: '20px', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15)' }}>
       <Typography variant="h6" align="center" style={{ color: '#002060', fontWeight: 'bold' }}>
         {ticker} - Price and Moving Averages
       </Typography>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' ,marginTop:'20px'}}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px', marginTop: '20px' }}>
         {Object.entries(visibleLines).map(([key, isVisible]) => (
-          <StyledButton
+          <Button
             key={key}
-            isActive={isVisible}
             onClick={() => handleLegendClick(key)}
-            lineColor={getLineColor(key)}
+            style={{
+              borderBottom: `2px solid ${isVisible ? getLineColor(key) : 'transparent'}`,
+              color: isVisible ? getLineColor(key) : 'inherit',
+              margin: '0 8px',
+            }}
           >
             {key.toUpperCase()}
-          </StyledButton>
+          </Button>
         ))}
       </div>
       <ComposedChart width={1000} height={400} data={formattedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>

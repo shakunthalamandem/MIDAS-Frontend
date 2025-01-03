@@ -10,19 +10,22 @@ interface InvestScreenerMainProps {
 
 const columns: GridColDef[] = [
   {
-    field: 'ticker', 
-    headerName: 'Ticker', 
-    width: 100,
+    field: 'ticker',
+    headerName: 'Ticker',
+    headerAlign: 'center', // Center-align the header
+    width: 120,
     renderCell: (params) => (
       // Create a link for the ticker that opens in a new tab
-      <Link 
-        to={`/technical/${params.value}`} 
-        style={{ color: '#1E88E5', textDecoration: 'none' }} 
-        target="_blank"
-      >
-        {params.value}
-      </Link>
-    )
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Link
+          to={`/technical/${params.value}`}
+          style={{ color: '#1E88E5', textDecoration: 'none' }}
+          target="_blank"
+        >
+          {params.value}
+        </Link>
+      </div>
+    ),
   },  
   { field: 'deal_type', headerName: 'Deal Type', width: 100 },
   { field: 'pricing_date', headerName: 'Date', width: 100 },
@@ -60,10 +63,10 @@ const columns: GridColDef[] = [
   { field: 'mtd', headerName: 'MTD', width: 100 },
   { field: 'qtd', headerName: 'QTD', width: 100 },
   { field: 'ytd', headerName: 'YTD', width: 100 },
-  { field: '1m', headerName: '1M', width: 100 },
-  { field: '3m', headerName: '3M', width: 100 },
-  { field: '6m', headerName: '6M', width: 100 },
-  { field: '1y', headerName: '1Y', width: 100 },
+  { field: '1m', headerName: '1 Months', width: 100 },
+  { field: '3m', headerName: '3 Months', width: 100 },
+  { field: '6m', headerName: '6 Months', width: 100 },
+  { field: '1y', headerName: '1 Year', width: 100 },
   { field: 'beta', headerName: 'Beta', width: 100 },
   { field: 'volatility', headerName: 'Volatility', width: 100 },
 ];

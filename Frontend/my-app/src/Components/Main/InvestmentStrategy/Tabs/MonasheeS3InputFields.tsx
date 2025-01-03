@@ -1,68 +1,62 @@
-import React from 'react';
-import { Box, TextField, Typography, Grid } from '@mui/material';
+import React from "react";
+import { Box, TextField, Typography } from "@mui/material";
 
 const MonasheeS3InputFields = () => {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "row",
         gap: 2,
         padding: 3,
-        maxWidth: '600px',
-        margin: '0 auto',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '8px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        paddingLeft:0,
+        maxWidth: 1200,
       }}
     >
-      {[ 
-        "Allocation % DealSize (Simple)",
-        "Allocation % IOI (Simple)",
-        "Hold Period",
-      ].map((label) => (
-        <Grid 
-          key={label} 
-          container 
-          alignItems="center" 
-          spacing={2} 
-          sx={{ gap: 2 }}
+      {["Alloc % DealSize", "Alloc % IOI", "Hold Period"].map((label) => (
+        <Box
+          key={label}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            flexDirection: "row",
+          }}
         >
-          {/* Label on the left */}
-          <Grid item xs={4}>
-            <Typography
-              variant="body2"
-              color="#333"
-              sx={{ fontSize: '0.9rem', textAlign: 'right' }}
-            >
-              {label}
-            </Typography>
-          </Grid>
-          
-          {/* Input boxes on the right */}
-          <Grid item xs={8} container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                label="Min Value"
-                variant="outlined"
-                type="number"
-                fullWidth
-                size="small"
-                InputProps={{ inputProps: { min: 0 } }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                label="Max Value"
-                variant="outlined"
-                type="number"
-                fullWidth
-                size="small"
-                InputProps={{ inputProps: { min: 0 } }}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
+          {/* Label */}
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: "0.8rem",
+              color: "#5a5959",
+              width: "60px", // Ensure consistent alignment
+            }}
+          >
+            {label}
+          </Typography>
+
+          {/* Input fields */}
+          <TextField
+            label="Min"
+            variant="outlined"
+            type="number"
+            size="small"
+            InputProps={{ inputProps: { min: 0 } }}
+            sx={{
+              width: { xs: "100%", sm: "80px" }, // Responsive width
+            }}
+          />
+          <TextField
+            label="Max"
+            variant="outlined"
+            type="number"
+            size="small"
+            InputProps={{ inputProps: { min: 0 } }}
+            sx={{
+              width: { xs: "100%", sm: "80px" }, // Responsive width
+            }}
+          />
+        </Box>
       ))}
     </Box>
   );
