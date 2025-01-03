@@ -37,7 +37,7 @@ const MonasheeS3InputFields = () => {
             type="number"
             size="small"
             InputProps={{ inputProps: { min: 0 } }}
-            sx={{ width: "100px" }} // Adjust width as needed
+            sx={{ width: "80px" }} // Adjust width as needed
           />
           <TextField
             label="Max"
@@ -45,7 +45,7 @@ const MonasheeS3InputFields = () => {
             type="number"
             size="small"
             InputProps={{ inputProps: { min: 0 } }}
-            sx={{ width: "100px" }} // Adjust width as needed
+            sx={{ width: "80px" }} // Adjust width as needed
           />
         </Box>
       ))}
