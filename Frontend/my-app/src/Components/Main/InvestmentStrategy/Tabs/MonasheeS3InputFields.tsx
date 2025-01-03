@@ -9,8 +9,7 @@ const MonasheeS3InputFields = () => {
         flexDirection: "column",
         gap: 2,
         padding: 3,
-        margin: "0 auto",
-        maxWidth: 600, // Adjust to control the width of the form
+        maxWidth: 1200, // Adjust to control the width of the form
       }}
     >
       {["Alloc % DealSize", "Alloc % IOI", "Hold Period"].map((label) => (
@@ -26,8 +25,7 @@ const MonasheeS3InputFields = () => {
           {/* Label */}
           <Typography
             variant="body2"
-            color="#333"
-            sx={{ fontSize: "0.9rem", width: "30%" }} // Adjust width for consistent alignment
+            sx={{ fontSize: "0.8rem",color:'#5a5959' }} // Adjust width for consistent alignment
           >
             {label}
           </Typography>
