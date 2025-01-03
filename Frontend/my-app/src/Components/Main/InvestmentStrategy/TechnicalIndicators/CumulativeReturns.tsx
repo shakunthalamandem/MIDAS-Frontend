@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import axios from "axios";
 
 interface CumulativeReturn {
   date: string;
@@ -13,21 +12,37 @@ interface CumulativeReturn {
 const CumulativeReturns: React.FC = () => {
   const [chartData, setChartData] = useState<CumulativeReturn[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const payload = {
-          ticker_list: ["ZVRA US", "LRMR US"]
-        };
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        setError("API URL is not defined in environment variables");
+        return;
+      }
 
-        const response = await axios.post(
-          "http://192.168.1.59:9000/api/cumulative_returns/",
-          payload
-        );
+      const payload = {
+        ticker_list: ["ZVRA US", "LRMR US"],
+      };
+
+      try {
+        const response = await fetch(`${apiUrl}/api/cumulative_returns/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const responseData = await response.json();
 
         // Transform the response data into a usable format for the chart
-        const transformedData: CumulativeReturn[] = Object.entries(response.data).map(([date, values]: any) => ({
+        const transformedData: CumulativeReturn[] = Object.entries(responseData).map(([date, values]: any) => ({
           date,
           snp_return: values.snp_return,
           dow_jone_return: values.dow_jone_return,
@@ -36,8 +51,9 @@ const CumulativeReturns: React.FC = () => {
         }));
 
         setChartData(transformedData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("An error occurred while fetching the data.");
       } finally {
         setLoading(false);
       }
@@ -48,6 +64,10 @@ const CumulativeReturns: React.FC = () => {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   return (
