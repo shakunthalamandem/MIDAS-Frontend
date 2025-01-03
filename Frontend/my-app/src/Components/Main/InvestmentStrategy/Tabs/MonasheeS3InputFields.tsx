@@ -11,7 +11,6 @@ const MonasheeS3InputFields = () => {
         padding: 3,
         maxWidth: '600px',
         margin: '0 auto',
-        backgroundColor: '#f5f5f5',
         borderRadius: '8px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       }}
