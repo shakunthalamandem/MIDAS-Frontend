@@ -1,5 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  CircularProgress,
+} from "@mui/material";
 
 interface CumulativeReturn {
   date: string;
@@ -10,7 +26,7 @@ interface CumulativeReturn {
 }
 
 interface CumulativeReturnsProps {
-  tickerList: string[]; // Prop to receive the list of tickers
+  tickerList: string[];
 }
 
 const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => {
@@ -27,7 +43,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
       }
 
       const payload = {
-        ticker_list: tickerList, // Use the ticker list passed as a prop
+        ticker_list: tickerList,
       };
 
       try {
@@ -44,17 +60,10 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
         }
 
         const responseData = await response.json();
+        console.log("responseData", responseData);
 
-        // Transform the response data into a usable format for the chart
-        const transformedData: CumulativeReturn[] = Object.entries(responseData).map(([date, values]: any) => ({
-          date,
-          snp_return: values.snp_return,
-          dow_jone_return: values.dow_jone_return,
-          russel_return: values.russel_return,
-          portfolio: values.portfolio,
-        }));
-
-        setChartData(transformedData);
+        // Assuming the data is already in the correct format, set it to state
+        setChartData(responseData);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("An error occurred while fetching the data.");
@@ -67,27 +76,89 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
   }, [tickerList]); // Dependency on tickerList to refetch if the prop changes
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
+        <CircularProgress />
+      </Container>
+    );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
+        <Typography color="error" align="center">
+          {error}
+        </Typography>
+      </Container>
+    );
   }
 
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="snp_return" stroke="#8884d8" name="S&P Return" />
-        <Line type="monotone" dataKey="dow_jone_return" stroke="#82ca9d" name="Dow Jones Return" />
-        <Line type="monotone" dataKey="russel_return" stroke="#ffc658" name="Russell Return" />
-        <Line type="monotone" dataKey="portfolio" stroke="#ff7300" name="Portfolio" />
-      </LineChart>
-    </ResponsiveContainer>
+    <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
+      <Card
+        sx={{
+          width: "100%",
+          maxWidth: 1200,
+          marginBottom: "16px",
+          boxShadow: "0 4px 8px 0 #c6f5e4, 0 6px 20px 0 #c6f5e4",
+        }}
+      >
+        <CardContent>
+          <Typography
+            variant="h6"
+            gutterBottom
+            color={"#002060"}
+            align="center"
+            sx={{ mb: 2 }}
+          >
+            <strong>Cumulative Returns</strong>
+          </Typography>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="snp_return"
+                stroke="#8884d8"
+                name="S&P Return"
+                dot={false}
+                strokeWidth={1}
+              />
+              <Line
+                type="monotone"
+                dataKey="dow_jone_return"
+                stroke="#82ca9d"
+                name="Dow Jones Return"
+                dot={false}
+                strokeWidth={1}
+              />
+              <Line
+                type="monotone"
+                dataKey="russel_return"
+                stroke="#ffc658"
+                name="Russell Return"
+                dot={false}
+                strokeWidth={1}
+              />
+              <Line
+                type="monotone"
+                dataKey="portfolio"
+                stroke="#ff7300"
+                name="Portfolio"
+                dot={false}
+                strokeWidth={1}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </Container>
   );
 };
 
