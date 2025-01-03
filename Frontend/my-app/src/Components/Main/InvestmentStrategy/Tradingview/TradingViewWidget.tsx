@@ -6,47 +6,55 @@ interface TradingViewWidgetProps {
 }
 
 const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
-  const cleanedTicker = ticker.replace(/\s+US$/, '');
-
-  const container = useRef<HTMLDivElement>(null);
+  const cleanedTicker = ticker.replace(/\s+US$/, "");
+  const container = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!container.current) return;
+    if (!container.current) {
+      console.error("Container reference is null.");
+      return;
+    }
 
     // Clean up any existing widget before loading a new one
-    container.current.innerHTML = '';
-    
-
-    const script = document.createElement("script");
-    script.src =
-      'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-    script.type = "text/javascript";
-    script.async = true;
-    script.innerHTML = `
-      {
-        "width": "1200",
-        "height": "500",        
-        "symbol": "${cleanedTicker}",
-        "interval": "D",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "en",
-        "allow_symbol_change": true,
-        "calendar": false,
-        "support_host": "https://www.tradingview.com"
-      }
+    container.current.innerHTML = `
+      <div class="tradingview-widget-container__widget"></div>
     `;
-    container.current.appendChild(script);
 
-    // Cleanup to remove the script on unmount
+    setTimeout(() => {
+      if (!container.current) return; // Additional null check
+
+      const script = document.createElement("script");
+      script.src =
+        "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+      script.type = "text/javascript";
+      script.async = true;
+      script.innerHTML = `
+        {
+          "width": "1200",
+          "height": "500",
+          "symbol": "${cleanedTicker}",
+          "interval": "D",
+          "timezone": "Etc/UTC",
+          "theme": "light",
+          "style": "1",
+          "locale": "en",
+          "allow_symbol_change": true,
+          "calendar": false,
+          "support_host": "https://www.tradingview.com"
+        }
+      `;
+      container.current
+        .querySelector(".tradingview-widget-container__widget")
+        ?.appendChild(script);
+    }, 100); // Delay for 100ms
+
+    // Cleanup on unmount
     return () => {
       if (container.current) {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         container.current.innerHTML = ""; // Clear the widget container
       }
     };
-  }, [cleanedTicker]); // Add ticker as a dependency to re-run effect on ticker change
+  }, [cleanedTicker]);
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" padding={3}>
@@ -68,13 +76,9 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
           }}
         >
           <div
-            className="tradingview-widget-container__widget"
-            style={{
-              height: "calc(600px - 32px)", // Adjusted height
-              width: "100%",
-            }}
-          ></div>
-          <div className="tradingview-widget-copyright">
+            className="tradingview-widget-copyright"
+            style={{ display: "none" }}
+          >
             <a
               href="https://www.tradingview.com/"
               rel="noopener noreferrer"
@@ -86,13 +90,6 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
             </a>
           </div>
         </Box>
-        <style>
-        {`
-          .tradingview-widget-copyright {
-            display: none !important;
-          }
-        `}
-      </style>
       </Card>
     </Box>
   );
