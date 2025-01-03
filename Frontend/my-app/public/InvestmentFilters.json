@@ -11,6 +11,7 @@
     },
     "deal_type": {
       "options": [
+        "Any",
         "IPO",
         "FO"
       ],
@@ -20,6 +21,7 @@
 
     "t1d_returns": {
       "options": [
+        "Any",
         ">4",
         "2% to 4%",
         "0% to 2%",
@@ -31,6 +33,7 @@
     },
     "t1m_returns": {
       "options": [
+        "Any",
         ">4",
         "2% to 4%",
         "0% to 2%",
@@ -42,6 +45,7 @@
     },
     "deal_value": {
       "options": [
+        "Any",
         "0 to $100M",
         "$100M to $200M",
         "$200M to $500M",
@@ -52,6 +56,7 @@
     },
     "sponsor": {
       "options": [
+        "Any",
         "Yes",
         "No"
       ],
@@ -60,6 +65,7 @@
     },
     "deal_captain": {
         "options": [
+            "Any",
             "Block",
             "HC",
             "Jay",
@@ -87,6 +93,7 @@
     },
     "sector": {
       "options": [
+        "Any",
         "Communication Services",
         "Consumer Discretionary",
         "Consumer Staples",
@@ -164,6 +171,7 @@
     "volume": {
       "label": "Volume",
       "options": [
+        "Any",
         "Below 100k",
         "Below 500k",
         "Below 1M",
@@ -642,6 +650,7 @@
     },
     "rsi_14d": {
       "options": [
+        "Any",
         "Overbought (above 90)",
         "Overbought (above 80)",
         "Overbought (above 70)",
@@ -704,6 +713,7 @@
     },
     "qtd": {
       "options": [
+        "Any",
         "Above 5%",
         "Above 10%",
         "Above 25%",
@@ -739,6 +749,7 @@
     },
     "ytd": {
       "options": [
+        "Any",
         "Above 5%",
         "Above 10%",
         "Above 25%",
@@ -774,6 +785,7 @@
     },
     "1m": {
       "options": [
+        "Any",
         "Above 5%",
         "Above 10%",
         "Above 25%",
@@ -809,6 +821,7 @@
     },
     "3m": {
       "options": [
+        "Any",
         "Above 5%",
         "Above 10%",
         "Above 25%",
@@ -844,6 +857,7 @@
     },
     "6m": {
       "options": [
+        "Any",
         "Above 5%",
         "Above 10%",
         "Above 25%",
@@ -879,6 +893,7 @@
     },
     "1y": {
       "options": [
+        "Any",
         "Above 5%",
         "Above 10%",
         "Above 25%",
