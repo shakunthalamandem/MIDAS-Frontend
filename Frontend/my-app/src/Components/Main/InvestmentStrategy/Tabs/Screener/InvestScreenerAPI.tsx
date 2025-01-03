@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+
 import { Box, Typography } from '@mui/material';
 import InvestScreenerMain from './InvestScreenerMain';
+import CumulativeReturns from '../../TechnicalIndicators/CumulativeReturns';
 
 interface InvestScreenerAPIProps {
   appliedValues: any;
@@ -11,6 +13,7 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalRows, setTotalRows] = useState(0); // Total rows from API
+  const [tickers, setTickers] = useState<string[]>([]); // State to store tickers
 
   useEffect(() => {
     const transformAppliedValues = (values: any) => {
@@ -48,6 +51,10 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
           const rows = Array.isArray(data.data) ? data.data : [];
           setRows(rows);
           setTotalRows(data.pagination?.total_items || 0);
+
+          // Extract tickers from the response data
+          const extractedTickers = rows.map((row: any) => row.ticker);
+          setTickers(extractedTickers); // Set tickers state
         } else {
           throw new Error("Failed to fetch investment screener data");
         }
@@ -74,6 +81,10 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
           <span style={{ color: "#004b33" }}>{totalRows}</span>
         </Typography>
       </Box>
+      
+      {/* Pass the fetched tickers to CumulativeReturns component */}
+      <CumulativeReturns tickerList={tickers} />
+
       {/* Pass the fetched data to the grid component */}
       <InvestScreenerMain rows={rows} loading={loading} totalRows={totalRows} />
     </Box>

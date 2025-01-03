@@ -9,7 +9,11 @@ interface CumulativeReturn {
   portfolio: number;
 }
 
-const CumulativeReturns: React.FC = () => {
+interface CumulativeReturnsProps {
+  tickerList: string[]; // Prop to receive the list of tickers
+}
+
+const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => {
   const [chartData, setChartData] = useState<CumulativeReturn[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +27,7 @@ const CumulativeReturns: React.FC = () => {
       }
 
       const payload = {
-        ticker_list: ["ZVRA US", "LRMR US"],
+        ticker_list: tickerList, // Use the ticker list passed as a prop
       };
 
       try {
@@ -60,7 +64,7 @@ const CumulativeReturns: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [tickerList]); // Dependency on tickerList to refetch if the prop changes
 
   if (loading) {
     return <div>Loading...</div>;
