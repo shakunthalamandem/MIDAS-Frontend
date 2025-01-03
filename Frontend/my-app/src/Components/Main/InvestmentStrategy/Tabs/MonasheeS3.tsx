@@ -75,7 +75,7 @@ const MonasheeS3: React.FC<MonasheeS3Props> = ({ data, selectedValues, onValueCh
       </Grid>
 
       {/* Input Fields */}
-        <MonasheeS3InputFields />
+        {/* <MonasheeS3InputFields /> */}
     </Box>
   );
 };
