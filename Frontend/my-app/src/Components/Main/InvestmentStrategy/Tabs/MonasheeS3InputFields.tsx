@@ -6,10 +6,11 @@ const MonasheeS3InputFields = () => {
     <Box
       sx={{
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "row",
         gap: 2,
         padding: 3,
-        maxWidth: 1200, // Adjust to control the width of the form
+        paddingLeft:0,
+        maxWidth: 1200,
       }}
     >
       {["Alloc % DealSize", "Alloc % IOI", "Hold Period"].map((label) => (
@@ -19,13 +20,17 @@ const MonasheeS3InputFields = () => {
             display: "flex",
             alignItems: "center",
             gap: 2,
-            flexWrap: "nowrap", // Ensure single row
+            flexDirection: "row",
           }}
         >
           {/* Label */}
           <Typography
             variant="body2"
-            sx={{ fontSize: "0.8rem",color:'#5a5959' }} // Adjust width for consistent alignment
+            sx={{
+              fontSize: "0.8rem",
+              color: "#5a5959",
+              width: "60px", // Ensure consistent alignment
+            }}
           >
             {label}
           </Typography>
@@ -37,7 +42,9 @@ const MonasheeS3InputFields = () => {
             type="number"
             size="small"
             InputProps={{ inputProps: { min: 0 } }}
-            sx={{ width: "80px" }} // Adjust width as needed
+            sx={{
+              width: { xs: "100%", sm: "80px" }, // Responsive width
+            }}
           />
           <TextField
             label="Max"
@@ -45,7 +52,9 @@ const MonasheeS3InputFields = () => {
             type="number"
             size="small"
             InputProps={{ inputProps: { min: 0 } }}
-            sx={{ width: "80px" }} // Adjust width as needed
+            sx={{
+              width: { xs: "100%", sm: "80px" }, // Responsive width
+            }}
           />
         </Box>
       ))}
