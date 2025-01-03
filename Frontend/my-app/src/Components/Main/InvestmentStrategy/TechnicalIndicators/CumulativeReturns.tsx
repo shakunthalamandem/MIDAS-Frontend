@@ -60,7 +60,6 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
         }
 
         const responseData = await response.json();
-        console.log("responseData", responseData);
 
         // Assuming the data is already in the correct format, set it to state
         setChartData(responseData);
@@ -133,7 +132,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
               <Line
                 type="monotone"
                 dataKey="dow_jone_return"
-                stroke="#82ca9d"
+                stroke="#9e0f01"
                 name="Dow Jones Return"
                 dot={false}
                 strokeWidth={1}
@@ -141,7 +140,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
               <Line
                 type="monotone"
                 dataKey="russel_return"
-                stroke="#ffc658"
+                stroke="#017c53"
                 name="Russell Return"
                 dot={false}
                 strokeWidth={1}
