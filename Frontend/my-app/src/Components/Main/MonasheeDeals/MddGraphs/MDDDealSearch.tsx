@@ -76,7 +76,7 @@ const MDDDealSearch: React.FC = () => {
       elevation={3}
       style={{
         padding: "10px",
-        maxWidth: "300px",
+        maxWidth: "280px",
         maxHeight: "300px", // Limit the height of the options
         overflowY: "auto", // Add scroll if the content overflows
       }}
