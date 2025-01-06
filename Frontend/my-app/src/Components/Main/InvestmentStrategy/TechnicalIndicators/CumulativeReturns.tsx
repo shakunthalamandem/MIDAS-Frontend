@@ -4,7 +4,6 @@ import {
   Line,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
@@ -80,6 +79,9 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
     return new Intl.DateTimeFormat("en-US", options).format(date);
   };
 
+  // Function to append '%' symbol
+  const appendPercentageSymbol = (value: number) => `${value}%`;
+
   if (loading) {
     return (
       <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
@@ -124,8 +126,10 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
             >
               <XAxis dataKey="date" tickFormatter={formatDate} />
-              <YAxis />
-              <Tooltip />
+              <YAxis tickFormatter={appendPercentageSymbol} />
+              <Tooltip
+                formatter={(value: number) => `${value}%`}
+              />
               <Legend />
               <Line
                 type="monotone"
