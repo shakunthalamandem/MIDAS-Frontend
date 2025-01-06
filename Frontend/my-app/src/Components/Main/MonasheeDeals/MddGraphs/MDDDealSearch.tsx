@@ -8,7 +8,9 @@ import {
   Paper,
   Container,
   Box,
+  Typography,
 } from "@mui/material";
+import SelectedTicker from "./SelectedTicker";
 
 // Define the type for the API response
 interface MDDResult {
@@ -16,10 +18,13 @@ interface MDDResult {
   issuer_name: string;
 }
 
+// Props for the SelectedTicker component
+
 const MDDDealSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<MDDResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -48,6 +53,11 @@ const MDDDealSearch: React.FC = () => {
     }
   };
 
+  // Function to handle selecting an item from the list
+  const handleItemClick = (ticker: string) => {
+    setSelectedTicker(ticker); // Set the selected ticker when clicked
+  };
+
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Box sx={{ width: "100%", padding: 2 }}>
@@ -65,7 +75,12 @@ const MDDDealSearch: React.FC = () => {
           <Paper elevation={3} style={{ padding: "10px" }}>
             <List>
               {results.map((item, index) => (
-                <ListItem key={index}>
+                <ListItem
+                  key={index}
+                  
+                  onClick={() => handleItemClick(item.ticker_us)} // Pass only ticker_us
+                  component="li" // Add this line to specify that ListItem is an `li` element
+                >
                   <ListItemText
                     primary={<strong>{item.ticker_us}</strong>}
                     secondary={item.issuer_name}
@@ -76,6 +91,9 @@ const MDDDealSearch: React.FC = () => {
           </Paper>
         )}
       </Box>
+
+      {/* If a ticker is selected, render the SelectedTicker component */}
+      {selectedTicker && <SelectedTicker ticker={selectedTicker} />}
     </Container>
   );
 };
