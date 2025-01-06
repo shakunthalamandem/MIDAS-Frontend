@@ -4,30 +4,42 @@ import {
   Pie,
   Cell,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
-import { Container, Typography, CircularProgress } from '@mui/material';
+import { Container, Typography } from '@mui/material';
 
 interface SectorwiseDataProps {
-  sectors: Record<string, number>;
+  sectors: Record<string, number> | { [key: string]: { name: string; value: Record<string, number> } };
 }
 
 const SectorwiseData: React.FC<SectorwiseDataProps> = ({ sectors }) => {
-  // Format the sectors data into the required format for PieChart
-  const sectorChartData = Object.keys(sectors).map((key) => ({
-    name: key,
-    value: sectors[key],
-  }));
+  let sectorChartData: { name: string; value: number }[] = [];
 
-  // Pie chart colors (adjust as needed)
+  // Check and handle nested structure
+  if (typeof sectors === 'object' && '0' in sectors) {
+    const nestedData = (sectors as any)['0'].value;
+    sectorChartData = Object.entries(nestedData).map(([key, value]) => ({
+      name: key,
+      value: typeof value === "number" ? Math.round(value) : 0, // Ensure `value` is a number
+    }));
+  } else {
+    // Assume flat structure
+    sectorChartData = Object.entries(sectors).map(([key, value]) => ({
+      name: key,
+      value: typeof value === "number" ? Math.round(value) : 0, // Ensure `value` is a number
+    }));
+  }
+
+  console.log("Formatted sectorChartData (rounded):", sectorChartData);
+
   const colors = [
     "#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D2B4DE", "#F1948A",
-    "#82E0AA", "#F7DC6F", "#F5B7B1", "#C39BD3", "#85C1AE"
+    "#82E0AA", "#F7DC6F", "#F5B7B1", "#C39BD3", "#85C1AE",
   ];
 
   return (
     <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom color="#002060" align='center'>
         Sector Distribution
       </Typography>
       <ResponsiveContainer width="100%" height={400}>
