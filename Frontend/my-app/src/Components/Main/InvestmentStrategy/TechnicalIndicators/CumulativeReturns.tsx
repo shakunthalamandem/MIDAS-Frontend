@@ -15,6 +15,7 @@ import {
   CardContent,
   CircularProgress,
 } from "@mui/material";
+import SectorwiseData from "./SectorwiseData";  // Import the SectorwiseData component
 
 interface CumulativeReturn {
   date: string;
@@ -30,6 +31,7 @@ interface CumulativeReturnsProps {
 
 const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => {
   const [chartData, setChartData] = useState<CumulativeReturn[]>([]);
+  const [sectorsData, setSectorsData] = useState<any>(null); // State to hold sectors data
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,6 +40,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
       const apiUrl = process.env.REACT_APP_API_URL;
       if (!apiUrl) {
         setError("API URL is not defined in environment variables");
+        setLoading(false);
         return;
       }
 
@@ -59,8 +62,8 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
         }
 
         const responseData = await response.json();
-
         setChartData(responseData.returns);
+        setSectorsData(responseData.sectors); // Set sectors data
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("An error occurred while fetching the data.");
@@ -102,86 +105,84 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
 
   return (
     <>
-    <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
-      <Card
-        sx={{
-          width: "100%",
-          maxWidth: 1200,
-          marginBottom: "16px",
-          boxShadow: "0 4px 8px 0 #c6f5e4, 0 6px 20px 0 #c6f5e4",
-        }}
-      >
-        <CardContent>
-          <Typography
-            variant="h6"
-            gutterBottom
-            color={"#002060"}
-            align="center"
-            sx={{ mb: 2 }}
-          >
-            <strong>Cumulative Returns</strong>
-          </Typography>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+      <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
+        <Card
+          sx={{
+            width: "100%",
+            maxWidth: 1200,
+            marginBottom: "16px",
+            boxShadow: "0 4px 8px 0 #c6f5e4, 0 6px 20px 0 #c6f5e4",
+          }}
+        >
+          <CardContent>
+            <Typography
+              variant="h6"
+              gutterBottom
+              color={"#002060"}
+              align="center"
+              sx={{ mb: 2 }}
             >
-              <XAxis dataKey="date" tickFormatter={formatDate} />
-              <YAxis tickFormatter={appendPercentageSymbol} />
-              <Tooltip
-                formatter={(value: number) => `${value}%`}
-              />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="snp_return"
-                stroke="#8884d8"
-                name="S&P Return"
-                dot={false}
-                strokeWidth={1}
-              />
-              <Line
-                type="monotone"
-                dataKey="dow_jone_return"
-                stroke="#9e0f01"
-                name="Dow Jones Return"
-                dot={false}
-                strokeWidth={1}
-              />
-              <Line
-                type="monotone"
-                dataKey="russel_return"
-                stroke="#017c53"
-                name="Russell Return"
-                dot={false}
-                strokeWidth={1}
-              />
-              <Line
-                type="monotone"
-                dataKey="portfolio"
-                stroke="#ff7300"
-                name="Portfolio"
-                dot={false}
-                strokeWidth={1}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-        <Typography 
-  variant="body2" 
-  align="center" 
-  sx={{ 
-    color: "#303030",
-    marginBottom:'10px' 
-   
-  }}
->
-  <strong style={{ color: "#000000" }}>Note:</strong> Considering $10,000 on each ticker invested
-</Typography>
+              <strong>Cumulative Returns</strong>
+            </Typography>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <XAxis dataKey="date" tickFormatter={formatDate} />
+                <YAxis tickFormatter={appendPercentageSymbol} />
+                <Tooltip formatter={(value: number) => `${value}%`} />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="snp_return"
+                  stroke="#8884d8"
+                  name="S&P Return"
+                  dot={false}
+                  strokeWidth={1}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="dow_jone_return"
+                  stroke="#9e0f01"
+                  name="Dow Jones Return"
+                  dot={false}
+                  strokeWidth={1}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="russel_return"
+                  stroke="#017c53"
+                  name="Russell Return"
+                  dot={false}
+                  strokeWidth={1}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="portfolio"
+                  stroke="#ff7300"
+                  name="Portfolio"
+                  dot={false}
+                  strokeWidth={1}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+          <Typography
+            variant="body2"
+            align="center"
+            sx={{
+              color: "#303030",
+              marginBottom: '10px'
+            }}
+          >
+            <strong style={{ color: "#000000" }}>Note:</strong> Considering $10,000 on each ticker invested
+          </Typography>
+        </Card>
+      </Container>
 
-
-      </Card>
-    </Container>
+      {/* Pass sectorsData to SectorwiseData component */}
+      {sectorsData && <SectorwiseData sectors={sectorsData} />}
     </>
   );
 };
