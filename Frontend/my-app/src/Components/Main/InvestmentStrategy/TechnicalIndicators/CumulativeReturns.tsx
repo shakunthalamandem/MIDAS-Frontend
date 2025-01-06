@@ -60,7 +60,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
 
         const responseData = await response.json();
 
-        setChartData(responseData);
+        setChartData(responseData.returns);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("An error occurred while fetching the data.");
