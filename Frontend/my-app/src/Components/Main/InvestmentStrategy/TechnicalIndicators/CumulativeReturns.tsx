@@ -101,6 +101,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
   }
 
   return (
+    <>
     <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
       <Card
         sx={{
@@ -166,8 +167,22 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
+        <Typography 
+  variant="body2" 
+  align="center" 
+  sx={{ 
+    color: "#303030",
+    marginBottom:'10px' 
+   
+  }}
+>
+  <strong style={{ color: "#000000" }}>Note:</strong> Considering $10,000 on each ticker invested
+</Typography>
+
+
       </Card>
     </Container>
+    </>
   );
 };
 
