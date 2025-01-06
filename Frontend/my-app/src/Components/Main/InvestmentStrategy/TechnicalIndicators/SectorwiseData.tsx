@@ -33,10 +33,10 @@ const SectorwiseData: React.FC<SectorwiseDataProps> = ({ sectors }) => {
   console.log("Formatted sectorChartData (rounded):", sectorChartData);
 
   const colors = [
-    "#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D2B4DE", "#F1948A",
-    "#82E0AA", "#F7DC6F", "#F5B7B1", "#C39BD3", "#85C1AE",
+    "#2E3A87", "#1D9C63", "#D75F01", "#C35A2C", "#B72B72", "#D94E8A",
+    "#5B9E6E", "#C8A700", "#D2768F", "#7B4C92", "#4A88B6",
   ];
-
+  
   return (
     <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
       <Card
