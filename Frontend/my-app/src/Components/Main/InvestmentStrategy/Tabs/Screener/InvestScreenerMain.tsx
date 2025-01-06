@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { Link } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 
 interface InvestScreenerMainProps {
   rows: any[];

@@ -3,7 +3,6 @@ import { Box, Button, Card, CardContent, Container, Tab, Tabs, Typography } from
 import Technical from "./Technical";
 import Fundamental from "./Fundamental";
 import MonasheeS3 from "./MonasheeS3";
-import InvestScreenerMain from "./Screener/InvestScreenerMain";
 import InvestScreenerAPI from "./Screener/InvestScreenerAPI";
 
 interface SelectedValues {
