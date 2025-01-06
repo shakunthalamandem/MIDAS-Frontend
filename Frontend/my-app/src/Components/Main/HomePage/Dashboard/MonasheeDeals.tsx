@@ -8,6 +8,7 @@ import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCap
 import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import DealCount from "../../MonasheeDeals/MddGraphs/DealCount";
 import DealVolumeMDD from "../../MonasheeDeals/MddGraphs/DealVolumeMDD";
+import MDDDealSearch from "../../MonasheeDeals/MddGraphs/MDDDealSearch";
 
 const MonasheeDeals: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -78,7 +79,8 @@ const MonasheeDeals: React.FC = () => {
           },
         }}
       >
-        <Tab label="Deals" />
+        <Tab label="Deal Search" />
+        <Tab label="Deal Count" />
         <Tab label="Volume" />
         <Tab label="Avg Size" />
         <Tab label="Allocation % DealSize" />
@@ -89,14 +91,15 @@ const MonasheeDeals: React.FC = () => {
       </Tabs>
 
       {/* Tab Content */}
-      {value === 0 && <DealCount />}
-      {value === 1 && <DealVolumeMDD />}
-      {value === 2 && <AvgDealSize />}
-      {value === 3 && <DealAllocation />}
-      {value === 4 && <DealMDDIOI />}
-      {value === 5 && <AllocationCaptureReturn />}
-      {value === 6 && <FOllowOnDiscount />}
-      {value === 7 && <MDDScreener />}
+      {value === 0 && <MDDDealSearch />}
+      {value === 1 && <DealCount />}
+      {value === 2 && <DealVolumeMDD />}
+      {value === 3 && <AvgDealSize />}
+      {value === 4 && <DealAllocation />}
+      {value === 5 && <DealMDDIOI />}
+      {value === 6 && <AllocationCaptureReturn />}
+      {value === 7 && <FOllowOnDiscount />}
+      {value === 8 && <MDDScreener />}
     </Box>
   );
 };
