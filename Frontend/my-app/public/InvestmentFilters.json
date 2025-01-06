@@ -116,21 +116,9 @@
       "label": "Sector",
       "options": [
         "Any",
-        "Cyclical (Consumer Discretionary, Materials, Finance, Realty)",
-        "Defensive (Healthcare, Utilities, Consumer Staples)",
-        "Sensitive (Telecom, Energy, IT, Industrials)",
-        "Consumer Discretionary",
-        "Consumer Staples",
-        "Utilities",
-        "Communication Services",
-        "Materials",
-        "Financials",
-        "Real Estate",
-        "Energy",
-        "Health Care",
-        "Other",
-        "Industrials",
-        "Information Technology"
+        "Communication Services", "Consumer Discretionary", "Consumer Staples",
+        "Energy", "Financials", "Health Care", "Industrials", "Information Technology",
+        "Materials", "Real Estate", "Utilities"
       ],
       "description": "Select the industry sector from the given options."
     },

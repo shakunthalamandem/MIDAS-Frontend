@@ -61,7 +61,6 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
 
         const responseData = await response.json();
 
-        // Assuming the data is already in the correct format, set it to state
         setChartData(responseData);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -72,7 +71,14 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
     };
 
     fetchData();
-  }, [tickerList]); // Dependency on tickerList to refetch if the prop changes
+  }, [tickerList]);
+
+  // Function to format the date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { month: "short", year: "numeric" };
+    return new Intl.DateTimeFormat("en-US", options).format(date);
+  };
 
   if (loading) {
     return (
@@ -117,7 +123,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
               data={chartData}
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
             >
-              <XAxis dataKey="date" />
+              <XAxis dataKey="date" tickFormatter={formatDate} />
               <YAxis />
               <Tooltip />
               <Legend />
