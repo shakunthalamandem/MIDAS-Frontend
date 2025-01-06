@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TextField, CircularProgress, List, ListItem, ListItemText, Paper, Container, Box } from '@mui/material';
 
 // Define the type for the API response
 interface MDDResult {
@@ -37,28 +38,37 @@ const MDDDealSearch: React.FC = () => {
   };
 
   return (
-    <div style={{ margin: '20px' }}>
-      <input
-        type="text"
-        placeholder="Search..."
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+            <Box sx={{ width: "100%", padding: 2 }}>
+
+
+      <TextField
+        label="Search"
+        variant="outlined"
         value={searchTerm}
         onChange={handleSearch}
-        style={{
-          width: '100%',
-          padding: '10px',
-          fontSize: '16px',
-          marginBottom: '20px',
-        }}
+        fullWidth
+        style={{ marginBottom: '20px' }}
       />
-      {loading && <p>Loading...</p>}
-      <ul>
-        {results.map((item, index) => (
-          <li key={index}>
-            <strong>{item.ticker_us}</strong>: {item.issuer_name}
-          </li>
-        ))}
-      </ul>
-    </div>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <Paper elevation={3} style={{ padding: '10px' }}>
+          <List>
+            {results.map((item, index) => (
+              <ListItem key={index}>
+                <ListItemText
+                  primary={<strong>{item.ticker_us}</strong>}
+                  secondary={item.issuer_name}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
+      )}
+          </Box>
+          </Container>
+
   );
 };
 
