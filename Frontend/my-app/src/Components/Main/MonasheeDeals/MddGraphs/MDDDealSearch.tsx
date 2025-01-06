@@ -18,8 +18,6 @@ interface MDDResult {
   issuer_name: string;
 }
 
-// Props for the SelectedTicker component
-
 const MDDDealSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<MDDResult[]>([]);
@@ -72,14 +70,27 @@ const MDDDealSearch: React.FC = () => {
         {loading ? (
           <CircularProgress />
         ) : (
-          <Paper elevation={3} style={{ padding: "10px" }}>
+          <Paper
+            elevation={3}
+            style={{
+              padding: "10px",
+              maxHeight: "300px", // Limit the height of the options
+              overflowY: "auto", // Add scroll if the content overflows
+            }}
+          >
             <List>
               {results.map((item, index) => (
                 <ListItem
                   key={index}
-                  
                   onClick={() => handleItemClick(item.ticker_us)} // Pass only ticker_us
-                  component="li" // Add this line to specify that ListItem is an `li` element
+                  component="li"
+                  
+                  style={{
+                    backgroundColor:
+                      selectedTicker === item.ticker_us
+                        ? "rgba(63, 81, 181, 0.1)" // Light blue background for selected item
+                        : "transparent",
+                  }}
                 >
                   <ListItemText
                     primary={<strong>{item.ticker_us}</strong>}
