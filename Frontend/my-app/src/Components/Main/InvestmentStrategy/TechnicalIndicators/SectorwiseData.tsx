@@ -6,7 +6,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Container, Typography } from '@mui/material';
+import { Container, Typography, Card, CardContent } from '@mui/material';
 
 interface SectorwiseDataProps {
   sectors: Record<string, number> | { [key: string]: { name: string; value: Record<string, number> } };
@@ -39,28 +39,39 @@ const SectorwiseData: React.FC<SectorwiseDataProps> = ({ sectors }) => {
 
   return (
     <Container sx={{ mt: 5, display: "flex", justifyContent: "center" }}>
-      <Typography variant="h6" gutterBottom color="#002060" align='center'>
-        Sector Distribution
-      </Typography>
-      <ResponsiveContainer width="100%" height={400}>
-        <PieChart>
-          <Pie
-            data={sectorChartData}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-            outerRadius={150}
-            fill="#8884d8"
-            dataKey="value"
-          >
-            {sectorChartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-            ))}
-          </Pie>
-          <Tooltip formatter={(value) => `${value}%`} />
-        </PieChart>
-      </ResponsiveContainer>
+      <Card
+        sx={{
+          width: "100%",
+          maxWidth: 1200,
+          marginBottom: "16px",
+          boxShadow: "0 4px 8px 0 #c6f5e4, 0 6px 20px 0 #c6f5e4",
+        }}
+      >
+        <CardContent>
+          <Typography variant="h6" gutterBottom color="#002060" align='center' sx={{fontWeight:'bold'}}>
+            Sector Distribution
+          </Typography>
+          <ResponsiveContainer width="100%" height={400}>
+            <PieChart>
+              <Pie
+                data={sectorChartData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={150}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {sectorChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => `${value}%`} />
+            </PieChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
     </Container>
   );
 };
