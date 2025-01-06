@@ -6,6 +6,7 @@ import OpportunityMain from "../../MonasheeGraphs/OpportunityMain";
 import OpportunityAbsBasis from "../../MonasheeGraphs/OpportunityAbsBasis";
 import SkewTableMain from "../../MonasheeGraphs/SkewTableMain";
 import ScreenerMain from "../../MonasheeGraphs/ScreenerTable/ScreenerMain";
+import DealSearch from "../../MonasheeGraphs/DealSearch";
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -69,11 +70,22 @@ const CapitalMarkets: React.FC = () => {
             height: "40px", // You can also set a fixed height for the tabs
           }}
         >
+            <Tab
+            label="Deal Search"
+            sx={{
+              backgroundColor: value === 0 ? "#9C27B0" : "#f5f5f5",
+              color: value === 0 ? "#fff" : "#777",
+              "&.Mui-selected": {
+                backgroundColor: "#9C27B0",
+                color: "#fff",
+              },
+            }}
+          />
           <Tab
             label="Deal Count"
             sx={{
-              backgroundColor: value === 0 ? "#FF5722" : "#f5f5f5",
-              color: value === 0 ? "#fff" : "#777",
+              backgroundColor: value === 1 ? "#FF5722" : "#f5f5f5",
+              color: value === 1 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#FF5722",
                 color: "#fff",
@@ -83,8 +95,8 @@ const CapitalMarkets: React.FC = () => {
           <Tab
             label="Deal Volume"
             sx={{
-              backgroundColor: value === 1 ? "#4CAF50" : "#f5f5f5",
-              color: value === 1 ? "#fff" : "#777",
+              backgroundColor: value === 2 ? "#4CAF50" : "#f5f5f5",
+              color: value === 2 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#4CAF50",
                 color: "#fff",
@@ -94,30 +106,20 @@ const CapitalMarkets: React.FC = () => {
           <Tab
             label="Opportunity Value Excess"
             sx={{
-              backgroundColor: value === 2 ? "#3F51B5" : "#f5f5f5",
-              color: value === 2 ? "#fff" : "#777",
+              backgroundColor: value === 3 ? "#3F51B5" : "#f5f5f5",
+              color: value === 3 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#3F51B5",
                 color: "#fff",
               },
             }}
           />
-          {/* <Tab
-            label="Opportunity Value Abs"
-            sx={{
-              backgroundColor: value === 3 ? '#00BCD4' : '#f5f5f5',
-              color: value === 3 ? '#fff' : '#777',
-              '&.Mui-selected': {
-                backgroundColor: '#00BCD4',
-                color: '#fff',
-              },
-            }}
-          /> */}
+  
           <Tab
             label="Skew Table"
             sx={{
-              backgroundColor: value === 3 ? "#9C27B0" : "#f5f5f5",
-              color: value === 3 ? "#fff" : "#777",
+              backgroundColor: value === 4 ? "#9C27B0" : "#f5f5f5",
+              color: value === 4 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#9C27B0",
                 color: "#fff",
@@ -125,10 +127,10 @@ const CapitalMarkets: React.FC = () => {
             }}
           />
           <Tab
-            label="Deal Search"
+            label="Deal Filter"
             sx={{
-              backgroundColor: value === 4 ? "#FF9800" : "#f5f5f5",
-              color: value === 4 ? "#fff" : "#777",
+              backgroundColor: value === 5 ? "#FF9800" : "#f5f5f5",
+              color: value === 5 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#FF9800",
                 color: "#fff",
@@ -136,13 +138,12 @@ const CapitalMarkets: React.FC = () => {
             }}
           />
         </Tabs>
-
-        {value === 0 && <DealGraph />}
-        {value === 1 && <DealVolume />}
-        {value === 2 && <OpportunityMain />}
-        {/* {value === 3 && <OpportunityAbsBasis />} */}
-        {value === 3 && <SkewTableMain />}
-        {value === 4 && <ScreenerMain />}
+        {value === 0 && <DealSearch />}
+        {value === 1 && <DealGraph />}
+        {value === 2 && <DealVolume />}
+        {value === 3 && <OpportunityMain />}
+        {value === 4 && <SkewTableMain />}
+        {value === 5 && <ScreenerMain />}
       </Box>
     </>
   );
