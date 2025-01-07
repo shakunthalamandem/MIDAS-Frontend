@@ -74,11 +74,11 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
       <Typography
         variant="h5"
         gutterBottom
-        color="#002060"
+        color="#6501c4"
         align="center"
         sx={{ fontWeight: "bold" }}
       >
-        Selected Ticker: {ticker_list.join(", ")}
+        Selected Ticker: <span style={{color:'#ff6005'}}>{ticker_list.join(", ")}</span>
       </Typography>
 
       <Grid container spacing={2}>

@@ -65,11 +65,11 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
       <Typography
         variant="h5"
         gutterBottom
-        color="#002060"
+        color="#6501c4"
         align="center"
         sx={{ fontWeight: "bold" }}
       >
-        Selected Ticker: {ticker}
+        Selected Ticker: <span style={{color:'#ff6005'}}>{ticker}</span>
       </Typography>
 
       <Grid container spacing={2}>
