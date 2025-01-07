@@ -67,6 +67,7 @@
         {
             "deal_type": {
                 "options": [
+                    "ALL",
                     "IPO",
                     "FO"
                 ],
@@ -87,6 +88,7 @@
         {
             "region": {
                 "options": [
+                    "ALL",
                     "US",
                     "International"
                 ],
@@ -97,6 +99,7 @@
         {
             "sector": {
                 "options": [
+                    "ALL",
                     "Communication Services",
                     "Consumer Discretionary",
                     "Consumer Staples",
