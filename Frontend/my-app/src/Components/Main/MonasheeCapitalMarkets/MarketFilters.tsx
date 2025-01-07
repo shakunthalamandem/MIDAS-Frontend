@@ -106,36 +106,41 @@ const MarketFilters: React.FC = () => {
                   </Typography>
 
                   <FormControl fullWidth>
-                    <Select
-                      id={key}
-                      multiple={isMultiSelect}
-                      value={selectedValues[key] || (isMultiSelect ? [] : "")}
-                      onChange={handleChange(key)}
-                      MenuProps={MenuProps}
-                      renderValue={(selected) =>
-                        Array.isArray(selected)
-                          ? selected.join(", ")
-                          : (selected as string | number)
-                      }
-                      sx={{
-                        fontSize: "12px", // Reduce font size in dropdown
-                        height: "40px", // Adjust the height of the dropdown input
-                      }}
-                    >
-                      {value.options.map((option, idx) => (
-                        <MenuItem key={idx} value={option} sx={{ fontSize: "12px" }}>
-                          {isMultiSelect && (
-                            <Checkbox
-                              checked={
-                                (selectedValues[key] as (string | number)[] || []).includes(option)
-                              }
-                            />
-                          )}
-                          <ListItemText primary={option} />
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+  <Select
+    id={key}
+    multiple={isMultiSelect}
+    value={selectedValues[key] || (isMultiSelect ? [] : "")}
+    onChange={handleChange(key)}
+    MenuProps={MenuProps}
+    renderValue={(selected) => {
+      if (Array.isArray(selected)) {
+        // Display the first selected option and additional count
+        return selected.length > 1
+          ? `${selected[0]} +${selected.length - 1}`
+          : selected[0];
+      }
+      return selected as string | number; // For single-select cases
+    }}
+    sx={{
+      fontSize: "12px", // Reduce font size in dropdown
+      height: "40px", // Adjust the height of the dropdown input
+    }}
+  >
+    {value.options.map((option, idx) => (
+      <MenuItem key={idx} value={option} sx={{ fontSize: "12px" }}>
+        {isMultiSelect && (
+          <Checkbox
+            checked={
+              (selectedValues[key] as (string | number)[] || []).includes(option)
+            }
+          />
+        )}
+        <ListItemText primary={option} />
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
                 </Grid>
               );
             })}
