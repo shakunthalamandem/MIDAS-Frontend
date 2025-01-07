@@ -79,15 +79,7 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({ rows, loading, 
 
   return (
     <Box mb={10} sx={{ height: 600, width: "100%" }}>
-      {/* <Box mt={5} mb={5}>
-       <Typography
-          align="center"
-          style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
-        >
-          Total No of Deals:
-          <span style={{ color: "#004b33" }}>{totalRows}</span>
-        </Typography>
-        </Box> */}
+
       <DataGrid
         rows={rows.map((row, index) => ({ id: index, ...row }))}
         columns={columns}
