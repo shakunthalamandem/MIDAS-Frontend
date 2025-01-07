@@ -10,7 +10,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import SelectedTicker from "./MDDSelectedTicker";
+import MDDSelectedTicker from "./MDDSelectedTicker";
 
 // Define the type for the API response
 interface MDDResult {
@@ -110,7 +110,7 @@ const MDDDealSearch: React.FC = () => {
       </Box>
 
       {/* If a ticker is selected, render the SelectedTicker component */}
-      {selectedTicker && <SelectedTicker ticker={selectedTicker} />}
+      {selectedTicker && <MDDSelectedTicker ticker={selectedTicker} />}
     </Container>
   );
 };

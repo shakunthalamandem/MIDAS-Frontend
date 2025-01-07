@@ -78,7 +78,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
         align="center"
         sx={{ fontWeight: "bold" }}
       >
-        Selected Tickers: {ticker_list.join(", ")}
+        Selected Ticker: {ticker_list.join(", ")}
       </Typography>
 
       <Grid container spacing={2}>
@@ -95,6 +95,8 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
               <Typography variant="h6" color="#002060" gutterBottom>
                 Ticker Information
               </Typography>
+              <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
               <Typography>
                 <strong>Pricing Date:</strong> {item.pricing_date}
               </Typography>
@@ -116,6 +118,9 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
               <Typography>
                 <strong>Deal Value:</strong> {item.deal_value}
               </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+             
               <Typography>
                 <strong>Issue Price:</strong> {item.issue_price}
               </Typography>
@@ -137,6 +142,8 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                 <strong>Opportunity Value Ex:</strong>{" "}
                 {item.opportunity_value_ex}
               </Typography>
+              </Grid>
+              </Grid>
             </Paper>
           </Grid>
         ))}

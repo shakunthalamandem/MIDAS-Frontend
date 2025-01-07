@@ -31,11 +31,11 @@ interface ApiResponse {
   data: TickerData[];
 }
 
-interface SelectedTickerProps {
+interface MDDSelectedTickerProps {
   ticker: string;
 }
 
-const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
+const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   const [data, setData] = useState<TickerData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -156,4 +156,4 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
   );
 };
 
-export default SelectedTicker;
+export default MDDSelectedTicker;

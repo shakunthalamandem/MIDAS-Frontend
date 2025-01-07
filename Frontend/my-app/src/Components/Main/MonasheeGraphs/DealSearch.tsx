@@ -55,6 +55,8 @@ const DealSearch: React.FC = () => {
   // Function to handle selecting an item from the list
   const handleItemClick = (ticker_symbol: string) => {
     setSelectedTicker(ticker_symbol); // Set the selected ticker when clicked
+    setSearchTerm(""); // Clear the search term
+    setResults([]); 
   };
 
   return (
