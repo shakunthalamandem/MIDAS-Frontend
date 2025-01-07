@@ -7,6 +7,7 @@ import OpportunityAbsBasis from "../../MonasheeGraphs/OpportunityAbsBasis";
 import SkewTableMain from "../../MonasheeGraphs/SkewTableMain";
 import ScreenerMain from "../../MonasheeGraphs/ScreenerTable/ScreenerMain";
 import DealSearch from "../../MonasheeGraphs/DealSearch";
+import MarketFilters from "../../MonasheeCapitalMarkets/MarketFilters";
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -80,6 +81,7 @@ const CapitalMarkets: React.FC = () => {
               },
             }}
           />
+          
           <Tab
             label="Deal Count"
             sx={{
@@ -136,6 +138,17 @@ const CapitalMarkets: React.FC = () => {
               },
             }}
           />
+            <Tab
+            label="Market Captial Count"
+            sx={{
+              backgroundColor: value === 6 ? "#9C27B0" : "#f5f5f5",
+              color: value === 6 ? "#fff" : "#777",
+              "&.Mui-selected": {
+                backgroundColor: "#9C27B0",
+                color: "#fff",
+              },
+            }}
+          />
         </Tabs>
         {value === 0 && <DealSearch />}
         {value === 1 && <DealGraph />}
@@ -143,6 +156,8 @@ const CapitalMarkets: React.FC = () => {
         {value === 3 && <OpportunityMain />}
         {value === 4 && <SkewTableMain />}
         {value === 5 && <ScreenerMain />}
+        {value === 6 && <MarketFilters />}
+
       </Box>
     </>
   );
