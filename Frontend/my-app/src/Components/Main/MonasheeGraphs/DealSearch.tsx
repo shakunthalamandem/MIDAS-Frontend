@@ -18,6 +18,7 @@ interface MDDResult {
   issuer_name: string;
 }
 
+
 const DealSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<MDDResult[]>([]);
@@ -107,7 +108,8 @@ const DealSearch: React.FC = () => {
       </Box>
 
       {/* If a ticker is selected, render the SelectedTicker component */}
-      {selectedTicker && <SelectedTicker ticker_list={selectedTicker} />}
+      {selectedTicker && <SelectedTicker ticker_list={[selectedTicker]} />}
+
     </Container>
   );
 };

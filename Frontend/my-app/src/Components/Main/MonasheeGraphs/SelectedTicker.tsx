@@ -19,7 +19,7 @@ interface TickerData {
 }
 
 interface SelectedTickerProps {
-  ticker_list: string;
+  ticker_list: string[]; // Adjusted to accept an array of ticker symbols
 }
 
 const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
@@ -35,7 +35,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
           throw new Error("API URL is not defined in environment variables");
         }
 
-        const payload = { ticker_list }; // Prepare the payload
+        const payload = { ticker_list }; // Prepare the payload as an array
         const response = await fetch(`${apiUrl}/api/super-screener/`, {
           method: "POST",
           headers: {
@@ -52,6 +52,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
               id: index + 1, // Add an ID field for internal use if needed
             }))
           );
+          console.log("result", result);
         } else {
           throw new Error("Failed to fetch data");
         }
@@ -71,7 +72,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
   return (
     <Box sx={{ marginTop: 4, padding: 2 }}>
       <Typography variant="h5" gutterBottom>
-        Selected Ticker: {ticker_list}
+        Selected Tickers: {ticker_list.join(", ")}
       </Typography>
 
       <Grid container spacing={2}>
