@@ -107,7 +107,7 @@ const DealSearch: React.FC = () => {
       </Box>
 
       {/* If a ticker is selected, render the SelectedTicker component */}
-      {selectedTicker && <SelectedTicker ticker={selectedTicker} />}
+      {selectedTicker && <SelectedTicker ticker_list={selectedTicker} />}
     </Container>
   );
 };
