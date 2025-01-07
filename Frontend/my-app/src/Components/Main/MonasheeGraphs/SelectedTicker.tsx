@@ -71,32 +71,72 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
 
   return (
     <Box sx={{ marginTop: 4, padding: 2 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography
+        variant="h5"
+        gutterBottom
+        color="#002060"
+        align="center"
+        sx={{ fontWeight: "bold" }}
+      >
         Selected Tickers: {ticker_list.join(", ")}
       </Typography>
 
       <Grid container spacing={2}>
         {data.map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Paper elevation={3} style={{ padding: "10px" }}>
-              <Typography variant="h6" gutterBottom>Deal Information</Typography>
-              <Typography><strong>Pricing Date:</strong> {item.pricing_date}</Typography>
-              <Typography><strong>Issuer Name:</strong> {item.issuer_name}</Typography>
-              <Typography><strong>Ticker Symbol:</strong> {item.ticker_symbol}</Typography>
-              <Typography><strong>GICS Sector:</strong> {item.gics_sector}</Typography>
-              <Typography><strong>Region:</strong> {item.us_international}</Typography>
-              <Typography><strong>Deal Type:</strong> {item.deal_type}</Typography>
-              <Typography><strong>Deal Value:</strong> {item.deal_value}</Typography>
-              <Typography><strong>Issue Price:</strong> {item.issue_price}</Typography>
-              <Typography><strong>T+1 Month Returns:</strong> {item.t1m_returns}</Typography>
-              <Typography><strong>T+1 Day Returns:</strong> {item.t1_return}</Typography>
-              <Typography>
-                <strong>T+1 Day Returns (Index Adjusted):</strong> {item.t1d_returns_index_returns}
+          <Grid item xs={12} key={index}>
+            <Paper
+              elevation={3}
+              style={{
+                padding: "20px",
+                backgroundColor: "#f9f9f9",
+                borderRadius: "8px",
+              }}
+            >
+              <Typography variant="h6" color="#002060" gutterBottom>
+                Ticker Information
               </Typography>
               <Typography>
-                <strong>T+1 Month Returns (Index Adjusted):</strong> {item.t1m_returns_index_returns}
+                <strong>Pricing Date:</strong> {item.pricing_date}
               </Typography>
-              <Typography><strong>Opportunity Value Ex:</strong> {item.opportunity_value_ex}</Typography>
+              <Typography>
+                <strong>Issuer Name:</strong> {item.issuer_name}
+              </Typography>
+              <Typography>
+                <strong>Ticker Symbol:</strong> {item.ticker_symbol}
+              </Typography>
+              <Typography>
+                <strong>GICS Sector:</strong> {item.gics_sector}
+              </Typography>
+              <Typography>
+                <strong>Region:</strong> {item.us_international}
+              </Typography>
+              <Typography>
+                <strong>Deal Type:</strong> {item.deal_type}
+              </Typography>
+              <Typography>
+                <strong>Deal Value:</strong> {item.deal_value}
+              </Typography>
+              <Typography>
+                <strong>Issue Price:</strong> {item.issue_price}
+              </Typography>
+              <Typography>
+                <strong>T+1 Month Returns:</strong> {item.t1m_returns}
+              </Typography>
+              <Typography>
+                <strong>T+1 Day Returns:</strong> {item.t1_return}
+              </Typography>
+              <Typography>
+                <strong>T+1 Day Returns (Index Adjusted):</strong>{" "}
+                {item.t1d_returns_index_returns}
+              </Typography>
+              <Typography>
+                <strong>T+1 Month Returns (Index Adjusted):</strong>{" "}
+                {item.t1m_returns_index_returns}
+              </Typography>
+              <Typography>
+                <strong>Opportunity Value Ex:</strong>{" "}
+                {item.opportunity_value_ex}
+              </Typography>
             </Paper>
           </Grid>
         ))}
