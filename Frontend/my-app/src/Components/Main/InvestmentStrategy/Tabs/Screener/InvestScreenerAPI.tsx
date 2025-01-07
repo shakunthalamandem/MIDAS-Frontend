@@ -73,13 +73,7 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
   return (
     <Box mb={10}>
       <Box mt={5} mb={5}>
-        <Typography
-          align="center"
-          style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
-        >
-          Total No of Deals:
-          <span style={{ color: "#004b33" }}>{totalRows}</span>
-        </Typography>
+    
       </Box>
       
       {/* Pass the fetched tickers to CumulativeReturns component */}
