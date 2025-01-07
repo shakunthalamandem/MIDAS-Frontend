@@ -43,7 +43,7 @@ const FooterMain: React.FC = () => {
       color: '#FFFFFF', // Muted accent for secondary text
     }}
   >
-    © 2024 MIDAS , Developed in Collaboration with Golden Hills Capital India Pvt Ltd.
+    © 2025 MIDAS , Developed in Collaboration with Golden Hills Capital India Pvt Ltd.
   </Typography>
   <img
     src={logo} // Replace with the actual path to your logo

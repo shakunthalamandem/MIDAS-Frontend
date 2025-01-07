@@ -84,7 +84,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
               }}
             >
               <Typography variant="h6" color="#002060" gutterBottom>
-                Ticker Information
+                Deal Information for the Selected Ticker
               </Typography>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>

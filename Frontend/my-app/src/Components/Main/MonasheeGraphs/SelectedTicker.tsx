@@ -93,7 +93,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
               }}
             >
               <Typography variant="h6" color="#002060" gutterBottom>
-                Ticker Information
+                Deal Information for the selected Ticker
               </Typography>
               <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
