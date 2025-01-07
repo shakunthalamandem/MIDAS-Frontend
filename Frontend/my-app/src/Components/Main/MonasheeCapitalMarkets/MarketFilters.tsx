@@ -17,26 +17,30 @@ import {
 // Define a type for the filter data
 interface FilterOption {
   label: string;
-  options: (string | number)[];
+  options: (string | number)[]; // options can be string or number
   description: string;
 }
 
 const MarketFilters: React.FC = () => {
   const [filtersData, setFiltersData] = useState<Record<string, FilterOption>[]>([]);
-  const [selectedValues, setSelectedValues] = useState<Record<string, string | number | (string | number)[]>>({});
+  const [selectedValues, setSelectedValues] = useState<
+    Record<string, string | number | (string | number)[]>
+  >({});
 
   const handleDataLoaded = (data: any) => {
     setFiltersData(data.market_capital);
   };
 
-  const handleChange = (filterKey: string) => (
-    event: SelectChangeEvent<string | number | (string | number)[]>
-  ) => {
-    setSelectedValues((prev) => ({
-      ...prev,
-      [filterKey]: event.target.value,
-    }));
-  };
+  const handleChange =
+    (filterKey: string) =>
+    (event: SelectChangeEvent<string | number | (string | number)[]>) => {
+      const value = event.target.value;
+
+      setSelectedValues((prev) => ({
+        ...prev,
+        [filterKey]: Array.isArray(value) ? value : [value], // Ensure array for multi-select
+      }));
+    };
 
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -78,7 +82,7 @@ const MarketFilters: React.FC = () => {
           <Grid container spacing={3}>
             {filtersData.map((filter, index) => {
               const [key, value] = Object.entries(filter)[0] as [string, FilterOption];
-              const isMultiSelect = Array.isArray(selectedValues[key]); // Detect multi-select based on stored value
+              const isMultiSelect = Array.isArray(value.options); // Determine multi-select based on options
 
               return (
                 <Grid item xs={12} sm={6} md={3} key={index}>
@@ -87,7 +91,7 @@ const MarketFilters: React.FC = () => {
                     <Select
                       labelId={`${key}-label`}
                       id={key}
-                      multiple={isMultiSelect} // Enable multi-select for options requiring checkboxes
+                      multiple={isMultiSelect}
                       value={selectedValues[key] || (isMultiSelect ? [] : "")}
                       onChange={handleChange(key)}
                       MenuProps={MenuProps}
@@ -99,9 +103,11 @@ const MarketFilters: React.FC = () => {
                     >
                       {value.options.map((option, idx) => (
                         <MenuItem key={idx} value={option}>
-                          {isMultiSelect && Array.isArray(selectedValues[key]) && (
+                          {isMultiSelect && (
                             <Checkbox
-                              checked={(selectedValues[key] as (string | number)[]).includes(option)}
+                              checked={
+                                (selectedValues[key] as (string | number)[] || []).includes(option)
+                              }
                             />
                           )}
                           <ListItemText primary={option} />
