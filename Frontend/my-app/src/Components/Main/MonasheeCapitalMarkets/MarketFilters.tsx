@@ -24,7 +24,9 @@ interface FilterOption {
 }
 
 const MarketFilters: React.FC = () => {
-  const [filtersData, setFiltersData] = useState<Record<string, FilterOption>[]>([]);
+  const [filtersData, setFiltersData] = useState<
+    Record<string, FilterOption>[]
+  >([]);
   const [selectedValues, setSelectedValues] = useState<
     Record<string, string | number | (string | number)[]>
   >({});
@@ -63,7 +65,12 @@ const MarketFilters: React.FC = () => {
         minHeight: "100vh",
       }}
     >
-      <Typography variant="h4" color="#002060" align="center" sx={{ fontWeight: "bold" }}>
+      <Typography
+        variant="h4"
+        color="#002060"
+        align="center"
+        sx={{ fontWeight: "bold" }}
+      >
         Market Filters
       </Typography>
 
@@ -81,9 +88,17 @@ const MarketFilters: React.FC = () => {
             backgroundColor: "#ffffff",
           }}
         >
-          <Grid container spacing={3} direction="row" justifyContent="space-between">
+          <Grid
+            container
+            spacing={3}
+            direction="row"
+            justifyContent="space-between"
+          >
             {filtersData.map((filter, index) => {
-              const [key, value] = Object.entries(filter)[0] as [string, FilterOption];
+              const [key, value] = Object.entries(filter)[0] as [
+                string,
+                FilterOption,
+              ];
               const isMultiSelect = Array.isArray(value.options); // Determine multi-select based on options
 
               return (
@@ -100,47 +115,58 @@ const MarketFilters: React.FC = () => {
                     {value.label}
                     {value.description && (
                       <Tooltip title={value.description} arrow>
-                        <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
+                        <InfoIcon
+                          sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
+                        />
                       </Tooltip>
                     )}
                   </Typography>
 
                   <FormControl fullWidth>
-  <Select
-    id={key}
-    multiple={isMultiSelect}
-    value={selectedValues[key] || (isMultiSelect ? [] : "")}
-    onChange={handleChange(key)}
-    MenuProps={MenuProps}
-    renderValue={(selected) => {
-      if (Array.isArray(selected)) {
-        // Display the first selected option and additional count
-        return selected.length > 1
-          ? `${selected[0]} +${selected.length - 1}`
-          : selected[0];
-      }
-      return selected as string | number; // For single-select cases
-    }}
-    sx={{
-      fontSize: "12px", // Reduce font size in dropdown
-      height: "40px", // Adjust the height of the dropdown input
-    }}
-  >
-    {value.options.map((option, idx) => (
-      <MenuItem key={idx} value={option} sx={{ fontSize: "12px" }}>
-        {isMultiSelect && (
-          <Checkbox
-            checked={
-              (selectedValues[key] as (string | number)[] || []).includes(option)
-            }
-          />
-        )}
-        <ListItemText primary={option} />
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
-
+                    <Select
+                      id={key}
+                      multiple={isMultiSelect}
+                      value={selectedValues[key] || (isMultiSelect ? [] : "")}
+                      onChange={handleChange(key)}
+                      MenuProps={MenuProps}
+                      renderValue={(selected) => {
+                        if (Array.isArray(selected)) {
+                          return selected.length > 1
+                            ? `${selected[0]} +${selected.length - 1}`
+                            : selected[0];
+                        }
+                        return selected as string | number;
+                      }}
+                      sx={{
+                        fontSize: "12px", // Reduce font size in dropdown input
+                        height: "40px", // Adjust height of the dropdown input
+                      }}
+                    >
+                      {value.options.map((option, idx) => (
+                        <MenuItem
+                          key={idx}
+                          value={option}
+                          sx={{
+                            fontSize: "0.8rem ", // Smaller font size for options
+                            padding: "4px 8px", // Adjust padding for options
+                          }}
+                        >
+                          {isMultiSelect && (
+                            <Checkbox
+                              checked={(
+                                (selectedValues[key] as (string | number)[]) ||
+                                []
+                              ).includes(option)}
+                              sx={{ padding: "0 8px" }} // Smaller checkbox padding
+                            />
+                          )}
+                          <ListItemText primary={option} sx={{
+                            fontSize: "0.8rem ", // Smaller font size for options
+                          }} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
               );
             })}
