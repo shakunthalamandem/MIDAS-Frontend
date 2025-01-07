@@ -5,7 +5,6 @@ import {
   Card,
   Typography,
   FormControl,
-  InputLabel,
   MenuItem,
   Select,
   Grid,
@@ -89,7 +88,7 @@ const MarketFilters: React.FC = () => {
 
               return (
                 <Grid item xs={2} key={index}>
-                  {/* Add Label and Tooltip */}
+                  {/* Add Label and Tooltip beside the label */}
                   <Typography
                     sx={{
                       fontSize: "0.75rem",
@@ -107,11 +106,7 @@ const MarketFilters: React.FC = () => {
                   </Typography>
 
                   <FormControl fullWidth>
-                    <InputLabel id={`${key}-label`} sx={{ fontSize: "0.75rem" }}>
-                      {value.label}
-                    </InputLabel>
                     <Select
-                      labelId={`${key}-label`}
                       id={key}
                       multiple={isMultiSelect}
                       value={selectedValues[key] || (isMultiSelect ? [] : "")}
