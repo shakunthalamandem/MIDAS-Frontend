@@ -12,6 +12,7 @@ import {
   Checkbox,
   ListItemText,
   SelectChangeEvent,
+  Button,
 } from "@mui/material";
 
 // Define a type for the filter data
@@ -47,8 +48,8 @@ const MarketFilters: React.FC = () => {
   const MenuProps = {
     PaperProps: {
       style: {
-        maxHeight: 400, // Set max height for dropdown
-        width: 250,
+        maxHeight: 300, // Set smaller max height for dropdown
+        width: 120, // Set smaller width for dropdown
       },
     },
   };
@@ -72,20 +73,20 @@ const MarketFilters: React.FC = () => {
         <Card
           sx={{
             padding: 3,
-            maxWidth: "1200px",
+            maxWidth: "1200px", // Adjust the max width to fit the dropdowns better
             margin: "0 auto",
             borderRadius: 2,
             boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
             backgroundColor: "#ffffff",
           }}
         >
-          <Grid container spacing={3}>
+          <Grid container spacing={3} direction="row" justifyContent="space-between">
             {filtersData.map((filter, index) => {
               const [key, value] = Object.entries(filter)[0] as [string, FilterOption];
               const isMultiSelect = Array.isArray(value.options); // Determine multi-select based on options
 
               return (
-                <Grid item xs={12} sm={6} md={3} key={index}>
+                <Grid item xs={2} key={index}>
                   <FormControl fullWidth>
                     <InputLabel id={`${key}-label`}>{value.label}</InputLabel>
                     <Select
@@ -100,6 +101,10 @@ const MarketFilters: React.FC = () => {
                           ? selected.join(", ")
                           : (selected as string | number)
                       }
+                      sx={{
+                        fontSize: "14px", // Reduce font size in dropdown
+                        height: "40px", // Adjust the height of the dropdown input
+                      }}
                     >
                       {value.options.map((option, idx) => (
                         <MenuItem key={idx} value={option}>
@@ -119,6 +124,30 @@ const MarketFilters: React.FC = () => {
               );
             })}
           </Grid>
+          <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+        <Grid item>
+          <Button
+            variant="contained"
+            type="submit"
+            sx={{ bgcolor: "#002060" }}
+            disabled={!filtersData || !Object.keys(filtersData).length}
+          >
+            Apply
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="outlined"
+            color="secondary"
+            type="button"
+            // onClick={handleReset}
+            disabled={!filtersData || !Object.keys(filtersData).length}
+          >
+            Reset
+          </Button>
+        </Grid>
+        </Grid>
+
         </Card>
       ) : (
         <Typography align="center">Loading filters...</Typography>
