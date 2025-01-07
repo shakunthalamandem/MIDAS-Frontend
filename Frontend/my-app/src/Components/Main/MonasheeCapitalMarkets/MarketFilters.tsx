@@ -13,7 +13,9 @@ import {
   ListItemText,
   SelectChangeEvent,
   Button,
+  Tooltip,
 } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 
 // Define a type for the filter data
 interface FilterOption {
@@ -87,8 +89,27 @@ const MarketFilters: React.FC = () => {
 
               return (
                 <Grid item xs={2} key={index}>
+                  {/* Add Label and Tooltip */}
+                  <Typography
+                    sx={{
+                      fontSize: "0.75rem",
+                      marginBottom: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {value.label}
+                    {value.description && (
+                      <Tooltip title={value.description} arrow>
+                        <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
+                      </Tooltip>
+                    )}
+                  </Typography>
+
                   <FormControl fullWidth>
-                    <InputLabel id={`${key}-label`}>{value.label}</InputLabel>
+                    <InputLabel id={`${key}-label`} sx={{ fontSize: "0.75rem" }}>
+                      {value.label}
+                    </InputLabel>
                     <Select
                       labelId={`${key}-label`}
                       id={key}
@@ -102,12 +123,12 @@ const MarketFilters: React.FC = () => {
                           : (selected as string | number)
                       }
                       sx={{
-                        fontSize: "14px", // Reduce font size in dropdown
+                        fontSize: "12px", // Reduce font size in dropdown
                         height: "40px", // Adjust the height of the dropdown input
                       }}
                     >
                       {value.options.map((option, idx) => (
-                        <MenuItem key={idx} value={option}>
+                        <MenuItem key={idx} value={option} sx={{ fontSize: "12px" }}>
                           {isMultiSelect && (
                             <Checkbox
                               checked={
@@ -125,29 +146,28 @@ const MarketFilters: React.FC = () => {
             })}
           </Grid>
           <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
-        <Grid item>
-          <Button
-            variant="contained"
-            type="submit"
-            sx={{ bgcolor: "#002060" }}
-            disabled={!filtersData || !Object.keys(filtersData).length}
-          >
-            Apply
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="outlined"
-            color="secondary"
-            type="button"
-            // onClick={handleReset}
-            disabled={!filtersData || !Object.keys(filtersData).length}
-          >
-            Reset
-          </Button>
-        </Grid>
-        </Grid>
-
+            <Grid item>
+              <Button
+                variant="contained"
+                type="submit"
+                sx={{ bgcolor: "#002060" }}
+                disabled={!filtersData || !Object.keys(filtersData).length}
+              >
+                Apply
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                color="secondary"
+                type="button"
+                // onClick={handleReset}
+                disabled={!filtersData || !Object.keys(filtersData).length}
+              >
+                Reset
+              </Button>
+            </Grid>
+          </Grid>
         </Card>
       ) : (
         <Typography align="center">Loading filters...</Typography>

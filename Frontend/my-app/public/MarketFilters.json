@@ -29,7 +29,7 @@
                     2001
                 ],
                 "label": "Start Year",
-                "description": ""
+                "description": "Start Year"
             }
         },
         {
@@ -61,7 +61,7 @@
                     2001
                 ],
                 "label": "End Year",
-                "description": ""
+                "description": "End Year"
             }
         },
         {
@@ -72,7 +72,7 @@
                     "FO"
                 ],
                 "label": "DealType",
-                "description": ""
+                "description": "DealType"
             }
         },
         {
@@ -81,8 +81,8 @@
                     "Yearly",
                     "Quarterly"
                 ],
-                "label": "DealType",
-                "description": ""
+                "label": "Period",
+                "description": "Period"
             }
         },
         {
@@ -93,7 +93,7 @@
                     "International"
                 ],
                 "label": "Region",
-                "description": ""
+                "description": "Region"
             }
         },
         {
@@ -113,7 +113,7 @@
                     "Utilities"
                 ],
                 "label": "Sector",
-                "description": ""
+                "description": "Sector"
             }
         }
     ]
