@@ -88,6 +88,9 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
               </Typography>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
+                <Typography>
+                    <strong>Prcing Date:</strong> {item.pricing_date}
+                  </Typography>
                   <Typography>
                     <strong>Issuer Name:</strong> {item.issuer_name}
                   </Typography>
