@@ -112,7 +112,7 @@
       "description": "Select the market capitalization range from the given options."
     },
     
-    "sector": {
+    "gics_sector_from_bloomberg": {
       "label": "Sector",
       "options": [
         "Any",

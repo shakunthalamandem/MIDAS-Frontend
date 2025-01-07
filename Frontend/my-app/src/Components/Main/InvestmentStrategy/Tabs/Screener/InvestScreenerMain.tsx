@@ -49,7 +49,7 @@ const columns: GridColDef[] = [
   { field: "allocation_ioi", headerName: "Alloc % of IOI", width: 100 },
   { field: "average_hold_period", headerName: "Hold Period", width: 100 },
   { field: "percentage_primary", headerName: "Primary %", width: 100 },
-  { field: "sector", headerName: "Sector", width: 140 },
+  { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 140 },
   { field: "market_cap", headerName: "Market Cap", width: 130 },
   { field: "analyst_target_price", headerName: "Target Price", width: 100 },
   { field: "volume", headerName: "Volume", width: 100 },
