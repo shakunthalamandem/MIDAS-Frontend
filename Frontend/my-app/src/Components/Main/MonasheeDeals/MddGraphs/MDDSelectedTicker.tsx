@@ -127,11 +127,11 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     {item["T+1D_returns"] ?? "N/A"}
                   </Typography>
                   <Typography>
-                    <strong>Allocation Deal Size:</strong>{" "}
+                    <strong>Allocation  % of Deal Size:</strong>{" "}
                     {item.allocation_deal_size ?? "N/A"}
                   </Typography>
                   <Typography>
-                    <strong>Allocation IOI:</strong>{" "}
+                    <strong>Allocation % of  IOI:</strong>{" "}
                     {item.allocation_ioi ?? "N/A"}
                   </Typography>
                   <Typography>
