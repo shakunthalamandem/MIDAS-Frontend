@@ -115,18 +115,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography>
-                    <strong>FO Discount:</strong> {item.fo_discount ?? "N/A"}
-                  </Typography>
-                  <Typography>
-                    <strong>T+1M Returns:</strong>{" "}
-                    {item["T+1M_returns"] ?? "N/A"}
-                  </Typography>
-                  <Typography>
-                    <strong>T+1D Returns:</strong>{" "}
-                    {item["T+1D_returns"] ?? "N/A"}
-                  </Typography>
-                  <Typography>
+                <Typography>
                     <strong>Allocation  % of Deal Size:</strong>{" "}
                     {item.allocation_deal_size ?? "N/A"}
                   </Typography>
@@ -138,6 +127,21 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <strong>Average Hold Period:</strong>{" "}
                     {item.average_hold_period ?? "N/A"}
                   </Typography>
+                  <Typography>
+                    <strong>T+1D Returns:</strong>{" "}
+                    {item["T+1D_returns"] ?? "N/A"}
+                  </Typography>
+                  <Typography>
+                    <strong>T+1M Returns:</strong>{" "}
+                    {item["T+1M_returns"] ?? "N/A"}
+                  </Typography>
+                  <Typography>
+                    <strong>FO Discount:</strong> {item.fo_discount ?? "N/A"}
+                  </Typography>
+                 
+                  
+                  
+                 
                   <Typography>
                     <strong>T+1D Issue Price:</strong>{" "}
                     {item["T+1D_issueprice"] ?? "N/A"}
