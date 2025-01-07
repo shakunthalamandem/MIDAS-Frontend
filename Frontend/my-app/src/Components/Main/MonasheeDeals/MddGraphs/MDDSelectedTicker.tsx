@@ -15,13 +15,15 @@ interface TickerData {
   deal_type: string;
   lead_bank: string[];
   deal_size: string;
+  last_price_t1:string;
+  issue_offer_price:string;
   fo_discount: string | null;
   "T+1M_returns"?: string | null; // Allow null or string
   "T+1D_returns"?: string | null; // Allow null or string
   allocation_deal_size: string | null; // Allow null or string
   allocation_ioi: string | null; // Allow null or string
   average_hold_period: string | null; // Allow null or string
-  "T+1D_issueprice"?: string | null;
+  // "T+1D_issueprice"?: string | null;
   percentage_primary: string | null; // Allow null or string
   sponsor: string | null; // Allow null or string
 }
@@ -113,6 +115,12 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                   <Typography>
                     <strong>Lead Bank:</strong> {item.lead_bank.join(", ")}
                   </Typography>
+                  <Typography>
+                    <strong>Issue Price: </strong> ${item.issue_offer_price}
+                  </Typography>
+                  <Typography>
+                    <strong>T + 1D Issue Price:</strong> ${item.last_price_t1}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                 <Typography>
@@ -142,10 +150,10 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                   
                   
                  
-                  <Typography>
+                  {/* <Typography>
                     <strong>T+1D Issue Price:</strong>{" "}
                     {item["T+1D_issueprice"] ?? "N/A"}
-                  </Typography>
+                  </Typography> */}
                   <Typography>
                     <strong>Percentage Primary:</strong>{" "}
                     {item.percentage_primary ?? "N/A"}
