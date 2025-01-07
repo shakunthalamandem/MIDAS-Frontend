@@ -121,6 +121,13 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                   <Typography>
                     <strong>T + 1D Issue Price:</strong> ${item.last_price_t1}
                   </Typography>
+                  <Typography>
+                    <strong>Percentage Primary:</strong>{" "}
+                    {item.percentage_primary ?? "N/A"}
+                  </Typography>
+                  <Typography>
+                    <strong>Sponsor:</strong> {item.sponsor ?? "N/A"}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                 <Typography>
@@ -154,13 +161,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <strong>T+1D Issue Price:</strong>{" "}
                     {item["T+1D_issueprice"] ?? "N/A"}
                   </Typography> */}
-                  <Typography>
-                    <strong>Percentage Primary:</strong>{" "}
-                    {item.percentage_primary ?? "N/A"}
-                  </Typography>
-                  <Typography>
-                    <strong>Sponsor:</strong> {item.sponsor ?? "N/A"}
-                  </Typography>
+                  
                 </Grid>
               </Grid>
             </Paper>
