@@ -10,7 +10,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import SelectedTicker from "./SelectedTicker";
+import SelectedTicker from "./MDDSelectedTicker";
 
 // Define the type for the API response
 interface MDDResult {
