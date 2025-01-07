@@ -38,7 +38,6 @@ const InvestmentMain: React.FC = () => {
           },
         }}
       >
-          Investment Strategies
           </Typography>
 
       {/* Fetch Data */}

@@ -41,7 +41,6 @@ const CapitalMarkets: React.FC = () => {
     },
   }}
 >
-  Capital Markets
 </Typography>
 
 

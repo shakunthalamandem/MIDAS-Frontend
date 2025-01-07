@@ -40,7 +40,6 @@ const MonasheeDeals: React.FC = () => {
           },
         }}
       >
-        Monashee Deals
       </Typography>
 
       {/* Tabs */}
