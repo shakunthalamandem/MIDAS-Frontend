@@ -54,7 +54,10 @@ const MDDDealSearch: React.FC = () => {
   // Function to handle selecting an item from the list
   const handleItemClick = (ticker: string) => {
     setSelectedTicker(ticker); // Set the selected ticker when clicked
+    setSearchTerm(""); // Clear the search term
+    setResults([]); // Clear the search results
   };
+  
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
