@@ -67,6 +67,7 @@ const DealSearch: React.FC = () => {
           variant="outlined"
           value={searchTerm}
           onChange={handleSearch}
+          autoComplete="off" // Disable autocomplete
           style={{ marginBottom: "20px",
             minWidth:'300px' 
           }}

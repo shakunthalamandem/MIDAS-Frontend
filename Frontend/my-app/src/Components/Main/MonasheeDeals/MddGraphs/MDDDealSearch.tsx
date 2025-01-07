@@ -65,6 +65,7 @@ const MDDDealSearch: React.FC = () => {
           label="Search"
           variant="outlined"
           value={searchTerm}
+          autoComplete="off" // Disable autocomplete
           onChange={handleSearch}
           style={{ marginBottom: "20px",
             minWidth:'300px' 
