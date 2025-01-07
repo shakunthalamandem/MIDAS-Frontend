@@ -8,7 +8,6 @@ import {
   Paper,
   Container,
   Box,
-  Typography,
 } from "@mui/material";
 import MDDSelectedTicker from "./MDDSelectedTicker";
 
