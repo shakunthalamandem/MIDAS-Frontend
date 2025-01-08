@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   BarChart,
   Bar,
@@ -9,20 +9,14 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Checkbox, Container, FormControlLabel, Box, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 interface NumberOfDealsProps {
   data: Record<string, any>;
+  selectedMetric: string;
 }
 
-const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data }) => {
-  const [selectedMetric, setSelectedMetric] = useState<string>("count"); // Default to "count" (Deal Count)
-
-  // Function to handle the checkbox change
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedMetric(event.target.value);
-  };
-
+const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) => {
   // Prepare the data for the chart, based on the selected metric
   const chartData = Object.entries(data).map(([year, stats]) => {
     const ipoValue = stats[selectedMetric]?.IPO || 0; // IPO value for the selected metric
@@ -35,8 +29,7 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data }) => {
   });
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Heading */}
+    <Box>
       <Typography
         variant="h5"
         align="center"
@@ -46,46 +39,10 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data }) => {
         Deal Type
       </Typography>
 
-      {/* Checkboxes for selecting the metric */}
-      <Box display="flex" justifyContent="center" mb={2}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={selectedMetric === "count"}
-              onChange={handleCheckboxChange}
-              value="count"
-              color="primary"
-            />
-          }
-          label="Deal Count"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={selectedMetric === "deal_value"}
-              onChange={handleCheckboxChange}
-              value="deal_value"
-              color="primary"
-            />
-          }
-          label="Deal Value"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={selectedMetric === "opportunity_value_ex"}
-              onChange={handleCheckboxChange}
-              value="opportunity_value_ex"
-              color="primary"
-            />
-          }
-          label="Opportunity Exits Value"
-        />
-      </Box>
-
       {/* Stacked Bar Chart using Recharts */}
       <ResponsiveContainer width="100%" height={400}>
         <BarChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
           <YAxis />
           <Tooltip />
@@ -94,7 +51,7 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data }) => {
           <Bar dataKey="FO" stackId="a" fill="#82ca9d" />
         </BarChart>
       </ResponsiveContainer>
-    </Container>
+    </Box>
   );
 };
 

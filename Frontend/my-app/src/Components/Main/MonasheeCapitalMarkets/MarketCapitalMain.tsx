@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-
-// Child Components for NumberOfDeals, Region, and Sector
+import { Box, Container, Grid, FormControlLabel, Checkbox, Typography } from '@mui/material';
 import NumberOfDeals from './NavigationTabs/NumberOfDeals';
 import RegionWiseDeals from './NavigationTabs/RegionWiseDeals';
 import SectorWiseDeals from './NavigationTabs/SectorWiseDeals';
-import { Box, Container, Grid } from '@mui/material';
 
 interface MarketCapitalMainProps {
   selectedFilters: Record<string, string | number | (string | number)[]>;
@@ -15,6 +12,11 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
   const [apiData, setApiData] = useState<any>(null); // Store the API response
   const [loading, setLoading] = useState<boolean>(false); // Loading state
   const [error, setError] = useState<string | null>(null); // Error state
+  const [selectedMetric, setSelectedMetric] = useState<string>('count'); // Default to "count" (Deal Count)
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedMetric(event.target.value);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +42,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
         if (response.ok) {
           const result = await response.json();
           setApiData(result); // Store API response data
-          console.log("result",result)
         } else {
           throw new Error('Failed to fetch data');
         }
@@ -55,36 +56,77 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
       fetchData(); // Fetch data when selectedFilters change
     }
   }, [selectedFilters]); // Dependency array to trigger useEffect when selectedFilters change
-console.log("apiData",apiData)
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-
       {/* Display loading state */}
       {loading && <p>Loading...</p>}
 
       {/* Display error message if any */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Display applied filters */}
-
+      {/* Checkboxes for selecting the metric */}
+      <Box display="flex" justifyContent="center" mb={2}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={selectedMetric === 'count'}
+              onChange={handleCheckboxChange}
+              value="count"
+              color="primary"
+            />
+          }
+          label="Deal Count"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={selectedMetric === 'deal_value'}
+              onChange={handleCheckboxChange}
+              value="deal_value"
+              color="primary"
+            />
+          }
+          label="Deal Value"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={selectedMetric === 'opportunity_value_ex'}
+              onChange={handleCheckboxChange}
+              value="opportunity_value_ex"
+              color="primary"
+            />
+          }
+          label="Opportunity Exits Return"
+        />
+      </Box>
 
       {/* Display the API data */}
       {apiData && (
         <>
-          <NumberOfDeals data={apiData.deal_type} />
+          <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
+            Deal Statistics
+          </Typography>
+          <Grid item xs={12} md={6}>
+                <NumberOfDeals data={apiData.deal_type} selectedMetric={selectedMetric} />
+              </Grid>
           <Box sx={{ px: 4, py: 2 }}>
-      <Grid container spacing={4}>
-        {/* Region Wise Deals */}
-        <Grid item xs={12} md={6}>
-          <RegionWiseDeals data={apiData.regions} />
-        </Grid>
+            <Grid container spacing={4}>
+              {/* Number of Deals */}
+            
 
-        {/* Sector Wise Deals */}
-        <Grid item xs={12} md={6}>
-          <SectorWiseDeals data={apiData.sectors} />
-        </Grid>
-      </Grid>
-    </Box>
+              {/* Region Wise Deals */}
+              <Grid item xs={12} md={6}>
+                <RegionWiseDeals data={apiData.regions} selectedMetric={selectedMetric} />
+              </Grid>
+
+              {/* Sector Wise Deals */}
+              <Grid item xs={12} md={6}>
+                <SectorWiseDeals data={apiData.sectors} selectedMetric={selectedMetric} />
+              </Grid>
+            </Grid>
+          </Box>
         </>
       )}
     </Container>
@@ -92,3 +134,4 @@ console.log("apiData",apiData)
 };
 
 export default MarketCapitalMain;
+ 

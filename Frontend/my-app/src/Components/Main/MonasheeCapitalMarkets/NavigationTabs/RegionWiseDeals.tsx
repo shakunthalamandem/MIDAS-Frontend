@@ -1,19 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Checkbox, Container, FormControlLabel, Box, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 interface RegionWiseDealsProps {
   data: Record<string, any>;
+  selectedMetric: string;
 }
 
-const RegionWiseDeals: React.FC<RegionWiseDealsProps> = ({ data }) => {
-  const [selectedMetric, setSelectedMetric] = useState<string>('count'); // Default to "count" (Deal Count)
-
-  // Function to handle the checkbox change
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedMetric(event.target.value);
-  };
-
+const RegionWiseDeals: React.FC<RegionWiseDealsProps> = ({ data, selectedMetric }) => {
   // Prepare the data for the Pie Chart, based on the selected metric
   const chartData = Object.entries(data).map(([region, stats]) => {
     const regionValue = stats[selectedMetric] || 0; // Get the selected metric for each region
@@ -30,50 +24,11 @@ const RegionWiseDeals: React.FC<RegionWiseDealsProps> = ({ data }) => {
     "#5F4774", "#DE5D85", "#83C3DA", "#4B3563"];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Heading with specified color */}
+    <Box>
       <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
         Region Wise Deals
       </Typography>
 
-      {/* Checkboxes for selecting the metric */}
-      <Box display="flex" justifyContent="center" mb={2}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={selectedMetric === 'count'}
-              onChange={handleCheckboxChange}
-              value="count"
-              color="primary"
-            />
-          }
-          label="Deal Count"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={selectedMetric === 'deal_value'}
-              onChange={handleCheckboxChange}
-              value="deal_value"
-              color="primary"
-            />
-          }
-          label="Deal Value"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={selectedMetric === 'opportunity_value_ex'}
-              onChange={handleCheckboxChange}
-              value="opportunity_value_ex"
-              color="primary"
-            />
-          }
-          label="Opportunity Exits Return"
-        />
-      </Box>
-
-      {/* Pie Chart using Recharts */}
       <ResponsiveContainer width="100%" height={400}>
         <PieChart>
           <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={150} fill="#8884d8" label>
@@ -85,7 +40,7 @@ const RegionWiseDeals: React.FC<RegionWiseDealsProps> = ({ data }) => {
           <Legend />
         </PieChart>
       </ResponsiveContainer>
-    </Container>
+    </Box>
   );
 };
 
