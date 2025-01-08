@@ -544,13 +544,13 @@
       "options": [
         "Any",
         "Equals to Current Price",
-        "10% above Current Price",
-        "20% above Current Price",
-        "30% above Current Price",
-        "40% above Current Price",
-        "50% above Current Price",
-        "75% above Current Price",
-        "100% above Current Price"
+        "20% below Current Price",
+        "30% below Current Price",
+        "40% below Current Price",
+        "50% below Current Price",
+        "75% below Current Price",
+        "10% below Current Price",
+        "100% below Current Price"
       ],
       "label": "52 Week Low",
       "description": "The current price in relation to the 52-week low."
@@ -576,7 +576,7 @@
       "label": "DMA 20",
       "description": "The current price in relation to the 20-day moving average."
     },
-    "dma50 ": {
+    "dma50": {
       "options": [
         "Any",
         "Below Current Price",
