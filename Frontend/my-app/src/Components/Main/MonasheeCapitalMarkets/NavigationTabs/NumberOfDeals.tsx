@@ -42,7 +42,6 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
       {/* Stacked Bar Chart using Recharts */}
       <ResponsiveContainer width="100%" height={400}>
         <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
           <YAxis />
           <Tooltip />
