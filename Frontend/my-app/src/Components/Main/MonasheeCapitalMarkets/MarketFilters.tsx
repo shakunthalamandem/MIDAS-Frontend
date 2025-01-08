@@ -14,6 +14,8 @@ import {
   SelectChangeEvent,
   Button,
   Tooltip,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 
@@ -27,6 +29,8 @@ const MarketFilters: React.FC = () => {
   const [filtersData, setFiltersData] = useState<Record<string, FilterOption>[]>([]);
   const [selectedValues, setSelectedValues] = useState<Record<string, string | number | (string | number)[]>>({});
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | (string | number)[]>>({});
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // Manage Snackbar open state
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message content
 
   const handleDataLoaded = (data: any) => {
     setFiltersData(data.market_capital);
@@ -43,13 +47,29 @@ const MarketFilters: React.FC = () => {
     };
 
   const handleApply = () => {
-    console.log("Applied Filters:", selectedValues);
-    setAppliedFilters(selectedValues);
+    // Check if start_year is less than end_year
+    const startYear = selectedValues["start_year"];
+    const endYear = selectedValues["end_year"];
+
+    if (startYear && endYear && startYear > endYear) {
+      // Open Snackbar with error message if validation fails
+      setSnackbarMessage("Start year should be less than or equal to end year.");
+      setSnackbarOpen(true);
+    } else {
+      setSnackbarOpen(false); // Close the Snackbar if validation passes
+      console.log("Applied Filters:", selectedValues);
+      setAppliedFilters(selectedValues); // Apply filters
+    }
   };
 
   const handleReset = () => {
     setSelectedValues({});
     setAppliedFilters({});
+    setSnackbarOpen(false); // Close Snackbar on reset
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false); // Close Snackbar when the user dismisses it
   };
 
   const MenuProps = {
@@ -138,6 +158,17 @@ const MarketFilters: React.FC = () => {
       )}
 
       {Object.keys(appliedFilters).length > 0 && <MarketCapitalMain selectedFilters={appliedFilters} />}
+
+      {/* Snackbar for error message */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: "100%" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
