@@ -28,7 +28,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
         }
 
         // Make the POST request with selectedFilters as the payload
-        const response = await fetch(`${apiUrl}/api/investment_screener/`, {
+        const response = await fetch(`${apiUrl}/api/dealogic_graph/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -39,6 +39,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
         if (response.ok) {
           const result = await response.json();
           setApiData(result); // Store API response data
+          console.log("result",result)
         } else {
           throw new Error('Failed to fetch data');
         }
@@ -53,7 +54,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
       fetchData(); // Fetch data when selectedFilters change
     }
   }, [selectedFilters]); // Dependency array to trigger useEffect when selectedFilters change
-
+console.log("apiData",apiData)
   return (
     <div>
       <h2>Market Capital Main</h2>
