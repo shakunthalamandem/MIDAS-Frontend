@@ -139,7 +139,7 @@ const CapitalMarkets: React.FC = () => {
             }}
           />
             <Tab
-            label="Market Captial Count"
+            label="Market Metrics"
             sx={{
               backgroundColor: value === 6 ? "#9C27B0" : "#f5f5f5",
               color: value === 6 ? "#fff" : "#777",
