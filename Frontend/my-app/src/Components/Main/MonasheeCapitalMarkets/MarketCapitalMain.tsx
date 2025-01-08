@@ -57,7 +57,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
 console.log("apiData",apiData)
   return (
     <div>
-      <h2>Market Capital Main</h2>
 
       {/* Display loading state */}
       {loading && <p>Loading...</p>}
@@ -66,20 +65,7 @@ console.log("apiData",apiData)
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       {/* Display applied filters */}
-      <div>
-        <h3>Applied Filters:</h3>
-        {Object.keys(selectedFilters).length > 0 ? (
-          <ul>
-            {Object.entries(selectedFilters).map(([key, value], index) => (
-              <li key={index}>
-                <strong>{key}:</strong> {Array.isArray(value) ? value.join(', ') : value.toString()}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No filters applied.</p>
-        )}
-      </div>
+
 
       {/* Display the API data */}
       {apiData && (

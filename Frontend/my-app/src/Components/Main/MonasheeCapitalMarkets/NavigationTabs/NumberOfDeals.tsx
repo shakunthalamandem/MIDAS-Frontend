@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Checkbox, FormControlLabel } from "@mui/material";
+import { Checkbox, Container, FormControlLabel } from "@mui/material";
 
 interface NumberOfDealsProps {
   data: Record<string, any>;
@@ -26,7 +26,7 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data }) => {
   });
 
   return (
-    <div>
+    <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <h3>Deal Type</h3>
 
       {/* Checkboxes for selecting the metric */}
@@ -58,7 +58,7 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data }) => {
           <Bar dataKey="FO" fill="#82ca9d" />
         </BarChart>
       </ResponsiveContainer>
-    </div>
+      </Container>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Checkbox, FormControlLabel } from '@mui/material';
+import { Checkbox, Container, FormControlLabel } from '@mui/material';
 
 interface RegionWiseDealsProps {
   data: Record<string, any>;
@@ -27,7 +27,7 @@ const RegionWiseDeals: React.FC<RegionWiseDealsProps> = ({ data }) => {
   const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#d0ed57', '#a4de6c'];
 
   return (
-    <div>
+    <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <h3>Region Wise Deals</h3>
 
       {/* Checkboxes for selecting the metric */}
@@ -58,7 +58,7 @@ const RegionWiseDeals: React.FC<RegionWiseDealsProps> = ({ data }) => {
           <Legend />
         </PieChart>
       </ResponsiveContainer>
-    </div>
+      </Container>
   );
 };
 
