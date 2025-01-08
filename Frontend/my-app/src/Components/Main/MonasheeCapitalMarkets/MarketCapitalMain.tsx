@@ -21,10 +21,29 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
       setError(null); // Reset error
 
       try {
-        const response = await axios.post('http://192.168.1.59:9000/api/investment_screener/', selectedFilters);
-        setApiData(response.data); // Store API response data
-      } catch (err) {
-        setError('Failed to fetch data');
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
+
+        // Make the POST request with selectedFilters as the payload
+        const response = await fetch(`${apiUrl}/api/investment_screener/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(selectedFilters), // Payload from selected filters
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setApiData(result); // Store API response data
+        } else {
+          throw new Error('Failed to fetch data');
+        }
+      } catch (err: any) {
+        setError(err.message || 'An error occurred while fetching data');
       } finally {
         setLoading(false);
       }
@@ -38,13 +57,13 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
   return (
     <div>
       <h2>Market Capital Main</h2>
-      
+
       {/* Display loading state */}
       {loading && <p>Loading...</p>}
-      
+
       {/* Display error message if any */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      
+
       {/* Display applied filters */}
       <div>
         <h3>Applied Filters:</h3>
@@ -60,7 +79,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
           <p>No filters applied.</p>
         )}
       </div>
-      
+
       {/* Display the API data */}
       {apiData && (
         <>
