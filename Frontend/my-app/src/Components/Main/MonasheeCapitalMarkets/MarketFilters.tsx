@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import MarketCapitalFilters from "./MarketCapitalFilters";
+import MarketCapitalMain from "./MarketCapitalMain";
 import {
   Box,
   Card,
@@ -16,10 +17,9 @@ import {
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 
-// Define a type for the filter data
 interface FilterOption {
   label: string;
-  options: (string | number)[]; // options can be string or number
+  options: (string | number)[];
   description: string;
 }
 
@@ -30,6 +30,9 @@ const MarketFilters: React.FC = () => {
   const [selectedValues, setSelectedValues] = useState<
     Record<string, string | number | (string | number)[]>
   >({});
+  const [appliedFilters, setAppliedFilters] = useState<
+    Record<string, string | number | (string | number)[]>
+  >({}); // Tracks filters after applying
 
   const handleDataLoaded = (data: any) => {
     setFiltersData(data.market_capital);
@@ -42,15 +45,25 @@ const MarketFilters: React.FC = () => {
 
       setSelectedValues((prev) => ({
         ...prev,
-        [filterKey]: Array.isArray(value) ? value : [value], // Ensure array for multi-select
+        [filterKey]: Array.isArray(value) ? value : [value],
       }));
     };
+
+  const handleApply = () => {
+    console.log("Applied Filters:", selectedValues);
+    setAppliedFilters(selectedValues); // Update applied filters
+  };
+
+  const handleReset = () => {
+    setSelectedValues({});
+    setAppliedFilters({}); // Clear applied filters
+  };
 
   const MenuProps = {
     PaperProps: {
       style: {
-        maxHeight: 300, // Set smaller max height for dropdown
-        width: 120, // Set smaller width for dropdown
+        maxHeight: 300,
+        width: 120,
       },
     },
   };
@@ -72,14 +85,13 @@ const MarketFilters: React.FC = () => {
         Market Filters
       </Typography>
 
-      {/* Load the filters data */}
       <MarketCapitalFilters onDataLoaded={handleDataLoaded} />
 
       {filtersData.length > 0 ? (
         <Card
           sx={{
             padding: 3,
-            maxWidth: "1200px", // Adjust the max width to fit the dropdowns better
+            maxWidth: "1200px",
             margin: "0 auto",
             borderRadius: 2,
             boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
@@ -95,13 +107,12 @@ const MarketFilters: React.FC = () => {
             {filtersData.map((filter, index) => {
               const [key, value] = Object.entries(filter)[0] as [
                 string,
-                FilterOption,
+                FilterOption
               ];
-              const isMultiSelect = Array.isArray(value.options); // Determine multi-select based on options
+              const isMultiSelect = Array.isArray(value.options);
 
               return (
                 <Grid item xs={2} key={index}>
-                  {/* Add Label and Tooltip beside the label */}
                   <Typography
                     sx={{
                       fontSize: "0.75rem",
@@ -136,8 +147,8 @@ const MarketFilters: React.FC = () => {
                         return selected as string | number;
                       }}
                       sx={{
-                        fontSize: "12px", // Reduce font size in dropdown input
-                        height: "40px", // Adjust height of the dropdown input
+                        fontSize: "12px",
+                        height: "40px",
                       }}
                     >
                       {value.options.map((option, idx) => (
@@ -145,8 +156,8 @@ const MarketFilters: React.FC = () => {
                           key={idx}
                           value={option}
                           sx={{
-                            fontSize: "0.8rem ", // Smaller font size for options
-                            padding: "4px 8px", // Adjust padding for options
+                            fontSize: "0.8rem ",
+                            padding: "4px 8px",
                           }}
                         >
                           {isMultiSelect && (
@@ -155,12 +166,15 @@ const MarketFilters: React.FC = () => {
                                 (selectedValues[key] as (string | number)[]) ||
                                 []
                               ).includes(option)}
-                              sx={{ padding: "0 8px" }} // Smaller checkbox padding
+                              sx={{ padding: "0 8px" }}
                             />
                           )}
-                          <ListItemText primary={option} sx={{
-                            fontSize: "0.8rem ", // Smaller font size for options
-                          }} />
+                          <ListItemText
+                            primary={option}
+                            sx={{
+                              fontSize: "0.8rem ",
+                            }}
+                          />
                         </MenuItem>
                       ))}
                     </Select>
@@ -173,8 +187,9 @@ const MarketFilters: React.FC = () => {
             <Grid item>
               <Button
                 variant="contained"
-                type="submit"
+                type="button"
                 sx={{ bgcolor: "#002060" }}
+                onClick={handleApply}
                 disabled={!filtersData || !Object.keys(filtersData).length}
               >
                 Apply
@@ -185,7 +200,7 @@ const MarketFilters: React.FC = () => {
                 variant="outlined"
                 color="secondary"
                 type="button"
-                // onClick={handleReset}
+                onClick={handleReset}
                 disabled={!filtersData || !Object.keys(filtersData).length}
               >
                 Reset
@@ -195,6 +210,10 @@ const MarketFilters: React.FC = () => {
         </Card>
       ) : (
         <Typography align="center">Loading filters...</Typography>
+      )}
+
+      {Object.keys(appliedFilters).length > 0 && (
+        <MarketCapitalMain selectedFilters={appliedFilters} />
       )}
     </Box>
   );
