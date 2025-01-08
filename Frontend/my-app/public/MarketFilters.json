@@ -90,7 +90,9 @@
                 "options": [
                     "ALL",
                     "US",
-                    "International"
+                    "EMEA",
+                    "APAC",
+                    "Non-US America"
                 ],
                 "label": "Region",
                 "description": "Region"
