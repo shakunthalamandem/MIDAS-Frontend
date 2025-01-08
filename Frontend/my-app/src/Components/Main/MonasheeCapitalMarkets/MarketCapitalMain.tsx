@@ -5,6 +5,7 @@ import axios from 'axios';
 import NumberOfDeals from './NavigationTabs/NumberOfDeals';
 import RegionWiseDeals from './NavigationTabs/RegionWiseDeals';
 import SectorWiseDeals from './NavigationTabs/SectorWiseDeals';
+import { Box, Container, Grid } from '@mui/material';
 
 interface MarketCapitalMainProps {
   selectedFilters: Record<string, string | number | (string | number)[]>;
@@ -56,7 +57,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
   }, [selectedFilters]); // Dependency array to trigger useEffect when selectedFilters change
 console.log("apiData",apiData)
   return (
-    <div>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
 
       {/* Display loading state */}
       {loading && <p>Loading...</p>}
@@ -71,11 +72,22 @@ console.log("apiData",apiData)
       {apiData && (
         <>
           <NumberOfDeals data={apiData.deal_type} />
+          <Box sx={{ px: 4, py: 2 }}>
+      <Grid container spacing={4}>
+        {/* Region Wise Deals */}
+        <Grid item xs={12} md={6}>
           <RegionWiseDeals data={apiData.regions} />
+        </Grid>
+
+        {/* Sector Wise Deals */}
+        <Grid item xs={12} md={6}>
           <SectorWiseDeals data={apiData.sectors} />
+        </Grid>
+      </Grid>
+    </Box>
         </>
       )}
-    </div>
+    </Container>
   );
 };
 

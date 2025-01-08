@@ -38,7 +38,7 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data }) => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Heading */}
       <Typography
-        variant="h4"
+        variant="h5"
         align="center"
         gutterBottom
         sx={{ color: "#002060", fontWeight: "bold" }}
