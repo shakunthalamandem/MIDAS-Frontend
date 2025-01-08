@@ -5,7 +5,9 @@ interface MarketCapitalMainProps {
 }
 
 const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }) => {
+    console.log("selectedFilters",selectedFilters)
   return (
+    
     <div>
       <h2>MarketCapitalMain</h2>
       <div>
