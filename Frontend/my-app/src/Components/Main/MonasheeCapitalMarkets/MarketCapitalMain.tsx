@@ -85,7 +85,7 @@ console.log("apiData",apiData)
       {apiData && (
         <>
           <NumberOfDeals data={apiData.deal_type} />
-          <RegionWiseDeals data={apiData.region} />
+          <RegionWiseDeals data={apiData.regions} />
           <SectorWiseDeals data={apiData.sectors} />
         </>
       )}

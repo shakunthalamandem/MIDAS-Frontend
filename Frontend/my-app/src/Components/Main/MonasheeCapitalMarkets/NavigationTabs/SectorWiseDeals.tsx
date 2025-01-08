@@ -36,12 +36,12 @@ const SectorWiseDeals: React.FC<SectorWiseDealsProps> = ({ data }) => {
           control={<Checkbox checked={selectedMetric === 'count'} onChange={handleCheckboxChange} value="count" />}
           label="Deal Count"
         />
+         <FormControlLabel
+                  control={<Checkbox checked={selectedMetric === 'deal_value'} onChange={handleCheckboxChange} value="deal_value" />}
+                  label="Deal Value"
+                />
         <FormControlLabel
-          control={<Checkbox checked={selectedMetric === 'volume'} onChange={handleCheckboxChange} value="volume" />}
-          label="Deal Size"
-        />
-        <FormControlLabel
-          control={<Checkbox checked={selectedMetric === 'opp_exs_return'} onChange={handleCheckboxChange} value="opp_exs_return" />}
+          control={<Checkbox checked={selectedMetric === 'opportunity_value_ex'} onChange={handleCheckboxChange} value="opportunity_value_ex" />}
           label="Opportunity Exits Return"
         />
       </div>
