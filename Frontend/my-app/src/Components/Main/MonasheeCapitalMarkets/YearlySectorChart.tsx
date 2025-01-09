@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, FormControlLabel, Checkbox } from '@mui/material';
+import { Box, FormControlLabel, Checkbox, Typography } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 interface LineChartProps {
@@ -32,7 +32,9 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, che
 
   return (
     <Box>
-      {/* Checkbox Controls */}
+        <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
+        Sector-wise Data Over the Years
+        </Typography>
       <Box display="flex" justifyContent="center" flexWrap="wrap" mb={2}>
         {allSectors.map((sector) => (
           <FormControlLabel
@@ -52,7 +54,6 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, che
       {/* Chart */}
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
           <YAxis />
           <Tooltip />

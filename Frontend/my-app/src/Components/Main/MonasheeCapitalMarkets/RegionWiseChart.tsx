@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, FormControlLabel, Checkbox } from '@mui/material';
+import { Box, FormControlLabel, Checkbox, Typography } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 interface RegionWiseChartProps {
@@ -32,7 +32,9 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({ data, selectedMetric,
 
   return (
     <Box>
-      {/* Checkbox Controls */}
+        <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
+            Region-wise Data Over the Years
+        </Typography>
       <Box display="flex" justifyContent="center" flexWrap="wrap" mb={2}>
         {allRegions.map((region) => (
           <FormControlLabel
@@ -52,7 +54,6 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({ data, selectedMetric,
       {/* Chart */}
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
           <YAxis />
           <Tooltip />

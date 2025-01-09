@@ -11,9 +11,9 @@ interface MarketCapitalMainProps {
 }
 
 const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }) => {
-  const [apiData, setApiData] = useState<any>(null); // Store the API response
-  const [loading, setLoading] = useState<boolean>(false); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error state
+  const [apiData, setApiData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<string>('count'); // Default to "count" (Deal Count)
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +23,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError(null); // Reset error
+      setError(null);
 
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
@@ -32,18 +32,17 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
           throw new Error('API URL is not defined in environment variables');
         }
 
-        // Make the POST request with selectedFilters as the payload
         const response = await fetch(`${apiUrl}/api/dealogic_graph/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(selectedFilters), // Payload from selected filters
+          body: JSON.stringify(selectedFilters),
         });
 
         if (response.ok) {
           const result = await response.json();
-          setApiData(result); // Store API response data
+          setApiData(result);
         } else {
           throw new Error('Failed to fetch data');
         }
@@ -54,18 +53,15 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
       }
     };
 
-      fetchData(); // Fetch data when selectedFilters change
-  }, [selectedFilters]); // Dependency array to trigger useEffect when selectedFilters change
+      fetchData();
+  }, [selectedFilters]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Display loading state */}
       {loading && <p>Loading...</p>}
 
-      {/* Display error message if any */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Checkboxes for selecting the metric */}
       <Box display="flex" justifyContent="center" mb={2}>
       {['count', 'deal_value', 'opportunity_value_ex'].map((metric, index) => {
         const labels = ['Deal Count', 'Deal Value', 'Opportunity Excess Value'];
@@ -92,7 +88,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
       })}
     </Box>
 
-      {/* Display the API data */}
       {apiData && (
         <>
          
@@ -100,16 +95,12 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
                 <NumberOfDeals data={apiData.deal_type} selectedMetric={selectedMetric} />
               </Grid>
           <Box sx={{ px: 4, py: 2 }}>
-            <Grid container spacing={4}>
-              {/* Number of Deals */}
-            
+            <Grid container spacing={4}>            
 
-              {/* Region Wise Deals */}
               <Grid item xs={12} md={6}>
                 <RegionWiseDeals data={apiData.regions} selectedMetric={selectedMetric} />
               </Grid>
 
-              {/* Sector Wise Deals */}
               <Grid item xs={12} md={6}>
                 <SectorWiseDeals data={apiData.sectors} selectedMetric={selectedMetric} />
               </Grid>
@@ -121,28 +112,26 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
               selectedMetric={selectedMetric}
               checkedItems={
                 Array.isArray(selectedFilters?.sector)
-                  ? selectedFilters.sector.filter((item): item is string => typeof item === 'string') // Ensure only strings
+                  ? selectedFilters.sector.filter((item): item is string => typeof item === 'string')
                   : typeof selectedFilters?.sector === 'string'
-                  ? [selectedFilters.sector] // Convert single string to array
-                  : [] // Default to empty array
+                  ? [selectedFilters.sector]
+                  : []
               }
             />
           </Grid>
           <Grid item xs={12} md={6}>
-  <RegionWiseChart
-    data={apiData.year_wise_region}
-    selectedMetric={selectedMetric}
-    checkedItems={ // Ensure this is passed
-      Array.isArray(selectedFilters?.region)
-        ? selectedFilters.region.filter((item): item is string => typeof item === 'string') // Ensure only strings
-        : typeof selectedFilters?.region === 'string'
-        ? [selectedFilters.region] // Convert single string to array
-        : [] // Default to empty array
-    } 
-  />
-</Grid>
-
-
+            <RegionWiseChart
+              data={apiData.year_wise_region}
+              selectedMetric={selectedMetric}
+              checkedItems={
+                Array.isArray(selectedFilters?.region)
+                  ? selectedFilters.region.filter((item): item is string => typeof item === 'string')
+                  : typeof selectedFilters?.region === 'string'
+                  ? [selectedFilters.region]
+                  : []
+              }
+            />
+          </Grid>
         </>
       )}
     </Container>
