@@ -1,0 +1,45 @@
+import React from 'react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer } from 'recharts';
+
+interface LineChartProps {
+  data: Record<string, any>; // API response
+  selectedMetric: string; // Metric to display (e.g., 'count', 'deal_value', 'opportunity_value_ex')
+}
+
+const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric }) => {
+  // Transform the data into a format suitable for the chart
+  const chartData = Object.entries(data).map(([year, sectors]) => {
+    const yearData: any = { year }; // Initialize year
+    Object.entries(sectors).forEach(([sector, metrics]: [string, any]) => {
+      yearData[sector] = metrics[selectedMetric]; // Add selected metric for each sector
+    });
+    return yearData;
+  });
+
+  // Extract all sectors from the first year to use as keys for the lines
+  const allSectors = Object.keys(data[Object.keys(data)[0]] || {});
+
+  return (
+    <ResponsiveContainer width="100%" height={400}>
+      <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="year" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        {/* Dynamically create a line for each sector */}
+        {allSectors.map((sector) => (
+          <Line
+            key={sector}
+            type="monotone"
+            dataKey={sector}
+            stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} // Random color for each line
+            activeDot={{ r: 8 }}
+          />
+        ))}
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};
+
+export default YearlySectorChart;
