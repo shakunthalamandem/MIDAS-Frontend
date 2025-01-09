@@ -81,12 +81,23 @@ const CapitalMarkets: React.FC = () => {
               },
             }}
           />
+               <Tab
+            label="Deal Stats"
+            sx={{
+              backgroundColor: value === 1 ? "#9C27B0" : "#f5f5f5",
+              color: value === 1 ? "#fff" : "#777",
+              "&.Mui-selected": {
+                backgroundColor: "#9C27B0",
+                color: "#fff",
+              },
+            }}
+          />
           
           <Tab
             label="Deal Count"
             sx={{
-              backgroundColor: value === 1 ? "#FF5722" : "#f5f5f5",
-              color: value === 1 ? "#fff" : "#777",
+              backgroundColor: value === 2 ? "#FF5722" : "#f5f5f5",
+              color: value === 2 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#FF5722",
                 color: "#fff",
@@ -96,8 +107,8 @@ const CapitalMarkets: React.FC = () => {
           <Tab
             label="Deal Volume"
             sx={{
-              backgroundColor: value === 2 ? "#4CAF50" : "#f5f5f5",
-              color: value === 2 ? "#fff" : "#777",
+              backgroundColor: value === 3 ? "#4CAF50" : "#f5f5f5",
+              color: value === 3 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#4CAF50",
                 color: "#fff",
@@ -107,8 +118,8 @@ const CapitalMarkets: React.FC = () => {
           <Tab
             label="Opportunity Value Excess"
             sx={{
-              backgroundColor: value === 3 ? "#3F51B5" : "#f5f5f5",
-              color: value === 3 ? "#fff" : "#777",
+              backgroundColor: value === 4 ? "#3F51B5" : "#f5f5f5",
+              color: value === 4 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#3F51B5",
                 color: "#fff",
@@ -119,8 +130,8 @@ const CapitalMarkets: React.FC = () => {
           <Tab
             label="Skew Table"
             sx={{
-              backgroundColor: value === 4 ? "#9C27B0" : "#f5f5f5",
-              color: value === 4 ? "#fff" : "#777",
+              backgroundColor: value === 5 ? "#9C27B0" : "#f5f5f5",
+              color: value === 5 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#9C27B0",
                 color: "#fff",
@@ -130,33 +141,23 @@ const CapitalMarkets: React.FC = () => {
           <Tab
             label="Deal Filter"
             sx={{
-              backgroundColor: value === 5 ? "#FF9800" : "#f5f5f5",
-              color: value === 5 ? "#fff" : "#777",
+              backgroundColor: value === 6 ? "#FF9800" : "#f5f5f5",
+              color: value === 6 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#FF9800",
                 color: "#fff",
               },
             }}
           />
-            <Tab
-            label="Market Metrics"
-            sx={{
-              backgroundColor: value === 6 ? "#9C27B0" : "#f5f5f5",
-              color: value === 6 ? "#fff" : "#777",
-              "&.Mui-selected": {
-                backgroundColor: "#9C27B0",
-                color: "#fff",
-              },
-            }}
-          />
+       
         </Tabs>
         {value === 0 && <DealSearch />}
-        {value === 1 && <DealGraph />}
-        {value === 2 && <DealVolume />}
-        {value === 3 && <OpportunityMain />}
-        {value === 4 && <SkewTableMain />}
-        {value === 5 && <ScreenerMain />}
-        {value === 6 && <MarketFilters />}
+        {value === 1 && <MarketFilters />}
+        {value === 2 && <DealGraph />}
+        {value === 3 && <DealVolume />}
+        {value === 4 && <OpportunityMain />}
+        {value === 5 && <SkewTableMain />}
+        {value === 6 && <ScreenerMain />}
 
       </Box>
     </>
