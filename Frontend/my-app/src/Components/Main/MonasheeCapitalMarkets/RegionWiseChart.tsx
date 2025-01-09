@@ -1,29 +1,30 @@
 import React, { useState } from 'react';
 import { Box, FormControlLabel, Checkbox, Typography } from '@mui/material';
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface RegionWiseChartProps {
   data: Record<string, any>; // API response for regions
   selectedMetric: string; // Metric to display (e.g., 'count', 'deal_value', 'opportunity_value_ex')
-  checkedItems: string[]; // List of initially checked regions
+  checkedItems?: string[]; // List of initially checked regions (optional)
 }
 
 const RegionWiseChart: React.FC<RegionWiseChartProps> = ({ data, selectedMetric, checkedItems }) => {
-  const [visibleRegions, setVisibleRegions] = useState<string[]>(checkedItems || []); // Manage checked regions
+  const [visibleRegions, setVisibleRegions] = useState<string[]>(
+    checkedItems && checkedItems.length > 0 
+      ? checkedItems 
+      : Object.keys(data[Object.keys(data)[0]] || []) // Default to all regions if no checkedItems
+  );
 
-  // Transform the data into a format suitable for the chart
   const chartData = Object.entries(data).map(([year, regions]) => {
     const yearData: any = { year };
     Object.entries(regions).forEach(([region, metrics]: [string, any]) => {
-      yearData[region] = metrics[selectedMetric]; // Add selected metric for each region
+      yearData[region] = metrics[selectedMetric];
     });
     return yearData;
   });
 
-  // Extract all regions from the first year to use as keys for the lines
   const allRegions = Object.keys(data[Object.keys(data)[0]] || {});
 
-  // Handle checkbox changes
   const handleCheckboxChange = (region: string) => {
     setVisibleRegions((prev) =>
       prev.includes(region) ? prev.filter((item) => item !== region) : [...prev, region]
@@ -32,9 +33,9 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({ data, selectedMetric,
 
   return (
     <Box>
-        <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
-            Region-wise Data Over the Years
-        </Typography>
+      <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
+        Region-wise Data Over the Years
+      </Typography>
       <Box display="flex" justifyContent="center" flexWrap="wrap" mb={2}>
         {allRegions.map((region) => (
           <FormControlLabel
@@ -51,14 +52,12 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({ data, selectedMetric,
         ))}
       </Box>
 
-      {/* Chart */}
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <XAxis dataKey="year" />
           <YAxis />
           <Tooltip />
           <Legend />
-          {/* Dynamically create a line for each visible region */}
           {visibleRegions.map((region) => (
             <Line
               key={region}

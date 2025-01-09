@@ -30,14 +30,7 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
 
   return (
     <Box>
-      <Typography
-        variant="h5"
-        align="center"
-        gutterBottom
-        sx={{ color: "#002060", fontWeight: "bold" }}
-      >
-        Deal Type
-      </Typography>
+
 
       {/* Stacked Bar Chart using Recharts */}
       <ResponsiveContainer width="100%" height={400}>
