@@ -157,7 +157,7 @@ const MarketFilters: React.FC = () => {
         <Typography align="center">Loading filters...</Typography>
       )}
 
-      {Object.keys(appliedFilters).length > 0 && <MarketCapitalMain selectedFilters={appliedFilters} />}
+      { <MarketCapitalMain selectedFilters={appliedFilters} />}
 
       {/* Snackbar for error message */}
       <Snackbar

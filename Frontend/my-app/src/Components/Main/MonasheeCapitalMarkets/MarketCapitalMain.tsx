@@ -52,9 +52,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
       }
     };
 
-    if (Object.keys(selectedFilters).length > 0) {
       fetchData(); // Fetch data when selectedFilters change
-    }
   }, [selectedFilters]); // Dependency array to trigger useEffect when selectedFilters change
 
   return (
