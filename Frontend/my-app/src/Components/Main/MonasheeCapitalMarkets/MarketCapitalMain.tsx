@@ -3,6 +3,8 @@ import { Box, Container, Grid, FormControlLabel, Checkbox, Typography } from '@m
 import NumberOfDeals from './NavigationTabs/NumberOfDeals';
 import RegionWiseDeals from './NavigationTabs/RegionWiseDeals';
 import SectorWiseDeals from './NavigationTabs/SectorWiseDeals';
+import YearlySectorChart from './YearlySectorChart';
+import RegionWiseChart from './RegionWiseChart';
 
 interface MarketCapitalMainProps {
   selectedFilters: Record<string, string | number | (string | number)[]>;
@@ -113,6 +115,12 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
               </Grid>
             </Grid>
           </Box>
+          <Grid item xs={12} md={6}>
+                <YearlySectorChart data={apiData.year_wise_sector} selectedMetric={selectedMetric} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <RegionWiseChart data={apiData.year_wise_region} selectedMetric={selectedMetric} />
+              </Grid>
         </>
       )}
     </Container>
