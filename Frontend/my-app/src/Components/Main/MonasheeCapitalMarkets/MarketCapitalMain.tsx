@@ -126,8 +126,18 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
             </Grid>
           </Box>
           <Grid item xs={12} md={6}>
-                <YearlySectorChart data={apiData.year_wise_sector} selectedMetric={selectedMetric} />
-              </Grid>
+            <YearlySectorChart
+              data={apiData.year_wise_sector}
+              selectedMetric={selectedMetric}
+              checkedItems={
+                Array.isArray(selectedFilters?.sector)
+                  ? selectedFilters.sector.filter((item): item is string => typeof item === 'string') // Ensure only strings
+                  : typeof selectedFilters?.sector === 'string'
+                  ? [selectedFilters.sector] // Convert single string to array
+                  : [] // Default to empty array
+              }
+            />
+          </Grid>
               <Grid item xs={12} md={6}>
                 <RegionWiseChart data={apiData.year_wise_region} selectedMetric={selectedMetric} />
               </Grid>

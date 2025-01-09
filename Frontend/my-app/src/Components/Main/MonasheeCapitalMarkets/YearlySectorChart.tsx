@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Box, FormControlLabel, Checkbox } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 interface LineChartProps {
   data: Record<string, any>; // API response
   selectedMetric: string; // Metric to display (e.g., 'count', 'deal_value', 'opportunity_value_ex')
+  checkedItems: string[]; // List of initially checked sectors
 }
 
-const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric }) => {
+const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, checkedItems }) => {
+  const [visibleSectors, setVisibleSectors] = useState<string[]>(checkedItems || []); // Manage checked sectors
+
   // Transform the data into a format suitable for the chart
   const chartData = Object.entries(data).map(([year, sectors]) => {
-    const yearData: any = { year }; // Initialize year
+    const yearData: any = { year };
     Object.entries(sectors).forEach(([sector, metrics]: [string, any]) => {
       yearData[sector] = metrics[selectedMetric]; // Add selected metric for each sector
     });
@@ -19,26 +23,53 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric }) =
   // Extract all sectors from the first year to use as keys for the lines
   const allSectors = Object.keys(data[Object.keys(data)[0]] || {});
 
+  // Handle checkbox changes
+  const handleCheckboxChange = (sector: string) => {
+    setVisibleSectors((prev) =>
+      prev.includes(sector) ? prev.filter((item) => item !== sector) : [...prev, sector]
+    );
+  };
+
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="year" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        {/* Dynamically create a line for each sector */}
+    <Box>
+      {/* Checkbox Controls */}
+      <Box display="flex" justifyContent="center" flexWrap="wrap" mb={2}>
         {allSectors.map((sector) => (
-          <Line
+          <FormControlLabel
             key={sector}
-            type="monotone"
-            dataKey={sector}
-            stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} // Random color for each line
-            activeDot={{ r: 8 }}
+            control={
+              <Checkbox
+                checked={visibleSectors.includes(sector)}
+                onChange={() => handleCheckboxChange(sector)}
+                color="primary"
+              />
+            }
+            label={sector}
           />
         ))}
-      </LineChart>
-    </ResponsiveContainer>
+      </Box>
+
+      {/* Chart */}
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="year" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          {/* Dynamically create a line for each visible sector */}
+          {visibleSectors.map((sector) => (
+            <Line
+              key={sector}
+              type="monotone"
+              dataKey={sector}
+              stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} // Random color for each line
+              activeDot={{ r: 8 }}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </Box>
   );
 };
 
