@@ -105,9 +105,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
       {/* Display the API data */}
       {apiData && (
         <>
-          <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
-            Deal Statistics
-          </Typography>
+         
           <Grid item xs={12} md={6}>
                 <NumberOfDeals data={apiData.deal_type} selectedMetric={selectedMetric} />
               </Grid>
