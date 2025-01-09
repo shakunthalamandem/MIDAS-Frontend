@@ -102,7 +102,7 @@ const MarketFilters: React.FC = () => {
                     {value.label}
                     {value.description && (
                       <Tooltip title={value.description} arrow>
-                        <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
+                        <InfoIcon sx={{ ml: 1, fontSize: "0.9rem", color: "#cfcfcf" }} />
                       </Tooltip>
                     )}
                   </Typography>
@@ -130,7 +130,7 @@ const MarketFilters: React.FC = () => {
                               sx={{ padding: "0 8px" }}
                             />
                           )}
-                          <ListItemText primary={option} sx={{ fontSize: "0.8rem" }} />
+                          <ListItemText primary={option} sx={{ fontSize: "0.8rem !important" }} />
                         </MenuItem>
                       ))}
                     </Select>
@@ -157,7 +157,7 @@ const MarketFilters: React.FC = () => {
         <Typography align="center">Loading filters...</Typography>
       )}
 
-      {Object.keys(appliedFilters).length > 0 && <MarketCapitalMain selectedFilters={appliedFilters} />}
+      { <MarketCapitalMain selectedFilters={appliedFilters} />}
 
       {/* Snackbar for error message */}
       <Snackbar
