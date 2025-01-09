@@ -130,7 +130,11 @@ const MarketFilters: React.FC = () => {
                               sx={{ padding: "0 8px" }}
                             />
                           )}
-                          <ListItemText primary={option} sx={{ fontSize: "0.8rem !important" }} />
+                          <ListItemText primary={option} sx={{
+            '& .MuiTypography-root': {
+              fontSize: '0.8rem',  // Ensure the typography within the ListItemText has the same size
+            },
+          }} />
                         </MenuItem>
                       ))}
                     </Select>

@@ -67,40 +67,30 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({ selectedFilters }
 
       {/* Checkboxes for selecting the metric */}
       <Box display="flex" justifyContent="center" mb={2}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={selectedMetric === 'count'}
-              onChange={handleCheckboxChange}
-              value="count"
-              color="primary"
-            />
-          }
-          label="Deal Count"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={selectedMetric === 'deal_value'}
-              onChange={handleCheckboxChange}
-              value="deal_value"
-              color="primary"
-            />
-          }
-          label="Deal Value"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={selectedMetric === 'opportunity_value_ex'}
-              onChange={handleCheckboxChange}
-              value="opportunity_value_ex"
-              color="primary"
-            />
-          }
-          label="Opportunity Exits Return"
-        />
-      </Box>
+      {['count', 'deal_value', 'opportunity_value_ex'].map((metric, index) => {
+        const labels = ['Deal Count', 'Deal Value', 'Opportunity Excess Value'];
+        const colors = ['#9b0000','#9b0000','#9b0000'];
+        return (
+          <FormControlLabel
+            key={metric}
+            control={
+              <Checkbox
+                checked={selectedMetric === metric}
+                onChange={handleCheckboxChange}
+                value={metric}
+                sx={{
+                  color: '#3f51b5',
+                  '&.Mui-checked': { color: colors[index] },
+                  '&:hover': { backgroundColor: 'transparent' },
+                  transition: 'color 0.3s ease',
+                }}
+              />
+            }
+            label={labels[index]}
+          />
+        );
+      })}
+    </Box>
 
       {/* Display the API data */}
       {apiData && (
