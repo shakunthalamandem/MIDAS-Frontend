@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, FormControlLabel, Checkbox, Typography } from '@mui/material';
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 interface RegionWiseChartProps {
   data: Record<string, any>; // API response for regions
@@ -31,6 +31,14 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({ data, selectedMetric,
     );
   };
 
+  // Define colors for the lines
+  const colors = [
+    "#2E3A87", "#1D9C63", "#D75F01", "#C35A2C", "#B72B72", "#D94E8A",
+    "#5B9E6E", "#C8A700", "#D2768F", "#7B4C92", "#4A88B6", 
+    "#3E7A3B", "#C04C97", "#7A3F5F", "#A16329", "#4D7893", "#9C6F1F",
+    "#5F4774", "#DE5D85", "#83C3DA", "#4B3563"
+  ];
+
   return (
     <Box>
       <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
@@ -58,12 +66,12 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({ data, selectedMetric,
           <YAxis />
           <Tooltip />
           <Legend />
-          {visibleRegions.map((region) => (
+          {visibleRegions.map((region, index) => (
             <Line
               key={region}
               type="monotone"
               dataKey={region}
-              stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} // Random color for each line
+              stroke={colors[index % colors.length]} // Assign color from the array
               activeDot={{ r: 8 }}
             />
           ))}
