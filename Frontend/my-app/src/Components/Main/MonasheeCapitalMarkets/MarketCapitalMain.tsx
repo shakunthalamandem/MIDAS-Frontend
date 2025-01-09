@@ -112,55 +112,57 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
             />
           </Grid>
           <Box sx={{ px: 4, py: 2 }}>
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={6}>
-                <RegionWiseChart
-                  data={apiData.year_wise_region}
-                  selectedMetric={selectedMetric}
-                  checkedItems={
-                    Array.isArray(selectedFilters?.region)
-                      ? selectedFilters.region.filter(
-                          (item): item is string => typeof item === "string"
-                        )
-                      : typeof selectedFilters?.region === "string"
-                        ? [selectedFilters.region]
-                        : []
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <RegionWiseDeals
-                  data={apiData.regions}
-                  selectedMetric={selectedMetric}
-                />
-              </Grid>
-            </Grid>
-          </Box>
-          <Box sx={{ px: 4, py: 2 }}>
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={6}>
-                <YearlySectorChart
-                  data={apiData.year_wise_sector}
-                  selectedMetric={selectedMetric}
-                  checkedItems={
-                    Array.isArray(selectedFilters?.sector)
-                      ? selectedFilters.sector.filter(
-                          (item): item is string => typeof item === "string"
-                        )
-                      : typeof selectedFilters?.sector === "string"
-                        ? [selectedFilters.sector]
-                        : []
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <SectorWiseDeals
-                  data={apiData.sectors}
-                  selectedMetric={selectedMetric}
-                />
-              </Grid>
-            </Grid>
-          </Box>
+  <Grid container spacing={6}> {/* Increased spacing between items */}
+    <Grid item xs={12} md={8}> {/* Increased size of RegionWiseChart */}
+      <RegionWiseChart
+        data={apiData.year_wise_region}
+        selectedMetric={selectedMetric}
+        checkedItems={
+          Array.isArray(selectedFilters?.region)
+            ? selectedFilters.region.filter(
+                (item): item is string => typeof item === "string"
+              )
+            : typeof selectedFilters?.region === "string"
+            ? [selectedFilters.region]
+            : []
+        }
+      />
+    </Grid>
+    <Grid item xs={12} md={4}> {/* Decreased size of RegionWiseDeals */}
+      <RegionWiseDeals
+        data={apiData.regions}
+        selectedMetric={selectedMetric}
+      />
+    </Grid>
+  </Grid>
+</Box>
+
+<Box sx={{ px: 4, py: 2 }}>
+  <Grid container spacing={6}> {/* Increased spacing */}
+    <Grid item xs={12} md={8}> {/* Increased space for YearlySectorChart */}
+      <YearlySectorChart
+        data={apiData.year_wise_sector}
+        selectedMetric={selectedMetric}
+        checkedItems={
+          Array.isArray(selectedFilters?.sector)
+            ? selectedFilters.sector.filter(
+                (item): item is string => typeof item === "string"
+              )
+            : typeof selectedFilters?.sector === "string"
+            ? [selectedFilters.sector]
+            : []
+        }
+      />
+    </Grid>
+    <Grid item xs={12} md={4}> {/* Reduced space for SectorWiseDeals */}
+      <SectorWiseDeals
+        data={apiData.sectors}
+        selectedMetric={selectedMetric}
+      />
+    </Grid>
+  </Grid>
+</Box>
+
         </>
       )}
     </Container>
