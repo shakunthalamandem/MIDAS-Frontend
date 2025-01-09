@@ -31,6 +31,13 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, che
     );
   };
 
+  const formatNumber = (value: number): string => {
+    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`; // Format billions
+    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`; // Format millions
+    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`; // Format thousands
+    return value.toString(); // Default format
+  };
+
   // Define colors for the lines
   const colors = [
     "#2E3A87", "#1D9C63", "#D75F01", "#C35A2C", "#B72B72", "#D94E8A",
@@ -63,8 +70,8 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, che
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <XAxis dataKey="year" />
-          <YAxis />
-          <Tooltip />
+          <YAxis tickFormatter={formatNumber} /> {/* Apply custom formatter */}
+          <Tooltip formatter={(value: number) => formatNumber(value)} />
           <Legend />
           {visibleSectors.map((sector, index) => (
             <Line

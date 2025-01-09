@@ -28,6 +28,14 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
     };
   });
 
+  // Number formatter function
+  const formatNumber = (value: number): string => {
+    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`; // Format billions
+    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`; // Format millions
+    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`; // Format thousands
+    return value.toString(); // Default format
+  };
+
   return (
     <Box>
 
@@ -36,8 +44,8 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
       <ResponsiveContainer width="100%" height={400}>
         <BarChart data={chartData}>
           <XAxis dataKey="year" />
-          <YAxis />
-          <Tooltip />
+          <YAxis tickFormatter={formatNumber} /> {/* Format Y-axis ticks */}
+          <Tooltip formatter={(value: number) => formatNumber(value)} /> {/* Format tooltip */}
           <Legend />
           <Bar dataKey="IPO" stackId="a" fill="#8884d8" />
           <Bar dataKey="FO" stackId="a" fill="#82ca9d" />
