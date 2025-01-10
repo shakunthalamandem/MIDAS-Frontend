@@ -5,36 +5,52 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Responsi
 interface RegionWiseChartProps {
   data: Record<string, any>; // API response for regions
   selectedMetric: string; // Metric to display (e.g., 'count', 'deal_value', 'opportunity_value_ex')
-  checkedItems: string[]; // List of initially checked regions
+  checkedItems?: string[]; // List of initially checked regions (optional)
 }
 
 const RegionWiseChart: React.FC<RegionWiseChartProps> = ({ data, selectedMetric, checkedItems }) => {
-  const [visibleRegions, setVisibleRegions] = useState<string[]>(checkedItems || []); // Manage checked regions
+  const [visibleRegions, setVisibleRegions] = useState<string[]>(
+    checkedItems && checkedItems.length > 0 
+      ? checkedItems 
+      : Object.keys(data[Object.keys(data)[0]] || []) // Default to all regions if no checkedItems
+  );
 
-  // Transform the data into a format suitable for the chart
   const chartData = Object.entries(data).map(([year, regions]) => {
     const yearData: any = { year };
     Object.entries(regions).forEach(([region, metrics]: [string, any]) => {
-      yearData[region] = metrics[selectedMetric]; // Add selected metric for each region
+      yearData[region] = metrics[selectedMetric];
     });
     return yearData;
   });
 
-  // Extract all regions from the first year to use as keys for the lines
   const allRegions = Object.keys(data[Object.keys(data)[0]] || {});
 
-  // Handle checkbox changes
   const handleCheckboxChange = (region: string) => {
     setVisibleRegions((prev) =>
       prev.includes(region) ? prev.filter((item) => item !== region) : [...prev, region]
     );
   };
 
+  const formatNumber = (value: number): string => {
+    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`; // Format billions
+    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`; // Format millions
+    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`; // Format thousands
+    return value.toString(); // Default format
+  };
+
+  // Define colors for the lines
+  const colors = [
+    "#2E3A87", "#1D9C63", "#D75F01", "#C35A2C", "#B72B72", "#D94E8A",
+    "#5B9E6E", "#C8A700", "#D2768F", "#7B4C92", "#4A88B6", 
+    "#3E7A3B", "#C04C97", "#7A3F5F", "#A16329", "#4D7893", "#9C6F1F",
+    "#5F4774", "#DE5D85", "#83C3DA", "#4B3563"
+  ];
+
   return (
     <Box>
-        <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
-            Region-wise Data Over the Years
-        </Typography>
+      <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
+        Region-wise Data Over the Years
+      </Typography>
       <Box display="flex" justifyContent="center" flexWrap="wrap" mb={2}>
         {allRegions.map((region) => (
           <FormControlLabel
@@ -51,20 +67,18 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({ data, selectedMetric,
         ))}
       </Box>
 
-      {/* Chart */}
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <XAxis dataKey="year" />
-          <YAxis />
-          <Tooltip />
+          <YAxis tickFormatter={formatNumber} /> {/* Apply custom formatter */}
+          <Tooltip formatter={(value: number) => formatNumber(value)} />
           <Legend />
-          {/* Dynamically create a line for each visible region */}
-          {visibleRegions.map((region) => (
+          {visibleRegions.map((region, index) => (
             <Line
               key={region}
               type="monotone"
               dataKey={region}
-              stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} // Random color for each line
+              stroke={colors[index % colors.length]} // Assign color from the array
               activeDot={{ r: 8 }}
             />
           ))}

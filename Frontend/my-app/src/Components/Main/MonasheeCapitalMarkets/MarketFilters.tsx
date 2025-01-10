@@ -83,9 +83,7 @@ const MarketFilters: React.FC = () => {
 
   return (
     <Box sx={{ padding: 4, backgroundColor: "#f4f6f8", minHeight: "100vh" }}>
-      <Typography variant="h4" color="#002060" align="center" sx={{ fontWeight: "bold" }}>
-        Market Filters
-      </Typography>
+   
 
       <MarketCapitalFilters onDataLoaded={handleDataLoaded} />
 
