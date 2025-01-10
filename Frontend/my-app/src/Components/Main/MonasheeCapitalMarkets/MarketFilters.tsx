@@ -108,37 +108,54 @@ const MarketFilters: React.FC = () => {
                   </Typography>
 
                   <FormControl fullWidth>
-                    <Select
-                      id={key}
-                      multiple={isMultiSelect}
-                      value={selectedValues[key] || (isMultiSelect ? [] : "")}
-                      onChange={handleChange(key)}
-                      MenuProps={MenuProps}
-                      renderValue={(selected) => {
-                        if (Array.isArray(selected)) {
-                          return selected.length > 1 ? `${selected[0]} +${selected.length - 1}` : selected[0];
-                        }
-                        return selected as string | number;
-                      }}
-                      sx={{ fontSize: "12px", height: "40px" }}
-                    >
-                      {value.options.map((option, idx) => (
-                        <MenuItem key={idx} value={option} sx={{ fontSize: "0.8rem", padding: "4px 8px" }}>
-                          {isMultiSelect && (
-                            <Checkbox
-                              checked={(selectedValues[key] as (string | number)[] || []).includes(option)}
-                              sx={{ padding: "0 8px" }}
-                            />
-                          )}
-                          <ListItemText primary={option} sx={{
-            '& .MuiTypography-root': {
-              fontSize: '0.8rem',  // Ensure the typography within the ListItemText has the same size
+                  <Box
+  sx={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "4px", // Reduced gap
+    alignItems: "center", // Align items properly
+  }}
+>
+  <Select
+    id={key}
+    multiple={isMultiSelect}
+    value={selectedValues[key] || (isMultiSelect ? [] : "")}
+    onChange={handleChange(key)}
+    MenuProps={MenuProps}
+    renderValue={(selected) => {
+      if (Array.isArray(selected)) {
+        return selected.length > 1 ? `${selected[0]} +${selected.length - 1}` : selected[0];
+      }
+      return selected as string | number;
+    }}
+    sx={{
+      fontSize: "12px",
+      height: "40px",
+      width: ["sector"].includes(key) ? "1200px" : "120px",  
+            margin: 0, // Remove default margin
+    }}
+  >
+    {value.options.map((option, idx) => (
+      <MenuItem key={idx} value={option} sx={{ fontSize: "0.8rem", padding: "4px 8px" }}>
+        {isMultiSelect && (
+          <Checkbox
+            checked={(selectedValues[key] as (string | number)[] || []).includes(option)}
+            sx={{ padding: "0 8px" }}
+          />
+        )}
+        <ListItemText
+          primary={option}
+          sx={{
+            "& .MuiTypography-root": {
+              fontSize: "0.8rem",
             },
-          }} />
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+          }}
+        />
+      </MenuItem>
+    ))}
+  </Select>
+</Box>
+</FormControl>
                 </Grid>
               );
             })}
