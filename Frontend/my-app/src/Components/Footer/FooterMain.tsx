@@ -9,6 +9,7 @@ import logo from '../../Assets/images/whitelogoghc.png';
 const FooterMain: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const currentYear = new Date().getFullYear();
 
   return (
     <Box
@@ -43,7 +44,7 @@ const FooterMain: React.FC = () => {
       color: '#FFFFFF', // Muted accent for secondary text
     }}
   >
-    © 2025 MIDAS , Developed in Collaboration with Golden Hills Capital India Pvt Ltd.
+    © {currentYear} MIDAS , Developed in Collaboration with Golden Hills Capital India Pvt Ltd.
   </Typography>
   <img
     src={logo} // Replace with the actual path to your logo
