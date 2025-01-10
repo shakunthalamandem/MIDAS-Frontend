@@ -404,33 +404,7 @@
       "description": "Select the Sales Growth 3Y CAGR range."
     },
 
-    "eps_to_3yr_cagr": {
-      "options": [
-        "Any",
-        "Above 0%",
-        "Above 10%",
-        "Above 20%",
-        "Above 50%",
-        "Below 0%",
-        "Below 10%",
-        "Below 20%",
-        "Below 50%",
-        "Above -10%",
-        "Above -20%",
-        "Above -50%",
-        "Below -10%",
-        "Below -20%",
-        "Below -50%",
-        "20% to 50%",
-        "10% to 20%",
-        "0% to 10%",
-        "-10% to 0%",
-        "-20% to -10%",
-        "-50% to -20%"
-      ],
-      "label": "EPS Growth 3Y CAGR",
-      "description": "Select the EPS Growth 3Y CAGR range."
-    },
+
     "return_on_equity": {
       "options": [
         "Any",

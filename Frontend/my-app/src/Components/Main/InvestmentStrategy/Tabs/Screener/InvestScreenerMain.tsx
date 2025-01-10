@@ -64,7 +64,7 @@ const columns: GridColDef[] = [
     headerName: "Sales Growth 3Y CAGR",
     width: 100,
   },
-  { field: "eps_growth_3y_cagr", headerName: "EPS Growth 3Y CAGR", width: 100 },
+  // { field: "eps_growth_3y_cagr", headerName: "EPS Growth 3Y CAGR", width: 100 },
   { field: "roe", headerName: "ROE", width: 100 },
   { field: "roce", headerName: "ROCE", width: 100 },
   { field: "net_debt_ebitda", headerName: "Net Debt/EBITDA", width: 100 },
