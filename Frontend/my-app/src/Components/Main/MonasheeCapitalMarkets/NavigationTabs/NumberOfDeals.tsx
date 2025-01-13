@@ -4,12 +4,12 @@ import {
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
+  
   Tooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
 interface NumberOfDealsProps {
   data: Record<string, any>;

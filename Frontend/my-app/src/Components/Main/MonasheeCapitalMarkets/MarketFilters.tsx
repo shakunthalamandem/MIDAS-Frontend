@@ -26,9 +26,15 @@ interface FilterOption {
 }
 
 const MarketFilters: React.FC = () => {
-  const [filtersData, setFiltersData] = useState<Record<string, FilterOption>[]>([]);
-  const [selectedValues, setSelectedValues] = useState<Record<string, string | number | (string | number)[]>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | (string | number)[]>>({});
+  const [filtersData, setFiltersData] = useState<
+    Record<string, FilterOption>[]
+  >([]);
+  const [selectedValues, setSelectedValues] = useState<
+    Record<string, string | number | (string | number)[]>
+  >({});
+  const [appliedFilters, setAppliedFilters] = useState<
+    Record<string, string | number | (string | number)[]>
+  >({});
   const [snackbarOpen, setSnackbarOpen] = useState(false); // Manage Snackbar open state
   const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message content
 
@@ -53,7 +59,9 @@ const MarketFilters: React.FC = () => {
 
     if (startYear && endYear && startYear > endYear) {
       // Open Snackbar with error message if validation fails
-      setSnackbarMessage("Start year should be less than or equal to end year.");
+      setSnackbarMessage(
+        "Start year should be less than or equal to end year."
+      );
       setSnackbarOpen(true);
     } else {
       setSnackbarOpen(false); // Close the Snackbar if validation passes
@@ -83,77 +91,107 @@ const MarketFilters: React.FC = () => {
 
   return (
     <Box sx={{ padding: 4, backgroundColor: "#f4f6f8", minHeight: "100vh" }}>
-   
-
       <MarketCapitalFilters onDataLoaded={handleDataLoaded} />
 
       {filtersData.length > 0 ? (
-        <Card sx={{ padding: 3, maxWidth: "1200px", margin: "0 auto", borderRadius: 2, boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)", backgroundColor: "#ffffff" }}>
-          <Grid container spacing={3} direction="row" justifyContent="space-between">
+        <Card
+          sx={{
+            padding: 3,
+            maxWidth: "1200px",
+            margin: "0 auto",
+            borderRadius: 2,
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+            backgroundColor: "#ffffff",
+          }}
+        >
+          <Grid
+            container
+            spacing={3}
+            direction="row"
+            justifyContent="space-between"
+          >
             {filtersData.map((filter, index) => {
-              const [key, value] = Object.entries(filter)[0] as [string, FilterOption];
-              const isMultiSelect = Array.isArray(value.options) && key !== "start_year" && key !== "end_year";
+              const [key, value] = Object.entries(filter)[0] as [
+                string,
+                FilterOption,
+              ];
+              const isMultiSelect =
+                Array.isArray(value.options) &&
+                key !== "start_year" &&
+                key !== "end_year";
 
               return (
                 <Grid item xs={2} key={index}>
-                  <Typography sx={{ fontSize: "0.75rem", marginBottom: "4px", display: "flex", alignItems: "center" }}>
+                  <Typography
+                    sx={{
+                      fontSize: "0.75rem",
+                      marginBottom: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
                     {value.label}
                     {value.description && (
                       <Tooltip title={value.description} arrow>
-                        <InfoIcon sx={{ ml: 1, fontSize: "0.9rem", color: "#cfcfcf" }} />
+                        <InfoIcon
+                          sx={{ ml: 1, fontSize: "0.9rem", color: "#cfcfcf" }}
+                        />
                       </Tooltip>
                     )}
                   </Typography>
 
                   <FormControl fullWidth>
-                  <Box
-  sx={{
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "4px", // Reduced gap
-    alignItems: "center", // Align items properly
-  }}
->
-  <Select
-    id={key}
-    multiple={isMultiSelect}
-    value={selectedValues[key] || (isMultiSelect ? [] : "")}
-    onChange={handleChange(key)}
-    MenuProps={MenuProps}
-    renderValue={(selected) => {
-      if (Array.isArray(selected)) {
-        return selected.length > 1 ? `${selected[0]} +${selected.length - 1}` : selected[0];
-      }
-      return selected as string | number;
-    }}
-    sx={{
-      fontSize: "12px",
-      height: "40px",
-      width: ["sector"].includes(key) ? "1200px" : "120px",  
-            margin: 0, // Remove default margin
-    }}
-  >
-    {value.options.map((option, idx) => (
-      <MenuItem key={idx} value={option} sx={{ fontSize: "0.8rem", padding: "4px 8px" }}>
-        {isMultiSelect && (
-          <Checkbox
-            checked={(selectedValues[key] as (string | number)[] || []).includes(option)}
-            sx={{ padding: "0 8px" }}
-          />
-        )}
-        <ListItemText
-          primary={option}
-          sx={{
-            "& .MuiTypography-root": {
-              fontSize: "0.8rem",
-            },
-          }}
-        />
-      </MenuItem>
-    ))}
-  </Select>
-</Box>
-</FormControl>
+                    <Box>
+                      <Select
+                        id={key}
+                        multiple={isMultiSelect}
+                        value={selectedValues[key] || (isMultiSelect ? [] : "")}
+                        onChange={handleChange(key)}
+                        MenuProps={MenuProps}
+                        renderValue={(selected) => {
+                          if (Array.isArray(selected)) {
+                            return selected.length > 1
+                              ? `${selected[0]} +${selected.length - 1}`
+                              : selected[0];
+                          }
+                          return selected as string | number;
+                        }}
+                        sx={{
+                          fontSize: "12px",
+                          height: "40px",
+                          width:'100%'
+                        }}
+                      >
+                        {value.options.map((option, idx) => (
+                          <MenuItem
+                            key={idx}
+                            value={option}
+                            sx={{ fontSize: "0.8rem", padding: "4px 8px" }}
+                          >
+                            {isMultiSelect && (
+                              <Checkbox
+                                checked={(
+                                  (selectedValues[key] as (
+                                    | string
+                                    | number
+                                  )[]) || []
+                                ).includes(option)}
+                                sx={{ padding: "0 8px" }}
+                              />
+                            )}
+                            <ListItemText
+                              primary={option}
+                              sx={{
+                                "& .MuiTypography-root": {
+                                  fontSize: "0.8rem",
+                                },
+                              }}
+                            />
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Box>
+                  </FormControl>
                 </Grid>
               );
             })}
@@ -161,12 +199,24 @@ const MarketFilters: React.FC = () => {
 
           <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
             <Grid item>
-              <Button variant="contained" type="button" sx={{ bgcolor: "#002060" }} onClick={handleApply} disabled={!filtersData || !Object.keys(filtersData).length}>
+              <Button
+                variant="contained"
+                type="button"
+                sx={{ bgcolor: "#002060" }}
+                onClick={handleApply}
+                disabled={!filtersData || !Object.keys(filtersData).length}
+              >
                 Apply
               </Button>
             </Grid>
             <Grid item>
-              <Button variant="outlined" color="secondary" type="button" onClick={handleReset} disabled={!filtersData || !Object.keys(filtersData).length}>
+              <Button
+                variant="outlined"
+                color="secondary"
+                type="button"
+                onClick={handleReset}
+                disabled={!filtersData || !Object.keys(filtersData).length}
+              >
                 Reset
               </Button>
             </Grid>
@@ -176,7 +226,7 @@ const MarketFilters: React.FC = () => {
         <Typography align="center">Loading filters...</Typography>
       )}
 
-      { <MarketCapitalMain selectedFilters={appliedFilters} />}
+      {<MarketCapitalMain selectedFilters={appliedFilters} />}
 
       {/* Snackbar for error message */}
       <Snackbar
@@ -184,7 +234,11 @@ const MarketFilters: React.FC = () => {
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
       >
-        <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: "100%" }}>
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
