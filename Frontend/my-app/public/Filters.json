@@ -1,90 +1,140 @@
 {
-    "screener": [
-      {
-        "year_range": {
-          "options": [
-            2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015,
+  "screener": [
+    {
+      "year_range": {
+        "options": [
+          2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015,
 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005,
 2004, 2003, 2002, 2001
-          ],
-          "label": "Year",
-          "description": ""
-        }
-      },
-      {
-        "dealType": {
-          "options": [ "IPO", "FO"],
-          "label": "DealType",
-          "description": ""
-        }
-      },
-      {
-        "region": {
-          "options": [ "US", "International"],
-          "label": "Region",
-          "description": ""
-        }
-      },
-      {
-        "sector": {
-          "options": [
-            
-            "Communication Services",
-            "Consumer Discretionary",
-            "Consumer Staples",
-            "Energy",
-            "Financials",
-            "Health Care",
-            "Industrials",
-            "Information Technology",
-            "Materials",
-            "Real Estate",
-            "Utilities"
-          ],
-          "label": "Sector",
-          "description": ""
-        }
-      },
-      {
-        "t1_return": {
-          "options": [
-           
-            ">4",
-            "2% to 4%",
-            "0% to 2%",
-            "-2% to 0%",
-            "<-2%"
-          ],
-          "label": "T+1D Returns",
-          "description": "The return of deals on the first trade date from the pricing date"
-        }
-      },
-      {
-        "t1m_returns": {
-          "options": [
-           
-            ">4",
-            "2% to 4%",
-            "0% to 2%",
-            "-2% to 0%",
-            "<-2%"
-          ],
-          "label": "T+1M Returns",
-          "description": "The return of deals on one month date from the pricing date"
-        }
-      },
-      {
-        "deal_value": {
-          "options": [
-          
-            "0 to $100M",
-            "$100M to $200M",
-            "$200M to $500M",
-            ">$500M"
-          ],
-          "label": "DealValue",
-          "description": "The total $ value of the offering or Deal offered"
-        }
+        ],
+        "label": "Year",
+        "description": ""
       }
-    ]
-  }
+    },
+    {
+      "dealType": {
+        "options": [ "IPO", "FO"],
+        "label": "DealType",
+        "description": ""
+      }
+    },
+    {
+      "region": {
+        "options": [ "US", "International"],
+        "label": "Region",
+        "description": ""
+      }
+    },
+    {
+      "sector": {
+        "options": [
+          
+          "Communication Services",
+          "Consumer Discretionary",
+          "Consumer Staples",
+          "Energy",
+          "Financials",
+          "Health Care",
+          "Industrials",
+          "Information Technology",
+          "Materials",
+          "Real Estate",
+          "Utilities"
+        ],
+        "label": "Sector",
+        "description": ""
+      }
+    },
+    {
+      "t1_return": {
+        "options": [
+         
+          ">4",
+          "2% to 4%",
+          "0% to 2%",
+          "-2% to 0%",
+          "<-2%"
+        ],
+        "label": "T+1D Returns",
+        "description": "The return of deals on the first trade date from the pricing date"
+      }
+    },
+    {
+      "t1m_returns": {
+        "options": [
+         
+          ">4",
+          "2% to 4%",
+          "0% to 2%",
+          "-2% to 0%",
+          "<-2%"
+        ],
+        "label": "T+1M Returns",
+        "description": "The return of deals on one month date from the pricing date"
+      }
+    },
+    {
+      "deal_value": {
+        "options": [
+        
+          "0 to $100M",
+          "$100M to $200M",
+          "$200M to $500M",
+          ">$500M"
+        ],
+        "label": "DealValue",
+        "description": "The total $ value of the offering or Deal offered"
+      }
+    },
+    {
+      "left_lead_bank": {
+        "options": [
+          "ABN AMRO Bank",
+          "Allen & Co LLC",
+          "Bank of America",
+          "Barclays",
+          "BMO Capital Markets",
+          "BNP Paribas",
+          "Canaccord Genuity",
+          "CIBC World Markets",
+          "Citigroup Global Markets Inc",
+          "CLSA",
+          "Commerzbank Group",
+          "Cowen & Company LLC",
+          "Credit Suisse",
+          "Deutsche Bank",
+          "Evercore Inc",
+          "Goldman Sachs",
+          "HSBC",
+          "Janney Montgomery Scott",
+          "Jefferies LLC",
+          "JMP Securities LLC",
+          "JPMorgan",
+          "Keefe Bruyette & Woods",
+          "Lazard Capital Markets",
+          "Leerink Partners LLC",
+          "Morgan Stanley",
+          "Needham & Co LLC",
+          "Nomura Securities Co Ltd",
+          "Oppenheimer & Co Inc",
+          "Rabobank",
+          "Raymond James & Associates Inc",
+          "RBC Capital Markets",
+          "Robert W Baird & Co",
+          "Scotiabank",
+          "SG Corporate & Investment Banking",
+          "Stifel",
+          "SunTrust Robinson Humphrey Inc",
+          "SVB Securities LLC",
+          "TD Securities Inc",
+          "UBS",
+          "William Blair & Co LLC",
+          "Others"
+        ],
+        "label": "Left Lead Bank",
+        "description": ""
+      }
+    }
+    
+  ]
+}

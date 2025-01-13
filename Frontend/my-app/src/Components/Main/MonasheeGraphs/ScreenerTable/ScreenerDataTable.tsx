@@ -54,6 +54,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       deal_value: data.deal_value,
       t1_return: data.t1_return,
       t1m_returns: data.t1m_returns,
+      left_lead_bank : data.left_lead_bank,
       pageSize: paginationModel.pageSize,
       page: paginationModel.page + 1,
     };
@@ -179,6 +180,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       headerName: "Opportunity Value Excess",
       width: 140,
     },
+    { field: "left_lead_bank", headerName: "lead bank", width: 100 },
+
   ];
 
   return (
