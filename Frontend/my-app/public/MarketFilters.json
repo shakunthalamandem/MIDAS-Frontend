@@ -117,6 +117,55 @@
                 "label": "Sector",
                 "description": "Sector"
             }
-        }
+        },
+        {
+            "left_lead_bank": {
+              "options": [
+                "ABN AMRO Bank",
+                "Bank of America",
+                "Barclays",
+                "BMO Capital Markets",
+                "BNP Paribas",
+                "Canaccord Genuity",
+                "CIBC World Markets",
+                "Citigroup Global Markets Inc",
+                "CLSA",
+                "Commerzbank Group",
+                "Cowen & Company LLC",
+                "Credit Suisse",
+                "Deutsche Bank",
+                "Evercore Inc",
+                "Goldman Sachs",
+                "HSBC",
+                "Janney Montgomery Scott",
+                "Jefferies LLC",
+                "JMP Securities LLC",
+                "JPMorgan",
+                "Keefe Bruyette & Woods",
+                "Lazard Capital Markets",
+                "Leerink Partners LLC",
+                "Morgan Stanley",
+                "Needham & Co LLC",
+                "Nomura Securities Co Ltd",
+                "Oppenheimer & Co Inc",
+                "Rabobank",
+                "Raymond James & Associates Inc",
+                "RBC Capital Markets",
+                "Robert W Baird & Co",
+                "Scotiabank",
+                "SG Corporate & Investment Banking",
+                "Stifel",
+                "SunTrust Robinson Humphrey Inc",
+                "SVB Securities LLC",
+                "TD Securities Inc",
+                "UBS",
+                "William Blair & Co LLC",
+                "Others"
+              ],
+              "label": "Left Lead Bank",
+              "description": ""
+            }
+          }
+          
     ]
 }
