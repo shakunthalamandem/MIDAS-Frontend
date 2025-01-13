@@ -180,7 +180,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       headerName: "Opportunity Value Excess",
       width: 140,
     },
-    { field: "left_lead_bank", headerName: "lead bank", width: 100 },
+    { field: "left_lead_bank", headerName: "lead bank", width: 150 },
 
   ];
 
