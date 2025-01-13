@@ -57,13 +57,26 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, che
             key={sector}
             control={
               <Checkbox
-                checked={visibleSectors.includes(sector)}
-                onChange={() => handleCheckboxChange(sector)}
-                color="primary"
-              />
+              checked={visibleSectors.includes(sector)}
+              onChange={() => handleCheckboxChange(sector)}
+              color="primary"
+              sx={{
+                "&.Mui-checked": {
+                  color: "#a20000", // Change the color of the tick (red, in this case)
+                },
+              }}
+            />
+            
             }
-            label={sector}
-          />
+            label={
+              <Typography
+                sx={{
+                  color: "#626262",  // Set label color
+                }}
+              >
+                {sector}
+              </Typography>
+            }          />
         ))}
       </Box>
 
