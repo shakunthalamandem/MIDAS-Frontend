@@ -6,6 +6,9 @@ import {
   FormControlLabel,
   Checkbox,
   Typography,
+  Card,
+  CardContent,
+  CardHeader,
 } from "@mui/material";
 import NumberOfDeals from "./NavigationTabs/NumberOfDeals";
 import RegionWiseDeals from "./NavigationTabs/RegionWiseDeals";
@@ -67,6 +70,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
+      
       {loading && <p>Loading...</p>}
 
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -105,56 +109,73 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
 
       {apiData && (
         <>
-          <Grid item xs={12} md={6}>
-            <NumberOfDeals
-              data={apiData.deal_type}
-              selectedMetric={selectedMetric}
-            />
-          </Grid>
-          <Box sx={{ px: 4, py: 2 }}>
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={6}>
-                <RegionWiseDeals
-                  data={apiData.regions}
-                  selectedMetric={selectedMetric}
-                />
+          {/* Card for Number of Deals */}
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <NumberOfDeals
+                data={apiData.deal_type}
+                selectedMetric={selectedMetric}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Card for Region Wise and Sector Wise Deals */}
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Grid container spacing={4}>
+                <Grid item xs={12} md={6}>
+                  <RegionWiseDeals
+                    data={apiData.regions}
+                    selectedMetric={selectedMetric}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <SectorWiseDeals
+                    data={apiData.sectors}
+                    selectedMetric={selectedMetric}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <SectorWiseDeals
-                  data={apiData.sectors}
-                  selectedMetric={selectedMetric}
-                />
-              </Grid>
-            </Grid>
-          </Box>
-          <Box sx={{ px: 4, py: 2 }}>
-            <YearlySectorChart
-              data={apiData.year_wise_sector}
-              selectedMetric={selectedMetric}
-              checkedItems={
-                Array.isArray(selectedFilters?.sector)
-                  ? selectedFilters.sector.filter(
-                      (item): item is string => typeof item === "string"
-                    )
-                  : typeof selectedFilters?.sector === "string"
+            </CardContent>
+          </Card>
+
+          {/* Card for Yearly Sector Chart */}
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <YearlySectorChart
+                data={apiData.year_wise_sector}
+                selectedMetric={selectedMetric}
+                checkedItems={
+                  Array.isArray(selectedFilters?.sector)
+                    ? selectedFilters.sector.filter(
+                        (item): item is string => typeof item === "string"
+                      )
+                    : typeof selectedFilters?.sector === "string"
                     ? [selectedFilters.sector]
                     : []
-              }
-            />
-            <RegionWiseChart
-              data={apiData.year_wise_region}
-              selectedMetric={selectedMetric}
-              checkedItems={
-                Array.isArray(selectedFilters?.region)
-                  ? selectedFilters.region.filter(
-                      (item): item is string => typeof item === "string"
-                    )
-                  : typeof selectedFilters?.region === "string"
+                }
+              />
+            </CardContent>
+          </Card>
+
+          {/* Card for Region Wise Chart */}
+          <Card>
+            <CardContent>
+              <RegionWiseChart
+                data={apiData.year_wise_region}
+                selectedMetric={selectedMetric}
+                checkedItems={
+                  Array.isArray(selectedFilters?.region)
+                    ? selectedFilters.region.filter(
+                        (item): item is string => typeof item === "string"
+                      )
+                    : typeof selectedFilters?.region === "string"
                     ? [selectedFilters.region]
                     : []
-              }
-            />
-          </Box>
+                }
+              />
+            </CardContent>
+          </Card>
         </>
       )}
     </Container>
