@@ -128,17 +128,9 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
   ];
 
   return (
-    <div>
-    
-      <Card
-          sx={{
-            width: "100%",
-            boxShadow: 3,
-            borderRadius: 2,
-            backgroundColor: "#ffffff",
-          }}
-        >
-          <CardContent>
+
+    <>
+
        <Box
               display="flex"
               justifyContent="space-between"
@@ -193,13 +185,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           }}
         />
       </Box>
-      </CardContent>
-      </Card>
-
-
-
-
-         </div>
+      </>
   );
 };
 
