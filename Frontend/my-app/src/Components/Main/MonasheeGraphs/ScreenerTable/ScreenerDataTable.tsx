@@ -130,6 +130,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
   return (
 
     <>
+        <Box mb={10} sx={{ height: 600, width: "100%" }}>
+    
 
        <Box
               display="flex"
@@ -159,7 +161,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
         rows={filteredRows.map((row, index) => ({ id: index, ...row }))}
         columns={columns}
         rowCount={filteredRows.length}
-
           paginationMode="server"
           loading={loading}
           rowHeight={35}
@@ -185,6 +186,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           }}
         />
       </Box>
+      </Box>
+
       </>
   );
 };
