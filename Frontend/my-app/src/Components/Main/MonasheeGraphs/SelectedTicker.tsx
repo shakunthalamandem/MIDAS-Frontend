@@ -36,7 +36,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
         }
 
         const payload = { ticker_list }; // Prepare the payload as an array
-        const response = await fetch(`${apiUrl}/api/super-screener/`, {
+        const response = await fetch(`${apiUrl}/api/super_screener/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
