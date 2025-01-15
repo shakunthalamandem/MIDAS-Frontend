@@ -107,8 +107,9 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
           ? parseFloat(sectors[dealType][allocationKeyForDealType])
           : 0;
       });
-      
 
+      // Calculate total for each quarter (IPO + FO)
+      chartRow["Total"] = chartRow["IPO"] + chartRow["FO"];
       return chartRow;
     });
   };
@@ -118,7 +119,7 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
   return (
     <div>
       {chartData.length === 0 && !responseData?.message ? (
-          <Box sx={{ textAlign: "center", padding: 4 }}>
+        <Box sx={{ textAlign: "center", padding: 4 }}>
           <Typography variant="h6" color="textSecondary">
             No Data Available for the selected filters.
           </Typography>
@@ -129,81 +130,93 @@ const DealAllocationGraph: React.FC<DealAllocationGraphProps> = ({ responseData,
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
             <XAxis dataKey="quarter" />
-            <YAxis tickFormatter={(value) => formatValue(value, apiName)} />
-            <Tooltip formatter={(value) => formatValue(Number(value), apiName)} />
+            <YAxis tickFormatter={(value) => formatValue(value, apiName)} />{/* Format Y-axis ticks */}
+
+            {/* Tooltip displaying IPO, FO, and Total */}
+            <Tooltip
+  formatter={(value: number, name: string, props: any) => {
+    // Calculate the total for the current data point (IPO + FO)
+    const totalValue = props.payload?.IPO + props.payload?.FO;
+    return [
+      `${formatValue(Number(value), apiName)}`, // Format individual value (either IPO or FO)
+      name
+    ];
+  }}
+  content={({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const { IPO, FO, quarter } = payload[0].payload;
+      const total = IPO + FO; // Calculate total here
+      return (
+        <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '10px' }}>
+          <h4>{quarter}</h4>
+          <p style={{ margin: 0,color:'#8884d8'}}>IPO: {formatValue(IPO, apiName)}</p>
+          <p style={{ margin: 0,color:'#82ca9d'}} >FO: {formatValue(FO, apiName)}</p>
+          <p style={{ margin: 0,color:'#002060' }}>Total Deals: {formatValue(total, apiName)}</p>
+        </div>
+      );
+    }
+    return null;
+  }}
+/>
+
+
             <Legend />
-            {Object.keys(chartData[0] || {})
-              .filter((key) => key !== "quarter")
-              .map((dealType) => (
-                <Bar
-                  key={dealType}
-                  dataKey={dealType}
-                  stackId="a"
-                  fill={{
-                    FO: "#8884d8",
-                    IPO: "#82ca9d",
-                  }[dealType] || "#ccc"}
-                />
-              ))}
+
+            {/* Only include IPO and FO in the chart */}
+            <Bar dataKey="IPO" stackId="a" fill="#8884d8" />
+            <Bar dataKey="FO" stackId="a" fill="#82ca9d" />
           </BarChart>
         </ResponsiveContainer>
       )}
 
       {/* Checkboxes for selecting normal or weighted values */}
       {(apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") && (
-       <div style={{ textAlign: "center", marginTop: "10px" }}>
-       <FormControlLabel
-         control={
-           <Checkbox
-             checked={selectedValue === "normal"}
-             onChange={() => setSelectedValue("normal")}
-             sx={{
-               color: "#002060", // Set the checkbox tick color
-               "&.Mui-checked": {
-                 color: "#002060", // Set the color when checkbox is checked
-               },
-             }}
-           />
-         }
-         label={
-           <Typography sx={{ fontWeight: "bold", color: "#002060" }}>
-             Simple Average
-           </Typography>
-         }
-         sx={{ marginRight: "10px" }}
-       />
-       <FormControlLabel
-         control={
-           <Checkbox
-             checked={selectedValue === "weighted"}
-             onChange={() => setSelectedValue("weighted")}
-             sx={{
-               color: "#002060", // Set the checkbox tick color
-               "&.Mui-checked": {
-                 color: "#002060", // Set the color when checkbox is checked
-               },
-             }}
-           />
-         }
-         label={
-           <Typography sx={{ fontWeight: "bold", color: "#002060" }}>
-             Deal Size Weighted Average
-           </Typography>
-         }
-       />
-     </div>
-     
+        <div style={{ textAlign: "center", marginTop: "10px" }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={selectedValue === "normal"}
+                onChange={() => setSelectedValue("normal")}
+                sx={{
+                  color: "#002060", // Set the checkbox tick color
+                  "&.Mui-checked": {
+                    color: "#002060", // Set the color when checkbox is checked
+                  },
+                }}
+              />
+            }
+            label={
+              <Typography sx={{ fontWeight: "bold", color: "#002060" }}>
+                Simple Average
+              </Typography>
+            }
+            sx={{ marginRight: "10px" }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={selectedValue === "weighted"}
+                onChange={() => setSelectedValue("weighted")}
+                sx={{
+                  color: "#002060", // Set the checkbox tick color
+                  "&.Mui-checked": {
+                    color: "#a20000", // Set the color when checkbox is checked
+                  },
+                }}
+              />
+            }
+            label={
+              <Typography sx={{ fontWeight: "bold", color: "#002060" }}>
+                Deal Size Weighted Average
+              </Typography>
+            }
+          />
+        </div>
       )}
 
       {/* Popup Dialog */}
-      <Dialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={dialogOpen} onClose={handleDialogClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogTitle id="alert-dialog-title">No Data Available</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
