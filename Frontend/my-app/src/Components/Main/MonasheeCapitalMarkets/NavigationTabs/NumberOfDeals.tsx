@@ -29,6 +29,9 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
 
   // Number formatter function
   const formatNumber = (value: number): string => {
+    if (selectedMetric === "count") {
+      return value.toString(); // No formatting for 'count'
+    }
     if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`; // Format billions
     if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`; // Format millions
     if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`; // Format thousands
@@ -64,10 +67,12 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
                 color: entry.color,
               }}
             >
-              {`${entry.name}: ${formatNumber(entry.value)}`}
+              {`${entry.name}: ${selectedMetric === "count" ? entry.value : formatNumber(entry.value)}`}
             </p>
           ))}
-          <p style={{ margin: 0, fontWeight: "bold",color:'#002060' }}>{`Total: ${formatNumber(total)}`}</p>
+          <p style={{ margin: 0, fontWeight: "bold",color:'#002060' }}>{`Total: ${
+            selectedMetric === "count" ? total : formatNumber(total)
+          }`}</p>
         </div>
       );
     }
@@ -80,8 +85,8 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
       <ResponsiveContainer width="100%" height={400}>
         <BarChart data={chartData}>
           <XAxis dataKey="year" />
-          <YAxis tickFormatter={formatNumber} /> {/* Format Y-axis ticks */}
-          <Tooltip content={<CustomTooltip />} /> {/* Use custom tooltip */}
+          <YAxis tickFormatter={formatNumber} /> {/* Conditional formatting */}
+          <Tooltip content={<CustomTooltip />} /> {/* Custom tooltip with conditional formatting */}
           <Legend />
           <Bar dataKey="IPO" stackId="a" fill="#8884d8" />
           <Bar dataKey="FO" stackId="a" fill="#82ca9d" />
