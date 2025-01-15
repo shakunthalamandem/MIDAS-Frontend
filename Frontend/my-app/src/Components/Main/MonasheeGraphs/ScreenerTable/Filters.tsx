@@ -152,21 +152,22 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
                           ));
                         }}
                         renderOption={(props, option, { selected }) => (
-                          <ListItem {...props} style={{ padding: "4px" }}>
-                            <Checkbox
-                              checked={selected}
-                              sx={{
-                                padding: "4px",
-                                "& .MuiSvgIcon-root": { fontSize: "1rem" },
-                              }}
-                            />
-                            <ListItemText
-                              primary={option.toString()}
-                              sx={{
-                                fontSize: "0.875rem", // Reduce font size of the options
-                              }}
-                            />
-                          </ListItem>
+                          <ListItem {...props} style={{ padding: "2px" }}>
+                          <Checkbox
+                            checked={selected}
+                            sx={{
+                              "&.Mui-checked": {
+                                color: "#A20000", // Change the color of the tick (red, in this case)
+                              },
+                            }}
+                          />
+                          <ListItemText
+                            primary={option.toString()}
+                            sx={{
+                              fontSize: "0.875rem", // Reduce font size of the options
+                            }}
+                          />
+                        </ListItem>
                         )}
                       />
                     </Box>

@@ -55,11 +55,7 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({
 
   // Define colors for the lines
   const colors = [
-    "#2E3A87",
-    "#1D9C63",
-    "#D75F01",
-    "#C35A2C",
-    "#B72B72",
+  "#2E3A87",
     "#D94E8A",
     "#5B9E6E",
     "#C8A700",
