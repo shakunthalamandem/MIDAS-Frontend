@@ -56,10 +56,14 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       const key = Object.keys(filter)[0];
       initialSelectedValues[key] = [];
     });
-    setSelectedValues(initialSelectedValues);
-    setAppliedFilters(initialSelectedValues);
-    handleSubmit(initialSelectedValues);
-  }, [filtersData]);
+    
+    if (JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)) {
+      setSelectedValues(initialSelectedValues);
+      setAppliedFilters(initialSelectedValues);
+      handleSubmit(initialSelectedValues);
+    }
+  }, [filtersData]);  // This hook will only be triggered when filtersData changes
+  
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
@@ -123,10 +127,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     setSearchKey(null); // Reset active search filter
   };
 
-  const handleAccordionChange =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : false);
-    };
+
 
   return (
     <Container
@@ -316,7 +317,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       ) : (
         <>
         <DealAllocationGraph responseData={apiData} apiName={apiName} />
-        <MDDScreenergrid sectorwiseData={payload} /> {/* Pass the payload here */}
+        <MDDScreenergrid sectorwiseData={payload} /> 
 </>
       )}
     </>
