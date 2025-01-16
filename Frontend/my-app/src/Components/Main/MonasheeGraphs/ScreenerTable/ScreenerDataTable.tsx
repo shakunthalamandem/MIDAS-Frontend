@@ -54,7 +54,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       deal_value: data.deal_value,
       t1_return: data.t1_return,
       t1m_returns: data.t1m_returns,
-      left_lead_bank : data.left_lead_bank,
+      left_lead_bank: data.left_lead_bank,
       pageSize: paginationModel.pageSize,
       page: paginationModel.page + 1,
     };
@@ -92,8 +92,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     }
   };
 
-
- const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const filteredRows = rows.filter((row) =>
     row.ticker_symbol?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -124,71 +123,70 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       width: 140,
     },
     { field: "left_lead_bank", headerName: "lead bank", width: 150 },
-
   ];
 
   return (
-
     <>
-        <Box mb={10} sx={{ height: 600, width: "100%" }}>
-    
-
-       <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mb={2}
-            >
-              <Typography
-                align="left"
-                style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
-              >
-                {" "}
-                Total no of deals:{" "}
-                <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
-              </Typography>
-              <TextField
-                variant="outlined"
-                size="small"
-                placeholder="Search Ticker"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                sx={{ width: 300 }}
-              />
-            </Box>
-      <Box sx={{ height: 500, width: "100%", marginTop: 3 }}>
-        <DataGrid
-        rows={filteredRows.map((row, index) => ({ id: index, ...row }))}
-        columns={columns}
-        rowCount={filteredRows.length}
-          paginationMode="server"
-          loading={loading}
-          rowHeight={35}
-          hideFooter // Hides the entire footer, including pagination controls
-          sx={{
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "transparent",
+      <Box mb={10} sx={{ height: 600, width: "100%" }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
+          <Typography
+            align="left"
+            style={{
               fontWeight: "bold",
-              color: "#002060",
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              fontWeight: "bold",
-              fontSize: "12px", // Decrease header font size
-            },
-            "& .MuiDataGrid-cell": {
-              color: "#000000",
-              fontSize: "12px", // Decrease font size for cell values
-              padding: "4px", // Optional: Reduce padding for compact look
-            },
-            "& .MuiDataGrid-row:nth-of-type(odd)": {
-              backgroundColor: "#F5F5F5",
-            },
-          }}
-        />
+              color: "#fd0303",
+              marginBottom: "15px",
+            }}
+          >
+            {" "}
+            Total no of deals:{" "}
+            <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
+          </Typography>
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Search Ticker"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ width: 300 }}
+          />
+        </Box>
+        <Box sx={{ height: 500, width: "100%", marginTop: 3 }}>
+          <DataGrid
+            rows={filteredRows.map((row, index) => ({ id: index, ...row }))}
+            columns={columns}
+            rowCount={filteredRows.length}
+            paginationMode="server"
+            loading={loading}
+            rowHeight={35}
+            hideFooter // Hides the entire footer, including pagination controls
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "transparent",
+                fontWeight: "bold",
+                color: "#002060",
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold",
+                fontSize: "12px", // Decrease header font size
+              },
+              "& .MuiDataGrid-cell": {
+                color: "#000000",
+                fontSize: "12px", // Decrease font size for cell values
+                padding: "4px", // Optional: Reduce padding for compact look
+              },
+              "& .MuiDataGrid-row:nth-of-type(odd)": {
+                backgroundColor: "#F5F5F5",
+              },
+            }}
+          />
+        </Box>
       </Box>
-      </Box>
-
-      </>
+    </>
   );
 };
 
