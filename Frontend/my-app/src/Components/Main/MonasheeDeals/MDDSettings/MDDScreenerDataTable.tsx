@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
-import { Box, Typography } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import MDDScreenerSummary from "./MDDScrennerSummary";
 
 // Define the type for each row of data
@@ -106,7 +106,9 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
         throw new Error("Failed to fetch paginated data");
       }
     } catch (err: any) {
-      setError(err.message || "An error occurred while fetching paginated data");
+      setError(
+        err.message || "An error occurred while fetching paginated data"
+      );
     } finally {
       setLoading(false);
     }
@@ -192,32 +194,54 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 100 },
     { field: "fo_discount", headerName: "Follow On Discount", width: 100 },
     { field: "percentage_primary", headerName: "Primary %", width: 100 },
-
   ];
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
+  const filteredRows = rows.filter((row) =>
+    row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   return (
     <>
       <div style={{ height: 600, width: "100%" }}>
         {error && <p style={{ color: "red" }}>{error}</p>}
         {loading && <p>Loading...</p>}
-        <Typography
-          align="center"
-          style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
         >
-          Total No of Deals:
-          <span style={{ color: "#004b33" }}>{totalRows}</span>
-        </Typography>
+          <Typography
+            align="left"
+            style={{
+              fontWeight: "bold",
+              color: "#fd0303",
+              marginBottom: "15px",
+            }}
+          >
+            {" "}
+            Total no of deals:{" "}
+            <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
+          </Typography>
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Search Ticker"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ width: 300 }}
+          />
+        </Box>
 
         <DataGrid
-          rows={rows}
+          rows={filteredRows.map((row, index) => ({ ids: index, ...row }))}
           columns={columns}
+          //  rowCount={filteredRows.length}
           paginationMode="server"
           rowCount={totalRows}
           loading={loading}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          pageSizeOptions={[10, 25, 50, 100]}
           rowHeight={35}
+          hideFooter
           sx={{
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "transparent",

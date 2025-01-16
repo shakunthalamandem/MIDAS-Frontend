@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import DealsDataFilter from '../../MonasheeDeals/DeoLogicData/DealsDataFilter';
 import InvestmentMain from '../../InvestmentStrategy/InvestmentMain';
 
 const Strategies: React.FC = () => {

@@ -40,6 +40,7 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
           "locale": "en",
           "allow_symbol_change": true,
           "calendar": false,
+          "withdateranges":true,
           "support_host": "https://www.tradingview.com"
         }
       `;

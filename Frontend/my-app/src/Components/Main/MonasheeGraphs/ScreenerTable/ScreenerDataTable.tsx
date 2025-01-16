@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardContent, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { debounce } from "lodash";
 
@@ -54,7 +54,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       deal_value: data.deal_value,
       t1_return: data.t1_return,
       t1m_returns: data.t1m_returns,
-      left_lead_bank : data.left_lead_bank,
+      left_lead_bank: data.left_lead_bank,
       pageSize: paginationModel.pageSize,
       page: paginationModel.page + 1,
     };
@@ -92,69 +92,11 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     }
   };
 
-  // Memoized calculations
-  const totaldealvalue = useMemo(
-    () =>
-      rows.reduce(
-        (sum, row) => sum + (parseFloat(row.deal_value.toString()) || 0),
-        0
-      ),
-    [rows]
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const filteredRows = rows.filter((row) =>
+    row.ticker_symbol?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const avgDealReturn = useMemo(
-    () =>
-      rows.length
-        ? rows.reduce((sum, row) => sum + (row.t1_return || 0), 0) / rows.length
-        : 0,
-    [rows]
-  );
-
-  const avgT1mReturnsIndex = useMemo(
-    () =>
-      rows.length
-        ? rows.reduce(
-            (sum, row) => sum + (row.t1m_returns_index_returns || 0),
-            0
-          ) / rows.length
-        : 0,
-    [rows]
-  );
-
-  const avgT1dReturnsIndex = useMemo(
-    () =>
-      rows.length
-        ? rows.reduce(
-            (sum, row) => sum + (row.t1d_returns_index_returns || 0),
-            0
-          ) / rows.length
-        : 0,
-    [rows]
-  );
-
-  const TotalOpportunityValue = useMemo(
-    () =>
-      rows.reduce(
-        (sum, row) =>
-          sum + (parseFloat(row.opportunity_value_ex.toString()) || 0),
-        0
-      ),
-    [rows]
-  );
-
-  const Avg_t1m_Return = useMemo(
-    () =>
-      rows.length
-        ? rows.reduce((sum, row) => sum + (row.t1m_returns || 0), 0) /
-          rows.length
-        : 0,
-    [rows]
-  );
-
-  const debouncedPaginationChange = debounce((model: GridPaginationModel) => {
-    setPaginationModel(model);
-  }, 300);
-
   const columns: GridColDef[] = [
     { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
@@ -181,70 +123,70 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       width: 140,
     },
     { field: "left_lead_bank", headerName: "lead bank", width: 150 },
-
   ];
 
   return (
-    <div>
-    
-      <Card
-          sx={{
-            width: "100%",
-            boxShadow: 3,
-            borderRadius: 2,
-            backgroundColor: "#ffffff",
-          }}
+    <>
+      <Box mb={10} sx={{ height: 600, width: "100%" }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
         >
-          <CardContent>
           <Typography
-        align="center"
-        style={{ fontWeight: "bold", color: "#fd0303", marginBottom: "15px" }}
-      >
-        Total No of Deals:
-        <span style={{ color: "#004b33" }}>{totalRows}</span>
-      </Typography>
-      <Box sx={{ height: 500, width: "100%", marginTop: 3 }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          paginationMode="server"
-          rowCount={totalRows}
-          loading={loading}
-          paginationModel={paginationModel}
-          // onPaginationModelChange={setPaginationModel}
-          onPaginationModelChange={debouncedPaginationChange}
-
-          pageSizeOptions={[10, 25, 50, 100]}
-          rowHeight={35}
-          // hideFooter // Hides the entire footer, including pagination controls
-          sx={{
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "transparent",
+            align="left"
+            style={{
               fontWeight: "bold",
-              color: "#002060",
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              fontWeight: "bold",
-              fontSize: "12px", // Decrease header font size
-            },
-            "& .MuiDataGrid-cell": {
-              color: "#000000",
-              fontSize: "12px", // Decrease font size for cell values
-              padding: "4px", // Optional: Reduce padding for compact look
-            },
-            "& .MuiDataGrid-row:nth-of-type(odd)": {
-              backgroundColor: "#F5F5F5",
-            },
-          }}
-        />
+              color: "#fd0303",
+              marginBottom: "15px",
+            }}
+          >
+            {" "}
+            Total no of deals:{" "}
+            <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
+          </Typography>
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Search Ticker"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ width: 300 }}
+          />
+        </Box>
+        <Box sx={{ height: 500, width: "100%", marginTop: 3 }}>
+          <DataGrid
+            rows={filteredRows.map((row, index) => ({ id: index, ...row }))}
+            columns={columns}
+            rowCount={filteredRows.length}
+            paginationMode="server"
+            loading={loading}
+            rowHeight={35}
+            hideFooter // Hides the entire footer, including pagination controls
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "transparent",
+                fontWeight: "bold",
+                color: "#002060",
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold",
+                fontSize: "12px", // Decrease header font size
+              },
+              "& .MuiDataGrid-cell": {
+                color: "#000000",
+                fontSize: "12px", // Decrease font size for cell values
+                padding: "4px", // Optional: Reduce padding for compact look
+              },
+              "& .MuiDataGrid-row:nth-of-type(odd)": {
+                backgroundColor: "#F5F5F5",
+              },
+            }}
+          />
+        </Box>
       </Box>
-      </CardContent>
-      </Card>
-
-
-
-
-         </div>
+    </>
   );
 };
 
