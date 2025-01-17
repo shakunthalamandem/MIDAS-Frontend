@@ -80,7 +80,7 @@
           { "type": "number", "operator": ">", "label": "Max", "placeholder": "Enter maximum discount" }
         ]
       },
-      "Tplus1DIssuePrice": {
+      "t1d_issueprice": {
         "type": "input",
         "label": "T+1D IssuePrice",
         "description": "Specify the percentage change from T+1 day to the index.",
