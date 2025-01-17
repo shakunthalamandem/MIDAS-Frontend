@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Paper, Typography, Grid } from "@mui/material";
+import { Box, Paper, Typography ,Grid,
+
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow, } from "@mui/material";
 
 // Define the structure of the response data
 interface TickerData {
@@ -82,72 +88,96 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
       </Typography>
 
       <Grid container spacing={2}>
-        {data.map((item, index) => (
-          <Grid item xs={12} key={index}>
-            <Paper
-              elevation={3}
-              style={{
-                padding: "20px",
-                backgroundColor: "#f9f9f9",
-                borderRadius: "8px",
-              }}
-            >
-              <Typography variant="h6" color="#002060" gutterBottom>
-                Deal Information for the selected Ticker
-              </Typography>
-              <Grid container spacing={2}>
+      {data.map((item, index) => (
+        <Grid item xs={12} key={index}>
+          <Paper
+            elevation={3}
+            style={{
+              padding: "20px",
+              backgroundColor: "#f9f9f9",
+              borderRadius: "8px",
+            }}
+          >
+            <Typography variant="h6" color="#002060" gutterBottom>
+              Deal Information for the Selected Ticker
+            </Typography>
+            <Grid container spacing={2}>
+              {/* Table 1 */}
               <Grid item xs={12} sm={6}>
-              <Typography>
-                <strong>Pricing Date:</strong> {item.pricing_date}
-              </Typography>
-              <Typography>
-                <strong>Issuer Name:</strong> {item.issuer_name}
-              </Typography>
-              <Typography>
-                <strong>Ticker Symbol:</strong> {item.ticker_symbol}
-              </Typography>
-              <Typography>
-                <strong>GICS Sector:</strong> {item.gics_sector}
-              </Typography>
-              <Typography>
-                <strong>Region:</strong> {item.us_international}
-              </Typography>
-              <Typography>
-                <strong>Deal Type:</strong> {item.deal_type}
-              </Typography>
-              <Typography>
-                <strong>Deal Value:</strong> {item.deal_value}
-              </Typography>
+                <TableContainer>
+                  <Table size="small" aria-label="Deal Info Table 1">
+                    <TableBody>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",border: "1px solid #ccc" }}><strong>Pricing Date:</strong></TableCell>
+                        <TableCell  style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",border: "1px solid #ccc" }}>{item.pricing_date}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",borderTop: "1px solid #ccc" }}><strong>Issuer Name:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.issuer_name}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Ticker Symbol:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.ticker_symbol}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>GICS Sector:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.gics_sector}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Region:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.us_international}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Deal Type:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.deal_type}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Deal Value:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.deal_value}</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Grid>
+
+              {/* Table 2 */}
               <Grid item xs={12} sm={6}>
-             
-              <Typography>
-                <strong>Issue Price:</strong> {item.issue_price}
-              </Typography>
-              <Typography>
-                <strong>T+1 Month Returns:</strong> {item.t1m_returns}
-              </Typography>
-              <Typography>
-                <strong>T+1 Day Returns:</strong> {item.t1_return}
-              </Typography>
-              <Typography>
-                <strong>T+1 Day Returns (Index Adjusted):</strong>{" "}
-                {item.t1d_returns_index_returns}
-              </Typography>
-              <Typography>
-                <strong>T+1 Month Returns (Index Adjusted):</strong>{" "}
-                {item.t1m_returns_index_returns}
-              </Typography>
-              <Typography>
-                <strong>Opportunity Value Ex:</strong>{" "}
-                {item.opportunity_value_ex}
-              </Typography>
+                <TableContainer>
+                  <Table size="small" aria-label="Deal Info Table 2">
+                    <TableBody>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",borderTop: "1px solid #ccc" }}><strong>Issue Price:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",borderTop: "1px solid #ccc"}}>{item.issue_price}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>T+1 Month Returns:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.t1m_returns}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>T+1 Day Returns:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.t1_return}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>T+1 Day Returns (Index Adjusted):</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.t1d_returns_index_returns}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>T+1 Month Returns (Index Adjusted):</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.t1m_returns_index_returns}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Opportunity Value Ex:</strong></TableCell>
+                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.opportunity_value_ex}</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      ))}
+    </Grid>
     </Box>
   );
 };
