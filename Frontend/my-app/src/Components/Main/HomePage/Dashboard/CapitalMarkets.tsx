@@ -92,7 +92,7 @@ const CapitalMarkets: React.FC = () => {
               },
             }}
           />
-          
+{/*           
           <Tab
             label="Deal Count"
             sx={{
@@ -125,13 +125,13 @@ const CapitalMarkets: React.FC = () => {
                 color: "#fff",
               },
             }}
-          />
+          /> */}
   
           <Tab
             label="Skew Table"
             sx={{
-              backgroundColor: value === 5 ? "#9C27B0" : "#f5f5f5",
-              color: value === 5 ? "#fff" : "#777",
+              backgroundColor: value === 2 ? "#9C27B0" : "#f5f5f5",
+              color: value === 2 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#9C27B0",
                 color: "#fff",
@@ -141,8 +141,8 @@ const CapitalMarkets: React.FC = () => {
           <Tab
             label="Deal Filter"
             sx={{
-              backgroundColor: value === 6 ? "#FF9800" : "#f5f5f5",
-              color: value === 6 ? "#fff" : "#777",
+              backgroundColor: value === 3 ? "#FF9800" : "#f5f5f5",
+              color: value === 3 ? "#fff" : "#777",
               "&.Mui-selected": {
                 backgroundColor: "#FF9800",
                 color: "#fff",
@@ -153,11 +153,11 @@ const CapitalMarkets: React.FC = () => {
         </Tabs>
         {value === 0 && <DealSearch />}
         {value === 1 && <MarketFilters />}
-        {value === 2 && <DealGraph />}
+        {/* {value === 2 && <DealGraph />}
         {value === 3 && <DealVolume />}
-        {value === 4 && <OpportunityMain />}
-        {value === 5 && <SkewTableMain />}
-        {value === 6 && <ScreenerMain />}
+        {value === 4 && <OpportunityMain />} */}
+        {value === 2 && <SkewTableMain />}
+        {value === 3 && <ScreenerMain />}
 
       </Box>
     </>
