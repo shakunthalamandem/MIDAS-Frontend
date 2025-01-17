@@ -62,7 +62,7 @@
       "type": "dropdown",
       "label": "Primary Percentage",
       "description": "Select a range or specific value for the primary category.",
-      "options": ["ALL", "Equal to 0", "Equal to 100", "0-20", "20-40", "40-60", "60-80", "80-100"]
+      "options": ["Equal to 0", "Equal to 100", "0-20", "20-40", "40-60", "60-80", "80-100"]
     },
     "Sponsor": {
       "type": "dropdown",

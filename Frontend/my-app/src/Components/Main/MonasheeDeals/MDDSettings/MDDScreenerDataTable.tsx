@@ -163,6 +163,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   };
 
   const columns: GridColDef[] = [
+    
     { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "ticker", headerName: "Ticker", width: 100 },
@@ -194,6 +195,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 100 },
     { field: "fo_discount", headerName: "Follow On Discount", width: 100 },
     { field: "percentage_primary", headerName: "Primary %", width: 100 },
+    { field: "sponsor", headerName: "Sponsor", width: 70 }
   ];
   const [searchQuery, setSearchQuery] = useState<string>("");
 
