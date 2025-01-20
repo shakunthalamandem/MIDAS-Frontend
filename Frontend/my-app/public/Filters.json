@@ -19,8 +19,8 @@
       }
     },
     {
-      "region": {
-        "options": [ "US", "International"],
+      "broad_region": {
+        "options": ["US", "Non-US America", "APAC", "EMEA"],
         "label": "Region",
         "description": ""
       }

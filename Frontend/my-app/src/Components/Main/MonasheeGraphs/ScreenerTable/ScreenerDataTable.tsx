@@ -8,7 +8,7 @@ interface ScreenerDataRow {
   issuer_name: string;
   ticker_symbol: string;
   gics_sector: string;
-  us_international: string;
+  broad_region: string;
   deal_type: string;
   deal_value: number;
   t_plus_1m_returns: number;
@@ -49,7 +49,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     const payload = {
       year_range: data.year_range,
       dealType: data.dealType,
-      region: data.region,
+      broad_region: data.broad_region,
       sector: data.sector,
       deal_value: data.deal_value,
       t_plus_1_return: data.t_plus_1_return,
@@ -102,7 +102,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "ticker_symbol", headerName: "Ticker", width: 100 },
     { field: "gics_sector", headerName: "Sector", width: 180 },
-    { field: "us_international", headerName: "Region", width: 100 },
+    { field: "broad_region", headerName: "Region", width: 100 },
     { field: "deal_type", headerName: "Deal Type", width: 80 },
     { field: "deal_value", headerName: "Deal Value", width: 120 },
     { field: "t_plus_1_return", headerName: "T + 1D Return", width: 100 },
