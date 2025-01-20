@@ -112,9 +112,9 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     { field: "broad_region", headerName: "Region", width: 150 },
     { field: "deal_type", headerName: "Deal Type", width: 150 },
     { field: "deal_size", headerName: "Deal Size", width: 180 },
-    { field: "T+1M_returns", headerName: "T + 1M Excess Returns", width: 200 },
+    { field: "t1m_returns", headerName: "T + 1M Excess Returns", width: 200 },
     {
-      field: "T+1D_returns",
+      field: "t1d_returns",
       headerName: "T + 1D Return (From Bloomberg)",
       width: 220,
     },
@@ -129,7 +129,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       headerName: "Average Hold Period",
       width: 180,
     },
-    { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 180 },
+    { field: "t1d_issueprice", headerName: "T + 1D issueprice", width: 180 },
     { field: "fo_discount", headerName: "Follow On Discount", width: 180 },
     { field: "percentage_primary", headerName: "Primary %", width: 100 },
   ];

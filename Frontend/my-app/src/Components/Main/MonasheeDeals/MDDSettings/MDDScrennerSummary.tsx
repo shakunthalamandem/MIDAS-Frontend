@@ -44,9 +44,9 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
       if (!isNaN(dealSize)) totalDealSize += dealSize;
 
       // T+1D Issue Price
-      if (item["T+1D_issueprice"]) {
+      if (item["t1d_issueprice"]) {
         const issuePrice = parseFloat(
-          item["T+1D_issueprice"].replace(/[^0-9.-]+/g, "")
+          item["t1d_issueprice"].replace(/[^0-9.-]+/g, "")
         );
         if (!isNaN(issuePrice)) totalT1DIssuePrice += issuePrice;
       }
@@ -60,17 +60,17 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
       }
 
       // T+1M Returns
-      if (item["T+1M_returns"]) {
+      if (item["t1m_returns"]) {
         const t1mReturns = parseFloat(
-          item["T+1M_returns"].replace(/[^0-9.-]+/g, "")
+          item["t1m_returns"].replace(/[^0-9.-]+/g, "")
         );
         if (!isNaN(t1mReturns)) totalT1MReturns += t1mReturns;
       }
 
       // T+1D Returns
-      if (item["T+1D_returns"]) {
+      if (item["t1d_returns"]) {
         const t1dReturns = parseFloat(
-          item["T+1D_returns"].replace(/[^0-9.-]+/g, "")
+          item["t1d_returns"].replace(/[^0-9.-]+/g, "")
         );
         if (!isNaN(t1dReturns)) totalT1DReturns += t1dReturns;
       }

@@ -18,12 +18,11 @@ interface TickerData {
   last_price_t1:string;
   issue_offer_price:string;
   fo_discount: string | null;
-  "T+1M_returns"?: string | null; // Allow null or string
-  "T+1D_returns"?: string | null; // Allow null or string
+  t1m_returns: string | null; // Allow null or string
+  t1d_returns: string | null; // Allow null or string
   allocation_deal_size: string | null; // Allow null or string
   allocation_ioi: string | null; // Allow null or string
   average_hold_period: string | null; // Allow null or string
-  // "T+1D_issueprice"?: string | null;
   percentage_primary: string | null; // Allow null or string
   sponsor: string | null; // Allow null or string
 }
@@ -144,11 +143,11 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                   </Typography>
                   <Typography>
                     <strong>T+1D Returns:</strong>{" "}
-                    {item["T+1D_returns"] ?? "N/A"}
+                    {item["t1d_returns"] ?? "N/A"}
                   </Typography>
                   <Typography>
                     <strong>T+1M Returns:</strong>{" "}
-                    {item["T+1M_returns"] ?? "N/A"}
+                    {item["t1m_returns"] ?? "N/A"}
                   </Typography>
                   <Typography>
                     <strong>FO Discount:</strong> {item.fo_discount ?? "N/A"}
@@ -156,11 +155,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                  
                   
                   
-                 
-                  {/* <Typography>
-                    <strong>T+1D Issue Price:</strong>{" "}
-                    {item["T+1D_issueprice"] ?? "N/A"}
-                  </Typography> */}
+          
                   
                 </Grid>
               </Grid>

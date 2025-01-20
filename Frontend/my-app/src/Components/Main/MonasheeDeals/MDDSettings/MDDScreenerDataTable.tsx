@@ -71,7 +71,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       allocation_deal_size: data.AllocationPercentOfDealSize,
       average_hold_period: data.HoldPeriod,
       allocation_ioi: data.AllocationPercentOfIOI,
-      t_1d_issue_price: data.Tplus1DIssuePrice,
+      t1d_issueprice: data.t1d_issueprice,
       percentage_primary: data.Primary,
       sponsor: data.Sponsor,
       page: paginationModel.page + 1, // API pages are often 1-indexed
@@ -131,7 +131,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       allocation_deal_size: data.AllocationPercentOfDealSize,
       average_hold_period: data.HoldPeriod,
       allocation_ioi: data.AllocationPercentOfIOI,
-      t_1d_issue_price: data.Tplus1DIssuePrice,
+      t1d_issueprice: data.t1d_issueprice,
       percentage_primary: data.Primary,
       sponsor: data.Sponsor,
     };
@@ -175,9 +175,9 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     { field: "broad_region", headerName: "Region", width: 100 },
     { field: "deal_type", headerName: "Deal Type", width: 100 },
     { field: "deal_size", headerName: "Deal Size", width: 120 },
-    { field: "T+1M_returns", headerName: "T + 1M Excess Returns", width: 100 },
+    { field: "t1m_returns", headerName: "T + 1M Excess Returns", width: 100 },
     {
-      field: "T+1D_returns",
+      field: "t1d_returns",
       headerName: "T + 1D Return (From Bloomberg)",
       width: 100,
     },
@@ -192,7 +192,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       headerName: "Average Hold Period",
       width: 100,
     },
-    { field: "T+1D_issueprice", headerName: "T + 1D issueprice", width: 100 },
+    { field: "t1d_issueprice", headerName: "T + 1D issueprice", width: 100 },
     { field: "fo_discount", headerName: "Follow On Discount", width: 100 },
     { field: "percentage_primary", headerName: "Primary %", width: 100 },
     { field: "sponsor", headerName: "Sponsor", width: 70 }
