@@ -43,7 +43,11 @@ interface CategoryData {
   "Deal volume": number;
   "Model Actual Return": number;
   "Model Return 1% Allocation": number;
-  "Net of Hedge": number;
+  // "Net of Hedge": number;
+  "Allocation Return": number,
+  "AM Return":number,
+  "Total Return": number,
+
 }
 
 interface ResponseData {
@@ -166,7 +170,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                           "Deal volume": 0,
                           "Model Actual Return": 0,
                           "Model Return 1% Allocation": 0,
-                          "Net of Hedge": 0,
+                          // "Net of Hedge": 0,
+                          "Allocation Return": 0,
+                          "AM Return":0,
+                          "Total Return": 0,
                         }
                     );
 
@@ -208,11 +215,13 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       "Alloc as % of Deal Size(Weighted)",
                                       "Alloc as % of IOI(Weighted)",
                                       "Deal Volume",
+                                      "Allocation Return",
+                                      "AM Return",
+                                      "Total Return",
                                       "Model Return With Actual Alloc",
                                       selectedCategory === "IPO"
                                         ? "Model Return 0.5% Allocation"
                                         : "Model Return 1% Allocation", // Dynamic header
-                                        year > "2018" ? "Net of Hedge" : null // Conditionally include "Net of Hedge"
                                       // ].map((header, idx) => (
                                       ].filter(Boolean).map((header, idx) => (
                                       <TableCell
@@ -280,17 +289,27 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {formatValue(data["Deal volume"] || 0)}
                                         </TableCell>
+
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                          {formatValue(data["Allocation Return"] || 0)}
+                                        </TableCell>
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                          {formatValue(data["AM Return"] || 0)}
+                                        </TableCell>
+                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                          {formatValue(data["Total Return"] || 0)}
+                                        </TableCell>
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {formatValue(data["Model Actual Return"] || 0)}
                                         </TableCell>
                                         <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                           {formatValue(data["Model Return 1% Allocation"] || 0)}
                                         </TableCell>
-                                        {year > "2018" && (
+                                        {/* {year > "2018" && (
                                           <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
                                             {formatValue(data["Net of Hedge"] || 0)}
                                           </TableCell>
-                                        )}
+                                        )} */}
                                       </TableRow>
                                     );
                                   })}
