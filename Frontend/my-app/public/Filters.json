@@ -46,7 +46,7 @@
       }
     },
     {
-      "t1_return": {
+      "t_plus_1_return": {
         "options": [
          
           ">4",
@@ -60,7 +60,7 @@
       }
     },
     {
-      "t1m_returns": {
+      "t_plus_1m_returns": {
         "options": [
          
           ">4",
