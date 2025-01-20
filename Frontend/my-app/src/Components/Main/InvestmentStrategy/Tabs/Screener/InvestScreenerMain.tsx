@@ -52,6 +52,8 @@ const columns: GridColDef[] = [
   { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 140 },
   { field: "market_cap", headerName: "Market Cap", width: 130 },
   { field: "analyst_target_price", headerName: "Target Price", width: 100 },
+  { field: "price", headerName: "Price", width: 100 },
+
   { field: "volume", headerName: "Volume", width: 100 },
   { field: "industry", headerName: "Industries", width: 150 },
   { field: "price_to_earnings", headerName: "PE", width: 80 },
