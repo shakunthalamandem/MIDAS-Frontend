@@ -192,7 +192,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       headerName: "Average Hold Period",
       width: 100,
     },
-    { field: "t1d_issueprice", headerName: "T + 1D issueprice", width: 100 },
+    { field: "tplus_1d_issueprice", headerName: "T + 1D issueprice", width: 100 },
     { field: "fo_discount", headerName: "Follow On Discount", width: 100 },
     { field: "percentage_primary", headerName: "Primary %", width: 100 },
     { field: "sponsor", headerName: "Sponsor", width: 70 }
