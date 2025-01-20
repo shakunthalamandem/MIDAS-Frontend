@@ -77,108 +77,128 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
 
   return (
     <Box sx={{ marginTop: 4, padding: 2 }}>
-      <Typography
-        variant="h5"
-        gutterBottom
-        color="#6501c4"
-        align="center"
-        sx={{ fontWeight: "bold" }}
-      >
-        Selected Ticker: <span style={{color:'#ff6005'}}>{ticker_list.join(", ")}</span>
-      </Typography>
+  <Typography
+    variant="h5"
+    gutterBottom
+    color="#6501c4"
+    align="center"
+    sx={{ fontWeight: "bold" }}
+  >
+    Selected Ticker: <span style={{ color: '#ff6005' }}>{ticker_list.join(", ")}</span>
+  </Typography>
 
-      <Grid container spacing={2}>
-      {data.map((item, index) => (
-        <Grid item xs={12} key={index}>
-          <Paper
-            elevation={3}
-            style={{
-              padding: "20px",
-              backgroundColor: "#f9f9f9",
-              borderRadius: "8px",
-            }}
-          >
-            <Typography variant="h6" color="#002060" gutterBottom>
-              Deal Information for the Selected Ticker
-            </Typography>
-            <Grid container spacing={2}>
-              {/* Table 1 */}
-              <Grid item xs={12} sm={6}>
-                <TableContainer>
-                  <Table size="small" aria-label="Deal Info Table 1">
-                    <TableBody>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",border: "1px solid #ccc" }}><strong>Pricing Date:</strong></TableCell>
-                        <TableCell  style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",border: "1px solid #ccc" }}>{item.pricing_date}</TableCell>
+  <Grid container spacing={2}>
+    {data.map((item, index) => (
+      <Grid item xs={12} key={index}>
+        <Paper
+          elevation={3}
+          sx={{
+            padding: "20px",
+            backgroundColor: "#f9f9f9",
+            borderRadius: "8px",
+          }}
+        >
+          <Typography variant="h6" color="#002060" gutterBottom>
+            Deal Information for the Selected Ticker
+          </Typography>
+          <Grid container spacing={2}>
+            {/* Table 1 */}
+            <Grid item xs={12} sm={6}>
+              <TableContainer>
+                <Table size="small" aria-label="Deal Info Table 1">
+                  <TableBody>
+                    {[
+                      { label: "Pricing Date:", value: item.pricing_date },
+                      { label: "Issuer Name:", value: item.issuer_name },
+                      { label: "Ticker Symbol:", value: item.ticker_symbol },
+                      { label: "GICS Sector:", value: item.gics_sector },
+                      { label: "Region:", value: item.us_international },
+                      { label: "Deal Type:", value: item.deal_type },
+                      { label: "Deal Value:", value: item.deal_value },
+                    ].map((row, i) => (
+                      <TableRow
+                        key={i}
+                        sx={{
+                          backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                          "&:hover": {
+                            backgroundColor: "#e0f7fa",
+                          },
+                        }}
+                      >
+                        <TableCell
+                          sx={{
+                            border: "1px solid #ccc",
+                            fontWeight: "bold",
+                            color: "#333",
+                          }}
+                        >
+                          {row.label}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            border: "1px solid #ccc",
+                          }}
+                        >
+                          {row.value}
+                        </TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",borderTop: "1px solid #ccc" }}><strong>Issuer Name:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.issuer_name}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Ticker Symbol:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.ticker_symbol}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>GICS Sector:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.gics_sector}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Region:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.us_international}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Deal Type:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.deal_type}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Deal Value:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.deal_value}</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-
-              {/* Table 2 */}
-              <Grid item xs={12} sm={6}>
-                <TableContainer>
-                  <Table size="small" aria-label="Deal Info Table 2">
-                    <TableBody>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",borderTop: "1px solid #ccc" }}><strong>Issue Price:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc",borderTop: "1px solid #ccc"}}>{item.issue_price}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>T+1 Month Returns:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.t1m_returns}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>T+1 Day Returns:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.t1_return}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>T+1 Day Returns (Index Adjusted):</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.t1d_returns_index_returns}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>T+1 Month Returns (Index Adjusted):</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.t1m_returns_index_returns}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}><strong>Opportunity Value Ex:</strong></TableCell>
-                        <TableCell style={{ borderRight: "1px solid #ccc",borderLeft: "1px solid #ccc" }}>{item.opportunity_value_ex}</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Grid>
-          </Paper>
-        </Grid>
-      ))}
-    </Grid>
-    </Box>
+
+            {/* Table 2 */}
+            <Grid item xs={12} sm={6}>
+              <TableContainer>
+                <Table size="small" aria-label="Deal Info Table 2">
+                  <TableBody>
+                    {[
+                      { label: "Issue Price:", value: item.issue_price },
+                      { label: "T+1 Month Returns:", value: item.t1m_returns },
+                      { label: "T+1 Day Returns:", value: item.t1_return },
+                      { label: "T+1 Day Returns (Index Adjusted):", value: item.t1d_returns_index_returns },
+                      { label: "T+1 Month Returns (Index Adjusted):", value: item.t1m_returns_index_returns },
+                      { label: "Opportunity Value Ex:", value: item.opportunity_value_ex },
+                    ].map((row, i) => (
+                      <TableRow
+                        key={i}
+                        sx={{
+                          backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                          "&:hover": {
+                            backgroundColor: "#e0f7fa",
+                          },
+                        }}
+                      >
+                        <TableCell
+                          sx={{
+                            border: "1px solid #ccc",
+                            fontWeight: "bold",
+                            color: "#333",
+                          }}
+                        >
+                          {row.label}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            border: "1px solid #ccc",
+                          }}
+                        >
+                          {row.value}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Grid>
+    ))}
+  </Grid>
+</Box>
+
   );
 };
 
