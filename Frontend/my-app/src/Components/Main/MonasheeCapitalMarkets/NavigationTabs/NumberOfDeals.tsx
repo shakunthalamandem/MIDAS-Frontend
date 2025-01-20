@@ -94,7 +94,7 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
     <Box>
       {/* Stacked Bar Chart using Recharts */}
       <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={chartData}>
+        <BarChart data={chartData} stackOffset="sign">
           <XAxis dataKey="year" />
           <YAxis tickFormatter={formatNumber} /> {/* Conditional formatting */}
           <Tooltip content={<CustomTooltip />} /> {/* Custom tooltip with conditional formatting */}
