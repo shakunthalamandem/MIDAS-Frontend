@@ -64,7 +64,7 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, che
   return (
     <Box>
       <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
-        Sector-wise Data Over the Yearrrs
+        Sector-wise Data Over the Years
       </Typography>
       <Box display="flex" justifyContent="center" flexWrap="wrap" mb={2}>
         {allSectors.map((sector) => (
