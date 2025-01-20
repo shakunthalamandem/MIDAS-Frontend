@@ -32,11 +32,26 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, che
   };
 
   const formatNumber = (value: number): string => {
-    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`; // Format billions
-    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`; // Format millions
-    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`; // Format thousands
-    return value.toString(); // Default format
+    if (selectedMetric === "count") {
+      return value.toString(); // No formatting for 'count'
+    }
+  
+    const absValue = Math.abs(value); // Get the absolute value for formatting
+    let formattedValue: string;
+  
+    if (absValue >= 1e9) {
+      formattedValue = `${(absValue / 1e9).toFixed(1)}B`; // Format billions
+    } else if (absValue >= 1e6) {
+      formattedValue = `${(absValue / 1e6).toFixed(1)}M`; // Format millions
+    } else if (absValue >= 1e3) {
+      formattedValue = `${(absValue / 1e3).toFixed(1)}K`; // Format thousands
+    } else {
+      formattedValue = absValue.toString(); // Default format
+    }
+  
+    return value < 0 ? `-${formattedValue}` : formattedValue; // Add negative sign if necessary
   };
+  
 
   // Define colors for the lines
   const colors = [
@@ -49,7 +64,7 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, che
   return (
     <Box>
       <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
-        Sector-wise Data Over the Years
+        Sector-wise Data Over the Yearrrs
       </Typography>
       <Box display="flex" justifyContent="center" flexWrap="wrap" mb={2}>
         {allSectors.map((sector) => (

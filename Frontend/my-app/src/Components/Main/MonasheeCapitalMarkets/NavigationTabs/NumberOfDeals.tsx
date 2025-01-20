@@ -27,16 +27,27 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
     };
   });
 
-  // Number formatter function
   const formatNumber = (value: number): string => {
     if (selectedMetric === "count") {
-      return value.toString(); // No formatting for 'count'
+      return value.toString(); 
     }
-    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`; // Format billions
-    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`; // Format millions
-    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`; // Format thousands
-    return value.toString(); // Default format
+  
+    const absValue = Math.abs(value); 
+    let formattedValue: string;
+  
+    if (absValue >= 1e9) {
+      formattedValue = `${(absValue / 1e9).toFixed(1)}B`; 
+    } else if (absValue >= 1e6) {
+      formattedValue = `${(absValue / 1e6).toFixed(1)}M`; 
+    } else if (absValue >= 1e3) {
+      formattedValue = `${(absValue / 1e3).toFixed(1)}K`; 
+    } else {
+      formattedValue = absValue.toString(); 
+    }
+  
+    return value < 0 ? `-${formattedValue}` : formattedValue; // Add negative sign if necessary
   };
+  
 
   // Custom tooltip
   const CustomTooltip = ({
