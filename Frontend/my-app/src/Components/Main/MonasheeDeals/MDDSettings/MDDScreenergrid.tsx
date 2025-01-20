@@ -129,7 +129,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       headerName: "Average Hold Period",
       width: 180,
     },
-    { field: "t1d_issueprice", headerName: "T + 1D issueprice", width: 180 },
+    { field: "tplus_1d_issueprice", headerName: "T + 1D issueprice", width: 180 },
     { field: "fo_discount", headerName: "Follow On Discount", width: 180 },
     { field: "percentage_primary", headerName: "Primary %", width: 100 },
   ];

@@ -24,6 +24,7 @@ interface TickerData {
   allocation_ioi: string | null; // Allow null or string
   average_hold_period: string | null; // Allow null or string
   percentage_primary: string | null; // Allow null or string
+  tplus_1d_issueprice: string | null; // Allow null or string
   sponsor: string | null; // Allow null or string
 }
 
@@ -118,7 +119,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <strong>Issue Price: </strong> ${item.issue_offer_price}
                   </Typography>
                   <Typography>
-                    <strong>T + 1D Issue Price:</strong> ${item.last_price_t1}
+                    <strong>T + 1D Issue Price:</strong> ${item.tplus_1d_issueprice}
                   </Typography>
                   <Typography>
                     <strong>Percentage Primary:</strong>{" "}
@@ -148,6 +149,10 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                   <Typography>
                     <strong>T+1M Returns:</strong>{" "}
                     {item["t1m_returns"] ?? "N/A"}
+                  </Typography>
+                  <Typography>
+                    <strong>Last Price T1</strong>{" "}
+                    {item["last_price_t1"] ?? "N/A"}
                   </Typography>
                   <Typography>
                     <strong>FO Discount:</strong> {item.fo_discount ?? "N/A"}
