@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, TextField, Typography } from "@mui/material";
 import MDDScreenerSummary from "./MDDScrennerSummary";
 
@@ -35,21 +35,16 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [totalRows, setTotalRows] = useState(0); // Total rows from API
   const [apiResponse, setApiResponse] = useState<any>(null); // Full API response for summary
 
-  // Pagination state
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: 0,
-    pageSize: 100,
-  });
+
 
   useEffect(() => {
     if (sectorwiseData) {
       fetchPaginatedData(sectorwiseData); // Fetch data for DataGrid
       fetchFullData(sectorwiseData); // Fetch full data for Summary
     }
-  }, [sectorwiseData, paginationModel]);
+  }, [sectorwiseData]);
 
   const fetchPaginatedData = async (
     data: MDDScreenerDataTableProps["sectorwiseData"]
@@ -74,8 +69,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       t1d_issueprice: data.t1d_issueprice,
       percentage_primary: data.Primary,
       sponsor: data.Sponsor,
-      page: paginationModel.page + 1, // API pages are often 1-indexed
-      pageSize: paginationModel.pageSize,
+
     };
 
     try {
@@ -101,7 +95,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
             id: index + 1,
           }))
         );
-        setTotalRows(result.pagination?.total_items || 0);
       } else {
         throw new Error("Failed to fetch paginated data");
       }
@@ -238,9 +231,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
         <DataGrid
           rows={filteredRows.map((row, index) => ({ ids: index, ...row }))}
           columns={columns}
-          //  rowCount={filteredRows.length}
-          paginationMode="server"
-          rowCount={totalRows}
           loading={loading}
           rowHeight={35}
           hideFooter

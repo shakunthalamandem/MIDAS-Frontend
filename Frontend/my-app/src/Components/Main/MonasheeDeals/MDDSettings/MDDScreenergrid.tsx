@@ -35,18 +35,13 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Pagination state
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: 0,
-    pageSize: 100,
-  });
-  const [totalRows, setTotalRows] = useState(0); // Total rows from API
+
 
   useEffect(() => {
     if (sectorwiseData) {
       fetchDataFromApi(sectorwiseData);
     }
-  }, [sectorwiseData, paginationModel]);
+  }, [sectorwiseData]);
 
   const fetchDataFromApi = async (
     data: MDDScreenergridProps["sectorwiseData"]
@@ -60,9 +55,8 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       deal_type: data.deal_type, // Array of deal types
       sector: data.gics_sector, // Array of sectors
       lead_bank: data.lead_bank, // Array of lead banks
-      year_range: data.years, // Array of years
-      page: paginationModel.page + 1, // API pages are often 1-indexed
-      pageSize: paginationModel.pageSize,
+      year_range: data.years // Array of years
+
     };
 
     try {
@@ -88,7 +82,6 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
             id: index + 1,
           }))
         );
-        setTotalRows(result.pagination?.total_items || 0); // Set total rows
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -175,7 +168,6 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
           rows={filteredRows.map((row, index) => ({ ids: index, ...row }))}
           columns={columns}
           rowCount={filteredRows.length}
-          paginationMode="server"
           loading={loading}
           rowHeight={35}
           hideFooter
