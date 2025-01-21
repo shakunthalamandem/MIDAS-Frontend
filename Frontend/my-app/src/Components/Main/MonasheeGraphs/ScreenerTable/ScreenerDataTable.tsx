@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Box, Card, CardContent, TextField, Typography } from "@mui/material";
-import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
-import { debounce } from "lodash";
+import React, { useState, useEffect } from "react";
+import { Box, TextField, Typography } from "@mui/material";
+import { DataGrid, GridColDef,  } from "@mui/x-data-grid";
 
 interface ScreenerDataRow {
   pricing_date: string;
