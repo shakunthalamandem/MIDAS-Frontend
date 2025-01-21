@@ -26,6 +26,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
 }) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [count, setCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
 
@@ -69,11 +70,13 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
 
       if (response.ok) {
         const result = await response.json();
+        setCount(result.count)
         setRows(
           (result.data || []).map((item: ScreenerDataRow, index: number) => ({
             ...item,
             id: index + 1,
           }))
+          
         );
         // setTotalRows(result.pagination?.total_items || 0);
       } else {
@@ -138,7 +141,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
           >
             {" "}
             Total no of deals:{" "}
-            <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
+            <span style={{ color: "#004b33" }}>{count}</span>
           </Typography>
           <TextField
             variant="outlined"

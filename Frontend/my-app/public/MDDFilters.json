@@ -33,7 +33,7 @@
    
       "t1_return": {
         "options": [
-          ">4", "2% to 4%", "0% to 2%", "-2% to 0%", "<-2%"
+          ">40%", "20% to 40%", "0% to 20%", "-20% to 0%", "<-20%"
         ],
         "label": "T+1D Returns",
         "description": "The return of deals on the first trade date from the pricing date."
@@ -41,7 +41,7 @@
     
       "t1m_returns": {
         "options": [
-          ">4", "2% to 4%", "0% to 2%", "-2% to 0%", "<-2%"
+          ">40%", "20% to 40%", "0% to 20%", "-20% to 0%", "<-20%"
         ],
         "label": "T+1M Returns",
         "description": "The return of deals on one month from the pricing date."
