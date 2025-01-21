@@ -117,9 +117,10 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                       {
                         label: "Deal Value:",
                         value: item.deal_value
-                          ? new Intl.NumberFormat('en-US', {}).format(Number(item.deal_value))
+                          ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.deal_value))}`
                           : "N/A"
                       }
+                      
                     ].map((row, i) => (   
                       <TableRow
                         key={i}
@@ -159,15 +160,24 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                 <Table size="small" aria-label="Deal Info Table 2">
                   <TableBody>
                     {[
-                      { label: "Issue Price:", value: (Number(item.issue_price_usd)).toFixed(2) },
+                      { label: "Issue Price:", value: "$" + (Number(item.issue_price_usd)).toFixed(2) },
                       { label: "T+1 Month Returns:", value: (Number(item.t_plus_1m_returns)).toFixed(2) + "%" },
                       { label: "T+1 Day Returns:", value: (Number(item.t_plus_1_return)).toFixed(2) + "%" },
                       { label: "T+1 Day Returns (Index Adjusted):", value: (Number(item.t_plus_1d_returns_index_returns)).toFixed(2) + "%" },
                       { label: "T+1 Month Returns (Index Adjusted):", value: (Number(item.t_plus_1m_returns_index_returns)).toFixed(2) + "%" },
                       
-                      { label: "Opportunity Value Ex:", value: item.opportunity_value_ex
-                        ? new Intl.NumberFormat('en-US', {}).format(Number(item.opportunity_value_ex))
-                        : "N/A" }
+                      {
+                        label: "Opportunity Value Ex:",
+                        value: item.opportunity_value_ex
+                          ? new Intl.NumberFormat('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                              minimumFractionDigits: 0,
+                            }).format(Number(item.opportunity_value_ex))
+                          : "N/A"
+                      }
+                      
+                      
                       
                       
                       
