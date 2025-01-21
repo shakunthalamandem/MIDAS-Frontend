@@ -40,13 +40,14 @@ interface MDDSelectedTickerProps {
 const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   const [data, setData] = useState<TickerData[]>([]);
   const [loading, setLoading] = useState(true);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     // Fetch data from API
     const fetchData = async () => {
       try {
         const response = await axios.post<ApiResponse>(
-          "http://192.168.1.59:9000/api/mdd_super_screener/",
+          `${apiUrl}/api/mdd_super_screener/`,
           { ticker }
         );
         // Now TypeScript knows the structure of the response

@@ -22,6 +22,7 @@ const MDDDealSearch: React.FC = () => {
   const [results, setResults] = useState<MDDResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -35,7 +36,7 @@ const MDDDealSearch: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://192.168.1.59:9000/api/mdd_search/${query}`
+        `${apiUrl}/api/mdd_search/${query}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch results");

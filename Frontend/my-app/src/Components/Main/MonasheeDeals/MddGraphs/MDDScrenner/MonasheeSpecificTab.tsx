@@ -42,6 +42,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
   const { values, setFieldValue, errors, touched } = useFormikContext<any>();
   const [dealCaptainOptions, setDealCaptainOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     // Fetch deal_captain options from API
@@ -50,7 +51,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
       try {
         const response = await axios.get<{
           deal_captain?: { options: string[] };
-        }>("http://192.168.1.59:9000/api/mdd_screener_filters/");
+        }>(`${apiUrl}/api/mdd_screener_filters/`);
 
         const dealCaptainData = response.data?.deal_captain;
 
