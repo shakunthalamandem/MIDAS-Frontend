@@ -114,8 +114,13 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                       { label: "GICS Sector:", value: item.gics_sector },
                       { label: "Region:", value: item.broad_region },
                       { label: "Deal Type:", value: item.deal_type },
-                      { label: "Deal Value:", value: item.deal_value },
-                    ].map((row, i) => (
+                      {
+                        label: "Deal Value:",
+                        value: item.deal_value
+                          ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(item.deal_value))
+                          : "N/A"
+                      }
+                    ].map((row, i) => (   
                       <TableRow
                         key={i}
                         sx={{
@@ -159,7 +164,12 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                       { label: "T+1 Day Returns:", value: item.t1_return },
                       { label: "T+1 Day Returns (Index Adjusted):", value: item.t1d_returns_index_returns },
                       { label: "T+1 Month Returns (Index Adjusted):", value: item.t1m_returns_index_returns },
-                      { label: "Opportunity Value Ex:", value: item.opportunity_value_ex },
+                      { label: "Opportunity Value Ex:", value: item.opportunity_value_ex
+                        ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(item.opportunity_value_ex))
+                        : "N/A" }
+                      
+                      
+                      
                     ].map((row, i) => (
                       <TableRow
                         key={i}
