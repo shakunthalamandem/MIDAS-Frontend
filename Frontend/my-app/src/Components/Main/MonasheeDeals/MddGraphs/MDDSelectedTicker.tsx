@@ -16,14 +16,15 @@ interface TickerData {
   deal_size: string;
   last_price_t1: string;
   issue_offer_price: string;
-  discount_from_announcement_price: string | null;
-  t1m_excess_returns: string | null;
-  t1d_return_from_bloomberg: string | null;
-  allocation_deal_size_percentage: string | null;
-  allocation_percentage: string | null;
+  fo_discount: string | null;
+  t1m_returns: string | null;
+  t1d_returns: string | null;
+  allocation_deal_size: string | null;
+  allocation_ioi: string | null;
   average_hold_period: string | null;
   percentage_primary: string | null;
-  sponsor_yn: string | null;
+  sponsor: string | null;
+  
 }
 
 // Define the structure of the response (the API wraps data inside a 'data' property)
@@ -111,15 +112,15 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <Table size="small" aria-label="Deal Info Table 2">
                       <TableBody>
                         {[
-                          { label: "T+1M Excess Returns:", value: item.t1m_excess_returns ?? "N/A" },
+                          { label: "T+1M Excess Returns:", value: item.t1m_returns ?? "N/A" },
                           { label: "Percentage Primary:", value: item.percentage_primary ?? "N/A" },
-                          { label: "T+1D Return (Bloomberg):", value: item.t1d_return_from_bloomberg ?? "N/A" },
-                          { label: "Discount from Announcement Price:", value: item.discount_from_announcement_price ?? "N/A" },
-                          { label: "Allocation Deal Size %:", value: item.allocation_deal_size_percentage ?? "N/A" },
+                          { label: "T+1D Return (Bloomberg):", value: item.t1d_returns ?? "N/A" },
+                          { label: "Discount from Announcement Price:", value: item.fo_discount ?? "N/A" },
+                          { label: "Allocation Deal Size %:", value: item.allocation_deal_size ?? "N/A" },
                           { label: "Average Hold Period:", value: item.average_hold_period ?? "N/A" },
                           { label: "Last Price T1:", value: item.last_price_t1 },
-                          { label: "Allocation Percentage:", value: item.allocation_percentage ?? "N/A" },
-                          { label: "Sponsor Y/N:", value: item.sponsor_yn ?? "N/A" },
+                          { label: "Allocation Percentage:", value: item.allocation_ioi ?? "N/A" },
+                          { label: "Sponsor Y/N:", value: item.sponsor ?? "N/A" },
                         ].map((row, i) => (
                           <TableRow key={i}>
                             <TableCell sx={{ fontWeight: "bold" }}>{row.label}</TableCell>
