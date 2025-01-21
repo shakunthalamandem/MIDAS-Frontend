@@ -54,41 +54,52 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Box sx={{ width: "100%", padding: 2 }}>
-        <Card sx={{ boxShadow: 3, borderRadius: 2, padding: 2 }}>
-          <CardContent>
-            <Typography variant="h5" color="#002060" gutterBottom>
-              Investment Strategies Screener
+      <Typography variant="h5" color="#002060" align="center" style={{ fontWeight: 'bold' }}>
+      Investment Strategies Screener
             </Typography>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              centered
-              sx={{
-                backgroundColor: "#000000",
-                borderRadius: 1,
-                "& .MuiTab-root": {
-                  fontWeight: "bold",
-                  color: "#828282",
-                  transition: "color 0.3s ease",
-                },
-                "& .Mui-selected": {
-                  color: "#e17400 !important",
-                  transition: "color 0.3s ease",
-                },
-                "& .MuiTabs-indicator": {
-                  backgroundColor: "#e17400 !important",
-                },
-                "& .MuiButtonBase-root-MuiTab-root": {
-                  backgroundColor: "#e17400 !important",
-                },
-              }}
-            >
+        <Card sx={{ boxShadow: 3, borderRadius: 2, padding: 2,mt:3 }}>
+          <CardContent>
+
+                 <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    centered
+                    TabIndicatorProps={{
+                      style: { display: "none" },
+                    }}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      margin: "10px 0",
+                      "& .MuiTab-root": {
+                        backgroundColor: "#E3E6F0", // Neutral background for unselected tabs
+                        color: "#002060", // Dark blue text for contrast
+                        borderRadius: "12px",
+                        padding: "10px 20px",
+                        fontSize: "0.9rem",
+                        fontWeight: "600",
+                        margin: "0 5px",
+                        textTransform: "none", // Avoid all caps
+                        transition: "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
+                        "&:hover": {
+                          backgroundColor: "#DCE6F0", // Slightly lighter shade on hover
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                        },
+                      },
+                      "& .Mui-selected": {
+                        backgroundColor: "#013e3a", // Vibrant orange for selected tab
+                        color: "#ffffff", // White text for selected tab
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Stronger shadow for selected tab
+                      },
+                    }}
+                  >
               <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
               <Tab label="Fundamentals" aria-label="Fundamentals Filters" />
               <Tab label="Technical" aria-label="Technical Filters" />
             </Tabs>
 
-            <Box sx={{ marginTop: 2 }}>
+            <Box sx={{ marginTop: 4 }}>
               {value === 0 && (
                 <MonasheeS3
                   data={filtersData["Monashee Specific"]}
