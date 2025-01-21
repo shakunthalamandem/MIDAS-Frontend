@@ -13,7 +13,7 @@ interface TickerData {
   issuer_name: string;
   ticker_symbol: string;
   gics_sector: string;
-  us_international: string;
+  broad_region: string;
   deal_type: string;
   deal_value: string;
   issue_price: string;
@@ -112,7 +112,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                       { label: "Issuer Name:", value: item.issuer_name },
                       { label: "Ticker Symbol:", value: item.ticker_symbol },
                       { label: "GICS Sector:", value: item.gics_sector },
-                      { label: "Region:", value: item.us_international },
+                      { label: "Region:", value: item.broad_region },
                       { label: "Deal Type:", value: item.deal_type },
                       { label: "Deal Value:", value: item.deal_value },
                     ].map((row, i) => (
