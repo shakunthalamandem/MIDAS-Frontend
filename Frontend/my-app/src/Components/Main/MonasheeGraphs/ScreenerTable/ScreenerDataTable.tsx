@@ -28,17 +28,13 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: 0,
-    pageSize: 100,
-  });
-  const [totalRows, setTotalRows] = useState<number>(0);
+
 
   useEffect(() => {
     if (sectorwiseData) {
       fetchDataFromApi(sectorwiseData);
     }
-  }, [sectorwiseData, paginationModel]);
+  }, [sectorwiseData]);
 
   const fetchDataFromApi = async (
     data: ScreenerDataTableProps["sectorwiseData"]
@@ -55,8 +51,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
       t_plus_1_return: data.t_plus_1_return,
       t_plus_1m_returns: data.t_plus_1m_returns,
       left_lead_bank: data.left_lead_bank,
-      pageSize: paginationModel.pageSize,
-      page: paginationModel.page + 1,
+
     };
 
     try {
@@ -81,7 +76,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
             id: index + 1,
           }))
         );
-        setTotalRows(result.pagination?.total_items || 0);
+        // setTotalRows(result.pagination?.total_items || 0);
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -160,7 +155,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
             rows={filteredRows.map((row, index) => ({ id: index, ...row }))}
             columns={columns}
             rowCount={filteredRows.length}
-            paginationMode="server"
             loading={loading}
             rowHeight={35}
             hideFooter // Hides the entire footer, including pagination controls
