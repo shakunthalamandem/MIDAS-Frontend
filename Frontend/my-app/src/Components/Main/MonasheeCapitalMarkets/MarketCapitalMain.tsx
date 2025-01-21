@@ -107,7 +107,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
 
       {apiData && (
         <>
-          {/* Card for Number of Deals */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <NumberOfDeals
@@ -117,27 +116,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
             </CardContent>
           </Card>
 
-          {/* Card for Region Wise and Sector Wise Deals */}
-          <Card sx={{ mb: 4 }}>
-            <CardContent>
-              <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
-                  <RegionWiseDeals
-                    data={apiData.regions}
-                    selectedMetric={selectedMetric}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <SectorWiseDeals
-                    data={apiData.sectors}
-                    selectedMetric={selectedMetric}
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-
-          {/* Card for Yearly Sector Chart */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <YearlySectorChart
@@ -146,12 +124,28 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
               />
             </CardContent>
           </Card>
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <SectorWiseDeals
+                data={apiData.sectors}
+                selectedMetric={selectedMetric}
+              />
+            </CardContent>
+          </Card>
 
-          {/* Card for Region Wise Chart */}
           <Card>
             <CardContent>
               <RegionWiseChart
                 data={apiData.year_wise_region}
+                selectedMetric={selectedMetric}
+              />
+            </CardContent>
+          </Card>
+
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <RegionWiseDeals
+                data={apiData.regions}
                 selectedMetric={selectedMetric}
               />
             </CardContent>

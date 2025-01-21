@@ -8,7 +8,6 @@ interface TickerData {
   pricing_date: string;
   issuer_name: string;
   ticker: string;
-  region: string;
   gics_sector_from_bloomberg: string;
   deal_captain: string | null;
   broad_region: string;
@@ -101,7 +100,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <strong>Ticker:</strong> {item.ticker}
                   </Typography>
                   <Typography>
-                    <strong>Region:</strong> {item.region}
+                    <strong>Region:</strong> {item.broad_region}
                   </Typography>
                   <Typography>
                     <strong>GICS Sector:</strong>{" "}
