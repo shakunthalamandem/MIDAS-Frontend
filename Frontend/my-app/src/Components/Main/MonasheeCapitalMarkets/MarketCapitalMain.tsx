@@ -107,7 +107,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
 
       {apiData && (
         <>
-          {/* Card for Number of Deals */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <NumberOfDeals
@@ -117,7 +116,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
             </CardContent>
           </Card>
 
-          {/* Card for Region Wise and Sector Wise Deals */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <YearlySectorChart
@@ -134,7 +132,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
               />
             </CardContent>
           </Card>
-          {/* Card for Yearly Sector Chart */}
 
           <Card>
             <CardContent>
@@ -144,7 +141,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
               />
             </CardContent>
           </Card>
-      
+
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <RegionWiseDeals
@@ -153,11 +150,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
               />
             </CardContent>
           </Card>
-
-         
-
-          {/* Card for Region Wise Chart */}
-         
         </>
       )}
     </Container>
