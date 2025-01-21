@@ -72,7 +72,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
         throw new Error("API URL is not defined in environment variables");
       }
 
-      const response = await fetch(`${apiUrl}/api/mdd_super_screener/`, {
+      const response = await fetch(`${apiUrl}/api/mdd_screener/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

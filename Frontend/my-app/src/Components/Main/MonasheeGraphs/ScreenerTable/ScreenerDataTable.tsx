@@ -65,7 +65,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({
         throw new Error("API URL is not defined in environment variables");
       }
 
-      const response = await fetch(`${apiUrl}/api/super_screener/`, {
+      const response = await fetch(`${apiUrl}/api/dealogic_screener/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

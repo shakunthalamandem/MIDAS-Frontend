@@ -47,7 +47,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
     const fetchData = async () => {
       try {
         const response = await axios.post<ApiResponse>(
-          `${apiUrl}/api/mdd_super_screener/`,
+          `${apiUrl}/api/mdd_screener/`,
           { ticker }
         );
         // Now TypeScript knows the structure of the response
