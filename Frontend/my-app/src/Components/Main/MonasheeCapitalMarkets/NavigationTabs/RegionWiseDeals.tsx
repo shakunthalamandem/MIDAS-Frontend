@@ -47,7 +47,7 @@ const RegionWiseDeals: React.FC<RegionWiseDealsProps> = ({ data, selectedMetric 
             nameKey="name"
             cx="50%"
             cy="50%"
-            outerRadius={150}
+            outerRadius={100}
             fill="#8884d8"
             label={({ name, value }) => `${name}: ${formatNumber(value)}`} // Format labels
           >

@@ -8,7 +8,6 @@ import {
   Typography,
   Card,
   CardContent,
-  CardHeader,
 } from "@mui/material";
 import NumberOfDeals from "./NavigationTabs/NumberOfDeals";
 import RegionWiseDeals from "./NavigationTabs/RegionWiseDeals";
@@ -26,7 +25,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
   const [apiData, setApiData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMetric, setSelectedMetric] = useState<string>("count"); // Default to "count" (Deal Count)
+  const [selectedMetric, setSelectedMetric] = useState<string>("count");
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedMetric(event.target.value);
@@ -70,7 +69,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      
       {loading && <p>Loading...</p>}
 
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -145,15 +143,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
               <YearlySectorChart
                 data={apiData.year_wise_sector}
                 selectedMetric={selectedMetric}
-                checkedItems={
-                  Array.isArray(selectedFilters?.sector)
-                    ? selectedFilters.sector.filter(
-                        (item): item is string => typeof item === "string"
-                      )
-                    : typeof selectedFilters?.sector === "string"
-                    ? [selectedFilters.sector]
-                    : []
-                }
               />
             </CardContent>
           </Card>
@@ -164,15 +153,6 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
               <RegionWiseChart
                 data={apiData.year_wise_region}
                 selectedMetric={selectedMetric}
-                checkedItems={
-                  Array.isArray(selectedFilters?.region)
-                    ? selectedFilters.region.filter(
-                        (item): item is string => typeof item === "string"
-                      )
-                    : typeof selectedFilters?.region === "string"
-                    ? [selectedFilters.region]
-                    : []
-                }
               />
             </CardContent>
           </Card>
