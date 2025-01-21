@@ -23,9 +23,7 @@ const formatValue = (value: number): string => {
   return `$${value.toFixed(2)}`;
 };
 
-const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
-  apiResponse,
-}) => {
+const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({ apiResponse }) => {
   // Helper function to calculate the summary
   const calculateSummary = (data: any[]): Summary => {
     let totalDealSize = 0;
@@ -37,57 +35,34 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
     let count = 0;
 
     data.forEach((item) => {
-      // Correct mapping for the fields in API response
-      const dealSize = item.deal_size
-        ? parseFloat(item.deal_size.replace(/[^0-9.-]+/g, ""))
-        : 0;
-      if (!isNaN(dealSize)) totalDealSize += dealSize;
+      // Use the fields directly as numbers
+      const dealSize = item.deal_size || 0;
+      totalDealSize += dealSize;
 
       // T+1D Issue Price
-      if (item["t1d_issueprice"]) {
-        const issuePrice = parseFloat(
-          item["t1d_issueprice"].replace(/[^0-9.-]+/g, "")
-        );
-        if (!isNaN(issuePrice)) totalT1DIssuePrice += issuePrice;
-      }
+      const t1DIssuePrice = item.tplus_1d_issueprice || 0;
+      totalT1DIssuePrice += t1DIssuePrice;
 
-      // FO Discount
-      if (item.fo_discount) {
-        const foDiscount = parseFloat(
-          item.fo_discount.replace(/[^0-9.-]+/g, "")
-        );
-        if (!isNaN(foDiscount)) totalFoDiscount += foDiscount;
-      }
+      // FO Discount (handle potential null values)
+      const foDiscount = item.fo_discount || 0;
+      totalFoDiscount += foDiscount;
 
       // T+1M Returns
-      if (item["t1m_returns"]) {
-        const t1mReturns = parseFloat(
-          item["t1m_returns"].replace(/[^0-9.-]+/g, "")
-        );
-        if (!isNaN(t1mReturns)) totalT1MReturns += t1mReturns;
-      }
+      const t1MReturns = item.t1m_returns || 0;
+      totalT1MReturns += t1MReturns;
 
       // T+1D Returns
-      if (item["t1d_returns"]) {
-        const t1dReturns = parseFloat(
-          item["t1d_returns"].replace(/[^0-9.-]+/g, "")
-        );
-        if (!isNaN(t1dReturns)) totalT1DReturns += t1dReturns;
-      }
+      const t1DReturns = item.t1d_returns || 0;
+      totalT1DReturns += t1DReturns;
 
       // Allocation Deal Size
-      if (item.allocation_deal_size) {
-        const allocationDealSize = parseFloat(
-          item.allocation_deal_size.replace(/[^0-9.-]+/g, "")
-        );
-        if (!isNaN(allocationDealSize))
-          totalAllocationDealSize += allocationDealSize;
-      }
+      const allocationDealSize = item.allocation_deal_size || 0;
+      totalAllocationDealSize += allocationDealSize;
 
       count += 1;
     });
 
-    // Calculate averages for fields except deal size
+    // Calculate averages for fields
     return {
       totalDealSize,
       avgT1DIssuePrice: count > 0 ? totalT1DIssuePrice / count : 0,
@@ -118,7 +93,6 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
         justifyContent: "center",
         alignItems: "center",
         marginTop: 8,
-        
       }}
     >
       <Card
@@ -161,17 +135,13 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
               }}
             >
               <Typography variant="body1" gutterBottom>
-                <strong>Total Deal Size:</strong> 
-                {/* {summary.totalDealSize.toLocaleString()} */}
-                {formatValue(summary.totalDealSize)}
+                <strong>Total Deal Size:</strong> {formatValue(summary.totalDealSize)}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                <strong>Avg T+1D Issue Price:</strong>{" "}
-                {summary.avgT1DIssuePrice.toFixed(2)}%
+                <strong>Avg T+1D Issue Price:</strong> {summary.avgT1DIssuePrice.toFixed(2)}%
               </Typography>
               <Typography variant="body1" gutterBottom>
-                <strong>Avg FO Discount:</strong>{" "}
-                {summary.avgFoDiscount.toFixed(2)}%
+                <strong>Avg FO Discount:</strong> {summary.avgFoDiscount.toFixed(2)}%
               </Typography>
             </Box>
 
@@ -188,12 +158,10 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({
               }}
             >
               <Typography variant="body1" gutterBottom>
-                <strong>Avg T+1M Returns:</strong>{" "}
-                {summary.avgT1MReturns.toFixed(2)}%
+                <strong>Avg T+1M Returns:</strong> {summary.avgT1MReturns.toFixed(2)}%
               </Typography>
               <Typography variant="body1" gutterBottom>
-                <strong>Avg T+1D Returns:</strong>{" "}
-                {summary.avgT1DReturns.toFixed(2)}%
+                <strong>Avg T+1D Returns:</strong> {summary.avgT1DReturns.toFixed(2)}%
               </Typography>
             </Box>
           </Box>
