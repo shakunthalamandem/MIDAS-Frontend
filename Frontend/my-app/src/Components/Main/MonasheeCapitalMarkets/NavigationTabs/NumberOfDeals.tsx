@@ -18,8 +18,9 @@ interface NumberOfDealsProps {
 const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) => {
   // Prepare the data for the chart, based on the selected metric
   const chartData = Object.entries(data).map(([year, stats]) => {
-    const ipoValue = stats[selectedMetric]?.IPO || 0; // IPO value for the selected metric
-    const foValue = stats[selectedMetric]?.FO || 0; // FO value for the selected metric
+    const ipoValue = stats["IPO"]?.[selectedMetric] || 0;
+    const foValue = stats["FO"]?.[selectedMetric] || 0;
+
     return {
       year,
       IPO: ipoValue,
@@ -27,29 +28,29 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
     };
   });
 
+  // Format numbers conditionally based on the metric
   const formatNumber = (value: number): string => {
     if (selectedMetric === "count") {
-      return value.toString(); 
+      return value.toString(); // Just show the number
     }
-  
-    const absValue = Math.abs(value); 
-    let formattedValue: string;
-  
-    if (absValue >= 1e9) {
-      formattedValue = `${(absValue / 1e9).toFixed(1)}B`; 
-    } else if (absValue >= 1e6) {
-      formattedValue = `${(absValue / 1e6).toFixed(1)}M`; 
-    } else if (absValue >= 1e3) {
-      formattedValue = `${(absValue / 1e3).toFixed(1)}K`; 
-    } else {
-      formattedValue = absValue.toString(); 
-    }
-  
-    return value < 0 ? `-${formattedValue}` : formattedValue; // Add negative sign if necessary
-  };
-  
 
-  // Custom tooltip
+    const absValue = Math.abs(value);
+    let formattedValue: string;
+
+    if (absValue >= 1e9) {
+      formattedValue = `${(absValue / 1e9).toFixed(1)}B`; // Billion
+    } else if (absValue >= 1e6) {
+      formattedValue = `${(absValue / 1e6).toFixed(1)}M`; // Million
+    } else if (absValue >= 1e3) {
+      formattedValue = `${(absValue / 1e3).toFixed(1)}K`; // Thousand
+    } else {
+      formattedValue = absValue.toString(); // No formatting for values < 1000
+    }
+
+    return value < 0 ? `-${formattedValue}` : formattedValue;
+  };
+
+  // Custom tooltip to display detailed information
   const CustomTooltip = ({
     active,
     payload,
@@ -81,9 +82,9 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
               {`${entry.name}: ${selectedMetric === "count" ? entry.value : formatNumber(entry.value)}`}
             </p>
           ))}
-          <p style={{ margin: 0, fontWeight: "bold",color:'#002060' }}>{`Total: ${
-            selectedMetric === "count" ? total : formatNumber(total)
-          }`}</p>
+          <p style={{ margin: 0, fontWeight: "bold", color: "#002060" }}>
+            {`Total: ${selectedMetric === "count" ? total : formatNumber(total)}`}
+          </p>
         </div>
       );
     }
@@ -94,10 +95,10 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
     <Box>
       {/* Stacked Bar Chart using Recharts */}
       <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={chartData} stackOffset="sign">
+        <BarChart data={chartData}>
           <XAxis dataKey="year" />
           <YAxis tickFormatter={formatNumber} /> {/* Conditional formatting */}
-          <Tooltip content={<CustomTooltip />} /> {/* Custom tooltip with conditional formatting */}
+          <Tooltip content={<CustomTooltip />} />
           <Legend />
           <Bar dataKey="IPO" stackId="a" fill="#8884d8" />
           <Bar dataKey="FO" stackId="a" fill="#82ca9d" />
