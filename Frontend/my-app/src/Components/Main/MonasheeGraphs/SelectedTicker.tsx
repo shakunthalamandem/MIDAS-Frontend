@@ -20,7 +20,7 @@ interface TickerData {
   t1m_returns: string;
   t1_return: string;
   t1d_returns_index_returns: string;
-  t1m_returns_index_returns: string;
+  t_plus_1m_returns_index_returns: string;
   opportunity_value_ex: string;
 }
 
@@ -163,7 +163,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                       { label: "T+1 Month Returns:", value: item.t1m_returns },
                       { label: "T+1 Day Returns:", value: item.t1_return },
                       { label: "T+1 Day Returns (Index Adjusted):", value: item.t1d_returns_index_returns },
-                      { label: "T+1 Month Returns (Index Adjusted):", value: item.t1m_returns_index_returns },
+                      { label: "T+1 Month Returns (Index Adjusted):", value: item.t_plus_1m_returns_index_returns },
                       { label: "Opportunity Value Ex:", value: item.opportunity_value_ex
                         ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(item.opportunity_value_ex))
                         : "N/A" }
