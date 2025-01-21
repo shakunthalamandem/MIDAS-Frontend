@@ -120,34 +120,22 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
           {/* Card for Region Wise and Sector Wise Deals */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
-              <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
-                  <RegionWiseDeals
-                    data={apiData.regions}
-                    selectedMetric={selectedMetric}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <SectorWiseDeals
-                    data={apiData.sectors}
-                    selectedMetric={selectedMetric}
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-
-          {/* Card for Yearly Sector Chart */}
-          <Card sx={{ mb: 4 }}>
-            <CardContent>
               <YearlySectorChart
                 data={apiData.year_wise_sector}
                 selectedMetric={selectedMetric}
               />
             </CardContent>
           </Card>
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <SectorWiseDeals
+                data={apiData.sectors}
+                selectedMetric={selectedMetric}
+              />
+            </CardContent>
+          </Card>
+          {/* Card for Yearly Sector Chart */}
 
-          {/* Card for Region Wise Chart */}
           <Card>
             <CardContent>
               <RegionWiseChart
@@ -156,6 +144,20 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
               />
             </CardContent>
           </Card>
+      
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <RegionWiseDeals
+                data={apiData.regions}
+                selectedMetric={selectedMetric}
+              />
+            </CardContent>
+          </Card>
+
+         
+
+          {/* Card for Region Wise Chart */}
+         
         </>
       )}
     </Container>
