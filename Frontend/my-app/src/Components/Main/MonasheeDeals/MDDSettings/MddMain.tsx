@@ -38,7 +38,6 @@ const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
 
   return<>
   <MDDFilters filtersData={filtersData} apiName={apiName} />;
-  {/* <MDDScreenergrid sectorwiseData={filtersData || {}} /> */}
 
   
   </> 

@@ -16,10 +16,10 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { LoadingButton } from "@mui/lab"; // Import LoadingButton
-import DealAllocationGraph from "./DealAllocationGraph";
 import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
 import MDDScreenergrid from "./MDDScreenergrid";
+import DealStatsGraph from "./DealStatsGraph";
 
 interface FilterOption {
   options: (string | number)[]; // Options can be either string or number
@@ -137,7 +137,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         marginBottom: 20,
         display: "flex",
         marginLeft: 0,
-        marginTop: 10,
+        marginTop: 0,
       }}
     >
       <Box width="320px" sx={{ marginRight: 10 }}>
@@ -316,7 +316,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         <AvgFoDiscountChart data={apiData} />
       ) : (
         <>
-        <DealAllocationGraph responseData={apiData} apiName={apiName} />
+        <DealStatsGraph responseData={apiData} />
+        
         <MDDScreenergrid sectorwiseData={payload} /> 
 </>
       )}

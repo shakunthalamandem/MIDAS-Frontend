@@ -170,7 +170,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
           rowCount={filteredRows.length}
           loading={loading}
           rowHeight={35}
-          hideFooter
+          // hideFooter
           sx={{
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "transparent",
