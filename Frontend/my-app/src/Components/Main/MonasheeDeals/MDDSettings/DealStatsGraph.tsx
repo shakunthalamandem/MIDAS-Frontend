@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import './DealStats.css';
 import {
   Box,
   Typography,
@@ -107,23 +108,24 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
 
   return (
     <div>
-      <div>
-        {/* <Typography variant="h6">Select a Deal Stats Option</Typography> */}
-        <RadioGroup
-          row
-          value={selectedOption} // This ensures that selectedOption is updated when a new option is selected
-          onChange={(e) => setSelectedOption(e.target.value)} // Handles the selection of an option
-        >
-          {dealStatsOptions.map((option) => (
-            <FormControlLabel
-              key={option.key}
-              value={option.key}
-              control={<Radio />}
-              label={option.label}
-            />
-          ))}
-        </RadioGroup>
-      </div>
+      <Box className="deal-stats-container">
+      <RadioGroup
+        row
+        value={selectedOption}
+        onChange={(e) => setSelectedOption(e.target.value)}
+        className="radio-group"
+      >
+        {dealStatsOptions.map((option) => (
+          <FormControlLabel
+            key={option.key}
+            value={option.key}
+            control={<Radio className="custom-radio" />}
+            label={option.label}
+            className={`radio-option ${selectedOption === option.key ? 'selected' : ''}`}
+          />
+        ))}
+      </RadioGroup>
+    </Box>
 
       {/* Show Normal/Weighted options if selectedOption is for allocation */}
       {(selectedOption === "mdd_allocation_ioi" || selectedOption === "mdd_allocation_percentage") && (

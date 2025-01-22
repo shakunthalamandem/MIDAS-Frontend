@@ -1,0 +1,59 @@
+.deal-stats-container {
+    text-align: center;
+    background: linear-gradient(to right, #190250, #6dd5ed);
+    padding: 5px;
+    border-radius: 15px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 1200px;
+    animation: fadeIn 1s ease-in-out;
+  }
+  
+  .title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+  
+  .radio-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .radio-option {
+    transition: transform 0.3s ease, color 0.3s ease;
+    color: #fff;
+    font-size: 18px;
+  }
+  
+  .radio-option:hover {
+    transform: scale(1.1);
+    color: #ffeb3b;
+  }
+  
+  .radio-option.selected {
+    font-weight: bold;
+    color: #ffeb3b;
+  }
+  
+  .custom-radio {
+    color: #fff !important;
+  }
+  
+  .custom-radio.Mui-checked {
+    color: #ffeb3b !important;
+    transform: scale(1.2);
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
