@@ -26,7 +26,6 @@ interface TickerData {
   percentage_primary: string | null;
   sponsor: string | null;
 
-}
 
 // Define the structure of the response (the API wraps data inside a 'data' property)
 interface ApiResponse {
