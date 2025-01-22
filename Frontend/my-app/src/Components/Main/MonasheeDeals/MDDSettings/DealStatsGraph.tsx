@@ -30,7 +30,7 @@ interface DealAllocationGraphProps {
 }
 
 const formatValue = (value: number, selectedOption: string): string => {
-  if (selectedOption === "mdd_deals_volume" || selectedOption === "avg_deal_size") {
+  if (selectedOption === "deal_size" || selectedOption === "avg_deal_size") {
     const absValue = Math.abs(value);
     if (absValue >= 1_000_000_000) {
       return `$${(value / 1_000_000_000).toFixed(1)}B`;
@@ -56,7 +56,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
     { label: "Deal Size", key: "deal_size" },
     { label: "Average Deal Size", key: "avg_deal_size" },
     { label: "MDD Allocation Percentage", key: "mdd_allocation_percentage" },
-    { label: "Allocation Percentage", key: "allocation_percentage" },
+    { label: "Allocation Percentage", key: "mdd_allocation_ioi" },
   ];
 
   const handleDialogClose = () => {
@@ -104,6 +104,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
   };
 
   const chartData = responseData && !responseData.message ? formatChartData(responseData) : [];
+  console.log(selectedOption)
 
   return (
     <div>
@@ -111,8 +112,8 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
         <Typography variant="h6">Select a Deal Stats Option</Typography>
         <RadioGroup
           row
-          value={selectedOption}
-          onChange={(e) => setSelectedOption(e.target.value)}
+          value={selectedOption} // This ensures that selectedOption is updated when a new option is selected
+          onChange={(e) => setSelectedOption(e.target.value)} // Handles the selection of an option
         >
           {dealStatsOptions.map((option) => (
             <FormControlLabel
