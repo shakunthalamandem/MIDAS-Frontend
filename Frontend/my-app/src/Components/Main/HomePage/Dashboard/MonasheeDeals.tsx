@@ -1,14 +1,10 @@
 import React, { useState } from "react";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
-import DealAllocation from "../../MonasheeDeals/MddGraphs/DealAllocation";
-import DealMDDIOI from "../../MonasheeDeals/MddGraphs/DealMDDIOI";
-import AvgDealSize from "../../MonasheeDeals/MddGraphs/AvgDealSize";
 import MDDScreener from "../../MonasheeDeals/MddGraphs/MDDScreener";
 import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
-import DealCount from "../../MonasheeDeals/MddGraphs/DealCount";
-import DealVolumeMDD from "../../MonasheeDeals/MddGraphs/DealVolumeMDD";
 import MDDDealSearch from "../../MonasheeDeals/MddGraphs/MDDDealSearch";
+import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 
 const MonasheeDeals: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -78,11 +74,7 @@ const MonasheeDeals: React.FC = () => {
         }}
       >
         <Tab label="Deal Search" />
-        <Tab label="Deal Count" />
-        <Tab label="Volume" />
-        <Tab label="Avg Size" />
-        <Tab label="Allocation % DealSize" />
-        <Tab label="Allocation % IOI" />
+        <Tab label="DealStats"/>
         <Tab label="Allocation Capture" />
         <Tab label="Follow-On Discount" />
         <Tab label="Screener" />
@@ -90,14 +82,11 @@ const MonasheeDeals: React.FC = () => {
 
       {/* Tab Content */}
       {value === 0 && <MDDDealSearch />}
-      {value === 1 && <DealCount />}
-      {value === 2 && <DealVolumeMDD />}
-      {value === 3 && <AvgDealSize />}
-      {value === 4 && <DealAllocation />}
-      {value === 5 && <DealMDDIOI />}
-      {value === 6 && <AllocationCaptureReturn />}
-      {value === 7 && <FOllowOnDiscount />}
-      {value === 8 && <MDDScreener />}
+      {value === 1 && <DealStats />}
+      {value === 2 && <AllocationCaptureReturn />}
+      {value === 3 && <FOllowOnDiscount />}
+      {value === 4 && <MDDScreener />}
+      
     </Box>
   );
 };

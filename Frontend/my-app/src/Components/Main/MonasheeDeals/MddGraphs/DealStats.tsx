@@ -2,7 +2,7 @@ import React from "react";
 import MddMain from "../MDDSettings/MddMain";
 import { Typography, Box } from "@mui/material";
 
-const DealVolumeMDD = () => {
+const DealStats = () => {
   return (
     <Box
       display="flex"
@@ -16,11 +16,11 @@ const DealVolumeMDD = () => {
         variant="h5" 
         sx={{ fontWeight: "bold", color: "#002060" }}
       >
-        Deal Volume
+        Deal Stats
       </Typography>
-      <MddMain apiName="mdd_deals_volume" />
+      <MddMain apiName="mdd_deals_graph" />
     </Box>
   );
 };
 
-export default DealVolumeMDD;
+export default DealStats;
