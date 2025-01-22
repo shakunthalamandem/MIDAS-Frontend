@@ -12,17 +12,19 @@ import {
   AccordionSummary,
   AccordionDetails,
   FormControlLabel,
+  RadioGroup,
+  Radio,
   TextField,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { LoadingButton } from "@mui/lab"; // Import LoadingButton
+import { LoadingButton } from "@mui/lab";
 import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
 import MDDScreenergrid from "./MDDScreenergrid";
 import DealStatsGraph from "./DealStatsGraph";
 
 interface FilterOption {
-  options: (string | number)[]; // Options can be either string or number
+  options: (string | number)[];
   label: string;
   description: string;
 }
@@ -32,7 +34,7 @@ interface Filter {
 }
 
 interface FiltersProps {
-  filtersData: Filter[]; // Accept filters as prop
+  filtersData: Filter[];
   apiName: string;
 }
 
@@ -44,11 +46,11 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   const [appliedFilters, setAppliedFilters] = useState<{
     [key: string]: (string | number)[];
   } | null>(null);
-  const [expanded, setExpanded] = useState<string | false>(false); // Track expanded state
+  const [expanded, setExpanded] = useState<string | false>(false);
   const [payload, setPayload] = useState<{ [key: string]: (string | number)[] }>({});
   const [apiData, setApiData] = useState({});
-  const [searchValue, setSearchValue] = useState<string>(""); // State for the search input
-  const [searchKey, setSearchKey] = useState<string | null>(null); // Track which filter's search bar is active
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [searchKey, setSearchKey] = useState<string | null>(null);
 
   useEffect(() => {
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
@@ -56,14 +58,13 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       const key = Object.keys(filter)[0];
       initialSelectedValues[key] = [];
     });
-    
+
     if (JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)) {
       setSelectedValues(initialSelectedValues);
       setAppliedFilters(initialSelectedValues);
       handleSubmit(initialSelectedValues);
     }
-  }, [filtersData]);  // This hook will only be triggered when filtersData changes
-  
+  }, [filtersData]);
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
@@ -72,27 +73,33 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     }));
   };
 
+  const handleSingleSelectionChange = (key: string, value: string | number) => {
+    setSelectedValues((prevState) => ({
+      ...prevState,
+      [key]: [value],
+    }));
+  };
+
   const handleSearchChange = (value: string, key: string) => {
     setSearchValue(value.toLowerCase());
-    setSearchKey(key); // Keep track of the filter being searched
+    setSearchKey(key);
   };
+
   const handleSubmit = async (filters = selectedValues) => {
     try {
       setLoading(true);
-  
       const payload: { [key: string]: (string | number)[] } = {};
       Object.keys(filters).forEach((key) => {
         payload[key] = filters[key] || [];
       });
-  
-      setPayload(payload); // Store the payload
-  
+
+      setPayload(payload);
+
       const apiUrl = process.env.REACT_APP_API_URL;
-  
       if (!apiUrl) {
         throw new Error("API URL is not defined in environment variables");
       }
-  
+
       const response = await fetch(`${apiUrl}/api/${apiName}/`, {
         method: "POST",
         headers: {
@@ -100,7 +107,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         },
         body: JSON.stringify(payload),
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         setApiData(result);
@@ -113,7 +120,6 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       setLoading(false);
     }
   };
-  
 
   const handleCancel = () => {
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
@@ -121,13 +127,11 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       const key = Object.keys(filter)[0];
       resetSelectedValues[key] = [];
     });
-    setSelectedValues(resetSelectedValues); // Reset the selected filters
-    setAppliedFilters(resetSelectedValues); // Reset the applied filters
-    setSearchValue(""); // Clear the search bar
-    setSearchKey(null); // Reset active search filter
+    setSelectedValues(resetSelectedValues);
+    setAppliedFilters(resetSelectedValues);
+    setSearchValue("");
+    setSearchKey(null);
   };
-
-
 
   return (
     <Container
@@ -137,32 +141,28 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         marginBottom: 20,
         display: "flex",
         marginLeft: 0,
-        marginTop: 0,
+        marginTop: 10,
       }}
     >
       <Box width="320px" sx={{ marginRight: 10 }}>
-        <Card
-          sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}
-        >
+        <Card sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}>
           <CardContent>
             <Box width="250px" sx={{ p: 2 }}>
               <Typography variant="h5" color="#002060" mb={4}>
-                Monashee Deal Filters
+                Monashee Deals Filters
               </Typography>
               {filtersData
                 .filter((filter) => {
                   const key = Object.keys(filter)[0];
-                  // Hide the 'deal type' filter if the API name is 'fo_discount'
                   return !(
                     (apiName === "fo_discount" || apiName === "allocation_capture") &&
-                    key === "deal_type"
+                    (key === "deal_type" || key === "period")
                   );
                 })
                 .map((filter) => {
                   const key = Object.keys(filter)[0];
                   const { options, label } = filter[key];
 
-                  // Apply search filtering for "lead_bank"
                   const filteredOptions =
                     label === "Lead Bank" && searchKey === key
                       ? options.filter((option) =>
@@ -170,15 +170,17 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                         )
                       : options;
 
+                  const isPeriodFilter = key === "period";
+
                   return (
                     <Accordion
                       key={key}
                       expanded={expanded === key}
                       onChange={() => setExpanded(expanded === key ? false : key)}
                       sx={{
-                        marginBottom: "10px", // Space between accordions
+                        marginBottom: "10px",
                         "&:before": {
-                          display: "none", // Hide default divider
+                          display: "none",
                         },
                       }}
                     >
@@ -187,27 +189,29 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                         aria-controls={`${key}-content`}
                         id={`${key}-header`}
                         sx={{
-                          backgroundColor: "#002060", // Accordion header background
-                          color: "white", // Text color in the header
+                          backgroundColor: "#002060",
+                          color: "white",
                           "& .MuiAccordionSummary-content": {
                             color: "white",
                           },
-                          transition: "background-color 0.3s ease", // Smooth transition on hover
+                          transition: "background-color 0.3s ease",
                           "&:hover": {
-                            backgroundColor: "#004080", // Darker shade on hover
+                            backgroundColor: "#004080",
                           },
                         }}
                       >
                         <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
                       </AccordionSummary>
                       {label === "Lead Bank" && (
-                        <div  style={{
-                          backgroundColor: "#f1f1f1", // Light background for the details
-                          padding: "10px 20px", // Padding inside accordion details
-                          borderRadius: "5px", // Rounded corners for accordion details
-                          textAlign: "left",
-                          maxHeight: "200px",
-                        }}>
+                        <div
+                          style={{
+                            backgroundColor: "#f1f1f1",
+                            padding: "10px 20px",
+                            borderRadius: "5px",
+                            textAlign: "left",
+                            maxHeight: "200px",
+                          }}
+                        >
                           <TextField
                             size="small"
                             placeholder="Search"
@@ -215,49 +219,62 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                             onChange={(e) => handleSearchChange(e.target.value, key)}
                             sx={{ mb: 2 }}
                           />
-                          </div>
-                        )}
+                        </div>
+                      )}
                       <AccordionDetails
                         sx={{
-                          backgroundColor: "#f1f1f1", // Light background for the details
-                          padding: "10px 20px", // Padding inside accordion details
-                          borderRadius: "5px", // Rounded corners for accordion details
+                          backgroundColor: "#f1f1f1",
+                          padding: "10px 20px",
+                          borderRadius: "5px",
                           textAlign: "left",
                           maxHeight: "200px",
                           overflowY: "scroll",
                         }}
                       >
-                    
-                        {filteredOptions.map((option) => (
-                          <FormControlLabel
-                            key={option}
-                            control={
-                              <Checkbox
-                              key={`${key}-${option}-${selectedValues[key]?.includes(option)}`} // Unique key for each checkbox
-                              checked={selectedValues[key]?.includes(option)} // Reflect reset state here
-                              onChange={() => {
-                                const newValues = selectedValues[key]?.includes(option)
-                                  ? selectedValues[key].filter((item) => item !== option) // Deselect
-                                  : [...(selectedValues[key] || []), option]; // Select
-                                handleSelectionChange(key, newValues || []);
-                              }}
+                        {isPeriodFilter ? (
+                          <RadioGroup
+                            value={selectedValues[key]?.[0] || ""}
+                            onChange={(e) => handleSingleSelectionChange(key, e.target.value)}
+                          >
+                            {options.map((option) => (
+                              <FormControlLabel
+                                key={option}
+                                value={option}
+                                control={<Radio sx={{ color: "#FF8C00" }} />}
+                                label={option}
+                              />
+                            ))}
+                          </RadioGroup>
+                        ) : (
+                          filteredOptions.map((option) => (
+                            <FormControlLabel
+                              key={option}
+                              control={
+                                <Checkbox
+                                  checked={selectedValues[key]?.includes(option)}
+                                  onChange={() => {
+                                    const newValues = selectedValues[key]?.includes(option)
+                                      ? selectedValues[key].filter((item) => item !== option)
+                                      : [...(selectedValues[key] || []), option];
+                                    handleSelectionChange(key, newValues);
+                                  }}
+                                  sx={{
+                                    "&.Mui-checked": {
+                                      color: "#FF8C00",
+                                    },
+                                    transition: "all 0.3s ease",
+                                    paddingLeft: 0,
+                                  }}
+                                />
+                              }
+                              label={option}
                               sx={{
-                                "&.Mui-checked": {
-                                  color: "#FF8C00", // Checkbox checked color
-                                },
-                                transition: "all 0.3s ease", // Smooth transition
-                                paddingLeft: 0, // Remove padding on the left to make it align better
+                                display: "flex",
+                                justifyContent: "flex-start",
                               }}
                             />
-                            
-                            }
-                            label={option}
-                            sx={{
-                              display: "flex", // Align checkbox and label horizontally
-                              justifyContent: "flex-start", // Ensure label is aligned to the left
-                            }}
-                          />
-                        ))}
+                          ))
+                        )}
                       </AccordionDetails>
                     </Accordion>
                   );
@@ -271,7 +288,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                     mr: 2,
                     bgcolor: "#002060",
                     "&:hover": {
-                      backgroundColor: "#004080", // Hover effect for the apply button
+                      backgroundColor: "#004080",
                     },
                   }}
                 >
@@ -283,7 +300,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                   onClick={handleCancel}
                   sx={{
                     "&:hover": {
-                      backgroundColor: "#FF8C00", // Hover effect for the reset button
+                      backgroundColor: "#FF8C00",
                     },
                   }}
                 >
@@ -295,36 +312,34 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         </Card>
       </Box>
       <Box mt={4} flex={1}>
-  {loading ? (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <CircularProgress color="primary" />
-      <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
-        Loading... Please Wait
-      </Typography>
-    </Box>
-  ) : (
-    <>
-      {apiName === "allocation_capture" ? (
-        <MDDCaptureTable responseData={apiData} apiName={apiName} />
-      ) : apiName === "fo_discount" ? (
-        <AvgFoDiscountChart data={apiData} />
-      ) : (
-        <>
-        <DealStatsGraph responseData={apiData} />
-        
-        <MDDScreenergrid sectorwiseData={payload} /> 
-</>
-      )}
-    </>
-  )}
-</Box>
-
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress color="primary" />
+            <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
+              Loading... Please Wait
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            {apiName === "allocation_capture" ? (
+              <MDDCaptureTable responseData={apiData} apiName={apiName} />
+            ) : apiName === "fo_discount" ? (
+              <AvgFoDiscountChart data={apiData} />
+            ) : (
+              <>
+                <DealStatsGraph responseData={apiData} />
+                <MDDScreenergrid sectorwiseData={payload} />
+              </>
+            )}
+          </>
+        )}
+      </Box>
     </Container>
   );
 };
