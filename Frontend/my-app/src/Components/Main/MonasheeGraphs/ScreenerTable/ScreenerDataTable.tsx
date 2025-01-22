@@ -51,7 +51,6 @@ const preprocessRows = (rows: any[]) =>
 const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData }) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [count, setCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -92,7 +91,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
 
       if (response.ok) {
         const result = await response.json();
-        setCount(result.count);
         setRows(
           (result.data || []).map((item: ScreenerDataRow, index: number) => ({
             ...item,
@@ -183,7 +181,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
           }}
         >
           Total no of deals:{" "}
-          <span style={{ color: "#004b33" }}>{count}</span>
+          <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
         </Typography>
         <TextField
           variant="outlined"

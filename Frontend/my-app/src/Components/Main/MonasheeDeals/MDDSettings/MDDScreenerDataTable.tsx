@@ -233,7 +233,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
           columns={columns}
           loading={loading}
           rowHeight={35}
-          hideFooter
           sx={{
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "transparent",

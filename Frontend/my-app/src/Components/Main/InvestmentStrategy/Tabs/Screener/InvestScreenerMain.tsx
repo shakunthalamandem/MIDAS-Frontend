@@ -140,7 +140,6 @@ const InvestScreenerMain: React.FC<InvestScreenerMainProps> = ({
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
         rowHeight={40}
-        hideFooter
         sx={{
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "transparent",
