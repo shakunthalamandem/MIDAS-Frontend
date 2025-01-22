@@ -235,11 +235,11 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
             {/* Show Normal/Weighted options if selectedOption is for allocation */}
             {(selectedOption === "mdd_allocation_ioi" ||
         selectedOption === "mdd_allocation_percentage") && (
-        <Box className="toggle-container">
+          <div className="toggle-container">
           <ToggleButtonGroup
             value={selectedValue}
             exclusive
-            onChange={(e, value) => value && setSelectedValue(value)}
+            onChange={(_, value) => value && setSelectedValue(value)}
             aria-label="allocation toggle"
             className="toggle-group"
           >
@@ -247,6 +247,25 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
               value="normal"
               aria-label="normal"
               className="toggle-button"
+              style={{
+                fontSize: '14px',
+                padding: '5px 10px',
+                color: '#444444',
+                background: 'transparent',
+                border: '2px solid #444444',
+                transition: 'all 0.3s ease',
+                borderRadius: '5px',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = '#b90066';
+                e.currentTarget.style.color = '#fff';
+                e.currentTarget.style.border = '2px solid #b90066';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#444444';
+                e.currentTarget.style.border = '2px solid #444444';
+              }}
             >
               Normal
             </ToggleButton>
@@ -254,11 +273,30 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
               value="weighted"
               aria-label="weighted"
               className="toggle-button"
+              style={{
+                fontSize: '14px',
+                padding: '5px 10px',
+                color: '#444444',
+                background: 'transparent',
+                border: '2px solid #444444',
+                transition: 'all 0.3s ease',
+                borderRadius: '5px',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = '#b90066';
+                e.currentTarget.style.color = '#fff';
+                e.currentTarget.style.border = '2px solid #b90066';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#444444';
+                e.currentTarget.style.border = '2px solid #444444';
+              }}
             >
               Weighted
             </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </div>        
       )}
 
       <Dialog
