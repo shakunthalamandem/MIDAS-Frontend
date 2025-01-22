@@ -118,7 +118,9 @@ const MarketFilters: React.FC = () => {
               const isMultiSelect =
                 Array.isArray(value.options) &&
                 key !== "start_year" &&
-                key !== "end_year";
+                key !== "end_year" &&
+                key !== "year_period";
+
 
               return (
                 <Grid item xs={2} key={index}>
