@@ -117,9 +117,9 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
   }, [rows, searchQuery]);
 
   const columns: GridColDef[] = [
-    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
-    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "ticker_symbol", headerName: "Ticker", width: 100 },
+    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "gics_sector", headerName: "Sector", width: 180 },
     { field: "broad_region", headerName: "Region", width: 100 },
     { field: "deal_type", headerName: "Deal Type", width: 80 },
