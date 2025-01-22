@@ -3,6 +3,7 @@ import axios from "axios";
 import { Box, Paper, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 
 // Define the structure of the response data
+// Define the structure of the response data
 interface TickerData {
   year_range: number;
   pricing_date: string;
@@ -16,14 +17,15 @@ interface TickerData {
   deal_size: string;
   last_price_t1: string;
   issue_offer_price: string;
-  discount_from_announcement_price: string | null;
-  t1m_excess_returns: string | null;
-  t1d_return_from_bloomberg: string | null;
-  allocation_deal_size_percentage: string | null;
-  allocation_percentage: string | null;
+  fo_discount: string | null;
+  t1m_returns: string | null;
+  t1d_returns: string | null;
+  allocation_deal_size: string | null;
+  allocation_ioi: string | null;
   average_hold_period: string | null;
   percentage_primary: string | null;
-  sponsor_yn: string | null;
+  sponsor: string | null;
+
 }
 
 // Define the structure of the response (the API wraps data inside a 'data' property)
@@ -92,12 +94,34 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           { label: "Region:", value: item.broad_region },
                           { label: "Deal Type:", value: item.deal_type },
                           { label: "Deal Size:", value: item.deal_size },
-                          { label: "Issue Offer Price:", value: item.issue_offer_price },
+                          { label: "Issue Offer Price:", value: "$" + item.issue_offer_price },
                           { label: "Deal Captain:", value: item.deal_captain ?? "N/A" },
                         ].map((row, i) => (
-                          <TableRow key={i}>
-                            <TableCell sx={{ fontWeight: "bold" }}>{row.label}</TableCell>
-                            <TableCell>{row.value}</TableCell>
+                          <TableRow
+                            key={i}
+                            sx={{
+                              backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                              "&:hover": {
+                                backgroundColor: "#e0f7fa",
+                              },
+                            }}
+                          >
+                            <TableCell
+                              sx={{
+                                border: "1px solid #ccc",
+                                fontWeight: "bold",
+                                color: "#333",
+                              }}
+                            >
+                              {row.label}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                border: "1px solid #ccc",
+                              }}
+                            >
+                              {row.value}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -111,19 +135,41 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <Table size="small" aria-label="Deal Info Table 2">
                       <TableBody>
                         {[
-                          { label: "T+1M Excess Returns:", value: item.t1m_excess_returns ?? "N/A" },
+                          { label: "T+1M Excess Returns:", value: item.t1m_returns ?? "N/A" },
                           { label: "Percentage Primary:", value: item.percentage_primary ?? "N/A" },
-                          { label: "T+1D Return (Bloomberg):", value: item.t1d_return_from_bloomberg ?? "N/A" },
-                          { label: "Discount from Announcement Price:", value: item.discount_from_announcement_price ?? "N/A" },
-                          { label: "Allocation Deal Size %:", value: item.allocation_deal_size_percentage ?? "N/A" },
+                          { label: "T+1D Return (Bloomberg):", value: item.t1d_returns ?? "N/A" },
+                          { label: "Discount from Announcement Price:", value: item.fo_discount ?? "N/A" },
+                          { label: "Allocation Deal Size %:", value: item.allocation_deal_size ?? "N/A" },
                           { label: "Average Hold Period:", value: item.average_hold_period ?? "N/A" },
                           { label: "Last Price T1:", value: item.last_price_t1 },
-                          { label: "Allocation Percentage:", value: item.allocation_percentage ?? "N/A" },
-                          { label: "Sponsor Y/N:", value: item.sponsor_yn ?? "N/A" },
+                          { label: "Allocation Percentage:", value: item.allocation_ioi ?? "N/A" },
+                          { label: "Sponsor Y/N:", value: item.sponsor ?? "N/A" },
                         ].map((row, i) => (
-                          <TableRow key={i}>
-                            <TableCell sx={{ fontWeight: "bold" }}>{row.label}</TableCell>
-                            <TableCell>{row.value}</TableCell>
+                          <TableRow
+                            key={i}
+                            sx={{
+                              backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                              "&:hover": {
+                                backgroundColor: "#e0f7fa",
+                              },
+                            }}
+                          >
+                            <TableCell
+                              sx={{
+                                border: "1px solid #ccc",
+                                fontWeight: "bold",
+                                color: "#333",
+                              }}
+                            >
+                              {row.label}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                border: "1px solid #ccc",
+                              }}
+                            >
+                              {row.value}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
