@@ -137,7 +137,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         marginBottom: 20,
         display: "flex",
         marginLeft: 0,
-        marginTop: 10,
+        marginTop: 0,
       }}
     >
       <Box width="320px" sx={{ marginRight: 10 }}>

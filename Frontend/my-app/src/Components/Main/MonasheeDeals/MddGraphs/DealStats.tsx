@@ -12,12 +12,7 @@ const DealStats = () => {
       marginTop={10}
       textAlign="center"
     >
-      <Typography 
-        variant="h5" 
-        sx={{ fontWeight: "bold", color: "#002060" }}
-      >
-        Deal Stats
-      </Typography>
+
       <MddMain apiName="mdd_deals_graph" />
     </Box>
   );

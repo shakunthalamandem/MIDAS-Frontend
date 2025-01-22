@@ -129,21 +129,22 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
 
       {/* Show Normal/Weighted options if selectedOption is for allocation */}
       {(selectedOption === "mdd_allocation_ioi" || selectedOption === "mdd_allocation_percentage") && (
-        <Box sx={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
-          <ToggleButtonGroup
-            value={selectedValue}
-            exclusive
-            onChange={(e, value) => value && setSelectedValue(value)}
-            aria-label="allocation toggle"
-          >
-            <ToggleButton value="normal" aria-label="normal">
-              Normal
-            </ToggleButton>
-            <ToggleButton value="weighted" aria-label="weighted">
-              Weighted
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
+        <Box className="toggle-container">
+        <ToggleButtonGroup
+          value={selectedValue}
+          exclusive
+          onChange={(e, value) => value && setSelectedValue(value)}
+          aria-label="allocation toggle"
+          className="toggle-group"
+        >
+          <ToggleButton value="normal" aria-label="normal" className="toggle-button">
+            Normal
+          </ToggleButton>
+          <ToggleButton value="weighted" aria-label="weighted" className="toggle-button">
+            Weighted
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
       )}
 
       {chartData.length === 0 && !responseData?.message ? (
@@ -158,7 +159,6 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="quarter" />
             <YAxis tickFormatter={(value) => formatValue(value, selectedOption)} />
             <Tooltip
