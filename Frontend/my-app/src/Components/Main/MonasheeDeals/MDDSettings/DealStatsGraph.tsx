@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import './DealStats.css';
+import "./DealStats.css";
 import {
   Box,
   Typography,
@@ -43,13 +43,18 @@ const formatValue = (value: number, selectedOption: string): string => {
       return `$${(value / 1_000).toFixed(1)}K`;
     }
     return `$${value.toFixed(2)}`;
-  } else if (selectedOption === "mdd_allocation_percentage" || selectedOption === "mdd_allocation_ioi") {
+  } else if (
+    selectedOption === "mdd_allocation_percentage" ||
+    selectedOption === "mdd_allocation_ioi"
+  ) {
     return `${value.toFixed(2)}%`;
   }
   return value.toFixed(0);
 };
 
-const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) => {
+const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
+  responseData,
+}) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("count");
   const [selectedValue, setSelectedValue] = useState("normal");
@@ -87,7 +92,9 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
 
         if (selectedOption === "mdd_allocation_ioi") {
           allocationKeyForDealType =
-            selectedValue === "normal" ? "allocation_percentage" : "weighted_allocation_percentage";
+            selectedValue === "normal"
+              ? "allocation_percentage"
+              : "weighted_allocation_percentage";
         } else if (selectedOption === "mdd_allocation_percentage") {
           allocationKeyForDealType =
             selectedValue === "normal"
@@ -97,7 +104,9 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
           allocationKeyForDealType = selectedOption;
         }
 
-        chartRow[`${dealType}_${selectedOption}`] = sectors[dealType]?.[allocationKeyForDealType]
+        chartRow[`${dealType}_${selectedOption}`] = sectors[dealType]?.[
+          allocationKeyForDealType
+        ]
           ? parseFloat(sectors[dealType][allocationKeyForDealType])
           : 0;
       });
@@ -106,48 +115,31 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
     });
   };
 
-  const chartData = responseData && !responseData.message ? formatChartData(responseData) : [];
+  const chartData =
+    responseData && !responseData.message ? formatChartData(responseData) : [];
 
   return (
     <div>
       <Box className="deal-stats-container">
-      <RadioGroup
-        row
-        value={selectedOption}
-        onChange={(e) => setSelectedOption(e.target.value)}
-        className="radio-group"
-      >
-        {dealStatsOptions.map((option) => (
-          <FormControlLabel
-            key={option.key}
-            value={option.key}
-            control={<Radio className="custom-radio" />}
-            label={option.label}
-            className={`radio-option ${selectedOption === option.key ? 'selected' : ''}`}
-          />
-        ))}
-      </RadioGroup>
-    </Box>
-
-      {/* Show Normal/Weighted options if selectedOption is for allocation */}
-      {(selectedOption === "mdd_allocation_ioi" || selectedOption === "mdd_allocation_percentage") && (
-        <Box className="toggle-container">
-        <ToggleButtonGroup
-          value={selectedValue}
-          exclusive
-          onChange={(e, value) => value && setSelectedValue(value)}
-          aria-label="allocation toggle"
-          className="toggle-group"
+        <RadioGroup
+          row
+          value={selectedOption}
+          onChange={(e) => setSelectedOption(e.target.value)}
+          className="radio-group"
         >
-          <ToggleButton value="normal" aria-label="normal" className="toggle-button">
-            Normal
-          </ToggleButton>
-          <ToggleButton value="weighted" aria-label="weighted" className="toggle-button">
-            Weighted
-          </ToggleButton>
-        </ToggleButtonGroup>
+          {dealStatsOptions.map((option) => (
+            <FormControlLabel
+              key={option.key}
+              value={option.key}
+              control={<Radio className="custom-radio" />}
+              label={option.label}
+              className={`radio-option ${selectedOption === option.key ? "selected" : ""}`}
+            />
+          ))}
+        </RadioGroup>
       </Box>
-      )}
+
+
 
       {chartData.length === 0 && !responseData?.message ? (
         <Box sx={{ textAlign: "center", padding: 4 }}>
@@ -159,56 +151,115 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
           </Typography>
         </Box>
       ) : (
-        <Card
-        sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}
-      >
-        <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={chartData}>
-            <XAxis dataKey="quarter" />
-            <YAxis tickFormatter={(value) => formatValue(value, selectedOption)} />
-            <Tooltip
-              formatter={(value: number, name: string, props: any) =>
-                formatValue(value, selectedOption)
-              }
-              labelFormatter={(label) => `Quarter: ${label}`}
-            />
-            <Legend />
-            {/* Render Bars based on selectedOption */}
-            {selectedOption === "count" && (
-              <>
-                <Bar dataKey="FO_count" fill="#8884d8" stackId="a" />
-                <Bar dataKey="IPO_count" fill="#82ca9d" stackId="a" />
-              </>
-            )}
-            {selectedOption === "deal_size" && (
-              <>
-                <Bar dataKey="FO_deal_size" fill="#8884d8" stackId="a" />
-                <Bar dataKey="IPO_deal_size" fill="#82ca9d" stackId="a" />
-              </>
-            )}
-            {selectedOption === "avg_deal_size" && (
-              <>
-                <Bar dataKey="FO_avg_deal_size" fill="#8884d8" stackId="a" />
-                <Bar dataKey="IPO_avg_deal_size" fill="#82ca9d" stackId="a" />
-              </>
-            )}
-            {selectedOption === "mdd_allocation_ioi" && (
-              <>
-                <Bar dataKey={`FO_mdd_allocation_ioi`} fill="#8884d8" stackId="a" />
-                <Bar dataKey={`IPO_mdd_allocation_ioi`} fill="#82ca9d" stackId="a" />
-              </>
-            )}
-            {selectedOption === "mdd_allocation_percentage" && (
-              <>
-                <Bar dataKey={`FO_mdd_allocation_percentage`} fill="#8884d8" stackId="a" />
-                <Bar dataKey={`IPO_mdd_allocation_percentage`} fill="#82ca9d" stackId="a" />
-              </>
-            )}
-          </BarChart>
-        </ResponsiveContainer>
+        <Box mt={5}>
+          <Card
+            sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}
+          >
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={chartData}>
+                  <XAxis dataKey="quarter" />
+                  <YAxis
+                    tickFormatter={(value) =>
+                      formatValue(value, selectedOption)
+                    }
+                  />
+                  <Tooltip
+                    formatter={(value: number, name: string, props: any) =>
+                      formatValue(value, selectedOption)
+                    }
+                    labelFormatter={(label) => `Quarter: ${label}`}
+                  />
+                  <Legend />
+                  {/* Render Bars based on selectedOption */}
+                  {selectedOption === "count" && (
+                    <>
+                      <Bar dataKey="FO_count" fill="#8884d8" stackId="a" />
+                      <Bar dataKey="IPO_count" fill="#82ca9d" stackId="a" />
+                    </>
+                  )}
+                  {selectedOption === "deal_size" && (
+                    <>
+                      <Bar dataKey="FO_deal_size" fill="#8884d8" stackId="a" />
+                      <Bar dataKey="IPO_deal_size" fill="#82ca9d" stackId="a" />
+                    </>
+                  )}
+                  {selectedOption === "avg_deal_size" && (
+                    <>
+                      <Bar
+                        dataKey="FO_avg_deal_size"
+                        fill="#8884d8"
+                        stackId="a"
+                      />
+                      <Bar
+                        dataKey="IPO_avg_deal_size"
+                        fill="#82ca9d"
+                        stackId="a"
+                      />
+                    </>
+                  )}
+                  {selectedOption === "mdd_allocation_ioi" && (
+                    <>
+                      <Bar
+                        dataKey={`FO_mdd_allocation_ioi`}
+                        fill="#8884d8"
+                        stackId="a"
+                      />
+                      <Bar
+                        dataKey={`IPO_mdd_allocation_ioi`}
+                        fill="#82ca9d"
+                        stackId="a"
+                      />
+                    </>
+                  )}
+                  {selectedOption === "mdd_allocation_percentage" && (
+                    <>
+                      <Bar
+                        dataKey={`FO_mdd_allocation_percentage`}
+                        fill="#8884d8"
+                        stackId="a"
+                      />
+                      <Bar
+                        dataKey={`IPO_mdd_allocation_percentage`}
+                        fill="#82ca9d"
+                        stackId="a"
+                      />
+                    </>
+                  )}
+                </BarChart>
+              </ResponsiveContainer>
             </CardContent>
-            </Card>
+          </Card>
+        </Box>
+        
+      )}
+            {/* Show Normal/Weighted options if selectedOption is for allocation */}
+            {(selectedOption === "mdd_allocation_ioi" ||
+        selectedOption === "mdd_allocation_percentage") && (
+        <Box className="toggle-container">
+          <ToggleButtonGroup
+            value={selectedValue}
+            exclusive
+            onChange={(e, value) => value && setSelectedValue(value)}
+            aria-label="allocation toggle"
+            className="toggle-group"
+          >
+            <ToggleButton
+              value="normal"
+              aria-label="normal"
+              className="toggle-button"
+            >
+              Normal
+            </ToggleButton>
+            <ToggleButton
+              value="weighted"
+              aria-label="weighted"
+              className="toggle-button"
+            >
+              Weighted
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
       )}
 
       <Dialog
