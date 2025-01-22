@@ -104,12 +104,11 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
   };
 
   const chartData = responseData && !responseData.message ? formatChartData(responseData) : [];
-  console.log(selectedOption);
 
   return (
     <div>
       <div>
-        <Typography variant="h6">Select a Deal Stats Option</Typography>
+        {/* <Typography variant="h6">Select a Deal Stats Option</Typography> */}
         <RadioGroup
           row
           value={selectedOption} // This ensures that selectedOption is updated when a new option is selected
@@ -186,7 +185,18 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
                 <Bar dataKey="IPO_avg_deal_size" fill="#82ca9d" stackId="a" />
               </>
             )}
-            {/* Handle other selected options here similarly */}
+            {selectedOption === "mdd_allocation_ioi" && (
+              <>
+                <Bar dataKey={`FO_mdd_allocation_ioi`} fill="#8884d8" stackId="a" />
+                <Bar dataKey={`IPO_mdd_allocation_ioi`} fill="#82ca9d" stackId="a" />
+              </>
+            )}
+            {selectedOption === "mdd_allocation_percentage" && (
+              <>
+                <Bar dataKey={`FO_mdd_allocation_percentage`} fill="#8884d8" stackId="a" />
+                <Bar dataKey={`IPO_mdd_allocation_percentage`} fill="#82ca9d" stackId="a" />
+              </>
+            )}
           </BarChart>
         </ResponsiveContainer>
       )}
