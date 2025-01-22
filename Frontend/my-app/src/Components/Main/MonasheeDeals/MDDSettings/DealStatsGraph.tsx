@@ -11,6 +11,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
 import {
   BarChart,
@@ -25,11 +27,10 @@ import {
 
 interface DealAllocationGraphProps {
   responseData: any; // The response data from the API
-  apiName: string; // The API name that determines the key
 }
 
-const formatValue = (value: number, apiName: string): string => {
-  if (apiName === "mdd_deals_volume" || apiName === "avg_deal_size") {
+const formatValue = (value: number, selectedOption: string): string => {
+  if (selectedOption === "mdd_deals_volume" || selectedOption === "avg_deal_size") {
     const absValue = Math.abs(value);
     if (absValue >= 1_000_000_000) {
       return `$${(value / 1_000_000_000).toFixed(1)}B`;
@@ -39,15 +40,16 @@ const formatValue = (value: number, apiName: string): string => {
       return `$${(value / 1_000).toFixed(1)}K`;
     }
     return `$${value.toFixed(2)}`;
-  } else if (apiName === "mdd_allocation_percentage" || apiName === "mdd_allocation_ioi") {
+  } else if (selectedOption === "mdd_allocation_percentage" || selectedOption === "mdd_allocation_ioi") {
     return `${value.toFixed(2)}%`;
   }
-  return value.toFixed(0); // Default to integer for other APIs
+  return value.toFixed(0);
 };
 
-const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiName }) => {
+const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("count"); // Tracks the selected option
+  const [selectedOption, setSelectedOption] = useState("count");
+  const [selectedValue, setSelectedValue] = useState("normal");
 
   const dealStatsOptions = [
     { label: "Deals Count", key: "count" },
@@ -59,7 +61,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiN
 
   const handleDialogClose = () => {
     setDialogOpen(false);
-    window.location.reload(); // Refresh the page
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -78,11 +80,22 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiN
       const chartRow: any = { quarter };
 
       allowedDealTypes.forEach((dealType) => {
-        const allocationKey =
-          selectedOption === "avg_deal_size" ? "weighted_avg_deal_size" : selectedOption;
+        let allocationKeyForDealType: string;
 
-        chartRow[`${dealType}_${selectedOption}`] = sectors[dealType]?.[allocationKey]
-          ? parseFloat(sectors[dealType][allocationKey])
+        if (selectedOption === "mdd_allocation_ioi") {
+          allocationKeyForDealType =
+            selectedValue === "normal" ? "allocation_percentage" : "weighted_allocation_percentage";
+        } else if (selectedOption === "mdd_allocation_percentage") {
+          allocationKeyForDealType =
+            selectedValue === "normal"
+              ? "allocation_deal_size_percentage"
+              : "weighted_allocation_deal_size_percentage";
+        } else {
+          allocationKeyForDealType = selectedOption;
+        }
+
+        chartRow[`${dealType}_${selectedOption}`] = sectors[dealType]?.[allocationKeyForDealType]
+          ? parseFloat(sectors[dealType][allocationKeyForDealType])
           : 0;
       });
 
@@ -112,6 +125,25 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiN
         </RadioGroup>
       </div>
 
+      {/* Show Normal/Weighted options if selectedOption is for allocation */}
+      {(selectedOption === "mdd_allocation_ioi" || selectedOption === "mdd_allocation_percentage") && (
+        <Box sx={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
+          <ToggleButtonGroup
+            value={selectedValue}
+            exclusive
+            onChange={(e, value) => value && setSelectedValue(value)}
+            aria-label="allocation toggle"
+          >
+            <ToggleButton value="normal" aria-label="normal">
+              Normal
+            </ToggleButton>
+            <ToggleButton value="weighted" aria-label="weighted">
+              Weighted
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      )}
+
       {chartData.length === 0 && !responseData?.message ? (
         <Box sx={{ textAlign: "center", padding: 4 }}>
           <Typography variant="h6" color="textSecondary">
@@ -124,18 +156,18 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData, apiN
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="quarter" />
-            <YAxis tickFormatter={(value) => formatValue(value, apiName)} />
-            <Tooltip />
+            <YAxis tickFormatter={(value) => formatValue(value, selectedOption)} />
+            <Tooltip
+              formatter={(value: number, name: string, props: any) =>
+                formatValue(value, selectedOption)
+              }
+              labelFormatter={(label) => `Quarter: ${label}`}
+            />
             <Legend />
-            {["FO", "IPO"].map((dealType) => (
-              <Bar
-                key={dealType}
-                dataKey={`${dealType}_${selectedOption}`}
-                stackId="a"
-                fill="#8884d8"
-              />
-            ))}
+            <Bar dataKey="FO_count" fill="#8884d8" stackId="a" />
+            <Bar dataKey="IPO_count" fill="#82ca9d" stackId="a" />
           </BarChart>
         </ResponsiveContainer>
       )}
