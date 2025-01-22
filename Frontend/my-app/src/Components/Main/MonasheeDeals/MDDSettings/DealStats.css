@@ -62,37 +62,36 @@
     display: flex;
     justify-content: center;
     padding: 20px;
-    background: #f0f0f0;
-    border-radius: 10px;
-    max-width: 300px;
-    margin: 20px auto;
   }
   
   .toggle-group {
     border: none;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
   }
   
   .toggle-button {
-    font-size: 16px;
-    padding: 10px 30px;
-    color: #1976d2;
-    background: #fff;
-    border: 1px solid #1976d2;
+    font-size: 14px;
+    padding: 5px 10px;
+    color: #444444;
+    background: transparent;
+    border: 2px solid #444444;
     transition: all 0.3s ease;
+    border-radius: 5px;
   }
   
   .toggle-button:hover {
-    background: #1976d2;
+    background: #b90066;
     color: #fff;
+    border: 2px solid #b90066;
+
   }
   
   .toggle-button.Mui-selected {
-    background: #1976d2 !important;
+    background: #004d1a !important;
     color: #fff !important;
     font-weight: bold;
-    border: none;
+    border: 2px solid #00570c;
   }
+  
   
