@@ -13,7 +13,7 @@ interface TickerData {
   deal_captain: string | null;
   broad_region: string;
   deal_type: string;
-  lead_bank: string[];
+  selected_bank: string[];
   deal_size: string;
   last_price_t1: string;
   issue_offer_price: string;

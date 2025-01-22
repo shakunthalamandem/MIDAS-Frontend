@@ -31,11 +31,11 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
     const fetchLeadBankOptions = async () => {
       setLoading(true);
       try {
-        const response = await axios.get<{ lead_bank?: { options: string[] } }>(
+        const response = await axios.get<{ selected_bank?: { options: string[] } }>(
           `${apiUrl}/api/mdd_screener_filters/`
         );
 
-        const leadBankData = response.data?.lead_bank;
+        const leadBankData = response.data?.selected_bank;
 
         if (leadBankData?.options) {
           setLeadBankOptions(leadBankData.options);
@@ -44,7 +44,7 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
           console.warn("Lead Bank options not found in the API response.");
         }
       } catch (error) {
-        console.error("Error fetching lead_bank options:", error);
+        console.error("Error fetching selected_bank options:", error);
       } finally {
         setLoading(false);
       }
@@ -64,7 +64,7 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
   // Handle selection of multiple items
   const handleSelectChange = (event: any) => {
     const { value } = event.target;
-    setFieldValue("lead_bank", value);
+    setFieldValue("selected_bank", value);
   };
 
   if (loading) {
@@ -111,7 +111,7 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
             labelId="lead-bank-label"
             id="lead-bank-select"
             multiple
-            value={values["lead_bank"] || []}
+            value={values["selected_bank"] || []}
             onChange={handleSelectChange}
             input={<OutlinedInput label="Select Lead Banks" />}
             renderValue={(selected) => selected.join(", ")}
@@ -127,7 +127,7 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
                 <MenuItem key={option} value={option}>
-                  <Checkbox checked={values["lead_bank"]?.includes(option) || false} />
+                  <Checkbox checked={values["selected_bank"]?.includes(option) || false} />
                   <ListItemText  primary={option} />
                 </MenuItem>
               ))

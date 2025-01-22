@@ -54,7 +54,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       deal_captain: data.deal_captain, // Array of deal captains
       deal_type: data.deal_type, // Array of deal types
       sector: data.gics_sector, // Array of sectors
-      lead_bank: data.lead_bank, // Array of lead banks
+      selected_bank: data.selected_bank, // Array of lead banks
       year_range: data.years // Array of years
 
     };

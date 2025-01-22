@@ -72,7 +72,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
       deal_value: data.deal_value,
       t_plus_1_return: data.t_plus_1_return,
       t_plus_1m_returns: data.t_plus_1m_returns,
-      left_lead_bank: data.left_lead_bank,
+      selected_bank: data.selected_bank,
     };
 
     try {
@@ -166,7 +166,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
         : "0";
             },
     },
-    { field: "left_lead_bank", headerName: "Lead Bank", width: 150 },
+    { field: "selected_bank", headerName: "Lead Bank", width: 150 },
   ];
 
   return (
