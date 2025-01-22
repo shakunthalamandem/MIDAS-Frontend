@@ -54,10 +54,8 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Box sx={{ width: "100%", padding: 2 }}>
-        <Card sx={{ boxShadow: 3, borderRadius: 2, padding: 2 }}>
-          <CardContent>
-            <Typography variant="h5" color="#002060" gutterBottom>
-              Investment Strategies Screener
+      <Typography variant="h5" color="#002060" align="center" style={{ fontWeight: 'bold' }}>
+      Investment Strategies Screener
             </Typography>
         <Card sx={{ boxShadow: 3, borderRadius: 2, padding: 2,mt:3 }}>
           <CardContent>
@@ -91,7 +89,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
                       },
                       "& .Mui-selected": {
                         backgroundColor: "#013e3a", // Vibrant orange for selected tab
-                        color: "#ffffff", // White text for selected tab
+                        color: "#ffffff !important", // White text for selected tab
                         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Stronger shadow for selected tab
                       },
                     }}
@@ -101,7 +99,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
               <Tab label="Technical" aria-label="Technical Filters" />
             </Tabs>
 
-            <Box sx={{ marginTop: 2 }}>
+            <Box sx={{ marginTop: 4 }}>
               {value === 0 && (
                 <MonasheeS3
                   data={filtersData["Monashee Specific"]}
