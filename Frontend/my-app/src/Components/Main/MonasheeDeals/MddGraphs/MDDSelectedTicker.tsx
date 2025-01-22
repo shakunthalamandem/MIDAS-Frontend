@@ -3,6 +3,7 @@ import axios from "axios";
 import { Box, Paper, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 
 // Define the structure of the response data
+// Define the structure of the response data
 interface TickerData {
   year_range: number;
   pricing_date: string;
@@ -24,8 +25,7 @@ interface TickerData {
   average_hold_period: string | null;
   percentage_primary: string | null;
   sponsor: string | null;
-  
-}
+
 
 // Define the structure of the response (the API wraps data inside a 'data' property)
 interface ApiResponse {
@@ -93,12 +93,34 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           { label: "Region:", value: item.broad_region },
                           { label: "Deal Type:", value: item.deal_type },
                           { label: "Deal Size:", value: item.deal_size },
-                          { label: "Issue Offer Price:", value: item.issue_offer_price },
+                          { label: "Issue Offer Price:", value: "$" + item.issue_offer_price },
                           { label: "Deal Captain:", value: item.deal_captain ?? "N/A" },
                         ].map((row, i) => (
-                          <TableRow key={i}>
-                            <TableCell sx={{ fontWeight: "bold" }}>{row.label}</TableCell>
-                            <TableCell>{row.value}</TableCell>
+                          <TableRow
+                            key={i}
+                            sx={{
+                              backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                              "&:hover": {
+                                backgroundColor: "#e0f7fa",
+                              },
+                            }}
+                          >
+                            <TableCell
+                              sx={{
+                                border: "1px solid #ccc",
+                                fontWeight: "bold",
+                                color: "#333",
+                              }}
+                            >
+                              {row.label}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                border: "1px solid #ccc",
+                              }}
+                            >
+                              {row.value}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -122,9 +144,31 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           { label: "Allocation Percentage:", value: item.allocation_ioi ?? "N/A" },
                           { label: "Sponsor Y/N:", value: item.sponsor ?? "N/A" },
                         ].map((row, i) => (
-                          <TableRow key={i}>
-                            <TableCell sx={{ fontWeight: "bold" }}>{row.label}</TableCell>
-                            <TableCell>{row.value}</TableCell>
+                          <TableRow
+                            key={i}
+                            sx={{
+                              backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                              "&:hover": {
+                                backgroundColor: "#e0f7fa",
+                              },
+                            }}
+                          >
+                            <TableCell
+                              sx={{
+                                border: "1px solid #ccc",
+                                fontWeight: "bold",
+                                color: "#333",
+                              }}
+                            >
+                              {row.label}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                border: "1px solid #ccc",
+                              }}
+                            >
+                              {row.value}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
