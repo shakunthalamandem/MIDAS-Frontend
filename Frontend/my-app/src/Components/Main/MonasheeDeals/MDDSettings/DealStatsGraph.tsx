@@ -14,6 +14,8 @@ import {
   Radio,
   ToggleButtonGroup,
   ToggleButton,
+  CardContent,
+  Card,
 } from "@mui/material";
 import {
   BarChart,
@@ -157,6 +159,10 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
           </Typography>
         </Box>
       ) : (
+        <Card
+        sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}
+      >
+        <CardContent>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData}>
             <XAxis dataKey="quarter" />
@@ -201,6 +207,8 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
             )}
           </BarChart>
         </ResponsiveContainer>
+            </CardContent>
+            </Card>
       )}
 
       <Dialog
