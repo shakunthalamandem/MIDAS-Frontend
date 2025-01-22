@@ -104,7 +104,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
   };
 
   const chartData = responseData && !responseData.message ? formatChartData(responseData) : [];
-  console.log(selectedOption)
+  console.log(selectedOption);
 
   return (
     <div>
@@ -167,8 +167,26 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({ responseData }) =>
               labelFormatter={(label) => `Quarter: ${label}`}
             />
             <Legend />
-            <Bar dataKey="FO_count" fill="#8884d8" stackId="a" />
-            <Bar dataKey="IPO_count" fill="#82ca9d" stackId="a" />
+            {/* Render Bars based on selectedOption */}
+            {selectedOption === "count" && (
+              <>
+                <Bar dataKey="FO_count" fill="#8884d8" stackId="a" />
+                <Bar dataKey="IPO_count" fill="#82ca9d" stackId="a" />
+              </>
+            )}
+            {selectedOption === "deal_size" && (
+              <>
+                <Bar dataKey="FO_deal_size" fill="#8884d8" stackId="a" />
+                <Bar dataKey="IPO_deal_size" fill="#82ca9d" stackId="a" />
+              </>
+            )}
+            {selectedOption === "avg_deal_size" && (
+              <>
+                <Bar dataKey="FO_avg_deal_size" fill="#8884d8" stackId="a" />
+                <Bar dataKey="IPO_avg_deal_size" fill="#82ca9d" stackId="a" />
+              </>
+            )}
+            {/* Handle other selected options here similarly */}
           </BarChart>
         </ResponsiveContainer>
       )}
