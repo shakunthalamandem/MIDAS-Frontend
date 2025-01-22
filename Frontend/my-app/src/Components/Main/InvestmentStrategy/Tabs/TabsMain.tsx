@@ -89,7 +89,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
                       },
                       "& .Mui-selected": {
                         backgroundColor: "#013e3a", // Vibrant orange for selected tab
-                        color: "#ffffff", // White text for selected tab
+                        color: "#ffffff !important", // White text for selected tab
                         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Stronger shadow for selected tab
                       },
                     }}
