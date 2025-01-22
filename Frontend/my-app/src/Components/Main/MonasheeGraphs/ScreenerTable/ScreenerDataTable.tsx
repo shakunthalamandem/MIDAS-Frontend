@@ -66,7 +66,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
 
     const payload = {
       year_range: data.year_range,
-      deal_type: data.deal_type,
+      dealType: data.dealType,
       broad_region: data.broad_region,
       sector: data.sector,
       deal_value: data.deal_value,

@@ -12,9 +12,9 @@
       }
     },
     {
-      "deal_type": {
+      "dealType": {
         "options": [ "IPO", "FO"],
-        "label": "Deal Type",
+        "label": "DealType",
         "description": ""
       }
     },

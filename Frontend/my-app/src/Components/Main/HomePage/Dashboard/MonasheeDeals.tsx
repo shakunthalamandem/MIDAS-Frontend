@@ -62,6 +62,7 @@ const MonasheeDeals: React.FC = () => {
             transition: "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
             "&:hover": {
               backgroundColor: "#DCE6F0", // Slightly lighter shade on hover
+              transform: "translateY(-2px)",
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
             },
           },
