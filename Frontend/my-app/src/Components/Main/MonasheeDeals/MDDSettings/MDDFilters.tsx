@@ -20,6 +20,7 @@ import DealAllocationGraph from "./DealAllocationGraph";
 import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
 import MDDScreenergrid from "./MDDScreenergrid";
+import DealStatsGraph from "./DealStatsGraph";
 
 interface FilterOption {
   options: (string | number)[]; // Options can be either string or number
@@ -316,7 +317,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         <AvgFoDiscountChart data={apiData} />
       ) : (
         <>
-        <DealAllocationGraph responseData={apiData} apiName={apiName} />
+        {/* <DealAllocationGraph responseData={apiData} apiName={apiName} /> */}
+        <DealStatsGraph responseData={apiData} apiName={apiName} />
+        
         <MDDScreenergrid sectorwiseData={payload} /> 
 </>
       )}

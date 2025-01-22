@@ -9,6 +9,7 @@ import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import DealCount from "../../MonasheeDeals/MddGraphs/DealCount";
 import DealVolumeMDD from "../../MonasheeDeals/MddGraphs/DealVolumeMDD";
 import MDDDealSearch from "../../MonasheeDeals/MddGraphs/MDDDealSearch";
+import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 
 const MonasheeDeals: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -86,6 +87,7 @@ const MonasheeDeals: React.FC = () => {
         <Tab label="Allocation Capture" />
         <Tab label="Follow-On Discount" />
         <Tab label="Screener" />
+        <Tab label="DealStats"/>
       </Tabs>
 
       {/* Tab Content */}
@@ -98,6 +100,7 @@ const MonasheeDeals: React.FC = () => {
       {value === 6 && <AllocationCaptureReturn />}
       {value === 7 && <FOllowOnDiscount />}
       {value === 8 && <MDDScreener />}
+      {value === 9 && <DealStats />}
     </Box>
   );
 };
