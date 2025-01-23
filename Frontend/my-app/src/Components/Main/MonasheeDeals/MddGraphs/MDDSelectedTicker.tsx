@@ -228,7 +228,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           },
                           {
                             label: "T+1M Excess Returns",
-                            (<span
+                            value:(<span
                               style={{
                                 backgroundColor: Number(item.t1m_returns) > 0
                                   ? "#85A947" // Light green for positive returns
