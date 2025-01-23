@@ -28,10 +28,36 @@ interface SelectedTickerProps {
   ticker_list: string[]; // Adjusted to accept an array of ticker symbols
 }
 
+const getOrdinalSuffix = (day: number): string => {
+  if (day > 3 && day < 21) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
+  const formattedDate = date.toLocaleDateString("en-GB", options);
+  const day = date.getDate();
+  return formattedDate.replace(
+    `${day}`,
+    `${day}${getOrdinalSuffix(day)}`
+  );
+};
+
 const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
   const [data, setData] = useState<TickerData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,16 +102,22 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Box sx={{ marginTop: 4, padding: 2 }}>
-  <Typography
-    variant="h5"
-    gutterBottom
-    color="#6501c4"
-    align="center"
-    sx={{ fontWeight: "bold" }}
-  >
-    Selected Ticker: <span style={{ color: '#ff6005' }}>{ticker_list.join(", ")}</span>
-  </Typography>
+    <Box sx={{ marginTop: 4, padding: 2}}>
+    <Typography
+      variant="h5"
+      gutterBottom
+      align="center"
+      sx={{
+        fontWeight: "bold",
+        color: "#6501c4",
+        textTransform: "uppercase",
+      }}
+    >
+      Historical Deals Overview for{" "}
+      <span style={{ color: "#ff6005", fontStyle: "italic" }}>
+        {ticker_list.join(", ")} - {data.length} deals
+      </span>
+    </Typography>
 
   <Grid container spacing={2}>
     {data.map((item, index) => (
@@ -98,8 +130,13 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
             borderRadius: "8px",
           }}
         >
-          <Typography variant="h6" color="#002060" gutterBottom>
-            Deal Information for the Selected Ticker
+          <Typography variant="h6" color="#002060" align="center" gutterBottom>
+            Deal Information for{" "}
+            <span style={{ fontWeight: "bold", color: "#0073e6" }}>{item.ticker_symbol}</span>{" "}
+            on{" "}
+            <span style={{ fontWeight: "bold", color: "#0073e6" }}>
+              {formatDate(item.pricing_date)}
+            </span>
           </Typography>
           <Grid container spacing={2}>
             {/* Table 1 */}
@@ -108,14 +145,14 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                 <Table size="small" aria-label="Deal Info Table 1">
                   <TableBody>
                     {[
-                      { label: "Pricing Date:", value: item.pricing_date },
-                      { label: "Issuer Name:", value: item.issuer_name },
-                      { label: "Ticker Symbol:", value: item.ticker_symbol },
-                      { label: "GICS Sector:", value: item.gics_sector },
-                      { label: "Region:", value: item.broad_region },
-                      { label: "Deal Type:", value: item.deal_type },
+                      { label: "Pricing Date", value: item.pricing_date },
+                      { label: "Issuer Name", value: item.issuer_name },
+                      { label: "Ticker Symbol", value: item.ticker_symbol },
+                      { label: "GICS Sector", value: item.gics_sector },
+                      { label: "Region", value: item.broad_region },
+                      { label: "Deal Type", value: item.deal_type },
                       {
-                        label: "Deal Value:",
+                        label: "Deal Value",
                         value: item.deal_value
                           ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.deal_value))}`
                           : "N/A"
@@ -160,14 +197,52 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                 <Table size="small" aria-label="Deal Info Table 2">
                   <TableBody>
                     {[
-                      { label: "Issue Price:", value: "$" + (Number(item.issue_price_usd)).toFixed(2) },
-                      { label: "T+1 Month Returns:", value: (Number(item.t_plus_1m_returns)).toFixed(2) + "%" },
-                      { label: "T+1 Day Returns:", value: (Number(item.t_plus_1_return)).toFixed(2) + "%" },
-                      { label: "T+1 Day Returns (Index Adjusted):", value: (Number(item.t_plus_1d_returns_index_returns)).toFixed(2) + "%" },
-                      { label: "T+1 Month Returns (Index Adjusted):", value: (Number(item.t_plus_1m_returns_index_returns)).toFixed(2) + "%" },
+                      { label: "Issue Price", value: "$" + (Number(item.issue_price_usd)).toFixed(2) },
+                      {
+                        label: "T+1 Month Returns",
+                        value: (
+                          <span
+                            style={{
+                              backgroundColor: Number(item.t_plus_1m_returns) > 0
+                                ? "#d4edda" // Light green for positive returns
+                                : Number(item.t_plus_1m_returns) < 0
+                                ? "#f8d7da" // Light red for negative returns
+                                : "#f8f9fa", // Light gray for neutral returns
+                              color: "#000", // Keep text color black for readability
+                              padding: "4px 8px", // Add some padding for better appearance
+                              borderRadius: "4px", // Rounded corners for styling
+                              display: "inline-block", // Ensures the span sizes properly
+                            }}
+                          >
+                            {Number(item.t_plus_1m_returns).toFixed(2)}%
+                          </span>
+                        ),
+                      },
+                      {
+                        label: "T+1 Day Returns",
+                        value: (
+                          <span
+                            style={{
+                              backgroundColor: Number(item.t_plus_1_return) > 0
+                                ? "#d4edda" // Light green for positive returns
+                                : Number(item.t_plus_1_return) < 0
+                                ? "#f8d7da" // Light red for negative returns
+                                : "#f8f9fa", // Light gray for neutral returns
+                              color: "#000", // Keep text color black for readability
+                              padding: "4px 8px", // Add some padding for better appearance
+                              borderRadius: "4px", // Rounded corners for styling
+                              display: "inline-block", // Ensures the span sizes properly
+                            }}
+                          >
+                            {Number(item.t_plus_1_return).toFixed(2)}%
+                          </span>
+                        ),
+                      },
+                      { label: "T+1 Day Returns (Index Adjusted)", value: (Number(item.t_plus_1d_returns_index_returns)).toFixed(2) + "%" },
+                      { label: "T+1 Month Returns (Index Adjusted)", value: (Number(item.t_plus_1m_returns_index_returns)).toFixed(2) + "%" },
                       
                       {
-                        label: "Opportunity Value Ex:",
+                        label: "Opportunity Value Excess",
                         value: item.opportunity_value_ex
                           ? new Intl.NumberFormat('en-US', {
                               style: 'currency',

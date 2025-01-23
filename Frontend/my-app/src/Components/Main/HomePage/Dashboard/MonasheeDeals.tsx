@@ -17,26 +17,36 @@ const MonasheeDeals: React.FC = () => {
     <Box sx={{ width: "100%", backgroundColor: "#fff" }}>
       {/* Heading */}
       <Typography
-        variant="h3"
-        sx={{
-          fontWeight: "bold",
-          color: "#FFFFFF",
-          fontSize: { xs: "2rem" },
-          backgroundColor: "#002060",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "5vh",
-          textAlign: "center",
-          marginBottom: "10px",
-          animation: "fadeInScale 2s ease-out",
-          "@keyframes fadeInScale": {
-            "0%": { opacity: 0, transform: "scale(0.8)" },
-            "100%": { opacity: 1, transform: "scale(1)" },
-          },
-        }}
-      >
-      </Typography>
+  variant="body2"
+  sx={{
+    fontWeight: 500, // Semi-bold for better balance
+    color: "#FFFFFF", // White text
+    fontSize: { xs: "1rem", sm: "1.2rem" }, // Adaptive font size for different screen sizes
+    backgroundColor: "#002060", // Navy background
+    display: "flex",
+    alignItems: "center", // Vertically center the text
+    justifyContent: "center", // Horizontally center the text
+    height: "4vh", // Adjust height for a larger appearance
+    padding: "8px 16px", // Add padding for better spacing
+    borderRadius: "8px", // Rounded edges for a modern look
+    textAlign: "center", // Ensure the text remains centered
+    marginBottom: "20px", // Margin for spacing below the component
+
+    // Add subtle shadow for depth
+    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+
+    // Add a smooth fade-in animation
+    animation: "fadeIn 2s ease-out",
+
+    "@keyframes fadeIn": {
+      "0%": { opacity: 0, transform: "translateY(-10px)" },
+      "100%": { opacity: 1, transform: "translateY(0)" },
+    },
+  }}
+>
+  Welcome to Monashee Participated Deals Dashboard! Explore valuable insights into the deals you've actively participated in across the global market.
+</Typography>
+
 
       {/* Tabs */}
       <Tabs
