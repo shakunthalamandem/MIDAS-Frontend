@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useMemo} from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, TextField, Typography } from "@mui/material";
 import MDDScreenerSummary from "./MDDScrennerSummary";
-
 // Define the type for each row of data
 interface ScreenerDataRow {
   id: number; // Unique ID for each row
@@ -25,6 +24,32 @@ interface ScreenerDataRow {
   allocated_shares: number;
 }
 
+const cleanDealSize = (dealSize: any): number => {
+  if (dealSize == null || dealSize === "") return 0; // Handle null, undefined, or empty values
+  const cleanedValue = parseFloat(dealSize.toString().replace(/[^0-9.-]+/g, ""));
+  return isNaN(cleanedValue) ? 0 : cleanedValue; // Return 0 if parsing fails
+};
+
+const formatDealSize = (dealSize: any) => {
+  const cleanedValue = cleanDealSize(dealSize);
+  return "$" + cleanedValue.toLocaleString("en-US");
+};
+
+
+
+const preprocessRows = (rows: any[]) =>
+  rows.map((row, index) => ({
+    id: index,
+    ...row,
+    percentage_primary: row.percentage_primary ? `${row.percentage_primary.toFixed()}%` : "",
+    fo_discount: row.fo_discount ? `${row.fo_discount.toFixed(2)}%` : "",
+    t1d_returns: row.t1d_returns ? `${row.t1d_returns.toFixed(2)}%` : "",
+    t1m_returns: row.t1m_returns ? `${row.t1m_returns.toFixed(2)}%` : "",
+    allocation_deal_size: row.allocation_deal_size ? `${row.allocation_deal_size.toFixed(2)}%` : "",
+    tplus_1d_issueprice: row.tplus_1d_issueprice ? `${row.tplus_1d_issueprice.toFixed(2)}%` : "",
+  }));
+
+
 interface MDDScreenerDataTableProps {
   sectorwiseData: { [key: string]: (string | number)[] };
 }
@@ -35,14 +60,13 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [apiResponse, setApiResponse] = useState<any>(null); // Full API response for summary
-
-
+  const [apiResponse, setApiResponse] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     if (sectorwiseData) {
-      fetchPaginatedData(sectorwiseData); // Fetch data for DataGrid
-      fetchFullData(sectorwiseData); // Fetch full data for Summary
+      fetchPaginatedData(sectorwiseData);
+      fetchFullData(sectorwiseData);
     }
   }, [sectorwiseData]);
 
@@ -51,26 +75,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   ) => {
     setLoading(true);
     setError(null);
-
-    const payload = {
-      year_range: data.year_range,
-      deal_type: data.dealType,
-      region: data.region,
-      sector: data.sector,
-      deal_captain: data.deal_captain,
-      deal_value: data.deal_value,
-      selected_bank: data.selected_bank,
-      fo_discount: data.FollowOnDiscount,
-      t1d_returns: data.t1_return,
-      t1m_returns: data.t1m_returns,
-      allocation_deal_size: data.AllocationPercentOfDealSize,
-      average_hold_period: data.HoldPeriod,
-      allocation_ioi: data.AllocationPercentOfIOI,
-      t1d_issueprice: data.t1d_issueprice,
-      percentage_primary: data.Primary,
-      sponsor: data.Sponsor,
-
-    };
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
@@ -84,7 +88,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
@@ -93,6 +97,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
           (result.data || []).map((item: ScreenerDataRow, index: number) => ({
             ...item,
             id: index + 1,
+            deal_size: formatDealSize(item.deal_size),
           }))
         );
       } else {
@@ -110,25 +115,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   const fetchFullData = async (
     data: MDDScreenerDataTableProps["sectorwiseData"]
   ) => {
-    const payload = {
-      year_range: data.year_range,
-      deal_type: data.dealType,
-      region: data.region,
-      sector: data.sector,
-      deal_captain: data.deal_captain,
-      deal_value: data.deal_value,
-      selected_bank: data.selected_bank,
-      fo_discount: data.FollowOnDiscount,
-      t1d_returns: data.t1_return,
-      t1m_returns: data.t1m_returns,
-      allocation_deal_size: data.AllocationPercentOfDealSize,
-      average_hold_period: data.HoldPeriod,
-      allocation_ioi: data.AllocationPercentOfIOI,
-      t1d_issueprice: data.t1d_issueprice,
-      percentage_primary: data.Primary,
-      sponsor: data.Sponsor,
-    };
-
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -141,12 +127,12 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
         const result = await response.json();
-        setApiResponse(result); // Set full data for the summary
+        setApiResponse(result);
       } else {
         throw new Error("Failed to fetch full data");
       }
@@ -156,7 +142,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   };
 
   const columns: GridColDef[] = [
-    
     { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "ticker", headerName: "Ticker", width: 100 },
@@ -167,34 +152,57 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     },
     { field: "broad_region", headerName: "Region", width: 100 },
     { field: "deal_type", headerName: "Deal Type", width: 100 },
-    { field: "deal_size", headerName: "Deal Size", width: 120 },
-    { field: "t1m_returns", headerName: "T + 1M Excess Returns", width: 100 },
+    {
+      field: "deal_size",
+      headerName: "Deal Size",
+      width: 120,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+    {
+      field: "t1m_returns",
+      headerName: "T + 1M Excess Returns",
+      width: 150,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
     {
       field: "t1d_returns",
-      headerName: "T + 1D Return (From Bloomberg)",
-      width: 100,
+      headerName: "T + 1D Return",
+      width: 150,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "allocation_deal_size",
-      headerName: "Allocation Deal Size Percentage",
-      width: 100,
+      headerName: "Allocation Deal Size %",
+      width: 150,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { field: "allocation_ioi", headerName: "Allocation of IOI", width: 100 },
     {
       field: "average_hold_period",
       headerName: "Average Hold Period",
-      width: 100,
+      width: 150,
+    }, { field: "tplus_1d_issueprice", headerName: "T + 1D issueprice", width: 100 ,renderCell: (params) => `${params.value}`,
+    sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),},
+    { field: "fo_discount", headerName: "Follow On Discount", width: 100,
+      renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { field: "tplus_1d_issueprice", headerName: "T + 1D issueprice", width: 100 },
-    { field: "fo_discount", headerName: "Follow On Discount", width: 100 },
-    { field: "percentage_primary", headerName: "Primary %", width: 100 },
-    { field: "sponsor", headerName: "Sponsor", width: 70 }
-  ];
-  const [searchQuery, setSearchQuery] = useState<string>("");
+    {
+      field: "percentage_primary", headerName: "Primary %", width: 100,
 
-  const filteredRows = rows.filter((row) =>
-    row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+    { field: "sponsor", headerName: "Sponsor", width: 70 }];
+
+    const filteredRows = useMemo(() => {
+      return preprocessRows(rows).filter((row) =>
+        row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }, [rows, searchQuery]);
   return (
     <>
       <div style={{ height: 600, width: "100%" }}>
@@ -214,7 +222,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
               marginBottom: "15px",
             }}
           >
-            {" "}
             Total no of deals:{" "}
             <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
           </Typography>
@@ -229,7 +236,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
         </Box>
 
         <DataGrid
-          rows={filteredRows.map((row, index) => ({ ids: index, ...row }))}
+          rows={filteredRows}
           columns={columns}
           loading={loading}
           rowHeight={35}
@@ -241,20 +248,18 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
             },
             "& .MuiDataGrid-columnHeaderTitle": {
               fontWeight: "bold",
-              fontSize: "12px", // Decrease header font size
+              fontSize: "12px",
             },
             "& .MuiDataGrid-cell": {
               color: "#000000",
-              fontSize: "12px", // Decrease font size for cell values
-              padding: "4px", // Optional: Reduce padding for compact look
+              fontSize: "12px",
+              padding: "4px",
             },
             "& .MuiDataGrid-row:nth-of-type(odd)": {
               backgroundColor: "#F5F5F5",
             },
           }}
         />
-
-        {/* Pass the API response to the MDDScreenerSummary component */}
       </div>
       <Box mt={2} mb={4}>
         <MDDScreenerSummary apiResponse={apiResponse} />
