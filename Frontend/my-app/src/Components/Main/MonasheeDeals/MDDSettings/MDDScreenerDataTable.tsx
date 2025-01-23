@@ -25,6 +25,7 @@ interface ScreenerDataRow {
   subscription_bid_shares: number;
   allocated_shares: number;
   tplus_1d_issueprice:number;
+  fo_discount:number;
 
 }
 interface MDDScreenerDataTableProps {
