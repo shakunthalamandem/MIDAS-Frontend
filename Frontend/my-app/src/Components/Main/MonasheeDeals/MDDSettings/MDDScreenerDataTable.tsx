@@ -82,7 +82,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       average_hold_period: data.average_hold_period,
       deal_captain: data.deal_captain,
       deal_type: data.deal_type,
-      deal_value: data.deal_value,
+      deal_size: data.deal_size,
       fo_discount: data.fo_discount,
       percentage_primary: data.percentage_primary,
       region: data.region,
@@ -113,14 +113,13 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
 
       if (response.ok) {
         const result = await response.json();
-        const formattedRows = (result.data || []).map(
-          (item: ScreenerDataRow, index: number) => ({
+        setRows(
+          (result.data || []).map((item: ScreenerDataRow, index: number) => ({
             ...item,
             id: index + 1,
-            deal_size: formatDealSize(item.deal_size),
-          })
+            deal_size: formatDealSize(item.deal_size), // Format the deal_value correctly
+          }))
         );
-        setRows(formattedRows);
         setApiResponse(result);
       } else {
         throw new Error("Failed to fetch data");
