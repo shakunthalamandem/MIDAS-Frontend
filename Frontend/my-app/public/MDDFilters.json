@@ -78,16 +78,8 @@
         { "type": "number", "operator": "<", "label": "Min", "placeholder": "Enter minimum discount" },
         { "type": "number", "operator": ">", "label": "Max", "placeholder": "Enter maximum discount" }
       ]
-    },
-    "tplus_1d_issueprice": {
-      "type": "input",
-      "label": "T+1D IssuePrice",
-      "description": "Specify the percentage change from T+1 day to the index.",
-      "fields": [
-        { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
-        { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
-      ]
     }
+   
   },
   
   "MonahseeSpecific": {
