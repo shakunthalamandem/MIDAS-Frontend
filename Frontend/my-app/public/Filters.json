@@ -87,7 +87,7 @@
       }
     },
     {
-      "selected_bank": {
+      "lead_bank": {
         "options": [
           "ABN AMRO Bank",
           "Bank of America Merrill Lynch",
