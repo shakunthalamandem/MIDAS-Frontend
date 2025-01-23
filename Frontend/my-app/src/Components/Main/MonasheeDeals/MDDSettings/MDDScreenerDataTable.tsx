@@ -113,14 +113,16 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
 
       if (response.ok) {
         const result = await response.json();
-        setRows(
-          (result.data || []).map((item: ScreenerDataRow, index: number) => ({
+
+        const processedData = Array.isArray(result.data) 
+        ? result.data.map((item: ScreenerDataRow, index: number) => ({
             ...item,
             id: index + 1,
-            deal_size: formatDealSize(item.deal_size), // Format the deal_value correctly
+            deal_size: formatDealSize(item.deal_size),
           }))
-        );
-        setApiResponse(result);
+        : [];
+      setRows(processedData);
+      
       } else {
         throw new Error("Failed to fetch data");
       }

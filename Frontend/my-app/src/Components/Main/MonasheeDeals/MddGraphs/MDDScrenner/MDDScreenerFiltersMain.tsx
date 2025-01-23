@@ -26,11 +26,11 @@ interface FilterData {
     sector: { options: string[]; label: string; description: string };
     t1d_returns: { options: string[]; label: string; description: string };
     t1m_returns: { options: string[]; label: string; description: string };
-    deal_value: { options: string[]; label: string; description: string };
+    deal_size: { options: string[]; label: string; description: string };
   };
   DealSpecific: {
     percentage_primary: { type: string; description: string; options: string[] };
-    LeadBank: { type: string; description: string; api: string; key: string };
+    selected_bank: { type: string; description: string; api: string; key: string };
     sponsor: { type: string; description: string; options: string[] };
     fo_discount: {
       type: string;
@@ -84,7 +84,7 @@ interface FilterData {
         placeholder: string;
       }[];
     };
-    DealCaption: {
+    deal_caption: {
       type: string;
       description: string;
       api: string;

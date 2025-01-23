@@ -47,7 +47,7 @@
         "description": "The return of deals on one month from the pricing date."
       },
    
-      "deal_value": {
+      "deal_size": {
         "options": [
           "0 to $100M", "$100M to $200M", "$200M to $500M", ">$500M"
         ],
