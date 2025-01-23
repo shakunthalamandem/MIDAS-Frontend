@@ -1,13 +1,9 @@
 import React, { useState } from "react";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
-import DealGraph from "../../MonasheeGraphs/DealGraph";
-import DealVolume from "../../MonasheeGraphs/DealVolume";
-import OpportunityMain from "../../MonasheeGraphs/OpportunityMain";
-import OpportunityAbsBasis from "../../MonasheeGraphs/OpportunityAbsBasis";
 import SkewTableMain from "../../MonasheeGraphs/SkewTableMain";
 import ScreenerMain from "../../MonasheeGraphs/ScreenerTable/ScreenerMain";
-import DealSearch from "../../MonasheeGraphs/DealSearch";
 import MarketFilters from "../../MonasheeCapitalMarkets/MarketFilters";
+import GlobalDealSearch from "../../MonasheeGraphs/DealSearch";
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState(0);
@@ -155,7 +151,7 @@ const CapitalMarkets: React.FC = () => {
           />
        
         </Tabs>
-        {value === 0 && <DealSearch />}
+        {value === 0 && <GlobalDealSearch />}
         {value === 1 && <MarketFilters />}
         {/* {value === 2 && <DealGraph />}
         {value === 3 && <DealVolume />}
