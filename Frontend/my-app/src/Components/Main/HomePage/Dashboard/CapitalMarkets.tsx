@@ -20,29 +20,36 @@ const CapitalMarkets: React.FC = () => {
     <>
       <Box sx={{ width: "100%", backgroundColor: "#fff" }}>
       <Typography
-  variant="h3"
+  variant="body2"
   sx={{
-    fontWeight: "bold",
-    color: "#FFFFFF", // Text color is now white
-    fontSize: { xs: "2rem" },
-    backgroundColor: "#002060", // Matching navbar color for the background
+    fontWeight: 500, // Semi-bold for better balance
+    color: "#FFFFFF", // White text
+    fontSize: { xs: "1rem", sm: "1.2rem" }, // Adaptive font size for different screen sizes
+    backgroundColor: "#002060", // Navy background
     display: "flex",
     alignItems: "center", // Vertically center the text
     justifyContent: "center", // Horizontally center the text
-    height: "5vh", // Full viewport height
-    textAlign: "center", // Ensure text is centered
-    marginBottom: '10px', // Remove any default margins
+    height: "4vh", // Adjust height for a slimmer appearance
+    padding: "8px 16px", // Add padding for better spacing
+    borderRadius: "8px", // Rounded edges for a modern look
+    textAlign: "center", // Ensure the text remains centered
+    marginBottom: "10px", // Margin for spacing below the component
 
-    // Add animation
-    animation: "fadeInScale 2s ease-out",
+    // Add subtle shadow for depth
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
 
-    "@keyframes fadeInScale": {
-      "0%": { opacity: 0, transform: "scale(0.8)" },
-      "100%": { opacity: 1, transform: "scale(1)" },
+    // Add a smooth fade-in animation
+    animation: "fadeIn 1.5s ease-in-out",
+
+    "@keyframes fadeIn": {
+      "0%": { opacity: 0 },
+      "100%": { opacity: 1 },
     },
   }}
 >
+  Welcome to Capital Markets! Explore deals and uncover statistics from the global market with ease.
 </Typography>
+
 
 
         <Tabs
