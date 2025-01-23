@@ -199,36 +199,36 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                       <TableBody>
                         {[
                           {
-                            label: "T+1M Excess Returns",
-                            value: item.t1m_returns ? (Number(item.t1m_returns)).toFixed(2) + "%" : "N/A",
+                            label: "Sponsor Y/N",
+                            value: item.sponsor ?? "N/A",
                           },
                           {
                             label: "Percentage Primary",
-                            value: item.percentage_primary ? (Number(item.percentage_primary)).toFixed(0) + "%" : "N/A",
-                          },
-                          {
-                            label: "T+1D Return (Bloomberg)",
-                            value: item.t1d_returns ? (Number(item.t1d_returns)).toFixed(2) + "%" : "N/A",
+                            value: item.percentage_primary ? (item.percentage_primary) + "%"  : "0%",
                           },
                           {
                             label: "Discount from Announcement Price",
-                            value: item.fo_discount ? (Number(item.fo_discount)).toFixed(0) + "%" : "N/A",
+                            value: item.fo_discount ? (Number(item.fo_discount)).toFixed(0) + "%" : "0%",
                           },
                           {
                             label: "Allocation Deal Size %",
                             value: item.t1m_returns ? (Number(item.allocation_deal_size)).toFixed(2) + "%" : "N/A",
                           },
                           {
-                            label: "Average Hold Period",
-                            value: item.average_hold_period ?? "N/A",
-                          },
-                          {
                             label: "Allocation Percentage",
                             value: item.allocation_ioi ? (Number(item.allocation_ioi)).toFixed(2) + "%": "N/A",
                           },
                           {
-                            label: "Sponsor Y/N",
-                            value: item.sponsor ?? "N/A",
+                            label: "T+1D Return (Bloomberg)",
+                            value: item.t1d_returns ? (Number(item.t1d_returns)).toFixed(2) + "%" : "N/A",
+                          },
+                          {
+                            label: "T+1M Excess Returns",
+                            value: item.t1m_returns ? (Number(item.t1m_returns)).toFixed(2) + "%" : "N/A",
+                          },
+                          {
+                            label: "Average Hold Period",
+                            value: item.average_hold_period ? (item.average_hold_period) + " days": "N/A",
                           },
                           {
                             label: "Total Return Earned",
