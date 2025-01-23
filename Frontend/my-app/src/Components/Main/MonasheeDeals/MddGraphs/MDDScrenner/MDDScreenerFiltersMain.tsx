@@ -29,10 +29,10 @@ interface FilterData {
     deal_value: { options: string[]; label: string; description: string };
   };
   DealSpecific: {
-    Primary: { type: string; description: string; options: string[] };
+    percentage_primary: { type: string; description: string; options: string[] };
     LeadBank: { type: string; description: string; api: string; key: string };
-    Sponsor: { type: string; description: string; options: string[] };
-    FollowOnDiscount: {
+    sponsor: { type: string; description: string; options: string[] };
+    fo_discount: {
       type: string;
       description: string;
       fields: {
@@ -42,7 +42,7 @@ interface FilterData {
         placeholder: string;
       }[];
     };
-    t1d_issueprice: {
+    tplus_1d_issueprice: {
       type: string;
       description: string;
       fields: {

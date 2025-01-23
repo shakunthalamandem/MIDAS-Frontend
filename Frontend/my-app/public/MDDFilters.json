@@ -58,19 +58,19 @@
   
   
   "DealSpecific": {
-    "Primary": {
+    "percentage_primary": {
       "type": "dropdown",
       "label": "Primary Percentage",
       "description": "Select a range or specific value for the primary category.",
       "options": ["Equal to 0", "Equal to 100", "0-20", "20-40", "40-60", "60-80", "80-100"]
     },
-    "Sponsor": {
+    "sponsor": {
       "type": "dropdown",
       "label": "Sponsor",
       "description": "Choose whether the sponsor is involved in the deal.",
       "options": ["Yes", "No"]
     },
-    "FollowOnDiscount": {
+    "fo_discount": {
       "type": "input",
       "label": "Follow-On Discount",
       "description": "Specify the discount for follow-on discount as a range using input fields. Only for follow on's.",
@@ -79,7 +79,7 @@
         { "type": "number", "operator": ">", "label": "Max", "placeholder": "Enter maximum discount" }
       ]
     },
-    "t1d_issueprice": {
+    "tplus_1d_issueprice": {
       "type": "input",
       "label": "T+1D IssuePrice",
       "description": "Specify the percentage change from T+1 day to the index.",
