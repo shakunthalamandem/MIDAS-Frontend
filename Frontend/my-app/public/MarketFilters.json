@@ -78,7 +78,8 @@
             "year_period": {
                 "options": [
                     "Yearly",
-                    "Quarterly"
+                    "Quarterly",
+                    "Monthly"
                 ],
                 "label": "Period",
                 "description": "Period"
