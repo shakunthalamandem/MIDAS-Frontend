@@ -115,6 +115,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
 
       if (response.ok) {
         const result = await response.json();
+        setApiResponse(result)
 
         const processedData = Array.isArray(result.data) 
         ? result.data.map((item: ScreenerDataRow, index: number) => ({
