@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Tab, Tabs, Box, Typography, Card, CardContent, Grid, Button, Container } from "@mui/material";
+import {
+  Tab,
+  Tabs,
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  Button,
+  Container,
+} from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import DealSpecificTab from "./DealSpecificTab";
 import GeneralTab from "./GeneralTab";
@@ -22,14 +32,64 @@ interface FilterData {
     Primary: { type: string; description: string; options: string[] };
     LeadBank: { type: string; description: string; api: string; key: string };
     Sponsor: { type: string; description: string; options: string[] };
-    FollowOnDiscount: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
-    t1d_issueprice: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    FollowOnDiscount: {
+      type: string;
+      description: string;
+      fields: {
+        type: string;
+        operator: string;
+        label: string;
+        placeholder: string;
+      }[];
+    };
+    t1d_issueprice: {
+      type: string;
+      description: string;
+      fields: {
+        type: string;
+        operator: string;
+        label: string;
+        placeholder: string;
+      }[];
+    };
   };
   MonahseeSpecific: {
-    AllocationPercentOfDealSize: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
-    AllocationPercentOfIOI: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
-    HoldPeriod: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
-    DealCaption: { type: string; description: string; api: string; key: string };
+    AllocationPercentOfDealSize: {
+      type: string;
+      description: string;
+      fields: {
+        type: string;
+        operator: string;
+        label: string;
+        placeholder: string;
+      }[];
+    };
+    AllocationPercentOfIOI: {
+      type: string;
+      description: string;
+      fields: {
+        type: string;
+        operator: string;
+        label: string;
+        placeholder: string;
+      }[];
+    };
+    HoldPeriod: {
+      type: string;
+      description: string;
+      fields: {
+        type: string;
+        operator: string;
+        label: string;
+        placeholder: string;
+      }[];
+    };
+    DealCaption: {
+      type: string;
+      description: string;
+      api: string;
+      key: string;
+    };
   };
 }
 
@@ -37,9 +97,13 @@ interface MDDScreenerFiltersMainProps {
   filtersData: FilterData;
 }
 
-const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filtersData }) => {
+const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({
+  filtersData,
+}) => {
   const [value, setValue] = useState<number>(0); // Tab index state
-  const [appliedFilters, setAppliedFilters] = useState<{ [key: string]: (string | number)[] } | null>(null); // Applied filters
+  const [appliedFilters, setAppliedFilters] = useState<{
+    [key: string]: (string | number)[];
+  } | null>(null); // Applied filters
 
   useEffect(() => {
     // Initialize applied filters when filtersData changes
@@ -116,54 +180,71 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({ filters
             >
               <Tab label="General" aria-label="General Filters" />
               <Tab label="Deal Specific" aria-label="Deal Specific Filters" />
-              <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
+              <Tab
+                label="Monashee Specific"
+                aria-label="Monashee Specific Filters"
+              />
             </Tabs>
             <Box sx={{ paddingTop: 2 }}>
-            <Formik
-  initialValues={appliedFilters || {}}
-  enableReinitialize
-  onSubmit={handleApply}
->
-  {({ values, handleChange }) => (
-    <Form>
-      {value === 0 && <GeneralTab filtersData={getFilteredDataForTab(0)} />}
-      {value === 1 && <DealSpecificTab filtersData={getFilteredDataForTab(1)} />}
-      {value === 2 && <MonasheeSpecificTab filtersData={getFilteredDataForTab(2)} />}
-      <Grid container justifyContent="center" spacing={2} sx={{ mt: 2 }}>
-        <Grid item>
-          <Button
-            variant="contained"
-            type="submit"
-            sx={{ bgcolor: "#002060" }}
-            disabled={!filtersData || !Object.keys(filtersData).length}
-          >
-            Apply
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="outlined"
-            color="secondary"
-            type="button"
-            onClick={handleReset}
-            disabled={!filtersData || !Object.keys(filtersData).length}
-          >
-            Reset
-          </Button>
-        </Grid>
-      </Grid>
-    </Form>
-  )}
-</Formik>
-
+              <Formik
+                initialValues={appliedFilters || {}}
+                enableReinitialize
+                onSubmit={handleApply}
+              >
+                {({ values, handleChange }) => (
+                  <Form>
+                    {value === 0 && (
+                      <GeneralTab filtersData={getFilteredDataForTab(0)} />
+                    )}
+                    {value === 1 && (
+                      <DealSpecificTab filtersData={getFilteredDataForTab(1)} />
+                    )}
+                    {value === 2 && (
+                      <MonasheeSpecificTab
+                        filtersData={getFilteredDataForTab(2)}
+                      />
+                    )}
+                    <Grid
+                      container
+                      justifyContent="center"
+                      spacing={2}
+                      sx={{ mt: 2 }}
+                    >
+                      <Grid item>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          sx={{ bgcolor: "#002060" }}
+                          disabled={
+                            !filtersData || !Object.keys(filtersData).length
+                          }
+                        >
+                          Apply
+                        </Button>
+                      </Grid>
+                      <Grid item>
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          type="button"
+                          onClick={handleReset}
+                          disabled={
+                            !filtersData || !Object.keys(filtersData).length
+                          }
+                        >
+                          Reset
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Form>
+                )}
+              </Formik>
             </Box>
           </CardContent>
         </Card>
         <Box mt={4} mb={4}>
           <MDDScreenerDataTable sectorwiseData={appliedFilters || {}} />
           {/* <SummaryCard sectorwiseData={appliedFilters || {}} /> */}
-
-
         </Box>
       </Box>
     </Container>
