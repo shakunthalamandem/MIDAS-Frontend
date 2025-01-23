@@ -244,7 +244,6 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({
         </Card>
         <Box mt={4} mb={4}>
           <MDDScreenerDataTable sectorwiseData={appliedFilters || {}} />
-          {/* <SummaryCard sectorwiseData={appliedFilters || {}} /> */}
         </Box>
       </Box>
     </Container>

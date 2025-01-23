@@ -25,6 +25,7 @@ interface ScreenerDataRow {
   subscription_bid_shares: number;
   allocated_shares: number;
   tplus_1d_issueprice:number;
+  fo_discount:number;
 
 }
 interface MDDScreenerDataTableProps {
@@ -88,7 +89,6 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       deal_captain: data.deal_captain,
       deal_type: data.deal_type,
       deal_size: data.deal_size,
-      fo_discount: data.fo_discount,
       percentage_primary: data.percentage_primary,
       region: data.region,
       sector: data.sector,
@@ -97,7 +97,9 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       t1d_returns: data.t1d_returns,
       t1m_returns: data.t1m_returns,
       tplus_1d_issueprice: data.tplus_1d_issueprice,
-      year_range: data.year_range
+      year_range: data.year_range,
+      // fo_discount: data.fo_discount
+
   };
   
 
@@ -130,7 +132,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       setRows(processedData);
       
       } else {
-        throw new Error("Failed to fetch ddd data");
+        throw new Error("Failed to fetch data");
       }
     } catch (err: any) {
       setError(err.message || "An error occurred while fetching data");
