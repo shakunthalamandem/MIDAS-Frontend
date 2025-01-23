@@ -228,7 +228,21 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           },
                           {
                             label: "T+1M Excess Returns",
-                            value: item.t1m_returns ? (Number(item.t1m_returns)).toFixed(2) + "%" : "N/A",
+                            (<span
+                              style={{
+                                backgroundColor: Number(item.t1m_returns) > 0
+                                  ? "#85A947" // Light green for positive returns
+                                  : Number(item.t1m_returns) < 0
+                                  ? "#FF8080" // Light red for negative returns
+                                  : "#f8f9fa", // Light gray for neutral returns
+                                color: "#000", // Keep text color black for readability
+                                padding: "4px 8px", // Add some padding for better appearance
+                                borderRadius: "4px", // Rounded corners for styling
+                                display: "inline-block",
+                              }}
+                            >
+                              {Number(item.t1m_returns).toFixed(2)}%
+                            </span>)
                           },
                           {
                             label: "Total Return Earned",
