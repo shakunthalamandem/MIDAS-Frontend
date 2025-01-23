@@ -11,12 +11,14 @@ interface ScreenerDataRow {
   gics_sector_from_bloomberg: string;
   broad_region: string;
   deal_type: string;
+  selected_bank:string;
   deal_size: number;
   issue_price_lcl: number;
   t1m_excess_returns: number;
   t1d_return_from_bloomberg: number;
   discount_from_announcement_price: number;
-  allocation_deal_size_percentage: number;
+  allocation_deal_size: number;
+  allocation_ioi:number;
   average_hold_period: number;
   last_price_t1: number;
   issue_offer_price: number;
@@ -52,6 +54,7 @@ const preprocessRows = (rows: any[]) =>
     t1d_returns: row.t1d_returns ? `${row.t1d_returns.toFixed(2)}%` : "",
     t1m_returns: row.t1m_returns ? `${row.t1m_returns.toFixed(2)}%` : "",
     allocation_deal_size: row.allocation_deal_size ? `${row.allocation_deal_size.toFixed(2)}%` : "",
+    allocation_ioi: row.allocation_ioi ? `${row.allocation_ioi.toFixed(2)}%` : "",
     tplus_1d_issueprice: row.tplus_1d_issueprice ? `${row.tplus_1d_issueprice.toFixed(2)}%` : "",
   }));
 
@@ -152,6 +155,8 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     },
     { field: "broad_region", headerName: "Region", width: 100 },
     { field: "deal_type", headerName: "Deal Type", width: 100 },
+    { field: "selected_bank", headerName: "Lead Bank", width: 100 },
+
     {
       field: "deal_size",
       headerName: "Deal Size",
@@ -176,6 +181,13 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     {
       field: "allocation_deal_size",
       headerName: "Allocation Deal Size %",
+      width: 150,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+    {
+      field: "allocation_ioi",
+      headerName: "Allocation of IOI %",
       width: 150,
       renderCell: (params) => params.value,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
@@ -208,7 +220,8 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          mb={2}
+          mb={6}
+        
         >
           <Typography
             align="left"
@@ -258,7 +271,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
           }}
         />
       </div>
-      <Box mt={2} mb={4}>
+      <Box mt={4} mb={4}>
         <MDDScreenerSummary apiResponse={apiResponse} />
       </Box>
     </>

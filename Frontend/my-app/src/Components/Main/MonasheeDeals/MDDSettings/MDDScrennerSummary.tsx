@@ -92,7 +92,7 @@ const MDDScreenerSummary: React.FC<MDDScreenerSummaryProps> = ({ apiResponse }) 
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 8,
+        marginTop: 20,
       }}
     >
       <Card
