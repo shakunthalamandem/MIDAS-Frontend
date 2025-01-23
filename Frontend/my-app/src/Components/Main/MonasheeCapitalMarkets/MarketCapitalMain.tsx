@@ -133,7 +133,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card sx={{ mb: 4 }}>
             <CardContent>
               <RegionWiseChart
                 data={apiData.year_wise_region}
