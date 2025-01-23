@@ -204,9 +204,9 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                           <span
                             style={{
                               backgroundColor: Number(item.t_plus_1m_returns) > 0
-                                ? "#d4edda" // Light green for positive returns
+                                ? "#85A947" // Light green for positive returns
                                 : Number(item.t_plus_1m_returns) < 0
-                                ? "#f8d7da" // Light red for negative returns
+                                ? "#FF8080" // Light red for negative returns
                                 : "#f8f9fa", // Light gray for neutral returns
                               color: "#000", // Keep text color black for readability
                               padding: "4px 8px", // Add some padding for better appearance
@@ -224,9 +224,9 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                           <span
                             style={{
                               backgroundColor: Number(item.t_plus_1_return) > 0
-                                ? "#d4edda" // Light green for positive returns
+                                ? "#85A947" // Light green for positive returns
                                 : Number(item.t_plus_1_return) < 0
-                                ? "#f8d7da" // Light red for negative returns
+                                ? "#FF8080" // Light red for negative returns
                                 : "#f8f9fa", // Light gray for neutral returns
                               color: "#000", // Keep text color black for readability
                               padding: "4px 8px", // Add some padding for better appearance

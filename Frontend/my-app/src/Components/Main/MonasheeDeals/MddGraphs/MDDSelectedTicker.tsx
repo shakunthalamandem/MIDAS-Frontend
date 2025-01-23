@@ -1,18 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Box,
-  Paper,
-  Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Box, Paper, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 
-// Define the structure of the response data
 // Define the structure of the response data
 interface TickerData {
   year_range: number;
@@ -35,6 +24,7 @@ interface TickerData {
   average_hold_period: string | null;
   percentage_primary: string | null;
   sponsor: string | null;
+  percentage_total_return: string | null;
 }
 
 // Define the structure of the response (the API wraps data inside a 'data' property)
@@ -45,6 +35,31 @@ interface ApiResponse {
 interface MDDSelectedTickerProps {
   ticker: string;
 }
+
+const getOrdinalSuffix = (day: number): string => {
+  if (day > 3 && day < 21) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
+  const formattedDate = date.toLocaleDateString("en-GB", options);
+  const day = date.getDate();
+  return formattedDate.replace(
+    `${day}`,
+    `${day}${getOrdinalSuffix(day)}`
+  );
+};
 
 const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   const [data, setData] = useState<TickerData[]>([]);
@@ -59,7 +74,6 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
           `${apiUrl}/api/mdd_screener/`,
           { ticker }
         );
-        // Now TypeScript knows the structure of the response
         setData(response.data.data);
         setLoading(false);
       } catch (error) {
@@ -81,7 +95,10 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
         align="center"
         sx={{ fontWeight: "bold" }}
       >
-        Selected Ticker: <span style={{ color: "#ff6005" }}>{ticker}</span>
+        Historical Monashee participated on{" "}
+        <span style={{ color: "#ff6005", fontStyle: "italic" }}>
+          {ticker} - {data.length} deals
+        </span>
       </Typography>
 
       <Grid container spacing={2}>
@@ -95,6 +112,26 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                 borderRadius: "8px",
               }}
             >
+              <Typography
+                variant="h6"
+                color="#002060"
+                align="center"
+                gutterBottom
+                sx={{
+                  fontWeight: "bold",
+                  color: "#0073e6",
+                }}
+              >
+                Deal Information for{" "}
+                <span style={{ fontWeight: "bold", color: "#0073e6" }}>
+                  {item.ticker}
+                </span>{" "}
+                on{" "}
+                <span style={{ fontWeight: "bold", color: "#0073e6" }}>
+                  {formatDate(item.pricing_date)}
+                </span>
+              </Typography>
+
               <Grid container spacing={2}>
                 {/* Table 1 */}
                 <Grid item xs={12} sm={6}>
@@ -102,31 +139,31 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <Table size="small" aria-label="Deal Info Table 1">
                       <TableBody>
                         {[
-                          { label: "Pricing Date:", value: item.pricing_date },
-                          { label: "Issuer Name:", value: item.issuer_name },
-                          { label: "Ticker:", value: item.ticker },
-                          { label: "Year Range:", value: item.year_range },
+                          { label: "Pricing Date", value: item.pricing_date },
+                          { label: "Issuer Name", value: item.issuer_name },
+                          { label: "Ticker", value: item.ticker },
                           {
-                            label: "GICS Sector (Bloomberg):",
+                            label: "GICS Sector (Bloomberg)",
                             value: item.gics_sector_from_bloomberg,
                           },
-                          { label: "Region:", value: item.broad_region },
-                          { label: "Deal Type:", value: item.deal_type },
-                          { label: "Deal Size:", value: "$" + item.deal_size },
+                          { label: "Region", value: item.broad_region },
+                          { label: "Deal Type", value: item.deal_type },
+                          { label: "Deal Size", value: item.deal_size
+                            ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.deal_size))}`
+                            : "N/A" },
                           {
-                            label: "Issue Offer Price:",
+                            label: "Issue Offer Price",
                             value: "$" + item.issue_offer_price,
                           },
                           {
-                            label: "Deal Captain:",
+                            label: "Deal Captain",
                             value: item.deal_captain ?? "N/A",
                           },
                         ].map((row, i) => (
                           <TableRow
                             key={i}
                             sx={{
-                              backgroundColor:
-                                i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                              backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
                               "&:hover": {
                                 backgroundColor: "#e0f7fa",
                               },
@@ -146,9 +183,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                                 border: "1px solid #ccc",
                               }}
                             >
-                              {typeof row.value === "number"
-                                ? row.value.toFixed(2)
-                                : row.value}
+                              {row.value}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -164,61 +199,60 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                       <TableBody>
                         {[
                           {
-                            label: "T+1M Excess Returns:",
-                            value: item.t1m_returns
-                              ? item.t1m_returns + "%"
-                              : "N/A",
-                          },
-                          {
-                            label: "Percentage Primary:",
-                            value: item.percentage_primary
-                              ? item.percentage_primary + "%"
-                              : "N/A",
-                          },
-                          {
-                            label: "T+1D Return (Bloomberg):",
-                            value: item.t1d_returns
-                              ? item.t1d_returns + "%"
-                              : "N/A",
-                          },
-                          {
-                            label: "Discount from Announcement Price:",
-                            value: item.fo_discount
-                              ? item.fo_discount + "%"
-                              : "N/A",
-                          },
-                          {
-                            label: "Allocation Deal Size %:",
-                            value: item.allocation_deal_size
-                              ? item.allocation_deal_size + "%"
-                              : "N/A",
-                          },
-                          {
-                            label: "Average Hold Period:",
-                            value: item.average_hold_period ?? "N/A",
-                          },
-                          {
-                            label: "Last Price T1:",
-                            value: item.last_price_t1
-                              ? "$" + item.last_price_t1
-                              : "N/A",
-                          },
-                          {
-                            label: "Allocation Percentage:",
-                            value: item.allocation_ioi
-                              ? item.allocation_ioi + "%"
-                              : "N/A",
-                          },
-                          {
-                            label: "Sponsor Y/N:",
+                            label: "Sponsor Y/N",
                             value: item.sponsor ?? "N/A",
+                          },
+                          {
+                            label: "Percentage Primary",
+                            value: item.percentage_primary ? (item.percentage_primary) + "%"  : "0%",
+                          },
+                          {
+                            label: "Discount from Announcement Price",
+                            value: item.fo_discount ? (Number(item.fo_discount)).toFixed(0) + "%" : "0%",
+                          },
+                          {
+                            label: "Allocation Deal Size %",
+                            value: item.t1m_returns ? (Number(item.allocation_deal_size)).toFixed(2) + "%" : "N/A",
+                          },
+                          {
+                            label: "Allocation Percentage",
+                            value: item.allocation_ioi ? (Number(item.allocation_ioi)).toFixed(2) + "%": "N/A",
+                          },
+                          {
+                            label: "Average Hold Period",
+                            value: item.average_hold_period ? (item.average_hold_period) + " days": "N/A",
+                          },
+                          {
+                            label: "T+1D Return (Bloomberg)",
+                            value: item.t1d_returns ? (Number(item.t1d_returns)).toFixed(2) + "%" : "N/A",
+                          },
+                          {
+                            label: "T+1M Excess Returns",
+                            value: item.t1m_returns ? (Number(item.t1m_returns)).toFixed(2) + "%" : "N/A",
+                          },
+                          {
+                            label: "Total Return Earned",
+                            value: (<span
+                            style={{
+                              backgroundColor: Number(item.percentage_total_return) > 0
+                                ? "#85A947" // Light green for positive returns
+                                : Number(item.percentage_total_return) < 0
+                                ? "#FF8080" // Light red for negative returns
+                                : "#f8f9fa", // Light gray for neutral returns
+                              color: "#000", // Keep text color black for readability
+                              padding: "4px 8px", // Add some padding for better appearance
+                              borderRadius: "4px", // Rounded corners for styling
+                              display: "inline-block",
+                            }}
+                          >
+                            {Number(item.percentage_total_return).toFixed(2)}%
+                          </span>)
                           },
                         ].map((row, i) => (
                           <TableRow
                             key={i}
                             sx={{
-                              backgroundColor:
-                                i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                              backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
                               "&:hover": {
                                 backgroundColor: "#e0f7fa",
                               },
@@ -238,32 +272,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                                 border: "1px solid #ccc",
                               }}
                             >
-                              {row.value
-                                ? // Check if row.value is a string with a percentage or dollar sign
-                                  typeof row.value === "string" &&
-                                  (row.value.includes("%") ||
-                                    row.value.includes("$"))
-                                  ? // Remove the '%' or '$' and parse it as a number
-                                    isNaN(
-                                      parseFloat(
-                                        row.value.replace(/[^0-9.-]+/g, "")
-                                      )
-                                    )
-                                    ? "N/A"
-                                    : parseFloat(
-                                        row.value.replace(/[^0-9.-]+/g, "")
-                                      ).toFixed(2) +
-                                      (row.value.includes("%") ? "%" : "$")
-                                  : // If row.value is "N" or "Y", show the value directly
-                                    row.value === "N" || row.value === "Y"
-                                    ? row.value
-                                    : // If row.value is a number, format it with two decimal places
-                                      !isNaN(parseFloat(row.value.toString()))
-                                      ? parseFloat(
-                                          row.value.toString()
-                                        ).toFixed(2)
-                                      : "N/A"
-                                : "N"}
+                              {row.value}
                             </TableCell>
                           </TableRow>
                         ))}
