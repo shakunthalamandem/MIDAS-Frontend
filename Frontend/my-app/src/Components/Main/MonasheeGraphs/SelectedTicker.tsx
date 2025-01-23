@@ -198,8 +198,46 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                   <TableBody>
                     {[
                       { label: "Issue Price", value: "$" + (Number(item.issue_price_usd)).toFixed(2) },
-                      { label: "T+1 Month Returns", value: (Number(item.t_plus_1m_returns)).toFixed(2) + "%" },
-                      { label: "T+1 Day Returns", value: (Number(item.t_plus_1_return)).toFixed(2) + "%" },
+                      {
+                        label: "T+1 Month Returns",
+                        value: (
+                          <span
+                            style={{
+                              backgroundColor: Number(item.t_plus_1m_returns) > 0
+                                ? "#d4edda" // Light green for positive returns
+                                : Number(item.t_plus_1m_returns) < 0
+                                ? "#f8d7da" // Light red for negative returns
+                                : "#f8f9fa", // Light gray for neutral returns
+                              color: "#000", // Keep text color black for readability
+                              padding: "4px 8px", // Add some padding for better appearance
+                              borderRadius: "4px", // Rounded corners for styling
+                              display: "inline-block", // Ensures the span sizes properly
+                            }}
+                          >
+                            {Number(item.t_plus_1m_returns).toFixed(2)}%
+                          </span>
+                        ),
+                      },
+                      {
+                        label: "T+1 Day Returns",
+                        value: (
+                          <span
+                            style={{
+                              backgroundColor: Number(item.t_plus_1_return) > 0
+                                ? "#d4edda" // Light green for positive returns
+                                : Number(item.t_plus_1_return) < 0
+                                ? "#f8d7da" // Light red for negative returns
+                                : "#f8f9fa", // Light gray for neutral returns
+                              color: "#000", // Keep text color black for readability
+                              padding: "4px 8px", // Add some padding for better appearance
+                              borderRadius: "4px", // Rounded corners for styling
+                              display: "inline-block", // Ensures the span sizes properly
+                            }}
+                          >
+                            {Number(item.t_plus_1_return).toFixed(2)}%
+                          </span>
+                        ),
+                      },
                       { label: "T+1 Day Returns (Index Adjusted)", value: (Number(item.t_plus_1d_returns_index_returns)).toFixed(2) + "%" },
                       { label: "T+1 Month Returns (Index Adjusted)", value: (Number(item.t_plus_1m_returns_index_returns)).toFixed(2) + "%" },
                       
