@@ -62,8 +62,8 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
     { label: "Deals Count", key: "count" },
     { label: "Deal Size", key: "deal_size" },
     { label: "Average Deal Size", key: "avg_deal_size" },
-    { label: "MDD Allocation Percentage", key: "mdd_allocation_percentage" },
-    { label: "Allocation Percentage", key: "mdd_allocation_ioi" },
+    { label: "Allocation % of Deal Size", key: "mdd_allocation_percentage" },
+    { label: "Allocation % of IOI", key: "mdd_allocation_ioi" },
   ];
 
   const handleDialogClose = () => {
