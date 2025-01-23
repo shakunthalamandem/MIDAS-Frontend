@@ -145,16 +145,16 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                       variant="outlined"
                       size="small"
                       value={field.value || ""}
-                      // onChange={(e) => {
-                      //   const value = e.target.value ? parseFloat(e.target.value) : null;
-                      //   const currentValues = form.values[key] || [null, null];
-                      //   const updatedValues = [...currentValues];
-                      //   updatedValues[index] = value;
-                      //   form.setFieldValue(
-                      //     key,
-                      //     updatedValues.map((v, i) => (v === "" ? null : v))
-                      //   );
-                      // }}
+                      onChange={(e) => {
+                        const value = e.target.value ? parseFloat(e.target.value) : null;
+                        const currentValues = form.values[key] || [null, null];
+                        const updatedValues = [...currentValues];
+                        updatedValues[index] = value;
+                        form.setFieldValue(
+                          key,
+                          updatedValues.map((v, i) => (v === "" ? null : v))
+                        );
+                      }}
                       sx={{
                         maxWidth: "100px",
                         "& input": {
