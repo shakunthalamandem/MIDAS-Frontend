@@ -13,7 +13,7 @@ interface ScreenerDataRow {
   deal_type: string;
   deal_size: number;
   deal_captain: string;
-
+  fo_discount:number;
   issue_price_lcl: number;
   t1m_excess_returns: number;
   t1d_return_from_bloomberg: number;
