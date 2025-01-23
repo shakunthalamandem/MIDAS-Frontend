@@ -192,11 +192,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
                         marginBottom: "20px", // Space between input boxes
                         marginRight: "20px",
                       }}
-                      inputProps={{
-                        min: -100,
-                        max: 100,
-                        step: 1,
-                      }}
+                   
                       error={!!(touched[key] && errors[key])} // Display error state
                       helperText={touched[key] && errors[key]} // Show error message
                     />

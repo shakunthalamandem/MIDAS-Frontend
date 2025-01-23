@@ -163,11 +163,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                         marginBottom: "20px",
                         marginRight: "20px",
                       }}
-                      inputProps={{
-                        min: -100,
-                        max: 100,
-                        step: 1,
-                      }}
+                      
                       error={!!(touched[key] && errors[key])}
                       helperText={touched[key] && errors[key]}
                     />
