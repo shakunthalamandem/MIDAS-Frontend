@@ -29,7 +29,7 @@ const CapitalMarkets: React.FC = () => {
           padding: "8px 16px", // Add padding for better spacing
           borderRadius: "8px", // Rounded edges for a modern look
           textAlign: "center", // Ensure the text remains centered
-          marginBottom: "10px", // Margin for spacing below the component
+          marginBottom: "20px", // Margin for spacing below the component
 
           // Add subtle shadow for depth
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
