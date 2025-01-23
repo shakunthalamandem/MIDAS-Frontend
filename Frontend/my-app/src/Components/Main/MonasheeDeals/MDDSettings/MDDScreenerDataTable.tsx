@@ -22,6 +22,8 @@ interface ScreenerDataRow {
   issue_offer_price: number;
   subscription_bid_shares: number;
   allocated_shares: number;
+  tplus_1d_issueprice:number;
+
 }
 interface MDDScreenerDataTableProps {
   sectorwiseData: { [key: string]: (string | number)[] };
@@ -124,7 +126,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       setRows(processedData);
       
       } else {
-        throw new Error("Failed to fetch data");
+        throw new Error("Failed to fetch ddd data");
       }
     } catch (err: any) {
       setError(err.message || "An error occurred while fetching data");
