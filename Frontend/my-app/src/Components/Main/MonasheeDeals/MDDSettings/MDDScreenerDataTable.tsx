@@ -65,12 +65,11 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
 
   useEffect(() => {
     if (sectorwiseData) {
-      fetchPaginatedData(sectorwiseData);
-      fetchFullData(sectorwiseData);
+      fetchData(sectorwiseData);
     }
   }, [sectorwiseData]);
 
-  const fetchPaginatedData = async (
+  const fetchData = async (
     data: MDDScreenerDataTableProps["sectorwiseData"]
   ) => {
     setLoading(true);
@@ -93,51 +92,22 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
 
       if (response.ok) {
         const result = await response.json();
-        setRows(
-          (result.data || []).map((item: ScreenerDataRow, index: number) => ({
+        const formattedRows = (result.data || []).map(
+          (item: ScreenerDataRow, index: number) => ({
             ...item,
             id: index + 1,
             deal_size: formatDealSize(item.deal_size),
-          }))
+          })
         );
-      } else {
-        throw new Error("Failed to fetch paginated data");
-      }
-    } catch (err: any) {
-      setError(
-        err.message || "An error occurred while fetching paginated data"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchFullData = async (
-    data: MDDScreenerDataTableProps["sectorwiseData"]
-  ) => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-
-      if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables");
-      }
-
-      const response = await fetch(`${apiUrl}/api/mdd_screener/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
+        setRows(formattedRows);
         setApiResponse(result);
       } else {
-        throw new Error("Failed to fetch full data");
+        throw new Error("Failed to fetch data");
       }
     } catch (err: any) {
-      setError(err.message || "An error occurred while fetching full data");
+      setError(err.message || "An error occurred while fetching data");
+    } finally {
+      setLoading(false);
     }
   };
 
