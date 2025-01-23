@@ -251,6 +251,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                               key={option}
                               control={
                                 <Checkbox
+                                key={`${key}-${option}-${selectedValues[key]?.includes(option)}`}
                                   checked={selectedValues[key]?.includes(option)}
                                   onChange={() => {
                                     const newValues = selectedValues[key]?.includes(option)
