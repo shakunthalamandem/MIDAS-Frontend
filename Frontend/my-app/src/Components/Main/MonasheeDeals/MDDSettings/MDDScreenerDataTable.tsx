@@ -102,7 +102,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
         setRows(formattedRows);
         setApiResponse(result);
       } else {
-        // throw new Error("Failed to fetch data");
+        throw new Error("Failed to fetch data");
       }
     } catch (err: any) {
       setError(err.message || "An error occurred while fetching data");
