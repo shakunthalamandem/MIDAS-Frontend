@@ -138,8 +138,6 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
         </RadioGroup>
       </Box>
 
-
-
       {chartData.length === 0 && !responseData?.message ? (
         <Box sx={{ textAlign: "center", padding: 4 }}>
           <Typography variant="h6" color="textSecondary">
@@ -169,7 +167,23 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
                     }
                     labelFormatter={(label) => `Quarter: ${label}`}
                   />
-                  <Legend />
+                  <Legend
+                    formatter={(value) => {
+                      const legendMapping: { [key: string]: string } = {
+                        FO_count: "FO",
+                        IPO_count: "IPO",
+                        FO_deal_size: "FO",
+                        IPO_deal_size: "IPO",
+                        FO_avg_deal_size: "FO",
+                        IPO_avg_deal_size: "IPO",
+                        FO_mdd_allocation_ioi: "FO",
+                        IPO_mdd_allocation_ioi: "IPO",
+                        FO_mdd_allocation_percentage: "FO",
+                        IPO_mdd_allocation_percentage: "IPO",
+                      };
+                      return legendMapping[value] || value;
+                    }}
+                  />
                   {/* Render Bars based on selectedOption */}
                   {selectedOption === "count" && (
                     <>
@@ -230,12 +244,11 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
             </CardContent>
           </Card>
         </Box>
-        
       )}
-            {/* Show Normal/Weighted options if selectedOption is for allocation */}
-            {(selectedOption === "mdd_allocation_ioi" ||
+      {/* Show Normal/Weighted options if selectedOption is for allocation */}
+      {(selectedOption === "mdd_allocation_ioi" ||
         selectedOption === "mdd_allocation_percentage") && (
-          <div className="toggle-container">
+        <div className="toggle-container">
           <ToggleButtonGroup
             value={selectedValue}
             exclusive
@@ -248,23 +261,23 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
               aria-label="normal"
               className="toggle-button"
               style={{
-                fontSize: '14px',
-                padding: '5px 10px',
-                color: '#444444',
-                background: 'transparent',
-                border: '2px solid #444444',
-                transition: 'all 0.3s ease',
-                borderRadius: '5px',
+                fontSize: "14px",
+                padding: "5px 10px",
+                color: "#444444",
+                background: "transparent",
+                border: "2px solid #444444",
+                transition: "all 0.3s ease",
+                borderRadius: "5px",
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.background = '#b90066';
-                e.currentTarget.style.color = '#fff';
-                e.currentTarget.style.border = '2px solid #b90066';
+                e.currentTarget.style.background = "#b90066";
+                e.currentTarget.style.color = "#fff";
+                e.currentTarget.style.border = "2px solid #b90066";
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#444444';
-                e.currentTarget.style.border = '2px solid #444444';
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "#444444";
+                e.currentTarget.style.border = "2px solid #444444";
               }}
             >
               Normal
@@ -274,29 +287,29 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
               aria-label="weighted"
               className="toggle-button"
               style={{
-                fontSize: '14px',
-                padding: '5px 10px',
-                color: '#444444',
-                background: 'transparent',
-                border: '2px solid #444444',
-                transition: 'all 0.3s ease',
-                borderRadius: '5px',
+                fontSize: "14px",
+                padding: "5px 10px",
+                color: "#444444",
+                background: "transparent",
+                border: "2px solid #444444",
+                transition: "all 0.3s ease",
+                borderRadius: "5px",
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.background = '#b90066';
-                e.currentTarget.style.color = '#fff';
-                e.currentTarget.style.border = '2px solid #b90066';
+                e.currentTarget.style.background = "#b90066";
+                e.currentTarget.style.color = "#fff";
+                e.currentTarget.style.border = "2px solid #b90066";
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#444444';
-                e.currentTarget.style.border = '2px solid #444444';
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "#444444";
+                e.currentTarget.style.border = "2px solid #444444";
               }}
             >
               Weighted
             </ToggleButton>
           </ToggleButtonGroup>
-        </div>        
+        </div>
       )}
 
       <Dialog
