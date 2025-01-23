@@ -68,9 +68,8 @@ const MonasheeDeals: React.FC = () => {
           },
           "& .Mui-selected": {
             backgroundColor: "#FF8C00", // Vibrant orange for selected tab
-            color: "#ffffff", // White text for selected tab
+            color: "#ffffff !important", // White text for selected tab
             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)", // Stronger shadow for selected tab
-            transform: "translateY(-2px)", // Lifted effect
           },
         }}
       >
