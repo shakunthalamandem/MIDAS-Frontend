@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Container, TextField, Typography } from "@mui/material";
 
@@ -11,20 +11,52 @@ interface ScreenerDataRow {
   gics_sector_from_bloomberg: string;
   broad_region: string;
   deal_type: string;
-  deal_captain:string;
   deal_size: number;
+  deal_captain: string;
+
   issue_price_lcl: number;
   t1m_excess_returns: number;
   t1d_return_from_bloomberg: number;
   discount_from_announcement_price: number;
   allocation_deal_size_percentage: number;
   average_hold_period: number;
+  selected_bank: string;
   last_price_t1: number;
-  selected_bank:string;
   issue_offer_price: number;
   subscription_bid_shares: number;
   allocated_shares: number;
+
 }
+
+const cleanDealSize = (dealSize: any): number => {
+  if (dealSize == null || dealSize === "") return 0; // Handle null, undefined, or empty values
+  const cleanedValue = parseFloat(dealSize.toString().replace(/[^0-9.-]+/g, ""));
+  return isNaN(cleanedValue) ? 0 : cleanedValue; // Return 0 if parsing fails
+};
+
+const formatDealSize = (dealSize: any) => {
+  const cleanedValue = cleanDealSize(dealSize);
+  return "$" + cleanedValue.toLocaleString("en-US");
+};
+
+const preprocessRows = (rows: any[]) =>
+  rows.map((row, index) => ({
+    id: index,
+    ...row,
+    t1d_returns: row.t1d_returns ? `${row.t1d_returns.toFixed(2)}%` : "",
+    t1m_returns: row.t1m_returns ? `${row.t1m_returns.toFixed(2)}%` : "",
+    percentage_primary: row.percentage_primary ? `${row.percentage_primary.toFixed()}%` : "",
+    fo_discount: row.fo_discount ? `${row.fo_discount.toFixed(2)}%` : "",
+    t1m_excess_returns: row.t1m_excess_returns ? `${row.t1m_excess_returns.toFixed(2)}%` : "",
+    t1d_return_from_bloomberg: row.t1d_return_from_bloomberg ? `${row.t1d_return_from_bloomberg.toFixed(2)}%` : "",
+    discount_from_announcement_price: row.discount_from_announcement_price ? `${row.discount_from_announcement_price.toFixed(2)}%` : "",
+    allocation_deal_size: row.allocation_deal_size ? `${row.allocation_deal_size.toFixed(2)}%` : "",
+    allocation_ioi: row.allocation_ioi ? `${row.allocation_ioi.toFixed(2)}%` : "",
+    allocation_deal_size_percentage: row.allocation_deal_size_percentage && !isNaN(parseFloat(row.allocation_deal_size_percentage))
+      ? `${parseFloat(row.allocation_deal_size_percentage).toFixed(2)}%`
+      : "%",
+    tplus_1d_issueprice: row.tplus_1d_issueprice ? `${row.tplus_1d_issueprice.toFixed(2)}%` : "",
+  }));
 
 interface MDDScreenergridProps {
   sectorwiseData: { [key: string]: (string | number)[] };
@@ -36,8 +68,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     if (sectorwiseData) {
@@ -82,6 +113,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
           (result.data || []).map((item: ScreenerDataRow, index: number) => ({
             ...item,
             id: index + 1,
+            deal_size: formatDealSize(item.deal_size),
           }))
         );
       } else {
@@ -94,7 +126,6 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     }
   };
 
-  // Updated columns with new field names
   const columns: GridColDef[] = [
     { field: "pricing_date", headerName: "Pricing Date", width: 150 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
@@ -106,37 +137,72 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     },
     { field: "broad_region", headerName: "Region", width: 150 },
     { field: "deal_type", headerName: "Deal Type", width: 150 },
-    { field: "deal_size", headerName: "Deal Size", width: 180 },
+    {
+      field: "deal_size",
+      headerName: "Deal Size",
+      width: 120,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
     { field: "deal_captain", headerName: "Deal Caption", width: 150 },
-    { field: "selected_bank", headerName: "Lead Bank", width: 150 },
-
-
-    { field: "t1m_returns", headerName: "T + 1M Excess Returns", width: 200 },
+    { field: "selected_bank", headerName: "Lead Bank", width: 150 }, {
+      field: "t1m_returns",
+      headerName: "T + 1M Excess Returns",
+      width: 200,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
     {
       field: "t1d_returns",
       headerName: "T + 1D Return (From Bloomberg)",
       width: 220,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
+
     {
       field: "allocation_deal_size",
       headerName: "Allocation Deal Size Percentage",
       width: 250,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     { field: "allocation_ioi", headerName: "Allocation of IOI", width: 180 },
     {
       field: "average_hold_period",
       headerName: "Average Hold Period",
       width: 180,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { field: "tplus_1d_issueprice", headerName: "T + 1D issueprice", width: 180 },
-    { field: "fo_discount", headerName: "Follow On Discount", width: 180 },
-    { field: "percentage_primary", headerName: "Primary %", width: 100 },
-  ];
-  const [searchQuery, setSearchQuery] = useState<string>("");
+    {
+      field: "tplus_1d_issueprice",
+      headerName: "T + 1D issueprice",
+      width: 180,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+    {
+      field: "fo_discount",
+      headerName: "Follow On Discount",
+      width: 180,
+      renderCell: (params) => params.value,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+    {
+      field: "percentage_primary", headerName: "Primary %", width: 100,
 
-  const filteredRows = rows.filter((row) =>
-    row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+  ];
+
+  const filteredRows = useMemo(() => {
+    return preprocessRows(rows).filter((row) =>
+      row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [rows, searchQuery]);
+
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <div style={{ height: 600, width: "100%" }}>
@@ -171,12 +237,11 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
         </Box>
 
         <DataGrid
-          rows={filteredRows.map((row, index) => ({ ids: index, ...row }))}
+          rows={filteredRows}
           columns={columns}
           rowCount={filteredRows.length}
           loading={loading}
           rowHeight={35}
-          // hideFooter
           sx={{
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "transparent",

@@ -21,18 +21,18 @@ import MDDScreenerDataTable from "../../MDDSettings/MDDScreenerDataTable";
 interface FilterData {
   screener: {
     year_range: { options: number[]; label: string; description: string };
-    dealType: { options: string[]; label: string; description: string };
+    deal_type: { options: string[]; label: string; description: string };
     region: { options: string[]; label: string; description: string };
     sector: { options: string[]; label: string; description: string };
-    t1_return: { options: string[]; label: string; description: string };
+    t1d_returns: { options: string[]; label: string; description: string };
     t1m_returns: { options: string[]; label: string; description: string };
-    deal_value: { options: string[]; label: string; description: string };
+    deal_size: { options: string[]; label: string; description: string };
   };
   DealSpecific: {
-    Primary: { type: string; description: string; options: string[] };
-    LeadBank: { type: string; description: string; api: string; key: string };
-    Sponsor: { type: string; description: string; options: string[] };
-    FollowOnDiscount: {
+    percentage_primary: { type: string; description: string; options: string[] };
+    selected_bank: { type: string; description: string; api: string; key: string };
+    sponsor: { type: string; description: string; options: string[] };
+    fo_discount: {
       type: string;
       description: string;
       fields: {
@@ -42,7 +42,7 @@ interface FilterData {
         placeholder: string;
       }[];
     };
-    t1d_issueprice: {
+    tplus_1d_issueprice: {
       type: string;
       description: string;
       fields: {
@@ -54,7 +54,7 @@ interface FilterData {
     };
   };
   MonahseeSpecific: {
-    AllocationPercentOfDealSize: {
+    allocation_deal_size: {
       type: string;
       description: string;
       fields: {
@@ -64,7 +64,7 @@ interface FilterData {
         placeholder: string;
       }[];
     };
-    AllocationPercentOfIOI: {
+    allocation_ioi: {
       type: string;
       description: string;
       fields: {
@@ -74,7 +74,7 @@ interface FilterData {
         placeholder: string;
       }[];
     };
-    HoldPeriod: {
+    average_hold_period: {
       type: string;
       description: string;
       fields: {
@@ -84,7 +84,7 @@ interface FilterData {
         placeholder: string;
       }[];
     };
-    DealCaption: {
+    deal_caption: {
       type: string;
       description: string;
       api: string;

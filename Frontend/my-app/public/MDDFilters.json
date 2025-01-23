@@ -9,7 +9,7 @@
         "description": "Select the year of the deal."
       },
    
-      "dealType": {
+      "deal_type": {
         "options": ["IPO", "FO","PRIVATE","OTHER"],
         "label": "Deal Type",
         "description": "Choose the type of deal."
@@ -31,7 +31,7 @@
         "description": "Select the sector of the deal."
       },
    
-      "t1_return": {
+      "t1d_returns": {
         "options": [
           ">40%", "20% to 40%", "0% to 20%", "-20% to 0%", "<-20%"
         ],
@@ -47,7 +47,7 @@
         "description": "The return of deals on one month from the pricing date."
       },
    
-      "deal_value": {
+      "deal_size": {
         "options": [
           "0 to $100M", "$100M to $200M", "$200M to $500M", ">$500M"
         ],
@@ -58,19 +58,19 @@
   
   
   "DealSpecific": {
-    "Primary": {
+    "percentage_primary": {
       "type": "dropdown",
       "label": "Primary Percentage",
       "description": "Select a range or specific value for the primary category.",
       "options": ["Equal to 0", "Equal to 100", "0-20", "20-40", "40-60", "60-80", "80-100"]
     },
-    "Sponsor": {
+    "sponsor": {
       "type": "dropdown",
       "label": "Sponsor",
       "description": "Choose whether the sponsor is involved in the deal.",
       "options": ["Yes", "No"]
     },
-    "FollowOnDiscount": {
+    "fo_discount": {
       "type": "input",
       "label": "Follow-On Discount",
       "description": "Specify the discount for follow-on discount as a range using input fields. Only for follow on's.",
@@ -79,7 +79,7 @@
         { "type": "number", "operator": ">", "label": "Max", "placeholder": "Enter maximum discount" }
       ]
     },
-    "t1d_issueprice": {
+    "tplus_1d_issueprice": {
       "type": "input",
       "label": "T+1D IssuePrice",
       "description": "Specify the percentage change from T+1 day to the index.",
@@ -91,7 +91,7 @@
   },
   
   "MonahseeSpecific": {
-    "AllocationPercentOfDealSize": {
+    "allocation_deal_size": {
       "type": "input",
       "label": "Allocation % DealSize (Simple)",
       "description": "Enter the allocation percentage of the deal size as a range.",
@@ -100,7 +100,7 @@
         { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
       ]
     },
-    "AllocationPercentOfIOI": {
+    "allocation_ioi": {
       "type": "input",
       "label": "Allocation % IOI (Simple)",
       "description": "Enter the allocation percentage of IOI as a range.",
@@ -109,7 +109,7 @@
         { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
       ]
     },
-    "HoldPeriod": {
+    "average_hold_period": {
       "type": "input",
       "description": "Specify the hold period as a range using input fields.",
       "label": "Hold Period",

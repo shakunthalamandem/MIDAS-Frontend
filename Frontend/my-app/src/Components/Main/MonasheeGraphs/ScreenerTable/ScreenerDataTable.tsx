@@ -171,6 +171,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
 
   return (
     <Box mb={10} sx={{ height: 600, width: "100%" }}>
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          {loading && <p>Loading...</p>}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography
           align="left"

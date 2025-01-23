@@ -22,7 +22,13 @@ interface ScreenerDataRow {
   issue_offer_price: number;
   subscription_bid_shares: number;
   allocated_shares: number;
+  tplus_1d_issueprice:number;
+
 }
+interface MDDScreenerDataTableProps {
+  sectorwiseData: { [key: string]: (string | number)[] };
+}
+
 
 const cleanDealSize = (dealSize: any): number => {
   if (dealSize == null || dealSize === "") return 0; // Handle null, undefined, or empty values
@@ -50,9 +56,6 @@ const preprocessRows = (rows: any[]) =>
   }));
 
 
-interface MDDScreenerDataTableProps {
-  sectorwiseData: { [key: string]: (string | number)[] };
-}
 
 const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   sectorwiseData,
@@ -65,17 +68,36 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
 
   useEffect(() => {
     if (sectorwiseData) {
-      fetchPaginatedData(sectorwiseData);
-      fetchFullData(sectorwiseData);
+      fetchData(sectorwiseData);
     }
   }, [sectorwiseData]);
 
-  const fetchPaginatedData = async (
+  const fetchData = async (
     data: MDDScreenerDataTableProps["sectorwiseData"]
   ) => {
     setLoading(true);
     setError(null);
 
+    const payload = {
+      allocation_deal_size: data.allocation_deal_size,
+      allocation_ioi: data.allocation_ioi,
+      average_hold_period: data.average_hold_period,
+      deal_captain: data.deal_captain,
+      deal_type: data.deal_type,
+      deal_size: data.deal_size,
+      fo_discount: data.fo_discount,
+      percentage_primary: data.percentage_primary,
+      region: data.region,
+      sector: data.sector,
+      selected_bank: data.selected_bank,
+      sponsor: data.sponsor,
+      t1d_returns: data.t1d_returns,
+      t1m_returns: data.t1m_returns,
+      tplus_1d_issueprice: data.tplus_1d_issueprice,
+      year_range: data.year_range
+  };
+  
+
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -88,58 +110,36 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
         const result = await response.json();
-        setRows(
-          (result.data || []).map((item: ScreenerDataRow, index: number) => ({
+        setApiResponse(result)
+
+        const processedData = Array.isArray(result.data) 
+        ? result.data.map((item: ScreenerDataRow, index: number) => ({
             ...item,
             id: index + 1,
             deal_size: formatDealSize(item.deal_size),
           }))
-        );
+        : [];
+      setRows(processedData);
+      
       } else {
-        throw new Error("Failed to fetch paginated data");
+        throw new Error("Failed to fetch ddd data");
       }
     } catch (err: any) {
-      setError(
-        err.message || "An error occurred while fetching paginated data"
-      );
+      setError(err.message || "An error occurred while fetching data");
     } finally {
       setLoading(false);
     }
   };
-
-  const fetchFullData = async (
-    data: MDDScreenerDataTableProps["sectorwiseData"]
-  ) => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-
-      if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables");
-      }
-
-      const response = await fetch(`${apiUrl}/api/mdd_screener/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setApiResponse(result);
-      } else {
-        throw new Error("Failed to fetch full data");
-      }
-    } catch (err: any) {
-      setError(err.message || "An error occurred while fetching full data");
-    }
-  };
+  const filteredRows = useMemo(() => {
+    return preprocessRows(rows).filter((row) =>
+      row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [rows, searchQuery]);
 
   const columns: GridColDef[] = [
     { field: "pricing_date", headerName: "Pricing Date", width: 100 },
@@ -198,11 +198,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     },
     { field: "sponsor", headerName: "Sponsor", width: 70 }];
 
-    const filteredRows = useMemo(() => {
-      return preprocessRows(rows).filter((row) =>
-        row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }, [rows, searchQuery]);
+
   return (
     <>
       <div style={{ height: 600, width: "100%" }}>
@@ -238,6 +234,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
         <DataGrid
           rows={filteredRows}
           columns={columns}
+          rowCount={filteredRows.length}
           loading={loading}
           rowHeight={35}
           sx={{
