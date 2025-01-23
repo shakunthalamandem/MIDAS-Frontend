@@ -211,7 +211,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           },
                           {
                             label: "Sponsor Y/N:",
-                            value: item.sponsor ?? "",
+                            value: item.sponsor ?? "N/A",
                           },
                         ].map((row, i) => (
                           <TableRow
@@ -254,13 +254,16 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                                         row.value.replace(/[^0-9.-]+/g, "")
                                       ).toFixed(2) +
                                       (row.value.includes("%") ? "%" : "$")
-                                  : // If row.value is already a number
-                                    !isNaN(parseFloat(row.value.toString()))
-                                    ? parseFloat(row.value.toString()).toFixed(
-                                        2
-                                      )
-                                    : "N/A"
-                                : "N/A"}
+                                  : // If row.value is "N" or "Y", show the value directly
+                                    row.value === "N" || row.value === "Y"
+                                    ? row.value
+                                    : // If row.value is a number, format it with two decimal places
+                                      !isNaN(parseFloat(row.value.toString()))
+                                      ? parseFloat(
+                                          row.value.toString()
+                                        ).toFixed(2)
+                                      : "N/A"
+                                : "N"}
                             </TableCell>
                           </TableRow>
                         ))}

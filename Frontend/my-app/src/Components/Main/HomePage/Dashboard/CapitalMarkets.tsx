@@ -153,9 +153,6 @@ const CapitalMarkets: React.FC = () => {
         </Tabs>
         {value === 0 && <GlobalDealSearch />}
         {value === 1 && <MarketFilters />}
-        {/* {value === 2 && <DealGraph />}
-        {value === 3 && <DealVolume />}
-        {value === 4 && <OpportunityMain />} */}
         {value === 2 && <SkewTableMain />}
         {value === 3 && <ScreenerMain />}
 
