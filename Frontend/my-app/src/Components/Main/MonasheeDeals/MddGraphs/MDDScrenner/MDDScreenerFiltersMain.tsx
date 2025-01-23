@@ -54,7 +54,7 @@ interface FilterData {
     };
   };
   MonahseeSpecific: {
-    AllocationPercentOfDealSize: {
+    allocation_deal_size: {
       type: string;
       description: string;
       fields: {
@@ -64,7 +64,7 @@ interface FilterData {
         placeholder: string;
       }[];
     };
-    AllocationPercentOfIOI: {
+    allocation_ioi: {
       type: string;
       description: string;
       fields: {
@@ -74,7 +74,7 @@ interface FilterData {
         placeholder: string;
       }[];
     };
-    HoldPeriod: {
+    average_hold_period: {
       type: string;
       description: string;
       fields: {

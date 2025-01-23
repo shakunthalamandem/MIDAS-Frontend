@@ -20,9 +20,9 @@ interface FiltersConfig {
     tplus_1d_issueprice: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
   };
   MonahseeSpecific: {
-    AllocationPercentOfDealSize: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
-    AllocationPercentOfIOI: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
-    HoldPeriod: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    allocation_deal_size: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    allocation_ioi: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
+    average_hold_period: { type: string; description: string; fields: { type: string; operator: string; label: string; placeholder: string }[] };
     DealCaption: { type: string; description: string; api: string; key: string };
   };
 }

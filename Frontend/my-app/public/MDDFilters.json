@@ -91,7 +91,7 @@
   },
   
   "MonahseeSpecific": {
-    "AllocationPercentOfDealSize": {
+    "allocation_deal_size": {
       "type": "input",
       "label": "Allocation % DealSize (Simple)",
       "description": "Enter the allocation percentage of the deal size as a range.",
@@ -100,7 +100,7 @@
         { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
       ]
     },
-    "AllocationPercentOfIOI": {
+    "allocation_ioi": {
       "type": "input",
       "label": "Allocation % IOI (Simple)",
       "description": "Enter the allocation percentage of IOI as a range.",
@@ -109,7 +109,7 @@
         { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
       ]
     },
-    "HoldPeriod": {
+    "average_hold_period": {
       "type": "input",
       "description": "Specify the hold period as a range using input fields.",
       "label": "Hold Period",
