@@ -8,7 +8,10 @@ import {
   Paper,
   Container,
   Box,
+  Typography,
+  InputAdornment,
 } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
 import MDDSelectedTicker from "./MDDSelectedTicker";
 
 // Define the type for the API response
@@ -17,7 +20,7 @@ interface MDDResult {
   issuer_name: string;
 }
 
-const MDDDealSearch: React.FC = () => {
+const MonasheeDealSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<MDDResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,9 +38,7 @@ const MDDDealSearch: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `${apiUrl}/api/mdd_search/${query}`
-      );
+      const response = await fetch(`${apiUrl}/api/mdd_search/${query}`);
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }
@@ -57,63 +58,92 @@ const MDDDealSearch: React.FC = () => {
     setSearchTerm(""); // Clear the search term
     setResults([]); // Clear the search results
   };
-  
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Box sx={{ width: "100%", padding: 2 }}>
         <TextField
-          label="Search"
+          label="Search Monashee Participated Deals"
           variant="outlined"
           value={searchTerm}
-          autoComplete="off" // Disable autocomplete
+          autoComplete="off"
           onChange={handleSearch}
-          style={{ marginBottom: "20px",
-            minWidth:'300px' 
+          placeholder="Enter ticker symbol or issuer name..."
+          style={{
+            marginBottom: "20px",
+            minWidth: "300px",
+            backgroundColor: "#f4f6f9",
+            borderRadius: "8px",
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: "#656565" }} />
+              </InputAdornment>
+            ),
           }}
         />
         {loading ? (
-  <CircularProgress />
-) : (
-  searchTerm.length > 0 && ( // Show Paper for any non-empty search term
-    <Paper
-      elevation={3}
-      style={{
-        padding: "10px",
-        maxWidth: "280px",
-        maxHeight: "300px", // Limit the height of the options
-        overflowY: "auto", // Add scroll if the content overflows
-      }}
-    >
-      <List>
-        {results.map((item, index) => (
-          <ListItem
-            key={index}
-            onClick={() => handleItemClick(item.ticker_us)} // Pass only ticker_us
-            component="li"
-            style={{
-              backgroundColor:
-                selectedTicker === item.ticker_us
-                  ? "rgba(63, 81, 181, 0.1)" // Light blue background for selected item
-                  : "transparent",
-            }}
-          >
-            <ListItemText
-              primary={<strong>{item.ticker_us}</strong>}
-              secondary={item.issuer_name}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </Paper>
-  )
-)}
+          <CircularProgress />
+        ) : (
+          searchTerm.length > 0 && (
+            <Paper
+              elevation={3}
+              style={{
+                padding: "10px",
+                maxWidth: "280px",
+                maxHeight: "300px",
+                overflowY: "auto",
+                backgroundColor: "#ffffff",
+                borderRadius: "8px",
+              }}
+            >
+              {results.length === 0 ? (
+                <Typography variant="body2" color="textSecondary" align="center">
+                  No results found.
+                </Typography>
+              ) : (
+                <List>
+                  {results.map((item, index) => (
+                    <ListItem
+                      key={index}
+                      onClick={() => handleItemClick(item.ticker_us)} // Pass only ticker_us
+                      component="li"
+                      style={{
+                        backgroundColor:
+                          selectedTicker === item.ticker_us
+                            ? "rgba(63, 81, 181, 0.1)"
+                            : "transparent",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        transition: "background-color 0.3s",
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#f0f0f0")
+                      }
+                      onMouseOut={(e) =>
+                        (e.currentTarget.style.backgroundColor = selectedTicker === item.ticker_us
+                          ? "rgba(63, 81, 181, 0.1)"
+                          : "transparent")
+                      }
+                    >
+                      <ListItemText
+                        primary={<strong>{item.ticker_us}</strong>}
+                        secondary={item.issuer_name}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </Paper>
+          )
+        )}
       </Box>
 
-      {/* If a ticker is selected, render the SelectedTicker component */}
+      {/* If a ticker is selected, render the MDDSelectedTicker component */}
       {selectedTicker && <MDDSelectedTicker ticker={selectedTicker} />}
     </Container>
   );
 };
 
-export default MDDDealSearch;
+export default MonasheeDealSearch;
