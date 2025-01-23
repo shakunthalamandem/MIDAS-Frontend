@@ -31,7 +31,7 @@
         "description": "Select the sector of the deal."
       },
    
-      "t1_return": {
+      "t1d_returns": {
         "options": [
           ">40%", "20% to 40%", "0% to 20%", "-20% to 0%", "<-20%"
         ],

@@ -8,7 +8,7 @@ interface FiltersConfig {
     deal_type: { options: string[]; label: string; description: string };
     region: { options: string[]; label: string; description: string };
     sector: { options: string[]; label: string; description: string };
-    t1_return: { options: string[]; label: string; description: string };
+    t1d_returns: { options: string[]; label: string; description: string };
     t1m_returns: { options: string[]; label: string; description: string };
     deal_value: { options: string[]; label: string; description: string };
   };
