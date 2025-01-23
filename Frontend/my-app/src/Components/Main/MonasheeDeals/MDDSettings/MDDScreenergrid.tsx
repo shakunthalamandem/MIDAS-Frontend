@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Container, TextField, Typography } from "@mui/material";
 
 // Define the type for each row of data with updated column names
@@ -11,6 +11,7 @@ interface ScreenerDataRow {
   gics_sector_from_bloomberg: string;
   broad_region: string;
   deal_type: string;
+  deal_captain:string;
   deal_size: number;
   issue_price_lcl: number;
   t1m_excess_returns: number;
@@ -19,6 +20,7 @@ interface ScreenerDataRow {
   allocation_deal_size_percentage: number;
   average_hold_period: number;
   last_price_t1: number;
+  selected_bank:string;
   issue_offer_price: number;
   subscription_bid_shares: number;
   allocated_shares: number;
@@ -105,6 +107,10 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     { field: "broad_region", headerName: "Region", width: 150 },
     { field: "deal_type", headerName: "Deal Type", width: 150 },
     { field: "deal_size", headerName: "Deal Size", width: 180 },
+    { field: "deal_captain", headerName: "Deal Caption", width: 150 },
+    { field: "selected_bank", headerName: "Lead Bank", width: 150 },
+
+
     { field: "t1m_returns", headerName: "T + 1M Excess Returns", width: 200 },
     {
       field: "t1d_returns",
