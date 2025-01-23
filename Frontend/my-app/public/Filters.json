@@ -87,7 +87,7 @@
       }
     },
     {
-      "lead_bank": {
+      "left_lead_bank": {
         "options": [
           "ABN AMRO Bank",
           "Bank of America Merrill Lynch",
@@ -128,7 +128,7 @@
           "William Blair & Co LLC"
          
         ],
-        "label": "Left Lead Bank",
+        "label": "Lead Bank",
         "description": ""
       }
     }
