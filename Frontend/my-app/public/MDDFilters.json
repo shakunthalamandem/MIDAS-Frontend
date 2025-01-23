@@ -9,7 +9,7 @@
         "description": "Select the year of the deal."
       },
    
-      "dealType": {
+      "deal_type": {
         "options": ["IPO", "FO","PRIVATE","OTHER"],
         "label": "Deal Type",
         "description": "Choose the type of deal."

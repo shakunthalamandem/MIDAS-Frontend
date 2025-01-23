@@ -21,7 +21,7 @@ import MDDScreenerDataTable from "../../MDDSettings/MDDScreenerDataTable";
 interface FilterData {
   screener: {
     year_range: { options: number[]; label: string; description: string };
-    dealType: { options: string[]; label: string; description: string };
+    deal_type: { options: string[]; label: string; description: string };
     region: { options: string[]; label: string; description: string };
     sector: { options: string[]; label: string; description: string };
     t1_return: { options: string[]; label: string; description: string };

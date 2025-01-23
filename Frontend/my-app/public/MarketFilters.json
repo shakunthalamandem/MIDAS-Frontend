@@ -70,8 +70,8 @@
                     "IPO",
                     "FO"
                 ],
-                "label": "DealType",
-                "description": "DealType"
+                "label": "Deal Type",
+                "description": "Deal Type"
             }
         },
         {
