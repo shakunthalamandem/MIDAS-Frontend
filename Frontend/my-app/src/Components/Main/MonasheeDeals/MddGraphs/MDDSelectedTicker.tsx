@@ -219,6 +219,10 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                             value: item.allocation_ioi ? (Number(item.allocation_ioi)).toFixed(2) + "%": "N/A",
                           },
                           {
+                            label: "Average Hold Period",
+                            value: item.average_hold_period ? (item.average_hold_period) + " days": "N/A",
+                          },
+                          {
                             label: "T+1D Return (Bloomberg)",
                             value: item.t1d_returns ? (Number(item.t1d_returns)).toFixed(2) + "%" : "N/A",
                           },
@@ -227,12 +231,22 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                             value: item.t1m_returns ? (Number(item.t1m_returns)).toFixed(2) + "%" : "N/A",
                           },
                           {
-                            label: "Average Hold Period",
-                            value: item.average_hold_period ? (item.average_hold_period) + " days": "N/A",
-                          },
-                          {
                             label: "Total Return Earned",
-                            value: item.t1m_returns ? (Number(item.percentage_total_return)).toFixed(2) + "%" : "N/A",
+                            value: (<span
+                            style={{
+                              backgroundColor: Number(item.percentage_total_return) > 0
+                                ? "#85A947" // Light green for positive returns
+                                : Number(item.percentage_total_return) < 0
+                                ? "#FF8080" // Light red for negative returns
+                                : "#f8f9fa", // Light gray for neutral returns
+                              color: "#000", // Keep text color black for readability
+                              padding: "4px 8px", // Add some padding for better appearance
+                              borderRadius: "4px", // Rounded corners for styling
+                              display: "inline-block",
+                            }}
+                          >
+                            {Number(item.percentage_total_return).toFixed(2)}%
+                          </span>)
                           },
                         ].map((row, i) => (
                           <TableRow
