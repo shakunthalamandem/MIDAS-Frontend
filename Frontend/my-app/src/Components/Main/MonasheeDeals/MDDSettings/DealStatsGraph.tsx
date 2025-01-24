@@ -179,7 +179,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
     const formattedName = tooltipMapping[name] || name;
     return [`${formatValue(value, selectedOption)}`, formattedName];
   }}
-  labelFormatter={(label) => `Year: ${label}`}
+  labelFormatter={(label) => <span style={{ fontWeight: 'bold', color: '#002060' }}>Year: {label}</span>}
 />
 
                   <Legend
