@@ -16,12 +16,12 @@ interface TickerData {
   broad_region: string;
   deal_type: string;
   deal_value: string;
-  issue_price_usd: string;
+  issue_offer_price: string;
   t_plus_1m_returns: string;
-  t_plus_1_return: string;
-  t_plus_1d_returns_index_returns: string;
-  t_plus_1m_returns_index_returns: string;
-  opportunity_value_ex: string;
+  t_plus_1d_return: string;
+  t1d_excess_return: string;
+  t1m_excess_returns: string;
+  opportunity_value_excess: string;
 }
 
 interface SelectedTickerProps {
@@ -68,7 +68,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
         }
 
         const payload = { ticker }; // Prepare the payload as an array
-        const response = await fetch(`${apiUrl}/api/dealogic_search_filters/`, {
+        const response = await fetch(`${apiUrl}/api/dealogic_search_ticker/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -197,15 +197,15 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
                 <Table size="small" aria-label="Deal Info Table 2">
                   <TableBody>
                     {[
-                      { label: "Issue / Price", value: "$" + (Number(item.issue_price_usd)).toFixed(2) },
+                      { label: "Issue / Price", value: "$" + (Number(item.issue_offer_price)).toFixed(2) },
                       {
                         label: "T+1 Day Returns",
                         value: (
                           <span
                             style={{
-                              backgroundColor: Number(item.t_plus_1_return) > 0
+                              backgroundColor: Number(item.t_plus_1d_return) > 0
                                 ? "#85A947" // Light green for positive returns
-                                : Number(item.t_plus_1_return) < 0
+                                : Number(item.t_plus_1d_return) < 0
                                 ? "#FF8080" // Light red for negative returns
                                 : "#f8f9fa", // Light gray for neutral returns
                               color: "#000", // Keep text color black for readability
@@ -214,16 +214,16 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
                               display: "inline-block", // Ensures the span sizes properly
                             }}
                           >
-                            {Number(item.t_plus_1_return).toFixed(2)}%
+                            {Number(item.t_plus_1d_return).toFixed(2)}%
                           </span>
                         ),
                       },
                       { label: "T+1 Day Excess Returns", value: (
                         <span
                           style={{
-                            backgroundColor: Number(item.t_plus_1d_returns_index_returns) > 0
+                            backgroundColor: Number(item.t1d_excess_return) > 0
                               ? "#85A947" // Light green for positive returns
-                              : Number(item.t_plus_1d_returns_index_returns) < 0
+                              : Number(item.t1d_excess_return) < 0
                               ? "#FF8080" // Light red for negative returns
                               : "#f8f9fa", // Light gray for neutral returns
                             color: "#000", // Keep text color black for readability
@@ -232,7 +232,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
                             display: "inline-block", // Ensures the span sizes properly
                           }}
                         >
-                          {Number(item.t_plus_1d_returns_index_returns).toFixed(2)}%
+                          {Number(item.t1d_excess_return).toFixed(2)}%
                         </span>
                       ), },
                       {
@@ -258,9 +258,9 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
                       { label: "T+1 Month Excess Returns", value: (
                           <span
                             style={{
-                              backgroundColor: Number(item.t_plus_1m_returns_index_returns) > 0
+                              backgroundColor: Number(item.t1m_excess_returns) > 0
                                 ? "#85A947" // Light green for positive returns
-                                : Number(item.t_plus_1m_returns_index_returns) < 0
+                                : Number(item.t1m_excess_returns) < 0
                                 ? "#FF8080" // Light red for negative returns
                                 : "#f8f9fa", // Light gray for neutral returns
                               color: "#000", // Keep text color black for readability
@@ -269,18 +269,18 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
                               display: "inline-block", // Ensures the span sizes properly
                             }}
                           >
-                            {Number(item.t_plus_1m_returns_index_returns).toFixed(2)}%
+                            {Number(item.t1m_excess_returns).toFixed(2)}%
                           </span>
                         ), },
                       
                       {
                         label: "Opportunity Value (T + 1M Excess)",
-                        value: item.opportunity_value_ex
+                        value: item.opportunity_value_excess
                           ? new Intl.NumberFormat('en-US', {
                               style: 'currency',
                               currency: 'USD',
                               minimumFractionDigits: 0,
-                            }).format(Number(item.opportunity_value_ex))
+                            }).format(Number(item.opportunity_value_excess))
                           : "N/A"
                       }
                       
