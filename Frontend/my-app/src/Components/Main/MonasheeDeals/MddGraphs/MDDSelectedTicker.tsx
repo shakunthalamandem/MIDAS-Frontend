@@ -232,10 +232,16 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           {
                             label: "Monashee PNL Gross",
                             value: item.total_return
-                            ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.total_return))}`
-                            : "N/A"
+                            ? `${
+                                Number(item.total_return) < 0 ? '-' : ''
+                              }$${new Intl.NumberFormat('en-US', {}).format(
+                                Math.abs(Number(Number(item.total_return).toFixed(0)))
+                              )} ${Number(item.total_return) < 0 ? '▼' : '▲'}`
+                            : "N/A",
+                            style: {
+                              color: Number(item.total_return) < 0 ? 'red' : 'green',
+                            },
                           },
-                          
                           {
                             label: "Return on Invested Capital",
                             value: (<span
