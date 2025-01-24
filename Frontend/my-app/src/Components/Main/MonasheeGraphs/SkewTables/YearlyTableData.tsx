@@ -34,7 +34,7 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
     'Avg T+1M Excess Return (Negatively)',
     // 'Expected Returns Absolute',
     'Expected Returns Excess',
-    'Long Opportunity Value',
+    'Opportunity Value    (T + 1M Excess)',
   ];
 
   // Initialize totals and counters for average calculations

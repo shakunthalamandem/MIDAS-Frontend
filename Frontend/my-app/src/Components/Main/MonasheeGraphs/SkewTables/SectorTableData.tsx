@@ -31,7 +31,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
     'Avg T+1M Excess Return (Negatively)',
     // 'Expected Returns Absolute',
     'Expected Returns Excess',
-    'Long Opportunity Value',
+    'Opportunity Value       (T + 1M Excess)',
   ];
 
   // Render the table only if Yearwise data exists

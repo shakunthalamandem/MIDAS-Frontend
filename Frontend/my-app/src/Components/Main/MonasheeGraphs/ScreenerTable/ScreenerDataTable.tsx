@@ -157,7 +157,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
     },
     {
       field: "opportunity_value_ex",
-      headerName: "Opportunity Value Excess",
+      headerName: "Opportunity Value (T + 1M Excess)",
       width: 140,
       renderCell: (params) => {
         const value = parseFloat(params.value);
