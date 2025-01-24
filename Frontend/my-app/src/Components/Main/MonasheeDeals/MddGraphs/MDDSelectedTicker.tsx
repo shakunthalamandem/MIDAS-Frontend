@@ -222,68 +222,55 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <Table size="small" aria-label="Deal Info Table 2">
                       <TableBody>
                         {[
-                          {
-                            label: "Discount from Announcement Price",
-                            value:
-                              item.fo_discount !== undefined ? (
-                                <Typography
-                                  sx={{
-                                    color:
-                                      Number(item.fo_discount) === 0
-                                        ? "black"
-                                        : Number(item.fo_discount) < 0
-                                          ? "red"
-                                          : "green",
-                                    display: "flex",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  {Number(item.fo_discount).toFixed(0) + "%"}
-                                  {Number(item.fo_discount) > 0 ? (
-                                    <ArrowDropUpIcon
-                                      sx={{
-                                        color: "green",
-                                        marginLeft: "4px",
-                                        fontSize: 30,
+                              {
+                                label: "Discount from Announcement Price",
+                                value:
+                                  item.fo_discount !== undefined ? (
+                                    <span
+                                      style={{
+                                        color:
+                                          Number(item.fo_discount) === 0
+                                            ? "black"
+                                            : Number(item.fo_discount) < 0
+                                              ? "red"
+                                              : "green",
+                                        display: "flex",
+                                        alignItems: "center",
                                       }}
-                                    />
-                                  ) : Number(item.fo_discount) < 0 ? (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "red",
-                                        marginLeft: "4px",
-                                        fontSize: 30,
-                                      }}
-                                    />
+                                    >
+                                      {Number(item.fo_discount).toFixed(
+                                        2
+                                      ) + "%"}
+                                      {Number(item.fo_discount) > 0 ? (
+                                        <ArrowDropUpIcon
+                                          sx={{
+                                            color: "green",
+                                            marginLeft: "4px",
+                                            fontSize: 20,
+                                          }}
+                                        />
+                                      ) : Number(item.fo_discount) < 0 ? (
+                                        <ArrowDropDownIcon
+                                          sx={{
+                                            color: "red",
+                                            marginLeft: "4px",
+                                            fontSize: 20,
+                                          }}
+                                        />
+                                      ) : (
+                                        <ArrowDropDownIcon
+                                          sx={{
+                                            color: "black",
+                                            marginLeft: "4px",
+                                            fontSize: 20,
+                                          }}
+                                        />
+                                      )}
+                                    </span>
                                   ) : (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "black",
-                                        marginLeft: "4px",
-                                        fontSize: 30,
-                                      }}
-                                    />
-                                  )}
-                                </Typography>
-                              ) : (
-                                <Typography
-                                  sx={{
-                                    color: "black",
-                                    display: "flex",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  0%{" "}
-                                  <ArrowDropDownIcon
-                                    sx={{
-                                      color: "black",
-                                      marginLeft: "4px",
-                                      fontSize: 30,
-                                    }}
-                                  />
-                                </Typography>
-                              ),
-                          },
+                                    "N/A"
+                                  ),
+                              },
                           {
                             label: "Primary %",
                             value: item.percentage_primary
