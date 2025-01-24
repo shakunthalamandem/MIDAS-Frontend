@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   CircularProgress,
@@ -24,7 +24,7 @@ const GlobalDealSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<MDDResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  const [selectedTicker, setSelectedTicker] = useState<string>("FANG"); // Set default ticker to "FANG"
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +58,7 @@ const GlobalDealSearch: React.FC = () => {
   const handleItemClick = (ticker_symbol: string) => {
     setSelectedTicker(ticker_symbol); // Set the selected ticker when clicked
     setSearchTerm(""); // Clear the search term
-    setResults([]);
+    setResults([]); // Clear the results list
   };
 
   return (
