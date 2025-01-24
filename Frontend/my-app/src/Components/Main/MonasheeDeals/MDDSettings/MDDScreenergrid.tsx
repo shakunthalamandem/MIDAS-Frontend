@@ -162,12 +162,12 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
 
     {
       field: "allocation_deal_size",
-      headerName: "Allocation Deal Size Percentage",
+      headerName: "Allocation as % of Deal Size",
       width: 250,
       renderCell: (params) => params.value,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { field: "allocation_ioi", headerName: "Allocation of IOI", width: 180 },
+    { field: "allocation_ioi", headerName: "Allocation as % of IOI", width: 180 },
     {
       field: "average_hold_period",
       headerName: "Average Hold Period",
