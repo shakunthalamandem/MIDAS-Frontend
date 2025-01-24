@@ -56,7 +56,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("count");
-  const [selectedValue, setSelectedValue] = useState("normal");
+  const [selectedValue, setSelectedValue] = useState("weighted");
 
   const dealStatsOptions = [
     { label: "Deals Count", key: "count" },
@@ -165,7 +165,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
                     formatter={(value: number, name: string, props: any) =>
                       formatValue(value, selectedOption)
                     }
-                    labelFormatter={(label) => `Quarter: ${label}`}
+                    labelFormatter={(label) => `Year: ${label}`}
                   />
                   <Legend
                     formatter={(value) => {
