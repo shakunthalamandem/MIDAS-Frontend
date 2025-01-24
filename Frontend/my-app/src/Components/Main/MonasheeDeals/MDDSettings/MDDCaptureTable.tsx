@@ -211,7 +211,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         fontWeight: "bold",
                                         border: "1px solid #ddd",
                                         padding: "4px 8px",
-                                        width: "80px", // Specific width for "Quintile"
+                                        width: "40px", // Specific width for "Quintile"
                                         // Add top border
                                       }}
                                     >
@@ -223,7 +223,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         fontWeight: "bold",
                                         border: "1px solid #ddd",
                                         padding: "4px 8px",
-                                        width: "90px",
+                                        width: "130px",
                                       }}
                                     >
                                       T+1M Excess Returns
@@ -248,6 +248,17 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         width: "90px",
                                       }}
                                     >
+                                      Deal Volume ($)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                      }}
+                                    >
                                       Allocation as % of Deal Size (Weighted)
                                     </TableCell>
                                     <TableCell
@@ -261,17 +272,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                     >
                                       Allocation as % of IOI (Weighted)
                                     </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        fontSize: "0.725rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "90px",
-                                      }}
-                                    >
-                                      Deal Volume ($)
-                                    </TableCell>
+                             
                                     <TableCell
                                       sx={{
                                         fontSize: "0.725rem",
@@ -411,6 +412,14 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           align="left"
                                           sx={{ fontSize: "0.8rem" }}
                                         >
+                                          {formatValue(
+                                            data["Deal volume"] || 0
+                                          )}
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{ fontSize: "0.8rem" }}
+                                        >
                                           {data[
                                             "Weighted Allocation as % of Deal Size"
                                           ]?.toFixed(2) || "0.00"}
@@ -425,14 +434,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           ]?.toFixed(2) || "0.00"}
                                           %
                                         </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{ fontSize: "0.8rem" }}
-                                        >
-                                          {formatValue(
-                                            data["Deal volume"] || 0
-                                          )}
-                                        </TableCell>
+                                    
 
                                         {/* Boxed Columns: Monashee */}
                                         <TableCell
