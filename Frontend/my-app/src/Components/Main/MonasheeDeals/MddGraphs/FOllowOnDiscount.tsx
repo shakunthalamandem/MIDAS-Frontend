@@ -1,6 +1,6 @@
 import React from "react";
 import MddMain from "../MDDSettings/MddMain";
-import { Typography, Box } from "@mui/material";
+import {  Box } from "@mui/material";
 
 const FollowOnDiscount = () => {
   return (
@@ -9,15 +9,9 @@ const FollowOnDiscount = () => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      marginTop={10}
       textAlign="center"
     >
-      <Typography 
-        variant="h5" 
-        sx={{ fontWeight: "bold", color: "#002060" }}
-      >
-        Follow-On Discount
-      </Typography>
+
       <MddMain apiName="fo_discount" />
     </Box>
   );

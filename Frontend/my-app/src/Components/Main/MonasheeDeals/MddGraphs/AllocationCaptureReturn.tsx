@@ -9,15 +9,8 @@ const AllocationCaptureReturn = () => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      marginTop={10}
       textAlign="center"
     >
-      <Typography 
-        variant="h5" 
-        sx={{ fontWeight: "bold", color: "#002060" }}
-      >
-        Allocation Capture
-      </Typography>
       <MddMain apiName="allocation_capture" />
     </Box>
   );
