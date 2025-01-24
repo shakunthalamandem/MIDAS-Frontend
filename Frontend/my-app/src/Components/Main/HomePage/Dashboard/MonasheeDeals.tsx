@@ -84,8 +84,8 @@ const MonasheeDeals: React.FC = () => {
         }}
       >
         <Tab label="Deal Search" />
-        <Tab label="DealStats"/>
-        <Tab label="Allocation Capture" />
+        <Tab label="Deal Stats"/>
+        <Tab label="GAP Analysis" />
         <Tab label="Follow-On Discount" />
         <Tab label="Screener" />
       </Tabs>
