@@ -161,12 +161,27 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
                       formatValue(value, selectedOption)
                     }
                   />
-                  <Tooltip
-                    formatter={(value: number, name: string, props: any) =>
-                      formatValue(value, selectedOption)
-                    }
-                    labelFormatter={(label) => `Year: ${label}`}
-                  />
+               <Tooltip
+  formatter={(value: number, name: string, props: any) => {
+    const tooltipMapping: { [key: string]: string } = {
+      FO_count: "FO",
+      IPO_count: "IPO",
+      FO_deal_size: "FO",
+      IPO_deal_size: "IPO",
+      FO_avg_deal_size: "FO",
+      IPO_avg_deal_size: "IPO",
+      FO_mdd_allocation_ioi: "FO",
+      IPO_mdd_allocation_ioi: "IPO",
+      FO_mdd_allocation_percentage: "FO",
+      IPO_mdd_allocation_percentage: "IPO",
+    };
+
+    const formattedName = tooltipMapping[name] || name;
+    return [`${formatValue(value, selectedOption)}`, formattedName];
+  }}
+  labelFormatter={(label) => `Year: ${label}`}
+/>
+
                   <Legend
                     formatter={(value) => {
                       const legendMapping: { [key: string]: string } = {
