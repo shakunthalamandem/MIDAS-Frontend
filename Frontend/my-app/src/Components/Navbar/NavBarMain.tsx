@@ -8,7 +8,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import logo from '../../Assets/images/Monashee-Cap-Logos.png';
 import TradingViewTickerTape from '../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape';
 
-const pages = ['New Issue Equity Market', 'Monashee Deal Database', 'Investment Strategies'];
+const pages = ['Equity Market Opportunity', 'Monashee Performance & Efficiency', 'PRIME Investment Strategies'];
 
 const NavbarMain: React.FC = () => {
   const theme = useTheme();
@@ -27,9 +27,9 @@ const NavbarMain: React.FC = () => {
   };
 
   const handleNavigate = (page: string) => {
-    if (page === 'New Issue Equity Market') navigate('/capital-markets');
-    if (page === 'Monashee Deal Database') navigate('/monashee-deals');
-    if (page === 'Investment Strategies') navigate('/strategies');
+    if (page === 'Equity Market Opportunity') navigate('/capital-markets');
+    if (page === 'Monashee Performance & Efficiency') navigate('/monashee-deals');
+    if (page === 'PRIME Investment Strategies') navigate('/strategies');
     handleCloseNavMenu();
   };
 

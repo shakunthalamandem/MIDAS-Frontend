@@ -43,7 +43,7 @@ const CapitalMarkets: React.FC = () => {
           },
         }}
       >
-        Welcome to Capital Markets! Explore deals and uncover statistics from the global market with ease.
+        Welcome to New Issue Equity Markets! Explore deals and uncover statistics from the global market with ease.
       </Typography>
         <Tabs
           value={value}
