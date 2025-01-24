@@ -120,7 +120,6 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       setLoading(false);
     }
   };
-
   const handleCancel = () => {
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
     filtersData.forEach((filter) => {
@@ -131,6 +130,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     setAppliedFilters(resetSelectedValues);
     setSearchValue("");
     setSearchKey(null);
+    handleSubmit(resetSelectedValues);
+
   };
 
   return (
