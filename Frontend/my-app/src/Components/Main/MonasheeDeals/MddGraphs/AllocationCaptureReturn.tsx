@@ -1,7 +1,6 @@
 import React from "react";
 import MddMain from "../MDDSettings/MddMain";
 import { Typography, Box } from "@mui/material";
-
 const AllocationCaptureReturn = () => {
   return (
     <Box
@@ -11,8 +10,31 @@ const AllocationCaptureReturn = () => {
       alignItems="center"
       textAlign="center"
     >
+      <Typography variant="body2" sx={{ "& .marquee": {
+          display: "inline-block",
+          whiteSpace: "nowrap",
+          animation: "marquee 40s linear infinite", // Increased duration for slower speed
+          color:"#666666",
+          fontWeight:'bold',
+          fontStyle:'italic'
+        },
+
+        // Keyframes for the scrolling marquee effect
+        "@keyframes marquee": {
+          "0%": { transform: "translateX(100%)" },
+          "100%": { transform: "translateX(-100%)" },
+        },
+        }}>
+                <span className="marquee">
+
+      Back-test Assumptions: Allocation @ 0.5% of Deal Size for IPOs and @ 1.0% of deal size for FOs, AM @ 1% of Deal Size for both IPOs and FOs. 
+      Position Limit of $50M, Daily Stop Loss of 10%; 60%-100% Hedge based on region specific futures/ETFs.
+      </span>
+      </Typography>
       <MddMain apiName="allocation_capture" />
+      
     </Box>
+
   );
 };
 
