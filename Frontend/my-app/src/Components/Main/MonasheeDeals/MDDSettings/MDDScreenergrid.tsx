@@ -132,7 +132,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     { field: "ticker", headerName: "Ticker", width: 150 },
     {
       field: "gics_sector_from_bloomberg",
-      headerName: "Sector (From Bloomberg)",
+      headerName: "Sector",
       width: 180,
     },
     { field: "broad_region", headerName: "Region", width: 150 },
@@ -154,7 +154,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     },
     {
       field: "t1d_returns",
-      headerName: "T + 1D Return (From Bloomberg)",
+      headerName: "T + 1D Return ",
       width: 220,
       renderCell: (params) => params.value,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),

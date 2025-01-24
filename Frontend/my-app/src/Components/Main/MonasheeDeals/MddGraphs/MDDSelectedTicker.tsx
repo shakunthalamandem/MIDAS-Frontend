@@ -143,7 +143,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           { label: "Issuer Name", value: item.issuer_name },
                           { label: "Ticker", value: item.ticker },
                           {
-                            label: "GICS Sector (Bloomberg)",
+                            label: "GICS Sector ",
                             value: item.gics_sector_from_bloomberg,
                           },
                           { label: "Region", value: item.broad_region },
@@ -223,7 +223,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                             value: item.average_hold_period ? (item.average_hold_period) + " days": "N/A",
                           },
                           {
-                            label: "T+1D Return (Bloomberg)",
+                            label: "T+1D Return ",
                             value: item.t1d_returns ? (Number(item.t1d_returns)).toFixed(2) + "%" : "N/A",
                           },
                           {

@@ -152,7 +152,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     { field: "ticker", headerName: "Ticker", width: 100 },
     {
       field: "gics_sector_from_bloomberg",
-      headerName: "Sector (From Bloomberg)",
+      headerName: "Sector ",
       width: 180,
     },
     { field: "broad_region", headerName: "Region", width: 100 },
