@@ -212,16 +212,16 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       "Quintile", // New column for serial numbers
                                       "T+1M Excess Returns",
                                       "No of Deals",
-                                      "Alloc as % of Deal Size(Weighted)",
-                                      "Alloc as % of IOI(Weighted)",
-                                      "Deal Volume",
-                                      "Allocation Return",
-                                      "AM Return",
-                                      "Total Return",
-                                      "Model Return With Actual Alloc",
+                                      "Allocation as % of Deal Size (Weighted)",
+                                      "Allocation as % of IOI (Weighted)",
+                                      "Deal Volume ($)",
+                                      "Monashee Allocation PnL (Gross $)",
+                                      "Monashee AM PnL  (Gross $)",
+                                      "Monashee Total  PnL (Gross $)",
+                                      "Model PnL With Actual Allocation ($)",
                                       selectedCategory === "IPO"
-                                        ? "Model Return 0.5% Allocation"
-                                        : "Model Return 1% Allocation", // Dynamic header
+                                        ? "Model PnL 0.5% Allocation ($)"
+                                        : "Model PnL 1% Allocation ($)", // Dynamic header
                                       // ].map((header, idx) => (
                                       ].filter(Boolean).map((header, idx) => (
                                       <TableCell
