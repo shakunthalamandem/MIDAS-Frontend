@@ -226,7 +226,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         width: "130px",
                                       }}
                                     >
-                                      T+1M Excess Returns
+                                      T+1M Absolute Returns
                                     </TableCell>
                                     <TableCell
                                       sx={{
