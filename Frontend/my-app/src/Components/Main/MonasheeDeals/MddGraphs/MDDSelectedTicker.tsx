@@ -12,19 +12,17 @@ interface TickerData {
   deal_captain: string | null;
   broad_region: string;
   deal_type: string;
-  selected_bank: string[];
   deal_size: string;
-  last_price_t1: string;
   issue_offer_price: string;
   fo_discount: string | null;
-  t1m_returns: string | null;
-  t1d_returns: string | null;
+  total_committed_capital: string | null;
   allocation_deal_size: string | null;
   allocation_ioi: string | null;
   average_hold_period: string | null;
   percentage_primary: string | null;
   sponsor: string | null;
   percentage_total_return: string | null;
+  t1m_return_from_dealogic: string | null;
 }
 
 // Define the structure of the response (the API wraps data inside a 'data' property)
@@ -70,6 +68,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
     // Fetch data from API
     const fetchData = async () => {
       try {
+        console.log("okau")
         const response = await axios.post<ApiResponse>(
           `${apiUrl}/api/mdd_screener/`,
           { ticker }
@@ -143,7 +142,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           { label: "Issuer Name", value: item.issuer_name },
                           { label: "Ticker", value: item.ticker },
                           {
-                            label: "GICS Sector ",
+                            label: "Sector ",
                             value: item.gics_sector_from_bloomberg,
                           },
                           { label: "Region", value: item.broad_region },
@@ -152,12 +151,20 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                             ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.deal_size))}`
                             : "N/A" },
                           {
-                            label: "Issue Offer Price",
+                            label: "Issue / Offer Price",
                             value: "$" + item.issue_offer_price,
                           },
                           {
                             label: "Deal Captain",
                             value: item.deal_captain ?? "N/A",
+                          },
+                          {
+                            label: "Sponsor Y/N",
+                            value: item.sponsor ?? "N/A",
+                          },
+                          {
+                            label: "Discount from Announcement Price",
+                            value: item.fo_discount ? (Number(item.fo_discount)).toFixed(0) + "%" : "0%",
                           },
                         ].map((row, i) => (
                           <TableRow
@@ -199,23 +206,15 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                       <TableBody>
                         {[
                           {
-                            label: "Sponsor Y/N",
-                            value: item.sponsor ?? "N/A",
-                          },
-                          {
-                            label: "Percentage Primary",
+                            label: "Primary %",
                             value: item.percentage_primary ? (item.percentage_primary) + "%"  : "0%",
                           },
                           {
-                            label: "Discount from Announcement Price",
-                            value: item.fo_discount ? (Number(item.fo_discount)).toFixed(0) + "%" : "0%",
+                            label: "Allocation as % of Deal Size",
+                            value: item.allocation_deal_size ? (Number(item.allocation_deal_size)).toFixed(2) + "%" : "N/A",
                           },
                           {
-                            label: "Allocation Deal Size %",
-                            value: item.t1m_returns ? (Number(item.allocation_deal_size)).toFixed(2) + "%" : "N/A",
-                          },
-                          {
-                            label: "Allocation Percentage",
+                            label: "Allocation as % of IOI",
                             value: item.allocation_ioi ? (Number(item.allocation_ioi)).toFixed(2) + "%": "N/A",
                           },
                           {
@@ -223,16 +222,20 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                             value: item.average_hold_period ? (item.average_hold_period) + " days": "N/A",
                           },
                           {
-                            label: "T+1D Return ",
-                            value: item.t1d_returns ? (Number(item.t1d_returns)).toFixed(2) + "%" : "N/A",
+                            label: "Monashee Capital Committed",
+                            value: item.total_committed_capital ? "$" + (Number(item.total_committed_capital)).toFixed(2) : "N/A",
                           },
                           {
-                            label: "T+1M Excess Returns",
+                            label: "Monashee PNL Gross",
+                            value: item.t1m_return_from_dealogic ? "$" + (Number(item.t1m_return_from_dealogic)).toFixed(2) : "N/A",
+                          },
+                          {
+                            label: "T+1M Absolute Return",
                             value:(<span
                               style={{
-                                backgroundColor: Number(item.t1m_returns) > 0
+                                backgroundColor: Number(item.t1m_return_from_dealogic) > 0
                                   ? "#85A947" // Light green for positive returns
-                                  : Number(item.t1m_returns) < 0
+                                  : Number(item.t1m_return_from_dealogic) < 0
                                   ? "#FF8080" // Light red for negative returns
                                   : "#f8f9fa", // Light gray for neutral returns
                                 color: "#000", // Keep text color black for readability
@@ -241,11 +244,11 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                                 display: "inline-block",
                               }}
                             >
-                              {Number(item.t1m_returns).toFixed(2)}%
+                              {Number(item.t1m_return_from_dealogic).toFixed(2)}%
                             </span>)
                           },
                           {
-                            label: "Total Return Earned",
+                            label: "Return on Invested Capital",
                             value: (<span
                             style={{
                               backgroundColor: Number(item.percentage_total_return) > 0

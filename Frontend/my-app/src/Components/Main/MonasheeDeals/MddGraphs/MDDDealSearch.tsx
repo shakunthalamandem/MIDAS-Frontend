@@ -16,7 +16,7 @@ import MDDSelectedTicker from "./MDDSelectedTicker";
 
 // Define the type for the API response
 interface MDDResult {
-  ticker_us: string;
+  ticker: string;
   issuer_name: string;
 }
 
@@ -107,11 +107,11 @@ const MonasheeDealSearch: React.FC = () => {
                   {results.map((item, index) => (
                     <ListItem
                       key={index}
-                      onClick={() => handleItemClick(item.ticker_us)} // Pass only ticker_us
+                      onClick={() => handleItemClick(item.ticker)} // Pass only ticker_us
                       component="li"
                       style={{
                         backgroundColor:
-                          selectedTicker === item.ticker_us
+                          selectedTicker === item.ticker
                             ? "rgba(63, 81, 181, 0.1)"
                             : "transparent",
                         borderRadius: "8px",
@@ -122,13 +122,13 @@ const MonasheeDealSearch: React.FC = () => {
                         (e.currentTarget.style.backgroundColor = "#f0f0f0")
                       }
                       onMouseOut={(e) =>
-                        (e.currentTarget.style.backgroundColor = selectedTicker === item.ticker_us
+                        (e.currentTarget.style.backgroundColor = selectedTicker === item.ticker
                           ? "rgba(63, 81, 181, 0.1)"
                           : "transparent")
                       }
                     >
                       <ListItemText
-                        primary={<strong>{item.ticker_us}</strong>}
+                        primary={<strong>{item.ticker}</strong>}
                         secondary={item.issuer_name}
                       />
                     </ListItem>
