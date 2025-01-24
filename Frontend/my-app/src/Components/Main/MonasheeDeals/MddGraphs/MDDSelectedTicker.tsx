@@ -23,6 +23,7 @@ interface TickerData {
   sponsor: string | null;
   percentage_total_return: string | null;
   t1m_return_from_dealogic: string | null;
+  total_return: string | null;
 }
 
 // Define the structure of the response (the API wraps data inside a 'data' property)
@@ -70,7 +71,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
       try {
         console.log("okau")
         const response = await axios.post<ApiResponse>(
-          `${apiUrl}/api/mdd_screener/`,
+          `${apiUrl}/api/mdd_deal_search_ticker/`,
           { ticker }
         );
         setData(response.data.data);
@@ -162,10 +163,6 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                             label: "Sponsor Y/N",
                             value: item.sponsor ?? "N/A",
                           },
-                          {
-                            label: "Discount from Announcement Price",
-                            value: item.fo_discount ? (Number(item.fo_discount)).toFixed(0) + "%" : "0%",
-                          },
                         ].map((row, i) => (
                           <TableRow
                             key={i}
@@ -206,6 +203,10 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                       <TableBody>
                         {[
                           {
+                            label: "Discount from Announcement Price",
+                            value: item.fo_discount ? (Number(item.fo_discount)).toFixed(0) + "%" : "0%",
+                          },
+                          {
                             label: "Primary %",
                             value: item.percentage_primary ? (item.percentage_primary) + "%"  : "0%",
                           },
@@ -223,30 +224,18 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           },
                           {
                             label: "Monashee Capital Committed",
-                            value: item.total_committed_capital ? "$" + (Number(item.total_committed_capital)).toFixed(2) : "N/A",
+                            // value: item.total_committed_capital ? "$" + (Number(item.total_committed_capital)).toFixed(2) : "N/A",
+                            value: item.total_committed_capital
+                            ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.total_committed_capital))}`
+                            : "N/A" 
                           },
                           {
                             label: "Monashee PNL Gross",
-                            value: item.t1m_return_from_dealogic ? "$" + (Number(item.t1m_return_from_dealogic)).toFixed(2) : "N/A",
+                            value: item.total_return
+                            ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.total_return))}`
+                            : "N/A"
                           },
-                          {
-                            label: "T+1M Absolute Return",
-                            value:(<span
-                              style={{
-                                backgroundColor: Number(item.t1m_return_from_dealogic) > 0
-                                  ? "#85A947" // Light green for positive returns
-                                  : Number(item.t1m_return_from_dealogic) < 0
-                                  ? "#FF8080" // Light red for negative returns
-                                  : "#f8f9fa", // Light gray for neutral returns
-                                color: "#000", // Keep text color black for readability
-                                padding: "4px 8px", // Add some padding for better appearance
-                                borderRadius: "4px", // Rounded corners for styling
-                                display: "inline-block",
-                              }}
-                            >
-                              {Number(item.t1m_return_from_dealogic).toFixed(2)}%
-                            </span>)
-                          },
+                          
                           {
                             label: "Return on Invested Capital",
                             value: (<span
@@ -264,6 +253,24 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           >
                             {Number(item.percentage_total_return).toFixed(2)}%
                           </span>)
+                          },
+                          {
+                            label: "Market T+1M Absolute Return",
+                            value:(<span
+                              style={{
+                                backgroundColor: Number(item.t1m_return_from_dealogic) > 0
+                                  ? "#85A947" // Light green for positive returns
+                                  : Number(item.t1m_return_from_dealogic) < 0
+                                  ? "#FF8080" // Light red for negative returns
+                                  : "#f8f9fa", // Light gray for neutral returns
+                                color: "#000", // Keep text color black for readability
+                                padding: "4px 8px", // Add some padding for better appearance
+                                borderRadius: "4px", // Rounded corners for styling
+                                display: "inline-block",
+                              }}
+                            >
+                              {Number(item.t1m_return_from_dealogic).toFixed(2)}%
+                            </span>)
                           },
                         ].map((row, i) => (
                           <TableRow
