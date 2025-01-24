@@ -182,14 +182,14 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     },
     {
       field: "allocation_deal_size",
-      headerName: "Allocation Deal Size %",
+      headerName: "Allocation as % Deal Size",
       width: 150,
       renderCell: (params) => params.value,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "allocation_ioi",
-      headerName: "Allocation of IOI %",
+      headerName: "Allocation as % of  IOI",
       width: 150,
       renderCell: (params) => params.value,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),

@@ -18,26 +18,28 @@ const InvestmentMain: React.FC = () => {
     <>
       {/* Header */}
    
-          <Typography
+      <Typography
         variant="h3"
         sx={{
-          fontWeight: "bold",
-          color: "#FFFFFF",
-          fontSize: { xs: "2rem" },
-          backgroundColor: "#002060",
+          fontWeight: 500, // Semi-bold for better balance
+          color: "#FFFFFF", // White text
+          fontSize: { xs: "1rem", sm: "1.2rem" }, // Adaptive font size for different screen sizes
+          backgroundColor: "#002060", // Navy background
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "5vh",
-          textAlign: "center",
-          marginBottom: "10px",
-          animation: "fadeInScale 2s ease-out",
+          alignItems: "center", // Vertically center the text
+          justifyContent: "center", // Horizontally center the text
+          height: "4vh", // Adjust height for a larger appearance
+          padding: "8px 16px", // Add padding for better spacing
+          borderRadius: "8px", // Rounded edges for a modern look
+          textAlign: "center", // Ensure the text remains centered
+          marginBottom: "20px", // Margin for spacing below the component
           "@keyframes fadeInScale": {
             "0%": { opacity: 0, transform: "scale(0.8)" },
             "100%": { opacity: 1, transform: "scale(1)" },
           },
         }}
       >
+         Last Three years Moanshee participated  Deal Information for PRIME Investment Strategies
           </Typography>
 
       {/* Fetch Data */}
