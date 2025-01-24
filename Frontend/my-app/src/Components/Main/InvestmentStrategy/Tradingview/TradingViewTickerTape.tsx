@@ -24,7 +24,7 @@ const TradingViewTickerTape: React.FC = () => {
             showSymbolLogo: true,
             colorTheme: 'dark',
             isTransparent: false,
-            displayMode: 'adaptive',
+            displayMode: 'regular',
             locale: 'en',
         });
         document.getElementById('tradingview-ticker-tape')?.appendChild(script);
