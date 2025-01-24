@@ -25,7 +25,7 @@ interface TickerData {
 }
 
 interface SelectedTickerProps {
-  ticker_list: string[]; // Adjusted to accept an array of ticker symbols
+  ticker: string; // Adjusted to accept an array of ticker symbols
 }
 
 const getOrdinalSuffix = (day: number): string => {
@@ -53,7 +53,7 @@ const formatDate = (dateString: string): string => {
   );
 };
 
-const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
+const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
   const [data, setData] = useState<TickerData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,8 +67,8 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
           throw new Error("API URL is not defined in environment variables");
         }
 
-        const payload = { ticker_list }; // Prepare the payload as an array
-        const response = await fetch(`${apiUrl}/api/dealogic_screener/`, {
+        const payload = { ticker }; // Prepare the payload as an array
+        const response = await fetch(`${apiUrl}/api/dealogic_search_filters/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -96,7 +96,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
     };
 
     fetchData();
-  }, [ticker_list]);
+  }, [ticker]);
 
   if (loading) return <Typography>Loading...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
@@ -115,7 +115,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
     >
       Historical Deals Overview for{" "}
       <span style={{ color: "#ff6005", fontStyle: "italic" }}>
-        {ticker_list.join(", ")} - {data.length} deals
+        {ticker} - {data.length} deals
       </span>
     </Typography>
 

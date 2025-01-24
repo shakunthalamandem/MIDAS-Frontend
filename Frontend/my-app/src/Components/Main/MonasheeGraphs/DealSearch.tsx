@@ -144,7 +144,7 @@ const GlobalDealSearch: React.FC = () => {
       </Box>
 
       {/* If a ticker is selected, render the SelectedTicker component */}
-      {selectedTicker && <SelectedTicker ticker_list={[selectedTicker]} />}
+      {selectedTicker && <SelectedTicker ticker={selectedTicker} />}
     </Container>
   );
 };
