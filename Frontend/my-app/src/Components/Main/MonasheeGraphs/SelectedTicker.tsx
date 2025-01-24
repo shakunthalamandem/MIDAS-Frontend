@@ -199,26 +199,6 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                     {[
                       { label: "Issue Price", value: "$" + (Number(item.issue_price_usd)).toFixed(2) },
                       {
-                        label: "T+1 Month Returns",
-                        value: (
-                          <span
-                            style={{
-                              backgroundColor: Number(item.t_plus_1m_returns) > 0
-                                ? "#85A947" // Light green for positive returns
-                                : Number(item.t_plus_1m_returns) < 0
-                                ? "#FF8080" // Light red for negative returns
-                                : "#f8f9fa", // Light gray for neutral returns
-                              color: "#000", // Keep text color black for readability
-                              padding: "4px 8px", // Add some padding for better appearance
-                              borderRadius: "4px", // Rounded corners for styling
-                              display: "inline-block", // Ensures the span sizes properly
-                            }}
-                          >
-                            {Number(item.t_plus_1m_returns).toFixed(2)}%
-                          </span>
-                        ),
-                      },
-                      {
                         label: "T+1 Day Returns",
                         value: (
                           <span
@@ -238,8 +218,60 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                           </span>
                         ),
                       },
-                      { label: "T+1 Day Returns (Index Adjusted)", value: (Number(item.t_plus_1d_returns_index_returns)).toFixed(2) + "%" },
-                      { label: "T+1 Month Returns (Index Adjusted)", value: (Number(item.t_plus_1m_returns_index_returns)).toFixed(2) + "%" },
+                      { label: "T+1 Day Excess Returns", value: (
+                        <span
+                          style={{
+                            backgroundColor: Number(item.t_plus_1d_returns_index_returns) > 0
+                              ? "#85A947" // Light green for positive returns
+                              : Number(item.t_plus_1d_returns_index_returns) < 0
+                              ? "#FF8080" // Light red for negative returns
+                              : "#f8f9fa", // Light gray for neutral returns
+                            color: "#000", // Keep text color black for readability
+                            padding: "4px 8px", // Add some padding for better appearance
+                            borderRadius: "4px", // Rounded corners for styling
+                            display: "inline-block", // Ensures the span sizes properly
+                          }}
+                        >
+                          {Number(item.t_plus_1d_returns_index_returns).toFixed(2)}%
+                        </span>
+                      ), },
+                      {
+                        label: "T+1 Month Returns",
+                        value: (
+                          <span
+                            style={{
+                              backgroundColor: Number(item.t_plus_1m_returns) > 0
+                                ? "#85A947" // Light green for positive returns
+                                : Number(item.t_plus_1m_returns) < 0
+                                ? "#FF8080" // Light red for negative returns
+                                : "#f8f9fa", // Light gray for neutral returns
+                              color: "#000", // Keep text color black for readability
+                              padding: "4px 8px", // Add some padding for better appearance
+                              borderRadius: "4px", // Rounded corners for styling
+                              display: "inline-block", // Ensures the span sizes properly
+                            }}
+                          >
+                            {Number(item.t_plus_1m_returns).toFixed(2)}%
+                          </span>
+                        ),
+                      },
+                      { label: "T+1 Month Excess Returns", value: (
+                          <span
+                            style={{
+                              backgroundColor: Number(item.t_plus_1m_returns_index_returns) > 0
+                                ? "#85A947" // Light green for positive returns
+                                : Number(item.t_plus_1m_returns_index_returns) < 0
+                                ? "#FF8080" // Light red for negative returns
+                                : "#f8f9fa", // Light gray for neutral returns
+                              color: "#000", // Keep text color black for readability
+                              padding: "4px 8px", // Add some padding for better appearance
+                              borderRadius: "4px", // Rounded corners for styling
+                              display: "inline-block", // Ensures the span sizes properly
+                            }}
+                          >
+                            {Number(item.t_plus_1m_returns_index_returns).toFixed(2)}%
+                          </span>
+                        ), },
                       
                       {
                         label: "Opportunity Value Excess",
