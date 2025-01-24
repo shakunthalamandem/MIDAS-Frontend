@@ -82,7 +82,7 @@
           "$200M to $500M",
           ">$500M"
         ],
-        "label": "DealValue",
+        "label": "Deal Volume",
         "description": "The total $ value of the offering or Deal offered"
       }
     },
