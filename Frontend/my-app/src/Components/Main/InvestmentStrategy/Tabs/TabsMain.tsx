@@ -54,9 +54,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Box sx={{ width: "100%", padding: 2 }}>
-      <Typography variant="h5" color="#002060" align="center" style={{ fontWeight: 'bold' }}>
-      Investment Strategies Screener
-            </Typography>
+  
         <Card sx={{ boxShadow: 3, borderRadius: 2, padding: 2,mt:3 }}>
           <CardContent>
 
@@ -95,7 +93,7 @@ const TabsMain: React.FC<{ filtersData: any }> = ({ filtersData }) => {
                     }}
                   >
               <Tab label="Monashee Specific" aria-label="Monashee Specific Filters" />
-              <Tab label="Fundamentals" aria-label="Fundamentals Filters" />
+              <Tab label="Fundamental" aria-label="Fundamentals Filters" />
               <Tab label="Technical" aria-label="Technical Filters" />
             </Tabs>
 
