@@ -70,7 +70,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
       try {
         console.log("okau")
         const response = await axios.post<ApiResponse>(
-          `${apiUrl}/api/mdd_screener/`,
+          `${apiUrl}/api/mdd_deal_search_filter/`,
           { ticker }
         );
         setData(response.data.data);
