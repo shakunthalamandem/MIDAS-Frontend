@@ -24,7 +24,9 @@ const MonasheeDealSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<MDDResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  // const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+ const [selectedTicker, setSelectedTicker] = useState<string>("CRGX"); // Set default ticker to "FANG"
+  
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
