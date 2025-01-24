@@ -295,7 +295,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
                 e.currentTarget.style.border = "2px solid #444444";
               }}
             >
-              Normal
+              Simple
             </ToggleButton>
             <ToggleButton
               value="weighted"
