@@ -123,7 +123,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
     { field: "deal_type", headerName: "Deal Type", width: 80 },
     {
       field: "deal_value",
-      headerName: "Deal Value",
+      headerName: "Deal Size",
       width: 120,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },

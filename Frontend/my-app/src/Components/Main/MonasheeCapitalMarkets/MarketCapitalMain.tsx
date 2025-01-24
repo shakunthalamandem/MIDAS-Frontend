@@ -78,7 +78,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
           (metric, index) => {
             const labels = [
               "Deal Count",
-              "Deal Value",
+              "Deal Volume",
               "Opportunity Value (T + 1M Excess)",
             ];
             const colors = ["#9b0000", "#9b0000", "#9b0000"];

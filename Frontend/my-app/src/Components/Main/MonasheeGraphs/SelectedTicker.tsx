@@ -152,7 +152,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                       { label: "Region", value: item.broad_region },
                       { label: "Deal Type", value: item.deal_type },
                       {
-                        label: "Deal Value",
+                        label: "Deal Size",
                         value: item.deal_value
                           ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.deal_value))}`
                           : "N/A"

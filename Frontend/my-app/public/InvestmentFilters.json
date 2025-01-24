@@ -50,7 +50,7 @@
         "$200M to $500M",
         ">$500M"
       ],
-      "label": "Deal Value",
+      "label": "Deal Size",
       "description": "The total $ value of the offering or deal."
     },
     "sponsor": {
