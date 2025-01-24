@@ -205,7 +205,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                   >
                                     {[
                                       "Quintile", // New column for serial numbers
-                                      "T+1M Excess Returns",
+                                      "T+1M Absolute Returns",
                                       "No of Deals",
                                       "Allocation as % of Deal Size (Weighted)",
                                       "Allocation as % of IOI (Weighted)",
@@ -213,10 +213,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       "Monashee Allocation PnL (Gross $)",
                                       "Monashee AM PnL  (Gross $)",
                                       "Monashee Total  PnL (Gross $)",
-                                      "Model PnL With Actual Allocation ($)",
+                                      "Model PnL With Actual Allocation (Gross $)",
                                       selectedCategory === "IPO"
-                                        ? "Model PnL 0.5% Allocation ($)"
-                                        : "Model PnL 1% Allocation ($)", // Dynamic header
+                                        ? "Model PnL 0.5% Allocation (Gross $)"
+                                        : "Model PnL 1% Allocation (Gross $)", // Dynamic header
                                       // ].map((header, idx) => (
                                       ].filter(Boolean).map((header, idx) => (
                                       <TableCell
