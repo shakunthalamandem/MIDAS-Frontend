@@ -60,7 +60,7 @@
   "DealSpecific": {
     "percentage_primary": {
       "type": "dropdown",
-      "label": "Primary Percentage",
+      "label": "% Primary",
       "description": "Select a range or specific value for the primary category.",
       "options": ["Equal to 0", "Equal to 100", "0-20", "20-40", "40-60", "60-80", "80-100"]
     },
