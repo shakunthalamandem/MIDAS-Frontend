@@ -79,7 +79,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
             const labels = [
               "Deal Count",
               "Deal Value",
-              "Opportunity Excess Value",
+              "Opportunity Value (T + 1M Excess)",
             ];
             const colors = ["#9b0000", "#9b0000", "#9b0000"];
             return (
