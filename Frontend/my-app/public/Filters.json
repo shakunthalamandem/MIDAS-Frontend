@@ -55,7 +55,7 @@
           "-20% to 0%",
           "<-20%"
         ],
-        "label": "T+1D Returns",
+        "label": "T+1D Absolute Returns",
         "description": "The return of deals on the first trade date from the pricing date"
       }
     },
@@ -69,7 +69,7 @@
           "-20% to 0%",
           "<-20%"
         ],
-        "label": "T+1M Returns",
+        "label": "T+1M Absolute Returns",
         "description": "The return of deals on one month date from the pricing date"
       }
     },
