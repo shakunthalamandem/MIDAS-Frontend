@@ -26,7 +26,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   const columns = [
     'Year',
     'Total Deal Count',
-    'Total Deal Volume',
+    'Total Deal Volume ($)',
     '% of Positively Performing Deals ',
     '% of Negatively Performing Deals ',
     'Weighted Avg T+1M Excess Return (Positive Deals)',
@@ -106,7 +106,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               <TableRow key={year}>
                 <TableCell sx={{ padding: '4px 8px' }}>{year}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Volume}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>${row.Total_Deal_Volume}B</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>
                   {row.Positively_Performing_Deals_Percentage}%
                 </TableCell>
@@ -138,7 +138,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               Total
             </TableCell>
             <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>{totalDealCount}</TableCell>
-            <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>{totalDealVolume}</TableCell>
+            <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}> ${totalDealVolume.toFixed(2)}B</TableCell>
 
             <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>
               {avgPositivelyPerformingDealsPercentage.toFixed(2)}%
