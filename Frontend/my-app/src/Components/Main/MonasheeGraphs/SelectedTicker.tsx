@@ -197,7 +197,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                 <Table size="small" aria-label="Deal Info Table 2">
                   <TableBody>
                     {[
-                      { label: "Issue Price", value: "$" + (Number(item.issue_price_usd)).toFixed(2) },
+                      { label: "Issue / Price", value: "$" + (Number(item.issue_price_usd)).toFixed(2) },
                       {
                         label: "T+1 Day Returns",
                         value: (
@@ -274,7 +274,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker_list }) => {
                         ), },
                       
                       {
-                        label: "Opportunity Value Excess",
+                        label: "Opportunity Value (T + 1M Excess)",
                         value: item.opportunity_value_ex
                           ? new Intl.NumberFormat('en-US', {
                               style: 'currency',
