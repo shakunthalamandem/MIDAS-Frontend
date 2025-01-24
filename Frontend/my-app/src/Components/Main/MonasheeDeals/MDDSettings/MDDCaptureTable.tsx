@@ -19,22 +19,17 @@ import {
 // Format values to represent millions, billions, etc.
 const formatValue = (value: number): string => {
   const absValue = Math.abs(value);
-  if (absValue >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
-  if (absValue >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (absValue >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
-  return `$${value.toFixed(2)}`;
+  const sign = value < 0 ? '-' : '';
+  
+  if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
+  if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
+  if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
+  
+  return `${sign}$${absValue.toFixed(2)}`;
 };
 
-// Function to sort the ranges in descending order
-const sortRangesDescending = (ranges: string[]): string[] => {
-  return ranges.sort((a, b) => {
-    const getValue = (range: string) => {
-      const match = range.match(/-?\d+(\.\d+)?%/);
-      return match ? parseFloat(match[0].replace("%", "")) : 0;
-    };
-    return getValue(b) - getValue(a); // Sort in descending order
-  });
-};
+
+
 
 interface CategoryData {
   "Number of deals": number;
