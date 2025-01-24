@@ -19,17 +19,16 @@ import {
 // Format values to represent millions, billions, etc.
 const formatValue = (value: number): string => {
   const absValue = Math.abs(value);
-  const sign = value < 0 ? '-' : '';
-  
-  if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
-  if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
+  const sign = value < 0 ? "-" : "";
+
+  if (absValue >= 1_000_000_000)
+    return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
+  if (absValue >= 1_000_000)
+    return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
   if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
-  
+
   return `${sign}$${absValue.toFixed(2)}`;
 };
-
-
-
 
 interface CategoryData {
   "Number of deals": number;
@@ -39,10 +38,9 @@ interface CategoryData {
   "Model Actual Return": number;
   "Model Return 1% Allocation": number;
   // "Net of Hedge": number;
-  "Allocation Return": number,
-  "AM Return":number,
-  "Total Return": number,
-
+  "Allocation Return": number;
+  "AM Return": number;
+  "Total Return": number;
 }
 
 interface ResponseData {
@@ -63,7 +61,9 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   apiName,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<"IPO" | "FO">("IPO");
-  const [dynamicCategoryByYear, setDynamicCategoryByYear] = useState<Record<string, string[]>>({});
+  const [dynamicCategoryByYear, setDynamicCategoryByYear] = useState<
+    Record<string, string[]>
+  >({});
 
   useEffect(() => {
     if (!responseData) return;
@@ -84,13 +84,15 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
   // Function to move "Summary" row to the end after sorting
   const sortRangesWithSummaryAtEnd = (ranges: string[]): string[] => {
-    const sortedRanges = ranges.filter((range) => range !== "Summary").sort((a, b) => {
-      const getValue = (range: string) => {
-        const match = range.match(/-?\d+(\.\d+)?%/);
-        return match ? parseFloat(match[0].replace("%", "")) : 0;
-      };
-      return getValue(b) - getValue(a); // Sort in descending order
-    });
+    const sortedRanges = ranges
+      .filter((range) => range !== "Summary")
+      .sort((a, b) => {
+        const getValue = (range: string) => {
+          const match = range.match(/-?\d+(\.\d+)?%/);
+          return match ? parseFloat(match[0].replace("%", "")) : 0;
+        };
+        return getValue(b) - getValue(a); // Sort in descending order
+      });
     // Push the "Summary" row to the end
     sortedRanges.push("Summary");
     return sortedRanges;
@@ -98,12 +100,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
   return (
     <Box mr={0} sx={{ Width: "100%", maxWidth: "1000px" }}>
-      <Box
-        display="flex"
-        justifyContent="center"
-        mb={3}
-        sx={{ gap: "10px" }}
-      >
+      <Box display="flex" justifyContent="center" mb={3} sx={{ gap: "10px" }}>
         <Button
           variant={selectedCategory === "IPO" ? "contained" : "outlined"}
           color="secondary"
@@ -154,9 +151,13 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
                 <Grid container spacing={3}>
                   {(() => {
-                    const categoryData = responseData[year]?.[selectedCategory] || {};
-                    const dynamicCategoryOrder = dynamicCategoryByYear[year] || [];
-                    const sortedCategoryData = sortRangesWithSummaryAtEnd(dynamicCategoryOrder).map(
+                    const categoryData =
+                      responseData[year]?.[selectedCategory] || {};
+                    const dynamicCategoryOrder =
+                      dynamicCategoryByYear[year] || [];
+                    const sortedCategoryData = sortRangesWithSummaryAtEnd(
+                      dynamicCategoryOrder
+                    ).map(
                       (range) =>
                         categoryData[range] || {
                           "Number of deals": 0,
@@ -167,7 +168,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                           "Model Return 1% Allocation": 0,
                           // "Net of Hedge": 0,
                           "Allocation Return": 0,
-                          "AM Return":0,
+                          "AM Return": 0,
                           "Total Return": 0,
                         }
                     );
@@ -203,51 +204,171 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       color: "white",
                                     }}
                                   >
-                                    {[
-                                      "Quintile", // New column for serial numbers
-                                      "T+1M Absolute Returns",
-                                      "No of Deals",
-                                      "Allocation as % of Deal Size (Weighted)",
-                                      "Allocation as % of IOI (Weighted)",
-                                      "Deal Volume ($)",
-                                      "Monashee Allocation PnL (Gross $)",
-                                      "Monashee AM PnL  (Gross $)",
-                                      "Monashee Total  PnL (Gross $)",
-                                      "Model PnL With Actual Allocation (Gross $)",
-                                      selectedCategory === "IPO"
-                                        ? "Model PnL 0.5% Allocation (Gross $)"
-                                        : "Model PnL 1% Allocation (Gross $)", // Dynamic header
-                                      // ].map((header, idx) => (
-                                      ].filter(Boolean).map((header, idx) => (
-                                      <TableCell
-                                        key={idx}
-                                        sx={{
-                                          fontSize: "0.725rem",
-                                          fontWeight: "bold",
-                                          border: "1px solid #ddd",
-                                          padding: "4px 8px",
-                                          width: idx === 0 ? "80px" : "90px", // Adjust width for Quantiles
-                                        }}
-                                      >
-                                        {header}
-                                      </TableCell>
-                                    ))}
+                                    {/* Individual TableCell for each header */}
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "80px", // Specific width for "Quintile"
+                                        // Add top border
+                                      }}
+                                    >
+                                      Quintile
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                      }}
+                                    >
+                                      T+1M Excess Returns
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                      }}
+                                    >
+                                      No of Deals
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                      }}
+                                    >
+                                      Allocation as % of Deal Size (Weighted)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                      }}
+                                    >
+                                      Allocation as % of IOI (Weighted)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                      }}
+                                    >
+                                      Deal Volume ($)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderLeft:
+                                          "2px solid #666666 !important",
+                                        borderTop:
+                                          "2px solid #666666 !important", // Add top border
+                                      }}
+                                    >
+                                      Monashee Allocation PnL (Gross $)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderTop: "2px solid #666666", // Add top border
+                                      }}
+                                    >
+                                      Monashee AM PnL (Gross $)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderTop: "2px solid #666666", // Add top border
+                                      }}
+                                    >
+                                      Monashee Total PnL (Gross $)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderLeft:
+                                          "2px solid #666666 !important",
+                                        borderTop:
+                                          "2px solid #666666 !important", // Add top border
+                                      }}
+                                    >
+                                      Model PnL With Actual Allocation ($)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderRight:
+                                          "2px solid #666666 !important",
+                                        borderTop:
+                                          "2px solid #666666 !important", // Add top border
+                                      }}
+                                    >
+                                      {selectedCategory === "IPO"
+                                        ? "Model PnL 0.5% Allocation ($)"
+                                        : "Model PnL 1% Allocation ($)"}
+                                    </TableCell>
                                   </TableRow>
                                 </TableHead>
+
                                 <TableBody>
                                   {sortedCategoryData.map((data, index) => {
-                                    const range = sortRangesWithSummaryAtEnd(dynamicCategoryOrder)[index];
-                                    const isSummary = range === "Summary"; // Check if it's the summary row
+                                    const range =
+                                      sortRangesWithSummaryAtEnd(
+                                        dynamicCategoryOrder
+                                      )[index];
+                                    const isSummary = range === "Summary";
+                                    const isLastRow =
+                                      index === sortedCategoryData.length - 1;
+
                                     return (
                                       <TableRow
-                                        key={range}
+                                        key={index}
                                         sx={{
                                           "&:nth-of-type(odd)": {
                                             backgroundColor: "#f9f9f9",
                                           },
-                                          backgroundColor: isSummary ? "#d1f7d1" : "inherit", // Highlight the summary row
+                                          backgroundColor: isSummary
+                                            ? "#d1f7d1"
+                                            : "inherit",
                                         }}
                                       >
+                                        {/* First column: Quintile */}
                                         <TableCell
                                           component="th"
                                           scope="row"
@@ -255,11 +376,15 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             fontSize: "0.8rem",
                                             border: "1px solid #ddd",
                                             padding: "4px 8px",
-                                            fontWeight: isSummary ? "bold" : "normal",
+                                            fontWeight: isSummary
+                                              ? "bold"
+                                              : "normal",
                                           }}
                                         >
                                           {isSummary ? "" : index + 1}
                                         </TableCell>
+
+                                        {/* Range */}
                                         <TableCell
                                           component="th"
                                           scope="row"
@@ -267,44 +392,130 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             fontSize: "0.8rem",
                                             border: "1px solid #ddd",
                                             padding: "4px 8px",
-                                            fontWeight: isSummary ? "bold" : "normal",
+                                            fontWeight: isSummary
+                                              ? "bold"
+                                              : "normal",
                                           }}
                                         >
                                           {range}
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+
+                                        {/* Standard Columns */}
+                                        <TableCell
+                                          align="left"
+                                          sx={{ fontSize: "0.8rem" }}
+                                        >
                                           {data["Number of deals"] || 0}
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                          {data["Weighted Allocation as % of Deal Size"]?.toFixed(2) || "0.00"}%
+                                        <TableCell
+                                          align="left"
+                                          sx={{ fontSize: "0.8rem" }}
+                                        >
+                                          {data[
+                                            "Weighted Allocation as % of Deal Size"
+                                          ]?.toFixed(2) || "0.00"}
+                                          %
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                          {data["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00"}%
+                                        <TableCell
+                                          align="left"
+                                          sx={{ fontSize: "0.8rem" }}
+                                        >
+                                          {data[
+                                            "Weighted Allocation as % of IOI"
+                                          ]?.toFixed(2) || "0.00"}
+                                          %
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                          {formatValue(data["Deal volume"] || 0)}
+                                        <TableCell
+                                          align="left"
+                                          sx={{ fontSize: "0.8rem" }}
+                                        >
+                                          {formatValue(
+                                            data["Deal volume"] || 0
+                                          )}
                                         </TableCell>
 
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                          {formatValue(data["Allocation Return"] || 0)}
+                                        {/* Boxed Columns: Monashee */}
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            borderLeft:
+                                              "2px solid #666666 !important",
+                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
+                                            borderBottom: isLastRow
+                                              ? "2px solid #666666 !important"
+                                              : "none",
+                                          }}
+                                        >
+                                          {formatValue(
+                                            data["Allocation Return"] || 0
+                                          )}
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            borderColor: "#ddd",
+                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
+                                            borderBottom: isLastRow
+                                              ? "2px solid #666666 !important"
+                                              : "none",
+                                          }}
+                                        >
                                           {formatValue(data["AM Return"] || 0)}
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                          {formatValue(data["Total Return"] || 0)}
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            borderRight:
+                                              "2px solid #666666 !important",
+                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
+                                            borderBottom: isLastRow
+                                              ? "2px solid #666666 !important"
+                                              : "none",
+                                          }}
+                                        >
+                                          {formatValue(
+                                            data["Total Return"] || 0
+                                          )}
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                          {formatValue(data["Model Actual Return"] || 0)}
+
+                                        {/* Boxed Columns: Model */}
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            // borderTop: isFirstRow ? "2px solid blue !important" : "none",
+                                            borderLeft:
+                                              "2px solid #666666 !important",
+                                            borderBottom: isLastRow
+                                              ? "2px solid #666666 !important"
+                                              : "none",
+                                          }}
+                                        >
+                                          {formatValue(
+                                            data["Model Actual Return"] || 0
+                                          )}
                                         </TableCell>
-                                        <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                          {formatValue(data["Model Return 1% Allocation"] || 0)}
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            borderRight:
+                                              "2px solid #666666 !important",
+                                            // borderTop: isFirstRow ? "2px solid blue !important" : "none",
+                                            borderBottom: isLastRow
+                                              ? "2px solid #666666 !important"
+                                              : "none",
+                                          }}
+                                        >
+                                          {formatValue(
+                                            data[
+                                              "Model Return 1% Allocation"
+                                            ] || 0
+                                          )}
                                         </TableCell>
-                                        {/* {year > "2018" && (
-                                          <TableCell align="left" sx={{ fontSize: "0.8rem" }}>
-                                            {formatValue(data["Net of Hedge"] || 0)}
-                                          </TableCell>
-                                        )} */}
                                       </TableRow>
                                     );
                                   })}
