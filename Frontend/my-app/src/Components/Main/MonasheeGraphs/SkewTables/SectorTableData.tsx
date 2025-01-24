@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 // Type definition for the table data
 interface TableData {
   Total_Deal_Count: number;
+  Total_Deal_Volume: number;
   Positively_Performing_Deals_Percentage: number;
   Negatively_Performing_Deals_Percentage: number;
   Average_T1M_Abs_Return_of_Positively: number;
@@ -25,10 +26,11 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   const columns = [
     'Year',
     'Total Deal Count',
+    'Total Deal Volume',
     '% of Positively Performing Deals ',
     '% of Negatively Performing Deals ',
-    'Avg T+1M Excess Return (Positively)',
-    'Avg T+1M Excess Return (Negatively)',
+    'Weighted Avg T+1M Excess Return (Positive Deals)',
+    'Weighted Avg T+1M Excess Return (Negative Deals)',
     // 'Expected Returns Absolute',
     'Expected Returns Excess',
     'Opportunity Value       (T + 1M Excess)',
@@ -41,6 +43,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
 
   // Initialize totals and counters for average calculations
   let totalDealCount = 0;
+  let totalDealVolume = 0;
   let totalLongOpportunityValue = 0;
   let totalPositivelyPerformingDealsPercentage = 0;
   let totalNegativelyPerformingDealsPercentage = 0;
@@ -53,6 +56,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   // Loop through the data and accumulate totals for averages
   Object.values(yearwiseData).forEach((row) => {
     totalDealCount += row.Total_Deal_Count;
+    totalDealVolume += row.Total_Deal_Volume;
     totalLongOpportunityValue += row.Long_Opportunity_Value;
     totalPositivelyPerformingDealsPercentage += row.Positively_Performing_Deals_Percentage;
     totalNegativelyPerformingDealsPercentage += row.Negatively_Performing_Deals_Percentage;
@@ -102,6 +106,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               <TableRow key={year}>
                 <TableCell sx={{ padding: '4px 8px' }}>{year}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Volume}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>
                   {row.Positively_Performing_Deals_Percentage}%
                 </TableCell>
@@ -133,6 +138,8 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               Total
             </TableCell>
             <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>{totalDealCount}</TableCell>
+            <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>{totalDealVolume}</TableCell>
+
             <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>
               {avgPositivelyPerformingDealsPercentage.toFixed(2)}%
             </TableCell>
