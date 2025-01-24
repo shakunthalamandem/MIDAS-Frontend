@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Paper, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import {
+  Box,
+  Paper,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 
 // Define the structure of the response data
 interface TickerData {
@@ -53,13 +63,14 @@ const getOrdinalSuffix = (day: number): string => {
 
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
+  const options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  };
   const formattedDate = date.toLocaleDateString("en-GB", options);
   const day = date.getDate();
-  return formattedDate.replace(
-    `${day}`,
-    `${day}${getOrdinalSuffix(day)}`
-  );
+  return formattedDate.replace(`${day}`, `${day}${getOrdinalSuffix(day)}`);
 };
 
 const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
@@ -71,7 +82,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
     // Fetch data from API
     const fetchData = async () => {
       try {
-        console.log("okau")
+        console.log("okau");
         const response = await axios.post<ApiResponse>(
           `${apiUrl}/api/mdd_deal_search_ticker/`,
           { ticker }
@@ -150,16 +161,22 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           },
                           { label: "Region", value: item.broad_region },
                           { label: "Deal Type", value: item.deal_type },
-                          { label: "Deal Size", value: item.deal_size
-                            ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.deal_size))}`
-                            : "N/A" },
+                          {
+                            label: "Deal Size",
+                            value: item.deal_size
+                              ? `$${new Intl.NumberFormat("en-US", {}).format(Number(item.deal_size))}`
+                              : "N/A",
+                          },
                           {
                             label: "Issue / Offer Price",
                             value: "$" + item.issue_offer_price,
                           },
                           {
                             label: "Deal Captain",
-                            value: item.deal_captain ?? "N/A",
+                            value:
+                              item.deal_captain === "none"
+                                ? "Not Available"
+                                : item.deal_captain,
                           },
                           {
                             label: "Sponsor Y/N",
@@ -169,7 +186,8 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                           <TableRow
                             key={i}
                             sx={{
-                              backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                              backgroundColor:
+                                i % 2 === 0 ? "#f3f3f3" : "#ffffff",
                               "&:hover": {
                                 backgroundColor: "#e0f7fa",
                               },
@@ -204,182 +222,342 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <Table size="small" aria-label="Deal Info Table 2">
                       <TableBody>
                         {[
-    {
-      label: "Discount from Announcement Price",
-      value: item.fo_discount !== undefined ? (
-        <Typography 
-          sx={{ 
-            color: Number(item.fo_discount) === 0 
-              ? 'black' 
-              : Number(item.fo_discount) < 0 
-              ? 'red' 
-              : 'green', 
-            display: 'flex', 
-            alignItems: 'center' 
-          }}
-        >
-          {Number(item.fo_discount).toFixed(0) + "%"}
-          {Number(item.fo_discount) > 0 ? (
-            <ArrowDropUpIcon sx={{ color: 'green', marginLeft: '4px', fontSize: 30 }} />
-          ) : Number(item.fo_discount) < 0 ? (
-            <ArrowDropDownIcon sx={{ color: 'red', marginLeft: '4px', fontSize: 30 }} />
-          ) : (
-            <ArrowDropDownIcon sx={{ color: 'black', marginLeft: '4px', fontSize: 30 }} />
-          )}
-        </Typography>
-      ) : (
-        <Typography sx={{ color: 'black', display: 'flex', alignItems: 'center' }}>
-          0% <ArrowDropDownIcon sx={{ color: 'black', marginLeft: '4px', fontSize: 30 }} />
-        </Typography>
-      ),
-    },
+                          {
+                            label: "Discount from Announcement Price",
+                            value:
+                              item.fo_discount !== undefined ? (
+                                <Typography
+                                  sx={{
+                                    color:
+                                      Number(item.fo_discount) === 0
+                                        ? "black"
+                                        : Number(item.fo_discount) < 0
+                                          ? "red"
+                                          : "green",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  {Number(item.fo_discount).toFixed(0) + "%"}
+                                  {Number(item.fo_discount) > 0 ? (
+                                    <ArrowDropUpIcon
+                                      sx={{
+                                        color: "green",
+                                        marginLeft: "4px",
+                                        fontSize: 30,
+                                      }}
+                                    />
+                                  ) : Number(item.fo_discount) < 0 ? (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "red",
+                                        marginLeft: "4px",
+                                        fontSize: 30,
+                                      }}
+                                    />
+                                  ) : (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "black",
+                                        marginLeft: "4px",
+                                        fontSize: 30,
+                                      }}
+                                    />
+                                  )}
+                                </Typography>
+                              ) : (
+                                <Typography
+                                  sx={{
+                                    color: "black",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  0%{" "}
+                                  <ArrowDropDownIcon
+                                    sx={{
+                                      color: "black",
+                                      marginLeft: "4px",
+                                      fontSize: 30,
+                                    }}
+                                  />
+                                </Typography>
+                              ),
+                          },
                           {
                             label: "Primary %",
-                            value: item.percentage_primary ? (item.percentage_primary) + "%"  : "0%",
+                            value: item.percentage_primary
+                              ? item.percentage_primary + "%"
+                              : "0%",
                           },
                           {
                             label: "Allocation as % of Deal Size",
-                            value: item.allocation_deal_size !== undefined ? (
-                              <span style={{ 
-                                color: Number(item.allocation_deal_size) === 0 
-                                  ? 'black' 
-                                  : Number(item.allocation_deal_size) < 0 
-                                  ? 'red' 
-                                  : 'green', 
-                                display: 'flex', 
-                                alignItems: 'center' 
-                              }}>
-                                {Number(item.allocation_deal_size).toFixed(2) + "%"}
-                                {Number(item.allocation_deal_size) > 0 ? (
-                                  <ArrowDropUpIcon sx={{ color: 'green', marginLeft: '4px', fontSize: 20 }} />
-                                ) : Number(item.allocation_deal_size) < 0 ? (
-                                  <ArrowDropDownIcon sx={{ color: 'red', marginLeft: '4px', fontSize: 20 }} />
-                                ) : (
-                                  <ArrowDropDownIcon sx={{ color: 'black', marginLeft: '4px', fontSize: 20 }} />
-                                )}
-                              </span>
-                            ) : "N/A",
+                            value:
+                              item.allocation_deal_size !== undefined ? (
+                                <span
+                                  style={{
+                                    color:
+                                      Number(item.allocation_deal_size) === 0
+                                        ? "black"
+                                        : Number(item.allocation_deal_size) < 0
+                                          ? "red"
+                                          : "green",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  {Number(item.allocation_deal_size).toFixed(
+                                    2
+                                  ) + "%"}
+                                  {Number(item.allocation_deal_size) > 0 ? (
+                                    <ArrowDropUpIcon
+                                      sx={{
+                                        color: "green",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  ) : Number(item.allocation_deal_size) < 0 ? (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "red",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  ) : (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "black",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  )}
+                                </span>
+                              ) : (
+                                "N/A"
+                              ),
                           },
                           {
                             label: "Allocation as % of IOI",
-                            value: item.allocation_ioi !== undefined ? (
-                              <span style={{ 
-                                color: Number(item.allocation_ioi) === 0 
-                                  ? 'black' 
-                                  : Number(item.allocation_ioi) < 0 
-                                  ? 'red' 
-                                  : 'green', 
-                                display: 'flex', 
-                                alignItems: 'center' 
-                              }}>
-                                {Number(item.allocation_ioi).toFixed(2) + "%"}
-                                {Number(item.allocation_ioi) > 0 ? (
-                                  <ArrowDropUpIcon sx={{ color: 'green', marginLeft: '4px', fontSize: 20 }} />
-                                ) : Number(item.allocation_ioi) < 0 ? (
-                                  <ArrowDropDownIcon sx={{ color: 'red', marginLeft: '4px', fontSize: 20 }} />
-                                ) : (
-                                  <ArrowDropDownIcon sx={{ color: 'black', marginLeft: '4px', fontSize: 20 }} />
-                                )}
-                              </span>
-                            ) : "N/A",
+                            value:
+                              item.allocation_ioi !== undefined ? (
+                                <span
+                                  style={{
+                                    color:
+                                      Number(item.allocation_ioi) === 0
+                                        ? "black"
+                                        : Number(item.allocation_ioi) < 0
+                                          ? "red"
+                                          : "green",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  {Number(item.allocation_ioi).toFixed(2) + "%"}
+                                  {Number(item.allocation_ioi) > 0 ? (
+                                    <ArrowDropUpIcon
+                                      sx={{
+                                        color: "green",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  ) : Number(item.allocation_ioi) < 0 ? (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "red",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  ) : (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "black",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  )}
+                                </span>
+                              ) : (
+                                "N/A"
+                              ),
                           },
                           {
                             label: "Average Hold Period",
-                            value: item.average_hold_period ? (item.average_hold_period) + " days": "N/A",
+                            value: item.average_hold_period
+                              ? item.average_hold_period + " days"
+                              : "N/A",
                           },
                           {
                             label: "Monashee Capital Committed",
                             // value: item.total_committed_capital ? "$" + (Number(item.total_committed_capital)).toFixed(2) : "N/A",
                             value: item.total_committed_capital
-                            ? `$${new Intl.NumberFormat('en-US', {}).format(Number(item.total_committed_capital))}`
-                            : "N/A" 
+                              ? `$${new Intl.NumberFormat("en-US", {}).format(Number(item.total_committed_capital))}`
+                              : "N/A",
                           },
                           {
                             label: "Monashee PNL Gross",
-                            value: item.total_return !== undefined ? (
-                              <span
-                                style={{
-                                  color: Number(item.total_return) < 0 ? 'red' : 'green',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                }}
-                              >
-                                {Number(item.total_return) < 0 ? '-' : ''}
-                                ${new Intl.NumberFormat('en-US', {}).format(
-                                  Math.abs(Number(Number(item.total_return).toFixed(0)))
-                                )}
-                                {Number(item.total_return) < 0 ? (
-                                  <ArrowDropDownIcon sx={{ color: 'red', marginLeft: '4px', fontSize: 20 }} />
-                                ) : (
-                                  <ArrowDropUpIcon sx={{ color: 'green', marginLeft: '4px', fontSize: 20 }} />
-                                )}
-                              </span>
-                            ) : (
-                              "N/A"
-                            ),
+                            value:
+                              item.total_return !== undefined ? (
+                                <span
+                                  style={{
+                                    color:
+                                      Number(item.total_return) < 0
+                                        ? "red"
+                                        : "green",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  {Number(item.total_return) < 0 ? "-" : ""}$
+                                  {new Intl.NumberFormat("en-US", {}).format(
+                                    Math.abs(
+                                      Number(
+                                        Number(item.total_return).toFixed(0)
+                                      )
+                                    )
+                                  )}
+                                  {Number(item.total_return) < 0 ? (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "red",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  ) : (
+                                    <ArrowDropUpIcon
+                                      sx={{
+                                        color: "green",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  )}
+                                </span>
+                              ) : (
+                                "N/A"
+                              ),
                             style: {
-                              color: Number(item.total_return) < 0 ? 'red' : 'green',
+                              color:
+                                Number(item.total_return) < 0 ? "red" : "green",
                             },
                           },
                           {
                             label: "Return on Invested Capital",
-                            value: item.percentage_total_return !== undefined ? (
-                              <span
-                                style={{
-                                  display: "inline-flex",
-                                  alignItems: "center", // Align the icon with the text
-                                  color: Number(item.percentage_total_return) > 0
-                                    ? 'green' // Green for positive
-                                    : Number(item.percentage_total_return) < 0
-                                    ? 'red' // Red for negative
-                                    : 'black', // Black for neutral (0%)
-                                }}
-                              >
-                                {Number(item.percentage_total_return).toFixed(2)}%
-                                {Number(item.percentage_total_return) > 0 ? (
-                                  <ArrowDropUpIcon sx={{ color: 'green', marginLeft: '4px', fontSize: 20 }} />
-                                ) : Number(item.percentage_total_return) < 0 ? (
-                                  <ArrowDropDownIcon sx={{ color: 'red', marginLeft: '4px', fontSize: 20 }} />
-                                ) : (
-                                  <ArrowDropDownIcon sx={{ color: 'black', marginLeft: '4px', fontSize: 20 }} />
-                                )}
-                              </span>
-                            ) : (
-                              "N/A"
-                            ),
+                            value:
+                              item.percentage_total_return !== undefined ? (
+                                <span
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center", // Align the icon with the text
+                                    color:
+                                      Number(item.percentage_total_return) > 0
+                                        ? "green" // Green for positive
+                                        : Number(item.percentage_total_return) <
+                                            0
+                                          ? "red" // Red for negative
+                                          : "black", // Black for neutral (0%)
+                                  }}
+                                >
+                                  {Number(item.percentage_total_return).toFixed(
+                                    2
+                                  )}
+                                  %
+                                  {Number(item.percentage_total_return) > 0 ? (
+                                    <ArrowDropUpIcon
+                                      sx={{
+                                        color: "green",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  ) : Number(item.percentage_total_return) <
+                                    0 ? (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "red",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  ) : (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "black",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  )}
+                                </span>
+                              ) : (
+                                "N/A"
+                              ),
                           },
                           {
                             label: "Market T+1M Absolute Return",
-                            value: item.t1m_return_from_dealogic !== undefined ? (
-                              <span
-                                style={{
-                                  display: "inline-flex",
-                                  alignItems: "center", // Align the icon with the text
-                                  color: Number(item.t1m_return_from_dealogic) > 0
-                                    ? 'green' // Green for positive returns
-                                    : Number(item.t1m_return_from_dealogic) < 0
-                                    ? 'red' // Red for negative returns
-                                    : 'black', // Black for neutral (0%)
-                                }}
-                              >
-                                {Number(item.t1m_return_from_dealogic).toFixed(2)}%
-                                {Number(item.t1m_return_from_dealogic) > 0 ? (
-                                  <ArrowDropUpIcon sx={{ color: 'green', marginLeft: '4px', fontSize: 20 }} />
-                                ) : Number(item.t1m_return_from_dealogic) < 0 ? (
-                                  <ArrowDropDownIcon sx={{ color: 'red', marginLeft: '4px', fontSize: 20 }} />
-                                ) : (
-                                  <ArrowDropDownIcon sx={{ color: 'black', marginLeft: '4px', fontSize: 20 }} />
-                                )}
-                              </span>
-                            ) : (
-                              "N/A"
-                            ),
+                            value:
+                              item.t1m_return_from_dealogic !== undefined ? (
+                                <span
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center", // Align the icon with the text
+                                    color:
+                                      Number(item.t1m_return_from_dealogic) > 0
+                                        ? "green" // Green for positive returns
+                                        : Number(
+                                              item.t1m_return_from_dealogic
+                                            ) < 0
+                                          ? "red" // Red for negative returns
+                                          : "black", // Black for neutral (0%)
+                                  }}
+                                >
+                                  {Number(
+                                    item.t1m_return_from_dealogic
+                                  ).toFixed(2)}
+                                  %
+                                  {Number(item.t1m_return_from_dealogic) > 0 ? (
+                                    <ArrowDropUpIcon
+                                      sx={{
+                                        color: "green",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  ) : Number(item.t1m_return_from_dealogic) <
+                                    0 ? (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "red",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  ) : (
+                                    <ArrowDropDownIcon
+                                      sx={{
+                                        color: "black",
+                                        marginLeft: "4px",
+                                        fontSize: 20,
+                                      }}
+                                    />
+                                  )}
+                                </span>
+                              ) : (
+                                "N/A"
+                              ),
                           },
                         ].map((row, i) => (
                           <TableRow
                             key={i}
                             sx={{
-                              backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                              backgroundColor:
+                                i % 2 === 0 ? "#f3f3f3" : "#ffffff",
                               "&:hover": {
                                 backgroundColor: "#e0f7fa",
                               },
