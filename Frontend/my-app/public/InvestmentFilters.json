@@ -86,7 +86,7 @@
         "60-80",
         "80-100"
       ],
-      "label": "% Percentage",
+      "label": "% Primary",
       "description": "Select a range or specific value for the primary category."
     }
   },
