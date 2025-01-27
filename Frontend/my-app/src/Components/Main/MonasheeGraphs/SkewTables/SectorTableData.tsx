@@ -106,27 +106,27 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               <TableRow key={year}>
                 <TableCell sx={{ padding: '4px 8px' }}>{year}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>${row.Total_Deal_Volume}B</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>${row.Total_Deal_Volume.toFixed(0)}B</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>
-                  {row.Positively_Performing_Deals_Percentage}%
+                  {row.Positively_Performing_Deals_Percentage.toFixed(0)}%
                 </TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>
-                  {row.Negatively_Performing_Deals_Percentage}%
+                  {row.Negatively_Performing_Deals_Percentage.toFixed(0)}%
                 </TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>
-                  {row.Average_T1M_Abs_Return_of_Positively}%
+                  {row.Average_T1M_Abs_Return_of_Positively.toFixed(1)}%
                 </TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>
-                  {row.Average_T1M_Abs_Return_of_Negatively}%
+                  {row.Average_T1M_Abs_Return_of_Negatively.toFixed(1)}%
                 </TableCell>
                 {/* <TableCell sx={{ padding: '4px 8px' }}>
                   {row.Expected_Returns_Absolute}%
                 </TableCell> */}
                 <TableCell sx={{ padding: '4px 8px' }}>
-                  {row.Expected_Returns_Excess}%
+                  {row.Expected_Returns_Excess.toFixed(1)}%
                 </TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>
-                  ${row.Long_Opportunity_Value}B
+                  ${row.Long_Opportunity_Value.toFixed(0)}B
                 </TableCell>
               </TableRow>
             );
@@ -138,28 +138,28 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               Total
             </TableCell>
             <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>{totalDealCount}</TableCell>
-            <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}> ${totalDealVolume.toFixed(2)}B</TableCell>
+            <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}> ${totalDealVolume.toFixed(0)}B</TableCell>
 
             <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>
-              {avgPositivelyPerformingDealsPercentage.toFixed(2)}%
+              {avgPositivelyPerformingDealsPercentage.toFixed(0)}%
             </TableCell>
             <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
-              {avgNegativelyPerformingDealsPercentage.toFixed(2)}%
+              {avgNegativelyPerformingDealsPercentage.toFixed(0)}%
             </TableCell>
             <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
-              {avgAvgT1MAbsReturnPositively.toFixed(2)}%
+              {avgAvgT1MAbsReturnPositively.toFixed(1)}%
             </TableCell>
             <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>
-              {avgAvgT1MAbsReturnNegatively.toFixed(2)}%
+              {avgAvgT1MAbsReturnNegatively.toFixed(1)}%
             </TableCell>
             {/* <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
               {avgExpectedReturnsAbsolute.toFixed(2)}%
             </TableCell> */}
             <TableCell sx={{ padding: '4px 8px' ,fontWeight: 'bold'}}>
-              {avgExpectedReturnsExcess.toFixed(2)}%
+              {avgExpectedReturnsExcess.toFixed(1)}%
             </TableCell>
             <TableCell sx={{ padding: '4px 8px',fontWeight: 'bold' }}>
-              ${totalLongOpportunityValue.toFixed(2)}B
+              ${totalLongOpportunityValue.toFixed(0)}B
             </TableCell>
           </TableRow>
         </TableBody>
