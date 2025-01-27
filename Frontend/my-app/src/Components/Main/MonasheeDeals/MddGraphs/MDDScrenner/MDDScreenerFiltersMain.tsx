@@ -108,11 +108,7 @@ interface MonasheeSpecificFilterConfig {
   api?: string; // Optional API endpoint for fetching data
 }
 
-interface MonasheeSpecificTabProps {
-  filtersData: {
-    [key: string]: MonasheeSpecificFilterConfig; // Map of filter key to filter config
-  };
-}
+
 
 
 interface MDDScreenerFiltersMainProps {
