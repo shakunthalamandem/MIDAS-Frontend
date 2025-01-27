@@ -105,7 +105,7 @@ const MDDSearchSummary: React.FC<MDDSearchSummaryProps> = ({ summary }) => {
           variant="h6"
           sx={{
             fontWeight: "bold",
-            color: "#333",
+            color: "#076d00",
             fontSize: "1.1rem",
           }}
         >
