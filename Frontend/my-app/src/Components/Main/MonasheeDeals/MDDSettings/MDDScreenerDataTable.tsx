@@ -98,7 +98,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       t1m_returns: data.t1m_returns,
       tplus_1d_issueprice: data.tplus_1d_issueprice,
       year_range: data.year_range,
-      // fo_discount: data.fo_discount
+      fo_discount: data.fo_discount
 
   };
   

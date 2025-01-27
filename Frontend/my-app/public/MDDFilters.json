@@ -75,8 +75,8 @@
       "label": "Follow-On Discount",
       "description": "Specify the discount for follow-on discount as a range using input fields. Only for follow on's.",
       "fields": [
-        { "type": "number", "operator": "<", "label": "Min", "placeholder": "Enter minimum discount" },
-        { "type": "number", "operator": ">", "label": "Max", "placeholder": "Enter maximum discount" }
+        { "type": "string", "operator": "<", "label": "Min", "placeholder": "Value" },
+        { "type": "String", "operator": ">", "label": "Max", "placeholder": "Value" }
       ]
     }
    

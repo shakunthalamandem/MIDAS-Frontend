@@ -35,7 +35,7 @@ const Login: React.FC = () => {
         {/* Email */}
         <TextField
           fullWidth
-          label="Email"
+          label="Email or Username"
           variant="outlined"
           type="email"
           sx={{
