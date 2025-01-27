@@ -93,6 +93,28 @@ interface FilterData {
   };
 }
 
+// Define the types for Monashee filtersData
+interface MonasheeSpecificFilterConfig {
+  type: string; // Type of filter (e.g., "dropdown", "input")
+  description: string; // Description of the filter
+  label: string; // Label for the filter input
+  options?: string[]; // Optional options for dropdowns (if applicable)
+  fields?: {
+    type: string; // Type for each field inside "input" type filter (e.g., "text", "number")
+    operator: string; // The operator (e.g., "eq", "gt")
+    label: string; // The label for the specific input field
+    placeholder: string; // Placeholder text for the input
+  }[]; // Fields inside the "input" filter type
+  api?: string; // Optional API endpoint for fetching data
+}
+
+interface MonasheeSpecificTabProps {
+  filtersData: {
+    [key: string]: MonasheeSpecificFilterConfig; // Map of filter key to filter config
+  };
+}
+
+
 interface MDDScreenerFiltersMainProps {
   filtersData: FilterData;
 }

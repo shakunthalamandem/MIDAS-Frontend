@@ -14,6 +14,9 @@ import {
 import InfoIcon from "@mui/icons-material/Info";
 import { Field, useFormikContext } from "formik";
 import axios from "axios";
+import { Unstable_NumberInput as NumberInput } from '@mui/base/Unstable_NumberInput';
+
+
 
 // Define the types for Monashee filtersData
 interface MonasheeSpecificFilterConfig {
@@ -162,43 +165,47 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
                 )}
               </Typography>
               {filter.fields?.map((fieldConfig, index) => (
-                <Field key={index} name={`${key}[${index}]`}>
-                  {({ field, form }: any) => (
-                    <TextField
-                      {...field}
-                      type="string"
-                      label={fieldConfig.label}
-                      placeholder={fieldConfig.placeholder || "Enter a value"} // Add placeholder here
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                      size="small"
-                      value={field.value || ""}
-                      onChange={(e) => {
-                        const value = e.target.value ? parseFloat(e.target.value) : null;
-                        const currentValues = form.values[key] || [null, null];
-                        const updatedValues = [...currentValues];
-                        updatedValues[index] = value;
-                        form.setFieldValue(
-                          key,
-                          updatedValues.map((v, i) => (v === "" ? null : v))
-                        );
-                      }}
-                      sx={{
-                        maxWidth: "100px", // Set width of the input box
-                        "& input": {
-                          textAlign: "center",
-                        },
-                        marginBottom: "20px", // Space between input boxes
-                        marginRight: "20px",
-                      }}
-                   
-                      error={!!(touched[key] && errors[key])} // Display error state
-                      helperText={touched[key] && errors[key]} // Show error message
-                    />
-                  )}
-                </Field>
-              ))}
+  <Field key={index} name={`${key}[${index}]`}>
+    {({ field, form }: any) => (
+      <TextField
+        {...field}
+        type="number"
+        label={fieldConfig.label}
+        placeholder={fieldConfig.placeholder || "Enter a value"}
+        fullWidth
+        margin="normal"
+        variant="outlined"
+        size="small"
+        value={field.value ?? ""} // Allow empty values initially
+        onChange={(e) => {
+          const inputValue = e.target.value;
+
+          // Handle empty, numeric, or '0' values properly
+          const value =
+            inputValue === "" ? null : !isNaN(Number(inputValue)) ? Number(inputValue) : null;
+
+          const currentValues = form.values[key] || [null, null];
+          const updatedValues = [...currentValues];
+          updatedValues[index] = value;
+
+          form.setFieldValue(key, updatedValues);
+        }}
+        sx={{
+          maxWidth: "100px",
+          "& input": {
+            textAlign: "center",
+          },
+          marginBottom: "20px",
+          marginRight: "20px",
+        }}
+        error={!!(touched[key] && errors[key])}
+        helperText={touched[key] && errors[key]}
+      />
+    )}
+  </Field>
+))}
+
+              
             </Box>
           </Grid>
         );
@@ -258,16 +265,16 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
                     }
                     sx={{
                       "& .MuiSelect-select": {
-                        padding: "8px", // Adjust padding for smaller height
-                        fontSize: "0.875rem", // Adjust font size for smaller text
+                        padding: "8px",
+                        fontSize: "0.875rem",
                       },
                       "& .MuiOutlinedInput-notchedOutline": {
-                        borderRadius: "4px", // Adjust border radius
+                        borderRadius: "4px",
                       },
-                      maxWidth: "150px", // Adjust dropdown width
+                      maxWidth: "150px",
                     }}
                     renderValue={(selected) => {
-                      if (!selected.length) return "Select"; // Placeholder when no value is selected
+                      if (!selected.length) return "Select";
                       const formattedTags = formatSelectedTags(
                         selected as (string | number)[]
                       );

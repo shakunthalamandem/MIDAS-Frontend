@@ -88,8 +88,8 @@
       "label": "Allocation % DealSize (Simple)",
       "description": "Enter the allocation percentage of the deal size as a range.",
       "fields": [
-        { "type": "number", "operator": "<", "label": "Min", "placeholder": "Value" },
-        { "type": "number", "operator": ">", "label": "Max", "placeholder": "Value" }
+        { "type": "string", "operator": "<", "label": "Min", "placeholder": "Value" },
+        { "type": "String", "operator": ">", "label": "Max", "placeholder": "Value" }
       ]
     },
     "allocation_ioi": {
