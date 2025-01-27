@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import MDDSearchSummary from "./MDDSearchSummary";
 
 // Define the structure of the response data
 interface TickerData {
@@ -40,7 +41,6 @@ interface TickerData {
   fo_type: string | null;
 }
 
-// Define the structure of the response (the API wraps data inside a 'data' property)
 interface ApiResponse {
   data: TickerData[];
   summary: any;
@@ -78,11 +78,11 @@ const formatDate = (dateString: string): string => {
 
 const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   const [data, setData] = useState<TickerData[]>([]);
+  const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    // Fetch data from API
     const fetchData = async () => {
       try {
         console.log("okau");
@@ -91,6 +91,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
           { ticker }
         );
         setData(response.data.data);
+        setSummary(response.data.summary)
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -103,6 +104,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   if (loading) return <Typography>Loading...</Typography>;
 
   return (
+    
     <Box sx={{ marginTop: 4, padding: 2 }}>
       <Typography
         variant="h5"
@@ -111,12 +113,13 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
         align="center"
         sx={{ fontWeight: "bold" }}
       >
-        Historical Monashee participated on{" "}
+        Monashee participation in {" "}
         <span style={{ color: "#ff6005", fontStyle: "italic" }}>
           {ticker} - {data.length} deals
         </span>
       </Typography>
-
+      {data.length > 1 && summary && (<MDDSearchSummary summary={summary} />
+      )}
       <Grid container spacing={2}>
         {data.map((item, index) => (
           <Grid item xs={12} key={index}>
