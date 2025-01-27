@@ -22,7 +22,7 @@ const Login: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           gap: 1,
-          mt: 2, // Reduce top margin for less gap at the top
+          mt: 10, // Reduce top margin for less gap at the top
           mb: 8, // Increase bottom margin for more gap at the bottom
           border: "1px solid #e0e0e0",
           width: "100%",
