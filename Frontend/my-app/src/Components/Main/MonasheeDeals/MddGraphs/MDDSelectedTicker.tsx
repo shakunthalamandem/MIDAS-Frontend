@@ -16,6 +16,7 @@ import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 
 // Define the structure of the response data
 interface TickerData {
+  all_bank: string;
   year_range: number;
   pricing_date: string;
   issuer_name: string;
@@ -152,6 +153,8 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                     <Table size="small" aria-label="Deal Info Table 1">
                       <TableBody>
                         {[
+                          
+
                           { label: "Pricing Date", value: item.pricing_date },
                           { label: "Issuer Name", value: item.issuer_name },
                           { label: "Ticker", value: item.ticker },
@@ -539,6 +542,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                                 "N/A"
                               ),
                           },
+                          { label: "Left Lead Bank", value: item.all_bank },
                         ].map((row, i) => (
                           <TableRow
                             key={i}

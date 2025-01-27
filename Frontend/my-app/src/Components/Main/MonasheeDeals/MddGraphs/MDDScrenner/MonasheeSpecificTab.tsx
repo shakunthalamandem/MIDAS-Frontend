@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   TextField,
   FormControl,
-  Select,
-  MenuItem,
   Box,
   Grid,
   Tooltip,
   Typography,
+  MenuItem,
+  Select,
   Checkbox,
   ListItemText,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { Field, useFormikContext } from "formik";
-import axios from "axios";
+import LeadBankFilter from "./LeadBankFilter"; // Import the LeadBankFilter component
 
-// Define the types for Monashee filtersData
-interface MonasheeSpecificFilterConfig {
+interface DealSpecificFilterConfig {
   type: string;
   description: string;
   label: string;
@@ -27,48 +26,16 @@ interface MonasheeSpecificFilterConfig {
     label: string;
     placeholder: string;
   }[];
-  api?: string;
 }
 
-interface MonasheeSpecificTabProps {
+interface DealSpecificTabProps {
   filtersData: {
-    [key: string]: MonasheeSpecificFilterConfig;
+    [key: string]: DealSpecificFilterConfig;
   };
 }
 
-const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
-  filtersData,
-}) => {
+const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
   const { values, setFieldValue, errors, touched } = useFormikContext<any>();
-  const [dealCaptainOptions, setDealCaptainOptions] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const apiUrl = process.env.REACT_APP_API_URL;
-
-  useEffect(() => {
-    // Fetch deal_captain options from API
-    const fetchDealCaptainOptions = async () => {
-      setLoading(true); // Set loading to true before the API request
-      try {
-        const response = await axios.get<{
-          deal_captain?: { options: string[] };
-        }>(`${apiUrl}/api/mdd_screener_filters/`);
-
-        const dealCaptainData = response.data?.deal_captain;
-
-        if (dealCaptainData?.options) {
-          setDealCaptainOptions(dealCaptainData.options);
-        } else {
-          console.warn("Deal Captain options not found in the API response.");
-        }
-      } catch (error) {
-        console.error("Error fetching deal_captain options:", error);
-      } finally {
-        setLoading(false); // Set loading to false after the API request
-      }
-    };
-
-    fetchDealCaptainOptions();
-  }, []);
 
   const formatSelectedTags = (values: (string | number)[]) => {
     if (values.length === 0) return [];
@@ -78,7 +45,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
       : [firstValue, `+${values.length - 1}`];
   };
 
-  const renderFilter = (key: string, filter: MonasheeSpecificFilterConfig) => {
+  const renderFilter = (key: string, filter: DealSpecificFilterConfig) => {
     switch (filter.type) {
       case "dropdown":
         return (
@@ -94,9 +61,7 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
                 {filter.label}
                 {filter.description && (
                   <Tooltip title={filter.description} arrow>
-                    <InfoIcon
-                      sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
-                    />
+                    <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
                   </Tooltip>
                 )}
               </Typography>
@@ -107,17 +72,25 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
                       multiple
                       value={field.value || []}
                       onChange={(e) => form.setFieldValue(key, e.target.value)}
+                      displayEmpty
                       sx={{
                         "& .MuiSelect-select": {
-                          padding: "8px", // Adjust padding for smaller height
-                          fontSize: "0.875rem", // Adjust font size for smaller text
+                          padding: "8px",
+                          fontSize: "0.875rem",
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
-                          borderRadius: "4px", // Adjust border radius
+                          borderRadius: "4px",
                         },
-                        maxWidth: "150px", // Adjust dropdown width
+                        maxWidth: "150px",
                       }}
                       renderValue={(selected) => {
+                        if (!selected || selected.length === 0) {
+                          return (
+                            <Typography sx={{ color: "#aaa", fontSize: "0.875rem" }}>
+                              Select
+                            </Typography>
+                          );
+                        }
                         const formattedTags = formatSelectedTags(
                           selected as (string | number)[]
                         );
@@ -155,54 +128,56 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
                 {filter.label}
                 {filter.description && (
                   <Tooltip title={filter.description} arrow>
-                    <InfoIcon
-                      sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }}
-                    />
+                    <InfoIcon sx={{ ml: 1, fontSize: "1rem", color: "#cfcfcf" }} />
                   </Tooltip>
                 )}
               </Typography>
               {filter.fields?.map((fieldConfig, index) => (
-                <Field key={index} name={`${key}[${index}]`}>
-                  {({ field, form }: any) => (
-                    <TextField
-                      {...field}
-                      type="string"
-                      label={fieldConfig.label}
-                      placeholder={fieldConfig.placeholder || "Enter a value"} // Add placeholder here
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                      size="small"
-                      value={field.value || ""}
-                      onChange={(e) => {
-                        const value = e.target.value ? parseFloat(e.target.value) : null;
-                        const currentValues = form.values[key] || [null, null];
-                        const updatedValues = [...currentValues];
-                        updatedValues[index] = value;
-                        form.setFieldValue(
-                          key,
-                          updatedValues.map((v, i) => (v === "" ? null : v))
-                        );
-                      }}
-                      sx={{
-                        maxWidth: "100px", // Set width of the input box
-                        "& input": {
-                          textAlign: "center",
-                        },
-                        marginBottom: "20px", // Space between input boxes
-                        marginRight: "20px",
-                      }}
-                   
-                      error={!!(touched[key] && errors[key])} // Display error state
-                      helperText={touched[key] && errors[key]} // Show error message
-                    />
-                  )}
-                </Field>
-              ))}
+  <Field key={index} name={`${key}[${index}]`}>
+    {({ field, form }: any) => (
+      <TextField
+        {...field}
+        type="number"
+        label={fieldConfig.label}
+        placeholder={fieldConfig.placeholder || "Enter a value"}
+        fullWidth
+        margin="normal"
+        variant="outlined"
+        size="small"
+        value={field.value ?? ""} // Allow empty values initially
+        onChange={(e) => {
+          const inputValue = e.target.value;
+
+          // Handle empty, numeric, or '0' values properly
+          const value =
+            inputValue === "" ? null : !isNaN(Number(inputValue)) ? Number(inputValue) : null;
+
+          const currentValues = form.values[key] || [null, null];
+          const updatedValues = [...currentValues];
+          updatedValues[index] = value;
+
+          form.setFieldValue(key, updatedValues);
+        }}
+        sx={{
+          maxWidth: "100px",
+          "& input": {
+            textAlign: "center",
+          },
+          marginBottom: "20px",
+          marginRight: "20px",
+        }}
+        error={!!(touched[key] && errors[key])}
+        helperText={touched[key] && errors[key]}
+      />
+    )}
+  </Field>
+))}
+
+           
             </Box>
           </Grid>
         );
-
+  
       default:
         return null;
     }
@@ -210,7 +185,6 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      {/* Input Filters Grid */}
       <Grid
         container
         spacing={2}
@@ -224,75 +198,16 @@ const MonasheeSpecificTab: React.FC<MonasheeSpecificTabProps> = ({
           flexWrap: "wrap",
         }}
       >
-        {/* Render existing filters */}
         {Object.keys(filtersData).map((key) => {
           const filter = filtersData[key];
           return renderFilter(key, filter);
         })}
 
-        {/* Render Deal Captain Dropdown */}
-        {loading ? (
-          <Grid item xs={12}>
-            <Typography>Loading Deal Captain options...</Typography>
-          </Grid>
-        ) : (
-          dealCaptainOptions.length > 0 && (
-            <Grid item xs={12} sm={6} md={3}>
-              <Box>
-                <Typography
-                  sx={{
-                    fontSize: "0.75rem",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  Deal Captain
-                </Typography>
-                <FormControl fullWidth margin="normal">
-                  <Select
-                    multiple
-                    displayEmpty
-                    value={values["deal_captain"] || []}
-                    onChange={(e) =>
-                      setFieldValue("deal_captain", e.target.value)
-                    }
-                    sx={{
-                      "& .MuiSelect-select": {
-                        padding: "8px", // Adjust padding for smaller height
-                        fontSize: "0.875rem", // Adjust font size for smaller text
-                      },
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderRadius: "4px", // Adjust border radius
-                      },
-                      maxWidth: "150px", // Adjust dropdown width
-                    }}
-                    renderValue={(selected) => {
-                      if (!selected.length) return "Select"; // Placeholder when no value is selected
-                      const formattedTags = formatSelectedTags(
-                        selected as (string | number)[]
-                      );
-                      return formattedTags.join(", ");
-                    }}
-                  >
-                    {dealCaptainOptions.map((option, index) => (
-                      <MenuItem key={index} value={option}>
-                        <Checkbox
-                          checked={
-                            values["deal_captain"]?.includes(option) || false
-                          }
-                        />
-                        <ListItemText primary={option} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-            </Grid>
-          )
-        )}
+        {/* LeadBankFilter will be used here */}
+        <LeadBankFilter values={values} setFieldValue={setFieldValue} />
       </Grid>
     </Box>
   );
 };
 
-export default MonasheeSpecificTab;
+export default DealSpecificTab;

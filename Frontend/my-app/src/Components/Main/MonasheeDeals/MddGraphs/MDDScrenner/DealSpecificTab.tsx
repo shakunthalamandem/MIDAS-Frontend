@@ -137,7 +137,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                   {({ field, form }: any) => (
                     <TextField
                       {...field}
-                      type="string"
+                      type="number"
                       label={fieldConfig.label}
                       placeholder={fieldConfig.placeholder || "Enter a value"}
                       fullWidth
@@ -146,14 +146,18 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                       size="small"
                       value={field.value || ""}
                       onChange={(e) => {
-                        const value = e.target.value ? parseFloat(e.target.value) : null;
+                        const inputValue = e.target.value;
+
+                        // Handle positive, negative, decimal values or 0
+                        const value = 
+                          inputValue === "" ? null : // Empty input should clear the value
+                          !isNaN(Number(inputValue)) ? Number(inputValue) : null; // Only accept valid numbers
+
                         const currentValues = form.values[key] || [null, null];
                         const updatedValues = [...currentValues];
                         updatedValues[index] = value;
-                        form.setFieldValue(
-                          key,
-                          updatedValues.map((v, i) => (v === "" ? null : v))
-                        );
+
+                        form.setFieldValue(key, updatedValues);
                       }}
                       sx={{
                         maxWidth: "100px",
@@ -163,7 +167,6 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                         marginBottom: "20px",
                         marginRight: "20px",
                       }}
-                      
                       error={!!(touched[key] && errors[key])}
                       helperText={touched[key] && errors[key]}
                     />
@@ -178,7 +181,6 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
         return null;
     }
   };
-  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
