@@ -27,7 +27,7 @@ const SummaryPopup: React.FC = () => {
     >
       <DialogTitle
         style={{
-          background: "linear-gradient(90deg, #1976d2, #42a5f5)",
+          background: "linear-gradient(90deg, #ff8a65, #ff7043)",
           color: "#fff",
           fontWeight: "bold",
           textAlign: "center",
@@ -35,7 +35,7 @@ const SummaryPopup: React.FC = () => {
       >
         Attention
       </DialogTitle>
-      <DialogContent>
+      <DialogContent >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -52,7 +52,7 @@ const SummaryPopup: React.FC = () => {
             onClick={handleClose}
             variant="contained"
             style={{
-              backgroundColor: "#1976d2",
+              backgroundColor: "#ff7043",
               color: "#fff",
               padding: "10px 30px",
               borderRadius: "8px",
