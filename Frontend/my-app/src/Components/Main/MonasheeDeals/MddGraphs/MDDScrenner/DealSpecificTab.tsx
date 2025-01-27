@@ -147,15 +147,16 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                       value={field.value || ""}
                       onChange={(e) => {
                         const inputValue = e.target.value;
-              
-                        // Handle empty, numeric, or '0' values properly
-                        const value =
-                          inputValue === "" ? null : !isNaN(Number(inputValue)) ? Number(inputValue) : null;
-              
+
+                        // Handle positive, negative, decimal values or 0
+                        const value = 
+                          inputValue === "" ? null : // Empty input should clear the value
+                          !isNaN(Number(inputValue)) ? Number(inputValue) : null; // Only accept valid numbers
+
                         const currentValues = form.values[key] || [null, null];
                         const updatedValues = [...currentValues];
                         updatedValues[index] = value;
-              
+
                         form.setFieldValue(key, updatedValues);
                       }}
                       sx={{
@@ -166,7 +167,6 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                         marginBottom: "20px",
                         marginRight: "20px",
                       }}
-                      
                       error={!!(touched[key] && errors[key])}
                       helperText={touched[key] && errors[key]}
                     />
@@ -181,7 +181,6 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
         return null;
     }
   };
-  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
