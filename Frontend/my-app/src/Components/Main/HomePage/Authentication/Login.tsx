@@ -112,7 +112,7 @@ const Login: React.FC = () => {
           Log In
         </Button>
 
-        <Grid container justifyContent="center" alignItems="center" spacing={1}>
+        <Grid container justifyContent="center" alignItems="center" spacing={1} mt={3}>
           <Grid item>
             <Typography variant="body1" color="#293c3d">
               Don't have an account?
@@ -127,48 +127,7 @@ const Login: React.FC = () => {
           </Grid>
         </Grid>
 
-        <Divider sx={{ width: "100%", my: 2, color: "#aab56b" }}>or</Divider>
-
-        {/* Social Login Buttons */}
-        <Grid container spacing={1} sx={{ width: "100%" }}>
-          <Grid item xs={6}>
-            <Button
-              fullWidth
-              startIcon={<FaFacebook />}
-              variant="contained"
-              sx={{
-                backgroundColor: "#4267b2",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#3b5998",
-                },
-                fontSize: "0.875rem",
-                py: 1,
-              }}
-            >
-              Facebook
-            </Button>
-          </Grid>
-          <Grid item xs={6}>
-            <Button
-              fullWidth
-              startIcon={<FcGoogle />}
-              variant="outlined"
-              sx={{
-                color: "#293c3d",
-                borderColor: "#d3d290",
-                "&:hover": {
-                  borderColor: "#6d7f40",
-                  backgroundColor: "#f5f5f5",
-                },
-                fontSize: "0.875rem",
-                py: 1,
-              }}
-            >
-              Google
-            </Button>
-          </Grid>
-        </Grid>
+    
       </Box>
     </Container>
   );

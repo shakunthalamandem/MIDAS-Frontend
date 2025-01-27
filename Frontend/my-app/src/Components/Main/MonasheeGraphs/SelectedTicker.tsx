@@ -28,6 +28,7 @@ interface TickerData {
   t1d_excess_return: string;
   t1m_excess_returns: string;
   opportunity_value_excess: string;
+  left_lead_bank:string;
 }
 
 interface SelectedTickerProps {
@@ -414,6 +415,8 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
                                 }).format(Number(item.opportunity_value_excess))
                               : "N/A",
                           },
+                          { label: "Left Lead Bank", value: item.left_lead_bank },
+
                         ].map((row, i) => (
                           <TableRow
                             key={i}
