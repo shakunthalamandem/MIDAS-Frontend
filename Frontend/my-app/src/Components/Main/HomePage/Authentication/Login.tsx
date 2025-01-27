@@ -119,7 +119,7 @@ const Login: React.FC = () => {
             </Typography>
           </Grid>
           <Grid item>
-            <Link to="/signup" style={{ textDecoration: "none" }}>
+            <Link to="/summarypopup" style={{ textDecoration: "none" }}>
               <Typography variant="body1" color="primary">
                 Sign Up
               </Typography>

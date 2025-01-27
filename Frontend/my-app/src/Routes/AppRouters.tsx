@@ -10,6 +10,7 @@ import InvestmentMain from "../Components/Main/InvestmentStrategy/InvestmentMain
 import TechnicalMain from "../Components/Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
 import ErrorPage from "../Pages/ErrorPage";
 import ErrorBoundary from "../Pages/ErrorBoundary";
+import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
 
 const AppRouters: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const AppRouters: React.FC = () => {
       <Routes>
         <Route path="/" element={<CapitalMarketsStatic />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/capital-markets" element={<CapitalMarkets />} />
         <Route path="/monashee-deals" element={<MonasheeDeals />} />

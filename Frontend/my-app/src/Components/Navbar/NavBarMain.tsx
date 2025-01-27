@@ -113,7 +113,7 @@ const NavbarMain: React.FC = () => {
           >
             Login
           </Button>
-          <Button
+          {/* <Button
             sx={{
               ml: 2,
               border: '1px solid #FFFFFF',
@@ -128,7 +128,7 @@ const NavbarMain: React.FC = () => {
             onClick={() => navigate('/signup')}
           >
             Sign Up
-          </Button>
+          </Button> */}
         </Toolbar>
       </AppBar>
     </>
