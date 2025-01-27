@@ -158,6 +158,8 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
     { field: "broad_region", headerName: "Region", width: 100 },
     { field: "deal_type", headerName: "Deal Type", width: 100 },
     { field: "selected_bank", headerName: "Lead Bank", width: 100 },
+    { field: "fo_type", headerName: "FO Type", width: 100 },
+
 
     {
       field: "deal_size",

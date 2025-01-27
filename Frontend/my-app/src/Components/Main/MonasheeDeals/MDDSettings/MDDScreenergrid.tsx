@@ -145,7 +145,9 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     { field: "deal_captain", headerName: "Deal Caption", width: 150 },
-    { field: "selected_bank", headerName: "Lead Bank", width: 150 }, {
+    { field: "selected_bank", headerName: "Lead Bank", width: 150 },
+    { field: "fo_type", headerName: "FO Type", width: 100 },
+    {
       field: "t1m_returns",
       headerName: "T + 1M Excess Returns",
       width: 200,
