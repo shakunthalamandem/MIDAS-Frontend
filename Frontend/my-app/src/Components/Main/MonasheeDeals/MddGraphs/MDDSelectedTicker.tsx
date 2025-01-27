@@ -37,11 +37,13 @@ interface TickerData {
   percentage_total_return: string | null;
   t1m_return_from_dealogic: string | null;
   total_return: string | null;
+  fo_type: string | null;
 }
 
 // Define the structure of the response (the API wraps data inside a 'data' property)
 interface ApiResponse {
   data: TickerData[];
+  summary: any;
 }
 
 interface MDDSelectedTickerProps {
@@ -163,7 +165,10 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                             value: item.gics_sector_from_bloomberg,
                           },
                           { label: "Region", value: item.broad_region },
-                          { label: "Deal Type", value: item.deal_type },
+                          { 
+                            label: "Deal Type", 
+                            value: item.deal_type + (item.fo_type ? ` (${item.fo_type})` : '') 
+                          },                          
                           {
                             label: "Deal Size",
                             value: item.deal_size
