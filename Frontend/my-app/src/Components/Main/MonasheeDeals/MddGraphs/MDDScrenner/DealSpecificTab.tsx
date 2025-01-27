@@ -133,45 +133,44 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                 )}
               </Typography>
               {filter.fields?.map((fieldConfig, index) => (
-                <Field name={`${key}[${index}]`} key={index}>
+            <Field name={`${key}[${index}]`} key={index}>
                   {({ field, form }: any) => (
                     <TextField
-                      {...field}
-                      type="number"
-                      label={fieldConfig.label}
-                      placeholder={fieldConfig.placeholder || "Enter a value"}
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                      size="small"
-                      value={field.value || ""}
-                      onChange={(e) => {
-                        const inputValue = e.target.value;
-
-                        // Handle positive, negative, decimal values or 0
-                        const value = 
-                          inputValue === "" ? null : // Empty input should clear the value
-                          !isNaN(Number(inputValue)) ? Number(inputValue) : null; // Only accept valid numbers
-
-                        const currentValues = form.values[key] || [null, null];
-                        const updatedValues = [...currentValues];
-                        updatedValues[index] = value;
-
-                        form.setFieldValue(key, updatedValues);
-                      }}
-                      sx={{
-                        maxWidth: "100px",
-                        "& input": {
-                          textAlign: "center",
-                        },
-                        marginBottom: "20px",
-                        marginRight: "20px",
-                      }}
-                      error={!!(touched[key] && errors[key])}
-                      helperText={touched[key] && errors[key]}
-                    />
-                  )}
-                </Field>
+                           {...field}
+                           type="number"
+                           label={fieldConfig.label}
+                           placeholder={fieldConfig.placeholder || "Enter a value"}
+                           fullWidth
+                           margin="normal"
+                           variant="outlined"
+                           size="small"
+                           value={field.value ?? ""} // Allow empty values initially
+                           onChange={(e) => {
+                             const inputValue = e.target.value;
+                   
+                             // Handle empty, numeric, or '0' values properly
+                             const value =
+                               inputValue === "" ? null : !isNaN(Number(inputValue)) ? Number(inputValue) : null;
+                   
+                             const currentValues = form.values[key] || [null, null];
+                             const updatedValues = [...currentValues];
+                             updatedValues[index] = value;
+                   
+                             form.setFieldValue(key, updatedValues);
+                           }}
+                           sx={{
+                             maxWidth: "100px",
+                             "& input": {
+                               textAlign: "center",
+                             },
+                             marginBottom: "20px",
+                             marginRight: "20px",
+                           }}
+                           error={!!(touched[key] && errors[key])}
+                           helperText={touched[key] && errors[key]}
+                         />
+                       )}
+                     </Field>
               ))}
             </Box>
           </Grid>
