@@ -137,7 +137,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                   {({ field, form }: any) => (
                     <TextField
                       {...field}
-                      type="string"
+                      type="number"
                       label={fieldConfig.label}
                       placeholder={fieldConfig.placeholder || "Enter a value"}
                       fullWidth
@@ -146,14 +146,17 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
                       size="small"
                       value={field.value || ""}
                       onChange={(e) => {
-                        const value = e.target.value ? parseFloat(e.target.value) : null;
+                        const inputValue = e.target.value;
+              
+                        // Handle empty, numeric, or '0' values properly
+                        const value =
+                          inputValue === "" ? null : !isNaN(Number(inputValue)) ? Number(inputValue) : null;
+              
                         const currentValues = form.values[key] || [null, null];
                         const updatedValues = [...currentValues];
                         updatedValues[index] = value;
-                        form.setFieldValue(
-                          key,
-                          updatedValues.map((v, i) => (v === "" ? null : v))
-                        );
+              
+                        form.setFieldValue(key, updatedValues);
                       }}
                       sx={{
                         maxWidth: "100px",
