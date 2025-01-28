@@ -10,6 +10,7 @@ import {
   TableContainer,
   TableRow,
   Typography,
+  Container,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
@@ -104,6 +105,8 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   if (loading) return <Typography>Loading...</Typography>;
 
   return (
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+
     
     <Box sx={{ marginTop: 4, padding: 2 }}>
       <Typography
@@ -590,6 +593,8 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
         ))}
       </Grid>
     </Box>
+    </Container>
+    
   );
 };
 

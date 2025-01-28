@@ -9,6 +9,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  Container,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
@@ -109,6 +110,8 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+
     <Box sx={{ marginTop: 4, padding: 2 }}>
       <Typography
         variant="h5"
@@ -456,6 +459,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
         ))}
       </Grid>
     </Box>
+    </Container>
   );
 };
 
