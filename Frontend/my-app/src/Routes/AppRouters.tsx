@@ -17,6 +17,7 @@ const AppRouters: React.FC = () => {
     <ErrorBoundary>
       <Routes>
         <Route path="/" element={<CapitalMarketsStatic />} />
+        <Route path="/dashboard" element={<CapitalMarketsStatic />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/login" element={<Login />} />

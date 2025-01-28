@@ -1,16 +1,86 @@
 import React, { useState } from "react";
-import { TextField, Button, IconButton, Typography, Box, Container, Divider, Grid } from "@mui/material";
-import { FaFacebook } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+import axios from "axios";
+import {
+  TextField,
+  Button,
+  IconButton,
+  Typography,
+  Box,
+  Container,
+  Grid,
+} from "@mui/material";
 import { BsEyeSlash, BsEye } from "react-icons/bs";
 import { Link } from "react-router-dom";
 
+// Define the form data interface
+interface SignupFormData {
+  fullName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
 const Signup: React.FC = () => {
+  const [formData, setFormData] = useState<SignupFormData>({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
-  const toggleConfirmPasswordVisibility = () => setConfirmPasswordVisible(!confirmPasswordVisible);
+  const toggleConfirmPasswordVisibility = () =>
+    setConfirmPasswordVisible(!confirmPasswordVisible);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev: SignupFormData) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSignup = async () => {
+    setLoading(true);
+    setError(null);
+
+    const { fullName, email, password } = formData;
+
+    try {
+      const response = await axios.post(`${apiUrl}/api/signup/`, {
+        full_name: fullName,
+        email,
+        password,
+      });
+      console.log("Signup successful:", response.data);
+      // Handle successful signup (e.g., redirect or show success message)
+    } catch (err: any) {
+      console.error("Signup error:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const { fullName, email, password, confirmPassword } = formData;
+
+    if (!fullName || !email || !password || !confirmPassword) {
+      setError("All fields are required.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    handleSignup();
+  };
 
   return (
     <Container maxWidth="xs">
@@ -24,8 +94,8 @@ const Signup: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           gap: 1,
-          mt: 2, // Reduce top margin for less gap at the top
-          mb: 8, // Increase bottom margin for more gap at the bottom
+          mt: 2,
+          mb: 8,
           border: "1px solid #e0e0e0",
           width: "100%",
         }}
@@ -34,206 +104,105 @@ const Signup: React.FC = () => {
           Sign Up
         </Typography>
 
-        {/* Full Name */}
-        <TextField
-          fullWidth
-          label="Full Name"
-          variant="outlined"
-          sx={{
-            marginBottom: 2,
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: "#d3d290", // Default border color
-              },
-              "&:hover fieldset": {
-                borderColor: "#aab56b", // Border color on hover
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "#aab56b", // Changed focus color
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: "#d3d290", // Default label color
-              "&.Mui-focused": {
-                color: "#6d7f40", // Focused label color
-              },
-            },
-          }}
-        />
+        {error && (
+          <Typography color="error" variant="body2" gutterBottom>
+            {error}
+          </Typography>
+        )}
 
-        {/* Email */}
-        <TextField
-          fullWidth
-          label="Email"
-          variant="outlined"
-          type="email"
-          sx={{
-            marginBottom: 2,
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: "#d3d290", // Default border color
-              },
-              "&:hover fieldset": {
-                borderColor: "#aab56b", // Border color on hover
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "#aab56b", // Changed focus color
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: "#d3d290", // Default label color
-              "&.Mui-focused": {
-                color: "#6d7f40", // Focused label color
-              },
-            },
-          }}
-        />
-
-        {/* Password */}
-        <Box position="relative" width="100%">
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
           <TextField
             fullWidth
-            label="Password"
+            label="Full Name"
             variant="outlined"
-            type={passwordVisible ? "text" : "password"}
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
             sx={{
               marginBottom: 2,
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#d3d290", // Default border color
-                },
-                "&:hover fieldset": {
-                  borderColor: "#aab56b", // Border color on hover
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#aab56b", // Changed focus color
-                },
-              },
-              "& .MuiInputLabel-root": {
-                color: "#d3d290", // Default label color
-                "&.Mui-focused": {
-                  color: "#6d7f40", // Focused label color
-                },
-              },
             }}
           />
-          <IconButton
-            onClick={togglePasswordVisibility}
-            sx={{ position: "absolute", top: "10%", right: 10, color: "#6d7f40" }}
-          >
-            {passwordVisible ? <BsEye /> : <BsEyeSlash />}
-          </IconButton>
-        </Box>
 
-        {/* Confirm Password */}
-        <Box position="relative" width="100%">
           <TextField
             fullWidth
-            label="Confirm Password"
+            label="Email"
             variant="outlined"
-            type={confirmPasswordVisible ? "text" : "password"}
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
             sx={{
-              marginTop: 2,
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#d3d290", // Default border color
-                },
-                "&:hover fieldset": {
-                  borderColor: "#aab56b", // Border color on hover
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#aab56b", // Changed focus color
-                },
-              },
-              "& .MuiInputLabel-root": {
-                color: "#d3d290", // Default label color
-                "&.Mui-focused": {
-                  color: "#6d7f40", // Focused label color
-                },
-              },
+              marginBottom: 2,
             }}
           />
-          <IconButton
-            onClick={toggleConfirmPasswordVisibility}
-            sx={{ position: "absolute", top: "30%", right: 10, color: "#6d7f40" }}
-          >
-            {confirmPasswordVisible ? <BsEye /> : <BsEyeSlash />}
-          </IconButton>
-        </Box>
 
-        {/* Sign Up Button */}
-        <Button
-          fullWidth
-          variant="contained"
-          color="primary"
-          sx={{
-            mt: 2,
-            backgroundColor: "#6d7f40",
-            "&:hover": {
-              backgroundColor: "#54662a",
-            },
-          }}
-        >
-          Sign Up
-        </Button>
-
-        <Grid container justifyContent="center" alignItems="center" spacing={1}>
-          <Grid item>
-            <Typography variant="body1" color="#293c3d">
-              Already have an account?
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Link to="/login" style={{ textDecoration: "none" }}>
-              <Typography variant="body1" color="primary">
-                Sign In
-              </Typography>
-            </Link>
-          </Grid>
-        </Grid>
-
-        <Divider sx={{ width: "100%", my: 2, color: "#aab56b" }}>or</Divider>
-
-        {/* Social Sign Up Buttons */}
-        <Grid container spacing={1} sx={{ width: "100%" }}>
-          <Grid item xs={6}>
-            <Button
+          <Box position="relative" width="100%">
+            <TextField
               fullWidth
-              startIcon={<FaFacebook />}
-              variant="contained"
-              sx={{
-                backgroundColor: "#4267b2",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#3b5998",
-                },
-                fontSize: "0.875rem",
-                py: 1,
-              }}
-            >
-              Facebook
-            </Button>
-          </Grid>
-          <Grid item xs={6}>
-            <Button
-              fullWidth
-              startIcon={<FcGoogle />}
+              label="Password"
               variant="outlined"
+              type={passwordVisible ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               sx={{
-                color: "#293c3d",
-                borderColor: "#d3d290",
-                "&:hover": {
-                  borderColor: "#6d7f40",
-                  backgroundColor: "#f5f5f5",
-                },
-                fontSize: "0.875rem",
-                py: 1,
+                marginBottom: 2,
+              }}
+            />
+            <IconButton
+              onClick={togglePasswordVisibility}
+              sx={{
+                position: "absolute",
+                top: "10%",
+                right: 10,
               }}
             >
-              Google
-            </Button>
-          </Grid>
-        </Grid>
+              {passwordVisible ? <BsEye /> : <BsEyeSlash />}
+            </IconButton>
+          </Box>
+
+          <Box position="relative" width="100%">
+            <TextField
+              fullWidth
+              label="Confirm Password"
+              variant="outlined"
+              type={confirmPasswordVisible ? "text" : "password"}
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              sx={{
+                marginTop: 2,
+              }}
+            />
+            <IconButton
+              onClick={toggleConfirmPasswordVisibility}
+              sx={{
+                position: "absolute",
+                top: "30%",
+                right: 10,
+              }}
+            >
+              {confirmPasswordVisible ? <BsEye /> : <BsEyeSlash />}
+            </IconButton>
+          </Box>
+
+          <Button
+            fullWidth={true}
+            variant="contained"
+            color="primary"
+            type="submit"
+            sx={{
+              mt: 2,
+              backgroundColor: "#6d7f40",
+              "&:hover": {
+                backgroundColor: "#54662a",
+              },
+            }}
+            disabled={loading}
+          >
+            {loading ? "Signing Up..." : "Sign Up"}
+          </Button>
+        </form>
       </Box>
     </Container>
   );

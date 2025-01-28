@@ -1,14 +1,56 @@
 import React, { useState } from "react";
-import { TextField, Button, IconButton, Typography, Box, Container, Divider, Grid } from "@mui/material";
-import { FaFacebook } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+import {
+  TextField,
+  Button,
+  IconButton,
+  Typography,
+  Box,
+  Container,
+  Grid,
+  CircularProgress,
+} from "@mui/material";
 import { BsEyeSlash, BsEye } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+// Define the response type
+interface LoginResponse {
+  access_token: string;
+  refresh_token: string;
+  message: string;
+}
 
 const Login: React.FC = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
+  const apiUrl = process.env.REACT_APP_API_URL;
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError(""); // Clear any previous error message
+
+    try {
+      const response = await axios.post<LoginResponse>(`${apiUrl}/api/login/`, { username, password });
+      const { access_token, refresh_token } = response.data;
+
+      // Store tokens (consider using secure cookies or state management for production apps)
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("refresh_token", refresh_token);
+
+      // Redirect to a protected route or dashboard
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Container maxWidth="xs">
@@ -22,8 +64,8 @@ const Login: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           gap: 1,
-          mt: 10, // Reduce top margin for less gap at the top
-          mb: 8, // Increase bottom margin for more gap at the bottom
+          mt: 10,
+          mb: 8,
           border: "1px solid #e0e0e0",
           width: "100%",
         }}
@@ -32,29 +74,36 @@ const Login: React.FC = () => {
           Log In
         </Typography>
 
-        {/* Email */}
+        {error && (
+          <Typography color="error" variant="body2" gutterBottom>
+            {error}
+          </Typography>
+        )}
+
+        {/* Username */}
         <TextField
           fullWidth
-          label="Email or Username"
+          label="Username"
           variant="outlined"
-          type="email"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           sx={{
             marginBottom: 2,
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
-                borderColor: "#d3d290", // Default border color
+                borderColor: "#d3d290",
               },
               "&:hover fieldset": {
-                borderColor: "#aab56b", // Border color on hover
+                borderColor: "#aab56b",
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#aab56b", // Changed focus color
+                borderColor: "#aab56b",
               },
             },
             "& .MuiInputLabel-root": {
-              color: "#d3d290", // Default label color
+              color: "#d3d290",
               "&.Mui-focused": {
-                color: "#6d7f40", // Focused label color
+                color: "#6d7f40",
               },
             },
           }}
@@ -67,23 +116,25 @@ const Login: React.FC = () => {
             label="Password"
             variant="outlined"
             type={passwordVisible ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             sx={{
               marginBottom: 2,
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#d3d290", // Default border color
+                  borderColor: "#d3d290",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#aab56b", // Border color on hover
+                  borderColor: "#aab56b",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#aab56b", // Changed focus color
+                  borderColor: "#aab56b",
                 },
               },
               "& .MuiInputLabel-root": {
-                color: "#d3d290", // Default label color
+                color: "#d3d290",
                 "&.Mui-focused": {
-                  color: "#6d7f40", // Focused label color
+                  color: "#6d7f40",
                 },
               },
             }}
@@ -101,6 +152,8 @@ const Login: React.FC = () => {
           fullWidth
           variant="contained"
           color="primary"
+          onClick={handleLogin}
+          disabled={loading}
           sx={{
             mt: 2,
             backgroundColor: "#6d7f40",
@@ -109,7 +162,7 @@ const Login: React.FC = () => {
             },
           }}
         >
-          Log In
+          {loading ? <CircularProgress size={24} color="inherit" /> : "Log In"}
         </Button>
 
         <Grid container justifyContent="center" alignItems="center" spacing={1} mt={3}>
@@ -126,8 +179,6 @@ const Login: React.FC = () => {
             </Link>
           </Grid>
         </Grid>
-
-    
       </Box>
     </Container>
   );
