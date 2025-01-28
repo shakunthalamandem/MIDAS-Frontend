@@ -92,7 +92,7 @@ const MonasheeDeals: React.FC = () => {
       </Typography>
 
       {/* Search results displayed outside the tabs */}
-     
+
 
       {/* Tabs */}
       <Tabs
@@ -132,29 +132,36 @@ const MonasheeDeals: React.FC = () => {
       >
         <Tab
           label={
-            <Box sx={{ width: "100%", padding: 2,maxHeight: "45px",minWidth: "230px", }}>
-             <TextField
-  label=""
-  variant="outlined"
-  value={searchTerm}
-  autoComplete="off"  
-  onChange={handleSearch}
-  placeholder="Enter ticker..."
-  style={{
-    marginBottom: "1px",
-    minWidth: "230px",    // Consistent width for both search box and TextField
-    maxHeight: "45px",    // Consistent height for both search box and TextField
-    backgroundColor: "#f4f6f9",
-    borderRadius: "8px",
-  }}
-  InputProps={{
-    startAdornment: (
-      <InputAdornment position="start">
-        <SearchIcon sx={{ color: "#656565" }} />
-      </InputAdornment>
-    ),
-  }}
-/>
+            <Box sx={{ width: "100%", padding: 2, maxHeight: "45px", minWidth: "230px", }}>
+              <TextField
+                label=""
+                variant="outlined"
+                value={searchTerm}
+                autoComplete="off"
+                onChange={handleSearch}
+                placeholder="Enter ticket symbol..."
+                style={{
+                  marginBottom: "1px",
+                  width: "250px", // Increase
+                  height: "40px", // Slightly
+                  borderRadius: "32px", // In
+                  backgroundColor: "#f4f6f9", // This
+
+
+                }}
+                InputProps={{
+                  style: {
+                    borderRadius: "42px",
+                    width: "250px", // Increase
+                    height: "40px",
+                  },
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: "#656565" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
 
             </Box>
           }
@@ -204,10 +211,10 @@ const MonasheeDeals: React.FC = () => {
                         (e.currentTarget.style.backgroundColor = "#f0f0f0")
                       }
                       onMouseOut={(e) =>
-                        (e.currentTarget.style.backgroundColor =
-                          selectedTicker === item.ticker
-                            ? "rgba(63, 81, 181, 0.1)"
-                            : "transparent")
+                      (e.currentTarget.style.backgroundColor =
+                        selectedTicker === item.ticker
+                          ? "rgba(63, 81, 181, 0.1)"
+                          : "transparent")
                       }
                     >
                       <ListItemText
