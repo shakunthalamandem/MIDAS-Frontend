@@ -28,7 +28,6 @@ const CapitalMarkets: React.FC = () => {
   const [results, setResults] = useState<MDDResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
 
-
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -36,8 +35,8 @@ const CapitalMarkets: React.FC = () => {
     ticker_symbol: string;
     issuer_name: string;
   }
-  
-const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchTerm(query);
 
@@ -48,9 +47,7 @@ const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `${apiUrl}/api/dealogic_search/${query}`
-      );
+      const response = await fetch(`${apiUrl}/api/dealogic_search/${query}`);
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }
@@ -95,75 +92,74 @@ const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
           },
         }}
       >
-        Welcome to New Issue Equity Markets! Explore deals and uncover statistics from the global market with ease.
+        Welcome to New Issue Equity Markets! Explore deals and uncover
+        statistics from the global market with ease.
       </Typography>
       <Tabs
-              value={value}
-              onChange={handleChange}
-              centered
-              TabIndicatorProps={{
-                style: { display: "none" },
-              }}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                margin: "10px 0",
-                "& .MuiTab-root": {
-                  backgroundColor: "#E3E6F0",
-                  color: "#002060",
-                  borderRadius: "12px",
-                  padding: "10px 20px",
-                  fontSize: "0.9rem",
-                  maxHeight: "50px",
-                  fontWeight: "600",
-                  margin: "0 5px",
-                  textTransform: "none",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "#DCE6F0",
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                  },
-                },
-                "& .Mui-selected": {
-                  backgroundColor: "#FF8C00",
-                  color: "#ffffff !important",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-                },
-              }}
-            >
+        value={value}
+        onChange={handleChange}
+        centered
+        TabIndicatorProps={{
+          style: { display: "none" },
+        }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          margin: "10px 0",
+          "& .MuiTab-root": {
+            backgroundColor: "#E3E6F0",
+            color: "#002060",
+            borderRadius: "12px",
+            padding: "10px 20px",
+            fontSize: "0.9rem",
+            maxHeight: "50px",
+            fontWeight: "600",
+            margin: "0 5px",
+            textTransform: "none",
+            transition:
+              "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
+            "&:hover": {
+              backgroundColor: "#DCE6F0",
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+            },
+          },
+          "& .Mui-selected": {
+            backgroundColor: "#FF8C00",
+            color: "#ffffff !important",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+          },
+        }}
+      >
         <Tab
           label={
             <TextField
-  label=""
-  variant="outlined"
-  value={searchTerm}
-  autoComplete="off"
-  onChange={handleSearch}
-  placeholder="Enter ticket symbol..."
-  style={{
-    marginBottom: "1px",
-    width: "300px", // Increase
-    height: "40px", // Slightly
-    borderRadius: "32px", // In
-    backgroundColor: "#f4f6f9", // This
-    
-    
-  }}
-  InputProps={{
-    style: {
-      borderRadius: "42px", 
-      width: "300px", // Increase
-      height: "40px",
-    },
-    startAdornment: (
-      <InputAdornment position="start">
-        <SearchIcon sx={{ color: "#656565" }} />
-      </InputAdornment>
-    ),
-  }}
-/>
-
+              label=""
+              variant="outlined"
+              value={searchTerm}
+              autoComplete="off"
+              onChange={handleSearch}
+              placeholder="Enter ticket symbol..."
+              style={{
+                marginBottom: "1px",
+                width: "300px", // Increase
+                height: "40px", // Slightly
+                borderRadius: "32px", // In
+                backgroundColor: "#f4f6f9", // This
+              }}
+              InputProps={{
+                style: {
+                  borderRadius: "42px",
+                  width: "300px", // Increase
+                  height: "40px",
+                },
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#656565" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
           }
         />
         {/* <Tab
@@ -216,6 +212,7 @@ const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
         <CircularProgress />
       ) : (
         searchTerm.length > 0 && (
+          <Box sx={{ marginBottom: "20px", display: "flex", marginLeft: "600px" }}>
           <Paper
             elevation={3}
             style={{
@@ -256,10 +253,13 @@ const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
               </List>
             )}
           </Paper>
+          </Box>
         )
       )}
 
-      {value === 0 && selectedTicker && <SelectedTicker ticker={selectedTicker} />}
+      {value === 0 && selectedTicker && (
+        <SelectedTicker ticker={selectedTicker} />
+      )}
       {value === 1 && <MarketFilters />}
       {value === 2 && <SkewTableMain />}
       {value === 3 && <ScreenerMain />}
