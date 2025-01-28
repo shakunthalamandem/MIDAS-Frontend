@@ -120,7 +120,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
       </Typography>
       {data.length > 1 && summary && (<MDDSearchSummary summary={summary} />
       )}
-      <Grid container spacing={2}>
+      <Grid container spacing={2} maxWidth="lg">
         {data.map((item, index) => (
           <Grid item xs={12} key={index}>
             <Paper
