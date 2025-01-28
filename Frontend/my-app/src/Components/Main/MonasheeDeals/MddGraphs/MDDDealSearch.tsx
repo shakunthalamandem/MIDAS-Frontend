@@ -108,7 +108,7 @@ const MonasheeDealSearch: React.FC = () => {
                 <List>
                   {results.map((item, index) => (
                     <ListItem
-                      key={index}
+                        key={index}
                       onClick={() => handleItemClick(item.ticker)} // Pass only ticker_us
                       component="li"
                       style={{

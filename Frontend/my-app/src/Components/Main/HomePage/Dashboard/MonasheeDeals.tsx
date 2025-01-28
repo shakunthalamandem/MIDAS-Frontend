@@ -7,7 +7,8 @@ import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import MDDDealSearch from "../../MonasheeDeals/MddGraphs/MDDDealSearch";
 import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 import MDDSelectedTicker from "../../MonasheeDeals/MddGraphs/MDDSelectedTicker";
-// Define the type for the API response 
+
+// Define the type for the API response
 interface MDDResult {
   ticker: string;
   issuer_name: string;
@@ -19,8 +20,7 @@ const MonasheeDeals: React.FC = () => {
   const [results, setResults] = useState<MDDResult[]>([]); // Search results
   const [loading, setLoading] = useState<boolean>(false); // Loading state
   const [selectedTicker, setSelectedTicker] = useState<string>("CRGX"); // Default selected ticker
-  const [searchQuery, setSearchQuery] = useState(""); // State for query in deal search tab
-  
+
   const apiUrl = process.env.REACT_APP_API_URL;
 
   // Handle change for tab selection
@@ -91,6 +91,9 @@ const MonasheeDeals: React.FC = () => {
         Welcome to Monashee Participated Deals Dashboard! Explore valuable insights into the deals you've actively participated in across the global market.
       </Typography>
 
+      {/* Search results displayed outside the tabs */}
+     
+
       {/* Tabs */}
       <Tabs
         value={value}
@@ -129,85 +132,30 @@ const MonasheeDeals: React.FC = () => {
       >
         <Tab
           label={
-            <Box sx={{ width: "100%", padding: 2 }}>
-              <TextField
-                label=""
-                variant="outlined"
-                value={searchTerm}
-                autoComplete="off"  
-                onChange={handleSearch}
-                placeholder="Enter ticker..."
-                style={{
-                  marginBottom: "1px",
-                  minWidth: "230px",
-                  maxHeight: "45px",
-                  backgroundColor: "#f4f6f9",
-                  borderRadius: "8px",
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: "#656565" }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              {loading ? (
-                <CircularProgress />
-              ) : (
-                searchTerm.length > 0 && (
-                  <Paper
-                    elevation={3}
-                    style={{
-                      padding: "10px",
-                      maxWidth: "280px",
-                      maxHeight: "300px",
-                      overflowY: "auto",
-                      backgroundColor: "#ffffff",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    {results.length === 0 ? (
-                      <Typography variant="body2" color="textSecondary" align="center">
-                        No results found.
-                      </Typography>
-                    ) : (
-                      <List>
-                        {results.map((item, index) => (
-                          <ListItem
-                            key={index}
-                            onClick={() => handleItemClick(item.ticker)} // Set selected ticker
-                            component="li"
-                            style={{
-                              backgroundColor:
-                                selectedTicker === item.ticker
-                                  ? "rgba(63, 81, 181, 0.1)"
-                                  : "transparent",
-                              borderRadius: "8px",
-                              cursor: "pointer",
-                              transition: "background-color 0.3s",
-                            }}
-                            onMouseOver={(e) =>
-                              (e.currentTarget.style.backgroundColor = "#f0f0f0")
-                            }
-                            onMouseOut={(e) =>
-                              (e.currentTarget.style.backgroundColor =
-                                selectedTicker === item.ticker
-                                  ? "rgba(63, 81, 181, 0.1)"
-                                  : "transparent")
-                            }
-                          >
-                            <ListItemText
-                              primary={<strong>{item.ticker}</strong>}
-                              secondary={item.issuer_name}
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                    )}
-                  </Paper>
-                )
-              )}
+            <Box sx={{ width: "100%", padding: 2,maxHeight: "45px",minWidth: "230px", }}>
+             <TextField
+  label=""
+  variant="outlined"
+  value={searchTerm}
+  autoComplete="off"  
+  onChange={handleSearch}
+  placeholder="Enter ticker..."
+  style={{
+    marginBottom: "1px",
+    minWidth: "230px",    // Consistent width for both search box and TextField
+    maxHeight: "45px",    // Consistent height for both search box and TextField
+    backgroundColor: "#f4f6f9",
+    borderRadius: "8px",
+  }}
+  InputProps={{
+    startAdornment: (
+      <InputAdornment position="start">
+        <SearchIcon sx={{ color: "#656565" }} />
+      </InputAdornment>
+    ),
+  }}
+/>
+
             </Box>
           }
         />
@@ -216,10 +164,67 @@ const MonasheeDeals: React.FC = () => {
         <Tab label="Follow-On Discount" />
         <Tab label="Screener" />
       </Tabs>
+      {searchTerm.length > 0 && (
+        <Box sx={{ marginBottom: "20px", display: "flex", marginLeft: "500px" }}>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <Paper
+              elevation={3}
+              style={{
+                padding: "10px",
+                maxWidth: "280px",
+                maxHeight: "300px",
+                overflowY: "auto",
+                backgroundColor: "#ffffff",
+                borderRadius: "8px",
+              }}
+            >
+              {results.length === 0 ? (
+                <Typography variant="body2" color="textSecondary" align="center">
+                  No results found.
+                </Typography>
+              ) : (
+                <List>
+                  {results.map((item, index) => (
+                    <ListItem
+                      key={index}
+                      onClick={() => handleItemClick(item.ticker)} // Set selected ticker
+                      component="li"
+                      style={{
+                        backgroundColor:
+                          selectedTicker === item.ticker
+                            ? "rgba(63, 81, 181, 0.1)"
+                            : "transparent",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        transition: "background-color 0.3s",
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#f0f0f0")
+                      }
+                      onMouseOut={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                          selectedTicker === item.ticker
+                            ? "rgba(63, 81, 181, 0.1)"
+                            : "transparent")
+                      }
+                    >
+                      <ListItemText
+                        primary={<strong>{item.ticker}</strong>}
+                        secondary={item.issuer_name}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </Paper>
+          )}
+        </Box>
+      )}
 
       {/* Tab Content */}
       {value === 0 && selectedTicker && <MDDSelectedTicker ticker={selectedTicker} />}
-
       {value === 1 && <DealStats />}
       {value === 2 && <AllocationCaptureReturn />}
       {value === 3 && <FOllowOnDiscount />}

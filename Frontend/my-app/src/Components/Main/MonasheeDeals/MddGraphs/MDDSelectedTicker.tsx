@@ -120,7 +120,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
       </Typography>
       {data.length > 1 && summary && (<MDDSearchSummary summary={summary} />
       )}
-      <Grid container spacing={2}>
+      <Grid container spacing={2} maxWidth="lg">
         {data.map((item, index) => (
           <Grid item xs={12} key={index}>
             <Paper
@@ -391,7 +391,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                               : "N/A",
                           },
                           {
-                            label: "xxxxxxxxxxxxxMonashee Capital Committed",
+                            label: "Monashee Capital Committed",
                             // value: item.total_committed_capital ? "$" + (Number(item.total_committed_capital)).toFixed(2) : "N/A",
                             value: item.total_committed_capital
                               ? `$${new Intl.NumberFormat("en-US", {}).format(Number(item.total_committed_capital))}`
