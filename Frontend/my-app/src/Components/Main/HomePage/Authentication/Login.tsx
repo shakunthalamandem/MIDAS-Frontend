@@ -12,6 +12,7 @@ import {
 import { BsEyeSlash, BsEye } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import ForgotPassword from "./ForgotPassword";
 
 // Define the response type
 interface LoginResponse {
@@ -26,6 +27,8 @@ const Login: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
@@ -177,6 +180,25 @@ const Login: React.FC = () => {
                 Sign Up
               </Typography>
             </Link>
+          </Grid>
+        </Grid>
+        <Grid container justifyContent="center" alignItems="center" spacing={1} mt={3}>
+ 
+          <Grid item>
+      <Typography
+        onClick={() => setOpen(true)}
+        variant="body1"
+      color="red"
+      sx={{
+        cursor: 'pointer', // Makes it look clickable
+        '&:hover': {
+          textDecoration: 'underline', // Optional: adds underline on hover
+        },
+      }}
+    >
+      Forgot Password ?
+    </Typography>
+      <ForgotPassword open={open} onClose={() => setOpen(false)} />
           </Grid>
         </Grid>
       </Box>
