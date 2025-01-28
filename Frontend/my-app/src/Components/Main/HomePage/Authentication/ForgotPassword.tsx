@@ -39,7 +39,7 @@ const ForgotPassword: React.FC<{ open: boolean; onClose: () => void }> = ({
   
     try {
         const response = await axios.post<ForgotPasswordResponse>(
-            `${apiUrl}/api/forgot_password/`,
+            `${apiUrl}/api/password-reset/`,
             { email }
           );
           
