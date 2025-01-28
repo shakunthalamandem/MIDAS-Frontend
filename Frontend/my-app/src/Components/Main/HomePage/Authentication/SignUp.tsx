@@ -14,72 +14,65 @@ import { Link } from "react-router-dom";
 
 // Define the form data interface
 interface SignupFormData {
-  fullName: string;
+  username: string;
   email: string;
   password: string;
-  confirmPassword: string;
+}
+interface SignupResponse {
+  message: string; // Adjust this based on your API's actual response structure
 }
 
 const Signup: React.FC = () => {
   const [formData, setFormData] = useState<SignupFormData>({
-    fullName: "",
+    username: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = process.env.REACT_APP_API_URL ; // Update as per your backend URL
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
-  const toggleConfirmPasswordVisibility = () =>
-    setConfirmPasswordVisible(!confirmPasswordVisible);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev: SignupFormData) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSignup = async () => {
-    setLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
-
-    const { fullName, email, password } = formData;
-
+    setSuccessMessage(null);
+    setLoading(true);
+  
+    const { username, email, password } = formData;
+  
+    if (!username || !email || !password) {
+      setError("All fields are required.");
+      setLoading(false);
+      return;
+    }
+  
     try {
-      const response = await axios.post(`${apiUrl}/api/signup/`, {
-        full_name: fullName,
+      const response = await axios.post<SignupResponse>(`${apiUrl}/api/signup/`, {
+        username,
         email,
         password,
       });
-      console.log("Signup successful:", response.data);
-      // Handle successful signup (e.g., redirect or show success message)
+  
+      // Now `response.data` is correctly typed as `SignupResponse`
+      setSuccessMessage(response.data.message);
+      setFormData({ username: "", email: "", password: "" });
     } catch (err: any) {
-      console.error("Signup error:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "Something went wrong.");
+      const errorMessage =
+        err.response?.data?.error || "An error occurred. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const { fullName, email, password, confirmPassword } = formData;
-
-    if (!fullName || !email || !password || !confirmPassword) {
-      setError("All fields are required.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    handleSignup();
   };
 
   return (
@@ -109,20 +102,27 @@ const Signup: React.FC = () => {
             {error}
           </Typography>
         )}
+        {successMessage && (
+          <Typography color="success" variant="body2" gutterBottom>
+            {successMessage}
+          </Typography>
+        )}
 
         <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+          {/* Username */}
           <TextField
             fullWidth
-            label="Full Name"
+            label="Username"
             variant="outlined"
-            name="fullName"
-            value={formData.fullName}
+            name="username"
+            value={formData.username}
             onChange={handleChange}
             sx={{
               marginBottom: 2,
             }}
           />
 
+          {/* Email */}
           <TextField
             fullWidth
             label="Email"
@@ -136,6 +136,7 @@ const Signup: React.FC = () => {
             }}
           />
 
+          {/* Password */}
           <Box position="relative" width="100%">
             <TextField
               fullWidth
@@ -151,43 +152,15 @@ const Signup: React.FC = () => {
             />
             <IconButton
               onClick={togglePasswordVisibility}
-              sx={{
-                position: "absolute",
-                top: "10%",
-                right: 10,
-              }}
+              sx={{ position: "absolute", top: "25%", right: 10 }}
             >
               {passwordVisible ? <BsEye /> : <BsEyeSlash />}
             </IconButton>
           </Box>
 
-          <Box position="relative" width="100%">
-            <TextField
-              fullWidth
-              label="Confirm Password"
-              variant="outlined"
-              type={confirmPasswordVisible ? "text" : "password"}
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              sx={{
-                marginTop: 2,
-              }}
-            />
-            <IconButton
-              onClick={toggleConfirmPasswordVisibility}
-              sx={{
-                position: "absolute",
-                top: "30%",
-                right: 10,
-              }}
-            >
-              {confirmPasswordVisible ? <BsEye /> : <BsEyeSlash />}
-            </IconButton>
-          </Box>
-
+          {/* Sign Up Button */}
           <Button
-            fullWidth={true}
+            fullWidth
             variant="contained"
             color="primary"
             type="submit"
@@ -203,6 +176,21 @@ const Signup: React.FC = () => {
             {loading ? "Signing Up..." : "Sign Up"}
           </Button>
         </form>
+
+        <Grid container justifyContent="center" alignItems="center" spacing={1} mt={3}>
+          <Grid item>
+            <Typography variant="body1" color="#293c3d">
+              Already have an account?
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Link to="/login" style={{ textDecoration: "none" }}>
+              <Typography variant="body1" color="primary">
+                Sign In
+              </Typography>
+            </Link>
+          </Grid>
+        </Grid>
       </Box>
     </Container>
   );
