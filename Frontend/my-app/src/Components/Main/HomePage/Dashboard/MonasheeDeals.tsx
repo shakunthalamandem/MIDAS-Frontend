@@ -4,7 +4,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import MDDScreener from "../../MonasheeDeals/MddGraphs/MDDScreener";
 import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
-import MDDDealSearch from "../../MonasheeDeals/MddGraphs/MDDDealSearch";
 import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 import MDDSelectedTicker from "../../MonasheeDeals/MddGraphs/MDDSelectedTicker";
 
@@ -130,7 +129,7 @@ const MonasheeDeals: React.FC = () => {
           },
         }}
       >
-        <Tab
+        <Tab sx={{ backgroundColor: value === 0 ? "#dce6f0" : "#f5f5f5", color: value === 0 ? "#fff" : "#777", "&.Mui-selected": { backgroundColor: "#dce6f0", color: "#fff" } }} 
           label={
             <Box sx={{ width: "100%", padding: 2, maxHeight: "45px", minWidth: "230px", }}>
               <TextField
