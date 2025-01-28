@@ -391,7 +391,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                               : "N/A",
                           },
                           {
-                            label: "Monashee Capital Committed",
+                            label: "xxxxxxxxxxxxxMonashee Capital Committed",
                             // value: item.total_committed_capital ? "$" + (Number(item.total_committed_capital)).toFixed(2) : "N/A",
                             value: item.total_committed_capital
                               ? `$${new Intl.NumberFormat("en-US", {}).format(Number(item.total_committed_capital))}`

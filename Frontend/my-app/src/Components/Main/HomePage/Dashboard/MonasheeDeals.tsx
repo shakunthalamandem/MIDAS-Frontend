@@ -7,7 +7,7 @@ import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import MDDDealSearch from "../../MonasheeDeals/MddGraphs/MDDDealSearch";
 import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 import MDDSelectedTicker from "../../MonasheeDeals/MddGraphs/MDDSelectedTicker";
-// Define the type for the API response
+// Define the type for the API response 
 interface MDDResult {
   ticker: string;
   issuer_name: string;
@@ -109,6 +109,7 @@ const MonasheeDeals: React.FC = () => {
             borderRadius: "12px",
             padding: "10px 20px",
             fontSize: "0.9rem",
+            maxHeight: "50px",
             fontWeight: "600",
             margin: "0 5px",
             textTransform: "none",
@@ -130,15 +131,16 @@ const MonasheeDeals: React.FC = () => {
           label={
             <Box sx={{ width: "100%", padding: 2 }}>
               <TextField
-                label="Search Monashee Participated Deals"
+                label=""
                 variant="outlined"
                 value={searchTerm}
-                autoComplete="off"
+                autoComplete="off"  
                 onChange={handleSearch}
-                placeholder="Enter ticker symbol or issuer name..."
+                placeholder="Enter ticker..."
                 style={{
                   marginBottom: "1px",
-                  minWidth: "300px",
+                  minWidth: "230px",
+                  maxHeight: "45px",
                   backgroundColor: "#f4f6f9",
                   borderRadius: "8px",
                 }}
