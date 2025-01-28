@@ -11,6 +11,7 @@ import TechnicalMain from "../Components/Main/InvestmentStrategy/TechnicalIndica
 import ErrorPage from "../Pages/ErrorPage";
 import ErrorBoundary from "../Pages/ErrorBoundary";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
+import ResetPassword from "../Components/Main/HomePage/Authentication/ResetPassword";
 
 const AppRouters: React.FC = () => {
   return (
@@ -27,6 +28,7 @@ const AppRouters: React.FC = () => {
         <Route path="/technical/:ticker" element={<TechnicalMain />} />
         <Route path="/error" element={<ErrorPage />} />
         {/* <Route path="*" element={<Navigate to="/error" state={{ message: 'Page not found' }} />} /> */}
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </ErrorBoundary>
   );
