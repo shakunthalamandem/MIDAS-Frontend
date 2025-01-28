@@ -6,7 +6,7 @@ import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCap
 import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import MDDDealSearch from "../../MonasheeDeals/MddGraphs/MDDDealSearch";
 import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
-
+import MDDSelectedTicker from "../../MonasheeDeals/MddGraphs/MDDSelectedTicker";
 // Define the type for the API response
 interface MDDResult {
   ticker: string;
@@ -137,7 +137,7 @@ const MonasheeDeals: React.FC = () => {
                 onChange={handleSearch}
                 placeholder="Enter ticker symbol or issuer name..."
                 style={{
-                  marginBottom: "20px",
+                  marginBottom: "1px",
                   minWidth: "300px",
                   backgroundColor: "#f4f6f9",
                   borderRadius: "8px",
@@ -216,7 +216,8 @@ const MonasheeDeals: React.FC = () => {
       </Tabs>
 
       {/* Tab Content */}
-      {value === 0 && <MDDDealSearch />}
+      {value === 0 && selectedTicker && <MDDSelectedTicker ticker={selectedTicker} />}
+
       {value === 1 && <DealStats />}
       {value === 2 && <AllocationCaptureReturn />}
       {value === 3 && <FOllowOnDiscount />}

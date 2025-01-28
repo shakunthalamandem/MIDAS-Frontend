@@ -63,7 +63,7 @@ const MonasheeDealSearch: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
-      <Box sx={{ width: "100%", padding: 2 }}>
+      {/* <Box sx={{ width: "100%", padding: 2 }}>
         <TextField
           label="Search Monashee Participated Deals"
           variant="outlined"
@@ -140,7 +140,7 @@ const MonasheeDealSearch: React.FC = () => {
             </Paper>
           )
         )}
-      </Box>
+      </Box> */}
 
       {/* If a ticker is selected, render the MDDSelectedTicker component */}
       {selectedTicker && <MDDSelectedTicker ticker={selectedTicker} />}
