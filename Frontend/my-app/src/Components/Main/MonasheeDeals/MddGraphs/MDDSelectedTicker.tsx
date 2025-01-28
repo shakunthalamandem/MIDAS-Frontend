@@ -10,6 +10,7 @@ import {
   TableContainer,
   TableRow,
   Typography,
+  Container,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
@@ -91,7 +92,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
           { ticker }
         );
         setData(response.data.data);
-        setSummary(response.data.summary)
+        setSummary(response.data.summary);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -104,492 +105,499 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   if (loading) return <Typography>Loading...</Typography>;
 
   return (
-    
-    <Box sx={{ marginTop: 4, padding: 2 }}>
-      <Typography
-        variant="h5"
-        gutterBottom
-        color="#6501c4"
-        align="center"
-        sx={{ fontWeight: "bold" }}
-      >
-        Monashee participation in {" "}
-        <span style={{ color: "#ff6005", fontStyle: "italic" }}>
-          {ticker} - {data.length} deals
-        </span>
-      </Typography>
-      {data.length > 1 && summary && (<MDDSearchSummary summary={summary} />
-      )}
-      <Grid container spacing={2} maxWidth="lg">
-        {data.map((item, index) => (
-          <Grid item xs={12} key={index}>
-            <Paper
-              elevation={3}
-              sx={{
-                padding: "20px",
-                backgroundColor: "#f9f9f9",
-                borderRadius: "8px",
-              }}
-            >
-              <Typography
-                variant="h6"
-                color="#002060"
-                align="center"
-                gutterBottom
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+      <Box sx={{ marginTop: 4, padding: 2 }}>
+        <Typography
+          variant="h5"
+          gutterBottom
+          color="#6501c4"
+          align="center"
+          sx={{ fontWeight: "bold" }}
+        >
+          Monashee participation in{" "}
+          <span style={{ color: "#ff6005", fontStyle: "italic" }}>
+            {ticker} - {data.length} deals
+          </span>
+        </Typography>
+        {data.length > 1 && summary && <MDDSearchSummary summary={summary} />}
+        <Grid container spacing={2} maxWidth="lg">
+          {data.map((item, index) => (
+            <Grid item xs={12} key={index}>
+              <Paper
+                elevation={3}
                 sx={{
-                  fontWeight: "bold",
-                  color: "#0073e6",
+                  padding: "20px",
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: "8px",
                 }}
               >
-                Deal Information for{" "}
-                <span style={{ fontWeight: "bold", color: "#0073e6" }}>
-                  {item.ticker}
-                </span>{" "}
-                on{" "}
-                <span style={{ fontWeight: "bold", color: "#0073e6" }}>
-                  {formatDate(item.pricing_date)}
-                </span>
-              </Typography>
+                <Typography
+                  variant="h6"
+                  color="#002060"
+                  align="center"
+                  gutterBottom
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#0073e6",
+                  }}
+                >
+                  Deal Information for{" "}
+                  <span style={{ fontWeight: "bold", color: "#0073e6" }}>
+                    {item.ticker}
+                  </span>{" "}
+                  on{" "}
+                  <span style={{ fontWeight: "bold", color: "#0073e6" }}>
+                    {formatDate(item.pricing_date)}
+                  </span>
+                </Typography>
 
-              <Grid container spacing={2}>
-                {/* Table 1 */}
-                <Grid item xs={12} sm={6}>
-                  <TableContainer>
-                    <Table size="small" aria-label="Deal Info Table 1">
-                      <TableBody>
-                        {[
-                          
-
-                          { label: "Pricing Date", value: item.pricing_date },
-                          { label: "Issuer Name", value: item.issuer_name },
-                          { label: "Ticker", value: item.ticker },
-                          {
-                            label: "Sector ",
-                            value: item.gics_sector_from_bloomberg,
-                          },
-                          { label: "Region", value: item.broad_region },
-                          { 
-                            label: "Deal Type", 
-                            value: item.deal_type + (item.fo_type ? ` (${item.fo_type})` : '') 
-                          },                          
-                          {
-                            label: "Deal Size",
-                            value: item.deal_size
-                              ? `$${new Intl.NumberFormat("en-US", {}).format(Number(item.deal_size))}`
-                              : "N/A",
-                          },
-                          {
-                            label: "Issue / Offer Price",
-                            value: "$" + item.issue_offer_price,
-                          },
-                          {
-                            label: "Deal Captain",
-                            value:
-                              item.deal_captain === "none"
-                                ? "Not Available"
-                                : item.deal_captain,
-                          },
-                          {
-                            label: "Sponsor Y/N",
-                            value: item.sponsor ?? "N/A",
-                          },
-                        ].map((row, i) => (
-                          <TableRow
-                            key={i}
-                            sx={{
-                              backgroundColor:
-                                i % 2 === 0 ? "#f3f3f3" : "#ffffff",
-                              "&:hover": {
-                                backgroundColor: "#e0f7fa",
-                              },
-                            }}
-                          >
-                            <TableCell
-                              sx={{
-                                border: "1px solid #ccc",
-                                fontWeight: "bold",
-                                color: "#333",
-                              }}
-                            >
-                              {row.label}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                border: "1px solid #ccc",
-                              }}
-                            >
-                              {row.value}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-
-                {/* Table 2 */}
-                <Grid item xs={12} sm={6}>
-                  <TableContainer>
-                    <Table size="small" aria-label="Deal Info Table 2">
-                      <TableBody>
-                        {[
-                              {
-                                label: "Discount from Announcement Price",
-                                value:
-                                  item.fo_discount !== undefined ? (
-                                    <span
-                                      style={{
-                                        color:
-                                          Number(item.fo_discount) === 0
-                                            ? "black"
-                                            : Number(item.fo_discount) < 0
-                                              ? "red"
-                                              : "green",
-                                        display: "flex",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      {Number(item.fo_discount).toFixed(
-                                        2
-                                      ) + "%"}
-                                      {Number(item.fo_discount) > 0 ? (
-                                        <ArrowDropUpIcon
-                                          sx={{
-                                            color: "green",
-                                            marginLeft: "4px",
-                                            fontSize: 20,
-                                          }}
-                                        />
-                                      ) : Number(item.fo_discount) < 0 ? (
-                                        <ArrowDropDownIcon
-                                          sx={{
-                                            color: "red",
-                                            marginLeft: "4px",
-                                            fontSize: 20,
-                                          }}
-                                        />
-                                      ) : (
-                                        <ArrowDropDownIcon
-                                          sx={{
-                                            color: "black",
-                                            marginLeft: "4px",
-                                            fontSize: 20,
-                                          }}
-                                        />
-                                      )}
-                                    </span>
-                                  ) : (
-                                    "N/A"
-                                  ),
-                              },
-                          {
-                            label: "Primary %",
-                            value: item.percentage_primary
-                              ? item.percentage_primary + "%"
-                              : "0%",
-                          },
-                          {
-                            label: "Allocation as % of Deal Size",
-                            value:
-                              item.allocation_deal_size !== undefined ? (
-                                <span
-                                  style={{
-                                    color:
-                                      Number(item.allocation_deal_size) === 0
-                                        ? "black"
-                                        : Number(item.allocation_deal_size) < 0
-                                          ? "red"
-                                          : "green",
-                                    display: "flex",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  {Number(item.allocation_deal_size).toFixed(
-                                    2
-                                  ) + "%"}
-                                  {Number(item.allocation_deal_size) > 0 ? (
-                                    <ArrowDropUpIcon
-                                      sx={{
-                                        color: "green",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  ) : Number(item.allocation_deal_size) < 0 ? (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "red",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  ) : (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "black",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  )}
-                                </span>
-                              ) : (
-                                "N/A"
-                              ),
-                          },
-                          {
-                            label: "Allocation as % of IOI",
-                            value:
-                              item.allocation_ioi !== undefined ? (
-                                <span
-                                  style={{
-                                    color:
-                                      Number(item.allocation_ioi) === 0
-                                        ? "black"
-                                        : Number(item.allocation_ioi) < 0
-                                          ? "red"
-                                          : "green",
-                                    display: "flex",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  {Number(item.allocation_ioi).toFixed(2) + "%"}
-                                  {Number(item.allocation_ioi) > 0 ? (
-                                    <ArrowDropUpIcon
-                                      sx={{
-                                        color: "green",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  ) : Number(item.allocation_ioi) < 0 ? (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "red",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  ) : (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "black",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  )}
-                                </span>
-                              ) : (
-                                "N/A"
-                              ),
-                          },
-                          {
-                            label: "Average Hold Period",
-                            value: item.average_hold_period
-                              ? item.average_hold_period + " days"
-                              : "N/A",
-                          },
-                          {
-                            label: "Monashee Capital Committed",
-                            // value: item.total_committed_capital ? "$" + (Number(item.total_committed_capital)).toFixed(2) : "N/A",
-                            value: item.total_committed_capital
-                              ? `$${new Intl.NumberFormat("en-US", {}).format(Number(item.total_committed_capital))}`
-                              : "N/A",
-                          },
-                          {
-                            label: "Monashee PNL Gross",
-                            value:
-                              item.total_return !== undefined ? (
-                                <span
-                                  style={{
-                                    color:
-                                      Number(item.total_return) < 0
-                                        ? "red"
-                                        : "green",
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  {Number(item.total_return) < 0 ? "-" : ""}$
-                                  {new Intl.NumberFormat("en-US", {}).format(
-                                    Math.abs(
-                                      Number(
-                                        Number(item.total_return).toFixed(0)
-                                      )
-                                    )
-                                  )}
-                                  {Number(item.total_return) < 0 ? (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "red",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  ) : (
-                                    <ArrowDropUpIcon
-                                      sx={{
-                                        color: "green",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  )}
-                                </span>
-                              ) : (
-                                "N/A"
-                              ),
-                            style: {
-                              color:
-                                Number(item.total_return) < 0 ? "red" : "green",
+                <Grid container spacing={2}>
+                  {/* Table 1 */}
+                  <Grid item xs={12} sm={6}>
+                    <TableContainer>
+                      <Table size="small" aria-label="Deal Info Table 1">
+                        <TableBody>
+                          {[
+                            { label: "Pricing Date", value: item.pricing_date },
+                            { label: "Issuer Name", value: item.issuer_name },
+                            { label: "Ticker", value: item.ticker },
+                            {
+                              label: "Sector ",
+                              value: item.gics_sector_from_bloomberg,
                             },
-                          },
-                          {
-                            label: "Return on Invested Capital",
-                            value:
-                              item.percentage_total_return !== undefined ? (
-                                <span
-                                  style={{
-                                    display: "inline-flex",
-                                    alignItems: "center", // Align the icon with the text
-                                    color:
-                                      Number(item.percentage_total_return) > 0
-                                        ? "green" // Green for positive
-                                        : Number(item.percentage_total_return) <
-                                            0
-                                          ? "red" // Red for negative
-                                          : "black", // Black for neutral (0%)
-                                  }}
-                                >
-                                  {Number(item.percentage_total_return).toFixed(
-                                    2
-                                  )}
-                                  %
-                                  {Number(item.percentage_total_return) > 0 ? (
-                                    <ArrowDropUpIcon
-                                      sx={{
-                                        color: "green",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  ) : Number(item.percentage_total_return) <
-                                    0 ? (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "red",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  ) : (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "black",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  )}
-                                </span>
-                              ) : (
-                                "N/A"
-                              ),
-                          },
-                          {
-                            label: "Market T+1M Absolute Return",
-                            value:
-                              item.t1m_return_from_dealogic !== undefined ? (
-                                <span
-                                  style={{
-                                    display: "inline-flex",
-                                    alignItems: "center", // Align the icon with the text
-                                    color:
-                                      Number(item.t1m_return_from_dealogic) > 0
-                                        ? "green" // Green for positive returns
-                                        : Number(
-                                              item.t1m_return_from_dealogic
-                                            ) < 0
-                                          ? "red" // Red for negative returns
-                                          : "black", // Black for neutral (0%)
-                                  }}
-                                >
-                                  {Number(
-                                    item.t1m_return_from_dealogic
-                                  ).toFixed(2)}
-                                  %
-                                  {Number(item.t1m_return_from_dealogic) > 0 ? (
-                                    <ArrowDropUpIcon
-                                      sx={{
-                                        color: "green",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  ) : Number(item.t1m_return_from_dealogic) <
-                                    0 ? (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "red",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  ) : (
-                                    <ArrowDropDownIcon
-                                      sx={{
-                                        color: "black",
-                                        marginLeft: "4px",
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  )}
-                                </span>
-                              ) : (
-                                "N/A"
-                              ),
-                          },
-                          { label: "Left Lead Bank", value: item.all_bank },
-                        ].map((row, i) => (
-                          <TableRow
-                            key={i}
-                            sx={{
-                              backgroundColor:
-                                i % 2 === 0 ? "#f3f3f3" : "#ffffff",
-                              "&:hover": {
-                                backgroundColor: "#e0f7fa",
+                            { label: "Region", value: item.broad_region },
+                            {
+                              label: "Deal Type",
+                              value:
+                                item.deal_type +
+                                (item.fo_type ? ` (${item.fo_type})` : ""),
+                            },
+                            {
+                              label: "Deal Size",
+                              value: item.deal_size
+                                ? `$${new Intl.NumberFormat("en-US", {}).format(Number(item.deal_size))}`
+                                : "N/A",
+                            },
+                            {
+                              label: "Issue / Offer Price",
+                              value: "$" + item.issue_offer_price,
+                            },
+                            {
+                              label: "Deal Captain",
+                              value:
+                                item.deal_captain === "none"
+                                  ? "Not Available"
+                                  : item.deal_captain,
+                            },
+                            {
+                              label: "Sponsor Y/N",
+                              value: item.sponsor ?? "N/A",
+                            },
+                          ].map((row, i) => (
+                            <TableRow
+                              key={i}
+                              sx={{
+                                backgroundColor:
+                                  i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                                "&:hover": {
+                                  backgroundColor: "#e0f7fa",
+                                },
+                              }}
+                            >
+                              <TableCell
+                                sx={{
+                                  border: "1px solid #ccc",
+                                  fontWeight: "bold",
+                                  color: "#333",
+                                }}
+                              >
+                                {row.label}
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  border: "1px solid #ccc",
+                                }}
+                              >
+                                {row.value}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Grid>
+
+                  {/* Table 2 */}
+                  <Grid item xs={12} sm={6}>
+                    <TableContainer>
+                      <Table size="small" aria-label="Deal Info Table 2">
+                        <TableBody>
+                          {[
+                            {
+                              label: "Discount from Announcement Price",
+                              value:
+                                item.fo_discount !== undefined ? (
+                                  <span
+                                    style={{
+                                      color:
+                                        Number(item.fo_discount) === 0
+                                          ? "black"
+                                          : Number(item.fo_discount) < 0
+                                            ? "red"
+                                            : "green",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    {Number(item.fo_discount).toFixed(2) + "%"}
+                                    {Number(item.fo_discount) > 0 ? (
+                                      <ArrowDropUpIcon
+                                        sx={{
+                                          color: "green",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : Number(item.fo_discount) < 0 ? (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "red",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "black",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    )}
+                                  </span>
+                                ) : (
+                                  "N/A"
+                                ),
+                            },
+                            {
+                              label: "Primary %",
+                              value: item.percentage_primary
+                                ? item.percentage_primary + "%"
+                                : "0%",
+                            },
+                            {
+                              label: "Allocation as % of Deal Size",
+                              value:
+                                item.allocation_deal_size !== undefined ? (
+                                  <span
+                                    style={{
+                                      color:
+                                        Number(item.allocation_deal_size) === 0
+                                          ? "black"
+                                          : Number(item.allocation_deal_size) <
+                                              0
+                                            ? "red"
+                                            : "green",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    {Number(item.allocation_deal_size).toFixed(
+                                      2
+                                    ) + "%"}
+                                    {Number(item.allocation_deal_size) > 0 ? (
+                                      <ArrowDropUpIcon
+                                        sx={{
+                                          color: "green",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : Number(item.allocation_deal_size) <
+                                      0 ? (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "red",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "black",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    )}
+                                  </span>
+                                ) : (
+                                  "N/A"
+                                ),
+                            },
+                            {
+                              label: "Allocation as % of IOI",
+                              value:
+                                item.allocation_ioi !== undefined ? (
+                                  <span
+                                    style={{
+                                      color:
+                                        Number(item.allocation_ioi) === 0
+                                          ? "black"
+                                          : Number(item.allocation_ioi) < 0
+                                            ? "red"
+                                            : "green",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    {Number(item.allocation_ioi).toFixed(2) +
+                                      "%"}
+                                    {Number(item.allocation_ioi) > 0 ? (
+                                      <ArrowDropUpIcon
+                                        sx={{
+                                          color: "green",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : Number(item.allocation_ioi) < 0 ? (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "red",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "black",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    )}
+                                  </span>
+                                ) : (
+                                  "N/A"
+                                ),
+                            },
+                            {
+                              label: "Average Hold Period",
+                              value: item.average_hold_period
+                                ? item.average_hold_period + " days"
+                                : "N/A",
+                            },
+                            {
+                              label: "Monashee Capital Committed",
+                              // value: item.total_committed_capital ? "$" + (Number(item.total_committed_capital)).toFixed(2) : "N/A",
+                              value: item.total_committed_capital
+                                ? `$${new Intl.NumberFormat("en-US", {}).format(Number(item.total_committed_capital))}`
+                                : "N/A",
+                            },
+                            {
+                              label: "Monashee PNL Gross",
+                              value:
+                                item.total_return !== undefined ? (
+                                  <span
+                                    style={{
+                                      color:
+                                        Number(item.total_return) < 0
+                                          ? "red"
+                                          : "green",
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    {Number(item.total_return) < 0 ? "-" : ""}$
+                                    {new Intl.NumberFormat("en-US", {}).format(
+                                      Math.abs(
+                                        Number(
+                                          Number(item.total_return).toFixed(0)
+                                        )
+                                      )
+                                    )}
+                                    {Number(item.total_return) < 0 ? (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "red",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : (
+                                      <ArrowDropUpIcon
+                                        sx={{
+                                          color: "green",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    )}
+                                  </span>
+                                ) : (
+                                  "N/A"
+                                ),
+                              style: {
+                                color:
+                                  Number(item.total_return) < 0
+                                    ? "red"
+                                    : "green",
                               },
-                            }}
-                          >
-                            <TableCell
+                            },
+                            {
+                              label: "Return on Invested Capital",
+                              value:
+                                item.percentage_total_return !== undefined ? (
+                                  <span
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center", // Align the icon with the text
+                                      color:
+                                        Number(item.percentage_total_return) > 0
+                                          ? "green" // Green for positive
+                                          : Number(
+                                                item.percentage_total_return
+                                              ) < 0
+                                            ? "red" // Red for negative
+                                            : "black", // Black for neutral (0%)
+                                    }}
+                                  >
+                                    {Number(
+                                      item.percentage_total_return
+                                    ).toFixed(2)}
+                                    %
+                                    {Number(item.percentage_total_return) >
+                                    0 ? (
+                                      <ArrowDropUpIcon
+                                        sx={{
+                                          color: "green",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : Number(item.percentage_total_return) <
+                                      0 ? (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "red",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "black",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    )}
+                                  </span>
+                                ) : (
+                                  "N/A"
+                                ),
+                            },
+                            {
+                              label: "Market T+1M Absolute Return",
+                              value:
+                                item.t1m_return_from_dealogic !== undefined ? (
+                                  <span
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center", // Align the icon with the text
+                                      color:
+                                        Number(item.t1m_return_from_dealogic) >
+                                        0
+                                          ? "green" // Green for positive returns
+                                          : Number(
+                                                item.t1m_return_from_dealogic
+                                              ) < 0
+                                            ? "red" // Red for negative returns
+                                            : "black", // Black for neutral (0%)
+                                    }}
+                                  >
+                                    {Number(
+                                      item.t1m_return_from_dealogic
+                                    ).toFixed(2)}
+                                    %
+                                    {Number(item.t1m_return_from_dealogic) >
+                                    0 ? (
+                                      <ArrowDropUpIcon
+                                        sx={{
+                                          color: "green",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : Number(item.t1m_return_from_dealogic) <
+                                      0 ? (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "red",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    ) : (
+                                      <ArrowDropDownIcon
+                                        sx={{
+                                          color: "black",
+                                          marginLeft: "4px",
+                                          fontSize: 20,
+                                        }}
+                                      />
+                                    )}
+                                  </span>
+                                ) : (
+                                  "N/A"
+                                ),
+                            },
+                            { label: "Left Lead Bank", value: item.all_bank },
+                          ].map((row, i) => (
+                            <TableRow
+                              key={i}
                               sx={{
-                                border: "1px solid #ccc",
-                                fontWeight: "bold",
-                                color: "#333",
+                                backgroundColor:
+                                  i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                                "&:hover": {
+                                  backgroundColor: "#e0f7fa",
+                                },
                               }}
                             >
-                              {row.label}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                border: "1px solid #ccc",
-                              }}
-                            >
-                              {row.value}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                              <TableCell
+                                sx={{
+                                  border: "1px solid #ccc",
+                                  fontWeight: "bold",
+                                  color: "#333",
+                                }}
+                              >
+                                {row.label}
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  border: "1px solid #ccc",
+                                }}
+                              >
+                                {row.value}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Container>
   );
 };
 
