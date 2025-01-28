@@ -140,18 +140,26 @@ const CapitalMarkets: React.FC = () => {
               autoComplete="off"
               onChange={handleSearch}
               placeholder="Enter ticket symbol..."
-              style={{
+              sx={{
                 marginBottom: "1px",
-                width: "300px", // Increase
-                height: "40px", // Slightly
-                borderRadius: "32px", // In
-                backgroundColor: "#f4f6f9", // This
+                width: "200px", // Increased width
+                height: "40px", // Slightly increased height
+                borderRadius: "32px", // Applied rounded corners
+                backgroundColor: "transparent", // Removed background color
+                border: "1px solid", // Border styles
+                borderColor: "#002060", // Change border color when selected
               }}
               InputProps={{
-                style: {
+                sx: {
                   borderRadius: "42px",
-                  width: "300px", // Increase
+                  width: "200px",
                   height: "40px",
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#002060",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#002060",
+                  },
                 },
                 startAdornment: (
                   <InputAdornment position="start">
@@ -162,6 +170,7 @@ const CapitalMarkets: React.FC = () => {
             />
           }
         />
+
         {/* <Tab
           label="Deal Search"
           sx={{
@@ -212,47 +221,53 @@ const CapitalMarkets: React.FC = () => {
         <CircularProgress />
       ) : (
         searchTerm.length > 0 && (
-          <Box sx={{ marginBottom: "20px", display: "flex", marginLeft: "600px" }}>
-          <Paper
-            elevation={3}
-            style={{
-              padding: "10px",
-              maxWidth: "280px",
-              maxHeight: "300px",
-              overflowY: "auto",
-              backgroundColor: "#ffffff",
-              borderRadius: "8px",
-            }}
+          <Box
+            sx={{ marginBottom: "20px", display: "flex", marginLeft: "600px" }}
           >
-            {results.length === 0 ? (
-              <Typography variant="body2" color="textSecondary" align="center">
-                No results found.
-              </Typography>
-            ) : (
-              <List>
-                {results.map((item, index) => (
-                  <ListItem
-                    key={index}
-                    onClick={() => handleItemClick(item.ticker_symbol)}
-                    style={{
-                      backgroundColor:
-                        selectedTicker === item.ticker_symbol
-                          ? "rgba(63, 81, 181, 0.1)"
-                          : "transparent",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                      transition: "background-color 0.3s",
-                    }}
-                  >
-                    <ListItemText
-                      primary={<strong>{item.ticker_symbol}</strong>}
-                      secondary={item.issuer_name}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </Paper>
+            <Paper
+              elevation={3}
+              style={{
+                padding: "10px",
+                maxWidth: "280px",
+                maxHeight: "300px",
+                overflowY: "auto",
+                backgroundColor: "#ffffff",
+                borderRadius: "8px",
+              }}
+            >
+              {results.length === 0 ? (
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  align="center"
+                >
+                  No results found.
+                </Typography>
+              ) : (
+                <List>
+                  {results.map((item, index) => (
+                    <ListItem
+                      key={index}
+                      onClick={() => handleItemClick(item.ticker_symbol)}
+                      style={{
+                        backgroundColor:
+                          selectedTicker === item.ticker_symbol
+                            ? "rgba(63, 81, 181, 0.1)"
+                            : "transparent",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        transition: "background-color 0.3s",
+                      }}
+                    >
+                      <ListItemText
+                        primary={<strong>{item.ticker_symbol}</strong>}
+                        secondary={item.issuer_name}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </Paper>
           </Box>
         )
       )}
