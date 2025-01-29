@@ -40,6 +40,7 @@ interface CategoryData {
   // "Net of Hedge": number;
   "Allocation Return": number;
   "AM Return": number;
+  "Model AM Return": number;
   "Total Return": number;
 }
 
@@ -295,30 +296,6 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         border: "1px solid #ddd",
                                         padding: "4px 8px",
                                         width: "90px",
-                                        borderTop: "2px solid #666666", // Add top border
-                                      }}
-                                    >
-                                      Monashee AM PnL (Gross $)
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        fontSize: "0.725rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "90px",
-                                        borderTop: "2px solid #666666", // Add top border
-                                      }}
-                                    >
-                                      Monashee Total PnL (Gross $)
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        fontSize: "0.725rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "90px",
                                         borderLeft:
                                           "2px solid #666666 !important",
                                         borderTop:
@@ -343,6 +320,54 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       {selectedCategory === "IPO"
                                         ? "Model PnL 0.5% Allocation ($)"
                                         : "Model PnL 1% Allocation ($)"}
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderTop: "2px solid #666666", // Add top border
+                                      }}
+                                    >
+                                      Actual Monashee AM PnL (Gross $)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderTop: "2px solid #666666", // Add top border
+                                      }}
+                                    >
+                                      Actual Model AM PnL (Gross $)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderTop: "2px solid #666666", // Add top border
+                                      }}
+                                    >
+                                      Actual Monashee Total PnL (Gross $)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderTop: "2px solid #666666", // Add top border
+                                      }}
+                                    >
+                                      Actual Model Total PnL (Gross $)
                                     </TableCell>
                                   </TableRow>
                                 </TableHead>
@@ -457,37 +482,6 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           align="left"
                                           sx={{
                                             fontSize: "0.8rem",
-                                            borderColor: "#ddd",
-                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
-                                            borderBottom: isLastRow
-                                              ? "2px solid #666666 !important"
-                                              : "none",
-                                          }}
-                                        >
-                                          {formatValue(data["AM Return"] || 0)}
-                                        </TableCell>
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.8rem",
-                                            borderRight:
-                                              "2px solid #666666 !important",
-                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
-                                            borderBottom: isLastRow
-                                              ? "2px solid #666666 !important"
-                                              : "none",
-                                          }}
-                                        >
-                                          {formatValue(
-                                            data["Total Return"] || 0
-                                          )}
-                                        </TableCell>
-
-                                        {/* Boxed Columns: Model */}
-                                        <TableCell
-                                          align="left"
-                                          sx={{
-                                            fontSize: "0.8rem",
                                             // borderTop: isFirstRow ? "2px solid blue !important" : "none",
                                             borderLeft:
                                               "2px solid #666666 !important",
@@ -518,6 +512,66 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             ] || 0
                                           )}
                                         </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            borderColor: "#ddd",
+                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
+                                            borderBottom: isLastRow
+                                              ? "2px solid #666666 !important"
+                                              : "none",
+                                          }}
+                                        >
+                                          {formatValue(data["AM Return"] || 0)}
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            borderColor: "#ddd",
+                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
+                                            borderBottom: isLastRow
+                                              ? "2px solid #666666 !important"
+                                              : "none",
+                                          }}
+                                        >
+                                          {formatValue(data["Model AM Return"] || 0)}
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            borderRight:
+                                              "2px solid #666666 !important",
+                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
+                                            borderBottom: isLastRow
+                                              ? "2px solid #666666 !important"
+                                              : "none",
+                                          }}
+                                        >
+                                          {formatValue(
+                                            data["Total Return"] || 0
+                                          )}
+                                        </TableCell>
+                                        <TableCell
+                                          align="left"
+                                          sx={{
+                                            fontSize: "0.8rem",
+                                            borderRight:
+                                              "2px solid #666666 !important",
+                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
+                                            borderBottom: isLastRow
+                                              ? "2px solid #666666 !important"
+                                              : "none",
+                                          }}
+                                        >
+                                          {formatValue(
+                                            data["Model Return 1% Allocation"] + data["Model AM Return"] || 0
+                                          )}
+                                        </TableCell>
+
+                                        {/* Boxed Columns: Model */}
                                       </TableRow>
                                     );
                                   })}
