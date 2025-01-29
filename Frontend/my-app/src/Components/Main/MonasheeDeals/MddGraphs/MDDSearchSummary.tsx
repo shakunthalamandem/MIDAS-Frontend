@@ -32,7 +32,7 @@ interface MDDSearchSummaryProps {
 }
 
 const MDDSearchSummary: React.FC<MDDSearchSummaryProps> = ({ summary }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const formatCurrency = (value: number): string => {
     const formattedValue = Math.abs(value).toLocaleString("en-US", {
@@ -73,7 +73,7 @@ const MDDSearchSummary: React.FC<MDDSearchSummaryProps> = ({ summary }) => {
     },
     {
       label1: "Avg Hold Period",
-      value1: `${summary.avg_hold_period} days`,
+      value1: `${summary.avg_hold_period.toFixed(0)} days`,
       label2: "Total Return in %",
       value2: 
       <>
@@ -89,7 +89,7 @@ const MDDSearchSummary: React.FC<MDDSearchSummaryProps> = ({ summary }) => {
   ];
 
   return (
-    <Box>
+    <Box mb={5}>
       <Grid
         container
         alignItems="center"
@@ -109,7 +109,7 @@ const MDDSearchSummary: React.FC<MDDSearchSummaryProps> = ({ summary }) => {
             fontSize: "1.1rem",
           }}
         >
-          Summary of All Deals Below
+          Summary of All Deals
         </Typography>
         <IconButton
           onClick={() => setOpen(!open)}

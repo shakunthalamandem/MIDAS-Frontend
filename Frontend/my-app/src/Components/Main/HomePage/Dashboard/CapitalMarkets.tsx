@@ -131,7 +131,7 @@ const CapitalMarkets: React.FC = () => {
           },
         }}
       >
-        <Tab
+               <Tab sx={{ backgroundColor: value === 0 ? "#dce6f0" : "#f5f5f5", color: value === 0 ? "#fff" : "#777", "&.Mui-selected": { backgroundColor: "#dce6f0", color: "#fff" } }} 
           label={
             <TextField
               label=""
