@@ -114,7 +114,7 @@ const YearlyBasedTable: React.FC = () => {
   };
 
   // Filter end year options based on the selected start year
-  const filteredEndYearOptions = endYearOptions.filter(year => year > startYear);
+  const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear);
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
