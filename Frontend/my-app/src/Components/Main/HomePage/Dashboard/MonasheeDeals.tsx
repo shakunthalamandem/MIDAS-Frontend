@@ -141,10 +141,10 @@ const MonasheeDeals: React.FC = () => {
                 placeholder="Enter ticket symbol..."
                 style={{
                   marginBottom: "1px",
-                  width: "200px", // Increase
-                  height: "40px", // Slightly
-                  borderRadius: "32px", // In
-                  backgroundColor: "#f4f6f9", // This
+                  width: "200px",
+                  height: "40px",
+                  borderRadius: "32px", 
+                  backgroundColor: "#f4f6f9", 
 
 
                 }}
