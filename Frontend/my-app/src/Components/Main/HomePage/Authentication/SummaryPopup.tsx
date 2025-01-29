@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, Slide } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+  Slide,
+} from "@mui/material";
 import { motion } from "framer-motion";
 
 const SummaryPopup: React.FC = () => {
@@ -35,18 +43,29 @@ const SummaryPopup: React.FC = () => {
       >
         Attention
       </DialogTitle>
-      <DialogContent >
+      <DialogContent>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Typography variant="body1" align="center" style={{ color: "#333", fontSize: "1.1rem" }}>
-            Please contact the <strong>GHC Administration</strong> for further assistance.
-          </Typography>
+        <Typography variant="body1" align="center" style={{ color: "#333", fontSize: "1.1rem" }}>
+  Please contact the <strong>GHC Administration</strong> for further assistance at{" "}
+  <a
+    href="https://mail.google.com/mail/?view=cm&fs=1&to=ghcit@goldenhillsindia.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{ color: "#002060"}}
+  >
+    ghcit@goldenhillsindia.com
+  </a>
+</Typography>
+
         </motion.div>
       </DialogContent>
-      <DialogActions style={{ justifyContent: "center", paddingBottom: "20px" }}>
+      <DialogActions
+        style={{ justifyContent: "center", paddingBottom: "20px" }}
+      >
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Button
             onClick={handleClose}
