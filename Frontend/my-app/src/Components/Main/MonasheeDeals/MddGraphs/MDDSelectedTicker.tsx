@@ -86,7 +86,6 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("okau");
         const response = await axios.post<ApiResponse>(
           `${apiUrl}/api/mdd_deal_search_ticker/`,
           { ticker }

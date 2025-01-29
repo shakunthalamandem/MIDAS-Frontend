@@ -65,7 +65,6 @@ const MarketFilters: React.FC = () => {
       setSnackbarOpen(true);
     } else {
       setSnackbarOpen(false); // Close the Snackbar if validation passes
-      console.log("Applied Filters:", selectedValues);
       setAppliedFilters(selectedValues); // Apply filters
     }
   };

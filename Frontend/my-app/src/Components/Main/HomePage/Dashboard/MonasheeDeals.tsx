@@ -44,7 +44,6 @@ const MonasheeDeals: React.FC = () => {
         throw new Error("Failed to fetch results");
       }
       const data: MDDResult[] = await response.json();
-      console.log("API Data:", data); // Log the data for debugging
       setResults(data); // Set the fetched results
     } catch (error) {
       console.error("Error fetching search results:", error);

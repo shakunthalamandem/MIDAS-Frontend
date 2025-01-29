@@ -30,7 +30,6 @@ const SectorwiseData: React.FC<SectorwiseDataProps> = ({ sectors }) => {
     }));
   }
 
-  console.log("Formatted sectorChartData (rounded):", sectorChartData);
 
   const colors = [
     "#2E3A87", "#1D9C63", "#D75F01", "#C35A2C", "#B72B72", "#D94E8A",
