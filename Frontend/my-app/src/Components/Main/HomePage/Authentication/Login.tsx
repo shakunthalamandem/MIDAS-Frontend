@@ -33,6 +33,7 @@ const Login: React.FC = () => {
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
   const apiUrl = process.env.REACT_APP_API_URL;
+// const token = localStorage.getItem("access_token");
 
   const handleLogin = async () => {
     setLoading(true);

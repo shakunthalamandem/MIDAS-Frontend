@@ -27,6 +27,7 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
   useEffect(() => {
     const fetchCompanyData = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
       if (!apiUrl) {
         throw new Error('API URL is not defined in environment variables.');
       }
@@ -41,6 +42,7 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
           {
             headers: {
               'Content-Type': 'application/json',
+              "Authorization": token ? `Bearer ${token}` : '',
             },
           }
         );

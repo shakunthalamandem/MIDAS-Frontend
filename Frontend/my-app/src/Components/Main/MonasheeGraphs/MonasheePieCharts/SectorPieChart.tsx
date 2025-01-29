@@ -72,11 +72,17 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
   const fetchYears = useCallback(async () => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
-      const response = await axios.get<YearResponse>(`${apiUrl}/api/distinct_years/`);
+      const response = await axios.get<YearResponse>(`${apiUrl}/api/distinct_years/`, 
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          }});
       const yearList = response.data.years.sort((a, b) => a - b);
       setYears(yearList);
       if (yearList.length > 0) {
@@ -106,6 +112,7 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
         deal_count,
       };
       const apiUrl = process.env.REACT_APP_API_URL;
+const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');

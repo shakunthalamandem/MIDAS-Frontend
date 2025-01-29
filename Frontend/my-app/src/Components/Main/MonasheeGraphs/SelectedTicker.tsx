@@ -66,20 +66,22 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
   const [data, setData] = useState<TickerData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apiUrl = process.env.REACT_APP_API_URL; // Get API URL from environment variables
         if (!apiUrl) {
           throw new Error("API URL is not defined in environment variables");
         }
 
-        const payload = { ticker }; // Prepare the payload as an array
+        const payload = { ticker };
         const response = await fetch(`${apiUrl}/api/dealogic_search_ticker/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(payload),
         });
@@ -89,7 +91,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
           setData(
             (result.data || []).map((item: TickerData, index: number) => ({
               ...item,
-              id: index + 1, // Add an ID field for internal use if needed
+              id: index + 1,
             }))
           );
           console.log("result", result);

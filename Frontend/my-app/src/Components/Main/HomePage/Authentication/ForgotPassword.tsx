@@ -25,6 +25,7 @@ const ForgotPassword: React.FC<{ open: boolean; onClose: () => void }> = ({
   const [loading, setLoading] = useState<boolean>(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
+// const token = localStorage.getItem("access_token");
 
   const handleSubmit = async () => {
     setError(null);

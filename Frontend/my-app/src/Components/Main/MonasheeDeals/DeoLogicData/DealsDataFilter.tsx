@@ -57,12 +57,17 @@ interface DealsDataFilterProps {
     const fetchData = async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error("API URL is not defined in environment variables");
         }
 
-        const response = await axios.get<ApiData>(`${apiUrl}/api/deals_data/`);
+        const response = await axios.get<ApiData>(`${apiUrl}/api/deals_data/`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "",
+          }});
         setApiData(response.data);
       } catch (error) {
         console.error("Failed to fetch data:", error);

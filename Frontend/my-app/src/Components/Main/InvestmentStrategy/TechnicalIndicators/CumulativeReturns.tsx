@@ -38,6 +38,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
   useEffect(() => {
     const fetchData = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
       if (!apiUrl) {
         setError("API URL is not defined in environment variables");
         setLoading(false);
@@ -53,6 +54,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(payload),
         });

@@ -26,6 +26,7 @@ const GlobalDealSearch: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTicker, setSelectedTicker] = useState<string>("CMG"); // Set default ticker to "FANG"
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -39,7 +40,13 @@ const GlobalDealSearch: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${apiUrl}/api/dealogic_search/${query}`
+        `${apiUrl}/api/dealogic_search/${query}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": token ? `Bearer ${token}` : "",
+          },
+      }
       );
       if (!response.ok) {
         throw new Error("Failed to fetch results");

@@ -82,6 +82,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,7 +90,12 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
         console.log("okau");
         const response = await axios.post<ApiResponse>(
           `${apiUrl}/api/mdd_deal_search_ticker/`,
-          { ticker }
+          { ticker },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            }}
         );
         setData(response.data.data);
         setSummary(response.data.summary);

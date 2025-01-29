@@ -114,12 +114,18 @@ const DealTypeSector: React.FC<DealTypeSectorProps> = ({ yAxisType }) => {
     const fetchData = async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
         const response = await axios.get<APIResponse>(
-          `${apiUrl}/api/sectorwise_data/`
+          `${apiUrl}/api/sectorwise_data/`, 
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            }}
         );
         setData(response.data);
       } catch (err) {

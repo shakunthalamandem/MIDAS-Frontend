@@ -25,6 +25,7 @@ const VolatilityChart: React.FC<VolatilityChartProps> = ({ ticker }) => {
   useEffect(() => {
     const fetchData = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
       if (!apiUrl) {
         throw new Error('API URL is not defined in environment variables');
       }
@@ -36,6 +37,7 @@ const VolatilityChart: React.FC<VolatilityChartProps> = ({ ticker }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            "Authorization": token ? `Bearer ${token}` : '',
           },
           body: JSON.stringify(payload),
         });

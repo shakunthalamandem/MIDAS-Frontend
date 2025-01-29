@@ -26,13 +26,18 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
   const [searchKey, setSearchKey] = useState<string>("");
   const [filteredOptions, setFilteredOptions] = useState<string[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchLeadBankOptions = async () => {
       setLoading(true);
       try {
         const response = await axios.get<{ selected_bank?: { options: string[] } }>(
-          `${apiUrl}/api/mdd_screener_filters/`
+          `${apiUrl}/api/mdd_screener_filters/`, {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": token ? `Bearer ${token}` : "",
+            }}
         );
 
         const leadBankData = response.data?.selected_bank;
