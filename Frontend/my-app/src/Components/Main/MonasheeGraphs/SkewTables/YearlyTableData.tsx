@@ -15,11 +15,19 @@ interface TableData {
 }
 
 interface SectorTableDataProps {
-  data: { Sectorwise: { [sector: string]: TableData } }; // Data passed from parent component
+  data: { Sectorwise: { [sector: string]: TableData },
+  sectorwise_total: { [sector: string]: TableData },
+
+ };
 }
 
 const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   const sectorwiseData = data?.Sectorwise;
+  const sectorwiseTotal = data?.sectorwise_total;
+
+  console.log("sectorwiseData",sectorwiseTotal)
+  console.log("data",data)
+
 
   if (!sectorwiseData) {
     return <div>No data available</div>;
