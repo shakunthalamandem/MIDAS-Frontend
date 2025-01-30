@@ -92,7 +92,6 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
               id: index + 1, // Add an ID field for internal use if needed
             }))
           );
-          console.log("result", result);
         } else {
           throw new Error("Failed to fetch data");
         }

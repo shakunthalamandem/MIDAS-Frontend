@@ -10,7 +10,6 @@ const MarketCapitalFilters: React.FC<{ onDataLoaded: (data: any) => void }> = ({
       fetch("/MarketFilters.json")
         .then((response) => response.json())
         .then((data) => {
-          console.log("Fetched data:", data); // Log the fetched data
           setFiltersData(data);
           onDataLoaded(data); // Notify parent with loaded data
         })
