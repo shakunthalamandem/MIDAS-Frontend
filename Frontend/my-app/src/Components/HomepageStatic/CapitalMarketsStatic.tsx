@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import SectionOne from './SectionOne';
 import SectionTwo from './SectionTwo';
 // import SectionFive from './SectionFive';
