@@ -42,7 +42,7 @@ const FundamentalMetricsCard: React.FC<Props> = ({ ticker }) => {
       }
     };
     fetchData();
-  }, [ticker]);
+  }, [apiUrl, ticker]);
 
   const renderSection = (title: string, sectionData: Record<string, string>) => (
     <Grid item xs={12} sm={6} md={6} lg={6} key={title}>
