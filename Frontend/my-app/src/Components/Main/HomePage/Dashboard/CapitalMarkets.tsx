@@ -4,7 +4,6 @@ import ScreenerMain from "../../MonasheeGraphs/ScreenerTable/ScreenerMain";
 import MarketFilters from "../../MonasheeCapitalMarkets/MarketFilters";
 import SearchIcon from "@mui/icons-material/Search";
 import SelectedTicker from "../../MonasheeGraphs/SelectedTicker";
-import GlobalDealSearch from "../../MonasheeGraphs/DealSearch";
 
 import {
   Box,

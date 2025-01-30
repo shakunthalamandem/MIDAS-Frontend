@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import InvestScreenerMain from './InvestScreenerMain';
 import CumulativeReturns from '../../TechnicalIndicators/CumulativeReturns';
 
