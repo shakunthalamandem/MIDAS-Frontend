@@ -13,6 +13,7 @@ import ResetPassword from "../Components/Main/HomePage/Authentication/ResetPassw
 import ErrorBoundary from "../Pages/ErrorBoundary";
 import AuthGuard from "./AuthGuard";
 import Logout from "../Components/Main/HomePage/Authentication/Logout";
+import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
 
 const AppRouters: React.FC = () => {
   return (
@@ -22,6 +23,7 @@ const AppRouters: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path="/summarypopup" element={<SummaryPopup />} />
 
 
         {/* Protected Routes */}
