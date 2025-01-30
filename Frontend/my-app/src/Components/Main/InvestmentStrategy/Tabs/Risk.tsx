@@ -15,7 +15,7 @@ interface RiskProps {
 
 const Risk: React.FC<RiskProps> = ({ data, selectedValues, onValueChange }) => {
   return (
-    <div>
+    <Box>
 
       
       {/* Correct Grid Layout */}
@@ -71,7 +71,7 @@ const Risk: React.FC<RiskProps> = ({ data, selectedValues, onValueChange }) => {
           </Grid>
         ))}
       </Grid>
-    </div>
+    </Box>
   );
 };
 
