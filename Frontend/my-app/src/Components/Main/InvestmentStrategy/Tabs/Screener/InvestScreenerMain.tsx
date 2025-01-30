@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import { Box, TextField, Typography } from "@mui/material";
-import { all } from "axios";
 
 interface InvestScreenerMainProps {
   rows: any[];

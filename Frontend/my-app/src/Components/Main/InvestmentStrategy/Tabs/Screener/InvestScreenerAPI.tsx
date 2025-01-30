@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import InvestScreenerMain from './InvestScreenerMain';
 import CumulativeReturns from '../../TechnicalIndicators/CumulativeReturns';
 
@@ -29,6 +28,7 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
 
     const fetchData = async () => {
       setLoading(true);
+      setError(null); // Reset error state before new request
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -73,15 +73,16 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
   return (
     <Box mb={10}>
       <Box mt={5} mb={5}>
-    
+        {error && (
+          <Typography color="error" variant="body1">
+            {error}
+          </Typography>
+        )}
       </Box>
-      
-      {/* Pass the fetched tickers to CumulativeReturns component */}
 
       {/* Pass the fetched data to the grid component */}
       <InvestScreenerMain rows={rows} loading={loading} totalRows={totalRows} />
       <CumulativeReturns tickerList={tickers} />
-
     </Box>
   );
 };
