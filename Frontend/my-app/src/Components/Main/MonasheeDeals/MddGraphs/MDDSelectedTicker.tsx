@@ -10,7 +10,7 @@ import {
   TableContainer,
   TableRow,
   Typography,
-  Container,
+  Container,CircularProgress
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
@@ -107,8 +107,43 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
     fetchData();
   }, [ticker]);
 
-  if (loading) return <Typography>Loading...</Typography>;
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh', 
+        }}
+      >
+        <CircularProgress color="primary" />
+        <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
+          Loading... Please Wait
+        </Typography>
+      </Box>
+    );
+  }
+  
+  
 
+  
+    // if (loading) {
+    //   return (
+    //     <Box
+    //       display="flex"
+    //       justifyContent="center"
+    //       alignItems="center"
+    //       height="100vh"
+    //     >
+    //       <CircularProgress />
+    //     </Box>
+    //   );
+    // }
+  
+    // return <Typography>hhihiihihihihiihihii...</Typography>;
+  
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Box sx={{ marginTop: 4, padding: 2 }}>

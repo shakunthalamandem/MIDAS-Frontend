@@ -9,7 +9,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Container,
+  Container,CircularProgress,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
@@ -107,8 +107,24 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
     fetchData();
   }, [ticker]);
 
-  if (loading) return <Typography>Loading...</Typography>;
-  if (error) return <Typography color="error">{error}</Typography>;
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh', 
+        }}
+      >
+        <CircularProgress color="primary" />
+        <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
+          Loading... Please Wait
+        </Typography>
+      </Box>
+    );
+  }  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
