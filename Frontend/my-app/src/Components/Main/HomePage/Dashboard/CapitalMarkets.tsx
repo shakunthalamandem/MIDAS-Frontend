@@ -141,12 +141,10 @@ const CapitalMarkets: React.FC = () => {
               placeholder="Enter ticket symbol..."
               sx={{
                 marginBottom: "1px",
-                width: "200px", // Increased width
-                height: "40px", // Slightly increased height
-                borderRadius: "32px", // Applied rounded corners
-                backgroundColor: "transparent", // Removed background color
-                border: "1px solid", // Border styles
-                borderColor: "#002060", // Change border color when selected
+                width: "200px",
+                height: "40px",
+                borderRadius: "32px", 
+                backgroundColor: "#f4f6f9",
               }}
               InputProps={{
                 sx: {
@@ -154,7 +152,7 @@ const CapitalMarkets: React.FC = () => {
                   width: "200px",
                   height: "40px",
                   "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#002060",
+                    // borderColor: "#002060",
                   },
                   "&:hover .MuiOutlinedInput-notchedOutline": {
                     borderColor: "#002060",

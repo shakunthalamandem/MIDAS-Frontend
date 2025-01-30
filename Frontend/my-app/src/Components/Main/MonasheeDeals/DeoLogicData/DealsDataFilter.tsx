@@ -115,7 +115,6 @@ interface DealsDataFilterProps {
       deal_types: selectedDealTypes,
       period: selectedPeriod,
     };
-    console.log("Applied Filters:", JSON.stringify(appliedFilters, null, 2));
   };
 
   if (loading) {
