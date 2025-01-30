@@ -28,6 +28,7 @@ const MonasheeDealSearch: React.FC = () => {
  const [selectedTicker, setSelectedTicker] = useState<string>("CRGX"); // Set default ticker to "FANG"
   
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -40,7 +41,12 @@ const MonasheeDealSearch: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/api/mdd_search/${query}`);
+      const response = await fetch(`${apiUrl}/api/mdd_search/${query}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
+        }});
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }

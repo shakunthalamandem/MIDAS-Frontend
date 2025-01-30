@@ -26,6 +26,7 @@ const CapitalMarkets: React.FC = () => {
   const [selectedTicker, setSelectedTicker] = useState<string>("CMG"); // Default ticker
   const [results, setResults] = useState<MDDResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -46,7 +47,17 @@ const CapitalMarkets: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/api/dealogic_search/${query}`);
+      const response = await fetch(`${apiUrl}/api/dealogic_search/${query}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "",
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+    }
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }

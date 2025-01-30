@@ -25,11 +25,17 @@ const FundamentalMetricsCard: React.FC<Props> = ({ ticker }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
+const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/fundamentals/${ticker}`);
+        const response = await fetch(`${apiUrl}/api/fundamentals/${ticker}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "",
+          }});
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

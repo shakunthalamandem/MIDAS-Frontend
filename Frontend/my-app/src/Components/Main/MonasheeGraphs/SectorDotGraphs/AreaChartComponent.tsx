@@ -42,12 +42,18 @@ const AreaChartComponent: React.FC<AreaChartComponentProps> = ({ dataCategory })
       try {
         // Fetch the data and type the response
         const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
         const response = await axios.get<APIResponse>(
-          `${apiUrl}/api/regionwise_data/`
+          `${apiUrl}/api/regionwise_data/`, 
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            }}
         );
 
         // Transform the data to the format required for the chart

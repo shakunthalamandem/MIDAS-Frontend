@@ -77,6 +77,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
       if (!apiUrl) {
         throw new Error("API URL is not defined in environment variables");
       }
@@ -85,6 +86,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -95,7 +97,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
           (result.data || []).map((item: ScreenerDataRow, index: number) => ({
             ...item,
             id: index + 1,
-            deal_value: formatDealValue(item.deal_value), // Format the deal_value correctly
+            deal_value: formatDealValue(item.deal_value),
           }))
         );
       } else {

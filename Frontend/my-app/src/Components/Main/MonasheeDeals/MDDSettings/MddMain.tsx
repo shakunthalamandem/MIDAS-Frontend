@@ -16,12 +16,18 @@ interface Filter {
 const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
   const [filtersData, setFiltersData] = useState<Filter[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchFilters = async () => {
       try {
         // const response = await fetch("/MDDFilters.json");
-        const response = await fetch(`${apiUrl}/api/mdd_distinct_values/`, {method: "GET"});
+        const response = await fetch(`${apiUrl}/api/mdd_distinct_values/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "",
+          }});
         if (!response.ok) {
           throw new Error(`Failed to fetch filters: ${response.statusText}`);
         }

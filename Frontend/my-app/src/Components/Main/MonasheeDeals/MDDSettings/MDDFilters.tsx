@@ -96,6 +96,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       setPayload(payload);
 
       const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
       if (!apiUrl) {
         throw new Error("API URL is not defined in environment variables");
       }
@@ -104,6 +105,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify(payload),
       });

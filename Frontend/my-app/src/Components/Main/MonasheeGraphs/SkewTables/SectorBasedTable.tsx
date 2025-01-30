@@ -47,11 +47,17 @@ const SectorBasedTable: React.FC = () => {
     const fetchFilterOptions = async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
-        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`);
+        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`, 
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            }});
         const data = response.data as SkewTableOptions;
 
         setStartYearOptions(data['start year']);
@@ -81,13 +87,19 @@ const SectorBasedTable: React.FC = () => {
 
       try {
       const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
         const response = await axios.post(
           `${apiUrl}/api/skewtable/calculations/`,
-          requestData
+          requestData, 
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            }}
         );
         setResponseData(response.data); // Store the response data in state
       } catch (error) {

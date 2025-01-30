@@ -21,6 +21,7 @@ const MonasheeDeals: React.FC = () => {
   const [selectedTicker, setSelectedTicker] = useState<string>("CRGX"); // Default selected ticker
 
   const apiUrl = process.env.REACT_APP_API_URL;
+const token = localStorage.getItem("access_token");
 
   // Handle change for tab selection
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -39,7 +40,12 @@ const MonasheeDeals: React.FC = () => {
 
     setLoading(true); // Set loading to true during fetch
     try {
-      const response = await fetch(`${apiUrl}/api/mdd_search/${query}`);
+      const response = await fetch(`${apiUrl}/api/mdd_search/${query}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
+        }});
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }

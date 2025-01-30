@@ -76,6 +76,7 @@ const MDDDealVolume: React.FC = () => {
   const fetchData = async () => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
@@ -83,7 +84,11 @@ const MDDDealVolume: React.FC = () => {
       const response = await axios.post<ApiResponse>(`${apiUrl}/api/mdd_deals_graph/`, {
         period,
         deal_value: "true",
-      });
+      },{
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        }});
 
       // Collect unique sectors
       const sectors = new Set<string>();

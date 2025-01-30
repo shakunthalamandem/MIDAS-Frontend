@@ -33,6 +33,7 @@ const Login: React.FC = () => {
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
   const apiUrl = process.env.REACT_APP_API_URL;
+// const token = localStorage.getItem("access_token");
 
   const handleLogin = async () => {
     setLoading(true);
@@ -47,7 +48,7 @@ const Login: React.FC = () => {
       localStorage.setItem("refresh_token", refresh_token);
 
       // Redirect to a protected route or dashboard
-      navigate("/dashboard");
+      navigate("/");
     } catch (err: any) {
       setError(err.response?.data?.error || "Something went wrong. Please try again.");
     } finally {

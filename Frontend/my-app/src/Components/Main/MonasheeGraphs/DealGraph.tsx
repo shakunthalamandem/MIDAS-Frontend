@@ -70,6 +70,7 @@ const DealGraph: React.FC = () => {
   const fetchData = async () => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
@@ -78,7 +79,12 @@ const DealGraph: React.FC = () => {
         type,
         period,
         region,
-      });
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        }});
 
       // Collect unique sectors
       const sectors = new Set<string>();
