@@ -12,6 +12,7 @@ import EmailVerification from "../Components/Main/HomePage/Authentication/EmailV
 import ResetPassword from "../Components/Main/HomePage/Authentication/ResetPassword";
 import ErrorBoundary from "../Pages/ErrorBoundary";
 import AuthGuard from "./AuthGuard";
+import Logout from "../Components/Main/HomePage/Authentication/Logout";
 
 const AppRouters: React.FC = () => {
   return (
@@ -20,6 +21,8 @@ const AppRouters: React.FC = () => {
         <Route path="/" element={<CapitalMarketsStatic />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/logout" element={<Logout />} />
+
 
         {/* Protected Routes */}
         <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />

@@ -46,6 +46,14 @@ const NavbarMain: React.FC = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    navigate('/login');
+  };
+
+  const isLoggedIn = !!localStorage.getItem('access_token');
+
   return (
     <>
       <AppBar position="sticky" sx={{ backgroundColor: '#FFFFFF', paddingX: { xs: 2, sm: 5 } }}>
@@ -55,8 +63,6 @@ const NavbarMain: React.FC = () => {
             <TradingViewTickerTape />
           </Box>
         )}
-
-      
 
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {/* Logo and Title */}
@@ -101,18 +107,33 @@ const NavbarMain: React.FC = () => {
             </Tabs>
           </Box>
 
-          <Button
-            sx={{
-              color: '#FFFFFF',
-              backgroundColor: '#002060',
-              fontWeight: 'bold',
-              fontFamily: 'Roboto, sans-serif',
-              '&:hover': { backgroundColor: '#002060' },
-            }}
-            onClick={() => navigate('/login')}
-          >
-            Login
-          </Button>
+          {isLoggedIn ? (
+            <Button
+              sx={{
+                color: '#FFFFFF',
+                backgroundColor: '#bb4401',
+                fontWeight: 'bold',
+                fontFamily: 'Roboto, sans-serif',
+                '&:hover': { backgroundColor: '#bb4401' },
+              }}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          ) : (
+            <Button
+              sx={{
+                color: '#FFFFFF',
+                backgroundColor: '#002060',
+                fontWeight: 'bold',
+                fontFamily: 'Roboto, sans-serif',
+                '&:hover': { backgroundColor: '#002060' },
+              }}
+              onClick={() => navigate('/login')}
+            >
+              Login
+            </Button>
+          )}
           {/* <Button
             sx={{
               ml: 2,
