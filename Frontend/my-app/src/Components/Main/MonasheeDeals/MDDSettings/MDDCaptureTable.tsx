@@ -100,8 +100,8 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   };
 
   return (
-    <Box mr={0} sx={{ Width: "100%", maxWidth: "1000px" }}>
-      <Box display="flex" justifyContent="center" mb={3} sx={{ gap: "10px" }}>
+    <Box mr={0} sx={{ Width: "100%" }}>
+      <Box display="flex" justifyContent="left" mb={3} sx={{ gap: "10px" }}>
         <Button
           variant={selectedCategory === "IPO" ? "contained" : "outlined"}
           color="secondary"
@@ -134,7 +134,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                 backgroundColor: "#fdfff8",
                 marginBottom: "30px",
                 padding: 2,
-                width: "1000px",
+                width: "1200px",
               }}
             >
               <CardContent>
@@ -287,7 +287,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           "2px solid #666666 !important", // Add top border
                                       }}
                                     >
-                                      Monashee Allocation PnL (Gross $)
+                                      Monashee Actual Allocation PnL (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -302,7 +302,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           "2px solid #666666 !important", // Add top border
                                       }}
                                     >
-                                      Model PnL With Actual Allocation ($)
+                                      Model PnL With Actual Allocation (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -318,8 +318,9 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       }}
                                     >
                                       {selectedCategory === "IPO"
-                                        ? "Model PnL 0.5% Allocation ($)"
-                                        : "Model PnL 1% Allocation ($)"}
+                                        ? "Model PnL with model Allocation (0.5%) (Gross $)"
+                                        : "Model PnL with model Allocation (1%) (Gross $)"
+                                      }
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -331,7 +332,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         borderTop: "2px solid #666666", // Add top border
                                       }}
                                     >
-                                      Actual Monashee AM PnL (Gross $)
+                                       Monashee Actual AM PnL (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -343,7 +344,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         borderTop: "2px solid #666666", // Add top border
                                       }}
                                     >
-                                      Actual Model AM PnL (Gross $)
+                                       Model PnL with model AM allocation (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -353,9 +354,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         padding: "4px 8px",
                                         width: "90px",
                                         borderTop: "2px solid #666666", // Add top border
+                                        borderRight:  "2px solid #666666 !important",
                                       }}
                                     >
-                                      Actual Monashee Total PnL (Gross $)
+                                       Monashee Actual Total PnL (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -365,9 +367,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         padding: "4px 8px",
                                         width: "90px",
                                         borderTop: "2px solid #666666", // Add top border
+                                        borderRight:  "2px solid #666666 !important",
                                       }}
                                     >
-                                      Actual Model Total PnL (Gross $)
+                                       Model Actual Total PnL (Gross $)
                                     </TableCell>
                                   </TableRow>
                                 </TableHead>
