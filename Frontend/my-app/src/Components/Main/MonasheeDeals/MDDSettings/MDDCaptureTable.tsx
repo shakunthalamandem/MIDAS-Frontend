@@ -15,6 +15,8 @@ import {
   Card,
   Button,
 } from "@mui/material";
+import "./MDDCaptureTable.css";
+
 
 // Format values to represent millions, billions, etc.
 const formatValue = (value: number): string => {
@@ -100,8 +102,8 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   };
 
   return (
-    <Box mr={0} sx={{ Width: "100%", maxWidth: "1000px" }}>
-      <Box display="flex" justifyContent="center" mb={3} sx={{ gap: "10px" }}>
+    <Box mr={0} sx={{ Width: "100%" }}>
+      <Box display="flex" justifyContent="left" mb={3} sx={{ gap: "10px" }}>
         <Button
           variant={selectedCategory === "IPO" ? "contained" : "outlined"}
           color="secondary"
@@ -134,7 +136,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                 backgroundColor: "#fdfff8",
                 marginBottom: "30px",
                 padding: 2,
-                width: "1000px",
+                width: "1200px",
               }}
             >
               <CardContent>
@@ -214,7 +216,8 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         padding: "4px 8px",
                                         width: "40px", // Specific width for "Quintile"
                                         // Add top border
-                                      }}
+                                      }}   
+
                                     >
                                       Quintile
                                     </TableCell>
@@ -278,16 +281,14 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       sx={{
                                         fontSize: "0.725rem",
                                         fontWeight: "bold",
-                                        border: "1px solid #ddd",
+                                        // border: "1px solid #ddd",
                                         padding: "4px 8px",
                                         width: "90px",
-                                        borderLeft:
-                                          "2px solid #666666 !important",
-                                        borderTop:
-                                          "2px solid #666666 !important", // Add top border
-                                      }}
-                                    >
-                                      Monashee Allocation PnL (Gross $)
+                                       
+                                      }}  className="colordataset"
+
+                                    > 
+                                      Monashee Actual Allocation PnL (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -298,11 +299,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         width: "90px",
                                         borderLeft:
                                           "2px solid #666666 !important",
-                                        borderTop:
-                                          "2px solid #666666 !important", // Add top border
-                                      }}
+                                        // borderTop:
+                                        //   "2px solid #666666 !important", // Add top border
+                                      }} className="flowing-left-border flowing-top-border"
                                     >
-                                      Model PnL With Actual Allocation ($)
+                                      Model PnL With Actual Allocation (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -313,13 +314,14 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         width: "90px",
                                         borderRight:
                                           "2px solid #666666 !important",
-                                        borderTop:
-                                          "2px solid #666666 !important", // Add top border
-                                      }}
+                                        // borderTop:
+                                        //   "2px solid #666666 !important", // Add top border
+                                      }} className="flowing-top-border"
                                     >
                                       {selectedCategory === "IPO"
-                                        ? "Model PnL 0.5% Allocation ($)"
-                                        : "Model PnL 1% Allocation ($)"}
+                                        ? "Model PnL with model Allocation (0.5%) (Gross $)"
+                                        : "Model PnL with model Allocation (1%) (Gross $)"
+                                      }
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -328,10 +330,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         border: "1px solid #ddd",
                                         padding: "4px 8px",
                                         width: "90px",
-                                        borderTop: "2px solid #666666", // Add top border
-                                      }}
+                                        // borderTop: "2px solid #666666", // Add top border
+                                      }} className="flowing-top-border"
                                     >
-                                      Actual Monashee AM PnL (Gross $)
+                                       Monashee Actual AM PnL (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -340,10 +342,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         border: "1px solid #ddd",
                                         padding: "4px 8px",
                                         width: "90px",
-                                        borderTop: "2px solid #666666", // Add top border
-                                      }}
+                                        // borderTop: "2px solid #666666", // Add top border
+                                      }}className="flowing-top-border"
                                     >
-                                      Actual Model AM PnL (Gross $)
+                                       Model PnL with model AM allocation (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -352,10 +354,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         border: "1px solid #ddd",
                                         padding: "4px 8px",
                                         width: "90px",
-                                        borderTop: "2px solid #666666", // Add top border
-                                      }}
+                                        // borderTop: "2px solid #666666", // Add top border
+                                        borderRight:  "2px solid #666666 !important",
+                                      }} className="flowing-top-border"
                                     >
-                                      Actual Monashee Total PnL (Gross $)
+                                       Monashee Actual Total PnL (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -364,10 +367,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         border: "1px solid #ddd",
                                         padding: "4px 8px",
                                         width: "90px",
-                                        borderTop: "2px solid #666666", // Add top border
-                                      }}
+                                        // borderTop: "2px solid #666666", // Add top border
+                                        borderRight:  "2px solid #666666 !important",
+                                      }} className="flowing-top-border"
                                     >
-                                      Actual Model Total PnL (Gross $)
+                                       Model Actual Total PnL (Gross $)
                                     </TableCell>
                                   </TableRow>
                                 </TableHead>
@@ -466,13 +470,15 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           align="left"
                                           sx={{
                                             fontSize: "0.8rem",
-                                            borderLeft:
-                                              "2px solid #666666 !important",
+                                            // borderLeft:
+                                            //   "2px solid #666666 !important",
                                             // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
                                             borderBottom: isLastRow
                                               ? "2px solid #666666 !important"
                                               : "none",
                                           }}
+                                          className="flowing-left-border"
+
                                         >
                                           {formatValue(
                                             data["Allocation Return"] || 0
@@ -485,10 +491,12 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             // borderTop: isFirstRow ? "2px solid blue !important" : "none",
                                             borderLeft:
                                               "2px solid #666666 !important",
-                                            borderBottom: isLastRow
-                                              ? "2px solid #666666 !important"
-                                              : "none",
-                                          }}
+                                            // borderBottom: isLastRow
+                                            //   ? "2px solid #666666 !important"
+                                            //   : "none",
+                                          }}    className={isLastRow ? "flowing-bottom-border" : ""}
+
+
                                         >
                                           {formatValue(
                                             data["Model Actual Return"] || 0
@@ -501,10 +509,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             borderRight:
                                               "2px solid #666666 !important",
                                             // borderTop: isFirstRow ? "2px solid blue !important" : "none",
-                                            borderBottom: isLastRow
-                                              ? "2px solid #666666 !important"
-                                              : "none",
-                                          }}
+                                            // borderBottom: isLastRow
+                                            //   ? "2px solid #666666 !important"
+                                            //   : "none",
+                                          }}className={isLastRow ? "flowing-bottom-border" : ""}
                                         >
                                           {formatValue(
                                             data[
@@ -518,10 +526,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             fontSize: "0.8rem",
                                             borderColor: "#ddd",
                                             // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
-                                            borderBottom: isLastRow
-                                              ? "2px solid #666666 !important"
-                                              : "none",
-                                          }}
+                                            // borderBottom: isLastRow
+                                            //   ? "2px solid #666666 !important"
+                                            //   : "none",
+                                          }}className={isLastRow ? "flowing-bottom-border" : ""}
                                         >
                                           {formatValue(data["AM Return"] || 0)}
                                         </TableCell>
@@ -531,10 +539,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             fontSize: "0.8rem",
                                             borderColor: "#ddd",
                                             // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
-                                            borderBottom: isLastRow
-                                              ? "2px solid #666666 !important"
-                                              : "none",
-                                          }}
+                                            // borderBottom: isLastRow
+                                            //   ? "2px solid #666666 !important"
+                                            //   : "none",
+                                          }}className={isLastRow ? "flowing-bottom-border" : ""}
                                         >
                                           {formatValue(data["Model AM Return"] || 0)}
                                         </TableCell>
@@ -545,10 +553,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             borderRight:
                                               "2px solid #666666 !important",
                                             // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
-                                            borderBottom: isLastRow
-                                              ? "2px solid #666666 !important"
-                                              : "none",
-                                          }}
+                                            // borderBottom: isLastRow
+                                            //   ? "2px solid #666666 !important"
+                                            //   : "none",
+                                          }}className={isLastRow ? "flowing-bottom-border" : ""}
                                         >
                                           {formatValue(
                                             data["Total Return"] || 0
@@ -558,13 +566,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           align="left"
                                           sx={{
                                             fontSize: "0.8rem",
-                                            borderRight:
-                                              "2px solid #666666 !important",
-                                            // borderTop: isFirstRow ? "2px solid #666666 !important" : "none",
+                                           
                                             borderBottom: isLastRow
                                               ? "2px solid #666666 !important"
                                               : "none",
-                                          }}
+                                          }} className="flowing-right-border"
                                         >
                                           {formatValue(
                                             data["Model Return 1% Allocation"] + data["Model AM Return"] || 0
@@ -584,11 +590,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                     );
                   })()}
                 </Grid>
-                {selectedCategory === "FO" && (
+                {/* {selectedCategory === "FO" && (
                   <Typography mt={4} sx={{ fontWeight: "bold" }}>
                     * Blocks are not included
                   </Typography>
-                )}
+                )} */}
               </CardContent>
             </Card>
           </motion.div>
