@@ -28,6 +28,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         await axios.get(`${apiUrl}/auth/verify-token/`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
+        setOpenDialog(false);
         setLoading(false);
       } catch (err: unknown) {
         const error = err as any; // 🔹 Explicitly casting 'error'  
@@ -43,6 +44,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       try {
         const response = await axios.post<RefreshResponse>(`${apiUrl}/auth/refresh-token/`, { refresh_token: refreshToken });
         localStorage.setItem("access_token", response.data.access_token);
+        setOpenDialog(false);
         setLoading(false);
       } catch (error) {
         redirectToLogin();
