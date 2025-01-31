@@ -1,0 +1,65 @@
+@keyframes rainbow-left-border {
+    0% { border-left: 2px solid red; }
+    14% { border-left: 2px solid orange; }
+    28% { border-left: 2px solid yellow; }
+    42% { border-left: 2px solid green; }
+    57% { border-left: 2px solid blue; }
+    71% { border-left: 2px solid indigo; }
+    85% { border-left: 2px solid violet; }
+    100% { border-left: 2px solid red; }
+  }
+  
+  @keyframes rainbow-right-border {
+    0% { border-right: 2px solid red; }
+    14% { border-right: 2px solid orange; }
+    28% { border-right: 2px solid yellow; }
+    42% { border-right: 2px solid green; }
+    57% { border-right: 2px solid blue; }
+    71% { border-right: 2px solid indigo; }
+    85% { border-right: 2px solid violet; }
+    100% { border-right: 2px solid red; }
+  }
+  
+  @keyframes rainbow-top-border {
+    0% { border-top: 2px solid red; }
+    14% { border-top: 2px solid orange; }
+    28% { border-top: 2px solid yellow; }
+    42% { border-top: 2px solid green; }
+    57% { border-top: 2px solid blue; }
+    71% { border-top: 2px solid indigo; }
+    85% { border-top: 2px solid violet; }
+    100% { border-top: 2px solid red; }
+  }
+  
+  @keyframes rainbow-bottom-border {
+    0% { border-bottom: 2px solid red; }
+    14% { border-bottom: 2px solid orange; }
+    28% { border-bottom: 2px solid yellow; }
+    42% { border-bottom: 2px solid green; }
+    57% { border-bottom: 2px solid blue; }
+    71% { border-bottom: 2px solid indigo; }
+    85% { border-bottom: 2px solid violet; }
+    100% { border-bottom: 2px solid red; }
+  }
+  
+  .flowing-left-border {
+    animation: rainbow-left-border 3s linear infinite;
+  }
+  
+  .flowing-right-border {
+    animation: rainbow-right-border 3s linear infinite;
+  }
+  
+  .flowing-top-border {
+    animation: rainbow-top-border 3s linear infinite;
+  }
+  
+  .flowing-bottom-border {
+    animation: rainbow-bottom-border 3s linear infinite;
+  }
+.colordataset{
+    animation: rainbow-left-border 3s linear infinite;
+    animation: rainbow-top-border 3s linear infinite;
+
+
+}
