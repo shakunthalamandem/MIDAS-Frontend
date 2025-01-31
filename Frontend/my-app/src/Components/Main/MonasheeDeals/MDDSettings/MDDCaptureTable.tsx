@@ -587,11 +587,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                     );
                   })()}
                 </Grid>
-                {selectedCategory === "FO" && (
+                {/* {selectedCategory === "FO" && (
                   <Typography mt={4} sx={{ fontWeight: "bold" }}>
                     * Blocks are not included
                   </Typography>
-                )}
+                )} */}
               </CardContent>
             </Card>
           </motion.div>
