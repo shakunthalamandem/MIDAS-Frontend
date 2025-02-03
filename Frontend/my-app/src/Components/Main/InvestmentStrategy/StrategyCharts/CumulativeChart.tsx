@@ -1,128 +1,134 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Checkbox, FormControlLabel, Card, CardContent, Typography } from '@mui/material';
+import { Checkbox, FormControlLabel, Box, Typography } from '@mui/material';
+import axios from 'axios';
 
-// Type definition for the API data structure
-interface ApiData {
-  chartdata: {
-    [key: string]: {
-      [week: string]: {
-        deal_count: number;
-        deal_size: number;
-      };
+// Define the DealData interface
+interface DealData {
+  [week: string]: {
+    count: {
+      [key: string]: number;
+    };
+    size: {
+      [key: string]: number;
     };
   };
 }
 
-interface ChartData {
-  week: string;
-  cumulative_avg: number;
-  [year: string]: number | string;  // Add index signature here
-}
-
-
-const ChartComponent: React.FC = () => {
-  const [data, setData] = useState<ChartData[]>([]);
-  const [showDealCount, setShowDealCount] = useState(true);
-  const [showDealSize, setShowDealSize] = useState(false);
+const Graph: React.FC = () => {
+  const [data, setData] = useState<DealData | null>(null);
+  const [showCount, setShowCount] = useState(true);
+  const [showSize, setShowSize] = useState(true);
 
   // Fetch data from the API
   useEffect(() => {
-    axios.get<ApiData>('http://192.168.1.59:9000/api/cummulatives_monashee/')
-      .then(response => {
-        const fetchedData = processData(response.data);
-        setData(fetchedData);
-      })
-      .catch(error => {
-        console.error('Error fetching the data:', error);
-      });
+    axios.get<DealData>('http://192.168.1.59:9000/api/cummulatives_monashee/')
+      .then((response) => setData(response.data))
+      .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  // Process the API response to transform it into the format needed for the chart
-  const processData = (data: ApiData): ChartData[] => {
-    const chartData: ChartData[] = [];
-    const weeks = Object.keys(data.chartdata['2022']); // Assuming all years have the same weeks
+  if (!data) {
+    return <div>Loading...</div>;
+  }
 
-    weeks.forEach((week) => {
-      const weekData: ChartData = { week, '2022': 0, '2023': 0, '2024': 0, cumulative_avg: 0 };
-      let totalDealCount = 0;
-      let totalDealSize = 0;
-      let count = 0;
+  // Prepare data for the chart
+  let cumulativeAvg2022 = 0;
+  let cumulativeAvg2023 = 0;
+  let cumulativeAvg2024 = 0;
 
-      // Accumulate values for each year
-      for (const year of ['2022', '2023', '2024']) {
-        if (data.chartdata[year] && data.chartdata[year][week]) {
-          const weekInfo = data.chartdata[year][week];
-          weekData[year] = weekInfo.deal_count || weekInfo.deal_size;
-          totalDealCount += weekInfo.deal_count;
-          totalDealSize += weekInfo.deal_size;
-          count++;
-        }
-      }
+  const chartData = Object.keys(data).map((week, index) => {
+    const count2022 = data[week]?.count[`2022_w${String(index + 1).padStart(2, '0')}_deal_count`] || 0;
+    const count2023 = data[week]?.count[`2023_w${String(index + 1).padStart(2, '0')}_deal_count`] || 0;
+    const count2024 = data[week]?.count[`2024_w${String(index + 1).padStart(2, '0')}_deal_count`] || 0;
 
-      // Calculate cumulative averages
-      weekData.cumulative_avg = (totalDealCount + totalDealSize) / (2 * count);  // Example avg calculation
+    // Update cumulative averages for each year
+    cumulativeAvg2022 += count2022;
+    cumulativeAvg2023 += count2023;
+    cumulativeAvg2024 += count2024;
 
-      chartData.push(weekData);
-    });
-
-    return chartData;
-  };
-
-  // Handle checkbox changes to toggle data
-  const handleDealCountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setShowDealCount(event.target.checked);
-  };
-
-  const handleDealSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setShowDealSize(event.target.checked);
-  };
+    return {
+      name: week,
+      '2022': count2022,
+      '2023': count2023,
+      '2024': count2024,
+      cumulative_avg_2022: cumulativeAvg2022 / (index + 1),
+      cumulative_avg_2023: cumulativeAvg2023 / (index + 1),
+      cumulative_avg_2024: cumulativeAvg2024 / (index + 1),
+    };
+  });
 
   return (
-    <div>
-      <Card>
-        <CardContent>
-          <Typography variant="h5" gutterBottom>Deal Count and Deal Size Chart</Typography>
+    <Box>
+      <Typography variant="h5">Cumulative Deal Data</Typography>
 
-          {/* Checkboxes for toggling data */}
-          <FormControlLabel
-            control={<Checkbox checked={showDealCount} onChange={handleDealCountChange} />}
-            label="Show Deal Count"
-          />
-          <FormControlLabel
-            control={<Checkbox checked={showDealSize} onChange={handleDealSizeChange} />}
-            label="Show Deal Size"
-          />
+      <Box>
+        <FormControlLabel
+          control={<Checkbox checked={showCount} onChange={() => setShowCount(!showCount)} />}
+          label="Show Deal Count"
+        />
+        <FormControlLabel
+          control={<Checkbox checked={showSize} onChange={() => setShowSize(!showSize)} />}
+          label="Show Deal Size"
+        />
+      </Box>
 
-          {/* Chart */}
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="week" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              {showDealCount && (
-                <>
-                  <Line type="monotone" dataKey="2022" stroke="#8884d8" name="2022 Deal Count" />
-                  <Line type="monotone" dataKey="2023" stroke="#82ca9d" name="2023 Deal Count" />
-                  <Line type="monotone" dataKey="2024" stroke="#ffc658" name="2024 Deal Count" />
-                </>
-              )}
-              {showDealSize && (
-                <>
-                  <Line type="monotone" dataKey="2022" stroke="#8884d8" name="2022 Deal Size" />
-                  <Line type="monotone" dataKey="2023" stroke="#82ca9d" name="2023 Deal Size" />
-                  <Line type="monotone" dataKey="2024" stroke="#ffc658" name="2024 Deal Size" />
-                </>
-              )}
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-    </div>
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+
+          {showCount && (
+            <>
+              <Line
+                type="monotone"
+                dataKey="2022"
+                stroke="#8884d8"
+                name="2022 Deal Count"
+              />
+              <Line
+                type="monotone"
+                dataKey="2023"
+                stroke="#82ca9d"
+                name="2023 Deal Count"
+              />
+              <Line
+                type="monotone"
+                dataKey="2024"
+                stroke="#ff7300"
+                name="2024 Deal Count"
+              />
+            </>
+          )}
+
+          {showSize && (
+            <>
+              <Line
+                type="monotone"
+                dataKey="cumulative_avg_2022"
+                stroke="#ff6347"
+                name="2022 Cumulative Avg Deal Count"
+              />
+              <Line
+                type="monotone"
+                dataKey="cumulative_avg_2023"
+                stroke="#32cd32"
+                name="2023 Cumulative Avg Deal Count"
+              />
+              <Line
+                type="monotone"
+                dataKey="cumulative_avg_2024"
+                stroke="#1e90ff"
+                name="2024 Cumulative Avg Deal Count"
+              />
+            </>
+          )}
+        </LineChart>
+      </ResponsiveContainer>
+    </Box>
   );
 };
 
-export default ChartComponent;
+export default Graph;
