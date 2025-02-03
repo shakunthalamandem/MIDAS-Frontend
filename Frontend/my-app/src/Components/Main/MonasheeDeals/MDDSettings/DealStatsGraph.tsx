@@ -61,7 +61,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
   const dealStatsOptions = [
     { label: "Deals Count", key: "count" },
     { label: "Deal Volume", key: "deal_size" },
-    { label: "Average Deal Volume", key: "avg_deal_size" },
+    { label: "Average Deal Size", key: "avg_deal_size" },
     { label: "Allocation as % of Deal Size", key: "mdd_allocation_percentage" },
     { label: "Allocation as % of IOI", key: "mdd_allocation_ioi" },
   ];
