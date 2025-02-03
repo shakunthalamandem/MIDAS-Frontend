@@ -9,7 +9,7 @@ const AllocationCaptureReturn = () => {
       justifyContent="center"
       alignItems="center"
       textAlign="center"
-      sx={{ width: "80%", overflow: "hidden", position: "relative" }}
+      sx={{ width: "100%", overflow: "hidden", position: "relative" }}
     >
         <Typography
     variant="body2"

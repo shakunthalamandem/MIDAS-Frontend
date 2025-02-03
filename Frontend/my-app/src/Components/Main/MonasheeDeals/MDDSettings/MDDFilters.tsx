@@ -137,17 +137,18 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   };
 
   return (
-    <Container
-      maxWidth="xl"
+    <Box
+      
       sx={{
         padding: 0,
         marginBottom: 20,
         display: "flex",
         marginLeft: 0,
         marginTop: 10,
+        width: '100%'
       }}
     >
-      <Box width="320px" sx={{ marginRight: 10 }}>
+      <Box width="320px" sx={{ marginRight: 10,marginLeft:5}}>  
         <Card sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}>
           <CardContent>
             <Box width="250px" sx={{ p: 2 }}>
@@ -315,7 +316,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </CardContent>
         </Card>
       </Box>
-      <Box mt={4} flex={1}>
+      <Box  width="100%" mt={4} flex={1}>
         {loading ? (
           <Box
             sx={{
@@ -344,7 +345,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </>
         )}
       </Box>
-    </Container>
+    </Box>
   );
 };
 
