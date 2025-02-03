@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Alert } from '@mui/material';
 import axios from 'axios';
+const apiUrl = process.env.REACT_APP_API_URL;
 
 const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -29,7 +30,8 @@ const ResetPassword: React.FC = () => {
     try {
       // Call the backend API to reset the password
       const response = await axios.post(
-        'http://192.168.1.27:9000/api/password-reset-confirm/',
+        `${apiUrl}/api/password-reset-confirm/`,
+
         {
           token,
           new_password: newPassword,
