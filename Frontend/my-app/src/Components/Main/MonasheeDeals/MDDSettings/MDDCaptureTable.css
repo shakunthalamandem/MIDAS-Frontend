@@ -57,9 +57,3 @@
   .flowing-bottom-border {
     animation: rainbow-bottom-border 3s linear infinite;
   }
-.colordataset{
-    animation: rainbow-left-border 3s linear infinite;
-    animation: rainbow-top-border 3s linear infinite;
-
-
-}

@@ -35,13 +35,13 @@ const formatValue = (value: number, selectedOption: string): string => {
   if (selectedOption === "deal_size" || selectedOption === "avg_deal_size") {
     const absValue = Math.abs(value);
     if (absValue >= 1_000_000_000) {
-      return `$${(value / 1_000_000_000).toFixed(1)}B`;
+      return `$${(value / 1_000_000_000).toFixed()}B`;
     } else if (absValue >= 1_000_000) {
-      return `$${(value / 1_000_000).toFixed(1)}M`;
+      return `$${(value / 1_000_000).toFixed()}M`;
     } else if (absValue >= 1_000) {
-      return `$${(value / 1_000).toFixed(1)}K`;
+      return `$${(value / 1_000).toFixed()}K`;
     }
-    return `$${value.toFixed(2)}`;
+    return `$${value.toFixed()}`;
   } else if (
     selectedOption === "mdd_allocation_percentage" ||
     selectedOption === "mdd_allocation_ioi"
@@ -61,7 +61,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
   const dealStatsOptions = [
     { label: "Deals Count", key: "count" },
     { label: "Deal Volume", key: "deal_size" },
-    { label: "Average Deal Volume", key: "avg_deal_size" },
+    { label: "Average Deal Size", key: "avg_deal_size" },
     { label: "Allocation as % of Deal Size", key: "mdd_allocation_percentage" },
     { label: "Allocation as % of IOI", key: "mdd_allocation_ioi" },
   ];
