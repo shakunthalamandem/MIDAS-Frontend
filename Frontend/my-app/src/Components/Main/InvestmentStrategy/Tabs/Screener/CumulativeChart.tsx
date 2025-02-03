@@ -22,10 +22,18 @@ ChartJS.register(
 
 type ChartData = {
   [key: string]: {
-    cumdeal_size: number;
-    cumdeal_count: number;
-    avg_deal_count: number;
-    avg_deal_size: number;
+    [key: string]: {
+      deal_count: number;
+      deal_size: number;
+    };
+    avg: {
+      avg_deal_count: number;
+      avg_deal_size: number;
+    };
+    cumulative_avg: {
+      avg_cum_deal_count: number;
+      avg_cum_deal_size: number;
+    };
   };
 };
 
@@ -50,16 +58,32 @@ const CumulativeChart: React.FC = () => {
   }
 
   const labels: string[] = Object.keys(data);
-  const cumDealSize: number[] = labels.map(label => data[label].cumdeal_size);
-  const cumDealCount: number[] = labels.map(label => data[label].cumdeal_count);
-  const avgDealCount: number[] = labels.map(label => data[label].avg_deal_count);
-  const avgDealSize: number[] = labels.map(label => data[label].avg_deal_size);
+  const cumDealSize: number[] = labels.map(
+    (label) => data[label].avg.avg_deal_size
+  );
+  const cumDealCount: number[] = labels.map(
+    (label) => data[label].avg.avg_deal_count
+  );
+  const avgDealCount: number[] = labels.map(
+    (label) => data[label].avg.avg_deal_count
+  );
+  const avgDealSize: number[] = labels.map(
+    (label) => data[label].avg.avg_deal_size
+  );
+  
+  // Cumulative averages
+  const avgCumDealCount: number[] = labels.map(
+    (label) => data[label].cumulative_avg.avg_cum_deal_count
+  );
+  const avgCumDealSize: number[] = labels.map(
+    (label) => data[label].cumulative_avg.avg_cum_deal_size
+  );
 
   const chartData = {
     labels,
     datasets: [
       {
-        label: 'Cumulative Deal Count',
+        label: 'Weekly Average Deal Count',
         data: cumDealCount,
         borderColor: 'rgba(75, 192, 192, 1)',
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -67,24 +91,24 @@ const CumulativeChart: React.FC = () => {
         tension: 0.2,
       },
       {
-        label: 'Average Deal Count',
-        data: avgDealCount,
+        label: 'Weekly Average Deal Size',
+        data: cumDealSize,
         borderColor: 'rgba(153, 102, 255, 1)',
         backgroundColor: 'rgba(153, 102, 255, 0.2)',
         fill: false,
         tension: 0.2,
       },
       {
-        label: 'Cumulative Deal Size',
-        data: cumDealSize,
+        label: 'Cumulative Average Deal Count',
+        data: avgCumDealCount,
         borderColor: 'rgba(255, 99, 132, 1)',
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
         fill: false,
         tension: 0.2,
       },
       {
-        label: 'Average Deal Size',
-        data: avgDealSize,
+        label: 'Cumulative Average Deal Size',
+        data: avgCumDealSize,
         borderColor: 'rgba(255, 159, 64, 1)',
         backgroundColor: 'rgba(255, 159, 64, 0.2)',
         fill: false,
