@@ -7,7 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Box, Typography, useTheme, Card, CardContent } from "@mui/material";
+import { Box, Typography, useTheme, Card, CardContent, Container } from "@mui/material";
 
 interface YearData {
   [year: string]: {
@@ -71,6 +71,8 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
   };
 
   return (
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+
     <Card
       elevation={4}
       sx={{
@@ -130,6 +132,7 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
         </ResponsiveContainer>
       </CardContent>
     </Card>
+    </Container>
   );
 };
 

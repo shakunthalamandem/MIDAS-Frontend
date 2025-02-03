@@ -16,6 +16,7 @@ import {
   ToggleButton,
   CardContent,
   Card,
+  Container,
 } from "@mui/material";
 import {
   BarChart,
@@ -119,6 +120,7 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
 
   return (
     <div>
+      <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Box className="deal-stats-container">
         <RadioGroup
           row
@@ -345,6 +347,8 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
+      </Container>
+
     </div>
   );
 };
