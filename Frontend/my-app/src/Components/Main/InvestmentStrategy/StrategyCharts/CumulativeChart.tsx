@@ -30,7 +30,7 @@ const formatNumber = (value: number) => {
 const CumulativeyearlyChart: React.FC = () => {
   const [data, setData] = useState<DealData | null>(null);
   const [showCount, setShowCount] = useState(true);
-  const [showSize, setShowSize] = useState(true);
+  const [showSize, setShowSize] = useState(false);
 
   // Fetch data from the API
   useEffect(() => {
@@ -118,19 +118,7 @@ const CumulativeyearlyChart: React.FC = () => {
 </Typography>
 
         {/* Radio Buttons for toggling */}
-        <FormControl component="fieldset">
-          <FormLabel component="legend">Select Data to Display</FormLabel>
-          <RadioGroup row>
-            <FormControlLabel
-              control={<Radio checked={showCount} onChange={() => { setShowCount(true); setShowSize(false); }} />}
-              label="Deal Count"
-            />
-            <FormControlLabel
-              control={<Radio checked={showSize} onChange={() => { setShowCount(false); setShowSize(true); }} />}
-              label="Deal Size"
-            />
-          </RadioGroup>
-        </FormControl>
+     
 
         {/* LineChart */}
         <ResponsiveContainer width="100%" height={400}>
@@ -159,6 +147,18 @@ const CumulativeyearlyChart: React.FC = () => {
             )}
           </LineChart>
         </ResponsiveContainer>
+        <FormControl component="fieldset">
+          <RadioGroup row>
+            <FormControlLabel
+              control={<Radio checked={showCount} onChange={() => { setShowCount(true); setShowSize(false); }} />}
+              label="Deal Count"
+            />
+            <FormControlLabel
+              control={<Radio checked={showSize} onChange={() => { setShowCount(false); setShowSize(true); }} />}
+              label="Deal Size"
+            />
+          </RadioGroup>
+        </FormControl>
       </CardContent>
     </Card>
   </Box>
