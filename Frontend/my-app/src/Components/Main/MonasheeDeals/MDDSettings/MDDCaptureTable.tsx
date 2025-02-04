@@ -103,7 +103,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
   return (
     <Box mr={0} sx={{ Width: "100%" }}>
-      <Box display="flex" justifyContent="left" mb={3} sx={{ gap: "10px" }}>
+      <Box display="flex" justifyContent="center" mb={3} sx={{ gap: "10px", maxWidth:'1240px' }}>
         <Button
           variant={selectedCategory === "IPO" ? "contained" : "outlined"}
           color="secondary"
