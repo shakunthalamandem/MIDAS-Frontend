@@ -198,7 +198,7 @@ const CumulativeyearlyChart: React.FC = () => {
                   <Line
                     type="monotone"
                     dataKey="2023"
-                    stroke="#82ca9d"
+                    stroke="#214100"
                     name="2023 Deal Count"
                   />
                   <Line
@@ -212,6 +212,7 @@ const CumulativeyearlyChart: React.FC = () => {
                     dataKey="CumulativeCount"
                     stroke="#002060"
                     name="Avg Deal Count"
+                    strokeWidth={2} 
                   />
                 </>
               )}
@@ -227,7 +228,7 @@ const CumulativeyearlyChart: React.FC = () => {
                   <Line
                     type="monotone"
                     dataKey="cumulative_avg_2023"
-                    stroke="#32cd32"
+                    stroke="#214100"
                     name="2023  Deal Size"
                   />
                   <Line
@@ -241,6 +242,8 @@ const CumulativeyearlyChart: React.FC = () => {
                     dataKey="cumulativedata_avg_size"
                     stroke="#002060"
                     name="Avg  Deal Size"
+                    strokeWidth={2} 
+
                   />
                 </>
               )}
@@ -252,6 +255,7 @@ const CumulativeyearlyChart: React.FC = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              marginTop:5
             }}
           >
             <RadioGroup row>
@@ -266,7 +270,7 @@ const CumulativeyearlyChart: React.FC = () => {
                   />
                 }
                 label="Deal Count"
-                style={{ color: "#005442" }} // Change label color
+                style={{ color: "#490400",fontWeight:'bold' }} // Change label color
               />
               <FormControlLabel
                 control={
@@ -279,7 +283,7 @@ const CumulativeyearlyChart: React.FC = () => {
                   />
                 }
                 label="Deal Size"
-                style={{ color: "#005442" }} // Change label color
+                style={{ color: "#490400" ,fontWeight:'bold'}} // Change label color
               />
             </RadioGroup>
           </FormControl>
