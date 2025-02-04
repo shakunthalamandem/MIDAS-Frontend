@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Checkbox, FormControlLabel, Box, Typography, CircularProgress } from '@mui/material';
+import {  FormControlLabel, Box, Typography, CircularProgress, Card, CardContent, FormControl, FormLabel, Radio, RadioGroup } from '@mui/material';
 import axios from 'axios';
 
 // Define the DealData interface
@@ -14,6 +14,18 @@ interface DealData {
     };
   };
 }
+const formatNumber = (value: number) => {
+  if (value >= 1_000_000_000) {
+    return (value / 1_000_000_000).toFixed(2) + 'B'; // Billions
+  }
+  if (value >= 1_000_000) {
+    return (value / 1_000_000).toFixed(2) + 'M'; // Millions
+  }
+  if (value >= 1_000) {
+    return (value / 1_000).toFixed(2) + 'K'; // Thousands
+  }
+  return value.toString(); // No formatting for numbers less than 1,000
+};
 
 const CumulativeyearlyChart: React.FC = () => {
   const [data, setData] = useState<DealData | null>(null);
@@ -98,48 +110,56 @@ const CumulativeyearlyChart: React.FC = () => {
   });
 
   return (
-    <Box>
-      <Typography variant="h5">Cumulative Deal Data</Typography>
+    <Box sx={{ padding: 3 }}>
+    <Card sx={{ boxShadow: 3 }}>
+      <CardContent>
+        <Typography variant="h5" gutterBottom>Cumulative Deal Data</Typography>
 
-      <Box>
-        <FormControlLabel
-          control={<Checkbox checked={showCount} onChange={() => setShowCount(!showCount)} />}
-          label="Show Deal Count"
-        />
-        <FormControlLabel
-          control={<Checkbox checked={showSize} onChange={() => setShowSize(!showSize)} />}
-          label="Show Deal Size"
-        />
-      </Box>
+        {/* Radio Buttons for toggling */}
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Select Data to Display</FormLabel>
+          <RadioGroup row>
+            <FormControlLabel
+              control={<Radio checked={showCount} onChange={() => { setShowCount(true); setShowSize(false); }} />}
+              label="Deal Count"
+            />
+            <FormControlLabel
+              control={<Radio checked={showSize} onChange={() => { setShowCount(false); setShowSize(true); }} />}
+              label="Deal Size"
+            />
+          </RadioGroup>
+        </FormControl>
 
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={chartData}>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
+        {/* LineChart */}
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart data={chartData}>
+            <XAxis dataKey="name" />
+            <YAxis tickFormatter={(tick: any) => formatNumber(Number(tick))} />
+            <Tooltip formatter={(value: any) => formatNumber(Number(value))} />
+            <Legend />
 
-          {showCount && (
-            <>
-              <Line type="monotone" dataKey="2022" stroke="#8884d8" name="2022 Deal Count" />
-              <Line type="monotone" dataKey="2023" stroke="#82ca9d" name="2023 Deal Count" />
-              <Line type="monotone" dataKey="2024" stroke="#ff7300" name="2024 Deal Count" />
-              <Line type="monotone" dataKey="CumulativeCount" stroke="#002060" name="Avg Deal Count" />
+            {showCount && (
+              <>
+                <Line type="monotone" dataKey="2022" stroke="#8884d8" name="2022 Deal Count" />
+                <Line type="monotone" dataKey="2023" stroke="#82ca9d" name="2023 Deal Count" />
+                <Line type="monotone" dataKey="2024" stroke="#ff7300" name="2024 Deal Count" />
+                <Line type="monotone" dataKey="CumulativeCount" stroke="#002060" name="Avg Deal Count" />
+              </>
+            )}
 
-            </>
-          )}
-
-          {showSize && (
-            <>
-              <Line type="monotone" dataKey="cumulative_avg_2022" stroke="#ff6347" name="2022 Cumulative Deal Size" />
-              <Line type="monotone" dataKey="cumulative_avg_2023" stroke="#32cd32" name="2023 Cumulative Deal Size" />
-              <Line type="monotone" dataKey="cumulative_avg_2024" stroke="#1e90ff" name="2024 Cumulative Deal Size" />
-              <Line type="monotone" dataKey="cumulativedata_avg_size" stroke="#002060" name="Avg Cumulative Deal Size" />
-            </>
-          )}
-        </LineChart>
-      </ResponsiveContainer>
-    </Box>
+            {showSize && (
+              <>
+                <Line type="monotone" dataKey="cumulative_avg_2022" stroke="#ff6347" name="2022 Cumulative Deal Size" />
+                <Line type="monotone" dataKey="cumulative_avg_2023" stroke="#32cd32" name="2023 Cumulative Deal Size" />
+                <Line type="monotone" dataKey="cumulative_avg_2024" stroke="#1e90ff" name="2024 Cumulative Deal Size" />
+                <Line type="monotone" dataKey="cumulativedata_avg_size" stroke="#002060" name="Avg Cumulative Deal Size" />
+              </>
+            )}
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  </Box>
   );
 };
 
