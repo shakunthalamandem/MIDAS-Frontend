@@ -7,6 +7,10 @@ interface Ticker {
   ticker: string;
 }
 
+interface TickerResponse {
+  ticker_list: string[];
+}
+
 interface TickerDropdownProps {
   onSelectTicker: (ticker: string) => void;
 }
@@ -23,13 +27,22 @@ const TickerDropdown: React.FC<TickerDropdownProps> = ({ onSelectTicker }) => {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
         if (!apiUrl) throw new Error('API URL is not defined in environment variables');
-        const response = await axios.get<Ticker[]>(`${apiUrl}/populate-invested-tickers/`, {
+
+        const response = await axios.get<TickerResponse>(`${apiUrl}/api/tickers_list/`, {
           headers: {
             "Content-Type": "application/json",
             "Authorization": token ? `Bearer ${token}` : "",
-          }});
-        setTickers(response.data);
-        setFilteredTickers(response.data);
+          }
+        });
+
+        // Convert response from ["AAPL US", "MSFT US"] to [{ id: 1, ticker: "AAPL US" }, ...]
+        const formattedTickers = response.data.ticker_list.map((ticker, index) => ({
+          id: index + 1,
+          ticker,
+        }));
+
+        setTickers(formattedTickers);
+        setFilteredTickers(formattedTickers);
       } catch (error) {
         console.error('Error fetching tickers:', error);
       }

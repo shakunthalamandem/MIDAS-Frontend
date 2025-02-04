@@ -31,7 +31,7 @@ const token = localStorage.getItem("access_token");
     const fetchData = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/fundamentals/${ticker}`, {
-          method: "POST",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             "Authorization": token ? `Bearer ${token}` : "",
