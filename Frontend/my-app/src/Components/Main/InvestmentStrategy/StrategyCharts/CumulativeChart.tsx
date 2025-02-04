@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Checkbox, FormControlLabel, Box, Typography } from '@mui/material';
 import axios from 'axios';
 
@@ -22,11 +22,28 @@ const CumulativeyearlyChart: React.FC = () => {
 
   // Fetch data from the API
   useEffect(() => {
-    axios
-      .get<DealData>('http://192.168.1.59:9000/api/cummulatives_monashee/')
-      .then((response) => setData(response.data))
-      .catch((error) => console.error('Error fetching data:', error));
+    const fetchData = async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
+        if (!apiUrl) throw new Error('API URL is not defined in environment variables');
+        
+        const response = await axios.get<DealData>(`${apiUrl}/api/cummulatives_monashee/`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "",
+          }
+        });
+  
+        setData(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchData();
   }, []);
+  
 
   if (!data) {
     return <div>Loading...</div>;
