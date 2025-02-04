@@ -234,7 +234,7 @@ const CumulativeyearlyChart: React.FC = () => {
                   <Line
                     type="monotone"
                     dataKey="cumulative_avg_2024"
-                    stroke="#1e90ff"
+                    stroke="#cc0300"
                     name="2024  Deal Size"
                   />
                   <Line
@@ -250,43 +250,56 @@ const CumulativeyearlyChart: React.FC = () => {
             </LineChart>
           </ResponsiveContainer>
           <FormControl
-            component="fieldset"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop:5
-            }}
-          >
-            <RadioGroup row>
-              <FormControlLabel
-                control={
-                  <Radio
-                    checked={showCount}
-                    onChange={() => {
-                      setShowCount(true);
-                      setShowSize(false);
-                    }}
-                  />
-                }
-                label="Deal Count"
-                style={{ color: "#490400",fontWeight:'bold' }} // Change label color
-              />
-              <FormControlLabel
-                control={
-                  <Radio
-                    checked={showSize}
-                    onChange={() => {
-                      setShowCount(false);
-                      setShowSize(true);
-                    }}
-                  />
-                }
-                label="Deal Size"
-                style={{ color: "#490400" ,fontWeight:'bold'}} // Change label color
-              />
-            </RadioGroup>
-          </FormControl>
+  component="fieldset"
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 5
+  }}
+>
+  <RadioGroup row>
+    <FormControlLabel
+      control={
+        <Radio
+          checked={showCount}
+          onChange={() => {
+            setShowCount(true);
+            setShowSize(false);
+          }}
+          sx={{
+            color: "#490400", // color when unchecked
+            '&.Mui-checked': {
+              color: "#002060", // color when checked
+            }
+          }}
+        />
+      }
+      label="Deal Count"
+      style={{ color: "#490400", fontWeight: 'bold' }}
+    />
+    <FormControlLabel
+      control={
+        <Radio
+          checked={showSize}
+          onChange={() => {
+            setShowCount(false);
+            setShowSize(true);
+          }}
+          sx={{
+            color: "#490400", // color when unchecked
+            '&.Mui-checked': {
+              color: "#002060", // color when checked
+            }
+          }}
+        />
+      }
+      label="Deal Size"
+      style={{ color: "#490400", fontWeight: 'bold' }}
+    />
+  </RadioGroup>
+</FormControl>
+
         </CardContent>
       </Card>
     </Box>
