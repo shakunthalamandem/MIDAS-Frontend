@@ -37,14 +37,27 @@ const Graph: React.FC = () => {
   let cumulativeSize2023 = 0;
   let cumulativeSize2024 = 0;
 
+  let cumulativeCount2022 = 0;
+  let cumulativeCount2023 = 0;
+  let cumulativeCount2024 = 0;
+
+
   const chartData = Object.keys(data).map((week, index) => {
     const count2022 = data[week]?.count[`2022_w${String(index + 1).padStart(2, '0')}_deal_count`] || 0;
     const count2023 = data[week]?.count[`2023_w${String(index + 1).padStart(2, '0')}_deal_count`] || 0;
     const count2024 = data[week]?.count[`2024_w${String(index + 1).padStart(2, '0')}_deal_count`] || 0;
+    const cumulative_avg_count = data[week]?.count[`cumulativeavg_w${String(index + 1).padStart(2, '0')}_deal_count`] || 0;
 
     const size2022 = data[week]?.size[`2022_w${String(index + 1).padStart(2, '0')}_deal_size`] || 0;
     const size2023 = data[week]?.size[`2023_w${String(index + 1).padStart(2, '0')}_deal_size`] || 0;
     const size2024 = data[week]?.size[`2024_w${String(index + 1).padStart(2, '0')}_deal_size`] || 0;
+    const cumulative_avg_size = data[week]?.size[`cumulativeavg_w${String(index + 1).padStart(2, '0')}_deal_size`] || 0;
+
+
+    cumulativeCount2022 += count2022;
+    cumulativeCount2023 += count2023;
+    cumulativeCount2024 += count2024;
+
 
     // Update cumulative deal sizes
     cumulativeSize2022 += size2022;
@@ -53,12 +66,14 @@ const Graph: React.FC = () => {
 
     return {
       name: week,
-      '2022': count2022,
-      '2023': count2023,
-      '2024': count2024,
-      cumulative_avg_2022: cumulativeSize2022 / (index + 1),
-      cumulative_avg_2023: cumulativeSize2023 / (index + 1),
-      cumulative_avg_2024: cumulativeSize2024 / (index + 1),
+      '2022': cumulativeCount2022,
+      '2023': cumulativeCount2023,
+      '2024': cumulativeCount2024,
+      'CumulativeCount':cumulative_avg_count,
+      cumulative_avg_2022: cumulativeSize2022 ,
+      cumulative_avg_2023: cumulativeSize2023 ,
+      cumulative_avg_2024: cumulativeSize2024 ,
+      cumulativedata_avg_size:cumulative_avg_size
     };
   });
 
@@ -79,7 +94,6 @@ const Graph: React.FC = () => {
 
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
@@ -90,6 +104,8 @@ const Graph: React.FC = () => {
               <Line type="monotone" dataKey="2022" stroke="#8884d8" name="2022 Deal Count" />
               <Line type="monotone" dataKey="2023" stroke="#82ca9d" name="2023 Deal Count" />
               <Line type="monotone" dataKey="2024" stroke="#ff7300" name="2024 Deal Count" />
+              <Line type="monotone" dataKey="CumulativeCount" stroke="#ff7300" name="Avg Deal Count" />
+
             </>
           )}
 
@@ -98,6 +114,7 @@ const Graph: React.FC = () => {
               <Line type="monotone" dataKey="cumulative_avg_2022" stroke="#ff6347" name="2022 Cumulative Deal Size" />
               <Line type="monotone" dataKey="cumulative_avg_2023" stroke="#32cd32" name="2023 Cumulative Deal Size" />
               <Line type="monotone" dataKey="cumulative_avg_2024" stroke="#1e90ff" name="2024 Cumulative Deal Size" />
+              <Line type="monotone" dataKey="cumulativedata_avg_size" stroke="#1e90ff" name="Avg Cumulative Deal Size" />
             </>
           )}
         </LineChart>
