@@ -104,7 +104,7 @@ const CumulativeyearlyChart: React.FC = () => {
               <Line type="monotone" dataKey="2022" stroke="#8884d8" name="2022 Deal Count" />
               <Line type="monotone" dataKey="2023" stroke="#82ca9d" name="2023 Deal Count" />
               <Line type="monotone" dataKey="2024" stroke="#ff7300" name="2024 Deal Count" />
-              <Line type="monotone" dataKey="CumulativeCount" stroke="#ff7300" name="Avg Deal Count" />
+              <Line type="monotone" dataKey="CumulativeCount" stroke="#002060" name="Avg Deal Count" />
 
             </>
           )}
@@ -114,7 +114,7 @@ const CumulativeyearlyChart: React.FC = () => {
               <Line type="monotone" dataKey="cumulative_avg_2022" stroke="#ff6347" name="2022 Cumulative Deal Size" />
               <Line type="monotone" dataKey="cumulative_avg_2023" stroke="#32cd32" name="2023 Cumulative Deal Size" />
               <Line type="monotone" dataKey="cumulative_avg_2024" stroke="#1e90ff" name="2024 Cumulative Deal Size" />
-              <Line type="monotone" dataKey="cumulativedata_avg_size" stroke="#1e90ff" name="Avg Cumulative Deal Size" />
+              <Line type="monotone" dataKey="cumulativedata_avg_size" stroke="#002060" name="Avg Cumulative Deal Size" />
             </>
           )}
         </LineChart>
