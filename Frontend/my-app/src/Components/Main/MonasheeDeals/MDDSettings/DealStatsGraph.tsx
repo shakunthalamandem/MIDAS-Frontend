@@ -17,6 +17,8 @@ import {
   CardContent,
   Card,
   Container,
+  FormControl,
+  FormLabel,
 } from "@mui/material";
 import {
   BarChart,
@@ -260,7 +262,62 @@ const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </Box>
+
+
+          <Box
+  sx={{
+    display: "flex",
+    justifyContent: "center", // Centers items horizontally
+    alignItems: "center", // Centers items vertically
+    gap: "40px",
+    padding: "15px",
+    borderRadius: "8px",
+    background: "linear-gradient(to right, rgba(255, 0, 150, 0.2), rgba(0, 204, 255, 0.2))",
+    mt: "5px", // Margin top of 5px
+  }}
+>
+  {/* Radio Group to ensure only one can be selected, with "Deal Type" as default */}
+  <RadioGroup row name="dealOptions" defaultValue="dealType">
+    <FormControl sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+      <FormLabel sx={{ fontWeight: "bold", marginRight: "10px" }}>Deal Type</FormLabel>
+      <FormControlLabel
+        control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "red" } }} />}
+        value="dealType"
+        label=""
+      />
+    </FormControl>
+
+    <FormControl sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+      <FormLabel sx={{ fontWeight: "bold", marginRight: "10px" }}>Sector</FormLabel>
+      <FormControlLabel
+        control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "red" } }} />}
+        value="sector"
+        label=""
+      />
+    </FormControl>
+
+    <FormControl sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+      <FormLabel sx={{ fontWeight: "bold", marginRight: "10px" }}>Region</FormLabel>
+      <FormControlLabel
+        control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "red" } }} />}
+        value="region"
+        label=""
+      />
+    </FormControl>
+
+    <FormControl sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+      <FormLabel sx={{ fontWeight: "bold", marginRight: "10px" }}>Deal Caption</FormLabel>
+      <FormControlLabel
+        control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "red" } }} />}
+        value="dealCaption"
+        label=""
+      />
+    </FormControl>
+  </RadioGroup>
+</Box>
+
+
+     </Box>
       )}
       {/* Show Normal/Weighted options if selectedOption is for allocation */}
       {(selectedOption === "mdd_allocation_ioi" ||
