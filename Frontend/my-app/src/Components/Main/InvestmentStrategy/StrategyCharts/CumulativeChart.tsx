@@ -170,7 +170,7 @@ const CumulativeyearlyChart: React.FC = () => {
             align="center"
             style={{ color: "#002060" }}
           >
-            Cumulative Deals Data
+            Cumulative Deals Data{" "}
           </Typography>
 
           {/* Radio Buttons for toggling */}
@@ -212,7 +212,7 @@ const CumulativeyearlyChart: React.FC = () => {
                     dataKey="CumulativeCount"
                     stroke="#002060"
                     name="Avg Deal Count"
-                    strokeWidth={2} 
+                    strokeWidth={2}
                   />
                 </>
               )}
@@ -234,7 +234,7 @@ const CumulativeyearlyChart: React.FC = () => {
                   <Line
                     type="monotone"
                     dataKey="cumulative_avg_2024"
-                    stroke="#cc0300"
+                    stroke="#8a009a"
                     name="2024  Deal Size"
                   />
                   <Line
@@ -242,64 +242,62 @@ const CumulativeyearlyChart: React.FC = () => {
                     dataKey="cumulativedata_avg_size"
                     stroke="#002060"
                     name="Avg  Deal Size"
-                    strokeWidth={2} 
-
+                    strokeWidth={2}
                   />
                 </>
               )}
             </LineChart>
           </ResponsiveContainer>
           <FormControl
-  component="fieldset"
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 5
-  }}
->
-  <RadioGroup row>
-    <FormControlLabel
-      control={
-        <Radio
-          checked={showCount}
-          onChange={() => {
-            setShowCount(true);
-            setShowSize(false);
-          }}
-          sx={{
-            color: "#490400", // color when unchecked
-            '&.Mui-checked': {
-              color: "#002060", // color when checked
-            }
-          }}
-        />
-      }
-      label="Deal Count"
-      style={{ color: "#490400", fontWeight: 'bold' }}
-    />
-    <FormControlLabel
-      control={
-        <Radio
-          checked={showSize}
-          onChange={() => {
-            setShowCount(false);
-            setShowSize(true);
-          }}
-          sx={{
-            color: "#490400", // color when unchecked
-            '&.Mui-checked': {
-              color: "#002060", // color when checked
-            }
-          }}
-        />
-      }
-      label="Deal Size"
-      style={{ color: "#490400", fontWeight: 'bold' }}
-    />
-  </RadioGroup>
-</FormControl>
-
+            component="fieldset"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 5,
+            }}
+          >
+            <RadioGroup row>
+              <FormControlLabel
+                control={
+                  <Radio
+                    checked={showCount}
+                    onChange={() => {
+                      setShowCount(true);
+                      setShowSize(false);
+                    }}
+                    sx={{
+                      color: "#490400", // color when unchecked
+                      "&.Mui-checked": {
+                        color: "#002060", // color when checked
+                      },
+                    }}
+                  />
+                }
+                label="Deal Count"
+                style={{ color: "#490400", fontWeight: "bold" }}
+              />
+              <FormControlLabel
+                control={
+                  <Radio
+                    checked={showSize}
+                    onChange={() => {
+                      setShowCount(false);
+                      setShowSize(true);
+                    }}
+                    sx={{
+                      color: "#490400", // color when unchecked
+                      "&.Mui-checked": {
+                        color: "#002060", // color when checked
+                      },
+                    }}
+                  />
+                }
+                label="Deal Size"
+                style={{ color: "#490400", fontWeight: "bold" }}
+              />
+            </RadioGroup>
+          </FormControl>
         </CardContent>
       </Card>
     </Box>
