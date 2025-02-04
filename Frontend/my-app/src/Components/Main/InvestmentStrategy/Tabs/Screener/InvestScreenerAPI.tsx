@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import InvestScreenerMain from './InvestScreenerMain';
 import CumulativeReturns from '../../TechnicalIndicators/CumulativeReturns';
+import CumulativeyearlyChart from '../../StrategyCharts/CumulativeChart';
 
 interface InvestScreenerAPIProps {
   appliedValues: any;
@@ -85,6 +86,7 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
       {/* Pass the fetched data to the grid component */}
       <InvestScreenerMain rows={rows} loading={loading} totalRows={totalRows} />
       <CumulativeReturns tickerList={tickers} />
+      <CumulativeyearlyChart />
     </Box>
   );
 };
