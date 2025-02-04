@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Checkbox, FormControlLabel, Box, Typography } from '@mui/material';
+import { Checkbox, FormControlLabel, Box, Typography, CircularProgress } from '@mui/material';
 import axios from 'axios';
 
 // Define the DealData interface
@@ -44,9 +44,12 @@ const CumulativeyearlyChart: React.FC = () => {
     fetchData();
   }, []);
   
-
   if (!data) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </div>
+    );
   }
 
   // Prepare data for the chart
