@@ -113,7 +113,9 @@ const CumulativeyearlyChart: React.FC = () => {
     <Box sx={{ padding: 3 }}>
     <Card sx={{ boxShadow: 3 }}>
       <CardContent>
-        <Typography variant="h5" gutterBottom>Cumulative Deal Data</Typography>
+      <Typography variant="h5" gutterBottom align="center" style={{ color: '#002060' }}>
+  Cumulative Deals Data
+</Typography>
 
         {/* Radio Buttons for toggling */}
         <FormControl component="fieldset">
@@ -149,10 +151,10 @@ const CumulativeyearlyChart: React.FC = () => {
 
             {showSize && (
               <>
-                <Line type="monotone" dataKey="cumulative_avg_2022" stroke="#ff6347" name="2022 Cumulative Deal Size" />
-                <Line type="monotone" dataKey="cumulative_avg_2023" stroke="#32cd32" name="2023 Cumulative Deal Size" />
-                <Line type="monotone" dataKey="cumulative_avg_2024" stroke="#1e90ff" name="2024 Cumulative Deal Size" />
-                <Line type="monotone" dataKey="cumulativedata_avg_size" stroke="#002060" name="Avg Cumulative Deal Size" />
+                <Line type="monotone" dataKey="cumulative_avg_2022" stroke="#ff6347" name="2022  Deal Size" />
+                <Line type="monotone" dataKey="cumulative_avg_2023" stroke="#32cd32" name="2023  Deal Size" />
+                <Line type="monotone" dataKey="cumulative_avg_2024" stroke="#1e90ff" name="2024  Deal Size" />
+                <Line type="monotone" dataKey="cumulativedata_avg_size" stroke="#002060" name="Avg  Deal Size" />
               </>
             )}
           </LineChart>
