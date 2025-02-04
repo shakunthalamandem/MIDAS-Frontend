@@ -35,7 +35,6 @@ const TickerDropdown: React.FC<TickerDropdownProps> = ({ onSelectTicker }) => {
           }
         });
 
-        // Convert response from ["AAPL US", "MSFT US"] to [{ id: 1, ticker: "AAPL US" }, ...]
         const formattedTickers = response.data.ticker_list.map((ticker, index) => ({
           id: index + 1,
           ticker,
