@@ -15,7 +15,7 @@ interface DealData {
   };
 }
 
-const Graph: React.FC = () => {
+const CumulativeyearlyChart: React.FC = () => {
   const [data, setData] = useState<DealData | null>(null);
   const [showCount, setShowCount] = useState(true);
   const [showSize, setShowSize] = useState(true);
@@ -123,4 +123,4 @@ const Graph: React.FC = () => {
   );
 };
 
-export default Graph;
+export default CumulativeyearlyChart;
