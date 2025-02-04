@@ -16,13 +16,13 @@ interface DealData {
 }
 const formatNumber = (value: number) => {
   if (value >= 1_000_000_000) {
-    return (value / 1_000_000_000).toFixed(2) + 'B'; // Billions
+    return (value / 1_000_000_000).toFixed(0) + 'B'; // Billions
   }
   if (value >= 1_000_000) {
-    return (value / 1_000_000).toFixed(2) + 'M'; // Millions
+    return (value / 1_000_000).toFixed(0) + 'M'; // Millions
   }
   if (value >= 1_000) {
-    return (value / 1_000).toFixed(2) + 'K'; // Thousands
+    return (value / 1_000).toFixed(0) + 'K'; // Thousands
   }
   return value.toString(); // No formatting for numbers less than 1,000
 };
