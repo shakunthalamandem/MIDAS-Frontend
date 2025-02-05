@@ -245,7 +245,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                   value: "Year",
                   position: "insideBottom",
                   dy: 10,
-                  fill: "#000000",
+                  fill: "#002060",
+                  
                 }}
               />
 
@@ -258,7 +259,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                   value: `${selectedField}`,
                   angle: -90,
                   position: "insideLeft",
-                  fill: "#000000",
+                  fill: "#002060",
                 }}
               />
 
