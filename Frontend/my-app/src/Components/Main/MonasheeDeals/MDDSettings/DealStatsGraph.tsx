@@ -47,20 +47,30 @@ const dataFields = [
   "weighted_allocation_percentage",
 ];
 
-const DealStatsGraph: React.FC = () => {
+interface DealStatsGraphProps {
+  selectedFilters: { [key: string]: (string | number)[] };
+}
+
+
+const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>(filterOptions[0]);
   const [selectedField, setSelectedField] = useState<string>("count");
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // Re-fetch the data when selectedField changes
-    fetchData(selectedFilter.payload);
-  }, [selectedField, selectedFilter]);
+    fetchData();
+  }, [selectedField, selectedFilter, selectedFilters]);
+  
 
-  const fetchData = async (payload: any) => {
+  const fetchData = async () => {
     setLoading(true);
     try {
+      const payload = {
+        ...selectedFilters,
+        ...(selectedFilter.payload || {}),
+      };
+  
       const response = await axios.post<ApiResponse>(API_URL, payload);
       setChartData(formatChartData(response.data));
     } catch (error) {
@@ -97,7 +107,6 @@ const DealStatsGraph: React.FC = () => {
     });
   }, [selectedField]);
 
-  // Colors for stacked bars
   const barColors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"];
 
   return (
@@ -105,7 +114,6 @@ const DealStatsGraph: React.FC = () => {
       <Card>
       <h2 className="text-lg font-semibold mb-4 text-white">Deal Statistics</h2>
 
-      {/* Primary Filter Box */}
       <Box
         sx={{
           background: 'linear-gradient(45deg, rgba(255, 0, 150, 0.5), rgba(0, 204, 255, 0.5))', // Multi-color transparent background
