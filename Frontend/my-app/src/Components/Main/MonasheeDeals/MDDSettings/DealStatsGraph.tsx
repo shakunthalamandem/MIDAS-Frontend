@@ -104,7 +104,7 @@ const filterOptions: FilterOption[] = [
 
 const dataFieldsWithLabels = [
   { label: "Count", value: "count" },
-  { label: "Deal Size", value: "deal_size" },
+  { label: "Deal Volume", value: "deal_size" },
   { label: "Average Deal Size", value: "avg_deal_size" },
   {
     label: "Allocation Deal Size %",
