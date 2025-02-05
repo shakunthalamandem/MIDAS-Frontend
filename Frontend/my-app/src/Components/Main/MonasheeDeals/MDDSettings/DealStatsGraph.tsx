@@ -231,10 +231,10 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
               Loading... Please Wait
             </Typography>
           </Box>        ) : (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={450}>
             <BarChart
               data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
             >
               {/* X-Axis */}
               <XAxis
@@ -252,16 +252,18 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
 
               {/* Y-Axis with formatted values */}
               <YAxis
-                stroke="#b2b2b2"
-                tick={{ fill: "#002060", fontSize: 12 }}
-                tickFormatter={formatValue}
-                label={{
-                  value: `${selectedField}`,
-                  angle: -90,
-                  position: "insideLeft",
-                  fill: "#002060",
-                }}
-              />
+  stroke="#b2b2b2"
+  tick={{ fill: "#002060", fontSize: 12 }}
+  tickFormatter={formatValue}
+  label={{
+    value: `${selectedField}`,
+    angle: -90,
+    position: "outsideLeft",  // Move the label outside the axis
+    fill: "#b2b2b2",
+    dx: -30,  // Adjust left or right position (negative moves it left)
+    dy: -10,  // Adjust up or down position (negative moves it up)
+  }}
+/>
 
               {/* Tooltip with formatted values */}
               <Tooltip
