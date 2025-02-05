@@ -18,6 +18,7 @@ import {
   Card,
   Stack,
   Chip,
+  Typography,
 } from "@mui/material";
 
 interface ChartData {
@@ -171,9 +172,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   return (
     <Container>
       <Card>
-        <h2 className="text-lg font-semibold mb-4 text-white">
-          Deal Statistics
-        </h2>
+    <Typography variant="h5" sx={{color:'#002060',fontWeight:'bold'}}>          Deal Statistics
+    </Typography>
 
         <Box
           sx={{

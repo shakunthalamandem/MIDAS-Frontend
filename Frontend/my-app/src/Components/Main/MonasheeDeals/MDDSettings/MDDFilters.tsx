@@ -318,7 +318,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </CardContent>
         </Card>
       </Box>
-      <Box  width="100%" mt={4} flex={1}>
+      <Box  width="100%" mt={1} flex={1}>
         {loading ? (
           <Box
             sx={{
