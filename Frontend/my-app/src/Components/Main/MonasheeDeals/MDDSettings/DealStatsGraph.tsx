@@ -200,10 +200,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
           {" "}
           Deal Statistics
         </Typography>
-        {/* Data Field Selection - Using MUI Radio Buttons */}
         <Box
           sx={{
-            // background: 'linear-gradient(to right, #190250, #6DD5ED)',
 
             padding: 1,
             borderRadius: "8px",
