@@ -3,9 +3,6 @@ import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Box, RadioGroup, FormControlLabel, Radio, Container, Card, Stack, Chip, } from "@mui/material";
 
-
-const API_URL = "http://192.168.1.59:9000/api/mdd_deals_graph/";
-
 interface ChartData {
   year: string;
   [key: string]: number | string;
@@ -58,6 +55,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   const [selectedField, setSelectedField] = useState<string>("count");
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     fetchData();
@@ -71,9 +70,16 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
         ...selectedFilters,
         ...(selectedFilter.payload || {}),
       };
-  
-      const response = await axios.post<ApiResponse>(API_URL, payload);
-      setChartData(formatChartData(response.data));
+      const response = await fetch(`${apiUrl}/api/mdd_deals_graph/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      setChartData(formatChartData(data));
     } catch (error) {
       console.error("Error fetching data", error);
       setChartData([]);
