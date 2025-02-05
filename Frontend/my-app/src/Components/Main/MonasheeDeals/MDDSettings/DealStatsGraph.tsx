@@ -28,6 +28,19 @@ interface FilterOption {
   payload: { filter_type: string } | null;
 }
 
+const formatValue = (value: number): string => {
+  const absValue = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+
+  if (absValue >= 1_000_000_000)
+    return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
+  if (absValue >= 1_000_000)
+    return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
+  if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
+
+  return `${sign}$${absValue.toFixed(2)}`;
+};
+
 const filterOptions: FilterOption[] = [
   { label: "Deal Type", value: "deal_type", payload: null },
   { label: "Sector", value: "sector", payload: { filter_type: "gics_sector_from_bloomberg" } },
