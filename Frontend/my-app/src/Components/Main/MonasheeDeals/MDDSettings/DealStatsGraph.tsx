@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Box, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 
 const API_URL = "http://192.168.1.59:9000/api/mdd_deals_graph/";
 
@@ -104,73 +105,106 @@ const DealStatsGraph: React.FC = () => {
       <h2 className="text-lg font-semibold mb-4 text-white">Deal Statistics</h2>
 
       {/* Primary Filter Box */}
-      <div className="bg-gray-900 bg-opacity-50 p-4 rounded-lg mb-4 flex flex-wrap">
-        {filterOptions.map((option) => (
-          <label key={option.value} className="mr-4 text-white">
-            <input
-              type="radio"
-              name="filter"
+      <Box
+        sx={{
+          background: 'linear-gradient(45deg, rgba(255, 0, 150, 0.5), rgba(0, 204, 255, 0.5))', // Multi-color transparent background
+          padding: 4,
+          borderRadius: '8px',
+          boxShadow: 3,
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center', // Centering items horizontally
+          alignItems: 'center',     // Centering items vertically
+          marginBottom: 4,
+        }}
+      >
+        <RadioGroup
+          value={selectedFilter.value}
+          onChange={(e) => setSelectedFilter(filterOptions.find(option => option.value === e.target.value)!)} // Update with the full option
+          row // Arrange radio buttons in a row
+        >
+          {filterOptions.map((option) => (
+            <FormControlLabel
+              key={option.value}
               value={option.value}
-              checked={selectedFilter.value === option.value}
-              onChange={() => setSelectedFilter(option)}
-              className="mr-2"
+              control={<Radio sx={{ color: 'white' }} />}
+              label={option.label}
+              sx={{
+                color: 'white',
+                marginRight: 4,
+                '& .MuiRadio-root': {
+                  color: 'white',
+                },
+              }}
             />
-            {option.label}
-          </label>
-        ))}
-      </div>
+          ))}
+        </RadioGroup>
+      </Box>
 
       {loading ? (
         <p className="text-white">Loading...</p>
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
-            {/* <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" /> */}
             <XAxis dataKey="year" stroke="#000000" />
             <YAxis stroke="#000000" />
             <Tooltip contentStyle={{ backgroundColor: "#333", color: "#fff" }} />
             <Legend wrapperStyle={{ color: "#000" }} />
             {
-  chartData.length > 0 &&
-    // Collect all unique categories across all years
-    Object.keys(
-      chartData.reduce((acc, item) => {
-        Object.keys(item).forEach((key) => {
-          if (key !== "year") acc[key] = true;  // Mark all unique keys
-        });
-        return acc;
-      }, {} as Record<string, boolean>)
-    ).map((key, index) => (
-      <Bar
-        key={index}
-        dataKey={key}
-        stackId="a"
-        fill={barColors[index % barColors.length]}
-        radius={[4, 4, 0, 0]}
-      />
-    ))
-}
-
+              chartData.length > 0 &&
+              // Collect all unique categories across all years
+              Object.keys(
+                chartData.reduce((acc, item) => {
+                  Object.keys(item).forEach((key) => {
+                    if (key !== "year") acc[key] = true;  // Mark all unique keys
+                  });
+                  return acc;
+                }, {} as Record<string, boolean>)
+              ).map((key, index) => (
+                <Bar
+                  key={index}
+                  dataKey={key}
+                  stackId="a"
+                  fill={barColors[index % barColors.length]}
+                  radius={[4, 4, 0, 0]}
+                />
+              ))
+            }
           </BarChart>
         </ResponsiveContainer>
       )}
 
-      {/* Data Field Selection */}
-      <div className="bg-gray-900 bg-opacity-50 p-4 rounded-lg mt-4 flex flex-wrap">
-        {dataFields.map((field) => (
-          <label key={field} className="mr-4 text-white">
-            <input
-              type="radio"
-              name="dataField"
+      {/* Data Field Selection - Using MUI Radio Buttons */}
+      <Box
+        sx={{
+          background: 'rgba(0, 0, 0, 0.5)',
+          padding: 4,
+          borderRadius: '8px',
+          marginTop: 4,
+        }}
+      >
+        <RadioGroup
+          value={selectedField}
+          onChange={(e) => setSelectedField(e.target.value)}
+          row
+        >
+          {dataFields.map((field) => (
+            <FormControlLabel
+              key={field}
               value={field}
-              checked={selectedField === field}
-              onChange={() => setSelectedField(field)}
-              className="mr-2"
+              control={<Radio sx={{ color: 'white' }} />}
+              label={field.replace(/_/g, " ")} // Replace underscores with spaces for display
+              sx={{
+                color: 'white',
+                marginRight: 4,
+                '& .MuiRadio-root': {
+                  color: 'white',
+                },
+              }}
             />
-            {field.replace(/_/g, " ")}
-          </label>
-        ))}
-      </div>
+          ))}
+        </RadioGroup>
+      </Box>
     </div>
   );
 };
