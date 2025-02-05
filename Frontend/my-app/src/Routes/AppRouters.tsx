@@ -38,20 +38,10 @@ const AppRouters: React.FC = () => {
         <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
         <Route path="/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
+        <Route path="/technicaldata/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
 
-        {/* Tab Routes */}
-        <Route
-          path="/monashee-deals/ticker/:ticker"
-          element={
-            <AuthGuard>
-              <TickerRoute />
-            </AuthGuard>
-          }
-        />
-        <Route path="/monashee-deals/deal-stats" element={<AuthGuard><DealStats /></AuthGuard>} />
-        <Route path="/monashee-deals/allocation-capture-return" element={<AuthGuard><AllocationCaptureReturn /></AuthGuard>} />
-        <Route path="/monashee-deals/follow-on-discount" element={<AuthGuard><FOllowOnDiscount /></AuthGuard>} />
-        <Route path="/monashee-deals/mdd-screener" element={<AuthGuard><MDDScreener /></AuthGuard>} />
+
+      
 
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/email-verification" element={<EmailVerification />} />
@@ -61,14 +51,6 @@ const AppRouters: React.FC = () => {
   );
 };
 
-const TickerRoute: React.FC = () => {
-  const { ticker } = useParams<{ ticker: string }>(); 
 
-  if (!ticker) {
-    return <div>No ticker found</div>; 
-  }
-
-  return <MDDSelectedTicker ticker={ticker} />; 
-};
 
 export default AppRouters;
