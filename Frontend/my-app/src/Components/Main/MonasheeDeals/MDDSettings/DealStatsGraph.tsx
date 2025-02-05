@@ -183,21 +183,16 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   }, [selectedField]);
 
   const barColors = [
-    "#81C784", // Light Green
-    "#D4E157", // Light Lime
-    "#4DB6AC", // Light Teal
-    "#FF8A80", // Soft Red
-    "#E57373", // Light Crimson
-    "#FFAB91", // Soft Orange
-    "#B0BEC5", // Light Gray
-    "#CFD8DC", // Pale Gray
-    "#90CAF9", // Soft Blue
-    "#64B5F6", // Light Sky Blue
-    "#CE93D8", // Soft Purple
-    "#FFECB3", // Light Yellow
-    "#BCAAA4", // Soft Brown
+    "#387F39",
+    "#A2CA71",
+    "#5D8736",
+    "#809D3C",
+    "#A58D4E",
+    "#A9C46C",
+    "#416D19",
+    "#9BCF53",
+    "#87A922",
   ];
-
   return (
     <Container>
       <Card>
