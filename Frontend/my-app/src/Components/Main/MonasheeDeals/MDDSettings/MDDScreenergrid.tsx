@@ -134,9 +134,9 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       headerName: "Ticker",
       width: 100,
       headerAlign: "center",
-      align: "center",
+      // align: "center",
       renderCell: (params) => (
-        <span style={{ color: "brown", fontWeight: "bold" }}>{params.value}</span>
+        <span style={{ color: "brown", fontWeight: "bold",paddingLeft:15 }}>{params.value}</span>
       ),
     }
     
