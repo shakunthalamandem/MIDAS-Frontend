@@ -180,7 +180,7 @@ const DealStatsGraph: React.FC = () => {
       {/* Data Field Selection - Using MUI Radio Buttons */}
       <Box
         sx={{
-          background: 'linear-gradient(45deg, rgba(255, 0, 150, 0.5), rgba(0, 204, 255, 0.5), rgba(255, 255, 0, 0.5))',
+          background: 'linear-gradient(45deg, rgba(38, 0, 255, 0.5), rgba(255, 123, 0, 0.62), rgba(0, 255, 0, 0.75))',
           padding: 1,
           borderRadius: '8px',
           marginTop: 4,
