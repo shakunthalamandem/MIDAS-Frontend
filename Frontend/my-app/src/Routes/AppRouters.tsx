@@ -61,15 +61,14 @@ const AppRouters: React.FC = () => {
   );
 };
 
-// Component to extract the ticker from the route params and pass it to MDDSelectedTicker
 const TickerRoute: React.FC = () => {
-  const { ticker } = useParams<{ ticker: string }>(); // Extract ticker from URL params
+  const { ticker } = useParams<{ ticker: string }>(); 
 
   if (!ticker) {
-    return <div>No ticker found</div>; // Handle the case where ticker is not available
+    return <div>No ticker found</div>; 
   }
 
-  return <MDDSelectedTicker ticker={ticker} />; // Pass ticker to the component
+  return <MDDSelectedTicker ticker={ticker} />; 
 };
 
 export default AppRouters;
