@@ -129,9 +129,9 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
   };
 
   const columns: GridColDef[] = [
-    { field: "pricing_date", headerName: "Pricing Date", width: 150 },
-    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "ticker", headerName: "Ticker", width: 150 },
+    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 150 },
     {
       field: "gics_sector_from_bloomberg",
       headerName: "Sector",
