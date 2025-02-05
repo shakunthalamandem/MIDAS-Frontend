@@ -146,7 +146,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
         >
 
           <Link
-            to={`/technicaldata/${params.value}`}
+            to={`/monasheeperformance/${params.value}`}
             style={{ color: "brown", fontWeight: "bold",paddingLeft:15,textDecoration: "none" }}
             target="_blank"
           >

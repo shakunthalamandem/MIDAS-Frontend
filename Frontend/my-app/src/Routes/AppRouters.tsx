@@ -38,7 +38,7 @@ const AppRouters: React.FC = () => {
         <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
         <Route path="/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
-        <Route path="/technicaldata/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
+        <Route path="/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
 
 
       
