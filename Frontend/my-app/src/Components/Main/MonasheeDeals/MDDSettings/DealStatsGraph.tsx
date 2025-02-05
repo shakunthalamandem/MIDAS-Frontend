@@ -337,8 +337,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
               setSelectedFilter(
                 filterOptions.find((option) => option.value === e.target.value)!
               )
-            } // Update with the full option
-            row // Arrange radio buttons in a row
+            } 
+            row 
           >
             {filterOptions.map((option) => (
               <FormControlLabel

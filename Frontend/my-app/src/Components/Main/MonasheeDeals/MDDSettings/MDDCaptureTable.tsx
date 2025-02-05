@@ -12,8 +12,8 @@ import {
   Typography,
   Box,
   CardContent,
-  Card,
-  Button,
+  Card,FormControlLabel,
+  Button,RadioGroup,Radio
 } from "@mui/material";
 import "./MDDCaptureTable.css";
 
@@ -45,7 +45,11 @@ interface CategoryData {
   "Model AM Return": number;
   "Total Return": number;
 }
-
+interface FilterOption {
+  label: string;
+  value: string;
+  payload: { filter_type: string } | null;
+}
 interface ResponseData {
   [year: string]: {
     [category: string]: {
@@ -54,16 +58,45 @@ interface ResponseData {
   };
 }
 
+
 interface MDDCaptureTableProps {
   responseData: ResponseData;
   apiName: string;
 }
+
+
+
+
+const filterOptions: FilterOption[] = [
+  { label: "Deal Type", value: "deal_type", payload: null },
+  {
+    label: "Sector",
+    value: "sector",
+    payload: { filter_type: "gics_sector_from_bloomberg" },
+  },
+  {
+    label: "Region",
+    value: "region",
+    payload: { filter_type: "broad_region" },
+  },
+
+];
+
+
+
+
+
 
 const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   responseData,
   apiName,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<"IPO" | "FO">("IPO");
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+   const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
+      filterOptions[0]
+    );
   const [dynamicCategoryByYear, setDynamicCategoryByYear] = useState<
     Record<string, string[]>
   >({});
@@ -103,22 +136,49 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
   return (
     <Box mr={0} sx={{ Width: "100%" }}>
-      <Box display="flex" justifyContent="center" mb={3} sx={{ gap: "10px", maxWidth:'1240px' }}>
-        <Button
-          variant={selectedCategory === "IPO" ? "contained" : "outlined"}
-          color="secondary"
-          onClick={() => setSelectedCategory("IPO")}
-        >
-          IPO
-        </Button>
-        <Button
-          variant={selectedCategory === "FO" ? "contained" : "outlined"}
-          color="secondary"
-          onClick={() => setSelectedCategory("FO")}
-        >
-          FO
-        </Button>
-      </Box>
+     <Box
+               sx={{
+                 background: 'linear-gradient(to right, #190250, #6DD5ED)',           
+                 paddingX: 2,
+                 borderRadius: "8px",
+                 boxShadow: 3,
+                 display: "flex",
+                 flexWrap: "wrap",
+                 justifyContent: "center", 
+                 wdith: "70%",
+                 alignItems: "center", 
+                 marginBottom: 4,
+                 marginLeft: 2,
+                 marginRight:'279px',
+                 marginX: 2,
+               }}
+             >
+               <RadioGroup
+                 value={selectedFilter.value}
+                 onChange={(e) =>
+                   setSelectedFilter(
+                     filterOptions.find((option) => option.value === e.target.value)!
+                   )
+                 } 
+                 row 
+               >
+                 {filterOptions.map((option) => (
+                   <FormControlLabel
+                     key={option.value}
+                     value={option.value}
+                     control={<Radio sx={{ color: "white" }} />}
+                     label={option.label}
+                     sx={{
+                       color: "white",
+                       marginRight: 4,
+                       "& .MuiRadio-root": {
+                         color: "white",
+                       },
+                     }}
+                   />
+                 ))}
+               </RadioGroup>
+             </Box>
 
       {Object.keys(responseData)
         .sort((a, b) => b.localeCompare(a)) // Sort years in descending order
