@@ -126,10 +126,10 @@ const DealStatsGraph: React.FC = () => {
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
             {/* <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" /> */}
-            <XAxis dataKey="year" stroke="#ffffff" />
-            <YAxis stroke="#ffffff" />
+            <XAxis dataKey="year" stroke="#000000" />
+            <YAxis stroke="#000000" />
             <Tooltip contentStyle={{ backgroundColor: "#333", color: "#fff" }} />
-            <Legend wrapperStyle={{ color: "#fff" }} />
+            <Legend wrapperStyle={{ color: "#000" }} />
             {chartData.length > 0 &&
               Object.keys(chartData[0])
                 .filter((key) => key !== "year")
