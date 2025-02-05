@@ -47,18 +47,31 @@ interface FilterOption {
   payload: { filter_type: string } | null;
 }
 
-const formatValue = (value: number): string => {
+const formatValue = (value: number, selectedField: string): string => {
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
 
-  if (absValue >= 1_000_000_000)
-    return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
-  if (absValue >= 1_000_000)
-    return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
-  if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
+  // Determine prefix and suffix based on the selected field
+  const prefix = ["deal_size", "avg_deal_size"].includes(selectedField) ? "$" : "";
+  const suffix = [
+    "allocation_deal_size_percentage",
+    "weighted_allocation_deal_size_percentage",
+    "allocation_percentage",
+    "weighted_allocation_percentage",
+  ].includes(selectedField)
+    ? "%"
+    : "";
 
-  return `${sign}$${absValue.toFixed(2)}`;
+  if (absValue >= 1_000_000_000)
+    return `${sign}${prefix}${(absValue / 1_000_000_000).toFixed(1)}B${suffix}`;
+  if (absValue >= 1_000_000)
+    return `${sign}${prefix}${(absValue / 1_000_000).toFixed(1)}M${suffix}`;
+  if (absValue >= 1_000)
+    return `${sign}${prefix}${(absValue / 1_000).toFixed(1)}K${suffix}`;
+
+  return `${sign}${prefix}${absValue.toFixed(2)}${suffix}`;
 };
+
 
 const filterOptions: FilterOption[] = [
   { label: "Deal Type", value: "deal_type", payload: null },
@@ -250,10 +263,10 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                 }}
               />
 
-              <YAxis
+              {/* <YAxis
                 stroke="#b2b2b2"
                 tick={{ fill: "#002060", fontSize: 12 }}
-                tickFormatter={formatValue}
+                tickFormatter={formatValue(value, selectedField)}
                 label={{
                   value: `${selectedField}`,
                   angle: -90,
@@ -272,7 +285,9 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                   padding: 8,
                 }}
                 formatter={(value: number) => formatValue(value)}
-              />
+              /> */}
+              <YAxis stroke="#000"  tickFormatter={(value) => formatValue(value, selectedField)} />
+              <Tooltip formatter={(value) => formatValue(value as number, selectedField)} />
 
               <Legend
                 wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }}
