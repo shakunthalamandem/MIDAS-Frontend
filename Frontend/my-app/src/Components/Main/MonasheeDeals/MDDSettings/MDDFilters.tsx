@@ -45,7 +45,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   }>({});
   const [appliedFilters, setAppliedFilters] = useState<{
     [key: string]: (string | number)[];
-  } | null>(null);
+  }>({});
   const [expanded, setExpanded] = useState<string | false>(false);
   const [payload, setPayload] = useState<{ [key: string]: (string | number)[] }>({});
   const [apiData, setApiData] = useState({});
@@ -92,15 +92,16 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       Object.keys(filters).forEach((key) => {
         payload[key] = filters[key] || [];
       });
-
+  
       setPayload(payload);
-
+      setAppliedFilters(filters);
+  
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
       if (!apiUrl) {
         throw new Error("API URL is not defined in environment variables");
       }
-
+  
       const response = await fetch(`${apiUrl}/api/${apiName}/`, {
         method: "POST",
         headers: {
@@ -109,7 +110,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         },
         body: JSON.stringify(payload),
       });
-
+  
       if (response.ok) {
         const result = await response.json();
         setApiData(result);
@@ -122,6 +123,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       setLoading(false);
     }
   };
+
   const handleCancel = () => {
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
     filtersData.forEach((filter) => {
@@ -316,7 +318,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </CardContent>
         </Card>
       </Box>
-      <Box  width="100%" mt={4} flex={1}>
+      <Box  width="100%" mt={1} flex={1}>
         {loading ? (
           <Box
             sx={{
@@ -338,7 +340,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
               <AvgFoDiscountChart data={apiData} />
             ) : (
               <>
-                <DealStatsGraph responseData={apiData} />
+                <DealStatsGraph selectedFilters={appliedFilters} />
                 <MDDScreenergrid sectorwiseData={payload} />
               </>
             )}
