@@ -19,6 +19,7 @@ import {
   Stack,
   Chip,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 
 interface ChartData {
@@ -218,8 +219,18 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
         </Box>
 
         {loading ? (
-          <p className="text-white">Loading...</p>
-        ) : (
+   <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress color="primary" />
+            <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
+              Loading... Please Wait
+            </Typography>
+          </Box>        ) : (
           <ResponsiveContainer width="100%" height={400}>
             <BarChart
               data={chartData}
