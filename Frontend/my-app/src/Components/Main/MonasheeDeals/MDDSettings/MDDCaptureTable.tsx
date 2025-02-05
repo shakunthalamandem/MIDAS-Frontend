@@ -149,7 +149,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                  alignItems: "center", 
                  marginBottom: 4,
                  marginLeft: 2,
-                 marginRight:'279px',
+                 marginRight:'220 px',
                  marginX: 2,
                }}
              >
