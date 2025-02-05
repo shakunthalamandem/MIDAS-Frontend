@@ -32,8 +32,8 @@ interface FilterOption {
 const filterOptions: FilterOption[] = [
   { label: "Deal Type", value: "deal_type", payload: null },
   { label: "Sector", value: "sector", payload: { filter_type: "gics_sector_from_bloomberg" } },
-  { label: "Region", value: "region", payload: { filter_type: "country" } },
-  { label: "Deal Caption", value: "deal_caption", payload: { filter_type: "deal_caption" } },
+  { label: "Region", value: "region", payload: { filter_type: "broad_region" } },
+  { label: "Deal Caption", value: "caption", payload: { filter_type: "deal_captain" } },
 ];
 
 const dataFields = [
@@ -53,8 +53,9 @@ const DealStatsGraph: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    // Re-fetch the data when selectedField changes
     fetchData(selectedFilter.payload);
-  }, [selectedFilter]);
+  }, [selectedField, selectedFilter]);
 
   const fetchData = async (payload: any) => {
     setLoading(true);
@@ -68,6 +69,7 @@ const DealStatsGraph: React.FC = () => {
       setLoading(false);
     }
   };
+
   const formatChartData = (data: ApiResponse): ChartData[] => {
     if (!data || typeof data !== "object") return [];
     return Object.keys(data).map((year) => {
@@ -79,7 +81,6 @@ const DealStatsGraph: React.FC = () => {
       return formatted;
     });
   };
-  
 
   useEffect(() => {
     setChartData((prevData) => {
@@ -123,8 +124,8 @@ const DealStatsGraph: React.FC = () => {
         <p className="text-white">Loading...</p>
       ) : (
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
+            {/* <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" /> */}
             <XAxis dataKey="year" stroke="#ffffff" />
             <YAxis stroke="#ffffff" />
             <Tooltip contentStyle={{ backgroundColor: "#333", color: "#fff" }} />
