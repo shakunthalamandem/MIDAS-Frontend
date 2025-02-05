@@ -275,7 +275,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
               />
 
               {/* Legend */}
-              <Legend wrapperStyle={{ color: "#000000", fontSize: 14 }} />
+              <Legend wrapperStyle={{ color: "#000000", fontSize: 14,bottom:10 }} />
 
               {/* Bars with formatted colors and values */}
               {chartData.length > 0 &&
