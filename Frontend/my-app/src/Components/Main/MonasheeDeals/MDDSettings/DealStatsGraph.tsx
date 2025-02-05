@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Box, RadioGroup, FormControlLabel, Radio, Container, Card } from "@mui/material";
+import { Box, RadioGroup, FormControlLabel, Radio, Container, Card, Stack, Chip, } from "@mui/material";
+
 
 const API_URL = "http://192.168.1.59:9000/api/mdd_deals_graph/";
 
@@ -185,27 +186,25 @@ const DealStatsGraph: React.FC = () => {
           marginTop: 4,
         }}
       >
-        <RadioGroup
-          value={selectedField}
-          onChange={(e) => setSelectedField(e.target.value)}
-          row
-        >
-          {dataFields.map((field) => (
-            <FormControlLabel
-              key={field}
-              value={field}
-              control={<Radio sx={{ color: 'white' }} />}
-              label={field.replace(/_/g, " ")} // Replace underscores with spaces for display
-              sx={{
-                color: 'white',
-                marginRight: 4,
-                '& .MuiRadio-root': {
-                  color: 'white',
-                },
-              }}
-            />
-          ))}
-        </RadioGroup>
+
+<Stack direction="row" spacing={1}>
+  {dataFields.map((field) => (
+    <Chip
+      key={field}
+      label={field.replace(/_/g, " ")}
+      clickable
+      onClick={() => setSelectedField(field)}
+      color={selectedField === field ? "primary" : "default"}
+      sx={{
+        color: 'white',
+        borderColor: 'white',
+        '&.MuiChip-outlined': { borderWidth: 2 },
+      }}
+    />
+  ))}
+</Stack>
+
+
       </Box>
       </Card>
     </Container>
