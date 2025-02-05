@@ -146,11 +146,11 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         marginBottom: 20,
         display: "flex",
         marginLeft: 0,
-        marginTop: 10,
+        marginTop: 5,
         width: '100%'
       }}
     >
-      <Box width="320px" sx={{ marginRight: 10,marginLeft:5}}>  
+      <Box width="320px" sx={{ marginRight: 5,marginLeft:5}}>  
         <Card sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}>
           <CardContent>
             <Box width="250px" sx={{ p: 2 }}>
