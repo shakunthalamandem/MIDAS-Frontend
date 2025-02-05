@@ -132,10 +132,14 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     {
       field: "ticker",
       headerName: "Ticker",
-      width: 150,
+      width: 100,
       headerAlign: "center",
-      align: "center"
+      align: "center",
+      renderCell: (params) => (
+        <span style={{ color: "brown", fontWeight: "bold" }}>{params.value}</span>
+      ),
     }
+    
 ,        { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "pricing_date", headerName: "Pricing Date", width: 150 },
     {
