@@ -310,7 +310,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
               "linear-gradient(45deg, rgba(109, 84, 252, 0.43), rgba(255, 123, 0, 0.62), rgba(0, 255, 255, 0.75))",
             padding: 1,
             borderRadius: "8px",
-            margin:2a
+            margin:2
           }}
         >
           <Stack direction="row" spacing={1}>
