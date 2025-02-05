@@ -1,411 +1,166 @@
 import React, { useState, useEffect } from "react";
-import "./DealStats.css";
-import {
-  Box,
-  Typography,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  ToggleButtonGroup,
-  ToggleButton,
-  CardContent,
-  Card,
-  Container,
-  FormControl,
-  FormLabel,
-} from "@mui/material";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import axios from "axios";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from "recharts";
 
-interface DealAllocationGraphProps {
-  responseData: any; // The response data from the API
+const API_URL = "http://192.168.1.59:9000/api/mdd_deals_graph/";
+
+interface ChartData {
+  year: string;
+  [key: string]: number | string;
 }
 
-const formatValue = (value: number, selectedOption: string): string => {
-  if (selectedOption === "deal_size" || selectedOption === "avg_deal_size") {
-    const absValue = Math.abs(value);
-    if (absValue >= 1_000_000_000) {
-      return `$${(value / 1_000_000_000).toFixed()}B`;
-    } else if (absValue >= 1_000_000) {
-      return `$${(value / 1_000_000).toFixed()}M`;
-    } else if (absValue >= 1_000) {
-      return `$${(value / 1_000).toFixed()}K`;
-    }
-    return `$${value.toFixed()}`;
-  } else if (
-    selectedOption === "mdd_allocation_percentage" ||
-    selectedOption === "mdd_allocation_ioi"
-  ) {
-    return `${value.toFixed(2)}%`;
-  }
-  return value.toFixed(0);
-};
-
-const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
-  responseData,
-}) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("count");
-  const [selectedValue, setSelectedValue] = useState("weighted");
-
-  const dealStatsOptions = [
-    { label: "Deals Count", key: "count" },
-    { label: "Deal Volume", key: "deal_size" },
-    { label: "Average Deal Size", key: "avg_deal_size" },
-    { label: "Allocation as % of Deal Size", key: "mdd_allocation_percentage" },
-    { label: "Allocation as % of IOI", key: "mdd_allocation_ioi" },
-  ];
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    window.location.reload();
+interface ApiResponse {
+  [year: string]: {
+    [category: string]: {
+      count: number;
+      deal_size: number;
+      avg_deal_size: number;
+      allocation_deal_size_percentage: number;
+      weighted_allocation_deal_size_percentage: number;
+      allocation_percentage: number;
+      weighted_allocation_percentage: number;
+    };
   };
+}
+
+interface FilterOption {
+  label: string;
+  value: string;
+  payload: { filter_type: string } | null;
+}
+
+const filterOptions: FilterOption[] = [
+  { label: "Deal Type", value: "deal_type", payload: null },
+  { label: "Sector", value: "sector", payload: { filter_type: "gics_sector_from_bloomberg" } },
+  { label: "Region", value: "region", payload: { filter_type: "country" } },
+  { label: "Deal Caption", value: "deal_caption", payload: { filter_type: "deal_caption" } },
+];
+
+const dataFields = [
+  "count",
+  "deal_size",
+  "avg_deal_size",
+  "allocation_deal_size_percentage",
+  "weighted_allocation_deal_size_percentage",
+  "allocation_percentage",
+  "weighted_allocation_percentage",
+];
+
+const DealStatsGraph: React.FC = () => {
+  const [selectedFilter, setSelectedFilter] = useState<FilterOption>(filterOptions[0]);
+  const [selectedField, setSelectedField] = useState<string>("count");
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (responseData?.message) {
-      setDialogOpen(true);
+    fetchData(selectedFilter.payload);
+  }, [selectedFilter]);
+
+  const fetchData = async (payload: any) => {
+    setLoading(true);
+    try {
+      const response = await axios.post<ApiResponse>(API_URL, payload);
+      setChartData(formatChartData(response.data));
+    } catch (error) {
+      console.error("Error fetching data", error);
+      setChartData([]);
+    } finally {
+      setLoading(false);
     }
-  }, [responseData]);
-
-  const formatChartData = (data: any) => {
+  };
+  const formatChartData = (data: ApiResponse): ChartData[] => {
     if (!data || typeof data !== "object") return [];
-
-    const allowedDealTypes = new Set(["FO", "IPO"]);
-
-    return Object.keys(data).map((quarter) => {
-      const sectors = data[quarter];
-      const chartRow: any = { quarter };
-
-      allowedDealTypes.forEach((dealType) => {
-        let allocationKeyForDealType: string;
-
-        if (selectedOption === "mdd_allocation_ioi") {
-          allocationKeyForDealType =
-            selectedValue === "normal"
-              ? "allocation_percentage"
-              : "weighted_allocation_percentage";
-        } else if (selectedOption === "mdd_allocation_percentage") {
-          allocationKeyForDealType =
-            selectedValue === "normal"
-              ? "allocation_deal_size_percentage"
-              : "weighted_allocation_deal_size_percentage";
-        } else {
-          allocationKeyForDealType = selectedOption;
-        }
-
-        chartRow[`${dealType}_${selectedOption}`] = sectors[dealType]?.[
-          allocationKeyForDealType
-        ]
-          ? parseFloat(sectors[dealType][allocationKeyForDealType])
-          : 0;
+    return Object.keys(data).map((year) => {
+      const categories = data[year];
+      let formatted: ChartData = { year };
+      Object.keys(categories).forEach((category) => {
+        formatted[category] = categories[category][selectedField as keyof typeof categories[typeof category]] || 0;
       });
-
-      return chartRow;
+      return formatted;
     });
   };
+  
 
-  const chartData =
-    responseData && !responseData.message ? formatChartData(responseData) : [];
+  useEffect(() => {
+    setChartData((prevData) => {
+      return prevData.map((item) => {
+        let updatedItem: ChartData = { year: item.year };
+        Object.keys(item).forEach((key) => {
+          if (key !== "year") {
+            updatedItem[key] = item[key] as number;
+          }
+        });
+        return updatedItem;
+      });
+    });
+  }, [selectedField]);
+
+  // Colors for stacked bars
+  const barColors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"];
 
   return (
-    <div>
-      <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
-      <Box className="deal-stats-container">
-        <RadioGroup
-          row
-          value={selectedOption}
-          onChange={(e) => setSelectedOption(e.target.value)}
-          className="radio-group"
-        >
-          {dealStatsOptions.map((option) => (
-            <FormControlLabel
-              key={option.key}
-              value={option.key}
-              control={<Radio className="custom-radio" />}
-              label={option.label}
-              className={`radio-option ${selectedOption === option.key ? "selected" : ""}`}
+    <div className="p-4 bg-transparent shadow-none">
+      <h2 className="text-lg font-semibold mb-4 text-white">Deal Statistics</h2>
+
+      {/* Primary Filter Box */}
+      <div className="bg-gray-900 bg-opacity-50 p-4 rounded-lg mb-4 flex flex-wrap">
+        {filterOptions.map((option) => (
+          <label key={option.value} className="mr-4 text-white">
+            <input
+              type="radio"
+              name="filter"
+              value={option.value}
+              checked={selectedFilter.value === option.value}
+              onChange={() => setSelectedFilter(option)}
+              className="mr-2"
             />
-          ))}
-        </RadioGroup>
-      </Box>
+            {option.label}
+          </label>
+        ))}
+      </div>
 
-      {chartData.length === 0 && !responseData?.message ? (
-        <Box sx={{ textAlign: "center", padding: 4 }}>
-          <Typography variant="h6" color="textSecondary">
-            No Data Available for the selected filters.
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            Please change the selected filters to show the Plot.
-          </Typography>
-        </Box>
+      {loading ? (
+        <p className="text-white">Loading...</p>
       ) : (
-        <Box mt={5}>
-          <Card
-            sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}
-          >
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={chartData}>
-                  <XAxis dataKey="quarter" />
-                  <YAxis
-                    tickFormatter={(value) =>
-                      formatValue(value, selectedOption)
-                    }
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="year" stroke="#ffffff" />
+            <YAxis stroke="#ffffff" />
+            <Tooltip contentStyle={{ backgroundColor: "#333", color: "#fff" }} />
+            <Legend wrapperStyle={{ color: "#fff" }} />
+            {chartData.length > 0 &&
+              Object.keys(chartData[0])
+                .filter((key) => key !== "year")
+                .map((key, index) => (
+                  <Bar
+                    key={index}
+                    dataKey={key}
+                    stackId="a"
+                    fill={barColors[index % barColors.length]}
+                    radius={[4, 4, 0, 0]}
                   />
-               <Tooltip
-  formatter={(value: number, name: string, props: any) => {
-    const tooltipMapping: { [key: string]: string } = {
-      FO_count: "FO",
-      IPO_count: "IPO",
-      FO_deal_size: "FO",
-      IPO_deal_size: "IPO",
-      FO_avg_deal_size: "FO",
-      IPO_avg_deal_size: "IPO",
-      FO_mdd_allocation_ioi: "FO",
-      IPO_mdd_allocation_ioi: "IPO",
-      FO_mdd_allocation_percentage: "FO",
-      IPO_mdd_allocation_percentage: "IPO",
-    };
-
-    const formattedName = tooltipMapping[name] || name;
-    return [`${formatValue(value, selectedOption)}`, formattedName];
-  }}
-  labelFormatter={(label) => <span style={{ fontWeight: 'bold', color: '#002060' }}>Year: {label}</span>}
-/>
-
-                  <Legend
-                    formatter={(value) => {
-                      const legendMapping: { [key: string]: string } = {
-                        FO_count: "FO",
-                        IPO_count: "IPO",
-                        FO_deal_size: "FO",
-                        IPO_deal_size: "IPO",
-                        FO_avg_deal_size: "FO",
-                        IPO_avg_deal_size: "IPO",
-                        FO_mdd_allocation_ioi: "FO",
-                        IPO_mdd_allocation_ioi: "IPO",
-                        FO_mdd_allocation_percentage: "FO",
-                        IPO_mdd_allocation_percentage: "IPO",
-                      };
-                      return legendMapping[value] || value;
-                    }}
-                  />
-                  {/* Render Bars based on selectedOption */}
-                  {selectedOption === "count" && (
-                    <>
-                      <Bar dataKey="FO_count" fill="#8884d8" stackId="a" />
-                      <Bar dataKey="IPO_count" fill="#82ca9d" stackId="a" />
-                    </>
-                  )}
-                  {selectedOption === "deal_size" && (
-                    <>
-                      <Bar dataKey="FO_deal_size" fill="#8884d8" stackId="a" />
-                      <Bar dataKey="IPO_deal_size" fill="#82ca9d" stackId="a" />
-                    </>
-                  )}
-                  {selectedOption === "avg_deal_size" && (
-                    <>
-                      <Bar
-                        dataKey="FO_avg_deal_size"
-                        fill="#8884d8"
-                        stackId="a"
-                      />
-                      <Bar
-                        dataKey="IPO_avg_deal_size"
-                        fill="#82ca9d"
-                        stackId="a"
-                      />
-                    </>
-                  )}
-                  {selectedOption === "mdd_allocation_ioi" && (
-                    <>
-                      <Bar
-                        dataKey={`FO_mdd_allocation_ioi`}
-                        fill="#8884d8"
-                        stackId="a"
-                      />
-                      <Bar
-                        dataKey={`IPO_mdd_allocation_ioi`}
-                        fill="#82ca9d"
-                        stackId="a"
-                      />
-                    </>
-                  )}
-                  {selectedOption === "mdd_allocation_percentage" && (
-                    <>
-                      <Bar
-                        dataKey={`FO_mdd_allocation_percentage`}
-                        fill="#8884d8"
-                        stackId="a"
-                      />
-                      <Bar
-                        dataKey={`IPO_mdd_allocation_percentage`}
-                        fill="#82ca9d"
-                        stackId="a"
-                      />
-                    </>
-                  )}
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-
-          <Box
-  sx={{
-    display: "flex",
-    justifyContent: "center", // Centers items horizontally
-    alignItems: "center", // Centers items vertically
-    gap: "40px",
-    padding: "15px",
-    borderRadius: "8px",
-    background: "linear-gradient(to right, rgba(255, 0, 150, 0.2), rgba(0, 204, 255, 0.2))",
-    mt: "5px", // Margin top of 5px
-  }}
->
-  {/* Radio Group to ensure only one can be selected, with "Deal Type" as default */}
-  <RadioGroup row name="dealOptions" defaultValue="dealType">
-    <FormControl sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-      <FormLabel sx={{ fontWeight: "bold", marginRight: "10px" }}>Deal Type</FormLabel>
-      <FormControlLabel
-        control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "red" } }} />}
-        value="dealType"
-        label=""
-      />
-    </FormControl>
-
-    <FormControl sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-      <FormLabel sx={{ fontWeight: "bold", marginRight: "10px" }}>Sector</FormLabel>
-      <FormControlLabel
-        control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "red" } }} />}
-        value="sector"
-        label=""
-      />
-    </FormControl>
-
-    <FormControl sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-      <FormLabel sx={{ fontWeight: "bold", marginRight: "10px" }}>Region</FormLabel>
-      <FormControlLabel
-        control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "red" } }} />}
-        value="region"
-        label=""
-      />
-    </FormControl>
-
-    <FormControl sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-      <FormLabel sx={{ fontWeight: "bold", marginRight: "10px" }}>Deal Caption</FormLabel>
-      <FormControlLabel
-        control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "red" } }} />}
-        value="dealCaption"
-        label=""
-      />
-    </FormControl>
-  </RadioGroup>
-</Box>
-
-
-     </Box>
-      )}
-      {/* Show Normal/Weighted options if selectedOption is for allocation */}
-      {(selectedOption === "mdd_allocation_ioi" ||
-        selectedOption === "mdd_allocation_percentage") && (
-        <div className="toggle-container">
-          <ToggleButtonGroup
-            value={selectedValue}
-            exclusive
-            onChange={(_, value) => value && setSelectedValue(value)}
-            aria-label="allocation toggle"
-            className="toggle-group"
-          >
-            <ToggleButton
-              value="normal"
-              aria-label="normal"
-              className="toggle-button"
-              style={{
-                fontSize: "14px",
-                padding: "5px 10px",
-                color: "#444444",
-                background: "transparent",
-                border: "2px solid #444444",
-                transition: "all 0.3s ease",
-                borderRadius: "5px",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = "#b90066";
-                e.currentTarget.style.color = "#fff";
-                e.currentTarget.style.border = "2px solid #b90066";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.color = "#444444";
-                e.currentTarget.style.border = "2px solid #444444";
-              }}
-            >
-              Simple
-            </ToggleButton>
-            <ToggleButton
-              value="weighted"
-              aria-label="weighted"
-              className="toggle-button"
-              style={{
-                fontSize: "14px",
-                padding: "5px 10px",
-                color: "#444444",
-                background: "transparent",
-                border: "2px solid #444444",
-                transition: "all 0.3s ease",
-                borderRadius: "5px",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = "#b90066";
-                e.currentTarget.style.color = "#fff";
-                e.currentTarget.style.border = "2px solid #b90066";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.color = "#444444";
-                e.currentTarget.style.border = "2px solid #444444";
-              }}
-            >
-              Weighted
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </div>
+                ))}
+          </BarChart>
+        </ResponsiveContainer>
       )}
 
-      <Dialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">No Data Available</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Please change the filters. No data available for the given filters.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} autoFocus>
-            Okay
-          </Button>
-        </DialogActions>
-      </Dialog>
-      </Container>
-
+      {/* Data Field Selection */}
+      <div className="bg-gray-900 bg-opacity-50 p-4 rounded-lg mt-4 flex flex-wrap">
+        {dataFields.map((field) => (
+          <label key={field} className="mr-4 text-white">
+            <input
+              type="radio"
+              name="dataField"
+              value={field}
+              checked={selectedField === field}
+              onChange={() => setSelectedField(field)}
+              className="mr-2"
+            />
+            {field.replace(/_/g, " ")}
+          </label>
+        ))}
+      </div>
     </div>
   );
 };
