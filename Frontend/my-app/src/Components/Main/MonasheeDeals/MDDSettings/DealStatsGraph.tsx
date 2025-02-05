@@ -239,7 +239,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
               {/* X-Axis */}
               <XAxis
                 dataKey="year"
-                stroke="#000000"
+                stroke="#b2b2b2"
                 tick={{ fill: "#000000", fontSize: 12 }}
                 label={{
                   value: "Year",
@@ -252,8 +252,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
 
               {/* Y-Axis with formatted values */}
               <YAxis
-                stroke="#000000"
-                tick={{ fill: "#000000", fontSize: 12 }}
+                stroke="#b2b2b2"
+                tick={{ fill: "#002060", fontSize: 12 }}
                 tickFormatter={formatValue}
                 label={{
                   value: `${selectedField}`,
