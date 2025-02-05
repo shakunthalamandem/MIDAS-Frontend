@@ -54,6 +54,13 @@ const FooterMain: React.FC = () => {
           }}
         />
       </Box>
+      <Typography
+          variant="body2"
+          sx={{
+            color: '#FFFFFF',
+          }}
+        >
+Version 1.0       </Typography>
     </Box>
   );
 };
