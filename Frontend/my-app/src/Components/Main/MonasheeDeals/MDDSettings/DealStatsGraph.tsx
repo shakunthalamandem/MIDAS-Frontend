@@ -182,17 +182,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
     });
   }, [selectedField]);
 
-  const barColors = [
-    "#387F39",
-    "#A2CA71",
-    "#5D8736",
-    "#809D3C",
-    "#A58D4E",
-    "#A9C46C",
-    "#416D19",
-    "#9BCF53",
-    "#87A922",
-  ];
+  const barColors= ['#809D3C', '#416D19', '#A2CA71', '#004E89', '#68A5CC', '#00356B', '#0072B5', '#387F39', '#489FB5', '#5D8736', '#79b4b8', '#87A922', '#A9C46C', '#9BCF53', '#96D0DB']
+
   return (
     <Container>
       <Card>
