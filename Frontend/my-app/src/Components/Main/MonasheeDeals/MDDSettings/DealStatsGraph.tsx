@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Box, RadioGroup, FormControlLabel, Radio, Container, Card, Stack, Chip, } from "@mui/material";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Box,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Container,
+  Card,
+  Stack,
+  Chip,
+} from "@mui/material";
 
 interface ChartData {
   year: string;
@@ -43,9 +60,21 @@ const formatValue = (value: number): string => {
 
 const filterOptions: FilterOption[] = [
   { label: "Deal Type", value: "deal_type", payload: null },
-  { label: "Sector", value: "sector", payload: { filter_type: "gics_sector_from_bloomberg" } },
-  { label: "Region", value: "region", payload: { filter_type: "broad_region" } },
-  { label: "Deal Caption", value: "caption", payload: { filter_type: "deal_captain" } },
+  {
+    label: "Sector",
+    value: "sector",
+    payload: { filter_type: "gics_sector_from_bloomberg" },
+  },
+  {
+    label: "Region",
+    value: "region",
+    payload: { filter_type: "broad_region" },
+  },
+  {
+    label: "Deal Caption",
+    value: "caption",
+    payload: { filter_type: "deal_captain" },
+  },
 ];
 
 const dataFields = [
@@ -62,9 +91,10 @@ interface DealStatsGraphProps {
   selectedFilters: { [key: string]: (string | number)[] };
 }
 
-
 const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
-  const [selectedFilter, setSelectedFilter] = useState<FilterOption>(filterOptions[0]);
+  const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
+    filterOptions[0]
+  );
   const [selectedField, setSelectedField] = useState<string>("count");
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -74,7 +104,6 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   useEffect(() => {
     fetchData();
   }, [selectedField, selectedFilter, selectedFilters]);
-  
 
   const fetchData = async () => {
     setLoading(true);
@@ -87,7 +116,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token}` : "",
+          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify(payload),
       });
@@ -107,7 +136,10 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
       const categories = data[year];
       let formatted: ChartData = { year };
       Object.keys(categories).forEach((category) => {
-        formatted[category] = categories[category][selectedField as keyof typeof categories[typeof category]] || 0;
+        formatted[category] =
+          categories[category][
+            selectedField as keyof (typeof categories)[typeof category]
+          ] || 0;
       });
       return formatted;
     });
@@ -127,112 +159,165 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
     });
   }, [selectedField]);
 
-  const barColors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"];
+  const barColors = [
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#4BC0C0",
+    "#9966FF",
+    "#FF9F40",
+  ];
 
   return (
     <Container>
       <Card>
-      <h2 className="text-lg font-semibold mb-4 text-white">Deal Statistics</h2>
+        <h2 className="text-lg font-semibold mb-4 text-white">
+          Deal Statistics
+        </h2>
 
-      <Box
-        sx={{
-          background: 'linear-gradient(45deg, rgba(255, 0, 150, 0.5), rgba(0, 204, 255, 0.5))', // Multi-color transparent background
-          paddingX: 2,
-          borderRadius: '8px',
-          boxShadow: 3,
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center', // Centering items horizontally
-          alignItems: 'center',     // Centering items vertically
-          marginBottom: 4,
-          marginX:2
-        }}
-      >
-        <RadioGroup
-          value={selectedFilter.value}
-          onChange={(e) => setSelectedFilter(filterOptions.find(option => option.value === e.target.value)!)} // Update with the full option
-          row // Arrange radio buttons in a row
+        <Box
+          sx={{
+            background:
+              "linear-gradient(45deg, rgba(255, 0, 150, 0.5), rgba(0, 204, 255, 0.5))", // Multi-color transparent background
+            paddingX: 2,
+            borderRadius: "8px",
+            boxShadow: 3,
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center", // Centering items horizontally
+            alignItems: "center", // Centering items vertically
+            marginBottom: 4,
+            marginX: 2,
+          }}
         >
-          {filterOptions.map((option) => (
-            <FormControlLabel
-              key={option.value}
-              value={option.value}
-              control={<Radio sx={{ color: 'white' }} />}
-              label={option.label}
-              sx={{
-                color: 'white',
-                marginRight: 4,
-                '& .MuiRadio-root': {
-                  color: 'white',
-                },
-              }}
-            />
-          ))}
-        </RadioGroup>
-      </Box>
+          <RadioGroup
+            value={selectedFilter.value}
+            onChange={(e) =>
+              setSelectedFilter(
+                filterOptions.find((option) => option.value === e.target.value)!
+              )
+            } // Update with the full option
+            row // Arrange radio buttons in a row
+          >
+            {filterOptions.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                value={option.value}
+                control={<Radio sx={{ color: "white" }} />}
+                label={option.label}
+                sx={{
+                  color: "white",
+                  marginRight: 4,
+                  "& .MuiRadio-root": {
+                    color: "white",
+                  },
+                }}
+              />
+            ))}
+          </RadioGroup>
+        </Box>
 
-      {loading ? (
-        <p className="text-white">Loading...</p>
-      ) : (
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
-            <XAxis dataKey="year" stroke="#000000" />
-            <YAxis stroke="#000000" />
-            <Tooltip contentStyle={{ backgroundColor: "#333", color: "#fff" }} />
-            <Legend wrapperStyle={{ color: "#000" }} />
-            {
-              chartData.length > 0 &&
-              // Collect all unique categories across all years
-              Object.keys(
-                chartData.reduce((acc, item) => {
-                  Object.keys(item).forEach((key) => {
-                    if (key !== "year") acc[key] = true;  // Mark all unique keys
-                  });
-                  return acc;
-                }, {} as Record<string, boolean>)
-              ).map((key, index) => (
-                <Bar
-                  key={index}
-                  dataKey={key}
-                  stackId="a"
-                  fill={barColors[index % barColors.length]}
-                  radius={[4, 4, 0, 0]}
-                />
-              ))
-            }
-          </BarChart>
-        </ResponsiveContainer>
-      )}
+        {loading ? (
+          <p className="text-white">Loading...</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+            >
+              {/* X-Axis */}
+              <XAxis
+                dataKey="year"
+                stroke="#000000"
+                tick={{ fill: "#000000", fontSize: 12 }}
+                label={{
+                  value: "Year",
+                  position: "insideBottom",
+                  dy: 10,
+                  fill: "#000000",
+                }}
+              />
 
-      {/* Data Field Selection - Using MUI Radio Buttons */}
-      <Box
-        sx={{
-          background: 'linear-gradient(45deg, rgba(38, 0, 255, 0.5), rgba(255, 123, 0, 0.62), rgba(0, 255, 0, 0.75))',
-          padding: 1,
-          borderRadius: '8px',
-          marginTop: 4,
-        }}
-      >
+              {/* Y-Axis with formatted values */}
+              <YAxis
+                stroke="#000000"
+                tick={{ fill: "#000000", fontSize: 12 }}
+                tickFormatter={formatValue}
+                label={{
+                  value: `${selectedField}`,
+                  angle: -90,
+                  position: "insideLeft",
+                  fill: "#000000",
+                }}
+              />
 
-<Stack direction="row" spacing={1}>
-  {dataFields.map((field) => (
-    <Chip
-      key={field}
-      label={field.replace(/_/g, " ")}
-      clickable
-      onClick={() => setSelectedField(field)}
-      color={selectedField === field ? "primary" : "default"}
-      sx={{
-        color: 'white',
-        borderColor: 'white',
-        '&.MuiChip-outlined': { borderWidth: 2 },
-      }}
-    />
-  ))}
-</Stack>
+              {/* Tooltip with formatted values */}
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#333",
+                  color: "#000000",
+                  borderRadius: 8,
+                  padding: 8,
+                }}
+                formatter={(value: number) => formatValue(value)}
+              />
 
+              {/* Legend */}
+              <Legend wrapperStyle={{ color: "#000000", fontSize: 14 }} />
 
-      </Box>
+              {/* Bars with formatted colors and values */}
+              {chartData.length > 0 &&
+                Object.keys(
+                  chartData.reduce(
+                    (acc, item) => {
+                      Object.keys(item).forEach((key) => {
+                        if (key !== "year") acc[key] = true;
+                      });
+                      return acc;
+                    },
+                    {} as Record<string, boolean>
+                  )
+                ).map((key, index) => (
+                  <Bar
+                    key={index}
+                    dataKey={key}
+                    stackId="a"
+                    fill={barColors[index % barColors.length]}
+                    radius={[4, 4, 0, 0]}
+                    barSize={40} // Adjust bar width
+                  />
+                ))}
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+
+        {/* Data Field Selection - Using MUI Radio Buttons */}
+        <Box
+          sx={{
+            background:
+              "linear-gradient(45deg, rgba(38, 0, 255, 0.5), rgba(255, 123, 0, 0.62), rgba(0, 255, 0, 0.75))",
+            padding: 1,
+            borderRadius: "8px",
+            marginTop: 4,
+          }}
+        >
+          <Stack direction="row" spacing={1}>
+            {dataFields.map((field) => (
+              <Chip
+                key={field}
+                label={field.replace(/_/g, " ")}
+                clickable
+                onClick={() => setSelectedField(field)}
+                color={selectedField === field ? "primary" : "default"}
+                sx={{
+                  color: "white",
+                  borderColor: "white",
+                  "&.MuiChip-outlined": { borderWidth: 2 },
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
       </Card>
     </Container>
   );
