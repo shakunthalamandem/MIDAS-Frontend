@@ -214,8 +214,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
 
   return (
     <Container>
-      <Card>
-        <Typography variant="h5" sx={{ color: "#002060", fontWeight: "bold" }}>
+      <Card elevation={5}>
+        <Typography variant="h5" sx={{ color: "#002060", fontWeight: "bold",marginTop:3 }}>
           {" "}
           Deal Statistics
         </Typography>
