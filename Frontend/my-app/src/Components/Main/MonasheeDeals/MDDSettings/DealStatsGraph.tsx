@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Box, RadioGroup, FormControlLabel, Radio } from "@mui/material";
+import { Box, RadioGroup, FormControlLabel, Radio, Container, Card } from "@mui/material";
 
 const API_URL = "http://192.168.1.59:9000/api/mdd_deals_graph/";
 
@@ -101,14 +101,15 @@ const DealStatsGraph: React.FC = () => {
   const barColors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"];
 
   return (
-    <div className="p-4 bg-transparent shadow-none">
+    <Container>
+      <Card>
       <h2 className="text-lg font-semibold mb-4 text-white">Deal Statistics</h2>
 
       {/* Primary Filter Box */}
       <Box
         sx={{
           background: 'linear-gradient(45deg, rgba(255, 0, 150, 0.5), rgba(0, 204, 255, 0.5))', // Multi-color transparent background
-          padding: 4,
+          paddingX: 2,
           borderRadius: '8px',
           boxShadow: 3,
           display: 'flex',
@@ -116,6 +117,7 @@ const DealStatsGraph: React.FC = () => {
           justifyContent: 'center', // Centering items horizontally
           alignItems: 'center',     // Centering items vertically
           marginBottom: 4,
+          marginX:2
         }}
       >
         <RadioGroup
@@ -177,8 +179,8 @@ const DealStatsGraph: React.FC = () => {
       {/* Data Field Selection - Using MUI Radio Buttons */}
       <Box
         sx={{
-          background: 'rgba(0, 0, 0, 0.5)',
-          padding: 4,
+          background: 'linear-gradient(45deg, rgba(255, 0, 150, 0.5), rgba(0, 204, 255, 0.5), rgba(255, 255, 0, 0.5))',
+          padding: 1,
           borderRadius: '8px',
           marginTop: 4,
         }}
@@ -205,7 +207,8 @@ const DealStatsGraph: React.FC = () => {
           ))}
         </RadioGroup>
       </Box>
-    </div>
+      </Card>
+    </Container>
   );
 };
 
