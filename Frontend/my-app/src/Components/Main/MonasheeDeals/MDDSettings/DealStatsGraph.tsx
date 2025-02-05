@@ -173,8 +173,10 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   return (
     <Container>
       <Card>
-    <Typography variant="h5" sx={{color:'#002060',fontWeight:'bold'}}>          Deal Statistics
-    </Typography>
+        <Typography variant="h5" sx={{ color: "#002060", fontWeight: "bold" }}>
+          {" "}
+          Deal Statistics
+        </Typography>
 
         <Box
           sx={{
@@ -219,7 +221,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
         </Box>
 
         {loading ? (
-   <Box
+          <Box
             sx={{
               display: "flex",
               justifyContent: "center",
@@ -230,7 +232,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
               Loading... Please Wait
             </Typography>
-          </Box>        ) : (
+          </Box>
+        ) : (
           <ResponsiveContainer width="100%" height={450}>
             <BarChart
               data={chartData}
@@ -246,26 +249,23 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                   position: "insideBottom",
                   dy: 10,
                   fill: "#002060",
-                  
                 }}
               />
 
-              {/* Y-Axis with formatted values */}
               <YAxis
-  stroke="#b2b2b2"
-  tick={{ fill: "#002060", fontSize: 12 }}
-  tickFormatter={formatValue}
-  label={{
-    value: `${selectedField}`,
-    angle: -90,
-    position: "outsideLeft",  // Move the label outside the axis
-    fill: "#b2b2b2",
-    dx: -30,  // Adjust left or right position (negative moves it left)
-    dy: -10,  // Adjust up or down position (negative moves it up)
-  }}
-/>
+                stroke="#b2b2b2"
+                tick={{ fill: "#002060", fontSize: 12 }}
+                tickFormatter={formatValue}
+                label={{
+                  value: `${selectedField}`,
+                  angle: -90,
+                  position: "outsideLeft",
+                  fill: "#b2b2b2",
+                  dx: -30,
+                  dy: -10,
+                }}
+              />
 
-              {/* Tooltip with formatted values */}
               <Tooltip
                 contentStyle={{
                   backgroundColor: "#333",
@@ -276,10 +276,10 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                 formatter={(value: number) => formatValue(value)}
               />
 
-              {/* Legend */}
-              <Legend wrapperStyle={{ color: "#000000", fontSize: 14,bottom:10 }} />
+              <Legend
+                wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }}
+              />
 
-              {/* Bars with formatted colors and values */}
               {chartData.length > 0 &&
                 Object.keys(
                   chartData.reduce(
@@ -312,7 +312,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
               "linear-gradient(45deg, rgba(109, 84, 252, 0.43), rgba(255, 123, 0, 0.62), rgba(0, 255, 255, 0.75))",
             padding: 1,
             borderRadius: "8px",
-            margin:2
+            margin: 2,
           }}
         >
           <Stack direction="row" spacing={1}>
