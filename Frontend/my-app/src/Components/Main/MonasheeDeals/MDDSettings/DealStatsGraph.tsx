@@ -58,18 +58,26 @@ const formatValue = (value: number, selectedField: string): string => {
     "weighted_allocation_deal_size_percentage",
     "allocation_percentage",
     "weighted_allocation_percentage",
-  ].includes(selectedField)
-    ? "%"
-    : "";
+  ].includes(selectedField) ? "%" : "";
 
-  if (absValue >= 1_000_000_000)
-    return `${sign}${prefix}${(absValue / 1_000_000_000).toFixed(1)}B${suffix}`;
-  if (absValue >= 1_000_000)
-    return `${sign}${prefix}${(absValue / 1_000_000).toFixed(1)}M${suffix}`;
-  if (absValue >= 1_000)
-    return `${sign}${prefix}${(absValue / 1_000).toFixed(1)}K${suffix}`;
+  // Determine the rounding precision based on selectedField
+  let precision = 2; // Default precision for most fields
 
-  return `${sign}${prefix}${absValue.toFixed(2)}${suffix}`;
+  if (["count", "deal_size", "avg_deal_size"].includes(selectedField)) {
+    precision = 0; // Round to 0 decimal places for these fields
+  }
+
+  if (absValue >= 1_000_000_000) {
+    return `${sign}${prefix}${(absValue / 1_000_000_000).toFixed(precision)}B${suffix}`;
+  }
+  if (absValue >= 1_000_000) {
+    return `${sign}${prefix}${(absValue / 1_000_000).toFixed(precision)}M${suffix}`;
+  }
+  if (absValue >= 1_000) {
+    return `${sign}${prefix}${(absValue / 1_000).toFixed(precision)}K${suffix}`;
+  }
+
+  return `${sign}${prefix}${absValue.toFixed(precision)}${suffix}`;
 };
 
 
@@ -174,7 +182,6 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
     });
   }, [selectedField]);
 
-
   const barColors = [
     "#81C784", // Light Green
     "#D4E157", // Light Lime
@@ -198,38 +205,40 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
           {" "}
           Deal Statistics
         </Typography>
- {/* Data Field Selection - Using MUI Radio Buttons */}
- <Box
+        {/* Data Field Selection - Using MUI Radio Buttons */}
+        <Box
           sx={{
-            // background: 'linear-gradient(to right, #190250, #6DD5ED)',           
+            // background: 'linear-gradient(to right, #190250, #6DD5ED)',
 
             padding: 1,
             borderRadius: "8px",
             margin: 2,
           }}
         >
-      <Stack direction="row" spacing={1}>
-  {dataFields.map((field) => (
-    <Chip
-      key={field}
-      label={field.replace(/_/g, " ")}
-      clickable
-      onClick={() => setSelectedField(field)}
-      variant={selectedField === field ? "filled" : "outlined"}
-      sx={{
-        color: selectedField === field ? "#FFFFFF" : "#002060", // White text if selected, Blue otherwise
-        backgroundColor: selectedField === field ? "#002060" : "#dfdfdf", 
-        border: "2px solid #dfdfdf", // White border for outlined variant
-        "&:hover": {
-          backgroundColor: selectedField === field ? "#001A45" : "rgba(0, 32, 96, 0.1)", // Subtle hover effect
-        },
-      }}
-    />
-  ))}
-</Stack>
-
+          <Stack direction="row" spacing={1}>
+            {dataFields.map((field) => (
+              <Chip
+                key={field}
+                label={field.replace(/_/g, " ")}
+                clickable
+                onClick={() => setSelectedField(field)}
+                variant={selectedField === field ? "filled" : "outlined"}
+                sx={{
+                  color: selectedField === field ? "#FFFFFF" : "#002060", // White text if selected, Blue otherwise
+                  backgroundColor:
+                    selectedField === field ? "#002060" : "#dfdfdf",
+                  border: "2px solid #dfdfdf", // White border for outlined variant
+                  "&:hover": {
+                    backgroundColor:
+                      selectedField === field
+                        ? "#001A45"
+                        : "rgba(0, 32, 96, 0.1)", // Subtle hover effect
+                  },
+                }}
+              />
+            ))}
+          </Stack>
         </Box>
-      
 
         {loading ? (
           <Box
@@ -286,8 +295,15 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                 }}
                 formatter={(value: number) => formatValue(value)}
               /> */}
-              <YAxis stroke="#000"  tickFormatter={(value) => formatValue(value, selectedField)} />
-              <Tooltip formatter={(value) => formatValue(value as number, selectedField)} />
+              <YAxis
+                stroke="#000"
+                tickFormatter={(value) => formatValue(value, selectedField)}
+              />
+              <Tooltip
+                formatter={(value) =>
+                  formatValue(value as number, selectedField)
+                }
+              />
 
               <Legend
                 wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }}
@@ -317,9 +333,9 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             </BarChart>
           </ResponsiveContainer>
         )}
-          <Box
+        <Box
           sx={{
-            background: 'linear-gradient(to right, #190250, #6DD5ED)',           
+            background: "linear-gradient(to right, #190250, #6DD5ED)",
             paddingX: 2,
             borderRadius: "8px",
             boxShadow: 3,
@@ -357,8 +373,6 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             ))}
           </RadioGroup>
         </Box>
-
-       
       </Card>
     </Container>
   );
