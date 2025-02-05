@@ -190,48 +190,34 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
           {" "}
           Deal Statistics
         </Typography>
-
-        <Box
+ {/* Data Field Selection - Using MUI Radio Buttons */}
+ <Box
           sx={{
-            background:
-              "linear-gradient(45deg, rgba(255, 0, 150, 0.5), rgba(0, 204, 255, 0.5))", // Multi-color transparent background
-            paddingX: 2,
+            // background: 'linear-gradient(to right, #190250, #6DD5ED)',           
+
+            padding: 1,
             borderRadius: "8px",
-            boxShadow: 3,
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center", // Centering items horizontally
-            alignItems: "center", // Centering items vertically
-            marginBottom: 4,
-            marginX: 2,
+            margin: 2,
           }}
         >
-          <RadioGroup
-            value={selectedFilter.value}
-            onChange={(e) =>
-              setSelectedFilter(
-                filterOptions.find((option) => option.value === e.target.value)!
-              )
-            } // Update with the full option
-            row // Arrange radio buttons in a row
-          >
-            {filterOptions.map((option) => (
-              <FormControlLabel
-                key={option.value}
-                value={option.value}
-                control={<Radio sx={{ color: "white" }} />}
-                label={option.label}
+          <Stack direction="row" spacing={1}>
+            {dataFields.map((field) => (
+              <Chip
+                key={field}
+                label={field.replace(/_/g, " ")}
+                clickable
+                onClick={() => setSelectedField(field)}
+                color={selectedField === field ? "primary" : "default"}
                 sx={{
-                  color: "white",
-                  marginRight: 4,
-                  "& .MuiRadio-root": {
-                    color: "white",
-                  },
+                  color: "#002060",
+                  borderColor: "white",
+                  "&.MuiChip-outlined": { borderWidth: 2 },
                 }}
               />
             ))}
-          </RadioGroup>
+          </Stack>
         </Box>
+      
 
         {loading ? (
           <Box
@@ -319,34 +305,48 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             </BarChart>
           </ResponsiveContainer>
         )}
-
-        {/* Data Field Selection - Using MUI Radio Buttons */}
-        <Box
+          <Box
           sx={{
-            background:
-              "linear-gradient(45deg, rgba(109, 84, 252, 0.43), rgba(255, 123, 0, 0.62), rgba(0, 255, 255, 0.75))",
-            padding: 1,
+            background: 'linear-gradient(to right, #190250, #6DD5ED)',           
+            paddingX: 2,
             borderRadius: "8px",
-            margin: 2,
+            boxShadow: 3,
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center", // Centering items horizontally
+            alignItems: "center", // Centering items vertically
+            marginBottom: 4,
+            marginX: 2,
           }}
         >
-          <Stack direction="row" spacing={1}>
-            {dataFields.map((field) => (
-              <Chip
-                key={field}
-                label={field.replace(/_/g, " ")}
-                clickable
-                onClick={() => setSelectedField(field)}
-                color={selectedField === field ? "primary" : "default"}
+          <RadioGroup
+            value={selectedFilter.value}
+            onChange={(e) =>
+              setSelectedFilter(
+                filterOptions.find((option) => option.value === e.target.value)!
+              )
+            } // Update with the full option
+            row // Arrange radio buttons in a row
+          >
+            {filterOptions.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                value={option.value}
+                control={<Radio sx={{ color: "white" }} />}
+                label={option.label}
                 sx={{
-                  color: "#002060",
-                  borderColor: "white",
-                  "&.MuiChip-outlined": { borderWidth: 2 },
+                  color: "white",
+                  marginRight: 4,
+                  "& .MuiRadio-root": {
+                    color: "white",
+                  },
                 }}
               />
             ))}
-          </Stack>
+          </RadioGroup>
         </Box>
+
+       
       </Card>
     </Container>
   );
