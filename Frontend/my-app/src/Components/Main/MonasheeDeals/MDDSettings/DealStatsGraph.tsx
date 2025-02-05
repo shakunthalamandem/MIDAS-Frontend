@@ -130,18 +130,27 @@ const DealStatsGraph: React.FC = () => {
             <YAxis stroke="#000000" />
             <Tooltip contentStyle={{ backgroundColor: "#333", color: "#fff" }} />
             <Legend wrapperStyle={{ color: "#000" }} />
-            {chartData.length > 0 &&
-              Object.keys(chartData[0])
-                .filter((key) => key !== "year")
-                .map((key, index) => (
-                  <Bar
-                    key={index}
-                    dataKey={key}
-                    stackId="a"
-                    fill={barColors[index % barColors.length]}
-                    radius={[4, 4, 0, 0]}
-                  />
-                ))}
+            {
+  chartData.length > 0 &&
+    // Collect all unique categories across all years
+    Object.keys(
+      chartData.reduce((acc, item) => {
+        Object.keys(item).forEach((key) => {
+          if (key !== "year") acc[key] = true;  // Mark all unique keys
+        });
+        return acc;
+      }, {} as Record<string, boolean>)
+    ).map((key, index) => (
+      <Bar
+        key={index}
+        dataKey={key}
+        stackId="a"
+        fill={barColors[index % barColors.length]}
+        radius={[4, 4, 0, 0]}
+      />
+    ))
+}
+
           </BarChart>
         </ResponsiveContainer>
       )}
