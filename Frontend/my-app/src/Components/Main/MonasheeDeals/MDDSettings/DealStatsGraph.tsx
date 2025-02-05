@@ -306,7 +306,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
         <Box
           sx={{
             background:
-              "linear-gradient(45deg, rgba(38, 0, 255, 0.5), rgba(255, 123, 0, 0.62), rgba(0, 255, 255, 0.75))",
+              "linear-gradient(45deg, rgba(109, 84, 252, 0.43), rgba(255, 123, 0, 0.62), rgba(0, 255, 255, 0.75))",
             padding: 1,
             borderRadius: "8px",
             marginTop: 4,
