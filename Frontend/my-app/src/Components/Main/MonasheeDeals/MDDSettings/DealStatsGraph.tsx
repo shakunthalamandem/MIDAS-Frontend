@@ -52,13 +52,17 @@ const formatValue = (value: number, selectedField: string): string => {
   const sign = value < 0 ? "-" : "";
 
   // Determine prefix and suffix based on the selected field
-  const prefix = ["deal_size", "avg_deal_size"].includes(selectedField) ? "$" : "";
+  const prefix = ["deal_size", "avg_deal_size"].includes(selectedField)
+    ? "$"
+    : "";
   const suffix = [
     "allocation_deal_size_percentage",
     "weighted_allocation_deal_size_percentage",
     "allocation_percentage",
     "weighted_allocation_percentage",
-  ].includes(selectedField) ? "%" : "";
+  ].includes(selectedField)
+    ? "%"
+    : "";
 
   // Determine the rounding precision based on selectedField
   let precision = 2; // Default precision for most fields
@@ -80,7 +84,6 @@ const formatValue = (value: number, selectedField: string): string => {
   return `${sign}${prefix}${absValue.toFixed(precision)}${suffix}`;
 };
 
-
 const filterOptions: FilterOption[] = [
   { label: "Deal Type", value: "deal_type", payload: null },
   {
@@ -100,14 +103,23 @@ const filterOptions: FilterOption[] = [
   },
 ];
 
-const dataFields = [
-  "count",
-  "deal_size",
-  "avg_deal_size",
-  "allocation_deal_size_percentage",
-  "weighted_allocation_deal_size_percentage",
-  "allocation_percentage",
-  "weighted_allocation_percentage",
+const dataFieldsWithLabels = [
+  { label: "Count", value: "count" },
+  { label: "Deal Size", value: "deal_size" },
+  { label: "Average Deal Size", value: "avg_deal_size" },
+  {
+    label: "Allocation Deal Size %",
+    value: "allocation_deal_size_percentage",
+  },
+  {
+    label: "Weighted Allocation Deal Size %",
+    value: "weighted_allocation_deal_size_percentage",
+  },
+  { label: "Allocation %", value: "allocation_percentage" },
+  {
+    label: "Weighted Allocation %",
+    value: "weighted_allocation_percentage",
+  },
 ];
 
 interface DealStatsGraphProps {
@@ -182,7 +194,23 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
     });
   }, [selectedField]);
 
-  const barColors= ['#809D3C', '#416D19', '#A2CA71', '#004E89', '#68A5CC', '#00356B', '#0072B5', '#387F39', '#489FB5', '#5D8736', '#79b4b8', '#87A922', '#A9C46C', '#9BCF53', '#96D0DB']
+  const barColors = [
+    "#809D3C",
+    "#416D19",
+    "#A2CA71",
+    "#004E89",
+    "#68A5CC",
+    "#00356B",
+    "#0072B5",
+    "#387F39",
+    "#489FB5",
+    "#5D8736",
+    "#79b4b8",
+    "#87A922",
+    "#A9C46C",
+    "#9BCF53",
+    "#96D0DB",
+  ];
 
   return (
     <Container>
@@ -193,28 +221,27 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
         </Typography>
         <Box
           sx={{
-
             padding: 1,
             borderRadius: "8px",
             margin: 2,
           }}
         >
           <Stack direction="row" spacing={1}>
-            {dataFields.map((field) => (
+            {dataFieldsWithLabels.map(({ label, value }) => (
               <Chip
-                key={field}
-                label={field.replace(/_/g, " ")}
+                key={value}
+                label={label}
                 clickable
-                onClick={() => setSelectedField(field)}
-                variant={selectedField === field ? "filled" : "outlined"}
+                onClick={() => setSelectedField(value)}
+                variant={selectedField === value ? "filled" : "outlined"}
                 sx={{
-                  color: selectedField === field ? "#FFFFFF" : "#002060", // White text if selected, Blue otherwise
+                  color: selectedField === value ? "#FFFFFF" : "#002060", // White text if selected, Blue otherwise
                   backgroundColor:
-                    selectedField === field ? "#002060" : "#dfdfdf",
+                    selectedField === value ? "#002060" : "#dfdfdf",
                   border: "2px solid #dfdfdf", // White border for outlined variant
                   "&:hover": {
                     backgroundColor:
-                      selectedField === field
+                      selectedField === value
                         ? "#001A45"
                         : "rgba(0, 32, 96, 0.1)", // Subtle hover effect
                   },
@@ -256,29 +283,6 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                 }}
               />
 
-              {/* <YAxis
-                stroke="#b2b2b2"
-                tick={{ fill: "#002060", fontSize: 12 }}
-                tickFormatter={formatValue(value, selectedField)}
-                label={{
-                  value: `${selectedField}`,
-                  angle: -90,
-                  position: "outsideLeft",
-                  fill: "#b2b2b2",
-                  dx: -30,
-                  dy: -10,
-                }}
-              />
-
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#333",
-                  color: "#000000",
-                  borderRadius: 8,
-                  padding: 8,
-                }}
-                formatter={(value: number) => formatValue(value)}
-              /> */}
               <YAxis
                 stroke="#000"
                 tickFormatter={(value) => formatValue(value, selectedField)}
