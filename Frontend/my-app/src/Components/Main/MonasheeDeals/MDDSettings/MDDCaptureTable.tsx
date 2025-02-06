@@ -86,7 +86,6 @@ const filterOptions: FilterOption[] = [
 
 
 
-
 const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   responseData,
   apiName,
@@ -94,13 +93,21 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<"IPO" | "FO">("IPO");
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const [showCategoryButtons, setShowCategoryButtons] = useState(false);
+
    const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
       filterOptions[0]
     );
   const [dynamicCategoryByYear, setDynamicCategoryByYear] = useState<
     Record<string, string[]>
   >({});
-
+  const handleFilterClick = (option: any) => {
+    setSelectedFilter(option);
+  
+    // Show IPO & FO buttons only if "Deal Type" is selected
+    setShowCategoryButtons(option.value === "deal_type");
+  };
+  
   useEffect(() => {
     if (!responseData) return;
 
@@ -118,6 +125,15 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
     setDynamicCategoryByYear(groupCategoriesByYear);
   }, [responseData, selectedCategory]);
 
+
+
+
+
+
+
+
+
+  
   // Function to move "Summary" row to the end after sorting
   const sortRangesWithSummaryAtEnd = (ranges: string[]): string[] => {
     const sortedRanges = ranges
@@ -149,36 +165,57 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                  alignItems: "center", 
                  marginBottom: 4,
                  marginLeft: 2,
-                 marginRight:'220 px',
+                 marginRight:'277px',
                  marginX: 2,
                }}
              >
                <RadioGroup
-                 value={selectedFilter.value}
-                 onChange={(e) =>
-                   setSelectedFilter(
-                     filterOptions.find((option) => option.value === e.target.value)!
-                   )
-                 } 
-                 row 
-               >
-                 {filterOptions.map((option) => (
-                   <FormControlLabel
-                     key={option.value}
-                     value={option.value}
-                     control={<Radio sx={{ color: "white" }} />}
-                     label={option.label}
-                     sx={{
-                       color: "white",
-                       marginRight: 4,
-                       "& .MuiRadio-root": {
-                         color: "white",
-                       },
-                     }}
-                   />
-                 ))}
-               </RadioGroup>
+                           value={selectedFilter.value}
+                           onChange={(e) =>
+                             setSelectedFilter(
+                               filterOptions.find((option) => option.value === e.target.value)!
+                             )
+                           } 
+                           row 
+                         >
+          {filterOptions.map((option) => (
+            <FormControlLabel
+              key={option.value}
+              value={option.value}
+              control={<Radio sx={{ color: "white" }} />}
+              label={option.label}
+              onClick={() => handleFilterClick(option)} // Handle click event
+              sx={{
+                color: "white",
+                marginRight: 4,
+                "& .MuiRadio-root": {
+                  color: "white",
+                },
+              }}
+            />
+          ))}
+        </RadioGroup>
+        
              </Box>
+             {showCategoryButtons && (
+        <Box sx={{ textAlign: "center", marginRight: 30 }}>
+          <Button
+            variant={selectedCategory === "IPO" ? "contained" : "outlined"}
+            color="secondary"
+            onClick={() => setSelectedCategory("IPO")}
+            sx={{ marginRight: 2 }}
+          >
+            IPO
+          </Button>
+          <Button
+            variant={selectedCategory === "FO" ? "contained" : "outlined"}
+            color="secondary"
+            onClick={() => setSelectedCategory("FO")}
+          >
+            FO
+          </Button>
+        </Box>
+      )}      
 
       {Object.keys(responseData)
         .sort((a, b) => b.localeCompare(a)) // Sort years in descending order
@@ -194,7 +231,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
               elevation={4}
               sx={{
                 backgroundColor: "#fdfff8",
-                marginBottom: "30px",
+                marginBottom: "40px",
                 padding: 2,
                 width: "1200px",
               }}
