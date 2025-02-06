@@ -50,19 +50,18 @@ interface FilterOption {
   value: string;
   payload: { filter_type: string } | null;
 }
-interface ResponseData {
+interface selectedFilterss {
   [year: string]: {
     [category: string]: {
       [range: string]: CategoryData;
     };
   };
 }
-
-
 interface MDDCaptureTableProps {
-  responseData: ResponseData;
-  apiName: string;
+  selectedFilterss:any;
 }
+
+
 
 
 
@@ -87,14 +86,12 @@ const filterOptions: FilterOption[] = [
 
 
 const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
-  responseData,
-  apiName,
+  selectedFilterss
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<"IPO" | "FO">("IPO");
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const [showCategoryButtons, setShowCategoryButtons] = useState(false);
-
    const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
       filterOptions[0]
     );
@@ -107,23 +104,66 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
     // Show IPO & FO buttons only if "Deal Type" is selected
     setShowCategoryButtons(option.value === "deal_type");
   };
-  
   useEffect(() => {
-    if (!responseData) return;
-
-    const groupCategoriesByYear = Object.keys(responseData).reduce(
+    fetchData();
+  }, [selectedCategory, selectedFilter, selectedFilterss]);
+  const fetchData = async () => {
+    try {
+      const payload = {
+        ...selectedFilterss,
+        ...(selectedFilter.payload || {}),
+      };
+      const response = await fetch(`${apiUrl}/api/allocation_capture/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      console.log("Data", data);
+      // setChartData(formatChartData(data));
+    } catch (error) {   
+      console.error("Error fetching data", error);
+      // setChartData([]);
+    } finally {
+      // setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (!selectedFilterss) return;
+  
+    const groupCategoriesByYear = Object.keys(selectedFilterss).reduce(
       (acc: Record<string, string[]>, year) => {
-        if (responseData[year]?.[selectedCategory]) {
-          const categories = Object.keys(responseData[year][selectedCategory]);
-          acc[year] = Array.from(new Set(categories)).sort(); // Unique sorted categories
+        if (selectedFilterss[year]?.[selectedCategory]) {
+          const categories = Object.keys(selectedFilterss[year]?.[selectedCategory] || {});
+          acc[year] = Array.from(new Set(categories)).sort(); 
         }
         return acc;
       },
       {}
     );
-
+  
     setDynamicCategoryByYear(groupCategoriesByYear);
-  }, [responseData, selectedCategory]);
+  }, [selectedFilterss,selectedCategory]);
+  
+  // useEffect(() => {
+  //   if (!responseData) return;
+
+  //   const groupCategoriesByYear = Object.keys(responseData).reduce(
+  //     (acc: Record<string, string[]>, year) => {
+  //       if (responseData[year]?.[selectedCategory]) {
+  //         const categories = Object.keys(responseData[year][selectedCategory]);
+  //         acc[year] = Array.from(new Set(categories)).sort(); // Unique sorted categories
+  //       }
+  //       return acc;
+  //     },
+  //     {}
+  //   );
+
+  //   setDynamicCategoryByYear(groupCategoriesByYear);
+  // }, [responseData, selectedCategory]);
 
 
 
@@ -217,7 +257,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
         </Box>
       )}      
 
-      {Object.keys(responseData)
+      {Object.keys(selectedFilterss)
         .sort((a, b) => b.localeCompare(a)) // Sort years in descending order
         .map((year) => (
           <motion.div
@@ -252,7 +292,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                 <Grid container spacing={3}>
                   {(() => {
                     const categoryData =
-                      responseData[year]?.[selectedCategory] || {};
+                    selectedFilterss[year]?.[selectedCategory] || {};
                     const dynamicCategoryOrder =
                       dynamicCategoryByYear[year] || [];
                     const sortedCategoryData = sortRangesWithSummaryAtEnd(
@@ -316,7 +356,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       }}   
 
                                     >
-                                      Quintile
+                                      {/* Quintile */}
+                                      {selectedFilter.label === "Deal Type"
+                                        ? "Quintile"
+                                        : "Sector"
+                                      }
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -518,7 +562,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                               : "normal",
                                           }}
                                         >
-                                          {isSummary ? "" : index + 1}
+                                          {/* {isSummary ? "" : index + 1} */}
+                                          {selectedFilter.label === "Deal Type"
+                                        ? `${range}`
+                                        : "Sector"}
                                         </TableCell>
 
                                         {/* Range */}
@@ -718,3 +765,5 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 };
 
 export default MDDCaptureTable;
+
+

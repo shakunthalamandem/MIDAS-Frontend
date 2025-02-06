@@ -45,6 +45,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   }>({});
   const [appliedFilters, setAppliedFilters] = useState<{
     [key: string]: (string | number)[];
+  }>({})  
+  const [appliedFilterss, setAppliedFilterss] = useState<{
+    [key: string]: (string | number)[];
   }>({});
   const [expanded, setExpanded] = useState<string | false>(false);
   const [payload, setPayload] = useState<{ [key: string]: (string | number)[] }>({});
@@ -62,9 +65,25 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     if (JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)) {
       setSelectedValues(initialSelectedValues);
       setAppliedFilters(initialSelectedValues);
+      setAppliedFilterss(initialSelectedValues);
       handleSubmit(initialSelectedValues);
     }
   }, [filtersData]);
+
+  // useEffect(() => {
+  //   const initialSelectedValues: { [key: string]: (string | number)[] } = {};
+  //   filtersData.forEach((filter) => {
+  //     const key = Object.keys(filter)[0];
+  //     initialSelectedValues[key] = [];
+  //   });
+
+  //   if (JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)) {
+  //     setSelectedValues(initialSelectedValues);
+  //     setAppliedFilterss(initialSelectedValues);
+  //     handleSubmit(initialSelectedValues);
+  //   }
+  // }, [filtersData]);
+
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
@@ -95,6 +114,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   
       setPayload(payload);
       setAppliedFilters(filters);
+      setAppliedFilterss(filters);
+
   
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
@@ -334,20 +355,20 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </Box>
         ) : (
           <>
-            {apiName === "allocation_capture" ? (
-              <MDDCaptureTable responseData={apiData} apiName={apiName} />
-            ) : apiName === "fo_discount" ? (
-              <AvgFoDiscountChart data={apiData} />
-            ) : (
-              <>
-                <DealStatsGraph selectedFilters={appliedFilters} />
-                <MDDScreenergrid sectorwiseData={payload} />
-              </>
-            )}
-          </>
+      {apiName === "allocation_capture" ? (
+        <MDDCaptureTable selectedFilterss={appliedFilterss} />
+      ) : apiName === "fo_discount" ? (
+        <AvgFoDiscountChart data={apiData} />      ) : (
+        <>
+          <DealStatsGraph selectedFilters={appliedFilters} />
+          <MDDScreenergrid sectorwiseData={payload} />
+        </>
+      )}
+    </>
         )}
       </Box>
-    </Box>
+      </Box>
+
   );
 };
 
