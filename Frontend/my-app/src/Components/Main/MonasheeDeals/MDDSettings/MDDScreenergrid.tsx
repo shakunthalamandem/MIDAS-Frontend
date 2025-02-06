@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Container, TextField, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
 // Define the type for each row of data with updated column names
 interface ScreenerDataRow {
@@ -129,9 +130,34 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
   };
 
   const columns: GridColDef[] = [
+    {
+      field: "ticker",
+      headerName: "Ticker",
+      width: 100,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+
+          <Link
+            to={`/monasheeperformance/${params.value}`}
+            style={{ color: "brown", fontWeight: "bold",paddingLeft:15,textDecoration: "none" }}
+            target="_blank"
+          >
+            {params.value}
+          </Link>
+        </div>
+      ),
+    }
+    
+,        { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "pricing_date", headerName: "Pricing Date", width: 150 },
-    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
-    { field: "ticker", headerName: "Ticker", width: 150 },
     {
       field: "gics_sector_from_bloomberg",
       headerName: "Sector",
