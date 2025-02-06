@@ -7,6 +7,7 @@ import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCap
 import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 import MDDSelectedTicker from "../../MonasheeDeals/MddGraphs/MDDSelectedTicker";
+import WeeklyStatsChart from "../../MonasheeDeals/MDDSettings/WeeklyStatsChart";
 
 // Define the type for the API response
 interface MDDResult {
@@ -181,6 +182,7 @@ const MonasheeDeals: React.FC = () => {
         <Tab label="Deal Stats" />
         <Tab label="GAP Analysis" />
         <Tab label="Follow-On Discount" />
+        <Tab label="Weekly Deals" />
         <Tab label="Screener" />
       </Tabs>
       {searchTerm.length > 0 && (
@@ -247,7 +249,8 @@ const MonasheeDeals: React.FC = () => {
       {value === 1 && <DealStats />}
       {value === 2 && <AllocationCaptureReturn />}
       {value === 3 && <FOllowOnDiscount />}
-      {value === 4 && <MDDScreener />}
+      {value === 4 && <WeeklyStatsChart />}
+      {value === 5 && <MDDScreener />}
     </Box>
   );
 };

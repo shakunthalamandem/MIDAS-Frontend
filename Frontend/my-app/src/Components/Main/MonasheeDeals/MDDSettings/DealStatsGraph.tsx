@@ -107,16 +107,16 @@ const dataFieldsWithLabels = [
   { label: "Deal Volume", value: "deal_size" },
   { label: "Average Deal Size", value: "avg_deal_size" },
   {
-    label: "Allocation Deal Size %",
+    label: "Allocation as % of Deal Size",
     value: "allocation_deal_size_percentage",
   },
   {
-    label: "Weighted Allocation Deal Size %",
+    label: "Weighted Allocation as % of Deal Size",
     value: "weighted_allocation_deal_size_percentage",
   },
-  { label: "Allocation %", value: "allocation_percentage" },
+  { label: "Allocation as % of IOI", value: "allocation_percentage" },
   {
-    label: "Weighted Allocation %",
+    label: "Weighted Allocation as % of IOI",
     value: "weighted_allocation_percentage",
   },
 ];
@@ -194,27 +194,28 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   }, [selectedField]);
 
   const barColors = [
-    "#809D3C",
-    "#416D19",
-    "#A2CA71",
-    "#004E89",
-    "#68A5CC",
-    "#00356B",
-    "#0072B5",
-    "#387F39",
-    "#489FB5",
-    "#5D8736",
-    "#79b4b8",
-    "#87A922",
-    "#A9C46C",
-    "#9BCF53",
-    "#96D0DB",
+    "#60A5FA", // Sky Blue
+    "#F97316", // Orange
+    "#14B8A6", // Teal
+    "#FACC15", // Gold
+    "#EF4444", // Red
+    "#64748B", // Slate Gray
+    "#0EA5E9", // Light Cyan Blue
+    "#22C55E", // Green
+    "#D97706", // Deep Yellow
+    "#8B5CF6", // Indigo
+    "#9CA3AF", // Cool Gray
+    "#1E3A8A", // Dark Blue
+    "#2563EB", // Bright Blue
   ];
 
   return (
     <Container>
       <Card elevation={5}>
-        <Typography variant="h5" sx={{ color: "#002060", fontWeight: "bold",marginTop:3 }}>
+        <Typography
+          variant="h5"
+          sx={{ color: "#002060", fontWeight: "bold", marginTop: 3 }}
+        >
           {" "}
           Deal Statistics
         </Typography>
@@ -225,7 +226,13 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             margin: 2,
           }}
         >
-          <Stack direction="row" spacing={1}>
+          <Box
+            display="flex"
+            justifyContent="center"
+            mb={2}
+            gap={1}
+            flexWrap="wrap"
+          >
             {dataFieldsWithLabels.map(({ label, value }) => (
               <Chip
                 key={value}
@@ -234,20 +241,25 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                 onClick={() => setSelectedField(value)}
                 variant={selectedField === value ? "filled" : "outlined"}
                 sx={{
-                  color: selectedField === value ? "#FFFFFF" : "#002060", // White text if selected, Blue otherwise
+                  color: selectedField === value ? "#FFFFFF" : "#3f51b5",
                   backgroundColor:
-                    selectedField === value ? "#002060" : "#dfdfdf",
-                  border: "2px solid #dfdfdf", // White border for outlined variant
+                    selectedField === value ? "#9b0000" : "#dfdfdf",
+                  border:
+                    selectedField === value
+                      ? "2px solid #9b0000"
+                      : "2px solid #dfdfdf",
+                  fontWeight: selectedField === value ? "bold" : "normal",
+                  transition: "all 0.3s ease",
                   "&:hover": {
                     backgroundColor:
                       selectedField === value
-                        ? "#001A45"
-                        : "rgba(0, 32, 96, 0.1)", // Subtle hover effect
+                        ? "#7b0000"
+                        : "rgba(63, 81, 181, 0.1)",
                   },
                 }}
               />
             ))}
-          </Stack>
+          </Box>
         </Box>
 
         {loading ? (
