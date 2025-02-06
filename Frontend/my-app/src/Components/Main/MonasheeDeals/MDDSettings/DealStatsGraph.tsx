@@ -174,13 +174,21 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
     });
   }, [selectedField]);
 
+
   const barColors = [
-    "#FF6384",
-    "#36A2EB",
-    "#FFCE56",
-    "#4BC0C0",
-    "#9966FF",
-    "#FF9F40",
+    "#81C784", // Light Green
+    "#D4E157", // Light Lime
+    "#4DB6AC", // Light Teal
+    "#FF8A80", // Soft Red
+    "#E57373", // Light Crimson
+    "#FFAB91", // Soft Orange
+    "#B0BEC5", // Light Gray
+    "#CFD8DC", // Pale Gray
+    "#90CAF9", // Soft Blue
+    "#64B5F6", // Light Sky Blue
+    "#CE93D8", // Soft Purple
+    "#FFECB3", // Light Yellow
+    "#BCAAA4", // Soft Brown
   ];
 
   return (
@@ -200,22 +208,26 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             margin: 2,
           }}
         >
-          <Stack direction="row" spacing={1}>
-            {dataFields.map((field) => (
-              <Chip
-                key={field}
-                label={field.replace(/_/g, " ")}
-                clickable
-                onClick={() => setSelectedField(field)}
-                color={selectedField === field ? "primary" : "default"}
-                sx={{
-                  color: "#002060",
-                  borderColor: "white",
-                  "&.MuiChip-outlined": { borderWidth: 2 },
-                }}
-              />
-            ))}
-          </Stack>
+      <Stack direction="row" spacing={1}>
+  {dataFields.map((field) => (
+    <Chip
+      key={field}
+      label={field.replace(/_/g, " ")}
+      clickable
+      onClick={() => setSelectedField(field)}
+      variant={selectedField === field ? "filled" : "outlined"}
+      sx={{
+        color: selectedField === field ? "#FFFFFF" : "#002060", // White text if selected, Blue otherwise
+        backgroundColor: selectedField === field ? "#002060" : "#dfdfdf", 
+        border: "2px solid #dfdfdf", // White border for outlined variant
+        "&:hover": {
+          backgroundColor: selectedField === field ? "#001A45" : "rgba(0, 32, 96, 0.1)", // Subtle hover effect
+        },
+      }}
+    />
+  ))}
+</Stack>
+
         </Box>
       
 
