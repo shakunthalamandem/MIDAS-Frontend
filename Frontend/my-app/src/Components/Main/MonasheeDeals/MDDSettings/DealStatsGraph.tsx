@@ -195,9 +195,9 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
 
   const barColors = [
     "#60A5FA", // Sky Blue
+    "#F97316", // Orange
     "#14B8A6", // Teal
     "#FACC15", // Gold
-    "#F97316", // Orange
     "#EF4444", // Red
     "#64748B", // Slate Gray
     "#0EA5E9", // Light Cyan Blue
