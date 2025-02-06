@@ -107,16 +107,16 @@ const dataFieldsWithLabels = [
   { label: "Deal Volume", value: "deal_size" },
   { label: "Average Deal Size", value: "avg_deal_size" },
   {
-    label: "Allocation Deal Size %",
+    label: "Allocation as % of Deal Size",
     value: "allocation_deal_size_percentage",
   },
   {
-    label: "Weighted Allocation Deal Size %",
+    label: "Weighted Allocation as % of Deal Size",
     value: "weighted_allocation_deal_size_percentage",
   },
-  { label: "Allocation %", value: "allocation_percentage" },
+  { label: "Allocation as % of IOI", value: "allocation_percentage" },
   {
-    label: "Weighted Allocation %",
+    label: "Weighted Allocation as % of IOI",
     value: "weighted_allocation_percentage",
   },
 ];
@@ -194,22 +194,20 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   }, [selectedField]);
 
   const barColors = [
-    "#809D3C",
-    "#416D19",
-    "#A2CA71",
-    "#004E89",
-    "#68A5CC",
-    "#00356B",
-    "#0072B5",
-    "#387F39",
-    "#489FB5",
-    "#5D8736",
-    "#79b4b8",
-    "#87A922",
-    "#A9C46C",
-    "#9BCF53",
-    "#96D0DB",
-  ];
+    "#60A5FA", // Sky Blue
+    "#14B8A6", // Teal
+    "#FACC15", // Gold
+    "#F97316", // Orange
+    "#EF4444", // Red
+    "#64748B", // Slate Gray
+    "#0EA5E9", // Light Cyan Blue
+    "#22C55E", // Green
+    "#D97706", // Deep Yellow
+    "#8B5CF6", // Indigo
+    "#9CA3AF",// Cool Gray
+    "#1E3A8A", // Dark Blue
+    "#2563EB", // Bright Blue
+  ];  
 
   return (
     <Container>
