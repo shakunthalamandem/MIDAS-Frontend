@@ -22,6 +22,8 @@ import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
 import MDDScreenergrid from "./MDDScreenergrid";
 import DealStatsGraph from "./DealStatsGraph";
+import Gap from "./Gap";
+import DealTypeComponent from "./DealTypeComponent";
 
 interface FilterOption {
   options: (string | number)[];
@@ -356,7 +358,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         ) : (
           <>
       {apiName === "allocation_capture" ? (
-        <MDDCaptureTable selectedFilterss={appliedFilterss} />
+        // <MDDCaptureTable selectedFilterss={appliedFilterss} />
+        // <Gap selectedFilters={appliedFilters} />
+        <DealTypeComponent/>
       ) : apiName === "fo_discount" ? (
         <AvgFoDiscountChart data={apiData} />      ) : (
         <>
