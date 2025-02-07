@@ -103,18 +103,18 @@ const filterOptions: FilterOption[] = [
 ];
 
 const dataFieldsWithLabels = [
-  { label: "Count", value: "count" },
+  { label: "Deal Count", value: "count" },
   { label: "Deal Volume", value: "deal_size" },
   { label: "Average Deal Size", value: "avg_deal_size" },
-  {
-    label: "Allocation as % of Deal Size",
-    value: "allocation_deal_size_percentage",
-  },
+  // {
+  //   label: "Allocation as % of Deal Size",
+  //   value: "allocation_deal_size_percentage",
+  // },
   {
     label: "Weighted Allocation as % of Deal Size",
     value: "weighted_allocation_deal_size_percentage",
   },
-  { label: "Allocation as % of IOI", value: "allocation_percentage" },
+  // { label: "Allocation as % of IOI", value: "allocation_percentage" },
   {
     label: "Weighted Allocation as % of IOI",
     value: "weighted_allocation_percentage",
