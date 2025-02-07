@@ -13,55 +13,68 @@ interface YearlyData {
 
 interface SectorRegionTypeComponentProps {
   data: YearlyData;
+  option:string
 }
 
-const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data }) => {
+const formatValue = (value?: number): string => {
+    if (value === undefined || value === null || isNaN(value)) return "N/A";
+    
+    const absValue = Math.abs(value);
+    const sign = value < 0 ? "-" : "";
+  
+    if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
+    if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
+    if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
+  
+    return `${sign}$${absValue.toFixed(2)}`;
+  };
+
+const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data, option }) => {
   return (
     <div>
       {Object.entries(data).map(([year, categories]) => (
-        <Paper key={year} sx={{ mb: 4, p: 2 }}>
-          <Typography variant="h6" sx={{ textAlign: "center", mb: 2 }}>
+        <Paper key={year} sx={{ padding: 5, marginBottom: 3, width: "90%", background: "#F1E3A4" }}>
+          <Typography variant="h6" sx={{ textAlign: "center", mb: 2, fontWeight: "bold", color: "#1976d2" }}>
             {`Financial Data for ${year}`}
           </Typography>
-          <TableContainer component={Paper}>
-            <Table>
+          <TableContainer component={Paper} sx={{ border: "1px solid #ccc" }}>
+            <Table size="small">
               <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }}>Category</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Number of Deals</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Weighted Allocation as % of Deal Size</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Weighted Allocation as % of IOI</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Deal Volume</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Model Actual Return</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Model Return 1% Allocation</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Net of Hedge</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Allocation Return</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">AM Return</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Model AM Return</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Total Return</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Max T+1M Return from Dealogic</TableCell>
-                  <TableCell sx={{ fontSize: "0.725rem", fontWeight: "bold", border: "1px solid #ddd", padding: "4px 8px" }} align="right">Min T+1M Return from Dealogic</TableCell>
+                <TableRow sx={{ backgroundColor: "#1976d2" }}>
+                  <TableCell sx={{ color: "white" }}>{option}</TableCell>
+                    <TableCell sx={{ color: "white" }}>T+1M Absolute Returns</TableCell>
+                    <TableCell sx={{ color: "white" }}>No of Deals</TableCell>
+                    <TableCell sx={{ color: "white" }}>Deal Volume ($)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Allocation as % of Deal Size (Weighted)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Allocation as % of IOI (Weighted)</TableCell>
+                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual Allocation PnL (Gross $)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Model PnL With Actual Allocation (Gross $)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Model PnL with model Allocation (1%)</TableCell>
+                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual AM PnL (Gross $)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Model PnL with model AM(Gross $)</TableCell>
+                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual Total PnL (Gross $)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Model Actual Total PnL (Gross $)</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {Object.entries(categories)
                   .sort(([a], [b]) => (a === "Summary" ? 1 : b === "Summary" ? -1 : a.localeCompare(b)))
                   .map(([category, values]) => (
-                    <TableRow key={category}>
-                      <TableCell>{category}</TableCell>
-                      <TableCell align="right">{values["Number of deals"]}</TableCell>
-                      <TableCell align="right">{values["Weighted Allocation as % of Deal Size"]}</TableCell>
-                      <TableCell align="right">{values["Weighted Allocation as % of IOI"]}</TableCell>
-                      <TableCell align="right">{values["Deal volume"]}</TableCell>
-                      <TableCell align="right">{values["Model Actual Return"]}</TableCell>
-                      <TableCell align="right">{values["Model Return 1% Allocation"]}</TableCell>
-                      <TableCell align="right">{values["Net of Hedge"]}</TableCell>
-                      <TableCell align="right">{values["Allocation Return"]}</TableCell>
-                      <TableCell align="right">{values["AM Return"]}</TableCell>
-                      <TableCell align="right">{values["Model AM Return"]}</TableCell>
-                      <TableCell align="right">{values["Total Return"]}</TableCell>
-                      <TableCell align="right">{values["Max t1m_return_from_dealogic"]}</TableCell>
-                      <TableCell align="right">{values["Min t1m_return_from_dealogic"]}</TableCell>
+                    <TableRow key={category} sx={{ backgroundColor: category === "Summary" ? "#e3f2fd" : "inherit" }}>
+                      <TableCell sx={{ fontWeight: category === "Summary" ? "bold" : "normal" }}>{category}</TableCell>
+                      <TableCell>{values["Min t1m_return_from_dealogic"] !== undefined ? `${values["Min t1m_return_from_dealogic"].toFixed(1)}%` : "N/A"} 
+                                to {values["Max t1m_return_from_dealogic"] !== undefined ? `${values["Max t1m_return_from_dealogic"].toFixed(1)}%` : "N/A"} </TableCell>
+                      <TableCell>{values["Number of deals"]}</TableCell>
+                      <TableCell>{formatValue(values["Deal volume"])}</TableCell>
+                      <TableCell>{(values["Weighted Allocation as % of Deal Size"]?.toFixed(2) || "0.00") + "%"}</TableCell>
+                      <TableCell>{(values["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00") + "%"}</TableCell>
+                      <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Allocation Return"])}</TableCell>
+                      <TableCell>{formatValue(values["Model Actual Return"])}</TableCell>
+                      <TableCell>{formatValue(values["Model Return 1% Allocation"])}</TableCell>
+                      <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["AM Return"])}</TableCell>
+                      <TableCell>{formatValue(values["Model AM Return"])}</TableCell>
+                      <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Total Return"])}</TableCell>
+                      <TableCell>{formatValue((values["Model Return 1% Allocation"] || 0) + (values["Model AM Return"] || 0))}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>

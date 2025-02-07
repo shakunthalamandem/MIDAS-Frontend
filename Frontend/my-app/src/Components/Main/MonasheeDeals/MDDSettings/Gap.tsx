@@ -96,8 +96,8 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
       {!loading && !error && data && (
         <Box sx={{ width: "100%", marginTop: 2, textAlign: "center" }}>
           {selectedFilter.value === "deal_type" && <DealTypeComponent data={data || {}} />}
-          {selectedFilter.value === "sector" && <SectorRegionComponent data={data || {}}/>}
-          {selectedFilter.value === "region" && <SectorRegionComponent data={data || {}}/>}
+          {selectedFilter.value === "sector" && <SectorRegionComponent data={data || {}} option = {selectedFilter.label}/>}
+          {selectedFilter.value === "region" && <SectorRegionComponent data={data || {}} option = {selectedFilter.label}/>}
         </Box>
       )}
     </Box>
