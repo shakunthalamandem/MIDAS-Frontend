@@ -182,7 +182,7 @@ const MonasheeDeals: React.FC = () => {
         <Tab label="Deal Stats" />
         <Tab label="GAP Analysis" />
         <Tab label="Follow-On Discount" />
-        <Tab label="Weekly Deals" />
+        <Tab label="Weekly Tracking" />
         <Tab label="Screener" />
       </Tabs>
       {searchTerm.length > 0 && (

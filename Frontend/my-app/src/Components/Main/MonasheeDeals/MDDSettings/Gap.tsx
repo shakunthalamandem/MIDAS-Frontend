@@ -3,7 +3,7 @@ import { Box, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 import DealTypeComponent from "./DealTypeComponent";
 
 interface GapProps {
-  selectedFilters: any; // Ensuring only one selected filter at a time
+  selectedFilters: any;
 }
 
 interface FilterOption {

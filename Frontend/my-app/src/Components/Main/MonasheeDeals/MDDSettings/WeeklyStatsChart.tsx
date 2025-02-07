@@ -21,7 +21,6 @@ import {
   RadioGroup,
 } from "@mui/material";
 import axios from "axios";
-import { BarChart } from "@mui/icons-material";
 
 interface WeeklyData {
   Count: number;
@@ -85,13 +84,13 @@ const WeeklyStatsChart: React.FC = () => {
   const chartData = Object.keys(data["2022"] || {}).map((week) => {
     return {
       name: week,
-      "2022": data["2022"]?.[week]?.cumulative_count ,
-      "2023": data["2023"]?.[week]?.cumulative_count,
+      // "2022": data["2022"]?.[week]?.cumulative_count ,
+      // "2023": data["2023"]?.[week]?.cumulative_count,
       "2024": data["2024"]?.[week]?.cumulative_count ,
       "2025": data["2025"]?.[week]?.cumulative_count,
       Average: data["average"]?.[week]?.cumulative_count,
-      "2022 Size": data["2022"]?.[week]?.cumulative_deal_volume ,
-      "2023 Size": data["2023"]?.[week]?.cumulative_deal_volume ,
+      // "2022 Size": data["2022"]?.[week]?.cumulative_deal_volume ,
+      // "2023 Size": data["2023"]?.[week]?.cumulative_deal_volume ,
       "2024 Size": data["2024"]?.[week]?.cumulative_deal_volume ,
       "2025 Size": data["2025"]?.[week]?.cumulative_deal_volume,
       "Average Size": data["average"]?.[week]?.cumulative_deal_volume,
@@ -115,22 +114,21 @@ const WeeklyStatsChart: React.FC = () => {
 
               {showCount ? (
                 <>
-                  <Line type="monotone" dataKey="2022" stroke="#8884d8" name="2022" />
-                  <Line type="monotone" dataKey="2023" stroke="#214100" name="2023" />
+                  {/* <Line type="monotone" dataKey="2022" stroke="#8884d8" name="2022" /> */}
+                  {/* <Line type="monotone" dataKey="2023" stroke="#214100" name="2023" /> */}
                   <Line type="monotone" dataKey="2024" stroke="#ff7300" name="2024" />
-                  <Line type="monotone" dataKey="2025" stroke="#000000" name="2025" />
+                  <Line type="monotone" dataKey="2025" stroke="#000000" strokeWidth={3} name="2025" />
 
             
-                  <Line type="monotone" dataKey="Average" stroke="#002060" name="Avg" strokeWidth={2} />
+                  <Line type="monotone" dataKey="Average" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               ) : (
                 <>
-                  <Line type="monotone" dataKey="2022 Size" stroke="#ff6347" name="2022 Deal Size" />
-                  <Line type="monotone" dataKey="2023 Size" stroke="#214100" name="2023 Deal Size" />
-                  <Line type="monotone" dataKey="2024 Size" stroke="#8a009a" name="2024 Deal Size" />
-                  <Line type="monotone" dataKey="2025 Size" stroke="#000000" name="2025 Deal Size" />
-                  
-                  <Line type="monotone" dataKey="Average Size" stroke="#002060" name="Avg Deal Size" strokeWidth={2} />
+                  {/* <Line type="monotone" dataKey="2022 Size" stroke="#ff6347" name="2022 Deal Size" />
+                  <Line type="monotone" dataKey="2023 Size" stroke="#214100" name="2023 Deal Size" /> */}
+                  <Line type="monotone" dataKey="2024 Size" stroke="#8a009a" name="2024" />
+                  <Line type="monotone" dataKey="2025 Size" stroke="#000000" strokeWidth={3} name="2025" />
+                  <Line type="monotone" dataKey="Average Size" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
             </LineChart>
@@ -159,7 +157,7 @@ const WeeklyStatsChart: React.FC = () => {
                       sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }} 
                     />
                   }
-                  label="Deal Size"
+                  label="Deal Volume"
                 />
               </RadioGroup>
 
