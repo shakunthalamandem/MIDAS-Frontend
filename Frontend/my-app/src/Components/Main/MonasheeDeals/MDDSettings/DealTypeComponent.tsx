@@ -16,13 +16,13 @@ import {
 const formatValue = (value: number): string => {
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-  
+
   if (absValue >= 1_000_000_000)
     return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
   if (absValue >= 1_000_000)
     return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
   if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
-  
+
   return `${sign}$${absValue.toFixed(2)}`;
 };
 
@@ -36,7 +36,7 @@ interface Data {
   };
 }
 
-const DealTypeComponent: React.FC<{ data: Data }> = ({ data }) => {
+const DealTypeComponent: React.FC<{ data?: Data }> = ({ data = {} }) => {
   const [selectedTypes, setSelectedTypes] = useState<{ [year: string]: "IPO" | "FO" }>(
     Object.keys(data).reduce((acc, year) => ({ ...acc, [year]: "IPO" }), {})
   );
@@ -44,8 +44,8 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data }) => {
   return (
     <div>
       {Object.keys(data).map((year) => {
-        const selectedType = selectedTypes[year];
-        const tableData = data[year][selectedType];
+        const selectedType = selectedTypes[year] || "IPO";
+        const tableData = data[year]?.[selectedType] || {};
         const sortedCategories = Object.keys(tableData).sort((a, b) => {
           if (a === "Summary") return 1;
           if (b === "Summary") return -1;
@@ -53,8 +53,10 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data }) => {
         });
 
         return (
-          <Paper key={year} sx={{ padding: 2, marginBottom: 3 }}>
-            <Typography variant="h6" align="center">{`Financial Data for ${year}`}</Typography>
+          <Paper key={year} sx={{ padding: 2, marginBottom: 3, boxShadow: 3 }}>
+            <Typography variant="h6" align="center" gutterBottom>
+              {`Financial Data for ${year}`}
+            </Typography>
             <RadioGroup
               row
               value={selectedType}
@@ -67,22 +69,24 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data }) => {
               <FormControlLabel value="FO" control={<Radio />} label="FO" />
             </RadioGroup>
 
-            <TableContainer component={Paper}>
-              <Table>
+            <TableContainer component={Paper} sx={{ border: "1px solid #ddd" }}>
+              <Table sx={{ borderCollapse: "collapse" }}>
                 <TableHead>
-                  <TableRow>
-                    <TableCell>Quintile</TableCell>
-                    <TableCell>T+1M Absolute Returns</TableCell>
-                    <TableCell>No of Deals</TableCell>
-                    <TableCell>Deal Volume ($)</TableCell>
-                    <TableCell>Allocation as % of IOI (Weighted)</TableCell>
-                    <TableCell>Monashee Actual Allocation PnL (Gross $)</TableCell>
-                    <TableCell>Model PnL With Actual Allocation (Gross $)</TableCell>
-                    <TableCell>{selectedType === "IPO" ? "Model PnL with model Allocation (0.5%)" : "Model PnL with model Allocation (1%)"}</TableCell>
-                    <TableCell>Monashee Actual AM PnL (Gross $)</TableCell>
-                    <TableCell>Model PnL with model AM allocation (Gross $)</TableCell>
-                    <TableCell>Monashee Actual Total PnL (Gross $)</TableCell>
-                    <TableCell>Model Actual Total PnL (Gross $)</TableCell>
+                  <TableRow sx={{ backgroundColor: "#1976d2", color: "white" }}>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>Quintile</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>T+1M Absolute Returns</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>No of Deals</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>Deal Volume ($)</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>Allocation as % of IOI</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>Monashee Actual Allocation PnL</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>Model PnL With Actual Allocation</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>{
+                      selectedType === "IPO" ? "Model PnL (0.5%)" : "Model PnL (1%)"
+                    }</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>Monashee Actual AM PnL</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>Model AM PnL</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>Monashee Total PnL</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", color: "white" }}>Model Total PnL</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -90,12 +94,17 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data }) => {
                     const values = tableData[category] || {};
                     const isSummary = category === "Summary";
                     return (
-                      <TableRow key={category}>
+                      <TableRow
+                        key={category}
+                        sx={{ backgroundColor: isSummary ? "#d0f0c0" : "inherit" }}
+                      >
                         <TableCell>{isSummary ? "" : index + 1}</TableCell>
                         <TableCell>{category}</TableCell>
                         <TableCell>{values["Number of deals"] || 0}</TableCell>
                         <TableCell>{formatValue(values["Deal volume"] || 0)}</TableCell>
-                        <TableCell>{(values["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00") + "%"}</TableCell>
+                        <TableCell>
+                          {(values["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00") + "%"}
+                        </TableCell>
                         <TableCell>{formatValue(values["Allocation Return"] || 0)}</TableCell>
                         <TableCell>{formatValue(values["Model Actual Return"] || 0)}</TableCell>
                         <TableCell>{formatValue(values["Model Return 1% Allocation"] || 0)}</TableCell>
