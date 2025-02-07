@@ -41,7 +41,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const payload = {
         ...selectedFilters,
@@ -62,30 +62,11 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
       const result = await response.json();
       setData(result);
       console.log("Data", result);
-      
-      // Redirect data to respective components based on filter type
-      handleDataRedirection(result);
     } catch (error) {
       console.error("Error fetching data", error);
       setError("Failed to fetch data.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDataRedirection = (data: any) => {
-    switch (selectedFilter.value) {
-      case "deal_type":
-        <DealTypeComponent/>
-        break;
-      case "sector":
-        <div><h5>we are working on this.</h5></div>
-        break;
-      case "region":
-        <div><h5>we are working on this.</h5></div>
-        break;
-      default:
-        console.warn("Unknown filter type");
     }
   };
 
@@ -133,6 +114,15 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
 
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {/* Render component based on the selected filter */}
+      {!loading && !error && data && (
+        <>
+          {selectedFilter.value === "deal_type" && <DealTypeComponent data={data} />}
+          {selectedFilter.value === "sector" && <h5>We are working on this.</h5>}
+          {selectedFilter.value === "region" && <h5>We are working on this.</h5>}
+        </>
+      )}
     </Box>
   );
 };

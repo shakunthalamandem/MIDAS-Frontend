@@ -359,8 +359,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           <>
       {apiName === "allocation_capture" ? (
         // <MDDCaptureTable selectedFilterss={appliedFilterss} />
-        // <Gap selectedFilters={appliedFilters} />
-        <DealTypeComponent/>
+        <Gap selectedFilters={appliedFilters} />
+        // <DealTypeComponent />
       ) : apiName === "fo_discount" ? (
         <AvgFoDiscountChart data={apiData} />      ) : (
         <>
