@@ -68,7 +68,14 @@ const FooterMain: React.FC = () => {
             height: '50px',
           }}
         />
+        
       </Box>
+      <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+            Version 1.0 - Updated February 7, 2025
+          </Typography>
+          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+            Data as of February 6, 2025
+          </Typography>
       <Box
         sx={{
           display: 'flex',
@@ -76,14 +83,6 @@ const FooterMain: React.FC = () => {
           marginTop: '10px',
         }}
       >
-        <Box sx={{ textAlign: 'left', color: '#FFFFFF' ,justifyContent: 'flex-end', flexGrow: 1}}>
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-            Version 1.0
-          </Typography>
-          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-            Last updated on 06/02/2025
-          </Typography>
-        </Box>
       </Box>
     </Box>
   );
