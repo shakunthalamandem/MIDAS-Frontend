@@ -36,9 +36,7 @@ const AllocationCaptureReturn = () => {
   >
     <span className="marquee">
       Back-test Assumptions: Allocation @ 0.5% of Deal Size for IPOs and @
-      1.0% of deal size for FOs, AM @ 1% of Deal Size for both IPOs and FOs.
-      Position Limit of $50M, Daily Stop Loss of 10%; 60%-100% Hedge based
-      on region specific futures/ETFs.
+      1.0% of deal size for FOs, AM @ 0.5% of Deal Size for both IPOs and FOs.
     </span>
   </Typography>
       <MddMain apiName="allocation_capture" />
