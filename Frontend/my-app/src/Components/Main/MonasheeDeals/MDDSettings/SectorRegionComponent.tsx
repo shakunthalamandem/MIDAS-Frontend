@@ -35,7 +35,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data,
       {Object.entries(data)
         .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
         .map(([year, categories]) => (
-          <Paper key={year} sx={{ padding: 5, marginBottom: 3, width: "90%", background: "#F1E3A4" }}>
+          <Paper key={year} sx={{ padding: 5, marginBottom: 3, width: "90%", background: "#F5E8DC" }}>
             <Typography variant="h6" sx={{ textAlign: "center", mb: 2, fontWeight: "bold", color: "#1976d2" }}>
               {`Financial Data for ${year}`}
             </Typography>
@@ -51,7 +51,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data,
                     <TableCell sx={{ color: "white" }}>Allocation as % of IOI (Weighted)</TableCell>
                     <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual Allocation PnL (Gross $)</TableCell>
                     <TableCell sx={{ color: "white" }}>Model PnL With Actual Allocation (Gross $)</TableCell>
-                    <TableCell sx={{ color: "white" }}>Model PnL with model Allocation (1%)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Model PnL with model Allocation</TableCell>
                     <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual AM PnL (Gross $)</TableCell>
                     <TableCell sx={{ color: "white" }}>Model PnL with model AM(Gross $)</TableCell>
                     <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual Total PnL (Gross $)</TableCell>

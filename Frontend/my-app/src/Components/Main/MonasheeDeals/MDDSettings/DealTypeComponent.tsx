@@ -36,7 +36,7 @@ interface Data {
 }
 
 const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
-  const sortedYears = Object.keys(data).sort((a, b) => parseInt(b) - parseInt(a)); // Latest year first
+  const sortedYears = Object.keys(data).sort((a, b) => parseInt(b) - parseInt(a));
   const [selectedTypes, setSelectedTypes] = useState<{ [year: string]: "IPO" | "FO" }>(
     sortedYears.reduce((acc, year) => ({ ...acc, [year]: "IPO" }), {})
   );
@@ -53,7 +53,7 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
         });
 
         return (
-          <Paper key={year} sx={{ padding: 5, marginBottom: 3, width: "85%", background: "#c2e0f5" }}> 
+          <Paper key={year} sx={{ padding: 5, marginBottom: 3, width: "90%", background: "#F5E8DC" }}> 
             <Typography variant="h6" align="center" sx={{ color: "#1976d2" }}>
               {`GAP Analysis for ${year}`}
             </Typography>
