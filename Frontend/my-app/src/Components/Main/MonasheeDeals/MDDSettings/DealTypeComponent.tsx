@@ -53,7 +53,7 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
         });
 
         return (
-          <Paper key={year} sx={{ padding: 5, marginBottom: 3, width: "80%", background: "#F1E3A4" }}>
+          <Paper key={year} sx={{ padding: 5, marginBottom: 3, width: "85%", background: "#c2e0f5" }}> 
             <Typography variant="h6" align="center" sx={{ color: "#1976d2" }}>
               {`GAP Analysis for ${year}`}
             </Typography>
@@ -93,7 +93,7 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
                     const values = tableData[category] || {};
                     const isSummary = category === "Summary";
                     return (
-                      <TableRow key={category} sx={isSummary ? { backgroundColor: "#d0f0c0" } : {}}>
+                      <TableRow key={category} sx={isSummary ? { backgroundColor: "#b5e59c" } : {}}>
                         <TableCell>{isSummary ? "" : index + 1}</TableCell>
                         <TableCell>{category}</TableCell>
                         <TableCell>{values["Number of deals"] || 0}</TableCell>
