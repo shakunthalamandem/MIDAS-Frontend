@@ -136,17 +136,33 @@ const WeeklyStatsChart: React.FC = () => {
             </LineChart>
           </ResponsiveContainer>
 
-          <FormControl component="fieldset" style={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
-            <RadioGroup row>
-              <FormControlLabel
-                control={<Radio checked={showCount} onChange={() => setShowCount(true)} sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }} />}
-                label="Deal Count"
-              />
-              <FormControlLabel
-                control={<Radio checked={!showCount} onChange={() => setShowCount(false)} sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }} />}
-                label="Deal Size"
-              />
-            </RadioGroup>
+            <FormControl 
+              component="fieldset" 
+              style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 5 }}
+            >
+              <RadioGroup row>
+                <FormControlLabel
+                  control={
+                    <Radio 
+                      checked={showCount} 
+                      onChange={() => setShowCount(true)} 
+                      sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }} 
+                    />
+                  }
+                  label="Deal Count"
+                />
+                <FormControlLabel
+                  control={
+                    <Radio 
+                      checked={!showCount} 
+                      onChange={() => setShowCount(false)} 
+                      sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }} 
+                    />
+                  }
+                  label="Deal Size"
+                />
+              </RadioGroup>
+
           </FormControl>
         </CardContent>
       </Card>
