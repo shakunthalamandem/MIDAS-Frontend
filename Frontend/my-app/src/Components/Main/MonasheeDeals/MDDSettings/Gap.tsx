@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Box, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 import DealTypeComponent from "./DealTypeComponent";
+import SectorRegionComponent from "./SectorRegionComponent";
 
 interface GapProps {
   selectedFilters: any;
@@ -95,8 +96,8 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
       {!loading && !error && data && (
         <Box sx={{ width: "100%", marginTop: 2, textAlign: "center" }}>
           {selectedFilter.value === "deal_type" && <DealTypeComponent data={data || {}} />}
-          {selectedFilter.value === "sector" && <h5>We are working on this.</h5>}
-          {selectedFilter.value === "region" && <h5>We are working on this.</h5>}
+          {selectedFilter.value === "sector" && <SectorRegionComponent data={data || {}} option = {selectedFilter.label}/>}
+          {selectedFilter.value === "region" && <SectorRegionComponent data={data || {}} option = {selectedFilter.label}/>}
         </Box>
       )}
     </Box>
