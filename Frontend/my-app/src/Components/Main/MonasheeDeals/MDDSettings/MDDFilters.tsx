@@ -184,8 +184,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                 .filter((filter) => {
                   const key = Object.keys(filter)[0];
                   return !(
-                    (apiName === "fo_discount" || apiName === "allocation_capture") &&
-                    (key === "deal_type" || key === "period")
+                    (apiName === "fo_discount" && (key === "deal_type" || key === "period")) ||
+                    (apiName === "allocation_capture" && key === "period")
                   );
                 })
                 .map((filter) => {

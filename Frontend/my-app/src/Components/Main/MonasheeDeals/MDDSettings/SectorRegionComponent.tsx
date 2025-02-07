@@ -37,7 +37,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data,
         .map(([year, categories]) => (
           <Paper key={year} sx={{ padding: 5, marginBottom: 3, width: "90%", background: "#F5E8DC" }}>
             <Typography variant="h6" sx={{ textAlign: "center", mb: 2, fontWeight: "bold", color: "#1976d2" }}>
-              {`Financial Data for ${year}`}
+              {`${option} wise Data for ${year}`}
             </Typography>
             <TableContainer component={Paper} sx={{ border: "1px solid #ccc" }}>
               <Table size="small">
@@ -62,7 +62,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data,
                   {Object.entries(categories)
                     .sort(([a], [b]) => (a === "Summary" ? 1 : b === "Summary" ? -1 : a.localeCompare(b)))
                     .map(([category, values]) => (
-                      <TableRow key={category} sx={{ backgroundColor: category === "Summary" ? "#e3f2fd" : "inherit" }}>
+                      <TableRow key={category} sx={{ backgroundColor: category === "Summary" ? "#b5e59c" : "inherit" }}>
                         <TableCell sx={{ fontWeight: category === "Summary" ? "bold" : "normal" }}>{category}</TableCell>
                         <TableCell>{values["Min t1m_return_from_dealogic"] !== undefined ? `${values["Min t1m_return_from_dealogic"].toFixed(1)}%` : "N/A"} 
                                   to {values["Max t1m_return_from_dealogic"] !== undefined ? `${values["Max t1m_return_from_dealogic"].toFixed(1)}%` : "N/A"} </TableCell>
