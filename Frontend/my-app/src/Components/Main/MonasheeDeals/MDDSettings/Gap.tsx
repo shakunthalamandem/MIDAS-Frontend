@@ -27,7 +27,9 @@ const filterOptions: FilterOption[] = [
 ];
 
 const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
-  const [selectedFilter, setSelectedFilter] = useState<FilterOption>(filterOptions[0]);
+  const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
+    filterOptions[0]
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<any>(null);
@@ -57,7 +59,8 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+      if (!response.ok)
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
 
       const result = await response.json();
       setData(result);
@@ -71,57 +74,71 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
   };
 
   return (
-    <Box
-      sx={{
-        background: "linear-gradient(to right, #190250, #6DD5ED)",
-        paddingX: 2,
-        borderRadius: "8px",
-        boxShadow: 3,
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "center",
-        width: "70%",
-        alignItems: "center",
-        marginBottom: 4,
-        marginLeft: 2,
-        marginRight: "277px",
-        marginX: 2,
-      }}
-    >
-      <RadioGroup
-        value={selectedFilter.value}
-        onChange={(e) =>
-          setSelectedFilter(filterOptions.find((option) => option.value === e.target.value)!)
-        }
-        row
+    <Box>
+      <Box
+        sx={{
+          background: "linear-gradient(to right, #190250, #6DD5ED)",
+          padding: 2,
+          borderRadius: "8px",
+          boxShadow: 3,
+          display: "flex",
+          flexDirection: "column", // Stack elements vertically
+          alignItems: "center",
+          width: "70%",
+          marginBottom: 4,
+          marginX: "auto",
+        }}
       >
-        {filterOptions.map((option) => (
-          <FormControlLabel
-            key={option.value}
-            value={option.value}
-            control={<Radio sx={{ color: "white" }} />}
-            label={option.label}
-            sx={{
-              color: "white",
-              marginRight: 4,
-              "& .MuiRadio-root": {
+        <RadioGroup
+          value={selectedFilter.value}
+          onChange={(e) =>
+            setSelectedFilter(
+              filterOptions.find((option) => option.value === e.target.value)!
+            )
+          }
+          row
+          sx={{ display: "flex", justifyContent: "center", marginBottom: 2 }} // Centers radio buttons
+        >
+          {filterOptions.map((option) => (
+            <FormControlLabel
+              key={option.value}
+              value={option.value}
+              control={<Radio sx={{ color: "white" }} />}
+              label={option.label}
+              sx={{
                 color: "white",
-              },
-            }}
-          />
-        ))}
-      </RadioGroup>
+                marginRight: 4,
+                "& .MuiRadio-root": {
+                  color: "white",
+                },
+              }}
+            />
+          ))}
+        </RadioGroup>
+      </Box>
 
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {/* Render component based on the selected filter */}
       {!loading && !error && data && (
-        <>
-          {selectedFilter.value === "deal_type" && <DealTypeComponent data={data} />}
-          {selectedFilter.value === "sector" && <h5>We are working on this.</h5>}
-          {selectedFilter.value === "region" && <h5>We are working on this.</h5>}
-        </>
+        <Box
+          sx={{
+            width: "100%",
+            marginTop: 2,
+            textAlign: "center",
+          }}
+        >
+          {selectedFilter.value === "deal_type" && (
+            <DealTypeComponent data={data || {}} />
+          )}
+          {selectedFilter.value === "sector" && (
+            <h5>We are working on this.</h5>
+          )}
+          {selectedFilter.value === "region" && (
+            <h5>We are working on this.</h5>
+          )}
+        </Box>
       )}
     </Box>
   );
