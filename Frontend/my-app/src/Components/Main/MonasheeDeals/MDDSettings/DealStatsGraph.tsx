@@ -96,7 +96,7 @@ const filterOptions: FilterOption[] = [
     payload: { filter_type: "broad_region" },
   },
   {
-    label: "Deal Captian",
+    label: "Deal Captain",
     value: "caption",
     payload: { filter_type: "deal_captain" },
   },
