@@ -49,13 +49,13 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data,
                     <TableCell sx={{ color: "white" }}>Deal Volume ($)</TableCell>
                     <TableCell sx={{ color: "white" }}>Allocation as % of Deal Size (Weighted)</TableCell>
                     <TableCell sx={{ color: "white" }}>Allocation as % of IOI (Weighted)</TableCell>
-                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual Allocation PnL (Gross $)</TableCell>
-                    <TableCell sx={{ color: "white" }}>Model PnL With Actual Allocation (Gross $)</TableCell>
+                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual Allocation PnL (Gross)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Model PnL With Actual Allocation (Gross)</TableCell>
                     <TableCell sx={{ color: "white" }}>Model PnL with model Allocation</TableCell>
-                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual AM PnL (Gross $)</TableCell>
-                    <TableCell sx={{ color: "white" }}>Model PnL with model AM(Gross $)</TableCell>
-                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual Total PnL (Gross $)</TableCell>
-                    <TableCell sx={{ color: "white" }}>Model Actual Total PnL (Gross $)</TableCell>
+                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual AM PnL (Gross)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Model PnL with model AM(Gross)</TableCell>
+                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547" }}>Monashee Actual Total PnL (Gross)</TableCell>
+                    <TableCell sx={{ color: "white" }}>Model Actual Total PnL (Gross)</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
