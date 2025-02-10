@@ -112,21 +112,21 @@ const WeeklyStatsChart: React.FC = () => {
               <Legend />
               <CartesianGrid stroke="#f5f5f5" />
 
-              {/* Line charts for 2024 and Average */}
               {showCount ? (
                 <>
                   <Line type="monotone" dataKey="2024" stroke="#ff7300" name="2024" />
+                  <Bar dataKey="2025" barSize={10} fill="#247B5B" name="2025" />
+
                   <Line type="monotone" dataKey="Average" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               ) : (
                 <>
                   <Line type="monotone" dataKey="2024 Size" stroke="#8a009a" name="2024" />
+                  <Bar dataKey="2025 Size" barSize={10} fill="#247B5B" name="2025" />
                   <Line type="monotone" dataKey="Average Size" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
 
-              {/* Bar chart for 2025 */}
-              <Bar dataKey="2025" barSize={20} fill="#247B5B" name="2025" />
             </ComposedChart>
           </ResponsiveContainer>
 
