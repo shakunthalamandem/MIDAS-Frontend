@@ -8,7 +8,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  CartesianGrid,
 } from "recharts";
 import {
   FormControlLabel,
@@ -110,7 +109,6 @@ const WeeklyStatsChart: React.FC = () => {
               <YAxis tickFormatter={formatNumber} />
               <Tooltip formatter={(value: any) => formatNumber(Number(value))} />
               <Legend />
-              <CartesianGrid stroke="#f5f5f5" />
 
               {showCount ? (
                 <>
@@ -118,19 +116,15 @@ const WeeklyStatsChart: React.FC = () => {
                   <Bar dataKey="2025" barSize={10} fill="#247B5B" name="2025" />
 
                   <Line type="monotone" dataKey="Average" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
-                  <Bar dataKey="2025" barSize={20} fill="#247B5B" name="2025" />
                 </>
               ) : (
                 <>
                   <Line type="monotone" dataKey="2024 Size" stroke="#8a009a" name="2024" />
                   <Bar dataKey="2025 Size" barSize={10} fill="#247B5B" name="2025" />
                   <Line type="monotone" dataKey="Average Size" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
-                  <Bar dataKey="2025 Size" barSize={20} fill="#247B5B" name="2025" />
                 </>
               )}
 
-              {/* Bar chart for 2025 */}
-              <Bar dataKey="2025" barSize={20} fill="#247B5B" name="2025" />
             </ComposedChart>
           </ResponsiveContainer>
 
