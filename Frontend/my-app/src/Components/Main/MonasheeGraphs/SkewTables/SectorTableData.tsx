@@ -1,5 +1,13 @@
-import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 
 // Type definition for the table data
 interface TableData {
@@ -28,6 +36,22 @@ interface SectorTableDataProps {
     };
   };
 }
+const formatNumber = (value: number): string => {
+  const absValue = Math.abs(value); // Get the absolute value for formatting
+  let formattedValue: string;
+
+  if (absValue >= 1e9) {
+    formattedValue = `${(absValue / 1e9).toFixed(0)}B`; // Format billions
+  } else if (absValue >= 1e6) {
+    formattedValue = `${(absValue / 1e6).toFixed(0)}M`; // Format millions
+  } else if (absValue >= 1e3) {
+    formattedValue = `${(absValue / 1e3).toFixed(0)}K`; // Format thousands
+  } else {
+    formattedValue = absValue.toString(); // Default format
+  }
+
+  return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`; // Ensure dollar sign is correctly placed
+};
 
 const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   // Extract the Yearwise data and Yearwise Total data
@@ -36,15 +60,15 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
 
   // Define columns for the table
   const columns = [
-    'Year',
-    'Total Deal Count',
-    'Total Deal Volume ($)',
-    '% of Positively Performing Deals ',
-    '% of Negatively Performing Deals ',
-    'Weighted Avg T+1M Excess Return (Positive Deals)',
-    'Weighted Avg T+1M Excess Return (Negative Deals)',
-    'Expected Returns Excess',
-    'Opportunity Value (T + 1M Excess)',
+    "Year",
+    "Total Deal Count",
+    "Total Deal Volume ($)",
+    "% of Positively Performing Deals ",
+    "% of Negatively Performing Deals ",
+    "Weighted Avg T+1M Excess Return (Positive Deals)",
+    "Weighted Avg T+1M Excess Return (Negative Deals)",
+    "Expected Returns Excess",
+    "Opportunity Value (T + 1M Excess)",
   ];
 
   // Render the table only if Yearwise data exists
@@ -53,12 +77,18 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   }
 
   // Calculate the averages for the total row
-  const avgPositivelyPerformingDealsPercentage = yearwiseTotal.Total_Postively_Performing_Deals || 0;
-  const avgNegativelyPerformingDealsPercentage = yearwiseTotal.Total_Negatively_Performing_Deals || 0;
-  const avgAvgT1MAbsReturnPositively = yearwiseTotal.Total_Returns_positively || 0;
-  const avgAvgT1MAbsReturnNegatively = yearwiseTotal.Total_Returns_negatively || 0;
-  const avgExpectedReturnsExcess = yearwiseTotal.Total_Expected_returns_excess || 0;
-  const totalLongOpportunityValue = yearwiseTotal.Total_Long_Opportunity_Value || 0;
+  const avgPositivelyPerformingDealsPercentage =
+    yearwiseTotal.Total_Postively_Performing_Deals || 0;
+  const avgNegativelyPerformingDealsPercentage =
+    yearwiseTotal.Total_Negatively_Performing_Deals || 0;
+  const avgAvgT1MAbsReturnPositively =
+    yearwiseTotal.Total_Returns_positively || 0;
+  const avgAvgT1MAbsReturnNegatively =
+    yearwiseTotal.Total_Returns_negatively || 0;
+  const avgExpectedReturnsExcess =
+    yearwiseTotal.Total_Expected_returns_excess || 0;
+  const totalLongOpportunityValue =
+    yearwiseTotal.Total_Long_Opportunity_Value || 0;
 
   return (
     <TableContainer component={Paper} sx={{ marginTop: 2, marginBottom: 4 }}>
@@ -69,12 +99,12 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               <TableCell
                 key={column}
                 sx={{
-                  fontWeight: 'bold',
-                  textAlign: 'left',
-                  padding: '4px 8px',
-                  fontSize: '0.875rem',
-                  bgcolor: '#002060',
-                  color: '#FFFFFF',
+                  fontWeight: "bold",
+                  textAlign: "left",
+                  padding: "4px 8px",
+                  fontSize: "0.875rem",
+                  bgcolor: "#002060",
+                  color: "#FFFFFF",
                 }}
               >
                 {column}
@@ -88,26 +118,30 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
             const row = yearwiseData[year];
             return (
               <TableRow key={year}>
-                <TableCell sx={{ padding: '4px 8px' }}>{year}</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>${row.Total_Deal_Volume.toFixed(0)}B</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>
+                <TableCell sx={{ padding: "4px 8px" }}>{year}</TableCell>
+                <TableCell sx={{ padding: "4px 8px" }}>
+                  {row.Total_Deal_Count}
+                </TableCell>
+                <TableCell sx={{ padding: "4px 8px" }}>
+                  {formatNumber(row.Total_Deal_Volume)}
+                </TableCell>
+                <TableCell sx={{ padding: "4px 8px" }}>
                   {row.Positively_Performing_Deals_Percentage.toFixed(0)}%
                 </TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>
+                <TableCell sx={{ padding: "4px 8px" }}>
                   {row.Negatively_Performing_Deals_Percentage.toFixed(0)}%
                 </TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>
+                <TableCell sx={{ padding: "4px 8px" }}>
                   {row.Average_T1M_Abs_Return_of_Positively.toFixed(1)}%
                 </TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>
+                <TableCell sx={{ padding: "4px 8px" }}>
                   {row.Average_T1M_Abs_Return_of_Negatively.toFixed(1)}%
                 </TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>
+                <TableCell sx={{ padding: "4px 8px" }}>
                   {row.Expected_Returns_Excess.toFixed(1)}%
                 </TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>
-                  ${row.Long_Opportunity_Value.toFixed(0)}B
+                <TableCell sx={{ padding: "4px 8px" }}>
+                  {formatNumber(row.Long_Opportunity_Value)}
                 </TableCell>
               </TableRow>
             );
@@ -115,31 +149,40 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
 
           {/* Last row with sum and averages from yearwise_total */}
           <TableRow key="total">
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', textAlign: 'center' }}>Total</TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>
+            <TableCell
+              sx={{
+                padding: "4px 8px",
+                fontWeight: "bold",
+                textAlign: "center",
+              }}
+            >
+              Total
+            </TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
               {yearwiseTotal.Total_Deal_Count_Sum}
             </TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>
-              ${yearwiseTotal.Total_Deal_Volume_Sum.toFixed(0)}B
+
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
+              {formatNumber(yearwiseTotal.Total_Deal_Volume_Sum)}
             </TableCell>
 
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
               {avgPositivelyPerformingDealsPercentage.toFixed(0)}%
             </TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
               {avgNegativelyPerformingDealsPercentage.toFixed(0)}%
             </TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
               {avgAvgT1MAbsReturnPositively.toFixed(1)}%
             </TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
               {avgAvgT1MAbsReturnNegatively.toFixed(1)}%
             </TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
               {avgExpectedReturnsExcess.toFixed(1)}%
             </TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>
-              ${totalLongOpportunityValue.toFixed(0)}B
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
+              {formatNumber(totalLongOpportunityValue)}
             </TableCell>
           </TableRow>
         </TableBody>
