@@ -105,7 +105,8 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
                         <TableCell>{formatValue(values["Model Return 1% Allocation"] || 0)}</TableCell>
                         <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["AM Return"] || 0)}</TableCell>
                         <TableCell>{formatValue(values["Model AM Return"] || 0)}</TableCell>
-                        <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Total Return"] || 0)}</TableCell>
+                        {/* <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Total Return"] || 0)}</TableCell> */}
+                        <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Allocation Return"] + values["AM Return"]  || 0)}</TableCell>
                         <TableCell>{formatValue((values["Model Return 1% Allocation"] || 0) + (values["Model AM Return"] || 0))}</TableCell>
                       </TableRow>
                     );

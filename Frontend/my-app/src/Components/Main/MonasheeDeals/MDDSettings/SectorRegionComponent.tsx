@@ -75,7 +75,8 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data,
                         <TableCell>{formatValue(values["Model Return 1% Allocation"])}</TableCell>
                         <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["AM Return"])}</TableCell>
                         <TableCell>{formatValue(values["Model AM Return"])}</TableCell>
-                        <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Total Return"])}</TableCell>
+                        {/* <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Total Return"])}</TableCell> */}
+                        <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Allocation Return"] + values["AM Return"])}</TableCell>
                         <TableCell>{formatValue((values["Model Return 1% Allocation"] || 0) + (values["Model AM Return"] || 0))}</TableCell>
                       </TableRow>
                     ))}
