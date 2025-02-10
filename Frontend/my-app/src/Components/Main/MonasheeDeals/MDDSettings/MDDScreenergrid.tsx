@@ -26,6 +26,7 @@ interface ScreenerDataRow {
   issue_offer_price: number;
   subscription_bid_shares: number;
   allocated_shares: number;
+  fo_type:string;
 
 }
 
@@ -89,7 +90,8 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       deal_type: data.deal_type, // Array of deal types
       sector: data.gics_sector, // Array of sectors
       selected_bank: data.selected_bank, // Array of lead banks
-      year_range: data.years // Array of years
+      year_range: data.years, // Array of years
+      fo_type: data.fo_type
 
     };
 
