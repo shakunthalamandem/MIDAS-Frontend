@@ -48,9 +48,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   const [appliedFilters, setAppliedFilters] = useState<{
     [key: string]: (string | number)[];
   }>({})  
-  const [appliedFilterss, setAppliedFilterss] = useState<{
-    [key: string]: (string | number)[];
-  }>({});
+
   const [expanded, setExpanded] = useState<string | false>(false);
   const [payload, setPayload] = useState<{ [key: string]: (string | number)[] }>({});
   const [apiData, setApiData] = useState({});
@@ -67,24 +65,11 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     if (JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)) {
       setSelectedValues(initialSelectedValues);
       setAppliedFilters(initialSelectedValues);
-      setAppliedFilterss(initialSelectedValues);
       handleSubmit(initialSelectedValues);
     }
   }, [filtersData]);
 
-  // useEffect(() => {
-  //   const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-  //   filtersData.forEach((filter) => {
-  //     const key = Object.keys(filter)[0];
-  //     initialSelectedValues[key] = [];
-  //   });
 
-  //   if (JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)) {
-  //     setSelectedValues(initialSelectedValues);
-  //     setAppliedFilterss(initialSelectedValues);
-  //     handleSubmit(initialSelectedValues);
-  //   }
-  // }, [filtersData]);
 
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
@@ -116,7 +101,6 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   
       setPayload(payload);
       setAppliedFilters(filters);
-      setAppliedFilterss(filters);
 
   
       const apiUrl = process.env.REACT_APP_API_URL;
@@ -358,9 +342,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         ) : (
           <>
       {apiName === "allocation_capture" ? (
-        // <MDDCaptureTable selectedFilterss={appliedFilterss} />
         <Gap selectedFilters={appliedFilters} />
-        // <DealTypeComponent />
       ) : apiName === "fo_discount" ? (
         <AvgFoDiscountChart data={apiData} />      ) : (
         <>
