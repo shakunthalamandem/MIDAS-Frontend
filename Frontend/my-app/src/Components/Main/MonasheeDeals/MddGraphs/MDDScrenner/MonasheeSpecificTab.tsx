@@ -204,7 +204,7 @@ const DealSpecificTab: React.FC<DealSpecificTabProps> = ({ filtersData }) => {
         })}
 
         {/* LeadBankFilter will be used here */}
-        <LeadBankFilter values={values} setFieldValue={setFieldValue} />
+        {/* <LeadBankFilter values={values} setFieldValue={setFieldValue} /> */}
       </Grid>
     </Box>
   );
