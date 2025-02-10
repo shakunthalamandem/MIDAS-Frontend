@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent } from "@mui/material";
 
-// Define the types for the props
+
 interface RequestDemoModalProps {
   open: boolean;
   onClose: () => void;
@@ -13,7 +13,7 @@ const countryCodes = [
   { code: "+44", country: "UK" },
   { code: "+91", country: "India" },
   { code: "+61", country: "Australia" },
-  // Add more countries as needed
+ 
 ];
 
 const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSubmit }) => {
@@ -22,7 +22,7 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
     phone: "",
     email: "",
     companyname: "",
-    countryCode: "+91", // default country code
+    countryCode: "+91", 
   });
 
   const [errors, setErrors] = useState({
@@ -55,12 +55,11 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
       companyname: "",
     };
 
-    // Validation checks
     if (!formData.name) formErrors.name = "Name is required";
     if (!formData.phone) formErrors.phone = "Phone number is required";
     if (!formData.email) formErrors.email = "Email is required";
 
-    // Email regex check for domain to start with @
+   
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (formData.email && !emailRegex.test(formData.email)) {
       formErrors.email = "Provide a valid email (example: johndoe@example.com)";
@@ -70,28 +69,24 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
 
     setErrors(formErrors);
 
-    // If any field has an error, return false to prevent form submission
     return Object.values(formErrors).every((error) => !error);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate the form before submitting
     if (validateForm()) {
-      // Submit the data
       onSubmit(formData);
 
-      // Reset form fields
       setFormData({
         name: "",
         phone: "",
         email: "",
         companyname: "",
-        countryCode: "+91", // reset to default country code
+        countryCode: "+91", 
       });
 
-      // Close the modal
+
       onClose();
     }
   };
@@ -102,8 +97,8 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
       onClose={onClose}
       sx={{
         "& .MuiDialog-paper": {
-          width: "400px", // Adjust the width to make the dialog smaller
-          maxWidth: "none", // Ensure the width does not go beyond the set value
+          width: "400px", 
+          maxWidth: "none", 
         },
       }}
     >
