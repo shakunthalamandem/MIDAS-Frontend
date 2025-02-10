@@ -5,6 +5,7 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  CircularProgress,
 } from "@mui/material";
 import DealTypeComponent from "./DealTypeComponent";
 import SectorRegionComponent from "./SectorRegionComponent";
@@ -142,8 +143,11 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
         </FormGroup>
       </Box>
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && (
+  <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+    <CircularProgress />
+  </Box>
+)}      {error && <p style={{ color: "red" }}>{error}</p>}
 
       {!loading && !error && data && (
         <Box sx={{ width: "100%", marginTop: 2, textAlign: "center" }}>
