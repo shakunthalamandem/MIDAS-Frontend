@@ -122,7 +122,7 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
             <TableContainer component={Paper} sx={{ border: "1px solid #ccc" }}>
               <Table size="small">
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: "#1976d2" }}>
+                  <TableRow sx={{ backgroundColor: "#004577" }}>
                     <TableCell sx={{ color: "white" }}>Quintile</TableCell>
                     <TableCell sx={{ color: "white" }}>
                       T+1M Absolute Returns
@@ -175,7 +175,7 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
                     return (
                       <TableRow
                         key={category}
-                        sx={isSummary ? { backgroundColor: "#b5e59c" } : {}}
+                        sx={isSummary ? { backgroundColor: "#e59c9c" } : {}}
                       >
                         <TableCell>{isSummary ? "" : index + 1}</TableCell>
                         <TableCell>{category}</TableCell>

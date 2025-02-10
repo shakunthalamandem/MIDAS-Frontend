@@ -42,7 +42,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data,
             <TableContainer component={Paper} sx={{ border: "1px solid #ccc" }}>
               <Table size="small">
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: "#1976d2" }}>
+                  <TableRow sx={{ backgroundColor: "#004577" }}>
                     <TableCell sx={{ color: "white" }}>{option}</TableCell>
                     <TableCell sx={{ color: "white" }}>T+1M Absolute Returns</TableCell>
                     <TableCell sx={{ color: "white" }}>No of Deals</TableCell>
