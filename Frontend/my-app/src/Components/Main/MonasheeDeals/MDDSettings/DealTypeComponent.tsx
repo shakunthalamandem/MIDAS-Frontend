@@ -124,7 +124,7 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#004577" }}>
                     <TableCell sx={{ color: "white",width:'30px' }}>Quintile</TableCell>
-                    <TableCell sx={{ color: "white",width:'120px' }}>
+                    <TableCell sx={{ color: "white",width:'150px' }}>
                       T+1M Absolute Returns
                     </TableCell>
                     <TableCell sx={{ color: "white",width:'30px' }}>No of Deals</TableCell>
@@ -140,10 +140,10 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
                     <TableCell
                       sx={{ color: "white", borderLeft: "2px solid #484547",width:'30px' }}
                     >
-                      Monashee Actual Allocation PnL(Gross $)
+                      Monashee Actual Allocation PnL(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white" ,width:'30px'}}>
-                      Model PnL With Actual Allocation(Gross $)
+                      Model PnL With Actual Allocation(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white",width:'30px' }}>
                       {selectedType === "IPO"
@@ -153,18 +153,18 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
                     <TableCell
                       sx={{ color: "white", borderLeft: "2px solid #484547" ,width:'30px'}}
                     >
-                      Monashee Actual AM PnL(Gross $)
+                      Monashee Actual AM PnL(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white",width:'30px' }}>
-                      Model PnL with model AM(Gross $)
+                      Model PnL with model AM(Gross)
                     </TableCell>
                     <TableCell
                       sx={{ color: "white", borderLeft: "2px solid #484547",width:'30px' }}
                     >
-                      Monashee Actual Total PnL(Gross $)
+                      Monashee Actual Total PnL(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white",width:'30px' }}>
-                      Model Actual Total PnL(Gross $)
+                      Model Actual Total PnL(Gross)
                     </TableCell>
                   </TableRow>
                 </TableHead>
