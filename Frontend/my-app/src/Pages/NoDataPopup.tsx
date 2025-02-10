@@ -29,7 +29,7 @@ const NoDataPopup: React.FC<NoDataPopupProps> = ({ open, onClose }) => {
           variant="contained"
           color="primary"
           sx={{
-            backgroundColor: '#004577',
+            backgroundColor: '#466675',
             '&:hover': { backgroundColor: '#115293' },
           }}
         >
