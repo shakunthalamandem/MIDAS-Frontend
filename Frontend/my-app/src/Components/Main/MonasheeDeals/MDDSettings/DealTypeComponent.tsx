@@ -123,47 +123,47 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
               <Table size="small">
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#004577" }}>
-                    <TableCell sx={{ color: "white" }}>Quintile</TableCell>
-                    <TableCell sx={{ color: "white" }}>
+                    <TableCell sx={{ color: "white",width:'30px' }}>Quintile</TableCell>
+                    <TableCell sx={{ color: "white",width:'120px' }}>
                       T+1M Absolute Returns
                     </TableCell>
-                    <TableCell sx={{ color: "white" }}>No of Deals</TableCell>
-                    <TableCell sx={{ color: "white" }}>
+                    <TableCell sx={{ color: "white",width:'30px' }}>No of Deals</TableCell>
+                    <TableCell sx={{ color: "white",width:'30px' }}>
                       Deal Volume ($)
                     </TableCell>
-                    <TableCell sx={{ color: "white" }}>
+                    <TableCell sx={{ color: "white",width:'30px' }}>
                       Allocation as % of Deal Size (Weighted)
                     </TableCell>
-                    <TableCell sx={{ color: "white" }}>
+                    <TableCell sx={{ color: "white" ,width:'30px'}}>
                       Allocation as % of IOI (Weighted)
                     </TableCell>
                     <TableCell
-                      sx={{ color: "white", borderLeft: "2px solid #484547" }}
+                      sx={{ color: "white", borderLeft: "2px solid #484547",width:'30px' }}
                     >
                       Monashee Actual Allocation PnL(Gross $)
                     </TableCell>
-                    <TableCell sx={{ color: "white" }}>
+                    <TableCell sx={{ color: "white" ,width:'30px'}}>
                       Model PnL With Actual Allocation(Gross $)
                     </TableCell>
-                    <TableCell sx={{ color: "white" }}>
+                    <TableCell sx={{ color: "white",width:'30px' }}>
                       {selectedType === "IPO"
                         ? "Model PnL with model Allocation(0.5%)"
                         : "Model PnL with model Allocation(1%)"}
                     </TableCell>
                     <TableCell
-                      sx={{ color: "white", borderLeft: "2px solid #484547" }}
+                      sx={{ color: "white", borderLeft: "2px solid #484547" ,width:'30px'}}
                     >
                       Monashee Actual AM PnL(Gross $)
                     </TableCell>
-                    <TableCell sx={{ color: "white" }}>
+                    <TableCell sx={{ color: "white",width:'30px' }}>
                       Model PnL with model AM(Gross $)
                     </TableCell>
                     <TableCell
-                      sx={{ color: "white", borderLeft: "2px solid #484547" }}
+                      sx={{ color: "white", borderLeft: "2px solid #484547",width:'30px' }}
                     >
                       Monashee Actual Total PnL(Gross $)
                     </TableCell>
-                    <TableCell sx={{ color: "white" }}>
+                    <TableCell sx={{ color: "white",width:'30px' }}>
                       Model Actual Total PnL(Gross $)
                     </TableCell>
                   </TableRow>
@@ -174,24 +174,44 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
                     const isSummary = category === "Summary";
                     return (
                       <TableRow
-                        key={category}
-                        sx={isSummary ? { backgroundColor: "#e59c9c" } : {}}
-                      >
-                        <TableCell>{isSummary ? "" : index + 1}</TableCell>
-                        <TableCell>{category}</TableCell>
-                        <TableCell>{values["Number of deals"] || 0}</TableCell>
-                        <TableCell>{formatValue(values["Deal volume"] || 0)}</TableCell>
-                        <TableCell>{(values["Weighted Allocation as % of Deal Size"]?.toFixed(2) || "0.00") + "%"}</TableCell>
-                        <TableCell>{(values["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00") + "%"}</TableCell>
-                        <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Allocation Return"] || 0)}</TableCell>
-                        <TableCell>{formatValue(values["Model Actual Return"] || 0)}</TableCell>
-                        <TableCell>{formatValue(values["Model Return 1% Allocation"] || 0)}</TableCell>
-                        <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["AM Return"] || 0)}</TableCell>
-                        <TableCell>{formatValue(values["Model AM Return"] || 0)}</TableCell>
-                        {/* <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Total Return"] || 0)}</TableCell> */}
-                        <TableCell sx={{ borderLeft: "2px solid #484547" }}>{formatValue(values["Allocation Return"] + values["AM Return"]  || 0)}</TableCell>
-                        <TableCell>{formatValue((values["Model Return 1% Allocation"] || 0) + (values["Model AM Return"] || 0))}</TableCell>
-                      </TableRow>
+                      key={category}
+                      sx={isSummary ? { backgroundColor: "#7bcf60" } : {}}
+                    >
+                      <TableCell>{isSummary ? <strong>{""}</strong> : index + 1}</TableCell>
+                      <TableCell>{isSummary ? <strong>{category}</strong> : category}</TableCell>
+                      <TableCell>{isSummary ? <strong>{values["Number of deals"] || 0}</strong> : values["Number of deals"] || 0}</TableCell>
+                      <TableCell>{isSummary ? <strong>{formatValue(values["Deal volume"] || 0)}</strong> : formatValue(values["Deal volume"] || 0)}</TableCell>
+                      <TableCell>
+                        {isSummary ? (
+                          <strong>{(values["Weighted Allocation as % of Deal Size"]?.toFixed(2) || "0.00") + "%"}</strong>
+                        ) : (
+                          (values["Weighted Allocation as % of Deal Size"]?.toFixed(2) || "0.00") + "%"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {isSummary ? (
+                          <strong>{(values["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00") + "%"}</strong>
+                        ) : (
+                          (values["Weighted Allocation as % of IOI"]?.toFixed(2) || "0.00") + "%"
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ borderLeft: "2px solid #484547" }}>
+                        {isSummary ? <strong>{formatValue(values["Allocation Return"] || 0)}</strong> : formatValue(values["Allocation Return"] || 0)}
+                      </TableCell>
+                      <TableCell>{isSummary ? <strong>{formatValue(values["Model Actual Return"] || 0)}</strong> : formatValue(values["Model Actual Return"] || 0)}</TableCell>
+                      <TableCell>{isSummary ? <strong>{formatValue(values["Model Return 1% Allocation"] || 0)}</strong> : formatValue(values["Model Return 1% Allocation"] || 0)}</TableCell>
+                      <TableCell sx={{ borderLeft: "2px solid #484547" }}>
+                        {isSummary ? <strong>{formatValue(values["AM Return"] || 0)}</strong> : formatValue(values["AM Return"] || 0)}
+                      </TableCell>
+                      <TableCell>{isSummary ? <strong>{formatValue(values["Model AM Return"] || 0)}</strong> : formatValue(values["Model AM Return"] || 0)}</TableCell>
+                      <TableCell sx={{ borderLeft: "2px solid #484547" }}>
+                        {isSummary ? <strong>{formatValue(values["Allocation Return"] + values["AM Return"] || 0)}</strong> : formatValue(values["Allocation Return"] + values["AM Return"] || 0)}
+                      </TableCell>
+                      <TableCell>
+                        {isSummary ? <strong>{formatValue((values["Model Return 1% Allocation"] || 0) + (values["Model AM Return"] || 0))}</strong> : formatValue((values["Model Return 1% Allocation"] || 0) + (values["Model AM Return"] || 0))}
+                      </TableCell>
+                    </TableRow>
+                    
                     );
                   })}
                 </TableBody>
