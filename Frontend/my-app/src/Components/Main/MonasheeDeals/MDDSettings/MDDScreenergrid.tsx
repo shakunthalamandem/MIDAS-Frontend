@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Container, TextField, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
 // Define the type for each row of data with updated column names
 interface ScreenerDataRow {
@@ -25,6 +26,7 @@ interface ScreenerDataRow {
   issue_offer_price: number;
   subscription_bid_shares: number;
   allocated_shares: number;
+  fo_type:string;
 
 }
 
@@ -88,7 +90,8 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       deal_type: data.deal_type, // Array of deal types
       sector: data.gics_sector, // Array of sectors
       selected_bank: data.selected_bank, // Array of lead banks
-      year_range: data.years // Array of years
+      year_range: data.years, // Array of years
+      fo_type: data.fo_type
 
     };
 
@@ -129,9 +132,34 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
   };
 
   const columns: GridColDef[] = [
+    {
+      field: "ticker",
+      headerName: "Ticker",
+      width: 100,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+
+          <Link
+            to={`/monasheeperformance/${params.value}`}
+            style={{ color: "brown", fontWeight: "bold",paddingLeft:15,textDecoration: "none" }}
+            target="_blank"
+          >
+            {params.value}
+          </Link>
+        </div>
+      ),
+    }
+    
+,        { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "pricing_date", headerName: "Pricing Date", width: 150 },
-    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
-    { field: "ticker", headerName: "Ticker", width: 150 },
     {
       field: "gics_sector_from_bloomberg",
       headerName: "Sector",
@@ -146,7 +174,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       renderCell: (params) => params.value,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { field: "deal_captain", headerName: "Deal Caption", width: 150 },
+    { field: "deal_captain", headerName: "Deal Captain", width: 150 },
     { field: "selected_bank", headerName: "Lead Bank", width: 150 },
     { field: "fo_type", headerName: "FO Type", width: 100 },
     {

@@ -13,10 +13,12 @@ import {
   Box,
   CardContent,
   Card,
+  FormControlLabel,
   Button,
+  RadioGroup,
+  Radio,
 } from "@mui/material";
 import "./MDDCaptureTable.css";
-
 
 // Format values to represent millions, billions, etc.
 const formatValue = (value: number): string => {
@@ -45,37 +47,92 @@ interface CategoryData {
   "Model AM Return": number;
   "Total Return": number;
 }
-
-interface ResponseData {
+interface FilterOption {
+  label: string;
+  value: string;
+  payload: { filter_type: string } | null;
+}
+interface selectedFilterss {
   [year: string]: {
     [category: string]: {
       [range: string]: CategoryData;
     };
   };
 }
-
 interface MDDCaptureTableProps {
-  responseData: ResponseData;
-  apiName: string;
+  selectedFilterss: any;
 }
 
+const filterOptions: FilterOption[] = [
+  { label: "Deal Type", value: "deal_type", payload: null },
+  {
+    label: "Sector",
+    value: "sector",
+    payload: { filter_type: "gics_sector_from_bloomberg" },
+  },
+  {
+    label: "Region",
+    value: "region",
+    payload: { filter_type: "broad_region" },
+  },
+];
+
 const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
-  responseData,
-  apiName,
+  selectedFilterss,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<"IPO" | "FO">("IPO");
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+  const [showCategoryButtons, setShowCategoryButtons] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
+    filterOptions[0]
+  );
   const [dynamicCategoryByYear, setDynamicCategoryByYear] = useState<
     Record<string, string[]>
   >({});
+  const handleFilterClick = (option: any) => {
+    setSelectedFilter(option);
 
+    // Show IPO & FO buttons only if "Deal Type" is selected
+    setShowCategoryButtons(option.value === "deal_type");
+  };
   useEffect(() => {
-    if (!responseData) return;
+    fetchData();
+  }, [selectedCategory, selectedFilter, selectedFilterss]);
+  const fetchData = async () => {
+    try {
+      const payload = {
+        ...selectedFilterss,
+        ...(selectedFilter.payload || {}),
+      };
+      const response = await fetch(`${apiUrl}/api/allocation_capture/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      console.log("Data", data);
+      // setChartData(formatChartData(data));
+    } catch (error) {
+      console.error("Error fetching data", error);
+      // setChartData([]);
+    } finally {
+      // setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (!selectedFilterss) return;
 
-    const groupCategoriesByYear = Object.keys(responseData).reduce(
+    const groupCategoriesByYear = Object.keys(selectedFilterss).reduce(
       (acc: Record<string, string[]>, year) => {
-        if (responseData[year]?.[selectedCategory]) {
-          const categories = Object.keys(responseData[year][selectedCategory]);
-          acc[year] = Array.from(new Set(categories)).sort(); // Unique sorted categories
+        if (selectedFilterss[year]?.[selectedCategory]) {
+          const categories = Object.keys(
+            selectedFilterss[year]?.[selectedCategory] || {}
+          );
+          acc[year] = Array.from(new Set(categories)).sort();
         }
         return acc;
       },
@@ -83,7 +140,24 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
     );
 
     setDynamicCategoryByYear(groupCategoriesByYear);
-  }, [responseData, selectedCategory]);
+  }, [selectedFilterss, selectedCategory]);
+
+  // useEffect(() => {
+  //   if (!responseData) return;
+
+  //   const groupCategoriesByYear = Object.keys(responseData).reduce(
+  //     (acc: Record<string, string[]>, year) => {
+  //       if (responseData[year]?.[selectedCategory]) {
+  //         const categories = Object.keys(responseData[year][selectedCategory]);
+  //         acc[year] = Array.from(new Set(categories)).sort(); // Unique sorted categories
+  //       }
+  //       return acc;
+  //     },
+  //     {}
+  //   );
+
+  //   setDynamicCategoryByYear(groupCategoriesByYear);
+  // }, [responseData, selectedCategory]);
 
   // Function to move "Summary" row to the end after sorting
   const sortRangesWithSummaryAtEnd = (ranges: string[]): string[] => {
@@ -103,24 +177,71 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 
   return (
     <Box mr={0} sx={{ Width: "100%" }}>
-      <Box display="flex" justifyContent="left" mb={3} sx={{ gap: "10px" }}>
-        <Button
-          variant={selectedCategory === "IPO" ? "contained" : "outlined"}
-          color="secondary"
-          onClick={() => setSelectedCategory("IPO")}
+      <Box
+        sx={{
+          background: "linear-gradient(to right, #190250, #6DD5ED)",
+          paddingX: 2,
+          borderRadius: "8px",
+          boxShadow: 3,
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          wdith: "70%",
+          alignItems: "center",
+          marginBottom: 4,
+          marginLeft: 2,
+          marginRight: "277px",
+          marginX: 2,
+        }}
+      >
+        <RadioGroup
+          value={selectedFilter.value}
+          onChange={(e) =>
+            setSelectedFilter(
+              filterOptions.find((option) => option.value === e.target.value)!
+            )
+          }
+          row
         >
-          IPO
-        </Button>
-        <Button
-          variant={selectedCategory === "FO" ? "contained" : "outlined"}
-          color="secondary"
-          onClick={() => setSelectedCategory("FO")}
-        >
-          FO
-        </Button>
+          {filterOptions.map((option) => (
+            <FormControlLabel
+              key={option.value}
+              value={option.value}
+              control={<Radio sx={{ color: "white" }} />}
+              label={option.label}
+              onClick={() => handleFilterClick(option)} // Handle click event
+              sx={{
+                color: "white",
+                marginRight: 4,
+                "& .MuiRadio-root": {
+                  color: "white",
+                },
+              }}
+            />
+          ))}
+        </RadioGroup>
       </Box>
+      {showCategoryButtons && (
+        <Box sx={{ textAlign: "center", marginRight: 30 }}>
+          <Button
+            variant={selectedCategory === "IPO" ? "contained" : "outlined"}
+            color="secondary"
+            onClick={() => setSelectedCategory("IPO")}
+            sx={{ marginRight: 2 }}
+          >
+            IPO
+          </Button>
+          <Button
+            variant={selectedCategory === "FO" ? "contained" : "outlined"}
+            color="secondary"
+            onClick={() => setSelectedCategory("FO")}
+          >
+            FO
+          </Button>
+        </Box>
+      )}
 
-      {Object.keys(responseData)
+      {Object.keys(selectedFilterss)
         .sort((a, b) => b.localeCompare(a)) // Sort years in descending order
         .map((year) => (
           <motion.div
@@ -134,7 +255,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
               elevation={4}
               sx={{
                 backgroundColor: "#fdfff8",
-                marginBottom: "30px",
+                marginBottom: "40px",
                 padding: 2,
                 width: "1200px",
               }}
@@ -155,7 +276,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                 <Grid container spacing={3}>
                   {(() => {
                     const categoryData =
-                      responseData[year]?.[selectedCategory] || {};
+                      selectedFilterss[year]?.[selectedCategory] || {};
                     const dynamicCategoryOrder =
                       dynamicCategoryByYear[year] || [];
                     const sortedCategoryData = sortRangesWithSummaryAtEnd(
@@ -216,10 +337,12 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         padding: "4px 8px",
                                         width: "40px", // Specific width for "Quintile"
                                         // Add top border
-                                      }}   
-
+                                      }}
                                     >
-                                      Quintile
+                                      {/* Quintile */}
+                                      {selectedFilter.label === "Deal Type"
+                                        ? "Quintile"
+                                        : "Sector"}
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -276,7 +399,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                     >
                                       Allocation as % of IOI (Weighted)
                                     </TableCell>
-                             
+
                                     <TableCell
                                       sx={{
                                         fontSize: "0.725rem",
@@ -284,14 +407,13 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         border: "1px solid #ddd",
                                         padding: "4px 8px",
                                         width: "90px",
-                                        borderLeft:"2px solid #666666 !important",
-                                        borderTop: "2px solid #666666 !important",
-                                        
-                                       
-                                      }}  
+                                        borderLeft:
+                                          "2px solid #666666 !important",
+                                        borderTop:
+                                          "2px solid #666666 !important",
+                                      }}
                                       // className="flowing-top-border"
-
-                                    > 
+                                    >
                                       Monashee Actual Allocation PnL (Gross $)
                                     </TableCell>
                                     <TableCell
@@ -305,7 +427,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         //   "2px solid #666666 !important",
                                         borderTop:
                                           "2px solid #666666 !important", // Add top border
-                                      }} 
+                                      }}
                                       // className="flowing-left-border flowing-top-border"
                                     >
                                       Model PnL With Actual Allocation (Gross $)
@@ -321,26 +443,12 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           "2px solid #666666 !important",
                                         borderTop:
                                           "2px solid #666666 !important", // Add top border
-                                      }} 
-                                      // className="flowing-top-border" 
+                                      }}
+                                      // className="flowing-top-border"
                                     >
                                       {selectedCategory === "IPO"
                                         ? "Model PnL with model Allocation (0.5%) (Gross $)"
-                                        : "Model PnL with model Allocation (1%) (Gross $)"
-                                      }
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        fontSize: "0.725rem",
-                                        fontWeight: "bold",
-                                        border: "1px solid #ddd",
-                                        padding: "4px 8px",
-                                        width: "90px",
-                                        borderTop: "2px solid #666666", // Add top border
-                                      }} 
-                                      // className="flowing-top-border"
-                                    >
-                                       Monashee Actual AM PnL (Gross $)
+                                        : "Model PnL with model Allocation (1%) (Gross $)"}
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -353,7 +461,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                       }}
                                       // className="flowing-top-border"
                                     >
-                                       Model PnL with model AM allocation (Gross $)
+                                      Monashee Actual AM PnL (Gross $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -363,11 +471,11 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         padding: "4px 8px",
                                         width: "90px",
                                         borderTop: "2px solid #666666", // Add top border
-                                        borderLeft:  "2px solid #666666 !important",
-                                      }} 
+                                      }}
                                       // className="flowing-top-border"
                                     >
-                                       Monashee Actual Total PnL (Gross $)
+                                      Model PnL with model AM allocation (Gross
+                                      $)
                                     </TableCell>
                                     <TableCell
                                       sx={{
@@ -377,11 +485,27 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                         padding: "4px 8px",
                                         width: "90px",
                                         borderTop: "2px solid #666666", // Add top border
-                                        borderRight:  "2px solid #666666 !important",
-                                      }} 
+                                        borderLeft:
+                                          "2px solid #666666 !important",
+                                      }}
                                       // className="flowing-top-border"
                                     >
-                                       Model Actual Total PnL (Gross $)
+                                      Monashee Actual Total PnL (Gross $)
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        fontSize: "0.725rem",
+                                        fontWeight: "bold",
+                                        border: "1px solid #ddd",
+                                        padding: "4px 8px",
+                                        width: "90px",
+                                        borderTop: "2px solid #666666", // Add top border
+                                        borderRight:
+                                          "2px solid #666666 !important",
+                                      }}
+                                      // className="flowing-top-border"
+                                    >
+                                      Model Actual Total PnL (Gross $)
                                     </TableCell>
                                   </TableRow>
                                 </TableHead>
@@ -421,7 +545,10 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                               : "normal",
                                           }}
                                         >
-                                          {isSummary ? "" : index + 1}
+                                          {/* {isSummary ? "" : index + 1} */}
+                                          {selectedFilter.label === "Deal Type"
+                                            ? `${range}`
+                                            : "Sector"}
                                         </TableCell>
 
                                         {/* Range */}
@@ -473,7 +600,6 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           ]?.toFixed(2) || "0.00"}
                                           %
                                         </TableCell>
-                                    
 
                                         {/* Boxed Columns: Monashee */}
                                         <TableCell
@@ -488,7 +614,6 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                               : "none",
                                           }}
                                           // className="flowing-left-border"
-
                                         >
                                           {formatValue(
                                             data["Allocation Return"] || 0
@@ -504,10 +629,8 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                             borderBottom: isLastRow
                                               ? "2px solid #666666 !important"
                                               : "none",
-                                          }}    
+                                          }}
                                           // className={isLastRow ? "flowing-bottom-border" : ""}
-
-
                                         >
                                           {formatValue(
                                             data["Model Actual Return"] || 0
@@ -558,7 +681,9 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           }}
                                           // className={isLastRow ? "flowing-bottom-border" : ""}
                                         >
-                                          {formatValue(data["Model AM Return"] || 0)}
+                                          {formatValue(
+                                            data["Model AM Return"] || 0
+                                          )}
                                         </TableCell>
                                         <TableCell
                                           align="left"
@@ -572,7 +697,6 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                               : "none",
                                           }}
                                           // className={isLastRow ? "flowing-bottom-border" : ""}
-                                          
                                         >
                                           {formatValue(
                                             data["Total Return"] || 0
@@ -582,15 +706,17 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
                                           align="left"
                                           sx={{
                                             fontSize: "0.8rem",
-                                            borderRight:"2px solid #666666 !important",
+                                            borderRight:
+                                              "2px solid #666666 !important",
                                             borderBottom: isLastRow
                                               ? "2px solid #666666 !important"
                                               : "none",
-                                          }} 
+                                          }}
                                           // className="flowing-right-border"
                                         >
                                           {formatValue(
-                                            data["Model Return 1% Allocation"] + data["Model AM Return"] || 0
+                                            data["Model Return 1% Allocation"] +
+                                              data["Model AM Return"] || 0
                                           )}
                                         </TableCell>
 
@@ -621,3 +747,5 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
 };
 
 export default MDDCaptureTable;
+
+// not using 

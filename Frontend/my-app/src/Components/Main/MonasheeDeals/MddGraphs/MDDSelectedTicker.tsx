@@ -129,20 +129,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   
 
   
-    // if (loading) {
-    //   return (
-    //     <Box
-    //       display="flex"
-    //       justifyContent="center"
-    //       alignItems="center"
-    //       height="100vh"
-    //     >
-    //       <CircularProgress />
-    //     </Box>
-    //   );
-    // }
-  
-    // return <Typography>hhihiihihihihiihihii...</Typography>;
+
   
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Box, Typography, Tabs, Tab, TextField, InputAdornment, List, ListItem, ListItemText, CircularProgress, Paper } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import MDDScreener from "../../MonasheeDeals/MddGraphs/MDDScreener";
@@ -6,6 +7,7 @@ import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCap
 import FOllowOnDiscount from "../../MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 import MDDSelectedTicker from "../../MonasheeDeals/MddGraphs/MDDSelectedTicker";
+import WeeklyStatsChart from "../../MonasheeDeals/MDDSettings/WeeklyStatsChart";
 
 // Define the type for the API response
 interface MDDResult {
@@ -14,14 +16,15 @@ interface MDDResult {
 }
 
 const MonasheeDeals: React.FC = () => {
+  const { ticker: routeTicker } = useParams<{ ticker: string }>(); // Get ticker from the route parameters
   const [value, setValue] = useState(0); // For controlling tab selection
   const [searchTerm, setSearchTerm] = useState<string>(""); // Search term state
   const [results, setResults] = useState<MDDResult[]>([]); // Search results
   const [loading, setLoading] = useState<boolean>(false); // Loading state
-  const [selectedTicker, setSelectedTicker] = useState<string>("CRGX"); // Default selected ticker
+  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "CRGX"); // Default selected ticker from URL or fallback
 
   const apiUrl = process.env.REACT_APP_API_URL;
-const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("access_token");
 
   // Handle change for tab selection
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -65,6 +68,12 @@ const token = localStorage.getItem("access_token");
     setSearchTerm(""); // Clear the search term
     setResults([]); // Clear the results
   };
+
+  useEffect(() => {
+    if (routeTicker) {
+      setSelectedTicker(routeTicker); // Set selected ticker when URL param changes
+    }
+  }, [routeTicker]);
 
   return (
     <Box sx={{ width: "100%", backgroundColor: "#fff" }}>
@@ -173,6 +182,7 @@ const token = localStorage.getItem("access_token");
         <Tab label="Deal Stats" />
         <Tab label="GAP Analysis" />
         <Tab label="Follow-On Discount" />
+        <Tab label="Weekly Tracking" />
         <Tab label="Screener" />
       </Tabs>
       {searchTerm.length > 0 && (
@@ -239,7 +249,8 @@ const token = localStorage.getItem("access_token");
       {value === 1 && <DealStats />}
       {value === 2 && <AllocationCaptureReturn />}
       {value === 3 && <FOllowOnDiscount />}
-      {value === 4 && <MDDScreener />}
+      {value === 4 && <WeeklyStatsChart />}
+      {value === 5 && <MDDScreener />}
     </Box>
   );
 };

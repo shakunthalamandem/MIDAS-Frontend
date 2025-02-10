@@ -35,10 +35,7 @@ const AllocationCaptureReturn = () => {
     }}
   >
     <span className="marquee">
-      Back-test Assumptions: Allocation @ 0.5% of Deal Size for IPOs and @
-      1.0% of deal size for FOs, AM @ 1% of Deal Size for both IPOs and FOs.
-      Position Limit of $50M, Daily Stop Loss of 10%; 60%-100% Hedge based
-      on region specific futures/ETFs.
+    As for the below GAP Analysis, we have assumed that 0.5% IPO Allocation, 1% for FO Allocation, and 0.5% AM for both IPOs and FOs. Also note that, for each year deals issued in that year are considered, and the EXIT date for actual PnL could be in future years. For Model, the EXIT date is always T+1Month. This analysis includes SPACs and PIPEs. 
     </span>
   </Typography>
       <MddMain apiName="allocation_capture" />

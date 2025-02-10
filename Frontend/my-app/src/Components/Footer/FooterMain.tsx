@@ -1,9 +1,12 @@
+
+
 import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import logo from '../../Assets/images/whitelogoghc.png';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 const FooterMain: React.FC = () => {
   const theme = useTheme();
@@ -18,8 +21,20 @@ const FooterMain: React.FC = () => {
         color: '#FFFFFF',
         textAlign: 'center',
         boxShadow: '0px -2px 10px rgba(0, 0, 0, 0.3)',
+        position: 'relative',
       }}
     >
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          position: 'absolute',
+          top: '-30px',
+          width: '100%',
+        }}
+      >
+        <ArrowUpwardIcon sx={{ color: '#FFFFFF', cursor: 'pointer' }} />
+      </Box>
       <Typography
         variant={isMobile ? 'body1' : 'h6'}
         sx={{
@@ -53,9 +68,27 @@ const FooterMain: React.FC = () => {
             height: '50px',
           }}
         />
+        
+      </Box>
+      <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+            Version 1.0 - Updated February 7, 2025
+          </Typography>
+          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+            Data as of February 6, 2025
+          </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: '10px',
+        }}
+      >
       </Box>
     </Box>
   );
 };
 
 export default FooterMain;
+
+
+

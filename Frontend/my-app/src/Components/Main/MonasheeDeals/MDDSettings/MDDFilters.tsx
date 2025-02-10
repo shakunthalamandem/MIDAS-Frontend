@@ -22,6 +22,8 @@ import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
 import MDDScreenergrid from "./MDDScreenergrid";
 import DealStatsGraph from "./DealStatsGraph";
+import Gap from "./Gap";
+import DealTypeComponent from "./DealTypeComponent";
 
 interface FilterOption {
   options: (string | number)[];
@@ -45,7 +47,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   }>({});
   const [appliedFilters, setAppliedFilters] = useState<{
     [key: string]: (string | number)[];
-  } | null>(null);
+  }>({})  
+
   const [expanded, setExpanded] = useState<string | false>(false);
   const [payload, setPayload] = useState<{ [key: string]: (string | number)[] }>({});
   const [apiData, setApiData] = useState({});
@@ -65,6 +68,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       handleSubmit(initialSelectedValues);
     }
   }, [filtersData]);
+
+
+
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
@@ -92,15 +98,17 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       Object.keys(filters).forEach((key) => {
         payload[key] = filters[key] || [];
       });
-
+  
       setPayload(payload);
+      setAppliedFilters(filters);
 
+  
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
       if (!apiUrl) {
         throw new Error("API URL is not defined in environment variables");
       }
-
+  
       const response = await fetch(`${apiUrl}/api/${apiName}/`, {
         method: "POST",
         headers: {
@@ -109,7 +117,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         },
         body: JSON.stringify(payload),
       });
-
+  
       if (response.ok) {
         const result = await response.json();
         setApiData(result);
@@ -122,6 +130,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       setLoading(false);
     }
   };
+
   const handleCancel = () => {
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
     filtersData.forEach((filter) => {
@@ -144,11 +153,11 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         marginBottom: 20,
         display: "flex",
         marginLeft: 0,
-        marginTop: 10,
+        marginTop: 5,
         width: '100%'
       }}
     >
-      <Box width="320px" sx={{ marginRight: 10,marginLeft:5}}>  
+      <Box width="320px" sx={{ marginRight: 5,marginLeft:5}}>  
         <Card sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}>
           <CardContent>
             <Box width="250px" sx={{ p: 2 }}>
@@ -159,8 +168,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                 .filter((filter) => {
                   const key = Object.keys(filter)[0];
                   return !(
-                    (apiName === "fo_discount" || apiName === "allocation_capture") &&
-                    (key === "deal_type" || key === "period")
+                    (apiName === "fo_discount" && (key === "deal_type" || key === "period")) ||
+                    (apiName === "allocation_capture" && key === "period")
                   );
                 })
                 .map((filter) => {
@@ -316,7 +325,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </CardContent>
         </Card>
       </Box>
-      <Box  width="100%" mt={4} flex={1}>
+      <Box  width="100%" mt={1} flex={1}>
         {loading ? (
           <Box
             sx={{
@@ -332,20 +341,20 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </Box>
         ) : (
           <>
-            {apiName === "allocation_capture" ? (
-              <MDDCaptureTable responseData={apiData} apiName={apiName} />
-            ) : apiName === "fo_discount" ? (
-              <AvgFoDiscountChart data={apiData} />
-            ) : (
-              <>
-                <DealStatsGraph responseData={apiData} />
-                <MDDScreenergrid sectorwiseData={payload} />
-              </>
-            )}
-          </>
+      {apiName === "allocation_capture" ? (
+        <Gap selectedFilters={appliedFilters} />
+      ) : apiName === "fo_discount" ? (
+        <AvgFoDiscountChart data={apiData} />      ) : (
+        <>
+          <DealStatsGraph selectedFilters={appliedFilters} />
+          <MDDScreenergrid sectorwiseData={payload} />
+        </>
+      )}
+    </>
         )}
       </Box>
-    </Box>
+      </Box>
+
   );
 };
 

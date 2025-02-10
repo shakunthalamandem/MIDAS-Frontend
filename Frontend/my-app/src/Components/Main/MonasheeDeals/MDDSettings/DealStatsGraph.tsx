@@ -1,23 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./DealStats.css";
-import {
-  Box,
-  Typography,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  ToggleButtonGroup,
-  ToggleButton,
-  CardContent,
-  Card,
-  Container,
-} from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -27,329 +8,372 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import {
+  Box,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Container,
+  Card,
+  Stack,
+  Chip,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 
-interface DealAllocationGraphProps {
-  responseData: any; // The response data from the API
+interface ChartData {
+  year: string;
+  [key: string]: number | string;
 }
 
-const formatValue = (value: number, selectedOption: string): string => {
-  if (selectedOption === "deal_size" || selectedOption === "avg_deal_size") {
-    const absValue = Math.abs(value);
-    if (absValue >= 1_000_000_000) {
-      return `$${(value / 1_000_000_000).toFixed()}B`;
-    } else if (absValue >= 1_000_000) {
-      return `$${(value / 1_000_000).toFixed()}M`;
-    } else if (absValue >= 1_000) {
-      return `$${(value / 1_000).toFixed()}K`;
-    }
-    return `$${value.toFixed()}`;
-  } else if (
-    selectedOption === "mdd_allocation_percentage" ||
-    selectedOption === "mdd_allocation_ioi"
-  ) {
-    return `${value.toFixed(2)}%`;
+interface ApiResponse {
+  [year: string]: {
+    [category: string]: {
+      count: number;
+      deal_size: number;
+      avg_deal_size: number;
+      allocation_deal_size_percentage: number;
+      weighted_allocation_deal_size_percentage: number;
+      allocation_percentage: number;
+      weighted_allocation_percentage: number;
+    };
+  };
+}
+
+interface FilterOption {
+  label: string;
+  value: string;
+  payload: { filter_type: string } | null;
+}
+
+const formatValue = (value: number, selectedField: string): string => {
+  const absValue = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+
+  // Determine prefix and suffix based on the selected field
+  const prefix = ["deal_size", "avg_deal_size"].includes(selectedField)
+    ? "$"
+    : "";
+  const suffix = [
+    "allocation_deal_size_percentage",
+    "weighted_allocation_deal_size_percentage",
+    "allocation_percentage",
+    "weighted_allocation_percentage",
+  ].includes(selectedField)
+    ? "%"
+    : "";
+
+  // Determine the rounding precision based on selectedField
+  let precision = 2; // Default precision for most fields
+
+  if (["count", "deal_size", "avg_deal_size"].includes(selectedField)) {
+    precision = 0; // Round to 0 decimal places for these fields
   }
-  return value.toFixed(0);
+
+  if (absValue >= 1_000_000_000) {
+    return `${sign}${prefix}${(absValue / 1_000_000_000).toFixed(precision)}B${suffix}`;
+  }
+  if (absValue >= 1_000_000) {
+    return `${sign}${prefix}${(absValue / 1_000_000).toFixed(precision)}M${suffix}`;
+  }
+  if (absValue >= 1_000) {
+    return `${sign}${prefix}${(absValue / 1_000).toFixed(precision)}K${suffix}`;
+  }
+
+  return `${sign}${prefix}${absValue.toFixed(precision)}${suffix}`;
 };
 
-const DealStatsGraph: React.FC<DealAllocationGraphProps> = ({
-  responseData,
-}) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("count");
-  const [selectedValue, setSelectedValue] = useState("weighted");
+const filterOptions: FilterOption[] = [
+  { label: "Deal Type", value: "deal_type", payload: null },
+  {
+    label: "Sector",
+    value: "sector",
+    payload: { filter_type: "gics_sector_from_bloomberg" },
+  },
+  {
+    label: "Region",
+    value: "region",
+    payload: { filter_type: "broad_region" },
+  },
+  {
+    label: "Deal Captain",
+    value: "caption",
+    payload: { filter_type: "deal_captain" },
+  },
+];
 
-  const dealStatsOptions = [
-    { label: "Deals Count", key: "count" },
-    { label: "Deal Volume", key: "deal_size" },
-    { label: "Average Deal Size", key: "avg_deal_size" },
-    { label: "Allocation as % of Deal Size", key: "mdd_allocation_percentage" },
-    { label: "Allocation as % of IOI", key: "mdd_allocation_ioi" },
-  ];
+const dataFieldsWithLabels = [
+  { label: "Deal Count", value: "count" },
+  { label: "Deal Volume", value: "deal_size" },
+  { label: "Average Deal Size", value: "avg_deal_size" },
+  // {
+  //   label: "Allocation as % of Deal Size",
+  //   value: "allocation_deal_size_percentage",
+  // },
+  {
+    label: "Weighted Allocation as % of Deal Size",
+    value: "weighted_allocation_deal_size_percentage",
+  },
+  // { label: "Allocation as % of IOI", value: "allocation_percentage" },
+  {
+    label: "Weighted Allocation as % of IOI",
+    value: "weighted_allocation_percentage",
+  },
+];
 
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    window.location.reload();
-  };
+interface DealStatsGraphProps {
+  selectedFilters: { [key: string]: (string | number)[] };
+}
+
+const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
+  const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
+    filterOptions[0]
+  );
+  const [selectedField, setSelectedField] = useState<string>("count");
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    if (responseData?.message) {
-      setDialogOpen(true);
-    }
-  }, [responseData]);
+    fetchData();
+  }, [selectedField, selectedFilter, selectedFilters]);
 
-  const formatChartData = (data: any) => {
-    if (!data || typeof data !== "object") return [];
-
-    const allowedDealTypes = new Set(["FO", "IPO"]);
-
-    return Object.keys(data).map((quarter) => {
-      const sectors = data[quarter];
-      const chartRow: any = { quarter };
-
-      allowedDealTypes.forEach((dealType) => {
-        let allocationKeyForDealType: string;
-
-        if (selectedOption === "mdd_allocation_ioi") {
-          allocationKeyForDealType =
-            selectedValue === "normal"
-              ? "allocation_percentage"
-              : "weighted_allocation_percentage";
-        } else if (selectedOption === "mdd_allocation_percentage") {
-          allocationKeyForDealType =
-            selectedValue === "normal"
-              ? "allocation_deal_size_percentage"
-              : "weighted_allocation_deal_size_percentage";
-        } else {
-          allocationKeyForDealType = selectedOption;
-        }
-
-        chartRow[`${dealType}_${selectedOption}`] = sectors[dealType]?.[
-          allocationKeyForDealType
-        ]
-          ? parseFloat(sectors[dealType][allocationKeyForDealType])
-          : 0;
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        ...selectedFilters,
+        ...(selectedFilter.payload || {}),
+      };
+      const response = await fetch(`${apiUrl}/api/mdd_deals_graph/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
       });
+      const data = await response.json();
+      setChartData(formatChartData(data));
+    } catch (error) {
+      console.error("Error fetching data", error);
+      setChartData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      return chartRow;
+  const formatChartData = (data: ApiResponse): ChartData[] => {
+    if (!data || typeof data !== "object") return [];
+    return Object.keys(data).map((year) => {
+      const categories = data[year];
+      let formatted: ChartData = { year };
+      Object.keys(categories).forEach((category) => {
+        formatted[category] =
+          categories[category][
+            selectedField as keyof (typeof categories)[typeof category]
+          ] || 0;
+      });
+      return formatted;
     });
   };
 
-  const chartData =
-    responseData && !responseData.message ? formatChartData(responseData) : [];
+  useEffect(() => {
+    setChartData((prevData) => {
+      return prevData.map((item) => {
+        let updatedItem: ChartData = { year: item.year };
+        Object.keys(item).forEach((key) => {
+          if (key !== "year") {
+            updatedItem[key] = item[key] as number;
+          }
+        });
+        return updatedItem;
+      });
+    });
+  }, [selectedField]);
+
+  const barColors = [
+    "#60A5FA", // Sky Blue
+    "#F97316", // Orange
+    "#14B8A6", // Teal
+    "#FACC15", // Gold
+    "#EF4444", // Red
+    "#64748B", // Slate Gray
+    "#0EA5E9", // Light Cyan Blue
+    "#22C55E", // Green
+    "#D97706", // Deep Yellow
+    "#8B5CF6", // Indigo
+    "#9CA3AF", // Cool Gray
+    "#1E3A8A", // Dark Blue
+    "#2563EB", // Bright Blue
+  ];
 
   return (
-    <div>
-      <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
-      <Box className="deal-stats-container">
-        <RadioGroup
-          row
-          value={selectedOption}
-          onChange={(e) => setSelectedOption(e.target.value)}
-          className="radio-group"
+    <Container>
+      <Card elevation={5}>
+        <Typography
+          variant="h5"
+          sx={{ color: "#002060", fontWeight: "bold", marginTop: 3 }}
         >
-          {dealStatsOptions.map((option) => (
-            <FormControlLabel
-              key={option.key}
-              value={option.key}
-              control={<Radio className="custom-radio" />}
-              label={option.label}
-              className={`radio-option ${selectedOption === option.key ? "selected" : ""}`}
-            />
-          ))}
-        </RadioGroup>
-      </Box>
-
-      {chartData.length === 0 && !responseData?.message ? (
-        <Box sx={{ textAlign: "center", padding: 4 }}>
-          <Typography variant="h6" color="textSecondary">
-            No Data Available for the selected filters.
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            Please change the selected filters to show the Plot.
-          </Typography>
-        </Box>
-      ) : (
-        <Box mt={5}>
-          <Card
-            sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}
+          {" "}
+          Deal Statistics
+        </Typography>
+        <Box
+          sx={{
+            padding: 1,
+            borderRadius: "8px",
+            margin: 2,
+          }}
+        >
+          <Box
+            display="flex"
+            justifyContent="center"
+            mb={2}
+            gap={1}
+            flexWrap="wrap"
           >
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={chartData}>
-                  <XAxis dataKey="quarter" />
-                  <YAxis
-                    tickFormatter={(value) =>
-                      formatValue(value, selectedOption)
-                    }
-                  />
-               <Tooltip
-  formatter={(value: number, name: string, props: any) => {
-    const tooltipMapping: { [key: string]: string } = {
-      FO_count: "FO",
-      IPO_count: "IPO",
-      FO_deal_size: "FO",
-      IPO_deal_size: "IPO",
-      FO_avg_deal_size: "FO",
-      IPO_avg_deal_size: "IPO",
-      FO_mdd_allocation_ioi: "FO",
-      IPO_mdd_allocation_ioi: "IPO",
-      FO_mdd_allocation_percentage: "FO",
-      IPO_mdd_allocation_percentage: "IPO",
-    };
-
-    const formattedName = tooltipMapping[name] || name;
-    return [`${formatValue(value, selectedOption)}`, formattedName];
-  }}
-  labelFormatter={(label) => <span style={{ fontWeight: 'bold', color: '#002060' }}>Year: {label}</span>}
-/>
-
-                  <Legend
-                    formatter={(value) => {
-                      const legendMapping: { [key: string]: string } = {
-                        FO_count: "FO",
-                        IPO_count: "IPO",
-                        FO_deal_size: "FO",
-                        IPO_deal_size: "IPO",
-                        FO_avg_deal_size: "FO",
-                        IPO_avg_deal_size: "IPO",
-                        FO_mdd_allocation_ioi: "FO",
-                        IPO_mdd_allocation_ioi: "IPO",
-                        FO_mdd_allocation_percentage: "FO",
-                        IPO_mdd_allocation_percentage: "IPO",
-                      };
-                      return legendMapping[value] || value;
-                    }}
-                  />
-                  {/* Render Bars based on selectedOption */}
-                  {selectedOption === "count" && (
-                    <>
-                      <Bar dataKey="FO_count" fill="#8884d8" stackId="a" />
-                      <Bar dataKey="IPO_count" fill="#82ca9d" stackId="a" />
-                    </>
-                  )}
-                  {selectedOption === "deal_size" && (
-                    <>
-                      <Bar dataKey="FO_deal_size" fill="#8884d8" stackId="a" />
-                      <Bar dataKey="IPO_deal_size" fill="#82ca9d" stackId="a" />
-                    </>
-                  )}
-                  {selectedOption === "avg_deal_size" && (
-                    <>
-                      <Bar
-                        dataKey="FO_avg_deal_size"
-                        fill="#8884d8"
-                        stackId="a"
-                      />
-                      <Bar
-                        dataKey="IPO_avg_deal_size"
-                        fill="#82ca9d"
-                        stackId="a"
-                      />
-                    </>
-                  )}
-                  {selectedOption === "mdd_allocation_ioi" && (
-                    <>
-                      <Bar
-                        dataKey={`FO_mdd_allocation_ioi`}
-                        fill="#8884d8"
-                        stackId="a"
-                      />
-                      <Bar
-                        dataKey={`IPO_mdd_allocation_ioi`}
-                        fill="#82ca9d"
-                        stackId="a"
-                      />
-                    </>
-                  )}
-                  {selectedOption === "mdd_allocation_percentage" && (
-                    <>
-                      <Bar
-                        dataKey={`FO_mdd_allocation_percentage`}
-                        fill="#8884d8"
-                        stackId="a"
-                      />
-                      <Bar
-                        dataKey={`IPO_mdd_allocation_percentage`}
-                        fill="#82ca9d"
-                        stackId="a"
-                      />
-                    </>
-                  )}
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            {dataFieldsWithLabels.map(({ label, value }) => (
+              <Chip
+                key={value}
+                label={label}
+                clickable
+                onClick={() => setSelectedField(value)}
+                variant={selectedField === value ? "filled" : "outlined"}
+                sx={{
+                  color: selectedField === value ? "#FFFFFF" : "#3f51b5",
+                  backgroundColor:
+                    selectedField === value ? "#9b0000" : "#dfdfdf",
+                  border:
+                    selectedField === value
+                      ? "2px solid #9b0000"
+                      : "2px solid #dfdfdf",
+                  fontWeight: selectedField === value ? "bold" : "normal",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor:
+                      selectedField === value
+                        ? "#7b0000"
+                        : "rgba(63, 81, 181, 0.1)",
+                  },
+                }}
+              />
+            ))}
+          </Box>
         </Box>
-      )}
-      {/* Show Normal/Weighted options if selectedOption is for allocation */}
-      {(selectedOption === "mdd_allocation_ioi" ||
-        selectedOption === "mdd_allocation_percentage") && (
-        <div className="toggle-container">
-          <ToggleButtonGroup
-            value={selectedValue}
-            exclusive
-            onChange={(_, value) => value && setSelectedValue(value)}
-            aria-label="allocation toggle"
-            className="toggle-group"
+
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <ToggleButton
-              value="normal"
-              aria-label="normal"
-              className="toggle-button"
-              style={{
-                fontSize: "14px",
-                padding: "5px 10px",
-                color: "#444444",
-                background: "transparent",
-                border: "2px solid #444444",
-                transition: "all 0.3s ease",
-                borderRadius: "5px",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = "#b90066";
-                e.currentTarget.style.color = "#fff";
-                e.currentTarget.style.border = "2px solid #b90066";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.color = "#444444";
-                e.currentTarget.style.border = "2px solid #444444";
-              }}
+            <CircularProgress color="primary" />
+            <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
+              Loading... Please Wait
+            </Typography>
+          </Box>
+        ) : (
+          <ResponsiveContainer width="100%" height={450}>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
             >
-              Simple
-            </ToggleButton>
-            <ToggleButton
-              value="weighted"
-              aria-label="weighted"
-              className="toggle-button"
-              style={{
-                fontSize: "14px",
-                padding: "5px 10px",
-                color: "#444444",
-                background: "transparent",
-                border: "2px solid #444444",
-                transition: "all 0.3s ease",
-                borderRadius: "5px",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = "#b90066";
-                e.currentTarget.style.color = "#fff";
-                e.currentTarget.style.border = "2px solid #b90066";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.color = "#444444";
-                e.currentTarget.style.border = "2px solid #444444";
-              }}
-            >
-              Weighted
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </div>
-      )}
+              {/* X-Axis */}
+              <XAxis
+                dataKey="year"
+                stroke="#b2b2b2"
+                tick={{ fill: "#000000", fontSize: 12 }}
+                label={{
+                  value: "Year",
+                  position: "insideBottom",
+                  dy: 10,
+                  fill: "#002060",
+                }}
+              />
 
-      <Dialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">No Data Available</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Please change the filters. No data available for the given filters.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} autoFocus>
-            Okay
-          </Button>
-        </DialogActions>
-      </Dialog>
-      </Container>
+              <YAxis
+                stroke="#000"
+                tickFormatter={(value) => formatValue(value, selectedField)}
+              />
+              <Tooltip
+                formatter={(value) =>
+                  formatValue(value as number, selectedField)
+                }
+              />
 
-    </div>
+              <Legend
+                wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }}
+              />
+
+              {chartData.length > 0 &&
+                Object.keys(
+                  chartData.reduce(
+                    (acc, item) => {
+                      Object.keys(item).forEach((key) => {
+                        if (key !== "year") acc[key] = true;
+                      });
+                      return acc;
+                    },
+                    {} as Record<string, boolean>
+                  )
+                ).map((key, index) => (
+                  <Bar
+                    key={index}
+                    dataKey={key}
+                    stackId="a"
+                    fill={barColors[index % barColors.length]}
+                    radius={[4, 4, 0, 0]}
+                    barSize={40} // Adjust bar width
+                  />
+                ))}
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+        <Box
+          sx={{
+            background: "linear-gradient(to right, #190250, #6DD5ED)",
+            paddingX: 2,
+            borderRadius: "8px",
+            boxShadow: 3,
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center", // Centering items horizontally
+            alignItems: "center", // Centering items vertically
+            marginBottom: 4,
+            marginX: 2,
+          }}
+        >
+          <RadioGroup
+            value={selectedFilter.value}
+            onChange={(e) =>
+              setSelectedFilter(
+                filterOptions.find((option) => option.value === e.target.value)!
+              )
+            } 
+            row 
+          >
+            {filterOptions.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                value={option.value}
+                control={<Radio sx={{ color: "white" }} />}
+                label={option.label}
+                sx={{
+                  color: "white",
+                  marginRight: 4,
+                  "& .MuiRadio-root": {
+                    color: "white",
+                  },
+                }}
+              />
+            ))}
+          </RadioGroup>
+        </Box>
+      </Card>
+    </Container>
   );
 };
 
