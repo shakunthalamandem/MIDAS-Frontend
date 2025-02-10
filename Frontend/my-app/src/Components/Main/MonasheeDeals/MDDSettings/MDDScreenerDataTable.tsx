@@ -154,13 +154,13 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
       field: "ticker",
       headerName: "Ticker",
       width: 100,
-      headerAlign: "center",
+      headerAlign: "left",
       renderCell: (params) => (
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: "left",
+            alignItems: "left",
             height: "100%",
           }}
         >
