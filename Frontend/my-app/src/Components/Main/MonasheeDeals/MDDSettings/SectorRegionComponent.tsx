@@ -36,7 +36,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({ data,
         .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
         .map(([year, categories]) => (
           <Paper key={year} sx={{ padding: 5, marginBottom: 3, width: "90%", background: "#F5E8DC" }}>
-            <Typography variant="h6" sx={{ textAlign: "center", mb: 2, fontWeight: "bold", color: "#1976d2" }}>
+            <Typography variant="h6" sx={{ textAlign: "center", mb: 2, fontWeight: "bold", color: "#002060" }}>
               {`${option} wise Data for ${year}`}
             </Typography>
             <TableContainer component={Paper} sx={{ border: "1px solid #ccc" }}>
