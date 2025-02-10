@@ -3,7 +3,6 @@ import {
   Box,
   FormGroup,
   FormControlLabel,
-  Checkbox,
   Radio,
   RadioGroup,
 } from "@mui/material";
