@@ -169,7 +169,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                   const key = Object.keys(filter)[0];
                   return !(
                     (apiName === "fo_discount" && (key === "deal_type" || key === "period")) ||
-                    (apiName === "allocation_capture" && key === "period")
+                    (apiName === "gap_analysis" && key === "period")
                   );
                 })
                 .map((filter) => {
@@ -341,7 +341,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </Box>
         ) : (
           <>
-      {apiName === "allocation_capture" ? (
+      {apiName === "gap_analysis" ? (
         <Gap selectedFilters={appliedFilters} />
       ) : apiName === "fo_discount" ? (
         <AvgFoDiscountChart data={apiData} />      ) : (

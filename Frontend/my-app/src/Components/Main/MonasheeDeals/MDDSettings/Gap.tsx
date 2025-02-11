@@ -59,7 +59,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
         ...(selectedFilter.payload || {}),
       };
 
-      const response = await fetch(`${apiUrl}/api/allocation_capture/`, {
+      const response = await fetch(`${apiUrl}/api/gap_analysis/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
