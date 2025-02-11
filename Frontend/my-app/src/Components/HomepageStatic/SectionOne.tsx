@@ -63,7 +63,7 @@ const SectionOne: React.FC = () => {
                     background: "linear-gradient(45deg, #2db9c3, #4a74c5)",
                   },
                 }}
-                onClick={handleOpenModal}
+                // onClick={handleOpenModal}
               >
                 Request Demo
               </Button>

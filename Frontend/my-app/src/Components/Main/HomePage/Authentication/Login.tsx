@@ -125,7 +125,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       refreshCaptcha();
-    }, 15000); // Refresh every 30 seconds
+    }, 60000); // Refresh every 30 seconds
   
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);

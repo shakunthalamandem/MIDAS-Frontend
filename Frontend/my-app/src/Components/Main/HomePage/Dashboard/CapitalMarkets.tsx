@@ -25,7 +25,7 @@ const CapitalMarkets: React.FC = () => {
   const { ticker: routeTicker } = useParams<{ ticker: string }>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "CMG"); 
+  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "AS"); 
   const [results, setResults] = useState<MDDResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
