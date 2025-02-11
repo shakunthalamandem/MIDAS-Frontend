@@ -120,6 +120,12 @@ const MarketFilters: React.FC = () => {
                 key !== "end_year" &&
                 key !== "year_period";
 
+              const placeholderValue =
+                key === "start_year"
+                  ? "2001"
+                  : key === "end_year"
+                    ? "2024"
+                    : "Yearly";
 
               return (
                 <Grid item xs={2} key={index}>
@@ -146,10 +152,20 @@ const MarketFilters: React.FC = () => {
                       <Select
                         id={key}
                         multiple={isMultiSelect}
-                        value={selectedValues[key] || (isMultiSelect ? [] : "")}
+                        value={
+                          selectedValues[key] ||
+                          (isMultiSelect ? [] : placeholderValue)
+                        }
                         onChange={handleChange(key)}
                         MenuProps={MenuProps}
+                        displayEmpty
                         renderValue={(selected) => {
+                          if (
+                            !selected ||
+                            (Array.isArray(selected) && selected.length === 0)
+                          ) {
+                            return <em>Any</em>;
+                          }
                           if (Array.isArray(selected)) {
                             return selected.length > 1
                               ? `${selected[0]} +${selected.length - 1}`
@@ -160,7 +176,7 @@ const MarketFilters: React.FC = () => {
                         sx={{
                           fontSize: "12px",
                           height: "40px",
-                          width:'100%'
+                          width: "100%",
                         }}
                       >
                         {value.options.map((option, idx) => (
