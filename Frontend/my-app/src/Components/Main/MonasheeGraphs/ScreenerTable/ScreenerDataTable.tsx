@@ -145,19 +145,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
       ),
     },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "gics_sector", headerName: "Sector", width: 180 },

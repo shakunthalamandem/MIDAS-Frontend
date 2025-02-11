@@ -4,6 +4,7 @@ import ScreenerMain from "../../MonasheeGraphs/ScreenerTable/ScreenerMain";
 import MarketFilters from "../../MonasheeCapitalMarkets/MarketFilters";
 import SearchIcon from "@mui/icons-material/Search";
 import SelectedTicker from "../../MonasheeGraphs/SelectedTicker";
+import { useParams } from "react-router-dom";
 
 import {
   Box,
@@ -21,9 +22,10 @@ import {
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState<number>(0);
+  const { ticker: routeTicker } = useParams<{ ticker: string }>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTicker, setSelectedTicker] = useState<string>("CMG"); // Default ticker
+  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "CMG"); 
   const [results, setResults] = useState<MDDResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
