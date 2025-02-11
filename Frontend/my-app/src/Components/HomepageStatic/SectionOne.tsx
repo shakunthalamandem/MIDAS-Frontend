@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Typography, Button, Grid } from "@mui/material";
-import RequestDemoModal from "./RequestDemoModal"; // Import the modal component
-import "./SectionOne.css"; // Import the CSS file for styling
+import RequestDemoModal from "./RequestDemoModal"; 
+import "./SectionOne.css";
 
 const SectionOne: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
