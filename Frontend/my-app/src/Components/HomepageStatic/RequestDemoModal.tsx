@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent } from "@mui/material";
-
+import emailjs from "emailjs-com"; // Import EmailJS
 
 interface RequestDemoModalProps {
   open: boolean;
@@ -13,7 +13,6 @@ const countryCodes = [
   { code: "+44", country: "UK" },
   { code: "+91", country: "India" },
   { code: "+61", country: "Australia" },
- 
 ];
 
 const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSubmit }) => {
@@ -22,7 +21,7 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
     phone: "",
     email: "",
     companyname: "",
-    countryCode: "+91", 
+    countryCode: "+91",
   });
 
   const [errors, setErrors] = useState({
@@ -59,7 +58,6 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
     if (!formData.phone) formErrors.phone = "Phone number is required";
     if (!formData.email) formErrors.email = "Email is required";
 
-   
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (formData.email && !emailRegex.test(formData.email)) {
       formErrors.email = "Provide a valid email (example: johndoe@example.com)";
@@ -76,18 +74,41 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
     e.preventDefault();
 
     if (validateForm()) {
-      onSubmit(formData);
+      const templateParams = {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        companyname: formData.companyname,
+        countryCode: formData.countryCode,
+        // to_email: "ghcit@goldenhillsindia.com",
+      };
 
-      setFormData({
-        name: "",
-        phone: "",
-        email: "",
-        companyname: "",
-        countryCode: "+91", 
-      });
+      emailjs
+      .send(
+        "service_1404",  
+        "template_r1dcptd",
+        templateParams,
+        "lUvtEwbYDxNbYX2_o"
+        
+      )
+        .then(
+          (response) => {
+            console.log("Email sent successfully:", response);
 
-
-      onClose();
+            setFormData({
+              name: "",
+              phone: "",
+              email: "",
+              companyname: "",
+              countryCode: "+91",
+            });
+            onClose(); 
+          },
+          (error) => {
+            console.error("Error sending email:", error);
+           
+          }
+        );
     }
   };
 
@@ -97,8 +118,8 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
       onClose={onClose}
       sx={{
         "& .MuiDialog-paper": {
-          width: "400px", 
-          maxWidth: "none", 
+          width: "400px",
+          maxWidth: "none",
         },
       }}
     >
@@ -183,3 +204,4 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
 };
 
 export default RequestDemoModal;
+
