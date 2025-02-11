@@ -25,12 +25,26 @@ const RegionWiseDeals: React.FC<RegionWiseDealsProps> = ({ data, selectedMetric 
     "#5F4774", "#DE5D85", "#83C3DA", "#4B3563"
   ];
 
-  // Number formatter function
+  // Updated Number formatter function based on the selected metric
   const formatNumber = (value: number): string => {
-    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`; // Format billions
-    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`; // Format millions
-    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`; // Format thousands
-    return value.toString(); // Default format
+    if (selectedMetric === "count") {
+      return value.toString(); // Just show the number for count
+    }
+
+    const absValue = Math.abs(value);
+    let formattedValue: string;
+
+    if (absValue >= 1e9) {
+      formattedValue = `${(absValue / 1e9).toFixed(1)}B`; // Billion
+    } else if (absValue >= 1e6) {
+      formattedValue = `${(absValue / 1e6).toFixed(1)}M`; // Million
+    } else if (absValue >= 1e3) {
+      formattedValue = `${(absValue / 1e3).toFixed(1)}K`; // Thousand
+    } else {
+      formattedValue = absValue.toString(); // No formatting for values < 1000
+    }
+
+    return value < 0 ? `-${formattedValue}` : formattedValue;
   };
 
   return (
@@ -49,13 +63,13 @@ const RegionWiseDeals: React.FC<RegionWiseDealsProps> = ({ data, selectedMetric 
             cy="50%"
             outerRadius={130}
             fill="#8884d8"
-            label={({ name, value }) => `${name}: ${formatNumber(value)}`} // Format labels
+            label={({ name, value }) => `${name}: ${formatNumber(value)}`} // Use the new formatNumber function for labels
           >
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: number) => formatNumber(value)} /> {/* Format tooltip */}
+          <Tooltip formatter={(value: number) => formatNumber(value)} /> {/* Use the new formatNumber function for tooltip */}
           <Legend />
         </PieChart>
       </ResponsiveContainer>
