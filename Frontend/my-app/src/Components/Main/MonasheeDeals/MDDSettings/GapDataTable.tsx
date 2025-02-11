@@ -6,9 +6,9 @@ interface GapDataTableProps {
   data: any[];
 }
 const columns: GridColDef[] = [
+    { field: "ticker_us", headerName: "Ticker", flex: 1 },
     { field: "pricing_date", headerName: "Pricing Date", flex: 1 },
     { field: "issuer_name", headerName: "Issuer Name", flex: 1 },
-    { field: "ticker_us", headerName: "Ticker", flex: 1 },
     { field: "deal_type", headerName: "Deal Type", flex: 1 },
     { field: "broad_region", headerName: "Region", flex: 1 },
     { 
