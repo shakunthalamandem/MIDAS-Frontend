@@ -19,19 +19,19 @@ const SectorWiseDeals: React.FC<SectorWiseDealsProps> = ({ data, selectedMetric 
 
   // Define colors for the pie chart sections
   const colors = [
-    "#2E3A87", "#1D9C63", "#D75F01", "#C35A2C", "#B72B72", "#D94E8A",
+    "#2E3A87", "#1D9C63", "#D75F01", "#1ea5db", "#B72B72", "#D94E8A",
     "#5B9E6E", "#C8A700", "#D2768F", "#7B4C92", "#4A88B6", 
     "#3E7A3B", "#C04C97", "#7A3F5F", "#A16329", "#4D7893", "#9C6F1F",
     "#5F4774", "#DE5D85", "#83C3DA", "#4B3563"
   ];
 
   // Number formatter function
-  const formatNumber = (value: number): string => {
-    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`; // Format billions
-    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`; // Format millions
-    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`; // Format thousands
-    return value.toString(); // Default format
-  };
+  // const formatNumber = (value: number): string => {
+  //   if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`; // Format billions
+  //   if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`; // Format millions
+  //   if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`; // Format thousands
+  //   return value.toString(); // Default format
+  // };
 
   return (
     <Box>
@@ -49,13 +49,13 @@ const SectorWiseDeals: React.FC<SectorWiseDealsProps> = ({ data, selectedMetric 
             cy="50%"
             outerRadius={130}
             fill="#8884d8"
-            label={({ name, value }) => `${name}: ${formatNumber(value)}`} // Format labels
+            label={({ name, value }) => `${name}: ${(value)}`} // Format labels
           >
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: number) => formatNumber(value)} /> {/* Format tooltip */}
+          <Tooltip formatter={(value: number) => (value)} /> {/* Format tooltip */}
           <Legend />
         </PieChart>
       </ResponsiveContainer>
