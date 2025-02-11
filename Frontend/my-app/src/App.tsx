@@ -12,7 +12,7 @@ const App: React.FC = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh', // Ensures the page takes the full viewport height
+        minHeight: '100vh',
       }}
     >
       <Router>
