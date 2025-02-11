@@ -222,7 +222,7 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
             </TableContainer>
             <Button 
       variant="contained" 
-      sx={{ backgroundColor: '#ff5722', marginTop: 2, color: 'white', '&:hover': { backgroundColor: '#e64a19' } }}
+      sx={{ backgroundColor: '#16303d', marginTop: 2, color: 'white', '&:hover': { backgroundColor: '#c8012b' } }}
       onClick={handleClick}
     >
       Click Here
