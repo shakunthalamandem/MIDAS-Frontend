@@ -27,8 +27,7 @@ const TechnicalMain = () => {
         {/* Header section with title and dropdown */}
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Typography variant="h4" style={{ color: "#002060", fontWeight: "bold" }}>
-            Technical Analysis
-          </Typography>
+          Stock Performance Dashboard          </Typography>
           {selectedTicker && <TickerDropdown onSelectTicker={setSelectedTicker} />}
         </Box>
 

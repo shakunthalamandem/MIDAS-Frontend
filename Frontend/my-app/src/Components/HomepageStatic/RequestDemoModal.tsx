@@ -1,32 +1,29 @@
 import React, { useState } from "react";
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent } from "@mui/material";
-import emailjs from "emailjs-com"; // Import EmailJS
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Button,
+} from "@mui/material";
+import { motion } from "framer-motion";
+import emailjs from "emailjs-com";
 
 interface RequestDemoModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (formData: { name: string; phone: string; email: string; companyname: string }) => void;
 }
 
-const countryCodes = [
-  { code: "+1", country: "USA" },
-  { code: "+44", country: "UK" },
-  { code: "+91", country: "India" },
-  { code: "+61", country: "Australia" },
-];
-
-const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSubmit }) => {
+const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
     email: "",
     companyname: "",
-    countryCode: "+91",
   });
 
   const [errors, setErrors] = useState({
     name: "",
-    phone: "",
     email: "",
     companyname: "",
   });
@@ -39,75 +36,37 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
     });
   };
 
-  const handleSelectChange = (e: SelectChangeEvent<string>) => {
-    setFormData({
-      ...formData,
-      countryCode: e.target.value,
-    });
-  };
-
   const validateForm = () => {
-    let formErrors = {
-      name: "",
-      phone: "",
-      email: "",
-      companyname: "",
-    };
-
+    let formErrors = { name: "", email: "", companyname: "" };
     if (!formData.name) formErrors.name = "Name is required";
-    if (!formData.phone) formErrors.phone = "Phone number is required";
     if (!formData.email) formErrors.email = "Email is required";
+    if (!formData.companyname) formErrors.companyname = "Company name is required";
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (formData.email && !emailRegex.test(formData.email)) {
-      formErrors.email = "Provide a valid email (example: johndoe@example.com)";
+      formErrors.email = "Provide a valid email";
     }
 
-    if (!formData.companyname) formErrors.companyname = "Company name is required";
-
     setErrors(formErrors);
-
     return Object.values(formErrors).every((error) => !error);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (validateForm()) {
-      const templateParams = {
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        companyname: formData.companyname,
-        countryCode: formData.countryCode,
-        // to_email: "ghcit@goldenhillsindia.com",
-      };
-
       emailjs
-      .send(
-        "service_1404",  
-        "template_r1dcptd",
-        templateParams,
-        "lUvtEwbYDxNbYX2_o"
-        
-      )
+        .send(
+          "service_1404", 
+          "template_r1dcptd", 
+          formData, 
+          "lUvtEwbYDxNbYX2_o"
+        )
         .then(
-          (response) => {
-            console.log("Email sent successfully:", response);
-
-            setFormData({
-              name: "",
-              phone: "",
-              email: "",
-              companyname: "",
-              countryCode: "+91",
-            });
-            onClose(); 
+          () => {
+            setFormData({ name: "", email: "", companyname: "" });
+            onClose();
           },
-          (error) => {
-            console.error("Error sending email:", error);
-           
-          }
+          (error) => console.error("Error sending email:", error)
         );
     }
   };
@@ -116,16 +75,34 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
     <Dialog
       open={open}
       onClose={onClose}
+      BackdropProps={{
+        style: {
+          background: "rgba(0, 0, 0, 0.2)",
+          backdropFilter: "blur(8px)",
+        },
+      }}
       sx={{
         "& .MuiDialog-paper": {
+          borderRadius: 3,
+          padding: 3,
+          background: "#1e1e2f",
+          color: "white",
           width: "400px",
-          maxWidth: "none",
         },
       }}
     >
-      <DialogTitle>Request a Demo</DialogTitle>
+      <DialogTitle>
+        <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+          Request a Demo
+        </motion.div>
+      </DialogTitle>
       <DialogContent>
-        <form onSubmit={handleSubmit}>
+        <motion.form
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          onSubmit={handleSubmit}
+        >
           <TextField
             label="Name"
             name="name"
@@ -136,37 +113,16 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
             required
             error={Boolean(errors.name)}
             helperText={errors.name}
+            sx={{
+              input: { color: "white" },
+              label: { color: "gray" },
+              fieldset: { borderColor: "#FFFFFF" },
+              '& .MuiOutlinedInput-root': {
+                '&:hover fieldset': { borderColor: "#FFD700" },
+                '&.Mui-focused fieldset': { borderColor: "#FF6347" },
+              },
+            }}
           />
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <FormControl fullWidth margin="normal" sx={{ width: 130 }}>
-              <InputLabel>Country Code</InputLabel>
-              <Select
-                value={formData.countryCode}
-                onChange={handleSelectChange}
-                name="countryCode"
-                label="Country Code"
-                sx={{ fontSize: '0.875rem', height: 35 }}
-              >
-                {countryCodes.map((country) => (
-                  <MenuItem key={country.code} value={country.code}>
-                    {country.code} ({country.country})
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              label="Phone Number"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              required
-              error={Boolean(errors.phone)}
-              helperText={errors.phone}
-              style={{ marginLeft: 8 }}
-            />
-          </div>
           <TextField
             label="Email Address"
             name="email"
@@ -177,6 +133,15 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
             required
             error={Boolean(errors.email)}
             helperText={errors.email}
+            sx={{
+              input: { color: "white" },
+              label: { color: "gray" },
+              fieldset: { borderColor: "#FFFFFF" },
+              '& .MuiOutlinedInput-root': {
+                '&:hover fieldset': { borderColor: "#FFD700" },
+                '&.Mui-focused fieldset': { borderColor: "#FF6347" },
+              },
+            }}
           />
           <TextField
             label="Company Name"
@@ -188,20 +153,24 @@ const RequestDemoModal: React.FC<RequestDemoModalProps> = ({ open, onClose, onSu
             required
             error={Boolean(errors.companyname)}
             helperText={errors.companyname}
+            sx={{
+              input: { color: "white" },
+              label: { color: "gray" },
+              fieldset: { borderColor: "#FFFFFF" },
+              '& .MuiOutlinedInput-root': {
+                '&:hover fieldset': { borderColor: "#FFD700" },
+                '&.Mui-focused fieldset': { borderColor: "#FF6347" },
+              },
+            }}
           />
-        </form>
+        </motion.form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
-          Close
-        </Button>
-        <Button onClick={handleSubmit} color="primary">
-          Submit
-        </Button>
+        <Button onClick={onClose} sx={{ color: "#ff5252" }}>Close</Button>
+        <Button onClick={handleSubmit} sx={{ background: "#4caf50", color: "white" }}>Submit</Button>
       </DialogActions>
     </Dialog>
   );
 };
 
 export default RequestDemoModal;
-
