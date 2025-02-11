@@ -78,7 +78,6 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
       sx={{
         width: "100%",
         maxWidth: 800,
-        margin: "auto",
         padding: 2,
         backgroundColor: theme.palette.background.default,
         borderRadius: "8px",
