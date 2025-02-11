@@ -28,6 +28,22 @@ interface SectorTableDataProps {
     };
   };
 }
+const formatNumber = (value: number): string => {
+  const absValue = Math.abs(value); // Get the absolute value for formatting
+  let formattedValue: string;
+
+  if (absValue >= 1e9) {
+    formattedValue = `${(absValue / 1e9).toFixed(0)}B`; // Format billions
+  } else if (absValue >= 1e6) {
+    formattedValue = `${(absValue / 1e6).toFixed(0)}M`; // Format millions
+  } else if (absValue >= 1e3) {
+    formattedValue = `${(absValue / 1e3).toFixed(0)}K`; // Format thousands
+  } else {
+    formattedValue = absValue.toString(); // Default format
+  }
+
+  return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`; // Ensure dollar sign is correctly placed
+};
 
 const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
   const sectorwiseData = data?.Sectorwise;
@@ -90,13 +106,13 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               <TableRow key={sector}>
                 <TableCell sx={{ padding: '4px 8px', width: '200px' }}>{sector}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>${row.Total_Deal_Volume.toFixed(0)}B</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{formatNumber(row.Total_Deal_Volume)}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Positively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Negatively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Positively.toFixed(1)}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Negatively.toFixed(1)}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Excess.toFixed(1)}%</TableCell>
-                <TableCell sx={{ padding: '4px 8px' }}>${row.Long_Opportunity_Value.toFixed(0)}B</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{formatNumber(row.Long_Opportunity_Value)}</TableCell>
               </TableRow>
             );
           })}
@@ -105,13 +121,13 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
           <TableRow key="total">
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', textAlign: 'center' }}>Total</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{totalDealCount}</TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>${totalDealVolume.toFixed(0)}B</TableCell>
+            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{formatNumber(totalDealVolume)}</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{avgPositivelyPerformingDealsPercentage.toFixed(0)}%</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{avgNegativelyPerformingDealsPercentage.toFixed(0)}%</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{avgAvgT1MAbsReturnPositively.toFixed(1)}%</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{avgAvgT1MAbsReturnNegatively.toFixed(1)}%</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{avgExpectedReturnsExcess.toFixed(1)}%</TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>${totalLongOpportunityValue.toFixed(0)}B</TableCell>
+            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{formatNumber(totalLongOpportunityValue)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>

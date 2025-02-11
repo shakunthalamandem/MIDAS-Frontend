@@ -122,7 +122,7 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
             <TableContainer component={Paper} sx={{ border: "1px solid #ccc" }}>
               <Table size="small">
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: "#004577" }}>
+                  <TableRow sx={{ backgroundColor: "#466675" }}>
                     <TableCell sx={{ color: "white",width:'30px' }}>Quintile</TableCell>
                     <TableCell sx={{ color: "white",width:'150px' }}>
                       T+1M Absolute Returns

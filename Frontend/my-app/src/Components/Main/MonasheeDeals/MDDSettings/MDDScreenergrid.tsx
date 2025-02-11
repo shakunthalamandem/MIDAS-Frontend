@@ -136,13 +136,13 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       field: "ticker",
       headerName: "Ticker",
       width: 100,
-      headerAlign: "center",
+      headerAlign: "left",
       renderCell: (params) => (
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: "left",
+            alignItems: "left",
             height: "100%",
           }}
         >
@@ -156,9 +156,8 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
           </Link>
         </div>
       ),
-    }
-    
-,        { field: "issuer_name", headerName: "Issuer Name", width: 200 },
+    },
+    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "pricing_date", headerName: "Pricing Date", width: 150 },
     {
       field: "gics_sector_from_bloomberg",

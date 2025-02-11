@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Box, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-
+import { Link } from "react-router-dom";
 interface ScreenerDataRow {
   pricing_date: string;
   issuer_name: string;
@@ -117,7 +117,47 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
   }, [rows, searchQuery]);
 
   const columns: GridColDef[] = [
-    { field: "ticker_symbol", headerName: "Ticker", width: 100 },
+    // { field: "ticker_symbol", headerName: "Ticker", width: 100 },
+
+
+    {
+      field: "ticker_symbol",
+      headerName: "Ticker",
+      headerAlign: "center",
+      width: 120,
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <Link
+            to={`/tickerperformance/${params.value}`}
+            style={{ color: "#1E88E5", textDecoration: "none" }}
+            target="_blank"
+          >
+            {params.value}
+          </Link>
+        </div>
+      ),
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "gics_sector", headerName: "Sector", width: 180 },

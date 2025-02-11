@@ -2,6 +2,7 @@ import React, { useState, useEffect ,useMemo} from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, TextField, Typography } from "@mui/material";
 import MDDScreenerSummary from "./MDDScrennerSummary";
+import { Link } from "react-router-dom";
 // Define the type for each row of data
 interface ScreenerDataRow {
   id: number; // Unique ID for each row
@@ -149,9 +150,33 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({
   }, [rows, searchQuery]);
 
   const columns: GridColDef[] = [
-    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
+ {
+      field: "ticker",
+      headerName: "Ticker",
+      width: 100,
+      headerAlign: "left",
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "left",
+            alignItems: "left",
+            height: "100%",
+          }}
+        >
+
+          <Link
+            to={`/monasheeperformance/${params.value}`}
+            style={{ color: "brown", fontWeight: "bold",paddingLeft:15,textDecoration: "none" }}
+            target="_blank"
+          >
+            {params.value}
+          </Link>
+        </div>
+      ),
+    },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
-    { field: "ticker", headerName: "Ticker", width: 100 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     {
       field: "gics_sector_from_bloomberg",
       headerName: "Sector ",
