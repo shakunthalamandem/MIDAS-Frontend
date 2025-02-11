@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CircularProgress, Box, Typography } from "@mui/material";
 import GapDataTable from "./GapDataTable";
+import { color } from "framer-motion";
 
 const DetailedGapData: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -56,7 +57,10 @@ const DetailedGapData: React.FC = () => {
 
   return (
     <Box p={3}>
-<Typography>Deal Details  </Typography>
+<Typography variant="h6" sx={{ color: '#002060', textAlign: 'center',mb:5 }}>
+  Deal Details
+</Typography>
+
       {loading ? (
         <CircularProgress />
       ) : error ? (
