@@ -33,7 +33,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       <DataGrid
         rows={data.map((row, index) => ({ id: index, ...row }))}
         columns={columns}
-        pageSizeOptions={[5, 10, 20]}
+        pageSizeOptions={[25, 50, 100]}
         disableRowSelectionOnClick
       />
     </Box>
