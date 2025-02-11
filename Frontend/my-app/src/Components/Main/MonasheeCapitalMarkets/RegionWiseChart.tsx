@@ -45,24 +45,28 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({
         : [...prev, region]
     );
   };
-
+  
   const formatNumber = (value: number): string => {
-    const absValue = Math.abs(value); // Get the absolute value for formatting
-    let formattedValue: string;
-  
-    if (absValue >= 1e9) {
-      formattedValue = `${(absValue / 1e9).toFixed(1)}B`; // Format billions
-    } else if (absValue >= 1e6) {
-      formattedValue = `${(absValue / 1e6).toFixed(1)}M`; // Format millions
-    } else if (absValue >= 1e3) {
-      formattedValue = `${(absValue / 1e3).toFixed(1)}K`; // Format thousands
-    } else {
-      formattedValue = absValue.toString(); // Default format
+    if (selectedMetric === "count") {
+      return value.toString(); // Just show the number for count
     }
-  
-    return value < 0 ? `-${formattedValue}` : formattedValue; // Add negative sign if necessary
+
+    const absValue = Math.abs(value);
+    let formattedValue: string;
+
+    if (absValue >= 1e9) {
+      formattedValue = `${(absValue / 1e9).toFixed(1)}B`; // Billion
+    } else if (absValue >= 1e6) {
+      formattedValue = `${(absValue / 1e6).toFixed(1)}M`; // Million
+    } else if (absValue >= 1e3) {
+      formattedValue = `${(absValue / 1e3).toFixed(1)}K`; // Thousand
+    } else {
+      formattedValue = absValue.toString(); // No formatting for values < 1000
+    }
+
+    return value < 0 ? `-${formattedValue}` : formattedValue;
   };
-  
+
   // Define colors for the lines
   const colors = [
   "#2E3A87",
