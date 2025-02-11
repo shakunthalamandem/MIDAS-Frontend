@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   TextField,
   Button,
   IconButton,
   Typography,
   Box,
-  Container,
-  Grid,
+  Container,Grid,
   CircularProgress,
+  Snackbar,
 } from "@mui/material";
+import { Refresh } from "@mui/icons-material";
 import { BsEyeSlash, BsEye } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -33,9 +34,75 @@ const Login: React.FC = () => {
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
   const apiUrl = process.env.REACT_APP_API_URL;
-// const token = localStorage.getItem("access_token");
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [captchaText, setCaptchaText] = useState("");
+  const [userInput, setUserInput] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const generateCaptchaText = () => {
+    const chars = "0123456789";
+    let text = "";
+    for (let i = 0; i < 6; i++) {
+      text += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return text;
+  };
+
+  const drawCaptcha = (text: string) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return; 
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#f4f4f4";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "black";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+
+    for (let i = 0; i < 10; i++) {
+      ctx.fillStyle = `rgba(${50 + Math.random() * 100}, ${50 + Math.random() * 100}, ${50 + Math.random() * 100}, 1)`;
+
+      ctx.fillRect(
+        Math.random() * canvas.width,
+        Math.random() * canvas.height,
+        Math.random() * 10,
+        Math.random() * 10
+      );
+    }
+
+    for (let i = 0; i < text.length; i++) {
+      ctx.save();
+      ctx.translate(8 + i * 25, 25);
+      ctx.rotate((Math.random() - 0.5) * 0.4); 
+      ctx.fillText(text[i], 0, 0);
+      ctx.restore();
+    }
+  };
+
+  useEffect(() => {
+    refreshCaptcha();
+  }, []);
+
+  const refreshCaptcha = () => {
+    const newCaptcha = generateCaptchaText();
+    setCaptchaText(newCaptcha);
+    drawCaptcha(newCaptcha);
+    setUserInput("");
+  };
 
   const handleLogin = async () => {
+    if (userInput !== captchaText) {
+      setSnackbarOpen(true);
+      return;
+    }
+
     setLoading(true);
     setError(""); // Clear any previous error message
 
@@ -43,11 +110,11 @@ const Login: React.FC = () => {
       const response = await axios.post<LoginResponse>(`${apiUrl}/api/login/`, { username, password });
       const { access_token, refresh_token } = response.data;
 
-      // Store tokens (consider using secure cookies or state management for production apps)
+      // Store tokens securely
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
 
-      // Redirect to a protected route or dashboard
+      // Redirect to the dashboard
       navigate("/");
     } catch (err: any) {
       setError(err.response?.data?.error || "Something went wrong. Please try again.");
@@ -55,7 +122,14 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshCaptcha();
+    }, 15000); // Refresh every 30 seconds
+  
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+  
   return (
     <Container maxWidth="xs">
       <Box
@@ -150,6 +224,66 @@ const Login: React.FC = () => {
             {passwordVisible ? <BsEye /> : <BsEyeSlash />}
           </IconButton>
         </Box>
+
+        <Box textAlign="center" p={2} display="flex" alignItems="center">
+  {/* CAPTCHA Canvas */}
+  <canvas
+  ref={canvasRef}
+  width={150}
+  height={40}
+  style={{
+    border: "1px solid #d3d290", // Set border color
+    backgroundColor: "#f8f9fa", // Light background
+    borderRadius: "4px", // Rounded corners
+  }}
+/>
+
+  
+  <IconButton onClick={refreshCaptcha} sx={{ ml: 1, height: "40px", width: "40px" }}>
+    <Refresh />
+  </IconButton>
+    <TextField
+    placeholder="Enter CAPTCHA"
+    value={userInput}
+    onChange={(e) => setUserInput(e.target.value)}
+    sx={{
+      "& .MuiOutlinedInput-root": {
+        "& fieldset": {
+          borderColor: "#d3d290",
+        },
+        "&:hover fieldset": {
+          borderColor: "#aab56b",
+        },
+        "&.Mui-focused fieldset": {
+          borderColor: "#aab56b",
+        },
+      },
+      "& .MuiInputLabel-root": {
+        color: "#d3d290",
+        "&.Mui-focused": {
+          color: "#6d7f40",
+        },
+      },
+    }}
+    
+  />
+</Box>
+
+<Snackbar
+  open={snackbarOpen}
+  autoHideDuration={3000}
+  onClose={() => setSnackbarOpen(false)}
+  message="❌ Incorrect CAPTCHA. Try again."
+  anchorOrigin={{ vertical: "bottom", horizontal: "right" }} 
+  sx={{
+    mt: "20px", 
+    "& .MuiSnackbarContent-root": {
+      height: "40px", 
+    },
+  }}
+/>
+
+        
 
         {/* Login Button */}
         <Button
