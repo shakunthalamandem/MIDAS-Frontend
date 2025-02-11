@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { CircularProgress, Box } from "@mui/material";
+import { CircularProgress, Box, Typography } from "@mui/material";
 import GapDataTable from "./GapDataTable";
 
 const DetailedGapData: React.FC = () => {
@@ -56,8 +56,7 @@ const DetailedGapData: React.FC = () => {
 
   return (
     <Box p={3}>
-      <h2>Detailed GAP Data</h2>
-
+<Typography>Deal Details  </Typography>
       {loading ? (
         <CircularProgress />
       ) : error ? (
