@@ -35,7 +35,12 @@ interface Data {
   };
 }
 
-const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
+interface DealTypeComponentProps {
+  data: Data;
+  selectedFilters?: any;
+}
+
+const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, selectedFilters = {} }) => {
   const sortedYears = Object.keys(data).sort(
     (a, b) => parseInt(b) - parseInt(a)
   );
