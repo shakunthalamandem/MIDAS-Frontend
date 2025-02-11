@@ -19,6 +19,7 @@ import DealStats from "../Components/Main/MonasheeDeals/MddGraphs/DealStats";
 import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
 import MDDSelectedTicker from "../Components/Main/MonasheeDeals/MddGraphs/MDDSelectedTicker";
+import GapDealsInfo from "../Components/Main/MonasheeDeals/MDDSettings/GapDealsInfo";
 
 // Your tab components (example imports)
 
@@ -40,6 +41,10 @@ const AppRouters: React.FC = () => {
         <Route path="/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
         <Route path="/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/tickerperformance/:ticker" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
+
+        <Route path="/gap-deals-info" element={<AuthGuard><GapDealsInfo /></AuthGuard>} />
+
+
 
 
 

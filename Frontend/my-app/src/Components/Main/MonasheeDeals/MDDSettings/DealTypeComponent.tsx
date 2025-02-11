@@ -36,6 +36,9 @@ interface Data {
 }
 
 const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
+  const handleClick = () => {
+    window.open('/gap-deals-info', '_blank');
+  };
   const sortedYears = Object.keys(data).sort(
     (a, b) => parseInt(b) - parseInt(a)
   );
@@ -217,7 +220,13 @@ const DealTypeComponent: React.FC<{ data: Data }> = ({ data = {} }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-          </Paper>
+            <Button 
+      variant="contained" 
+      sx={{ backgroundColor: '#ff5722', marginTop: 2, color: 'white', '&:hover': { backgroundColor: '#e64a19' } }}
+      onClick={handleClick}
+    >
+      Click Here
+    </Button>         </Paper>
         );
       })}
     </Box>
