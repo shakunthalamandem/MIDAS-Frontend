@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Box } from "@mui/material";
+import { CircularProgress, Box } from "@mui/material";
+import GapDataTable from "./GapDataTable";
 
 const DetailedGapData: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -64,34 +65,7 @@ const DetailedGapData: React.FC = () => {
       ) : data.length === 0 ? (
         <p>No data available.</p>
       ) : (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Year</TableCell>
-              <TableCell>Deal Type</TableCell>
-              <TableCell>Region</TableCell>
-              <TableCell>Deal Size</TableCell>
-              <TableCell>Ticker</TableCell>
-              <TableCell>Sector</TableCell>
-              <TableCell>Deal Captain</TableCell>
-              <TableCell>Return</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row, index) => (
-              <TableRow key={index}>
-                <TableCell>{row.year}</TableCell>
-                <TableCell>{row.deal_type}</TableCell>
-                <TableCell>{row.broad_region}</TableCell>
-                <TableCell>${row.deal_size.toLocaleString()}</TableCell>
-                <TableCell>{row.ticker_us}</TableCell>
-                <TableCell>{row.gics_sector_from_bloomberg}</TableCell>
-                <TableCell>{row.deal_captain}</TableCell>
-                <TableCell>{row.total_return.toFixed(2)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <GapDataTable data={data} />
       )}
     </Box>
   );
