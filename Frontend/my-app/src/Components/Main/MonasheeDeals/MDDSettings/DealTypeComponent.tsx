@@ -11,6 +11,7 @@ import {
   Box,
   Button,
 } from "@mui/material";
+import DetailedGapData from "./DetailedGapData";
 
 const formatValue = (value: number): string => {
   const absValue = Math.abs(value);
@@ -41,9 +42,16 @@ interface DealTypeComponentProps {
 }
 
 const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, selectedFilters = {} }) => {
-  const handleClick = () => {
-    window.open('/gap-deals-info', '_blank');
+  const handleClick = (year: number) => {
+    const filters = { ...selectedFilters, years: [year] };
+    console.log(filters)
+  
+    const url = new URL(window.location.origin + "/detailed_gap_analysis");
+    url.searchParams.set("filters", JSON.stringify(filters));
+  
+    window.open(url.toString(), "_blank");
   };
+  
   const sortedYears = Object.keys(data).sort(
     (a, b) => parseInt(b) - parseInt(a)
   );
@@ -226,12 +234,13 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, select
               </Table>
             </TableContainer>
             <Button 
-      variant="contained" 
-      sx={{ backgroundColor: '#16303d', marginTop: 2, color: 'white', '&:hover': { backgroundColor: '#c8012b' } }}
-      onClick={handleClick}
-    >
-      Click Here
-    </Button>         </Paper>
+              variant="contained" 
+              sx={{ backgroundColor: '#16303d', marginTop: 2, color: 'white', '&:hover': { backgroundColor: '#c8012b' } }}
+              onClick={() => handleClick(Number(year))}
+            >
+              Click Here
+            </Button>
+          </Paper>
         );
       })}
     </Box>
