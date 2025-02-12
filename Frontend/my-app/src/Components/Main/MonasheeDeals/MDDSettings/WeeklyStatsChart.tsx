@@ -95,10 +95,12 @@ const WeeklyStatsChart: React.FC = () => {
     .map((week) => {
       return {
         name: week,
+        "2023": data["2023"]?.[week]?.cumulative_count,
         "2024": data["2024"]?.[week]?.cumulative_count,
         "2025": data["2025"]?.[week]?.cumulative_count,
         Average: data["average"]?.[week]?.cumulative_count,
-  
+
+        "2023 Size": data["2023"]?.[week]?.cumulative_deal_volume,
         "2024 Size": data["2024"]?.[week]?.cumulative_deal_volume,
         "2025 Size": data["2025"]?.[week]?.cumulative_deal_volume,
         "Average Size": data["average"]?.[week]?.cumulative_deal_volume,
@@ -122,14 +124,18 @@ const WeeklyStatsChart: React.FC = () => {
 
               {showCount ? (
                 <>
-                  <Line type="monotone" dataKey="2024" stroke="#ff7300" name="2024" />
+                  <Line type="monotone" dataKey="2023" stroke="#ff7300" name="2023" />
+                  <Line type="monotone" dataKey="2024" stroke="#770500" name="2024" />
+
                   <Bar dataKey="2025" barSize={10} fill="#247B5B" name="2025" />
 
                   <Line type="monotone" dataKey="Average" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               ) : (
                 <>
-                  <Line type="monotone" dataKey="2024 Size" stroke="#8a009a" name="2024" />
+                  <Line type="monotone" dataKey="2023 Size" stroke="#8a009a" name="2023" />
+                  <Line type="monotone" dataKey="2024 Size" stroke="#770500" name="2024" />
+
                   <Bar dataKey="2025 Size" barSize={10} fill="#247B5B" name="2025" />
                   <Line type="monotone" dataKey="Average Size" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
