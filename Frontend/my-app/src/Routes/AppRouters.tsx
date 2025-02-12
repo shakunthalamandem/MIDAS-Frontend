@@ -16,7 +16,6 @@ import Logout from "../Components/Main/HomePage/Authentication/Logout";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
 import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/DetailedGapData";
 
-// Your tab components (example imports)
 
 
 const AppRouters: React.FC = () => {
