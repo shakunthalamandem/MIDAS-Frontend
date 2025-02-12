@@ -55,7 +55,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       id: index,
       ...row,
       deal_size: row.deal_size ? formatDealSize(row.deal_size.toFixed()) : "$0",
-      allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "0%",
+      allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
       allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed()}%` : "0%",
       model_am_return: row.model_am_return ? `${formatDealSize(row.model_am_return.toFixed())}` : "$0",
       total_model_capital: row.total_model_capital ? `${formatDealSize(row.total_model_capital.toFixed())}` : "$0",
