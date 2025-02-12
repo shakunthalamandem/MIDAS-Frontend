@@ -22,6 +22,7 @@ import {
   Container,
 } from "@mui/material";
 import axios from "axios";
+import GapDealDeatilsTable from "./GapDealDeatilsTable";
 
 interface WeeklyData {
   Count: number;
@@ -157,6 +158,7 @@ const WeeklyStatsChart: React.FC = () => {
           </FormControl>
         </CardContent>
       </Card>
+      <GapDealDeatilsTable />
     </Container>
   );
 };
