@@ -5,6 +5,7 @@ import NavbarMain from './Components/Navbar/NavBarMain';
 import FooterMain from './Components/Footer/FooterMain';
 import ScrollToTopButton from './Components/Main/HomePage/Authentication/ScrollToTopButton';
 import Box from '@mui/material/Box';
+import SecurityLayer from './Tests/SecurityLayer';
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,8 @@ const App: React.FC = () => {
         minHeight: '100vh',
       }}
     >
+            <SecurityLayer />
+
       <Router>
         <NavbarMain />
         <Box
