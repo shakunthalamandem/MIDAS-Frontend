@@ -17,22 +17,45 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
     );
     return isNaN(cleanedValue) ? 0 : cleanedValue;
   };
-
+  // const formatDealSize = (dealSize: any) => {
+  //   const cleanedValue = cleanDealSize(dealSize);
+  //   const formattedValue =
+  //     cleanedValue < 0
+  //       ? `-$${Math.abs(cleanedValue).toLocaleString("en-US")}`
+  //       : `$${cleanedValue.toLocaleString("en-US")}`;
+  //   return formattedValue;
+  // };
   const formatDealSize = (dealSize: any) => {
     const cleanedValue = cleanDealSize(dealSize);
-    const formattedValue =
-      cleanedValue < 0
-        ? `-$${Math.abs(cleanedValue).toLocaleString("en-US")}`
-        : `$${cleanedValue.toLocaleString("en-US")}`;
-    return formattedValue;
+    let formattedNumber;
+    let suffix = "";
+  
+    if (Math.abs(cleanedValue) >= 1_000_000_000) {
+      formattedNumber = (cleanedValue / 1_000_000_000).toFixed();
+      suffix = "B";
+    } else if (Math.abs(cleanedValue) >= 1_000_000) {
+      formattedNumber = (cleanedValue / 1_000_000).toFixed();
+      suffix = "M";
+    } else if (Math.abs(cleanedValue) >= 1_000) {
+      formattedNumber = (cleanedValue / 1_000).toFixed();
+      suffix = "K";
+    } else {
+      formattedNumber = cleanedValue.toFixed();
+    }
+  
+    return cleanedValue < 0
+      ? `-$${Math.abs(Number(formattedNumber)).toLocaleString("en-US")}${suffix}`
+      : `$${Number(formattedNumber).toLocaleString("en-US")}${suffix}`;
   };
+  
+  
 
   const preprocessRows = (rows: any[]) =>
     rows.map((row, index) => ({
       id: index,
       ...row,
       deal_size: row.deal_size ? formatDealSize(row.deal_size.toFixed()) : "$0",
-      allocation_return: row.allocation_return ? `$${row.allocation_return.toFixed()}` : "0%",
+      allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "0%",
       allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed()}%` : "0%",
       model_am_return: row.model_am_return ? `${formatDealSize(row.model_am_return.toFixed())}` : "$0",
       total_model_capital: row.total_model_capital ? `${formatDealSize(row.total_model_capital.toFixed())}` : "$0",
@@ -130,13 +153,15 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { 
-      field: "total_model_capital", 
-      headerName: "Total Model Capital", 
+    {
+      field: "total_model_capital",
+      headerName: "Total Model Capital",
       width: 180,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
+    }
+    
+,    
     { 
       field: "allocation_return", 
       headerName: "Monashee Actual Allocation PnL(Gross)", 
