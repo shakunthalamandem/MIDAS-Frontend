@@ -53,7 +53,6 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       monahsee_actual_total: row.monahsee_actual_total ? `${formatDealSize(row.monahsee_actual_total.toFixed())}` : "$0",
     }));
 
-  // Filter rows based on search query
   const filteredRows = useMemo(() => {
     return preprocessRows(rows).filter((row) =>
       row.ticker_us?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -95,19 +94,6 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
     renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
-  // { 
-  //   field: "subscription_bid_shares", 
-  //   headerName: "Subscription Bid Shares", 
-  //   width: 180,
-  //   valueFormatter: (params) => Number(params).toLocaleString(),
-  // },
-  // { 
-  //   field: "allocation_price", 
-  //   headerName: "Allocation Price", 
-  //   width: 150,
-  //   renderCell: (params) => `${params.value}`,
-  //     sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  // },
   { 
     field: "allocated_capital", 
     headerName: "Allocated Capital", 
@@ -129,13 +115,6 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
-  // { 
-  //   field: "t1d_return_from_bloomberg", 
-  //   headerName: "T1D Return", 
-  //   width: 140,
-  //   renderCell: (params) => `${params.value}`,
-  //     sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  // },
     { 
       field: "model_capital_1_allocation", 
       headerName: "Model Allocation", 
@@ -192,13 +171,6 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    // { 
-    //   field: "allocation_return" + "am_return", 
-    //   headerName: "Monashee Actual Total PnL(Gross)", 
-    //   width: 150,
-    //   renderCell: (params) => `${params.value}`,
-    //   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    // },
     {
       field: "monahsee_actual_total", 
       headerName: "Monashee Actual Total PnL(Gross)",
