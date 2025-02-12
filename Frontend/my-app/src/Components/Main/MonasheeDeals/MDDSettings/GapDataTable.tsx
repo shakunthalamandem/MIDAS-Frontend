@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { Box, TextField } from "@mui/material";
+import { Box, Card, CardContent, TextField } from "@mui/material";
 
 interface GapDataTableProps {
   data: any[];
@@ -12,16 +12,21 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
 
   const cleanDealSize = (dealSize: any): number => {
     if (dealSize == null || dealSize === "") return 0;
-    const cleanedValue = parseFloat(dealSize.toString().replace(/[^0-9.-]+/g, ""));
+    const cleanedValue = parseFloat(
+      dealSize.toString().replace(/[^0-9.-]+/g, "")
+    );
     return isNaN(cleanedValue) ? 0 : cleanedValue;
   };
 
   const formatDealSize = (dealSize: any) => {
     const cleanedValue = cleanDealSize(dealSize);
-    const formattedValue = cleanedValue < 0 ? `-$${Math.abs(cleanedValue).toLocaleString("en-US")}` : `$${cleanedValue.toLocaleString("en-US")}`;
+    const formattedValue =
+      cleanedValue < 0
+        ? `-$${Math.abs(cleanedValue).toLocaleString("en-US")}`
+        : `$${cleanedValue.toLocaleString("en-US")}`;
     return formattedValue;
   };
-  
+
   const preprocessRows = (rows: any[]) =>
     rows.map((row, index) => ({
       id: index,
@@ -58,15 +63,15 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
   }, [rows, searchQuery]);
 
   const columns: GridColDef[] = [
-    { field: "ticker_us", headerName: "Ticker", width: 120 },
-    { field: "pricing_date", headerName: "Pricing Date", width: 150 },
+    { field: "ticker_us", headerName: "Ticker", width: 100 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
-    { field: "deal_type", headerName: "Deal Type", width: 150 },
-    { field: "broad_region", headerName: "Region", width: 130 },
-    { 
-      field: "deal_size", 
-      headerName: "Deal Size", 
-      width: 150,
+    { field: "deal_type", headerName: "Deal Type", width: 80 },
+    { field: "broad_region", headerName: "Region", width: 80 },
+    {
+      field: "deal_size",
+      headerName: "Deal Size",
+      width: 120,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
@@ -111,19 +116,27 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
     width: 180,
     renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  },
-  { 
-    field: "am_capital_committed", 
-    headerName: "AM Capital Committed", 
-    width: 180,
-    renderCell: (params) => `${params.value}`,
+    },
+
+    {
+      field: "allocated_capital",
+      headerName: "Allocated Capital",
+      width: 120,
+      renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  },
-  { 
-    field: "total_committed_capital", 
-    headerName: "Total Committed Capital", 
-    width: 180,
-    renderCell: (params) => `${params.value}`,
+    },
+    {
+      field: "am_capital_committed",
+      headerName: "AM Capital Committed",
+      width: 150,
+      renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+    {
+      field: "total_committed_capital",
+      headerName: "Total Committed Capital",
+      width: 160,
+      renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
   // { 
@@ -200,46 +213,52 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
   ];
 
   return (
-    <Box sx={{ height: 600, width: "100%", overflowX: "auto", padding: "10px" }}>
-      <Box sx={{ display: "flex", marginBottom: 2,marginLeft: 2 }}>
-  <TextField
-    label="Search by Ticker"
-    variant="outlined"
-    size="small"
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-    sx={{ width: "200px" }}
-  />
-</Box>
+    <Box mb={10} sx={{ height: 600, width: "100%" }}>
+      <Card>
+        <CardContent>
+          <Box sx={{ display: "flex", marginBottom: 2 }}>
+            <TextField
+              label="Search by Ticker"
+              variant="outlined"
+              size="small"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ width: "200px" }}
+            />
+          </Box>
+      <Box sx={{ height: 600, width: "100%", marginTop: 3 }}>
 
+          <DataGrid
+            rows={filteredRows}
+            columns={columns}
+            pageSizeOptions={[25, 50, 100]}
+            disableRowSelectionOnClick
+            rowHeight={35}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "transparent",
+                fontWeight: "bold",
+                color: "#002060",
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold",
+                fontSize: "12px",
+              },
+              "& .MuiDataGrid-cell": {
+                color: "#000000",
+                fontSize: "12px",
+                padding: "4px",
+              },
+              "& .MuiDataGrid-row:nth-of-type(odd)": {
+                backgroundColor: "#F5F5F5",
+              },
+            }}
+          />
+            </Box>
 
-      
-      <DataGrid
-        rows={filteredRows}
-        columns={columns}
-        pageSizeOptions={[25, 50, 100]}
-        disableRowSelectionOnClick
-        sx={{
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "transparent",
-            fontWeight: "bold",
-            color: "#002060",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: "bold",
-            fontSize: "12px",
-          },
-          "& .MuiDataGrid-cell": {
-            color: "#000000",
-            fontSize: "12px",
-            padding: "4px",
-          },
-          "& .MuiDataGrid-row:nth-of-type(odd)": {
-            backgroundColor: "#F5F5F5",
-          },
-        }}
-      />
-    </Box>
+        </CardContent>
+      </Card>
+  </Box>
   );
 };
 
