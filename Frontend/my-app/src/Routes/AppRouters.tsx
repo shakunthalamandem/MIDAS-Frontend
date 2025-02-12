@@ -14,9 +14,8 @@ import ErrorBoundary from "../Pages/ErrorBoundary";
 import AuthGuard from "./AuthGuard";
 import Logout from "../Components/Main/HomePage/Authentication/Logout";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
+import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/DetailedGapData";
 
-
-// Your tab components (example imports)
 
 
 const AppRouters: React.FC = () => {
@@ -37,9 +36,7 @@ const AppRouters: React.FC = () => {
         <Route path="/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/tickerperformance/:ticker" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
 
-
-
-      
+        <Route path="/detailed_gap_analysis" element={<AuthGuard><DetailedGapData /></AuthGuard>} />
 
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/email-verification" element={<EmailVerification />} />

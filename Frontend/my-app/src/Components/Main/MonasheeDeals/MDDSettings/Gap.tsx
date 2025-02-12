@@ -59,7 +59,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
         ...(selectedFilter.payload || {}),
       };
 
-      const response = await fetch(`${apiUrl}/api/allocation_capture/`, {
+      const response = await fetch(`${apiUrl}/api/gap_analysis/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -152,7 +152,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
       {!loading && !error && data && (
         <Box sx={{ width: "100%", marginTop: 2, textAlign: "center" }}>
           {selectedFilter.value === "deal_type" && (
-            <DealTypeComponent data={data || {}} />
+            <DealTypeComponent data={data || {}} selectedFilters={selectedFilters || {}} />
           )}
           {selectedFilter.value === "sector" && (
             <SectorRegionComponent
