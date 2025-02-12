@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CircularProgress, Box, Typography } from "@mui/material";
 import GapDataTable from "./GapDataTable";
-import { color } from "framer-motion";
+import Marquee from "react-fast-marquee";
+
+interface SelectedFilters {
+  years?: number[]; // Ensures 'years' is recognized as an optional array of numbers
+}
 
 const DetailedGapData: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -14,15 +18,14 @@ const DetailedGapData: React.FC = () => {
 
   console.log("Search Params:", searchParams.toString());
 
-  let selectedFilters = {};
+  let selectedFilters: SelectedFilters = {}; // Explicitly using the typed interface
+
   try {
     const filters = JSON.parse(searchParams.get("filters") || "{}");
     selectedFilters = filters;
   } catch (error) {
     console.error("Invalid filters format", error);
   }
-
-  console.log("Selected Filters:", selectedFilters);
 
   useEffect(() => {
     if (!Object.keys(selectedFilters).length) return;
@@ -36,7 +39,7 @@ const DetailedGapData: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : "",
+            Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(selectedFilters),
         });
@@ -56,11 +59,31 @@ const DetailedGapData: React.FC = () => {
   }, [searchParams]);
 
   return (
-    <Box p={3}>
-<Typography variant="h6" sx={{ color: '#002060', textAlign: 'center',mb:5 }}>
-  Deal Details
-</Typography>
-
+    <Box>
+      <Box  sx={{
+            color: "#fff",
+            textAlign: "center",
+            fontWeight: "bold",
+            background:
+              "linear-gradient(45deg, rgb(0, 63, 134), rgb(56, 138, 88))",
+            borderRadius: "5px",
+          }}>
+    <Marquee gradient={false} speed={100}>
+    <Typography
+          variant="h5"
+          sx={{
+            color: "#fff",
+            textAlign: "center",
+            fontWeight: "bold",
+            borderRadius: "5px",
+            display: "inline-block",
+            padding:1
+          }}
+        >
+          Deal Details for {selectedFilters.years?.[0] || "N/A"}
+        </Typography>
+        </Marquee>
+        </Box>
       {loading ? (
         <CircularProgress />
       ) : error ? (
