@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { Box, TextField } from "@mui/material";
+import { Box, Card, CardContent, TextField } from "@mui/material";
 
 interface GapDataTableProps {
   data: any[];
@@ -201,47 +201,52 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
   ];
 
   return (
-    <Box
-      sx={{ height: 600, width: "100%", overflowX: "auto", padding: "10px" }}
-    >
-      <Box sx={{ display: "flex", marginBottom: 2, marginLeft: 2 }}>
-        <TextField
-          label="Search by Ticker"
-          variant="outlined"
-          size="small"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ width: "200px" }}
-        />
-      </Box>
+    <Box mb={10} sx={{ height: 600, width: "100%" }}>
+      <Card>
+        <CardContent>
+          <Box sx={{ display: "flex", marginBottom: 2 }}>
+            <TextField
+              label="Search by Ticker"
+              variant="outlined"
+              size="small"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ width: "200px" }}
+            />
+          </Box>
+      <Box sx={{ height: 600, width: "100%", marginTop: 3 }}>
 
-      <DataGrid
-        rows={filteredRows}
-        columns={columns}
-        pageSizeOptions={[25, 50, 100]}
-        disableRowSelectionOnClick
-        rowHeight={35}
-        sx={{
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "transparent",
-            fontWeight: "bold",
-            color: "#002060",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: "bold",
-            fontSize: "12px",
-          },
-          "& .MuiDataGrid-cell": {
-            color: "#000000",
-            fontSize: "12px",
-            padding: "4px",
-          },
-          "& .MuiDataGrid-row:nth-of-type(odd)": {
-            backgroundColor: "#F5F5F5",
-          },
-        }}
-      />
-    </Box>
+          <DataGrid
+            rows={filteredRows}
+            columns={columns}
+            pageSizeOptions={[25, 50, 100]}
+            disableRowSelectionOnClick
+            rowHeight={35}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "transparent",
+                fontWeight: "bold",
+                color: "#002060",
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold",
+                fontSize: "12px",
+              },
+              "& .MuiDataGrid-cell": {
+                color: "#000000",
+                fontSize: "12px",
+                padding: "4px",
+              },
+              "& .MuiDataGrid-row:nth-of-type(odd)": {
+                backgroundColor: "#F5F5F5",
+              },
+            }}
+          />
+            </Box>
+
+        </CardContent>
+      </Card>
+  </Box>
   );
 };
 
