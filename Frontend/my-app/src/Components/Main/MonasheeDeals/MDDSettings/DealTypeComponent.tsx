@@ -238,7 +238,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, select
               sx={{ backgroundColor: '#16303d', marginTop: 2, color: 'white', '&:hover': { backgroundColor: '#c8012b' } }}
               onClick={() => handleClick(Number(year))}
             >
-              Click Here
+              Click Here for Deal Details
             </Button>
           </Paper>
         );
