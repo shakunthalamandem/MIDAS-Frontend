@@ -165,42 +165,42 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
     { 
       field: "allocation_return", 
       headerName: "Monashee Actual Allocation PnL(Gross)", 
-      width: 150,
+      width: 280,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     { 
       field: "model_actual_return", 
       headerName: "Model PnL With Actual Allocation(Gross)", 
-      width: 160,
+      width: 260,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     { 
       field: "model_return_1_allocation", 
       headerName: "Model PnL with Model Allocation", 
-      width: 180,
+      width: 210,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     { 
       field: "am_return", 
       headerName: "Monashee Actual AM PnL(Gross)", 
-      width: 140,
+      width: 215,
       renderCell: (params) => `${params.value}`,
         sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     { 
       field: "model_am_return", 
       headerName: "Model PnL with Model AM(Gross)", 
-      width: 150,
+      width: 220,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "monahsee_actual_total", 
       headerName: "Monashee Actual Total PnL(Gross)",
-      width: 150,
+      width: 220,
       renderCell: (params) => {
         return `${params.value}`;
       },
@@ -209,7 +209,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
     { 
       field: "model_actual_total", 
       headerName: "Model Actual Total PnL(Gross)", 
-      width: 150,
+      width: 220,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
