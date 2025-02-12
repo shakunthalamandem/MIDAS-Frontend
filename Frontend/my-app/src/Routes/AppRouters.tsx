@@ -14,11 +14,6 @@ import ErrorBoundary from "../Pages/ErrorBoundary";
 import AuthGuard from "./AuthGuard";
 import Logout from "../Components/Main/HomePage/Authentication/Logout";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
-import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
-import DealStats from "../Components/Main/MonasheeDeals/MddGraphs/DealStats";
-import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount";
-import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
-import MDDSelectedTicker from "../Components/Main/MonasheeDeals/MddGraphs/MDDSelectedTicker";
 import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/DetailedGapData";
 
 // Your tab components (example imports)
