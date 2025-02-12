@@ -191,7 +191,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
   ];
 
   return (
-    <Box mb={10} sx={{ height: 600, width: "100%" }}>
+    <Box mb={15}  sx={{ height: 600, width: "100%" }}>
       <Card>
         <CardContent>
           <Box sx={{ display: "flex", marginBottom: 2 }}>
@@ -212,6 +212,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
             pageSizeOptions={[25, 50, 100]}
             disableRowSelectionOnClick
             rowHeight={35}
+            
             sx={{
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "transparent",
