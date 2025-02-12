@@ -70,6 +70,10 @@ const formatValue = (value: number, selectedField: string): string => {
     precision = 0; // Round to 0 decimal places for these fields
   }
 
+  if (selectedField === "count") {
+    return `${sign}${prefix}${absValue.toFixed(precision)}${suffix}`;
+  }
+
   if (absValue >= 1_000_000_000) {
     return `${sign}${prefix}${(absValue / 1_000_000_000).toFixed(precision)}B${suffix}`;
   }

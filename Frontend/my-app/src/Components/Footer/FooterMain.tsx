@@ -71,10 +71,10 @@ const FooterMain: React.FC = () => {
         
       </Box>
       <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-            Version 1.0 - Updated February 7, 2025
+            Version 1.01 - Updated February 12, 2025
           </Typography>
           <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-            Data as of February 6, 2025
+            Data as of February 10, 2025
           </Typography>
       <Box
         sx={{

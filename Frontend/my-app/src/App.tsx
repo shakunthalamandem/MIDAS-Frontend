@@ -5,6 +5,7 @@ import NavbarMain from './Components/Navbar/NavBarMain';
 import FooterMain from './Components/Footer/FooterMain';
 import ScrollToTopButton from './Components/Main/HomePage/Authentication/ScrollToTopButton';
 import Box from '@mui/material/Box';
+import SecurityLayer from './Tests/SecurityLayer';
 
 const App: React.FC = () => {
   return (
@@ -12,9 +13,11 @@ const App: React.FC = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh', // Ensures the page takes the full viewport height
+        minHeight: '100vh',
       }}
     >
+            <SecurityLayer />
+
       <Router>
         <NavbarMain />
         <Box

@@ -174,6 +174,7 @@ const token = localStorage.getItem("access_token");
       sx={{
         width: '100%', // Ensure the card takes the full width
         marginTop: 2,
+        marginBottom: 2,
         borderRadius: 3,
         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
         bgcolor: '#fdf7ff',
@@ -194,7 +195,7 @@ const token = localStorage.getItem("access_token");
         </Grid>
 
         {/* Second row with two tables */}
-        <Grid container spacing={3} sx={{ marginTop: 3 }}>
+        <Grid container spacing={3} sx={{ marginTop: 3 ,marginBottom:3}}>
           {data &&
             Object.entries(data).slice(2, 4).map(([section, values], index) =>
               renderSection(section, values)

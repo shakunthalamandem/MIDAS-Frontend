@@ -83,19 +83,31 @@ const WeeklyStatsChart: React.FC = () => {
     );
   }
 
-  const chartData = Object.keys(data["2022"] || {}).map((week) => {
-    return {
-      name: week,
-      "2024": data["2024"]?.[week]?.cumulative_count,
-      "2025": data["2025"]?.[week]?.cumulative_count,
-      Average: data["average"]?.[week]?.cumulative_count,
+  const highestWeek2025 = Object.keys(data["2025"] || {}).reduce((highest, week) => {
+    const cumulativeCount2025 = data["2025"]?.[week]?.cumulative_count || 0;
+    return cumulativeCount2025 > (data["2025"]?.[highest]?.cumulative_count || 0) ? week : highest;
+  }, "");
+  
+  const chartData = Object.keys(data["2022"] || {})
+    .filter((week) => {
+      // Only include weeks up to the highest week in 2025
+      return week <= highestWeek2025;
+    })
+    .map((week) => {
+      return {
+        name: week,
+        "2023": data["2023"]?.[week]?.cumulative_count,
+        "2024": data["2024"]?.[week]?.cumulative_count,
+        "2025": data["2025"]?.[week]?.cumulative_count,
+        Average: data["average"]?.[week]?.cumulative_count,
 
-      "2024 Size": data["2024"]?.[week]?.cumulative_deal_volume,
-      "2025 Size": data["2025"]?.[week]?.cumulative_deal_volume,
-      "Average Size": data["average"]?.[week]?.cumulative_deal_volume,
-    };
-  });
-
+        "2023 Size": data["2023"]?.[week]?.cumulative_deal_volume,
+        "2024 Size": data["2024"]?.[week]?.cumulative_deal_volume,
+        "2025 Size": data["2025"]?.[week]?.cumulative_deal_volume,
+        "Average Size": data["average"]?.[week]?.cumulative_deal_volume,
+      };
+    });
+  
   return (
     <Container maxWidth="lg">
       <Card sx={{ boxShadow: 3, marginTop: 8, marginBottom: 10 }}>
@@ -113,14 +125,18 @@ const WeeklyStatsChart: React.FC = () => {
 
               {showCount ? (
                 <>
-                  <Line type="monotone" dataKey="2024" stroke="#ff7300" name="2024" />
+                  <Line type="monotone" dataKey="2023" stroke="#ff7300" name="2023" />
+                  <Line type="monotone" dataKey="2024" stroke="#770500" name="2024" />
+
                   <Bar dataKey="2025" barSize={10} fill="#247B5B" name="2025" />
 
                   <Line type="monotone" dataKey="Average" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               ) : (
                 <>
-                  <Line type="monotone" dataKey="2024 Size" stroke="#8a009a" name="2024" />
+                  <Line type="monotone" dataKey="2023 Size" stroke="#8a009a" name="2023" />
+                  <Line type="monotone" dataKey="2024 Size" stroke="#770500" name="2024" />
+
                   <Bar dataKey="2025 Size" barSize={10} fill="#247B5B" name="2025" />
                   <Line type="monotone" dataKey="Average Size" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>

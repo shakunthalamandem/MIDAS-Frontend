@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Tabs, Tab, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Tabs, Tab, Button, Box, Typography } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -54,13 +54,61 @@ const NavbarMain: React.FC = () => {
 
   const isLoggedIn = !!localStorage.getItem('access_token');
 
+  const isMarketOrPerformanceSelected =
+    location.pathname === '/capital-markets' || location.pathname === '/monashee-deals';
+
   return (
     <>
-      <AppBar position="sticky" sx={{ backgroundColor: '#FFFFFF', paddingX: { xs: 2, sm: 5 } }}>
+      <AppBar position="sticky" sx={{ backgroundColor: '#FFFFFF' }}>
         {/* Conditionally show TradingViewTickerTape only when on the 'Investment Strategies' page */}
         {(location.pathname === '/strategies' || location.pathname.startsWith('/technical/')) && (
           <Box sx={{ marginBottom: '50px' }}>
             <TradingViewTickerTape />
+          </Box>
+        )}
+
+        {/* Scrollbar container */}
+        {isMarketOrPerformanceSelected && (
+          <Box
+            sx={{
+              width: '100%',
+              backgroundColor: '#002060',
+              color: '#fff',
+              padding: '5px 0',
+              textAlign: 'center',
+              fontWeight: 'bold',
+              position: 'sticky',
+              top: 0,
+              zIndex: 1100, // Ensure it stays on top of the navbar
+              fontSize: '14px',
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                '& .marquee': {
+                  display: 'inline-block',
+                  whiteSpace: 'nowrap',
+                  animation: 'marquee 40s linear infinite',
+                  color: '#fff',
+                  fontWeight: 'bold',
+                  fontStyle: 'italic',
+                  paddingLeft: '10px',
+                  paddingRight: '50px',
+                },
+                '@keyframes marquee': {
+                  '0%': { transform: 'translateX(100%)' },
+                  '100%': { transform: 'translateX(-100%)' },
+                },
+                '& .marquee:hover': {
+                  animationPlayState: 'paused',
+                },
+              }}
+            >
+              <span className="marquee">
+                MIDAS is for internal usage only. All Data and Analytics are Confidential
+              </span>
+            </Typography>
           </Box>
         )}
 

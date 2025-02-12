@@ -178,7 +178,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     { field: "fo_type", headerName: "FO Type", width: 100 },
     {
       field: "t1m_returns",
-      headerName: "T + 1M Excess Returns",
+      headerName: "T + 1M Absolute Returns",
       width: 200,
       renderCell: (params) => params.value,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
