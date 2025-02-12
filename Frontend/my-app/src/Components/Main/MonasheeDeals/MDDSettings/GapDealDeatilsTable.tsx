@@ -60,7 +60,7 @@ const GapDealDeatilsTable: React.FC = () => {
   }, [searchParams]);
   console.log("dataset",data)
   return (
-    <div>    
+    <>    
          {loading ? (
         <CircularProgress />
       ) : error ? (
@@ -70,7 +70,7 @@ const GapDealDeatilsTable: React.FC = () => {
       ) : (
         <GapDataTable data={data} />
       )} 
-</div>
+</>
   )
 }
 
