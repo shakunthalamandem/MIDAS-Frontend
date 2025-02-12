@@ -17,14 +17,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
     );
     return isNaN(cleanedValue) ? 0 : cleanedValue;
   };
-  // const formatDealSize = (dealSize: any) => {
-  //   const cleanedValue = cleanDealSize(dealSize);
-  //   const formattedValue =
-  //     cleanedValue < 0
-  //       ? `-$${Math.abs(cleanedValue).toLocaleString("en-US")}`
-  //       : `$${cleanedValue.toLocaleString("en-US")}`;
-  //   return formattedValue;
-  // };
+
   const formatDealSize = (dealSize: any) => {
     const cleanedValue = cleanDealSize(dealSize);
     let formattedNumber;
@@ -152,6 +145,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       width: 180,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+
     },
     {
       field: "total_model_capital",
@@ -159,111 +153,122 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       width: 180,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+
     }
     
 ,    
-    { 
-      field: "allocation_return", 
-      headerName: "Monashee Actual Allocation PnL(Gross)", 
-      width: 280,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-    { 
-      field: "model_actual_return", 
-      headerName: "Model PnL With Actual Allocation(Gross)", 
-      width: 260,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-    { 
-      field: "model_return_1_allocation", 
-      headerName: "Model PnL with Model Allocation", 
-      width: 210,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-    { 
-      field: "am_return", 
-      headerName: "Monashee Actual AM PnL(Gross)", 
-      width: 215,
-      renderCell: (params) => `${params.value}`,
-        sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-    { 
-      field: "model_am_return", 
-      headerName: "Model PnL with Model AM(Gross)", 
-      width: 220,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-    {
-      field: "monahsee_actual_total", 
-      headerName: "Monashee Actual Total PnL(Gross)",
-      width: 220,
-      renderCell: (params) => {
-        return `${params.value}`;
-      },
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-    { 
-      field: "model_actual_total", 
-      headerName: "Model Actual Total PnL(Gross)", 
-      width: 220,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-  ];
+{ 
+  field: "allocation_return", 
+  headerName: "Monashee Actual Allocation PnL(Gross)", 
+  width: 280,
+  renderCell: (params) => `${params.value}`,
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  cellClassName: "first-column-border",
 
-  return (
-    <Box mb={15}  sx={{ height: 600, width: "100%" }}>
-      <Card>
-        <CardContent>
-          <Box sx={{ display: "flex", marginBottom: 2 }}>
-            <TextField
-              label="Search by Ticker"
-              variant="outlined"
-              size="small"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              sx={{ width: "200px" }}
-            />
-          </Box>
+},
+{ 
+  field: "model_actual_return", 
+  headerName: "Model PnL With Actual Allocation(Gross)", 
+  width: 260,
+  renderCell: (params) => `${params.value}`,
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+},
+{ 
+  field: "model_return_1_allocation", 
+  headerName: "Model PnL with Model Allocation", 
+  width: 210,
+  renderCell: (params) => `${params.value}`,
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  cellClassName: "last-columns-border",
+
+},
+{ 
+  field: "am_return", 
+  headerName: "Monashee Actual AM PnL(Gross)", 
+  width: 215,
+  renderCell: (params) => `${params.value}`,
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+},
+{ 
+  field: "model_am_return", 
+  headerName: "Model PnL with Model AM(Gross)", 
+  width: 220,
+  renderCell: (params) => `${params.value}`,
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  cellClassName: "last-columns-border",
+},
+{
+  field: "monahsee_actual_total", 
+  headerName: "Monashee Actual Total PnL(Gross)",
+  width: 220,
+  renderCell: (params) => {
+    return `${params.value}`;
+  },
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+},
+{ 
+  field: "model_actual_total", 
+  headerName: "Model Actual Total PnL(Gross)", 
+  width: 220,
+  renderCell: (params) => `${params.value}`,
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  cellClassName: "last-columns-border",
+},
+];
+
+return (
+<Box mb={15} sx={{ height: 600, width: "100%" }}>
+  <Card>
+    <CardContent>
+      <Box sx={{ display: "flex", marginBottom: 2 }}>
+        <TextField
+          label="Search by Ticker"
+          variant="outlined"
+          size="small"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{ width: "200px" }}
+        />
+      </Box>
       <Box sx={{ height: 600, width: "100%", marginTop: 3 }}>
+        <DataGrid
+          rows={filteredRows}
+          columns={columns}
+          pageSizeOptions={[25, 50, 100]}
+          disableRowSelectionOnClick
+          rowHeight={35}
 
-          <DataGrid
-            rows={filteredRows}
-            columns={columns}
-            pageSizeOptions={[25, 50, 100]}
-            disableRowSelectionOnClick
-            rowHeight={35}
-            
-            sx={{
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "transparent",
-                fontWeight: "bold",
-                color: "#002060",
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                fontWeight: "bold",
-                fontSize: "12px",
-              },
-              "& .MuiDataGrid-cell": {
-                color: "#000000",
-                fontSize: "12px",
-                padding: "4px",
-              },
-              "& .MuiDataGrid-row:nth-of-type(odd)": {
-                backgroundColor: "#F5F5F5",
-              },
-            }}
-          />
-            </Box>
-
-        </CardContent>
-      </Card>
-  </Box>
-  );
+          sx={{
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "transparent",
+              fontWeight: "bold",
+              color: "#002060",
+            },
+            "& .MuiDataGrid-columnHeaderTitle": {
+              fontWeight: "bold",
+              fontSize: "12px",
+            },
+            "& .MuiDataGrid-cell": {
+              color: "#000000",
+              fontSize: "12px",
+              padding: "4px",
+            },
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "#F5F5F5",
+            },
+            "& .first-column-border": {
+              borderLeft: "2px solid rgb(110, 110, 110)",
+            },
+            "& .last-columns-border": {
+              borderRight: "2px solid rgb(110, 110, 110)",
+            },
+          }}
+        />
+      </Box>
+    </CardContent>
+  </Card>
+</Box>
+);
 };
 
 export default GapDataTable;
