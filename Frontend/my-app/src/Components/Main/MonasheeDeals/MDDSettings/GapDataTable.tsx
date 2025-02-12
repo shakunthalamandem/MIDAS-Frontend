@@ -32,27 +32,25 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       id: index,
       ...row,
       deal_size: row.deal_size ? formatDealSize(row.deal_size.toFixed()) : "$0",
-      
       allocation_return: row.allocation_return ? `$${row.allocation_return.toFixed()}` : "0%",
       allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed()}%` : "0%",
       model_am_return: row.model_am_return ? `${formatDealSize(row.model_am_return.toFixed())}` : "",
-      model_am_capital: row.model_am_capital ? `${formatDealSize(row.model_am_capital.toFixed())}` : "",
+      total_model_capital: row.total_model_capital ? `${formatDealSize(row.total_model_capital.toFixed())}` : "$0",
+      model_am_capital: row.model_am_capital ? `${formatDealSize(row.model_am_capital.toFixed())}` : "$0",
       model_return_1_allocation: row.model_return_1_allocation ? `${formatDealSize(row.model_return_1_allocation.toFixed())}` : "",
       model_capital_1_allocation: row.model_capital_1_allocation ? `${formatDealSize(row.model_capital_1_allocation.toFixed())}` : "",
       model_actual_return: row.model_actual_return ? `${formatDealSize(row.model_actual_return.toFixed())}` : "",
-      // allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed(2)}%` : "",
-      // allocation_return: row.allocation_return ? `${row.allocation_return.toFixed(2)}%` : "",
       am_return: row.am_return ? `${formatDealSize(row.am_return.toFixed())}` : "",
       t1d_return_from_bloomberg: row.t1d_return_from_bloomberg ? `${row.t1d_return_from_bloomberg.toFixed(2)}%` : "",
       t1m_return_from_dealogic: row.t1m_return_from_dealogic ? `${row.t1m_return_from_dealogic.toFixed(2)}%` : "",
       total_committed_capital: row.total_committed_capital ? `${formatDealSize(row.total_committed_capital.toFixed())}` : "",
-      am_capital_committed: row.am_capital_committed ? `${formatDealSize(row.am_capital_committed.toFixed())}` : "",
-      allocated_capital: row.allocated_capital ? `${formatDealSize(row.allocated_capital.toFixed())}` : "",
+      am_capital_committed: row.am_capital_committed ? `${formatDealSize(row.am_capital_committed.toFixed())}` : "$0",
+      allocated_capital: row.allocated_capital ? `${formatDealSize(row.allocated_capital.toFixed())}` : "$0",
       allocation_price: row.allocation_price ? `${row.allocation_price.toFixed()}%` : "",
       subscription_bid_shares: row.subscription_bid_shares ? `${row.subscription_bid_shares.toFixed(2)}%` : "",
-      allocation_deal_size_percentage: row.allocation_deal_size_percentage ? `${row.allocation_deal_size_percentage.toFixed(2)}%` : "",
-      // deal_size: row.deal_size ? `${row.deal_size.toFixed(2)}%` : "",
-      
+      allocation_deal_size_percentage: row.allocation_deal_size_percentage ? `${row.allocation_deal_size_percentage.toFixed(2)}%` : "$0",
+      model_actual_total: row.model_actual_total ? `${formatDealSize(row.model_actual_total.toFixed())}` : "$0",
+      monahsee_actual_total: row.monahsee_actual_total ? `${formatDealSize(row.monahsee_actual_total.toFixed())}` : "$0",
     }));
 
   // Filter rows based on search query
@@ -117,14 +115,6 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
     renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-
-    {
-      field: "allocated_capital",
-      headerName: "Allocated Capital",
-      width: 120,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
     {
       field: "am_capital_committed",
       headerName: "AM Capital Committed",
@@ -156,6 +146,13 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
     { 
       field: "model_am_capital", 
       headerName: "Model AM Capital", 
+      width: 180,
+      renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+    { 
+      field: "total_model_capital", 
+      headerName: "Total Model Capital", 
       width: 180,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
@@ -195,16 +192,24 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { 
-      field: "allocation_return" + "am_return", 
-      headerName: "Monashee Actual Total PnL(Gross)", 
+    // { 
+    //   field: "allocation_return" + "am_return", 
+    //   headerName: "Monashee Actual Total PnL(Gross)", 
+    //   width: 150,
+    //   renderCell: (params) => `${params.value}`,
+    //   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    // },
+    {
+      field: "monahsee_actual_total", 
+      headerName: "Monashee Actual Total PnL(Gross)",
       width: 150,
-      renderCell: (params) => `${params.value}`,
+      renderCell: (params) => {
+        return `${params.value}`;
+      },
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    
     { 
-      field: "model_return_1_allocation" + "model_am_return", 
+      field: "model_actual_total", 
       headerName: "Model Actual Total PnL(Gross)", 
       width: 150,
       renderCell: (params) => `${params.value}`,
