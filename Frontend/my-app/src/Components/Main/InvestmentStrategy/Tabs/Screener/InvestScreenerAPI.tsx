@@ -86,7 +86,6 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
       {/* Pass the fetched data to the grid component */}
       <InvestScreenerMain rows={rows} loading={loading} totalRows={totalRows} />
       <CumulativeReturns tickerList={tickers} />
-      <CumulativeyearlyChart />
     </Box>
   );
 };
