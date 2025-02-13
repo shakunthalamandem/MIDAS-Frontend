@@ -52,7 +52,6 @@ const formatValue = (value: number, selectedField: string): string => {
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
 
-  // Determine prefix and suffix based on the selected field
   const prefix = ["deal_size", "avg_deal_size"].includes(selectedField)
     ? "$"
     : "";
@@ -65,8 +64,7 @@ const formatValue = (value: number, selectedField: string): string => {
     ? "%"
     : "";
 
-  // Determine the rounding precision based on selectedField
-  let precision = 2; // Default precision for most fields
+  let precision = 2; 
 
   if (["count", "deal_size", "avg_deal_size"].includes(selectedField)) {
     precision = 0; // Round to 0 decimal places for these fields
