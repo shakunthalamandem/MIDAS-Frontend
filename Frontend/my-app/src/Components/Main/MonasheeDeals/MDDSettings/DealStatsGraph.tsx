@@ -7,20 +7,20 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  LineChart,
-  Line,
+  ScatterChart,
+  Scatter,
 } from "recharts";
 import {
   Box,
+  Chip,
+  Typography,
+  CircularProgress,
   RadioGroup,
   FormControlLabel,
   Radio,
   Container,
   Card,
-  Stack,
-  Chip,
-  Typography,
-  CircularProgress,
+
 } from "@mui/material";
 
 interface ChartData {
@@ -215,34 +215,14 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
     "#2563EB", // Bright Blue
   ];
 
-  const isLineChart = [
-    "weighted_allocation_deal_size_percentage",
-    "weighted_allocation_percentage",
-  ].includes(selectedField);
-
   return (
     <Container>
       <Card elevation={5}>
-        <Typography
-          variant="h5"
-          sx={{ color: "#002060", fontWeight: "bold", marginTop: 3 }}
-        >
+        <Typography variant="h5" sx={{ color: "#002060", fontWeight: "bold", marginTop: 3 }}>
           Deal Statistics
         </Typography>
-        <Box
-          sx={{
-            padding: 1,
-            borderRadius: "8px",
-            margin: 2,
-          }}
-        >
-          <Box
-            display="flex"
-            justifyContent="center"
-            mb={2}
-            gap={1}
-            flexWrap="wrap"
-          >
+        <Box sx={{ padding: 1, borderRadius: "8px", margin: 2 }}>
+          <Box display="flex" justifyContent="center" mb={2} gap={1} flexWrap="wrap">
             {dataFieldsWithLabels.map(({ label, value }) => (
               <Chip
                 key={value}
@@ -252,19 +232,12 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                 variant={selectedField === value ? "filled" : "outlined"}
                 sx={{
                   color: selectedField === value ? "#FFFFFF" : "#3f51b5",
-                  backgroundColor:
-                    selectedField === value ? "#9b0000" : "#dfdfdf",
-                  border:
-                    selectedField === value
-                      ? "2px solid #9b0000"
-                      : "2px solid #dfdfdf",
+                  backgroundColor: selectedField === value ? "#9b0000" : "#dfdfdf",
+                  border: selectedField === value ? "2px solid #9b0000" : "2px solid #dfdfdf",
                   fontWeight: selectedField === value ? "bold" : "normal",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    backgroundColor:
-                      selectedField === value
-                        ? "#7b0000"
-                        : "rgba(63, 81, 181, 0.1)",
+                    backgroundColor: selectedField === value ? "#7b0000" : "rgba(63, 81, 181, 0.1)",
                   },
                 }}
               />
@@ -273,13 +246,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
         </Box>
 
         {loading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress color="primary" />
             <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
               Loading... Please Wait
@@ -287,34 +254,23 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
           </Box>
         ) : (
           <ResponsiveContainer width="100%" height={450}>
-            {isLineChart ? (
-              <LineChart
-                data={chartData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-              >
+            {selectedField === "weighted_allocation_deal_size_percentage" ||
+            selectedField === "weighted_allocation_percentage" ? (
+              // ScatterChart for specific fields
+              <ScatterChart                 data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
                 <XAxis
                   dataKey="year"
                   stroke="#b2b2b2"
                   tick={{ fill: "#000000", fontSize: 12 }}
-                  label={{
-                    value: "Year",
-                    position: "insideBottom",
-                    dy: 10,
-                    fill: "#002060",
-                  }}
+                  label={{ value: "Year", position: "insideBottom", dy: 10, fill: "#002060" }}
                 />
                 <YAxis
                   stroke="#000"
                   tickFormatter={(value) => formatValue(value, selectedField)}
                 />
-                <Tooltip
-                  formatter={(value) =>
-                    formatValue(value as number, selectedField)
-                  }
-                />
-                <Legend
-                  wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }}
-                />
+                <Tooltip formatter={(value) => formatValue(value as number, selectedField)} />
+                <Legend wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }} />
                 {chartData.length > 0 &&
                   Object.keys(
                     chartData.reduce(
@@ -327,48 +283,25 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
                       {} as Record<string, boolean>
                     )
                   ).map((key, index) => (
-                    <Line
+                    <Scatter
                       key={index}
                       dataKey={key}
-                      stroke={barColors[index % barColors.length]}
-                      strokeWidth={2}
-                      // dot={false}
-                      activeDot={{ r: 8 }}
+                      fill={barColors[index % barColors.length]}
                     />
                   ))}
-              </LineChart>
+              </ScatterChart>
             ) : (
-              <BarChart
-                data={chartData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-              >
-                {/* X-Axis */}
+              // BarChart for other fields
+              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
                 <XAxis
                   dataKey="year"
                   stroke="#b2b2b2"
                   tick={{ fill: "#000000", fontSize: 12 }}
-                  label={{
-                    value: "Year",
-                    position: "insideBottom",
-                    dy: 10,
-                    fill: "#002060",
-                  }}
+                  label={{ value: "Year", position: "insideBottom", dy: 10, fill: "#002060" }}
                 />
-
-                <YAxis
-                  stroke="#000"
-                  tickFormatter={(value) => formatValue(value, selectedField)}
-                />
-                <Tooltip
-                  formatter={(value) =>
-                    formatValue(value as number, selectedField)
-                  }
-                />
-
-                <Legend
-                  wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }}
-                />
-
+                <YAxis stroke="#000" tickFormatter={(value) => formatValue(value, selectedField)} />
+                <Tooltip formatter={(value) => formatValue(value as number, selectedField)} />
+                <Legend wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }} />
                 {chartData.length > 0 &&
                   Object.keys(
                     chartData.reduce(
