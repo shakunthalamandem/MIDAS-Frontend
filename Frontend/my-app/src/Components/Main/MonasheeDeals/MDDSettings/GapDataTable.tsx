@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Card, CardContent, TextField } from "@mui/material";
+import { Link } from "react-router-dom";
 
 interface GapDataTableProps {
   data: any[];
@@ -76,8 +77,31 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
   }, [rows, searchQuery]);
 
   const columns: GridColDef[] = [
-    { field: "ticker", headerName: "Ticker", width: 100 },
-    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
+ {
+      field: "ticker",
+      headerName: "Ticker",
+      width: 100,
+      headerAlign: "left",
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "left",
+            alignItems: "left",
+            height: "100%",
+          }}
+        >
+
+          <Link
+            to={`/monasheeperformance/${params.value}`}
+            style={{ color: "brown", fontWeight: "bold",paddingLeft:15,textDecoration: "none" }}
+            target="_blank"
+          >
+            {params.value}
+          </Link>
+        </div>
+      ),
+    },    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "deal_type", headerName: "Deal Type", width: 80 },
     { field: "broad_region", headerName: "Region", width: 80 },
