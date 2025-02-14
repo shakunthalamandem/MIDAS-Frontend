@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import logo from '../../Assets/images/Monashee-Cap-Logos.png';
 import TradingViewTickerTape from '../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape';
-import Logs from './logs';
+import Logs from '../Main/HomePage/Authentication/Logs';
 
 const pages = ['Equity Market Opportunity', 'Monashee Performance & Efficiency', 'PRIME Investment Strategies'];
 
@@ -14,6 +14,7 @@ const NavbarMain: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const location = useLocation();
+  const [openLogsDialog, setOpenLogsDialog] = useState(false);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -159,24 +160,28 @@ const NavbarMain: React.FC = () => {
               ))}
             </Tabs>
           </Box>
-          <div>
-          {isLoggedIn ? (
-            <Button
-              sx={{
-                color: 'black',
-                fontWeight: 'bold',
-                marginRight:'20px'
-               
-              }}
-              // onClick={() => setOpenDialog(true)}
-            >
-              User Logs
-            </Button>
-          ):(
-            <p>Hello ungle</p>
-          )}
-          {openDialog && <Logs />}
-</div>
+
+<Button
+  sx={{
+    color: 'black',
+    fontWeight: 'bold',
+    marginRight: '20px',
+  }}
+  onClick={() => setOpenLogsDialog(true)} // Opens logs dialog
+>
+  User Logs
+</Button>
+
+<Dialog open={openLogsDialog} onClose={() => setOpenLogsDialog(false)}>
+  <DialogContent>
+    <Logs />
+
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenLogsDialog(false)}>Close</Button>
+  </DialogActions>
+</Dialog>
+
           {isLoggedIn ? (
             <Button
               sx={{

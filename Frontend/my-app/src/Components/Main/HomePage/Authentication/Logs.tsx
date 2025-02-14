@@ -8,7 +8,6 @@ import {
   DialogActions,
   IconButton,
   TextField,
-  Typography,
   CircularProgress,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -21,14 +20,14 @@ const Logs = () => {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState("activity");
   const [search, setSearch] = useState("");
-
-  const isAdmin = localStorage.getItem("is_admin") === "true";
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const fetchLogs = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.get("/api/user-logs/", {
+      const response = await axios.get(          `${apiUrl}/api/user_activity/`,
+        {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLogs(response.data);
@@ -36,12 +35,11 @@ const Logs = () => {
       console.error("Error fetching logs:", error);
     }
     setLoading(false);
-  };
 
+  };
   useEffect(() => {
     if (open) fetchLogs();
   }, [open]);
-
   const handleSearch = (data: any[]) => {
     return data.filter((item) =>
       Object.values(item).some((value) =>
@@ -71,31 +69,44 @@ const Logs = () => {
 
   const getRows = () => {
     if (!logs) return [];
-    if (view === "activity") return handleSearch(logs.user_activity);
-    if (view === "details") return handleSearch(logs.user_details);
-    if (view === "summary") {
-        return handleSearch(
-            Object.entries(logs.monthly_summary).flatMap(([year, monthsObj]) =>
-              Object.entries(monthsObj as Record<string, number>).map(([month, count]) => ({
-                id: `${year}-${month}`,
-                year,
-                month,
-                count,
-              }))
-            )
-          );
-          
+  
+    if (view === "activity") {
+      return handleSearch(logs.user_activity).map((item, index) => ({
+        id: item.username + "-" + index, // Generate unique ID
+        ...item,
+      }));
     }
+  
+    if (view === "details") {
+      return handleSearch(logs.user_details).map((item, index) => ({
+        id: item.username + "-" + index, // Generate unique ID
+        ...item,
+      }));
+    }
+  
+    if (view === "summary") {
+      return handleSearch(
+        Object.entries(logs.monthly_summary).flatMap(([year, monthsObj]) =>
+          Object.entries(monthsObj as Record<string, number>).map(([month, count], index) => ({
+            id: `${year}-${month}-${index}`, // Generate unique ID
+            year,
+            month,
+            count,
+          }))
+        )
+      );
+    }
+  
     return [];
   };
+  
 
   return (
     <Box textAlign="center" mt={2}>
-      {isAdmin && (
-        <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
-          User Logs
-        </Button>
-      )}
+      {/* Removed the condition that checks if the user is admin */}
+      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+        User Logs
+      </Button>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>
@@ -139,7 +150,7 @@ const Logs = () => {
             <CircularProgress />
           ) : (
             <Box sx={{ height: 400 }}>
-              <DataGrid rows={getRows()} columns={columns[view]}/>
+              <DataGrid rows={getRows()} columns={columns[view]} />
             </Box>
           )}
         </DialogContent>
