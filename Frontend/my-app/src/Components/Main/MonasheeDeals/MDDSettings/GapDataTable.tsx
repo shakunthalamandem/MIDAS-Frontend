@@ -71,12 +71,12 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
 
   const filteredRows = useMemo(() => {
     return preprocessRows(rows).filter((row) =>
-      row.ticker_us?.toLowerCase().includes(searchQuery.toLowerCase())
+      row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [rows, searchQuery]);
 
   const columns: GridColDef[] = [
-    { field: "ticker_us", headerName: "Ticker", width: 100 },
+    { field: "ticker", headerName: "Ticker", width: 100 },
     { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "deal_type", headerName: "Deal Type", width: 80 },
