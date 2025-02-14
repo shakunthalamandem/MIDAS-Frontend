@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
-import { AppBar, Toolbar, Tabs, Tab, Button, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@mui/material';
-import { useMediaQuery } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import logo from '../../Assets/images/Monashee-Cap-Logos.png';
-import TradingViewTickerTape from '../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape';
+import React, { useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Tabs,
+  Tab,
+  Button,
+  Box,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+} from "@mui/material";
+import { useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import logo from "../../Assets/images/Monashee-Cap-Logos.png";
+import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
 
-const pages = ['Equity Market Opportunity', 'Monashee Performance & Efficiency', 'PRIME Investment Strategies'];
+const pages = [
+  "Equity Market Opportunity",
+  "Monashee Performance & Efficiency",
+  "PRIME Investment Strategies",
+];
 
 const NavbarMain: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -27,19 +44,20 @@ const NavbarMain: React.FC = () => {
   };
 
   const handleNavigate = (page: string) => {
-    if (page === 'Equity Market Opportunity') navigate('/capital-markets');
-    if (page === 'Monashee Performance & Efficiency') navigate('/monashee-deals');
-    if (page === 'PRIME Investment Strategies') navigate('/strategies');
+    if (page === "Equity Market Opportunity") navigate("/capital-markets");
+    if (page === "Monashee Performance & Efficiency")
+      navigate("/monashee-deals");
+    if (page === "PRIME Investment Strategies") navigate("/strategies");
     handleCloseNavMenu();
   };
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case '/capital-markets':
+      case "/capital-markets":
         return 0;
-      case '/monashee-deals':
+      case "/monashee-deals":
         return 1;
-      case '/strategies':
+      case "/strategies":
         return 2;
       default:
         return false;
@@ -49,24 +67,26 @@ const NavbarMain: React.FC = () => {
   const handleLogout = () => {
     setLoading(true);
     setTimeout(() => {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
       setLoading(false);
       setOpenDialog(false);
-      navigate('/login');
+      navigate("/login");
     }, 1500); // Simulate API delay
   };
 
-  const isLoggedIn = !!localStorage.getItem('access_token');
+  const isLoggedIn = !!localStorage.getItem("access_token");
 
   const isMarketOrPerformanceSelected =
-    location.pathname === '/capital-markets' || location.pathname === '/monashee-deals';
+    location.pathname === "/capital-markets" ||
+    location.pathname === "/monashee-deals";
 
   return (
     <>
-      <AppBar position="sticky" sx={{ backgroundColor: '#FFFFFF' }}>
-        {(location.pathname === '/strategies' || location.pathname.startsWith('/technical/')) && (
-          <Box sx={{ marginBottom: '50px' }}>
+      <AppBar position="sticky" sx={{ backgroundColor: "#FFFFFF" }}>
+        {(location.pathname === "/strategies" ||
+          location.pathname.startsWith("/technical/")) && (
+          <Box sx={{ marginBottom: "50px" }}>
             <TradingViewTickerTape />
           </Box>
         )}
@@ -75,60 +95,79 @@ const NavbarMain: React.FC = () => {
         {isMarketOrPerformanceSelected && (
           <Box
             sx={{
-              width: '100%',
-              backgroundColor: '#002060',
-              color: '#fff',
-              padding: '5px 0',
-              textAlign: 'center',
-              fontWeight: 'bold',
-              position: 'sticky',
+              width: "100%",
+              backgroundColor: "#002060",
+              color: "#fff",
+              padding: "5px 0",
+              textAlign: "center",
+              fontWeight: "bold",
+              position: "sticky",
               top: 0,
               zIndex: 1100, // Ensure it stays on top of the navbar
-              fontSize: '14px',
+              fontSize: "14px",
             }}
           >
             <Typography
               variant="body2"
               sx={{
-                '& .marquee': {
-                  display: 'inline-block',
-                  whiteSpace: 'nowrap',
-                  animation: 'marquee 40s linear infinite',
-                  color: '#fff',
-                  fontWeight: 'bold',
-                  fontStyle: 'italic',
-                  paddingLeft: '10px',
-                  paddingRight: '50px',
+                "& .marquee": {
+                  display: "inline-block",
+                  whiteSpace: "nowrap",
+                  animation: "marquee 40s linear infinite",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  fontStyle: "italic",
+                  paddingLeft: "10px",
+                  paddingRight: "50px",
                 },
-                '@keyframes marquee': {
-                  '0%': { transform: 'translateX(100%)' },
-                  '100%': { transform: 'translateX(-100%)' },
+                "@keyframes marquee": {
+                  "0%": { transform: "translateX(100%)" },
+                  "100%": { transform: "translateX(-100%)" },
                 },
-                '& .marquee:hover': {
-                  animationPlayState: 'paused',
+                "& .marquee:hover": {
+                  animationPlayState: "paused",
                 },
               }}
             >
               <span className="marquee">
-                MIDAS is for internal usage only. All Data and Analytics are Confidential
+                MIDAS is for internal usage only. All Data and Analytics are
+                Confidential
               </span>
             </Typography>
           </Box>
         )}
 
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           {/* Logo and Title */}
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#FFFFFF' }}>
-            <img src={logo} alt="MIDAS Logo" style={{ width: '130px', height: '60px', marginRight: '10px' }} />
+          <Link
+            to="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              color: "#FFFFFF",
+            }}
+          >
+            <img
+              src={logo}
+              alt="MIDAS Logo"
+              style={{ width: "130px", height: "60px", marginRight: "10px" }}
+            />
           </Link>
 
-          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
             <Tabs
               value={getTabIndex()}
               sx={{
-                '& .MuiTabs-indicator': {
-                  backgroundColor: '#002060',
-                  display: 'none', // Set the custom indicator color here
+                "& .MuiTabs-indicator": {
+                  backgroundColor: "#002060",
+                  display: "none", // Set the custom indicator color here
                 },
               }}
             >
@@ -139,19 +178,19 @@ const NavbarMain: React.FC = () => {
                   onClick={() => handleNavigate(page)}
                   sx={{
                     minWidth: 100,
-                    fontWeight: 'bold',
-                    fontSize: '16px',
-                    color: '#bb4401',
-                    textTransform: 'none',
-                    '&.Mui-selected': {
-                      color: '#FFFFFF',
-                      backgroundColor: '#002060',
-                      borderRadius: '6px',
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                    color: "#bb4401",
+                    textTransform: "none",
+                    "&.Mui-selected": {
+                      color: "#FFFFFF",
+                      backgroundColor: "#002060",
+                      borderRadius: "6px",
                     },
-                    '&:hover': {
-                      backgroundColor: '#002060',
-                      borderRadius: '6px',
-                      color: '#FFFFFF',
+                    "&:hover": {
+                      backgroundColor: "#002060",
+                      borderRadius: "6px",
+                      color: "#FFFFFF",
                     },
                   }}
                 />
@@ -162,11 +201,11 @@ const NavbarMain: React.FC = () => {
           {isLoggedIn ? (
             <Button
               sx={{
-                color: '#FFFFFF',
-                backgroundColor: '#bb4401',
-                fontWeight: 'bold',
-                fontFamily: 'Roboto, sans-serif',
-                '&:hover': { backgroundColor: '#bb4401' },
+                color: "#FFFFFF",
+                backgroundColor: "#bb4401",
+                fontWeight: "bold",
+                fontFamily: "Roboto, sans-serif",
+                "&:hover": { backgroundColor: "#bb4401" },
               }}
               onClick={() => setOpenDialog(true)}
             >
@@ -175,13 +214,13 @@ const NavbarMain: React.FC = () => {
           ) : (
             <Button
               sx={{
-                color: '#FFFFFF',
-                backgroundColor: '#002060',
-                fontWeight: 'bold',
-                fontFamily: 'Roboto, sans-serif',
-                '&:hover': { backgroundColor: '#002060' },
+                color: "#FFFFFF",
+                backgroundColor: "#002060",
+                fontWeight: "bold",
+                fontFamily: "Roboto, sans-serif",
+                "&:hover": { backgroundColor: "#002060" },
               }}
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
             >
               Login
             </Button>
@@ -192,18 +231,43 @@ const NavbarMain: React.FC = () => {
       {/* Logout Confirmation Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>
-          <Typography variant="h6" fontWeight="bold" color="primary">
+          <Typography variant="h6" fontWeight="bold" sx={{ color: "#002060" }}>
             Logging out...
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body1">You are about to log out. Do you want to continue?</Typography>
+          <Typography variant="body1" sx={{ color: "#333" }}>
+            You are about to log out. Do you want to continue?
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" color="primary" onClick={handleLogout} disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Yes, Log Out'}
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: "#D32F2F",
+              color: "#fff",
+              "&:hover": { bgcolor: "#B71C1C" },
+            }}
+            onClick={handleLogout}
+            disabled={loading}
+          >
+            {loading ? (
+              <CircularProgress size={24} sx={{ color: "#fff" }} />
+            ) : (
+              "Yes, Log Out"
+            )}
           </Button>
-          <Button variant="outlined" onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            variant="outlined"
+            sx={{
+              color: "#4CAF50",
+              borderColor: "#4CAF50",
+              "&:hover": { bgcolor: "rgba(76, 175, 80, 0.1)" },
+            }}
+            onClick={() => setOpenDialog(false)}
+          >
+            Cancel
+          </Button>
         </DialogActions>
       </Dialog>
     </>
