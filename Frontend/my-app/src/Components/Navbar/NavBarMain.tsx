@@ -5,6 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import logo from '../../Assets/images/Monashee-Cap-Logos.png';
 import TradingViewTickerTape from '../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape';
+import Logs from './logs';
 
 const pages = ['Equity Market Opportunity', 'Monashee Performance & Efficiency', 'PRIME Investment Strategies'];
 
@@ -158,7 +159,24 @@ const NavbarMain: React.FC = () => {
               ))}
             </Tabs>
           </Box>
-
+          <div>
+          {isLoggedIn ? (
+            <Button
+              sx={{
+                color: 'black',
+                fontWeight: 'bold',
+                marginRight:'20px'
+               
+              }}
+              // onClick={() => setOpenDialog(true)}
+            >
+              User Logs
+            </Button>
+          ):(
+            <p>Hello ungle</p>
+          )}
+          {openDialog && <Logs />}
+</div>
           {isLoggedIn ? (
             <Button
               sx={{
