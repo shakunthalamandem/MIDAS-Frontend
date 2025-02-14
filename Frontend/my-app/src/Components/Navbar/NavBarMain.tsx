@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Tabs, Tab, Button, Box, Typography } from '@mui/material';
+import { AppBar, Toolbar, Tabs, Tab, Button, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-
-// Import your logo
 import logo from '../../Assets/images/Monashee-Cap-Logos.png';
 import TradingViewTickerTape from '../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape';
 
@@ -16,6 +14,8 @@ const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -47,9 +47,14 @@ const NavbarMain: React.FC = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    navigate('/login');
+    setLoading(true);
+    setTimeout(() => {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      setLoading(false);
+      setOpenDialog(false);
+      navigate('/login');
+    }, 1500); // Simulate API delay
   };
 
   const isLoggedIn = !!localStorage.getItem('access_token');
@@ -60,7 +65,6 @@ const NavbarMain: React.FC = () => {
   return (
     <>
       <AppBar position="sticky" sx={{ backgroundColor: '#FFFFFF' }}>
-        {/* Conditionally show TradingViewTickerTape only when on the 'Investment Strategies' page */}
         {(location.pathname === '/strategies' || location.pathname.startsWith('/technical/')) && (
           <Box sx={{ marginBottom: '50px' }}>
             <TradingViewTickerTape />
@@ -137,17 +141,17 @@ const NavbarMain: React.FC = () => {
                     minWidth: 100,
                     fontWeight: 'bold',
                     fontSize: '16px',
-                    color: '#bb4401', // Dark gray for unselected tabs
+                    color: '#bb4401',
                     textTransform: 'none',
                     '&.Mui-selected': {
-                      color: '#FFFFFF', // White text for the selected tab
-                      backgroundColor: '#002060', // Deep maroon background for selected tab
+                      color: '#FFFFFF',
+                      backgroundColor: '#002060',
                       borderRadius: '6px',
                     },
                     '&:hover': {
-                      backgroundColor: '#002060', // Soft taupe for hover effect
+                      backgroundColor: '#002060',
                       borderRadius: '6px',
-                      color: '#FFFFFF', // Deep maroon text for hover state
+                      color: '#FFFFFF',
                     },
                   }}
                 />
@@ -164,7 +168,7 @@ const NavbarMain: React.FC = () => {
                 fontFamily: 'Roboto, sans-serif',
                 '&:hover': { backgroundColor: '#bb4401' },
               }}
-              onClick={handleLogout}
+              onClick={() => setOpenDialog(true)}
             >
               Logout
             </Button>
@@ -182,24 +186,26 @@ const NavbarMain: React.FC = () => {
               Login
             </Button>
           )}
-          {/* <Button
-            sx={{
-              ml: 2,
-              border: '1px solid #FFFFFF',
-              color: '#FFFFFF',
-              backgroundColor: '#002060',
-              fontWeight: 'bold',
-              '&:hover': {
-                backgroundColor: '#FFFFFF',
-                color: '#002060',
-              },
-            }}
-            onClick={() => navigate('/signup')}
-          >
-            Sign Up
-          </Button> */}
         </Toolbar>
       </AppBar>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>
+          <Typography variant="h6" fontWeight="bold" color="primary">
+            Logging out...
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">You are about to log out. Do you want to continue?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" color="primary" onClick={handleLogout} disabled={loading}>
+            {loading ? <CircularProgress size={24} /> : 'Yes, Log Out'}
+          </Button>
+          <Button variant="outlined" onClick={() => setOpenDialog(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
