@@ -47,7 +47,10 @@ const Logs = () => {
       )
     );
   };
-
+  interface RowData {
+    login_time: string;  
+  }
+  
   const columns: { [key: string]: GridColDef[] } = {
     activity: [
       { field: "username", headerName: "Username", flex: 1 },
@@ -103,11 +106,12 @@ const Logs = () => {
   
 
   return (
-    <Box textAlign="center" mt={2}>
+    <Box textAlign="center" mt={2} height={60}>
       {/* Removed the condition that checks if the user is admin */}
-      <Button variant="contained" color="secondary" sx={{
+      <Button  color="secondary" sx={{
                 color: '#FFFFFF',
-                height:'40px',
+                marginTop:'8px',
+                height:'30px',
 
                 backgroundColor: '#3399ff',
                 fontWeight: 'bold',

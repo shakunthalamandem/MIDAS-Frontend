@@ -120,6 +120,7 @@ const Login: React.FC = () => {
       // Store tokens securely
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
+      localStorage.setItem("user", username)
   
       // Store superuser status
       localStorage.setItem("is_superuser", user.is_superuser ? "true" : "false");

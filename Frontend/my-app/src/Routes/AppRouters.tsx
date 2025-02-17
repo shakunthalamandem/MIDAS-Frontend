@@ -25,7 +25,7 @@ const AppRouters: React.FC = () => {
         <Route path="/" element={<CapitalMarketsStatic />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/logout" element={<Logout />} />
+        {/* <Route path="/logout" element={<Logout />} /> */}
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
         {/* Protected Routes */}
