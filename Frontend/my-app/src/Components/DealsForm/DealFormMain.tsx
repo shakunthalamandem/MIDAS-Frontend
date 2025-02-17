@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Container, Grid, Typography } from '@mui/material';
 import Background from './SectionForms/Background';
 import DealActivity from './SectionForms/DealActivity';
@@ -9,6 +7,8 @@ import HistoricalData from './SectionForms/HistoricalData';
 import Participation from './SectionForms/Participation';
 import PerformanceStatergy from './SectionForms/PerformanceStatergy';
 import TechnicalInsights from './SectionForms/TechnicalInsights';
+import TempJsonData from './TempJsonData'; // Import the TempJsonData component
+import { useState } from 'react';
 
 interface VendorIssuer {
   type: string;
@@ -35,38 +35,9 @@ const DealFormMain = () => {
   const [error, setError] = useState<string | null>(null);
   const [ticker, setTicker] = useState<string>("GALD SW"); // Set initial ticker or get it from user input
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem("access_token");
-
-        if (!apiUrl) {
-          throw new Error("API URL is not defined in environment variables");
-        }
-
-        const response = await axios.post<FormData>(`${apiUrl}/api/formdeatils/`, {
-          ticker, // Send ticker in the request body
-        }, {
-          headers: {
-            "Authorization": token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
-          },
-        });
-
-        setFormData(response.data); // Now response.data is of type FormData
-      } catch (err: any) {
-        setError(err.message || "An error occurred while fetching data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [ticker]); // Dependency array includes ticker to fetch new data when ticker changes
+  const handleDataLoaded = (data: FormData) => {
+    setFormData(data);
+  };
 
   const handleTickerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTicker(event.target.value); // Update ticker when user changes it
@@ -116,6 +87,9 @@ const DealFormMain = () => {
           <TechnicalInsights data={formData} />
         </Grid>
       </Grid>
+
+      {/* Pass the handleDataLoaded function to TempJsonData component */}
+      <TempJsonData onDataLoaded={handleDataLoaded} />
     </Container>
   );
 };
