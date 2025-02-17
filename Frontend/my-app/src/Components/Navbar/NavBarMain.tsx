@@ -20,6 +20,7 @@ import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
 
 const pages = [
+  "New Issue Market",
   "Equity Market Opportunity",
   "Monashee Performance & Efficiency",
   "PRIME Investment Strategies",
@@ -44,6 +45,7 @@ const NavbarMain: React.FC = () => {
   };
 
   const handleNavigate = (page: string) => {
+    if (page === "New Issue Market") navigate("/issue_market");
     if (page === "Equity Market Opportunity") navigate("/capital-markets");
     if (page === "Monashee Performance & Efficiency")
       navigate("/monashee-deals");
@@ -53,12 +55,14 @@ const NavbarMain: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case "/capital-markets":
+      case "/issue_market":
         return 0;
-      case "/monashee-deals":
+      case "/capital-markets":
         return 1;
-      case "/strategies":
+      case "/monashee-deals":
         return 2;
+      case "/strategies":
+        return 3;
       default:
         return false;
     }
@@ -79,7 +83,9 @@ const NavbarMain: React.FC = () => {
 
   const isMarketOrPerformanceSelected =
     location.pathname === "/capital-markets" ||
-    location.pathname === "/monashee-deals";
+    location.pathname === "/monashee-deals" ||
+    location.pathname === "/issue_market";
+
 
   return (
     <>
