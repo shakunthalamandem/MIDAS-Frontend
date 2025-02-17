@@ -76,14 +76,14 @@ const Logs = () => {
   
     if (view === "activity") {
       return handleSearch(logs.user_activity).map((item, index) => ({
-        id: item.username + "-" + index, // Generate unique ID
+        id: item.username + "-" + index, 
         ...item,
       }));
     }
   
     if (view === "details") {
       return handleSearch(logs.user_details).map((item, index) => ({
-        id: item.username + "-" + index, // Generate unique ID
+        id: item.username + "-" + index, 
         ...item,
       }));
     }
@@ -92,7 +92,7 @@ const Logs = () => {
       return handleSearch(
         Object.entries(logs.monthly_summary).flatMap(([year, monthsObj]) =>
           Object.entries(monthsObj as Record<string, number>).map(([month, count], index) => ({
-            id: `${year}-${month}-${index}`, // Generate unique ID
+            id: `${year}-${month}-${index}`, 
             year,
             month,
             count,
@@ -107,7 +107,6 @@ const Logs = () => {
 
   return (
     <Box textAlign="center" mt={2} height={60}>
-      {/* Removed the condition that checks if the user is admin */}
       <Button  color="secondary" sx={{
                 color: '#FFFFFF',
                 marginTop:'8px',
