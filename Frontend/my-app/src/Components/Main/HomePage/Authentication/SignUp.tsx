@@ -32,6 +32,7 @@ const Signup: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   const apiUrl = process.env.REACT_APP_API_URL ; // Update as per your backend URL
 
@@ -74,7 +75,26 @@ const Signup: React.FC = () => {
       setLoading(false);
     }
   };
+  const validatePassword = (password: string) => {
+    const minLength = password.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*]/.test(password);
 
+    if (!minLength) return "Password must be at least 8 characters.";
+    if (!hasUpperCase) return "Password must include at least one uppercase letter.";
+    if (!hasLowerCase) return "Password must include at least one lowercase letter.";
+    if (!hasNumber) return "Password must include at least one number.";
+    if (!hasSpecialChar) return "Password must include at least one special character (!@#$%^&*).";
+
+    return ""; // ✅ Password is valid
+  };
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    handleChange(e); // Call parent function to update form data
+    setPasswordError(validatePassword(value)); // Validate password
+  };
   return (
     <Container maxWidth="xs">
       <Box
@@ -138,25 +158,25 @@ const Signup: React.FC = () => {
 
           {/* Password */}
           <Box position="relative" width="100%">
-            <TextField
-              fullWidth
-              label="Password"
-              variant="outlined"
-              type={passwordVisible ? "text" : "password"}
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              sx={{
-                marginBottom: 2,
-              }}
-            />
-            <IconButton
-              onClick={togglePasswordVisibility}
-              sx={{ position: "absolute", top: "25%", right: 10 }}
-            >
-              {passwordVisible ? <BsEye /> : <BsEyeSlash />}
-            </IconButton>
-          </Box>
+      <TextField
+        fullWidth
+        label="Password"
+        variant="outlined"
+        type={passwordVisible ? "text" : "password"}
+        name="password"
+        value={formData.password}
+        onChange={handlePasswordChange}
+        error={!!passwordError}
+        helperText={passwordError}
+        sx={{ marginBottom: 2 }}
+      />
+      <IconButton
+        onClick={togglePasswordVisibility}
+        sx={{ position: "absolute", top: "10%", right: 10 }}
+      >
+        {passwordVisible ? <BsEye /> : <BsEyeSlash />}
+      </IconButton>
+    </Box>
 
           {/* Sign Up Button */}
           <Button
