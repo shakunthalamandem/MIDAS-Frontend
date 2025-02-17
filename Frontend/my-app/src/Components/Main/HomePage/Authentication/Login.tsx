@@ -45,9 +45,9 @@ const Login: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const generateCaptchaText = () => {
-    const chars = "0";
+    const chars = "0123456789";
     let text = "";
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 4; i++) {
       text += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return text;
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
 
     for (let i = 0; i < text.length; i++) {
       ctx.save();
-      ctx.translate(8 + i * 25, 25);
+      ctx.translate(17 + i * 30, 25);
       ctx.rotate((Math.random() - 0.5) * 0.4);
       ctx.fillText(text[i], 0, 0);
       ctx.restore();
@@ -248,7 +248,7 @@ const Login: React.FC = () => {
           {/* CAPTCHA Canvas */}
           <canvas
             ref={canvasRef}
-            width={150}
+            width={120}
             height={40}
             style={{
               border: "1px solid #d3d290", // Set border color
