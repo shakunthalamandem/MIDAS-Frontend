@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Tabs, Tab, Button, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@mui/material';
+import { AppBar, Toolbar, Tabs, Tab, Button, Box, Typography } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import logo from '../../Assets/images/Monashee-Cap-Logos.png';
-import axios from "axios";
 import TradingViewTickerTape from '../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape';
 import Logs from '../Main/HomePage/Authentication/Logs';
 import Logout from '../Main/HomePage/Authentication/Logout';
