@@ -15,6 +15,7 @@ import AuthGuard from "./AuthGuard";
 import Logout from "../Components/Main/HomePage/Authentication/Logout";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
 import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/DetailedGapData";
+import DealFormMain from "../Components/DealsForm/DealFormMain";
 
 
 
@@ -29,6 +30,7 @@ const AppRouters: React.FC = () => {
         <Route path="/summarypopup" element={<SummaryPopup />} />
 
         {/* Protected Routes */}
+        <Route path="/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
         <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
         <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
