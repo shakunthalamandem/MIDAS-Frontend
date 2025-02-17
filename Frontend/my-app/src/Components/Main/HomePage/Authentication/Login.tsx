@@ -48,7 +48,6 @@ const Login: React.FC = () => {
     const chars = "0123456789";
     let text = "";
     for (let i = 0; i < 4; i++) {
-    for (let i = 0; i < 4; i++) {
       text += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return text;
@@ -373,5 +372,6 @@ const Login: React.FC = () => {
     </Container>
   );
 };
+
 
 export default Login;
