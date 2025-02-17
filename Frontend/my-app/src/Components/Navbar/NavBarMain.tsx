@@ -1,39 +1,30 @@
-import React, { useState } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Tabs,
-  Tab,
-  Button,
-  Box,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  CircularProgress,
-} from "@mui/material";
-import { useMediaQuery } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { useNavigate, useLocation, Link } from "react-router-dom";
-import logo from "../../Assets/images/Monashee-Cap-Logos.png";
-import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
-
-const pages = [
-  "Equity Market Opportunity",
-  "Monashee Performance & Efficiency",
-  "PRIME Investment Strategies",
-];
+import React, { useState } from 'react';
+import { AppBar, Toolbar, Tabs, Tab, Button, Box, Typography } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import logo from '../../Assets/images/Monashee-Cap-Logos.png';
+import TradingViewTickerTape from '../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape';
+import Logs from '../Main/HomePage/Authentication/Logs';
+import Logout from '../Main/HomePage/Authentication/Logout';
+const pages = ['Equity Market Opportunity', 'Monashee Performance & Efficiency', 'PRIME Investment Strategies'];
 
 const NavbarMain: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [openLogsDialog, setOpenLogsDialog] = useState(false);
+  const isSuperUser = localStorage.getItem('is_superuser') === 'true';
+  const [showLogs, setShowLogs] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+  const refresh_token = localStorage.getItem("refresh_token");
+  const user = localStorage.getItem("user");
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -43,6 +34,38 @@ const NavbarMain: React.FC = () => {
     setAnchorElNav(null);
   };
 
+  const handleLogoutClick = () => {
+    setShowLogout(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    try {
+      await fetch(`${apiUrl}/api/logout/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ refresh_token: refresh_token, user: user })
+    });    
+
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("user")
+
+      setLoading(false);
+      navigate("/login");
+    } catch (error) {
+      setLoading(false);
+      console.error("Logout failed:", error);
+    }
+    setShowLogout(false);
+  };
+
+  const handleCancelLogout = () => {
+    setShowLogout(false);
+  };
+
   const handleNavigate = (page: string) => {
     if (page === "Equity Market Opportunity") navigate("/capital-markets");
     if (page === "Monashee Performance & Efficiency")
@@ -50,6 +73,8 @@ const NavbarMain: React.FC = () => {
     if (page === "PRIME Investment Strategies") navigate("/strategies");
     handleCloseNavMenu();
   };
+
+
 
   const getTabIndex = () => {
     switch (location.pathname) {
@@ -197,79 +222,70 @@ const NavbarMain: React.FC = () => {
               ))}
             </Tabs>
           </Box>
+          {isLoggedIn && isSuperUser && (
+            <>
+              <Button
+                sx={{
+                  color: 'black',
+                  fontWeight: 'bold',
+                  marginRight: '20px',
+                }}
+                onClick={() => setShowLogs(true)}
+              >
 
-          {isLoggedIn ? (
-            <Button
-              sx={{
-                color: "#FFFFFF",
-                backgroundColor: "#bb4401",
-                fontWeight: "bold",
-                fontFamily: "Roboto, sans-serif",
-                "&:hover": { backgroundColor: "#bb4401" },
-              }}
-              onClick={() => setOpenDialog(true)}
-            >
-              Logout
-            </Button>
-          ) : (
-            <Button
-              sx={{
-                color: "#FFFFFF",
-                backgroundColor: "#002060",
-                fontWeight: "bold",
-                fontFamily: "Roboto, sans-serif",
-                "&:hover": { backgroundColor: "#002060" },
-              }}
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </Button>
+                <div>
+                  <Logs />
+
+                </div>          </Button>
+
+
+            </>
           )}
+
+
+
+          <>
+            {isLoggedIn ? (
+              <Button
+                sx={{
+                  color: '#FFFFFF',
+                  backgroundColor: '#bb4401',
+                  fontWeight: 'bold',
+                  fontFamily: 'Roboto, sans-serif',
+                  height: 30,
+                  '&:hover': { backgroundColor: '#bb4401' },
+                }}
+                onClick={handleLogoutClick}  // Show Logout component when clicked
+              >
+                Logout
+              </Button>
+            ) : (
+              <Button
+                sx={{
+                  color: '#FFFFFF',
+                  backgroundColor: '#002060',
+                  fontWeight: 'bold',
+                  fontFamily: 'Roboto, sans-serif',
+                  '&:hover': { backgroundColor: '#002060' },
+                }}
+                onClick={() => navigate('/login')}  // Navigate to the login page
+              >
+                Login
+              </Button>
+            )}
+
+
+          </>
+          {/* {showLogout && <Logout />}  */}
+          {showLogout && (
+            <Logout
+              onConfirm={handleConfirmLogout}
+              onCancel={handleCancelLogout}
+            />)}
         </Toolbar>
       </AppBar>
 
-      {/* Logout Confirmation Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>
-          <Typography variant="h6" fontWeight="bold" sx={{ color: "#002060" }}>
-            Logging out...
-          </Typography>
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" sx={{ color: "#333" }}>
-            You are about to log out. Do you want to continue?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            sx={{
-              bgcolor: "#D32F2F",
-              color: "#fff",
-              "&:hover": { bgcolor: "#B71C1C" },
-            }}
-            onClick={handleLogout}
-            disabled={loading}
-          >
-            {loading ? (
-              <CircularProgress size={24} sx={{ color: "#fff" }} />
-            ) : (
-              "Yes, Log Out"
-            )}
-          </Button>
-          <Button
-            variant="outlined"
-            sx={{
-              color: "#4CAF50",
-              borderColor: "#4CAF50",
-              "&:hover": { bgcolor: "rgba(76, 175, 80, 0.1)" },
-            }}
-            onClick={() => setOpenDialog(false)}
-          >
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
+
     </>
   );
 };
