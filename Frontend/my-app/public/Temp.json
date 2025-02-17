@@ -1,0 +1,212 @@
+{
+    "deal_captain": "Robin",
+    "team": "International Team",
+    "participants": ["Robin", "John"],
+    "ticker": "GALD SW",
+    "company": {
+      "name": "Galderma Group AG",
+      "description": "Switzerland / Health Care / Pharmaceuticals"
+    },
+    "vendor_issuer": "Secondary ABB from EQT, ADIA",
+    "participation": {
+      "allocation": {
+        "value": "USD19.9m",
+        "shares": 220000,
+        "percentage_of_deal": "1.38%",
+        "fill": "13.8%",
+        "days": "0.4"
+      },
+      "bd_bank": "GS",
+      "final_indication": {
+        "value": "USD144.8m",
+        "shares": 1600000,
+        "percentage_of_deal": "10.0%",
+        "days": "3.0"
+      },
+      "deal_size": {
+        "value": "USD1,461m",
+        "shares": 16000000,
+        "percentage_of_company": "6.7%",
+        "days": "30.4"
+      },
+      "price_local": "CHF 80.00",
+      "discount_to_last_close": "6.9%",
+      "last_close_price": "CHF 85.95",
+      "initial_range": "No launch range",
+      "deal_colour": "Wall x on well-seasoned second FO in Galderma from EQT/ADIA..."
+    },
+    "use_of_proceeds": "-",
+    "allocation_layout": {
+      "institutional": "100.0%",
+      "retail": "0.0%",
+      "long_only": "55.0%",
+      "hedge_funds": "45.0%",
+      "local": "0.0%",
+      "international": "100.0%"
+    },
+    "allocation_concentration": "0.0% taken by top 10",
+    "aftermarket": {
+      "order": "Yes",
+      "strategy": "Add small then take profit",
+      "target_local": "CHF 88.00",
+      "stop_local": "CHF 72.00"
+    },
+    "background": {
+      "syndicate": ["MS", "GS", "Citi", "Jeffco", "UBS"],
+      "pe_vendor": "Yes",
+      "index_fund_participation": "-",
+      "recent_earnings_estimate_revision": "No",
+      "recent_positive_news": "No",
+      "vix_elevated": "-",
+      "restrictions": "144a",
+      "lock_up": "90 days",
+      "free_float_percentage": "24.4%",
+      "current_float_percentage": "27.6%",
+      "short_interest": {
+        "shares": "-",
+        "value": "-",
+        "percentage_of_deal": "-"
+      },
+      "shares_outstanding_pre_deal": 237897600,
+      "market_cap_pre_deal": {
+        "usd": 23341,
+        "chf": 20647
+      },
+      "launch_date": "11/20/2024",
+      "trade_date": "11/21/2024",
+      "settlement_date": "11/23/2024",
+      "next_results_date": "19/02/2025",
+      "club_deal": "No"
+    },
+    "performance_statistics": {
+      "change_on_day": "0.0%",
+      "last_7_days": "1.4%",
+      "52_week_high": "87.91",
+      "percentage_below_high": "-2.2%",
+      "sector_stats": {
+        "l30d_performance": "-8.342%",
+        "correlation": "0.360"
+      },
+      "3m_advt_eu": {
+        "usd": 79.9,
+        "shares": 0.79
+      },
+      "3m_advt_local": {
+        "usd": 54.4,
+        "shares": 0.53
+      },
+      "beta": {
+        "smi": "0.48",
+        "sx5e": "0.51"
+      },
+      "volatility_3m": "26.1",
+      "rsi": {
+        "14d": "68",
+        "30d": "62"
+      },
+      "dmi_14d": "20",
+      "macd_9d": "1",
+      "stock_relative_to_ma": "#VALUE!"
+    },
+    "aftermarket_analysis": {
+      "safety_liquidity_check": "Safe / liquid",
+      "max_size": "Can buy add'l 180,000 shares up to CHF 86.00",
+      "shares_left_to_allocation": 30000,
+      "current_price": "CHF 83.52",
+      "percentage_change_from_offer": "+4.4%"
+    },
+    "monashee_deal_activity": {
+      "conviction": "-",
+      "wallcrossing": {
+        "size": 1600000,
+        "discount": "5.0%",
+        "invitation_bank": "MS"
+      },
+      "reverse": {
+        "size": 2000000,
+        "discount": "7.0%"
+      },
+      "expected_allocation": {
+        "shares": 250000,
+        "percentage_of_deal": "1.6%",
+        "fill": "16%",
+        "value": "USD22.6m"
+      }
+    },
+    "technical_sentiment_analysis": {
+      "discount_analysis": {
+        "v1": "3.4%",
+        "v2": "2.9%"
+      },
+      "demand_analysis": "USD109.9m",
+      "ltm_fcf_yield": "USD0.2m",
+      "ltm_dividend_yield": "USD0.0m",
+      "deal_rating_v2": "97%",
+      "block_seasoned": "Yes",
+      "timing_expected": "No",
+      "clean_up": "No",
+      "primary": "No",
+      "good_register": "Yes",
+      "positive_liquidity_event": "Yes",
+      "bank_analyst_coverage": "Yes",
+      "developed_market": "Yes",
+      "deal_wallcrossed": "Yes",
+      "wallcrossing_coverage": "100%",
+      "launched_with_market_reference": "Yes",
+      "coverage_estimate": "10.0x",
+      "coverage_speed": "10 mins",
+      "lo_allocation_percentage": "55%",
+      "outsized_anchor": "No",
+      "upsized": "Yes",
+      "price_comparison": {
+        "v1_minus": "+3.6%",
+        "v1_divide": "+106.4%",
+        "v2_minus": "+4.0%",
+        "v2_divide": "+139.8%"
+      }
+    },
+    "historical_transactions": [
+      {
+        "announcement_trade_date": "03/09/24 - 04/09/24 (Post-market)",
+        "price_discount": "0",
+        "type": "ABB",
+        "deal_size": {
+          "usd": "1,267m",
+          "percentage_of_company": "6.0%",
+          "shares": "-"
+        },
+        "bookrunners": ["GS", "MS", "UBS"],
+        "primary_secondary": "Secondary",
+        "monashee_demand_alloc_hold_period": "-",
+        "lock_up_date": "12/3/2024",
+        "performance": {
+          "open": "+2.1%",
+          "close": "+6.2%",
+          "1w": "+7.5%",
+          "1m": "+4.1%"
+        },
+        "sellers": ["Abu Dhabi Investment Authority", "-", "-"]
+      },
+      {
+        "announcement_trade_date": "13/03/24 - 22/03/24 (Post-market)",
+        "price_discount": "53.00 (IPO)",
+        "type": "IPO",
+        "deal_size": {
+          "usd": "2,548m",
+          "percentage_of_company": "18.1%",
+          "shares": "43.1m shrs"
+        },
+        "bookrunners": ["BNPP", "BofA", "CITI", "GS", "JEF", "MS", "UBS"],
+        "primary_secondary": "99.3% primary",
+        "monashee_demand_alloc_hold_period": "-",
+        "lock_up_date": "-",
+        "performance": {
+          "open": "+15.1%",
+          "close": "+20.8%",
+          "1w": "+19.5%",
+          "1m": "+26.4%"
+        },
+        "sellers": ["Abu Dhabi Investment Authority", "-", "-"]
+      }
+    ]
+  }
