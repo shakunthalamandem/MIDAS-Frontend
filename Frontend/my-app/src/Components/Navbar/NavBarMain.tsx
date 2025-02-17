@@ -171,15 +171,12 @@ const NavbarMain: React.FC = () => {
             }}
             onClick={() => setShowLogs(true)}  // Set to true when clicked
           >
-            
-          </Button>
-
-          {showLogs && (
-            <div>
+<div>
               <Logs />  
               
-            </div>
-          )}
+            </div>          </Button>
+
+          
         </>
       )}
   
