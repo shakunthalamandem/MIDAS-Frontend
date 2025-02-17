@@ -152,7 +152,7 @@ const MonasheeDeals: React.FC = () => {
                 value={searchTerm}
                 autoComplete="off"
                 onChange={handleSearch}
-                placeholder="Enter ticket symbol..."
+                placeholder="Enter ticker..."
                 style={{
                   marginBottom: "1px",
                   width: "200px",

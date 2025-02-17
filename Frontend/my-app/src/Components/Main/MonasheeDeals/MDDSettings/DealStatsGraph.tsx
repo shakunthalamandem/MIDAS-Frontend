@@ -7,6 +7,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  LineChart,
+  Line,
 } from "recharts";
 import {
   Box,
@@ -213,6 +215,11 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
     "#2563EB", // Bright Blue
   ];
 
+  const isLineChart = [
+    "weighted_allocation_deal_size_percentage",
+    "weighted_allocation_percentage",
+  ].includes(selectedField);
+
   return (
     <Container>
       <Card elevation={5}>
@@ -220,7 +227,6 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
           variant="h5"
           sx={{ color: "#002060", fontWeight: "bold", marginTop: 3 }}
         >
-          {" "}
           Deal Statistics
         </Typography>
         <Box
@@ -281,61 +287,114 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
           </Box>
         ) : (
           <ResponsiveContainer width="100%" height={450}>
-            <BarChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-            >
-              {/* X-Axis */}
-              <XAxis
-                dataKey="year"
-                stroke="#b2b2b2"
-                tick={{ fill: "#000000", fontSize: 12 }}
-                label={{
-                  value: "Year",
-                  position: "insideBottom",
-                  dy: 10,
-                  fill: "#002060",
-                }}
-              />
+            {isLineChart ? (
+              <LineChart
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+              >
+                <XAxis
+                  dataKey="year"
+                  stroke="#b2b2b2"
+                  tick={{ fill: "#000000", fontSize: 12 }}
+                  label={{
+                    value: "Year",
+                    position: "insideBottom",
+                    dy: 10,
+                    fill: "#002060",
+                  }}
+                />
+                <YAxis
+                  stroke="#000"
+                  tickFormatter={(value) => formatValue(value, selectedField)}
+                />
+                <Tooltip
+                  formatter={(value) =>
+                    formatValue(value as number, selectedField)
+                  }
+                />
+                <Legend
+                  wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }}
+                />
+                {chartData.length > 0 &&
+                  Object.keys(
+                    chartData.reduce(
+                      (acc, item) => {
+                        Object.keys(item).forEach((key) => {
+                          if (key !== "year") acc[key] = true;
+                        });
+                        return acc;
+                      },
+                      {} as Record<string, boolean>
+                    )
+                  ).map((key, index) => (
+                    <Line
+                      key={index}
+                      dataKey={key}
+                      stroke={barColors[index % barColors.length]}
+                      strokeWidth={2}
+                      // dot={false}
+                      activeDot={{ r: 8 }}
+                    />
+                  ))}
+              </LineChart>
+            ) : (
+              <BarChart
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+              >
+                {/* X-Axis */}
+                <XAxis
+                  dataKey="year"
+                  stroke="#b2b2b2"
+                  tick={{ fill: "#000000", fontSize: 12 }}
+                  label={{
+                    value: "Year",
+                    position: "insideBottom",
+                    dy: 10,
+                    fill: "#002060",
+                  }}
+                />
 
-              <YAxis
-                stroke="#000"
-                tickFormatter={(value) => formatValue(value, selectedField)}
-              />
-              <Tooltip
-                formatter={(value) =>
-                  formatValue(value as number, selectedField)
-                }
-              />
+                <YAxis
+                  stroke="#000"
+                  tickFormatter={(value) => formatValue(value, selectedField)}
+                />
+                <Tooltip
+                  formatter={(value) =>
+                    formatValue(value as number, selectedField)
+                  }
+                />
 
-              <Legend
-                wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }}
-              />
+                <Legend
+                  wrapperStyle={{ color: "#000000", fontSize: 14, bottom: 10 }}
+                />
 
-              {chartData.length > 0 &&
-                Object.keys(
-                  chartData.reduce(
-                    (acc, item) => {
-                      Object.keys(item).forEach((key) => {
-                        if (key !== "year") acc[key] = true;
-                      });
-                      return acc;
-                    },
-                    {} as Record<string, boolean>
-                  )
-                ).map((key, index) => (
-                  <Bar
-                    key={index}
-                    dataKey={key}
-                    stackId="a"
-                    fill={barColors[index % barColors.length]}
-                    radius={[4, 4, 0, 0]}
-                    barSize={40} // Adjust bar width
-                  />
-                ))}
-            </BarChart>
+                {chartData.length > 0 &&
+                  Object.keys(
+                    chartData.reduce(
+                      (acc, item) => {
+                        Object.keys(item).forEach((key) => {
+                          if (key !== "year") acc[key] = true;
+                        });
+                        return acc;
+                      },
+                      {} as Record<string, boolean>
+                    )
+                  ).map((key, index) => (
+                    <Bar
+                      key={index}
+                      dataKey={key}
+                      stackId="a"
+                      fill={barColors[index % barColors.length]}
+                      radius={[4, 4, 0, 0]}
+                      barSize={40}
+                    />
+                  ))}
+              </BarChart>
+            )}
           </ResponsiveContainer>
         )}
+
         <Box
           sx={{
             background: "linear-gradient(to right, #190250, #6DD5ED)",
@@ -344,8 +403,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             boxShadow: 3,
             display: "flex",
             flexWrap: "wrap",
-            justifyContent: "center", // Centering items horizontally
-            alignItems: "center", // Centering items vertically
+            justifyContent: "center",
+            alignItems: "center",
             marginBottom: 4,
             marginX: 2,
           }}
@@ -356,8 +415,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
               setSelectedFilter(
                 filterOptions.find((option) => option.value === e.target.value)!
               )
-            } 
-            row 
+            }
+            row
           >
             {filterOptions.map((option) => (
               <FormControlLabel

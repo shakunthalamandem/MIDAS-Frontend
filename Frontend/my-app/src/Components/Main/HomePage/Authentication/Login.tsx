@@ -48,6 +48,7 @@ const Login: React.FC = () => {
     const chars = "0123456789";
     let text = "";
     for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++) {
       text += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return text;
@@ -248,7 +249,7 @@ const Login: React.FC = () => {
           {/* CAPTCHA Canvas */}
           <canvas
             ref={canvasRef}
-            width={120}
+            width={150}
             height={40}
             style={{
               border: "1px solid #d3d290", // Set border color

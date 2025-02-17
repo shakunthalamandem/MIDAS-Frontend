@@ -1,6 +1,6 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Button, Modal } from '@mui/material';
+import { motion } from 'framer-motion';
 
 interface NoDataPopupProps {
   open: boolean;
@@ -8,35 +8,42 @@ interface NoDataPopupProps {
 }
 
 const NoDataPopup: React.FC<NoDataPopupProps> = ({ open, onClose }) => {
-  const navigate = useNavigate();
-
-  const handleOkClick = () => {
-    onClose(); // Close the popup
-    navigate('/'); // Navigate to the main page or any other component
-  };
-
   return (
-    <Dialog open={open} onClose={onClose} aria-labelledby="no-data-dialog">
-      <DialogTitle id="no-data-dialog">No Data Found</DialogTitle>
-      <DialogContent>
-        <p style={{ fontSize: '16px', color: '#555' }}>
-          The selected filters returned no data. Please try different filters or adjust your search criteria.
-        </p>
-      </DialogContent>
-      <DialogActions>
+    <Modal open={open} onClose={onClose}>
+      <Box
+        component={motion.div}
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -50 }}
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: 'white',
+          boxShadow: 24,
+          p: 4,
+          borderRadius: 2,
+          textAlign: 'center',
+          maxWidth: 400,
+          width: '100%',
+        }}
+      >
+        <Typography variant="h6" color="#002060" gutterBottom>
+          No Data Available
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          Please change the applied filters and try again.
+        </Typography>
         <Button
-          onClick={handleOkClick}
           variant="contained"
-          color="primary"
-          sx={{
-            backgroundColor: '#466675',
-            '&:hover': { backgroundColor: '#115293' },
-          }}
+          sx={{ bgcolor: '#002060', '&:hover': { bgcolor: '#001540' } }}
+          onClick={onClose}
         >
-          OK
+          Okay
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Box>
+    </Modal>
   );
 };
 
