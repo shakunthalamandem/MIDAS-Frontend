@@ -53,6 +53,7 @@ const Logs = () => {
       { field: "username", headerName: "Username", flex: 1 },
       { field: "login_time", headerName: "Login Time", flex: 1 },
       { field: "logout_time", headerName: "Logout Time", flex: 1 },
+      { field: "ip_address", headerName: "IP Address", flex: 0.5 },
       { field: "is_active", headerName: "Active", flex: 0.5 },
     ],
     details: [
@@ -104,17 +105,20 @@ const Logs = () => {
   return (
     <Box textAlign="center" mt={2}>
       {/* Removed the condition that checks if the user is admin */}
-      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+      <Button variant="contained" color="secondary" sx={{
+                color: '#FFFFFF',
+                height:'40px',
+
+                backgroundColor: '#3399ff',
+                fontWeight: 'bold',
+                fontFamily: 'Roboto, sans-serif',
+                '&:hover': { backgroundColor: '#bb4401' },
+              }} onClick={() => setOpen(true)}>
         User Logs
       </Button>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
-          User Logs
-          <IconButton onClick={() => setOpen(false)} sx={{ position: "absolute", right: 10, top: 10 }}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+        
 
         <DialogContent>
           <Box display="flex" justifyContent="center" gap={2} mb={2}>
@@ -149,7 +153,7 @@ const Logs = () => {
           {loading ? (
             <CircularProgress />
           ) : (
-            <Box sx={{ height: 400 }}>
+            <Box sx={{ height: 400, width:900 }}>
               <DataGrid rows={getRows()} columns={columns[view]} />
             </Box>
           )}

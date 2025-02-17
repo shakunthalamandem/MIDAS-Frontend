@@ -15,8 +15,9 @@ const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [openLogsDialog, setOpenLogsDialog] = useState(false);
-
-  const [openDialog, setOpenDialog] = useState(false);
+    const isSuperUser = localStorage.getItem('is_superuser') === 'true';
+    const [showLogs, setShowLogs] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 
@@ -160,27 +161,29 @@ const NavbarMain: React.FC = () => {
               ))}
             </Tabs>
           </Box>
+          {isLoggedIn && isSuperUser && (
+        <>
+          <Button
+            sx={{
+              color: 'black',
+              fontWeight: 'bold',
+              marginRight: '20px',
+            }}
+            onClick={() => setShowLogs(true)}  // Set to true when clicked
+          >
+            
+          </Button>
 
-<Button
-  sx={{
-    color: 'black',
-    fontWeight: 'bold',
-    marginRight: '20px',
-  }}
-  onClick={() => setOpenLogsDialog(true)} // Opens logs dialog
->
-  User Logs
-</Button>
+          {showLogs && (
+            <div>
+              <Logs />  
+              
+            </div>
+          )}
+        </>
+      )}
+  
 
-<Dialog open={openLogsDialog} onClose={() => setOpenLogsDialog(false)}>
-  <DialogContent>
-    <Logs />
-
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setOpenLogsDialog(false)}>Close</Button>
-  </DialogActions>
-</Dialog>
 
           {isLoggedIn ? (
             <Button
