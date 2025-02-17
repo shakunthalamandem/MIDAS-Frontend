@@ -30,31 +30,81 @@ const SectionThree = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem("access_token");
-        if (!apiUrl) throw new Error("API URL is not defined in environment variables");
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+      if (!apiUrl) return;
 
-        const response = await axios.get<APIResponse>(`${apiUrl}/api/delogic_data_count/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
+      const response = await axios.get<APIResponse>(`${apiUrl}/api/delogic_data_count/`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
 
-        const data = response.data;
+      const data = response.data;
 
-        // Map the values from the API response to the correct cards
-        setCounts([
-          { title: "IPOs globally", value: data.deal_type_counts.find((item) => item.deal_type === "IPO")?.count || 0 },
-          { title: "Follow-Ons globally", value: data.deal_type_counts.find((item) => item.deal_type === "FO")?.count || 0 },
-          { title: "Billion of Opportunity Value", value: data.total_opportunity_value / 1e9 }, // Convert to billions
-          { title: "US New Issue Deals", value: data.us_international_counts.find((item) => item.us_international === "US")?.count || 0 },
-          { title: "International New Issue Deals", value: data.us_international_counts.find((item) => item.us_international === "International")?.count || 0 },
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+      // Initialize counts with fetched data, applying rounding rules
+      const fetchedCounts = [
+        {
+          title: "IPOs globally",
+          value: Math.round((data.deal_type_counts.find((item) => item.deal_type === "IPO")?.count || 0) / 100) * 100,
+        },
+        {
+          title: "Follow-Ons globally",
+          value: Math.round((data.deal_type_counts.find((item) => item.deal_type === "FO")?.count || 0) / 100) * 100,
+        },
+        {
+          title: "Billion of Opportunity Value",
+          value: Math.round(data.total_opportunity_value / 1e9 / 10) * 10, // Round to the nearest 10 billion
+        },
+        
+        {
+          title: "US New Issue Deals",
+          value: Math.round((data.us_international_counts.find((item) => item.us_international === "US")?.count || 0) / 100) * 100,
+        },
+        {
+          title: "International New Issue Deals",
+          value: Math.round((data.us_international_counts.find((item) => item.us_international === "International")?.count || 0) / 100) * 100,
+        },
+      ];
+
+      setCounts(fetchedCounts);
+
+      // Animation logic
+      const timers = fetchedCounts.map((card, index) => {
+        const targetValue = card.value;
+        let currentValue = 0;
+
+        // Store the animation frame ID
+        let animationFrameId: number;
+
+        const increment = () => {
+          if (currentValue < targetValue) {
+            currentValue += Math.ceil(targetValue / 100); // Adjust speed of animation
+            setCounts((prevCounts) => {
+              const newCounts = [...prevCounts];
+              newCounts[index] = { ...newCounts[index], value: currentValue };
+              return newCounts;
+            });
+            animationFrameId = requestAnimationFrame(increment); // Save the ID of the requestAnimationFrame
+          } else {
+            setCounts((prevCounts) => {
+              const newCounts = [...prevCounts];
+              newCounts[index] = { ...newCounts[index], value: targetValue };
+              return newCounts;
+            });
+          }
+        };
+
+        // Start the animation
+        animationFrameId = requestAnimationFrame(increment);
+
+        // Return a cleanup function to cancel the animation when the component unmounts
+        return () => cancelAnimationFrame(animationFrameId);
+      });
+
+      // Cleanup all timers
+      return () => timers.forEach((clearTimer) => clearTimer());
     };
 
     fetchData();
@@ -79,11 +129,11 @@ const SectionThree = () => {
               }}
             >
               <CardContent>
-              <Typography variant="h4" component="div" align="center" sx={{ fontWeight: "bold" }}>
-                {card.title === "Billion of Opportunity Value"
-                  ? `$${card.value.toFixed(1)}+` // Format with suffix for "Opportunity Value"
-                  : `${card.value}+`}  {/* Add "+" for all values */}
-              </Typography>
+                <Typography variant="h4" component="div" align="center" sx={{ fontWeight: "bold" }}>
+                  {card.title === "Billion of Opportunity Value"
+                    ? `$${card.value.toFixed(0)}B   +` // Format with suffix for "Opportunity Value" rounded
+                    : `${card.value}+`} {/* Add "+" for all values */}
+                </Typography>
                 <Typography variant="h6" component="div" align="center" sx={{ fontWeight: "bold" }}>
                   {card.title}
                 </Typography>
