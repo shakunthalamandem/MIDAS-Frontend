@@ -1,9 +1,32 @@
-import React from 'react'
+import React from 'react';
+import { TextField, Typography } from '@mui/material';
 
-const TechnicalInsights = () => {
-  return (
-    <div>TechnicalInsights</div>
-  )
+interface TechnicalInsightsProps {
+  data: {
+    company: {
+      description: string; // Assuming you might want to display the company description in this section
+    };
+  };
 }
 
-export default TechnicalInsights
+const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
+  const { description } = data.company;
+
+  return (
+    <div>
+      <Typography variant="h6" gutterBottom>
+        Technical Insights
+      </Typography>
+      <TextField
+        label="Company Description"
+        value={description}
+        onChange={(e) => console.log(e.target.value)} // Handle change logic if needed
+        fullWidth
+        margin="normal"
+      />
+      {/* You can add more fields related to technical insights here */}
+    </div>
+  );
+};
+
+export default TechnicalInsights;

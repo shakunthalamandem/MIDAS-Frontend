@@ -1,9 +1,29 @@
-import React from 'react'
+import React from 'react';
+import { TextField, Typography } from '@mui/material';
 
-const DealActivity = () => {
-  return (
-    <div>DealActivity</div>
-  )
+interface DealActivityProps {
+  data: {
+    ticker: string;
+  };
 }
 
-export default DealActivity
+const DealActivity: React.FC<DealActivityProps> = ({ data }) => {
+  const { ticker } = data;
+
+  return (
+    <div>
+      <Typography variant="h6" gutterBottom>
+        Deal Activity
+      </Typography>
+      <TextField
+        label="Ticker"
+        value={ticker}
+        onChange={(e) => console.log(e.target.value)} // Handle change logic if needed
+        fullWidth
+        margin="normal"
+      />
+    </div>
+  );
+};
+
+export default DealActivity;

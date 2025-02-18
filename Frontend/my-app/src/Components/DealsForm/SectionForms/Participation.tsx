@@ -1,9 +1,29 @@
-import React from 'react'
+import React from 'react';
+import { TextField, Typography } from '@mui/material';
 
-const Participation = () => {
-  return (
-    <div>Participation</div>
-  )
+interface ParticipationProps {
+  data: {
+    participants: string[]; // Assuming 'participants' is an array of strings
+  };
 }
 
-export default Participation
+const Participation: React.FC<ParticipationProps> = ({ data }) => {
+  const { participants } = data;
+
+  return (
+    <div>
+      <Typography variant="h6" gutterBottom>
+        Participation
+      </Typography>
+      <TextField
+        label="Participants"
+        value={participants.join(', ')} // Join participants into a comma-separated string
+        onChange={(e) => console.log(e.target.value)} // Handle change logic if needed
+        fullWidth
+        margin="normal"
+      />
+    </div>
+  );
+};
+
+export default Participation;

@@ -1,9 +1,30 @@
-import React from 'react'
+import React from 'react';
+import { TextField, Typography } from '@mui/material';
 
-const HistoricalData = () => {
-  return (
-    <div>HistoricalData</div>
-  )
+interface HistoricalDataProps {
+  data: {
+    ticker: string; // Assuming ticker or other historical data can be included here
+  };
 }
 
-export default HistoricalData
+const HistoricalData: React.FC<HistoricalDataProps> = ({ data }) => {
+  const { ticker } = data; // You can add more fields to display from data if needed
+
+  return (
+    <div>
+      <Typography variant="h6" gutterBottom>
+        Historical Data
+      </Typography>
+      <TextField
+        label="Ticker"
+        value={ticker}
+        onChange={(e) => console.log(e.target.value)} // Handle change logic if needed
+        fullWidth
+        margin="normal"
+      />
+      {/* You can add more TextFields here to display other relevant data */}
+    </div>
+  );
+};
+
+export default HistoricalData;
