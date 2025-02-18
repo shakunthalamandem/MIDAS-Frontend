@@ -21,7 +21,6 @@ const DealFormMain: React.FC = () => {
     setLoading(false);  // Data is loaded, so turn off loading
   };
 
-  // if (loading) return <CircularProgress />;  // Show loading spinner if data is still loading
 
   return (
     <Container>
