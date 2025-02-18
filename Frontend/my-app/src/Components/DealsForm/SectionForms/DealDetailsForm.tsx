@@ -57,35 +57,35 @@ const DealDetailsForm: React.FC<DealDetailsFormProps> = ({ data }) => {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell><strong>Deal Captain</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Deal Captain</strong></TableCell>
               <TableCell>{data.deal_captain}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>International Team</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>International Team</strong></TableCell>
               <TableCell>{data.international_team.join(", ")}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Ticker</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Ticker</strong></TableCell>
               <TableCell>{data.ticker}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Company Name</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Company Name</strong></TableCell>
               <TableCell>{data.company_name}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Country</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Country</strong></TableCell>
               <TableCell>{data.description.country}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Sector</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Sector</strong></TableCell>
               <TableCell>{data.description.sector}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Industry</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Industry</strong></TableCell>
               <TableCell>{data.description.industry}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Vendor Issuer</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Vendor Issuer</strong></TableCell>
               <TableCell>{data.vendor_issuer.join(", ")}</TableCell>
             </TableRow>
           </TableBody>

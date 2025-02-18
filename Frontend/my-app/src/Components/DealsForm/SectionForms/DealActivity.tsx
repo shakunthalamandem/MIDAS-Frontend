@@ -62,43 +62,43 @@ const DealActivity: React.FC<DealActivityProps> = ({ data }) => {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell><strong>Conviction</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Conviction</strong></TableCell>
               <TableCell>{data.conviction}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Wallcrossing Size (Shares)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Wallcrossing Size (Shares)</strong></TableCell>
               <TableCell>{data.monashee_wallcrossing_size_shares.toLocaleString()}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Wallcrossing Discount (%)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Wallcrossing Discount (%)</strong></TableCell>
               <TableCell>{data.monashee_wallcrossing_discount_percent}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Invitation Bank</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Invitation Bank</strong></TableCell>
               <TableCell>{data.wallcrossing_invitation_bank}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Reverse Size (Shares)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Reverse Size (Shares)</strong></TableCell>
               <TableCell>{data.monashee_reverse_size_shares.toLocaleString()}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Reverse Discount (%)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Reverse Discount (%)</strong></TableCell>
               <TableCell>{data.monashee_reverse_discount_percent}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Alloc Expected - Shares</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Alloc Expected - Shares</strong></TableCell>
               <TableCell>{data.alloc_expected.shares.toLocaleString()}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Alloc Expected - Deal Percentage</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Alloc Expected - Deal Percentage</strong></TableCell>
               <TableCell>{data.alloc_expected.deal_percentage}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Alloc Expected - Fill Percentage</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Alloc Expected - Fill Percentage</strong></TableCell>
               <TableCell>{data.alloc_expected.fill_percentage}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Alloc Expected - Amount (USD)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Alloc Expected - Amount (USD)</strong></TableCell>
               <TableCell>${data.alloc_expected.amount_usd.toFixed(2)}</TableCell>
             </TableRow>
           </TableBody>

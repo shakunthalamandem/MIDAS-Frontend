@@ -76,63 +76,63 @@ const HistoricalData: React.FC<HistoricalDataProps> = ({ data }) => {
                 </TableRow>
                 
                 <TableRow>
-                  <TableCell><strong>Announcement and Trade Date</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Announcement and Trade Date</strong></TableCell>
                   <TableCell>{transaction.announcement_and_trade_date}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Price Discount</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Price Discount</strong></TableCell>
                   <TableCell>{transaction.price_discount}%</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Type</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Type</strong></TableCell>
                   <TableCell>{transaction.type}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Deal Size (USD)</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Deal Size (USD)</strong></TableCell>
                   <TableCell>{transaction.deal_size.usd}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Deal Size (% of Co)</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Deal Size (% of Co)</strong></TableCell>
                   <TableCell>{transaction.deal_size.percentage_of_co}%</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Deal Size (Shares M)</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Deal Size (Shares M)</strong></TableCell>
                   <TableCell>{transaction.deal_size.shares_m}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Bookrunners</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Bookrunners</strong></TableCell>
                   <TableCell>{transaction.bookrunners.join(", ")}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Primary/Secondary</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Primary/Secondary</strong></TableCell>
                   <TableCell>{transaction.primary_secondary}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Monashee Demand Alloc Hold Period</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Monashee Demand Alloc Hold Period</strong></TableCell>
                   <TableCell>{transaction.monashee_demand_alloc_hold_period}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Lock-Up Date</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Lock-Up Date</strong></TableCell>
                   <TableCell>{transaction.lock_up_date}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Performance (Open)</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Performance (Open)</strong></TableCell>
                   <TableCell>{transaction.performance.open}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Performance (Close)</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Performance (Close)</strong></TableCell>
                   <TableCell>{transaction.performance.close}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Performance (1W)</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Performance (1W)</strong></TableCell>
                   <TableCell>{transaction.performance["1W"]}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Performance (1M)</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Performance (1M)</strong></TableCell>
                   <TableCell>{transaction.performance["1M"]}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Sellers</strong></TableCell>
+                  <TableCell sx={{color:'#4d4d4d'}}><strong>Sellers</strong></TableCell>
                   <TableCell>{transaction.sellers.join(", ")}</TableCell>
                 </TableRow>
               </React.Fragment>

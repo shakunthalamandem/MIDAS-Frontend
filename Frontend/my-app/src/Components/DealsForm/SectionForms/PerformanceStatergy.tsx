@@ -77,99 +77,99 @@ const PerformanceStrategy: React.FC<PerformanceStrategyProps> = ({ data }) => {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell><strong>Percent Change on Day</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Percent Change on Day</strong></TableCell>
               <TableCell>{data.percent_change_on_day}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Percent Change Last 7 Days</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Percent Change Last 7 Days</strong></TableCell>
               <TableCell>{data.percent_change_last_7_days}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>52 Week High</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>52 Week High</strong></TableCell>
               <TableCell>{data["52_week_high"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Percent Below 52 Week High</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Percent Below 52 Week High</strong></TableCell>
               <TableCell>{data.percent_below_52_week_high}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Sector Stats (Last 30 Days) Performance</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Sector Stats (Last 30 Days) Performance</strong></TableCell>
               <TableCell>{data.sector_stats_l30d_performance}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Sector Stats Correlation</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Sector Stats Correlation</strong></TableCell>
               <TableCell>{data.sector_stats_correlation}</TableCell>
             </TableRow>
 
             <TableRow>
-              <TableCell><strong>3M ADTV (EU) USD</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>3M ADTV (EU) USD</strong></TableCell>
               <TableCell>{data["3m_adtv_eu_line"].usd}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>3M ADTV (EU) Shares</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>3M ADTV (EU) Shares</strong></TableCell>
               <TableCell>{data["3m_adtv_eu_line"].shares}</TableCell>
             </TableRow>
 
             <TableRow>
-              <TableCell><strong>3M ADTV (Local) USD</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>3M ADTV (Local) USD</strong></TableCell>
               <TableCell>{data["3m_adtv_local_line"].usd}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>3M ADTV (Local) Shares</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>3M ADTV (Local) Shares</strong></TableCell>
               <TableCell>{data["3m_adtv_local_line"].shares}</TableCell>
             </TableRow>
 
             <TableRow>
-              <TableCell><strong>Beta (SMI)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Beta (SMI)</strong></TableCell>
               <TableCell>{data.beta_smi}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Beta (SX5E)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Beta (SX5E)</strong></TableCell>
               <TableCell>{data.beta_sx5e}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>1 Sigma Block Trading Days (12M)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>1 Sigma Block Trading Days (12M)</strong></TableCell>
               <TableCell>{data["1_sigma_block_trading_days_l12m"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>3M Volatility</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>3M Volatility</strong></TableCell>
               <TableCell>{data["3m_volatility"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>RSI (14D)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>RSI (14D)</strong></TableCell>
               <TableCell>{data.rsi_14d}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>RSI (30D)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>RSI (30D)</strong></TableCell>
               <TableCell>{data.rsi_30d}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>DMI (14D)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>DMI (14D)</strong></TableCell>
               <TableCell>{data.dmi_14d}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>MACD (9D)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>MACD (9D)</strong></TableCell>
               <TableCell>{data.macd_9d}</TableCell>
             </TableRow>
 
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (10D)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Stock Relative to MA (10D)</strong></TableCell>
               <TableCell>{data.stock_relative_to_ma["10d"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (20D)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Stock Relative to MA (20D)</strong></TableCell>
               <TableCell>{data.stock_relative_to_ma["20d"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (50D)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Stock Relative to MA (50D)</strong></TableCell>
               <TableCell>{data.stock_relative_to_ma["50d"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (100D)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Stock Relative to MA (100D)</strong></TableCell>
               <TableCell>{data.stock_relative_to_ma["100d"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (200D)</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Stock Relative to MA (200D)</strong></TableCell>
               <TableCell>{data.stock_relative_to_ma["200d"]}</TableCell>
             </TableRow>
           </TableBody>

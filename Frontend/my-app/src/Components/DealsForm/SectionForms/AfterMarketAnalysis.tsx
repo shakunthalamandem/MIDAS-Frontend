@@ -53,19 +53,19 @@ const AfterMarketAnalysis: React.FC<AfterMarketAnalysisProps> = ({ data }) => {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell><strong>Safety and Liquidity Check Max Size</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Safety and Liquidity Check Max Size</strong></TableCell>
               <TableCell>{data.safety_and_liquidity_check_max_size}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Shares Left to Go to Expected Allocation</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Shares Left to Go to Expected Allocation</strong></TableCell>
               <TableCell>{data.shares_left_to_go_to_expected_allocation}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Current Price</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Current Price</strong></TableCell>
               <TableCell>{data.current_price}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Percent Change from Offer</strong></TableCell>
+              <TableCell sx={{color:'#4d4d4d'}}><strong>Percent Change from Offer</strong></TableCell>
               <TableCell>{data.percent_change_from_offer}</TableCell>
             </TableRow>
           </TableBody>
