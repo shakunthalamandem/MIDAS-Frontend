@@ -1,94 +1,52 @@
-import { Container, Grid, Typography } from '@mui/material';
+import { Container, Grid, Typography, CircularProgress } from '@mui/material';
 import Background from './SectionForms/Background';
 import DealActivity from './SectionForms/DealActivity';
 import DealDetailsForm from './SectionForms/DealDetailsForm';
-import FormalIndicators from './SectionForms/FormalIndicators';
 import HistoricalData from './SectionForms/HistoricalData';
 import Participation from './SectionForms/Participation';
 import PerformanceStatergy from './SectionForms/PerformanceStatergy';
 import TechnicalInsights from './SectionForms/TechnicalInsights';
-import TempJsonData from './TempJsonData'; // Import the TempJsonData component
+import TempJsonData from './TempJsonData';
 import { useState } from 'react';
+import { DealFormData } from '../../types/DealFormData';
+import AfterMarketAnalysis from './SectionForms/AfterMarketAnalysis';
 
-interface VendorIssuer {
-  type: string;
-  from: string[];
-}
+const DealFormMain: React.FC = () => {
+  const [formData, setFormData] = useState<DealFormData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);  // Set initial loading state to true
 
-interface Company {
-  name: string;
-  description: string;
-}
-
-interface FormData {
-  deal_captain: string;
-  team: string;
-  participants: string[];
-  ticker: string;
-  company: Company;
-  vendor_issuer: VendorIssuer;
-}
-
-const DealFormMain = () => {
-  const [formData, setFormData] = useState<FormData | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [ticker, setTicker] = useState<string>("GALD SW"); // Set initial ticker or get it from user input
-
-  const handleDataLoaded = (data: FormData) => {
+  // Handle JSON data loaded from TempJsonData component
+  const handleDataLoaded = (data: DealFormData) => {
     setFormData(data);
+    setLoading(false);  // Data is loaded, so turn off loading
   };
 
-  const handleTickerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTicker(event.target.value); // Update ticker when user changes it
-  };
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!formData) return <div>No data found</div>;
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
-        Deal Form Main
-      </Typography>
+    <Container sx={{mb:5}}>
+     <Typography variant="h5" color='#002060' style={{ textAlign: 'center',marginTop:10 }}>
+  Deal Information Form
+</Typography>
 
-      {/* Ticker input to allow the user to change the ticker */}
-      <input 
-        type="text" 
-        value={ticker} 
-        onChange={handleTickerChange} 
-        placeholder="Enter Ticker" 
-      />
 
-      <Grid container spacing={3}>
-        <Grid item xs={4}>
-          <Background data={formData} />
+      {/* Section Forms */}
+      {formData ? (
+        <Grid container spacing={3}>
+          {/* Render each section based on the data */}
+          <Grid item xs={4}><DealDetailsForm data={formData.company_details} /></Grid>
+          <Grid item xs={4}><Participation data={formData.participation} /></Grid>
+          <Grid item xs={4}><Background data={formData.background} /></Grid>
+          <Grid item xs={4}><DealActivity data={formData.monashee_deal_activity} /></Grid>
+          <Grid item xs={4}><PerformanceStatergy data={formData.performance_statistics} /></Grid>
+          <Grid item xs={4}><AfterMarketAnalysis data={formData.aftermarket_analysis} /></Grid>
+          <Grid item xs={4}><TechnicalInsights data={formData.technical_sentiment_analysis} /></Grid>
+          <Grid item xs={4}><HistoricalData data={formData.historical_transactions} /></Grid>
         </Grid>
-        <Grid item xs={4}>
-          <DealActivity data={formData} />
-        </Grid>
-        <Grid item xs={4}>
-          <DealDetailsForm data={formData} />
-        </Grid>
-        <Grid item xs={4}>
-          <FormalIndicators data={formData} />
-        </Grid>
-        <Grid item xs={4}>
-          <HistoricalData data={formData} />
-        </Grid>
-        <Grid item xs={4}>
-          <Participation data={formData} />
-        </Grid>
-        <Grid item xs={4}>
-          <PerformanceStatergy data={formData} />
-        </Grid>
-        <Grid item xs={4}>
-          <TechnicalInsights data={formData} />
-        </Grid>
-      </Grid>
+      ) : (
+        <Typography variant="body1">No data found</Typography>
+      )}
 
-      {/* Pass the handleDataLoaded function to TempJsonData component */}
+      {/* Fetch Temp.json Data */}
       <TempJsonData onDataLoaded={handleDataLoaded} />
     </Container>
   );
