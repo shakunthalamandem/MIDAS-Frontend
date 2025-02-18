@@ -41,8 +41,7 @@ const PerformanceStrategy: React.FC<PerformanceStrategyProps> = ({ data }) => {
   return (
     <div>
       <Typography variant="h6" gutterBottom>
-        Performance Strategy
-      </Typography>
+      Performance Statistics      </Typography>
 
       <TableContainer component={Paper}>
         <Table size="small" aria-label="performance strategy table">
