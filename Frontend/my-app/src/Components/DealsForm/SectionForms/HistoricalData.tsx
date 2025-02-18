@@ -93,7 +93,7 @@ const HistoricalData: React.FC<HistoricalDataProps> = ({ data }) => {
             {data.map((transaction, index) => (
               <React.Fragment key={index}>
                 <TableRow>
-                  <TableCell colSpan={2}>
+                  <TableCell sx={{ color: "#4d4d4d" }} colSpan={2}>
                     <strong>Transaction {index + 1}</strong>
                   </TableCell>
                 </TableRow>
