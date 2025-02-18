@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Container } from '@mui/material';
 import { DealFormData } from '../../../types/DealFormData';
 
 // Define the structure for each transaction
@@ -31,8 +31,11 @@ interface HistoricalDataProps {
 
 const HistoricalData: React.FC<HistoricalDataProps> = ({ data }) => {
   return (
-    <div>
-      <Typography variant="h6" gutterBottom>
+    <Container sx={{mt:2,mb:2}}>
+
+     <Typography variant="h6" color='#aa1e13' style={{ textAlign: 'center',marginBottom:2}}>
+
+
         Historical Data
       </Typography>
       
@@ -117,7 +120,7 @@ const HistoricalData: React.FC<HistoricalDataProps> = ({ data }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Container>
   );
 };
 

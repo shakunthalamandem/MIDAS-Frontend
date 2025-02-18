@@ -37,8 +37,11 @@ interface BackgroundProps {
 
 const Background: React.FC<BackgroundProps> = ({ data }) => {
   return (
-    <div>
-      <Typography variant="h6" gutterBottom>
+    <Container sx={{mt:2,mb:2}}>
+    
+     <Typography variant="h6" color='#aa1e13' style={{ textAlign: 'center',marginBottom:2}}>
+
+
         Background Data
       </Typography>
 
@@ -141,7 +144,7 @@ const Background: React.FC<BackgroundProps> = ({ data }) => {
         </Table>
       </TableContainer>
 
-    </div>
+    </Container>
   );
 };
 

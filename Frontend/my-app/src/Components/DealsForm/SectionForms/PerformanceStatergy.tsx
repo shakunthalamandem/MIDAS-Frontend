@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Container } from '@mui/material';
 
 interface PerformanceStatisticsData {
   percent_change_on_day: string;
@@ -39,8 +39,11 @@ interface PerformanceStrategyProps {
 
 const PerformanceStrategy: React.FC<PerformanceStrategyProps> = ({ data }) => {
   return (
-    <div>
-      <Typography variant="h6" gutterBottom>
+    <Container sx={{mt:2,mb:2}}>
+
+     <Typography variant="h6" color='#aa1e13' style={{ textAlign: 'center',marginBottom:2}}>
+
+
       Performance Statistics      </Typography>
 
       <TableContainer component={Paper} sx={{height:'400px'
@@ -152,7 +155,7 @@ const PerformanceStrategy: React.FC<PerformanceStrategyProps> = ({ data }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Container>
   );
 };
 

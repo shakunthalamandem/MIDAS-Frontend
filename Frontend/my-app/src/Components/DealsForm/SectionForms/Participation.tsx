@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Container } from '@mui/material';
 
 interface ParticipationData {
   allocation: {
@@ -60,8 +60,11 @@ interface ParticipationProps {
 
 const Participation: React.FC<ParticipationProps> = ({ data }) => {
   return (
-    <div>
-      <Typography variant="h6" gutterBottom>
+    <Container sx={{mt:2,mb:2}}>
+
+     <Typography variant="h6" color='#aa1e13' style={{ textAlign: 'center',marginBottom:2}}>
+
+
         Participation Details
       </Typography>
 
@@ -215,7 +218,7 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Container>
   );
 };
 

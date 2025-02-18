@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Container } from '@mui/material';
 
 interface AllocExpected {
   shares: number;
@@ -24,8 +24,11 @@ interface DealActivityProps {
 
 const DealActivity: React.FC<DealActivityProps> = ({ data }) => {
   return (
-    <div>
-      <Typography variant="h6" gutterBottom>
+    <Container sx={{mt:2,mb:2}}>
+
+     <Typography variant="h6" color='#aa1e13' style={{ textAlign: 'center',marginBottom:2}}>
+
+
         Monashee Deal Activity
       </Typography>
 
@@ -81,7 +84,7 @@ const DealActivity: React.FC<DealActivityProps> = ({ data }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Container>
   );
 };
 

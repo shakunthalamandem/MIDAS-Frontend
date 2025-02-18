@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Container } from '@mui/material';
 
 interface TechnicalSentimentAnalysis {
   discount_analysis_v1_percent: number;
@@ -36,9 +36,10 @@ interface TechnicalInsightsProps {
 
 const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
   return (
-    <div>
-      <Typography variant="h6" gutterBottom>
-        Technical Sentiment Analysis
+    <Container sx={{mt:2,mb:2}}>
+     <Typography variant="h6" color='#aa1e13' style={{ textAlign: 'center',marginBottom:2}}>
+
+     Technical Sentiment Analysis
       </Typography>
 
       <TableContainer component={Paper} sx={{ height: '400px' }}>
@@ -157,7 +158,7 @@ const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Container>
   );
 };
 

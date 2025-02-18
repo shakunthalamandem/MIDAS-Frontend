@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Container } from '@mui/material';
 
 interface AfterMarketAnalysisData {
   safety_and_liquidity_check_max_size: string;
@@ -14,8 +14,11 @@ interface AfterMarketAnalysisProps {
 
 const AfterMarketAnalysis: React.FC<AfterMarketAnalysisProps> = ({ data }) => {
   return (
-    <div>
-      <Typography variant="h6" gutterBottom>
+    <Container sx={{mt:2,mb:2}}>
+
+     <Typography variant="h6" color='#aa1e13' style={{ textAlign: 'center',marginBottom:2}}>
+
+
         After Market Analysis
       </Typography>
 
@@ -48,7 +51,7 @@ const AfterMarketAnalysis: React.FC<AfterMarketAnalysisProps> = ({ data }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Container>
   );
 };
 
