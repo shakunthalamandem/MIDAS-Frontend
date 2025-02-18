@@ -1,13 +1,15 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from '@mui/material';
+
+interface AfterMarketAnalysisData {
+  safety_and_liquidity_check_max_size: string;
+  shares_left_to_go_to_expected_allocation: number;
+  current_price: string;
+  percent_change_from_offer: string;
+}
 
 interface AfterMarketAnalysisProps {
-  data: {
-    safety_and_liquidity_check_max_size: string;
-    shares_left_to_go_to_expected_allocation: number;
-    current_price: string;
-    percent_change_from_offer: string;
-  };
+  data: AfterMarketAnalysisData;
 }
 
 const AfterMarketAnalysis: React.FC<AfterMarketAnalysisProps> = ({ data }) => {
@@ -16,30 +18,31 @@ const AfterMarketAnalysis: React.FC<AfterMarketAnalysisProps> = ({ data }) => {
       <Typography variant="h6" gutterBottom>
         After Market Analysis
       </Typography>
+
       <TableContainer component={Paper}>
-        <Table>
+        <Table size="small" aria-label="aftermarket analysis table">
           <TableHead>
             <TableRow>
-              <TableCell>Attribute</TableCell>
-              <TableCell align="right">Value</TableCell>
+              <TableCell><strong>Key</strong></TableCell>
+              <TableCell><strong>Value</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell>Safety & Liquidity Check Max Size</TableCell>
-              <TableCell align="right">{data.safety_and_liquidity_check_max_size}</TableCell>
+              <TableCell><strong>Safety and Liquidity Check Max Size</strong></TableCell>
+              <TableCell>{data.safety_and_liquidity_check_max_size}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Shares Left to Go to Expected Allocation</TableCell>
-              <TableCell align="right">{data.shares_left_to_go_to_expected_allocation}</TableCell>
+              <TableCell><strong>Shares Left to Go to Expected Allocation</strong></TableCell>
+              <TableCell>{data.shares_left_to_go_to_expected_allocation}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Current Price</TableCell>
-              <TableCell align="right">{data.current_price}</TableCell>
+              <TableCell><strong>Current Price</strong></TableCell>
+              <TableCell>{data.current_price}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Percent Change from Offer</TableCell>
-              <TableCell align="right">{data.percent_change_from_offer}</TableCell>
+              <TableCell><strong>Percent Change from Offer</strong></TableCell>
+              <TableCell>{data.percent_change_from_offer}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

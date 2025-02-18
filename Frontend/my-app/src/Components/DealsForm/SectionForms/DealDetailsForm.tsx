@@ -1,37 +1,74 @@
 import React from 'react';
-import { TextField, Typography } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from '@mui/material';
+
+interface CompanyDetailsData {
+  deal_captain: string;
+  international_team: string[];
+  ticker: string;
+  company_name: string;
+  description: {
+    country: string;
+    sector: string;
+    industry: string;
+  };
+  vendor_issuer: string[];
+}
 
 interface DealDetailsFormProps {
-  data: {
-    company: {
-      name: string;
-      description: string;
-    };
-  };
+  data: CompanyDetailsData;
 }
 
 const DealDetailsForm: React.FC<DealDetailsFormProps> = ({ data }) => {
-  const { name, description } = data.company;
-
   return (
     <div>
       <Typography variant="h6" gutterBottom>
-        Deal Details
+        Company Details
       </Typography>
-      <TextField
-        label="Company Name"
-        value={name}
-        onChange={(e) => console.log(e.target.value)} // Handle change logic if needed
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="Company Description"
-        value={description}
-        onChange={(e) => console.log(e.target.value)} // Handle change logic if needed
-        fullWidth
-        margin="normal"
-      />
+
+      <TableContainer component={Paper}>
+        <Table size="small" aria-label="company details table">
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>Key</strong></TableCell>
+              <TableCell><strong>Value</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell><strong>Deal Captain</strong></TableCell>
+              <TableCell>{data.deal_captain}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>International Team</strong></TableCell>
+              <TableCell>{data.international_team.join(", ")}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Ticker</strong></TableCell>
+              <TableCell>{data.ticker}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Company Name</strong></TableCell>
+              <TableCell>{data.company_name}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Country</strong></TableCell>
+              <TableCell>{data.description.country}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Sector</strong></TableCell>
+              <TableCell>{data.description.sector}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Industry</strong></TableCell>
+              <TableCell>{data.description.industry}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Vendor Issuer</strong></TableCell>
+              <TableCell>{data.vendor_issuer.join(", ")}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };
