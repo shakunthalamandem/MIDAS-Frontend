@@ -39,6 +39,7 @@ export interface DealFormData {
     };
     initial_range: string;
     deal_colour: string;
+    use_of_proceeds: string;
     allocation_layout: {
       institutional: number;
       retail: number;
@@ -109,7 +110,8 @@ export interface DealFormData {
     };
     beta_smi: number;
     beta_sx5e: number;
-    "1_sigma_block_trading_days_l12m": string;
+    "1_sigma_block_trading_days": string;
+    "1_Sigma_L12M":string;
     "3m_volatility": number;
     rsi_14d: number;
     rsi_30d: number;

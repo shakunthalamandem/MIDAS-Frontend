@@ -28,7 +28,8 @@ interface PerformanceStatisticsData {
   };
   beta_smi: number;
   beta_sx5e: number;
-  "1_sigma_block_trading_days_l12m": string;
+  "1_sigma_block_trading_days": string;
+  "1_Sigma_L12M":string;
   "3m_volatility": number;
   rsi_14d: number;
   rsi_30d: number;
@@ -174,6 +175,12 @@ const PerformanceStrategy: React.FC<PerformanceStrategyProps> = ({ data }) => {
               <TableCell>{data.beta_sx5e}</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell><strong>1 Sigma Block Trading Days </strong></TableCell>
+              <TableCell>{data["1_sigma_block_trading_days"]}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>1 Sigma Block L12M </strong></TableCell>
+              <TableCell>{data["1_Sigma_L12M"]}</TableCell>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>1 Sigma Block Trading Days (12M)</strong>
               </TableCell>

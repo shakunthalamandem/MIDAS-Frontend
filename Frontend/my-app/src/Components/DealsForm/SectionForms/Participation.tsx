@@ -39,6 +39,7 @@ interface ParticipationData {
   };
   initial_range: string;
   deal_colour: string;
+  use_of_proceeds:string;
   allocation_layout: {
     institutional: number;
     retail: number;
