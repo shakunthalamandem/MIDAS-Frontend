@@ -10,6 +10,7 @@ import TempJsonData from './TempJsonData';
 import { useState } from 'react';
 import { DealFormData } from '../../types/DealFormData';
 import AfterMarketAnalysis from './SectionForms/AfterMarketAnalysis';
+import DealFormSearch from './DealFormSearch';
 
 const DealFormMain: React.FC = () => {
   const [formData, setFormData] = useState<DealFormData | null>(null);
@@ -27,6 +28,7 @@ const DealFormMain: React.FC = () => {
      <Typography variant="h5" color='#002060' style={{ textAlign: 'center',marginTop:10 }}>
   Deal Information Form
 </Typography>
+<DealFormSearch />
 
 
       {/* Section Forms */}
