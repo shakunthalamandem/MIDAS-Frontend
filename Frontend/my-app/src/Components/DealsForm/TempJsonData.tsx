@@ -13,8 +13,9 @@ const TempJsonData: React.FC<{ onDataLoaded: (data: any) => void }> = ({ onDataL
       })
       .catch((error) => console.error("Error loading data:", error));
   }, [onDataLoaded]);
+  console.log("filtersData",filtersData)
 
-  return null; // Does not render UI directly
+  return null; 
 };
 
 export default TempJsonData;
