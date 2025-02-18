@@ -1,19 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-interface DealFormData {
-  deal_captain: string;
-  team: string;
-  participants: string[];
-  ticker: string;
-  company: {
-    name: string;
-    description: string;
-  };
-  vendor_issuer: {
-    type: string;
-    from: string[];
-  };
-}
+import { DealFormData } from "../../types/DealFormData";
 
 interface TempJsonDataProps {
   onDataLoaded: (data: DealFormData) => void;
@@ -23,11 +9,11 @@ const TempJsonData: React.FC<TempJsonDataProps> = ({ onDataLoaded }) => {
   const [filtersData, setFiltersData] = useState<DealFormData | null>(null);
 
   useEffect(() => {
-    fetch("/Temp.json")
+    fetch("/Temp.json") // Fetch data from the json file
       .then((response) => response.json())
       .then((data: DealFormData) => {
         setFiltersData(data);
-        onDataLoaded(data); // Pass data to parent
+        onDataLoaded(data); // Pass the full data to parent
       })
       .catch((error) => console.error("Error loading data:", error));
   }, [onDataLoaded]);
