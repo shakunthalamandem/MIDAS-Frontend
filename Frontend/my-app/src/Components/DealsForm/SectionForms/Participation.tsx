@@ -29,6 +29,7 @@ interface ParticipationData {
   };
   initial_range: string;
   deal_colour: string;
+  use_of_proceeds:string;
   allocation_layout: {
     institutional: number;
     retail: number;
@@ -159,6 +160,11 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
             <TableRow>
               <TableCell><strong>Deal Colour</strong></TableCell>
               <TableCell>{data.deal_colour}</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell><strong>Use of Proceeds</strong></TableCell>
+              <TableCell>{data.use_of_proceeds}</TableCell>
             </TableRow>
 
             <TableRow>
