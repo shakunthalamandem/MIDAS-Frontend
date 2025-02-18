@@ -20,8 +20,11 @@ import ForgotPassword from "./ForgotPassword";
 interface LoginResponse {
   access_token: string;
   refresh_token: string;
-  message: string;
+  user: {
+    is_superuser: boolean;
+  };
 }
+
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -106,18 +109,22 @@ const Login: React.FC = () => {
 
     setLoading(true);
     setError(""); // Clear any previous error message
-
+  
     try {
       const response = await axios.post<LoginResponse>(`${apiUrl}/api/login/`, {
         username,
         password,
       });
-      const { access_token, refresh_token } = response.data;
-
+      const { access_token, refresh_token, user } = response.data;
+  
       // Store tokens securely
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
-
+      localStorage.setItem("user", username)
+  
+      // Store superuser status
+      localStorage.setItem("is_superuser", user.is_superuser ? "true" : "false");
+  
       // Redirect to the dashboard
       navigate("/");
     } catch (err: any) {
@@ -128,6 +135,7 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     const interval = setInterval(() => {
       refreshCaptcha();
@@ -240,7 +248,7 @@ const Login: React.FC = () => {
           {/* CAPTCHA Canvas */}
           <canvas
             ref={canvasRef}
-            width={130}
+            width={150}
             height={40}
             style={{
               border: "1px solid #d3d290", // Set border color
@@ -364,5 +372,6 @@ const Login: React.FC = () => {
     </Container>
   );
 };
+
 
 export default Login;

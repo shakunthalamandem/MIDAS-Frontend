@@ -17,12 +17,27 @@ interface YearData {
 }
 
 interface Props {
-  data: YearData;
+  data: YearData | { message: string }; // data can either be the actual YearData or an error message
 }
 
 const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
   const theme = useTheme(); // Use theme for consistent colors
 
+  // Check if data contains the error message
+  if ('message' in data && data.message === "No data found for the given filters.") {
+    return (
+      <Box sx={{ textAlign: "center", padding: 4 }}>
+        <Typography variant="h6" color="textSecondary">
+          No Data Available for the selected filters.
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Please change the selected filters to show the Plot.
+        </Typography>
+      </Box>
+    );
+  }
+
+  // If no data, return early with the same message
   const chartData = Object.entries(data).map(([year, values]) => ({
     year,
     avgFoDiscount: values.avg_fo_discount,
