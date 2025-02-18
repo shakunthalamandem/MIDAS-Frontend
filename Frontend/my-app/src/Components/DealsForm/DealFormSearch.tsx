@@ -42,8 +42,6 @@ const DealFormSearch: React.FC = () => {
         justifyContent: "center", 
         alignItems: "center", 
         height: "10vh",
-        width:"1880px",
-        backgroundColor: "#f5f5f5"
       }}
     >
       <FormControl sx={{ m: 1, minWidth: 190 }} size="small">
