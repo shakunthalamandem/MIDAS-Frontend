@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Container, CardContent, Card } from '@mui/material';
 
 interface BackgroundData {
   syndicate: string[];
@@ -42,7 +42,9 @@ const Background: React.FC<BackgroundProps> = ({ data }) => {
         Background Data
       </Typography>
 
-      <TableContainer component={Paper}>
+
+      <TableContainer component={Paper} sx={{height:'400px'
+      }}>
         <Table size="small" aria-label="background data table">
           <TableHead>
             <TableRow>
@@ -138,6 +140,7 @@ const Background: React.FC<BackgroundProps> = ({ data }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
     </div>
   );
 };
