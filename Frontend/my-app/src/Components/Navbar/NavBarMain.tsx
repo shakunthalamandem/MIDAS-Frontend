@@ -6,18 +6,16 @@ import {
   Tab,
   Button,
   Box,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  CircularProgress,
+  Typography
+
 } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
+import Logs from "../Main/HomePage/Authentication/Logs";
+import Logout from "../Main/HomePage/Authentication/Logout";
 
 const pages = [
   "New Issue Market",
@@ -31,11 +29,9 @@ const NavbarMain: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const location = useLocation();
-  const [openLogsDialog, setOpenLogsDialog] = useState(false);
   const isSuperUser = localStorage.getItem('is_superuser') === 'true';
   const [showLogs, setShowLogs] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -43,9 +39,7 @@ const NavbarMain: React.FC = () => {
   const refresh_token = localStorage.getItem("refresh_token");
   const user = localStorage.getItem("user");
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
+
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
@@ -109,16 +103,7 @@ const NavbarMain: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
-    setLoading(true);
-    setTimeout(() => {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      setLoading(false);
-      setOpenDialog(false);
-      navigate("/login");
-    }, 1500); // Simulate API delay
-  };
+
 
   const isLoggedIn = !!localStorage.getItem("access_token");
 
