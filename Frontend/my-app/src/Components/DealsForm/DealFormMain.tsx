@@ -39,12 +39,14 @@ const DealFormMain: React.FC = () => {
           <Grid item xs={4}><PerformanceStatergy data={formData.performance_statistics} /></Grid>
           <Grid item xs={4}><HistoricalData data={formData.historical_transactions} /></Grid>
           <Grid item xs={4}><Participation data={formData.participation} /></Grid>
+          <Grid item xs={4}><DealActivity data={formData.monashee_deal_activity} /></Grid>
+          <Grid item xs={4}><TechnicalInsights data={formData.technical_sentiment_analysis} /></Grid>
 
 
 
 
           {/* <Grid item xs={4}><DealActivity data={formData.monashee_deal_activity} /></Grid>
-          <Grid item xs={4}><TechnicalInsights data={formData.technical_sentiment_analysis} /></Grid> */}
+           */}
         </Grid>
       ) : (
         <Typography variant="body1">No data found</Typography>
