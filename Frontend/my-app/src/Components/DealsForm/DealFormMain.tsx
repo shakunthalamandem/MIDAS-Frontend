@@ -33,8 +33,7 @@ interface DealFormData {
 const DealFormMain: React.FC = () => {
   const [formData, setFormData] = useState<DealFormData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [ticker, setTicker] = useState<string>("GALD SW");
+
 
   // Handle JSON data loaded from TempJsonData component
   const handleDataLoaded = (data: DealFormData) => {
@@ -42,13 +41,8 @@ const DealFormMain: React.FC = () => {
     setLoading(false);
   };
 
-  // Handle ticker input change
-  const handleTickerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTicker(event.target.value);
-  };
 
   if (loading) return <CircularProgress />;
-  if (error) return <div>Error: {error}</div>;
 
   return (
     <Container>
@@ -56,27 +50,17 @@ const DealFormMain: React.FC = () => {
         Deal Form Main
       </Typography>
 
-      {/* Ticker Input Field */}
-      <TextField
-        label="Enter Ticker"
-        value={ticker}
-        onChange={handleTickerChange}
-        fullWidth
-        variant="outlined"
-        margin="normal"
-      />
-
       {/* Section Forms */}
       {formData ? (
         <Grid container spacing={3}>
           <Grid item xs={4}><Background data={formData} /></Grid>
-          <Grid item xs={4}><DealActivity data={formData} /></Grid>
+          {/* <Grid item xs={4}><DealActivity data={formData} /></Grid>
           <Grid item xs={4}><DealDetailsForm data={formData} /></Grid>
           <Grid item xs={4}><FormalIndicators data={formData} /></Grid>
           <Grid item xs={4}><HistoricalData data={formData} /></Grid>
           <Grid item xs={4}><Participation data={formData} /></Grid>
           <Grid item xs={4}><PerformanceStatergy data={formData} /></Grid>
-          <Grid item xs={4}><TechnicalInsights data={formData} /></Grid>
+          <Grid item xs={4}><TechnicalInsights data={formData} /></Grid> */}
         </Grid>
       ) : (
         <Typography variant="body1">No data found</Typography>
