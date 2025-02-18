@@ -36,7 +36,8 @@ const HistoricalData: React.FC<HistoricalDataProps> = ({ data }) => {
         Historical Data
       </Typography>
       
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{height:'400px'
+      }}>
         <Table size="small" aria-label="historical data table">
           <TableHead>
             <TableRow>

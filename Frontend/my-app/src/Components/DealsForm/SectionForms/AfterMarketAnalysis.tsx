@@ -19,7 +19,8 @@ const AfterMarketAnalysis: React.FC<AfterMarketAnalysisProps> = ({ data }) => {
         After Market Analysis
       </Typography>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{height:'400px'
+      }}>
         <Table size="small" aria-label="aftermarket analysis table">
           <TableHead>
             <TableRow>

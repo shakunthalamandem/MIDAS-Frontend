@@ -65,7 +65,8 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
         Participation Details
       </Typography>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{height:'400px'
+      }}>
         <Table size="small" aria-label="participation details table">
           <TableHead>
             <TableRow>

@@ -25,7 +25,8 @@ const DealDetailsForm: React.FC<DealDetailsFormProps> = ({ data }) => {
         Company Details
       </Typography>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{height:'400px'
+      }}>
         <Table size="small" aria-label="company details table">
           <TableHead>
             <TableRow>

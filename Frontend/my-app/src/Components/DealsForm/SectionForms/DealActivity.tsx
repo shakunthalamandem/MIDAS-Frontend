@@ -15,7 +15,8 @@ const DealActivity: React.FC<DealActivityProps> = ({ data }) => {
       <Typography variant="h6" gutterBottom>
         Deal Activity
       </Typography>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{height:'400px'
+      }}>
         <Table>
           <TableHead>
             <TableRow>
