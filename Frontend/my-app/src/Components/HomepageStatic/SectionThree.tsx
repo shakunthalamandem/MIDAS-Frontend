@@ -31,13 +31,11 @@ const SectionThree = () => {
   useEffect(() => {
     const fetchData = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
       if (!apiUrl) return;
 
       const response = await axios.get<APIResponse>(`${apiUrl}/api/delogic_data_count/`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
         },
       });
 
