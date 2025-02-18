@@ -11,7 +11,6 @@ const Logout: React.FC<LogoutProps> = ({ onConfirm, onCancel }) => {
 
   const handleLogout = () => {
     setLoading(true);
-    // Call the onConfirm callback to handle actual logout logic
     setTimeout(() => {
       setLoading(false);
       onConfirm(); // Invoke onConfirm when logout is successful
