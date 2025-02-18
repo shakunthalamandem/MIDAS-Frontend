@@ -23,7 +23,7 @@ const DealFormMain: React.FC = () => {
 
 
   return (
-    <Container>
+    <Container sx={{mb:5}}>
      <Typography variant="h5" color='#002060' style={{ textAlign: 'center',marginTop:10 }}>
   Deal Information Form
 </Typography>
@@ -34,19 +34,13 @@ const DealFormMain: React.FC = () => {
         <Grid container spacing={3}>
           {/* Render each section based on the data */}
           <Grid item xs={4}><DealDetailsForm data={formData.company_details} /></Grid>
-          <Grid item xs={4}><AfterMarketAnalysis data={formData.aftermarket_analysis} /></Grid>
-          <Grid item xs={4}><Background data={formData.background} /></Grid>
-          <Grid item xs={4}><PerformanceStatergy data={formData.performance_statistics} /></Grid>
-          <Grid item xs={4}><HistoricalData data={formData.historical_transactions} /></Grid>
           <Grid item xs={4}><Participation data={formData.participation} /></Grid>
+          <Grid item xs={4}><Background data={formData.background} /></Grid>
           <Grid item xs={4}><DealActivity data={formData.monashee_deal_activity} /></Grid>
+          <Grid item xs={4}><PerformanceStatergy data={formData.performance_statistics} /></Grid>
+          <Grid item xs={4}><AfterMarketAnalysis data={formData.aftermarket_analysis} /></Grid>
           <Grid item xs={4}><TechnicalInsights data={formData.technical_sentiment_analysis} /></Grid>
-
-
-
-
-          {/* <Grid item xs={4}><DealActivity data={formData.monashee_deal_activity} /></Grid>
-           */}
+          <Grid item xs={4}><HistoricalData data={formData.historical_transactions} /></Grid>
         </Grid>
       ) : (
         <Typography variant="body1">No data found</Typography>
