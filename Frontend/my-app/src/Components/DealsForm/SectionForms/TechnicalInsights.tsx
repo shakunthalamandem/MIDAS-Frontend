@@ -53,7 +53,7 @@ const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
         color="#aa1e13"
         style={{ textAlign: "center", marginBottom: 2 }}
       >
-        Technical Sentiment Analysis
+        Technical Analysis
       </Typography>
 
       <TableContainer
