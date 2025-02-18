@@ -32,8 +32,27 @@ const DealActivity: React.FC<DealActivityProps> = ({ data }) => {
         Monashee Deal Activity
       </Typography>
 
-      <TableContainer component={Paper} sx={{ height: '400px' }}>
-        <Table size="small" aria-label="monashee deal activity table">
+      <TableContainer
+  component={Paper}
+  sx={{
+    height: '400px',
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+      width: '6px',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#aaa',
+      borderRadius: '10px',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+      backgroundColor: '#888',
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: '#f0f0f0',
+      borderRadius: '10px',
+    },
+  }}
+>        <Table size="small" aria-label="monashee deal activity table">
           <TableHead>
             <TableRow>
               <TableCell><strong>Key</strong></TableCell>

@@ -22,8 +22,27 @@ const AfterMarketAnalysis: React.FC<AfterMarketAnalysisProps> = ({ data }) => {
         After Market Analysis
       </Typography>
 
-      <TableContainer component={Paper} sx={{height:'400px'
-      }}>
+        <TableContainer
+  component={Paper}
+  sx={{
+    height: '400px',
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+      width: '6px',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#aaa',
+      borderRadius: '10px',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+      backgroundColor: '#888',
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: '#f0f0f0',
+      borderRadius: '10px',
+    },
+  }}
+>
         <Table size="small" aria-label="aftermarket analysis table">
           <TableHead>
             <TableRow>
