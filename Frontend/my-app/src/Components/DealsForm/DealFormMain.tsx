@@ -25,9 +25,10 @@ const DealFormMain: React.FC = () => {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
-        Deal Form Main
-      </Typography>
+     <Typography variant="h5" color='#002060' style={{ textAlign: 'center',marginTop:10 }}>
+  Deal Information Form
+</Typography>
+
 
       {/* Section Forms */}
       {formData ? (
