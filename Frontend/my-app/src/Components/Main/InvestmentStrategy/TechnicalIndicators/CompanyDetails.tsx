@@ -35,7 +35,6 @@ const CompanyDetails: React.FC<CompanyDetailsProps> = ({ ticker }) => {
       const payload = { ticker };
 
       try {
-        // Fetch company details
         const companyResponse = await axios.post<CompanyDetailsResponse>(
           `${apiUrl}/api/stockbasicdata/`,
           payload,
