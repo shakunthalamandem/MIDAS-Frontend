@@ -1,36 +1,34 @@
 import React from 'react';
-import { TextField, Typography } from '@mui/material';
+import { Card, CardContent, Typography } from '@mui/material';
 
-interface BackgroundProps {
-  data: {
-    deal_captain: string;
-    team: string;
+interface FormData {
+  deal_captain: string;
+  team: string;
+  participants: string[];
+  ticker: string;
+  company: {
+    name: string;
+    description: string;
+  };
+  vendor_issuer: {
+    type: string;
+    from: string[];
   };
 }
 
-const Background: React.FC<BackgroundProps> = ({ data }) => {
-  const { deal_captain, team } = data;
+interface BackgroundProps {
+  data: FormData;
+}
 
+const Background: React.FC<BackgroundProps> = ({ data }) => {
   return (
-    <div>
-      <Typography variant="h6" gutterBottom>
-        Background
-      </Typography>
-      <TextField
-        label="Deal Captain"
-        value={deal_captain}
-        onChange={(e) => console.log(e.target.value)} // Handle change logic if needed
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="Team"
-        value={team}
-        onChange={(e) => console.log(e.target.value)} // Handle change logic if needed
-        fullWidth
-        margin="normal"
-      />
-    </div>
+    <Card>
+      <CardContent>
+        <Typography variant="h6">Background Information</Typography>
+        <Typography variant="body1">Company: {data.company.name}</Typography>
+        <Typography variant="body1">Description: {data.company.description}</Typography>
+      </CardContent>
+    </Card>
   );
 };
 
