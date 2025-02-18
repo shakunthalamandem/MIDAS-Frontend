@@ -46,8 +46,9 @@ const AfterMarketAnalysis: React.FC<AfterMarketAnalysisProps> = ({ data }) => {
         <Table size="small" aria-label="aftermarket analysis table">
           <TableHead>
             <TableRow>
-              <TableCell><strong>Key</strong></TableCell>
-              <TableCell><strong>Value</strong></TableCell>
+              <TableCell sx={{color:'#002060'}}><strong>Key</strong></TableCell>
+              <TableCell sx={{color:'#002060'}}><strong>Value</strong></TableCell>
+
             </TableRow>
           </TableHead>
           <TableBody>

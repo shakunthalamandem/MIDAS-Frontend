@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Container } from '@mui/material';
+import { color } from 'framer-motion';
 
 interface TechnicalSentimentAnalysis {
   discount_analysis_v1_percent: number;
@@ -65,8 +66,8 @@ const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
 >        <Table size="small" aria-label="technical sentiment analysis table">
           <TableHead>
             <TableRow>
-              <TableCell><strong>Key</strong></TableCell>
-              <TableCell><strong>Value</strong></TableCell>
+              <TableCell sx={{color:'#002060'}}><strong>Key</strong></TableCell>
+              <TableCell sx={{color:'#002060'}}><strong>Value</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
