@@ -76,7 +76,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, select
             sx={{
               padding: 5,
               marginBottom: 3,
-              width: "90%",
+              width: "1300px",
               background: "#F5E8DC",
             }}
           >
