@@ -6,7 +6,6 @@ import {
   Checkbox,
   Card,
   CardContent,
-  Container,
   CircularProgress,
   Accordion,
   AccordionSummary,
@@ -18,12 +17,10 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { LoadingButton } from "@mui/lab";
-import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
 import MDDScreenergrid from "./MDDScreenergrid";
 import DealStatsGraph from "./DealStatsGraph";
 import Gap from "./Gap";
-import DealTypeComponent from "./DealTypeComponent";
 
 interface FilterOption {
   options: (string | number)[];
@@ -59,7 +56,10 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
     filtersData.forEach((filter) => {
       const key = Object.keys(filter)[0];
-      initialSelectedValues[key] = [];
+      const { options } = filter[key];
+        initialSelectedValues[key] = options.includes("Marketed") || options.includes("Overnight")
+        ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
+        : [];
     });
 
     if (JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)) {
@@ -135,8 +135,12 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
     filtersData.forEach((filter) => {
       const key = Object.keys(filter)[0];
-      resetSelectedValues[key] = [];
+      const { options } = filter[key];
+        resetSelectedValues[key] = options.includes("Marketed") || options.includes("Overnight")
+        ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
+        : [];
     });
+  
     setSelectedValues(resetSelectedValues);
     setAppliedFilters(resetSelectedValues);
     setSearchValue("");

@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { DealFormData } from '../../types/DealFormData';
 import AfterMarketAnalysis from './SectionForms/AfterMarketAnalysis';
 import DealFormSearch from './DealFormSearch';
-
+import Box from '@mui/material/Box';
 const DealFormMain: React.FC = () => {
   const [formData, setFormData] = useState<DealFormData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);  // Set initial loading state to true
@@ -47,6 +47,44 @@ const DealFormMain: React.FC = () => {
           ))}
         </Grid>
       </Box>
+    <Box sx={{ width: "100%", backgroundColor: "#fff" ,height:"40%"}}>
+      <Typography
+    variant="body2"
+    sx={{
+      fontWeight: 500,
+      color: "#FFFFFF",
+      fontSize: { xs: "1rem", sm: "1.2rem" },
+      backgroundColor: "#002060",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "4vh",
+      padding: "8px 16px",
+      borderRadius: "8px",
+      textAlign: "center",
+      marginBottom: "20px",
+      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+      animation: "fadeIn 2s ease-out",
+      "@keyframes fadeIn": {
+        "0%": { opacity: 0, transform: "translateY(-10px)" },
+        "100%": { opacity: 1, transform: "translateY(0)" },
+      },
+    }}
+  >
+    Welcome to New Deal Data...!
+  </Typography>
+  
+    <Container sx={{mb:5}}>
+    
+      
+            
+            
+     <Typography variant="h5" color='#002060' style={{ textAlign: 'center',marginTop:10 }}>
+  Deal Information Form
+</Typography>
+<DealFormSearch />
+
+
       {/* Section Forms */}
       {formData ? (
         <Grid container spacing={3} sx={{ mt: 2 }}>
@@ -65,6 +103,7 @@ const DealFormMain: React.FC = () => {
   
       <TempJsonData onDataLoaded={handleDataLoaded} />
     </Container>
+    </Box>
   );
   
   

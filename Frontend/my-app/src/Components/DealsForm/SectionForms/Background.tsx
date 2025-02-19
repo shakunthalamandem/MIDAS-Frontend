@@ -1,5 +1,17 @@
-import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Container, CardContent, Card } from '@mui/material';
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Paper,
+  Container,
+  CardContent,
+  Card,
+} from "@mui/material";
 
 interface BackgroundData {
   syndicate: string[];
@@ -37,133 +49,186 @@ interface BackgroundProps {
 
 const Background: React.FC<BackgroundProps> = ({ data }) => {
   return (
-    <Container sx={{mt:2,mb:2}}>
-    
-     <Typography variant="h6" color='#aa1e13' style={{ textAlign: 'center',marginBottom:2}}>
-
-
+    <Container sx={{ mt: 2, mb: 2 }}>
+      <Typography
+        variant="h6"
+        color="#aa1e13"
+        style={{ textAlign: "center", marginBottom: 2 }}
+      >
         Background Data
       </Typography>
 
-
-        <TableContainer
-  component={Paper}
-  sx={{
-    height: '400px',
-    overflowY: 'auto',
-    '&::-webkit-scrollbar': {
-      width: '6px',
-    },
-    '&::-webkit-scrollbar-thumb': {
-      backgroundColor: '#aaa',
-      borderRadius: '10px',
-    },
-    '&::-webkit-scrollbar-thumb:hover': {
-      backgroundColor: '#888',
-    },
-    '&::-webkit-scrollbar-track': {
-      backgroundColor: '#f0f0f0',
-      borderRadius: '10px',
-    },
-  }}
->
+      <TableContainer
+        component={Paper}
+        sx={{
+          height: "400px",
+          overflowY: "auto",
+          "&::-webkit-scrollbar": {
+            width: "6px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#aaa",
+            borderRadius: "10px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            backgroundColor: "#888",
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "#f0f0f0",
+            borderRadius: "10px",
+          },
+        }}
+      >
         <Table size="small" aria-label="background data table">
           <TableHead>
-            <TableRow>
-              <TableCell sx={{color:'#002060'}}><strong>Key</strong></TableCell>
-              <TableCell sx={{color:'#002060'}}><strong>Value</strong></TableCell>
-
+            <TableRow
+              sx={{
+                position: "sticky",
+                top: 0,
+                zIndex: 1,
+                backgroundColor: "#f3ecec",
+              }}
+            >
+              <TableCell sx={{ color: "#002060" }}>
+                <strong>Key</strong>
+              </TableCell>
+              <TableCell sx={{ color: "#002060" }}>
+                <strong>Value</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell><strong>Syndicate</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Syndicate</strong>
+              </TableCell>
               <TableCell>{data.syndicate.join(", ")}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>PE Vendor</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>PE Vendor</strong>
+              </TableCell>
               <TableCell>{data.pe_vendor}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Index Fund Participation</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Index Fund Participation</strong>
+              </TableCell>
               <TableCell sx={{bgcolor:"#00FFFF"}}>{data.index_fund_participation.join(", ")}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Recent Earnings Estimate Revision</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Recent Earnings Estimate Revision</strong>
+              </TableCell>
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.recent_earnings_estimate_revision}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Recent Positive News</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Recent Positive News</strong>
+              </TableCell>
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.recent_positive_news}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>VIX Elevated</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>VIX Elevated</strong>
+              </TableCell>
               <TableCell>{data.vix_elevated}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Restrictions</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Restrictions</strong>
+              </TableCell>
               <TableCell>{data.restrictions}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Lock-Up</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Lock-Up</strong>
+              </TableCell>
               <TableCell>{data.lock_up}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>% of Free Float (Current Float)</strong></TableCell>
-              <TableCell sx={{bgcolor:"#FFFF00"}}>{data["%_of_free_float_current_float"].percentage_free_float}%</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>% of Free Float (Current Float)</strong>
+              </TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>
+                {data["%_of_free_float_current_float"].percentage_free_float}%
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>% of Free Float (Pre-Deal)</strong></TableCell>
-              <TableCell sx={{bgcolor:"#FFFF00"}}>{data["%_of_free_float_current_float"].pre_deal_free_float_percentage}%</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>% of Free Float (Pre-Deal)</strong>
+              </TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>
+                {
+                  data["%_of_free_float_current_float"]
+                    .pre_deal_free_float_percentage
+                }
+                %
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Short Interest (Shares)</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Short Interest (Shares)</strong>
+              </TableCell>
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.short_interest.shares}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Short Interest (Dollar Amount)</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Short Interest (Dollar Amount)</strong>
+              </TableCell>
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.short_interest.dollar_amount}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Short Interest (Percentage of Deal)</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Short Interest (Percentage of Deal)</strong>
+              </TableCell>
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.short_interest.percentage_of_deal}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Shares Outstanding Pre-Deal</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Shares Outstanding Pre-Deal</strong>
+              </TableCell>
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.shares_outstanding_pre_deal}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Market Cap Pre-Deal (USD)</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Market Cap Pre-Deal (USD)</strong>
+              </TableCell>
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.market_cap_pre_deal.usd}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Market Cap Pre-Deal (CHF)</strong></TableCell>
-              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.market_cap_pre_deal.chf}</TableCell>
+              <TableCell>{data.market_cap_pre_deal.chf}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Launch Date</strong></TableCell>
-              <TableCell sx={{bgcolor:"#FF0000"}}>{data.launch_date}</TableCell>
+              <TableCell>{data.launch_date}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Trade Date</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Trade Date</strong>
+              </TableCell>
               <TableCell>{data.trade_date}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Settlement Date</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Settlement Date</strong>
+              </TableCell>
               <TableCell>{data.settlement_date}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Next Results Date</strong></TableCell>
-              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.next_results_date}</TableCell>
+              <TableCell>{data.next_results_date}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Club Deal</strong></TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}>
+                <strong>Club Deal</strong>
+              </TableCell>
               <TableCell>{data.club_deal}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
-
     </Container>
   );
 };
