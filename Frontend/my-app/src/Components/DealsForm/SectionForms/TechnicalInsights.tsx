@@ -73,11 +73,11 @@ const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
           <TableBody>
             <TableRow>
               <TableCell><strong>Discount Analysis V1 (%)</strong></TableCell>
-              <TableCell>{data.discount_analysis_v1_percent}%</TableCell>
+              <TableCell sx={{bgcolor:"lightgreen"}}>{data.discount_analysis_v1_percent}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Discount Analysis V2 (%)</strong></TableCell>
-              <TableCell>{data.discount_analysis_v2_percent}%</TableCell>
+              <TableCell sx={{bgcolor:"lightgreen"}}>{data.discount_analysis_v2_percent}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Demand Analysis (USD)</strong></TableCell>
@@ -129,7 +129,7 @@ const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
             </TableRow>
             <TableRow>
               <TableCell><strong>Deal Wallcrossed</strong></TableCell>
-              <TableCell>{data.deal_wallcrossed}</TableCell>
+              <TableCell sx={{bgcolor:"cyan"}}>{data.deal_wallcrossed}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Wallcrossing Coverage (%)</strong></TableCell>
@@ -141,19 +141,19 @@ const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
             </TableRow>
             <TableRow>
               <TableCell><strong>Coverage Estimate (x)</strong></TableCell>
-              <TableCell>{data.coverage_estimate_x}</TableCell>
+              <TableCell sx={{bgcolor:"cyan"}}>{data.coverage_estimate_x}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Coverage Speed (mins)</strong></TableCell>
-              <TableCell>{data.coverage_speed_mins}</TableCell>
+              <TableCell sx={{bgcolor:"cyan"}}>{data.coverage_speed_mins}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>LO Allocation (%)</strong></TableCell>
-              <TableCell>{data.lo_allocation_percent}%</TableCell>
+              <TableCell sx={{bgcolor:"cyan"}}>{data.lo_allocation_percent}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Outsized Anchor</strong></TableCell>
-              <TableCell>{data.outsized_anchor}</TableCell>
+              <TableCell sx={{bgcolor:"cyan"}}>{data.outsized_anchor}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Upsized</strong></TableCell>
@@ -161,7 +161,7 @@ const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
             </TableRow>
             <TableRow>
               <TableCell><strong>Price vs V1 Model Minus (%)</strong></TableCell>
-              <TableCell>{data.price_vs_v1_model_minus_percent}%</TableCell>
+              <TableCell sx={{bgcolor:"lightgreen"}}>{data.price_vs_v1_model_minus_percent}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Price vs V1 Model Divide (%)</strong></TableCell>

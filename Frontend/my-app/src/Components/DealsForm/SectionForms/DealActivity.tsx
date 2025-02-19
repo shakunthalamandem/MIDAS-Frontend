@@ -63,7 +63,7 @@ const DealActivity: React.FC<DealActivityProps> = ({ data }) => {
           <TableBody>
             <TableRow>
               <TableCell><strong>Conviction</strong></TableCell>
-              <TableCell>{data.conviction}</TableCell>
+              <TableCell sx={{bgcolor:"cyan"}}>{data.conviction}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Wallcrossing Size (Shares)</strong></TableCell>
