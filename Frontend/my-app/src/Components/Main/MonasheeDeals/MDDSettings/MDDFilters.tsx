@@ -6,7 +6,6 @@ import {
   Checkbox,
   Card,
   CardContent,
-  Container,
   CircularProgress,
   Accordion,
   AccordionSummary,
@@ -18,12 +17,10 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { LoadingButton } from "@mui/lab";
-import MDDCaptureTable from "./MDDCaptureTable";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
 import MDDScreenergrid from "./MDDScreenergrid";
 import DealStatsGraph from "./DealStatsGraph";
 import Gap from "./Gap";
-import DealTypeComponent from "./DealTypeComponent";
 
 interface FilterOption {
   options: (string | number)[];
