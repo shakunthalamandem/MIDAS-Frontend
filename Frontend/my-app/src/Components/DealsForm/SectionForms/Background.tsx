@@ -197,12 +197,12 @@ const Background: React.FC<BackgroundProps> = ({ data }) => {
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.market_cap_pre_deal.usd}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Market Cap Pre-Deal (CHF)</strong></TableCell>
-              <TableCell>{data.market_cap_pre_deal.chf}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Market Cap Pre-Deal (CHF)</strong></TableCell>
+              <TableCell sx={{ bgcolor:"#FFFF00"}}>{data.market_cap_pre_deal.chf}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Launch Date</strong></TableCell>
-              <TableCell>{data.launch_date}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Launch Date</strong></TableCell>
+              <TableCell sx={{ bgcolor:"#FF0000"}}>{data.launch_date}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
@@ -217,8 +217,8 @@ const Background: React.FC<BackgroundProps> = ({ data }) => {
               <TableCell>{data.settlement_date}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Next Results Date</strong></TableCell>
-              <TableCell>{data.next_results_date}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Next Results Date</strong></TableCell>
+              <TableCell sx={{ bgcolor:"#FFFF00"}}>{data.next_results_date}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>

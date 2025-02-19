@@ -206,16 +206,16 @@ const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
               <TableCell sx={{bgcolor:"#00FFFF"}}>{data.coverage_estimate_x}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Coverage Speed (mins)</strong></TableCell>
-              <TableCell>{data.coverage_speed_mins}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Coverage Speed (mins)</strong></TableCell>
+              <TableCell  sx={{bgcolor:"#00FFFF"}} >{data.coverage_speed_mins}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>LO Allocation (%)</strong></TableCell>
-              <TableCell>{data.lo_allocation_percent}%</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>LO Allocation (%)</strong></TableCell>
+              <TableCell  sx={{bgcolor:"#00FFFF"}}>{data.lo_allocation_percent}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Outsized Anchor</strong></TableCell>
-              <TableCell>{data.outsized_anchor}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Outsized Anchor</strong></TableCell>
+              <TableCell  sx={{bgcolor:"#00FFFF"}}>{data.outsized_anchor}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
@@ -224,8 +224,8 @@ const TechnicalInsights: React.FC<TechnicalInsightsProps> = ({ data }) => {
               <TableCell>{data.upsized}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Price vs V1 Model Minus (%)</strong></TableCell>
-              <TableCell>{data.price_vs_v1_model_minus_percent}%</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Price vs V1 Model Minus (%)</strong></TableCell>
+              <TableCell  sx={{bgcolor:"#00ff00"}}>{data.price_vs_v1_model_minus_percent}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>

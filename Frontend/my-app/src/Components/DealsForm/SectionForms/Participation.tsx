@@ -235,10 +235,14 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
             </TableRow>
 
             <TableRow>
-              <TableCell sx={{ color: "#4d4d4d" }}>
-                <strong>Deal Colour</strong>
-              </TableCell>
-              <TableCell>{data.deal_colour}</TableCell>
+            <TableCell 
+  align="left" 
+  sx={{ verticalAlign: "top", color: "#4d4d4d"}}
+>
+  <strong>Deal Colour</strong>
+</TableCell>
+
+              <TableCell sx={{bgcolor:"#00FFFF" }}>{data.deal_colour}</TableCell>
             </TableRow>
 
             <TableRow>
@@ -266,12 +270,12 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
               <TableCell sx={{bgcolor:"#00FFFF"}}>{data.allocation_layout.hedge_funds}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Local Allocation (%)</strong></TableCell>
-              <TableCell>{data.allocation_layout.local}%</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Local Allocation (%)</strong></TableCell>
+              <TableCell sx={{ bgcolor:"#00FFFF"}}>{data.allocation_layout.local}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>International Allocation (%)</strong></TableCell>
-              <TableCell>{data.allocation_layout.international}%</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>International Allocation (%)</strong></TableCell>
+              <TableCell sx={{ bgcolor:"#00FFFF"}}>{data.allocation_layout.international}%</TableCell>
             </TableRow>
 
             <TableRow>
@@ -284,8 +288,8 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
             </TableRow>
 
             <TableRow>
-              <TableCell><strong>Aftermarket Order</strong></TableCell>
-              <TableCell>{data.aftermarket.order ? 'Yes' : 'No'}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Aftermarket Order</strong></TableCell>
+              <TableCell sx={{ bgcolor:"#00FFFF"}}>{data.aftermarket.order ? 'Yes' : 'No'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>

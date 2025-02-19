@@ -183,7 +183,7 @@ const PerformanceStrategy: React.FC<PerformanceStrategyProps> = ({ data }) => {
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>1 Sigma Block L12M </strong>
               </TableCell>
-              <TableCell>{data["1_Sigma_L12M"]}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data["1_Sigma_L12M"]}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
@@ -210,29 +210,29 @@ const PerformanceStrategy: React.FC<PerformanceStrategyProps> = ({ data }) => {
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.dmi_14d}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>MACD (9D)</strong></TableCell>
-              <TableCell>{data.macd_9d}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>MACD (9D)</strong></TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.macd_9d}</TableCell>
             </TableRow>
 
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (10D)</strong></TableCell>
-              <TableCell>{data.stock_relative_to_ma["10d"]}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Stock Relative to MA (10D)</strong></TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.stock_relative_to_ma["10d"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (20D)</strong></TableCell>
-              <TableCell>{data.stock_relative_to_ma["20d"]}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Stock Relative to MA (20D)</strong></TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.stock_relative_to_ma["20d"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (50D)</strong></TableCell>
-              <TableCell>{data.stock_relative_to_ma["50d"]}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Stock Relative to MA (50D)</strong></TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.stock_relative_to_ma["50d"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (100D)</strong></TableCell>
-              <TableCell>{data.stock_relative_to_ma["100d"]}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Stock Relative to MA (100D)</strong></TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.stock_relative_to_ma["100d"]}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Stock Relative to MA (200D)</strong></TableCell>
-              <TableCell>{data.stock_relative_to_ma["200d"]}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Stock Relative to MA (200D)</strong></TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.stock_relative_to_ma["200d"]}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

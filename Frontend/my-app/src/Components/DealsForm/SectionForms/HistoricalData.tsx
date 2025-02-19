@@ -151,7 +151,7 @@ const HistoricalData: React.FC<HistoricalDataProps> = ({ data }) => {
                   <TableCell sx={{bgcolor:"#FFFF00"}}>{transaction.primary_secondary}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell sx={{bgcolor:"#FF00FF"}} sx={{ color: "#4d4d4d" }}>
+                  <TableCell sx={{bgcolor:"#FF00FF",color:"#4d4d4d"}} >
                     <strong>Monashee Demand Alloc Hold Period</strong>
                   </TableCell>
                   <TableCell>
@@ -177,16 +177,16 @@ const HistoricalData: React.FC<HistoricalDataProps> = ({ data }) => {
                   <TableCell sx={{bgcolor:"#FFFF00"}}>{transaction.performance.close}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Performance (1W)</strong></TableCell>
-                  <TableCell>{transaction.performance["1W"]}</TableCell>
+                  <TableCell sx={{ color: "#4d4d4d" }}><strong>Performance (1W)</strong></TableCell>
+                  <TableCell  sx={{bgcolor:"#FFFF00"}}>{transaction.performance["1W"]}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Performance (1M)</strong></TableCell>
-                  <TableCell>{transaction.performance["1M"]}</TableCell>
+                  <TableCell sx={{ color: "#4d4d4d" }} ><strong>Performance (1M)</strong></TableCell>
+                  <TableCell  sx={{bgcolor:"#FFFF00"}}>{transaction.performance["1M"]}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell><strong>Sellers</strong></TableCell>
-                  <TableCell>{transaction.sellers.join(", ")}</TableCell>
+                  <TableCell sx={{ color: "#4d4d4d" }}><strong>Sellers</strong></TableCell>
+                  <TableCell sx={{bgcolor:"#FFFF00"}}>{transaction.sellers.join(", ")}</TableCell>
                 </TableRow>
               </React.Fragment>
             ))}

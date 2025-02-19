@@ -94,8 +94,8 @@ const AfterMarketAnalysis: React.FC<AfterMarketAnalysisProps> = ({ data }) => {
               <TableCell sx={{bgcolor:"#FFFF00"}}>{data.current_price}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell><strong>Percent Change from Offer</strong></TableCell>
-              <TableCell>{data.percent_change_from_offer}</TableCell>
+              <TableCell sx={{ color: "#4d4d4d" }}><strong>Percent Change from Offer</strong></TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.percent_change_from_offer}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
