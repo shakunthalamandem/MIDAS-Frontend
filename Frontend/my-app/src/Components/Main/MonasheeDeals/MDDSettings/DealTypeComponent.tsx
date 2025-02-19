@@ -136,17 +136,13 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, select
             </Box>
 
             <TableContainer component={Paper} sx={{ border: "1px solid #ccc" }}>
-              <Table size="small">
+              <Table size="medium">
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#466675" }}>
-                    <TableCell sx={{ color: "white",width:'30px' }}>Quintile</TableCell>
-                    <TableCell sx={{ color: "white",width:'150px' }}>
-                      T+1M Absolute Returns
-                    </TableCell>
-                    <TableCell sx={{ color: "white",width:'30px' }}>No of Deals</TableCell>
-                    <TableCell sx={{ color: "white",width:'30px' }}>
-                      Deal Volume ($)
-                    </TableCell>
+                    <TableCell sx={{ color: "white",width:'10px' }}>Quintile</TableCell>
+                    <TableCell sx={{ color: "white",width:'10px' }}>T+1M Absolute Returns</TableCell>
+                    <TableCell sx={{ color: "white",width:'10px' }}>No of Deals</TableCell>
+                    <TableCell sx={{ color: "white",width:'30px' }}>Deal Volume ($)</TableCell>
                     <TableCell sx={{ color: "white",width:'30px' }}>
                       Allocation as % of Deal Size (Weighted)
                     </TableCell>
@@ -166,6 +162,12 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, select
                         ? "Model PnL with model Allocation(0.5%)"
                         : "Model PnL with model Allocation(1%)"}
                     </TableCell>
+                    <TableCell sx={{ color: "white",width:'30px' }}>
+                      Model Allocation Gap
+                    </TableCell>
+                    <TableCell sx={{ color: "white",width:'30px' }}>
+                      Monashee Exit Gap
+                    </TableCell>
                     <TableCell
                       sx={{ color: "white", borderLeft: "2px solid #484547" ,width:'30px'}}
                     >
@@ -174,6 +176,9 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, select
                     <TableCell sx={{ color: "white",width:'30px' }}>
                       Model PnL with model AM(Gross)
                     </TableCell>
+                    <TableCell sx={{ color: "white",width:'30px' }}>
+                      AM Gap
+                    </TableCell>
                     <TableCell
                       sx={{ color: "white", borderLeft: "2px solid #484547",width:'30px' }}
                     >
@@ -181,6 +186,9 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, select
                     </TableCell>
                     <TableCell sx={{ color: "white",width:'30px' }}>
                       Model Actual Total PnL(Gross)
+                    </TableCell>
+                    <TableCell sx={{ color: "white",width:'30px' }}>
+                      Total Gap
                     </TableCell>
                   </TableRow>
                 </TableHead>
