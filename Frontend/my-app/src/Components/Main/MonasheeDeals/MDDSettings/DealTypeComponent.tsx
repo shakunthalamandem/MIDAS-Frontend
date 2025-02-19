@@ -148,31 +148,33 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, select
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#466675" }}>
                     {/* Set minWidth instead of fixed width */}
-                    <TableCell sx={{ color: "white", minWidth: '150px' }}>Quintile</TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '200px' }}>T+1M Absolute Returns</TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '150px' }}>No of Deals</TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '150px' }}>Deal Volume ($)</TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>Allocation as % of Deal Size (Weighted)</TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>Allocation as % of IOI (Weighted)</TableCell>
-                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547", minWidth: '250px' }}>
-                      Monashee Actual Allocation PnL(Gross)
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Quintile</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>T+1M Absolute Returns</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>No of Deals</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Deal Volume ($)</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Allocation as % of Deal Size (Weighted)</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Allocation as % of IOI (Weighted)</TableCell>
+                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547", minWidth: '5px' }}>
+                      Monashee Actual Allocation PnL
+                      (Gross)
                     </TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>Model PnL With Actual Allocation(Gross)</TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Model PnL With Actual Allocation
+                      (Gross)</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>
                       {selectedType === "IPO" ? "Model PnL with model Allocation(0.5%)" : "Model PnL with model Allocation(1%)"}
                     </TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>Model Allocation Gap</TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>Monashee Exit Gap</TableCell>
-                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547", minWidth: '250px' }}>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Model Allocation Gap</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Monashee Exit Gap</TableCell>
+                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547", minWidth: '5px' }}>
                       Monashee Actual AM PnL(Gross)
                     </TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>Model PnL with model AM(Gross)</TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>AM Gap</TableCell>
-                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547", minWidth: '250px' }}>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Model PnL with model AM(Gross)</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>AM Gap</TableCell>
+                    <TableCell sx={{ color: "white", borderLeft: "2px solid #484547", minWidth: '5px' }}>
                       Monashee Actual Total PnL(Gross)
                     </TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>Model Actual Total PnL(Gross)</TableCell>
-                    <TableCell sx={{ color: "white", minWidth: '250px' }}>Total Gap</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Model Actual Total PnL(Gross)</TableCell>
+                    <TableCell sx={{ color: "white", minWidth: '5px' }}>Total Gap</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
