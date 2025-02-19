@@ -34,11 +34,11 @@ const DealFormMain: React.FC = () => {
         <Typography variant="h6" sx={{ mb: 1 }}>Note:</Typography>
         <Grid container spacing={1}>
           {[
-            { color: 'red', label: 'Key data inputs to run model' },
-            { color: 'yellow', label: 'Bloomberg data pulled automatically by ticker' },
-            { color: 'lightgreen', label: 'Model pricing/discount automatically calced' },
-            { color: 'cyan', label: 'Proprietary deal data kept – some of which could be used for analysis' },
-            { color: 'violet', label: 'Proprietary deal data kept in MDD (and in past used to be able to be pulled by model from MDD for historical transactions)' }
+            { color: '#FF0000', label: 'Key data inputs to run model' },
+            { color: '#FFFF00', label: 'Bloomberg data pulled automatically by ticker' },
+            { color: '#00FF00', label: 'Model pricing/discount automatically calced' },
+            { color: '#00FFFF', label: 'Proprietary deal data kept – some of which could be used for analysis' },
+            { color: '#FF00FF', label: 'Proprietary deal data kept in MDD (and in past used to be able to be pulled by model from MDD for historical transactions)' }
           ].map((item, index) => (
             <Grid item key={index} sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
               <Box sx={{ width: 16, height: 16, backgroundColor: item.color, border: '1px solid #000', mr: 1 }} />

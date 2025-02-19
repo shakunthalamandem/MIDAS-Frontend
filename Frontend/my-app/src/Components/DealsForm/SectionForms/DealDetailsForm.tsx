@@ -66,23 +66,23 @@ const DealDetailsForm: React.FC<DealDetailsFormProps> = ({ data }) => {
             </TableRow>
             <TableRow>
               <TableCell><strong>Ticker</strong></TableCell>
-              <TableCell sx={{bgcolor:"red"}}>{data.ticker}</TableCell>
+              <TableCell sx={{bgcolor:"#FF0000"}}>{data.ticker}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Company Name</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.company_name}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.company_name}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Country</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.description.country}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.description.country}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Sector</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.description.sector}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.description.sector}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Industry</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.description.industry}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.description.industry}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Vendor Issuer</strong></TableCell>

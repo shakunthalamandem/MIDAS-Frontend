@@ -86,15 +86,15 @@ const Background: React.FC<BackgroundProps> = ({ data }) => {
             </TableRow>
             <TableRow>
               <TableCell><strong>Index Fund Participation</strong></TableCell>
-              <TableCell sx={{bgcolor:"cyan"}}>{data.index_fund_participation.join(", ")}</TableCell>
+              <TableCell sx={{bgcolor:"#00FFFF"}}>{data.index_fund_participation.join(", ")}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Recent Earnings Estimate Revision</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.recent_earnings_estimate_revision}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.recent_earnings_estimate_revision}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Recent Positive News</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.recent_positive_news}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.recent_positive_news}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>VIX Elevated</strong></TableCell>
@@ -110,39 +110,39 @@ const Background: React.FC<BackgroundProps> = ({ data }) => {
             </TableRow>
             <TableRow>
               <TableCell><strong>% of Free Float (Current Float)</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data["%_of_free_float_current_float"].percentage_free_float}%</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data["%_of_free_float_current_float"].percentage_free_float}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>% of Free Float (Pre-Deal)</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data["%_of_free_float_current_float"].pre_deal_free_float_percentage}%</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data["%_of_free_float_current_float"].pre_deal_free_float_percentage}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Short Interest (Shares)</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.short_interest.shares}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.short_interest.shares}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Short Interest (Dollar Amount)</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.short_interest.dollar_amount}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.short_interest.dollar_amount}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Short Interest (Percentage of Deal)</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.short_interest.percentage_of_deal}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.short_interest.percentage_of_deal}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Shares Outstanding Pre-Deal</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.shares_outstanding_pre_deal}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.shares_outstanding_pre_deal}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Market Cap Pre-Deal (USD)</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.market_cap_pre_deal.usd}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.market_cap_pre_deal.usd}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Market Cap Pre-Deal (CHF)</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.market_cap_pre_deal.chf}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.market_cap_pre_deal.chf}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Launch Date</strong></TableCell>
-              <TableCell sx={{bgcolor:"red"}}>{data.launch_date}</TableCell>
+              <TableCell sx={{bgcolor:"#FF0000"}}>{data.launch_date}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Trade Date</strong></TableCell>
@@ -154,7 +154,7 @@ const Background: React.FC<BackgroundProps> = ({ data }) => {
             </TableRow>
             <TableRow>
               <TableCell><strong>Next Results Date</strong></TableCell>
-              <TableCell sx={{bgcolor:"yellow"}}>{data.next_results_date}</TableCell>
+              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.next_results_date}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell><strong>Club Deal</strong></TableCell>
