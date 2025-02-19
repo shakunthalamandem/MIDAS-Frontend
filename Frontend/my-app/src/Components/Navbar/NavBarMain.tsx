@@ -18,7 +18,7 @@ import Logs from "../Main/HomePage/Authentication/Logs";
 import Logout from "../Main/HomePage/Authentication/Logout";
 
 const pages = [
-  "New Issue Market",
+  "New Deal Data",
   "Equity Market Opportunity",
   "Monashee Performance & Efficiency",
   "PRIME Investment Strategies",
@@ -78,7 +78,7 @@ const NavbarMain: React.FC = () => {
   };
 
   const handleNavigate = (page: string) => {
-    if (page === "New Issue Market") navigate("/issue_market");
+    if (page === "New Deal Data") navigate("/issue_market");
     if (page === "Equity Market Opportunity") navigate("/capital-markets");
     if (page === "Monashee Performance & Efficiency")
       navigate("/monashee-deals");

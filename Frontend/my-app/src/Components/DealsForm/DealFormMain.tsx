@@ -48,7 +48,7 @@ const DealFormMain: React.FC = () => {
       },
     }}
   >
-    Welcome to New Issue Market...!
+    Welcome to New Deal Data...!
   </Typography>
   
     <Container sx={{mb:5}}>
