@@ -233,10 +233,13 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({ data = {}, select
                       <TableCell>{isSummary ? <strong>{formatValue(values["AM Gap"] || 0)}</strong> : formatValue(values["AM Gap"] || 0)}</TableCell>
 
                       <TableCell sx={{ borderLeft: "2px solid #484547" }}>
-                        {isSummary ? <strong>{formatValue(values["Allocation Return"] + values["AM Return"] || 0)}</strong> : formatValue(values["Allocation Return"] + values["AM Return"] || 0)}
+                        {isSummary ? <strong>{formatValue(values["Allocation Return"] + values["Allocation Return"] || 0)}</strong> : formatValue(values["Allocation Return"] + values["AM Return"] || 0)}
                       </TableCell>
                       <TableCell>
                         {isSummary ? <strong>{formatValue((values["Model Return 1% Allocation"] || 0) + (values["Model AM Return"] || 0))}</strong> : formatValue((values["Model Return 1% Allocation"] || 0) + (values["Model AM Return"] || 0))}
+                      </TableCell>
+                      <TableCell>
+                        {isSummary ? <strong>{formatValue((values["Allocation Return"] || 0) + (values["Allocation Return"] || 0) - (values["Model Return 1% Allocation"] || 0) - (values["Model AM Return"] || 0) )}</strong> : formatValue((values["Allocation Return"] || 0) + (values["Allocation Return"] || 0) - (values["Model Return 1% Allocation"] || 0) - (values["Model AM Return"] || 0) )}
                       </TableCell>
                     </TableRow>
                     
