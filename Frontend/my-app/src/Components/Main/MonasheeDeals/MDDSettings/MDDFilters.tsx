@@ -54,20 +54,25 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
 
   useEffect(() => {
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
+  
     filtersData.forEach((filter) => {
       const key = Object.keys(filter)[0];
       const { options } = filter[key];
-        initialSelectedValues[key] = options.includes("Marketed") || options.includes("Overnight")
-        ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
-        : [];
+  
+      // Only select "Marketed" and "Overnight" when API is "mdd_deals_graph"
+      initialSelectedValues[key] =
+        apiName === "mdd_deals_graph"
+          ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
+          : [];
     });
-
+  
     if (JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)) {
       setSelectedValues(initialSelectedValues);
       setAppliedFilters(initialSelectedValues);
       handleSubmit(initialSelectedValues);
     }
-  }, [filtersData]);
+  }, [filtersData, apiName]); // Added apiName as a dependency
+  
 
 
 
@@ -133,12 +138,15 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
 
   const handleCancel = () => {
     const resetSelectedValues: { [key: string]: (string | number)[] } = {};
+  
     filtersData.forEach((filter) => {
       const key = Object.keys(filter)[0];
       const { options } = filter[key];
-        resetSelectedValues[key] = options.includes("Marketed") || options.includes("Overnight")
-        ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
-        : [];
+  
+      resetSelectedValues[key] =
+        apiName === "mdd_deals_graph"
+          ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
+          : [];
     });
   
     setSelectedValues(resetSelectedValues);
@@ -146,8 +154,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     setSearchValue("");
     setSearchKey(null);
     handleSubmit(resetSelectedValues);
-
   };
+  
 
   return (
     <Box
