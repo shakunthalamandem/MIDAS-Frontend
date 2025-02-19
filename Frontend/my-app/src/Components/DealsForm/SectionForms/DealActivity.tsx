@@ -88,7 +88,7 @@ const DealActivity: React.FC<DealActivityProps> = ({ data }) => {
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Conviction</strong>
               </TableCell>
-              <TableCell>{data.conviction}</TableCell>
+              <TableCell sx={{bgcolor:"#00FFFF"}}>{data.conviction}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
