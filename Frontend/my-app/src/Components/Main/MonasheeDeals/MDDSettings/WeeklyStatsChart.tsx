@@ -244,84 +244,88 @@ const WeeklyStatsChart: React.FC = () => {
               )}
             </ComposedChart>
           </ResponsiveContainer>
+          <Box sx={{
+            paddingX: 15,
 
-          <FormControl
-            component="fieldset"
-            style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 5 }}
-          >
-            <RadioGroup row>
-              <FormControlLabel
-                control={
-                  <Radio
-                    checked={chartType === "count"}
-                    onChange={() => setChartType("count")}
-                    sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
-                  />
-                }
-                label="Deal Count"
-              />
-              <FormControlLabel
-                control={
-                  <Radio
-                    checked={chartType === "volume"}
-                    onChange={() => setChartType("volume")}
-                    sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
-                  />
-                }
-                label="Deal Volume"
-              />
-              <FormControlLabel
-                control={
-                  <Radio
-                    checked={chartType === "capital"}
-                    onChange={() => setChartType("capital")}
-                    sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
-                  />
-                }
-                label="Allocated Capital"
-              />
-              <FormControlLabel
-                control={
-                  <Radio
-                    checked={chartType === "opportunity_value_ex"}
-                    onChange={() => setChartType("opportunity_value_ex")}
-                    sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
-                  />
-                }
-                label="Opportunity Value Ex"
-              />
-              <FormControlLabel
-                control={
-                  <Radio
-                    checked={chartType === "allocation_return"}
-                    onChange={() => setChartType("allocation_return")}
-                    sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
-                  />
-                }
-                label="Monashee Actual Allocation PNL"
-              />
-              <FormControlLabel
-                control={
-                  <Radio
-                    checked={chartType === "monahsee_actual_total_PNL"}
-                    onChange={() => setChartType("monahsee_actual_total_PNL")}
-                    sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
-                  />
-                }
-                label="Monahsee Actual Total PNL"
-              />
-              <FormControlLabel
-                control={
-                  <Radio
-                    checked={chartType === "model_actual_total_PNL"}
-                    onChange={() => setChartType("model_actual_total_PNL")}
-                    sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
-                  />
-                }
-                label="Model Actual Total PNL"
-              />
-            </RadioGroup>
-          </FormControl>
+          }}>
+            <FormControl
+              component="fieldset"
+              style={{ display: "flex", justifyContent: "center", borderRadius: '4px', alignItems: "center", marginTop: 5, paddingLeft: 10, paddingRight: 10, background: "linear-gradient(to right,rgb(194, 182, 226),rgb(216, 242, 247))", }}
+            >
+              <RadioGroup row>
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={chartType === "count"}
+                      onChange={() => setChartType("count")}
+                      sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
+                    />
+                  }
+                  label="Deal Count"
+                />
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={chartType === "volume"}
+                      onChange={() => setChartType("volume")}
+                      sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
+                    />
+                  }
+                  label="Deal Volume"
+                />
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={chartType === "capital"}
+                      onChange={() => setChartType("capital")}
+                      sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
+                    />
+                  }
+                  label="Allocated Capital"
+                />
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={chartType === "opportunity_value_ex"}
+                      onChange={() => setChartType("opportunity_value_ex")}
+                      sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
+                    />
+                  }
+                  label="Opportunity Value Excess"
+                />
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={chartType === "allocation_return"}
+                      onChange={() => setChartType("allocation_return")}
+                      sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
+                    />
+                  }
+                  label="Monashee Actual Allocation PNL"
+                />
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={chartType === "monahsee_actual_total_PNL"}
+                      onChange={() => setChartType("monahsee_actual_total_PNL")}
+                      sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
+                    />
+                  }
+                  label="Monahsee Actual Total PNL"
+                />
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={chartType === "model_actual_total_PNL"}
+                      onChange={() => setChartType("model_actual_total_PNL")}
+                      sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
+                    />
+                  }
+                  label="Model Actual Total PNL"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Box>
         </CardContent>
       </Card>
       <GapDealDeatilsTable />
