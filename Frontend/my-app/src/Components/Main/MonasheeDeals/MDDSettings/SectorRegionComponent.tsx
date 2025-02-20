@@ -54,7 +54,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
             sx={{
               padding: 5,
               marginBottom: 3,
-              width: "90%",
+              width: "1300px",
               background: "#F5E8DC",
             }}
           >
@@ -98,6 +98,8 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                     <TableCell sx={{ color: "white" }}>
                       Model PnL with model Allocation
                     </TableCell>
+                     <TableCell sx={{ color: "white", minWidth: '5px' }}>Model Allocation Gap</TableCell>
+                      <TableCell sx={{ color: "white", minWidth: '5px' }}>Monashee Exit Gap</TableCell>
                     <TableCell
                       sx={{ color: "white", borderLeft: "2px solid #484547" }}
                     >
@@ -106,6 +108,8 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                     <TableCell sx={{ color: "white" }}>
                       Model PnL with model AM(Gross)
                     </TableCell>
+                                        <TableCell sx={{ color: "white", minWidth: '5px' }}>AM Gap</TableCell>
+                    
                     <TableCell
                       sx={{ color: "white", borderLeft: "2px solid #484547" }}
                     >
@@ -114,6 +118,8 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                     <TableCell sx={{ color: "white" }}>
                       Model Actual Total PnL (Gross)
                     </TableCell>
+                                        <TableCell sx={{ color: "white", minWidth: '5px' }}>Total Gap</TableCell>
+                    
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -195,6 +201,8 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                           >
                             {formatValue(values["Model Return 1% Allocation"])}
                           </TableCell>
+                           <TableCell>{isSummary ? <strong>{formatValue(values["Model Allocation Gap"] || 0)}</strong> : formatValue(values["Model Allocation Gap"] || 0)}</TableCell>
+                            <TableCell>{isSummary ? <strong>{formatValue(values["Monashee Exit Gap"] || 0)}</strong> : formatValue(values["Monashee Exit Gap"] || 0)}</TableCell>
                           <TableCell
                             sx={{
                               borderLeft: "2px solid #484547",
@@ -208,6 +216,8 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                           >
                             {formatValue(values["Model AM Return"])}
                           </TableCell>
+                                                  <TableCell>{isSummary ? <strong>{formatValue(values["AM Gap"] || 0)}</strong> : formatValue(values["AM Gap"] || 0)}</TableCell>
+                          
                           <TableCell
                             sx={{
                               borderLeft: "2px solid #484547",
@@ -226,6 +236,9 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                                 (values["Model AM Return"] || 0)
                             )}
                           </TableCell>
+                          <TableCell>
+                                                    {isSummary ? <strong>{formatValue((values["Allocation Return"] || 0) + (values["Allocation Return"] || 0) - (values["Model Return 1% Allocation"] || 0) - (values["Model AM Return"] || 0))}</strong> : formatValue((values["Allocation Return"] || 0) + (values["Allocation Return"] || 0) - (values["Model Return 1% Allocation"] || 0) - (values["Model AM Return"] || 0))}
+                                                  </TableCell>
                         </TableRow>
                       );
                     })}
