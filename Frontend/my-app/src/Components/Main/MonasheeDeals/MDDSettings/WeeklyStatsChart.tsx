@@ -245,9 +245,9 @@ const WeeklyStatsChart: React.FC = () => {
             </ComposedChart>
           </ResponsiveContainer>
 
-    <FormControl
+          <FormControl
             component="fieldset"
-            style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 5  }}
+            style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 5 }}
           >
             <RadioGroup row>
               <FormControlLabel
