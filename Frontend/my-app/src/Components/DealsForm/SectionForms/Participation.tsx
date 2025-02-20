@@ -124,31 +124,31 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Allocation Amount (USD)</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF00FF"}}>{data.allocation.amount_usd}</TableCell>
+              <TableCell sx={{bgcolor:"#d4b8de"}}>{data.allocation.amount_usd}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Allocation Shares</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF00FF"}}>{data.allocation.shares}</TableCell>
+              <TableCell sx={{bgcolor:"#d4b8de"}}>{data.allocation.shares}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Deal Percentage (Allocation)</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF00FF"}}>{data.allocation.deal_percentage}%</TableCell>
+              <TableCell sx={{bgcolor:"#d4b8de"}}>{data.allocation.deal_percentage}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Fill Percentage</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF00FF"}}>{data.allocation.fill_percentage}%</TableCell>
+              <TableCell sx={{bgcolor:"#d4b8de"}}>{data.allocation.fill_percentage}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Days to Allocate</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF00FF"}}>{data.allocation.days}</TableCell>
+              <TableCell sx={{bgcolor:"#d4b8de"}}>{data.allocation.days}</TableCell>
             </TableRow>
 
             <TableRow>
@@ -162,25 +162,25 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Final Indication Amount (USD)</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF00FF"}}>{data.final_indication.amount_usd}</TableCell>
+              <TableCell sx={{bgcolor:"#d4b8de"}}>{data.final_indication.amount_usd}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Final Indication Shares</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF00FF"}}>{data.final_indication.shares}</TableCell>
+              <TableCell sx={{bgcolor:"#d4b8de"}}>{data.final_indication.shares}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Final Indication Deal Percentage</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF00FF"}}>{data.final_indication.deal_percentage}%</TableCell>
+              <TableCell sx={{bgcolor:"#d4b8de"}}>{data.final_indication.deal_percentage}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Final Indication Days</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF00FF"}}>{data.final_indication.days}</TableCell>
+              <TableCell sx={{bgcolor:"#d4b8de"}}>{data.final_indication.days}</TableCell>
             </TableRow>
 
             <TableRow>
@@ -193,7 +193,7 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Deal Size Shares</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FF0000"}}>{data.deal_size.shares}</TableCell>
+              <TableCell sx={{bgcolor:"#f56c6c"}}>{data.deal_size.shares}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
@@ -218,13 +218,13 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Discount Percentage</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.price_local.discount_percentage}%</TableCell>
+              <TableCell sx={{bgcolor:"#dbed91"}}>{data.price_local.discount_percentage}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Last Close Price</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#FFFF00"}}>{data.price_local.last_close}</TableCell>
+              <TableCell sx={{bgcolor:"#dbed91"}}>{data.price_local.last_close}</TableCell>
             </TableRow>
 
             <TableRow>
@@ -242,40 +242,40 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
   <strong>Deal Colour</strong>
 </TableCell>
 
-              <TableCell sx={{bgcolor:"#00FFFF" }}>{data.deal_colour}</TableCell>
+              <TableCell sx={{bgcolor:"#abf5f5" }}>{data.deal_colour}</TableCell>
             </TableRow>
 
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Institutional Allocation (%)</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#00FFFF"}}>{data.allocation_layout.institutional}%</TableCell>
+              <TableCell sx={{bgcolor:"#abf5f5"}}>{data.allocation_layout.institutional}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Retail Allocation (%)</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#00FFFF"}}>{data.allocation_layout.retail}%</TableCell>
+              <TableCell sx={{bgcolor:"#abf5f5"}}>{data.allocation_layout.retail}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Long Only Allocation (%)</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#00FFFF"}}>{data.allocation_layout.long_only}%</TableCell>
+              <TableCell sx={{bgcolor:"#abf5f5"}}>{data.allocation_layout.long_only}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Hedge Funds Allocation (%)</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#00FFFF"}}>{data.allocation_layout.hedge_funds}%</TableCell>
+              <TableCell sx={{bgcolor:"#abf5f5"}}>{data.allocation_layout.hedge_funds}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}><strong>Local Allocation (%)</strong></TableCell>
-              <TableCell sx={{ bgcolor:"#00FFFF"}}>{data.allocation_layout.local}%</TableCell>
+              <TableCell sx={{ bgcolor:"#abf5f5"}}>{data.allocation_layout.local}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}><strong>International Allocation (%)</strong></TableCell>
-              <TableCell sx={{ bgcolor:"#00FFFF"}}>{data.allocation_layout.international}%</TableCell>
+              <TableCell sx={{ bgcolor:"#abf5f5"}}>{data.allocation_layout.international}%</TableCell>
             </TableRow>
 
             <TableRow>
@@ -289,7 +289,7 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
 
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}><strong>Aftermarket Order</strong></TableCell>
-              <TableCell sx={{ bgcolor:"#00FFFF"}}>{data.aftermarket.order ? 'Yes' : 'No'}</TableCell>
+              <TableCell sx={{ bgcolor:"#abf5f5"}}>{data.aftermarket.order ? 'Yes' : 'No'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
