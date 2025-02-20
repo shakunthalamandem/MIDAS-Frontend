@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   FormGroup,
@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import DealTypeComponent from "./DealTypeComponent";
 import SectorRegionComponent from "./SectorRegionComponent";
+import NoDataPopup from "../../../../Pages/NoDataPopup";
 
 interface GapProps {
   selectedFilters: any;
@@ -42,6 +43,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<any>(null);
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -52,6 +54,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
+    setNoDataPopupOpen(false);
 
     try {
       const payload = {
@@ -68,18 +71,23 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok)
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-
       const result = await response.json();
       setData(result);
-      console.log("Data", result);
+
+      if (result.message === "No data found for the given filters.") {
+        setNoDataPopupOpen(true);
+        setData(null);
+      }
     } catch (error) {
       console.error("Error fetching data", error);
       setError("Failed to fetch data.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClosePopup = () => {
+    setNoDataPopupOpen(false);
   };
 
   return (
@@ -106,48 +114,50 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
             }
             row
           >
-                 {filterOptions.map((option) => (
-        <FormControlLabel
-          key={option.value}
-          value={option.value}
-          control={
-            <Radio
-              sx={{
-                color: "white",
-                "&.Mui-checked": {
-                  color: "#ff8c00",
-                },
-              }}
-            />
-          }
-          label={option.label}
-          sx={{
-            color: "white",
-            marginRight: 4,
-            "& .MuiRadio-root": {
-              color: "white",
-            },
-            "&.Mui-checked": {
-              color: "#ff8c00",
-            },
-            "& .MuiFormControlLabel-label": {
-              color: "white",
-            },
-            "& .Mui-checked + .MuiFormControlLabel-label": {
-              color: "#ff8c00",
-            },
-          }}
-        />
-      ))}
+            {filterOptions.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                value={option.value}
+                control={
+                  <Radio
+                    sx={{
+                      color: "white",
+                      "&.Mui-checked": {
+                        color: "#ff8c00",
+                      },
+                    }}
+                  />
+                }
+                label={option.label}
+                sx={{
+                  color: "white",
+                  marginRight: 4,
+                  "& .MuiRadio-root": {
+                    color: "white",
+                  },
+                  "&.Mui-checked": {
+                    color: "#ff8c00",
+                  },
+                  "& .MuiFormControlLabel-label": {
+                    color: "white",
+                  },
+                  "& .Mui-checked + .MuiFormControlLabel-label": {
+                    color: "#ff8c00",
+                  },
+                }}
+              />
+            ))}
           </RadioGroup>
         </FormGroup>
       </Box>
 
       {loading && (
-  <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-    <CircularProgress />
-  </Box>
-)}      {error && <p style={{ color: "red" }}>{error}</p>}
+        <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+          <CircularProgress />
+        </Box>
+      )}
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       {!loading && !error && data && (
         <Box sx={{ width: "100%", marginTop: 2, textAlign: "center" }}>
@@ -168,6 +178,8 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
           )}
         </Box>
       )}
+
+      <NoDataPopup open={noDataPopupOpen} onClose={handleClosePopup} />
     </Box>
   );
 };

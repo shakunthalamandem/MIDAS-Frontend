@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Container, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import NoDataPopup from "../../../../Pages/NoDataPopup";
 
-// Define the type for each row of data with updated column names
 interface ScreenerDataRow {
-  id: number; // Unique ID for each row
+  id: number;
   pricing_date: string;
   issuer_name: string;
   ticker: string;
@@ -14,7 +14,7 @@ interface ScreenerDataRow {
   deal_type: string;
   deal_size: number;
   deal_captain: string;
-  fo_discount:number;
+  fo_discount: number;
   issue_price_lcl: number;
   t1m_excess_returns: number;
   t1d_return_from_bloomberg: number;
@@ -26,14 +26,13 @@ interface ScreenerDataRow {
   issue_offer_price: number;
   subscription_bid_shares: number;
   allocated_shares: number;
-  fo_type:string;
-
+  fo_type: string;
 }
 
 const cleanDealSize = (dealSize: any): number => {
-  if (dealSize == null || dealSize === "") return 0; // Handle null, undefined, or empty values
+  if (dealSize == null || dealSize === "") return 0;
   const cleanedValue = parseFloat(dealSize.toString().replace(/[^0-9.-]+/g, ""));
-  return isNaN(cleanedValue) ? 0 : cleanedValue; // Return 0 if parsing fails
+  return isNaN(cleanedValue) ? 0 : cleanedValue;
 };
 
 const formatDealSize = (dealSize: any) => {
@@ -47,30 +46,45 @@ const preprocessRows = (rows: any[]) =>
     ...row,
     t1d_returns: row.t1d_returns ? `${row.t1d_returns.toFixed(2)}%` : "",
     t1m_returns: row.t1m_returns ? `${row.t1m_returns.toFixed(2)}%` : "",
-    percentage_primary: row.percentage_primary ? `${row.percentage_primary.toFixed()}%` : "",
+    percentage_primary: row.percentage_primary
+      ? `${row.percentage_primary.toFixed()}%`
+      : "",
     fo_discount: row.fo_discount ? `${row.fo_discount.toFixed(2)}%` : "",
-    t1m_excess_returns: row.t1m_excess_returns ? `${row.t1m_excess_returns.toFixed(2)}%` : "",
-    t1d_return_from_bloomberg: row.t1d_return_from_bloomberg ? `${row.t1d_return_from_bloomberg.toFixed(2)}%` : "",
-    discount_from_announcement_price: row.discount_from_announcement_price ? `${row.discount_from_announcement_price.toFixed(2)}%` : "",
-    allocation_deal_size: row.allocation_deal_size ? `${row.allocation_deal_size.toFixed(2)}%` : "",
-    allocation_ioi: row.allocation_ioi ? `${row.allocation_ioi.toFixed(2)}%` : "",
-    allocation_deal_size_percentage: row.allocation_deal_size_percentage && !isNaN(parseFloat(row.allocation_deal_size_percentage))
-      ? `${parseFloat(row.allocation_deal_size_percentage).toFixed(2)}%`
-      : "%",
-    tplus_1d_issueprice: row.tplus_1d_issueprice ? `${row.tplus_1d_issueprice.toFixed(2)}%` : "",
+    t1m_excess_returns: row.t1m_excess_returns
+      ? `${row.t1m_excess_returns.toFixed(2)}%`
+      : "",
+    t1d_return_from_bloomberg: row.t1d_return_from_bloomberg
+      ? `${row.t1d_return_from_bloomberg.toFixed(2)}%`
+      : "",
+    discount_from_announcement_price: row.discount_from_announcement_price
+      ? `${row.discount_from_announcement_price.toFixed(2)}%`
+      : "",
+    allocation_deal_size: row.allocation_deal_size
+      ? `${row.allocation_deal_size.toFixed(2)}%`
+      : "",
+    allocation_ioi: row.allocation_ioi
+      ? `${row.allocation_ioi.toFixed(2)}%`
+      : "",
+    allocation_deal_size_percentage:
+      row.allocation_deal_size_percentage &&
+      !isNaN(parseFloat(row.allocation_deal_size_percentage))
+        ? `${parseFloat(row.allocation_deal_size_percentage).toFixed(2)}%`
+        : "%",
+    tplus_1d_issueprice: row.tplus_1d_issueprice
+      ? `${row.tplus_1d_issueprice.toFixed(2)}%`
+      : "",
   }));
 
 interface MDDScreenergridProps {
   sectorwiseData: { [key: string]: (string | number)[] };
 }
 
-const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
-  sectorwiseData,
-}) => {
+const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData }) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [openNoDataPopup, setOpenNoDataPopup] = useState<boolean>(false);
 
   useEffect(() => {
     if (sectorwiseData) {
@@ -78,21 +92,18 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     }
   }, [sectorwiseData]);
 
-  const fetchDataFromApi = async (
-    data: MDDScreenergridProps["sectorwiseData"]
-  ) => {
+  const fetchDataFromApi = async (data: MDDScreenergridProps["sectorwiseData"]) => {
     setLoading(true);
     setError(null);
 
     const payload = {
-      region: data.broad_region, // Array of regions
-      deal_captain: data.deal_captain, // Array of deal captains
-      deal_type: data.deal_type, // Array of deal types
-      sector: data.gics_sector, // Array of sectors
-      selected_bank: data.selected_bank, // Array of lead banks
-      year_range: data.years, // Array of years
-      fo_type: data.fo_type
-
+      region: data.broad_region,
+      deal_captain: data.deal_captain,
+      deal_type: data.deal_type,
+      sector: data.gics_sector,
+      selected_bank: data.selected_bank,
+      year_range: data.years,
+      fo_type: data.fo_type,
     };
 
     try {
@@ -107,20 +118,26 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token}` : "",
+          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
         const result = await response.json();
-        setRows(
-          (result.data || []).map((item: ScreenerDataRow, index: number) => ({
-            ...item,
-            id: index + 1,
-            deal_size: formatDealSize(item.deal_size),
-          }))
-        );
+        const fetchedRows = result.data || [];
+
+        if (fetchedRows.length === 0) {
+          setOpenNoDataPopup(true);
+        } else {
+          setRows(
+            fetchedRows.map((item: ScreenerDataRow, index: number) => ({
+              ...item,
+              id: index + 1,
+              deal_size: formatDealSize(item.deal_size),
+            }))
+          );
+        }
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -146,10 +163,14 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
             height: "100%",
           }}
         >
-
           <Link
             to={`/monasheeperformance/${params.value}`}
-            style={{ color: "brown", fontWeight: "bold",paddingLeft:15,textDecoration: "none" }}
+            style={{
+              color: "brown",
+              fontWeight: "bold",
+              paddingLeft: 15,
+              textDecoration: "none",
+            }}
             target="_blank"
           >
             {params.value}
@@ -190,7 +211,6 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
       renderCell: (params) => params.value,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-
     {
       field: "allocation_deal_size",
       headerName: "Allocation as % of Deal Size",
@@ -223,7 +243,6 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
     },
     {
       field: "percentage_primary", headerName: "Primary %", width: 100,
-
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
@@ -237,64 +256,65 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
-      <div style={{ height: 600, width: "100%" }}>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {loading && <p>Loading...</p>}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-        >
-          <Typography
-            align="left"
-            style={{
-              fontWeight: "bold",
-              color: "#fd0303",
-              marginBottom: "15px",
-            }}
+      <NoDataPopup open={openNoDataPopup} onClose={() => setOpenNoDataPopup(false)} />
+      {loading && <Typography>Loading...</Typography>}
+      {filteredRows.length > 0 && (
+        <div style={{ height: 600, width: "100%" }}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
           >
-            {" "}
-            Total no of deals:{" "}
-            <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
-          </Typography>
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Search Ticker"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{ width: 300 }}
-          />
-        </Box>
+            <Typography
+              align="left"
+              style={{
+                fontWeight: "bold",
+                color: "#fd0303",
+                marginBottom: "15px",
+              }}
+            >
+              Total no of deals:{" "}
+              <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
+            </Typography>
+            <TextField
+              variant="outlined"
+              size="small"
+              placeholder="Search Ticker"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ width: 300 }}
+            />
+          </Box>
 
-        <DataGrid
-          rows={filteredRows}
-          columns={columns}
-          rowCount={filteredRows.length}
-          loading={loading}
-          rowHeight={35}
-          sx={{
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "transparent",
-              fontWeight: "bold",
-              color: "#002060",
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              fontWeight: "bold",
-              fontSize: "12px", // Decrease header font size
-            },
-            "& .MuiDataGrid-cell": {
-              color: "#000000",
-              fontSize: "12px", // Decrease font size for cell values
-              padding: "4px", // Optional: Reduce padding for compact look
-            },
-            "& .MuiDataGrid-row:nth-of-type(odd)": {
-              backgroundColor: "#F5F5F5",
-            },
-          }}
-        />
-      </div>
+          <DataGrid
+            rows={filteredRows}
+            columns={columns}
+            rowCount={filteredRows.length}
+            loading={loading}
+            rowHeight={35}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "transparent",
+                fontWeight: "bold",
+                color: "#002060",
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold",
+                fontSize: "12px",
+              },
+              "& .MuiDataGrid-cell": {
+                color: "#000000",
+                fontSize: "12px",
+                padding: "4px",
+              },
+              "& .MuiDataGrid-row:nth-of-type(odd)": {
+                backgroundColor: "#F5F5F5",
+              },
+            }}
+          />
+        </div>
+      )}
     </Container>
   );
 };
