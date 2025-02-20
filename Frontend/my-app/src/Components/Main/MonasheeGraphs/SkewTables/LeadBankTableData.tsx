@@ -8,7 +8,6 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-// Type definition for the table data
 interface TableData {
   Total_Deal_Count: number;
   Total_Deal_Volume: number;
@@ -22,7 +21,7 @@ interface TableData {
 
 interface LeadBankTableDataProps {
   data: {
-    Yearwise: { [year: string]: TableData }; // Data passed from parent component
+    Yearwise: { [year: string]: TableData }; 
     yearwise_total: {
       Total_Deal_Count_Sum: number;
       Total_Deal_Volume_Sum: number;
