@@ -195,10 +195,10 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       Model PnL With Actual Allocation (Gross)
                     </TableCell>
-                    <TableCell sx={{ color: "white", minWidth: "40px" }}>
+                    <TableCell sx={{ color: "white", maxWidth: "40px" }}>
                       {selectedType === "IPO"
-                        ? "Model PnL with model Allocation(0.5%)"
-                        : "Model PnL with model Allocation(1%)"}
+                        ? "Model PnL with model Allocation (0.5%)"
+                        : "Model PnL with model Allocation (1%)"}
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       Model Allocation Gap
