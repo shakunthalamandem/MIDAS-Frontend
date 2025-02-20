@@ -376,7 +376,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             <strong>
                               {formatValue(
                                 values["Allocation Return"] +
-                                values["Allocation Return"] || 0
+                                values["AM Return"] || 0
                               )}
                             </strong>
                           ) : (
@@ -406,7 +406,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             <strong>
                               {formatValue(
                                 (values["Allocation Return"] || 0) +
-                                (values["Allocation Return"] || 0) -
+                                (values["AM Return"] || 0) -
                                 (values["Model Return 1% Allocation"] || 0) -
                                 (values["Model AM Return"] || 0)
                               )}
@@ -414,7 +414,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                           ) : (
                             formatValue(
                               (values["Allocation Return"] || 0) +
-                              (values["Allocation Return"] || 0) -
+                              (values["AM Return"] || 0) -
                               (values["Model Return 1% Allocation"] || 0) -
                               (values["Model AM Return"] || 0)
                             )
