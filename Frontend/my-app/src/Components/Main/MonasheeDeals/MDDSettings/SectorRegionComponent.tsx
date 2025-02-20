@@ -69,8 +69,29 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
             >
               {`${option} wise Data for ${year}`}
             </Typography>
-            <TableContainer component={Paper} sx={{ border: "1px solid #ccc" }}>
-              <Table size="small">
+            <TableContainer
+              component={Paper}
+              sx={{
+                border: "1px solid #ccc",
+                maxHeight: "600px", // Increase if needed
+                overflowX: "auto", // Horizontal scroll
+                overflowY: "auto", // Vertical scroll
+                "&::-webkit-scrollbar": {
+                  width: "4px",  // Thin scrollbar width
+                  height: "10px", // Thin scrollbar for horizontal scrolling
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#888", // Scroll thumb color
+                  borderRadius: "8px",
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                  backgroundColor: "#555",
+                },
+                "&::-webkit-scrollbar-track": {
+                  background: "transparent", // Hide scrollbar track
+                },
+              }}
+            >              <Table size="small">
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#466675" }}>
                     <TableCell sx={{ color: "white", minWidth: "160px" }}>
@@ -178,12 +199,12 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                             }}
                           >
                             {values["Min t1m_return_from_dealogic"] !==
-                            undefined
+                              undefined
                               ? `${values["Min t1m_return_from_dealogic"].toFixed(1)}%`
                               : "N/A"}{" "}
                             to{" "}
                             {values["Max t1m_return_from_dealogic"] !==
-                            undefined
+                              undefined
                               ? `${values["Max t1m_return_from_dealogic"].toFixed(1)}%`
                               : "N/A"}
                           </TableCell>
@@ -313,7 +334,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                           >
                             {formatValue(
                               (values["Model Return 1% Allocation"] || 0) +
-                                (values["Model AM Return"] || 0)
+                              (values["Model AM Return"] || 0)
                             )}
                           </TableCell>
                           <TableCell sx={{ minWidth: "40px" }}>
@@ -321,18 +342,18 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               <strong>
                                 {formatValue(
                                   (values["Allocation Return"] || 0) +
-                                    (values["AM Return"] || 0) -
-                                    (values["Model Return 1% Allocation"] ||
-                                      0) -
-                                    (values["Model AM Return"] || 0)
+                                  (values["AM Return"] || 0) -
+                                  (values["Model Return 1% Allocation"] ||
+                                    0) -
+                                  (values["Model AM Return"] || 0)
                                 )}
                               </strong>
                             ) : (
                               formatValue(
                                 (values["Allocation Return"] || 0) +
-                                  (values["AM Return"] || 0) -
-                                  (values["Model Return 1% Allocation"] || 0) -
-                                  (values["Model AM Return"] || 0)
+                                (values["AM Return"] || 0) -
+                                (values["Model Return 1% Allocation"] || 0) -
+                                (values["Model AM Return"] || 0)
                               )
                             )}
                           </TableCell>

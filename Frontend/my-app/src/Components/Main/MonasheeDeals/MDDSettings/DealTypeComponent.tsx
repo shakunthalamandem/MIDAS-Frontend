@@ -145,6 +145,20 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                 maxHeight: "600px", // Increase if needed
                 overflowX: "auto", // Horizontal scroll
                 overflowY: "auto", // Vertical scroll
+                "&::-webkit-scrollbar": {
+                  width: "4px",  // Thin scrollbar width
+                  height: "10px", // Thin scrollbar for horizontal scrolling
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#888", // Scroll thumb color
+                  borderRadius: "8px",
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                  backgroundColor: "#555",
+                },
+                "&::-webkit-scrollbar-track": {
+                  background: "transparent", // Hide scrollbar track
+                },
               }}
             >
               <Table size="small">
@@ -362,13 +376,13 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             <strong>
                               {formatValue(
                                 values["Allocation Return"] +
-                                  values["Allocation Return"] || 0
+                                values["Allocation Return"] || 0
                               )}
                             </strong>
                           ) : (
                             formatValue(
                               values["Allocation Return"] +
-                                values["AM Return"] || 0
+                              values["AM Return"] || 0
                             )
                           )}
                         </TableCell>
@@ -377,13 +391,13 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             <strong>
                               {formatValue(
                                 (values["Model Return 1% Allocation"] || 0) +
-                                  (values["Model AM Return"] || 0)
+                                (values["Model AM Return"] || 0)
                               )}
                             </strong>
                           ) : (
                             formatValue(
                               (values["Model Return 1% Allocation"] || 0) +
-                                (values["Model AM Return"] || 0)
+                              (values["Model AM Return"] || 0)
                             )
                           )}
                         </TableCell>
@@ -392,17 +406,17 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             <strong>
                               {formatValue(
                                 (values["Allocation Return"] || 0) +
-                                  (values["Allocation Return"] || 0) -
-                                  (values["Model Return 1% Allocation"] || 0) -
-                                  (values["Model AM Return"] || 0)
+                                (values["Allocation Return"] || 0) -
+                                (values["Model Return 1% Allocation"] || 0) -
+                                (values["Model AM Return"] || 0)
                               )}
                             </strong>
                           ) : (
                             formatValue(
                               (values["Allocation Return"] || 0) +
-                                (values["Allocation Return"] || 0) -
-                                (values["Model Return 1% Allocation"] || 0) -
-                                (values["Model AM Return"] || 0)
+                              (values["Allocation Return"] || 0) -
+                              (values["Model Return 1% Allocation"] || 0) -
+                              (values["Model AM Return"] || 0)
                             )
                           )}
                         </TableCell>
