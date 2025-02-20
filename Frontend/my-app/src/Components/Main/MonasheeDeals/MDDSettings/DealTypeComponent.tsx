@@ -326,8 +326,8 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             )
                           )}
                         </TableCell>
-                        <TableCell>
-                          {isSummary ? (
+                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
+                        {isSummary ? (
                             <strong>
                               {formatValue(values["Model Allocation Gap"] || 0)}
                             </strong>
@@ -335,7 +335,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             formatValue(values["Model Allocation Gap"] || 0)
                           )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                           {isSummary ? (
                             <strong>
                               {formatValue(values["Monashee Exit Gap"] || 0)}
@@ -362,7 +362,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             formatValue(values["Model AM Return"] || 0)
                           )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                           {isSummary ? (
                             <strong>
                               {formatValue(values["AM Gap"] || 0)}
@@ -401,7 +401,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             )
                           )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                           {isSummary ? (
                             <strong>
                               {formatValue(

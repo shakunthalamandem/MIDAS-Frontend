@@ -269,7 +269,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                           >
                             {formatValue(values["Model Return 1% Allocation"])}
                           </TableCell>
-                          <TableCell sx={{ minWidth: "40px" }}>
+                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                             {isSummary ? (
                               <strong>
                                 {formatValue(
@@ -280,7 +280,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               formatValue(values["Model Allocation Gap"] || 0)
                             )}
                           </TableCell>
-                          <TableCell sx={{ minWidth: "40px" }}>
+                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                             {isSummary ? (
                               <strong>
                                 {formatValue(values["Monashee Exit Gap"] || 0)}
@@ -306,7 +306,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                           >
                             {formatValue(values["Model AM Return"])}
                           </TableCell>
-                          <TableCell sx={{ minWidth: "40px" }}>
+                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                             {isSummary ? (
                               <strong>
                                 {formatValue(values["AM Gap"] || 0)}
@@ -337,7 +337,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               (values["Model AM Return"] || 0)
                             )}
                           </TableCell>
-                          <TableCell sx={{ minWidth: "40px" }}>
+                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                             {isSummary ? (
                               <strong>
                                 {formatValue(
