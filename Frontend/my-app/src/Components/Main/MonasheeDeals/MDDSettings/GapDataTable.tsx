@@ -136,7 +136,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
   },
   { 
     field: "allocated_capital", 
-    headerName: "Allocated Capital", 
+    headerName: "Allocation Capital", 
     width: 180,
     renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
