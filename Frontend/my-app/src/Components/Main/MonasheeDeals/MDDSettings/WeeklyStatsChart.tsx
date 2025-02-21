@@ -54,9 +54,9 @@ const formatNumber = (value: number) => {
   let formattedValue;
 
   if (absValue >= 1_000_000_000) {
-    formattedValue = (absValue / 1_000_000_000).toFixed(0) + "B";
+    formattedValue = (absValue / 1_000_000_000).toFixed(1) + "B";
   } else if (absValue >= 1_000_000) {
-    formattedValue = (absValue / 1_000_000).toFixed(0) + "M";
+    formattedValue = (absValue / 1_000_000).toFixed(1) + "M";
   } else if (absValue >= 1_000) {
     formattedValue = (absValue / 1_000).toFixed(0) + "K";
   } else {

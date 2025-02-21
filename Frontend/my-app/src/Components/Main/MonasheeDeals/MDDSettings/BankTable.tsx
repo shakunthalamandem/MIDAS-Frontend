@@ -113,14 +113,14 @@ const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
           >
             <Table size="small" sx={{ minWidth: 500 }}>
               <TableHead>
-                <TableRow sx={{ backgroundColor: "#355070" }}>
+                <TableRow sx={{ backgroundColor: "#466675" }}>
                   {[
-                    "selected_bank",
-                    "count",
-                    "deal_size",
-                    "Weighted Allocation as % of Deal Size(AVG)",
-                    "Weighted Allocation as % of IOI(AVG)",
-                    "t1m_return_from_dealogic",
+                    "bank",
+                    "Deal count",
+                    "Deal Volume",
+                    "Weighted Allocation as % of Deal Size",
+                    "Weighted Allocation as % of IOI",
+                    "t + 1M Return (AVG)",
                   ].map((col, index) => (
                     <TableCell
                       key={index}
