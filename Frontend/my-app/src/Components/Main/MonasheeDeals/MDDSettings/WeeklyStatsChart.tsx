@@ -170,7 +170,7 @@ const WeeklyStatsChart: React.FC = () => {
       <Card sx={{ boxShadow: 3, marginTop: 8, marginBottom: 10 }}>
         <CardContent>
           <Typography variant="h5" gutterBottom align="center" style={{ color: "#002060" }}>
-            Cumulative Deals Data
+            Cumulative Data
           </Typography>
 
           <ResponsiveContainer width="100%" height={400}>
@@ -291,7 +291,7 @@ const WeeklyStatsChart: React.FC = () => {
                       sx={{ color: "#490400", "&.Mui-checked": { color: "#002060" } }}
                     />
                   }
-                  label="Opportunity Value Excess"
+                  label="Opportunity Value"
                 />
                 <FormControlLabel
                   control={
