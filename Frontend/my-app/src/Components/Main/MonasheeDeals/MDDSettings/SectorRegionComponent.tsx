@@ -198,14 +198,14 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               minWidth: "100px",
                             }}
                           >
-                            {values["Min t1m_return_from_dealogic"] !==
+                            {values["Min t1m_return_from_bloomberg"] !==
                               undefined
-                              ? `${values["Min t1m_return_from_dealogic"].toFixed(1)}%`
+                              ? `${values["Min t1m_return_from_bloomberg"].toFixed(1)}%`
                               : "N/A"}{" "}
                             to{" "}
-                            {values["Max t1m_return_from_dealogic"] !==
+                            {values["Max t1m_return_from_bloomberg"] !==
                               undefined
-                              ? `${values["Max t1m_return_from_dealogic"].toFixed(1)}%`
+                              ? `${values["Max t1m_return_from_bloomberg"].toFixed(1)}%`
                               : "N/A"}
                           </TableCell>
                           <TableCell

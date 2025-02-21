@@ -1,23 +1,6 @@
-import { 
-    Box, Card, Container, FormControl, InputLabel, Select, MenuItem, 
-    OutlinedInput, Button, TableCell, Grid, Table, TableHead, TableRow, 
-    TableBody, Typography 
-  } from "@mui/material";
-  import React, { useEffect, useState } from "react";
-  
-
-  const formatValue = (value: number): string => {
-    const absValue = Math.abs(value);
-    const sign = value < 0 ? "-" : "";
-  
-    if (absValue >= 1_000_000_000)
-      return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
-    if (absValue >= 1_000_000)
-      return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
-    if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
-  
-    return `${sign}$${absValue.toFixed(2)}`;
-  };
+import { Box, Card, Container, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Button, Grid, Typography, Checkbox, ListItemText } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import WeeklyDealTable from "./WeeklyDealTable";
 
   const TwoWeekDealData: React.FC = () => {
     const [data, setData] = useState<any>({});
@@ -153,8 +136,6 @@ import {
             </FormControl>
 
 
-
-
       
 
 
@@ -214,7 +195,7 @@ import {
                           <TableCell>{formatValue(dealStats.volume.toFixed(2))}</TableCell>
                           <TableCell>{formatValue(dealStats.allocation_capital.toFixed(2))}</TableCell>
                           <TableCell>{(dealStats.allocation_weighted).toFixed(2)}%</TableCell>
-                          <TableCell>{formatValue(dealStats.allocation_return.toFixed(2))}</TableCell>
+                          <TableCell>{formatValue(dealStats.model_actual_return.toFixed(2))}</TableCell>
                           <TableCell>{dealStats.model_actual_total.toFixed(2)}</TableCell>
                           <TableCell>{dealStats.GAP.toFixed(2)}</TableCell>
                         </TableRow>
