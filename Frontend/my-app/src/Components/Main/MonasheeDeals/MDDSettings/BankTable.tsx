@@ -12,10 +12,11 @@ import {
   TableRow,
   Paper,
   TableSortLabel,
+  Container,
 } from "@mui/material";
 
 interface FilterTableProps {
-  selectedFilters: Record<string, any>; // Adjust filter type as needed
+  selectedFilters: Record<string, any>;
 }
 
 const formatValue = (value: number): string => {
@@ -89,7 +90,8 @@ const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
   };
 
   return (
-    <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
+    <Container>
+    <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 ,mt:5}}>
       <CardContent>
         <Typography variant="h6" mb={2} color="#002060" fontWeight="bold">
           Top 10 Banks
@@ -101,7 +103,7 @@ const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
           <TableContainer
             component={Paper}
             sx={{
-              maxHeight: 400,
+              maxHeight: 600,
               overflowY: "auto",
               borderRadius: 1,
               "&::-webkit-scrollbar": { width: "4px" },
@@ -109,15 +111,15 @@ const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
               "&::-webkit-scrollbar-thumb:hover": { backgroundColor: "#555" },
             }}
           >
-            <Table size="small" sx={{ minWidth: 650 }}>
+            <Table size="small" sx={{ minWidth: 500 }}>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#355070" }}>
                   {[
                     "selected_bank",
                     "count",
                     "deal_size",
-                    "Weighted Allocation as % of Deal Size",
-                    "Weighted Allocation as % of IOI",
+                    "Weighted Allocation as % of Deal Size(AVG)",
+                    "Weighted Allocation as % of IOI(AVG)",
                     "t1m_return_from_dealogic",
                   ].map((col, index) => (
                     <TableCell
@@ -139,7 +141,7 @@ const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
               <TableBody>
                 {data.map((row, index) => (
                   <TableRow key={index} hover sx={{ "&:nth-of-type(odd)": { backgroundColor: "#f5f5f5" } }}>
-                    <TableCell>{row.selected_bank}</TableCell>
+                    <TableCell>{row.selected_bank && row.selected_bank !== "0" ? row.selected_bank : "Not Available"}</TableCell>
                     <TableCell>{row.count}</TableCell>
                     <TableCell>{formatValue(Number(row.deal_size.toFixed(0)))}</TableCell>
                     <TableCell>{row["Weighted Allocation as % of Deal Size"].toFixed(2)}%</TableCell>
@@ -153,6 +155,7 @@ const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
         )}
       </CardContent>
     </Card>
+    </Container>
   );
 };
 
