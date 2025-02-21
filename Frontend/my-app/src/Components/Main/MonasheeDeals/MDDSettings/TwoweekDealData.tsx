@@ -94,7 +94,7 @@ import {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Card sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h5"  color="#002060" align="center"gutterBottom>
             Weekly Deal Filters
           </Typography>
           <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center" alignItems="center">
