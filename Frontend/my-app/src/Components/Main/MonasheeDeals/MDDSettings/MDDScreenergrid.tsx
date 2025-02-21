@@ -16,7 +16,7 @@ interface ScreenerDataRow {
   deal_captain: string;
   fo_discount:number;
   issue_price_lcl: number;
-  t1m_excess_returns: number;
+  t1m_return_from_bloomberg: number;
   t1d_return_from_bloomberg: number;
   discount_from_announcement_price: number;
   allocation_deal_size_percentage: number;
@@ -49,7 +49,7 @@ const preprocessRows = (rows: any[]) =>
     t1m_returns: row.t1m_returns ? `${row.t1m_returns.toFixed(2)}%` : "",
     percentage_primary: row.percentage_primary ? `${row.percentage_primary.toFixed()}%` : "",
     fo_discount: row.fo_discount ? `${row.fo_discount.toFixed(2)}%` : "",
-    t1m_excess_returns: row.t1m_excess_returns ? `${row.t1m_excess_returns.toFixed(2)}%` : "",
+    t1m_return_from_bloomberg: row.t1m_return_from_bloomberg ? `${row.t1m_return_from_bloomberg.toFixed(2)}%` : "",
     t1d_return_from_bloomberg: row.t1d_return_from_bloomberg ? `${row.t1d_return_from_bloomberg.toFixed(2)}%` : "",
     discount_from_announcement_price: row.discount_from_announcement_price ? `${row.discount_from_announcement_price.toFixed(2)}%` : "",
     allocation_deal_size: row.allocation_deal_size ? `${row.allocation_deal_size.toFixed(2)}%` : "",

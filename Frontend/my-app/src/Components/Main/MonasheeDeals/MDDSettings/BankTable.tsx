@@ -36,7 +36,7 @@ interface BankData {
   deal_size: number;
   "Weighted Allocation as % of Deal Size": number;
   "Weighted Allocation as % of IOI": number;
-  t1m_return_from_dealogic: number;
+  t1m_return_from_bloomberg: number;
 }
 
 const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
@@ -146,7 +146,7 @@ const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
                     <TableCell>{formatValue(Number(row.deal_size.toFixed(0)))}</TableCell>
                     <TableCell>{row["Weighted Allocation as % of Deal Size"].toFixed(2)}%</TableCell>
                     <TableCell>{row["Weighted Allocation as % of IOI"].toFixed(2)}%</TableCell>
-                    <TableCell>{row.t1m_return_from_dealogic.toFixed(2)}%</TableCell>
+                    <TableCell>{row.t1m_return_from_bloomberg.toFixed(2)}%</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

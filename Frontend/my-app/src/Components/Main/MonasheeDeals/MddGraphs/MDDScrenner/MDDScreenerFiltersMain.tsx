@@ -15,7 +15,6 @@ import DealSpecificTab from "./DealSpecificTab";
 import GeneralTab from "./GeneralTab";
 import MonasheeSpecificTab from "./MonasheeSpecificTab";
 import MDDScreenerDataTable from "../../MDDSettings/MDDScreenerDataTable";
-// import SummaryCard from "./SummaryCard";
 
 // Define the structure for filters data (same as your initial code)
 interface FilterData {
