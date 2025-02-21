@@ -32,8 +32,8 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
             "Volume", 
             "Allocation Capital", 
             "Allocation Deal %", 
-            "Modal Actual Total Return", 
-            "Model Actual Total", 
+            "Monashee Actual Total PnL(Gross)", 
+            "Model Actual Total PnL(Gross)", 
             "Gap"
           ].map((heading) => (
             <TableCell key={heading} sx={{ color: "white", minWidth: "40px" }}>
@@ -63,9 +63,9 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
                     <TableCell>{formatValue(dealStats.volume)}</TableCell>
                     <TableCell>{formatValue(dealStats.allocation_capital)}</TableCell>
                     <TableCell>{(dealStats.allocation_weighted).toFixed(2)}%</TableCell>
-                    <TableCell>{formatValue(dealStats.model_actual_return)}</TableCell>
-                    <TableCell>{dealStats.model_actual_total.toFixed(2)}</TableCell>
-                    <TableCell>{dealStats.GAP.toFixed(2)}</TableCell>
+                    <TableCell>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
+                    <TableCell>{formatValue(dealStats.model_actual_total.toFixed(2))}</TableCell>
+                    <TableCell>{formatValue(dealStats.GAP.toFixed(2))}</TableCell>
                   </TableRow>
                 ))
             )
