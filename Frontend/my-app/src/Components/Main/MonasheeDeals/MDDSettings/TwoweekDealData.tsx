@@ -47,7 +47,6 @@ const TwoWeekDealData: React.FC = () => {
 
       if (response.ok) {
         setData(result);
-        // Dynamically extract regions and deal types from the API response
         setRegions(Object.keys(result)); // APAC, EMEA, US
         setDealTypes(
           Object.keys(result[Object.keys(result)[0]]) // Extract deal types (IPO, FO, TOTAL)
@@ -178,4 +177,3 @@ const TwoWeekDealData: React.FC = () => {
 };
 
 export default TwoWeekDealData;
-  
