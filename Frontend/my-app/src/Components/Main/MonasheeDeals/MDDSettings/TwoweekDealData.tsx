@@ -8,10 +8,15 @@ const TwoWeekDealData: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
-  const [selectedWeek, setSelectedWeek] = useState<number[]>([]);
+  const [selectedWeek, setSelectedWeek] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]); // Default all weeks
   const [regions, setRegions] = useState<string[]>([]);
   const [dealTypes, setDealTypes] = useState<string[]>([]);
-  const [weeks, setWeeks] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
+  const weeks = [1, 2, 3, 4, 5, 6, 7];
+
+  // Fetch data when filters change
+  useEffect(() => {
+    fetchData();
+  }, [selectedRegions, selectedDealTypes, selectedWeek]);
 
   const fetchData = async () => {
     try {
@@ -44,10 +49,15 @@ const TwoWeekDealData: React.FC = () => {
 
       if (response.ok) {
         setData(result);
-        setRegions(Object.keys(result));
         setDealTypes(
-          Object.keys(result[Object.keys(result)[0]]).filter((type) => type !== "TOTAL") // Exclude TOTAL
-        );
+          Object.keys(result[Object.keys(result)[0]]).filter((type) => type !== "TOTAL") 
+          
+        );   
+        
+        setRegions(Object.keys(result).filter((region) => region !== "SUMMARY"));
+
+        
+        
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -58,15 +68,10 @@ const TwoWeekDealData: React.FC = () => {
     }
   };
 
-  const handleApply = () => {
-    fetchData();
-  };
-
   const handleReset = () => {
     setSelectedRegions([]);
-    setSelectedWeek([]);
     setSelectedDealTypes([]);
-    setData({});
+    setSelectedWeek(weeks); // Reset to all weeks
   };
 
   return (
@@ -134,8 +139,8 @@ const TwoWeekDealData: React.FC = () => {
 
         <Grid container spacing={2} mt={2} justifyContent="center" alignItems="center">
           <Grid item>
-            <Button variant="contained" sx={{ backgroundColor: "#002060", color: "white" }} onClick={handleApply}>
-              Apply 
+            <Button variant="contained" sx={{ backgroundColor: "#002060", color: "white" }} onClick={fetchData}>
+              Apply
             </Button>
           </Grid>
           <Grid item>
