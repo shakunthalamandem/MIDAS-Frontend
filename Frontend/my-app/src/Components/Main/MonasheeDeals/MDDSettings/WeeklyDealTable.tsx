@@ -21,21 +21,28 @@ interface WeeklyDealTableProps {
 }
 
 const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions, selectedDealTypes }) => {
+  const rows = Object.entries(data)
+    .filter(([region]) => selectedRegions.length === 0 || selectedRegions.includes(region))
+    .flatMap(([region, regionData]: [string, any]) =>
+      Object.entries(regionData)
+        .filter(([dealType]) => selectedDealTypes.length === 0 || selectedDealTypes.includes(dealType))
+        .map(([dealType, dealStats]: [string, any], idx: number) => {
+          // Apply alternating row colors every 3 rows
+          const rowColor = idx % 6 < 3 ? "#f5f5f5" : "#e0e0e0"; // alternate every 3 rows
+          return {
+            region,
+            dealType,
+            dealStats,
+            rowColor,
+          };
+        })
+    );
+
   return (
     <Table size="small">
       <TableHead>
-        <TableRow sx={{ backgroundColor: "#466675" }}>
-          {[
-            "Region", 
-            "Deal Type", 
-            "Count", 
-            "Volume", 
-            "Allocation Capital", 
-            "Allocation Deal %", 
-            "Monashee Actual Total PnL(Gross)", 
-            "Model Actual Total PnL(Gross)", 
-            "Gap"
-          ].map((heading) => (
+        <TableRow sx={{ backgroundColor: "#002060" }}>
+          {["Region", "Deal Type", "Count", "Volume", "Allocation Capital", "Allocation Deal %", "Monashee Actual Total PnL(Gross)", "Model Actual Total PnL(Gross)", "Gap"].map((heading) => (
             <TableCell key={heading} sx={{ color: "white", minWidth: "40px" }}>
               {heading}
             </TableCell>
@@ -43,39 +50,36 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
         </TableRow>
       </TableHead>
       <TableBody>
-        {Object.entries(data).length === 0 ? (
+        {rows.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={8} align="center">
+            <TableCell colSpan={9} align="center">
               No data found
             </TableCell>
           </TableRow>
         ) : (
-          Object.entries(data)
-            .filter(([region]) => selectedRegions.length === 0 || selectedRegions.includes(region))
-            .flatMap(([region, regionData]: [string, any]) =>
-              Object.entries(regionData)
-                .filter(([dealType]) => selectedDealTypes.length === 0 || selectedDealTypes.includes(dealType))
-                .map(([dealType, dealStats]: [string, any], idx: number) => {
-                  // Apply alternating row colors every 3 rows
-                  const rowColor = idx % 6 < 3 ? "#f5f5f5" : "#e0e0e0"; // alternate every 3 rows
-                  return (
-                    <TableRow
-                      key={`${region}-${dealType}`}
-                      sx={{ backgroundColor: rowColor }}
-                    >
-                      <TableCell>{region}</TableCell>
-                      <TableCell>{dealType}</TableCell>
-                      <TableCell>{dealStats.count}</TableCell>
-                      <TableCell>{formatValue(dealStats.volume)}</TableCell>
-                      <TableCell>{formatValue(dealStats.allocation_capital)}</TableCell>
-                      <TableCell>{(dealStats.allocation_weighted).toFixed(2)}%</TableCell>
-                      <TableCell>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
-                      <TableCell>{formatValue(dealStats.model_actual_total.toFixed(2))}</TableCell>
-                      <TableCell>{formatValue(dealStats.GAP.toFixed(2))}</TableCell>
-                    </TableRow>
-                  );
-                })
-            )
+          rows.map(({ region, dealType, dealStats, rowColor }, idx) => {
+            const isLastRow = idx === rows.length - 1;
+            return (
+              <TableRow
+                key={`${region}-${dealType}`}
+                sx={{
+                  backgroundColor: isLastRow ? "#59735b" : rowColor,
+                  color: isLastRow ? "#FFFFFF" : "inherit",
+                  fontWeight: isLastRow ? "bold" : "normal",
+                }}
+              >
+                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{region}</TableCell>
+                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{dealType}</TableCell>
+                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{dealStats.count}</TableCell>
+                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.volume)}</TableCell>
+                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.allocation_capital)}</TableCell>
+                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{dealStats.allocation_weighted.toFixed(2)}%</TableCell>
+                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
+                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.model_actual_total.toFixed(2))}</TableCell>
+                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.GAP.toFixed(2))}</TableCell>
+              </TableRow>
+            );
+          })
         )}
       </TableBody>
     </Table>
