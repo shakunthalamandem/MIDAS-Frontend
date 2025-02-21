@@ -112,8 +112,9 @@ const TwoWeekDealData: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Card sx={{ p: 3, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 0 }}>
+      <Card sx={{ boxShadow: 3,p: 3, mb: 2}}>
+      <Card sx={{ p: 1, mb: 2}}>
         <Typography variant="h5" color="#002060" align="center" gutterBottom>
           Weekly Deal Filters
         </Typography>
@@ -233,6 +234,7 @@ const TwoWeekDealData: React.FC = () => {
           selectedDealTypes={appliedDealTypes}
         />
       )}
+       </Card>
     </Container>
   );
 };
