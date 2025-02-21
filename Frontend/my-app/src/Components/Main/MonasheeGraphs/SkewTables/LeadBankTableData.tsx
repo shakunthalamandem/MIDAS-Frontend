@@ -21,8 +21,8 @@ interface TableData {
 
 interface LeadBankTableDataProps {
   data: {
-    Yearwise: { [year: string]: TableData }; 
-    yearwise_total: {
+    LeftLeadBankwise: { [year: string]: TableData }; 
+    left_lead_bankwise_total: {
       Total_Deal_Count_Sum: number;
       Total_Deal_Volume_Sum: number;
       Total_Postively_Performing_Deals: number;
@@ -53,12 +53,12 @@ const formatNumber = (value: number): string => {
 
 const LeadBankTableData: React.FC<LeadBankTableDataProps> = ({ data }) => {
   // Extract the Yearwise data and Yearwise Total data
-  const yearwiseData = data?.Yearwise;
-  const yearwiseTotal = data?.yearwise_total;
+  const yearwiseData = data?.LeftLeadBankwise;
+  const yearwiseTotal = data?.left_lead_bankwise_total;
 
   // Define columns for the table
   const columns = [
-    "Year",
+    "Lead Bank",
     "Total Deal Count",
     "Total Deal Volume ($)",
     "% of Positively Performing Deals ",

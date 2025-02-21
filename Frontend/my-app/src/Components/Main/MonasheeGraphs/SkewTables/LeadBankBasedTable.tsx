@@ -52,12 +52,13 @@ const LeadBankBasedTable: React.FC = () => {
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
-        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`, 
+        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`,
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: token ? `Bearer ${token}` : "",
-            }});
+            }
+          });
         const data = response.data as SkewTableOptions;
 
         setStartYearOptions(data['start year']);
@@ -86,20 +87,21 @@ const LeadBankBasedTable: React.FC = () => {
       };
 
       try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
         const response = await axios.post(
           `${apiUrl}/api/skewtable/calculations/`,
-          requestData, 
+          requestData,
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: token ? `Bearer ${token}` : "",
-            }}
+            }
+          }
         );
         setResponseData(response.data); // Store the response data in state
       } catch (error) {
@@ -107,14 +109,24 @@ const LeadBankBasedTable: React.FC = () => {
       }
     };
 
-    // Only fetch data when all required filters are selected
-    if (dealType && region && sector) {
+
+    if (dealType && region && sector && endYear && startYear) {
       fetchData();
     }
   }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
 
   const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
     setDealType(event.target.value);
+  };
+  const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
+    const newStartYear = Number(event.target.value);
+    setStartYear(newStartYear);
+
+    // Set end year to the next year after the selected start year
+    setEndYear(newStartYear + 1);
+  };
+  const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
+    setEndYear(Number(event.target.value));
   };
 
   const handleRegionChange = (event: SelectChangeEvent<string>) => {
@@ -124,9 +136,10 @@ const LeadBankBasedTable: React.FC = () => {
   const handleSectorChange = (event: SelectChangeEvent<string>) => {
     setSector(event.target.value);
   };
+  const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear);
 
   return (
-    <Container maxWidth="lg" sx={{ padding: 0 ,marginBottom:4}}>
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box p={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>
@@ -135,7 +148,61 @@ const LeadBankBasedTable: React.FC = () => {
             </Typography>
             <Grid container spacing={2}>
               {/* Deal Type Selector */}
-              <Grid item xs={12} sm={6} md={3}>
+              {/* Start Year Selector */}
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Start Year</InputLabel>
+                  <Select
+                    value={startYear}
+                    onChange={handleStartYearChange}
+                    label="Start Year"
+                    sx={{ backgroundColor: '#e0f7fa', color: '#006064' }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200, // Adjust the height as needed
+                          overflow: 'auto',
+                        },
+                      },
+                    }}
+                  >
+                    {startYearOptions.map((year) => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* End Year Selector */}
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>End Year</InputLabel>
+                  <Select
+                    value={endYear}
+                    onChange={handleEndYearChange}
+                    label="End Year"
+                    sx={{ backgroundColor: '#e8eaf6', color: '#1a237e' }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200, // Adjust the height as needed
+                          overflow: 'auto',
+                        },
+                      },
+                    }}
+                    disabled={filteredEndYearOptions.length === 0} // Disable if no valid options
+                  >
+                    {filteredEndYearOptions.map((year) => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Deal Type</InputLabel>
                   <Select
@@ -155,7 +222,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* Region Selector */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
                   <Select
