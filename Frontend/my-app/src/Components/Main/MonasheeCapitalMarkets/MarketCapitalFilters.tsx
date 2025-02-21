@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 const MarketCapitalFilters: React.FC<{ onDataLoaded: (data: any) => void }> = ({ onDataLoaded }) => {
   const [filtersData, setFiltersData] = useState<any>(null);
 
-  // Run only once when the component mounts
   useEffect(() => {
     if (!filtersData) { // Check if data is already loaded to avoid re-fetching
       // Simulate fetching data from a JSON file or API
