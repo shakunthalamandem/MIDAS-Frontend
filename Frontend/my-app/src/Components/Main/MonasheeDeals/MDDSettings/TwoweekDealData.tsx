@@ -1,4 +1,4 @@
-import { Box, Card, Container, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Button, Grid, Typography } from "@mui/material";
+import { Box, Card, Container, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Button, Grid, Typography, Checkbox, ListItemText } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import WeeklyDealTable from "./WeeklyDealTable";
 
@@ -80,7 +80,7 @@ const TwoWeekDealData: React.FC = () => {
           Weekly Deal Filters
         </Typography>
         <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center" alignItems="center">
-          {/* Deal Type Filter */}
+          {/* Deal Type Filter with MultiSelect Checkboxes */}
           <FormControl sx={{ m: 1, width: 200 }}>
             <InputLabel>Deal Type</InputLabel>
             <Select
@@ -92,13 +92,14 @@ const TwoWeekDealData: React.FC = () => {
             >
               {["IPO", "FO", "TOTAL"].map((dealType) => (
                 <MenuItem key={dealType} value={dealType}>
-                  {dealType}
+                  <Checkbox checked={selectedDealTypes.indexOf(dealType) > -1} />
+                  <ListItemText primary={dealType} />
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          {/* Region Filter */}
+          {/* Region Filter with MultiSelect Checkboxes */}
           <FormControl sx={{ m: 1, width: 200 }}>
             <InputLabel>Region</InputLabel>
             <Select
@@ -110,13 +111,14 @@ const TwoWeekDealData: React.FC = () => {
             >
               {["US", "EMEA", "APAC"].map((region) => (
                 <MenuItem key={region} value={region}>
-                  {region}
+                  <Checkbox checked={selectedRegions.indexOf(region) > -1} />
+                  <ListItemText primary={region} />
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          {/* Week Filter */}
+          {/* Week Filter with MultiSelect Checkboxes */}
           <FormControl sx={{ m: 1, width: 200 }}>
             <InputLabel>Week</InputLabel>
             <Select
@@ -128,7 +130,8 @@ const TwoWeekDealData: React.FC = () => {
             >
               {[1, 2, 3, 4, 5, 6, 7].map((week) => (
                 <MenuItem key={week} value={week}>
-                  {week}
+                  <Checkbox checked={selectedWeek.indexOf(week.toString()) > -1} />
+                  <ListItemText primary={`Week ${week}`} />
                 </MenuItem>
               ))}
             </Select>
