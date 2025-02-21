@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from "@mui/material";
+import { Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
 
 const formatValue = (value: number): string => {
   const absValue = Math.abs(value);
@@ -55,19 +55,26 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
             .flatMap(([region, regionData]: [string, any]) =>
               Object.entries(regionData)
                 .filter(([dealType]) => selectedDealTypes.length === 0 || selectedDealTypes.includes(dealType))
-                .map(([dealType, dealStats]: [string, any]) => (
-                  <TableRow key={`${region}-${dealType}`}>
-                    <TableCell>{region}</TableCell>
-                    <TableCell>{dealType}</TableCell>
-                    <TableCell>{dealStats.count}</TableCell>
-                    <TableCell>{formatValue(dealStats.volume)}</TableCell>
-                    <TableCell>{formatValue(dealStats.allocation_capital)}</TableCell>
-                    <TableCell>{(dealStats.allocation_weighted).toFixed(2)}%</TableCell>
-                    <TableCell>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
-                    <TableCell>{formatValue(dealStats.model_actual_total.toFixed(2))}</TableCell>
-                    <TableCell>{formatValue(dealStats.GAP.toFixed(2))}</TableCell>
-                  </TableRow>
-                ))
+                .map(([dealType, dealStats]: [string, any], idx: number) => {
+                  // Apply alternating row colors every 3 rows
+                  const rowColor = idx % 6 < 3 ? "#f5f5f5" : "#e0e0e0"; // alternate every 3 rows
+                  return (
+                    <TableRow
+                      key={`${region}-${dealType}`}
+                      sx={{ backgroundColor: rowColor }}
+                    >
+                      <TableCell>{region}</TableCell>
+                      <TableCell>{dealType}</TableCell>
+                      <TableCell>{dealStats.count}</TableCell>
+                      <TableCell>{formatValue(dealStats.volume)}</TableCell>
+                      <TableCell>{formatValue(dealStats.allocation_capital)}</TableCell>
+                      <TableCell>{(dealStats.allocation_weighted).toFixed(2)}%</TableCell>
+                      <TableCell>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
+                      <TableCell>{formatValue(dealStats.model_actual_total.toFixed(2))}</TableCell>
+                      <TableCell>{formatValue(dealStats.GAP.toFixed(2))}</TableCell>
+                    </TableRow>
+                  );
+                })
             )
         )}
       </TableBody>
