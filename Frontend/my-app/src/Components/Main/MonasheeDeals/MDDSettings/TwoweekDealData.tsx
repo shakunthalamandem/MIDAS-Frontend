@@ -132,8 +132,8 @@ const TwoWeekDealData: React.FC = () => {
           >
             {/* Deal Type Filter */}
             <Grid item>
-              <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel>Deal Type</InputLabel>
+            <FormControl fullWidth variant="outlined" size="small" sx={{ m: 1, width: 200 }}>
+            <InputLabel>Deal Type</InputLabel>
                 <Select
                   multiple
                   value={selectedDealTypes}
@@ -157,8 +157,8 @@ const TwoWeekDealData: React.FC = () => {
 
             {/* Region Filter */}
             <Grid item>
-              <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel>Region</InputLabel>
+            <FormControl fullWidth variant="outlined" size="small" sx={{ m: 1, width: 200 }}>
+            <InputLabel>Region</InputLabel>
                 <Select
                   multiple
                   value={selectedRegions}
@@ -180,7 +180,7 @@ const TwoWeekDealData: React.FC = () => {
 
             {/* Week Filter */}
             <Grid item>
-              <FormControl sx={{ m: 1, width: 200 }}>
+                <FormControl fullWidth variant="outlined" size="small" sx={{ m: 1, width: 200 }}>
                 <InputLabel>Week</InputLabel>
                 <Select
                   value={selectedWeek[0]} // Single value instead of array
