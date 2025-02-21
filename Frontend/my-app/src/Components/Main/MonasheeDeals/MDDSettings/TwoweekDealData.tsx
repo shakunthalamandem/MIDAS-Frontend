@@ -8,7 +8,7 @@ const TwoWeekDealData: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
-  const [selectedWeek, setSelectedWeek] = useState<number[]>([]); // Default all weeks
+  const [selectedWeek, setSelectedWeek] = useState<number[]>([7]); // Default all weeks
   const [regions, setRegions] = useState<string[]>([]);
   const [dealTypes, setDealTypes] = useState<string[]>([]);
   
