@@ -18,6 +18,11 @@ import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/Detail
 import DealFormMain from "../Components/DealsForm/DealFormMain";
 
 import Logs from "../Components/Main/HomePage/Authentication/Logs";
+import DealStats from "../Components/Main/MonasheeDeals/MddGraphs/DealStats";
+import WeeklyStatsChart from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyStatsChart";
+import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount";
+import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
+import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 
 
 const AppRouters: React.FC = () => {
@@ -33,7 +38,14 @@ const AppRouters: React.FC = () => {
         {/* Protected Routes */}
         <Route path="/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
         <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
-        <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
+        <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
+          {/* Nested Routes for Tabs */}
+          <Route path="deal-stats" element={<AuthGuard><DealStats /></AuthGuard>} />
+          <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
+          <Route path="follow-on-discount" element={<FOllowOnDiscount />} />
+          <Route path="weekly-tracking" element={<WeeklyStatsChart />} />
+          <Route path="screener" element={<MDDScreener />} />
+        </Route>
         <Route path="/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
         <Route path="/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
         <Route path="/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
