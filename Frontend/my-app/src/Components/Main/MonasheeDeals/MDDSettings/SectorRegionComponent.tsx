@@ -315,7 +315,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               formatValue(values["AM Gap"] || 0)
                             )}
                           </TableCell>
-                          <TableCell
+                      <TableCell
                             sx={{
                               borderLeft: "2px solid #484547",
                               fontWeight: isSummary ? "bold" : "normal",
@@ -326,7 +326,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               values["Allocation Return"] + values["AM Return"]
                             )}
                           </TableCell>
-                          <TableCell
+                      <TableCell
                             sx={{
                               fontWeight: isSummary ? "bold" : "normal",
                               minWidth: "40px",
@@ -337,7 +337,8 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               (values["Model AM Return"] || 0)
                             )}
                           </TableCell>
-                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
+                          
+                      <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                             {isSummary ? (
                               <strong>
                                 {formatValue(

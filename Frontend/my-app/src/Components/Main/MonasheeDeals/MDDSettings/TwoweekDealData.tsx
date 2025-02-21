@@ -214,7 +214,7 @@ import {
                           <TableCell>{formatValue(dealStats.volume.toFixed(2))}</TableCell>
                           <TableCell>{formatValue(dealStats.allocation_capital.toFixed(2))}</TableCell>
                           <TableCell>{(dealStats.allocation_weighted).toFixed(2)}%</TableCell>
-                          <TableCell>{formatValue(dealStats.model_actual_return.toFixed(2))}</TableCell>
+                          <TableCell>{formatValue(dealStats.allocation_return.toFixed(2))}</TableCell>
                           <TableCell>{dealStats.model_actual_total.toFixed(2)}</TableCell>
                           <TableCell>{dealStats.GAP.toFixed(2)}</TableCell>
                         </TableRow>
