@@ -10,6 +10,9 @@ const TwoWeekDealData: React.FC = () => {
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
   const [selectedWeek, setSelectedWeek] = useState<string[]>([]);
   const [filtersApplied, setFiltersApplied] = useState<boolean>(false);
+  const [regions, setRegions] = useState<string[]>([]); // Dynamic regions
+  const [dealTypes, setDealTypes] = useState<string[]>([]); // Dynamic deal types
+  const [weeks, setWeeks] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]); // Assuming weeks are from 1-7 as per your example
 
   const fetchData = async () => {
     try {
@@ -44,6 +47,11 @@ const TwoWeekDealData: React.FC = () => {
 
       if (response.ok) {
         setData(result);
+        // Dynamically extract regions and deal types from the API response
+        setRegions(Object.keys(result)); // APAC, EMEA, US
+        setDealTypes(
+          Object.keys(result[Object.keys(result)[0]]) // Extract deal types (IPO, FO, TOTAL)
+        );
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -90,7 +98,7 @@ const TwoWeekDealData: React.FC = () => {
               input={<OutlinedInput label="Deal Type" />}
               renderValue={(selected) => selected.join(", ")}
             >
-              {["IPO", "FO", "TOTAL"].map((dealType) => (
+              {dealTypes.map((dealType) => (
                 <MenuItem key={dealType} value={dealType}>
                   <Checkbox checked={selectedDealTypes.indexOf(dealType) > -1} />
                   <ListItemText primary={dealType} />
@@ -109,7 +117,7 @@ const TwoWeekDealData: React.FC = () => {
               input={<OutlinedInput label="Region" />}
               renderValue={(selected) => selected.join(", ")}
             >
-              {["US", "EMEA", "APAC"].map((region) => (
+              {regions.map((region) => (
                 <MenuItem key={region} value={region}>
                   <Checkbox checked={selectedRegions.indexOf(region) > -1} />
                   <ListItemText primary={region} />
@@ -128,7 +136,7 @@ const TwoWeekDealData: React.FC = () => {
               input={<OutlinedInput label="Week" />}
               renderValue={(selected) => selected.join(", ")}
             >
-              {[1, 2, 3, 4, 5, 6, 7].map((week) => (
+              {weeks.map((week) => (
                 <MenuItem key={week} value={week}>
                   <Checkbox checked={selectedWeek.indexOf(week.toString()) > -1} />
                   <ListItemText primary={`Week ${week}`} />
@@ -170,3 +178,4 @@ const TwoWeekDealData: React.FC = () => {
 };
 
 export default TwoWeekDealData;
+  
