@@ -37,7 +37,7 @@ interface TickerData {
   percentage_primary: string | null;
   sponsor: string | null;
   percentage_total_return: string | null;
-  t1m_return_from_dealogic: string | null;
+  t1m_return_from_bloomberg: string | null;
   total_return: string | null;
   fo_type: string | null;
 }
@@ -532,27 +532,27 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                             {
                               label: "Market T+1M Absolute Return",
                               value:
-                                item.t1m_return_from_dealogic !== undefined ? (
+                                item.t1m_return_from_bloomberg !== undefined ? (
                                   <span
                                     style={{
                                       display: "inline-flex",
                                       alignItems: "center", // Align the icon with the text
                                       color:
-                                        Number(item.t1m_return_from_dealogic) >
+                                        Number(item.t1m_return_from_bloomberg) >
                                         0
                                           ? "green" // Green for positive returns
                                           : Number(
-                                                item.t1m_return_from_dealogic
+                                                item.t1m_return_from_bloomberg
                                               ) < 0
                                             ? "red" // Red for negative returns
                                             : "black", // Black for neutral (0%)
                                     }}
                                   >
                                     {Number(
-                                      item.t1m_return_from_dealogic
+                                      item.t1m_return_from_bloomberg
                                     ).toFixed(2)}
                                     %
-                                    {Number(item.t1m_return_from_dealogic) >
+                                    {Number(item.t1m_return_from_bloomberg) >
                                     0 ? (
                                       <ArrowDropUpIcon
                                         sx={{
@@ -561,7 +561,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
                                           fontSize: 20,
                                         }}
                                       />
-                                    ) : Number(item.t1m_return_from_dealogic) <
+                                    ) : Number(item.t1m_return_from_bloomberg) <
                                       0 ? (
                                       <ArrowDropDownIcon
                                         sx={{
