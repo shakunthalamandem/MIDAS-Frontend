@@ -83,6 +83,7 @@ const TwoWeekDealData: React.FC = () => {
     setSelectedWeek([]); 
     setAppliedRegions([]);
     setAppliedDealTypes([]);
+    setAppliedWeek([]);
   };
 
   // Function to format multi-select display
