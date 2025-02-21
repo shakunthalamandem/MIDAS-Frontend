@@ -9,13 +9,24 @@ const formatValue = (value: number): string => {
     return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
   if (absValue >= 1_000_000)
     return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
-  if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
+  if (absValue >= 1_000)
+    return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
 
   return `${sign}$${absValue.toFixed(2)}`;
 };
 
+interface DealStats {
+  count: number;
+  volume: number;
+  allocation_capital: number;
+  allocation_weighted: number;
+  monahsee_actual_total: number;
+  model_actual_total: number;
+  GAP: number;
+}
+
 interface WeeklyDealTableProps {
-  data: any;
+  data: Record<string, Record<string, DealStats>>;
   selectedRegions: string[];
   selectedDealTypes: string[];
 }
@@ -23,20 +34,24 @@ interface WeeklyDealTableProps {
 const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions, selectedDealTypes }) => {
   const rows = Object.entries(data)
     .filter(([region]) => selectedRegions.length === 0 || selectedRegions.includes(region))
-    .flatMap(([region, regionData]: [string, any]) =>
+    .flatMap(([region, regionData]) =>
       Object.entries(regionData)
         .filter(([dealType]) => selectedDealTypes.length === 0 || selectedDealTypes.includes(dealType))
-        .map(([dealType, dealStats]: [string, any], idx: number) => {
-          // Apply alternating row colors every 3 rows
-          const rowColor = idx % 6 < 3 ? "#f5f5f5" : "#e0e0e0"; // alternate every 3 rows
-          return {
-            region,
-            dealType,
-            dealStats,
-            rowColor,
-          };
-        })
+        .map(([dealType, dealStats]) => ({ region, dealType, dealStats }))
     );
+
+  let rowSpans: Record<string, number> = {};
+  let previousRegion: string | null = null;
+  let renderedRegions: Record<string, boolean> = {};
+
+  rows.forEach(({ region }) => {
+    if (region !== previousRegion) {
+      rowSpans[region] = 1;
+    } else {
+      rowSpans[region]++;
+    }
+    previousRegion = region;
+  });
 
   return (
     <Table size="small">
@@ -57,26 +72,36 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
             </TableCell>
           </TableRow>
         ) : (
-          rows.map(({ region, dealType, dealStats, rowColor }, idx) => {
+          rows.map(({ region, dealType, dealStats }, idx) => {
             const isLastRow = idx === rows.length - 1;
+            const rowColor = idx % 6 < 3 ? "#f5f5f5" : "#e0e0e0";
+            const showRegion = !renderedRegions[region];
+
+            if (showRegion) {
+              renderedRegions[region] = true;
+            }
+
             return (
               <TableRow
                 key={`${region}-${dealType}`}
-                sx={{
-                  backgroundColor: isLastRow ? "#59735b" : rowColor,
-                  color: isLastRow ? "#FFFFFF" : "inherit",
-                  fontWeight: isLastRow ? "bold" : "normal",
-                }}
+                sx={{ backgroundColor: isLastRow ? "#59735b" : rowColor }}
               >
-                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{region}</TableCell>
-                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{dealType}</TableCell>
-                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{dealStats.count}</TableCell>
-                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.volume)}</TableCell>
-                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.allocation_capital)}</TableCell>
-                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{dealStats.allocation_weighted.toFixed(2)}%</TableCell>
-                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
-                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.model_actual_total.toFixed(2))}</TableCell>
-                <TableCell sx={isLastRow ? { fontWeight: "bold", color: "#FFFFFF" } : {}}>{formatValue(dealStats.GAP.toFixed(2))}</TableCell>
+                {showRegion && (
+                  <TableCell
+                    rowSpan={rowSpans[region]}
+                    sx={{ fontWeight: "bold", textAlign: "center", verticalAlign: "middle" }}
+                  >
+                    {region}
+                  </TableCell>
+                )}
+                <TableCell>{dealType}</TableCell>
+                <TableCell>{dealStats.count}</TableCell>
+                <TableCell>{formatValue(dealStats.volume)}</TableCell>
+                <TableCell>{formatValue(dealStats.allocation_capital)}</TableCell>
+                <TableCell>{dealStats.allocation_weighted.toFixed(2)}%</TableCell>
+                <TableCell>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
+                <TableCell>{formatValue(dealStats.model_actual_total)}</TableCell>
+                <TableCell>{formatValue(dealStats.GAP)}</TableCell>
               </TableRow>
             );
           })
