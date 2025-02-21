@@ -59,7 +59,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
       model_actual_return: row.model_actual_return ? `${formatDealSize(row.model_actual_return.toFixed())}` : "$0",
       am_return: row.am_return ? `${formatDealSize(row.am_return.toFixed())}` : "$0",
       t1d_return_from_bloomberg: row.t1d_return_from_bloomberg ? `${row.t1d_return_from_bloomberg.toFixed(2)}%` : "",
-      t1m_return_from_dealogic: row.t1m_return_from_dealogic ? `${row.t1m_return_from_dealogic.toFixed(2)}%` : "",
+      t1m_return_from_bloomberg: row.t1m_return_from_bloomberg ? `${row.t1m_return_from_bloomberg.toFixed(2)}%` : "",
       total_committed_capital: row.total_committed_capital ? `${formatDealSize(row.total_committed_capital.toFixed())}` : "$0",
       am_capital_committed: row.am_capital_committed ? `${formatDealSize(row.am_capital_committed.toFixed())}` : "$0",
       allocated_capital: row.allocated_capital ? `${formatDealSize(row.allocated_capital.toFixed())}` : "$0",
@@ -128,7 +128,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
     sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
   { 
-    field: "t1m_return_from_dealogic", 
+    field: "t1m_return_from_bloomberg", 
     headerName: "T+1Month Return", 
     width: 140,
     renderCell: (params) => `${params.value}`,

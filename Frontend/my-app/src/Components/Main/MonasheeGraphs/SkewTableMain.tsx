@@ -1,6 +1,7 @@
 import React from 'react'
 import YearlyBasedTable from './SkewTables/YearlyBasedTable';
 import SectorBasedTable from './SkewTables/SectorBasedTable';
+import LeadBankTable from './SkewTables/LeadBankBasedTable';
 
 const SkewTableMain = () => {
   return (
@@ -8,6 +9,7 @@ const SkewTableMain = () => {
     <>
     <SectorBasedTable   />
     <YearlyBasedTable   />
+    <LeadBankTable />
 
     </>
   )
