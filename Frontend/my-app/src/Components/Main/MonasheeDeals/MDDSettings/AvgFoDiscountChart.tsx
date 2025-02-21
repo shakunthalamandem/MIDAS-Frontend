@@ -8,7 +8,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Box, Typography, useTheme, Card, CardContent, Container } from "@mui/material";
-import NoDataPopup from "../../../../Pages/NoDataPopup"; // Import NoDataPopup
+import NoDataPopup from "../../../../Pages/NoDataPopup";
+import { resetFilters } from "./MDDFilters";  
 
 interface YearData {
   [year: string]: {
@@ -18,21 +19,21 @@ interface YearData {
 }
 
 interface Props {
-  data: YearData | { message: string }; 
+  data: YearData | { message: string };
+  handleCancel: () => void;  // Accept handleCancel as a prop here
 }
 
-const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
+const AvgFoDiscountChart: React.FC<Props> = ({ data, handleCancel }) => {  // Accept handleCancel here as well
   const theme = useTheme();
 
-  const [noDataPopupOpen, setNoDataPopupOpen] = useState(false); 
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
 
   useEffect(() => {
     if ('message' in data && data.message === "No data found for the given filters.") {
       setNoDataPopupOpen(true); // Open the NoDataPopup
     }
-  }, [data]); // Re-run this effect whenever `data` changes
+  }, [data]);
 
-  // Process data and check if chartData is valid or not
   const chartData = Object.entries(data).map(([year, values]) => ({
     year,
     avgFoDiscount: values.avg_fo_discount,
@@ -42,25 +43,29 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
   if ('message' in data && data.message === "No data found for the given filters.") {
     return (
       <NoDataPopup
-        open={noDataPopupOpen} // Open the popup when message matches
-        onClose={() => setNoDataPopupOpen(false)} // Close the popup when user clicks "Okay"
+        open={noDataPopupOpen}
+        onClose={() => {
+          resetFilters(handleCancel); // Pass handleCancel here
+          setNoDataPopupOpen(false);
+        }}
       />
     );
   }
-
 
   if (chartData.length === 0) {
     return (
       <>
         <NoDataPopup
-          open={noDataPopupOpen} // Open the popup when no valid chartData
-          onClose={() => setNoDataPopupOpen(false)} // Close the popup when user clicks "Okay"
+          open={noDataPopupOpen}
+          onClose={() => {
+            setNoDataPopupOpen(false);
+            resetFilters(handleCancel); // Pass handleCancel here
+          }}
         />
       </>
     );
   }
 
-  // Custom Tooltip component
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const { year, avgFoDiscount, count } = payload[0].payload;
@@ -140,9 +145,9 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
                 />
                 <Bar
                   dataKey="avgFoDiscount"
-                  fill='#68021d'
-                  radius={[4, 4, 0, 0]} // Rounded top corners
-                  animationDuration={800} // Animation for bars
+                  fill="#68021d"
+                  radius={[4, 4, 0, 0]}
+                  animationDuration={800}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -150,10 +155,12 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
         </Card>
       </Container>
 
-      {/* NoDataPopup - Modal for showing No Data Available */}
       <NoDataPopup
         open={noDataPopupOpen}
-        onClose={() => setNoDataPopupOpen(false)} 
+        onClose={() => {
+          setNoDataPopupOpen(false);
+          resetFilters(handleCancel); // Pass handleCancel here
+        }}
       />
     </>
   );
