@@ -8,6 +8,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ReferenceLine,
 } from "recharts";
 import {
   FormControlLabel,
@@ -178,6 +179,8 @@ const WeeklyStatsChart: React.FC = () => {
               <XAxis dataKey="name" />
               <YAxis tickFormatter={formatNumber} />
               <Tooltip formatter={(value: any) => formatNumber(Number(value))} />
+              <ReferenceLine y={0} stroke="#a4a4a4" strokeWidth={1} />
+
               <Legend />
 
               {chartType === "count" && (
