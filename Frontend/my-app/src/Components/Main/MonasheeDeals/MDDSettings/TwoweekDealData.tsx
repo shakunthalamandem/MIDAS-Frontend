@@ -8,11 +8,11 @@ const TwoWeekDealData: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
-  const [selectedWeek, setSelectedWeek] = useState<number[]>([7]); // Default all weeks
+  const [selectedWeek, setSelectedWeek] = useState<number[]>([8]); // Default all weeks
   const [regions, setRegions] = useState<string[]>([]);
   const [dealTypes, setDealTypes] = useState<string[]>([]);
   
-  const weeks = [1, 2, 3, 4, 5, 6, 7];
+  const weeks = [1, 2, 3, 4, 5, 6, 7,8];
 
   // Store applied filters separately
   const [appliedRegions, setAppliedRegions] = useState<string[]>([]);
@@ -140,22 +140,21 @@ const TwoWeekDealData: React.FC = () => {
 
           {/* Week Filter */}
           <FormControl sx={{ m: 1, width: 200 }}>
-            <InputLabel>Week</InputLabel>
-            <Select
-              multiple
-              value={selectedWeek}
-              onChange={(e) => setSelectedWeek(e.target.value as number[])}
-              input={<OutlinedInput label="Week" />}
-              renderValue={(selected) => formatMultiSelect(selected)}
-            >
-              {weeks.map((week) => (
-                <MenuItem key={week} value={week}>
-                  <Checkbox checked={selectedWeek.includes(week)} />
-                  <ListItemText primary={`Week ${week}`} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+  <InputLabel>Week</InputLabel>
+  <Select
+    value={selectedWeek[0]}  // Single value instead of array
+    onChange={(e) => setSelectedWeek([e.target.value as number])}  // Update to set a single value
+    input={<OutlinedInput label="Week" />}
+  >
+    {weeks.map((week) => (
+      <MenuItem key={week} value={week}>
+        <ListItemText primary={`Week ${week}`} />
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
+
         </Box>
 
         {/* Apply and Reset Buttons */}
