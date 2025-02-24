@@ -18,6 +18,7 @@ import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/Detail
 import DealFormMain from "../Components/DealsForm/DealFormMain";
 
 import Logs from "../Components/Main/HomePage/Authentication/Logs";
+import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
 
 
 const AppRouters: React.FC = () => {
@@ -33,6 +34,7 @@ const AppRouters: React.FC = () => {
         {/* Protected Routes */}
         <Route path="/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
         <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
+        <Route path="/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} />
         <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
         <Route path="/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
