@@ -10,9 +10,11 @@ import {
 import DealTypeComponent from "./DealTypeComponent";
 import SectorRegionComponent from "./SectorRegionComponent";
 import NoDataPopup from "../../../../Pages/NoDataPopup";
+import { resetFilters } from "./MDDFilters"; // Assuming resetFilters is the function to reset the filters
 
 interface GapProps {
   selectedFilters: any;
+  handleCancel: () => void; // Accept handleCancel as a prop here
 }
 
 interface FilterOption {
@@ -35,10 +37,9 @@ const filterOptions: FilterOption[] = [
   },
 ];
 
-const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
+const Gap: React.FC<GapProps> = ({ selectedFilters, handleCancel }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
-    filterOptions.find((option) => option.value === selectedFilters) ||
-      filterOptions[0]
+    filterOptions.find((option) => option.value === selectedFilters) || filterOptions[0]
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -88,7 +89,17 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
 
   const handleClosePopup = () => {
     setNoDataPopupOpen(false);
+    resetFilters(handleCancel); // Reset filters when closing popup
   };
+
+  // if ('message' in data && data.message === "No data found for the given filters.") {
+  //   return (
+      // <NoDataPopup
+      //   open={noDataPopupOpen}
+      //   onClose={handleClosePopup}
+      // />
+  //   );
+  // }
 
   return (
     <Box>
@@ -179,7 +190,10 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
         </Box>
       )}
 
-      <NoDataPopup open={noDataPopupOpen} onClose={handleClosePopup} />
+      <NoDataPopup
+        open={noDataPopupOpen}
+        onClose={handleClosePopup}
+      />
     </Box>
   );
 };

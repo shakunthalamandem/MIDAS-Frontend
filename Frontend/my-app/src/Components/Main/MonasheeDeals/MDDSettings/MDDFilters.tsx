@@ -355,13 +355,13 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         ) : (
           <>
       {apiName === "gap_analysis" ? (
-        <Gap selectedFilters={appliedFilters} />
+        <Gap selectedFilters={appliedFilters} handleCancel={handleCancel}/>
       ) : apiName === "fo_discount" ? (
         <AvgFoDiscountChart data={apiData} handleCancel={handleCancel} /> 
                                                                     ) : (
         <>
           <DealStatsGraph selectedFilters={appliedFilters} />
-          <MDDScreenergrid sectorwiseData={payload} />
+          <MDDScreenergrid sectorwiseData={payload} handleCancel={handleCancel} />
         </>
       )}
     </>

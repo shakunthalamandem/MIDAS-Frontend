@@ -32,6 +32,7 @@ interface ScreenerDataRow {
 
 interface MDDScreenerDataTableProps {
   sectorwiseData: { [key: string]: (string | number)[] };
+  handleReset: () => void; // Define handleReset prop
 }
 
 const cleanDealSize = (dealSize: any): number => {
@@ -58,7 +59,7 @@ const preprocessRows = (rows: any[]) =>
     tplus_1d_issueprice: row.tplus_1d_issueprice ? `${row.tplus_1d_issueprice.toFixed(2)}%` : "",
   }));
 
-const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseData }) => {
+const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseData,handleReset }) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -140,6 +141,10 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
     }
   };
 
+  const handleClosePopup = () => {
+    setNoDataPopupOpen(false);
+    handleReset();
+  };
   const filteredRows = useMemo(() => {
     return preprocessRows(rows).filter((row) =>
       row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -284,7 +289,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
           />
         )}
 
-        {noDataPopupOpen && <NoDataPopup open={noDataPopupOpen} onClose={() => setNoDataPopupOpen(false)} />}
+        {noDataPopupOpen && <NoDataPopup open={noDataPopupOpen}   onClose={handleClosePopup}/>}
       </div>
 
       <Box mt={4} mb={4}>

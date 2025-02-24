@@ -3,7 +3,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Container, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import NoDataPopup from "../../../../Pages/NoDataPopup";
-
+import { resetFilters } from "./MDDFilters"; // Assuming resetFilters is the function to reset the filters
 interface ScreenerDataRow {
   id: number;
   pricing_date: string;
@@ -27,6 +27,7 @@ interface ScreenerDataRow {
   subscription_bid_shares: number;
   allocated_shares: number;
   fo_type: string;
+
 }
 
 const cleanDealSize = (dealSize: any): number => {
@@ -77,9 +78,12 @@ const preprocessRows = (rows: any[]) =>
 
 interface MDDScreenergridProps {
   sectorwiseData: { [key: string]: (string | number)[] };
+  handleCancel: () => void; // Accept handleCancel as a prop here
+
 }
 
-const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData }) => {
+
+const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData,handleCancel }) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -146,6 +150,10 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData }) => 
     } finally {
       setLoading(false);
     }
+  };
+const handleClosePopup = () => {
+    setOpenNoDataPopup(false);
+    resetFilters(handleCancel); // Reset filters when closing popup
   };
 
   const columns: GridColDef[] = [
@@ -256,7 +264,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData }) => 
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
-      <NoDataPopup open={openNoDataPopup} onClose={() => setOpenNoDataPopup(false)} />
+      <NoDataPopup open={openNoDataPopup}   onClose={handleClosePopup}/>
       {loading && <Typography>Loading...</Typography>}
       {filteredRows.length > 0 && (
         <div style={{ height: 600, width: "100%" }}>
@@ -320,3 +328,4 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData }) => 
 };
 
 export default MDDScreenergrid;
+
