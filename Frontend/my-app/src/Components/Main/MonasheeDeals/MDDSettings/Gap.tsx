@@ -91,16 +91,6 @@ const Gap: React.FC<GapProps> = ({ selectedFilters, handleCancel }) => {
     setNoDataPopupOpen(false);
     resetFilters(handleCancel); // Reset filters when closing popup
   };
-
-  // if ('message' in data && data.message === "No data found for the given filters.") {
-  //   return (
-      // <NoDataPopup
-      //   open={noDataPopupOpen}
-      //   onClose={handleClosePopup}
-      // />
-  //   );
-  // }
-
   return (
     <Box>
       <Box
