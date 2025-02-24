@@ -23,6 +23,7 @@ import WeeklyStatsChart from "../Components/Main/MonasheeDeals/MDDSettings/Weekl
 import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
 import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
+import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
 
 
 const AppRouters: React.FC = () => {
@@ -46,6 +47,8 @@ const AppRouters: React.FC = () => {
           <Route path="weekly-tracking" element={<WeeklyStatsChart />} />
           <Route path="screener" element={<MDDScreener />} />
         </Route>
+        <Route path="/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} />
+        <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
         <Route path="/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
         <Route path="/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />

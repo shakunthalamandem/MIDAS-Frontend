@@ -21,6 +21,7 @@ import AvgFoDiscountChart from "./AvgFoDiscountChart";
 import MDDScreenergrid from "./MDDScreenergrid";
 import DealStatsGraph from "./DealStatsGraph";
 import Gap from "./Gap";
+import BankTable from "./BankTable";
 
 interface FilterOption {
   options: (string | number)[];
@@ -182,7 +183,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                   const key = Object.keys(filter)[0];
                   return !(
                     (apiName === "fo_discount" && (key === "deal_type" || key === "period")) ||
-                    (apiName === "gap_analysis" && key === "period")
+                    (apiName === "gap_analysis" && key === "period") ||
+                    (apiName === "by_bank" && (key === "period" || key === "selected_bank" || key=== "deal_captain"))
                   );
                 })
                 .map((filter) => {
@@ -357,8 +359,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       {apiName === "gap_analysis" ? (
         <Gap selectedFilters={appliedFilters} handleCancel={handleCancel}/>
       ) : apiName === "fo_discount" ? (
-        <AvgFoDiscountChart data={apiData} handleCancel={handleCancel} /> 
-                                                                    ) : (
+        <AvgFoDiscountChart data={apiData} handleCancel={handleCancel} />) : apiName === "by_bank" ? (
+          <BankTable selectedFilters={appliedFilters} />      ) : (
         <>
           <DealStatsGraph selectedFilters={appliedFilters} />
           <MDDScreenergrid sectorwiseData={payload} handleCancel={handleCancel} />

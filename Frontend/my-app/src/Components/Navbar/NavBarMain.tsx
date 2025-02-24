@@ -22,6 +22,7 @@ const pages = [
   "Equity Market Opportunity",
   "Monashee Performance & Efficiency",
   "PRIME Investment Strategies",
+  "Portfolio Attribution"
 ];
 
 const NavbarMain: React.FC = () => {
@@ -83,6 +84,8 @@ const NavbarMain: React.FC = () => {
     if (page === "Monashee Performance & Efficiency")
       navigate("/monashee-deals");
     if (page === "PRIME Investment Strategies") navigate("/strategies");
+    if (page === "Portfolio Attribution") navigate("/portfolio-attribution");
+
     handleCloseNavMenu();
   };
 
@@ -98,6 +101,8 @@ const NavbarMain: React.FC = () => {
         return 2;
       case "/strategies":
         return 3;
+      case "/portfolio-attribution":
+          return 4;
       default:
         return false;
     }
@@ -110,6 +115,7 @@ const NavbarMain: React.FC = () => {
   const isMarketOrPerformanceSelected =
     location.pathname === "/capital-markets" ||
     location.pathname === "/monashee-deals" ||
+    location.pathname === "/portfolio-attribution" ||
     location.pathname === "/issue_market";
 
 

@@ -16,7 +16,7 @@ interface ScreenerDataRow {
   selected_bank: string;
   deal_size: number;
   issue_price_lcl: number;
-  t1m_excess_returns: number;
+  t1m_return_from_bloomberg: number;
   t1d_return_from_bloomberg: number;
   discount_from_announcement_price: number;
   allocation_deal_size: number;
