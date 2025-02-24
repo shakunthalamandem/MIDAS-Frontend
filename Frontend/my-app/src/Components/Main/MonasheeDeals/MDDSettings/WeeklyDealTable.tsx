@@ -57,7 +57,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
     <Table size="small">
       <TableHead>
         <TableRow sx={{ backgroundColor: "#002060" }}>
-          {["Region", "Deal Type", "Count", "Volume", "Allocation Capital", "Allocation Deal %", "Monashee Actual Total PnL(Gross)", "Model Actual Total PnL(Gross)", "Gap"].map((heading) => (
+          {["Region", "Deal Type", "Count", "Volume", "Allocation Capital", "Allocation of Deal Size %", "Monashee Actual Total PnL(Gross)", "Model Actual Total PnL(Gross)", "Gap"].map((heading) => (
             <TableCell key={heading} sx={{ color: "white", minWidth: "40px" }}>
               {heading}
             </TableCell>
