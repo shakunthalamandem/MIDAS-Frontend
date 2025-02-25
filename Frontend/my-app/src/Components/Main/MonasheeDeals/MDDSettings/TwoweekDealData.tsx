@@ -22,7 +22,7 @@ const TwoWeekDealData: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
-  const [selectedWeek, setSelectedWeek] = useState<number[]>([]); // Default all weeks
+  const [selectedWeeks, setSelectedWeeks] = useState<number[]>([]); // Changed to an array for multi-select
   const [regions, setRegions] = useState<string[]>([]);
   const [dealTypes, setDealTypes] = useState<string[]>([]);
 
@@ -31,12 +31,12 @@ const TwoWeekDealData: React.FC = () => {
   // Store applied filters separately
   const [appliedRegions, setAppliedRegions] = useState<string[]>([]);
   const [appliedDealTypes, setAppliedDealTypes] = useState<string[]>([]);
-  const [appliedWeek, setAppliedWeek] = useState<number[]>([8]);
+  const [appliedWeeks, setAppliedWeeks] = useState<number[]>([]); // Changed to handle multiple weeks
 
   // Fetch data on mount and when the "Apply" button is clicked
   useEffect(() => {
     fetchData();
-  }, [appliedRegions, appliedDealTypes, appliedWeek]); // Fetch only when "Apply" is clicked
+  }, [appliedRegions, appliedDealTypes, appliedWeeks]); // Fetch only when "Apply" is clicked
 
   const fetchData = async () => {
     try {
@@ -53,7 +53,7 @@ const TwoWeekDealData: React.FC = () => {
       const body = {
         broad_region: appliedRegions.length > 0 ? appliedRegions : undefined,
         deal_type: appliedDealTypes.length > 0 ? appliedDealTypes : undefined,
-        week: appliedWeek.length > 0 ? appliedWeek : undefined,
+        week: appliedWeeks.length > 0 ? appliedWeeks : undefined,
       };
 
       const response = await fetch(`${apiUrl}/api/weekly_dealstat/`, {
@@ -92,16 +92,16 @@ const TwoWeekDealData: React.FC = () => {
   const handleApply = () => {
     setAppliedRegions(selectedRegions);
     setAppliedDealTypes(selectedDealTypes);
-    setAppliedWeek(selectedWeek);
+    setAppliedWeeks(selectedWeeks);
   };
 
   const handleReset = () => {
     setSelectedRegions([]);
     setSelectedDealTypes([]);
-    setSelectedWeek([]);
+    setSelectedWeeks([]);
     setAppliedRegions([]);
     setAppliedDealTypes([]);
-    setAppliedWeek([]);
+    setAppliedWeeks([]);
   };
 
   // Function to format multi-select display
@@ -113,128 +113,106 @@ const TwoWeekDealData: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 0 }}>
-      <Card sx={{ boxShadow: 3,p: 3, mb: 2}}>
-      <Card sx={{ p: 1, mb: 2}}>
-        <Typography variant="h5" color="#002060" align="center" gutterBottom>
-          Weekly Deal Filters
-        </Typography>
-        <Box
-          display="flex"
-          gap={2}
-          flexWrap="wrap"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Grid
-            container
-            spacing={2}
-            justifyContent="center"
-            alignItems="center"
-          >
-            {/* Deal Type Filter */}
-            <Grid item>
-            <FormControl fullWidth variant="outlined" size="small" sx={{ m: 1, width: 200 }}>
-            <InputLabel>Deal Type</InputLabel>
-                <Select
-                  multiple
-                  value={selectedDealTypes}
-                  onChange={(e) =>
-                    setSelectedDealTypes(e.target.value as string[])
-                  }
-                  input={<OutlinedInput label="Deal Type" sx={{ height: 40 }} />}
-                  renderValue={(selected) => formatMultiSelect(selected)}
-                >
-                  {dealTypes.map((dealType) => (
-                    <MenuItem key={dealType} value={dealType}>
-                      <Checkbox
-                        checked={selectedDealTypes.includes(dealType)}
-                      />
-                      <ListItemText primary={dealType} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            {/* Region Filter */}
-            <Grid item>
-            <FormControl fullWidth variant="outlined" size="small" sx={{ m: 1, width: 200 }}>
-            <InputLabel>Region</InputLabel>
-                <Select
-                  multiple
-                  value={selectedRegions}
-                  onChange={(e) =>
-                    setSelectedRegions(e.target.value as string[])
-                  }
-                  input={<OutlinedInput label="Region" sx={{ height: 40 }} />}
-                  renderValue={(selected) => formatMultiSelect(selected)}
-                >
-                  {regions.map((region) => (
-                    <MenuItem key={region} value={region}>
-                      <Checkbox checked={selectedRegions.includes(region)} />
-                      <ListItemText primary={region} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            {/* Week Filter */}
-            <Grid item>
+      <Card sx={{ boxShadow: 3, p: 3, mb: 2 }}>
+        <Card sx={{ p: 1, mb: 2 }}>
+          <Typography variant="h5" color="#002060" align="center" gutterBottom>
+            Weekly Deal Filters
+          </Typography>
+          <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center" alignItems="center">
+            <Grid container spacing={2} justifyContent="center" alignItems="center">
+              {/* Deal Type Filter */}
+              <Grid item>
                 <FormControl fullWidth variant="outlined" size="small" sx={{ m: 1, width: 200 }}>
-                <InputLabel>Week</InputLabel>
-                <Select
-                  value={selectedWeek[0]} // Single value instead of array
-                  onChange={(e) => setSelectedWeek([e.target.value as number])} // Update to set a single value
-                  input={<OutlinedInput label="Week" sx={{ height: 40 }} />}
+                  <InputLabel>Deal Type</InputLabel>
+                  <Select
+                    multiple
+                    value={selectedDealTypes}
+                    onChange={(e) => setSelectedDealTypes(e.target.value as string[])}
+                    input={<OutlinedInput label="Deal Type" sx={{ height: 40 }} />}
+                    renderValue={(selected) => formatMultiSelect(selected)}
+                  >
+                    {dealTypes.map((dealType) => (
+                      <MenuItem key={dealType} value={dealType}>
+                        <Checkbox checked={selectedDealTypes.includes(dealType)} />
+                        <ListItemText primary={dealType} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Region Filter */}
+              <Grid item>
+                <FormControl fullWidth variant="outlined" size="small" sx={{ m: 1, width: 200 }}>
+                  <InputLabel>Region</InputLabel>
+                  <Select
+                    multiple
+                    value={selectedRegions}
+                    onChange={(e) => setSelectedRegions(e.target.value as string[])}
+                    input={<OutlinedInput label="Region" sx={{ height: 40 }} />}
+                    renderValue={(selected) => formatMultiSelect(selected)}
+                  >
+                    {regions.map((region) => (
+                      <MenuItem key={region} value={region}>
+                        <Checkbox checked={selectedRegions.includes(region)} />
+                        <ListItemText primary={region} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Week Filter */}
+              <Grid item>
+                <FormControl fullWidth variant="outlined" size="small" sx={{ m: 1, width: 200 }}>
+                  <InputLabel>Week</InputLabel>
+                  <Select
+                    multiple
+                    value={selectedWeeks}
+                    onChange={(e) => setSelectedWeeks(e.target.value as number[])}
+                    input={<OutlinedInput label="Week" sx={{ height: 40 }} />}
+                    renderValue={(selected) => formatMultiSelect(selected)}
+                  >
+                    {weeks.map((week) => (
+                      <MenuItem key={week} value={week}>
+                        <Checkbox checked={selectedWeeks.includes(week)} />
+                        <ListItemText primary={`Week ${week}`} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Apply Button */}
+              <Grid item>
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: "#002060", color: "white" }}
+                  onClick={handleApply}
                 >
-                  {weeks.map((week) => (
-                    <MenuItem key={week} value={week}>
-                      <ListItemText primary={`Week ${week}`} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                  Apply
+                </Button>
+              </Grid>
 
-            {/* Apply Button */}
-            <Grid item>
-              <Button
-                variant="contained"
-                sx={{ backgroundColor: "#002060", color: "white" }}
-                onClick={handleApply}
-              >
-                Apply
-              </Button>
+              {/* Reset Button */}
+              <Grid item>
+                <Button variant="outlined" color="secondary" onClick={handleReset}>
+                  Reset
+                </Button>
+              </Grid>
             </Grid>
+          </Box>
+        </Card>
 
-            {/* Reset Button */}
-            <Grid item>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleReset}
-              >
-                Reset
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
+        {/* Data Display */}
+        {loading ? (
+          <Typography>Loading...</Typography>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : (
+          <WeeklyDealTable data={data} selectedRegions={appliedRegions} selectedDealTypes={appliedDealTypes} />
+        )}
       </Card>
-
-      {/* Data Display */}
-      {loading ? (
-        <Typography>Loading...</Typography>
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : (
-        <WeeklyDealTable
-          data={data}
-          selectedRegions={appliedRegions}
-          selectedDealTypes={appliedDealTypes}
-        />
-      )}
-       </Card>
     </Container>
   );
 };

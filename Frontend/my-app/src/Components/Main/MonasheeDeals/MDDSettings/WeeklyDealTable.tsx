@@ -98,7 +98,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
                 <TableCell>{dealStats.count}</TableCell>
                 <TableCell>{formatValue(dealStats.volume)}</TableCell>
                 <TableCell>{formatValue(dealStats.allocation_capital)}</TableCell>
-                <TableCell>{dealStats.allocation_weighted.toFixed(2)}%</TableCell>
+                <TableCell>{dealStats.allocation_weighted ? dealStats.allocation_weighted.toFixed(2) : "N/A"}%</TableCell>
                 <TableCell>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
                 <TableCell>{formatValue(dealStats.model_actual_total)}</TableCell>
                 <TableCell>{formatValue(dealStats.GAP)}</TableCell>
