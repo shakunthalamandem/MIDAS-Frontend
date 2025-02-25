@@ -73,7 +73,6 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
 
       const result = await response.json();
       setData(result);
-      console.log("Data", result);
     } catch (error) {
       console.error("Error fetching data", error);
       setError("Failed to fetch data.");

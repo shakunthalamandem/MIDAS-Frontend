@@ -47,7 +47,6 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
 }) => {
   const handleClick = (year: number) => {
     const filters = { ...selectedFilters, years: [year] };
-    console.log(filters);
 
     const url = new URL(window.location.origin + "/detailed_gap_analysis");
     url.searchParams.set("filters", JSON.stringify(filters));
