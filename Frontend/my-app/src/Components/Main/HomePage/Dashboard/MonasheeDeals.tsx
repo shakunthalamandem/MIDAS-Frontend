@@ -19,7 +19,7 @@ interface MDDResult {
 const MonasheeDeals: React.FC = () => {
   const { ticker: routeTicker } = useParams<{ ticker: string }>(); // Get ticker from the route parameters
   const navigate = useNavigate(); // Initialize the navigate function for routing
-  const [value, setValue] = useState(0); // For controlling tab selection
+  const [value, setValue] = useState(0); // For controlling tab selectiony
   const [searchTerm, setSearchTerm] = useState<string>(""); // Search term state
   const [results, setResults] = useState<MDDResult[]>([]); // Search results
   const [loading, setLoading] = useState<boolean>(false); // Loading state
@@ -27,7 +27,32 @@ const MonasheeDeals: React.FC = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-
+  useEffect(() => {
+    const path = window.location.pathname.split("/").pop();
+    switch (path) {
+      case "deal-stats":
+        setValue(1);
+        break;
+      case "gap-analysis":
+        setValue(2);
+        break;
+      case "follow-on-discount":
+        setValue(3);
+        break;
+      case "weekly-tracking":
+        setValue(4);
+        break;
+      case "by-bank":
+        setValue(5);
+        break;
+      case "screener":
+        setValue(6);
+        break;
+      default:
+        setValue(0);
+        break;
+    }
+  }, [window.location.pathname]);
   // Handle change for tab selection
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
