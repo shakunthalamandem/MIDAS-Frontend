@@ -83,7 +83,7 @@ const Login: React.FC = () => {
 
     for (let i = 0; i < text.length; i++) {
       ctx.save();
-      ctx.translate(17 + i * 30, 25);
+      ctx.translate(15 + i * 30, 25);
       ctx.rotate((Math.random() - 0.5) * 0.4);
       ctx.fillText(text[i], 0, 0);
       ctx.restore();
@@ -253,7 +253,7 @@ const Login: React.FC = () => {
           {/* CAPTCHA Canvas */}
           <canvas
             ref={canvasRef}
-            width={150}
+            width={120}
             height={40}
             style={{
               border: "1px solid #d3d290", // Set border color
