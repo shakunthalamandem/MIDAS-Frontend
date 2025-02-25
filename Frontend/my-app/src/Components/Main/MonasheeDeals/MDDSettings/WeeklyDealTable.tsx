@@ -30,15 +30,23 @@ interface WeeklyDealTableProps {
   selectedRegions: string[];
   selectedDealTypes: string[];
 }
-
 const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions, selectedDealTypes }) => {
-  const rows = Object.entries(data)
-    .filter(([region]) => selectedRegions.length === 0 || selectedRegions.includes(region))
+  let rows = Object.entries(data)
+    .filter(([region]) => region !== "SUMMARY" && (selectedRegions.length === 0 || selectedRegions.includes(region)))
     .flatMap(([region, regionData]) =>
       Object.entries(regionData)
         .filter(([dealType]) => selectedDealTypes.length === 0 || selectedDealTypes.includes(dealType))
         .map(([dealType, dealStats]) => ({ region, dealType, dealStats }))
     );
+
+  // Include SUMMARY row
+  if (data.SUMMARY && data.SUMMARY.TOTAL) {
+    rows.push({
+      region: "SUMMARY",
+      dealType: "TOTAL",
+      dealStats: data.SUMMARY.TOTAL,
+    });
+  }
 
   let rowSpans: Record<string, number> = {};
   let previousRegion: string | null = null;
@@ -73,8 +81,8 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
           </TableRow>
         ) : (
           rows.map(({ region, dealType, dealStats }, idx) => {
-            const isLastRow = idx === rows.length - 1;
-            const rowColor = idx % 6 < 3 ? "#f5f5f5" : "#e0e0e0";
+            const isSummaryRow = region === "SUMMARY";
+            const rowColor = isSummaryRow ? "#59735b" : idx % 6 < 3 ? "#" : "#";
             const showRegion = !renderedRegions[region];
 
             if (showRegion) {
@@ -82,10 +90,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
             }
 
             return (
-              <TableRow
-                key={`${region}-${dealType}`}
-                sx={{ backgroundColor: isLastRow ? "#59735b" : rowColor }}
-              >
+              <TableRow key={`${region}-${dealType}`} sx={{ backgroundColor: rowColor, fontWeight: isSummaryRow ? "bold" : "normal" }}>
                 {showRegion && (
                   <TableCell
                     rowSpan={rowSpans[region]}
