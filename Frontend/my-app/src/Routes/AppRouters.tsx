@@ -39,7 +39,12 @@ const AppRouters: React.FC = () => {
         <Route path="/user_log" element={<Logs />} />
         {/* Protected Routes */}
         <Route path="/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
-        <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
+        <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} >
+          {/* Nested Routes for Tabs */}
+          <Route path="deal-stats" element={<DealStats />} />
+          <Route path="skew-table" element={<AllocationCaptureReturn />} />
+          <Route path="deal-filter" element={<FOllowOnDiscount />} />
+        </Route>
         <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
           {/* Nested Routes for Tabs */}
           <Route path="deal-stats" element={<AuthGuard><DealStats /></AuthGuard>} />
