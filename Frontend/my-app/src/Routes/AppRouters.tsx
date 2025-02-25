@@ -24,6 +24,7 @@ import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowO
 import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
 import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
+import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
 
 
 const AppRouters: React.FC = () => {
@@ -45,6 +46,7 @@ const AppRouters: React.FC = () => {
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
           <Route path="follow-on-discount" element={<FOllowOnDiscount />} />
           <Route path="weekly-tracking" element={<WeeklyStatsChart />} />
+          <Route path="by-bank" element={<BankTable selectedFilters={{}} />} />
           <Route path="screener" element={<MDDScreener />} />
         </Route>
         <Route path="/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} />

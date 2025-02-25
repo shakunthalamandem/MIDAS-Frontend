@@ -64,6 +64,7 @@ const MonasheeDeals: React.FC = () => {
       "gap-analysis",
       "follow-on-discount",
       "weekly-tracking",
+      "by-bank",
       "screener"
     ];
 
