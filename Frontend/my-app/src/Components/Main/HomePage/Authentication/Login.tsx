@@ -83,7 +83,7 @@ const Login: React.FC = () => {
 
     for (let i = 0; i < text.length; i++) {
       ctx.save();
-      ctx.translate(17 + i * 30, 25);
+      ctx.translate(15 + i * 30, 25);
       ctx.rotate((Math.random() - 0.5) * 0.4);
       ctx.fillText(text[i], 0, 0);
       ctx.restore();
@@ -143,7 +143,12 @@ const Login: React.FC = () => {
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
-
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevent form submission
+      handleLogin();
+    }
+  };
   return (
     <Container maxWidth="xs">
       <Box
@@ -248,7 +253,7 @@ const Login: React.FC = () => {
           {/* CAPTCHA Canvas */}
           <canvas
             ref={canvasRef}
-            width={150}
+            width={120}
             height={40}
             style={{
               border: "1px solid #d3d290", // Set border color
@@ -265,6 +270,7 @@ const Login: React.FC = () => {
           </IconButton>
           <TextField
             placeholder="Enter CAPTCHA"
+            onKeyDown={handleKeyDown}
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             sx={{
@@ -308,6 +314,7 @@ const Login: React.FC = () => {
 
         {/* Login Button */}
         <Button
+         onKeyDown={handleKeyDown}
           fullWidth
           variant="contained"
           color="primary"

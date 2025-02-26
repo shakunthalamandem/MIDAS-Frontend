@@ -114,7 +114,6 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
         body: JSON.stringify(payload),
       });
       const data = await response.json();
-      console.log("Data", data);
       // setChartData(formatChartData(data));
     } catch (error) {
       console.error("Error fetching data", error);

@@ -16,7 +16,6 @@ const DetailedGapData: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  console.log("Search Params:", searchParams.toString());
 
   let selectedFilters: SelectedFilters = {}; // Explicitly using the typed interface
 
