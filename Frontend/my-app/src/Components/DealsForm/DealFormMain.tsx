@@ -15,7 +15,7 @@ import { useState, useCallback } from "react";
 
 const DealFormMain: React.FC = () => {
   const [formData, setFormData] = useState<DealFormData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);  // Set initial loading state to true
+  const [loading, setLoading] = useState<boolean>(true); 
 
 
 
