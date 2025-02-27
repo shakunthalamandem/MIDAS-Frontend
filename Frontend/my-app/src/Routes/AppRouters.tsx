@@ -37,23 +37,30 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/logout" element={<Logout />} /> */}
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
-        {/* Protected Routes */}
         <Route path="/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
+
+
+
+
         <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} >
-          {/* Nested Routes for Tabs */}
           <Route path="deal-stats" element={<DealStats />} />
           <Route path="skew-table" element={<AllocationCaptureReturn />} />
           <Route path="deal-filter" element={<FOllowOnDiscount />} />
         </Route>
+
+
+
         <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
-          {/* Nested Routes for Tabs */}
-          <Route path="deal-stats" element={<AuthGuard><DealStats /></AuthGuard>} />
+          <Route path="deal-stats" element={<DealStats />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
           <Route path="follow-on-discount" element={<FOllowOnDiscount />} />
           <Route path="weekly-tracking" element={<WeeklyStatsChart />} />
           <Route path="by-bank" element={<BankTable selectedFilters={{}} />} />
           <Route path="screener" element={<MDDScreener />} />
         </Route>
+
+
+
         <Route path="/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} />
         <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />

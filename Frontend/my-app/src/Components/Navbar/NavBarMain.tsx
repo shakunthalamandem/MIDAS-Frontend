@@ -55,11 +55,11 @@ const NavbarMain: React.FC = () => {
       await fetch(`${apiUrl}/api/logout/`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({ refresh_token: refresh_token, user: user })
-    });    
+      });
 
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
@@ -88,25 +88,40 @@ const NavbarMain: React.FC = () => {
 
     handleCloseNavMenu();
   };
-
-
-
   const getTabIndex = () => {
     switch (location.pathname) {
       case "/issue_market":
         return 0;
       case "/capital-markets":
+      case "/capital-markets/deal-stats":
+      case "/capital-markets/skew-table":
+      case "/capital-markets/deal-filter":
         return 1;
       case "/monashee-deals":
+      case "/monashee-deals/deal-stats":
+      case "/monashee-deals/screener":
+
+      case "/monashee-deals/by-bank":
+
+      case "/monashee-deals/weekly-tracking":
+
+      case "/monashee-deals/follow-on-discount":
+      case "/monashee-deals/gap-analysis":
         return 2;
       case "/strategies":
         return 3;
       case "/portfolio-attribution":
-          return 4;
+        return 4;
       default:
         return false;
     }
   };
+
+
+  const isActiveTab = (index: number) => {
+    return getTabIndex() === index;
+  };
+
 
 
 
@@ -124,10 +139,10 @@ const NavbarMain: React.FC = () => {
       <AppBar position="sticky" sx={{ backgroundColor: "#FFFFFF" }}>
         {(location.pathname === "/strategies" ||
           location.pathname.startsWith("/technical/")) && (
-          <Box sx={{ marginBottom: "50px" }}>
-            <TradingViewTickerTape />
-          </Box>
-        )}
+            <Box sx={{ marginBottom: "50px" }}>
+              <TradingViewTickerTape />
+            </Box>
+          )}
 
         {/* Scrollbar container */}
         {isMarketOrPerformanceSelected && (
@@ -209,7 +224,113 @@ const NavbarMain: React.FC = () => {
                 },
               }}
             >
-              {pages.map((page) => (
+              <Tab
+                label="New Deal Data"
+                onClick={() => handleNavigate("New Deal Data")}
+                sx={{
+                  minWidth: 100,
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                  color: isActiveTab(0) ? "#FFFFFF" : "#bb4401",  // Active color
+                  backgroundColor: isActiveTab(0) ? "#002060" : "transparent",  // Active background color
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: "#002060",
+                    borderRadius: "6px",
+                    color: "#FFFFFF",
+                  },
+                  "&.Mui-selected": {
+                    backgroundColor: "#002060",
+                    color: "#FFFFFF",
+                  },
+                }}
+              />
+              <Tab
+                label="Equity Market Opportunity"
+                onClick={() => handleNavigate("Equity Market Opportunity")}
+                sx={{
+                  minWidth: 100,
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                  color: isActiveTab(1) ? "#FFFFFF" : "#bb4401",  // Active color
+                  backgroundColor: isActiveTab(1) ? "#002060" : "transparent",  // Active background color
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: "#002060",
+                    borderRadius: "6px",
+                    color: "#FFFFFF",
+                  },
+                  "&.Mui-selected": {
+                    backgroundColor: "#002060",
+                    color: "#FFFFFF",
+                  },
+                }}
+              />
+              <Tab
+                label="Monashee Performance & Efficiency"
+                onClick={() => handleNavigate("Monashee Performance & Efficiency")}
+
+                sx={{
+                  minWidth: 100,
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                  color: isActiveTab(2) ? "#FFFFFF" : "#bb4401",  // Active color
+                  backgroundColor: isActiveTab(2) ? "#002060" : "transparent",  // Active background color
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: "#002060",
+                    borderRadius: "6px",
+                    color: "#FFFFFF",
+                  },
+                  "&.Mui-selected": {
+                    backgroundColor: "#002060",
+                    color: "#FFFFFF",
+                  },
+                }}
+              />
+              <Tab
+                label="PRIME Investment Strategies"
+                onClick={() => handleNavigate("PRIME Investment Strategies")}
+                sx={{
+                  minWidth: 100,
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                  color: isActiveTab(3) ? "#FFFFFF" : "#bb4401",  // Active color
+                  backgroundColor: isActiveTab(3) ? "#002060" : "transparent",  // Active background color
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: "#002060",
+                    borderRadius: "6px",
+                    color: "#FFFFFF",
+                  },
+                  "&.Mui-selected": {
+                    backgroundColor: "#002060",
+                    color: "#FFFFFF",
+                  },
+                }}
+              />
+              <Tab
+                label="Portfolio Attribution"
+                onClick={() => handleNavigate("Portfolio Attribution")}
+                sx={{
+                  minWidth: 100,
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                  color: isActiveTab(4) ? "#FFFFFF" : "#bb4401",  // Active color
+                  backgroundColor: isActiveTab(4) ? "#002060" : "transparent",  // Active background color
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: "#002060",
+                    borderRadius: "6px",
+                    color: "#FFFFFF",
+                  },
+                  "&.Mui-selected": {
+                    backgroundColor: "#002060",
+                    color: "#FFFFFF",
+                  },
+                }}
+              />
+              {/* {pages.map((page) => (
                 <Tab
                   key={page}
                   label={page}
@@ -232,7 +353,7 @@ const NavbarMain: React.FC = () => {
                     },
                   }}
                 />
-              ))}
+              ))} */}
             </Tabs>
           </Box>
           {isLoggedIn && isSuperUser && (
