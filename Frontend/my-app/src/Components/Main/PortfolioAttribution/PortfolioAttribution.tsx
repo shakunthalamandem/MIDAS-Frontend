@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Box, Typography, Container } from "@mui/material";
+import { Link } from "react-router-dom";  // Import Link to make fund names clickable
 
 interface FundData {
   fund: string;
@@ -130,7 +131,15 @@ const FundTable: React.FC = () => {
                 <TableBody>
                   {data.map((row, index) => (
                     <TableRow key={index}>
-                      <TableCell>{row.fund}</TableCell>
+<Link
+  to={`/fund/${row.fund}`}  // Use backticks and `${}` for interpolation
+  style={{ color: "#1E88E5", textDecoration: "none" }}
+  target="_blank"  // Optionally open in a new tab
+>
+  {row.fund}
+</Link>
+
+
                       <TableCell>{row.pnl}</TableCell>
                       <TableCell>{row.aum}</TableCell>
                       <TableCell>{row.net}</TableCell>

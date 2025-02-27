@@ -19,6 +19,7 @@ import DealFormMain from "../Components/DealsForm/DealFormMain";
 
 import Logs from "../Components/Main/HomePage/Authentication/Logs";
 import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
+import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable";
 
 
 const AppRouters: React.FC = () => {
@@ -40,6 +41,7 @@ const AppRouters: React.FC = () => {
         <Route path="/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
         <Route path="/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/tickerperformance/:ticker" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
+        <Route path="/fund/:fund" element={<AuthGuard><FundWiseTable /></AuthGuard>} />
 
         <Route path="/detailed_gap_analysis" element={<AuthGuard><DetailedGapData /></AuthGuard>} />
 
