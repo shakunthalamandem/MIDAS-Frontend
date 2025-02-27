@@ -237,6 +237,8 @@ const NavbarMain: React.FC = () => {
                     "&.Mui-selected": {
                       backgroundColor: "#002060",
                       color: "#FFFFFF",
+                      borderRadius: "6px",
+
                     },
                   }}
                 />
