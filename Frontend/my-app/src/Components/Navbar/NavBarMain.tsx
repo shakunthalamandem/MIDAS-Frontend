@@ -6,8 +6,7 @@ import {
   Tab,
   Button,
   Box,
-  Typography
-
+  Typography,
 } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -22,7 +21,7 @@ const pages = [
   "Equity Market Opportunity",
   "Monashee Performance & Efficiency",
   "PRIME Investment Strategies",
-  "Portfolio Attribution"
+  "Portfolio Attribution",
 ];
 
 const NavbarMain: React.FC = () => {
@@ -30,7 +29,7 @@ const NavbarMain: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const location = useLocation();
-  const isSuperUser = localStorage.getItem('is_superuser') === 'true';
+  const isSuperUser = localStorage.getItem("is_superuser") === "true";
   const [showLogs, setShowLogs] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,8 +38,6 @@ const NavbarMain: React.FC = () => {
   const token = localStorage.getItem("access_token");
   const refresh_token = localStorage.getItem("refresh_token");
   const user = localStorage.getItem("user");
-
-
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
@@ -56,14 +53,14 @@ const NavbarMain: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token}` : "",
+          Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({ refresh_token: refresh_token, user: user })
+        body: JSON.stringify({ refresh_token: refresh_token, user: user }),
       });
 
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      localStorage.removeItem("user")
+      localStorage.removeItem("user");
 
       setLoading(false);
       navigate("/login");
@@ -92,9 +89,9 @@ const NavbarMain: React.FC = () => {
     switch (location.pathname) {
       case "/issue_market":
         return 0;
+      case "/capital-markets":
       case "/capital-markets/":
       case "/capital-markets/deal-stats":
-      case "/capital-markets/dealogic_search":
       case "/capital-markets/skew-table":
       case "/capital-markets/deal-filter":
         return 1;
@@ -116,13 +113,9 @@ const NavbarMain: React.FC = () => {
     }
   };
 
-
   const isActiveTab = (index: number) => {
     return getTabIndex() === index;
   };
-
-
-
 
   const isLoggedIn = !!localStorage.getItem("access_token");
 
@@ -132,16 +125,15 @@ const NavbarMain: React.FC = () => {
     location.pathname === "/portfolio-attribution" ||
     location.pathname === "/issue_market";
 
-
   return (
     <>
       <AppBar position="sticky" sx={{ backgroundColor: "#FFFFFF" }}>
         {(location.pathname === "/strategies" ||
           location.pathname.startsWith("/technical/")) && (
-            <Box sx={{ marginBottom: "50px" }}>
-              <TradingViewTickerTape />
-            </Box>
-          )}
+          <Box sx={{ marginBottom: "50px" }}>
+            <TradingViewTickerTape />
+          </Box>
+        )}
 
         {/* Scrollbar container */}
         {isMarketOrPerformanceSelected && (
@@ -223,97 +215,90 @@ const NavbarMain: React.FC = () => {
                 },
               }}
             >
-          {pages.map((page, index) => (
-          <Tab
-            key={page}
-            label={page}
-            onClick={() => handleNavigate(page)}
-            sx={{
-              minWidth: 100,
-              fontWeight: "bold",
-              fontSize: "16px",
-              color: isActiveTab(index) ? "#FFFFFF" : "#bb4401",  // Set color based on active status
-              backgroundColor: isActiveTab(index) ? "#002060" : "transparent",  // Set background color based on active status
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#002060",
-                borderRadius: "6px",
-                color: "#FFFFFF",
-              },
-              "&.Mui-selected": {
-                backgroundColor: "#002060",
-                color: "#FFFFFF",
-              },
-            }}
-          />
+              {pages.map((page, index) => (
+                <Tab
+                  key={page}
+                  label={page}
+                  onClick={() => handleNavigate(page)}
+                  sx={{
+                    minWidth: 100,
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                    color: isActiveTab(index) ? "#FFFFFF" : "#bb4401", // Set color based on active status
+                    backgroundColor: isActiveTab(index)
+                      ? "#002060"
+                      : "transparent", // Set background color based on active status
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#002060",
+                      borderRadius: "6px",
+                      color: "#FFFFFF",
+                    },
+                    "&.Mui-selected": {
+                      backgroundColor: "#002060",
+                      color: "#FFFFFF",
+                    },
+                  }}
+                />
               ))}
-
             </Tabs>
           </Box>
           {isLoggedIn && isSuperUser && (
             <>
               <Button
                 sx={{
-                  color: 'black',
-                  fontWeight: 'bold',
-                  marginRight: '20px',
+                  color: "black",
+                  fontWeight: "bold",
+                  marginRight: "20px",
                 }}
                 onClick={() => setShowLogs(true)}
               >
-
                 <div>
                   <Logs />
-
-                </div>          </Button>
-
-
+                </div>{" "}
+              </Button>
             </>
           )}
-
-
 
           <>
             {isLoggedIn ? (
               <Button
                 sx={{
-                  color: '#FFFFFF',
-                  backgroundColor: '#bb4401',
-                  fontWeight: 'bold',
-                  fontFamily: 'Roboto, sans-serif',
+                  color: "#FFFFFF",
+                  backgroundColor: "#bb4401",
+                  fontWeight: "bold",
+                  fontFamily: "Roboto, sans-serif",
                   height: 30,
-                  '&:hover': { backgroundColor: '#bb4401' },
+                  "&:hover": { backgroundColor: "#bb4401" },
                 }}
-                onClick={handleLogoutClick}  // Show Logout component when clicked
+                onClick={handleLogoutClick} // Show Logout component when clicked
               >
                 Logout
               </Button>
             ) : (
               <Button
                 sx={{
-                  color: '#FFFFFF',
-                  backgroundColor: '#002060',
-                  fontWeight: 'bold',
-                  fontFamily: 'Roboto, sans-serif',
-                  '&:hover': { backgroundColor: '#002060' },
+                  color: "#FFFFFF",
+                  backgroundColor: "#002060",
+                  fontWeight: "bold",
+                  fontFamily: "Roboto, sans-serif",
+                  "&:hover": { backgroundColor: "#002060" },
                 }}
-                onClick={() => navigate('/login')}  // Navigate to the login page
+                onClick={() => navigate("/login")} // Navigate to the login page
               >
                 Login
               </Button>
             )}
-
-
           </>
           {/* {showLogout && <Logout />}  */}
           {showLogout && (
             <Logout
               onConfirm={handleConfirmLogout}
               onCancel={handleCancelLogout}
-            />)}
+            />
+          )}
         </Toolbar>
       </AppBar>
-
-
     </>
   );
 };
