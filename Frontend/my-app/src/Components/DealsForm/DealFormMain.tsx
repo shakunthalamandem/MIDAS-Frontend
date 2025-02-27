@@ -7,20 +7,24 @@ import Participation from './SectionForms/Participation';
 import PerformanceStatergy from './SectionForms/PerformanceStatergy';
 import TechnicalInsights from './SectionForms/TechnicalInsights';
 import TempJsonData from './TempJsonData';
-import { useState } from 'react';
 import { DealFormData } from '../../types/DealFormData';
 import AfterMarketAnalysis from './SectionForms/AfterMarketAnalysis';
 import DealFormSearch from './DealFormSearch';
+import { useState, useCallback } from "react";
+
 
 const DealFormMain: React.FC = () => {
   const [formData, setFormData] = useState<DealFormData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);  // Set initial loading state to true
 
-  // Handle JSON data loaded from TempJsonData component
-  const handleDataLoaded = (data: DealFormData) => {
-    setFormData(data);
-    setLoading(false);  // Data is loaded, so turn off loading
-  };
+
+
+
+const handleDataLoaded = useCallback((data: DealFormData) => {
+  setFormData(data);
+  setLoading(false);
+}, []);
+
   return (
     
     <Container sx={{ mb: 5 }}>
