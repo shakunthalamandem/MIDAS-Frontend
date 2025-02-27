@@ -25,6 +25,7 @@ import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener"
 import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
 import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
+import SelectedTicker from "../Components/Main/MonasheeGraphs/SelectedTicker";
 
 
 const AppRouters: React.FC = () => {
@@ -43,6 +44,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} >
+          <Route path="search" element={<SelectedTicker ticker={'AS'}/>} />
           <Route path="deal-stats" element={<DealStats />} />
           <Route path="skew-table" element={<AllocationCaptureReturn />} />
           <Route path="deal-filter" element={<FOllowOnDiscount />} />
@@ -51,6 +53,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
+          <Route path="search" element={<SelectedTicker ticker={'CGRX'}/>} />
           <Route path="deal-stats" element={<DealStats />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
           <Route path="follow-on-discount" element={<FOllowOnDiscount />} />

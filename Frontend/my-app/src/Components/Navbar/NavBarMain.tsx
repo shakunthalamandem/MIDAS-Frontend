@@ -92,19 +92,18 @@ const NavbarMain: React.FC = () => {
     switch (location.pathname) {
       case "/issue_market":
         return 0;
-      case "/capital-markets":
+      case "/capital-markets/":
       case "/capital-markets/deal-stats":
+      case "/capital-markets/dealogic_search":
       case "/capital-markets/skew-table":
       case "/capital-markets/deal-filter":
         return 1;
       case "/monashee-deals":
+      case "/monashee-deals/":
       case "/monashee-deals/deal-stats":
       case "/monashee-deals/screener":
-
       case "/monashee-deals/by-bank":
-
       case "/monashee-deals/weekly-tracking":
-
       case "/monashee-deals/follow-on-discount":
       case "/monashee-deals/gap-analysis":
         return 2;
@@ -224,136 +223,31 @@ const NavbarMain: React.FC = () => {
                 },
               }}
             >
-              <Tab
-                label="New Deal Data"
-                onClick={() => handleNavigate("New Deal Data")}
-                sx={{
-                  minWidth: 100,
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  color: isActiveTab(0) ? "#FFFFFF" : "#bb4401",  // Active color
-                  backgroundColor: isActiveTab(0) ? "#002060" : "transparent",  // Active background color
-                  textTransform: "none",
-                  "&:hover": {
-                    backgroundColor: "#002060",
-                    borderRadius: "6px",
-                    color: "#FFFFFF",
-                  },
-                  "&.Mui-selected": {
-                    backgroundColor: "#002060",
-                    color: "#FFFFFF",
-                  },
-                }}
-              />
-              <Tab
-                label="Equity Market Opportunity"
-                onClick={() => handleNavigate("Equity Market Opportunity")}
-                sx={{
-                  minWidth: 100,
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  color: isActiveTab(1) ? "#FFFFFF" : "#bb4401",  // Active color
-                  backgroundColor: isActiveTab(1) ? "#002060" : "transparent",  // Active background color
-                  textTransform: "none",
-                  "&:hover": {
-                    backgroundColor: "#002060",
-                    borderRadius: "6px",
-                    color: "#FFFFFF",
-                  },
-                  "&.Mui-selected": {
-                    backgroundColor: "#002060",
-                    color: "#FFFFFF",
-                  },
-                }}
-              />
-              <Tab
-                label="Monashee Performance & Efficiency"
-                onClick={() => handleNavigate("Monashee Performance & Efficiency")}
+          {pages.map((page, index) => (
+          <Tab
+            key={page}
+            label={page}
+            onClick={() => handleNavigate(page)}
+            sx={{
+              minWidth: 100,
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: isActiveTab(index) ? "#FFFFFF" : "#bb4401",  // Set color based on active status
+              backgroundColor: isActiveTab(index) ? "#002060" : "transparent",  // Set background color based on active status
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#002060",
+                borderRadius: "6px",
+                color: "#FFFFFF",
+              },
+              "&.Mui-selected": {
+                backgroundColor: "#002060",
+                color: "#FFFFFF",
+              },
+            }}
+          />
+              ))}
 
-                sx={{
-                  minWidth: 100,
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  color: isActiveTab(2) ? "#FFFFFF" : "#bb4401",  // Active color
-                  backgroundColor: isActiveTab(2) ? "#002060" : "transparent",  // Active background color
-                  textTransform: "none",
-                  "&:hover": {
-                    backgroundColor: "#002060",
-                    borderRadius: "6px",
-                    color: "#FFFFFF",
-                  },
-                  "&.Mui-selected": {
-                    backgroundColor: "#002060",
-                    color: "#FFFFFF",
-                  },
-                }}
-              />
-              <Tab
-                label="PRIME Investment Strategies"
-                onClick={() => handleNavigate("PRIME Investment Strategies")}
-                sx={{
-                  minWidth: 100,
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  color: isActiveTab(3) ? "#FFFFFF" : "#bb4401",  // Active color
-                  backgroundColor: isActiveTab(3) ? "#002060" : "transparent",  // Active background color
-                  textTransform: "none",
-                  "&:hover": {
-                    backgroundColor: "#002060",
-                    borderRadius: "6px",
-                    color: "#FFFFFF",
-                  },
-                  "&.Mui-selected": {
-                    backgroundColor: "#002060",
-                    color: "#FFFFFF",
-                  },
-                }}
-              />
-              <Tab
-                label="Portfolio Attribution"
-                onClick={() => handleNavigate("Portfolio Attribution")}
-                sx={{
-                  minWidth: 100,
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  color: isActiveTab(4) ? "#FFFFFF" : "#bb4401",  // Active color
-                  backgroundColor: isActiveTab(4) ? "#002060" : "transparent",  // Active background color
-                  textTransform: "none",
-                  "&:hover": {
-                    backgroundColor: "#002060",
-                    borderRadius: "6px",
-                    color: "#FFFFFF",
-                  },
-                  "&.Mui-selected": {
-                    backgroundColor: "#002060",
-                    color: "#FFFFFF",
-                  },
-                }}
-              />
-              {/* {pages.map((page) => (
-                <Tab
-                  key={page}
-                  label={page}
-                  onClick={() => handleNavigate(page)}
-                  sx={{
-                    minWidth: 100,
-                    fontWeight: "bold",
-                    fontSize: "16px",
-                    color: "#bb4401",
-                    textTransform: "none",
-                    "&.Mui-selected": {
-                      color: "#FFFFFF",
-                      backgroundColor: "#002060",
-                      borderRadius: "6px",
-                    },
-                    "&:hover": {
-                      backgroundColor: "#002060",
-                      borderRadius: "6px",
-                      color: "#FFFFFF",
-                    },
-                  }}
-                />
-              ))} */}
             </Tabs>
           </Box>
           {isLoggedIn && isSuperUser && (
