@@ -4,7 +4,7 @@ import { Box, CircularProgress, Typography, Table, TableBody, TableCell, TableCo
 // import { result } from "lodash"; // This import is not needed
 
 const FundWiseTable: React.FC = () => {
-  const { fundId } = useParams(); // Get the fundId from the URL params
+  const { fund } = useParams(); // Get the fund from the URL params
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<any[]>([]);
@@ -23,7 +23,7 @@ const FundWiseTable: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ fundId }), 
+          body: JSON.stringify({ fund }), 
         });
   
         if (!response.ok) {
@@ -31,7 +31,9 @@ const FundWiseTable: React.FC = () => {
         }
   
         const result = await response.json();
-        setData(result.data);
+
+        setData(result);
+
       } catch (error) {
         setError((error as any).message || "An error occurred while fetching data");
       } finally {
@@ -39,10 +41,10 @@ const FundWiseTable: React.FC = () => {
       }
     };
   
-    if (fundId) {
+    if (fund) {
       fetchData();
     }
-  }, [fundId, apiUrl, token]);  // Ensure fundId is used correctly as a dependency
+  }, [fund, apiUrl, token]);  // Ensure fund is used correctly as a dependency
   
 
   return (
@@ -53,22 +55,24 @@ const FundWiseTable: React.FC = () => {
         <Typography color="error">{error}</Typography>
       ) : (
         <Box>
-          <Typography variant="h4">{`Details for Fund: ${fundId}`}</Typography>
+          <Typography variant="h4">{`Details for Fund: ${fund}`}</Typography>
 
           {/* Displaying detailed fund data in a table */}
           <TableContainer component={Paper} sx={{ marginTop: 2 }}>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell><b>Metric</b></TableCell>
-                  <TableCell><b>Value</b></TableCell>
+                  <TableCell><b>Region</b></TableCell>
+                  <TableCell><b>Jan-2025</b></TableCell>
+                  <TableCell><b>2025 YTD</b></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {data.map((row, index) => (
                   <TableRow key={index}>
-                    <TableCell>{row.metric}</TableCell>
-                    <TableCell>{row.value}</TableCell>
+                    <TableCell>{row.broad_region}</TableCell>
+                    <TableCell>{row.pnl}</TableCell>
+                    <TableCell>{row.aum}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
