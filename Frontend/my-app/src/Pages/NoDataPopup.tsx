@@ -30,7 +30,7 @@ const NoDataPopup: React.FC<NoDataPopupProps> = ({ open, onClose }) => {
         }}
       >
         <Typography variant="h6" color="#002060" gutterBottom>
-          No Data Available
+          No Data Available for Selected Filters
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           Please change the applied filters and try again.

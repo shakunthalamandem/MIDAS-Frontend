@@ -8,33 +8,36 @@ import {
   Typography,
   Card,
   CardContent,
+  CircularProgress,
 } from "@mui/material";
 import NumberOfDeals from "./NavigationTabs/NumberOfDeals";
 import RegionWiseDeals from "./NavigationTabs/RegionWiseDeals";
 import SectorWiseDeals from "./NavigationTabs/SectorWiseDeals";
 import YearlySectorChart from "./YearlySectorChart";
 import RegionWiseChart from "./RegionWiseChart";
-
+import NoDataPopup from "../../../Pages/NoDataPopup";
 interface MarketCapitalMainProps {
-  selectedFilters: Record<string, string | number | (string | number)[]>;
+  selectedFilters: Record<string, string | number | (string | number)[]>; 
+  handleReset: () => void;
 }
 
 const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
-  selectedFilters,
+  selectedFilters,handleReset
 }) => {
   const [apiData, setApiData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<string>("count");
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState(false); // State for NoDataPopup
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedMetric(event.target.value);
   };
-
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+      setNoDataPopupOpen(false); // Close popup if it's already open
 
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
@@ -55,12 +58,19 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
 
         if (response.ok) {
           const result = await response.json();
-          setApiData(result);
+          if (result.error === "No data found for the given filters.") {
+            setNoDataPopupOpen(true); // Open the NoDataPopup if no data is returned
+            setApiData(null); // Set data to null
+          } else {
+            setApiData(result);
+          }
         } else {
-          throw new Error("Failed to fetch data");
+          setNoDataPopupOpen(true); // Open the NoDataPopup if fetch fails
+          setApiData(null); // Set data to null
         }
       } catch (err: any) {
-        setError(err.message || "An error occurred while fetching data");
+        setNoDataPopupOpen(true); // Open the NoDataPopup if an error occurs
+        setApiData(null); // Set data to null
       } finally {
         setLoading(false);
       }
@@ -68,6 +78,10 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
 
     fetchData();
   }, [selectedFilters]);
+  const handleClosePopup = () => {
+    setNoDataPopupOpen(false); // Close the NoDataPopup
+    handleReset(); 
+  };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -154,6 +168,10 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
           </Card>
         </>
       )}
+     <NoDataPopup
+        open={noDataPopupOpen}
+        onClose={handleClosePopup} // Close the popup and reset filters when the user clicks the close button
+      />
     </Container>
   );
 };

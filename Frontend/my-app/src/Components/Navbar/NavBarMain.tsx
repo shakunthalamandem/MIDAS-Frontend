@@ -6,8 +6,7 @@ import {
   Tab,
   Button,
   Box,
-  Typography
-
+  Typography,
 } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -22,7 +21,7 @@ const pages = [
   "Equity Market Opportunity",
   "Monashee Performance & Efficiency",
   "PRIME Investment Strategies",
-  "Portfolio Attribution"
+  "Portfolio Attribution",
 ];
 
 const NavbarMain: React.FC = () => {
@@ -30,7 +29,7 @@ const NavbarMain: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const location = useLocation();
-  const isSuperUser = localStorage.getItem('is_superuser') === 'true';
+  const isSuperUser = localStorage.getItem("is_superuser") === "true";
   const [showLogs, setShowLogs] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,8 +38,6 @@ const NavbarMain: React.FC = () => {
   const token = localStorage.getItem("access_token");
   const refresh_token = localStorage.getItem("refresh_token");
   const user = localStorage.getItem("user");
-
-
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
@@ -55,15 +52,15 @@ const NavbarMain: React.FC = () => {
       await fetch(`${apiUrl}/api/logout/`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({ refresh_token: refresh_token, user: user })
-    });    
+        body: JSON.stringify({ refresh_token: refresh_token, user: user }),
+      });
 
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      localStorage.removeItem("user")
+      localStorage.removeItem("user");
 
       setLoading(false);
       navigate("/login");
@@ -88,27 +85,37 @@ const NavbarMain: React.FC = () => {
 
     handleCloseNavMenu();
   };
-
-
-
   const getTabIndex = () => {
     switch (location.pathname) {
       case "/issue_market":
         return 0;
       case "/capital-markets":
+      case "/capital-markets/":
+      case "/capital-markets/deal-stats":
+      case "/capital-markets/skew-table":
+      case "/capital-markets/deal-filter":
         return 1;
       case "/monashee-deals":
+      case "/monashee-deals/":
+      case "/monashee-deals/deal-stats":
+      case "/monashee-deals/screener":
+      case "/monashee-deals/by-bank":
+      case "/monashee-deals/weekly-tracking":
+      case "/monashee-deals/follow-on-discount":
+      case "/monashee-deals/gap-analysis":
         return 2;
       case "/strategies":
         return 3;
       case "/portfolio-attribution":
-          return 4;
+        return 4;
       default:
         return false;
     }
   };
 
-
+  const isActiveTab = (index: number) => {
+    return getTabIndex() === index;
+  };
 
   const isLoggedIn = !!localStorage.getItem("access_token");
 
@@ -117,7 +124,6 @@ const NavbarMain: React.FC = () => {
     location.pathname === "/monashee-deals" ||
     location.pathname === "/portfolio-attribution" ||
     location.pathname === "/issue_market";
-
 
   return (
     <>
@@ -209,7 +215,7 @@ const NavbarMain: React.FC = () => {
                 },
               }}
             >
-              {pages.map((page) => (
+              {pages.map((page, index) => (
                 <Tab
                   key={page}
                   label={page}
@@ -218,17 +224,21 @@ const NavbarMain: React.FC = () => {
                     minWidth: 100,
                     fontWeight: "bold",
                     fontSize: "16px",
-                    color: "#bb4401",
+                    color: isActiveTab(index) ? "#FFFFFF" : "#bb4401", // Set color based on active status
+                    backgroundColor: isActiveTab(index)
+                      ? "#002060"
+                      : "transparent", // Set background color based on active status
                     textTransform: "none",
-                    "&.Mui-selected": {
-                      color: "#FFFFFF",
-                      backgroundColor: "#002060",
-                      borderRadius: "6px",
-                    },
                     "&:hover": {
                       backgroundColor: "#002060",
                       borderRadius: "6px",
                       color: "#FFFFFF",
+                    },
+                    "&.Mui-selected": {
+                      backgroundColor: "#002060",
+                      color: "#FFFFFF",
+                      borderRadius: "6px",
+
                     },
                   }}
                 />
@@ -239,66 +249,58 @@ const NavbarMain: React.FC = () => {
             <>
               <Button
                 sx={{
-                  color: 'black',
-                  fontWeight: 'bold',
-                  marginRight: '20px',
+                  color: "black",
+                  fontWeight: "bold",
+                  marginRight: "20px",
                 }}
                 onClick={() => setShowLogs(true)}
               >
-
                 <div>
                   <Logs />
-
-                </div>          </Button>
-
-
+                </div>{" "}
+              </Button>
             </>
           )}
-
-
 
           <>
             {isLoggedIn ? (
               <Button
                 sx={{
-                  color: '#FFFFFF',
-                  backgroundColor: '#bb4401',
-                  fontWeight: 'bold',
-                  fontFamily: 'Roboto, sans-serif',
+                  color: "#FFFFFF",
+                  backgroundColor: "#bb4401",
+                  fontWeight: "bold",
+                  fontFamily: "Roboto, sans-serif",
                   height: 30,
-                  '&:hover': { backgroundColor: '#bb4401' },
+                  "&:hover": { backgroundColor: "#bb4401" },
                 }}
-                onClick={handleLogoutClick}  // Show Logout component when clicked
+                onClick={handleLogoutClick} // Show Logout component when clicked
               >
                 Logout
               </Button>
             ) : (
               <Button
                 sx={{
-                  color: '#FFFFFF',
-                  backgroundColor: '#002060',
-                  fontWeight: 'bold',
-                  fontFamily: 'Roboto, sans-serif',
-                  '&:hover': { backgroundColor: '#002060' },
+                  color: "#FFFFFF",
+                  backgroundColor: "#002060",
+                  fontWeight: "bold",
+                  fontFamily: "Roboto, sans-serif",
+                  "&:hover": { backgroundColor: "#002060" },
                 }}
-                onClick={() => navigate('/login')}  // Navigate to the login page
+                onClick={() => navigate("/login")} // Navigate to the login page
               >
                 Login
               </Button>
             )}
-
-
           </>
           {/* {showLogout && <Logout />}  */}
           {showLogout && (
             <Logout
               onConfirm={handleConfirmLogout}
               onCancel={handleCancelLogout}
-            />)}
+            />
+          )}
         </Toolbar>
       </AppBar>
-
-
     </>
   );
 };

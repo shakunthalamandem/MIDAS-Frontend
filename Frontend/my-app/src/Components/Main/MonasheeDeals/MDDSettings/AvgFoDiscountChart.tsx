@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -8,6 +8,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Box, Typography, useTheme, Card, CardContent, Container } from "@mui/material";
+import NoDataPopup from "../../../../Pages/NoDataPopup";
+import { resetFilters } from "./MDDFilters";  
 
 interface YearData {
   [year: string]: {
@@ -17,47 +19,53 @@ interface YearData {
 }
 
 interface Props {
-  data: YearData | { message: string }; // data can either be the actual YearData or an error message
+  data: YearData | { message: string };
+  handleCancel: () => void;  // Accept handleCancel as a prop here
 }
 
-const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
-  const theme = useTheme(); // Use theme for consistent colors
+const AvgFoDiscountChart: React.FC<Props> = ({ data, handleCancel }) => {  // Accept handleCancel here as well
+  const theme = useTheme();
 
-  // Check if data contains the error message
-  if ('message' in data && data.message === "No data found for the given filters.") {
-    return (
-      <Box sx={{ textAlign: "center", padding: 4 }}>
-        <Typography variant="h6" color="textSecondary">
-          No Data Available for the selected filters.
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
-          Please change the selected filters to show the Plot.
-        </Typography>
-      </Box>
-    );
-  }
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
 
-  // If no data, return early with the same message
+  useEffect(() => {
+    if ('message' in data && data.message === "No data found for the given filters.") {
+      setNoDataPopupOpen(true); // Open the NoDataPopup
+    }
+  }, [data]);
+
   const chartData = Object.entries(data).map(([year, values]) => ({
     year,
     avgFoDiscount: values.avg_fo_discount,
     count: values.count,
   }));
 
-  if (chartData.length === 0) {
+  if ('message' in data && data.message === "No data found for the given filters.") {
     return (
-      <Box sx={{ textAlign: "center", padding: 4 }}>
-        <Typography variant="h6" color="textSecondary">
-          No Data Available for the selected filters.
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
-          Please change the selected filters to show the Plot.
-        </Typography>
-      </Box>
+      <NoDataPopup
+        open={noDataPopupOpen}
+        onClose={() => {
+          resetFilters(handleCancel); // Pass handleCancel here
+          setNoDataPopupOpen(false);
+        }}
+      />
     );
   }
 
-  // Custom Tooltip component
+  if (chartData.length === 0) {
+    return (
+      <>
+        <NoDataPopup
+          open={noDataPopupOpen}
+          onClose={() => {
+            setNoDataPopupOpen(false);
+            resetFilters(handleCancel); // Pass handleCancel here
+          }}
+        />
+      </>
+    );
+  }
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const { year, avgFoDiscount, count } = payload[0].payload;
@@ -86,67 +94,75 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data }) => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
-
-    <Card
-      elevation={4}
-      sx={{
-        width: "100%",
-        maxWidth: 800,
-        padding: 2,
-        backgroundColor: theme.palette.background.default,
-        borderRadius: "8px",
-        boxShadow: theme.shadows[2],
-      }}
-    >
-      <CardContent>
-        <Typography
-          variant="h6"
+    <>
+      <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+        <Card
+          elevation={4}
           sx={{
-            marginBottom: 2,
-            textAlign: "center",
-            fontWeight: "bold",
-            color: "#002060",
+            width: "100%",
+            maxWidth: 800,
+            padding: 2,
+            backgroundColor: theme.palette.background.default,
+            borderRadius: "8px",
+            boxShadow: theme.shadows[2],
           }}
         >
-          Average FO Discount by Year
-        </Typography>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={chartData}>
-            <XAxis
-              dataKey="year"
-              tick={{
-                fill: "#002060",
-                fontSize: 12,
+          <CardContent>
+            <Typography
+              variant="h6"
+              sx={{
+                marginBottom: 2,
+                textAlign: "center",
+                fontWeight: "bold",
+                color: "#002060",
               }}
-              tickLine={false}
-              axisLine={{ stroke: theme.palette.divider }}
-            />
-            <YAxis
-              tick={{
-                fill: "#002060",
-                fontSize: 12,
+            >
+              Average FO Discount by Year
+            </Typography>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={chartData}>
+                <XAxis
+                  dataKey="year"
+                  tick={{
+                    fill: "#002060",
+                    fontSize: 12,
+                  }}
+                  tickLine={false}
+                  axisLine={{ stroke: theme.palette.divider }}
+                />
+                <YAxis
+                  tick={{
+                    fill: "#002060",
+                    fontSize: 12,
+                  }}
+                  tickLine={false}
+                  axisLine={{ stroke: theme.palette.divider }}
+                  width={50}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: theme.palette.action.hover }}
+                />
+                <Bar
+                  dataKey="avgFoDiscount"
+                  fill="#68021d"
+                  radius={[4, 4, 0, 0]}
+                  animationDuration={800}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </Container>
 
-              }}
-              tickLine={false}
-              axisLine={{ stroke: theme.palette.divider }}
-              width={50}
-            />
-            <Tooltip
-              content={<CustomTooltip />}
-              cursor={{ fill: theme.palette.action.hover }}
-            />
-            <Bar
-              dataKey="avgFoDiscount"
-              fill='#68021d'
-              radius={[4, 4, 0, 0]} // Rounded top corners
-              animationDuration={800} // Animation for bars
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
-    </Container>
+      <NoDataPopup
+        open={noDataPopupOpen}
+        onClose={() => {
+          setNoDataPopupOpen(false);
+          resetFilters(handleCancel); // Pass handleCancel here
+        }}
+      />
+    </>
   );
 };
 
