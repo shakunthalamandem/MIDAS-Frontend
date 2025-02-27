@@ -1,7 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Box, CircularProgress, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
-// import { result } from "lodash"; // This import is not needed
+import { Box, CircularProgress, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container } from "@mui/material";
+
+// Formatting function
+const formatNumber = (value: number) => {
+  const isNegative = value < 0;
+  const absValue = Math.abs(value);
+
+  let formattedValue;
+
+  if (absValue >= 1_000_000_000) {
+    formattedValue = (absValue / 1_000_000_000).toFixed(1) + "B";
+  } else if (absValue >= 1_000_000) {
+    formattedValue = (absValue / 1_000_000).toFixed(1) + "M";
+  } else if (absValue >= 1_000) {
+    formattedValue = (absValue / 1_000).toFixed(0) + "K";
+  } else {
+    formattedValue = absValue.toFixed(2);
+  }
+
+  return isNegative ? `-${formattedValue}` : formattedValue;
+};
 
 const FundWiseTable: React.FC = () => {
   const { fund } = useParams(); // Get the fund from the URL params
@@ -25,11 +44,11 @@ const FundWiseTable: React.FC = () => {
           },
           body: JSON.stringify({ fund }), 
         });
-  
+
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
-  
+
         const result = await response.json();
 
         setData(result);
@@ -40,46 +59,50 @@ const FundWiseTable: React.FC = () => {
         setLoading(false);
       }
     };
-  
+
     if (fund) {
       fetchData();
     }
   }, [fund, apiUrl, token]);  // Ensure fund is used correctly as a dependency
-  
 
   return (
     <Box sx={{ p: 3 }}>
-      {loading ? (
-        <CircularProgress />
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : (
-        <Box>
-          <Typography variant="h4">{`Details for Fund: ${fund}`}</Typography>
+      <Container>
+        {loading ? (
+          <CircularProgress />
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : (
+          <Box>
+            <Typography variant="h5" align="center" color="#002060">{`Details for Fund: ${fund}`}</Typography>
 
-          {/* Displaying detailed fund data in a table */}
-          <TableContainer component={Paper} sx={{ marginTop: 2 }}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell><b>Region</b></TableCell>
-                  <TableCell><b>Jan-2025</b></TableCell>
-                  <TableCell><b>2025 YTD</b></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{row.broad_region}</TableCell>
-                    <TableCell>{row.pnl}</TableCell>
-                    <TableCell>{row.aum}</TableCell>
+            {/* Displaying detailed fund data in a table */}
+            <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell><b>Region</b></TableCell>
+                    <TableCell><b>Custom Group1</b></TableCell>
+                    <TableCell><b>Jan-2025</b></TableCell>
+                    <TableCell><b>2025 YTD</b></TableCell>
+                    
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      )}
+                </TableHead>
+                <TableBody>
+                  {data.map((row, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{row.broad_region}</TableCell>
+                        <TableCell>{row.custom_group_1}</TableCell>
+                      <TableCell>{formatNumber(row.pnl)}</TableCell> {/* Formatting pnl */}
+                      <TableCell>{formatNumber(row.aum)}</TableCell> {/* Formatting aum */}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        )}
+      </Container>
     </Box>
   );
 };
