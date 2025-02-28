@@ -2,6 +2,9 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Box, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
+import NoDataPopup from "../../../../Pages/NoDataPopup";
+import { resetFilters } from "./Filters";
+
 interface ScreenerDataRow {
   pricing_date: string;
   issuer_name: string;
@@ -19,6 +22,7 @@ interface ScreenerDataRow {
 
 interface ScreenerDataTableProps {
   sectorwiseData: { [key: string]: (string | number)[] };
+  handleCancel: () => void;
 }
 
 const formatDealValue = (dealValue: number): string => {
@@ -48,11 +52,12 @@ const preprocessRows = (rows: any[]) =>
       : "0%",
   }));
 
-const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData }) => {
+const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData ,handleCancel}) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (sectorwiseData) {
@@ -91,15 +96,21 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
         body: JSON.stringify(payload),
       });
 
+      
       if (response.ok) {
         const result = await response.json();
-        setRows(
-          (result.data || []).map((item: ScreenerDataRow, index: number) => ({
-            ...item,
-            id: index + 1,
-            deal_value: formatDealValue(item.deal_value),
-          }))
-        );
+        if (result.detail === "No data found.") {
+          setNoDataPopupOpen(true); // Open the NoDataPopup
+          setRows([]); // Clear rows as no data was found
+        } else {
+          setRows(
+            (result.data || []).map((item: ScreenerDataRow, index: number) => ({
+              ...item,
+              id: index + 1,
+              deal_value: formatDealValue(item.deal_value),
+            }))
+          );
+        }
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -108,6 +119,10 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
     } finally {
       setLoading(false);
     }
+  };
+  const handleCloseNoDataPopup = () => {
+    setNoDataPopupOpen(false);
+    resetFilters(handleCancel);
   };
 
   const filteredRows = useMemo(() => {
@@ -251,8 +266,12 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData })
           }}
         />
       </Box>
+
+      <NoDataPopup open={noDataPopupOpen} onClose={handleCloseNoDataPopup} />
     </Box>
   );
 };
 
+
 export default ScreenerDataTable;
+

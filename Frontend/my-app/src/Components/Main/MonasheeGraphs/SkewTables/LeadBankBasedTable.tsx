@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import LeadBankTableData from './LeadBankTableData';
+import NoDataPopup from '../../../../Pages/NoDataPopup';
 
 // Define the expected structure of the API response
 interface SkewTableOptions {
@@ -38,6 +39,7 @@ const LeadBankBasedTable: React.FC = () => {
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
 
   // State to store the response data
   const [responseData, setResponseData] = useState<any>(null);
@@ -74,7 +76,6 @@ const LeadBankBasedTable: React.FC = () => {
     fetchFilterOptions();
   }, []);
 
-  // Fetch data when any filter changes
   useEffect(() => {
     const fetchData = async () => {
       const requestData = {
@@ -89,13 +90,14 @@ const LeadBankBasedTable: React.FC = () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
-
+        
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
+
         const response = await axios.post(
           `${apiUrl}/api/skewtable/calculations/`,
-          requestData,
+          requestData, 
           {
             headers: {
               "Content-Type": "application/json",
@@ -103,12 +105,20 @@ const LeadBankBasedTable: React.FC = () => {
             }
           }
         );
-        setResponseData(response.data); // Store the response data in state
-      } catch (error) {
-        console.error('Error fetching data:', error);
+
+        const responseData = response.data as { error?: string };
+        if (responseData.error === "No data found matching the specified filters.") {
+          setNoDataPopupOpen(true); // Open the popup if no data is found
+          setResponseData(null); // Clear previous response data
+        } else {
+          setResponseData(response.data); // Store the response data in state
+        }
+      }catch (error) {
+        // If an error occurs, show the popup instead of console.error
+        setNoDataPopupOpen(true); // Open the popup in case of error
+     
       }
     };
-
 
     if (dealType && region && sector && endYear && startYear) {
       fetchData();
@@ -137,6 +147,16 @@ const LeadBankBasedTable: React.FC = () => {
     setSector(event.target.value);
   };
   const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear);
+
+  const handleClosePopup = () => {
+    setNoDataPopupOpen(false); // Close the NoDataPopup
+    // Reset filters if desired (example for startYear)
+    setStartYear(2001);
+    setEndYear(2024);
+    setDealType("All");
+    setRegion("All");
+    setSector("All");
+  };
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
@@ -267,6 +287,9 @@ const LeadBankBasedTable: React.FC = () => {
 
         </CardContent>
       </Card>
+
+      {/* NoDataPopup */}
+      <NoDataPopup open={noDataPopupOpen} onClose={handleClosePopup} />
     </Container>
   );
 };

@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import SkewTableMain from "../../MonasheeGraphs/SkewTableMain";
 import ScreenerMain from "../../MonasheeGraphs/ScreenerTable/ScreenerMain";
 import MarketFilters from "../../MonasheeCapitalMarkets/MarketFilters";
 import SearchIcon from "@mui/icons-material/Search";
 import SelectedTicker from "../../MonasheeGraphs/SelectedTicker";
-import { useParams } from "react-router-dom";
-
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -22,6 +21,7 @@ import {
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState<number>(0);
+  const navigate = useNavigate(); 
   const { ticker: routeTicker } = useParams<{ ticker: string }>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -29,9 +29,28 @@ const CapitalMarkets: React.FC = () => {
   const [results, setResults] = useState<MDDResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-
+useEffect(() => {
+    const path = window.location.pathname.split("/").pop();
+    switch (path) {
+      case "deal-stats":
+        setValue(1);
+        break;
+      case "skew-table":
+        setValue(2);
+        break;
+      case "deal-filter":
+        setValue(3);
+        break;
+      default:
+        setValue(0);
+        break;
+    }
+  }, [window.location.pathname]);
+  
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+    const tabPaths = ["", "deal-stats", "skew-table", "deal-filter"];
+    navigate(`/capital-markets/${tabPaths[newValue]}`);
   };
   interface MDDResult {
     ticker_symbol: string;
@@ -220,7 +239,7 @@ const CapitalMarkets: React.FC = () => {
             backgroundColor: value === 3 ? "#FF9800" : "#f5f5f5",
             color: value === 3 ? "#fff" : "#777",
             "&.Mui-selected": {
-              backgroundColor: "#FF9800",
+              backgroundColor: "#9C27B0",
               color: "#fff",
             },
           }}

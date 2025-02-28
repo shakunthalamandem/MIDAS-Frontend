@@ -243,7 +243,7 @@ const MarketFilters: React.FC = () => {
         <Typography align="center">Loading filters...</Typography>
       )}
 
-      {<MarketCapitalMain selectedFilters={appliedFilters} />}
+      {<MarketCapitalMain selectedFilters={appliedFilters} handleReset={handleReset} />}
 
       {/* Snackbar for error message */}
       <Snackbar

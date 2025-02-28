@@ -260,7 +260,10 @@ const MDDScreenerFiltersMain: React.FC<MDDScreenerFiltersMainProps> = ({
           </CardContent>
         </Card>
         <Box mt={4} mb={4}>
-          <MDDScreenerDataTable sectorwiseData={appliedFilters || {}} />
+        <MDDScreenerDataTable
+  sectorwiseData={appliedFilters || {}}
+  handleReset={handleReset} // Pass the handler function as a prop
+/>
         </Box>
       </Box>
     </Container>

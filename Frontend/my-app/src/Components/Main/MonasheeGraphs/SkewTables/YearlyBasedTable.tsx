@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import YearlyTableData from './YearlyTableData'; // Import YearlyTableData component
+import NoDataPopup from '../../../../Pages/NoDataPopup';
+
 
 interface SkewTableOptions {
   'start year': number[];
@@ -30,12 +32,15 @@ const YearlyBasedTable: React.FC = () => {
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string[]>([]);
 
+
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
   const [sectorwiseData, setSectorwiseData] = useState<any>(null);
+
+  const [openNoDataPopup, setOpenNoDataPopup] = useState(false);
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
@@ -92,12 +97,20 @@ const YearlyBasedTable: React.FC = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: token ? `Bearer ${token}` : "",
-            }}
+            }
+          }
         );
-        setSectorwiseData(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
+
+        if (response.data === "No data found matching the specified filters.") {
+          setOpenNoDataPopup(true); // Show No Data popup if API returns error
+        } else {
+          setSectorwiseData(response.data); // Store data if available
+          console.log("data found");
+        }
+      }catch (error) {
+  
+        setOpenNoDataPopup(true); // Open the popup in case of error
+      }  
     };
 
     if (dealType && region && endYear && startYear) {
@@ -108,8 +121,6 @@ const YearlyBasedTable: React.FC = () => {
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
     const newStartYear = Number(event.target.value);
     setStartYear(newStartYear);
-    
-    // Set end year to the next year after the selected start year
     setEndYear(newStartYear + 1);
   };
 
@@ -125,9 +136,18 @@ const YearlyBasedTable: React.FC = () => {
     setRegion(event.target.value);
   };
 
-  // Filter end year options based on the selected start year
   const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear);
 
+  const handleCloseNoDataPopup = () => {
+    setOpenNoDataPopup(false);
+    // Reset filters to default values when the popup is closed
+    setStartYear(2001);
+    setEndYear(2002);
+    setDealType("All");
+    setRegion("All");
+    setSector([]);
+  };
+ 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
@@ -236,7 +256,14 @@ const YearlyBasedTable: React.FC = () => {
         </CardContent>
       </Card>
 
+
       {sectorwiseData && <YearlyTableData data={sectorwiseData} />}
+
+      {/* Use the NoDataPopup component */}
+      <NoDataPopup 
+        open={openNoDataPopup} 
+        onClose={handleCloseNoDataPopup}
+      />
     </Container>
   );
 };

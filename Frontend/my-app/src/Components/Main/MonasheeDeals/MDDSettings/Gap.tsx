@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   FormGroup,
@@ -9,9 +9,12 @@ import {
 } from "@mui/material";
 import DealTypeComponent from "./DealTypeComponent";
 import SectorRegionComponent from "./SectorRegionComponent";
+import NoDataPopup from "../../../../Pages/NoDataPopup";
+import { resetFilters } from "./MDDFilters"; // Assuming resetFilters is the function to reset the filters
 
 interface GapProps {
   selectedFilters: any;
+  handleCancel: () => void; // Accept handleCancel as a prop here
 }
 
 interface FilterOption {
@@ -34,14 +37,14 @@ const filterOptions: FilterOption[] = [
   },
 ];
 
-const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
+const Gap: React.FC<GapProps> = ({ selectedFilters, handleCancel }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
-    filterOptions.find((option) => option.value === selectedFilters) ||
-      filterOptions[0]
+    filterOptions.find((option) => option.value === selectedFilters) || filterOptions[0]
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<any>(null);
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -52,6 +55,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
+    setNoDataPopupOpen(false);
 
     try {
       const payload = {
@@ -68,11 +72,13 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok)
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-
       const result = await response.json();
       setData(result);
+
+      if (result.message === "No data found for the given filters.") {
+        setNoDataPopupOpen(true);
+        setData(null);
+      }
     } catch (error) {
       console.error("Error fetching data", error);
       setError("Failed to fetch data.");
@@ -81,6 +87,10 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
     }
   };
 
+  const handleClosePopup = () => {
+    setNoDataPopupOpen(false);
+    resetFilters(handleCancel); // Reset filters when closing popup
+  };
   return (
     <Box>
       <Box
@@ -105,48 +115,50 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
             }
             row
           >
-                 {filterOptions.map((option) => (
-        <FormControlLabel
-          key={option.value}
-          value={option.value}
-          control={
-            <Radio
-              sx={{
-                color: "white",
-                "&.Mui-checked": {
-                  color: "#ff8c00",
-                },
-              }}
-            />
-          }
-          label={option.label}
-          sx={{
-            color: "white",
-            marginRight: 4,
-            "& .MuiRadio-root": {
-              color: "white",
-            },
-            "&.Mui-checked": {
-              color: "#ff8c00",
-            },
-            "& .MuiFormControlLabel-label": {
-              color: "white",
-            },
-            "& .Mui-checked + .MuiFormControlLabel-label": {
-              color: "#ff8c00",
-            },
-          }}
-        />
-      ))}
+            {filterOptions.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                value={option.value}
+                control={
+                  <Radio
+                    sx={{
+                      color: "white",
+                      "&.Mui-checked": {
+                        color: "#ff8c00",
+                      },
+                    }}
+                  />
+                }
+                label={option.label}
+                sx={{
+                  color: "white",
+                  marginRight: 4,
+                  "& .MuiRadio-root": {
+                    color: "white",
+                  },
+                  "&.Mui-checked": {
+                    color: "#ff8c00",
+                  },
+                  "& .MuiFormControlLabel-label": {
+                    color: "white",
+                  },
+                  "& .Mui-checked + .MuiFormControlLabel-label": {
+                    color: "#ff8c00",
+                  },
+                }}
+              />
+            ))}
           </RadioGroup>
         </FormGroup>
       </Box>
 
       {loading && (
-  <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-    <CircularProgress />
-  </Box>
-)}      {error && <p style={{ color: "red" }}>{error}</p>}
+        <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+          <CircularProgress />
+        </Box>
+      )}
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       {!loading && !error && data && (
         <Box sx={{ width: "100%", marginTop: 2, textAlign: "center" }}>
@@ -167,6 +179,11 @@ const Gap: React.FC<GapProps> = ({ selectedFilters }) => {
           )}
         </Box>
       )}
+
+      <NoDataPopup
+        open={noDataPopupOpen}
+        onClose={handleClosePopup}
+      />
     </Box>
   );
 };

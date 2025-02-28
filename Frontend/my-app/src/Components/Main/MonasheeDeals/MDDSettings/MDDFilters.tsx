@@ -137,19 +137,20 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     }
   };
 
-  const handleCancel = () => {
-    const resetSelectedValues: { [key: string]: (string | number)[] } = {};
-  
-    filtersData.forEach((filter) => {
-      const key = Object.keys(filter)[0];
-      const { options } = filter[key];
-  
-      resetSelectedValues[key] =
-        apiName === "mdd_deals_graph"
-          ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
-          : [];
-    });
-  
+    const handleCancel = () => {
+        const resetSelectedValues: { [key: string]: (string | number)[] } = {};
+      
+        filtersData.forEach((filter) => {
+          const key = Object.keys(filter)[0];
+          const { options } = filter[key];
+      
+          resetSelectedValues[key] =
+            apiName === "mdd_deals_graph"
+              ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
+              : [];
+               console.log("filters reset");
+        });
+      
     setSelectedValues(resetSelectedValues);
     setAppliedFilters(resetSelectedValues);
     setSearchValue("");
@@ -325,7 +326,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                 <Button
                   variant="outlined"
                   color="secondary"
-                  onClick={handleCancel}
+                  onClick={() => resetFilters(handleCancel)}
                   sx={{
                     "&:hover": {
                       backgroundColor: "#FF8C00",
@@ -356,13 +357,13 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         ) : (
           <>
       {apiName === "gap_analysis" ? (
-        <Gap selectedFilters={appliedFilters} />
+        <Gap selectedFilters={appliedFilters} handleCancel={handleCancel}/>
       ) : apiName === "fo_discount" ? (
-        <AvgFoDiscountChart data={apiData} />      ) : apiName === "by_bank" ? (
+        <AvgFoDiscountChart data={apiData} handleCancel={handleCancel} />) : apiName === "by_bank" ? (
           <BankTable selectedFilters={appliedFilters} />      ) : (
         <>
           <DealStatsGraph selectedFilters={appliedFilters} />
-          <MDDScreenergrid sectorwiseData={payload} />
+          <MDDScreenergrid sectorwiseData={payload} handleCancel={handleCancel} />
         </>
       )}
     </>
@@ -371,6 +372,10 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       </Box>
 
   );
+};
+export const resetFilters = (handleCancel: () => void) => {
+  console.log("Filters have been reset.");
+  handleCancel();  // Call the existing handleCancel function
 };
 
 export default MDDFilters;

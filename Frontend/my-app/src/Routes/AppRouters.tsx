@@ -18,7 +18,14 @@ import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/Detail
 import DealFormMain from "../Components/DealsForm/DealFormMain";
 
 import Logs from "../Components/Main/HomePage/Authentication/Logs";
+import DealStats from "../Components/Main/MonasheeDeals/MddGraphs/DealStats";
+import WeeklyStatsChart from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyStatsChart";
+import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount";
+import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
+import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
+import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
+import SelectedTicker from "../Components/Main/MonasheeGraphs/SelectedTicker";
 import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable";
 
 
@@ -32,9 +39,32 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/logout" element={<Logout />} /> */}
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
-        {/* Protected Routes */}
         <Route path="/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
-        <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
+
+
+
+
+        <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} >
+          <Route path="search" element={<SelectedTicker ticker={'AS'}/>} />
+          <Route path="deal-stats" element={<DealStats />} />
+          <Route path="skew-table" element={<AllocationCaptureReturn />} />
+          <Route path="deal-filter" element={<FOllowOnDiscount />} />
+        </Route>
+
+
+
+        <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
+          <Route path="search" element={<SelectedTicker ticker={'CGRX'}/>} />
+          <Route path="deal-stats" element={<DealStats />} />
+          <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
+          <Route path="follow-on-discount" element={<FOllowOnDiscount />} />
+          <Route path="weekly-tracking" element={<WeeklyStatsChart />} />
+          <Route path="by-bank" element={<BankTable selectedFilters={{}} />} />
+          <Route path="screener" element={<MDDScreener />} />
+        </Route>
+
+
+
         <Route path="/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} />
         <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
