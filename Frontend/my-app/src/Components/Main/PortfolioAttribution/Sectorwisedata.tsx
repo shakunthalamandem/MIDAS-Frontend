@@ -35,13 +35,11 @@ interface RegionData {
     APAC: number;
     EMEA: number;
     US: number;
-    custom_group_2: string;  // Sector name
-
-
+    custom_group_2: string;
 }
 
 interface SectorData {
-    custom_group_2: string;  // Sector name
+    custom_group_2: string;
     APAC: number;
     EMEA: number;
     US: number;
@@ -76,24 +74,20 @@ const Sectorwisedata: React.FC = () => {
                 }
 
                 const result = await response.json();
-                console.log("result", result)
+                console.log("result", result);
 
-                // Correctly format the data using Object.entries(result)
                 const formattedData: SectorData[] = Object.entries(result).map(
                     ([sector, regions]: [string, unknown]) => {
-                        // Type assertion for 'regions' to ensure it matches 'RegionData'
                         const typedRegions = regions as RegionData;
 
-                        // Return formatted data where `custom_group_2` is the correct sector name
                         return {
-                            custom_group_2: typedRegions.custom_group_2,  // Correctly assign sector name here
+                            custom_group_2: typedRegions.custom_group_2,
                             APAC: typedRegions.APAC || 0,
                             EMEA: typedRegions.EMEA || 0,
                             US: typedRegions.US || 0,
                         };
                     }
                 );
-
 
                 setData(formattedData);
                 setLoading(false);
@@ -109,15 +103,15 @@ const Sectorwisedata: React.FC = () => {
     // Compute total PnL for each row
     const computeTotalPnl = (row: SectorData) => row.APAC + row.EMEA + row.US;
 
-    // Compute total PnL for the whole dataset
-    const totalPnl = formatNumber(
-        data.reduce((sum, row) => sum + computeTotalPnl(row), 0)
-    );
+    // Compute totals for APAC, US, EMEA, and YTD
+    const totalAPAC = data.reduce((sum, row) => sum + row.APAC, 0);
+    const totalUS = data.reduce((sum, row) => sum + row.US, 0);
+    const totalEMEA = data.reduce((sum, row) => sum + row.EMEA, 0);
+    const totalPnl = data.reduce((sum, row) => sum + computeTotalPnl(row), 0);
 
     return (
         <Box sx={{ width: "100%", backgroundColor: "#fff", p: 2 }}>
             <Container>
-
                 <Typography
                     variant="h5"
                     color="#002060"
@@ -125,7 +119,8 @@ const Sectorwisedata: React.FC = () => {
                     fontWeight={600}
                     marginBottom={2}
                 >
-                    Net $P&L attribution by Sector      </Typography>
+                    Net $P&L Attribution by Sector
+                </Typography>
 
                 {loading ? (
                     <Box display="flex" justifyContent="center" alignItems="center">
@@ -148,8 +143,13 @@ const Sectorwisedata: React.FC = () => {
                             <TableBody>
                                 {data.length > 0 ? (
                                     data.map((row, index) => (
-                                        <TableRow key={index} sx={{ backgroundColor: index % 2 ? "#f5f5f5" : "#ffffff" }}>
-                                            <TableCell>{row.custom_group_2}</TableCell>
+                                        <TableRow
+                                            key={index}
+                                            sx={{ backgroundColor: index % 2 ? "#f5f5f5" : "#ffffff" }}
+                                        >
+                                            <TableCell sx={{ color: "#A52A2A", fontWeight: "bold" }}>
+                                                {row.custom_group_2}
+                                            </TableCell>
                                             <TableCell>{formatNumber(row.APAC)}</TableCell>
                                             <TableCell>{formatNumber(row.US)}</TableCell>
                                             <TableCell>{formatNumber(row.EMEA)}</TableCell>
@@ -163,19 +163,19 @@ const Sectorwisedata: React.FC = () => {
                                         </TableCell>
                                     </TableRow>
                                 )}
+                                {/* Totals Row */}
                                 <TableRow sx={{ backgroundColor: "#91ce89", fontWeight: "bold" }}>
                                     <TableCell>Total</TableCell>
-                                    <TableCell>-</TableCell>
-                                    <TableCell>-</TableCell>
-                                    <TableCell>-</TableCell>
-                                    <TableCell>{totalPnl}</TableCell>
+                                    <TableCell>{formatNumber(totalAPAC)}</TableCell>
+                                    <TableCell>{formatNumber(totalUS)}</TableCell>
+                                    <TableCell>{formatNumber(totalEMEA)}</TableCell>
+                                    <TableCell>{formatNumber(totalPnl)}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
                     </TableContainer>
                 )}
             </Container>
-
         </Box>
     );
 };
