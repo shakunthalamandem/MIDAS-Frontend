@@ -112,19 +112,19 @@ const FundWiseTable: React.FC = () => {
                   {`${fund} : 2025 YTD Net of Hedge P&L Strategy`}
                 </Typography>
                 <TableContainer component={Paper} sx={{ marginTop: 2 }}>
-                  <Table size="small">
+                  <Table size="small" sx={{ borderCollapse: "collapse" }}>
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#466675" }}>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>Region</b>
                         </TableCell>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>Deal Type</b>
                         </TableCell>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>Jan-2025</b>
                         </TableCell>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>2025 YTD</b>
                         </TableCell>
                       </TableRow>
@@ -138,26 +138,40 @@ const FundWiseTable: React.FC = () => {
                           <>
                             <TableRow key={index}>
                               {index === 0 || array[index - 1].broad_region !== row.broad_region ? (
-                                <TableCell rowSpan={regionSpan}>{row.broad_region}</TableCell>
+                                <TableCell rowSpan={regionSpan} sx={{ border: "1px solid black" }}>
+                                  {row.broad_region}
+                                </TableCell>
                               ) : null}
-                              <TableCell>{row.custom_group_1}</TableCell>
-                              <TableCell>{formatNumber(row.pnl)}</TableCell>
-                              <TableCell>{formatNumber(row.aum)}</TableCell>
+                              <TableCell sx={{ border: "1px solid black" }}>{row.custom_group_1}</TableCell>
+                              <TableCell sx={{ border: "1px solid black" }}>{formatNumber(row.pnl)}</TableCell>
+                              <TableCell sx={{ border: "1px solid black" }}>{formatNumber(row.aum)}</TableCell>
                             </TableRow>
                             {isLastInRegion && (
-                              <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
-                                <TableCell colSpan={2} sx={{ fontWeight: "bold" }}>Total for {row.broad_region}</TableCell>
-                                <TableCell sx={{ fontWeight: "bold" }}>{formatNumber(regionTotals[row.broad_region].pnl)}</TableCell>
-                                <TableCell sx={{ fontWeight: "bold" }}>{formatNumber(regionTotals[row.broad_region].aum)}</TableCell>
+                              <TableRow sx={{ backgroundColor: "#91ce89" }}>
+                                <TableCell colSpan={2} sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                                  Total for {row.broad_region}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                                  {formatNumber(regionTotals[row.broad_region].pnl)}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                                  {formatNumber(regionTotals[row.broad_region].aum)}
+                                </TableCell>
                               </TableRow>
                             )}
                           </>
                         );
                       })}
                       <TableRow sx={{ backgroundColor: "#cfd8dc" }}>
-                        <TableCell colSpan={2} sx={{ fontWeight: "bold" }}>Overall Total</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>{formatNumber(overallTotal.pnl)}</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>{formatNumber(overallTotal.aum)}</TableCell>
+                        <TableCell colSpan={2} sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                          Overall Total
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                          {formatNumber(overallTotal.pnl)}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                          {formatNumber(overallTotal.aum)}
+                        </TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
