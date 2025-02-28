@@ -108,7 +108,7 @@ const PortfolioAttribution: React.FC = () => {
         Uncover the driving forces behind your portfolio’s performance with detailed attribution analysis.
       </Typography>
       <Container>
-        <Typography variant="h5" gutterBottom align="center">
+        <Typography variant="h5" color="#002060" align="center" fontWeight={500} marginBottom={2}>
           Fund Performance Data
         </Typography>
         {loading ? (
