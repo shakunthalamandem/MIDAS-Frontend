@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Box, CircularProgress, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container } from "@mui/material";
+import { Box, CircularProgress, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container, Grid } from "@mui/material";
 import NoDataPopup from "../../../Pages/NoDataPopup";
-import { set } from "lodash";
 
-// Formatting function
+interface FundData {
+  broad_region: string;
+  custom_group_1: string;
+  pnl: number;
+  aum: number;
+}
+
 const formatNumber = (value: number) => {
   const isNegative = value < 0;
   const absValue = Math.abs(value);
-
   let formattedValue;
-
   if (absValue >= 1_000_000_000) {
     formattedValue = (absValue / 1_000_000_000).toFixed(1) + "B";
   } else if (absValue >= 1_000_000) {
@@ -20,19 +23,17 @@ const formatNumber = (value: number) => {
   } else {
     formattedValue = absValue.toFixed(2);
   }
-
-  return isNegative ? `-${formattedValue}` : formattedValue;
+  return isNegative ? `-$${formattedValue}` : `$${formattedValue}`;
 };
 
 const FundWiseTable: React.FC = () => {
-  const { fund } = useParams(); // Get the fund from the URL params
+  const { fund } = useParams<{ fund: string }>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<any[]>([]);
-  const [openNoDataPopup, setOpenNoDataPopup] = useState(false);
-  // Get the API URL and token from environment variables or storage
-  const apiUrl = process.env.REACT_APP_API_URL; // or your defined API URL
-  const token = localStorage.getItem('access_token');  // or your global state/context
+  const [data, setData] = useState<FundData[]>([]);
+  const [openNoDataPopup, setOpenNoDataPopup] = useState<boolean>(false);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,19 +45,18 @@ const FundWiseTable: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ fund }), 
+          body: JSON.stringify({ fund }),
         });
-        const result = await response.json();
+        const result: FundData[] = await response.json();
 
-        if (result.detail === "No data found." || result.length === 0) {
+        if (!result || result.length === 0) {
           setOpenNoDataPopup(true);
+          setData([]);
         } else {
-          setData(result);
+          setData(result.sort((a, b) => a.broad_region.localeCompare(b.broad_region)));
         }
-        // setData(result);
-
       } catch (error) {
-        setError((error as any).message || "An error occurred while fetching data");
+        setError(error instanceof Error ? error.message : "An error occurred while fetching data");
       } finally {
         setLoading(false);
       }
@@ -65,58 +65,109 @@ const FundWiseTable: React.FC = () => {
     if (fund) {
       fetchData();
     }
-  }, [fund, apiUrl, token]);  // Ensure fund is used correctly as a dependency
+  }, [fund, apiUrl, token]);
 
-    
-  const handleCloseNoDataPopup = () =>{
-        setOpenNoDataPopup(false);
+  const handleCloseNoDataPopup = () => {
+    setOpenNoDataPopup(false);
+  };
+
+  let regionTotals: Record<string, { pnl: number; aum: number }> = {};
+  let overallTotal = { pnl: 0, aum: 0 };
+
+  data.forEach(({ broad_region, pnl, aum }) => {
+    if (!regionTotals[broad_region]) {
+      regionTotals[broad_region] = { pnl: 0, aum: 0 };
     }
+    regionTotals[broad_region].pnl += pnl;
+    regionTotals[broad_region].aum += aum;
+    overallTotal.pnl += pnl;
+    overallTotal.aum += aum;
+  });
+
+  // Initialize rowSpans and other necessary variables for span logic
+  let rowSpans: Record<string, number> = {};
+  let previousRegion: string | null = null;
+
+  data.forEach(({ broad_region }) => {
+    if (broad_region !== previousRegion) {
+      rowSpans[broad_region] = 1;
+    } else {
+      rowSpans[broad_region]++;
+    }
+    previousRegion = broad_region;
+  });
 
   return (
     <Box sx={{ p: 3 }}>
       <Container>
-        {loading ? (
-          <CircularProgress />
-        ) : error ? (
-          <Typography color="error">{error}</Typography>
-        ) : (
-          <Box>
-            <Typography variant="h5" align="center" color="#002060" fontWeight={500} marginBottom={2}>{`${fund} : 2025 YTD Net of Hedge P&L Strategy`}</Typography>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12}>
+            {loading ? (
+              <CircularProgress />
+            ) : error ? (
+              <Typography color="error">{error}</Typography>
+            ) : (
+              <Box>
+                <Typography variant="h5" align="center" color="#002060" fontWeight={500} marginBottom={2}>
+                  {`${fund} : 2025 YTD Net of Hedge P&L Strategy`}
+                </Typography>
+                <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow sx={{ backgroundColor: "#466675" }}>
+                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                          <b>Region</b>
+                        </TableCell>
+                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                          <b>Deal Type</b>
+                        </TableCell>
+                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                          <b>Jan-2025</b>
+                        </TableCell>
+                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                          <b>2025 YTD</b>
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data.map((row, index, array) => {
+                        const isLastInRegion = index === array.length - 1 || array[index + 1].broad_region !== row.broad_region;
+                        const regionSpan = rowSpans[row.broad_region];
 
-            {/* Displaying detailed fund data in a table */}
-            <TableContainer component={Paper} sx={{ marginTop: 2 }}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow sx={{ backgroundColor: "#466675"}}>
-                    <TableCell sx={{ color: "#ffffff" ,fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}><b>Region</b></TableCell>
-                    <TableCell sx={{ color: "#ffffff" ,fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}><b>Custom Group1</b></TableCell>
-                    <TableCell sx={{ color: "#ffffff" ,fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}><b>Jan-2025</b></TableCell>
-                    <TableCell sx={{ color: "#ffffff" ,fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}><b>2025 YTD</b></TableCell>
-
-                    
-                    
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{row.broad_region}</TableCell>
-                        <TableCell>{row.custom_group_1}</TableCell>
-                      <TableCell>{formatNumber(row.pnl)}</TableCell> {/* Formatting pnl */}
-                      <TableCell>{formatNumber(row.aum)}</TableCell> {/* Formatting aum */}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-        )}
+                        return (
+                          <>
+                            <TableRow key={index}>
+                              {index === 0 || array[index - 1].broad_region !== row.broad_region ? (
+                                <TableCell rowSpan={regionSpan}>{row.broad_region}</TableCell>
+                              ) : null}
+                              <TableCell>{row.custom_group_1}</TableCell>
+                              <TableCell>{formatNumber(row.pnl)}</TableCell>
+                              <TableCell>{formatNumber(row.aum)}</TableCell>
+                            </TableRow>
+                            {isLastInRegion && (
+                              <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
+                                <TableCell colSpan={2} sx={{ fontWeight: "bold" }}>Total for {row.broad_region}</TableCell>
+                                <TableCell sx={{ fontWeight: "bold" }}>{formatNumber(regionTotals[row.broad_region].pnl)}</TableCell>
+                                <TableCell sx={{ fontWeight: "bold" }}>{formatNumber(regionTotals[row.broad_region].aum)}</TableCell>
+                              </TableRow>
+                            )}
+                          </>
+                        );
+                      })}
+                      <TableRow sx={{ backgroundColor: "#cfd8dc" }}>
+                        <TableCell colSpan={2} sx={{ fontWeight: "bold" }}>Overall Total</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>{formatNumber(overallTotal.pnl)}</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>{formatNumber(overallTotal.aum)}</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            )}
+          </Grid>
+        </Grid>
       </Container>
-         {/* Use the NoDataPopup component */}
-         <NoDataPopup 
-        open={openNoDataPopup} 
-        onClose={handleCloseNoDataPopup}
-      />
+      <NoDataPopup open={openNoDataPopup} onClose={handleCloseNoDataPopup} />
     </Box>
   );
 };
