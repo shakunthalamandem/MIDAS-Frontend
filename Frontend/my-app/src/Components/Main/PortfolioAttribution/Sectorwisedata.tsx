@@ -142,7 +142,7 @@ const Sectorwisedata: React.FC = () => {
                                     <TableCell sx={{ color: "#ffffff", fontWeight: "bold" }}>APAC</TableCell>
                                     <TableCell sx={{ color: "#ffffff", fontWeight: "bold" }}>US</TableCell>
                                     <TableCell sx={{ color: "#ffffff", fontWeight: "bold" }}>EMEA</TableCell>
-                                    <TableCell sx={{ color: "#ffffff", fontWeight: "bold" }}>Total PnL</TableCell>
+                                    <TableCell sx={{ color: "#ffffff", fontWeight: "bold" }}>YTD</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
