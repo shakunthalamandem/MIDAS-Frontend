@@ -26,6 +26,7 @@ import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/
 import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
 import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
 import SelectedTicker from "../Components/Main/MonasheeGraphs/SelectedTicker";
+import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable";
 
 
 const AppRouters: React.FC = () => {
@@ -70,6 +71,7 @@ const AppRouters: React.FC = () => {
         <Route path="/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
         <Route path="/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/tickerperformance/:ticker" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
+        <Route path="/fund/:fund" element={<AuthGuard><FundWiseTable /></AuthGuard>} />
 
         <Route path="/detailed_gap_analysis" element={<AuthGuard><DetailedGapData /></AuthGuard>} />
 

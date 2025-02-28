@@ -82,7 +82,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
         ) : (
           rows.map(({ region, dealType, dealStats }, idx) => {
             const isSummaryRow = region === "SUMMARY";
-            const rowColor = isSummaryRow ? "#59735b" : idx % 6 < 3 ? "#" : "#";
+            const rowColor = isSummaryRow ? "#91ce89" : idx % 6 < 3 ? "#" : "#";
             const showRegion = !renderedRegions[region];
 
             if (showRegion) {
