@@ -81,17 +81,19 @@ const FundWiseTable: React.FC = () => {
           <Typography color="error">{error}</Typography>
         ) : (
           <Box>
-            <Typography variant="h5" align="center" color="#002060">{`Details for Fund: ${fund}`}</Typography>
+            <Typography variant="h5" align="center" color="#002060" fontWeight={500} marginBottom={2}>{`${fund} : 2025 YTD Net of Hedge P&L Strategy`}</Typography>
 
             {/* Displaying detailed fund data in a table */}
             <TableContainer component={Paper} sx={{ marginTop: 2 }}>
               <Table size="small">
                 <TableHead>
-                  <TableRow>
-                    <TableCell><b>Region</b></TableCell>
-                    <TableCell><b>Custom Group1</b></TableCell>
-                    <TableCell><b>Jan-2025</b></TableCell>
-                    <TableCell><b>2025 YTD</b></TableCell>
+                  <TableRow sx={{ backgroundColor: "#466675"}}>
+                    <TableCell sx={{ color: "#ffffff" ,fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}><b>Region</b></TableCell>
+                    <TableCell sx={{ color: "#ffffff" ,fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}><b>Custom Group1</b></TableCell>
+                    <TableCell sx={{ color: "#ffffff" ,fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}><b>Jan-2025</b></TableCell>
+                    <TableCell sx={{ color: "#ffffff" ,fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}><b>2025 YTD</b></TableCell>
+
+                    
                     
                   </TableRow>
                 </TableHead>
