@@ -30,7 +30,7 @@
   
   .radio-option:hover {
     transform: scale(1.1);
-    color: #ffeb3b;
+    color: rgb(145, 206, 137);
   }
   
   .radio-option.selected {

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Box, Typography, Container } from "@mui/material";
-import { Link } from "react-router-dom";  // Import Link to make fund names clickable
-import { Token } from "@mui/icons-material";
+import { Box, CircularProgress, Typography, Container, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from "@mui/material";
+import { Link } from "react-router-dom";
 
 interface FundData {
   fund: string;
@@ -26,18 +25,15 @@ const formatNumber = (value: number) => {
     formattedValue = absValue.toFixed(2);
   }
 
-  return isNegative ? `-${formattedValue}` : formattedValue;
+  return isNegative ? `-$${formattedValue}` : `$${formattedValue}`;
 };
 
-const FundTable: React.FC = () => {
+const PortfolioAttribution: React.FC = () => {
   const [data, setData] = useState<FundData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  // console.log("API URL: ", token);
-
-
 
   useEffect(() => {
     let isMounted = true;
@@ -65,9 +61,9 @@ const FundTable: React.FC = () => {
         if (isMounted) {
           const formattedData = result.map((row: FundData) => ({
             fund: row.fund || "N/A",
-            pnl: formatNumber(row.pnl || 0),
-            aum: formatNumber(row.aum || 0),
-            net: formatNumber(row.net || 0),
+            pnl: row.pnl || 0,
+            aum: row.aum || 0,
+            net: row.net || 0,
           }));
           setData(formattedData);
           setLoading(false);
@@ -84,9 +80,12 @@ const FundTable: React.FC = () => {
     return () => { isMounted = false; };
   }, [apiUrl, token]);
 
+  const totalPnl = formatNumber(data.reduce((sum, row) => sum + row.pnl, 0));
+  const totalAum = formatNumber(data.reduce((sum, row) => sum + row.aum, 0));
+  const totalNet = formatNumber(data.reduce((sum, row) => sum + row.net, 0));
+
   return (
-    <Box sx={{ width: "100%", backgroundColor: "#fff" }}>
-      {/* Heading */}
+    <Box sx={{ width: "100%", backgroundColor: "#fff", p: 2 }}>
       <Typography
         variant="body2"
         sx={{
@@ -108,55 +107,53 @@ const FundTable: React.FC = () => {
       >
         Uncover the driving forces behind your portfolio’s performance with detailed attribution analysis.
       </Typography>
-
-      {/* Table Content */}
-      <Box sx={{ p: 1 }}>
-        <Container>
-          <Typography variant="h5" gutterBottom>
-            Fund Performance Data
-          </Typography>
-          {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <CircularProgress />
-            </Box>
-          ) : error ? (
-            <Typography color="error">{error}</Typography>
-          ) : (
-            <TableContainer component={Paper}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ width: "5%" }}><b>Fund</b></TableCell>
-                    <TableCell sx={{ width: "5%" }}><b>YTD PnL</b></TableCell>
-                    <TableCell sx={{ width: "5%" }}><b>Hurdle Return</b></TableCell>
-                    <TableCell sx={{ width: "5%" }}><b>Net PnL</b></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.map((row, index) => (
-                    <TableRow key={index}>
-                      <Link
-                        to={`/fund/${row.fund}`}  // Use backticks and `${}` for interpolation
-                        style={{ color: "#1E88E5", textDecoration: "none" }}
-                        target="_blank"  // Optionally open in a new tab
-                      >
+      <Container>
+        <Typography variant="h5" gutterBottom align="center">
+          Fund Performance Data
+        </Typography>
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : (
+          <TableContainer component={Paper} sx={{ border: "1px solid #ddd" }}>
+            <Table size="small" sx={{ borderCollapse: "collapse" }}>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#466675"}}>
+                  <TableCell sx={{ color: "#ffffff" ,fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}>Fund</TableCell>
+                  <TableCell sx={{color: "#ffffff" , fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}>YTD PnL</TableCell>
+                  <TableCell sx={{color: "#ffffff" , fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}>Hurdle Return</TableCell>
+                  <TableCell sx={{ color: "#ffffff" , fontWeight: "bold", width: "120px", border: "1px solid #ddd", textAlign: "center" }}>Net PnL</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                      <Link to={`/fund/${row.fund}`} style={{ color: "#A52A2A", textDecoration: "none" }} target="_blank">
                         {row.fund}
                       </Link>
-
-
-                      <TableCell>{row.pnl}</TableCell>
-                      <TableCell>{row.aum}</TableCell>
-                      <TableCell>{row.net}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </Container>
-      </Box>
+                    </TableCell>
+                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.pnl)}</TableCell>
+                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.aum)}</TableCell>
+                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.net)}</TableCell>
+                  </TableRow>
+                ))}
+                <TableRow sx ={{backgroundColor: "#91ce89"}} >
+                  <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>Total</TableCell>
+                  <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalPnl}</TableCell>
+                  <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalAum}</TableCell>
+                  <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalNet}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Container>
     </Box>
   );
 };
 
-export default FundTable;
+export default PortfolioAttribution;
