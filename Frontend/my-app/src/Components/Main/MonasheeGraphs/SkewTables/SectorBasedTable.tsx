@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import SectorTableData from './SectorTableData';
+import NoDataPopup from '../../../../Pages/NoDataPopup'; // Assuming this is where NoDataPopup is located
 
 // Define the expected structure of the API response
 interface SkewTableOptions {
@@ -39,8 +40,9 @@ const SectorBasedTable: React.FC = () => {
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
-  // State to store the response data
+  // State to store the response data and the no data popup visibility
   const [responseData, setResponseData] = useState<any>(null);
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
 
   // Fetch the filter options on component mount
   useEffect(() => {
@@ -86,12 +88,13 @@ const SectorBasedTable: React.FC = () => {
       };
 
       try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
-
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
+        
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
+
         const response = await axios.post(
           `${apiUrl}/api/skewtable/calculations/`,
           requestData, 
@@ -99,12 +102,23 @@ const SectorBasedTable: React.FC = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: token ? `Bearer ${token}` : "",
-            }}
+            }
+          }
         );
-        setResponseData(response.data); // Store the response data in state
+
+        // Check if the response contains the "No data found" error
+        const responseData = response.data as { error?: string };
+        if (responseData.error === "No data found matching the specified filters.") {
+          setNoDataPopupOpen(true);
+          setResponseData(null);  // Clear previous response data
+        } else {
+          setResponseData(response.data);  // Store the response data in state
+          // console.log("data found");
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
-      }
+        // If an error occurs, show the popup instead of console.error
+        setNoDataPopupOpen(true); // Open the popup in case of error
+      }  
     };
 
     // Only fetch data when all required filters are selected
@@ -125,8 +139,18 @@ const SectorBasedTable: React.FC = () => {
     setSector(event.target.value);
   };
 
+  const handleClosePopup = () => {
+    setNoDataPopupOpen(false);  // Close the NoDataPopup
+    setStartYear(2001);  // Reset the filters
+    setEndYear(2024);
+    setDealType('All');
+    setRegion('All');
+    setSector('All');
+  
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ padding: 0 ,marginBottom:4}}>
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box p={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>
@@ -200,6 +224,9 @@ const SectorBasedTable: React.FC = () => {
           {responseData && <SectorTableData data={responseData} />}
         </CardContent>
       </Card>
+      
+      {/* NoDataPopup */}
+      <NoDataPopup open={noDataPopupOpen} onClose={handleClosePopup} />
     </Container>
   );
 };

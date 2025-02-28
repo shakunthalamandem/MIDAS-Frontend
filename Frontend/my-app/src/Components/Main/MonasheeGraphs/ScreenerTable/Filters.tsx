@@ -196,7 +196,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
 
       {/* Render ScreenerDataTable */}
       <Box mt={4}>
-        <ScreenerDataTable sectorwiseData={appliedFilters || selectedValues} />
+        <ScreenerDataTable sectorwiseData={appliedFilters || selectedValues} handleCancel={handleCancel} />
       </Box>
     </Container>
   );
@@ -204,3 +204,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
 
 export default Filters;
 
+export const resetFilters = (handleCancel: () => void) => {
+  console.log("Filters have been reset.");
+  handleCancel();  // Call the existing handleCancel function
+};

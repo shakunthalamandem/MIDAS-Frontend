@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, Tabs, Tab, TextField, InputAdornment, List, ListItem, ListItemText, CircularProgress, Paper } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import MDDScreener from "../../MonasheeDeals/MddGraphs/MDDScreener";
@@ -18,7 +18,8 @@ interface MDDResult {
 
 const MonasheeDeals: React.FC = () => {
   const { ticker: routeTicker } = useParams<{ ticker: string }>(); // Get ticker from the route parameters
-  const [value, setValue] = useState(0); // For controlling tab selection
+  const navigate = useNavigate(); // Initialize the navigate function for routing
+  const [value, setValue] = useState(0); // For controlling tab selectiony
   const [searchTerm, setSearchTerm] = useState<string>(""); // Search term state
   const [results, setResults] = useState<MDDResult[]>([]); // Search results
   const [loading, setLoading] = useState<boolean>(false); // Loading state
@@ -26,10 +27,49 @@ const MonasheeDeals: React.FC = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-
+  useEffect(() => {
+    const path = window.location.pathname.split("/").pop();
+    switch (path) {
+      case "deal-stats":
+        setValue(1);
+        break;
+      case "gap-analysis":
+        setValue(2);
+        break;
+      case "follow-on-discount":
+        setValue(3);
+        break;
+      case "weekly-tracking":
+        setValue(4);
+        break;
+      case "by-bank":
+        setValue(5);
+        break;
+      case "screener":
+        setValue(6);
+        break;
+      default:
+        setValue(0);
+        break;
+    }
+  }, [window.location.pathname]);
   // Handle change for tab selection
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+
+    // Map the selected tab index to the URL path
+    const tabPaths = [
+      " ",
+      "deal-stats",
+      "gap-analysis",
+      "follow-on-discount",
+      "weekly-tracking",
+      "by-bank",
+      "screener"
+    ];
+
+    // Update the URL based on the tab index
+    navigate(`/monashee-deals/${tabPaths[newValue]}`);
   };
 
   // Handle search input and fetching results
@@ -49,7 +89,8 @@ const MonasheeDeals: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
           "Authorization": token ? `Bearer ${token}` : "",
-        }});
+        }
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }
@@ -105,9 +146,6 @@ const MonasheeDeals: React.FC = () => {
         Welcome to Monashee Participated Deals Dashboard! Explore valuable insights into the deals you've actively participated in across the global market.
       </Typography>
 
-      {/* Search results displayed outside the tabs */}
-
-
       {/* Tabs */}
       <Tabs
         value={value}
@@ -144,7 +182,7 @@ const MonasheeDeals: React.FC = () => {
           },
         }}
       >
-        <Tab sx={{ backgroundColor: value === 0 ? "#dce6f0" : "#f5f5f5", color: value === 0 ? "#fff" : "#777", "&.Mui-selected": { backgroundColor: "#dce6f0", color: "#fff" } }} 
+       <Tab sx={{ backgroundColor: value === 0 ? "#dce6f0" : "#f5f5f5", color: value === 0 ? "#fff" : "#777", "&.Mui-selected": { backgroundColor: "#dce6f0", color: "#fff" } }}
           label={
             <Box sx={{ width: "100%", maxHeight: "45px", maxWidth: "200px"}}>
               <TextField
@@ -158,10 +196,8 @@ const MonasheeDeals: React.FC = () => {
                   marginBottom: "1px",
                   width: "200px",
                   height: "40px",
-                  borderRadius: "32px", 
-                  backgroundColor: "#f4f6f9", 
-
-
+                  borderRadius: "32px",
+                  backgroundColor: "#f4f6f9",
                 }}
                 InputProps={{
                   style: {
@@ -176,7 +212,6 @@ const MonasheeDeals: React.FC = () => {
                   ),
                 }}
               />
-
             </Box>
           }
         />
@@ -187,6 +222,8 @@ const MonasheeDeals: React.FC = () => {
         <Tab label="By Bank" />
         <Tab label="Screener" />
       </Tabs>
+
+      {/* Search results displayed outside the tabs */}
       {searchTerm.length > 0 && (
         <Box sx={{ marginBottom: "20px", display: "flex", marginLeft: "500px" }}>
           {loading ? (
@@ -227,10 +264,10 @@ const MonasheeDeals: React.FC = () => {
                         (e.currentTarget.style.backgroundColor = "#f0f0f0")
                       }
                       onMouseOut={(e) =>
-                      (e.currentTarget.style.backgroundColor =
-                        selectedTicker === item.ticker
-                          ? "rgba(63, 81, 181, 0.1)"
-                          : "transparent")
+                        (e.currentTarget.style.backgroundColor =
+                          selectedTicker === item.ticker
+                            ? "rgba(63, 81, 181, 0.1)"
+                            : "transparent")
                       }
                     >
                       <ListItemText
