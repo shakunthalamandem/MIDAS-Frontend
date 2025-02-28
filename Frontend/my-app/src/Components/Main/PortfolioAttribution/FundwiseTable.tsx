@@ -30,7 +30,7 @@ const FundWiseTable: React.FC = () => {
 
   // Get the API URL and token from environment variables or storage
   const apiUrl = process.env.REACT_APP_API_URL; // or your defined API URL
-  const token = localStorage.getItem('token');  // or your global state/context
+  const token = localStorage.getItem('access_token');  // or your global state/context
 
   useEffect(() => {
     const fetchData = async () => {

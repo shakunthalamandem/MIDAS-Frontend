@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Box, Typography, Container } from "@mui/material";
 import { Link } from "react-router-dom";  // Import Link to make fund names clickable
+import { Token } from "@mui/icons-material";
 
 interface FundData {
   fund: string;
@@ -33,7 +34,10 @@ const FundTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("access_token");
+  // console.log("API URL: ", token);
+
+
 
   useEffect(() => {
     let isMounted = true;
@@ -131,13 +135,13 @@ const FundTable: React.FC = () => {
                 <TableBody>
                   {data.map((row, index) => (
                     <TableRow key={index}>
-<Link
-  to={`/fund/${row.fund}`}  // Use backticks and `${}` for interpolation
-  style={{ color: "#1E88E5", textDecoration: "none" }}
-  target="_blank"  // Optionally open in a new tab
->
-  {row.fund}
-</Link>
+                      <Link
+                        to={`/fund/${row.fund}`}  // Use backticks and `${}` for interpolation
+                        style={{ color: "#1E88E5", textDecoration: "none" }}
+                        target="_blank"  // Optionally open in a new tab
+                      >
+                        {row.fund}
+                      </Link>
 
 
                       <TableCell>{row.pnl}</TableCell>
