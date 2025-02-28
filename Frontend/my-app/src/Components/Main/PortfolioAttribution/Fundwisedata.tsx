@@ -82,7 +82,7 @@ const Fundwisedata: React.FC = () => {
                 {/* Heading Section */}
 
 
-                <Typography variant="h5" color="#002060" align="center" fontWeight={500} marginBottom={2}>
+                <Typography variant="h5" color="#002060" align="center" fontWeight={600} marginBottom={2}>
                     2025 YTD Net of Hedge P&L Attribution by Fund      </Typography>
 
 
