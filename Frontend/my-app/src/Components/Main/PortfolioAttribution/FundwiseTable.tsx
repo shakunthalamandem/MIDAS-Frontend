@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Box, CircularProgress, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container } from "@mui/material";
+import NoDataPopup from "../../../Pages/NoDataPopup";
+import { set } from "lodash";
 
 // Formatting function
 const formatNumber = (value: number) => {
@@ -27,7 +29,7 @@ const FundWiseTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<any[]>([]);
-
+  const [openNoDataPopup, setOpenNoDataPopup] = useState(false);
   // Get the API URL and token from environment variables or storage
   const apiUrl = process.env.REACT_APP_API_URL; // or your defined API URL
   const token = localStorage.getItem('access_token');  // or your global state/context
@@ -44,14 +46,14 @@ const FundWiseTable: React.FC = () => {
           },
           body: JSON.stringify({ fund }), 
         });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-
         const result = await response.json();
 
-        setData(result);
+        if (result.detail === "No data found." || result.length === 0) {
+          setOpenNoDataPopup(true);
+        } else {
+          setData(result);
+        }
+        // setData(result);
 
       } catch (error) {
         setError((error as any).message || "An error occurred while fetching data");
@@ -64,6 +66,11 @@ const FundWiseTable: React.FC = () => {
       fetchData();
     }
   }, [fund, apiUrl, token]);  // Ensure fund is used correctly as a dependency
+
+    
+  const handleCloseNoDataPopup = () =>{
+        setOpenNoDataPopup(false);
+    }
 
   return (
     <Box sx={{ p: 3 }}>
@@ -103,6 +110,11 @@ const FundWiseTable: React.FC = () => {
           </Box>
         )}
       </Container>
+         {/* Use the NoDataPopup component */}
+         <NoDataPopup 
+        open={openNoDataPopup} 
+        onClose={handleCloseNoDataPopup}
+      />
     </Box>
   );
 };
