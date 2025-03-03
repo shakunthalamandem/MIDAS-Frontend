@@ -19,11 +19,7 @@ const formatNumber = (value: number) => {
     const absValue = Math.abs(value);
     let formattedValue;
 
-    if (absValue >= 1_000) {
         formattedValue = (absValue / 1_000).toFixed(0) + "K";
-    } else {
-        formattedValue = absValue.toFixed(2);
-    }
 
     return isNegative ? `-$${formattedValue}` : `$${formattedValue}`;
 };
@@ -69,7 +65,7 @@ const Fundwisedata: React.FC = () => {
     }, [apiUrl, token]);
 
     const totalPnl = formatNumber(data.reduce((sum, row) => sum + row.pnl, 0));
-    const totalAum = formatNumber(data.reduce((sum, row) => sum + row.aum, 0));
+    const totalhurdle_return = formatNumber(data.reduce((sum, row) => sum + row.hurdle_return, 0));
     const totalNet = formatNumber(data.reduce((sum, row) => sum + (row.net || 0), 0));
 
     return (
@@ -116,28 +112,28 @@ const Fundwisedata: React.FC = () => {
                                     >
                                         YTD PnL
                                     </TableCell>
-                                    {/* <TableCell
-                  sx={{
-                    color: "#ffffff",
-                    fontWeight: "bold",
-                    width: "120px",
-                    border: "1px solid #ddd",
-                    textAlign: "center",
-                  }}
-                >
-                  Hurdle Return
-                </TableCell> */}
-                                    {/* <TableCell
-                  sx={{
-                    color: "#ffffff",
-                    fontWeight: "bold",
-                    width: "120px",
-                    border: "1px solid #ddd",
-                    textAlign: "center",
-                  }}
-                >
-                  Net PnL
-                </TableCell> */}
+                                    <TableCell
+                                        sx={{
+                                            color: "#ffffff",
+                                            fontWeight: "bold",
+                                            width: "120px",
+                                            border: "1px solid #ddd",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        Hurdle Return
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            color: "#ffffff",
+                                            fontWeight: "bold",
+                                            width: "120px",
+                                            border: "1px solid #ddd",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        Net PnL
+                                    </TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -149,15 +145,15 @@ const Fundwisedata: React.FC = () => {
                                             </Link>
                                         </TableCell>
                                         <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.pnl)}</TableCell>
-                                        {/* <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.aum)}</TableCell>
-                  <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.net || 0)}</TableCell> */}
+                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.hurdle_return)}</TableCell>
+                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.net || 0)}</TableCell>
                                     </TableRow>
                                 ))}
                                 <TableRow sx={{ backgroundColor: "#91ce89" }}>
                                     <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>Total</TableCell>
                                     <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalPnl}</TableCell>
-                                    {/* <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalAum}</TableCell>
-                <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalNet}</TableCell> */}
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalhurdle_return}</TableCell>
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalNet}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
