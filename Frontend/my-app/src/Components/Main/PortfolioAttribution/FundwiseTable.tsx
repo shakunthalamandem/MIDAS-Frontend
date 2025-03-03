@@ -170,11 +170,12 @@ const FundWiseTable: React.FC = () => {
                   <Table size="small" sx={{ borderCollapse: "collapse" }}>
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#466675" }}>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
-                          <b>{view === "sector" ? "Sector" : "Region"}</b>
-                        </TableCell>
+                        
                         <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>Deal Type</b>
+                        </TableCell>
+                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                          <b>{view === "sector" ? "Sector" : "Region"}</b>
                         </TableCell>
                         <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>Jan-2025</b>
