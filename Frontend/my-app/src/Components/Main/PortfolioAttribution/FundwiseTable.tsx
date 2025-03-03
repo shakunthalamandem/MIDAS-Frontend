@@ -102,7 +102,7 @@ const FundWiseTable: React.FC = () => {
   let regionTotals: Record<string, { pnl: number; aum: number }> = {};
   let overallTotal = { pnl: 0, aum: 0 };
 
-  data.forEach(({ broad_region, pnl, aum }: any) => {
+  data.forEach(({ broad_region, pnl, aum }: FundData | SectorData) => {
     if (!regionTotals[broad_region]) {
       regionTotals[broad_region] = { pnl: 0, aum: 0 };
     }
@@ -116,7 +116,7 @@ const FundWiseTable: React.FC = () => {
   let rowSpans: Record<string, number> = {};
   let previousRegion: string | null = null;
 
-  data.forEach(({ broad_region }: any) => {
+  data.forEach(({ broad_region }: FundData | SectorData) => {
     if (broad_region !== previousRegion) {
       rowSpans[broad_region] = 1;
     } else {
@@ -172,38 +172,40 @@ const FundWiseTable: React.FC = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {data.map((row: any, index, array) => {
-                        const isLastInRegion = index === array.length - 1 || array[index + 1].broad_region !== row.broad_region;
-                        const regionSpan = rowSpans[row.broad_region];
+  {data.map((row, index, array) => {
+    const isLastInRegion = index === array.length - 1 || array[index + 1].broad_region !== row.broad_region;
+    const regionSpan = rowSpans[row.broad_region];
 
-                        return (
-                          <>
-                            <TableRow key={index}>
-                              {index === 0 || array[index - 1].broad_region !== row.broad_region ? (
-                                <TableCell rowSpan={regionSpan} sx={{ border: "1px solid black" }}>
-                                  {row.broad_region}
-                                </TableCell>
-                              ) : null}
-                              <TableCell sx={{ border: "1px solid black" }}>{view === "sector" ? row.custom_group_2 : row.custom_group_1}</TableCell>
-                              <TableCell sx={{ border: "1px solid black" }}>{formatNumber(row.pnl)}</TableCell>
-                              <TableCell sx={{ border: "1px solid black" }}>{formatNumber(row.aum)}</TableCell>
-                            </TableRow>
-                            {isLastInRegion && (
-                              <TableRow sx={{ backgroundColor: "#91ce89" }}>
-                                <TableCell colSpan={2} sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  Total for {row.broad_region}
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  {formatNumber(regionTotals[row.broad_region].pnl)}
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  {formatNumber(regionTotals[row.broad_region].aum)}
-                                </TableCell>
-                              </TableRow>
-                            )}
-                          </>
-                        );
-                      })}
+    return (
+      <React.Fragment key={index}>
+        <TableRow>
+          {index === 0 || array[index - 1].broad_region !== row.broad_region ? (
+            <TableCell rowSpan={regionSpan} sx={{ border: "1px solid black" }}>
+              {row.broad_region}
+            </TableCell>
+          ) : null}
+          <TableCell sx={{ border: "1px solid black" }}>
+            {view === "sector" ? (row as SectorData).custom_group_2 : (row as FundData).custom_group_1}
+          </TableCell>
+          <TableCell sx={{ border: "1px solid black" }}>{formatNumber(row.pnl)}</TableCell>
+          <TableCell sx={{ border: "1px solid black" }}>{formatNumber(row.aum)}</TableCell>
+        </TableRow>
+        {isLastInRegion && (
+          <TableRow sx={{ backgroundColor: "#91ce89" }}>
+            <TableCell colSpan={2} sx={{ fontWeight: "bold", border: "1px solid black" }}>
+              Total for {row.broad_region}
+            </TableCell>
+            <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+              {formatNumber(regionTotals[row.broad_region].pnl)}
+            </TableCell>
+            <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+              {formatNumber(regionTotals[row.broad_region].aum)}
+            </TableCell>
+          </TableRow>
+        )}
+      </React.Fragment>
+    );
+  })}
                       <TableRow sx={{ backgroundColor: "#cfd8dc" }}>
                         <TableCell colSpan={2} sx={{ fontWeight: "bold", border: "1px solid black" }}>
                           Overall Total
@@ -215,7 +217,8 @@ const FundWiseTable: React.FC = () => {
                           {formatNumber(overallTotal.aum)}
                         </TableCell>
                       </TableRow>
-                    </TableBody>
+</TableBody>
+
                   </Table>
                 </TableContainer>
               </Box>
