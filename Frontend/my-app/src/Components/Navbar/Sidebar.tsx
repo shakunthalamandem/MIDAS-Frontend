@@ -11,7 +11,7 @@ const tabs: Tab[] = [
   { name: "Equity", icon: <Home /> },
   { name: "Connects", icon: <People /> },
   { name: "High Yields", icon: <TrendingUp /> },
-  { name: "Portfolio", icon: <Work /> },
+  { name: "Macro", icon: <Work /> },
 ];
 
 function Sidebar() {
