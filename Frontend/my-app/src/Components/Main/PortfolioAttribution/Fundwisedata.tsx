@@ -19,11 +19,7 @@ const formatNumber = (value: number) => {
     const absValue = Math.abs(value);
     let formattedValue;
 
-    if (absValue >= 1_000_000_000) {
-        formattedValue = (absValue / 1_000_000_000).toFixed(1) + "B";
-    } else if (absValue >= 1_000_000) {
-        formattedValue = (absValue / 1_000_000).toFixed(1) + "M";
-    } else if (absValue >= 1_000) {
+    if (absValue >= 1_000) {
         formattedValue = (absValue / 1_000).toFixed(0) + "K";
     } else {
         formattedValue = absValue.toFixed(2);
