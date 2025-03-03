@@ -1,13 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Box, CircularProgress, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container, Grid } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Container,
+  Grid,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+} from "@mui/material";
 import NoDataPopup from "../../../Pages/NoDataPopup";
 
 interface FundData {
   broad_region: string;
   custom_group_1: string;
   pnl: number;
-  aum: number;
+}
+
+interface SectorData {
+  broad_region: string;
+  custom_group_2: string;
+  custom_group_1: string;
+  pnl: number;
+  adjusted_hedge: number;
 }
 
 const formatNumber = (value: number) => {
@@ -30,8 +54,9 @@ const FundWiseTable: React.FC = () => {
   const { fund } = useParams<{ fund: string }>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<FundData[]>([]);
+  const [data, setData] = useState<FundData[] | SectorData[]>([]);
   const [openNoDataPopup, setOpenNoDataPopup] = useState<boolean>(false);
+  const [view, setView] = useState<"fund" | "sector">("fund"); // Default view is "fund"
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -39,15 +64,32 @@ const FundWiseTable: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${apiUrl}/api/detailed_fund_pnl/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify({ fund }),
-        });
-        const result: FundData[] = await response.json();
+        let response;
+        if (view === "fund") {
+          response = await fetch(`${apiUrl}/api/detailed_fund_pnl/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+            body: JSON.stringify({ fund }),
+          });
+        } else if (view === "sector") {
+          response = await fetch(`${apiUrl}/api/detailed_sector_pnl/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+            body: JSON.stringify({ fund }), // Assuming sector data requires the same parameter
+          });
+        }
+
+        if (!response || !response.ok) {
+          throw new Error("Failed to fetch data from the API.");
+        }
+
+        const result: (FundData[] | SectorData[]) = await response.json();
 
         if (!result || result.length === 0) {
           setOpenNoDataPopup(true);
@@ -65,30 +107,29 @@ const FundWiseTable: React.FC = () => {
     if (fund) {
       fetchData();
     }
-  }, [fund, apiUrl, token]);
+  }, [fund, apiUrl, token, view]);
 
   const handleCloseNoDataPopup = () => {
     setOpenNoDataPopup(false);
   };
 
-  let regionTotals: Record<string, { pnl: number; aum: number }> = {};
-  let overallTotal = { pnl: 0, aum: 0 };
+  // Region totals and overall totals initialization
+  let regionTotals: Record<string, { pnl: number }> = {};
+  let overallTotal = { pnl: 0 };
 
-  data.forEach(({ broad_region, pnl, aum }) => {
+  data.forEach(({ broad_region, pnl }: FundData | SectorData) => {
     if (!regionTotals[broad_region]) {
-      regionTotals[broad_region] = { pnl: 0, aum: 0 };
+      regionTotals[broad_region] = { pnl: 0 };
     }
     regionTotals[broad_region].pnl += pnl;
-    regionTotals[broad_region].aum += aum;
     overallTotal.pnl += pnl;
-    overallTotal.aum += aum;
   });
 
-  // Initialize rowSpans and other necessary variables for span logic
+  // Row span logic
   let rowSpans: Record<string, number> = {};
   let previousRegion: string | null = null;
 
-  data.forEach(({ broad_region }) => {
+  data.forEach(({ broad_region }: FundData | SectorData) => {
     if (broad_region !== previousRegion) {
       rowSpans[broad_region] = 1;
     } else {
@@ -101,6 +142,20 @@ const FundWiseTable: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Container>
         <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12} textAlign="center">
+            <FormControl>
+              <RadioGroup
+                row
+                aria-labelledby="view-toggle-label"
+                value={view}
+                onChange={(e) => setView(e.target.value as "fund" | "sector")}
+              >
+                <FormControlLabel value="fund" control={<Radio />} label="Fund Detail" />
+                <FormControlLabel value="sector" control={<Radio />} label="Sector Detail" />
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+
           <Grid item xs={12}>
             {loading ? (
               <CircularProgress />
@@ -109,14 +164,16 @@ const FundWiseTable: React.FC = () => {
             ) : (
               <Box>
                 <Typography variant="h5" align="center" color="#002060" fontWeight={500} marginBottom={2}>
-                  {`${fund} : 2025 YTD Net of Hedge P&L Strategy`}
+                  {view === "sector"
+                    ? `${fund}: 2025 YTD Net of Hedge P&L by Sector`
+                    : `${fund} : 2025 YTD Net of Hedge P&L Strategy`}
                 </Typography>
                 <TableContainer component={Paper} sx={{ marginTop: 2 }}>
                   <Table size="small" sx={{ borderCollapse: "collapse" }}>
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#466675" }}>
                         <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
-                          <b>Region</b>
+                          <b>{view === "sector" ? "Sector" : "Region"}</b>
                         </TableCell>
                         <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>Deal Type</b>
@@ -135,16 +192,18 @@ const FundWiseTable: React.FC = () => {
                         const regionSpan = rowSpans[row.broad_region];
 
                         return (
-                          <>
-                            <TableRow key={index}>
+                          <React.Fragment key={index}>
+                            <TableRow>
                               {index === 0 || array[index - 1].broad_region !== row.broad_region ? (
                                 <TableCell rowSpan={regionSpan} sx={{ border: "1px solid black" }}>
                                   {row.broad_region}
                                 </TableCell>
                               ) : null}
-                              <TableCell sx={{ border: "1px solid black" }}>{row.custom_group_1}</TableCell>
+                              <TableCell sx={{ border: "1px solid black" }}>
+                                {view === "sector" ? (row as SectorData).custom_group_2 : (row as FundData).custom_group_1}
+                              </TableCell>
                               <TableCell sx={{ border: "1px solid black" }}>{formatNumber(row.pnl)}</TableCell>
-                              <TableCell sx={{ border: "1px solid black" }}>{formatNumber(row.aum)}</TableCell>
+                              <TableCell sx={{ border: "1px solid black" }}>{formatNumber(row.pnl)}</TableCell> {/* Change here */}
                             </TableRow>
                             {isLastInRegion && (
                               <TableRow sx={{ backgroundColor: "#91ce89" }}>
@@ -155,11 +214,11 @@ const FundWiseTable: React.FC = () => {
                                   {formatNumber(regionTotals[row.broad_region].pnl)}
                                 </TableCell>
                                 <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  {formatNumber(regionTotals[row.broad_region].aum)}
+                                  {formatNumber(regionTotals[row.broad_region].pnl)} {/* Change here */}
                                 </TableCell>
                               </TableRow>
                             )}
-                          </>
+                          </React.Fragment>
                         );
                       })}
                       <TableRow sx={{ backgroundColor: "#cfd8dc" }}>
@@ -170,7 +229,7 @@ const FundWiseTable: React.FC = () => {
                           {formatNumber(overallTotal.pnl)}
                         </TableCell>
                         <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                          {formatNumber(overallTotal.aum)}
+                          {formatNumber(overallTotal.pnl)} {/* Change here */}
                         </TableCell>
                       </TableRow>
                     </TableBody>
