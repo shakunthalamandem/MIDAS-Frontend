@@ -1,28 +1,27 @@
-import { useState } from "react";
 import { Home, People, TrendingUp, Work } from "@mui/icons-material";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 
 interface SidebarProps {
+  open: boolean;
+  onClose: () => void;
   onEquityClick: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onEquityClick }) => {
-  const [activeTab, setActiveTab] = useState<string>("");
-
+const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onEquityClick }) => {
   const handleTabClick = (tabName: string) => {
-    setActiveTab(tabName);
     if (tabName === "Equity") {
-      onEquityClick(); // Call function passed from NavbarMain
+      onEquityClick();
     }
+    onClose(); // Close drawer after clicking an item (useful in mobile views)
   };
 
   return (
     <Drawer
-      variant="permanent"
+      variant="temporary"
       anchor="left"
+      open={open}
+      onClose={onClose}
       sx={{
-        width: 240,
-        flexShrink: 0,
         '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box', backgroundColor: '#1e1e1e', color: 'white' }
       }}
     >
@@ -35,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onEquityClick }) => {
           { name: "Macro", icon: <Work /> }
         ].map((tab) => (
           <ListItem key={tab.name} disablePadding>
-            <ListItemButton selected={activeTab === tab.name} onClick={() => handleTabClick(tab.name)}>
+            <ListItemButton onClick={() => handleTabClick(tab.name)}>
               <ListItemIcon sx={{ color: 'white' }}>{tab.icon}</ListItemIcon>
               <ListItemText primary={tab.name} />
             </ListItemButton>
@@ -44,6 +43,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onEquityClick }) => {
       </List>
     </Drawer>
   );
-}
+};
 
 export default Sidebar;

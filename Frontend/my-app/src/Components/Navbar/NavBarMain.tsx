@@ -21,6 +21,8 @@ const NavbarMain: React.FC = () => {
   const [showLogs, setShowLogs] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const refresh_token = localStorage.getItem("refresh_token");
@@ -119,7 +121,9 @@ const NavbarMain: React.FC = () => {
             <img src={logo} alt="MIDAS Logo" style={{ width: "130px", height: "60px", marginRight: "10px" }} />
           </Link>
 
-            <NavbarTabs />
+            {/* <NavbarTabs /> */}
+            <Button onClick={() => setDrawerOpen(true)}>Open Sidebar</Button>
+      <Sidebar open={drawerOpen} onClose={() => setDrawerOpen(false)} onEquityClick={() => console.log("Equity clicked")} />
 
           {isLoggedIn && isSuperUser && (
             <Button sx={{ color: "black", fontWeight: "bold", marginRight: "20px" }} onClick={() => setShowLogs(true)}>
