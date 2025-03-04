@@ -31,6 +31,10 @@ import HighYieldsMain from "../Components/HighYields/HighYieldsMain";
 import DealStatsMain from "../Components/HighYields/Tabs/DealStatsMain";
 import HYSkewTableMain from "../Components/HighYields/Tabs/HYSkewTableMain";
 import SelectedDealHYMain from "../Components/HighYields/Tabs/SelectedDealHYMain";
+import MDDSelectedTicker from "../Components/Main/MonasheeDeals/MddGraphs/MDDSelectedTicker";
+import MarketFilters from "../Components/Main/MonasheeCapitalMarkets/MarketFilters";
+import ScreenerMain from "../Components/Main/MonasheeGraphs/ScreenerTable/ScreenerMain";
+import SkewTableMain from "../Components/Main/MonasheeGraphs/SkewTableMain";
 
 
 
@@ -53,9 +57,9 @@ const AppRouters: React.FC = () => {
 
         <Route path="/equity/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} >
           <Route path="search" element={<SelectedTicker ticker={'AS'}/>} />
-          <Route path="deal-stats" element={<DealStats />} />
-          <Route path="skew-table" element={<AllocationCaptureReturn />} />
-          <Route path="deal-filter" element={<FOllowOnDiscount />} />
+          <Route path="deal-stats" element={<MarketFilters />} />
+          <Route path="skew-table" element={<SkewTableMain />} />
+          <Route path="deal-filter" element={<ScreenerMain />} />
         </Route>
 
         <Route path="/highyield/capital-markets" element={<AuthGuard><HighYieldsMain /></AuthGuard>} >
@@ -67,7 +71,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/equity/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
-          <Route path="search" element={<SelectedTicker ticker={'CGRX'}/>} />
+          <Route path="search" element={<MDDSelectedTicker ticker={'CGRX'}/>} />
           <Route path="deal-stats" element={<DealStats />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
           <Route path="follow-on-discount" element={<FOllowOnDiscount />} />
