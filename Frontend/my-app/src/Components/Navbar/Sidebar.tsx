@@ -1,24 +1,31 @@
-import {  TrendingUp } from "@mui/icons-material";
+import { TrendingUp } from "@mui/icons-material";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
-import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange"; 
-import LeaderboardIcon from "@mui/icons-material/Leaderboard"; 
-import ShowChartIcon from "@mui/icons-material/ShowChart"; 
-
-
-
-
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import LeaderboardIcon from "@mui/icons-material/Leaderboard";
+import ShowChartIcon from "@mui/icons-material/ShowChart";
+import { useState } from "react";
 
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
-  onTabSelect: (tabName: string) => void;  // Update to notify parent on tab selection
+  onTabSelect: (tabName: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onTabSelect }) => {
+  const [selectedTab, setSelectedTab] = useState<string>("Equity"); // Default to "Equity"
+
   const handleTabClick = (tabName: string) => {
-    onTabSelect(tabName);  // Notify parent on tab selection
-    onClose(); // Close drawer after clicking an item
+    setSelectedTab(tabName);
+    onTabSelect(tabName);
+    onClose();
   };
+
+  const menuItems = [
+    { name: "Equity", icon: <ShowChartIcon /> },
+    { name: "Converts", icon: <CurrencyExchangeIcon /> },
+    { name: "High Yields", icon: <TrendingUp /> },
+    { name: "Macro", icon: <LeaderboardIcon /> }
+  ];
 
   return (
     <Drawer
@@ -32,22 +39,25 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onTabSelect }) => {
     >
       <Typography variant="h6" sx={{ p: 2, fontWeight: "bold" }}>Dashboard</Typography>
       <List>
-        {[{ name: "Equity", icon: <ShowChartIcon /> },
-          { name: "Converts", icon: <CurrencyExchangeIcon /> },
-          { name: "High Yields", icon: <TrendingUp /> },
-          { name: "Macro", icon: <LeaderboardIcon /> }]
-          .map((tab) => (
-            <ListItem key={tab.name} disablePadding>
-              <ListItemButton onClick={() => handleTabClick(tab.name)}>
-                <ListItemIcon sx={{ color: 'white' }}>{tab.icon}</ListItemIcon>
-                <ListItemText primary={tab.name} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+        {menuItems.map((tab) => (
+          <ListItem key={tab.name} disablePadding>
+            <ListItemButton
+              onClick={() => handleTabClick(tab.name)}
+              sx={{
+                backgroundColor: selectedTab === tab.name ? "#004080" : "transparent",
+                "&:hover": {
+                  backgroundColor: "#0050A0"
+                }
+              }}
+            >
+              <ListItemIcon sx={{ color: 'white' }}>{tab.icon}</ListItemIcon>
+              <ListItemText primary={tab.name} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
     </Drawer>
   );
 };
 
 export default Sidebar;
-
