@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Button,
-  Box,
-  Typography,
-} from "@mui/material";
+import { AppBar, Toolbar, Button, Box, Typography } from "@mui/material";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
@@ -13,6 +7,10 @@ import Logs from "../Main/HomePage/Authentication/Logs";
 import Logout from "../Main/HomePage/Authentication/Logout";
 import NavbarTabs from "./NavbarTabs";
 import Sidebar from "./Sidebar";
+import ConvertsNavbar from "./ConvertsNavbar";
+import EquityNavbar from "./EquityNavbar";
+import HighYieldNavbar from "./HighYieldNavbar";
+import MacroNavbar from "./MacroNavbar";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -27,6 +25,11 @@ const NavbarMain: React.FC = () => {
   const token = localStorage.getItem("access_token");
   const refresh_token = localStorage.getItem("refresh_token");
   const user = localStorage.getItem("user");
+  const [selectedTab, setSelectedTab] = useState<string>(""); // State to track selected tab
+
+  const handleTabSelect = (tabName: string) => {
+    setSelectedTab(tabName); // Set the selected tab when a button is clicked
+  };
 
   const handleLogoutClick = () => {
     setShowLogout(true);
@@ -62,8 +65,6 @@ const NavbarMain: React.FC = () => {
 
   const isLoggedIn = !!localStorage.getItem("access_token");
 
-
-
   return (
     <>
       <AppBar position="sticky" sx={{ backgroundColor: "#FFFFFF" }}>
@@ -74,78 +75,124 @@ const NavbarMain: React.FC = () => {
           </Box>
         )}
 
-          <Box
+        <Box
+          sx={{
+            width: "100%",
+            backgroundColor: "#002060",
+            color: "#fff",
+            padding: "5px 0",
+            textAlign: "center",
+            fontWeight: "bold",
+            position: "sticky",
+            top: 0,
+            zIndex: 1100,
+            fontSize: "14px",
+          }}
+        >
+          <Typography
+            variant="body2"
             sx={{
-              width: "100%",
-              backgroundColor: "#002060",
-              color: "#fff",
-              padding: "5px 0",
-              textAlign: "center",
-              fontWeight: "bold",
-              position: "sticky",
-              top: 0,
-              zIndex: 1100,
-              fontSize: "14px",
+              "& .marquee": {
+                display: "inline-block",
+                whiteSpace: "nowrap",
+                animation: "marquee 40s linear infinite",
+                color: "#fff",
+                fontWeight: "bold",
+                fontStyle: "italic",
+                paddingLeft: "10px",
+                paddingRight: "50px",
+              },
+              "@keyframes marquee": {
+                "0%": { transform: "translateX(100%)" },
+                "100%": { transform: "translateX(-100%)" },
+              },
+              "& .marquee:hover": {
+                animationPlayState: "paused",
+              },
             }}
           >
-            <Typography
-              variant="body2"
-              sx={{
-                "& .marquee": {
-                  display: "inline-block",
-                  whiteSpace: "nowrap",
-                  animation: "marquee 40s linear infinite",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  fontStyle: "italic",
-                  paddingLeft: "10px",
-                  paddingRight: "50px",
-                },
-                "@keyframes marquee": {
-                  "0%": { transform: "translateX(100%)" },
-                  "100%": { transform: "translateX(-100%)" },
-                },
-                "& .marquee:hover": {
-                  animationPlayState: "paused",
-                },
-              }}
-            >
-              <span className="marquee">
-                MIDAS is for internal usage only. All Data and Analytics are Confidential
-              </span>
-            </Typography>
-          </Box>
+            <span className="marquee">
+              MIDAS is for internal usage only. All Data and Analytics are
+              Confidential
+            </span>
+          </Typography>
+        </Box>
 
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-            <img src={logo} alt="MIDAS Logo" style={{ width: "130px", height: "60px", marginRight: "10px" }} />
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Link
+            to="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+          >
+            <img
+              src={logo}
+              alt="MIDAS Logo"
+              style={{ width: "130px", height: "60px", marginRight: "10px" }}
+            />
           </Link>
 
-            {/* <NavbarTabs /> */}
-            <Button onClick={() => setDrawerOpen(true)}>Open Sidebar</Button>
-      <Sidebar open={drawerOpen} onClose={() => setDrawerOpen(false)} onEquityClick={() => console.log("Equity clicked")} />
+          <Sidebar
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            onTabSelect={handleTabSelect}
+          />
+
+          {/* Conditionally render the navbar based on the selected tab */}
+          {selectedTab === "Equity" && <EquityNavbar />}
+          {selectedTab === "Converts" && <ConvertsNavbar />}
+          {selectedTab === "High Yields" && <HighYieldNavbar />}
+          {selectedTab === "Macro" && <MacroNavbar />}
 
           {isLoggedIn && isSuperUser && (
-            <Button sx={{ color: "black", fontWeight: "bold", marginRight: "20px" }} onClick={() => setShowLogs(true)}>
+            <Button
+              sx={{ color: "black", fontWeight: "bold", marginRight: "20px" }}
+              onClick={() => setShowLogs(true)}
+            >
               <Logs />
             </Button>
           )}
 
           {isLoggedIn ? (
-            <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }} onClick={handleLogoutClick}>
+            <Button
+              sx={{
+                color: "#FFFFFF",
+                backgroundColor: "#bb4401",
+                fontWeight: "bold",
+              }}
+              onClick={handleLogoutClick}
+            >
               Logout
             </Button>
           ) : (
-            <Button sx={{ color: "#FFFFFF", backgroundColor: "#002060", fontWeight: "bold" }} onClick={() => navigate("/login")}>
+            <Button
+              sx={{
+                color: "#FFFFFF",
+                backgroundColor: "#002060",
+                fontWeight: "bold",
+              }}
+              onClick={() => navigate("/login")}
+            >
               Login
             </Button>
           )}
 
-          {showLogout && <Logout onConfirm={handleConfirmLogout} onCancel={handleCancelLogout} />}
+          {showLogout && (
+            <Logout
+              onConfirm={handleConfirmLogout}
+              onCancel={handleCancelLogout}
+            />
+          )}
         </Toolbar>
       </AppBar>
-
-     
     </>
   );
 };
