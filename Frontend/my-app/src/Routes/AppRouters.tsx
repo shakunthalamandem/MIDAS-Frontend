@@ -27,6 +27,10 @@ import PortfolioAttribution from "../Components/Main/PortfolioAttribution/Portfo
 import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
 import SelectedTicker from "../Components/Main/MonasheeGraphs/SelectedTicker";
 import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable";
+import HighYieldsMain from "../Components/HighYields/HighYieldsMain";
+
+
+
 
 
 const AppRouters: React.FC = () => {
@@ -49,6 +53,12 @@ const AppRouters: React.FC = () => {
           <Route path="deal-stats" element={<DealStats />} />
           <Route path="skew-table" element={<AllocationCaptureReturn />} />
           <Route path="deal-filter" element={<FOllowOnDiscount />} />
+        </Route>
+
+        <Route path="/highyield/capital-markets" element={<AuthGuard><HighYieldsMain /></AuthGuard>} >
+          <Route path="search" element={<SelectedTicker ticker={'AS'}/>} />
+          <Route path="deal-stats" element={<DealStats />} />
+          <Route path="skew-table" element={<AllocationCaptureReturn />} />
         </Route>
 
 
@@ -74,6 +84,11 @@ const AppRouters: React.FC = () => {
         <Route path="/equity/portfolio-attribution/fund/:fund" element={<AuthGuard><FundWiseTable /></AuthGuard>} />
 
         <Route path="/equity/detailed_gap_analysis" element={<AuthGuard><DetailedGapData /></AuthGuard>} />
+
+
+
+        <Route path="/highyield/dealperformance/:deal" element={<AuthGuard><HighYieldsMain /></AuthGuard>} />
+
 
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/email-verification" element={<EmailVerification />} />
