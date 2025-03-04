@@ -50,7 +50,7 @@ useEffect(() => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     const tabPaths = ["", "deal-stats", "skew-table", "deal-filter"];
-    navigate(`/capital-markets/${tabPaths[newValue]}`);
+    navigate(`/equity/capital-markets/${tabPaths[newValue]}`);
   };
   interface MDDResult {
     ticker_symbol: string;

@@ -61,7 +61,7 @@ const columns: GridColDef[] = [
         }}
       >
         <Link
-          to={`/technical/${params.value}`}
+          to={`/equity/technical/${params.value}`}
           style={{ color: "#1E88E5", textDecoration: "none" }}
           target="_blank"
         >
