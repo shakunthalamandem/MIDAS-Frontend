@@ -71,7 +71,7 @@ const AppRouters: React.FC = () => {
         <Route path="/equity/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
         <Route path="/equity/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/equity/tickerperformance/:ticker" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
-        <Route path="/equity/fund/:fund" element={<AuthGuard><FundWiseTable /></AuthGuard>} />
+        <Route path="/equity/portfolio-attribution/fund/:fund" element={<AuthGuard><FundWiseTable /></AuthGuard>} />
 
         <Route path="/equity/detailed_gap_analysis" element={<AuthGuard><DetailedGapData /></AuthGuard>} />
 
