@@ -5,16 +5,16 @@ import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
 import Logs from "../Main/HomePage/Authentication/Logs";
 import Logout from "../Main/HomePage/Authentication/Logout";
-import Sidebar from "./Sidebar"; 
-import EquityNavbar from "./EquityNavbar"; 
-import ConvertsNavbar from "./ConvertsNavbar"; 
-import HighYieldNavbar from "./HighYieldNavbar"; 
-import MacroNavbar from "./MacroNavbar"; 
-import MenuIcon from '@mui/icons-material/Menu'; 
+import Sidebar from "./Sidebar";
+import EquityNavbar from "./EquityNavbar";
+import ConvertsNavbar from "./ConvertsNavbar";
+import HighYieldNavbar from "./HighYieldNavbar";
+import MacroNavbar from "./MacroNavbar";
+import MenuIcon from '@mui/icons-material/Menu';
 
 const NavbarMain: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState<string>("Equity"); 
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(false); 
+  const [selectedTab, setSelectedTab] = useState<string>("Equity");
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
   const isSuperUser = localStorage.getItem("is_superuser") === "true";
@@ -28,7 +28,17 @@ const NavbarMain: React.FC = () => {
   const user = localStorage.getItem("user");
 
   const handleTabSelect = (tabName: string) => {
-    setSelectedTab(tabName); 
+    setSelectedTab(tabName);
+    // Navigate to the relevant tab based on the selected tab
+    if (tabName === "Equity") {
+      navigate("/equity/issue_market");
+    } else if (tabName === "Converts") {
+      navigate("/converts/capital-markets");
+    } else if (tabName === "High Yields") {
+      navigate("/highyield/capital-markets"); 
+    } else if (tabName === "Macro") {
+      navigate("/macro/capital-markets");
+    }
   };
 
   const handleLogoutClick = () => {
@@ -66,7 +76,7 @@ const NavbarMain: React.FC = () => {
   const isLoggedIn = !!localStorage.getItem("access_token");
 
   const handleSidebarToggle = () => {
-    setDrawerOpen(!drawerOpen); 
+    setDrawerOpen(!drawerOpen);
   };
 
   return (
