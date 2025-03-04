@@ -5,16 +5,16 @@ import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
 import Logs from "../Main/HomePage/Authentication/Logs";
 import Logout from "../Main/HomePage/Authentication/Logout";
-import Sidebar from "./Sidebar"; // Assuming Sidebar is in the same folder
-import EquityNavbar from "./EquityNavbar"; // Example import
-import ConvertsNavbar from "./ConvertsNavbar"; // Example import
-import HighYieldNavbar from "./HighYieldNavbar"; // Example import
-import MacroNavbar from "./MacroNavbar"; // Example import
-import MenuIcon from '@mui/icons-material/Menu'; // Import MenuIcon
+import Sidebar from "./Sidebar"; 
+import EquityNavbar from "./EquityNavbar"; 
+import ConvertsNavbar from "./ConvertsNavbar"; 
+import HighYieldNavbar from "./HighYieldNavbar"; 
+import MacroNavbar from "./MacroNavbar"; 
+import MenuIcon from '@mui/icons-material/Menu'; 
 
 const NavbarMain: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState<string>(""); // State to track selected tab
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(false); // Sidebar initially closed
+  const [selectedTab, setSelectedTab] = useState<string>("Equity"); 
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false); 
   const navigate = useNavigate();
   const location = useLocation();
   const isSuperUser = localStorage.getItem("is_superuser") === "true";
@@ -28,7 +28,7 @@ const NavbarMain: React.FC = () => {
   const user = localStorage.getItem("user");
 
   const handleTabSelect = (tabName: string) => {
-    setSelectedTab(tabName); // Set the selected tab when a button is clicked
+    setSelectedTab(tabName); 
   };
 
   const handleLogoutClick = () => {
@@ -65,9 +65,8 @@ const NavbarMain: React.FC = () => {
 
   const isLoggedIn = !!localStorage.getItem("access_token");
 
-  // Toggle the drawer open and close
   const handleSidebarToggle = () => {
-    setDrawerOpen(!drawerOpen); // Toggle the drawer state
+    setDrawerOpen(!drawerOpen); 
   };
 
   return (
@@ -126,7 +125,7 @@ const NavbarMain: React.FC = () => {
             aria-label="open sidebar"
             edge="start"
             onClick={handleSidebarToggle}
-            sx={{ mr: 2 ,color:'#002060'}} // margin to the right of the button
+            sx={{ mr: 2 ,color:'#002060'}}
           >
             <MenuIcon />
           </IconButton>
@@ -135,7 +134,6 @@ const NavbarMain: React.FC = () => {
             <img src={logo} alt="MIDAS Logo" style={{ width: "130px", height: "60px", marginRight: "10px" }} />
           </Link>
 
-          {/* You can add a navbar for each selected tab */}
           {selectedTab === "Equity" && <EquityNavbar />}
           {selectedTab === "Converts" && <ConvertsNavbar />}
           {selectedTab === "High Yields" && <HighYieldNavbar />}
