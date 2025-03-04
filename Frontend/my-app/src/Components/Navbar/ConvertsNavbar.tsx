@@ -8,20 +8,20 @@ const pages = [
   "Portfolio Attribution",
 ];
 
-const ConnectsNavbar: React.FC = () => {
+const ConvertsNavbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleNavigate = (page: string) => {
     switch (page) {
       case "Equity Market Opportunity":
-        navigate("/connects/capital-markets");
+        navigate("/converts/capital-markets");
         break;
       case "Monashee Performance & Efficiency":
-        navigate("/connects/monashee-deals");
+        navigate("/converts/monashee-deals");
         break;
       case "Portfolio Attribution":
-        navigate("/connects/portfolio-attribution");
+        navigate("/converts/portfolio-attribution");
         break;
       default:
         break;
@@ -31,23 +31,23 @@ const ConnectsNavbar: React.FC = () => {
   const getTabIndex = () => {
     switch (location.pathname) {
 
-      case "/connects/capital-markets":
-      case "/connects/capital-markets/":
-      case "/connects/capital-markets/deal-stats":
-      case "/connects/capital-markets/skew-table":
-      case "/connects/capital-markets/deal-filter":
+      case "/converts/capital-markets":
+      case "/converts/capital-markets/":
+      case "/converts/capital-markets/deal-stats":
+      case "/converts/capital-markets/skew-table":
+      case "/converts/capital-markets/deal-filter":
         return 0;
-      case "/connects/monashee-deals":
-      case "/connects/monashee-deals/":
-      case "/connects/monashee-deals/deal-stats":
-      case "/connects/monashee-deals/screener":
-      case "/connects/monashee-deals/by-bank":
-      case "/connects/monashee-deals/weekly-tracking":
-      case "/connects/monashee-deals/follow-on-discount":
-      case "/connects/monashee-deals/gap-analysis":
+      case "/converts/monashee-deals":
+      case "/converts/monashee-deals/":
+      case "/converts/monashee-deals/deal-stats":
+      case "/converts/monashee-deals/screener":
+      case "/converts/monashee-deals/by-bank":
+      case "/converts/monashee-deals/weekly-tracking":
+      case "/converts/monashee-deals/follow-on-discount":
+      case "/converts/monashee-deals/gap-analysis":
         return 1;
 
-      case "/connects/portfolio-attribution":
+      case "/converts/portfolio-attribution":
         return 2;
       default:
         return false;
@@ -95,4 +95,4 @@ const ConnectsNavbar: React.FC = () => {
   );
 };
 
-export default ConnectsNavbar;
+export default ConvertsNavbar;

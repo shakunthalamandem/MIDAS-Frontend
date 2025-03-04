@@ -30,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onEquityClick }) => {
       <List>
         {[
           { name: "Equity", icon: <Home /> },
-          { name: "Connects", icon: <People /> },
+          { name: "Converts", icon: <People /> },
           { name: "High Yields", icon: <TrendingUp /> },
           { name: "Macro", icon: <Work /> }
         ].map((tab) => (
