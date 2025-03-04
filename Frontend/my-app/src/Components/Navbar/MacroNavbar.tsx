@@ -15,13 +15,13 @@ const MacroNavbar: React.FC = () => {
   const handleNavigate = (page: string) => {
     switch (page) {
       case "Equity Market Opportunity":
-        navigate("/capital-markets");
+        navigate("/macro/capital-markets");
         break;
       case "Monashee Performance & Efficiency":
-        navigate("/monashee-deals");
+        navigate("/macro/monashee-deals");
         break;
       case "Portfolio Attribution":
-        navigate("/portfolio-attribution");
+        navigate("/macro/portfolio-attribution");
         break;
       default:
         break;
@@ -30,27 +30,24 @@ const MacroNavbar: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case "/issue_market":
+      case "/macro/capital-markets":
+      case "/macro/capital-markets/":
+      case "/macro/capital-markets/deal-stats":
+      case "/macro/capital-markets/skew-table":
+      case "/macro/capital-markets/deal-filter":
         return 0;
-      case "/capital-markets":
-      case "/capital-markets/":
-      case "/capital-markets/deal-stats":
-      case "/capital-markets/skew-table":
-      case "/capital-markets/deal-filter":
+      case "/macro/monashee-deals":
+      case "/macro/monashee-deals/":
+      case "/macro/monashee-deals/deal-stats":
+      case "/macro/monashee-deals/screener":
+      case "/macro/monashee-deals/by-bank":
+      case "/macro/monashee-deals/weekly-tracking":
+      case "/macro/monashee-deals/follow-on-discount":
+      case "/macro/monashee-deals/gap-analysis":
         return 1;
-      case "/monashee-deals":
-      case "/monashee-deals/":
-      case "/monashee-deals/deal-stats":
-      case "/monashee-deals/screener":
-      case "/monashee-deals/by-bank":
-      case "/monashee-deals/weekly-tracking":
-      case "/monashee-deals/follow-on-discount":
-      case "/monashee-deals/gap-analysis":
+
+      case "/macro/portfolio-attribution":
         return 2;
-      case "/strategies":
-        return 3;
-      case "/portfolio-attribution":
-        return 4;
       default:
         return false;
     }

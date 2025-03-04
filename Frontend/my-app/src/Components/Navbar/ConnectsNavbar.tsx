@@ -15,13 +15,13 @@ const ConnectsNavbar: React.FC = () => {
   const handleNavigate = (page: string) => {
     switch (page) {
       case "Equity Market Opportunity":
-        navigate("/capital-markets");
+        navigate("/connects/capital-markets");
         break;
       case "Monashee Performance & Efficiency":
-        navigate("/monashee-deals");
+        navigate("/connects/monashee-deals");
         break;
       case "Portfolio Attribution":
-        navigate("/portfolio-attribution");
+        navigate("/connects/portfolio-attribution");
         break;
       default:
         break;
@@ -30,27 +30,25 @@ const ConnectsNavbar: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case "/issue_market":
+
+      case "/connects/capital-markets":
+      case "/connects/capital-markets/":
+      case "/connects/capital-markets/deal-stats":
+      case "/connects/capital-markets/skew-table":
+      case "/connects/capital-markets/deal-filter":
         return 0;
-      case "/capital-markets":
-      case "/capital-markets/":
-      case "/capital-markets/deal-stats":
-      case "/capital-markets/skew-table":
-      case "/capital-markets/deal-filter":
+      case "/connects/monashee-deals":
+      case "/connects/monashee-deals/":
+      case "/connects/monashee-deals/deal-stats":
+      case "/connects/monashee-deals/screener":
+      case "/connects/monashee-deals/by-bank":
+      case "/connects/monashee-deals/weekly-tracking":
+      case "/connects/monashee-deals/follow-on-discount":
+      case "/connects/monashee-deals/gap-analysis":
         return 1;
-      case "/monashee-deals":
-      case "/monashee-deals/":
-      case "/monashee-deals/deal-stats":
-      case "/monashee-deals/screener":
-      case "/monashee-deals/by-bank":
-      case "/monashee-deals/weekly-tracking":
-      case "/monashee-deals/follow-on-discount":
-      case "/monashee-deals/gap-analysis":
+
+      case "/connects/portfolio-attribution":
         return 2;
-      case "/strategies":
-        return 3;
-      case "/portfolio-attribution":
-        return 4;
       default:
         return false;
     }

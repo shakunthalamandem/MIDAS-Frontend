@@ -8,20 +8,20 @@ const pages = [
   "Portfolio Attribution",
 ];
 
-const HighYield: React.FC = () => {
+const HighYieldNavbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleNavigate = (page: string) => {
     switch (page) {
       case "Equity Market Opportunity":
-        navigate("/capital-markets");
+        navigate("/highyield/capital-markets");
         break;
       case "Monashee Performance & Efficiency":
-        navigate("/monashee-deals");
+        navigate("/highyield/monashee-deals");
         break;
       case "Portfolio Attribution":
-        navigate("/portfolio-attribution");
+        navigate("/highyield/portfolio-attribution");
         break;
       default:
         break;
@@ -30,27 +30,23 @@ const HighYield: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case "/issue_market":
+       case "/highyield/capital-markets":
+       case "/highyield/capital-markets/":
+       case "/highyield/capital-markets/deal-stats":
+       case "/highyield/capital-markets/skew-table":
+       case "/highyield/capital-markets/deal-filter":
         return 0;
-      case "/capital-markets":
-      case "/capital-markets/":
-      case "/capital-markets/deal-stats":
-      case "/capital-markets/skew-table":
-      case "/capital-markets/deal-filter":
+       case "/highyield/monashee-deals":
+       case "/highyield/monashee-deals/":
+       case "/highyield/monashee-deals/deal-stats":
+       case "/highyield/monashee-deals/screener":
+       case "/highyield/monashee-deals/by-bank":
+       case "/highyield/monashee-deals/weekly-tracking":
+       case "/highyield/monashee-deals/follow-on-discount":
+       case "/highyield/monashee-deals/gap-analysis":
         return 1;
-      case "/monashee-deals":
-      case "/monashee-deals/":
-      case "/monashee-deals/deal-stats":
-      case "/monashee-deals/screener":
-      case "/monashee-deals/by-bank":
-      case "/monashee-deals/weekly-tracking":
-      case "/monashee-deals/follow-on-discount":
-      case "/monashee-deals/gap-analysis":
+       case "/highyield/portfolio-attribution":
         return 2;
-      case "/strategies":
-        return 3;
-      case "/portfolio-attribution":
-        return 4;
       default:
         return false;
     }
@@ -97,4 +93,4 @@ const HighYield: React.FC = () => {
   );
 };
 
-export default HighYield;
+export default HighYieldNavbar;
