@@ -126,8 +126,6 @@ const NavbarMain: React.FC = () => {
             <img src={logo} alt="MIDAS Logo" style={{ width: "130px", height: "60px", marginRight: "10px" }} />
           </Link>
 
-          {/* Pass function to Sidebar */}
-          {/* <Sidebar onEquityClick={() => setShowNavbarTabs(true)} /> */}
             <NavbarTabs />
 
           {isLoggedIn && isSuperUser && (
@@ -150,12 +148,7 @@ const NavbarMain: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Conditionally Show NavbarTabs */}
-      {/* {showNavbarTabs && (
-        <Box sx={{ marginLeft: "240px", padding: "20px" }}>
-          <NavbarTabs />
-        </Box>
-      )} */}
+     
     </>
   );
 };
