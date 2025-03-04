@@ -12,6 +12,7 @@ import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/Tradin
 import Logs from "../Main/HomePage/Authentication/Logs";
 import Logout from "../Main/HomePage/Authentication/Logout";
 import NavbarTabs from "./NavbarTabs";
+import Sidebar from "./Sidebar";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const NavbarMain: React.FC = () => {
   const [showLogs, setShowLogs] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showNavbarTabs, setShowNavbarTabs] = useState(false); // State to show NavbarTabs
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const refresh_token = localStorage.getItem("refresh_token");
@@ -124,8 +126,8 @@ const NavbarMain: React.FC = () => {
             <img src={logo} alt="MIDAS Logo" style={{ width: "130px", height: "60px", marginRight: "10px" }} />
           </Link>
 
-          {/* NavbarTabs Component */}
-          <NavbarTabs />
+          {/* Pass function to Sidebar */}
+          <Sidebar onEquityClick={() => setShowNavbarTabs(true)} />
 
           {isLoggedIn && isSuperUser && (
             <Button sx={{ color: "black", fontWeight: "bold", marginRight: "20px" }} onClick={() => setShowLogs(true)}>
@@ -146,6 +148,13 @@ const NavbarMain: React.FC = () => {
           {showLogout && <Logout onConfirm={handleConfirmLogout} onCancel={handleCancelLogout} />}
         </Toolbar>
       </AppBar>
+
+      {/* Conditionally Show NavbarTabs */}
+      {showNavbarTabs && (
+        <Box sx={{ marginLeft: "240px", padding: "20px" }}>
+          <NavbarTabs />
+        </Box>
+      )}
     </>
   );
 };
