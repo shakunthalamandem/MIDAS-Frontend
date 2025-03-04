@@ -1,5 +1,10 @@
 import { Home, People, TrendingUp, Work } from "@mui/icons-material";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange"; 
+import LeaderboardIcon from "@mui/icons-material/Leaderboard"; 
+import ShowChartIcon from "@mui/icons-material/ShowChart"; 
+
+
 
 
 
@@ -27,10 +32,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onTabSelect }) => {
     >
       <Typography variant="h6" sx={{ p: 2, fontWeight: "bold" }}>Dashboard</Typography>
       <List>
-        {[{ name: "Equity", icon: <Home /> },
-          { name: "Converts", icon: <People /> },
+        {[{ name: "Equity", icon: <ShowChartIcon /> },
+          { name: "Converts", icon: <CurrencyExchangeIcon /> },
           { name: "High Yields", icon: <TrendingUp /> },
-          { name: "Macro", icon: <Work /> }]
+          { name: "Macro", icon: <LeaderboardIcon /> }]
           .map((tab) => (
             <ListItem key={tab.name} disablePadding>
               <ListItemButton onClick={() => handleTabClick(tab.name)}>
