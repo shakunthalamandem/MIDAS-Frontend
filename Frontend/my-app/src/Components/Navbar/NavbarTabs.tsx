@@ -17,7 +17,7 @@ const NavbarTabs: React.FC = () => {
   const handleNavigate = (page: string) => {
     switch (page) {
       case "New Deal Data":
-        navigate("/issue_market");
+        navigate("/equity/issue_market");
         break;
       case "Equity Market Opportunity":
         navigate("/equity/capital-markets");
@@ -29,7 +29,7 @@ const NavbarTabs: React.FC = () => {
         navigate("/equity/strategies");
         break;
       case "Portfolio Attribution":
-        navigate("/portfolio-attribution");
+        navigate("/equity/portfolio-attribution");
         break;
       default:
         break;
@@ -38,7 +38,7 @@ const NavbarTabs: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case "/issue_market":
+      case "/equity/issue_market":
         return 0;
       case "/equity/capital-markets":
       case "/equity/capital-markets/":
@@ -57,7 +57,7 @@ const NavbarTabs: React.FC = () => {
         return 2;
       case "/equity/strategies":
         return 3;
-      case "/portfolio-attribution":
+      case "/equity/portfolio-attribution":
         return 4;
       default:
         return false;
