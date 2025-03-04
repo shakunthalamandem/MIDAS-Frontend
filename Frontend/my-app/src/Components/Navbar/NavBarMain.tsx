@@ -65,13 +65,13 @@ const NavbarMain: React.FC = () => {
     location.pathname === "/equity/capital-markets" ||
     location.pathname === "/equity/monashee-deals" ||
     location.pathname === "/equity/portfolio-attribution" ||
-    location.pathname === "/issue_market";
+    location.pathname === "/equity/issue_market";
 
   return (
     <>
       <AppBar position="sticky" sx={{ backgroundColor: "#FFFFFF" }}>
         {(location.pathname === "/equity/strategies" ||
-          location.pathname.startsWith("/technical/")) && (
+          location.pathname.startsWith("/equity/technical/")) && (
           <Box sx={{ marginBottom: "50px" }}>
             <TradingViewTickerTape />
           </Box>
