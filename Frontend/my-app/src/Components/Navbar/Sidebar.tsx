@@ -1,4 +1,4 @@
-import { Home, People, TrendingUp, Work } from "@mui/icons-material";
+import {  TrendingUp } from "@mui/icons-material";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange"; 
 import LeaderboardIcon from "@mui/icons-material/Leaderboard"; 
