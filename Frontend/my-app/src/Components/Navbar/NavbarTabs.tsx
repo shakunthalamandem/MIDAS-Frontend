@@ -20,13 +20,13 @@ const NavbarTabs: React.FC = () => {
         navigate("/issue_market");
         break;
       case "Equity Market Opportunity":
-        navigate("/capital-markets");
+        navigate("/equity/capital-markets");
         break;
       case "Monashee Performance & Efficiency":
-        navigate("/monashee-deals");
+        navigate("/equity/monashee-deals");
         break;
       case "PRIME Investment Strategies":
-        navigate("/strategies");
+        navigate("/equity/strategies");
         break;
       case "Portfolio Attribution":
         navigate("/portfolio-attribution");
@@ -40,22 +40,22 @@ const NavbarTabs: React.FC = () => {
     switch (location.pathname) {
       case "/issue_market":
         return 0;
-      case "/capital-markets":
-      case "/capital-markets/":
-      case "/capital-markets/deal-stats":
-      case "/capital-markets/skew-table":
-      case "/capital-markets/deal-filter":
+      case "/equity/capital-markets":
+      case "/equity/capital-markets/":
+      case "/equity/capital-markets/deal-stats":
+      case "/equity/capital-markets/skew-table":
+      case "/equity/capital-markets/deal-filter":
         return 1;
-      case "/monashee-deals":
-      case "/monashee-deals/":
-      case "/monashee-deals/deal-stats":
-      case "/monashee-deals/screener":
-      case "/monashee-deals/by-bank":
-      case "/monashee-deals/weekly-tracking":
-      case "/monashee-deals/follow-on-discount":
-      case "/monashee-deals/gap-analysis":
+      case "/equity/monashee-deals":
+      case "/equity/monashee-deals/":
+      case "/equity/monashee-deals/deal-stats":
+      case "/equity/monashee-deals/screener":
+      case "/equity/monashee-deals/by-bank":
+      case "/equity/monashee-deals/weekly-tracking":
+      case "/equity/monashee-deals/follow-on-discount":
+      case "/equity/monashee-deals/gap-analysis":
         return 2;
-      case "/strategies":
+      case "/equity/strategies":
         return 3;
       case "/portfolio-attribution":
         return 4;

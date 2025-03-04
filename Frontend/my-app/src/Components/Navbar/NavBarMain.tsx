@@ -62,15 +62,15 @@ const NavbarMain: React.FC = () => {
   const isLoggedIn = !!localStorage.getItem("access_token");
 
   const isMarketOrPerformanceSelected =
-    location.pathname === "/capital-markets" ||
-    location.pathname === "/monashee-deals" ||
-    location.pathname === "/portfolio-attribution" ||
+    location.pathname === "/equity/capital-markets" ||
+    location.pathname === "/equity/monashee-deals" ||
+    location.pathname === "/equity/portfolio-attribution" ||
     location.pathname === "/issue_market";
 
   return (
     <>
       <AppBar position="sticky" sx={{ backgroundColor: "#FFFFFF" }}>
-        {(location.pathname === "/strategies" ||
+        {(location.pathname === "/equity/strategies" ||
           location.pathname.startsWith("/technical/")) && (
           <Box sx={{ marginBottom: "50px" }}>
             <TradingViewTickerTape />

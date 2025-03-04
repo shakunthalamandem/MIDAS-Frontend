@@ -69,7 +69,7 @@ const MonasheeDeals: React.FC = () => {
     ];
 
     // Update the URL based on the tab index
-    navigate(`/monashee-deals/${tabPaths[newValue]}`);
+    navigate(`/equity/monashee-deals/${tabPaths[newValue]}`);
   };
 
   // Handle search input and fetching results
