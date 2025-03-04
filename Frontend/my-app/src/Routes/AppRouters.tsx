@@ -28,6 +28,9 @@ import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
 import SelectedTicker from "../Components/Main/MonasheeGraphs/SelectedTicker";
 import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable";
 import HighYieldsMain from "../Components/HighYields/HighYieldsMain";
+import DealStatsMain from "../Components/HighYields/Tabs/DealStatsMain";
+import HYSkewTableMain from "../Components/HighYields/Tabs/HYSkewTableMain";
+import SelectedDealHYMain from "../Components/HighYields/Tabs/SelectedDealHYMain";
 
 
 
@@ -56,9 +59,9 @@ const AppRouters: React.FC = () => {
         </Route>
 
         <Route path="/highyield/capital-markets" element={<AuthGuard><HighYieldsMain /></AuthGuard>} >
-          <Route path="search" element={<SelectedTicker ticker={'AS'}/>} />
-          <Route path="deal-stats" element={<DealStats />} />
-          <Route path="skew-table" element={<AllocationCaptureReturn />} />
+          <Route path="search" element={<SelectedDealHYMain/>} />
+          <Route path="deal-stats" element={<DealStatsMain />} />
+          <Route path="skew-table" element={<HYSkewTableMain />} />
         </Route>
 
 
