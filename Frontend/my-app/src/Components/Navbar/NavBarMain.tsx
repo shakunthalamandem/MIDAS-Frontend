@@ -127,7 +127,8 @@ const NavbarMain: React.FC = () => {
           </Link>
 
           {/* Pass function to Sidebar */}
-          <Sidebar onEquityClick={() => setShowNavbarTabs(true)} />
+          {/* <Sidebar onEquityClick={() => setShowNavbarTabs(true)} /> */}
+            <NavbarTabs />
 
           {isLoggedIn && isSuperUser && (
             <Button sx={{ color: "black", fontWeight: "bold", marginRight: "20px" }} onClick={() => setShowLogs(true)}>
@@ -150,11 +151,11 @@ const NavbarMain: React.FC = () => {
       </AppBar>
 
       {/* Conditionally Show NavbarTabs */}
-      {showNavbarTabs && (
+      {/* {showNavbarTabs && (
         <Box sx={{ marginLeft: "240px", padding: "20px" }}>
           <NavbarTabs />
         </Box>
-      )}
+      )} */}
     </>
   );
 };
