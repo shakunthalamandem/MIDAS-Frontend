@@ -21,7 +21,6 @@ const NavbarMain: React.FC = () => {
   const [showLogs, setShowLogs] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showNavbarTabs, setShowNavbarTabs] = useState(false); // State to show NavbarTabs
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const refresh_token = localStorage.getItem("refresh_token");
@@ -61,11 +60,7 @@ const NavbarMain: React.FC = () => {
 
   const isLoggedIn = !!localStorage.getItem("access_token");
 
-  const isMarketOrPerformanceSelected =
-    location.pathname === "/equity/capital-markets" ||
-    location.pathname === "/equity/monashee-deals" ||
-    location.pathname === "/equity/portfolio-attribution" ||
-    location.pathname === "/equity/issue_market";
+
 
   return (
     <>
@@ -77,7 +72,6 @@ const NavbarMain: React.FC = () => {
           </Box>
         )}
 
-        {isMarketOrPerformanceSelected && (
           <Box
             sx={{
               width: "100%",
@@ -119,7 +113,6 @@ const NavbarMain: React.FC = () => {
               </span>
             </Typography>
           </Box>
-        )}
 
         <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
