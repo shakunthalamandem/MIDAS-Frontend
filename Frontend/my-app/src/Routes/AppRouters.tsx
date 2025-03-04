@@ -39,12 +39,12 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/logout" element={<Logout />} /> */}
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
-        <Route path="/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
+        <Route path="/equity/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
 
 
 
 
-        <Route path="/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} >
+        <Route path="/equity/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} >
           <Route path="search" element={<SelectedTicker ticker={'AS'}/>} />
           <Route path="deal-stats" element={<DealStats />} />
           <Route path="skew-table" element={<AllocationCaptureReturn />} />
@@ -53,7 +53,7 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
+        <Route path="/equity/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
           <Route path="search" element={<SelectedTicker ticker={'CGRX'}/>} />
           <Route path="deal-stats" element={<DealStats />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
@@ -65,15 +65,15 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path="/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} />
-        <Route path="/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
-        <Route path="/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
-        <Route path="/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
-        <Route path="/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
-        <Route path="/tickerperformance/:ticker" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
-        <Route path="/fund/:fund" element={<AuthGuard><FundWiseTable /></AuthGuard>} />
+        <Route path="/equity/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} />
+        <Route path="/equity/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
+        <Route path="/equity/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
+        <Route path="/equity/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
+        <Route path="/equity/monasheeperformance/:ticker" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
+        <Route path="/equity/tickerperformance/:ticker" element={<AuthGuard><CapitalMarkets /></AuthGuard>} />
+        <Route path="/equity/fund/:fund" element={<AuthGuard><FundWiseTable /></AuthGuard>} />
 
-        <Route path="/detailed_gap_analysis" element={<AuthGuard><DetailedGapData /></AuthGuard>} />
+        <Route path="/equity/detailed_gap_analysis" element={<AuthGuard><DetailedGapData /></AuthGuard>} />
 
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/email-verification" element={<EmailVerification />} />
