@@ -1,9 +1,15 @@
-import React from 'react'
+import React from 'react';
+import DealStatsfilter from './DealStatsfilter';
+
+ // Adjust the import path as needed
 
 const DealStatsMain = () => {
   return (
-    <div>DealStatsMain</div>
-  )
-}
+    <div>
+      <h2>Deal Stats Main</h2>
+      <DealStatsfilter />
+    </div>
+  );
+};
 
-export default DealStatsMain
+export default DealStatsMain;
