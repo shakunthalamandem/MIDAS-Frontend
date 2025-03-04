@@ -144,7 +144,7 @@ const Fundwisedata: React.FC = () => {
                                 {data.map((row, index) => (
                                     <TableRow key={index} sx={{ backgroundColor: index % 2 ? "#f5f5f5" : "#ffffff" }}>
                                         <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
-                                            <Link to={`/fund/${row.fund}`} style={{ color: "#A52A2A", textDecoration: "none" }} target="_blank">
+                                            <Link to={`/equity/fund/${row.fund}`} style={{ color: "#A52A2A", textDecoration: "none" }} target="_blank">
                                                 {row.fund}
                                             </Link>
                                         </TableCell>

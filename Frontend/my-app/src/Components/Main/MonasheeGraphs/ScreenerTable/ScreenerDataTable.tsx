@@ -150,7 +150,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData ,h
           }}
         >
           <Link
-            to={`/tickerperformance/${params.value}`}
+            to={`/equity/tickerperformance/${params.value}`}
             style={{ color: "#1E88E5", textDecoration: "none" }}
             target="_blank"
           >

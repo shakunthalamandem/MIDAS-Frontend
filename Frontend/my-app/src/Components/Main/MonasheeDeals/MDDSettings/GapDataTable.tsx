@@ -93,7 +93,7 @@ const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
         >
 
           <Link
-            to={`/monasheeperformance/${params.value}`}
+            to={`/equity/monasheeperformance/${params.value}`}
             style={{ color: "brown", fontWeight: "bold",paddingLeft:15,textDecoration: "none" }}
             target="_blank"
           >
