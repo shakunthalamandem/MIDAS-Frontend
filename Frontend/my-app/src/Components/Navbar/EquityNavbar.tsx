@@ -60,7 +60,7 @@ const EquityNavbar: React.FC = () => {
       case "/equity/portfolio-attribution":
         return 4;
       default:
-        return false;
+        return 0;
     }
   };
 

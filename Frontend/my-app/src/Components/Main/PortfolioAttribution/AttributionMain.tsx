@@ -10,7 +10,7 @@ const AttributionMain = () => {
     <Router>
       <Routes>
         <Route path="/" element={<PortfolioAttribution />} />
-        <Route path="/equity/fund/:fundId" element={<FundWiseTable />} />
+        <Route path="/equity/portfolio-attribution/fund/:fundId" element={<FundWiseTable />} />
       </Routes>
     </Router>
   );

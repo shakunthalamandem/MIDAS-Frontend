@@ -49,7 +49,7 @@ const MacroNavbar: React.FC = () => {
       case "/macro/portfolio-attribution":
         return 2;
       default:
-        return false;
+        return 0;
     }
   };
 
