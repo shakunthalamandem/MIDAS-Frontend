@@ -22,8 +22,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onTabSelect }) => {
 
   const menuItems = [
     { name: "Equity", icon: <ShowChartIcon /> },
-    { name: "Converts", icon: <CurrencyExchangeIcon /> },
     { name: "High Yields", icon: <TrendingUp /> },
+    { name: "Converts", icon: <CurrencyExchangeIcon /> },
     { name: "Macro", icon: <LeaderboardIcon /> }
   ];
 
