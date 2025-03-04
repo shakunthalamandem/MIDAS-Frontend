@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AppBar, Toolbar, Button, Box, Typography } from "@mui/material";
+import { AppBar, Toolbar, Button, Box, Typography, IconButton } from "@mui/material";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
@@ -10,10 +10,11 @@ import EquityNavbar from "./EquityNavbar"; // Example import
 import ConvertsNavbar from "./ConvertsNavbar"; // Example import
 import HighYieldNavbar from "./HighYieldNavbar"; // Example import
 import MacroNavbar from "./MacroNavbar"; // Example import
+import MenuIcon from '@mui/icons-material/Menu'; // Import MenuIcon
 
 const NavbarMain: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>(""); // State to track selected tab
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(true); // Default sidebar open
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false); // Sidebar initially closed
   const navigate = useNavigate();
   const location = useLocation();
   const isSuperUser = localStorage.getItem("is_superuser") === "true";
@@ -63,6 +64,11 @@ const NavbarMain: React.FC = () => {
   };
 
   const isLoggedIn = !!localStorage.getItem("access_token");
+
+  // Toggle the drawer open and close
+  const handleSidebarToggle = () => {
+    setDrawerOpen(!drawerOpen); // Toggle the drawer state
+  };
 
   return (
     <>
@@ -116,6 +122,15 @@ const NavbarMain: React.FC = () => {
         </Box>
 
         <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <IconButton
+            aria-label="open sidebar"
+            edge="start"
+            onClick={handleSidebarToggle}
+            sx={{ mr: 2 ,color:'#002060'}} // margin to the right of the button
+          >
+            <MenuIcon />
+          </IconButton>
+
           <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
             <img src={logo} alt="MIDAS Logo" style={{ width: "130px", height: "60px", marginRight: "10px" }} />
           </Link>
@@ -146,7 +161,6 @@ const NavbarMain: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Sidebar is always open by default */}
       <Sidebar open={drawerOpen} onClose={() => setDrawerOpen(false)} onTabSelect={handleTabSelect} />
     </>
   );
