@@ -3,9 +3,9 @@ import { Tabs, Tab, Box } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const pages = [
-  "Equity Market Opportunity",
-  "Monashee Performance & Efficiency",
-  "Portfolio Attribution",
+  "Sector Comparison",
+  // "Monashee Performance & Efficiency",
+  // "Portfolio Attribution",
 ];
 
 const MacroNavbar: React.FC = () => {
@@ -14,8 +14,8 @@ const MacroNavbar: React.FC = () => {
 
   const handleNavigate = (page: string) => {
     switch (page) {
-      case "Equity Market Opportunity":
-        navigate("/macro/capital-markets");
+      case "Sector Comparison":
+        navigate("/macro/sector");
         break;
       case "Monashee Performance & Efficiency":
         navigate("/macro/monashee-deals");
@@ -30,7 +30,7 @@ const MacroNavbar: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case "/macro/capital-markets":
+      case "/macro/sector":
       case "/macro/capital-markets/":
       case "/macro/capital-markets/deal-stats":
       case "/macro/capital-markets/skew-table":
