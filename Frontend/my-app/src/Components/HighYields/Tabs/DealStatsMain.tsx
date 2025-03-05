@@ -23,29 +23,28 @@ const DealStatsMain = () => {
     start_year: number;
     end_year: number;
     sector: string;
-    sp_rating: string;
+    sp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: '',
-    sp_rating: '',
+    sp_rating: [],
     year_period: 'Yearly',
   });
   const [appliedFilters, setAppliedFilters] = useState<{
     start_year: number;
     end_year: number;
     sector: string;
-    sp_rating: string;
+    sp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: '',
-    sp_rating: '',
+    sp_rating: [],
     year_period: 'Yearly',
   });
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
@@ -83,18 +82,19 @@ const DealStatsMain = () => {
     setSelectedFilters({ ...selectedFilters, [category]: event.target.value });
   };
 
-  const handleCheckboxChange = (option: string) => {
-    setSelectedOptions(prevSelected =>
-      prevSelected.includes(option)
-        ? prevSelected.filter(item => item !== option)
-        : [...prevSelected, option]
-    );
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, rating: string) => {
+    setSelectedFilters((prev) => {
+      const newSPRatings = event.target.checked
+        ? [...prev.sp_rating, rating]
+        : prev.sp_rating.filter((item) => item !== rating);
+
+      return { ...prev, sp_rating: newSPRatings };
+    });
   };
 
   const handleApply = () => {
     setAppliedFilters({ ...selectedFilters });
     console.log('Applied Filters:', selectedFilters);
-    console.log('Applied Checkbox Options:', selectedOptions);
   };
 
   const handleReset = () => {
@@ -102,15 +102,14 @@ const DealStatsMain = () => {
       start_year: 2012,
       end_year: 2025,
       sector: '',
-      sp_rating: '',
+      sp_rating: [],
       year_period: '',
     });
-    setSelectedOptions([]);
     setAppliedFilters({
       start_year: 2012,
       end_year: 2025,
       sector: '',
-      sp_rating: '',
+      sp_rating: [],
       year_period: '',
     });
   };
@@ -122,9 +121,7 @@ const DealStatsMain = () => {
     <>
       <Container>
         <Card sx={{ mt: 2, mb: 2 }}>
-
           <CardContent>
-
             <Container maxWidth="lg">
               <Grid container spacing={3}>
                 {/* Start Year Filter */}
@@ -168,21 +165,39 @@ const DealStatsMain = () => {
                 <Grid item xs={12} sm={6} md={2}>
                   <FormControl fullWidth variant="outlined" size="small">
                     <InputLabel>SP Rating</InputLabel>
-                    <Select value={selectedFilters.sp_rating} onChange={handleFilterChange('sp_rating')} label="SP Rating">
-                      <MenuItem value="">All</MenuItem>
-                      {filters.sp_rating.map((rating) => (
-                        <MenuItem key={rating} value={rating}>{rating}</MenuItem>
+                    <Select
+                      multiple
+                      value={selectedFilters.sp_rating}
+                      onChange={handleFilterChange('sp_rating')}
+                      renderValue={(selected) => selected.join(', ')}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 300, // Limit the dropdown height to allow scrolling
+                            overflowY: 'auto',
+                          },
+                        },
+                      }}
+                    >
+                      {filters.sp_rating.sort().map((rating) => (
+                        <MenuItem key={rating} value={rating} sx={{ fontSize: '0.875rem' }}>
+                          <Checkbox
+                            checked={selectedFilters.sp_rating.includes(rating)}
+                            sx={{ transform: 'scale(0.8)' }} // Scale the checkbox to make it smaller
+                          />
+                          <Typography sx={{ fontSize: '1rem' }}>{rating}</Typography> {/* Reduce the text size */}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
+
 
                 {/* Period Filter */}
                 <Grid item xs={12} sm={6} md={2}>
                   <FormControl fullWidth variant="outlined" size="small">
                     <InputLabel>Period</InputLabel>
                     <Select value={selectedFilters.year_period} onChange={handleFilterChange('year_period')} label="Period">
-                     
                       {['Yearly', 'Quarterly', 'Monthly'].map((period) => (
                         <MenuItem key={period} value={period}>{period}</MenuItem>
                       ))}
