@@ -109,11 +109,12 @@ const SectorMacroChart: React.FC = () => {
           </Typography>
 
           <Box display="flex" gap={2} mb={2}>
-            {["1y", "5y", "3y", "1m", "3m", "6m"].map((period) => (
+            {["5y", "3y", "1y", "6m", "3m", "1m"].map((period) => (
               <Button
                 key={period}
                 variant={selectedPeriod === period ? "contained" : "outlined"}
                 onClick={() => handleButtonClick(period)}
+                sx={{color:"#002060",border:'1px solid #002060'}}
               >
                 {period}
               </Button>
