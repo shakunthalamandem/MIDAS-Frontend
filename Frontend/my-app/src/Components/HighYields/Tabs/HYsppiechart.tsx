@@ -3,44 +3,40 @@ import { CircularProgress, Typography, Alert, Box } from '@mui/material';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 
 interface SelectedFilters {
-    [key: string]: any;
-  }
-  interface DataType {
-    [key: string]: {
-      count: number;
-    };
+  [key: string]: any;
 }
-  const HYsppiechart = ({ selectedFilters }: { selectedFilters: SelectedFilters }) => {
- 
-  
+interface DataType {
+  [key: string]: {
+    count: number;
+  };
+}
 
-
-  
+const HYsppiechart = ({ selectedFilters }: { selectedFilters: SelectedFilters }) => {
   const [data, setData] = useState<DataType | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<Error | null>(null); // Explicitly typing the error state
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem('access_token');
 
         if (!apiUrl) {
-          throw new Error("API URL is not defined in environment variables");
+          throw new Error('API URL is not defined in environment variables');
         }
 
         const response = await fetch(`${apiUrl}/api/high_yields_graph/`, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : "",
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '',
           },
           body: JSON.stringify(selectedFilters),
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch data");
+          throw new Error('Failed to fetch data');
         }
 
         const result = await response.json();
@@ -48,7 +44,7 @@ interface SelectedFilters {
       } catch (error) {
         if (error instanceof Error) {
           setError(error);
-        } 
+        }
       } finally {
         setLoading(false);
       }
@@ -57,18 +53,12 @@ interface SelectedFilters {
     fetchData();
   }, [selectedFilters]);
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
+  if (loading) return <p>Loading...</p>;
   if (error) {
+    // Check for the error before accessing its message
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <Alert severity="error">{error.message}</Alert>
+        <Alert severity="error">{error?.message}</Alert>
       </Box>
     );
   }
@@ -96,15 +86,7 @@ interface SelectedFilters {
       </Typography>
       <Box sx={{ width: '100%', maxWidth: 600 }}>
         <PieChart width={400} height={400}>
-          <Pie
-            data={chartData}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={150}
-            label
-          >
+          <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={150} label>
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
             ))}
