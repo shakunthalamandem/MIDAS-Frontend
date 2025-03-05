@@ -34,7 +34,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onTabSelect }) => {
       open={open}
       onClose={onClose}
       sx={{
-        '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box', backgroundColor: '#002060', color: 'white' }
+        '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box', backgroundColor: '#002060', color: 'white',      marginTop: '148px' 
+        }
       }}
     >
       <Typography variant="h6" sx={{ p: 2, fontWeight: "bold" }}>Dashboard</Typography>
