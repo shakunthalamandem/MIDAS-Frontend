@@ -114,7 +114,7 @@ const SectorMacroChart: React.FC = () => {
                 key={period}
                 variant={selectedPeriod === period ? "contained" : "outlined"}
                 onClick={() => handleButtonClick(period)}
-                sx={{color:"#002060",border:'1px solid #002060'}}
+                sx={{ color: "#002060", border: "1px solid #002060" }}
               >
                 {period}
               </Button>
@@ -142,20 +142,72 @@ const SectorMacroChart: React.FC = () => {
                 <Line type="monotone" dataKey="snp_500" stroke="#8884d8" />
                 <Line type="monotone" dataKey="dow_jones" stroke="#82ca9d" />
                 <Line type="monotone" dataKey="russell_2000" stroke="#ffc658" />
-                <Line type="monotone" dataKey="sp500_consumer_discretionary" stroke="#ff7300" />
-                <Line type="monotone" dataKey="sp500_consumer_staples" stroke="#00C49F" />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_consumer_discretionary"
+                  stroke="#ff7300"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_consumer_staples"
+                  stroke="#00C49F"
+                />
                 <Line type="monotone" dataKey="sp500_energy" stroke="#FFBB28" />
-                <Line type="monotone" dataKey="sp500_financials" stroke="#FF8042" />
-                <Line type="monotone" dataKey="sp500_healthcare" stroke="#FF0033" />
-                <Line type="monotone" dataKey="sp500_industrials" stroke="#7C4DFF" />
-                <Line type="monotone" dataKey="sp500_information_technology" stroke="#8E24AA" />
-                <Line type="monotone" dataKey="sp500_materials" stroke="#9E9E9E" />
-                <Line type="monotone" dataKey="sp500_telecom_services" stroke="#607D8B" />
-                <Line type="monotone" dataKey="sp500_utilities" stroke="#039BE5" />
-                <Line type="monotone" dataKey="sp500_real_estate" stroke="#4CAF50" />
-                <Line type="monotone" dataKey="sp500_technology" stroke="#D32F2F" />
-                <Line type="monotone" dataKey="sp500_oil_gas" stroke="#2196F3" />
-                <Line type="monotone" dataKey="sp500_insurance_industry" stroke="#FF5722" />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_financials"
+                  stroke="#FF8042"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_healthcare"
+                  stroke="#FF0033"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_industrials"
+                  stroke="#7C4DFF"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_information_technology"
+                  stroke="#8E24AA"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_materials"
+                  stroke="#9E9E9E"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_telecom_services"
+                  stroke="#607D8B"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_utilities"
+                  stroke="#039BE5"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_real_estate"
+                  stroke="#4CAF50"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_technology"
+                  stroke="#D32F2F"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_oil_gas"
+                  stroke="#2196F3"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sp500_insurance_industry"
+                  stroke="#FF5722"
+                />
               </LineChart>
             </ResponsiveContainer>
           )}
