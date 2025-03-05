@@ -71,8 +71,8 @@ const SectorMacroChart: React.FC = () => {
         }
 
         const responseData = await response.json();
-        setData(responseData.returns); // Set chart data
-        setSectorsData(responseData.sectors); // Set sectors data
+        setData(responseData); // Set chart data
+        // setSectorsData(responseData.sectors); // Set sectors data
         setError(null); // Clear error if data is fetched successfully
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -133,7 +133,6 @@ const SectorMacroChart: React.FC = () => {
           ) : (
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
