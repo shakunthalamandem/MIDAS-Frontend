@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, FormControlLabel, CardContent, Card, Container } from '@mui/material';
+import DealStatsGraph from './DealStatsMain';
 
 interface HighYieldOptions {
   start_year: string[];
@@ -91,6 +92,7 @@ const HYFilters = () => {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
+    <>
     <Card>
       <CardContent>
         <Typography variant="h5" gutterBottom>
@@ -213,6 +215,8 @@ const HYFilters = () => {
         </Box>
       </CardContent>
     </Card>
+    <DealStatsGraph selectedFilters={undefined} />
+    </>
   );
 };
 
