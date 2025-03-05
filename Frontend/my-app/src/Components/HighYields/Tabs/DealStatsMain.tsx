@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, FormControlLabel, CardContent, Card, Container } from '@mui/material';
 import HyDealStatGraph from './HyDealStatGraph';
+import HYsppiechart from './HYsppiechart';
 
 interface HighYieldOptions {
   start_year: number[];
@@ -227,6 +228,7 @@ const DealStatsMain = () => {
 
       {/* Pass only applied filters to the graph */}
       <HyDealStatGraph selectedFilters={appliedFilters} />
+      <HYsppiechart selectedFilters={appliedFilters} />
     </>
   );
 };
