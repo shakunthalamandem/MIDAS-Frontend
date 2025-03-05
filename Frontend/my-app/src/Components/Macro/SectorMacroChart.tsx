@@ -70,16 +70,17 @@ const SectorMacroChart: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state
 
-  // Use a more flexible type for the visibleLines state
-  const [visibleLines, setVisibleLines] = useState<Record<SectorKey, boolean>>(
+ 
+const [visibleLines, setVisibleLines] = useState<Record<SectorKey, boolean>>(
     sectors.reduce(
       (acc, sector) => {
-        acc[sector] = true;
+        acc[sector] = ["snp_500", "dow_jones", "russell_2000"].includes(sector);
         return acc;
       },
       {} as Record<SectorKey, boolean>
     )
   );
+  
 
   useEffect(() => {
     const fetchData = async () => {
