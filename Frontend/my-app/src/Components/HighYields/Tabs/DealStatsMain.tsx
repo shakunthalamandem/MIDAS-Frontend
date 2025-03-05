@@ -3,10 +3,9 @@ import axios from 'axios';
 import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, FormControlLabel, CardContent, Card, Container } from '@mui/material';
 import HyDealStatGraph from './HyDealStatGraph';
 
-
 interface HighYieldOptions {
-  start_year: string[];
-  end_year: string[];
+  start_year: number[];
+  end_year: number[];
   sector: string[];
   sp_rating: string[];
 }
@@ -20,9 +19,28 @@ const DealStatsMain = () => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedFilters, setSelectedFilters] = useState<any>({
-    start_year: '',
-    end_year: '',
+  const [selectedFilters, setSelectedFilters] = useState<{
+    start_year: number;
+    end_year: number;
+    sector: string;
+    sp_rating: string;
+    period: string;
+  }>({
+    start_year: 2012,
+    end_year: 2025,
+    sector: '',
+    sp_rating: '',
+    period: '',
+  });
+  const [appliedFilters, setAppliedFilters] = useState<{
+    start_year: number;
+    end_year: number;
+    sector: string;
+    sp_rating: string;
+    period: string;
+  }>({
+    start_year: 2012,
+    end_year: 2025,
     sector: '',
     sp_rating: '',
     period: '',
@@ -74,19 +92,27 @@ const DealStatsMain = () => {
   };
 
   const handleApply = () => {
+    setAppliedFilters({ ...selectedFilters });
     console.log('Applied Filters:', selectedFilters);
     console.log('Applied Checkbox Options:', selectedOptions);
   };
 
   const handleReset = () => {
     setSelectedFilters({
-      start_year: '',
-      end_year: '',
+      start_year: 2012,
+      end_year: 2025,
       sector: '',
       sp_rating: '',
       period: '',
     });
     setSelectedOptions([]);
+    setAppliedFilters({
+      start_year: 2012,
+      end_year: 2025,
+      sector: '',
+      sp_rating: '',
+      period: '',
+    });
   };
 
   if (loading) return <CircularProgress />;
@@ -94,129 +120,100 @@ const DealStatsMain = () => {
 
   return (
     <>
-    <Container>
-    <Card sx={{ mt: 2 ,mb: 2}}> 
+      <Container>
+        <Card sx={{ mt: 2, mb: 2 }}>
 
-      <CardContent>
+          <CardContent>
 
-        <Container maxWidth="lg">
-          <Grid container spacing={3}>
-            {/* Start Year Filter */}
-            <Grid item xs={12} sm={6} md={2}>
-              <FormControl fullWidth variant="outlined" size="small">
-                <InputLabel>Start Year</InputLabel>
-                <Select value={selectedFilters.start_year} onChange={handleFilterChange('start_year')} label="Start Year">
-                  <MenuItem value="">All</MenuItem>
-                  {filters.start_year.map((year) => (
-                    <MenuItem key={year} value={year}>{year}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+            <Container maxWidth="lg">
+              <Grid container spacing={3}>
+                {/* Start Year Filter */}
+                <Grid item xs={12} sm={6} md={2}>
+                  <FormControl fullWidth variant="outlined" size="small">
+                    <InputLabel>Start Year</InputLabel>
+                    <Select value={selectedFilters.start_year} onChange={handleFilterChange('start_year')} label="Start Year">
+                      <MenuItem value="">All</MenuItem>
+                      {filters.start_year.map((year) => (
+                        <MenuItem key={year} value={year}>{year}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
 
-            {/* End Year Filter */}
-            <Grid item xs={12} sm={6} md={2}>
-              <FormControl fullWidth variant="outlined" size="small">
-                <InputLabel>End Year</InputLabel>
-                <Select value={selectedFilters.end_year} onChange={handleFilterChange('end_year')} label="End Year">
-                  <MenuItem value="">All</MenuItem>
-                  {filters.end_year.map((year) => (
-                    <MenuItem key={year} value={year}>{year}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                {/* End Year Filter */}
+                <Grid item xs={12} sm={6} md={2}>
+                  <FormControl fullWidth variant="outlined" size="small">
+                    <InputLabel>End Year</InputLabel>
+                    <Select value={selectedFilters.end_year} onChange={handleFilterChange('end_year')} label="End Year">
+                      <MenuItem value="">All</MenuItem>
+                      {filters.end_year.map((year) => (
+                        <MenuItem key={year} value={year}>{year}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
 
-            {/* Sector Filter with Checkbox Inside */}
-            <Grid item xs={12} sm={6} md={2}>
-  <FormControl fullWidth variant="outlined" size="small">
-    <InputLabel>Sector</InputLabel>
-    <Select
-      value={selectedFilters.sector}
-      onChange={handleFilterChange('sector')}
-      label="Sector"
-    >
-      <MenuItem value="">All</MenuItem>
-      {filters.sector.map((sec) => (
-        <MenuItem key={sec} value={sec}>
-          {sec}
-        </MenuItem>
-      ))}
-    </Select>
-    {/* Uncomment this block if you want to include the checkbox option */}
-    {/* 
-    <FormControlLabel
-      control={
-        <Checkbox
-          checked={selectedOptions.includes('sectorOption')}
-          onChange={() => handleCheckboxChange('sectorOption')}
-          sx={{
-            "&.Mui-checked": {
-              color: "#002060",
-            },
-          }}
-        />
-      }
-      label="Select Sector Option"
-    />
-    */}
-  </FormControl>
-</Grid>
+                {/* Sector Filter */}
+                <Grid item xs={12} sm={6} md={2}>
+                  <FormControl fullWidth variant="outlined" size="small">
+                    <InputLabel>Sector</InputLabel>
+                    <Select value={selectedFilters.sector} onChange={handleFilterChange('sector')} label="Sector">
+                      <MenuItem value="">All</MenuItem>
+                      {filters.sector.map((sec) => (
+                        <MenuItem key={sec} value={sec}>{sec}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
 
+                {/* SP Rating Filter */}
+                <Grid item xs={12} sm={6} md={2}>
+                  <FormControl fullWidth variant="outlined" size="small">
+                    <InputLabel>SP Rating</InputLabel>
+                    <Select value={selectedFilters.sp_rating} onChange={handleFilterChange('sp_rating')} label="SP Rating">
+                      <MenuItem value="">All</MenuItem>
+                      {filters.sp_rating.map((rating) => (
+                        <MenuItem key={rating} value={rating}>{rating}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
 
-            {/* SP Rating Filter with Checkbox Inside */}
-            <Grid item xs={12} sm={6} md={2}>
-  <FormControl fullWidth variant="outlined" size="small">
-    <InputLabel>SP Rating</InputLabel>
-    <Select
-      value={selectedFilters.sp_rating}
-      onChange={handleFilterChange('sp_rating')}
-      label="SP Rating"
-    >
-      <MenuItem value="">All</MenuItem>
-      {filters.sp_rating.map((rating) => (
-        <MenuItem key={rating} value={rating}>
-          {rating}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-</Grid>
+                {/* Period Filter */}
+                <Grid item xs={12} sm={6} md={2}>
+                  <FormControl fullWidth variant="outlined" size="small">
+                    <InputLabel>Period</InputLabel>
+                    <Select value={selectedFilters.period} onChange={handleFilterChange('period')} label="Period">
+                      <MenuItem value="">All</MenuItem>
+                      {['Yearly', 'Quarterly', 'Monthly'].map((period) => (
+                        <MenuItem key={period} value={period}>{period}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Container>
 
+            {/* Apply and Reset Buttons Centered */}
+            <Box display="flex" justifyContent="center" mt={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleApply}
+                sx={{ mr: 2, bgcolor: "#002060" }}
+              >
+                Apply
+              </Button>
+              <Button variant="outlined" color="secondary" onClick={handleReset}>
+                Reset
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
 
-            {/* Period Filter */}
-            <Grid item xs={12} sm={6} md={2}>
-              <FormControl fullWidth variant="outlined" size="small">
-                <InputLabel>Period</InputLabel>
-                <Select value={selectedFilters.period} onChange={handleFilterChange('period')} label="Period">
-                  <MenuItem value="">All</MenuItem>
-                  {['Yearly', 'Quarterly', 'Monthly'].map((period) => (
-                    <MenuItem key={period} value={period}>{period}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Container>
-
-        {/* Apply and Reset Buttons Centered */}
-        <Box display="flex" justifyContent="center" mt={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleApply}
-            sx={{ mr: 2, bgcolor: "#002060" }}
-          >
-            Apply
-          </Button>
-          <Button variant="outlined" color="secondary" onClick={handleReset}>
-            Reset
-          </Button>
-        </Box>
-      </CardContent>
-    </Card>
-    </Container>
-<HyDealStatGraph selectedFilters={selectedFilters} />
+      {/* Pass only applied filters to the graph */}
+      <HyDealStatGraph selectedFilters={appliedFilters} />
     </>
   );
 };
