@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onTabSelect }) => {
           boxSizing: 'border-box',
           backgroundColor: '#002060',
           color: 'white',
-          marginTop: '148px'
+          marginTop: '93px'
         }
       }}
     >
