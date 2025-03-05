@@ -16,6 +16,9 @@ import {
   CircularProgress,
   Paper,
 } from "@mui/material";
+import HYSkewTableMain from "./Tabs/HYSkewTableMain";
+import DealStatsMain from "./Tabs/DealStatsMain";
+import SelectedDealHYMain from "./Tabs/SelectedDealHYMain";
 
 const HighYieldsMain: React.FC = () => {
   const [value, setValue] = useState<number>(0);
@@ -165,7 +168,7 @@ useEffect(() => {
               value={searchTerm}
               autoComplete="off"
               onChange={handleSearch}
-              placeholder="Enter ticker..."
+              placeholder="Enter Deal..."
               sx={{
                 marginBottom: "1px",
                 width: "200px",
@@ -275,11 +278,11 @@ useEffect(() => {
         )
       )}
 
-      {/* {value === 0 && selectedTicker && (
-        <SelectedTicker ticker={selectedTicker} />
+      {value === 0 && selectedTicker && (
+        <SelectedDealHYMain  />
       )}
-      {value === 1 && <MarketFilters />}
-      {value === 2 && <SkewTableMain />} */}
+      {value === 1 && <DealStatsMain />}
+      {value === 2 && <HYSkewTableMain />}
     </Box>
   );
 };
