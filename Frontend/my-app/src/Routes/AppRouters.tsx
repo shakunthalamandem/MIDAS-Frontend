@@ -35,6 +35,7 @@ import MDDSelectedTicker from "../Components/Main/MonasheeDeals/MddGraphs/MDDSel
 import MarketFilters from "../Components/Main/MonasheeCapitalMarkets/MarketFilters";
 import ScreenerMain from "../Components/Main/MonasheeGraphs/ScreenerTable/ScreenerMain";
 import SkewTableMain from "../Components/Main/MonasheeGraphs/SkewTableMain";
+import MacroMain from "../Components/Macro/MacroMain";
 
 
 
@@ -95,6 +96,8 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/highyield/dealperformance/:deal" element={<AuthGuard><HighYieldsMain /></AuthGuard>} />
+        <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
+
 
 
         <Route path="/error" element={<ErrorPage />} />
