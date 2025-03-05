@@ -96,6 +96,10 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/highyield/dealperformance/:deal" element={<AuthGuard><HighYieldsMain /></AuthGuard>} />
+
+
+
+        
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
 
 
