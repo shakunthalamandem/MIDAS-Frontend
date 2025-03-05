@@ -64,7 +64,7 @@ const AppRouters: React.FC = () => {
         </Route>
 
         <Route path="/highyield/capital-markets" element={<AuthGuard><HighYieldsMain /></AuthGuard>} >
-          <Route path="search" element={<SelectedDealHYMain issuer_name={""}/>} />
+          <Route path="search" element={<HighYieldsMain/>} />
           <Route path="deal-stats" element={<DealStatsMain />} />
           <Route path="skew-table" element={<HYSkewTableMain />} />
         </Route>
@@ -99,7 +99,7 @@ const AppRouters: React.FC = () => {
 
 
 
-        
+
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
 
 
