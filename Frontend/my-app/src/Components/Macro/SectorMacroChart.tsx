@@ -36,7 +36,6 @@ interface ApiData {
 
 const SectorMacroChart: React.FC = () => {
   const [data, setData] = useState<ApiData[]>([]); // Data state for chart
-  const [sectorsData, setSectorsData] = useState<any>([]); // Data state for sectors (if needed later)
   const [selectedPeriod, setSelectedPeriod] = useState<string>("1y"); // Default period
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state
@@ -72,7 +71,6 @@ const SectorMacroChart: React.FC = () => {
 
         const responseData = await response.json();
         setData(responseData); // Set chart data
-        // setSectorsData(responseData.sectors); // Set sectors data
         setError(null); // Clear error if data is fetched successfully
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -88,6 +86,11 @@ const SectorMacroChart: React.FC = () => {
   // Handle button clicks to change the period
   const handleButtonClick = (period: string) => {
     setSelectedPeriod(period);
+  };
+
+  // Formatter function to display numbers with 2 decimals and append '%'
+  const formatPercentage = (value: number) => {
+    return `${value.toFixed(2)}%`;
   };
 
   return (
@@ -135,8 +138,8 @@ const SectorMacroChart: React.FC = () => {
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={data}>
                 <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
+                <YAxis tickFormatter={formatPercentage} />
+                <Tooltip formatter={formatPercentage} />
                 <Legend />
                 {/* Render lines for each sector */}
                 <Line type="monotone" dataKey="snp_500" stroke="#8884d8" />
