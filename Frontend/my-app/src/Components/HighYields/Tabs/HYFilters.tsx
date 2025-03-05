@@ -127,57 +127,60 @@ const HYFilters = () => {
 
             {/* Sector Filter with Checkbox Inside */}
             <Grid item xs={12} sm={6} md={2}>
-              <FormControl fullWidth variant="outlined" size="small">
-                <InputLabel>Sector</InputLabel>
-                <Select value={selectedFilters.sector} onChange={handleFilterChange('sector')} label="Sector">
-                  <MenuItem value="">All</MenuItem>
-                  {filters.sector.map((sec) => (
-                    <MenuItem key={sec} value={sec}>{sec}</MenuItem>
-                  ))}
-                </Select>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={selectedOptions.includes('sectorOption')}
-                      onChange={() => handleCheckboxChange('sectorOption')}
-                      sx={{
-                        "&.Mui-checked": {
-                          color: "#002060",
-                        },
-                      }}
-                    />
-                  }
-                  label="Select Sector Option"
-                />
-              </FormControl>
-            </Grid>
+  <FormControl fullWidth variant="outlined" size="small">
+    <InputLabel>Sector</InputLabel>
+    <Select
+      value={selectedFilters.sector}
+      onChange={handleFilterChange('sector')}
+      label="Sector"
+    >
+      <MenuItem value="">All</MenuItem>
+      {filters.sector.map((sec) => (
+        <MenuItem key={sec} value={sec}>
+          {sec}
+        </MenuItem>
+      ))}
+    </Select>
+    {/* Uncomment this block if you want to include the checkbox option */}
+    {/* 
+    <FormControlLabel
+      control={
+        <Checkbox
+          checked={selectedOptions.includes('sectorOption')}
+          onChange={() => handleCheckboxChange('sectorOption')}
+          sx={{
+            "&.Mui-checked": {
+              color: "#002060",
+            },
+          }}
+        />
+      }
+      label="Select Sector Option"
+    />
+    */}
+  </FormControl>
+</Grid>
+
 
             {/* SP Rating Filter with Checkbox Inside */}
             <Grid item xs={12} sm={6} md={2}>
-              <FormControl fullWidth variant="outlined" size="small">
-                <InputLabel>SP Rating</InputLabel>
-                <Select value={selectedFilters.sp_rating} onChange={handleFilterChange('sp_rating')} label="SP Rating">
-                  <MenuItem value="">All</MenuItem>
-                  {filters.sp_rating.map((rating) => (
-                    <MenuItem key={rating} value={rating}>{rating}</MenuItem>
-                  ))}
-                </Select>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={selectedOptions.includes('ratingOption')}
-                      onChange={() => handleCheckboxChange('ratingOption')}
-                      sx={{
-                        "&.Mui-checked": {
-                          color: "#002060",
-                        },
-                      }}
-                    />
-                  }
-                  label="Select Rating Option"
-                />
-              </FormControl>
-            </Grid>
+  <FormControl fullWidth variant="outlined" size="small">
+    <InputLabel>SP Rating</InputLabel>
+    <Select
+      value={selectedFilters.sp_rating}
+      onChange={handleFilterChange('sp_rating')}
+      label="SP Rating"
+    >
+      <MenuItem value="">All</MenuItem>
+      {filters.sp_rating.map((rating) => (
+        <MenuItem key={rating} value={rating}>
+          {rating}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</Grid>
+
 
             {/* Period Filter */}
             <Grid item xs={12} sm={6} md={2}>
