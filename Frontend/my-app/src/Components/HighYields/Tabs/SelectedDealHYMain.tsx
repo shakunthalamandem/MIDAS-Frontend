@@ -89,7 +89,7 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
 
   if (error) return <Typography color="error">{error}</Typography>;
   return (
-    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4,marginTop: 4 }}>
   
         <Typography
           variant="h5"
@@ -103,7 +103,7 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
           {data.map((item, index) => (
             <Grid item xs={12} key={index}>
               <Paper elevation={3} sx={{ padding: 3, backgroundColor: "#f9f9f9", borderRadius: 2 }}>
-                <Typography variant="h6" color="#002060" align="center" gutterBottom>
+                <Typography variant="h6" color="#002060" align="center" gutterBottom sx={{ marginBottom: 2}}>
                   Deal Information for{" "}
                   <span style={{ fontWeight: "bold", color: "#0073e6" }}>{item.issuer_name}</span> on{" "}
                   <span style={{ fontWeight: "bold", color: "#0073e6" }}>{new Date(item.pricing_date).toLocaleDateString()}</span>
@@ -116,15 +116,15 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                         <TableBody>
                                           {[
                                          
-                                            { label: "Issuer Name", value: item.issuer_name },
-                                            { label: "PricingDate", value: item.pricing_date },
+                                            { label: "Issuer Name", value: item.issuer_name?? "N/A"  },
+                                            { label: "PricingDate", value: item.pricing_date?? "N/A"  },
                                             {
                                               label: "ISIN",
-                                              value: item.isin,
+                                              value: item.isin?? "N/A" ,
                                             },
-                                            { label: "S&P Rating", value: item.sp_init_rtg },
-                                            { label: "Maturity", value: item.maturity },
-                                            { label: "Sector", value: item.sector },
+                                            { label: "S&P Rating", value: item.sp_init_rtg ?? "N/A" },
+                                            { label: "Maturity", value: item.maturity?? "N/A"  },
+                                            { label: "Sector", value: item.sector?? "N/A"  },
                                           ].map((row, i) => (
                                             <TableRow
                                               key={i}
@@ -166,41 +166,39 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                         <Table size="small" aria-label="high yield deal table2">
                                           <TableBody>
                                             {[
-                                              { label: "Issue Price", value: item.issue_price },
-                                              { label: "Price 30", value: item.price_30 },
-                                              { label: "Original Amount Sold", value: item.orig_amt_sold },
-                                              { label: "Coupon", value: item.cpn },
-                                              {
-                                                label: "Opportunity Value",
-                                                value: item.opportunity_value,
-                                              },
+                                         { label: "Issue Price", value: item.issue_price ? item.issue_price.toLocaleString(undefined, { style: 'currency', currency: 'USD',minimumFractionDigits: 0  }) : "N/A" },
+                                         { label: "30 day price", value: item.price_30 ? item.price_30.toLocaleString(undefined, { style: 'currency', currency: 'USD' }) : "N/A" },
+                                         { label: "Original Amount Sold", value: item.orig_amt_sold ? item.orig_amt_sold.toLocaleString(undefined,{style:"currency",currency:'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
+                                         { label: "Coupon", value: item.cpn ?? "N/A" },
+                                         { label: "Opportunity Value", value: item.opportunity_value ? item.opportunity_value.toLocaleString(undefined, { style: 'currency', currency: 'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
+                                         
                                             ].map((row, i) => (
                                               <TableRow
-                                                key={i}
+                                              key={i}
+                                              sx={{
+                                                backgroundColor:
+                                                i % 2 === 0 ? "#f3f3f3" : "#ffffff",
+                                                "&:hover": {
+                                                backgroundColor: "#e0f7fa",
+                                                },
+                                              }}
+                                              >
+                                              <TableCell
                                                 sx={{
-                                                  backgroundColor:
-                                                    i % 2 === 0 ? "#f3f3f3" : "#ffffff",
-                                                  "&:hover": {
-                                                    backgroundColor: "#e0f7fa",
-                                                  },
+                                                border: "1px solid #ccc",
+                                                fontWeight: "bold",
+                                                color: "#333",
                                                 }}
                                               >
-                                                <TableCell
-                                                  sx={{
-                                                    border: "1px solid #ccc",
-                                                    fontWeight: "bold",
-                                                    color: "#333",
-                                                  }}
-                                                >
-                                                  {row.label}
-                                                </TableCell>
-                                                <TableCell
-                                                  sx={{
-                                                    border: "1px solid #ccc",
-                                                  }}
-                                                >
-                                                  {row.value}
-                                                </TableCell>
+                                                {row.label}
+                                              </TableCell>
+                                              <TableCell
+                                                sx={{
+                                                border: "1px solid #ccc",
+                                                }}
+                                              >
+                                                {row.value}
+                                              </TableCell>
                                               </TableRow>
                                             ))}
                                           </TableBody>
