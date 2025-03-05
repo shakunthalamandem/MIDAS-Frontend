@@ -26,7 +26,7 @@ const HighYieldsMain: React.FC = () => {
   const { ticker: routeTicker } = useParams<{ ticker: string }>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "AS"); 
+  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "Atwood Oceanics Inc"); 
   const [results, setResults] = useState<HighYieldResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -254,10 +254,10 @@ useEffect(() => {
                   {results.map((item, index) => (
                     <ListItem
                       key={index}
-                      onClick={() => handleItemClick(item.ticker_symbol)}
+                      onClick={() => handleItemClick(item.issuer_name)}
                       style={{
                         backgroundColor:
-                          selectedTicker === item.ticker_symbol
+                          selectedTicker === item.issuer_name
                             ? "rgba(63, 81, 181, 0.1)"
                             : "transparent",
                         borderRadius: "8px",
@@ -266,8 +266,8 @@ useEffect(() => {
                       }}
                     >
                       <ListItemText
-                        primary={<strong>{item.ticker_symbol}</strong>}
-                        secondary={item.issuer_name}
+                        primary={<strong>{item.issuer_name}</strong>}
+                        // secondary={item.isin}
                       />
                     </ListItem>
                   ))}
@@ -279,7 +279,7 @@ useEffect(() => {
       )}
 
       {value === 0 && selectedTicker && (
-        <SelectedDealHYMain  />
+        <SelectedDealHYMain issuer_name={selectedTicker}  />
       )}
       {value === 1 && <DealStatsMain />}
       {value === 2 && <HYSkewTableMain />}
