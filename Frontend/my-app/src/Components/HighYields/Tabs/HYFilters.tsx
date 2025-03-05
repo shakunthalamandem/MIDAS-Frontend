@@ -9,7 +9,7 @@ interface HighYieldOptions {
   sp_rating: string[];
 }
 
-const DealStatsfilter = () => {
+const HYFilters = () => {
   const [filters, setFilters] = useState<HighYieldOptions>({
     start_year: [],
     end_year: [],
@@ -141,4 +141,4 @@ const DealStatsfilter = () => {
   );
 };
 
-export default DealStatsfilter;
+export default HYFilters;
