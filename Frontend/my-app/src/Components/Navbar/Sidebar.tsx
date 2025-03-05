@@ -45,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onTabSelect }) => {
     >
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ p: 1 ,borderBottom:'1px solid #fff'}}>
         <Typography variant="h6" fontWeight="bold">Dashboard</Typography>
-        <IconButton onClick={onClose} sx={{ color: 'white' }}>
+        <IconButton onClick={onClose} sx={{ color: 'red' }}>
           <HighlightOff />
         </IconButton>
       </Box>
