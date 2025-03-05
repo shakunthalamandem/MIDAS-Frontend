@@ -1,5 +1,5 @@
-import { TrendingUp } from "@mui/icons-material";
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { TrendingUp, HighlightOff } from "@mui/icons-material";
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, IconButton, Box } from "@mui/material";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
@@ -34,11 +34,21 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onTabSelect }) => {
       open={open}
       onClose={onClose}
       sx={{
-        '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box', backgroundColor: '#002060', color: 'white',      marginTop: '148px' 
+        '& .MuiDrawer-paper': {
+          width: 240,
+          boxSizing: 'border-box',
+          backgroundColor: '#002060',
+          color: 'white',
+          marginTop: '148px'
         }
       }}
     >
-      <Typography variant="h6" sx={{ p: 2, fontWeight: "bold" }}>Dashboard</Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ p: 2 }}>
+        <Typography variant="h6" fontWeight="bold">Dashboard</Typography>
+        <IconButton onClick={onClose} sx={{ color: 'white' }}>
+          <HighlightOff />
+        </IconButton>
+      </Box>
       <List>
         {menuItems.map((tab) => (
           <ListItem key={tab.name} disablePadding>
