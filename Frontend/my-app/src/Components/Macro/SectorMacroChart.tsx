@@ -70,8 +70,7 @@ const SectorMacroChart: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state
 
- 
-const [visibleLines, setVisibleLines] = useState<Record<SectorKey, boolean>>(
+  const [visibleLines, setVisibleLines] = useState<Record<SectorKey, boolean>>(
     sectors.reduce(
       (acc, sector) => {
         acc[sector] = ["snp_500", "dow_jones", "russell_2000"].includes(sector);
@@ -80,7 +79,6 @@ const [visibleLines, setVisibleLines] = useState<Record<SectorKey, boolean>>(
       {} as Record<SectorKey, boolean>
     )
   );
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -167,7 +165,17 @@ const [visibleLines, setVisibleLines] = useState<Record<SectorKey, boolean>>(
                 key={period}
                 variant={selectedPeriod === period ? "contained" : "outlined"}
                 onClick={() => handleButtonClick(period)}
-                sx={{ color: "#002060", border: "1px solid #002060" }}
+                sx={{
+                  color: "#3f51b5",
+                  border: "1px solid #3f51b5",
+                  "&.MuiButton-contained": {
+                    backgroundColor: "#3f51b5",
+                    color: "#fff",
+                    "&:hover": {
+                      backgroundColor: "#303f9f",
+                    },
+                  },
+                }}
               >
                 {period}
               </Button>
