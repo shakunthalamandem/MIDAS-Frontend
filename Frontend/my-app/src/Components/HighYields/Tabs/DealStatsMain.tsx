@@ -24,26 +24,26 @@ const DealStatsMain = () => {
     end_year: number;
     sector: string;
     sp_rating: string;
-    period: string;
+    year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: '',
     sp_rating: '',
-    period: '',
+    year_period: 'Yearly',
   });
   const [appliedFilters, setAppliedFilters] = useState<{
     start_year: number;
     end_year: number;
     sector: string;
     sp_rating: string;
-    period: string;
+    year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: '',
     sp_rating: '',
-    period: '',
+    year_period: 'Yearly',
   });
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
@@ -103,7 +103,7 @@ const DealStatsMain = () => {
       end_year: 2025,
       sector: '',
       sp_rating: '',
-      period: '',
+      year_period: '',
     });
     setSelectedOptions([]);
     setAppliedFilters({
@@ -111,7 +111,7 @@ const DealStatsMain = () => {
       end_year: 2025,
       sector: '',
       sp_rating: '',
-      period: '',
+      year_period: '',
     });
   };
 
@@ -132,7 +132,6 @@ const DealStatsMain = () => {
                   <FormControl fullWidth variant="outlined" size="small">
                     <InputLabel>Start Year</InputLabel>
                     <Select value={selectedFilters.start_year} onChange={handleFilterChange('start_year')} label="Start Year">
-                      <MenuItem value="">All</MenuItem>
                       {filters.start_year.map((year) => (
                         <MenuItem key={year} value={year}>{year}</MenuItem>
                       ))}
@@ -145,7 +144,6 @@ const DealStatsMain = () => {
                   <FormControl fullWidth variant="outlined" size="small">
                     <InputLabel>End Year</InputLabel>
                     <Select value={selectedFilters.end_year} onChange={handleFilterChange('end_year')} label="End Year">
-                      <MenuItem value="">All</MenuItem>
                       {filters.end_year.map((year) => (
                         <MenuItem key={year} value={year}>{year}</MenuItem>
                       ))}
@@ -183,8 +181,8 @@ const DealStatsMain = () => {
                 <Grid item xs={12} sm={6} md={2}>
                   <FormControl fullWidth variant="outlined" size="small">
                     <InputLabel>Period</InputLabel>
-                    <Select value={selectedFilters.period} onChange={handleFilterChange('period')} label="Period">
-                      <MenuItem value="">All</MenuItem>
+                    <Select value={selectedFilters.year_period} onChange={handleFilterChange('year_period')} label="Period">
+                     
                       {['Yearly', 'Quarterly', 'Monthly'].map((period) => (
                         <MenuItem key={period} value={period}>{period}</MenuItem>
                       ))}

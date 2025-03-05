@@ -52,7 +52,7 @@ const HyDealStatGraph = ({ selectedFilters }: { selectedFilters: SelectedFilters
 
   return (
     <Container>
-        <Card sx={{ mt: 2 ,mb: 2}}> 
+        <Card sx={{ mt: 2 ,mb: 2, padding: 10 }}> 
     <ResponsiveContainer width="100%" height={400}>
       <BarChart data={data}>
 
