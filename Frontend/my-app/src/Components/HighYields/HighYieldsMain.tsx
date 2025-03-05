@@ -168,7 +168,7 @@ useEffect(() => {
               value={searchTerm}
               autoComplete="off"
               onChange={handleSearch}
-              placeholder="Enter ticker..."
+              placeholder="Enter Deal..."
               sx={{
                 marginBottom: "1px",
                 width: "200px",
