@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Button, Box, Typography, Container, Card } from "@mui/material";
+import {
+  Button,
+  Box,
+  Typography,
+  Container,
+  Card,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
@@ -34,11 +40,46 @@ interface ApiData {
   sp500_insurance_industry: number;
 }
 
+// List of the sectors
+const sectors = [
+  "snp_500",
+  "dow_jones",
+  "russell_2000",
+  "sp500_consumer_discretionary",
+  "sp500_consumer_staples",
+  "sp500_energy",
+  "sp500_financials",
+  "sp500_healthcare",
+  "sp500_industrials",
+  "sp500_information_technology",
+  "sp500_materials",
+  "sp500_telecom_services",
+  "sp500_utilities",
+  "sp500_real_estate",
+  "sp500_technology",
+  "sp500_oil_gas",
+  "sp500_insurance_industry",
+] as const;
+
+// Type that includes only the sector names
+type SectorKey = (typeof sectors)[number];
+
 const SectorMacroChart: React.FC = () => {
   const [data, setData] = useState<ApiData[]>([]); // Data state for chart
   const [selectedPeriod, setSelectedPeriod] = useState<string>("1y"); // Default period
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state
+
+  // Use a more flexible type for the visibleLines state
+  const [visibleLines, setVisibleLines] = useState<Record<SectorKey, boolean>>(
+    sectors.reduce(
+      (acc, sector) => {
+        acc[sector] = true;
+        return acc;
+      },
+      {} as Record<SectorKey, boolean>
+    )
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,6 +129,14 @@ const SectorMacroChart: React.FC = () => {
     setSelectedPeriod(period);
   };
 
+  // Handle checkbox change for toggling line visibility
+  const handleCheckboxChange = (line: SectorKey) => {
+    setVisibleLines((prev) => ({
+      ...prev,
+      [line]: !prev[line],
+    }));
+  };
+
   // Formatter function to display numbers with 2 decimals and append '%'
   const formatPercentage = (value: number) => {
     return `${value.toFixed(2)}%`;
@@ -135,84 +184,174 @@ const SectorMacroChart: React.FC = () => {
           {loading ? (
             <Typography>Loading...</Typography>
           ) : (
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={data}>
-                <XAxis dataKey="date" />
-                <YAxis tickFormatter={formatPercentage} />
-                <Tooltip formatter={formatPercentage} />
-                <Legend />
-                {/* Render lines for each sector */}
-                <Line type="monotone" dot={false} dataKey="snp_500" stroke="#8884d8" />
-                <Line type="monotone" dot={false} dataKey="dow_jones" stroke="#82ca9d" />
-                <Line type="monotone" dot={false} dataKey="russell_2000" stroke="#ffc658" />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_consumer_discretionary"
-                  stroke="#ff7300"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_consumer_staples"
-                  stroke="#00C49F"
-                />
-                <Line type="monotone" dot={false} dataKey="sp500_energy" stroke="#FFBB28" />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_financials"
-                  stroke="#FF8042"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_healthcare"
-                  stroke="#FF0033"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_industrials"
-                  stroke="#7C4DFF"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_information_technology"
-                  stroke="#8E24AA"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_materials"
-                  stroke="#9E9E9E"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_telecom_services"
-                  stroke="#607D8B"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_utilities"
-                  stroke="#039BE5"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_real_estate"
-                  stroke="#4CAF50"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_technology"
-                  stroke="#D32F2F"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_oil_gas"
-                  stroke="#2196F3"
-                />
-                <Line
-                  type="monotone" dot={false}
-                  dataKey="sp500_insurance_industry"
-                  stroke="#FF5722"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <>
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={data}>
+                  <XAxis dataKey="date" />
+                  <YAxis tickFormatter={formatPercentage} />
+                  <Tooltip formatter={formatPercentage} />
+                  <Legend />
+                  {/* Render lines for each sector if the line is visible */}
+                  {visibleLines.snp_500 && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="snp_500"
+                      stroke="#8884d8"
+                    />
+                  )}
+                  {visibleLines.dow_jones && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="dow_jones"
+                      stroke="#82ca9d"
+                    />
+                  )}
+                  {visibleLines.russell_2000 && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="russell_2000"
+                      stroke="#ffc658"
+                    />
+                  )}
+                  {visibleLines.sp500_consumer_discretionary && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_consumer_discretionary"
+                      stroke="#ff7300"
+                    />
+                  )}
+                  {visibleLines.sp500_consumer_staples && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_consumer_staples"
+                      stroke="#00C49F"
+                    />
+                  )}
+                  {visibleLines.sp500_energy && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_energy"
+                      stroke="#FFBB28"
+                    />
+                  )}
+                  {visibleLines.sp500_financials && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_financials"
+                      stroke="#FF8042"
+                    />
+                  )}
+                  {visibleLines.sp500_healthcare && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_healthcare"
+                      stroke="#FF0033"
+                    />
+                  )}
+                  {visibleLines.sp500_industrials && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_industrials"
+                      stroke="#7C4DFF"
+                    />
+                  )}
+                  {visibleLines.sp500_information_technology && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_information_technology"
+                      stroke="#8E24AA"
+                    />
+                  )}
+                  {visibleLines.sp500_materials && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_materials"
+                      stroke="#9E9E9E"
+                    />
+                  )}
+                  {visibleLines.sp500_telecom_services && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_telecom_services"
+                      stroke="#607D8B"
+                    />
+                  )}
+                  {visibleLines.sp500_utilities && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_utilities"
+                      stroke="#039BE5"
+                    />
+                  )}
+                  {visibleLines.sp500_real_estate && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_real_estate"
+                      stroke="#4CAF50"
+                    />
+                  )}
+                  {visibleLines.sp500_technology && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_technology"
+                      stroke="#D32F2F"
+                    />
+                  )}
+                  {visibleLines.sp500_oil_gas && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_oil_gas"
+                      stroke="#2196F3"
+                    />
+                  )}
+                  {visibleLines.sp500_insurance_industry && (
+                    <Line
+                      type="monotone"
+                      dot={false}
+                      dataKey="sp500_insurance_industry"
+                      stroke="#FF5722"
+                    />
+                  )}
+                </LineChart>
+              </ResponsiveContainer>
+              <Box mb={2}>
+                {sectors.map((line) => (
+                  <FormControlLabel
+                    key={line}
+                    control={
+                      <Checkbox
+                        checked={visibleLines[line]}
+                        onChange={() => handleCheckboxChange(line)}
+                        name={line}
+                        sx={{
+                          color: "#9b0000",
+                          "&.Mui-checked": {
+                            color: "#9b0000",
+                          },
+                        }}
+                      />
+                    }
+                    label={line.replace(/_/g, " ").toUpperCase()}
+                  />
+                ))}
+              </Box>
+            </>
           )}
         </Box>
       </Card>
