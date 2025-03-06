@@ -5,6 +5,8 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 interface TableData {
   Total_Deal_Count: number;
   Total_Deal_Volume: number;
+  Deal_count_without_nulls: number;
+  Deal_volume_without_nulls: number;
   Positively_Performing_Deals_Percentage: number;
   Negatively_Performing_Deals_Percentage: number;
   Average_T1M_Abs_Return_of_Positively: number;
@@ -19,11 +21,13 @@ interface HySectorTableDataProps {
     sectorwise_total: {
       Total_Deal_Count_Sum: number;
       Total_Deal_Volume_Sum: number;
-      Total_Postively_Performing_Deals: number;
-      Total_Negatively_Performing_Deals: number;
-      Total_Returns_positively: number;
-      Total_Returns_negatively: number;
-      Total_Expected_returns_excess: number;
+      Total_Deal_Count_Sum_without_null: number;
+      Total_Deal_Volume_Sum_without_null: number;
+      Total_Positive_Performing_Deals_Percentage: number;
+      Total_Negative_Performing_Deals_Percentage: number;
+      Total_Returns_Positive: number;
+      Total_Returns_Negative: number;
+      Total_Expected_Returns_Excess: number;
       Total_Long_Opportunity_Value: number;
     };
   };
@@ -59,6 +63,8 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
     'Sector',
     'Total Deal Count',
     'Total Deal Volume ($)',
+    "Deal Count Without Nulls",
+    "Deal Volume Without Nulls",
     '% of Positively Performing Deals ',
     '% of Negatively Performing Deals ',
     'Weighted Avg T+1M Excess Return (Positive Deals)',
@@ -70,12 +76,39 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   // Extract totals from sectorwiseTotal
   const totalDealCount = sectorwiseTotal.Total_Deal_Count_Sum || 0;
   const totalDealVolume = sectorwiseTotal.Total_Deal_Volume_Sum || 0;
-  const avgPositivelyPerformingDealsPercentage = sectorwiseTotal.Total_Postively_Performing_Deals || 0;
-  const avgNegativelyPerformingDealsPercentage = sectorwiseTotal.Total_Negatively_Performing_Deals || 0;
-  const avgAvgT1MAbsReturnPositively = sectorwiseTotal.Total_Returns_positively || 0;
-  const avgAvgT1MAbsReturnNegatively = sectorwiseTotal.Total_Returns_negatively || 0;
-  const avgExpectedReturnsExcess = sectorwiseTotal.Total_Expected_returns_excess || 0;
+  const totalDealCount_without_nulls = sectorwiseTotal.Total_Deal_Count_Sum_without_null || 0;
+  const totalDealVolume_without_nulls = sectorwiseTotal.Total_Deal_Volume_Sum_without_null || 0;
+  const avgPositivelyPerformingDealsPercentage = sectorwiseTotal.Total_Positive_Performing_Deals_Percentage || 0;
+  const avgNegativelyPerformingDealsPercentage = sectorwiseTotal.Total_Negative_Performing_Deals_Percentage || 0;
+
+  const avgExpectedReturnsExcess = sectorwiseTotal.Total_Expected_Returns_Excess || 0;
   const totalLongOpportunityValue = sectorwiseTotal.Total_Long_Opportunity_Value || 0;
+
+
+  const avgAvgT1MAbsReturnPositively = sectorwiseTotal.Total_Returns_Positive || 0;
+  const avgAvgT1MAbsReturnNegatively = sectorwiseTotal.Total_Returns_Negative || 0;
+
+
+
+
+
+
+
+  // "Total_Deal_Count_Sum": 6425,
+  // "Total_Deal_Volume_Sum": 4562813847996,
+  // "Total_Deal_Count_Sum_Without_Nulls": 4678,
+  // "Total_Deal_Volume_Sum_Without_Nulls": 3639561435432,
+  // "Total_Positive_Performing_Deals_Percentage": 97.06,
+  // "Total_Negative_Performing_Deals_Percentage": 2.94,
+  // "Total_Expected_Returns_Excess": 0.86,
+  // "Total_Returns_Positive": 0.73,
+  // "Total_Returns_Negatively": -2.01
+  
+
+
+
+
+
 
   return (
     <TableContainer component={Paper} sx={{ marginTop: 2, marginBottom: 4 }}>
@@ -110,6 +143,8 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
                 <TableCell sx={{ padding: '4px 8px', width: '200px' }}>{sectorName}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{formatNumber(row.Total_Deal_Volume)}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{row.Deal_count_without_nulls}</TableCell>
+                <TableCell sx={{ padding: '4px 8px' }}>{formatNumber(row.Deal_volume_without_nulls)}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>
                   {row.Positively_Performing_Deals_Percentage.toFixed(0)}%
                 </TableCell>
@@ -135,6 +170,8 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', textAlign: 'center' }}>Total</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{totalDealCount}</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{formatNumber(totalDealVolume)}</TableCell>
+            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{totalDealCount_without_nulls}</TableCell>
+            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{formatNumber(totalDealVolume_without_nulls)}</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>
               {avgPositivelyPerformingDealsPercentage.toFixed(0)}%
             </TableCell>

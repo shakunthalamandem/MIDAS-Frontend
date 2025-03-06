@@ -49,7 +49,7 @@ const HyYearlyBasedTable: React.FC = () => {
             }
           });
         const data = response.data as SkewTableOptions;
-        console.log(data,"CHinthamani");
+        // console.log(data,"CHinthamani");
         setRatingOptions(data['ratings'] || []);
       
         setStartYearOptions(data['start year'] || []);
@@ -128,13 +128,14 @@ const HyYearlyBasedTable: React.FC = () => {
               Sector Filtered Data
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item xs={8} sm={3} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Start Year</InputLabel>
                   <Select
                     value={startYear}
                     onChange={handleStartYearChange}
-                    label="Start Year"
+                    label="Start Year"                     sx={{ backgroundColor: '#e0f7fa', color: '#006064' }}
+
                     disabled={!Array.isArray(startYearOptions) || startYearOptions.length === 0}
                   >
                     {Array.isArray(startYearOptions) && startYearOptions.length > 0 ? (
@@ -147,13 +148,14 @@ const HyYearlyBasedTable: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item xs={12} sm={3} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>End Year</InputLabel>
                   <Select
                     value={endYear}
                     onChange={handleEndYearChange}
-                    label="End Year"
+                    label="End Year"                     sx={{ backgroundColor: '#f9dc8f', color: '#1a237e' }}
+
                     disabled={filteredEndYearOptions.length === 0}
                   >
                     {filteredEndYearOptions.length > 0 ? (
@@ -166,13 +168,14 @@ const HyYearlyBasedTable: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item xs={12} sm={3} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Rating</InputLabel>
                   <Select
                     value={rating}
                     onChange={handleRatingChange}
-                    label="Rating"
+                    label="Rating"                     sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
+
                     disabled={ratingOptions.length === 0}
                   >
                     <MenuItem value="All">All</MenuItem>

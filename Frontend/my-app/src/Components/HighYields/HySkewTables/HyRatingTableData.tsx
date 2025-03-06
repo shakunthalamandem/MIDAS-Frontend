@@ -12,8 +12,8 @@ import {
 interface TableData {
   Total_Deal_Count: number;
   Total_Deal_Volume: number;
-  Deal_count_without_nulls: number;
-  Deal_volume_without_nulls: number;
+  Total_Deal_Count_without_null: number;
+  Total_Deal_Volume_without_null: number;
   Positively_Performing_Deals_Percentage: number;
   Negatively_Performing_Deals_Percentage: number;
   Average_T1M_Abs_Return_of_Positively: number;
@@ -24,21 +24,23 @@ interface TableData {
 
 interface HyRatingTableDataProps {
   data: {
-    RatingWise: { [year: string]: TableData };
-    ratingwise_total: {
+    Ratingswise: { [year: string]: TableData };
+    ratingswise_total: {
       Total_Deal_Count_Sum: number;
       Total_Deal_Volume_Sum: number;
-      Total_Deal_Count_Sum_Without_Nulls: number;
-      Total_Deal_Volume_Sum_Without_Nulls: number;
-      Total_Postively_Performing_Deals: number;
-      Total_Negatively_Performing_Deals: number;
-      Total_Returns_positively: number;
-      Total_Returns_negatively: number;
-      Total_Expected_returns_excess: number;
+      Total_Deal_Count_Sum_without_null: number;
+      Total_Deal_Volume_Sum_without_null: number;
+      Total_Positive_Performing_Deals_Percentage: number;
+      Total_Negative_Performing_Deals_Percentage: number;
+      Total_Returns_Positive: number;
+      Total_Returns_Negative: number;
+      Total_Expected_Returns_Excess: number;
       Total_Long_Opportunity_Value: number;
     };
   };
 }
+
+
 
 const formatNumber = (value: number): string => {
   const absValue = Math.abs(value);
@@ -57,20 +59,30 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
 };
 
-const HyRatingTableData: React.FC<HyRatingTableDataProps> = ({ data }) => {
-  const yearwiseData = data?.RatingWise;
-  const yearwiseTotal = data?.ratingwise_total;
 
-  if (!yearwiseData || !yearwiseTotal) {
-    return <div>No data available</div>;
-  }
+
+
+
+
+  
+  const HyRatingTableData: React.FC<HyRatingTableDataProps> = ({ data }) => {
+    // Ensure data exists before rendering
+    
+    if (!data?.Ratingswise || !data?.ratingswise_total || Object.keys(data.Ratingswise).length === 0) {
+      return <div>No data available</div>;
+    }
+  
+    // Extract the Yearwise and Total data
+    const { Ratingswise: Ratingswise, ratingswise_total: ratingswise_total } = data;
 
   const columns = [
-    "Lead Bank",
-    "Total Deal Count",
+    "Rank",
+  "Total Deal Count",
     "Total Deal Volume ($)",
-    "% of Positively Performing Deals ",
-    "% of Negatively Performing Deals ",
+    "Deal Count Without Nulls",
+    "Deal Volume Without Nulls",
+    "% of Positively Performing Deals",
+    "% of Negatively Performing Deals",
     "Weighted Avg T+1M Excess Return (Positive Deals)",
     "Weighted Avg T+1M Excess Return (Negative Deals)",
     "Expected Returns Excess",
@@ -90,15 +102,20 @@ const HyRatingTableData: React.FC<HyRatingTableDataProps> = ({ data }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {Object.keys(yearwiseData).map((year) => {
-            const row = yearwiseData[year];
+          {Object.keys(Ratingswise).map((year) => {
+            const row = Ratingswise[year];
             return (
               <TableRow key={year}>
                 <TableCell sx={{ padding: "4px 8px" }}>{year}</TableCell>
                 <TableCell sx={{ padding: "4px 8px" }}>{row.Total_Deal_Count}</TableCell>
                 <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Total_Deal_Volume)}</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{row.Deal_count_without_nulls}</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Deal_volume_without_nulls)}</TableCell>
+
+
+
+                <TableCell sx={{ padding: "4px 8px" }}>{row.Total_Deal_Count_without_null}</TableCell>
+                <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Total_Deal_Volume_without_null)}</TableCell>
+
+
                 <TableCell sx={{ padding: "4px 8px" }}>
                   {row.Positively_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
                 </TableCell>
@@ -123,33 +140,33 @@ const HyRatingTableData: React.FC<HyRatingTableDataProps> = ({ data }) => {
 
           <TableRow key="total">
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", textAlign: "center" }}>Total</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{yearwiseTotal.Total_Deal_Count_Sum}</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{ratingswise_total.Total_Deal_Count_Sum}</TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(yearwiseTotal.Total_Deal_Volume_Sum)}
+              {formatNumber(ratingswise_total.Total_Deal_Volume_Sum)}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Deal_Count_Sum_Without_Nulls}
+              {ratingswise_total.Total_Deal_Count_Sum_without_null}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(yearwiseTotal.Total_Deal_Count_Sum_Without_Nulls)}
+              {formatNumber(ratingswise_total.Total_Deal_Volume_Sum_without_null)}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Postively_Performing_Deals?.toFixed(0) ?? "0"}%
+              {ratingswise_total.Total_Positive_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Negatively_Performing_Deals?.toFixed(0) ?? "0"}%
+              {ratingswise_total.Total_Negative_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Returns_positively?.toFixed(1) ?? "0"}%
+              {ratingswise_total.Total_Returns_Positive?.toFixed(1) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Returns_negatively?.toFixed(1) ?? "0"}%
+              {ratingswise_total.Total_Returns_Negative?.toFixed(1) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Expected_returns_excess?.toFixed(1) ?? "0"}%
+              {ratingswise_total.Total_Expected_Returns_Excess?.toFixed(1) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(yearwiseTotal.Total_Long_Opportunity_Value)}
+              {formatNumber(ratingswise_total.Total_Long_Opportunity_Value)}
             </TableCell>
           </TableRow>
         </TableBody>

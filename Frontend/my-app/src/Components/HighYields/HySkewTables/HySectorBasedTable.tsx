@@ -137,11 +137,12 @@ const HySectorBasedTable: React.FC = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
               Yearly Based Filtered Data
             </Typography>
+
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={3} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Rating</InputLabel>
-                  <Select value={rating} label="Rating" onChange={handleRatingChange}>
+                  <Select value={rating} label="Rating" onChange={handleRatingChange} sx={{ backgroundColor: '#e0f7fa', color: '#006064' }} >
                     <MenuItem value="All">All</MenuItem>
                     {ratingOptions.length > 0 ? (
                       ratingOptions.map((type) => (
@@ -156,10 +157,11 @@ const HySectorBasedTable: React.FC = () => {
                 </FormControl>
               </Grid>
 
+                    
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Sector</InputLabel>
-                  <Select value={sector} label="Sector" onChange={handleSectorChange}>
+                  <Select value={sector} label="Sector" onChange={handleSectorChange} sx={{ backgroundColor: '#f9dc8f', color: '#1a237e' }}>
                     <MenuItem value="All">All</MenuItem>
                     {sectorOptions.length > 0 ? (
                       sectorOptions.map((sec) => (
@@ -186,11 +188,11 @@ const HySectorBasedTable: React.FC = () => {
       </Card>
       
 
-      {noDataPopupOpen && (
+      {/* {noDataPopupOpen && (
         <Box p={2} sx={{ textAlign: "center", backgroundColor: "#ffcccb" }}>
           <Typography variant="body1">No data found for the selected filters.</Typography>
         </Box>
-      )}
+      )} */}
     </Container>
   );
 };

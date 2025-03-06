@@ -124,7 +124,7 @@ const HyRatingBasedTable: React.FC = () => {
                     value={endYear}
                     onChange={(event) => setEndYear(Number(event.target.value))}
                     label="End Year"
-                    sx={{ backgroundColor: '#e8eaf6', color: '#1a237e' }}
+                    sx={{ backgroundColor: '#f9dc8f', color: '#1a237e' }}
                   >
                     {endYearOptions.map((year) => (
                       <MenuItem key={year} value={year}>{year}</MenuItem>
@@ -151,8 +151,9 @@ const HyRatingBasedTable: React.FC = () => {
             </Grid>
           </Box>
           {ratingData && <HyRatingTableData data={ratingData} />}
+          {console.log("Data sent to tabledata file",ratingData)}
         </CardContent>
-      </Card>
+      </Card>  
     </Container>
   );
 };
