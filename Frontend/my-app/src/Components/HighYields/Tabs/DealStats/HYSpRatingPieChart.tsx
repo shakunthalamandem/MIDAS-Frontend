@@ -96,7 +96,7 @@ const HYSpRatingPieChart: React.FC<HYSpRatingPieChartProps> = ({
         gutterBottom
         sx={{ color: "#002060", fontWeight: "bold" }}
       >
-        Region-wise Data Over the Years
+        Rating wise Data Over the Years
       </Typography>
       <Box display="flex" justifyContent="center" flexWrap="wrap" mb={2}>
         {allRegions.map((region) => (

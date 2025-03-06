@@ -48,7 +48,7 @@ const HYSpRatingWiseChart: React.FC<HYSpRatingWiseChartProps> = ({ data, selecte
   return (
     <Box>
       <Typography variant="h5" align="center" gutterBottom sx={{ color: '#002060', fontWeight: 'bold' }}>
-        Region Wise Deals
+        Rating Wise Deals
       </Typography>
 
       <ResponsiveContainer width="100%" height={400}>
