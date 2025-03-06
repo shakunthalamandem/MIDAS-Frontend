@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, FormControlLabel, CardContent, Card, Container } from '@mui/material';
+import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, FormControlLabel, CardContent, Card, Container, Snackbar } from '@mui/material';
 import HyDealStatGraph from './HyDealStatGraph';
 import HYsppiechart from './HYsppiechart';
+import HyDealMainTable from './HyDealMainTable';
 
 interface HighYieldOptions {
   start_year: number[];
@@ -20,6 +21,8 @@ const DealStatsMain = () => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+    const [snackbarOpen, setSnackbarOpen] = useState(false); // Manage Snackbar open state
+    const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message content
   const [selectedFilters, setSelectedFilters] = useState<{
     start_year: number;
     end_year: number;
@@ -82,6 +85,9 @@ const DealStatsMain = () => {
   const handleFilterChange = (category: string) => (event: any) => {
     setSelectedFilters({ ...selectedFilters, [category]: event.target.value });
   };
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false); // Close Snackbar when the user dismisses it
+  };
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, value: string, category: 'sector' | 'sp_rating') => {
     setSelectedFilters((prev) => {
@@ -93,26 +99,32 @@ const DealStatsMain = () => {
     });
   };
 
+  // const handleApply = () => {
+  //   setAppliedFilters({ ...selectedFilters });
+  //   console.log('Applied Filters:', selectedFilters);
+  // };
   const handleApply = () => {
-    setAppliedFilters({ ...selectedFilters });
-    console.log('Applied Filters:', selectedFilters);
+    // Check if start_year is less than end_year
+    const startYear = selectedFilters["start_year"];
+    const endYear = selectedFilters["end_year"];
+
+    if (startYear && endYear && startYear > endYear) {
+      // Open Snackbar with error message if validation fails
+      setSnackbarMessage(
+        "Start year should be less than or equal to end year."
+      );
+      setSnackbarOpen(true);
+    } else {
+      setSnackbarOpen(false); // Close the Snackbar if validation passes
+      setAppliedFilters(selectedFilters); // Apply filters
+    }
   };
 
+
   const handleReset = () => {
-    setSelectedFilters({
-      start_year: 2012,
-      end_year: 2025,
-      sector: [],
-      sp_rating: [],
-      year_period: '',
-    });
-    setAppliedFilters({
-      start_year: 2012,
-      end_year: 2025,
-      sector: [],
-      sp_rating: [],
-      year_period: '',
-    });
+    // setSelectedFilters({});
+    // setAppliedFilters({});
+    setSnackbarOpen(false); // Close Snackbar on reset
   };
 
   if (loading) return <CircularProgress />;
@@ -247,8 +259,22 @@ const DealStatsMain = () => {
       </Container>
 
       {/* Pass only applied filters to the graph */}
-      <HyDealStatGraph selectedFilters={appliedFilters} />
-      <HYsppiechart selectedFilters={appliedFilters} />
+      <HyDealMainTable selectedFilters={appliedFilters} handleReset={handleReset}  />
+
+       <Snackbar
+              open={snackbarOpen}
+              autoHideDuration={6000}
+              onClose={handleSnackbarClose}
+            >
+              <Alert
+                onClose={handleSnackbarClose}
+                severity="error"
+                sx={{ width: "100%" }}
+              >
+                {snackbarMessage}
+              </Alert>
+            </Snackbar>
+ 
     </>
   );
 };
