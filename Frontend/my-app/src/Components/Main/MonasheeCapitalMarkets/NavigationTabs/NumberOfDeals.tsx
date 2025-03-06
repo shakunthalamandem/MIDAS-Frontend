@@ -16,7 +16,6 @@ interface NumberOfDealsProps {
 }
 
 const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) => {
-  // Prepare the data for the chart, based on the selected metric
   const chartData = Object.entries(data).map(([year, stats]) => {
     const ipoValue = stats["IPO"]?.[selectedMetric] || 0;
     const foValue = stats["FO"]?.[selectedMetric] || 0;
@@ -28,10 +27,9 @@ const NumberOfDeals: React.FC<NumberOfDealsProps> = ({ data, selectedMetric }) =
     };
   });
 
-  // Format numbers conditionally based on the metric
   const formatNumber = (value: number): string => {
     if (selectedMetric === "count") {
-      return value.toString(); // Just show the number
+      return value.toString(); 
     }
 
     const absValue = Math.abs(value);
