@@ -7,6 +7,7 @@ import {
   Card,
   Checkbox,
   FormControlLabel,
+  Grid,
 } from "@mui/material";
 import {
   LineChart,
@@ -340,26 +341,44 @@ const SectorMacroChart: React.FC = () => {
                 </LineChart>
               </ResponsiveContainer>
               <Box mb={2}>
-                {sectors.map((line) => (
-                  <FormControlLabel
-                    key={line}
-                    control={
-                      <Checkbox
-                        checked={visibleLines[line]}
-                        onChange={() => handleCheckboxChange(line)}
-                        name={line}
-                        sx={{
-                          color: "#9b0000",
-                          "&.Mui-checked": {
-                            color: "#9b0000",
-                          },
-                        }}
-                      />
-                    }
-                    label={line.replace(/_/g, " ").toUpperCase()}
-                  />
-                ))}
-              </Box>
+      <Grid container spacing={1}>
+        {sectors.map((line) => (
+          <Grid item xs={12} sm={6} md={3}>
+          <Box
+              p={0.5}
+              border={1}
+              borderColor="#ddd"
+              borderRadius={1}
+              fontSize="0.75rem"
+            >
+              <FormControlLabel
+  control={
+    <Checkbox
+      checked={visibleLines[line]}
+      onChange={() => handleCheckboxChange(line)}
+      name={line}
+      sx={{
+        transform: "scale(0.7)",
+        color: "#9b0000",
+        "&.Mui-checked": {
+          color: "#9b0000",
+        },
+      }}
+    />
+  }
+  label={line.replace(/_/g, " ").toUpperCase()}
+  componentsProps={{
+    typography: {
+      sx: { fontSize: "0.725rem" }, // Correct way to set label font size
+    },
+  }}
+/>
+
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
             </>
           )}
         </Box>
