@@ -23,26 +23,26 @@ const DealStatsMain = () => {
   const [selectedFilters, setSelectedFilters] = useState<{
     start_year: number;
     end_year: number;
-    sector: string;
+    sector: string[];  // Change sector to an array of strings
     sp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
-    sector: '',
+    sector: [],  // This should be an array
     sp_rating: [],
     year_period: 'Yearly',
   });
   const [appliedFilters, setAppliedFilters] = useState<{
     start_year: number;
     end_year: number;
-    sector: string;
+    sector: string[];  // Change sector to an array of strings
     sp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
-    sector: '',
+    sector: [],
     sp_rating: [],
     year_period: 'Yearly',
   });
@@ -83,13 +83,13 @@ const DealStatsMain = () => {
     setSelectedFilters({ ...selectedFilters, [category]: event.target.value });
   };
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, rating: string) => {
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, value: string, category: 'sector' | 'sp_rating') => {
     setSelectedFilters((prev) => {
-      const newSPRatings = event.target.checked
-        ? [...prev.sp_rating, rating]
-        : prev.sp_rating.filter((item) => item !== rating);
+      const newCategoryValues = event.target.checked
+        ? [...prev[category], value]
+        : prev[category].filter((item) => item !== value);
 
-      return { ...prev, sp_rating: newSPRatings };
+      return { ...prev, [category]: newCategoryValues };
     });
   };
 
@@ -102,14 +102,14 @@ const DealStatsMain = () => {
     setSelectedFilters({
       start_year: 2012,
       end_year: 2025,
-      sector: '',
+      sector: [],
       sp_rating: [],
       year_period: '',
     });
     setAppliedFilters({
       start_year: 2012,
       end_year: 2025,
-      sector: '',
+      sector: [],
       sp_rating: [],
       year_period: '',
     });
@@ -149,18 +149,38 @@ const DealStatsMain = () => {
                   </FormControl>
                 </Grid>
 
-                {/* Sector Filter */}
+                {/* Sector Filter with checkboxes */}
                 <Grid item xs={12} sm={6} md={2}>
+
                   <FormControl fullWidth variant="outlined" size="small">
                     <InputLabel>Sector</InputLabel>
-                    <Select value={selectedFilters.sector} onChange={handleFilterChange('sector')} label="Sector">
-                      <MenuItem value="">All</MenuItem>
+                    <Select
+                      multiple
+                      value={selectedFilters.sector}
+                      onChange={handleFilterChange('sector')}
+                      renderValue={(selected) => selected.join(', ')}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 300, // Limit the dropdown height to allow scrolling
+                            overflowY: 'auto',
+                          },
+                        },
+                      }}
+                    >
                       {filters.sector.map((sec) => (
-                        <MenuItem key={sec} value={sec}>{sec}</MenuItem>
+                        <MenuItem key={sec} value={sec} sx={{ fontSize: '0.875rem' }}>
+                          <Checkbox
+                            checked={selectedFilters.sector.includes(sec)}
+                            sx={{ transform: 'scale(0.8)' }} // Scale the checkbox to make it smaller
+                          />
+                          <Typography sx={{ fontSize: '1rem' }}>{sec}</Typography> {/* Reduce the text size */}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
+
 
                 {/* SP Rating Filter */}
                 <Grid item xs={12} sm={6} md={2}>
