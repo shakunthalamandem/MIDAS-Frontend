@@ -37,7 +37,7 @@ const NavbarMain: React.FC = () => {
     } else if (tabName === "High Yields") {
       navigate("/highyield/capital-markets"); 
     } else if (tabName === "Macro") {
-      navigate("/macro/capital-markets");
+      navigate("/macro/sector");
     }
   };
 

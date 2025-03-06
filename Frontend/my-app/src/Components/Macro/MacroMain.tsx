@@ -1,8 +1,13 @@
 import React from 'react'
+import SectorMacroChart from './SectorMacroChart'
 
 const MacroMain = () => {
   return (
-    <div>MacroMain</div>
+
+<>
+<SectorMacroChart />
+</>
+
   )
 }
 
