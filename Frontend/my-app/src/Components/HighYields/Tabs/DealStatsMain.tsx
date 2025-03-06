@@ -122,8 +122,18 @@ const DealStatsMain = () => {
 
 
   const handleReset = () => {
-    // setSelectedFilters({});
-    // setAppliedFilters({});
+    setSelectedFilters({ start_year: 2012,
+      end_year: 2025,
+      sector: [],
+      sp_rating: [],
+      year_period: 'Yearly',});
+    setAppliedFilters({
+      start_year: 2012,
+      end_year: 2025,
+      sector: [],
+      sp_rating: [],
+      year_period: 'Yearly',
+    });
     setSnackbarOpen(false); // Close Snackbar on reset
   };
 
