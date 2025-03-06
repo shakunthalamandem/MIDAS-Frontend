@@ -16,22 +16,21 @@ interface HYBarChartsProps {
 }
 
 const HYBarCharts: React.FC<HYBarChartsProps> = ({ data, selectedMetric }) => {
+  
   // Prepare the data for the chart, based on the selected metric
   const chartData = Object.entries(data).map(([year, stats]) => {
-    const ipoValue = stats["IPO"]?.[selectedMetric] || 0;
-    const foValue = stats["FO"]?.[selectedMetric] || 0;
+    const metricValue = stats[selectedMetric] || 0; // Get the value based on selectedMetric
 
     return {
       year,
-      IPO: ipoValue,
-      FO: foValue,
+      [selectedMetric]: metricValue, // Dynamically set the key based on selectedMetric
     };
   });
 
   // Format numbers conditionally based on the metric
   const formatNumber = (value: number): string => {
     if (selectedMetric === "count") {
-      return value.toString(); // Just show the number
+      return value.toString(); // Just show the number for count
     }
 
     const absValue = Math.abs(value);
@@ -100,8 +99,7 @@ const HYBarCharts: React.FC<HYBarChartsProps> = ({ data, selectedMetric }) => {
           <YAxis tickFormatter={formatNumber} /> {/* Conditional formatting */}
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-          <Bar dataKey="IPO" stackId="a" fill="#8884d8" />
-
+          <Bar dataKey={selectedMetric} stackId="a" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>
     </Box>

@@ -92,7 +92,7 @@ const HyDealMainTable: React.FC<HyDealMainTableProps> = ({
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <Box display="flex" justifyContent="center" mb={2}>
-        {["count", "deal_value", "opportunity_value_ex"].map(
+        {["count", "deal_value", "opp_value"].map(
           (metric, index) => {
             const labels = [
               "Deal Count",
@@ -128,13 +128,13 @@ const HyDealMainTable: React.FC<HyDealMainTableProps> = ({
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <HYBarCharts
-                data={apiData.deal_type}
+                data={apiData.main_aggregation}
                 selectedMetric={selectedMetric}
               />
             </CardContent>
           </Card>
 
-          <Card sx={{ mb: 4 }}>
+          {/* <Card sx={{ mb: 4 }}>
             <CardContent>
               <HYYearlySectorChart
                 data={apiData.year_wise_sector}
@@ -167,7 +167,7 @@ const HyDealMainTable: React.FC<HyDealMainTableProps> = ({
                 selectedMetric={selectedMetric}
               />
             </CardContent>
-          </Card>
+          </Card> */}
         </>
       )}
      <NoDataPopup
