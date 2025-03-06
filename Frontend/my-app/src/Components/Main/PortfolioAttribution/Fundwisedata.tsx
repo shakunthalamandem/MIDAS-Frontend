@@ -13,13 +13,15 @@ import {
     Container,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import DealStatsMain from "../../HighYields/Tabs/DealStatsMain";
+// import DealStatsMain from './DealStatsMain'; // Importing the DealStatsMain component
 
 const formatNumber = (value: number) => {
     const isNegative = value < 0;
     const absValue = Math.abs(value);
     let formattedValue;
 
-        formattedValue = (absValue / 1_000).toFixed(0) + "K";
+    formattedValue = (absValue / 1_000).toFixed(0) + "K";
 
     return isNegative ? `-$${formattedValue}` : `$${formattedValue}`;
 };
@@ -72,11 +74,9 @@ const Fundwisedata: React.FC = () => {
         <Box sx={{ width: "100%", backgroundColor: "#fff", p: 2 }}>
             <Container>
                 {/* Heading Section */}
-
-
                 <Typography variant="h5" color="#002060" align="center" fontWeight={600} marginBottom={2}>
-                    2025 YTD Net of Hedge P&L Attribution by Fund      </Typography>
-
+                    2025 YTD Net of Hedge P&L Attribution by Fund
+                </Typography>
 
                 {/* Loading & Error Handling */}
                 {loading ? (
@@ -159,6 +159,9 @@ const Fundwisedata: React.FC = () => {
                         </Table>
                     </TableContainer>
                 )}
+
+                {/* Render DealStatsMain Component below the table */}
+                <DealStatsMain />
             </Container>
         </Box>
     );
