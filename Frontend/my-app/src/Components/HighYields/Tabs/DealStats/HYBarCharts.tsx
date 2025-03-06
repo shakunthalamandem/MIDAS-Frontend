@@ -17,6 +17,7 @@ interface HYBarChartsProps {
 
 const HYBarCharts: React.FC<HYBarChartsProps> = ({ data, selectedMetric }) => {
   
+  
   // Prepare the data for the chart, based on the selected metric
   const chartData = Object.entries(data).map(([year, stats]) => {
     const metricValue = stats[selectedMetric] || 0; // Get the value based on selectedMetric

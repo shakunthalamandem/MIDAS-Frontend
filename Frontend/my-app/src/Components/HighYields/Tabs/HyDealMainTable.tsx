@@ -134,7 +134,7 @@ const HyDealMainTable: React.FC<HyDealMainTableProps> = ({
             </CardContent>
           </Card>
 
-          {/* <Card sx={{ mb: 4 }}>
+          <Card sx={{ mb: 4 }}>
             <CardContent>
               <HYYearlySectorChart
                 data={apiData.year_wise_sector}
@@ -142,7 +142,7 @@ const HyDealMainTable: React.FC<HyDealMainTableProps> = ({
               />
             </CardContent>
           </Card>
-          <Card sx={{ mb: 4 }}>
+          {/* <Card sx={{ mb: 4 }}>
             <CardContent>
               <HYSectorWisePieChart
                 data={apiData.sectors}
