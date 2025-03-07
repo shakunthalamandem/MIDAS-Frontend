@@ -13,7 +13,7 @@ import {
     Container,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import DealStatsMain from "../../HighYields/Tabs/DealStatsMain";
+
 // import DealStatsMain from './DealStatsMain'; // Importing the DealStatsMain component
 
 const formatNumber = (value: number) => {
@@ -161,7 +161,7 @@ const Fundwisedata: React.FC = () => {
                 )}
 
                 {/* Render DealStatsMain Component below the table */}
-                <DealStatsMain />
+                {/* <DealStatsMain /> */}
             </Container>
         </Box>
     );
