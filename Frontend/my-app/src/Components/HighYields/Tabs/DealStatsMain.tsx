@@ -9,7 +9,7 @@ interface HighYieldOptions {
   start_year: number[];
   end_year: number[];
   sector: string[];
-  sp_rating: string[];
+  snp_rating: string[];
 }
 
 const DealStatsMain = () => {
@@ -17,7 +17,7 @@ const DealStatsMain = () => {
     start_year: [],
     end_year: [],
     sector: [],
-    sp_rating: [],
+    snp_rating: [],
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,26 +27,26 @@ const DealStatsMain = () => {
     start_year: number;
     end_year: number;
     sector: string[];  // Change sector to an array of strings
-    sp_rating: string[];
+    snp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: [],  // This should be an array
-    sp_rating: [],
+    snp_rating: [],
     year_period: 'Yearly',
   });
   const [appliedFilters, setAppliedFilters] = useState<{
     start_year: number;
     end_year: number;
     sector: string[];  // Change sector to an array of strings
-    sp_rating: string[];
+    snp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: [],
-    sp_rating: [],
+    snp_rating: [],
     year_period: 'Yearly',
   });
 
@@ -89,7 +89,7 @@ const DealStatsMain = () => {
     setSnackbarOpen(false); // Close Snackbar when the user dismisses it
   };
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, value: string, category: 'sector' | 'sp_rating') => {
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, value: string, category: 'sector' | 'snp_rating') => {
     setSelectedFilters((prev) => {
       const newCategoryValues = event.target.checked
         ? [...prev[category], value]
@@ -125,13 +125,13 @@ const DealStatsMain = () => {
     setSelectedFilters({ start_year: 2012,
       end_year: 2025,
       sector: [],
-      sp_rating: [],
+      snp_rating: [],
       year_period: 'Yearly',});
     setAppliedFilters({
       start_year: 2012,
       end_year: 2025,
       sector: [],
-      sp_rating: [],
+      snp_rating: [],
       year_period: 'Yearly',
     });
     setSnackbarOpen(false); // Close Snackbar on reset
@@ -210,8 +210,8 @@ const DealStatsMain = () => {
                     <InputLabel>SP Rating</InputLabel>
                     <Select
                       multiple
-                      value={selectedFilters.sp_rating}
-                      onChange={handleFilterChange('sp_rating')}
+                      value={selectedFilters.snp_rating}
+                      onChange={handleFilterChange('snp_rating')}
                       renderValue={(selected) => selected.join(', ')}
                       MenuProps={{
                         PaperProps: {
@@ -222,10 +222,10 @@ const DealStatsMain = () => {
                         },
                       }}
                     >
-                      {filters.sp_rating.sort().map((rating) => (
+                      {filters.snp_rating.sort().map((rating) => (
                         <MenuItem key={rating} value={rating} sx={{ fontSize: '0.875rem' }}>
                           <Checkbox
-                            checked={selectedFilters.sp_rating.includes(rating)}
+                            checked={selectedFilters.snp_rating.includes(rating)}
                             sx={{ transform: 'scale(0.8)' }} // Scale the checkbox to make it smaller
                           />
                           <Typography sx={{ fontSize: '1rem' }}>{rating}</Typography> {/* Reduce the text size */}

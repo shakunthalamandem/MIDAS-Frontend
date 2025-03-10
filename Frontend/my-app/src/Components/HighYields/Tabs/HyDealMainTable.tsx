@@ -154,7 +154,7 @@ const HyDealMainTable: React.FC<HyDealMainTableProps> = ({
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <HYSpRatingPieChart
-                data={apiData.year_wise_sp_rating}
+                data={apiData.year_wise_snp_rating}
                 selectedMetric={selectedMetric}
               />
             </CardContent>
@@ -163,7 +163,7 @@ const HyDealMainTable: React.FC<HyDealMainTableProps> = ({
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <HYSpRatingWiseChart
-                data={apiData.sp_rating}
+                data={apiData.snp_rating}
                 selectedMetric={selectedMetric}
               />
             </CardContent>
