@@ -14,20 +14,19 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 
-// import DealStatsMain from './DealStatsMain'; // Importing the DealStatsMain component
-
 const formatNumber = (value: number) => {
+    if (value === undefined || value === null) return "-";
     const isNegative = value < 0;
     const absValue = Math.abs(value);
     let formattedValue;
 
-    formattedValue = (absValue / 1_000).toFixed(0) + "K";
+    formattedValue = absValue >= 1_000 ? (absValue / 1_000).toFixed(0) + "K" : absValue.toFixed(2);
 
     return isNegative ? `-$${formattedValue}` : `$${formattedValue}`;
 };
 
 const Fundwisedata: React.FC = () => {
-    const [data, setData] = useState<any[]>([]);
+    const [data, setData] = useState<{ fund: string; Jan: number; Feb: number; Mar: number; YTD: number }[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +54,26 @@ const Fundwisedata: React.FC = () => {
                 }
 
                 const result = await response.json();
-                setData(result);
+
+                // Transform API response
+                const formattedData = result.map((item: any) => {
+                    const fundName = Object.keys(item)[0]; // Extract fund name
+                    const fundValues = item[fundName]; // Extract month-wise data
+                    const Jan = fundValues.Jan || 0;
+                    const Feb = fundValues.Feb || 0;
+                    const Mar = fundValues.Mar || 0;
+                    const YTD = Jan + Feb + Mar; // Calculate YTD
+
+                    return {
+                        fund: fundName,
+                        Jan,
+                        Feb,
+                        Mar,
+                        YTD, // Add YTD column
+                    };
+                });
+
+                setData(formattedData);
                 setLoading(false);
             } catch (error: any) {
                 setError(error.message);
@@ -66,19 +84,19 @@ const Fundwisedata: React.FC = () => {
         fetchData();
     }, [apiUrl, token]);
 
-    const totalPnl = formatNumber(data.reduce((sum, row) => sum + row.pnl, 0));
-    const totalhurdle_return = formatNumber(data.reduce((sum, row) => sum + row.hurdle_return, 0));
-    const totalNet = formatNumber(data.reduce((sum, row) => sum + (row.net || 0), 0));
+    // Calculate total values
+    const totalJan = data.reduce((sum, row) => sum + row.Jan, 0);
+    const totalFeb = data.reduce((sum, row) => sum + row.Feb, 0);
+    const totalMar = data.reduce((sum, row) => sum + row.Mar, 0);
+    const totalYTD = data.reduce((sum, row) => sum + row.YTD, 0);
 
     return (
         <Box sx={{ width: "100%", backgroundColor: "#fff", p: 2 }}>
             <Container>
-                {/* Heading Section */}
                 <Typography variant="h5" color="#002060" align="center" fontWeight={600} marginBottom={2}>
-                    2025 YTD Net of Hedge P&L Attribution by Fund 
+                    2025 YTD Net of Hedge P&L Attribution by Fund
                 </Typography>
 
-                {/* Loading & Error Handling */}
                 {loading ? (
                     <Box display="flex" justifyContent="center" alignItems="center">
                         <CircularProgress />
@@ -87,107 +105,74 @@ const Fundwisedata: React.FC = () => {
                     <Typography color="error">{error}</Typography>
                 ) : (
                     <TableContainer component={Paper} sx={{ border: "1px solid #ddd" }}>
-                        <Table size="small" sx={{ borderCollapse: "collapse" }}>
+                        <Table size="small">
                             <TableHead>
                                 <TableRow sx={{ backgroundColor: "#466675" }}>
-                                    <TableCell
-                                        sx={{
-                                            color: "#ffffff",
-                                            fontWeight: "bold",
-                                            width: "20px",
-                                            border: "1px solid #ddd",
-                                        }}
-                                    >
+                                    <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd" }}>
                                         Fund
                                     </TableCell>
-                                    <TableCell
-                                        sx={{
-                                            color: "#ffffff",
-                                            fontWeight: "bold",
-                                            width: "20px",
-                                            border: "1px solid #ddd",
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        YTD PnL
+                                    <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                                        Jan
                                     </TableCell>
-                                    <TableCell
-                                        sx={{
-                                            color: "#ffffff",
-                                            fontWeight: "bold",
-                                            width: "120px",
-                                            border: "1px solid #ddd",
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        Hurdle Return
+                                    <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                                        Feb
                                     </TableCell>
-                                    <TableCell
-                                        sx={{
-                                            color: "#ffffff",
-                                            fontWeight: "bold",
-                                            width: "120px",
-                                            border: "1px solid #ddd",
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        Net PnL
+                                    <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                                        Mar
+                                    </TableCell>
+                                    <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                                        YTD
                                     </TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {data.map((row, index) => (
                                     <TableRow key={index} sx={{ backgroundColor: index % 2 ? "#f5f5f5" : "#ffffff" }}>
-                                        <TableCell
-                                            sx={{
-                                                fontWeight: "bold",
-                                                border: "1px solid #ddd",
-                                                whiteSpace: "nowrap", // Prevent text wrapping
-                                            }}
-                                        >
+                                        <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", whiteSpace: "nowrap" }}>
                                             <Link
                                                 to={`/equity/portfolio-attribution/fund/${row.fund}`}
-                                                style={{
-                                                    color: "#A52A2A",
-                                                    textDecoration: "none",
-                                                }}
+                                                style={{ color: "#A52A2A", textDecoration: "none" }}
                                                 target="_blank"
                                             >
                                                 {row.fund}
                                             </Link>
                                         </TableCell>
                                         <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
-                                            {formatNumber(row.pnl)}
+                                            {formatNumber(row.Jan)}
                                         </TableCell>
                                         <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
-                                            {formatNumber(row.hurdle_return)}
+                                            {formatNumber(row.Feb)}
                                         </TableCell>
                                         <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
-                                            {formatNumber(row.net || 0)}
+                                            {formatNumber(row.Mar)}
+                                        </TableCell>
+                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center"}}>
+                                            {formatNumber(row.YTD)}
                                         </TableCell>
                                     </TableRow>
                                 ))}
+                                {/* Total Row */}
                                 <TableRow sx={{ backgroundColor: "#91ce89" }}>
                                     <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
                                         Total
                                     </TableCell>
-                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
-                                        {totalPnl}
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
+                                        {formatNumber(totalJan)}
                                     </TableCell>
-                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
-                                        {totalhurdle_return}
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
+                                        {formatNumber(totalFeb)}
                                     </TableCell>
-                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
-                                        {totalNet}
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
+                                        {formatNumber(totalMar)}
+                                    </TableCell>
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
+                                        {formatNumber(totalYTD)}
                                     </TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
                     </TableContainer>
                 )}
-
-                {/* Render DealStatsMain Component below the table */}
-                {/* <DealStatsMain /> */}
             </Container>
         </Box>
     );
