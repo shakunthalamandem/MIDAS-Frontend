@@ -34,7 +34,7 @@ const NavbarMain: React.FC = () => {
       navigate("/equity/issue_market");
     } else if (tabName === "Converts") {
       navigate("/converts/capital-markets");
-    } else if (tabName === "High Yields") {
+    } else if (tabName === "High Yield") {
       navigate("/highyield/capital-markets"); 
     } else if (tabName === "Macro") {
       navigate("/macro/sector");
@@ -146,7 +146,7 @@ const NavbarMain: React.FC = () => {
 
           {selectedTab === "Equity" && <EquityNavbar />}
           {selectedTab === "Converts" && <ConvertsNavbar />}
-          {selectedTab === "High Yields" && <HighYieldNavbar />}
+          {selectedTab === "High Yield" && <HighYieldNavbar />}
           {selectedTab === "Macro" && <MacroNavbar />}
 
           {isLoggedIn && isSuperUser && (
