@@ -21,12 +21,12 @@ interface IssuerData {
   pricing_date: string;
   issuer_name: string;
   isin: string;
-  sp_init_rtg: string;
-  maturity: string;
-  issue_price: number;
+  snp_rating: string;
+  maturity_date: string;
+  modified_issue_price: number;
   price_30: number;  // Changed from price_30d
-  orig_amt_sold: number;
-  cpn: number;
+  original_amount_sold: number;
+  coupon: number;
   opportunity_value: number;
   sector: string;
 }
@@ -122,8 +122,8 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                               label: "ISIN",
                                               value: item.isin?? "N/A" ,
                                             },
-                                            { label: "S&P Rating", value: item.sp_init_rtg ?? "N/A" },
-                                            { label: "Maturity", value: item.maturity?? "N/A"  },
+                                            { label: "S&P Rating", value: item.snp_rating ?? "N/A" },
+                                            { label: "maturity_date", value: item.maturity_date?? "N/A"  },
                                             { label: "Sector", value: item.sector?? "N/A"  },
                                           ].map((row, i) => (
                                             <TableRow
@@ -166,10 +166,10 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                         <Table size="small" aria-label="high yield deal table2">
                                           <TableBody>
                                             {[
-                                         { label: "Issue Price", value: item.issue_price ? item.issue_price.toLocaleString(undefined, { style: 'currency', currency: 'USD',minimumFractionDigits: 0  }) : "N/A" },
+                                         { label: "Issue Price", value: item.modified_issue_price ? item.modified_issue_price.toLocaleString(undefined, { style: 'currency', currency: 'USD',minimumFractionDigits: 0  }) : "N/A" },
                                          { label: "30 day price", value: item.price_30 ? item.price_30.toLocaleString(undefined, { style: 'currency', currency: 'USD' }) : "N/A" },
-                                         { label: "Original Amount Sold", value: item.orig_amt_sold ? item.orig_amt_sold.toLocaleString(undefined,{style:"currency",currency:'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
-                                         { label: "Coupon", value: `${item.cpn ?? "N/A"}%` },
+                                         { label: "Original Amount Sold", value: item.original_amount_sold ? item.original_amount_sold.toLocaleString(undefined,{style:"currency",currency:'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
+                                         { label: "Coupon", value: `${item.coupon ?? "N/A"}%` },
                                          { label: "Opportunity Value", value: item.opportunity_value ? item.opportunity_value.toLocaleString(undefined, { style: 'currency', currency: 'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
                                          
                                             ].map((row, i) => (
