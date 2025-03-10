@@ -169,7 +169,7 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                          { label: "Issue Price", value: item.issue_price ? item.issue_price.toLocaleString(undefined, { style: 'currency', currency: 'USD',minimumFractionDigits: 0  }) : "N/A" },
                                          { label: "30 day price", value: item.price_30 ? item.price_30.toLocaleString(undefined, { style: 'currency', currency: 'USD' }) : "N/A" },
                                          { label: "Original Amount Sold", value: item.orig_amt_sold ? item.orig_amt_sold.toLocaleString(undefined,{style:"currency",currency:'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
-                                         { label: "Coupon", value: item.cpn ?? "N/A" },
+                                         { label: "Coupon", value: `${item.cpn ?? "N/A"}%` },
                                          { label: "Opportunity Value", value: item.opportunity_value ? item.opportunity_value.toLocaleString(undefined, { style: 'currency', currency: 'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
                                          
                                             ].map((row, i) => (
