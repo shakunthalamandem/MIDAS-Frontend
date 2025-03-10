@@ -143,6 +143,12 @@ const NavbarMain: React.FC = () => {
           <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
             <img src={logo} alt="MIDAS Logo" style={{ width: "130px", height: "60px", marginRight: "10px" }} />
           </Link>
+          
+          <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }}>
+            <Typography variant="body1" fontWeight="bold" >
+              {selectedTab}
+            </Typography>
+          </Button>
 
           {selectedTab === "Equity" && <EquityNavbar />}
           {selectedTab === "Converts" && <ConvertsNavbar />}
