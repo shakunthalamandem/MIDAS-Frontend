@@ -139,21 +139,51 @@ const Fundwisedata: React.FC = () => {
                             <TableBody>
                                 {data.map((row, index) => (
                                     <TableRow key={index} sx={{ backgroundColor: index % 2 ? "#f5f5f5" : "#ffffff" }}>
-                                        <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
-                                            <Link to={`/equity/portfolio-attribution/fund/${row.fund}`} style={{ color: "#A52A2A", textDecoration: "none" }} target="_blank">
+                                        <TableCell
+                                            sx={{
+                                                fontWeight: "bold",
+                                                border: "1px solid #ddd",
+                                                textAlign: "center",
+                                                fontSize: "18px", // Increase font size for the Fund column values
+                                                whiteSpace: "nowrap", // Prevent text wrapping
+                                            }}
+                                        >
+                                            <Link
+                                                to={`/equity/portfolio-attribution/fund/${row.fund}`}
+                                                style={{
+                                                    color: "#A52A2A",
+                                                    textDecoration: "none",
+                                                    fontSize: "18px", // Increase font size for the link as well
+                                                }}
+                                                target="_blank"
+                                            >
                                                 {row.fund}
                                             </Link>
                                         </TableCell>
-                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.pnl)}</TableCell>
-                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.hurdle_return)}</TableCell>
-                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{formatNumber(row.net || 0)}</TableCell>
+                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
+                                            {formatNumber(row.pnl)}
+                                        </TableCell>
+                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
+                                            {formatNumber(row.hurdle_return)}
+                                        </TableCell>
+                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
+                                            {formatNumber(row.net || 0)}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                                 <TableRow sx={{ backgroundColor: "#91ce89" }}>
-                                    <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>Total</TableCell>
-                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalPnl}</TableCell>
-                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalhurdle_return}</TableCell>
-                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>{totalNet}</TableCell>
+                                    <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                                        Total
+                                    </TableCell>
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
+                                        {totalPnl}
+                                    </TableCell>
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
+                                        {totalhurdle_return}
+                                    </TableCell>
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
+                                        {totalNet}
+                                    </TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

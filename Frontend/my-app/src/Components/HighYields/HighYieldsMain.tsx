@@ -26,7 +26,7 @@ const HighYieldsMain: React.FC = () => {
   const { ticker: routeTicker } = useParams<{ ticker: string }>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "Atwood Oceanics Inc"); 
+  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "Kimmeridge Texas Gas LLC"); 
   const [results, setResults] = useState<HighYieldResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -121,7 +121,7 @@ useEffect(() => {
           },
         }}
       >
-        Welcome to HighYields New Issue Equity Markets! Explore deals and uncover
+        Welcome to HighYield New Issue Equity Markets! Explore deals and uncover
         statistics from the global market with ease.
       </Typography>
       <Tabs

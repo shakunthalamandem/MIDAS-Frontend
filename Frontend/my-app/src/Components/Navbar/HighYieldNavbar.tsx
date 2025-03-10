@@ -3,7 +3,7 @@ import { Tabs, Tab, Box } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const pages = [
-  "Equity Market Opportunity",
+  "High Yield Market Opportunity",
   "Monashee Performance & Efficiency",
   "Portfolio Attribution",
 ];
@@ -14,7 +14,7 @@ const HighYieldNavbar: React.FC = () => {
 
   const handleNavigate = (page: string) => {
     switch (page) {
-      case "Equity Market Opportunity":
+      case "High Yield Market Opportunity":
         navigate("/highyield/capital-markets");
         break;
       case "Monashee Performance & Efficiency":
