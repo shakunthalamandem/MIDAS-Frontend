@@ -96,7 +96,6 @@ const Fundwisedata: React.FC = () => {
                                             fontWeight: "bold",
                                             width: "20px",
                                             border: "1px solid #ddd",
-                                            textAlign: "center",
                                         }}
                                     >
                                         Fund
@@ -143,8 +142,6 @@ const Fundwisedata: React.FC = () => {
                                             sx={{
                                                 fontWeight: "bold",
                                                 border: "1px solid #ddd",
-                                                textAlign: "center",
-                                                fontSize: "18px", // Increase font size for the Fund column values
                                                 whiteSpace: "nowrap", // Prevent text wrapping
                                             }}
                                         >
@@ -153,7 +150,6 @@ const Fundwisedata: React.FC = () => {
                                                 style={{
                                                     color: "#A52A2A",
                                                     textDecoration: "none",
-                                                    fontSize: "18px", // Increase font size for the link as well
                                                 }}
                                                 target="_blank"
                                             >
