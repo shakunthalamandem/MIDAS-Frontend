@@ -110,6 +110,13 @@ const HyRatingBasedTable: React.FC = () => {
                     onChange={(event) => setStartYear(Number(event.target.value))}
                     label="Start Year"
                     sx={{ backgroundColor: '#e0f7fa', color: '#006064' }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}
                   >
                     {startYearOptions.map((year) => (
                       <MenuItem key={year} value={year}>{year}</MenuItem>
@@ -125,6 +132,13 @@ const HyRatingBasedTable: React.FC = () => {
                     onChange={(event) => setEndYear(Number(event.target.value))}
                     label="End Year"
                     sx={{ backgroundColor: '#f9dc8f', color: '#1a237e' }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}
                   >
                     {endYearOptions.map((year) => (
                       <MenuItem key={year} value={year}>{year}</MenuItem>
@@ -140,6 +154,13 @@ const HyRatingBasedTable: React.FC = () => {
                     onChange={(event) => setSector(event.target.value)}
                     label="Sector"
                     sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}
                   >
                     <MenuItem value="All">All</MenuItem>
                     {sectorOptions.map((sec) => (

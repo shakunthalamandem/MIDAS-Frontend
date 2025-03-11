@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AppBar, Toolbar, Button, Box, Typography, IconButton } from "@mui/material";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logo from "../../Assets/images/Monashee-Cap-Logos.png";
@@ -13,10 +13,14 @@ import MacroNavbar from "./MacroNavbar";
 import MenuIcon from '@mui/icons-material/Menu';
 
 const NavbarMain: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState<string>("Equity");
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
+  
+  const [selectedTab, setSelectedTab] = useState<string>(() => {
+    return localStorage.getItem("selectedTab") || "Equity"; // Retrieve tab from localStorage or default to "Equity"
+  });
+
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const isSuperUser = localStorage.getItem("is_superuser") === "true";
   const [showLogs, setShowLogs] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
@@ -27,15 +31,19 @@ const NavbarMain: React.FC = () => {
   const refresh_token = localStorage.getItem("refresh_token");
   const user = localStorage.getItem("user");
 
+  useEffect(() => {
+    localStorage.setItem("selectedTab", selectedTab); // Save selected tab to localStorage on change
+  }, [selectedTab]);
+
   const handleTabSelect = (tabName: string) => {
     setSelectedTab(tabName);
-    // Navigate to the relevant tab based on the selected tab
+    localStorage.setItem("selectedTab", tabName); // Save to localStorage immediately
     if (tabName === "Equity") {
       navigate("/equity/issue_market");
     } else if (tabName === "Converts") {
       navigate("/converts/capital-markets");
     } else if (tabName === "High Yield") {
-      navigate("/highyield/capital-markets"); 
+      navigate("/highyield/capital-markets");
     } else if (tabName === "Macro") {
       navigate("/macro/sector");
     }
@@ -59,6 +67,7 @@ const NavbarMain: React.FC = () => {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
+      localStorage.removeItem("selectedTab"); // Clear tab on logout
 
       setLoading(false);
       navigate("/login");
@@ -135,7 +144,7 @@ const NavbarMain: React.FC = () => {
             aria-label="open sidebar"
             edge="start"
             onClick={handleSidebarToggle}
-            sx={{ mr: 2 ,color:'#002060'}}
+            sx={{ mr: 2, color: "#002060" }}
           >
             <MenuIcon />
           </IconButton>
@@ -143,9 +152,9 @@ const NavbarMain: React.FC = () => {
           <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
             <img src={logo} alt="MIDAS Logo" style={{ width: "130px", height: "60px", marginRight: "10px" }} />
           </Link>
-          
-          <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }}>
-            <Typography variant="body1" fontWeight="bold" >
+
+          <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }} onClick={handleSidebarToggle}>
+            <Typography variant="body1" fontWeight="bold">
               {selectedTab}
             </Typography>
           </Button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   FormControl,
@@ -11,14 +11,14 @@ import {
   Card,
   CardContent,
   Typography,
-} from '@mui/material';
-import axios from 'axios';
-import HySectorTableData from './HySectorTableData';
+} from "@mui/material";
+import axios from "axios";
+import HySectorTableData from "./HySectorTableData";
 
 // Define the expected structure of the API response
 interface SkewTableOptions {
-  'start year': number[];
-  'end year': number[];
+  "start year": number[];
+  "end year": number[];
   ratings: string[];
   // region: string[];
   sector: string[];
@@ -27,8 +27,8 @@ interface SkewTableOptions {
 const HySectorBasedTable: React.FC = () => {
   const [startYear, setStartYear] = useState<number>(2012);
   const [endYear, setEndYear] = useState<number | string>(2025);
-  const [rating, setRating] = useState<string>('All');
-  const [sector, setSector] = useState<string>('All');
+  const [rating, setRating] = useState<string>("All");
+  const [sector, setSector] = useState<string>("All");
 
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
@@ -45,23 +45,25 @@ const HySectorBasedTable: React.FC = () => {
         const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
-          throw new Error('API URL is not defined in environment variables');
+          throw new Error("API URL is not defined in environment variables");
         }
 
-        const response = await axios.get(`${apiUrl}/api/hy_skew_table_filters/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
+        const response = await axios.get(
+          `${apiUrl}/api/hy_skew_table_filters/`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          }
+        );
 
         const data = response.data as SkewTableOptions;
 
-        setRatingOptions(data['ratings']);
-        setSectorOptions(Array.isArray(data['sector']) ? data['sector'] : []);
-
+        setRatingOptions(data["ratings"]);
+        setSectorOptions(Array.isArray(data["sector"]) ? data["sector"] : []);
       } catch (error) {
-        console.error('Error fetching filter options:', error);
+        console.error("Error fetching filter options:", error);
       }
     };
 
@@ -73,8 +75,8 @@ const HySectorBasedTable: React.FC = () => {
       const requestData = {
         filters: {
           year_range: [startYear, endYear],
-          rating: rating === 'All' ? ratingOptions : [rating],
-          sector: sector === 'All' ? sectorOptions : [sector],
+          rating: rating === "All" ? ratingOptions : [rating],
+          sector: sector === "All" ? sectorOptions : [sector],
         },
       };
 
@@ -83,7 +85,7 @@ const HySectorBasedTable: React.FC = () => {
         const token = localStorage.getItem("access_token");
 
         if (!apiUrl) {
-          throw new Error('API URL is not defined in environment variables');
+          throw new Error("API URL is not defined in environment variables");
         }
 
         const response = await axios.post(
@@ -93,7 +95,7 @@ const HySectorBasedTable: React.FC = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: token ? `Bearer ${token}` : "",
-            }
+            },
           }
         );
 
@@ -125,16 +127,20 @@ const HySectorBasedTable: React.FC = () => {
     setNoDataPopupOpen(false);
     setStartYear(2012);
     setEndYear(2025);
-    setRating('All');
-    setSector('All');
+    setRating("All");
+    setSector("All");
   };
 
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
-          <Box p={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>
-            <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
+          <Box p={3} sx={{ backgroundColor: "#f0f4ff", borderRadius: 2 }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ color: "#3b3f57", fontWeight: "bold" }}
+            >
               Yearly Based Filtered Data
             </Typography>
 
@@ -142,7 +148,19 @@ const HySectorBasedTable: React.FC = () => {
               <Grid item xs={12} sm={3} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Rating</InputLabel>
-                  <Select value={rating} label="Rating" onChange={handleRatingChange} sx={{ backgroundColor: '#e0f7fa', color: '#006064' }} >
+                  <Select
+                    value={rating}
+                    label="Rating"
+                    onChange={handleRatingChange}
+                    sx={{ backgroundColor: "#e0f7fa", color: "#006064" }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}
+                  >
                     <MenuItem value="All">All</MenuItem>
                     {ratingOptions.length > 0 ? (
                       ratingOptions.map((type) => (
@@ -157,11 +175,22 @@ const HySectorBasedTable: React.FC = () => {
                 </FormControl>
               </Grid>
 
-                    
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Sector</InputLabel>
-                  <Select value={sector} label="Sector" onChange={handleSectorChange} sx={{ backgroundColor: '#f9dc8f', color: '#1a237e' }}>
+                  <Select
+                    value={sector}
+                    label="Sector"
+                    onChange={handleSectorChange}
+                    sx={{ backgroundColor: "#f9dc8f", color: "#1a237e" }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}
+                  >
                     <MenuItem value="All">All</MenuItem>
                     {sectorOptions.length > 0 ? (
                       sectorOptions.map((sec) => (
@@ -186,7 +215,6 @@ const HySectorBasedTable: React.FC = () => {
           {responseData && <HySectorTableData data={responseData} />}
         </CardContent>
       </Card>
-      
 
       {/* {noDataPopupOpen && (
         <Box p={2} sx={{ textAlign: "center", backgroundColor: "#ffcccb" }}>
