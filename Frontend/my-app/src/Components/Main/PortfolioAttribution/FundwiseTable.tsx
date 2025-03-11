@@ -181,9 +181,9 @@ const FundWiseTable: React.FC = () => {
                         <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>Feb-2025</b>
                         </TableCell>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                        {/* <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>Mar-2025</b>
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
                           <b>2025 YTD</b>
                         </TableCell>
@@ -214,9 +214,9 @@ const FundWiseTable: React.FC = () => {
                               <TableCell sx={{ border: "1px solid black" }}>
                                 {formatNumber(row.Feb_pnl)}
                               </TableCell>
-                              <TableCell sx={{ border: "1px solid black" }}>
+                              {/* <TableCell sx={{ border: "1px solid black" }}>
                                 {formatNumber(row.Mar_pnl)}
-                              </TableCell>
+                              </TableCell> */}
                               <TableCell sx={{ border: "1px solid black" }}>
                                 {formatNumber(ytd)}
                               </TableCell>
@@ -232,9 +232,9 @@ const FundWiseTable: React.FC = () => {
                                 <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
                                   {formatNumber(regionTotals[row.broad_region].Feb_pnl)}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                                {/* <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
                                   {formatNumber(regionTotals[row.broad_region].Mar_pnl)}
-                                </TableCell>
+                                </TableCell> */}
                                 <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
                                   {formatNumber(
                                     regionTotals[row.broad_region].Jan_pnl +
@@ -257,9 +257,9 @@ const FundWiseTable: React.FC = () => {
                         <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
                           {formatNumber(overallTotal.Feb_pnl)}
                         </TableCell>
-                        <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                        {/* <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
                           {formatNumber(overallTotal.Mar_pnl)}
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
                           {formatNumber(overallTotal.Jan_pnl + overallTotal.Feb_pnl + overallTotal.Mar_pnl)}
                         </TableCell>
