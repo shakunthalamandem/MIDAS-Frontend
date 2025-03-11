@@ -134,6 +134,13 @@ const HyYearlyBasedTable: React.FC = () => {
                   <Select
                     value={startYear}
                     onChange={handleStartYearChange}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}
                     label="Start Year"                     sx={{ backgroundColor: '#e0f7fa', color: '#006064' }}
 
                     disabled={!Array.isArray(startYearOptions) || startYearOptions.length === 0}
@@ -154,6 +161,13 @@ const HyYearlyBasedTable: React.FC = () => {
                   <Select
                     value={endYear}
                     onChange={handleEndYearChange}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}
                     label="End Year"                     sx={{ backgroundColor: '#f9dc8f', color: '#1a237e' }}
 
                     disabled={filteredEndYearOptions.length === 0}
@@ -174,7 +188,14 @@ const HyYearlyBasedTable: React.FC = () => {
                   <Select
                     value={rating}
                     onChange={handleRatingChange}
-                    label="Rating"                     sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
+                    label="Rating"
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}                     sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
 
                     disabled={ratingOptions.length === 0}
                   >
