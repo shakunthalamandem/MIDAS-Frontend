@@ -47,8 +47,10 @@ const HighYieldNavbar: React.FC = () => {
         return 1;
        case "/highyield/portfolio-attribution":
         return 2;
+        case "/":
+          return 3;
       default:
-        return 0;
+        return 3;
     }
   };
 

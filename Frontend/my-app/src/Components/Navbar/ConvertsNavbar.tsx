@@ -49,8 +49,10 @@ const ConvertsNavbar: React.FC = () => {
 
       case "/converts/portfolio-attribution":
         return 2;
+        case "/":
+          return 3;
       default:
-        return 0;
+        return 3;
     }
   };
 
