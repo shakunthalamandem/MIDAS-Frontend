@@ -168,7 +168,7 @@ const HyRatingBasedTable: React.FC = () => {
                     MenuProps={{
                       PaperProps: {
                         sx: {
-                          maxHeight: 300, // Set the dropdown height
+                          maxHeight: 300, 
                         },
                       },
                     }}
@@ -182,7 +182,6 @@ const HyRatingBasedTable: React.FC = () => {
               </Grid>
             </Grid>
           </Box>
-            {/* Show loading spinner while fetching data */}
             {loading ? (
             <Box display="flex" justifyContent="center" alignItems="center" mt={3} mb={3}>
               <CircularProgress color="primary" />
@@ -191,7 +190,6 @@ const HyRatingBasedTable: React.FC = () => {
             ratingData && <HyRatingTableData data={ratingData} />
           )}
 
-          {/* No Data Message */}
           {noDataPopupOpen && !loading && (
            <>
            <NoDataPopup open={noDataPopupOpen} onClose={() => setNoDataPopupOpen(false)} /></>
