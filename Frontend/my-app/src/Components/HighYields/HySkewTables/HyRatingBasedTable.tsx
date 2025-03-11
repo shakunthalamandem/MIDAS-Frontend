@@ -11,9 +11,11 @@ import {
   Card,
   CardContent,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import axios from 'axios';
 import HyRatingTableData from './HyRatingTableData';
+import NoDataPopup from '../../../Pages/NoDataPopup';
 
 interface SkewTableOptions {
   'start year': number[];
@@ -30,6 +32,9 @@ const HyRatingBasedTable: React.FC = () => {
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
+
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
@@ -58,6 +63,8 @@ const HyRatingBasedTable: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true); // Start loading
+
       const requestData = {
         filters: {
           year_range: [startYear, endYear],
@@ -82,10 +89,14 @@ const HyRatingBasedTable: React.FC = () => {
           setRatingData(null);
         } else {
           setRatingData(response.data);
+          setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
+
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
-        setRatingData(null);
+        setNoDataPopupOpen(true);
+      }
+      finally {
+        setLoading(false);
       }
     };
     if (sector && endYear && startYear) {
@@ -171,8 +182,22 @@ const HyRatingBasedTable: React.FC = () => {
               </Grid>
             </Grid>
           </Box>
-          {ratingData && <HyRatingTableData data={ratingData} />}
-          {console.log("Data sent to tabledata file",ratingData)}
+            {/* Show loading spinner while fetching data */}
+            {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" mt={3} mb={3}>
+              <CircularProgress color="primary" />
+            </Box>
+          ) : (
+            ratingData && <HyRatingTableData data={ratingData} />
+          )}
+
+          {/* No Data Message */}
+          {noDataPopupOpen && !loading && (
+           <>
+           <NoDataPopup open={noDataPopupOpen} onClose={() => setNoDataPopupOpen(false)} /></>
+          )}
+
+
         </CardContent>
       </Card>  
     </Container>

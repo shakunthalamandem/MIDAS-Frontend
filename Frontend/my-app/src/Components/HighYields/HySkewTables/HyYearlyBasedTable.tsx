@@ -11,9 +11,11 @@ import {
   Card,
   CardContent,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import axios from 'axios';
 import HyYearlyTableData from './HyYearlyTableData';
+import NoDataPopup from '../../../Pages/NoDataPopup';
 
 interface SkewTableOptions {
   'start year': number[];
@@ -30,6 +32,10 @@ const HyYearlyBasedTable: React.FC = () => {
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
   const [ratingOptions, setRatingOptions] = useState<string[]>([]);
   const [tableData, setTableData] = useState<any>(null);
+
+  
+    const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
   // Fetch filter options from the API
   useEffect(() => {
@@ -49,7 +55,6 @@ const HyYearlyBasedTable: React.FC = () => {
             }
           });
         const data = response.data as SkewTableOptions;
-        // console.log(data,"CHinthamani");
         setRatingOptions(data['ratings'] || []);
       
         setStartYearOptions(data['start year'] || []);
@@ -61,9 +66,9 @@ const HyYearlyBasedTable: React.FC = () => {
     fetchFilterOptions();
   }, []);
 
-  // Fetch table data based on the selected filters
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true); // Start loading
       const requestData = {
         filters: {
           year_range: [startYear, endYear],
@@ -89,9 +94,13 @@ const HyYearlyBasedTable: React.FC = () => {
           }
         );
         setTableData(response.data);
+        setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
+
       } catch (error) {
-        console.error('Error fetching data:', error);
-      }  
+        setNoDataPopupOpen(true);
+      }  finally {
+        setLoading(false); 
+      }
     };
     
     if (rating && endYear && startYear) {
@@ -212,17 +221,24 @@ const HyYearlyBasedTable: React.FC = () => {
               </Grid>
             </Grid>
           </Box>
+           {/* Show loading spinner while fetching data */}
+           {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" mt={3} mb={3}>
+              <CircularProgress color="primary" />
+            </Box>
+          ) : (
+            tableData && <HyYearlyTableData data={tableData} />
+          )}
+
+          {/* No Data Message */}
+          {noDataPopupOpen && !loading && (
+           <>
+           <NoDataPopup open={noDataPopupOpen} onClose={() => setNoDataPopupOpen(false)} /></>
+          )}
         </CardContent>
       </Card>
 
-      {/* Ensure tableData is available before rendering HyYearlyTableData */}
-      {tableData ? (
-        <HyYearlyTableData data={tableData} />
-      ) : (
-        <Typography variant="body1" color="textSecondary" sx={{ textAlign: 'center', padding: 2 }}>
-          Loading data...
-        </Typography>
-      )}
+  
     </Container>
   );
 };
