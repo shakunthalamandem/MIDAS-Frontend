@@ -31,7 +31,6 @@ interface FundData {
 interface SectorData {
   broad_region: string;
   custom_group_2: string;
-  custom_group_1: string;
   Jan_pnl: number;
   Feb_pnl: number;
   Mar_pnl: number;
@@ -66,27 +65,19 @@ const FundWiseTable: React.FC = () => {
       setLoading(true);
       try {
         let response;
-        if (view === "fund") {
-          response = await fetch(`${apiUrl}/api/detailed_fund_pnl/`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-            body: JSON.stringify({ fund }),
-          });
-        } else if (view === "sector") {
-          response = await fetch(`${apiUrl}/api/detailed_sector_pnl/`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-            body: JSON.stringify({ fund }), // Assuming sector data requires the same parameter
-          });
-        }
+        const endpoint =
+          view === "fund" ? "/api/detailed_fund_pnl/" : "/api/detailed_sector_pnl/";
 
-        if (!response || !response.ok) {
+        response = await fetch(`${apiUrl}${endpoint}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ fund }),
+        });
+
+        if (!response.ok) {
           throw new Error("Failed to fetch data from the API.");
         }
 
@@ -96,7 +87,7 @@ const FundWiseTable: React.FC = () => {
           setOpenNoDataPopup(true);
           setData([]);
         } else {
-          setData(result.sort((a, b) => a.broad_region.localeCompare(b.broad_region)));
+          setData(result);
         }
       } catch (error) {
         setError(error instanceof Error ? error.message : "An error occurred while fetching data");
@@ -115,7 +106,7 @@ const FundWiseTable: React.FC = () => {
   };
 
   // Region totals and overall totals initialization
-  let regionTotals: Record<string, { Jan_pnl: number, Feb_pnl: number, Mar_pnl: number }> = {};
+  let regionTotals: Record<string, { Jan_pnl: number; Feb_pnl: number; Mar_pnl: number }> = {};
   let overallTotal = { Jan_pnl: 0, Feb_pnl: 0, Mar_pnl: 0 };
 
   data.forEach(({ broad_region, Jan_pnl, Feb_pnl, Mar_pnl }: FundData | SectorData) => {
@@ -204,7 +195,7 @@ const FundWiseTable: React.FC = () => {
                         const regionSpan = rowSpans[row.broad_region];
 
                         // Calculate 2025 YTD as the sum of Jan, Feb, and Mar P&L
-                        const ytd = (row.Jan_pnl || 0) + (row.Feb_pnl || 0) + (row.Mar_pnl || 0); 
+                        const ytd = (row.Jan_pnl || 0) + (row.Feb_pnl || 0) + (row.Mar_pnl || 0);
 
                         return (
                           <React.Fragment key={index}>
@@ -218,16 +209,16 @@ const FundWiseTable: React.FC = () => {
                                 {view === "sector" ? (row as SectorData).custom_group_2 : (row as FundData).custom_group_1}
                               </TableCell>
                               <TableCell sx={{ border: "1px solid black" }}>
-                                {formatNumber(row.Jan_pnl)} {/* Jan P&L */}
+                                {formatNumber(row.Jan_pnl)}
                               </TableCell>
                               <TableCell sx={{ border: "1px solid black" }}>
-                                {formatNumber(row.Feb_pnl)} {/* Feb P&L */}
+                                {formatNumber(row.Feb_pnl)}
                               </TableCell>
                               <TableCell sx={{ border: "1px solid black" }}>
-                                {formatNumber(row.Mar_pnl)} {/* Mar P&L */}
+                                {formatNumber(row.Mar_pnl)}
                               </TableCell>
                               <TableCell sx={{ border: "1px solid black" }}>
-                                {formatNumber(ytd)} {/* 2025 YTD */}
+                                {formatNumber(ytd)}
                               </TableCell>
                             </TableRow>
                             {isLastInRegion && (
@@ -245,7 +236,11 @@ const FundWiseTable: React.FC = () => {
                                   {formatNumber(regionTotals[row.broad_region].Mar_pnl)}
                                 </TableCell>
                                 <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  {formatNumber(regionTotals[row.broad_region].Jan_pnl + regionTotals[row.broad_region].Feb_pnl + regionTotals[row.broad_region].Mar_pnl)} {/* Total YTD */}
+                                  {formatNumber(
+                                    regionTotals[row.broad_region].Jan_pnl +
+                                      regionTotals[row.broad_region].Feb_pnl +
+                                      regionTotals[row.broad_region].Mar_pnl
+                                  )}
                                 </TableCell>
                               </TableRow>
                             )}
@@ -266,7 +261,7 @@ const FundWiseTable: React.FC = () => {
                           {formatNumber(overallTotal.Mar_pnl)}
                         </TableCell>
                         <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                          {formatNumber(overallTotal.Jan_pnl + overallTotal.Feb_pnl + overallTotal.Mar_pnl)} {/* Overall Total YTD */}
+                          {formatNumber(overallTotal.Jan_pnl + overallTotal.Feb_pnl + overallTotal.Mar_pnl)}
                         </TableCell>
                       </TableRow>
                     </TableBody>
