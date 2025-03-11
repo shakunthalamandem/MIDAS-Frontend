@@ -35,7 +35,7 @@ const AllocationCaptureReturn = () => {
     }}
   >
     <span className="marquee">
-    As for the below GAP Analysis, we have assumed that 0.5% IPO Allocation, 1% for FO Allocation, and 0.5% AM for both IPOs and FOs. Also note that, for each year deals issued in that year are considered, and the EXIT date for actual PnL could be in future years. For Model, the EXIT date is always T+1Month. This analysis includes SPACs and PIPEs. 
+    As for the below GAP Analysis, we have assumed that 0.5% IPO Allocation, 1% for FO Allocation, and 0.5% AM for both IPOs and FOs. There is a Position limit of $30M. Also note that, for each year deals issued in that year are considered, and the EXIT date for actual PnL could be in future years. For Model, the EXIT date is always T+1Month. This analysis includes SPACs and PIPEs. 
     </span>
   </Typography>
       <MddMain apiName="gap_analysis" />
