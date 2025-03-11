@@ -107,8 +107,8 @@ const HYYearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, c
               type="monotone"
               dataKey={sector}
               stroke={colors[index % colors.length]} // Assign color from the colors array
-              activeDot={{ r: 8 }}
-            />
+              dot={false} 
+              />
           ))}
         </LineChart>
       </ResponsiveContainer>

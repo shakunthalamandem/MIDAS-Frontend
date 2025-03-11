@@ -133,7 +133,7 @@ const HYSpRatingPieChart: React.FC<HYSpRatingPieChartProps> = ({
           margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
         >
           <XAxis dataKey="year" />
-          <YAxis tickFormatter={formatNumber} /> {/* Apply custom formatter */}
+          <YAxis tickFormatter={formatNumber} /> 
           <Tooltip formatter={(value: number) => formatNumber(value)} />
           <Legend />
           {visibleRegions.map((region, index) => (
@@ -141,8 +141,8 @@ const HYSpRatingPieChart: React.FC<HYSpRatingPieChartProps> = ({
               key={region}
               type="monotone"
               dataKey={region}
-              stroke={colors[index % colors.length]} // Assign color from the array
-              activeDot={{ r: 8 }}
+              stroke={colors[index % colors.length]} 
+              dot={false} 
             />
           ))}
         </LineChart>
