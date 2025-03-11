@@ -144,7 +144,8 @@ const NavbarMain: React.FC = () => {
             <img src={logo} alt="MIDAS Logo" style={{ width: "130px", height: "60px", marginRight: "10px" }} />
           </Link>
           
-          <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }}>
+          <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }}             onClick={handleSidebarToggle}
+          >
             <Typography variant="body1" fontWeight="bold" >
               {selectedTab}
             </Typography>
