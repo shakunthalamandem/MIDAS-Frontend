@@ -11,16 +11,16 @@ import {
   Card,
   CardContent,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import HySectorTableData from "./HySectorTableData";
+import NoDataPopup from "../../../Pages/NoDataPopup";
 
-// Define the expected structure of the API response
 interface SkewTableOptions {
   "start year": number[];
   "end year": number[];
   ratings: string[];
-  // region: string[];
   sector: string[];
 }
 
@@ -30,13 +30,12 @@ const HySectorBasedTable: React.FC = () => {
   const [rating, setRating] = useState<string>("All");
   const [sector, setSector] = useState<string>("All");
 
-  const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
-  const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
   const [ratingOptions, setRatingOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
   const [responseData, setResponseData] = useState<any>(null);
   const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
@@ -44,24 +43,18 @@ const HySectorBasedTable: React.FC = () => {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
-        if (!apiUrl) {
-          throw new Error("API URL is not defined in environment variables");
-        }
+        if (!apiUrl) throw new Error("API URL is not defined in environment variables");
 
-        const response = await axios.get(
-          `${apiUrl}/api/hy_skew_table_filters/`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-          }
-        );
+        const response = await axios.get(`${apiUrl}/api/hy_skew_table_filters/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
 
         const data = response.data as SkewTableOptions;
-
-        setRatingOptions(data["ratings"]);
-        setSectorOptions(Array.isArray(data["sector"]) ? data["sector"] : []);
+        setRatingOptions(data.ratings);
+        setSectorOptions(Array.isArray(data.sector) ? data.sector : []);
       } catch (error) {
         console.error("Error fetching filter options:", error);
       }
@@ -72,6 +65,8 @@ const HySectorBasedTable: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true); // Start loading
+
       const requestData = {
         filters: {
           year_range: [startYear, endYear],
@@ -84,35 +79,25 @@ const HySectorBasedTable: React.FC = () => {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
-        if (!apiUrl) {
-          throw new Error("API URL is not defined in environment variables");
-        }
+        if (!apiUrl) throw new Error("API URL is not defined in environment variables");
 
-        const response = await axios.post(
-          `${apiUrl}/api/hy_skewtable/calculations/`,
-          requestData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-          }
-        );
+        const response = await axios.post(`${apiUrl}/api/hy_skewtable/calculations/`, requestData, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
 
-        if (!response.data || Object.keys(response.data).length === 0) {
-          setNoDataPopupOpen(true);
-          setResponseData(null);
-        } else {
-          setResponseData(response.data);
-        }
+        setResponseData(response.data && Object.keys(response.data).length ? response.data : null);
+        setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
       } catch (error) {
         setNoDataPopupOpen(true);
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
 
-    if (rating) {
-      fetchData();
-    }
+    if (rating) fetchData();
   }, [startYear, endYear, rating, ratingOptions, sector, sectorOptions]);
 
   const handleRatingChange = (event: SelectChangeEvent<string>) => {
@@ -123,43 +108,25 @@ const HySectorBasedTable: React.FC = () => {
     setSector(event.target.value);
   };
 
-  const handleClosePopup = () => {
-    setNoDataPopupOpen(false);
-    setStartYear(2012);
-    setEndYear(2025);
-    setRating("All");
-    setSector("All");
-  };
-
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box p={3} sx={{ backgroundColor: "#f0f4ff", borderRadius: 2 }}>
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{ color: "#3b3f57", fontWeight: "bold" }}
-            >
+            <Typography variant="h6" gutterBottom sx={{ color: "#3b3f57", fontWeight: "bold" }}>
               Yearly Based Filtered Data
             </Typography>
 
             <Grid container spacing={2}>
               <Grid item xs={12} sm={3} md={2}>
-                <FormControl fullWidth variant="outlined" size="small">
+                <FormControl fullWidth variant="outlined" size="small" disabled={loading}>
                   <InputLabel>Rating</InputLabel>
                   <Select
                     value={rating}
                     label="Rating"
                     onChange={handleRatingChange}
                     sx={{ backgroundColor: "#e0f7fa", color: "#006064" }}
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          maxHeight: 300, // Set the dropdown height
-                        },
-                      },
-                    }}
+                    MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
                   >
                     <MenuItem value="All">All</MenuItem>
                     {ratingOptions.length > 0 ? (
@@ -176,20 +143,14 @@ const HySectorBasedTable: React.FC = () => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={3}>
-                <FormControl fullWidth variant="outlined" size="small">
+                <FormControl fullWidth variant="outlined" size="small" disabled={loading}>
                   <InputLabel>Sector</InputLabel>
                   <Select
                     value={sector}
                     label="Sector"
                     onChange={handleSectorChange}
                     sx={{ backgroundColor: "#f9dc8f", color: "#1a237e" }}
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          maxHeight: 300, // Set the dropdown height
-                        },
-                      },
-                    }}
+                    MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
                   >
                     <MenuItem value="All">All</MenuItem>
                     {sectorOptions.length > 0 ? (
@@ -207,20 +168,22 @@ const HySectorBasedTable: React.FC = () => {
             </Grid>
           </Box>
 
-          {responseData && responseData.Yearwise ? (
-            <Typography></Typography>
+          {/* Show loading spinner while fetching data */}
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" mt={3} mb={3}>
+              <CircularProgress color="primary" />
+            </Box>
           ) : (
-            <Typography></Typography>
+            responseData && <HySectorTableData data={responseData} />
           )}
-          {responseData && <HySectorTableData data={responseData} />}
+
+          {/* No Data Message */}
+          {noDataPopupOpen && !loading && (
+           <>
+           <NoDataPopup open={noDataPopupOpen} onClose={() => setNoDataPopupOpen(false)} /></>
+          )}
         </CardContent>
       </Card>
-
-      {/* {noDataPopupOpen && (
-        <Box p={2} sx={{ textAlign: "center", backgroundColor: "#ffcccb" }}>
-          <Typography variant="body1">No data found for the selected filters.</Typography>
-        </Box>
-      )} */}
     </Container>
   );
 };

@@ -8,6 +8,10 @@ interface NoDataPopupProps {
 }
 
 const NoDataPopup: React.FC<NoDataPopupProps> = ({ open, onClose }) => {
+  const handleClose = () => {
+    window.location.reload(); // Refresh the page
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -38,7 +42,7 @@ const NoDataPopup: React.FC<NoDataPopupProps> = ({ open, onClose }) => {
         <Button
           variant="contained"
           sx={{ bgcolor: '#002060', '&:hover': { bgcolor: '#001540' } }}
-          onClick={onClose}
+          onClick={handleClose}
         >
           Okay
         </Button>
