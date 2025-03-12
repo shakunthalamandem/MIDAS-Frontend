@@ -62,7 +62,7 @@ const ConvertsDealStatsMain = () => {
           throw new Error('API URL is not defined in environment variables');
         }
 
-        const response = await axios.get(`${apiUrl}/api/high-yields/distinct/`, {
+        const response = await axios.get(`${apiUrl}/api/converts/distinct/`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: token ? `Bearer ${token}` : '',
@@ -98,10 +98,7 @@ const ConvertsDealStatsMain = () => {
     });
   };
 
-  // const handleApply = () => {
-  //   setAppliedFilters({ ...selectedFilters });
-  //   console.log('Applied Filters:', selectedFilters);
-  // };
+
   const handleApply = () => {
     // Check if start_year is less than end_year
     const startYear = selectedFilters["start_year"];
@@ -170,7 +167,6 @@ const ConvertsDealStatsMain = () => {
                   </FormControl>
                 </Grid>
 
-                {/* Sector Filter with checkboxes */}
                 <Grid item xs={12} sm={6} md={2}>
 
                   <FormControl fullWidth variant="outlined" size="small">
@@ -203,7 +199,6 @@ const ConvertsDealStatsMain = () => {
                 </Grid>
 
 
-                {/* SP Rating Filter */}
                 <Grid item xs={12} sm={6} md={2}>
                   <FormControl fullWidth variant="outlined" size="small">
                     <InputLabel>SP Rating</InputLabel>
@@ -215,7 +210,7 @@ const ConvertsDealStatsMain = () => {
                       MenuProps={{
                         PaperProps: {
                           style: {
-                            maxHeight: 300, // Limit the dropdown height to allow scrolling
+                            maxHeight: 300, 
                             overflowY: 'auto',
                           },
                         },
@@ -225,9 +220,9 @@ const ConvertsDealStatsMain = () => {
                         <MenuItem key={rating} value={rating} sx={{ fontSize: '0.875rem' }}>
                           <Checkbox
                             checked={selectedFilters.snp_rating.includes(rating)}
-                            sx={{ transform: 'scale(0.8)' }} // Scale the checkbox to make it smaller
+                            sx={{ transform: 'scale(0.8)' }} 
                           />
-                          <Typography sx={{ fontSize: '1rem' }}>{rating}</Typography> {/* Reduce the text size */}
+                          <Typography sx={{ fontSize: '1rem' }}>{rating}</Typography> 
                         </MenuItem>
                       ))}
                     </Select>
@@ -235,7 +230,6 @@ const ConvertsDealStatsMain = () => {
                 </Grid>
 
 
-                {/* Period Filter */}
                 <Grid item xs={12} sm={6} md={2}>
                   <FormControl fullWidth variant="outlined" size="small">
                     <InputLabel>Period</InputLabel>
@@ -249,7 +243,6 @@ const ConvertsDealStatsMain = () => {
               </Grid>
             </Container>
 
-            {/* Apply and Reset Buttons Centered */}
             <Box display="flex" justifyContent="center" mt={2}>
               <Button
                 variant="contained"
@@ -267,7 +260,6 @@ const ConvertsDealStatsMain = () => {
         </Card>
       </Container>
 
-      {/* Pass only applied filters to the graph */}
       <ConvertsDealStatsTabMain selectedFilters={appliedFilters} handleReset={handleReset}  />
 
        <Snackbar
