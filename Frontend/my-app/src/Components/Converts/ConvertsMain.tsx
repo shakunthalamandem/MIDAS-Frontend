@@ -26,7 +26,7 @@ const ConvertsMain: React.FC = () => {
   const { ticker: routeTicker } = useParams<{ ticker: string }>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "Kimmeridge Texas Gas LLC"); 
+  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "Invitae Corp"); 
   const [results, setResults] = useState<HighYieldResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");

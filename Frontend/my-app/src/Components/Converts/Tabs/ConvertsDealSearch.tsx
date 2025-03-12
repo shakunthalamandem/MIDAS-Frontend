@@ -21,10 +21,10 @@ interface IssuerData {
   pricing_date: string;
   issuer_name: string;
   isin: string;
-  snp_rating: string;
-  maturity_date: string;
+  t_60_day_return_with_coupon: string;
+  coupon_60_day: string;
   modified_issue_price: number;
-  price_30: number;  // Changed from price_30d
+  price_60: number;  // Changed from price_60d
   original_amount_sold: number;
   coupon: number;
   opportunity_value: number;
@@ -122,8 +122,8 @@ const ConvertsDealSearch: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                               label: "ISIN",
                                               value: item.isin?? "N/A" ,
                                             },
-                                            { label: "S&P Rating", value: item.snp_rating ?? "N/A" },
-                                            { label: "maturity_date", value: item.maturity_date?? "N/A"  },
+                                            { label: "60 day Coupon Return", value: item.t_60_day_return_with_coupon ?? "N/A" },
+                                            { label: "Coupon 60 Day", value: item.coupon_60_day?? "N/A"  },
                                             { label: "Sector", value: item.sector?? "N/A"  },
                                           ].map((row, i) => (
                                             <TableRow
@@ -167,7 +167,7 @@ const ConvertsDealSearch: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                           <TableBody>
                                             {[
                                          { label: "Issue Price", value: item.modified_issue_price ? item.modified_issue_price.toLocaleString(undefined, { style: 'currency', currency: 'USD',minimumFractionDigits: 0  }) : "N/A" },
-                                         { label: "30 day price", value: item.price_30 ? item.price_30.toLocaleString(undefined, { style: 'currency', currency: 'USD' }) : "N/A" },
+                                         { label: "60 day price", value: item.price_60 ? item.price_60.toLocaleString(undefined, { style: 'currency', currency: 'USD' }) : "N/A" },
                                          { label: "Original Amount Sold", value: item.original_amount_sold ? item.original_amount_sold.toLocaleString(undefined,{style:"currency",currency:'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
                                          { label: "Coupon", value: `${item.coupon ?? "N/A"}%` },
                                          { label: "Opportunity Value", value: item.opportunity_value ? item.opportunity_value.toLocaleString(undefined, { style: 'currency', currency: 'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
