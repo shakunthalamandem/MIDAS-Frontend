@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import GapDataTable from "./GapDataTable";
+import GapDataTable from "./DetailedGapDataTable";
 import { CircularProgress } from "@mui/material";
 
 

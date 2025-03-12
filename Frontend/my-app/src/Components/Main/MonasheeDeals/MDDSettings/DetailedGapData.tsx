@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CircularProgress, Box, Typography } from "@mui/material";
-import GapDataTable from "./GapDataTable";
 import Marquee from "react-fast-marquee";
+import DetailedGapDataTable from "./DetailedGapDataTable";
 
 interface SelectedFilters {
   years?: number[]; // Ensures 'years' is recognized as an optional array of numbers
@@ -90,7 +90,7 @@ const DetailedGapData: React.FC = () => {
       ) : data.length === 0 ? (
         <p>No data available.</p>
       ) : (
-        <GapDataTable data={data} />
+        <DetailedGapDataTable data={data} />
       )}
     </Box>
   );
