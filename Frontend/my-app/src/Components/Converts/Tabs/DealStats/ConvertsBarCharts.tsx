@@ -59,7 +59,6 @@ const ConvertsBarCharts: React.FC<ConvertsBarChartsProps> = ({ data, selectedMet
     label?: string;
   }) => {
     if (active && payload && payload.length) {
-      const total = payload.reduce((sum, item) => sum + (item.value || 0), 0);
       return (
         <div
           style={{
