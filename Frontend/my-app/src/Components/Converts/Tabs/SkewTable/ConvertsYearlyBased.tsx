@@ -20,17 +20,14 @@ import ConvertYearlyTableData from "./ConvertYearlyTableData";
 interface SkewTableOptions {
   "start year": number[];
   "end year": number[];
-  ratings: string[];
   sector: string[];
 }
 
 const ConvertsYearlyBased: React.FC = () => {
   const [startYear, setStartYear] = useState<number>(2012);
   const [endYear, setEndYear] = useState<number | string>(2025);
-  const [rating, setRating] = useState<string>("All");
   const [sector, setSector] = useState<string>("All");
 
-  const [ratingOptions, setRatingOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
   const [responseData, setResponseData] = useState<any>(null);
@@ -53,7 +50,6 @@ const ConvertsYearlyBased: React.FC = () => {
         });
 
         const data = response.data as SkewTableOptions;
-        setRatingOptions(data.ratings);
         setSectorOptions(Array.isArray(data.sector) ? data.sector : []);
       } catch (error) {
         console.error("Error fetching filter options:", error);
@@ -80,7 +76,7 @@ const ConvertsYearlyBased: React.FC = () => {
 
         if (!apiUrl) throw new Error("API URL is not defined in environment variables");
 
-        const response = await axios.post(`${apiUrl}/api/hy_skewtable/calculations/`, requestData, {
+        const response = await axios.post(`${apiUrl}/api/converts_skewtable/`, requestData, {
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
@@ -96,12 +92,9 @@ const ConvertsYearlyBased: React.FC = () => {
       }
     };
 
-    if (rating) fetchData();
-  }, [startYear, endYear, rating, ratingOptions, sector, sectorOptions]);
+    if (sector) fetchData();
+  }, [startYear, endYear,  sector, sectorOptions]);
 
-  const handleRatingChange = (event: SelectChangeEvent<string>) => {
-    setRating(event.target.value);
-  };
 
   const handleSectorChange = (event: SelectChangeEvent<string>) => {
     setSector(event.target.value);

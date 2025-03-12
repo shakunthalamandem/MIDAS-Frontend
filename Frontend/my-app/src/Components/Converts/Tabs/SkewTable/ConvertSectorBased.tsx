@@ -44,7 +44,7 @@ const ConvertSectorBased: React.FC = () => {
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
-        const response = await axios.get(`${apiUrl}/api/hy_skew_table_filters/`, 
+        const response = await axios.get(`${apiUrl}/api/converts_skew_table_filters/`, 
           {
             headers: {
               "Content-Type": "application/json",
@@ -79,7 +79,7 @@ const ConvertSectorBased: React.FC = () => {
           throw new Error('API URL is not defined in environment variables');
         }
         const response = await axios.post(
-          `${apiUrl}/api/hy_skewtable/calculations/`,
+          `${apiUrl}/api/converts_skewtable/`,
           requestData, 
           {
             headers: {
