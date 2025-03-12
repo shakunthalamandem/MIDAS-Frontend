@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, FormControlLabel, CardContent, Card, Container, Snackbar } from '@mui/material';
-import HyDealStatGraph from './HyDealStatGraph';
-import HYsppiechart from './HYsppiechart';
+
 import HyDealMainTable from './HyDealMainTable';
 
 interface HighYieldOptions {
