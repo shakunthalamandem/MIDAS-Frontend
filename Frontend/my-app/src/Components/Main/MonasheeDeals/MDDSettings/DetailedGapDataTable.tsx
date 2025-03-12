@@ -68,7 +68,18 @@ const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => 
       allocation_deal_size_percentage: row.allocation_deal_size_percentage ? `${row.allocation_deal_size_percentage.toFixed(2)}%` : "0%",
       model_actual_total: row.model_actual_total ? `${formatDealSize(row.model_actual_total.toFixed())}` : "$0",
       monahsee_actual_total: row.monahsee_actual_total ? `${formatDealSize(row.monahsee_actual_total.toFixed())}` : "$0",
+      
+      model_allocation_gap: row.model_allocation_gap ? `${formatDealSize(row.model_allocation_gap.toFixed())}` : "$0",
+      monashee_exit_gap: row.monashee_exit_gap ? `${formatDealSize(row.monashee_exit_gap.toFixed())}` : "$0",
+      am_gap: row.am_gap ? `${formatDealSize(row.am_gap.toFixed())}` : "$0",
+      am_exit_gap: row.am_exit_gap ? `${formatDealSize(row.am_exit_gap.toFixed())}` : "$0",
+      total_gap: row.monahsee_actual_total - row.model_actual_total 
+      ? formatDealSize((row.monahsee_actual_total - row.model_actual_total).toFixed()) 
+      : "$0",
+      
+
     }));
+ 
 
   const filteredRows = useMemo(() => {
     return preprocessRows(rows).filter((row) =>
@@ -207,17 +218,18 @@ const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => 
 { 
   field: "model_allocation_gap", 
   headerName: "Model Allocation Gap", 
-  width: 260,
+  width: 180,
   renderCell: (params) => `${params.value}`,
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  cellClassName: "highlight-cell",
 },
 { 
   field: "monashee_exit_gap", 
   headerName: "Monashee Exit Gap", 
-  width: 210,
+  width: 150,
   renderCell: (params) => `${params.value}`,
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "last-columns-border",
+  cellClassName: "last-columns-border highlight-cell",
 
 },
 { 
@@ -238,17 +250,18 @@ const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => 
 { 
   field: "am_gap", 
   headerName: "AM Gap", 
-  width: 260,
+  width: 90,
   renderCell: (params) => `${params.value}`,
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  cellClassName: "highlight-cell",
 },
 { 
   field: "am_exit_gap", 
   headerName: "AM Exit Gap", 
-  width: 260,
+  width: 110,
   renderCell: (params) => `${params.value}`,
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "last-columns-border",
+  cellClassName: "last-columns-border   highlight-cell",
 },
 {
   field: "monahsee_actual_total", 
@@ -265,8 +278,21 @@ const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => 
   width: 220,
   renderCell: (params) => `${params.value}`,
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "last-columns-border",
+  // cellClassName: "last-columns-border",
 },
+{
+  field: "total_gap", 
+  headerName: "Total Gap",
+  width: 120,
+  renderCell: (params) => {
+    return `${params.value}`;
+  },
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  cellClassName: "last-columns-border highlight-cell",
+ 
+},
+
+
 ];
 
 return (
@@ -315,6 +341,8 @@ return (
             "& .last-columns-border": {
               borderRight: "2px solid rgb(110, 110, 110)",
             },
+            "& .highlight-cell": {
+              backgroundColor: "#F8F9CD",},
           }}
         />
       </Box>
