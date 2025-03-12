@@ -3,11 +3,11 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Card, CardContent, TextField } from "@mui/material";
 import { Link } from "react-router-dom";
 
-interface GapDataTableProps {
+interface DetailedGapDataTableProps {
   data: any[];
 }
 
-const GapDataTable: React.FC<GapDataTableProps> = ({ data }) => {
+const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [rows, setRows] = useState<any[]>(data);
 
@@ -295,4 +295,4 @@ return (
 );
 };
 
-export default GapDataTable;
+export default DetailedGapDataTable;
