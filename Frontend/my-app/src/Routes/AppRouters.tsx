@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useParams } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import CapitalMarketsStatic from "../Components/HomepageStatic/CapitalMarketsStatic";
 import Login from "../Components/Main/HomePage/Authentication/Login";
 import SignUp from "../Components/Main/HomePage/Authentication/SignUp";
@@ -12,7 +12,6 @@ import EmailVerification from "../Components/Main/HomePage/Authentication/EmailV
 import ResetPassword from "../Components/Main/HomePage/Authentication/ResetPassword";
 import ErrorBoundary from "../Pages/ErrorBoundary";
 import AuthGuard from "./AuthGuard";
-import Logout from "../Components/Main/HomePage/Authentication/Logout";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
 import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/DetailedGapData";
 import DealFormMain from "../Components/DealsForm/DealFormMain";
@@ -30,7 +29,6 @@ import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable
 import HighYieldsMain from "../Components/HighYields/HighYieldsMain";
 import DealStatsMain from "../Components/HighYields/Tabs/DealStatsMain";
 import HYSkewTableMain from "../Components/HighYields/Tabs/HYSkewTableMain";
-import SelectedDealHYMain from "../Components/HighYields/Tabs/SelectedDealHYMain";
 import MDDSelectedTicker from "../Components/Main/MonasheeDeals/MddGraphs/MDDSelectedTicker";
 import MarketFilters from "../Components/Main/MonasheeCapitalMarkets/MarketFilters";
 import ScreenerMain from "../Components/Main/MonasheeGraphs/ScreenerTable/ScreenerMain";
