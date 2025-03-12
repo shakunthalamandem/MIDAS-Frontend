@@ -8,7 +8,6 @@ interface HighYieldOptions {
   start_year: number[];
   end_year: number[];
   sector: string[];
-  snp_rating: string[];
 }
 
 const ConvertsDealStatsMain = () => {
@@ -16,7 +15,6 @@ const ConvertsDealStatsMain = () => {
     start_year: [],
     end_year: [],
     sector: [],
-    snp_rating: [],
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,26 +24,22 @@ const ConvertsDealStatsMain = () => {
     start_year: number;
     end_year: number;
     sector: string[];  // Change sector to an array of strings
-    snp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: [],  // This should be an array
-    snp_rating: [],
     year_period: 'Yearly',
   });
   const [appliedFilters, setAppliedFilters] = useState<{
     start_year: number;
     end_year: number;
     sector: string[];  // Change sector to an array of strings
-    snp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: [],
-    snp_rating: [],
     year_period: 'Yearly',
   });
 
@@ -88,7 +82,7 @@ const ConvertsDealStatsMain = () => {
     setSnackbarOpen(false); // Close Snackbar when the user dismisses it
   };
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, value: string, category: 'sector' | 'snp_rating') => {
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, value: string, category: 'sector' ) => {
     setSelectedFilters((prev) => {
       const newCategoryValues = event.target.checked
         ? [...prev[category], value]
@@ -121,13 +115,11 @@ const ConvertsDealStatsMain = () => {
     setSelectedFilters({ start_year: 2012,
       end_year: 2025,
       sector: [],
-      snp_rating: [],
       year_period: 'Yearly',});
     setAppliedFilters({
       start_year: 2012,
       end_year: 2025,
       sector: [],
-      snp_rating: [],
       year_period: 'Yearly',
     });
     setSnackbarOpen(false); // Close Snackbar on reset
@@ -199,35 +191,7 @@ const ConvertsDealStatsMain = () => {
                 </Grid>
 
 
-                <Grid item xs={12} sm={6} md={2}>
-                  <FormControl fullWidth variant="outlined" size="small">
-                    <InputLabel>SP Rating</InputLabel>
-                    <Select
-                      multiple
-                      value={selectedFilters.snp_rating}
-                      onChange={handleFilterChange('snp_rating')}
-                      renderValue={(selected) => selected.join(', ')}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 300, 
-                            overflowY: 'auto',
-                          },
-                        },
-                      }}
-                    >
-                      {filters.snp_rating.sort().map((rating) => (
-                        <MenuItem key={rating} value={rating} sx={{ fontSize: '0.875rem' }}>
-                          <Checkbox
-                            checked={selectedFilters.snp_rating.includes(rating)}
-                            sx={{ transform: 'scale(0.8)' }} 
-                          />
-                          <Typography sx={{ fontSize: '1rem' }}>{rating}</Typography> 
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
+            
 
 
                 <Grid item xs={12} sm={6} md={2}>

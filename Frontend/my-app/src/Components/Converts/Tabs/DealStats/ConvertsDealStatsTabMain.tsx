@@ -13,8 +13,7 @@ import {
 import NoDataPopup from "../../../../Pages/NoDataPopup";
 import ConvertsBarCharts from "./ConvertsBarCharts";
 import ConvertsSectorWisePieChart from "./ConvertsSectorWisePieChart";
-import ConvertsSpRatingPieChart from "./ConvertsSpRatingPieChart";
-import ConvertsSpRatingWiseChart from "./ConvertsSpRatingWiseChart";
+
 import ConvertsYearlySectorChart from "./ConvertsYearlySectorChart";
 
 
@@ -50,7 +49,7 @@ const ConvertsDealStatsTabMain: React.FC<ConvertsDealStatsTabMainProps> = ({
           throw new Error("API URL is not defined in environment variables");
         }
 
-        const response = await fetch(`${apiUrl}/api/high_yields_graph/`, {
+        const response = await fetch(`${apiUrl}/api/converts_graph/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -62,18 +61,18 @@ const ConvertsDealStatsTabMain: React.FC<ConvertsDealStatsTabMainProps> = ({
         if (response.ok) {
           const result = await response.json();
           if (result.error === "No data found for the given filters.") {
-            setNoDataPopupOpen(true); // Open the NoDataPopup if no data is returned
-            setApiData(null); // Set data to null
+            setNoDataPopupOpen(true); 
+            setApiData(null); 
           } else {
             setApiData(result);
           }
         } else {
-          setNoDataPopupOpen(true); // Open the NoDataPopup if fetch fails
-          setApiData(null); // Set data to null
+          setNoDataPopupOpen(true); 
+          setApiData(null); 
         }
       } catch (err: any) {
-        setNoDataPopupOpen(true); // Open the NoDataPopup if an error occurs
-        setApiData(null); // Set data to null
+        setNoDataPopupOpen(true); 
+        setApiData(null);
       } finally {
         setLoading(false);
       }
@@ -82,7 +81,7 @@ const ConvertsDealStatsTabMain: React.FC<ConvertsDealStatsTabMainProps> = ({
     fetchData();
   }, [selectedFilters]);
   const handleClosePopup = () => {
-    setNoDataPopupOpen(false); // Close the NoDataPopup
+    setNoDataPopupOpen(false); 
     handleReset(); 
   };
 
@@ -152,28 +151,13 @@ const ConvertsDealStatsTabMain: React.FC<ConvertsDealStatsTabMainProps> = ({
             </CardContent>
           </Card>
 
-          <Card sx={{ mb: 4 }}>
-            <CardContent>
-              <ConvertsSpRatingPieChart
-                data={apiData.year_wise_snp_rating}
-                selectedMetric={selectedMetric}
-              />
-            </CardContent>
-          </Card>
+ 
 
-          <Card sx={{ mb: 4 }}>
-            <CardContent>
-              <ConvertsSpRatingWiseChart
-                data={apiData.snp_rating}
-                selectedMetric={selectedMetric}
-              />
-            </CardContent>
-          </Card>
         </>
       )}
      <NoDataPopup
         open={noDataPopupOpen}
-        onClose={handleClosePopup} // Close the popup and reset filters when the user clicks the close button
+        onClose={handleClosePopup} 
       />
     </Container>
   );
