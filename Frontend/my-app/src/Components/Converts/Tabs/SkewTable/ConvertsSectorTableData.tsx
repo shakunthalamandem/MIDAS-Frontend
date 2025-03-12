@@ -23,7 +23,7 @@ interface TableData {
   Long_Opportunity_Value: number;
 }
 
-interface HySectorTableDataProps {
+interface ConvertsSectorTableDataProps {
   data: {
     Yearwise: { [year: string]: TableData };
     yearwise_total: {
@@ -59,7 +59,7 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
 };
 
-const HySectorTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
+const ConvertsSectorTableData: React.FC<ConvertsSectorTableDataProps> = ({ data }) => {
   // Ensure data exists before rendering
   if (!data?.Yearwise || !data?.yearwise_total || Object.keys(data.Yearwise).length === 0) {
     return <div>No data available</div>;
@@ -175,4 +175,4 @@ const HySectorTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   );
 };
 
-export default HySectorTableData;
+export default ConvertsSectorTableData;

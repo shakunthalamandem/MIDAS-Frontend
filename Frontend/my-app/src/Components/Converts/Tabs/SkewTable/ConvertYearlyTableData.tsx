@@ -50,7 +50,7 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`; // Ensure dollar sign is correctly placed
 };
 
-const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
+const ConvertYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   const sectorwiseData = data?.Sectorwise;
   const sectorwiseTotal = data?.sectorwise_total;
 
@@ -197,4 +197,4 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   );
 };
 
-export default HyYearlyTableData;
+export default ConvertYearlyTableData;

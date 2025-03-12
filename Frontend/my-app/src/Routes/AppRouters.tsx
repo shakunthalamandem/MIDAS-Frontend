@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useParams } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import CapitalMarketsStatic from "../Components/HomepageStatic/CapitalMarketsStatic";
 import Login from "../Components/Main/HomePage/Authentication/Login";
 import SignUp from "../Components/Main/HomePage/Authentication/SignUp";
@@ -12,7 +12,6 @@ import EmailVerification from "../Components/Main/HomePage/Authentication/EmailV
 import ResetPassword from "../Components/Main/HomePage/Authentication/ResetPassword";
 import ErrorBoundary from "../Pages/ErrorBoundary";
 import AuthGuard from "./AuthGuard";
-import Logout from "../Components/Main/HomePage/Authentication/Logout";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
 import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/DetailedGapData";
 import DealFormMain from "../Components/DealsForm/DealFormMain";
@@ -30,12 +29,15 @@ import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable
 import HighYieldsMain from "../Components/HighYields/HighYieldsMain";
 import DealStatsMain from "../Components/HighYields/Tabs/DealStatsMain";
 import HYSkewTableMain from "../Components/HighYields/Tabs/HYSkewTableMain";
-import SelectedDealHYMain from "../Components/HighYields/Tabs/SelectedDealHYMain";
 import MDDSelectedTicker from "../Components/Main/MonasheeDeals/MddGraphs/MDDSelectedTicker";
 import MarketFilters from "../Components/Main/MonasheeCapitalMarkets/MarketFilters";
 import ScreenerMain from "../Components/Main/MonasheeGraphs/ScreenerTable/ScreenerMain";
 import SkewTableMain from "../Components/Main/MonasheeGraphs/SkewTableMain";
 import MacroMain from "../Components/Macro/MacroMain";
+import ConvertsMain from "../Components/Converts/ConvertsMain";
+import ConvertsDealSearch from "../Components/Converts/Tabs/ConvertsDealSearch";
+import ConvertsDealStatsMain from "../Components/Converts/Tabs/ConvertsDealStatsMain";
+import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
 
 
 
@@ -70,6 +72,14 @@ const AppRouters: React.FC = () => {
         </Route>
 
 
+        <Route path="/converts/capital-markets" element={<AuthGuard><ConvertsMain /></AuthGuard>} >
+          <Route path="search" element={<ConvertsMain/>} />
+          <Route path="deal-stats" element={<ConvertsDealStatsMain />} />
+          <Route path="skew-table" element={<ConvertsSkewMain />} />
+        </Route>
+
+
+
 
         <Route path="/equity/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
           <Route path="search" element={<MDDSelectedTicker ticker={'CGRX'}/>} />
@@ -96,6 +106,8 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/highyield/dealperformance/:deal" element={<AuthGuard><HighYieldsMain /></AuthGuard>} />
+        <Route path="/converts/dealperformance/:deal" element={<AuthGuard><ConvertsMain /></AuthGuard>} />
+
 
 
 
