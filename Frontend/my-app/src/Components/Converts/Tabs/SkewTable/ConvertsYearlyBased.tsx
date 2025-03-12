@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import NoDataPopup from "../../../../Pages/NoDataPopup";
-import ConvertYearlyTableData from "./ConvertYearlyTableData";
+import ConvertsSectorTableData from "./ConvertsSectorTableData";
 
 interface SkewTableOptions {
   "start year": number[];
@@ -143,7 +143,7 @@ const ConvertsYearlyBased: React.FC = () => {
               <CircularProgress color="primary" />
             </Box>
           ) : (
-            responseData && <ConvertYearlyTableData data={responseData} />
+            responseData && <ConvertsSectorTableData data={responseData} />
           )}
 
           {/* No Data Message */}

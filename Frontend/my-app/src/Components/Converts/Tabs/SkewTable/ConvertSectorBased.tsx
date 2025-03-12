@@ -16,6 +16,7 @@ import {
 import axios from 'axios';
 import NoDataPopup from '../../../../Pages/NoDataPopup';
 import ConvertsSectorTableData from './ConvertsSectorTableData';
+import ConvertYearlyTableData from './ConvertYearlyTableData';
 
 interface SkewTableOptions {
   'start year': number[];
@@ -193,7 +194,7 @@ const ConvertSectorBased: React.FC = () => {
               <CircularProgress color="primary" />
             </Box>
           ) : (
-            tableData && <ConvertsSectorTableData data={tableData} />
+            tableData && <ConvertYearlyTableData data={tableData} />
           )}
 
           {/* No Data Message */}

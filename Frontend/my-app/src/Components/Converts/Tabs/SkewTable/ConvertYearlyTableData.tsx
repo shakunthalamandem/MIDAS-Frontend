@@ -94,22 +94,6 @@ const ConvertYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
 
 
 
-  // "Total_Deal_Count_Sum": 6425,
-  // "Total_Deal_Volume_Sum": 4562813847996,
-  // "Total_Deal_Count_Sum_Without_Nulls": 4678,
-  // "Total_Deal_Volume_Sum_Without_Nulls": 3639561435432,
-  // "Total_Positive_Performing_Deals_Percentage": 97.06,
-  // "Total_Negative_Performing_Deals_Percentage": 2.94,
-  // "Total_Expected_Returns_Excess": 0.86,
-  // "Total_Returns_Positive": 0.73,
-  // "Total_Returns_Negatively": -2.01
-  
-
-
-
-
-
-
   return (
     <TableContainer component={Paper} sx={{ marginTop: 2, marginBottom: 4 }}>
       <Table>
