@@ -61,16 +61,16 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   // Columns for the table
   const columns = [
     'Sector',
-    'Total Deal Count',
-    'Total Deal Volume ($)',
+    "Total Deal Count",
+    "Total Deal Volume ($)",
     "Deal Count Without Nulls",
     "Deal Volume Without Nulls",
-    '% of Positively Performing Deals ',
-    '% of Negatively Performing Deals ',
-    'Weighted Avg T+1M Excess Return (Positive Deals)',
-    'Weighted Avg T+1M Excess Return (Negative Deals)',
-    'Expected Returns Excess',
-    'Opportunity Value (T + 1M Excess)',
+    "% of Positively Performing Deals",
+    "% of Negatively Performing Deals",
+    "Weighted Avg T+1M Return (Positive Deals)",
+    "Weighted Avg T+1M Return (Negative Deals)",
+    "Expected Returns",
+    "Opportunity Value (T + 1M)",
   ];
 
   // Extract totals from sectorwiseTotal
