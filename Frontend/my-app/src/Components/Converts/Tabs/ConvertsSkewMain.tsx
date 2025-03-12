@@ -1,9 +1,13 @@
 import React from 'react'
+import ConvertsYearlyBased from './SkewTable/ConvertsYearlyBased'
+import ConvertSectorBased from './SkewTable/ConvertSectorBased'
 
 const ConvertsSkewMain = () => {
   return (
-    <div>ConvertsSkewMain</div>
-  )
+<>
+<ConvertsYearlyBased />
+<ConvertSectorBased />
+</>  )
 }
 
 export default ConvertsSkewMain
