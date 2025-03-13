@@ -71,7 +71,7 @@ const FooterMain: React.FC = () => {
         
       </Box>
       <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-            Version 1.06 - Updated March 11, 2025
+            Version 1.07 - Updated March 13, 2025
           </Typography>
           <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
             Data as of March 10 , 2025
