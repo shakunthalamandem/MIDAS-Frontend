@@ -220,9 +220,9 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       AM Gap
                     </TableCell>
-                    <TableCell sx={{ color: "white", minWidth: "40px" }}>
+                    {/* <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       AM Exit Gap
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell
                       sx={{
                         color: "white",
@@ -373,7 +373,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             formatValue(values["AM Gap"] || 0)
                           )}
                         </TableCell>
-                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
+                        {/* <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                           {isSummary ? (
                             <strong>
                               {formatValue(values["AM Exit Gap"] || 0)}
@@ -381,7 +381,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                           ) : (
                             formatValue(values["AM Exit Gap"] || 0)
                           )}
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell sx={{ borderLeft: "2px solid #484547" }}>
                           {isSummary ? (
                             <strong>

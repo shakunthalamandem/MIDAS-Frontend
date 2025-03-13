@@ -255,14 +255,14 @@ const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => 
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   cellClassName: "highlight-cell",
 },
-{ 
-  field: "am_exit_gap", 
-  headerName: "AM Exit Gap", 
-  width: 110,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "last-columns-border   highlight-cell",
-},
+// { 
+//   field: "am_exit_gap", 
+//   headerName: "AM Exit Gap", 
+//   width: 110,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//   cellClassName: "last-columns-border   highlight-cell",
+// },
 {
   field: "monahsee_actual_total", 
   headerName: "Monashee Actual Total PnL(Gross)",
