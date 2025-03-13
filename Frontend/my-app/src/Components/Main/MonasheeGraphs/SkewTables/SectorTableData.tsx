@@ -118,7 +118,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
             const row = yearwiseData[year];
             return (
               <TableRow key={year}>
-                <TableCell sx={{ padding: "4px 8px" }}>{year}</TableCell>
+                <TableCell sx={{ padding: "4px 8px", width: '70px' }}>{year}</TableCell>
                 <TableCell sx={{ padding: "4px 8px" }}>
                   {row.Total_Deal_Count}
                 </TableCell>
