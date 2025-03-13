@@ -77,10 +77,10 @@ const HySectorTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
     "Deal Volume Without Nulls",
     "% of Positively Performing Deals",
     "% of Negatively Performing Deals",
-    "Weighted Avg T+1M Excess Return (Positive Deals)",
-    "Weighted Avg T+1M Excess Return (Negative Deals)",
-    "Expected Returns Excess",
-    "Opportunity Value (T + 1M Excess)",
+    "Weighted Avg T+1M Return (Positive Deals)",
+    "Weighted Avg T+1M Return (Negative Deals)",
+    "Expected Returns",
+    "Opportunity Value (T + 1M)",
   ];
 
   return (
@@ -134,7 +134,7 @@ const HySectorTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
           ))}
 
           {/* Total row */}
-          <TableRow key="total">
+          <TableRow key="total" sx={{ backgroundColor: '#f0f4ff' }}>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", textAlign: "center" }}>
               Total
             </TableCell>
