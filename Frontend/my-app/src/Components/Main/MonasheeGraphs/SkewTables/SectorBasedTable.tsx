@@ -148,8 +148,8 @@ const SectorBasedTable: React.FC = () => {
   };
 
   const handleClosePopup = () => {
-    setNoDataPopupOpen(false);  // Close the NoDataPopup
-    setStartYear(2001);  // Reset the filters
+    setNoDataPopupOpen(false);  
+    setStartYear(2001); 
     setEndYear(2024);
     setDealType('All');
     setRegion('All');
