@@ -129,7 +129,7 @@ const SectorBasedTable: React.FC = () => {
     if (dealType && region && sector) {
       fetchData();
     }
-  }, [startYear, endYear, dealType, region, sector, year_period]);
+  }, [startYear, endYear, dealType, region, sector,dealTypeOptions, regionOptions, sectorOptions, year_period]);
 
   const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
     setDealType(event.target.value);
@@ -148,8 +148,8 @@ const SectorBasedTable: React.FC = () => {
   };
 
   const handleClosePopup = () => {
-    setNoDataPopupOpen(false);  // Close the NoDataPopup
-    setStartYear(2001);  // Reset the filters
+    setNoDataPopupOpen(false);  
+    setStartYear(2001); 
     setEndYear(2024);
     setDealType('All');
     setRegion('All');
@@ -188,7 +188,7 @@ const SectorBasedTable: React.FC = () => {
               {/* Region Selector */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
-                  <InputLabel>  </InputLabel>
+                  <InputLabel>Region  </InputLabel>
                   <Select
                     value={region}
                     onChange={handleRegionChange}
