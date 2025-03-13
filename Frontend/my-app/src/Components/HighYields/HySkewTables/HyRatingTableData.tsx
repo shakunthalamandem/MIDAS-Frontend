@@ -12,8 +12,8 @@ import {
 interface TableData {
   Total_Deal_Count: number;
   Total_Deal_Volume: number;
-  Total_Deal_Count_without_null: number;
-  Total_Deal_Volume_without_null: number;
+  Deal_count_without_nulls: number;
+  Deal_volume_without_nulls: number;
   Positively_Performing_Deals_Percentage: number;
   Negatively_Performing_Deals_Percentage: number;
   Average_T1M_Abs_Return_of_Positively: number;
@@ -26,16 +26,16 @@ interface HyRatingTableDataProps {
   data: {
     Ratingswise: { [year: string]: TableData };
     ratingswise_total: {
-      Total_Deal_Count_Sum: number;
-      Total_Deal_Volume_Sum: number;
-      Total_Deal_Count_Sum_without_null: number;
-      Total_Deal_Volume_Sum_without_null: number;
-      Total_Positive_Performing_Deals_Percentage: number;
-      Total_Negative_Performing_Deals_Percentage: number;
-      Total_Returns_Positive: number;
-      Total_Returns_Negative: number;
-      Total_Expected_Returns_Excess: number;
-      Total_Long_Opportunity_Value: number;
+      Total_Deal_Count: number;
+      Total_Deal_Volume: number;
+      Deal_count_without_nulls: number;
+      Deal_volume_without_nulls: number;
+      Positively_Performing_Deals_Percentage: number;
+      Negatively_Performing_Deals_Percentage: number;
+      Average_T1M_Abs_Return_of_Positively: number;
+      Average_T1M_Abs_Return_of_Negatively: number;
+      Expected_Returns_Excess: number;
+      Long_Opportunity_Value: number;
     };
   };
 }
@@ -112,8 +112,8 @@ const formatNumber = (value: number): string => {
 
 
 
-                <TableCell sx={{ padding: "4px 8px" }}>{row.Total_Deal_Count_without_null}</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Total_Deal_Volume_without_null)}</TableCell>
+                <TableCell sx={{ padding: "4px 8px" }}>{row.Deal_count_without_nulls}</TableCell>
+                <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Deal_volume_without_nulls)}</TableCell>
 
 
                 <TableCell sx={{ padding: "4px 8px" }}>
@@ -141,33 +141,33 @@ const formatNumber = (value: number): string => {
           <TableRow key="total" sx={{ backgroundColor: '#f0f4ff' }}>
             
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", textAlign: "center" }}>Total</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{ratingswise_total.Total_Deal_Count_Sum}</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{ratingswise_total.Total_Deal_Count}</TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(ratingswise_total.Total_Deal_Volume_Sum)}
+              {formatNumber(ratingswise_total.Total_Deal_Volume)}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {ratingswise_total.Total_Deal_Count_Sum_without_null}
+              {ratingswise_total.Deal_count_without_nulls}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(ratingswise_total.Total_Deal_Volume_Sum_without_null)}
+              {formatNumber(ratingswise_total.Deal_volume_without_nulls)}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {ratingswise_total.Total_Positive_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
+              {ratingswise_total.Positively_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {ratingswise_total.Total_Negative_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
+              {ratingswise_total.Negatively_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {ratingswise_total.Total_Returns_Positive?.toFixed(1) ?? "0"}%
+              {ratingswise_total.Average_T1M_Abs_Return_of_Positively?.toFixed(1) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {ratingswise_total.Total_Returns_Negative?.toFixed(1) ?? "0"}%
+              {ratingswise_total.Average_T1M_Abs_Return_of_Negatively?.toFixed(1) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {ratingswise_total.Total_Expected_Returns_Excess?.toFixed(1) ?? "0"}%
+              {ratingswise_total.Expected_Returns_Excess?.toFixed(1) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(ratingswise_total.Total_Long_Opportunity_Value)}
+              {formatNumber(ratingswise_total.Long_Opportunity_Value)}
             </TableCell>
           </TableRow>
         </TableBody>

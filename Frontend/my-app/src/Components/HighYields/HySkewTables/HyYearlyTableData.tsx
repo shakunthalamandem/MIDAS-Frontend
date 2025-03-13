@@ -19,16 +19,16 @@ interface HySectorTableDataProps {
   data: {
     Sectorwise: { [sector: string]: TableData };
     sectorwise_total: {
-      Total_Deal_Count_Sum: number;
-      Total_Deal_Volume_Sum: number;
-      Total_Deal_Count_Sum_without_null: number;
-      Total_Deal_Volume_Sum_without_null: number;
-      Total_Positive_Performing_Deals_Percentage: number;
-      Total_Negative_Performing_Deals_Percentage: number;
-      Total_Returns_Positive: number;
-      Total_Returns_Negative: number;
-      Total_Expected_Returns_Excess: number;
-      Total_Long_Opportunity_Value: number;
+      Total_Deal_Count: number;
+      Total_Deal_Volume: number;
+      Deal_count_without_nulls: number;
+      Deal_volume_without_nulls: number;
+      Positively_Performing_Deals_Percentage: number;
+      Negatively_Performing_Deals_Percentage: number;
+      Average_T1M_Abs_Return_of_Positively: number;
+      Average_T1M_Abs_Return_of_Negatively: number;
+      Expected_Returns_Excess: number;
+      Long_Opportunity_Value: number;
     };
   };
 }
@@ -74,19 +74,19 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   ];
 
   // Extract totals from sectorwiseTotal
-  const totalDealCount = sectorwiseTotal.Total_Deal_Count_Sum || 0;
-  const totalDealVolume = sectorwiseTotal.Total_Deal_Volume_Sum || 0;
-  const totalDealCount_without_nulls = sectorwiseTotal.Total_Deal_Count_Sum_without_null || 0;
-  const totalDealVolume_without_nulls = sectorwiseTotal.Total_Deal_Volume_Sum_without_null || 0;
-  const avgPositivelyPerformingDealsPercentage = sectorwiseTotal.Total_Positive_Performing_Deals_Percentage || 0;
-  const avgNegativelyPerformingDealsPercentage = sectorwiseTotal.Total_Negative_Performing_Deals_Percentage || 0;
+  const totalDealCount = sectorwiseTotal.Total_Deal_Count || 0;
+  const totalDealVolume = sectorwiseTotal.Total_Deal_Volume || 0;
+  const totalDealCount_without_nulls = sectorwiseTotal.Deal_count_without_nulls || 0;
+  const totalDealVolume_without_nulls = sectorwiseTotal.Deal_volume_without_nulls || 0;
+  const avgPositivelyPerformingDealsPercentage = sectorwiseTotal.Positively_Performing_Deals_Percentage || 0;
+  const avgNegativelyPerformingDealsPercentage = sectorwiseTotal.Negatively_Performing_Deals_Percentage || 0;
 
-  const avgExpectedReturnsExcess = sectorwiseTotal.Total_Expected_Returns_Excess || 0;
-  const totalLongOpportunityValue = sectorwiseTotal.Total_Long_Opportunity_Value || 0;
+  const avgExpectedReturnsExcess = sectorwiseTotal.Expected_Returns_Excess || 0;
+  const totalLongOpportunityValue = sectorwiseTotal.Long_Opportunity_Value || 0;
 
 
-  const avgAvgT1MAbsReturnPositively = sectorwiseTotal.Total_Returns_Positive || 0;
-  const avgAvgT1MAbsReturnNegatively = sectorwiseTotal.Total_Returns_Negative || 0;
+  const avgAvgT1MAbsReturnPositively = sectorwiseTotal.Average_T1M_Abs_Return_of_Positively || 0;
+  const avgAvgT1MAbsReturnNegatively = sectorwiseTotal.Average_T1M_Abs_Return_of_Negatively || 0;
 
 
   return (
