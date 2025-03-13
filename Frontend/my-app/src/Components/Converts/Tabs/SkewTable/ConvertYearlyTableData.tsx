@@ -33,7 +33,7 @@ const ConvertYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   if (!data?.Sectorwise || !data?.sectorwise_total) return <div>No data available</div>;
 
   const columns = [
-    "Year",
+    "Sector",
     "Total Deal Count",
     "Total Deal Volume ($)",
     "Deal Count Without Nulls",
@@ -52,7 +52,8 @@ const ConvertYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
         <TableHead>
           <TableRow>
             {columns.map((column) => (
-              <TableCell key={column} sx={{ fontWeight: 'bold', bgcolor: '#002060', color: '#FFF' }}>
+              <TableCell key={column} sx={{ fontWeight: "bold", textAlign: "left", padding: "4px 8px", fontSize: "0.875rem", bgcolor: "#002060", color: "#FFFFFF" }}>
+                
                 {column}
               </TableCell>
             ))}
@@ -61,31 +62,31 @@ const ConvertYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
         <TableBody>
           {Object.entries(data.Sectorwise).map(([sector, row]) => (
             <TableRow key={sector}>
-              <TableCell>{sector || 'Unknown Sector'}</TableCell>
-              <TableCell>{row.Total_Deal_Count}</TableCell>
-              <TableCell>{formatNumber(row.Total_Deal_Volume)}</TableCell>
-              <TableCell>{row.Deal_count_without_nulls}</TableCell>
-              <TableCell>{formatNumber(row.Deal_volume_without_nulls)}</TableCell>
-              <TableCell>{row.Positively_Performing_Deals_Percentage.toFixed(1)}%</TableCell>
-              <TableCell>{row.Negatively_Performing_Deals_Percentage.toFixed(1)}%</TableCell>
-              <TableCell>{row.Average_T1M_Abs_Return_of_Positively.toFixed(2)}%</TableCell>
-              <TableCell>{row.Average_T1M_Abs_Return_of_Negatively.toFixed(2)}%</TableCell>
-              <TableCell>{row.Expected_Returns_Excess.toFixed(1)}%</TableCell>
-              <TableCell>{formatNumber(row.Long_Opportunity_Value)}</TableCell>
+              <TableCell sx={{padding: '4px 8px', width: '200px'  }}>{sector || 'Unknown Sector'}</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{row.Total_Deal_Count}</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Total_Deal_Volume)}</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{row.Deal_count_without_nulls}</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Deal_volume_without_nulls)}</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{row.Positively_Performing_Deals_Percentage.toFixed(1)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{row.Negatively_Performing_Deals_Percentage.toFixed(1)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{row.Average_T1M_Abs_Return_of_Positively.toFixed(2)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{row.Average_T1M_Abs_Return_of_Negatively.toFixed(2)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{row.Expected_Returns_Excess.toFixed(1)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Long_Opportunity_Value)}</TableCell>
             </TableRow>
           ))}
-          <TableRow>
-            <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{data.sectorwise_total.Total_Deal_Count}</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{formatNumber(data.sectorwise_total.Total_Deal_Volume)}</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{data.sectorwise_total.Deal_count_without_nulls}</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{formatNumber(data.sectorwise_total.Deal_volume_without_nulls)}</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{data.sectorwise_total.Positively_Performing_Deals_Percentage.toFixed(1)}%</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{data.sectorwise_total.Negatively_Performing_Deals_Percentage.toFixed(1)}%</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{data.sectorwise_total.Average_T1M_Abs_Return_of_Positively.toFixed(2)}%</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{data.sectorwise_total.Average_T1M_Abs_Return_of_Negatively.toFixed(2)}%</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{data.sectorwise_total.Expected_Returns_Excess.toFixed(1)}%</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>{formatNumber(data.sectorwise_total.Long_Opportunity_Value)}</TableCell>
+          <TableRow sx={{ backgroundColor: '#f0f4ff' }}>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>Total</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{data.sectorwise_total.Total_Deal_Count}</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{formatNumber(data.sectorwise_total.Total_Deal_Volume)}</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{data.sectorwise_total.Deal_count_without_nulls}</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{formatNumber(data.sectorwise_total.Deal_volume_without_nulls)}</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{data.sectorwise_total.Positively_Performing_Deals_Percentage.toFixed(1)}%</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{data.sectorwise_total.Negatively_Performing_Deals_Percentage.toFixed(1)}%</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{data.sectorwise_total.Average_T1M_Abs_Return_of_Positively.toFixed(2)}%</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{data.sectorwise_total.Average_T1M_Abs_Return_of_Negatively.toFixed(2)}%</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{data.sectorwise_total.Expected_Returns_Excess.toFixed(1)}%</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , padding: '8px' }}>{formatNumber(data.sectorwise_total.Long_Opportunity_Value)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>

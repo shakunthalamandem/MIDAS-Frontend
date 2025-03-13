@@ -138,7 +138,8 @@ const formatNumber = (value: number): string => {
             );
           })}
 
-          <TableRow key="total">
+          <TableRow key="total" sx={{ backgroundColor: '#f0f4ff' }}>
+            
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", textAlign: "center" }}>Total</TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{ratingswise_total.Total_Deal_Count_Sum}</TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>

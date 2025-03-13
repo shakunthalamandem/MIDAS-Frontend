@@ -134,7 +134,7 @@ const HySectorTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
           ))}
 
           {/* Total row */}
-          <TableRow key="total">
+          <TableRow key="total" sx={{ backgroundColor: '#f0f4ff' }}>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", textAlign: "center" }}>
               Total
             </TableCell>
