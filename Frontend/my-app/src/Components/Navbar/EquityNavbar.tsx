@@ -3,7 +3,7 @@ import { Tabs, Tab, Box } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const pages = [
-  "New Deal Data",
+  // "New Deal Data",
   "Equity Market Opportunity",
   "Monashee Performance & Efficiency",
   "PRIME Investment Strategies",
@@ -16,9 +16,9 @@ const EquityNavbar: React.FC = () => {
 
   const handleNavigate = (page: string) => {
     switch (page) {
-      case "New Deal Data":
-        navigate("/equity/issue_market");
-        break;
+      // case "New Deal Data":
+      //   navigate("/equity/issue_market");
+      //   break;
       case "Equity Market Opportunity":
         navigate("/equity/capital-markets");
         break;
@@ -38,14 +38,14 @@ const EquityNavbar: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case "/equity/issue_market":
-        return 0;
+      // case "/equity/issue_market":
+      //   return 0;
       case "/equity/capital-markets":
       case "/equity/capital-markets/":
       case "/equity/capital-markets/deal-stats":
       case "/equity/capital-markets/skew-table":
       case "/equity/capital-markets/deal-filter":
-        return 1;
+        return 0;
       case "/equity/monashee-deals":
       case "/equity/monashee-deals/":
       case "/equity/monashee-deals/deal-stats":
@@ -54,15 +54,15 @@ const EquityNavbar: React.FC = () => {
       case "/equity/monashee-deals/weekly-tracking":
       case "/equity/monashee-deals/follow-on-discount":
       case "/equity/monashee-deals/gap-analysis":
-        return 2;
+        return 1;
       case "/equity/strategies":
-        return 3;
+        return 2;
       case "/equity/portfolio-attribution":
-        return 4;
+        return 3;
       case "/":
-          return 5;
+          return 4;
       default:
-        return 5;
+        return 4;
     }
   };
 
