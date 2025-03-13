@@ -188,7 +188,7 @@ const SectorBasedTable: React.FC = () => {
               {/* Region Selector */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
-                  <InputLabel>Region</InputLabel>
+                  <InputLabel>  </InputLabel>
                   <Select
                     value={region}
                     onChange={handleRegionChange}
