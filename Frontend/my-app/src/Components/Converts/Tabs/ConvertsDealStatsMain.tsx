@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, CardContent, Card, Container, Snackbar } from '@mui/material';
+import ConvertsDealStatsTabMain from './DealStats/ConvertsDealStatsTabMain';
 
-import HyDealMainTable from './HyDealMainTable';
 
 interface HighYieldOptions {
   start_year: number[];
   end_year: number[];
   sector: string[];
-  snp_rating: string[];
 }
 
-const DealStatsMain = () => {
+const ConvertsDealStatsMain = () => {
   const [filters, setFilters] = useState<HighYieldOptions>({
     start_year: [],
     end_year: [],
     sector: [],
-    snp_rating: [],
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,26 +24,22 @@ const DealStatsMain = () => {
     start_year: number;
     end_year: number;
     sector: string[];  // Change sector to an array of strings
-    snp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: [],  // This should be an array
-    snp_rating: [],
     year_period: 'Yearly',
   });
   const [appliedFilters, setAppliedFilters] = useState<{
     start_year: number;
     end_year: number;
     sector: string[];  // Change sector to an array of strings
-    snp_rating: string[];
     year_period: string;
   }>({
     start_year: 2012,
     end_year: 2025,
     sector: [],
-    snp_rating: [],
     year_period: 'Yearly',
   });
 
@@ -62,7 +56,7 @@ const DealStatsMain = () => {
           throw new Error('API URL is not defined in environment variables');
         }
 
-        const response = await axios.get(`${apiUrl}/api/high-yields/distinct/`, {
+        const response = await axios.get(`${apiUrl}/api/converts/distinct/`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: token ? `Bearer ${token}` : '',
@@ -88,12 +82,24 @@ const DealStatsMain = () => {
     setSnackbarOpen(false); // Close Snackbar when the user dismisses it
   };
 
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, value: string, category: 'sector' ) => {
+    setSelectedFilters((prev) => {
+      const newCategoryValues = event.target.checked
+        ? [...prev[category], value]
+        : prev[category].filter((item) => item !== value);
+
+      return { ...prev, [category]: newCategoryValues };
+    });
+  };
+
 
   const handleApply = () => {
+    // Check if start_year is less than end_year
     const startYear = selectedFilters["start_year"];
     const endYear = selectedFilters["end_year"];
 
     if (startYear && endYear && startYear > endYear) {
+      // Open Snackbar with error message if validation fails
       setSnackbarMessage(
         "Start year should be less than or equal to end year."
       );
@@ -109,13 +115,11 @@ const DealStatsMain = () => {
     setSelectedFilters({ start_year: 2012,
       end_year: 2025,
       sector: [],
-      snp_rating: [],
       year_period: 'Yearly',});
     setAppliedFilters({
       start_year: 2012,
       end_year: 2025,
       sector: [],
-      snp_rating: [],
       year_period: 'Yearly',
     });
     setSnackbarOpen(false); // Close Snackbar on reset
@@ -155,7 +159,6 @@ const DealStatsMain = () => {
                   </FormControl>
                 </Grid>
 
-                {/* Sector Filter with checkboxes */}
                 <Grid item xs={12} sm={6} md={2}>
 
                   <FormControl fullWidth variant="outlined" size="small">
@@ -188,39 +191,9 @@ const DealStatsMain = () => {
                 </Grid>
 
 
-                {/* SP Rating Filter */}
-                <Grid item xs={12} sm={6} md={2}>
-                  <FormControl fullWidth variant="outlined" size="small">
-                    <InputLabel>SP Rating</InputLabel>
-                    <Select
-                      multiple
-                      value={selectedFilters.snp_rating}
-                      onChange={handleFilterChange('snp_rating')}
-                      renderValue={(selected) => selected.join(', ')}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 300, // Limit the dropdown height to allow scrolling
-                            overflowY: 'auto',
-                          },
-                        },
-                      }}
-                    >
-                      {filters.snp_rating.sort().map((rating) => (
-                        <MenuItem key={rating} value={rating} sx={{ fontSize: '0.875rem' }}>
-                          <Checkbox
-                            checked={selectedFilters.snp_rating.includes(rating)}
-                            sx={{ transform: 'scale(0.8)' }} // Scale the checkbox to make it smaller
-                          />
-                          <Typography sx={{ fontSize: '1rem' }}>{rating}</Typography> {/* Reduce the text size */}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
+            
 
 
-                {/* Period Filter */}
                 <Grid item xs={12} sm={6} md={2}>
                   <FormControl fullWidth variant="outlined" size="small">
                     <InputLabel>Period</InputLabel>
@@ -234,7 +207,6 @@ const DealStatsMain = () => {
               </Grid>
             </Container>
 
-            {/* Apply and Reset Buttons Centered */}
             <Box display="flex" justifyContent="center" mt={2}>
               <Button
                 variant="contained"
@@ -252,8 +224,7 @@ const DealStatsMain = () => {
         </Card>
       </Container>
 
-      {/* Pass only applied filters to the graph */}
-      <HyDealMainTable selectedFilters={appliedFilters} handleReset={handleReset}  />
+      <ConvertsDealStatsTabMain selectedFilters={appliedFilters} handleReset={handleReset}  />
 
        <Snackbar
               open={snackbarOpen}
@@ -273,4 +244,4 @@ const DealStatsMain = () => {
   );
 };
 
-export default DealStatsMain;
+export default ConvertsDealStatsMain;

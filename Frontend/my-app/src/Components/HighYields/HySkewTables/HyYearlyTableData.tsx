@@ -61,16 +61,16 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   // Columns for the table
   const columns = [
     'Sector',
-    'Total Deal Count',
-    'Total Deal Volume ($)',
+    "Total Deal Count",
+    "Total Deal Volume ($)",
     "Deal Count Without Nulls",
     "Deal Volume Without Nulls",
-    '% of Positively Performing Deals ',
-    '% of Negatively Performing Deals ',
-    'Weighted Avg T+1M Excess Return (Positive Deals)',
-    'Weighted Avg T+1M Excess Return (Negative Deals)',
-    'Expected Returns Excess',
-    'Opportunity Value (T + 1M Excess)',
+    "% of Positively Performing Deals",
+    "% of Negatively Performing Deals",
+    "Weighted Avg T+1M Return (Positive Deals)",
+    "Weighted Avg T+1M Return (Negative Deals)",
+    "Expected Returns",
+    "Opportunity Value (T + 1M)",
   ];
 
   // Extract totals from sectorwiseTotal
@@ -87,27 +87,6 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
 
   const avgAvgT1MAbsReturnPositively = sectorwiseTotal.Total_Returns_Positive || 0;
   const avgAvgT1MAbsReturnNegatively = sectorwiseTotal.Total_Returns_Negative || 0;
-
-
-
-
-
-
-
-  // "Total_Deal_Count_Sum": 6425,
-  // "Total_Deal_Volume_Sum": 4562813847996,
-  // "Total_Deal_Count_Sum_Without_Nulls": 4678,
-  // "Total_Deal_Volume_Sum_Without_Nulls": 3639561435432,
-  // "Total_Positive_Performing_Deals_Percentage": 97.06,
-  // "Total_Negative_Performing_Deals_Percentage": 2.94,
-  // "Total_Expected_Returns_Excess": 0.86,
-  // "Total_Returns_Positive": 0.73,
-  // "Total_Returns_Negatively": -2.01
-  
-
-
-
-
 
 
   return (
@@ -166,7 +145,7 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
           })}
 
           {/* Last row with sum and averages */}
-          <TableRow key="total">
+          <TableRow key="total" sx={{ backgroundColor: '#f0f4ff' }}>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', textAlign: 'center' }}>Total</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{totalDealCount}</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{formatNumber(totalDealVolume)}</TableCell>
