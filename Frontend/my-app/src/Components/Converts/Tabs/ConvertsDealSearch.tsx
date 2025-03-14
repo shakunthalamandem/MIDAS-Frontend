@@ -209,7 +209,7 @@ const ConvertsDealSearch: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                       <TableBody>
                         {[
                           {
-                            label: "60 day Coupon Return",
+                            label: "60 day Return (Including coupon value)",
                             value:
                               (item.t_60_day_return_with_coupon ?? "N/A") + "%",
                           },

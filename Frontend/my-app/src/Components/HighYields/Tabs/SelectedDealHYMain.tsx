@@ -123,7 +123,7 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                               value: item.isin?? "N/A" ,
                                             },
                                             { label: "S&P Rating", value: item.snp_rating ?? "N/A" },
-                                            { label: "maturity_date", value: item.maturity_date?? "N/A"  },
+                                            { label: "Maturity Date", value: item.maturity_date?? "N/A"  },
                                             { label: "Sector", value: item.sector?? "N/A"  },
                                           ].map((row, i) => (
                                             <TableRow
