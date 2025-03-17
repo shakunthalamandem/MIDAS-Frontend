@@ -23,8 +23,9 @@ const HYYearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, c
     return yearData;
   });
 
-  const allSectors = Object.keys(data[Object.keys(data)[0]] || {});
-
+  const allSectors = Array.from(
+    new Set(Object.values(data).flatMap((sectors) => Object.keys(sectors)))
+  );
   const handleCheckboxChange = (sector: string) => {
     setVisibleSectors((prev) =>
       prev.includes(sector) ? prev.filter((item) => item !== sector) : [...prev, sector]
