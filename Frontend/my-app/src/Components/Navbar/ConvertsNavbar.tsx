@@ -3,7 +3,7 @@ import { Tabs, Tab, Box } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const pages = [
-  "Equity Market Opportunity",
+  "Converts Market Opportunity",
   "Monashee Performance & Efficiency",
   "Portfolio Attribution",
 ];
@@ -14,7 +14,7 @@ const ConvertsNavbar: React.FC = () => {
 
   const handleNavigate = (page: string) => {
     switch (page) {
-      case "Equity Market Opportunity":
+      case "Converts Market Opportunity":
         navigate("/converts/capital-markets");
         break;
       case "Monashee Performance & Efficiency":

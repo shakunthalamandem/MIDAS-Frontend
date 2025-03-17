@@ -223,7 +223,7 @@ const ConvertsDealSearch: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                               : "N/A",
                           },
                           {
-                            label: "Original Amount Sold",
+                            label: "Deal Size",
                             value: item.original_amount_sold
                               ? item.original_amount_sold.toLocaleString(
                                   undefined,
