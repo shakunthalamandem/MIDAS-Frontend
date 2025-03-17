@@ -20,8 +20,7 @@ const ErrorPage: React.FC = () => {
         textAlign="center"
       >
         <Typography variant="h2" color="error" gutterBottom>
-          Error
-        </Typography>
+        Data Not Available     </Typography>
         <Typography variant="body1" color="textSecondary" paragraph>
           {errorMessage}
         </Typography>
