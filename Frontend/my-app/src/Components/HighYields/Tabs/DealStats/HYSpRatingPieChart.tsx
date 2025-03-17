@@ -36,7 +36,11 @@ const HYSpRatingPieChart: React.FC<HYSpRatingPieChartProps> = ({
     return yearData;
   });
 
-  const allRegions = Object.keys(data[Object.keys(data)[0]] || {});
+  // const allRegions = Object.keys(data[Object.keys(data)[0]] || {});
+  const allRegions = Array.from(
+    new Set(Object.values(data).flatMap((sectors) => Object.keys(sectors)))
+  );
+  
 
   const handleCheckboxChange = (region: string) => {
     setVisibleRegions((prev) =>
