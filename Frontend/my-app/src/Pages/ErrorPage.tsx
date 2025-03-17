@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Container, Typography, Button, Box } from '@mui/material';
 
 const ErrorPage: React.FC = () => {
   const navigate = useNavigate();
@@ -9,11 +10,29 @@ const ErrorPage: React.FC = () => {
   const errorMessage = location.state?.message || 'An unexpected error occurred.';
 
   return (
-    <div style={{ textAlign: 'center', padding: '50px' }}>
-      <h1>Error</h1>
-      <p>{errorMessage}</p>
-      <button onClick={() => navigate('/')}>Go Home</button>
-    </div>
+    <Container maxWidth="sm">
+      <Box 
+        display="flex" 
+        flexDirection="column" 
+        alignItems="center" 
+        justifyContent="center" 
+        height="100vh" 
+        textAlign="center"
+      >
+        <Typography variant="h2" color="error" gutterBottom>
+        Data Not Available     </Typography>
+        <Typography variant="body1" color="textSecondary" paragraph>
+          {errorMessage}
+        </Typography>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={() => navigate('/')}
+        >
+          Go Home
+        </Button>
+      </Box>
+    </Container>
   );
 };
 
