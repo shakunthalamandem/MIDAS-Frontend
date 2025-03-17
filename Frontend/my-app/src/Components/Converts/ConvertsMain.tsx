@@ -121,7 +121,7 @@ useEffect(() => {
           },
         }}
       >
-        Welcome to HighYield New Issue Equity Markets! Explore deals and uncover
+        Welcome to Converts New Issue Equity Markets! Explore deals and uncover
         statistics from the global market with ease.
       </Typography>
       <Tabs
