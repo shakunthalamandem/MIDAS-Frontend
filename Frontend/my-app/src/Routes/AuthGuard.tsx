@@ -31,6 +31,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setOpenDialog(false);
         setLoading(false);
       } catch (err: unknown) {
+        navigate("/login");
         const error = err as any; // 🔹 Explicitly casting 'error'  
         if (error?.response?.status === 401 && refreshToken) {
           refreshAccessToken(refreshToken);
