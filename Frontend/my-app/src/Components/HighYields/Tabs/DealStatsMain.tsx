@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, CardContent, Card, Container, Snackbar } from '@mui/material';
 
 import HyDealMainTable from './HyDealMainTable';
+import { useNavigate } from 'react-router-dom';
 
 interface HighYieldOptions {
   start_year: number[];
@@ -19,6 +20,8 @@ const DealStatsMain = () => {
     snp_rating: [],
   });
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate(); 
+
   const [error, setError] = useState<string | null>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false); // Manage Snackbar open state
     const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message content
@@ -73,6 +76,8 @@ const DealStatsMain = () => {
       } catch (error) {
         setError('Failed to fetch filter options');
         console.error('Error fetching filter options:', error);
+        navigate("/error");  
+
       } finally {
         setLoading(false);
       }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CircularProgress, Typography, Alert, Box } from '@mui/material';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 interface SelectedFilters {
   [key: string]: any;
@@ -13,6 +14,8 @@ interface DataType {
 
 const HYsppiechart = ({ selectedFilters }: { selectedFilters: SelectedFilters }) => {
   const [data, setData] = useState<DataType | null>(null);
+  const navigate = useNavigate(); 
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null); // Explicitly typing the error state
 
@@ -44,6 +47,9 @@ const HYsppiechart = ({ selectedFilters }: { selectedFilters: SelectedFilters })
       } catch (error) {
         if (error instanceof Error) {
           setError(error);
+          navigate("/error");  
+
+
         }
       } finally {
         setLoading(false);

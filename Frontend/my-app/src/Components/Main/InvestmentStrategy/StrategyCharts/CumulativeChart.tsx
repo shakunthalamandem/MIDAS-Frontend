@@ -21,6 +21,7 @@ import {
   RadioGroup,
 } from "@mui/material";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // Define the DealData interface
 interface DealData {
@@ -50,6 +51,8 @@ const CumulativeyearlyChart: React.FC = () => {
   const [data, setData] = useState<DealData | null>(null);
   const [showCount, setShowCount] = useState(true);
   const [showSize, setShowSize] = useState(false);
+  const navigate = useNavigate(); 
+
 
   // Fetch data from the API
   useEffect(() => {
@@ -73,6 +76,8 @@ const CumulativeyearlyChart: React.FC = () => {
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        navigate("/error");  
+
       }
     };
 

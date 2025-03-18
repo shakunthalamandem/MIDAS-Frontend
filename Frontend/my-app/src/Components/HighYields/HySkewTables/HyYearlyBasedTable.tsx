@@ -16,6 +16,7 @@ import {
 import axios from 'axios';
 import HyYearlyTableData from './HyYearlyTableData';
 import NoDataPopup from '../../../Pages/NoDataPopup';
+import { useNavigate } from 'react-router-dom';
 
 interface SkewTableOptions {
   'start year': number[];
@@ -32,6 +33,8 @@ const HyYearlyBasedTable: React.FC = () => {
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
   const [ratingOptions, setRatingOptions] = useState<string[]>([]);
   const [tableData, setTableData] = useState<any>(null);
+  const navigate = useNavigate(); 
+
 
   
     const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
@@ -61,6 +64,8 @@ const HyYearlyBasedTable: React.FC = () => {
         setEndYearOptions(data['end year'] || []);
         } catch (error) {
         console.error('Error fetching filter options:', error);
+        navigate("/error");  
+
       }
     };
     fetchFilterOptions();
@@ -97,7 +102,7 @@ const HyYearlyBasedTable: React.FC = () => {
         setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
 
       } catch (error) {
-        setNoDataPopupOpen(true);
+        navigate("/error");  
       }  finally {
         setLoading(false); 
       }

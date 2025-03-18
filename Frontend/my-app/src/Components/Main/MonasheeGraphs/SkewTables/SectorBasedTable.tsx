@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import SectorTableData from './SectorTableData';
 import NoDataPopup from '../../../../Pages/NoDataPopup'; // Assuming this is where NoDataPopup is located
+import { useNavigate } from 'react-router-dom';
 
 // Define the expected structure of the API response
 interface SkewTableOptions {
@@ -42,6 +43,8 @@ const SectorBasedTable: React.FC = () => {
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
   const [year_periodOptions, setYearPeriodOptions] = useState<string[]>([]);
+  const navigate = useNavigate(); 
+
 
   // State to store the response data and the no data popup visibility
   const [responseData, setResponseData] = useState<any>(null);
@@ -74,6 +77,8 @@ const SectorBasedTable: React.FC = () => {
         setYearPeriodOptions(data['year_period']);  // Ensure year_period options are set here
       } catch (error) {
         console.error('Error fetching filter options:', error);
+        navigate("/error");  
+
       }
     };
 
@@ -121,7 +126,7 @@ const SectorBasedTable: React.FC = () => {
           setResponseData(response.data);  // Store the response data in state
         }
       } catch (error) {
-        setNoDataPopupOpen(true); // Open the popup in case of error
+        navigate("/error");  
       }  
     };
 

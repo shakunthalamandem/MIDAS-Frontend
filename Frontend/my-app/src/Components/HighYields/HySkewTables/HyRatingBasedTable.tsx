@@ -16,6 +16,7 @@ import {
 import axios from 'axios';
 import HyRatingTableData from './HyRatingTableData';
 import NoDataPopup from '../../../Pages/NoDataPopup';
+import { useNavigate } from 'react-router-dom';
 
 interface SkewTableOptions {
   'start year': number[];
@@ -35,6 +36,8 @@ const HyRatingBasedTable: React.FC = () => {
 
   const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate(); 
+
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
@@ -56,6 +59,8 @@ const HyRatingBasedTable: React.FC = () => {
         setSectorOptions(data['sector']);
       } catch (error) {
         console.error('Error fetching filter options:', error);
+        navigate("/error");  
+
       }
     };
     fetchFilterOptions();
@@ -93,7 +98,7 @@ const HyRatingBasedTable: React.FC = () => {
 
         }
       } catch (error) {
-        setNoDataPopupOpen(true);
+        navigate("/error");  
       }
       finally {
         setLoading(false);

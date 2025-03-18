@@ -16,6 +16,8 @@ import {
 import axios from "axios";
 import NoDataPopup from "../../../../Pages/NoDataPopup";
 import ConvertsSectorTableData from "./ConvertsSectorTableData";
+import { useNavigate } from "react-router-dom";  // Import useNavigate
+
 
 interface SkewTableOptions {
   "start year": number[];
@@ -27,6 +29,8 @@ const ConvertsYearlyBased: React.FC = () => {
   const [startYear, setStartYear] = useState<number>(2012);
   const [endYear, setEndYear] = useState<number | string>(2025);
   const [sector, setSector] = useState<string>("All");
+  const navigate = useNavigate();  // Initialize navigate function
+
 
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
@@ -53,6 +57,7 @@ const ConvertsYearlyBased: React.FC = () => {
         setSectorOptions(Array.isArray(data.sector) ? data.sector : []);
       } catch (error) {
         console.error("Error fetching filter options:", error);
+        navigate("/error");  // Redirect to error page
       }
     };
 
@@ -86,7 +91,8 @@ const ConvertsYearlyBased: React.FC = () => {
         setResponseData(response.data && Object.keys(response.data).length ? response.data : null);
         setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
       } catch (error) {
-        setNoDataPopupOpen(true);
+        navigate("/error");  
+
       } finally {
         setLoading(false); // Stop loading
       }

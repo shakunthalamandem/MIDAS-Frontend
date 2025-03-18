@@ -25,6 +25,7 @@ import {
 import axios from "axios";
 import GapDealDeatilsTable from "./GapDealDeatilsTable";
 import TwoWeekDealData from "./TwoweekDealData";
+import { useNavigate } from "react-router-dom";
 
 interface WeeklyData {
   Count: number;
@@ -71,6 +72,8 @@ const formatNumber = (value: number) => {
 
 const WeeklyStatsChart: React.FC = () => {
   const [data, setData] = useState<APIResponse | null>(null);
+  const navigate = useNavigate(); 
+
   const [chartType, setChartType] = useState<
     | "count"
     | "volume"
@@ -97,6 +100,8 @@ const WeeklyStatsChart: React.FC = () => {
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        navigate("/error");  
+
       }
     };
     fetchData();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   CircularProgress,
@@ -59,6 +59,8 @@ const FundWiseTable: React.FC = () => {
   const [view, setView] = useState<"fund" | "sector">("fund"); // Default view is "fund"
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate(); 
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,7 +95,7 @@ const FundWiseTable: React.FC = () => {
         }
       } catch (error) {
         setError(error instanceof Error ? error.message : "An error occurred while fetching data");
-        setOpenNoDataPopup(true); // In case of any error, show no data popup
+        navigate("/error");  
       } finally {
         setLoading(false);
       }

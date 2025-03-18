@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import HySectorTableData from "./HySectorTableData";
 import NoDataPopup from "../../../Pages/NoDataPopup";
+import { useNavigate } from "react-router-dom";
 
 interface SkewTableOptions {
   "start year": number[];
@@ -36,6 +37,8 @@ const HySectorBasedTable: React.FC = () => {
   const [responseData, setResponseData] = useState<any>(null);
   const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate(); 
+
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
@@ -57,6 +60,8 @@ const HySectorBasedTable: React.FC = () => {
         setSectorOptions(Array.isArray(data.sector) ? data.sector : []);
       } catch (error) {
         console.error("Error fetching filter options:", error);
+        navigate("/error");  
+
       }
     };
 
@@ -91,7 +96,7 @@ const HySectorBasedTable: React.FC = () => {
         setResponseData(response.data && Object.keys(response.data).length ? response.data : null);
         setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
       } catch (error) {
-        setNoDataPopupOpen(true);
+        navigate("/error");  
       } finally {
         setLoading(false); // Stop loading
       }

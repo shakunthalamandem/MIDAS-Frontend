@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { CircularProgress, Box, Typography } from "@mui/material";
 import Marquee from "react-fast-marquee";
 import DetailedGapDataTable from "./DetailedGapDataTable";
@@ -15,6 +15,8 @@ const DetailedGapData: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate(); 
+
 
 
   let selectedFilters: SelectedFilters = {}; // Explicitly using the typed interface
@@ -24,6 +26,8 @@ const DetailedGapData: React.FC = () => {
     selectedFilters = filters;
   } catch (error) {
     console.error("Invalid filters format", error);
+    navigate("/error");  
+
   }
 
   useEffect(() => {
@@ -48,6 +52,8 @@ const DetailedGapData: React.FC = () => {
         const result = await response.json();
         setData(result.data || []);
       } catch (error) {
+        navigate("/error");  
+
         setError(error instanceof Error ? error.message : "Unknown error");
       } finally {
         setLoading(false);

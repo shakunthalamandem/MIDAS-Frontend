@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Box, FormControl, InputLabel, TextField, Autocomplete } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface ApiResponse {
   tickers: string[];
@@ -11,6 +12,8 @@ const DealFormSearch: React.FC = () => {
   const [tickers, setTickers] = useState<string[]>([]); 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate(); 
+
 
   useEffect(() => {
     const fetchTickers = async () => {
@@ -29,6 +32,8 @@ const DealFormSearch: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching tickers:", error);
+        navigate("/error");  
+
       }
     };
 

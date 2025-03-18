@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import LeadBankTableData from './LeadBankTableData';
 import NoDataPopup from '../../../../Pages/NoDataPopup';
+import { useNavigate } from 'react-router-dom';
 
 // Define the expected structure of the API response
 interface SkewTableOptions {
@@ -32,6 +33,8 @@ const LeadBankBasedTable: React.FC = () => {
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
+  const navigate = useNavigate(); 
+
 
   // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
@@ -70,6 +73,8 @@ const LeadBankBasedTable: React.FC = () => {
         setSectorOptions(data['sector']);
       } catch (error) {
         console.error('Error fetching filter options:', error);
+        navigate("/error");  
+
       }
     };
 

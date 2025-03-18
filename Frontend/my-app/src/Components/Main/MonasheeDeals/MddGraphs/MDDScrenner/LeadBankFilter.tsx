@@ -14,6 +14,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface LeadBankFilterProps {
   values: any;
@@ -26,6 +27,8 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
   const [searchKey, setSearchKey] = useState<string>("");
   const [filteredOptions, setFilteredOptions] = useState<string[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate(); 
+
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
@@ -50,6 +53,8 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
         }
       } catch (error) {
         console.error("Error fetching selected_bank options:", error);
+        navigate("/error");  
+
       } finally {
         setLoading(false);
       }
