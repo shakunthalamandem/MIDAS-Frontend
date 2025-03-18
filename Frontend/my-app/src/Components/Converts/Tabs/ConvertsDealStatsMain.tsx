@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, CardContent, Card, Container, Snackbar } from '@mui/material';
 import ConvertsDealStatsTabMain from './DealStats/ConvertsDealStatsTabMain';
+import { useNavigate } from 'react-router-dom';
 
 
 interface HighYieldOptions {
@@ -20,6 +21,8 @@ const ConvertsDealStatsMain = () => {
   const [error, setError] = useState<string | null>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false); // Manage Snackbar open state
     const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message content
+    const navigate = useNavigate(); 
+    
   const [selectedFilters, setSelectedFilters] = useState<{
     start_year: number;
     end_year: number;
@@ -67,6 +70,7 @@ const ConvertsDealStatsMain = () => {
       } catch (error) {
         setError('Failed to fetch filter options');
         console.error('Error fetching filter options:', error);
+        navigate("/error");  
       } finally {
         setLoading(false);
       }

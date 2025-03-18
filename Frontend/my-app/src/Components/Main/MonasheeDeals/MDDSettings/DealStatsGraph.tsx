@@ -22,6 +22,7 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface ChartData {
   year: string;
@@ -138,6 +139,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   const [selectedField, setSelectedField] = useState<string>("count");
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate(); 
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -164,6 +167,8 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
       setChartData(formatChartData(data));
     } catch (error) {
       console.error("Error fetching data", error);
+      navigate("/error");  
+
       setChartData([]);
     } finally {
       setLoading(false);

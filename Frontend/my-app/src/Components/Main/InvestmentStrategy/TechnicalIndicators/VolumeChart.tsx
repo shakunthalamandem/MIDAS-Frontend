@@ -11,6 +11,7 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 // Define the types
 interface VolumeData {
@@ -25,6 +26,8 @@ interface VolumeChartProps {
 
 const VolumeChart: React.FC<VolumeChartProps> = ({ ticker }) => {
   const [data, setData] = useState<VolumeData[]>([]);
+  const navigate = useNavigate(); 
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +58,8 @@ const VolumeChart: React.FC<VolumeChartProps> = ({ ticker }) => {
         setData(volumeGraphData); // Update the state with the volume graph data
       } catch (error) {
         console.error('Error fetching data:', error);
+        navigate("/error");  
+
       }
     };
 

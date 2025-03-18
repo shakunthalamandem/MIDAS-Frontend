@@ -26,6 +26,7 @@ const NavbarMain: React.FC = () => {
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
 
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const refresh_token = localStorage.getItem("refresh_token");
@@ -74,6 +75,8 @@ const NavbarMain: React.FC = () => {
     } catch (error) {
       setLoading(false);
       console.error("Logout failed:", error);
+      navigate("/error");  
+
     }
     setShowLogout(false);
   };

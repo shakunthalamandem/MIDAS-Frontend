@@ -10,6 +10,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface ApiResponse {
   [year: string]: {
@@ -68,6 +69,9 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
   const [years, setYears] = useState<number[]>([]);
   const [sectors, setSectors] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const navigate = useNavigate(); 
+
+
 
   const fetchYears = useCallback(async () => {
     try {
@@ -91,6 +95,8 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
     } catch (error) {
       console.error("Error fetching years:", error);
       setError("Failed to fetch years. Please try again later.");
+      navigate("/error");  
+
     }
   }, []);
 
@@ -124,6 +130,8 @@ const token = localStorage.getItem("access_token");
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
+      navigate("/error");  
+
     }
   }, [startYear, endYear, type, sector, opportunity_value_on_abs_basis, opportunity_value_ex, deal_value, deal_count]);
 

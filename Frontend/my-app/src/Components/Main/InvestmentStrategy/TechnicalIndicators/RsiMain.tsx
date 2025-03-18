@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 // Define the types
 interface RsiData {
@@ -21,11 +22,15 @@ interface RsiMainProps {
 
 const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
   const [data, setData] = useState<RsiData[]>([]);
+  const navigate = useNavigate(); 
+
 
   useEffect(() => {
     const fetchData = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
+
       const token = localStorage.getItem("access_token");
+
       if (!apiUrl) {
         throw new Error('API URL is not defined in environment variables');
       }
@@ -50,6 +55,8 @@ const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
         const rsiGraphData = jsonData.technical_data?.rsi_graph || [];
         setData(rsiGraphData); // Update the state with the extracted RSI graph data
       } catch (error) {
+        navigate("/error");  
+
         console.error('Error fetching data:', error);
       }
     };

@@ -98,6 +98,7 @@ const MonasheeDeals: React.FC = () => {
       setResults(data); // Set the fetched results
     } catch (error) {
       console.error("Error fetching search results:", error);
+      navigate("/error");  
       setResults([]); // Clear results on error
     } finally {
       setLoading(false); // Set loading to false once fetch is done

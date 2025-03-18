@@ -1,5 +1,6 @@
 import { Card, Container, Checkbox, FormControlLabel, FormControl, FormLabel } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 
 // Number formatting function
@@ -29,6 +30,8 @@ const HyDealStatGraph = ({ selectedFilters }: { selectedFilters: SelectedFilters
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); 
+
   const [selectedMetric, setSelectedMetric] = useState("count"); // Default metric is "count"
 
   useEffect(() => {
@@ -58,6 +61,8 @@ const HyDealStatGraph = ({ selectedFilters }: { selectedFilters: SelectedFilters
         setData(result.main_aggregation);
       } catch (error) {
         setError((error as any).message);
+        navigate("/error");  
+
       } finally {
         setLoading(false);
       }

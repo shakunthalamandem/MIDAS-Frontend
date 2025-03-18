@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import YearlyTableData from './YearlyTableData'; // Import YearlyTableData component
 import NoDataPopup from '../../../../Pages/NoDataPopup';
+import { useNavigate } from 'react-router-dom';
 
 
 interface SkewTableOptions {
@@ -39,6 +40,8 @@ const YearlyBasedTable: React.FC = () => {
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
   const [sectorwiseData, setSectorwiseData] = useState<any>(null);
+  const navigate = useNavigate(); 
+
 
   const [openNoDataPopup, setOpenNoDataPopup] = useState(false);
 
@@ -66,6 +69,8 @@ const YearlyBasedTable: React.FC = () => {
         setSectorOptions(data['sector']);
       } catch (error) {
         console.error('Error fetching filter options:', error);
+        navigate("/error");  
+
       }
     };
 

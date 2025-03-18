@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Paper, Button } from '@mui/material';
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 interface ChartData {
   price: { date: string; price: number }[];
@@ -18,6 +19,8 @@ interface MacdChartProps {
 
 const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
   const [data, setData] = useState<ChartData | null>(null);
+  const navigate = useNavigate(); 
+
   const [visibleLines, setVisibleLines] = useState({
     price: true,
     dma9: true,
@@ -72,6 +75,8 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
         setData(transformedData);
       } catch (error) {
         console.error('Error fetching data:', error);
+        navigate("/error");  
+
       }
     };
 

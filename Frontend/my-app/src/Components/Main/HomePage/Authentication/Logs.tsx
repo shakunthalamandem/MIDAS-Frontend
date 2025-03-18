@@ -13,6 +13,7 @@ import {
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Logs = () => {
   const [logs, setLogs] = useState<any>(null);
@@ -20,6 +21,8 @@ const Logs = () => {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState("activity");
   const [search, setSearch] = useState("");
+  const navigate = useNavigate(); 
+
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const fetchLogs = async () => {
@@ -33,6 +36,8 @@ const Logs = () => {
       setLogs(response.data);
     } catch (error) {
       console.error("Error fetching logs:", error);
+      navigate("/error");  
+
     }
     setLoading(false);
 

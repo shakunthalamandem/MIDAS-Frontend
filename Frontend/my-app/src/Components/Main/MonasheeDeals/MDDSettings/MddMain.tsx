@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MDDFilters from "./MDDFilters";
 import MDDScreenergrid from "./MDDScreenergrid";
+import { useNavigate } from "react-router-dom";
 
 interface MddMainProps {
   apiName: string;
@@ -16,6 +17,8 @@ interface Filter {
 const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
   const [filtersData, setFiltersData] = useState<Filter[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate(); 
+
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
@@ -36,6 +39,8 @@ const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
         setFiltersData(data || []);
       } catch (error) {
         console.error("Error loading filters:", error);
+        navigate("/error");  
+
       }
     };
 

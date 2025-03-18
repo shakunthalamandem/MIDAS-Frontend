@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { TextField, MenuItem, Box, Typography } from '@mui/material';
+import { useNavigate } from "react-router-dom";
 
 interface Ticker {
   id: number;
@@ -20,6 +21,8 @@ const TickerDropdown: React.FC<TickerDropdownProps> = ({ onSelectTicker }) => {
   const [filteredTickers, setFilteredTickers] = useState<Ticker[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const navigate = useNavigate(); 
+
 
   useEffect(() => {
     const fetchTickers = async () => {
@@ -44,6 +47,8 @@ const TickerDropdown: React.FC<TickerDropdownProps> = ({ onSelectTicker }) => {
         setFilteredTickers(formattedTickers);
       } catch (error) {
         console.error('Error fetching tickers:', error);
+        navigate("/error");  
+
       }
     };
     fetchTickers();
