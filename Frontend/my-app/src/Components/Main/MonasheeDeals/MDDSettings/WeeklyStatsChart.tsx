@@ -338,7 +338,7 @@ const WeeklyStatsChart: React.FC = () => {
         </CardContent>
       </Card>
       <TwoWeekDealData />
-      <GapDealDeatilsTable />
+      {/* <GapDealDeatilsTable /> */}
     </Container>
   );
 };
