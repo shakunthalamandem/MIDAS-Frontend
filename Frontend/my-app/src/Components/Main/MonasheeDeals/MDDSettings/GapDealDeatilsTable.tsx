@@ -39,7 +39,7 @@ const GapDealDeatilsTable: React.FC = () => {
       setError(null);
 
       try {
-        const response = await fetch(`${apiUrl}/api/equity/detailed_gap_analysis/`, {
+        const response = await fetch(`${apiUrl}/api/detailed_gap_analysis/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
