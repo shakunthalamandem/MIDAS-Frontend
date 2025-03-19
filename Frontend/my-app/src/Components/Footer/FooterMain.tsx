@@ -35,14 +35,12 @@ const FooterMain: React.FC = () => {
     const fetchVersionInfo = async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem("access_token");
 
         if (!apiUrl) throw new Error("API URL is not defined in environment variables");
 
         const response = await axios.get<VersionInfo>(`${apiUrl}/api/latest_version/`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
           },
         });
 
