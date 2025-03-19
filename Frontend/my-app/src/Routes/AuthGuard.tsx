@@ -49,7 +49,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setLoading(false);
       } catch (error) {
         redirectToLogin();
-        navigate("/error");  
+        navigate("/login");  
 
       }
     };
