@@ -38,11 +38,8 @@ const handleDataLoaded = useCallback((data: DealFormData) => {
         <Typography variant="h6" sx={{ mb: 1 }}>Note:</Typography>
         <Grid container spacing={1}>
           {[
-            { color: '#f56c6c', label: 'Key data inputs to run model' },
-            { color: '#dbed91', label: 'Bloomberg data pulled automatically by ticker' },
-            { color: '#96ffa1', label: 'Model pricing/discount automatically calced' },
-            { color: '#abf5f5', label: 'Proprietary deal data kept – some of which could be used for analysis' },
-            { color: '#d4b8de', label: 'Proprietary deal data kept in MDD (and in past used to be able to be pulled by model from MDD for historical transactions)' }
+            { color: '#b7cdf7', label: 'Bloomberg data pulled automatically by ticker' },
+           
           ].map((item, index) => (
             <Grid item key={index} sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
               <Box sx={{ width: 16, height: 16, backgroundColor: item.color, border: '1px solid #000', mr: 1 }} />
