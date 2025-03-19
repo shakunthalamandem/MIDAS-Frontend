@@ -44,17 +44,16 @@ const FooterMain: React.FC = () => {
           },
         });
 
-        // Data is now strongly typed thanks to the response being typed as VersionInfo
         const data = response.data;
         setVersionInfo({
           version: data.version || '',
           release_date: data.release_date || '',
           key_updates: data.key_updates || '',
-          data_up_to_date: data.data_up_to_date || '', // Set the data_up_to_date field
+          data_up_to_date: data.data_up_to_date || '', 
         });
       } catch (error) {
         console.error("Error fetching version info:", error);
-        navigate("/error");  // Redirect to error page in case of failure
+        navigate("/error");  
       }
     };
 
