@@ -18,7 +18,6 @@ import {
   FormControlLabel,
   FormControl,
 } from "@mui/material";
-import NoDataPopup from "../../../Pages/NoDataPopup";
 
 interface FundData {
   broad_region: string;
@@ -55,7 +54,6 @@ const FundWiseTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<FundData[] | SectorData[]>([]);
-  const [openNoDataPopup, setOpenNoDataPopup] = useState<boolean>(false);
   const [view, setView] = useState<"fund" | "sector">("fund"); // Default view is "fund"
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -88,10 +86,8 @@ const FundWiseTable: React.FC = () => {
         // Check for specific error from API response
         if (responseData.error === "No data found.") {
           setData([]);
-          setOpenNoDataPopup(true); // Show popup when no data is found
         } else {
           setData(responseData);
-          setOpenNoDataPopup(!Array.isArray(responseData) || responseData.length === 0);
         }
       } catch (error) {
         setError(error instanceof Error ? error.message : "An error occurred while fetching data");
@@ -106,9 +102,7 @@ const FundWiseTable: React.FC = () => {
     }
   }, [fund, apiUrl, token, view]);
 
-  const handleCloseNoDataPopup = () => {
-    setOpenNoDataPopup(false);
-  };
+
 
   // Region totals and overall totals initialization
   let regionTotals: Record<string, { Jan_pnl: number; Feb_pnl: number; Mar_pnl: number }> = {};
@@ -269,7 +263,6 @@ const FundWiseTable: React.FC = () => {
           </Grid>
         </Grid>
       </Container>
-      <NoDataPopup open={openNoDataPopup} onClose={handleCloseNoDataPopup} />
     </Box>
   );
 };
