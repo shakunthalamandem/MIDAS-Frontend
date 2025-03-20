@@ -218,13 +218,13 @@ const Participation: React.FC<ParticipationProps> = ({ data }) => {
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Discount Percentage</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#dbed91"}}>{data.price_local.discount_percentage}%</TableCell>
+              <TableCell sx={{bgcolor:"#b7cdf7"}}>{data.price_local.discount_percentage}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{ color: "#4d4d4d" }}>
                 <strong>Last Close Price</strong>
               </TableCell>
-              <TableCell sx={{bgcolor:"#dbed91"}}>{data.price_local.last_close}</TableCell>
+              <TableCell sx={{bgcolor:"#b7cdf7"}}>{data.price_local.last_close}</TableCell>
             </TableRow>
 
             <TableRow>
