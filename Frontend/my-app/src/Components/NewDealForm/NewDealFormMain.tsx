@@ -17,12 +17,10 @@ const NewDealFormMain: React.FC = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: '#f4f4f4', padding: 3, borderRadius: 2 }}>
-      <Typography variant="h5" sx={{ color: '#002060', marginBottom: 2 }}>
-        New Deal Form
-      </Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+    <Box mt={2}>
+
+      <Grid container spacing={2} justifyContent="flex-start" alignItems="center">
+        <Grid item xs={3}>  {/* Ticker input field */}
           <TextField
             label="Ticker Name"
             variant="outlined"
@@ -32,7 +30,7 @@ const NewDealFormMain: React.FC = () => {
             sx={{ marginBottom: 2 }}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={3}>  {/* Launch Date input field */}
           <TextField
             label="Launch Date"
             type="date"
@@ -46,13 +44,13 @@ const NewDealFormMain: React.FC = () => {
             sx={{ marginBottom: 2 }}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={2}>  {/* Get Data button */}
           <Button
             variant="contained"
             color="primary"
             fullWidth
             sx={{
-              backgroundColor: '#002060',
+              backgroundColor: '#015200',
               '&:hover': {
                 backgroundColor: '#001B4D',
               },
@@ -71,7 +69,5 @@ const NewDealFormMain: React.FC = () => {
     </Box>
   );
 };
-
-
 
 export default NewDealFormMain;
