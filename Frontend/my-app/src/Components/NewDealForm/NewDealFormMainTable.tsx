@@ -94,15 +94,13 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
       <tr key={index}>
         {pair.map(([key, value]) => (
           <td style={{ padding: '8px', width: '33%' }} key={key}>
-            <Typography variant="body1" sx={{ fontWeight: 'bold',color:"#4d4d4d" }}>
-              {capitalizeLabel(key)}
-            </Typography>
+          
             <TextField
               fullWidth
               value={value || ''}
               onChange={(e) => handleInputChange(e, section, key)}
               label={capitalizeLabel(key)}
-              variant="outlined"
+              variant="standard"
               disabled={!isEditable} // Disable the field when not in edit mode
               sx={{
                 width: '90%',
@@ -110,7 +108,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
                 height: '40px',
                 display: 'flex',
                 justifyContent: 'center',
-                '& .MuiOutlinedInput-root': {
+                '& .MuistandardInput-root': {
                   height: '40px',
                   '&:hover': {
                     borderColor: '#002060', // Change border color on hover
