@@ -1,33 +1,8 @@
-import {
-  Container,
-  Grid,
-  Typography,
-  CircularProgress,
-  Box,
-} from "@mui/material";
-import Background from "./SectionForms/Background";
-import DealActivity from "./SectionForms/DealActivity";
-import DealDetailsForm from "./SectionForms/DealDetailsForm";
-import HistoricalData from "./SectionForms/HistoricalData";
-import Participation from "./SectionForms/Participation";
-import PerformanceStatergy from "./SectionForms/PerformanceStatergy";
-import TechnicalInsights from "./SectionForms/TechnicalInsights";
-import TempJsonData from "./TempJsonData";
-import { DealFormData } from "../../types/DealFormData";
-import AfterMarketAnalysis from "./SectionForms/AfterMarketAnalysis";
-import DealFormSearch from "./DealFormSearch";
-import { useState, useCallback } from "react";
+import { Container, Typography, Box } from "@mui/material";
+
 import NewDealFormMain from "../NewDealForm/NewDealFormMain";
 
 const DealFormMain: React.FC = () => {
-  const [formData, setFormData] = useState<DealFormData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const handleDataLoaded = useCallback((data: DealFormData) => {
-    setFormData(data);
-    setLoading(false);
-  }, []);
-
   return (
     <>
       <Box sx={{ width: "100%", backgroundColor: "#fff" }}>
