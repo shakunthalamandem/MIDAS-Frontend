@@ -47,9 +47,9 @@ const NewDealFormMain: React.FC = () => {
         <Grid item xs={2}>  {/* Get Data button */}
           <Button
             variant="contained"
-            color="primary"
             fullWidth
             sx={{
+              padding: '5px',
               backgroundColor: '#015200',
               '&:hover': {
                 backgroundColor: '#001B4D',
