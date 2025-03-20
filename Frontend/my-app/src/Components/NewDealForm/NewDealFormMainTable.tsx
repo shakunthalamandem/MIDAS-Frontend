@@ -1,4 +1,4 @@
-import { Box, Typography, TextField, Grid, Button } from '@mui/material';
+import { Box, Typography, TextField, Button } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -82,49 +82,52 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     // Ensure that sectionData is defined before attempting to access its keys
     if (!sectionData) return null;
 
-    return Object.keys(sectionData).map((key) => (
-      <Grid container spacing={2} key={key}>
-       <Grid item xs={4}>
-  <Typography variant="body1" >
-    {capitalizeLabel(key)}
-  </Typography>
-</Grid>
+    const entries = Object.entries(sectionData);
 
-        <Grid item xs={8}>
-        <TextField
-  fullWidth
-  value={sectionData[key] || ''}
-  onChange={(e) => handleInputChange(e, section, key)}
-  label={capitalizeLabel(key)}
-  variant="outlined"
-  disabled={!isEditable} // Disable the field when not in edit mode
-  sx={{
-    width: '200px', // Decrease width of the input
-    padding: '5px',
-    height: '40px', // Decrease height of the input field
-    display: 'flex',
-    justifyContent: 'center', // Center the input field
-    '& .MuiOutlinedInput-root': {
-      height: '40px', // Set the height of the text input
-      '&:hover': {
-        borderColor: '#002060', // Change border color on hover
-      },
-      '&.Mui-focused': {
-        borderColor: '#002060', // Change border color when focused
-      },
-    },
-    '& .MuiInputBase-input': {
-      padding: '10px', // Optional: Adjust padding inside the input field
-      fontSize: '12px', // Reduce the font size of the input text
-    },
-    '& .MuiInputBase-input::placeholder': {
-      fontSize: '8px', // Reduce the font size of the placeholder text
-    },
-  }}
-/>
+    // Split entries into groups of 3 (3 fields per row)
+    const splitEntries = [];
+    for (let i = 0; i < entries.length; i += 3) {
+      splitEntries.push(entries.slice(i, i + 3)); // Create groups of 3 fields
+    }
 
-        </Grid>
-      </Grid>
+    return splitEntries.map((pair, index) => (
+      <tr key={index}>
+        {pair.map(([key, value]) => (
+          <td style={{ padding: '8px', width: '33%' }} key={key}>
+            <Typography variant="body1" sx={{ fontWeight: 'bold',color:"#4d4d4d" }}>
+              {capitalizeLabel(key)}
+            </Typography>
+            <TextField
+              fullWidth
+              value={value || ''}
+              onChange={(e) => handleInputChange(e, section, key)}
+              label={capitalizeLabel(key)}
+              variant="outlined"
+              disabled={!isEditable} // Disable the field when not in edit mode
+              sx={{
+                width: '90%',
+                padding: '5px',
+                height: '40px',
+                display: 'flex',
+                justifyContent: 'center',
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  '&:hover': {
+                    borderColor: '#002060', // Change border color on hover
+                  },
+                  '&.Mui-focused': {
+                    borderColor: '#002060', // Change border color when focused
+                  },
+                },
+                '& .MuiInputBase-input': {
+                  padding: '10px',
+                  fontSize: '15px',
+                },
+              }}
+            />
+          </td>
+        ))}
+      </tr>
     ));
   };
 
@@ -138,53 +141,81 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   return (
     <Box sx={{ marginTop: 3, padding: 2, border: '1px solid #ccc' }}>
       <Box sx={{ marginTop: 3, display: 'flex', justifyContent: 'flex-end' }}>
-  {isEditable ? (
-    <Button
-      variant="contained"
-      sx={{ backgroundColor: '#007777', '&:hover': { backgroundColor: '#005757' } }}
-      onClick={handleSave}
-    >
-      Save
-    </Button>
-  ) : (
-    <Button
-      variant="contained"
-      sx={{ backgroundColor: '#007777', '&:hover': { backgroundColor: '#005757' } }}
-      onClick={() => setIsEditable(true)}
-    >
-      Edit
-    </Button>
-  )}
-</Box>
-
+        {isEditable ? (
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: '#007777', '&:hover': { backgroundColor: '#005757' } }}
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: '#007777', '&:hover': { backgroundColor: '#005757' } }}
+            onClick={() => setIsEditable(true)}
+          >
+            Edit
+          </Button>
+        )}
+      </Box>
 
       <form>
-        <Typography variant="h6" sx={{ margin: 2 ,color:'#002060' , textAlign:'center'}}>Company Details</Typography>
-        {renderFormFields('company_details', formData.company_details)}
+        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
+          Company Details
+        </Typography>
+        <table style={{ width: '100%', marginBottom: '20px' }}>
+          <tbody>{renderFormFields('company_details', formData.company_details)}</tbody>
+        </table>
 
-        <Typography variant="h6" sx={{ margin: 2 ,color:'#002060' , textAlign:'center'}}>Participation Details</Typography>
-        {renderFormFields('participation_details', formData.participation_details)}
+        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
+          Participation Details
+        </Typography>
+        <table style={{ width: '100%', marginBottom: '20px' }}>
+          <tbody>{renderFormFields('participation_details', formData.participation_details)}</tbody>
+        </table>
 
-        <Typography variant="h6" sx={{ margin: 2 ,color:'#002060' , textAlign:'center'}}>Background Data</Typography>
-        {renderFormFields('background_data', formData.background_data)}
+        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
+          Background Data
+        </Typography>
+        <table style={{ width: '100%', marginBottom: '20px' }}>
+          <tbody>{renderFormFields('background_data', formData.background_data)}</tbody>
+        </table>
 
-        <Typography variant="h6" sx={{ margin: 2 ,color:'#002060' , textAlign:'center'}}>Monashee Deal Activity</Typography>
-        {renderFormFields('monashee_deal_activity', formData.monashee_deal_activity)}
+        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
+          Monashee Deal Activity
+        </Typography>
+        <table style={{ width: '100%', marginBottom: '20px' }}>
+          <tbody>{renderFormFields('monashee_deal_activity', formData.monashee_deal_activity)}</tbody>
+        </table>
 
-        <Typography variant="h6" sx={{ margin: 2 ,color:'#002060' , textAlign:'center'}}>Performance Statistics</Typography>
-        {renderFormFields('performance_statistics', formData.performance_statistics)}
+        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
+          Performance Statistics
+        </Typography>
+        <table style={{ width: '100%', marginBottom: '20px' }}>
+          <tbody>{renderFormFields('performance_statistics', formData.performance_statistics)}</tbody>
+        </table>
 
-        <Typography variant="h6" sx={{ margin: 2,color:'#002060' , textAlign:'center' }}>After Market Analysis</Typography>
-        {renderFormFields('after_market_analysis', formData.after_market_analysis)}
+        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
+          After Market Analysis
+        </Typography>
+        <table style={{ width: '100%', marginBottom: '20px' }}>
+          <tbody>{renderFormFields('after_market_analysis', formData.after_market_analysis)}</tbody>
+        </table>
 
-        <Typography variant="h6" sx={{ margin: 2 ,color:'#002060' , textAlign:'center'}}>Technical Analysis</Typography>
-        {renderFormFields('technical_analysis', formData.technical_analysis)}
+        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
+          Technical Analysis
+        </Typography>
+        <table style={{ width: '100%', marginBottom: '20px' }}>
+          <tbody>{renderFormFields('technical_analysis', formData.technical_analysis)}</tbody>
+        </table>
 
-        <Typography variant="h6" sx={{ margin: 2,color:'#002060', textAlign:'center' }}>Historical Data</Typography>
-        {renderFormFields('historical_data', formData.historical_data)}
-
-        {/* Save/Edit buttons */}
-        
+        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
+          Historical Data
+        </Typography>
+        <table style={{ width: '100%', marginBottom: '20px' }}>
+          <tbody>{renderFormFields('historical_data', formData.historical_data)}</tbody>
+        </table>
       </form>
     </Box>
   );
