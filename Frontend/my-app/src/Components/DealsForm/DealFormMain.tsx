@@ -11,6 +11,7 @@ import { DealFormData } from '../../types/DealFormData';
 import AfterMarketAnalysis from './SectionForms/AfterMarketAnalysis';
 import DealFormSearch from './DealFormSearch';
 import { useState, useCallback } from "react";
+import NewDealFormMain from '../NewDealForm/NewDealFormMain';
 
 
 const DealFormMain: React.FC = () => {
@@ -32,7 +33,7 @@ const handleDataLoaded = useCallback((data: DealFormData) => {
         Deal Information Form
       </Typography>
   
-      <DealFormSearch />
+      <NewDealFormMain />
      {/* 🔹 Color Legend - Aligned to the Left */}
      <Box sx={{ mt: 3 }}>
         <Typography variant="h6" sx={{ mb: 1 }}>Note:</Typography>
