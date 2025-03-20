@@ -1,25 +1,27 @@
-import { Container, Grid, Typography, CircularProgress, Box } from '@mui/material';
-import Background from './SectionForms/Background';
-import DealActivity from './SectionForms/DealActivity';
-import DealDetailsForm from './SectionForms/DealDetailsForm';
-import HistoricalData from './SectionForms/HistoricalData';
-import Participation from './SectionForms/Participation';
-import PerformanceStatergy from './SectionForms/PerformanceStatergy';
-import TechnicalInsights from './SectionForms/TechnicalInsights';
-import TempJsonData from './TempJsonData';
-import { DealFormData } from '../../types/DealFormData';
-import AfterMarketAnalysis from './SectionForms/AfterMarketAnalysis';
-import DealFormSearch from './DealFormSearch';
+import {
+  Container,
+  Grid,
+  Typography,
+  CircularProgress,
+  Box,
+} from "@mui/material";
+import Background from "./SectionForms/Background";
+import DealActivity from "./SectionForms/DealActivity";
+import DealDetailsForm from "./SectionForms/DealDetailsForm";
+import HistoricalData from "./SectionForms/HistoricalData";
+import Participation from "./SectionForms/Participation";
+import PerformanceStatergy from "./SectionForms/PerformanceStatergy";
+import TechnicalInsights from "./SectionForms/TechnicalInsights";
+import TempJsonData from "./TempJsonData";
+import { DealFormData } from "../../types/DealFormData";
+import AfterMarketAnalysis from "./SectionForms/AfterMarketAnalysis";
+import DealFormSearch from "./DealFormSearch";
 import { useState, useCallback } from "react";
-import NewDealFormMain from '../NewDealForm/NewDealFormMain';
-
+import NewDealFormMain from "../NewDealForm/NewDealFormMain";
 
 const DealFormMain: React.FC = () => {
   const [formData, setFormData] = useState<DealFormData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-
-
 
   const handleDataLoaded = useCallback((data: DealFormData) => {
     setFormData(data);
@@ -29,7 +31,6 @@ const DealFormMain: React.FC = () => {
   return (
     <>
       <Box sx={{ width: "100%", backgroundColor: "#fff" }}>
-
         <Typography
           variant="body2"
           sx={{
@@ -53,53 +54,60 @@ const DealFormMain: React.FC = () => {
             },
           }}
         >
-         Welcome to the Deal Form! Seamlessly input and track all deal parameters, from company details to allocation and pricing information
+          Welcome to the Deal Form! Seamlessly input and track all deal
+          parameters, from company details to allocation and pricing information
         </Typography>
 
         <Container sx={{ mb: 5 }}>
-          <Typography variant="h5" color="#002060" sx={{ textAlign: 'center', mt: 2 }}>
+          <Typography
+            variant="h5"
+            color="#002060"
+            sx={{ textAlign: "center", mt: 2 }}
+          >
             Deal Information Form
           </Typography>
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            textAlign="center"
+            sx={{ width: "100%", overflow: "hidden", position: "relative" }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                "& .marquee": {
+                  display: "inline-block",
+                  whiteSpace: "nowrap",
+                  animation: "marquee 40s linear infinite",
+                  color: "#666666",
+                  fontWeight: "bold",
+                  fontStyle: "italic",
+                  paddingLeft: "10px",
+                  paddingR: "50px",
+                  paddingRight: "10px",
+                },
+                "@keyframes marquee": {
+                  "0%": { transform: "translateX(100%)" },
+                  "100%": { transform: "translateX(-100%)" },
+                },
+                "& .marquee:hover": {
+                  animationPlayState: "paused",
+                },
+              }}
+            >
+              <span className="marquee">
+                Bloomberg data pulled automatically by ticker{" "}
+              </span>
+            </Typography>
+          </Box>
 
           <NewDealFormMain />
-          {/* 🔹 Color Legend - Aligned to the Left */}
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>Note:</Typography>
-            <Grid container spacing={1}>
-              {[
-                { color: '#b7cdf7', label: 'Bloomberg data pulled automatically by ticker' },
-
-              ].map((item, index) => (
-                <Grid item key={index} sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
-                  <Box sx={{ width: 16, height: 16, backgroundColor: item.color, border: '1px solid #000', mr: 1 }} />
-                  <Typography variant="body2">{item.label}</Typography>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-          {/* Section Forms */}
-          {formData ? (
-            <Grid container spacing={3} sx={{ mt: 2 }}>
-              <Grid item xs={4}><DealDetailsForm data={formData.company_details} /></Grid>
-              <Grid item xs={8}><Participation data={formData.participation} /></Grid>
-              <Grid item xs={4}><Background data={formData.background} /></Grid>
-              <Grid item xs={4}><DealActivity data={formData.monashee_deal_activity} /></Grid>
-              <Grid item xs={4}><PerformanceStatergy data={formData.performance_statistics} /></Grid>
-              <Grid item xs={4}><AfterMarketAnalysis data={formData.aftermarket_analysis} /></Grid>
-              <Grid item xs={4}><TechnicalInsights data={formData.technical_sentiment_analysis} /></Grid>
-              <Grid item xs={4}><HistoricalData data={formData.historical_transactions} /></Grid>
-            </Grid>
-          ) : (
-            <Typography variant="body1">No data found</Typography>
-          )}
-
-          <TempJsonData onDataLoaded={handleDataLoaded} />
         </Container>
-        </Box>
-      </>
-      );
-  
-  
+      </Box>
+    </>
+  );
 };
 
-      export default DealFormMain;
+export default DealFormMain;
