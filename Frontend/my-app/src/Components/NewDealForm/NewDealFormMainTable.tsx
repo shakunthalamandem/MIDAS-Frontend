@@ -95,34 +95,43 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         {pair.map(([key, value]) => (
           <td style={{ padding: '8px', width: '33%' }} key={key}>
           
-            <TextField
-              fullWidth
-              value={value || ''}
-              onChange={(e) => handleInputChange(e, section, key)}
-              label={capitalizeLabel(key)}
-              variant="standard"
-              disabled={!isEditable} // Disable the field when not in edit mode
-              sx={{
-                width: '90%',
-                padding: '5px',
-                height: '40px',
-                display: 'flex',
-                justifyContent: 'center',
-                '& .MuistandardInput-root': {
-                  height: '40px',
-                  '&:hover': {
-                    borderColor: '#002060', // Change border color on hover
-                  },
-                  '&.Mui-focused': {
-                    borderColor: '#002060', // Change border color when focused
-                  },
-                },
-                '& .MuiInputBase-input': {
-                  padding: '10px',
-                  fontSize: '15px',
-                },
-              }}
-            />
+          <TextField
+  fullWidth
+  value={value || ''}
+  onChange={(e) => handleInputChange(e, section, key)}
+  label={capitalizeLabel(key)}
+  variant="filled"
+  disabled={!isEditable} // Disable the field when not in edit mode
+  sx={{
+    width: '90%',
+    padding: '10px',
+    height: '40px',
+    display: 'flex',
+    justifyContent: 'center',
+    '& .MuiInput-root': {
+      height: '40px',
+      '&:hover:not(.Mui-disabled):before': {
+        borderBottom: '2px solid #002060', // Change border color on hover
+      },
+      '&.Mui-focused:before': {
+        borderBottom: '2px solid #002060', // Change border color when focused
+      },
+    },
+    '& .MuiInputBase-input': {
+      padding: '10px',
+      fontSize: '15px',
+      color: '#4d4d4d', // Set input text color
+    },
+    '& .MuiInputLabel-root': {
+      color: '#4d4d4d', // Set label color
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: '#002060', // Label color when focused
+    },
+  }}
+/>
+
+
           </td>
         ))}
       </tr>
