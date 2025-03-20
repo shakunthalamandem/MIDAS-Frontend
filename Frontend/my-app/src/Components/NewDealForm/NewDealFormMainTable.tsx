@@ -8,23 +8,43 @@ interface NewDealFormMainTableProps {
 
 const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selecteditems }) => {
   const [formData, setFormData] = useState<any>({});
+  const [isEditable, setIsEditable] = useState<boolean>(false); // To toggle edit/save mode
 
   useEffect(() => {
-    const initializedData = {
-      company_details: selecteditems?.company_details || {},
-      participation_details: selecteditems?.participation_details || {},
-      background_data: selecteditems?.background_data || {},
-      monashee_deal_activity: selecteditems?.monashee_deal_activity || {},
-      performance_statistics: selecteditems?.performance_statistics || {},
-      after_market_analysis: selecteditems?.after_market_analysis || {},
-      technical_analysis: selecteditems?.technical_analysis || {},
-      historical_data: selecteditems?.historical_data || {},
+    const fetchData = async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem('access_token');
+        
+        if (!apiUrl) throw new Error('API URL is not defined in environment variables');
+        if (!token) throw new Error('Access token is missing');
+        
+        // Hit the API with the selecteditems as payload
+        const response = await axios.post(
+          `${apiUrl}/api/equity_deal_form/`,
+          selecteditems,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        
+        console.log('API Response:', response.data);
+
+        // Initialize formData with the API response if needed (or set selecteditems directly)
+        setFormData(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
-    setFormData(initializedData);
+
+    fetchData();
   }, [selecteditems]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, // Updated type to handle both input and textarea
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     section: string, 
     key: string
   ) => {
@@ -33,16 +53,16 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     setFormData(updatedFormData);
   };
 
-  const handleSubmit = async () => {
+  const handleSave = async () => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem('access_token');
 
       if (!apiUrl) throw new Error('API URL is not defined in environment variables');
 
-      const response = await axios.post(
+      const response = await axios.put(
         `${apiUrl}/api/equity_deal_form/`,
-        formData, 
+        formData, // Send updated form data
         {
           headers: {
             'Content-Type': 'application/json',
@@ -51,9 +71,10 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         }
       );
 
-      console.log('API Response:', response.data);
+      console.log('Save API Response:', response.data);
+      setIsEditable(false); // Disable edit mode after save
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('Error saving form:', error);
     }
   };
 
@@ -69,10 +90,11 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         <Grid item xs={8}>
           <TextField
             fullWidth
-            value={sectionData[key] || ''} // Ensure the value is never undefined or null
+            value={sectionData[key] || ''}
             onChange={(e) => handleInputChange(e, section, key)}
             label={key.replace(/_/g, ' ')}
             variant="outlined"
+            disabled={!isEditable} // Disable the field when not in edit mode
           />
         </Grid>
       </Grid>
@@ -108,10 +130,17 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         <Typography variant="h6" sx={{ marginTop: 2 }}>Historical Data</Typography>
         {renderFormFields('historical_data', formData.historical_data)}
 
+        {/* Save/Edit buttons */}
         <Box sx={{ marginTop: 3 }}>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Submit
-          </Button>
+          {isEditable ? (
+            <Button variant="contained" color="primary" onClick={handleSave}>
+              Save
+            </Button>
+          ) : (
+            <Button variant="contained" color="primary" onClick={() => setIsEditable(true)}>
+              Edit
+            </Button>
+          )}
         </Box>
       </form>
     </Box>
