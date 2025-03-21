@@ -143,6 +143,9 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                       Monashee Actual AM PnL (Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
+                    Model PnL with Actual AM
+                    </TableCell>
+                    <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       Model PnL with model AM(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
@@ -297,6 +300,14 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                             }}
                           >
                             {formatValue(values["AM Return"])}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: isSummary ? "bold" : "normal",
+                              minWidth: "40px",
+                            }}
+                          >
+                            {formatValue(values["Model Actual AM Return"])}
                           </TableCell>
                           <TableCell
                             sx={{

@@ -215,14 +215,17 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                       Monashee Actual AM PnL(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
+                    Model PnL with Actual AM
+                    </TableCell>
+                    <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       Model PnL with model AM(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       AM Gap
                     </TableCell>
-                    {/* <TableCell sx={{ color: "white", minWidth: "40px" }}>
+                    <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       AM Exit Gap
-                    </TableCell> */}
+                    </TableCell>
                     <TableCell
                       sx={{
                         color: "white",
@@ -358,6 +361,15 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                         <TableCell>
                           {isSummary ? (
                             <strong>
+                              {formatValue(values["Model Actual AM Return"] || 0)}
+                            </strong>
+                          ) : (
+                            formatValue(values["Model Actual AM Return"] || 0)
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {isSummary ? (
+                            <strong>
                               {formatValue(values["Model AM Return"] || 0)}
                             </strong>
                           ) : (
@@ -373,7 +385,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             formatValue(values["AM Gap"] || 0)
                           )}
                         </TableCell>
-                        {/* <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
+                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
                           {isSummary ? (
                             <strong>
                               {formatValue(values["AM Exit Gap"] || 0)}
@@ -381,7 +393,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                           ) : (
                             formatValue(values["AM Exit Gap"] || 0)
                           )}
-                        </TableCell> */}
+                        </TableCell>
                         <TableCell sx={{ borderLeft: "2px solid #484547" }}>
                           {isSummary ? (
                             <strong>
