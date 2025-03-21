@@ -68,7 +68,7 @@ const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => 
       allocation_deal_size_percentage: row.allocation_deal_size_percentage ? `${row.allocation_deal_size_percentage.toFixed(2)}%` : "0%",
       model_actual_total: row.model_actual_total ? `${formatDealSize(row.model_actual_total.toFixed())}` : "$0",
       monahsee_actual_total: row.monahsee_actual_total ? `${formatDealSize(row.monahsee_actual_total.toFixed())}` : "$0",
-      
+      model_actual_am_return: row.model_actual_am_return ? `${formatDealSize(row.model_actual_am_return.toFixed())}` : "$0",
       model_allocation_gap: row.model_allocation_gap ? `${formatDealSize(row.model_allocation_gap.toFixed())}` : "$0",
       monashee_exit_gap: row.monashee_exit_gap ? `${formatDealSize(row.monashee_exit_gap.toFixed())}` : "$0",
       am_gap: row.am_gap ? `${formatDealSize(row.am_gap.toFixed())}` : "$0",
@@ -240,6 +240,13 @@ const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => 
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
 },
 { 
+  field: "model_actual_am_return", 
+  headerName: "Model PnL with Actual AM", 
+  width: 215,
+  renderCell: (params) => `${params.value}`,
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+},
+{ 
   field: "model_am_return", 
   headerName: "Model PnL with Model AM(Gross)", 
   width: 220,
@@ -255,14 +262,14 @@ const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => 
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   cellClassName: "highlight-cell",
 },
-// { 
-//   field: "am_exit_gap", 
-//   headerName: "AM Exit Gap", 
-//   width: 110,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-//   cellClassName: "last-columns-border   highlight-cell",
-// },
+{ 
+  field: "am_exit_gap", 
+  headerName: "AM Exit Gap", 
+  width: 110,
+  renderCell: (params) => `${params.value}`,
+  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  cellClassName: "last-columns-border   highlight-cell",
+},
 {
   field: "monahsee_actual_total", 
   headerName: "Monashee Actual Total PnL(Gross)",
