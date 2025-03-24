@@ -18,7 +18,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import USMarketIndexTable from "./summary_sectorchart";
+import USMarketIndexTable from "./USMarketIndexTable";
 
 // Define data interface
 interface ApiData {
@@ -180,7 +180,7 @@ const SectorMacroChart: React.FC = () => {
           </Typography>
 
           <Box display="flex" gap={2} mb={2}>
-            {["5Y", "3Y", "1Y", "6M", "3M", "1M", "1W", "1D", "YTD"].map((period) => (
+            {["1D", "1W", "1M", "3M",  "6M", "YTD", "1Y", "3Y", "5Y"].map((period) => (
               <Button
                 key={period}
                 variant={selectedPeriod === period ? "contained" : "outlined"}
@@ -403,7 +403,7 @@ const SectorMacroChart: React.FC = () => {
         </Box>
       </Card>
       <>
-        {usMarketIndexData && <USMarketIndexTable latest_data={usMarketIndexData} />}
+        {usMarketIndexData && <USMarketIndexTable latest_data={usMarketIndexData} time_frame = {selectedPeriod} />}
       </>
     </Container>
   );
