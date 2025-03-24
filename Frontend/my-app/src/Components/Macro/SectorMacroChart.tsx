@@ -47,6 +47,8 @@ interface MarketData {
   snp_500: number;
   dow_jones: number;
   russell_2000: number;
+  top_gainers: Record<string, number>;
+  top_losers: Record<string, number>;
 }
 
 // List of the sectors
@@ -83,6 +85,8 @@ const SectorMacroChart: React.FC = () => {
     snp_500: 0,
     dow_jones: 0,
     russell_2000: 0,
+    top_gainers: {},
+    top_losers: {},
   });
 
   const [visibleLines, setVisibleLines] = useState<Record<SectorKey, boolean>>(
@@ -126,7 +130,7 @@ const SectorMacroChart: React.FC = () => {
 
         const responseData = await response.json();
         setData(responseData.data); // Set chart data
-        setUsMarketIndexData(responseData.latest_data);
+        setUsMarketIndexData(responseData.us_market_data);
         setError(null); // Clear error if data is fetched successfully
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -176,7 +180,7 @@ const SectorMacroChart: React.FC = () => {
           </Typography>
 
           <Box display="flex" gap={2} mb={2}>
-            {["5y", "3y", "1y", "6m", "3m", "1m", "1W", "1D", "YTD"].map((period) => (
+            {["5Y", "3Y", "1Y", "6M", "3M", "1M", "1W", "1D", "YTD"].map((period) => (
               <Button
                 key={period}
                 variant={selectedPeriod === period ? "contained" : "outlined"}
