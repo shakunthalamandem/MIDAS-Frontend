@@ -77,7 +77,7 @@ type SectorKey = (typeof sectors)[number];
 
 const SectorMacroChart: React.FC = () => {
   const [data, setData] = useState<ApiData[]>([]); // Data state for chart
-  const [selectedPeriod, setSelectedPeriod] = useState<string>("1y"); // Default period
+  const [selectedPeriod, setSelectedPeriod] = useState<string>("1Y"); // Default period
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state
   const [usMarketIndexData, setUsMarketIndexData] = useState<MarketData>({
