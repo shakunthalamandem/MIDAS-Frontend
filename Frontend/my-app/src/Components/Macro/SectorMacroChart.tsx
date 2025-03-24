@@ -18,6 +18,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import USMarketIndexTable from "./USMarketIndexTable";
 
 // Define data interface
 interface ApiData {
@@ -39,6 +40,15 @@ interface ApiData {
   sp500_technology: number;
   sp500_oil_gas: number;
   sp500_insurance_industry: number;
+}
+
+interface MarketData {
+  latest_date: string;
+  snp_500: number;
+  dow_jones: number;
+  russell_2000: number;
+  top_gainers: Record<string, number>;
+  top_losers: Record<string, number>;
 }
 
 // List of the sectors
@@ -67,9 +77,17 @@ type SectorKey = (typeof sectors)[number];
 
 const SectorMacroChart: React.FC = () => {
   const [data, setData] = useState<ApiData[]>([]); // Data state for chart
-  const [selectedPeriod, setSelectedPeriod] = useState<string>("1y"); // Default period
+  const [selectedPeriod, setSelectedPeriod] = useState<string>("1Y"); // Default period
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state
+  const [usMarketIndexData, setUsMarketIndexData] = useState<MarketData>({
+    latest_date: "",
+    snp_500: 0,
+    dow_jones: 0,
+    russell_2000: 0,
+    top_gainers: {},
+    top_losers: {},
+  });
 
   const [visibleLines, setVisibleLines] = useState<Record<SectorKey, boolean>>(
     sectors.reduce(
@@ -111,7 +129,8 @@ const SectorMacroChart: React.FC = () => {
         }
 
         const responseData = await response.json();
-        setData(responseData); // Set chart data
+        setData(responseData.data); // Set chart data
+        setUsMarketIndexData(responseData.us_market_data);
         setError(null); // Clear error if data is fetched successfully
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -161,7 +180,7 @@ const SectorMacroChart: React.FC = () => {
           </Typography>
 
           <Box display="flex" gap={2} mb={2}>
-            {["5y", "3y", "1y", "6m", "3m", "1m"].map((period) => (
+            {["1D", "1W", "1M", "3M",  "6M", "YTD", "1Y", "3Y", "5Y"].map((period) => (
               <Button
                 key={period}
                 variant={selectedPeriod === period ? "contained" : "outlined"}
@@ -204,7 +223,7 @@ const SectorMacroChart: React.FC = () => {
                   {/* Render lines for each sector if the line is visible */}
                   {visibleLines.snp_500 && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="snp_500"
                       stroke="#8884d8"
@@ -212,7 +231,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.dow_jones && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="dow_jones"
                       stroke="#82ca9d"
@@ -220,7 +239,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.russell_2000 && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="russell_2000"
                       stroke="#ffc658"
@@ -228,7 +247,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_consumer_discretionary && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_consumer_discretionary"
                       stroke="#ff7300"
@@ -236,7 +255,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_consumer_staples && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_consumer_staples"
                       stroke="#00C49F"
@@ -244,7 +263,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_energy && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_energy"
                       stroke="#FFBB28"
@@ -252,7 +271,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_financials && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_financials"
                       stroke="#FF8042"
@@ -260,7 +279,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_healthcare && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_healthcare"
                       stroke="#FF0033"
@@ -268,7 +287,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_industrials && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_industrials"
                       stroke="#7C4DFF"
@@ -276,7 +295,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_information_technology && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_information_technology"
                       stroke="#8E24AA"
@@ -284,7 +303,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_materials && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_materials"
                       stroke="#9E9E9E"
@@ -292,7 +311,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_telecom_services && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_telecom_services"
                       stroke="#607D8B"
@@ -300,7 +319,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_utilities && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_utilities"
                       stroke="#039BE5"
@@ -308,7 +327,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_real_estate && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_real_estate"
                       stroke="#4CAF50"
@@ -316,7 +335,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_technology && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_technology"
                       stroke="#D32F2F"
@@ -324,7 +343,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_oil_gas && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_oil_gas"
                       stroke="#2196F3"
@@ -332,7 +351,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_insurance_industry && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_insurance_industry"
                       stroke="#FF5722"
@@ -341,48 +360,51 @@ const SectorMacroChart: React.FC = () => {
                 </LineChart>
               </ResponsiveContainer>
               <Box mb={2}>
-      <Grid container spacing={1}>
-        {sectors.map((line) => (
-          <Grid item xs={12} sm={6} md={3}>
-          <Box
-              p={0.5}
-              border={1}
-              borderColor="#ddd"
-              borderRadius={1}
-              fontSize="0.75rem"
-            >
-              <FormControlLabel
-  control={
-    <Checkbox
-      checked={visibleLines[line]}
-      onChange={() => handleCheckboxChange(line)}
-      name={line}
-      sx={{
-        transform: "scale(0.7)",
-        color: "#9b0000",
-        "&.Mui-checked": {
-          color: "#9b0000",
-        },
-      }}
-    />
-  }
-  label={line.replace(/_/g, " ").toUpperCase()}
-  componentsProps={{
-    typography: {
-      sx: { fontSize: "0.725rem" }, // Correct way to set label font size
-    },
-  }}
-/>
+                <Grid container spacing={1}>
+                  {sectors.map((line) => (
+                    <Grid item xs={12} sm={6} md={3}>
+                      <Box
+                        p={0.5}
+                        border={1}
+                        borderColor="#ddd"
+                        borderRadius={1}
+                        fontSize="0.75rem"
+                      >
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={visibleLines[line]}
+                              onChange={() => handleCheckboxChange(line)}
+                              name={line}
+                              sx={{
+                                transform: "scale(0.7)",
+                                color: "#9b0000",
+                                "&.Mui-checked": {
+                                  color: "#9b0000",
+                                },
+                              }}
+                            />
+                          }
+                          label={line.replace(/_/g, " ").toUpperCase()}
+                          componentsProps={{
+                            typography: {
+                              sx: { fontSize: "0.725rem" }, // Correct way to set label font size
+                            },
+                          }}
+                        />
 
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
             </>
           )}
         </Box>
       </Card>
+      <>
+        {usMarketIndexData && <USMarketIndexTable latest_data={usMarketIndexData} time_frame = {selectedPeriod} />}
+      </>
     </Container>
   );
 };
