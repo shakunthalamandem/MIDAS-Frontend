@@ -223,7 +223,7 @@ const SectorMacroChart: React.FC = () => {
                   {/* Render lines for each sector if the line is visible */}
                   {visibleLines.snp_500 && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="snp_500"
                       stroke="#8884d8"
@@ -231,7 +231,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.dow_jones && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="dow_jones"
                       stroke="#82ca9d"
@@ -239,7 +239,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.russell_2000 && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="russell_2000"
                       stroke="#ffc658"
@@ -247,7 +247,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_consumer_discretionary && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_consumer_discretionary"
                       stroke="#ff7300"
@@ -255,7 +255,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_consumer_staples && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_consumer_staples"
                       stroke="#00C49F"
@@ -263,7 +263,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_energy && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_energy"
                       stroke="#FFBB28"
@@ -271,7 +271,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_financials && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_financials"
                       stroke="#FF8042"
@@ -279,7 +279,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_healthcare && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_healthcare"
                       stroke="#FF0033"
@@ -287,7 +287,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_industrials && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_industrials"
                       stroke="#7C4DFF"
@@ -295,7 +295,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_information_technology && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_information_technology"
                       stroke="#8E24AA"
@@ -303,7 +303,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_materials && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_materials"
                       stroke="#9E9E9E"
@@ -311,7 +311,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_telecom_services && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_telecom_services"
                       stroke="#607D8B"
@@ -319,7 +319,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_utilities && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_utilities"
                       stroke="#039BE5"
@@ -327,7 +327,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_real_estate && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_real_estate"
                       stroke="#4CAF50"
@@ -335,7 +335,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_technology && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_technology"
                       stroke="#D32F2F"
@@ -343,7 +343,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_oil_gas && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_oil_gas"
                       stroke="#2196F3"
@@ -351,7 +351,7 @@ const SectorMacroChart: React.FC = () => {
                   )}
                   {visibleLines.sp500_insurance_industry && (
                     <Line
-                      type="monotone"
+                      
                       dot={false}
                       dataKey="sp500_insurance_industry"
                       stroke="#FF5722"
