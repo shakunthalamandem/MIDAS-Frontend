@@ -1,5 +1,6 @@
 import React from "react";
-import { Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
+import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from "@mui/material";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const formatValue = (value: number): string => {
   const absValue = Math.abs(value);
@@ -13,6 +14,19 @@ const formatValue = (value: number): string => {
     return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
 
   return `${sign}$${absValue.toFixed(2)}`;
+};
+
+const formatNegativeValue = (value: number) => {
+  const formattedValue = formatValue(value);
+  return value < 0 ? (
+    <Typography sx={{ color: "red", display: "flex", alignItems: "center",fontSize: "13px", }}>
+      {formattedValue}
+      <ArrowDownwardIcon sx={{ fontSize: "13px", marginRight: "4px" }} />
+
+    </Typography>
+  ) : (
+    formattedValue
+  );
 };
 
 interface DealStats {
@@ -30,12 +44,24 @@ interface WeeklyDealTableProps {
   selectedRegions: string[];
   selectedDealTypes: string[];
 }
-const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions, selectedDealTypes }) => {
+
+const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
+  data,
+  selectedRegions,
+  selectedDealTypes,
+}) => {
   let rows = Object.entries(data)
-    .filter(([region]) => region !== "SUMMARY" && (selectedRegions.length === 0 || selectedRegions.includes(region)))
+    .filter(
+      ([region]) =>
+        region !== "SUMMARY" &&
+        (selectedRegions.length === 0 || selectedRegions.includes(region))
+    )
     .flatMap(([region, regionData]) =>
       Object.entries(regionData)
-        .filter(([dealType]) => selectedDealTypes.length === 0 || selectedDealTypes.includes(dealType))
+        .filter(
+          ([dealType]) =>
+            selectedDealTypes.length === 0 || selectedDealTypes.includes(dealType)
+        )
         .map(([dealType, dealStats]) => ({ region, dealType, dealStats }))
     );
 
@@ -65,7 +91,17 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
     <Table size="small">
       <TableHead>
         <TableRow sx={{ backgroundColor: "#002060" }}>
-          {["Region", "Deal Type", "Deal Count", "Deal Volume", "Allocation Capital", "Weighted Allocation as % of deal size", "Monashee Actual Total PnL(Gross)", "Model Actual Total PnL(Gross)", "Total Gap"].map((heading) => (
+          {[
+            "Region",
+            "Deal Type",
+            "Deal Count",
+            "Deal Volume",
+            "Allocation Capital",
+            "Weighted Allocation as % of deal size",
+            "Monashee Actual Total PnL(Gross)",
+            "Model Actual Total PnL(Gross)",
+            "Total Gap",
+          ].map((heading) => (
             <TableCell key={heading} sx={{ color: "white", minWidth: "40px" }}>
               {heading}
             </TableCell>
@@ -90,7 +126,13 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
             }
 
             return (
-              <TableRow key={`${region}-${dealType}`} sx={{ backgroundColor: rowColor, fontWeight: isSummaryRow ? "bold" : "normal" }}>
+              <TableRow
+                key={`${region}-${dealType}`}
+                sx={{
+                  backgroundColor: rowColor,
+                  fontWeight: isSummaryRow ? "bold" : "normal",
+                }}
+              >
                 {showRegion && (
                   <TableCell
                     rowSpan={rowSpans[region]}
@@ -101,12 +143,17 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
                 )}
                 <TableCell>{dealType}</TableCell>
                 <TableCell>{dealStats.count}</TableCell>
-                <TableCell>{formatValue(dealStats.volume)}</TableCell>
-                <TableCell>{formatValue(dealStats.allocation_capital)}</TableCell>
-                <TableCell>{dealStats.allocation_weighted ? dealStats.allocation_weighted.toFixed(2) : "N/A"}%</TableCell>
-                <TableCell>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
-                <TableCell>{formatValue(dealStats.model_actual_total)}</TableCell>
-                <TableCell>{formatValue(dealStats.GAP)}</TableCell>
+                <TableCell>{formatNegativeValue(dealStats.volume)}</TableCell>
+                <TableCell>{formatNegativeValue(dealStats.allocation_capital)}</TableCell>
+                <TableCell>
+                  {dealStats.allocation_weighted
+                    ? dealStats.allocation_weighted.toFixed(2)
+                    : "N/A"}
+                  %
+                </TableCell>
+                <TableCell>{formatNegativeValue(dealStats.monahsee_actual_total)}</TableCell>
+                <TableCell>{formatNegativeValue(dealStats.model_actual_total)}</TableCell>
+                <TableCell>{formatNegativeValue(dealStats.GAP)}</TableCell>
               </TableRow>
             );
           })
