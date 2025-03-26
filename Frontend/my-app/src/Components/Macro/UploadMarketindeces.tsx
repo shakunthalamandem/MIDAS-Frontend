@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Box, Button, Typography, Snackbar, Alert } from '@mui/material';
+import { Grid, Box, Button, Typography, Snackbar, Alert, Container } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from 'axios';
 
@@ -69,8 +69,8 @@ const UploadMarketIndices = () => {
   };
 
   return (
-    <div>
-      <Grid container spacing={2} marginBottom={'10px'} justifyContent="center">
+    <Container>
+      <Grid container spacing={2} marginBottom={'40px'} justifyContent="center">
         <Grid item>
           <Typography variant="h5" gutterBottom color="#012d3f" align="center">
             <strong>Upload Market Indices Data</strong>
@@ -78,8 +78,8 @@ const UploadMarketIndices = () => {
         </Grid>
       </Grid>
 
-      {/* Smaller Box aligned to the left side */}
-      <Box width="50%" maxWidth="400px" margin="0 auto" padding={'10px'}>
+      {/* Smaller Box aligned to the left side with a gap from the heading */}
+      <Box width="50%" maxWidth="400px" margin="0 auto" padding={'10px'} marginTop={'20px'}>
         <Grid container spacing={2} justifyContent="center" padding={'10px'} border={'1px solid #e9e9e9'}>
           <Grid item>
             <CloudUploadIcon color="primary" sx={{ ml: 1, verticalAlign: 'middle', fontSize: '50px' }} />
@@ -125,16 +125,12 @@ const UploadMarketIndices = () => {
       </Grid>
 
       {/* Snackbar component to show success message */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </div>
+    </Container>
   );
 };
 

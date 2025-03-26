@@ -114,7 +114,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
-        <Route path="/macro/upload_market_indices" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
+        <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
 
 
 
