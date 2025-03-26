@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const pages = [
   "Sector Comparison",
-  // "Monashee Performance & Efficiency",
+  // "Upload Market Indices",
   // "Portfolio Attribution",
 ];
 
@@ -17,8 +17,8 @@ const MacroNavbar: React.FC = () => {
       case "Sector Comparison":
         navigate("/macro/sector");
         break;
-      case "Monashee Performance & Efficiency":
-        navigate("/macro/monashee-deals");
+      case "Upload Market Indices":
+        navigate("/upload");
         break;
       case "Portfolio Attribution":
         navigate("/macro/portfolio-attribution");
