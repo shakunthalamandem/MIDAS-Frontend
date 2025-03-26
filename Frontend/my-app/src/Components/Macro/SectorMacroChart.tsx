@@ -75,6 +75,35 @@ const sectors = [
 // Type that includes only the sector names
 type SectorKey = (typeof sectors)[number];
 
+// Helper function to prettify keys
+const formatLabel = (label: string): string => {
+  // Define common replacements for sector names
+  const replacements: Record<string, string> = {
+    snp_500: "S&P 500",
+    dow_jones: "Dow Jones",
+    russell_2000: "Russell 2000",
+    sp500_consumer_discretionary: "S&P 500 Consumer Discretionary",
+    sp500_consumer_staples: "S&P 500 Consumer Staples",
+    sp500_energy: "S&P 500 Energy",
+    sp500_financials: "S&P 500 Financials",
+    sp500_healthcare: "S&P 500 Healthcare",
+    sp500_industrials: "S&P 500 Industrials",
+    sp500_information_technology: "S&P 500 Info Tech",
+    sp500_materials: "S&P 500 Materials",
+    sp500_telecom_services: "S&P 500 Telecom Services",
+    sp500_utilities: "S&P 500 Utilities",
+    sp500_real_estate: "S&P 500 Real Estate",
+    sp500_technology: "S&P 500 Technology",
+    sp500_oil_gas: "S&P 500 Oil & Gas",
+    sp500_insurance_industry: "S&P 500 Insurance Industry",
+  };
+
+  // Return formatted label or prettify with fallback
+  return replacements[label] || label
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 const SectorMacroChart: React.FC = () => {
   const [data, setData] = useState<ApiData[]>([]); // Data state for chart
   const [selectedPeriod, setSelectedPeriod] = useState<string>("1Y"); // Default period
@@ -161,6 +190,31 @@ const SectorMacroChart: React.FC = () => {
     return `${value.toFixed(2)}%`;
   };
 
+  // Helper function to get color for each sector line
+  const getLineColor = (line: SectorKey) => {
+    const colors: Record<SectorKey, string> = {
+      snp_500: "#8884d8",
+      dow_jones: "#82ca9d",
+      russell_2000: "#ffc658",
+      sp500_consumer_discretionary: "#ff7300",
+      sp500_consumer_staples: "#00C49F",
+      sp500_energy: "#FFBB28",
+      sp500_financials: "#FF8042",
+      sp500_healthcare: "#FF0033",
+      sp500_industrials: "#7C4DFF",
+      sp500_information_technology: "#8E24AA",
+      sp500_materials: "#9E9E9E",
+      sp500_telecom_services: "#607D8B",
+      sp500_utilities: "#039BE5",
+      sp500_real_estate: "#4CAF50",
+      sp500_technology: "#D32F2F",
+      sp500_oil_gas: "#2196F3",
+      sp500_insurance_industry: "#FF5722",
+    };
+
+    return colors[line] || "#000000"; // Default to black if no color is found
+  };
+
   return (
     <Container>
       <Card
@@ -180,26 +234,28 @@ const SectorMacroChart: React.FC = () => {
           </Typography>
 
           <Box display="flex" gap={2} mb={2}>
-            {["1D", "1W", "1M", "3M",  "6M", "YTD", "1Y", "3Y", "5Y"].map((period) => (
-              <Button
-                key={period}
-                variant={selectedPeriod === period ? "contained" : "outlined"}
-                onClick={() => handleButtonClick(period)}
-                sx={{
-                  color: "#3f51b5",
-                  border: "1px solid #3f51b5",
-                  "&.MuiButton-contained": {
-                    backgroundColor: "#3f51b5",
-                    color: "#fff",
-                    "&:hover": {
-                      backgroundColor: "#303f9f",
+            {["1D", "1W", "1M", "3M", "6M", "YTD", "1Y", "3Y", "5Y"].map(
+              (period) => (
+                <Button
+                  key={period}
+                  variant={selectedPeriod === period ? "contained" : "outlined"}
+                  onClick={() => handleButtonClick(period)}
+                  sx={{
+                    color: "#3f51b5",
+                    border: "1px solid #3f51b5",
+                    "&.MuiButton-contained": {
+                      backgroundColor: "#3f51b5",
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#303f9f",
+                      },
                     },
-                  },
-                }}
-              >
-                {period}
-              </Button>
-            ))}
+                  }}
+                >
+                  {period}
+                </Button>
+              )
+            )}
           </Box>
 
           {/* Error state */}
@@ -215,154 +271,36 @@ const SectorMacroChart: React.FC = () => {
           ) : (
             <>
               <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={data}>
+                <LineChart
+                  data={data}
+                  margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                >
                   <XAxis dataKey="date" />
                   <YAxis tickFormatter={formatPercentage} />
-                  <Tooltip formatter={formatPercentage} />
-                  <Legend />
+                  <Tooltip
+                    labelFormatter={(label) => formatLabel(label)}
+                    formatter={formatPercentage}
+                  />
+                  <Legend formatter={(value) => formatLabel(value)} />
                   {/* Render lines for each sector if the line is visible */}
-                  {visibleLines.snp_500 && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="snp_500"
-                      stroke="#8884d8"
-                    />
-                  )}
-                  {visibleLines.dow_jones && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="dow_jones"
-                      stroke="#82ca9d"
-                    />
-                  )}
-                  {visibleLines.russell_2000 && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="russell_2000"
-                      stroke="#ffc658"
-                    />
-                  )}
-                  {visibleLines.sp500_consumer_discretionary && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_consumer_discretionary"
-                      stroke="#ff7300"
-                    />
-                  )}
-                  {visibleLines.sp500_consumer_staples && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_consumer_staples"
-                      stroke="#00C49F"
-                    />
-                  )}
-                  {visibleLines.sp500_energy && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_energy"
-                      stroke="#FFBB28"
-                    />
-                  )}
-                  {visibleLines.sp500_financials && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_financials"
-                      stroke="#FF8042"
-                    />
-                  )}
-                  {visibleLines.sp500_healthcare && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_healthcare"
-                      stroke="#FF0033"
-                    />
-                  )}
-                  {visibleLines.sp500_industrials && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_industrials"
-                      stroke="#7C4DFF"
-                    />
-                  )}
-                  {visibleLines.sp500_information_technology && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_information_technology"
-                      stroke="#8E24AA"
-                    />
-                  )}
-                  {visibleLines.sp500_materials && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_materials"
-                      stroke="#9E9E9E"
-                    />
-                  )}
-                  {visibleLines.sp500_telecom_services && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_telecom_services"
-                      stroke="#607D8B"
-                    />
-                  )}
-                  {visibleLines.sp500_utilities && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_utilities"
-                      stroke="#039BE5"
-                    />
-                  )}
-                  {visibleLines.sp500_real_estate && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_real_estate"
-                      stroke="#4CAF50"
-                    />
-                  )}
-                  {visibleLines.sp500_technology && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_technology"
-                      stroke="#D32F2F"
-                    />
-                  )}
-                  {visibleLines.sp500_oil_gas && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_oil_gas"
-                      stroke="#2196F3"
-                    />
-                  )}
-                  {visibleLines.sp500_insurance_industry && (
-                    <Line
-                      
-                      dot={false}
-                      dataKey="sp500_insurance_industry"
-                      stroke="#FF5722"
-                    />
+                  {sectors.map(
+                    (line) =>
+                      visibleLines[line] && (
+                        <Line
+                          key={line}
+                          dot={false}
+                          dataKey={line} // Dynamically use the line as the dataKey
+                          stroke={getLineColor(line)} 
+                          strokeWidth={2}// Dynamically set the stroke color
+                        />
+                      )
                   )}
                 </LineChart>
               </ResponsiveContainer>
               <Box mb={2}>
                 <Grid container spacing={1}>
                   {sectors.map((line) => (
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid item xs={12} sm={6} md={3} key={line}>
                       <Box
                         p={0.5}
                         border={1}
@@ -385,14 +323,13 @@ const SectorMacroChart: React.FC = () => {
                               }}
                             />
                           }
-                          label={line.replace(/_/g, " ").toUpperCase()}
+                          label={formatLabel(line)}
                           componentsProps={{
                             typography: {
-                              sx: { fontSize: "0.725rem" }, // Correct way to set label font size
+                              sx: { fontSize: "0.725rem" },
                             },
                           }}
                         />
-
                       </Box>
                     </Grid>
                   ))}
@@ -402,9 +339,7 @@ const SectorMacroChart: React.FC = () => {
           )}
         </Box>
       </Card>
-      <>
-        {usMarketIndexData && <USMarketIndexTable latest_data={usMarketIndexData} time_frame = {selectedPeriod} />}
-      </>
+      <>{usMarketIndexData && <USMarketIndexTable latest_data={usMarketIndexData} time_frame={selectedPeriod} />}</>
     </Container>
   );
 };
