@@ -16,13 +16,12 @@ const formatValue = (value: number): string => {
   return `${sign}$${absValue.toFixed(2)}`;
 };
 
-const formatNegativeValue = (value: number) => {
+const formatNegativeValue = (value: number, isTotalRow: boolean) => {
   const formattedValue = formatValue(value);
   return value < 0 ? (
-    <Typography sx={{ color: "red", display: "flex", alignItems: "center",fontSize: "13px", }}>
+    <Typography sx={{ color: "red", display: "flex", alignItems: "center", fontSize: "13px", fontWeight: isTotalRow ? "bold" : "normal"  }}>
       {formattedValue}
       <ArrowDownwardIcon sx={{ fontSize: "13px", marginRight: "4px" }} />
-
     </Typography>
   ) : (
     formattedValue
@@ -45,33 +44,18 @@ interface WeeklyDealTableProps {
   selectedDealTypes: string[];
 }
 
-const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
-  data,
-  selectedRegions,
-  selectedDealTypes,
-}) => {
+const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions, selectedDealTypes }) => {
   let rows = Object.entries(data)
-    .filter(
-      ([region]) =>
-        region !== "SUMMARY" &&
-        (selectedRegions.length === 0 || selectedRegions.includes(region))
-    )
+    .filter(([region]) => region !== "SUMMARY" && (selectedRegions.length === 0 || selectedRegions.includes(region)))
     .flatMap(([region, regionData]) =>
       Object.entries(regionData)
-        .filter(
-          ([dealType]) =>
-            selectedDealTypes.length === 0 || selectedDealTypes.includes(dealType)
-        )
+        .filter(([dealType]) => selectedDealTypes.length === 0 || selectedDealTypes.includes(dealType))
         .map(([dealType, dealStats]) => ({ region, dealType, dealStats }))
     );
 
   // Include SUMMARY row
   if (data.SUMMARY && data.SUMMARY.TOTAL) {
-    rows.push({
-      region: "SUMMARY",
-      dealType: "TOTAL",
-      dealStats: data.SUMMARY.TOTAL,
-    });
+    rows.push({ region: "SUMMARY", dealType: "TOTAL", dealStats: data.SUMMARY.TOTAL });
   }
 
   let rowSpans: Record<string, number> = {};
@@ -91,17 +75,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
     <Table size="small">
       <TableHead>
         <TableRow sx={{ backgroundColor: "#002060" }}>
-          {[
-            "Region",
-            "Deal Type",
-            "Deal Count",
-            "Deal Volume",
-            "Allocation Capital",
-            "Weighted Allocation as % of deal size",
-            "Monashee Actual Total PnL(Gross)",
-            "Model Actual Total PnL(Gross)",
-            "Total Gap",
-          ].map((heading) => (
+          {["Region", "Deal Type", "Deal Count", "Deal Volume", "Allocation Capital", "Weighted Allocation as % of deal size", "Monashee Actual Total PnL(Gross)", "Model Actual Total PnL(Gross)", "Total Gap"].map((heading) => (
             <TableCell key={heading} sx={{ color: "white", minWidth: "40px" }}>
               {heading}
             </TableCell>
@@ -116,9 +90,10 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
             </TableCell>
           </TableRow>
         ) : (
-          rows.map(({ region, dealType, dealStats }, idx) => {
+          rows.map(({ region, dealType, dealStats }) => {
             const isSummaryRow = region === "SUMMARY";
-            const rowColor = isSummaryRow ? "#91ce89" : idx % 6 < 3 ? "#" : "#";
+            const isTotalRow = dealType === "TOTAL";
+            const rowColor = isSummaryRow ? "#91ce89" : isTotalRow ? "#f0f0f0" : "#ffffff";
             const showRegion = !renderedRegions[region];
 
             if (showRegion) {
@@ -128,10 +103,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
             return (
               <TableRow
                 key={`${region}-${dealType}`}
-                sx={{
-                  backgroundColor: rowColor,
-                  fontWeight: isSummaryRow ? "bold" : "normal",
-                }}
+                sx={{ backgroundColor: rowColor, fontWeight: isTotalRow || isSummaryRow ? "bold" : "normal" }}
               >
                 {showRegion && (
                   <TableCell
@@ -141,19 +113,16 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
                     {region}
                   </TableCell>
                 )}
-                <TableCell>{dealType}</TableCell>
-                <TableCell>{dealStats.count}</TableCell>
-                <TableCell>{formatNegativeValue(dealStats.volume)}</TableCell>
-                <TableCell>{formatNegativeValue(dealStats.allocation_capital)}</TableCell>
-                <TableCell>
-                  {dealStats.allocation_weighted
-                    ? dealStats.allocation_weighted.toFixed(2)
-                    : "N/A"}
-                  %
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{dealType}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{dealStats.count}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.volume, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.allocation_capital, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>
+                  {dealStats.allocation_weighted ? dealStats.allocation_weighted.toFixed(2) : "N/A"}%
                 </TableCell>
-                <TableCell>{formatNegativeValue(dealStats.monahsee_actual_total)}</TableCell>
-                <TableCell>{formatNegativeValue(dealStats.model_actual_total)}</TableCell>
-                <TableCell>{formatNegativeValue(dealStats.GAP)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.monahsee_actual_total, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.model_actual_total, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.GAP, isTotalRow)}</TableCell>
               </TableRow>
             );
           })
