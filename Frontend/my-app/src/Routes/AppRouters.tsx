@@ -38,6 +38,7 @@ import ConvertsMain from "../Components/Converts/ConvertsMain";
 import ConvertsDealSearch from "../Components/Converts/Tabs/ConvertsDealSearch";
 import ConvertsDealStatsMain from "../Components/Converts/Tabs/ConvertsDealStatsMain";
 import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
+import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 
 
 
@@ -113,6 +114,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
+        <Route path="/macro/upload_market_indices" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
 
 
 
