@@ -69,7 +69,7 @@ const UploadMarketIndices = () => {
   };
 
   return (
-    <Container>
+    <Container sx={{ marginTop: '40px' }}>
       <Grid container spacing={2} marginBottom={'40px'} justifyContent="center">
         <Grid item>
           <Typography variant="h5" gutterBottom color="#012d3f" align="center">
