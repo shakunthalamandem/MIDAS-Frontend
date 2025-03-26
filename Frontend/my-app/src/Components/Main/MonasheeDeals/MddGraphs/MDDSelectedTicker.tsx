@@ -104,7 +104,7 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        navigate("/error");  
+        // navigate("/error");  
 
 
         setLoading(false);
