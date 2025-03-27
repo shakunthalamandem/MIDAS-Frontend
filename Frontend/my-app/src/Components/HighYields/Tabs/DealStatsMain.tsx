@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, FormControlLabel, CardContent, Card, Container, Snackbar } from '@mui/material';
-import HyDealStatGraph from './HyDealStatGraph';
-import HYsppiechart from './HYsppiechart';
+import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Box, Button, Checkbox, CardContent, Card, Container, Snackbar } from '@mui/material';
+
 import HyDealMainTable from './HyDealMainTable';
+import { useNavigate } from 'react-router-dom';
 
 interface HighYieldOptions {
   start_year: number[];
@@ -20,6 +20,8 @@ const DealStatsMain = () => {
     snp_rating: [],
   });
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate(); 
+
   const [error, setError] = useState<string | null>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false); // Manage Snackbar open state
     const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message content
@@ -74,6 +76,8 @@ const DealStatsMain = () => {
       } catch (error) {
         setError('Failed to fetch filter options');
         console.error('Error fetching filter options:', error);
+        navigate("/error");  
+
       } finally {
         setLoading(false);
       }
@@ -89,27 +93,12 @@ const DealStatsMain = () => {
     setSnackbarOpen(false); // Close Snackbar when the user dismisses it
   };
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, value: string, category: 'sector' | 'snp_rating') => {
-    setSelectedFilters((prev) => {
-      const newCategoryValues = event.target.checked
-        ? [...prev[category], value]
-        : prev[category].filter((item) => item !== value);
 
-      return { ...prev, [category]: newCategoryValues };
-    });
-  };
-
-  // const handleApply = () => {
-  //   setAppliedFilters({ ...selectedFilters });
-  //   console.log('Applied Filters:', selectedFilters);
-  // };
   const handleApply = () => {
-    // Check if start_year is less than end_year
     const startYear = selectedFilters["start_year"];
     const endYear = selectedFilters["end_year"];
 
     if (startYear && endYear && startYear > endYear) {
-      // Open Snackbar with error message if validation fails
       setSnackbarMessage(
         "Start year should be less than or equal to end year."
       );

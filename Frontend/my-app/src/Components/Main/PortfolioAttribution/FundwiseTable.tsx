@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   CircularProgress,
@@ -18,7 +18,6 @@ import {
   FormControlLabel,
   FormControl,
 } from "@mui/material";
-import NoDataPopup from "../../../Pages/NoDataPopup";
 
 interface FundData {
   broad_region: string;
@@ -55,10 +54,10 @@ const FundWiseTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<FundData[] | SectorData[]>([]);
-  const [openNoDataPopup, setOpenNoDataPopup] = useState<boolean>(false);
   const [view, setView] = useState<"fund" | "sector">("fund"); // Default view is "fund"
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,7 +65,9 @@ const FundWiseTable: React.FC = () => {
       try {
         let response;
         const endpoint =
-          view === "fund" ? "/api/detailed_fund_pnl/" : "/api/detailed_sector_pnl/";
+          view === "fund"
+            ? "/api/detailed_fund_pnl/"
+            : "/api/detailed_sector_pnl/";
 
         response = await fetch(`${apiUrl}${endpoint}`, {
           method: "POST",
@@ -81,16 +82,21 @@ const FundWiseTable: React.FC = () => {
           throw new Error("Failed to fetch data from the API.");
         }
 
-        const result: (FundData[] | SectorData[]) = await response.json();
+        const responseData = await response.json();
 
-        if (!result || result.length === 0) {
-          setOpenNoDataPopup(true);
+        // Check for specific error from API response
+        if (responseData.error === "No data found.") {
           setData([]);
         } else {
-          setData(result);
+          setData(responseData);
         }
       } catch (error) {
-        setError(error instanceof Error ? error.message : "An error occurred while fetching data");
+        setError(
+          error instanceof Error
+            ? error.message
+            : "An error occurred while fetching data"
+        );
+        navigate("/error");
       } finally {
         setLoading(false);
       }
@@ -101,39 +107,44 @@ const FundWiseTable: React.FC = () => {
     }
   }, [fund, apiUrl, token, view]);
 
-  const handleCloseNoDataPopup = () => {
-    setOpenNoDataPopup(false);
-  };
-
   // Region totals and overall totals initialization
-  let regionTotals: Record<string, { Jan_pnl: number; Feb_pnl: number; Mar_pnl: number }> = {};
+  let regionTotals: Record<
+    string,
+    { Jan_pnl: number; Feb_pnl: number; Mar_pnl: number }
+  > = {};
   let overallTotal = { Jan_pnl: 0, Feb_pnl: 0, Mar_pnl: 0 };
 
-  data.forEach(({ broad_region, Jan_pnl, Feb_pnl, Mar_pnl }: FundData | SectorData) => {
-    if (!regionTotals[broad_region]) {
-      regionTotals[broad_region] = { Jan_pnl: 0, Feb_pnl: 0, Mar_pnl: 0 };
-    }
-    regionTotals[broad_region].Jan_pnl += Jan_pnl;
-    regionTotals[broad_region].Feb_pnl += Feb_pnl;
-    regionTotals[broad_region].Mar_pnl += Mar_pnl;
+  if (Array.isArray(data)) {
+    data.forEach(
+      ({ broad_region, Jan_pnl, Feb_pnl, Mar_pnl }: FundData | SectorData) => {
+        if (!regionTotals[broad_region]) {
+          regionTotals[broad_region] = { Jan_pnl: 0, Feb_pnl: 0, Mar_pnl: 0 };
+        }
+        regionTotals[broad_region].Jan_pnl += Jan_pnl;
+        regionTotals[broad_region].Feb_pnl += Feb_pnl;
+        regionTotals[broad_region].Mar_pnl += Mar_pnl;
 
-    overallTotal.Jan_pnl += Jan_pnl;
-    overallTotal.Feb_pnl += Feb_pnl;
-    overallTotal.Mar_pnl += Mar_pnl;
-  });
+        overallTotal.Jan_pnl += Jan_pnl;
+        overallTotal.Feb_pnl += Feb_pnl;
+        overallTotal.Mar_pnl += Mar_pnl;
+      }
+    );
+  }
 
   // Row span logic
   let rowSpans: Record<string, number> = {};
   let previousRegion: string | null = null;
 
-  data.forEach(({ broad_region }: FundData | SectorData) => {
-    if (broad_region !== previousRegion) {
-      rowSpans[broad_region] = 1;
-    } else {
-      rowSpans[broad_region]++;
-    }
-    previousRegion = broad_region;
-  });
+  if (Array.isArray(data)) {
+    data.forEach(({ broad_region }: FundData | SectorData) => {
+      if (broad_region !== previousRegion) {
+        rowSpans[broad_region] = 1;
+      } else {
+        rowSpans[broad_region]++;
+      }
+      previousRegion = broad_region;
+    });
+  }
 
   return (
     <Box sx={{ p: 3 }}>
@@ -147,8 +158,16 @@ const FundWiseTable: React.FC = () => {
                 value={view}
                 onChange={(e) => setView(e.target.value as "fund" | "sector")}
               >
-                <FormControlLabel value="fund" control={<Radio />} label="Fund Detail" />
-                <FormControlLabel value="sector" control={<Radio />} label="Sector Detail" />
+                <FormControlLabel
+                  value="fund"
+                  control={<Radio />}
+                  label="Fund Detail"
+                />
+                <FormControlLabel
+                  value="sector"
+                  control={<Radio />}
+                  label="Sector Detail"
+                />
               </RadioGroup>
             </FormControl>
           </Grid>
@@ -160,7 +179,13 @@ const FundWiseTable: React.FC = () => {
               <Typography color="error">{error}</Typography>
             ) : (
               <Box>
-                <Typography variant="h5" align="center" color="#002060" fontWeight={500} marginBottom={2}>
+                <Typography
+                  variant="h5"
+                  align="center"
+                  color="#002060"
+                  fontWeight={500}
+                  marginBottom={2}
+                >
                   {view === "sector"
                     ? `${fund}: 2025 YTD Net of Hedge P&L by Sector`
                     : `${fund} : 2025 YTD Net of Hedge P&L Strategy`}
@@ -169,99 +194,180 @@ const FundWiseTable: React.FC = () => {
                   <Table size="small" sx={{ borderCollapse: "collapse" }}>
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#466675" }}>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                        <TableCell
+                          sx={{
+                            color: "#ffffff",
+                            fontWeight: "bold",
+                            border: "1px solid black",
+                            textAlign: "center",
+                          }}
+                        >
                           <b>Region</b>
                         </TableCell>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                        <TableCell
+                          sx={{
+                            color: "#ffffff",
+                            fontWeight: "bold",
+                            border: "1px solid black",
+                            textAlign: "center",
+                          }}
+                        >
                           <b>{view === "sector" ? "Sector" : "Deal Type"}</b>
                         </TableCell>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                        <TableCell
+                          sx={{
+                            color: "#ffffff",
+                            fontWeight: "bold",
+                            border: "1px solid black",
+                            textAlign: "center",
+                          }}
+                        >
                           <b>Jan-2025</b>
                         </TableCell>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                        <TableCell
+                          sx={{
+                            color: "#ffffff",
+                            fontWeight: "bold",
+                            border: "1px solid black",
+                            textAlign: "center",
+                          }}
+                        >
                           <b>Feb-2025</b>
                         </TableCell>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
-                          <b>Mar-2025</b>
-                        </TableCell>
-                        <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                        <TableCell
+                          sx={{
+                            color: "#ffffff",
+                            fontWeight: "bold",
+                            border: "1px solid black",
+                            textAlign: "center",
+                          }}
+                        >
                           <b>2025 YTD</b>
                         </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {data.map((row, index, array) => {
-                        const isLastInRegion = index === array.length - 1 || array[index + 1].broad_region !== row.broad_region;
-                        const regionSpan = rowSpans[row.broad_region];
+                      {Array.isArray(data) &&
+                        data.map((row, index, array) => {
+                          const isLastInRegion =
+                            index === array.length - 1 ||
+                            array[index + 1].broad_region !== row.broad_region;
+                          const regionSpan = rowSpans[row.broad_region];
 
-                        // Calculate 2025 YTD as the sum of Jan, Feb, and Mar P&L
-                        const ytd = (row.Jan_pnl || 0) + (row.Feb_pnl || 0) + (row.Mar_pnl || 0);
+                          const ytd =
+                            (row.Jan_pnl || 0) +
+                            (row.Feb_pnl || 0) +
+                            (row.Mar_pnl || 0);
 
-                        return (
-                          <React.Fragment key={index}>
-                            <TableRow>
-                              {index === 0 || array[index - 1].broad_region !== row.broad_region ? (
-                                <TableCell rowSpan={regionSpan} sx={{ border: "1px solid black" }}>
-                                  {row.broad_region}
+                          return (
+                            <React.Fragment key={index}>
+                              <TableRow>
+                                {index === 0 ||
+                                array[index - 1].broad_region !==
+                                  row.broad_region ? (
+                                  <TableCell
+                                    rowSpan={regionSpan}
+                                    sx={{ border: "1px solid black" }}
+                                  >
+                                    {row.broad_region}
+                                  </TableCell>
+                                ) : null}
+                                <TableCell sx={{ border: "1px solid black" }}>
+                                  {view === "sector"
+                                    ? (row as SectorData).custom_group_2
+                                    : (row as FundData).custom_group_1}
                                 </TableCell>
-                              ) : null}
-                              <TableCell sx={{ border: "1px solid black" }}>
-                                {view === "sector" ? (row as SectorData).custom_group_2 : (row as FundData).custom_group_1}
-                              </TableCell>
-                              <TableCell sx={{ border: "1px solid black" }}>
-                                {formatNumber(row.Jan_pnl)}
-                              </TableCell>
-                              <TableCell sx={{ border: "1px solid black" }}>
-                                {formatNumber(row.Feb_pnl)}
-                              </TableCell>
-                              <TableCell sx={{ border: "1px solid black" }}>
-                                {formatNumber(row.Mar_pnl)}
-                              </TableCell>
-                              <TableCell sx={{ border: "1px solid black" }}>
-                                {formatNumber(ytd)}
-                              </TableCell>
-                            </TableRow>
-                            {isLastInRegion && (
-                              <TableRow sx={{ backgroundColor: "#91ce89" }}>
-                                <TableCell colSpan={2} sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  Total for {row.broad_region}
+                                <TableCell sx={{ border: "1px solid black" }}>
+                                  {formatNumber(row.Jan_pnl)}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  {formatNumber(regionTotals[row.broad_region].Jan_pnl)}
+                                <TableCell sx={{ border: "1px solid black" }}>
+                                  {formatNumber(row.Feb_pnl)}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  {formatNumber(regionTotals[row.broad_region].Feb_pnl)}
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  {formatNumber(regionTotals[row.broad_region].Mar_pnl)}
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                                  {formatNumber(
-                                    regionTotals[row.broad_region].Jan_pnl +
-                                      regionTotals[row.broad_region].Feb_pnl +
-                                      regionTotals[row.broad_region].Mar_pnl
-                                  )}
+                                <TableCell sx={{ border: "1px solid black" }}>
+                                  {formatNumber(ytd)}
                                 </TableCell>
                               </TableRow>
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
+                              {isLastInRegion && (
+                                <TableRow sx={{ backgroundColor: "#91ce89" }}>
+                                  <TableCell
+                                    colSpan={2}
+                                    sx={{
+                                      fontWeight: "bold",
+                                      border: "1px solid black",
+                                    }}
+                                  >
+                                    Total for {row.broad_region}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{
+                                      fontWeight: "bold",
+                                      border: "1px solid black",
+                                    }}
+                                  >
+                                    {formatNumber(
+                                      regionTotals[row.broad_region].Jan_pnl
+                                    )}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{
+                                      fontWeight: "bold",
+                                      border: "1px solid black",
+                                    }}
+                                  >
+                                    {formatNumber(
+                                      regionTotals[row.broad_region].Feb_pnl
+                                    )}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{
+                                      fontWeight: "bold",
+                                      border: "1px solid black",
+                                    }}
+                                  >
+                                    {formatNumber(
+                                      (Number(
+                                        regionTotals[row.broad_region]?.Jan_pnl
+                                      ) || 0) +
+                                        (Number(
+                                          regionTotals[row.broad_region]
+                                            ?.Feb_pnl
+                                        ) || 0) +
+                                        (Number(
+                                          regionTotals[row.broad_region]
+                                            ?.Mar_pnl
+                                        ) || 0)
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
                       <TableRow sx={{ backgroundColor: "#cfd8dc" }}>
-                        <TableCell colSpan={2} sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                        <TableCell
+                          colSpan={2}
+                          sx={{ fontWeight: "bold", border: "1px solid black" }}
+                        >
                           Overall Total
                         </TableCell>
-                        <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                        <TableCell
+                          sx={{ fontWeight: "bold", border: "1px solid black" }}
+                        >
                           {formatNumber(overallTotal.Jan_pnl)}
                         </TableCell>
-                        <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                        <TableCell
+                          sx={{ fontWeight: "bold", border: "1px solid black" }}
+                        >
                           {formatNumber(overallTotal.Feb_pnl)}
                         </TableCell>
-                        <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                          {formatNumber(overallTotal.Mar_pnl)}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
-                          {formatNumber(overallTotal.Jan_pnl + overallTotal.Feb_pnl + overallTotal.Mar_pnl)}
+                        <TableCell
+                          sx={{ fontWeight: "bold", border: "1px solid black" }}
+                        >
+                          {formatNumber(
+                            (Number(overallTotal?.Jan_pnl) || 0) +
+                              (Number(overallTotal?.Feb_pnl) || 0) +
+                              (Number(overallTotal?.Mar_pnl) || 0)
+                          )}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -272,7 +378,6 @@ const FundWiseTable: React.FC = () => {
           </Grid>
         </Grid>
       </Container>
-      <NoDataPopup open={openNoDataPopup} onClose={handleCloseNoDataPopup} />
     </Box>
   );
 };

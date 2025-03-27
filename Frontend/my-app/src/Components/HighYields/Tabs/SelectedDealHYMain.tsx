@@ -123,7 +123,7 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                               value: item.isin?? "N/A" ,
                                             },
                                             { label: "S&P Rating", value: item.snp_rating ?? "N/A" },
-                                            { label: "maturity_date", value: item.maturity_date?? "N/A"  },
+                                            { label: "Maturity Date", value: item.maturity_date?? "N/A"  },
                                             { label: "Sector", value: item.sector?? "N/A"  },
                                           ].map((row, i) => (
                                             <TableRow
@@ -168,7 +168,7 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
                                             {[
                                          { label: "Issue Price", value: item.modified_issue_price ? item.modified_issue_price.toLocaleString(undefined, { style: 'currency', currency: 'USD',minimumFractionDigits: 0  }) : "N/A" },
                                          { label: "30 day price", value: item.price_30 ? item.price_30.toLocaleString(undefined, { style: 'currency', currency: 'USD' }) : "N/A" },
-                                         { label: "Original Amount Sold", value: item.original_amount_sold ? item.original_amount_sold.toLocaleString(undefined,{style:"currency",currency:'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
+                                         { label: "Deal Size", value: item.original_amount_sold ? item.original_amount_sold.toLocaleString(undefined,{style:"currency",currency:'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
                                          { label: "Coupon", value: `${item.coupon ?? "N/A"}%` },
                                          { label: "Opportunity Value", value: item.opportunity_value ? item.opportunity_value.toLocaleString(undefined, { style: 'currency', currency: 'USD' ,minimumFractionDigits: 0,maximumFractionDigits:0}) : "N/A" },
                                          

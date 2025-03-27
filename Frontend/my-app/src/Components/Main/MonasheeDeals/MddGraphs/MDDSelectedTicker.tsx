@@ -15,6 +15,7 @@ import {
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import MDDSearchSummary from "./MDDSearchSummary";
+import { useNavigate } from "react-router-dom";
 
 // Define the structure of the response data
 interface TickerData {
@@ -80,6 +81,8 @@ const formatDate = (dateString: string): string => {
 const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
   const [data, setData] = useState<TickerData[]>([]);
   const [summary, setSummary] = useState<any>(null);
+  const navigate = useNavigate(); 
+
   const [loading, setLoading] = useState(true);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -101,6 +104,9 @@ const MDDSelectedTicker: React.FC<MDDSelectedTickerProps> = ({ ticker }) => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        // navigate("/error");  
+
+
         setLoading(false);
       }
     };

@@ -63,13 +63,13 @@ const SectorWiseDeals: React.FC<SectorWiseDealsProps> = ({ data, selectedMetric 
             cy="50%"
             outerRadius={130}
             fill="#8884d8"
-            label={({ name, value }) => `${name}: ${formatNumber(value)}`} // Format labels using the custom function
+            label={({ name, value }) => `${name}: ${formatNumber(value)}`} 
           >
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: number) => formatNumber(value)} /> {/* Format tooltip using the custom function */}
+          <Tooltip formatter={(value: number) => formatNumber(value)} /> 
           <Legend />
         </PieChart>
       </ResponsiveContainer>

@@ -26,6 +26,7 @@ const NavbarMain: React.FC = () => {
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
 
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const refresh_token = localStorage.getItem("refresh_token");
@@ -39,7 +40,7 @@ const NavbarMain: React.FC = () => {
     setSelectedTab(tabName);
     localStorage.setItem("selectedTab", tabName); // Save to localStorage immediately
     if (tabName === "Equity") {
-      navigate("/equity/issue_market");
+      navigate("/equity/capital-markets");
     } else if (tabName === "Converts") {
       navigate("/converts/capital-markets");
     } else if (tabName === "High Yield") {
@@ -74,6 +75,8 @@ const NavbarMain: React.FC = () => {
     } catch (error) {
       setLoading(false);
       console.error("Logout failed:", error);
+      navigate("/error");  
+
     }
     setShowLogout(false);
   };

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { CircularProgress, Box, Typography } from "@mui/material";
-import GapDataTable from "./GapDataTable";
 import Marquee from "react-fast-marquee";
+import DetailedGapDataTable from "./DetailedGapDataTable";
 
 interface SelectedFilters {
   years?: number[]; // Ensures 'years' is recognized as an optional array of numbers
@@ -15,6 +15,8 @@ const DetailedGapData: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate(); 
+
 
 
   let selectedFilters: SelectedFilters = {}; // Explicitly using the typed interface
@@ -24,6 +26,8 @@ const DetailedGapData: React.FC = () => {
     selectedFilters = filters;
   } catch (error) {
     console.error("Invalid filters format", error);
+    navigate("/error");  
+
   }
 
   useEffect(() => {
@@ -48,6 +52,8 @@ const DetailedGapData: React.FC = () => {
         const result = await response.json();
         setData(result.data || []);
       } catch (error) {
+        navigate("/error");  
+
         setError(error instanceof Error ? error.message : "Unknown error");
       } finally {
         setLoading(false);
@@ -90,7 +96,7 @@ const DetailedGapData: React.FC = () => {
       ) : data.length === 0 ? (
         <p>No data available.</p>
       ) : (
-        <GapDataTable data={data} />
+        <DetailedGapDataTable data={data} />
       )}
     </Box>
   );

@@ -215,6 +215,9 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                       Monashee Actual AM PnL(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
+                    Model PnL with Actual AM
+                    </TableCell>
+                    <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       Model PnL with model AM(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
@@ -353,6 +356,15 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             </strong>
                           ) : (
                             formatValue(values["AM Return"] || 0)
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {isSummary ? (
+                            <strong>
+                              {formatValue(values["Model Actual AM Return"] || 0)}
+                            </strong>
+                          ) : (
+                            formatValue(values["Model Actual AM Return"] || 0)
                           )}
                         </TableCell>
                         <TableCell>

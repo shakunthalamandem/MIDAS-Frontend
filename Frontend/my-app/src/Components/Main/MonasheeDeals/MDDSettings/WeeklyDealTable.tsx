@@ -1,5 +1,6 @@
 import React from "react";
-import { Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
+import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from "@mui/material";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const formatValue = (value: number): string => {
   const absValue = Math.abs(value);
@@ -13,6 +14,18 @@ const formatValue = (value: number): string => {
     return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
 
   return `${sign}$${absValue.toFixed(2)}`;
+};
+
+const formatNegativeValue = (value: number, isTotalRow: boolean) => {
+  const formattedValue = formatValue(value);
+  return value < 0 ? (
+    <Typography sx={{ color: "red", display: "flex", alignItems: "center", fontSize: "13px", fontWeight: isTotalRow ? "bold" : "normal"  }}>
+      {formattedValue}
+      <ArrowDownwardIcon sx={{ fontSize: "13px", marginRight: "4px" }} />
+    </Typography>
+  ) : (
+    formattedValue
+  );
 };
 
 interface DealStats {
@@ -30,6 +43,7 @@ interface WeeklyDealTableProps {
   selectedRegions: string[];
   selectedDealTypes: string[];
 }
+
 const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions, selectedDealTypes }) => {
   let rows = Object.entries(data)
     .filter(([region]) => region !== "SUMMARY" && (selectedRegions.length === 0 || selectedRegions.includes(region)))
@@ -41,11 +55,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
 
   // Include SUMMARY row
   if (data.SUMMARY && data.SUMMARY.TOTAL) {
-    rows.push({
-      region: "SUMMARY",
-      dealType: "TOTAL",
-      dealStats: data.SUMMARY.TOTAL,
-    });
+    rows.push({ region: "SUMMARY", dealType: "TOTAL", dealStats: data.SUMMARY.TOTAL });
   }
 
   let rowSpans: Record<string, number> = {};
@@ -80,9 +90,10 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
             </TableCell>
           </TableRow>
         ) : (
-          rows.map(({ region, dealType, dealStats }, idx) => {
+          rows.map(({ region, dealType, dealStats }) => {
             const isSummaryRow = region === "SUMMARY";
-            const rowColor = isSummaryRow ? "#91ce89" : idx % 6 < 3 ? "#" : "#";
+            const isTotalRow = dealType === "TOTAL";
+            const rowColor = isSummaryRow ? "#91ce89" : isTotalRow ? "#f0f0f0" : "#ffffff";
             const showRegion = !renderedRegions[region];
 
             if (showRegion) {
@@ -90,7 +101,10 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
             }
 
             return (
-              <TableRow key={`${region}-${dealType}`} sx={{ backgroundColor: rowColor, fontWeight: isSummaryRow ? "bold" : "normal" }}>
+              <TableRow
+                key={`${region}-${dealType}`}
+                sx={{ backgroundColor: rowColor, fontWeight: isTotalRow || isSummaryRow ? "bold" : "normal" }}
+              >
                 {showRegion && (
                   <TableCell
                     rowSpan={rowSpans[region]}
@@ -99,14 +113,16 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
                     {region}
                   </TableCell>
                 )}
-                <TableCell>{dealType}</TableCell>
-                <TableCell>{dealStats.count}</TableCell>
-                <TableCell>{formatValue(dealStats.volume)}</TableCell>
-                <TableCell>{formatValue(dealStats.allocation_capital)}</TableCell>
-                <TableCell>{dealStats.allocation_weighted ? dealStats.allocation_weighted.toFixed(2) : "N/A"}%</TableCell>
-                <TableCell>{formatValue(dealStats.monahsee_actual_total)}</TableCell>
-                <TableCell>{formatValue(dealStats.model_actual_total)}</TableCell>
-                <TableCell>{formatValue(dealStats.GAP)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{dealType}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{dealStats.count}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.volume, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.allocation_capital, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>
+                  {dealStats.allocation_weighted ? dealStats.allocation_weighted.toFixed(2) : "N/A"}%
+                </TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.monahsee_actual_total, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.model_actual_total, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.GAP, isTotalRow)}</TableCell>
               </TableRow>
             );
           })

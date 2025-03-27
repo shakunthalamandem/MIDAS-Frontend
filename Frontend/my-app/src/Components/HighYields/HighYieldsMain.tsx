@@ -30,6 +30,7 @@ const HighYieldsMain: React.FC = () => {
   const [results, setResults] = useState<HighYieldResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+
 useEffect(() => {
     const path = window.location.pathname.split("/").pop();
     switch (path) {
@@ -84,6 +85,8 @@ useEffect(() => {
       setResults(data);
     } catch (error) {
       console.error("Error fetching search results:", error);
+      navigate("/error");  
+
       setResults([]);
     } finally {
       setLoading(false);

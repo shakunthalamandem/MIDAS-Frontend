@@ -8,6 +8,7 @@ const pages = [
   "Sector Comparison",
   "News",
   // "Monashee Performance & Efficiency",
+  // "Upload Market Indices",
   // "Portfolio Attribution",
 ];
 
@@ -56,7 +57,7 @@ const MacroNavbar: React.FC = () => {
       case "/macro/monashee-deals/gap-analysis":
         return 3;
       default:
-        return 0;
+        return 3;
     }
   };
 

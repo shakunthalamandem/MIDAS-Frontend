@@ -19,6 +19,7 @@ import {
   Radio,
 } from "@mui/material";
 import "./MDDCaptureTable.css";
+import { useNavigate } from "react-router-dom";
 
 // Format values to represent millions, billions, etc.
 const formatValue = (value: number): string => {
@@ -84,6 +85,8 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const [showCategoryButtons, setShowCategoryButtons] = useState(false);
+  const navigate = useNavigate(); 
+
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>(
     filterOptions[0]
   );
@@ -117,6 +120,8 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
       // setChartData(formatChartData(data));
     } catch (error) {
       console.error("Error fetching data", error);
+      navigate("/error");  
+
       // setChartData([]);
     } finally {
       // setLoading(false);

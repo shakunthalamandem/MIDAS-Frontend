@@ -27,16 +27,16 @@ interface HySectorTableDataProps {
   data: {
     Yearwise: { [year: string]: TableData };
     yearwise_total: {
-      Total_Deal_Count_Sum: number;
-      Total_Deal_Volume_Sum: number;
-      Total_Deal_Count_Sum_Without_Nulls: number;
-      Total_Deal_Volume_Sum_Without_Nulls: number;
-      Total_Positive_Performing_Deals_Percentage: number;
-      Total_Negative_Performing_Deals_Percentage: number;
-      Total_Returns_Positively: number;
-      Total_Returns_Negatively: number;
-      Total_Expected_Returns_Excess: number;
-      Total_Long_Opportunity_Value: number;
+      Total_Deal_Count: number;
+      Total_Deal_Volume: number;
+      Deal_count_without_nulls: number;
+      Deal_volume_without_nulls: number;
+      Positively_Performing_Deals_Percentage: number;
+      Negatively_Performing_Deals_Percentage: number;
+      Average_T1M_Abs_Return_of_Positively: number;
+      Average_T1M_Abs_Return_of_Negatively: number;
+      Expected_Returns_Excess: number;
+      Long_Opportunity_Value: number;
     };
   };
 }
@@ -77,10 +77,10 @@ const HySectorTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
     "Deal Volume Without Nulls",
     "% of Positively Performing Deals",
     "% of Negatively Performing Deals",
-    "Weighted Avg T+1M Excess Return (Positive Deals)",
-    "Weighted Avg T+1M Excess Return (Negative Deals)",
-    "Expected Returns Excess",
-    "Opportunity Value (T + 1M Excess)",
+    "Weighted Avg T+1M Return (Positive Deals)",
+    "Weighted Avg T+1M Return (Negative Deals)",
+    "Expected Returns",
+    "Opportunity Value (T + 1M)",
   ];
 
   return (
@@ -134,39 +134,39 @@ const HySectorTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
           ))}
 
           {/* Total row */}
-          <TableRow key="total">
+          <TableRow key="total" sx={{ backgroundColor: '#f0f4ff' }}>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", textAlign: "center" }}>
               Total
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Deal_Count_Sum}
+              {yearwiseTotal.Total_Deal_Count}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(yearwiseTotal.Total_Deal_Volume_Sum)}
+              {formatNumber(yearwiseTotal.Total_Deal_Volume)}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Deal_Count_Sum_Without_Nulls}
+              {yearwiseTotal.Deal_count_without_nulls}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(yearwiseTotal.Total_Deal_Volume_Sum_Without_Nulls)}
+              {formatNumber(yearwiseTotal.Deal_volume_without_nulls)}
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Positive_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
+              {yearwiseTotal.Positively_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Negative_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
+              {yearwiseTotal.Negatively_Performing_Deals_Percentage?.toFixed(0) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Returns_Positively?.toFixed(1) ?? "0"}%
+              {yearwiseTotal.Average_T1M_Abs_Return_of_Positively?.toFixed(1) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Returns_Negatively?.toFixed(1) ?? "0"}%
+              {yearwiseTotal.Average_T1M_Abs_Return_of_Negatively?.toFixed(1) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {yearwiseTotal.Total_Expected_Returns_Excess?.toFixed(1) ?? "0"}%
+              {yearwiseTotal.Expected_Returns_Excess?.toFixed(1) ?? "0"}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(yearwiseTotal.Total_Long_Opportunity_Value)}
+              {formatNumber(yearwiseTotal.Long_Opportunity_Value)}
             </TableCell>
           </TableRow>
         </TableBody>

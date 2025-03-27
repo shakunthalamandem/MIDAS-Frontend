@@ -11,6 +11,7 @@ import DealTypeComponent from "./DealTypeComponent";
 import SectorRegionComponent from "./SectorRegionComponent";
 import NoDataPopup from "../../../../Pages/NoDataPopup";
 import { resetFilters } from "./MDDFilters"; // Assuming resetFilters is the function to reset the filters
+import { useNavigate } from "react-router-dom";
 
 interface GapProps {
   selectedFilters: any;
@@ -46,6 +47,8 @@ const Gap: React.FC<GapProps> = ({ selectedFilters, handleCancel }) => {
   const [data, setData] = useState<any>(null);
   const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate(); 
+
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
@@ -81,6 +84,8 @@ const Gap: React.FC<GapProps> = ({ selectedFilters, handleCancel }) => {
       }
     } catch (error) {
       console.error("Error fetching data", error);
+      navigate("/error");  
+
       setError("Failed to fetch data.");
     } finally {
       setLoading(false);

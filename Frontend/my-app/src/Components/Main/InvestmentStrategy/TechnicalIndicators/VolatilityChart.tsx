@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 // Define the types
 interface VolatilityData {
@@ -21,6 +22,8 @@ interface VolatilityChartProps {
 
 const VolatilityChart: React.FC<VolatilityChartProps> = ({ ticker }) => {
   const [data, setData] = useState<VolatilityData[]>([]);
+  const navigate = useNavigate(); 
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +54,8 @@ const VolatilityChart: React.FC<VolatilityChartProps> = ({ ticker }) => {
         setData(VolatilityGraphData); // Update the state with the extracted Volatility graph data
       } catch (error) {
         console.error('Error fetching data:', error);
+        navigate("/error");  
+
       }
     };
 

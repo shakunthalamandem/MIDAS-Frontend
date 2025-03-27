@@ -26,7 +26,7 @@ const TwoWeekDealData: React.FC = () => {
   const [regions, setRegions] = useState<string[]>([]);
   const [dealTypes, setDealTypes] = useState<string[]>([]);
 
-  const weeks = [ 2, 3, 4, 5, 6, 7, 8];
+  const weeks = [ 2, 3, 4, 5, 6, 7, 8,9,10,11,12,];
 
   // Store applied filters separately
   const [appliedRegions, setAppliedRegions] = useState<string[]>([]);
@@ -116,7 +116,7 @@ const TwoWeekDealData: React.FC = () => {
       <Card sx={{ boxShadow: 3, p: 3, mb: 2 }}>
         <Card sx={{ p: 1, mb: 2 }}>
           <Typography variant="h5" color="#002060" align="center" gutterBottom>
-            Weekly Deal Filters
+           2025 Weekly Deal Filters
           </Typography>
           <Box
             display="flex"
@@ -228,7 +228,7 @@ const TwoWeekDealData: React.FC = () => {
                     renderValue={(selected) => formatMultiSelect(selected)}
                   >
                     {weeks.map((week) => (
-                      <MenuItem key={week} value={week}>
+                      <MenuItem key={week} value={week}  sx={{ height: 35 }}>
                         <Checkbox checked={selectedWeeks.includes(week)} />
                         <ListItemText primary={`Week ${week}`} />
                       </MenuItem>

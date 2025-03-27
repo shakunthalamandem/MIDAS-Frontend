@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface ApiData {
   years: number[];
@@ -43,6 +44,8 @@ interface DealsDataFilterProps {
   const DealsDataFilter: React.FC<DealsDataFilterProps> = ({ appliedFilters, onFiltersChange }) => {
     const [apiData, setApiData] = useState<ApiData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate(); 
+
 
   // Initialize filter states with appliedFilters or set default to all values
   const [selectedYears, setSelectedYears] = useState<string[]>(appliedFilters?.years || []);
@@ -71,6 +74,8 @@ interface DealsDataFilterProps {
         setApiData(response.data);
       } catch (error) {
         console.error("Failed to fetch data:", error);
+        navigate("/error");  
+
       } finally {
         setLoading(false);
       }

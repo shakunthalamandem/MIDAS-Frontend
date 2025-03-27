@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import GapDataTable from "./GapDataTable";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import GapDataTable from "./DetailedGapDataTable";
 import { CircularProgress } from "@mui/material";
 
 
@@ -15,6 +15,8 @@ const GapDealDeatilsTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate(); 
+
 
 
   let selectedFilters: SelectedFilters = {}; // Explicitly using the typed interface
@@ -24,6 +26,8 @@ const GapDealDeatilsTable: React.FC = () => {
     selectedFilters = filters;
   } catch (error) {
     console.error("Invalid filters format", error);
+    navigate("/error");  
+
   }
   selectedFilters.years = [2025];
 
@@ -35,7 +39,7 @@ const GapDealDeatilsTable: React.FC = () => {
       setError(null);
 
       try {
-        const response = await fetch(`${apiUrl}/api/equity/detailed_gap_analysis/`, {
+        const response = await fetch(`${apiUrl}/api/detailed_gap_analysis/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -50,6 +54,8 @@ const GapDealDeatilsTable: React.FC = () => {
         setData(result.data || []);
       } catch (error) {
         setError(error instanceof Error ? error.message : "Unknown error");
+        navigate("/error");  
+
       } finally {
         setLoading(false);
       }

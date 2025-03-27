@@ -1,17 +1,71 @@
-
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import logo from '../../Assets/images/whitelogoghc.png';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+// Define the interface for the version info response
+interface VersionInfo {
+  version: string;
+  release_date: string;
+  key_updates: string;
+  data_up_to_date: string; // Added field for "Data as of"
+}
 
 const FooterMain: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const currentYear = new Date().getFullYear();
+  const navigate = useNavigate();
+
+  const [versionInfo, setVersionInfo] = useState<VersionInfo>({
+    version: '',
+    release_date: '',
+    key_updates: '',
+    data_up_to_date: '', // Initialize this new field
+  });
+
+  const [isKeyUpdatesVisible, setIsKeyUpdatesVisible] = useState(false); // State to track visibility of key updates
+
+  useEffect(() => {
+    const fetchVersionInfo = async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiUrl) throw new Error("API URL is not defined in environment variables");
+
+        const response = await axios.get<VersionInfo>(`${apiUrl}/api/latest_version/`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = response.data;
+        setVersionInfo({
+          version: data.version || '',
+          release_date: data.release_date || '',
+          key_updates: data.key_updates || '',
+          data_up_to_date: data.data_up_to_date || '', 
+        });
+      } catch (error) {
+        console.error("Error fetching version info:", error);
+        navigate("/error");  
+      }
+    };
+
+    fetchVersionInfo();
+  }, [navigate]);
+
+  // Function to format the date to "Month Day, Year" format
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options); // e.g., "March 17, 2025"
+  };
 
   return (
     <Box
@@ -68,14 +122,48 @@ const FooterMain: React.FC = () => {
             height: '50px',
           }}
         />
-        
       </Box>
-      <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-            Version 1.06 - Updated March 10, 2025
-          </Typography>
+      
+      {/* Display Version Info dynamically from API */}
+      {versionInfo.version && (
+        <>
           <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-            Data as of March 07 , 2025
+            {`Version ${versionInfo.version} - Updated ${formatDate(versionInfo.release_date)}`}
           </Typography>
+        </>
+      )}
+
+      {/* Conditionally render Key Updates with clickable text */}
+      {versionInfo.key_updates && (
+        <>
+          {!isKeyUpdatesVisible ? (
+            <Typography
+              variant="body2"
+              sx={{
+                fontStyle: 'italic',
+                color: '#7bcf60', // Color for the clickable text
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+              onClick={() => setIsKeyUpdatesVisible(true)} // Show the key updates on click
+            >
+              Click here for Key Updates
+            </Typography>
+          ) : (
+            <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+              {`Key Updates: ${versionInfo.key_updates}`}
+            </Typography>
+          )}
+        </>
+      )}
+
+      {/* Dynamically display the data as of date from the API */}
+      {versionInfo.data_up_to_date && (
+        <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+          {`Data as of ${formatDate(versionInfo.data_up_to_date)}`}
+        </Typography>
+      )}
+
       <Box
         sx={{
           display: 'flex',
@@ -89,6 +177,3 @@ const FooterMain: React.FC = () => {
 };
 
 export default FooterMain;
-
-
-

@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import SectorTableData from './SectorTableData';
 import NoDataPopup from '../../../../Pages/NoDataPopup'; // Assuming this is where NoDataPopup is located
+import { useNavigate } from 'react-router-dom';
 
 // Define the expected structure of the API response
 interface SkewTableOptions {
@@ -23,6 +24,7 @@ interface SkewTableOptions {
   dealType: string[];
   region: string[];
   sector: string[];
+  year_period: string[];
 }
 
 const SectorBasedTable: React.FC = () => {
@@ -32,6 +34,7 @@ const SectorBasedTable: React.FC = () => {
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
+  const [year_period, setYearPeriod] = useState<string>('Yearly');
 
   // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
@@ -39,6 +42,9 @@ const SectorBasedTable: React.FC = () => {
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
+  const [year_periodOptions, setYearPeriodOptions] = useState<string[]>([]);
+  const navigate = useNavigate(); 
+
 
   // State to store the response data and the no data popup visibility
   const [responseData, setResponseData] = useState<any>(null);
@@ -59,7 +65,8 @@ const SectorBasedTable: React.FC = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: token ? `Bearer ${token}` : "",
-            }});
+            }
+          });
         const data = response.data as SkewTableOptions;
 
         setStartYearOptions(data['start year']);
@@ -67,8 +74,11 @@ const SectorBasedTable: React.FC = () => {
         setDealTypeOptions(data['dealType']);
         setRegionOptions(data['region']);
         setSectorOptions(data['sector']);
+        setYearPeriodOptions(data['year_period']);  // Ensure year_period options are set here
       } catch (error) {
         console.error('Error fetching filter options:', error);
+        navigate("/error");  
+
       }
     };
 
@@ -84,13 +94,14 @@ const SectorBasedTable: React.FC = () => {
           deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
           region: region === 'All' ? regionOptions : [region],
           sector: sector === 'All' ? sectorOptions : [sector],
+          year_period: year_period,  // Directly pass year_period as a string
         },
       };
 
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
-        
+
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
@@ -113,11 +124,9 @@ const SectorBasedTable: React.FC = () => {
           setResponseData(null);  // Clear previous response data
         } else {
           setResponseData(response.data);  // Store the response data in state
-          // console.log("data found");
         }
       } catch (error) {
-        // If an error occurs, show the popup instead of console.error
-        setNoDataPopupOpen(true); // Open the popup in case of error
+        navigate("/error");  
       }  
     };
 
@@ -125,7 +134,7 @@ const SectorBasedTable: React.FC = () => {
     if (dealType && region && sector) {
       fetchData();
     }
-  }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
+  }, [startYear, endYear, dealType, region, sector,dealTypeOptions, regionOptions, sectorOptions, year_period]);
 
   const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
     setDealType(event.target.value);
@@ -139,14 +148,17 @@ const SectorBasedTable: React.FC = () => {
     setSector(event.target.value);
   };
 
+  const handleYearPeriodChange = (event: SelectChangeEvent<string>) => {
+    setYearPeriod(event.target.value);
+  };
+
   const handleClosePopup = () => {
-    setNoDataPopupOpen(false);  // Close the NoDataPopup
-    setStartYear(2001);  // Reset the filters
+    setNoDataPopupOpen(false);  
+    setStartYear(2001); 
     setEndYear(2024);
     setDealType('All');
     setRegion('All');
     setSector('All');
-  
   };
 
   return (
@@ -181,7 +193,7 @@ const SectorBasedTable: React.FC = () => {
               {/* Region Selector */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
-                  <InputLabel>Region</InputLabel>
+                  <InputLabel>Region  </InputLabel>
                   <Select
                     value={region}
                     onChange={handleRegionChange}
@@ -212,6 +224,25 @@ const SectorBasedTable: React.FC = () => {
                     {sectorOptions.map((sec) => (
                       <MenuItem key={sec} value={sec}>
                         {sec}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Year Period Selector */}
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Period</InputLabel>
+                  <Select
+                    value={year_period}
+                    onChange={handleYearPeriodChange}
+                    label="Period"
+                    sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
+                  >
+                    {year_periodOptions.map((period) => (
+                      <MenuItem key={period} value={period}>
+                        {period}
                       </MenuItem>
                     ))}
                   </Select>

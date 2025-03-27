@@ -25,6 +25,7 @@ import {
 import axios from "axios";
 import GapDealDeatilsTable from "./GapDealDeatilsTable";
 import TwoWeekDealData from "./TwoweekDealData";
+import { useNavigate } from "react-router-dom";
 
 interface WeeklyData {
   Count: number;
@@ -71,6 +72,8 @@ const formatNumber = (value: number) => {
 
 const WeeklyStatsChart: React.FC = () => {
   const [data, setData] = useState<APIResponse | null>(null);
+  const navigate = useNavigate(); 
+
   const [chartType, setChartType] = useState<
     | "count"
     | "volume"
@@ -97,6 +100,8 @@ const WeeklyStatsChart: React.FC = () => {
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        navigate("/error");  
+
       }
     };
     fetchData();
@@ -186,64 +191,64 @@ const WeeklyStatsChart: React.FC = () => {
 
               {chartType === "count" && (
                 <>
-                  <Line type="monotone" dataKey="2023" stroke="#ff7300" name="2023" />
-                  <Line type="monotone" dataKey="2024" stroke="#770500" name="2024" />
+                  <Line  dataKey="2023" stroke="#ff7300" name="2023" />
+                  <Line  dataKey="2024" stroke="#770500" name="2024" />
                   <Bar dataKey="2025" barSize={10} fill="#247B5B" name="2025" />
-                  <Line type="monotone" dataKey="Average" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
+                  <Line  dataKey="Average" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
 
               {chartType === "volume" && (
                 <>
-                  <Line type="monotone" dataKey="2023 Size" stroke="#8a009a" name="2023" />
-                  <Line type="monotone" dataKey="2024 Size" stroke="#770500" name="2024" />
+                  <Line  dataKey="2023 Size" stroke="#8a009a" name="2023" />
+                  <Line  dataKey="2024 Size" stroke="#770500" name="2024" />
                   <Bar dataKey="2025 Size" barSize={10} fill="#247B5B" name="2025" />
-                  <Line type="monotone" dataKey="Average Size" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
+                  <Line  dataKey="Average Size" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
 
               {chartType === "capital" && (
                 <>
-                  <Line type="monotone" dataKey="2023 Capital" stroke="#8a009a" name="2023" />
-                  <Line type="monotone" dataKey="2024 Capital" stroke="#770500" name="2024" />
+                  <Line  dataKey="2023 Capital" stroke="#8a009a" name="2023" />
+                  <Line  dataKey="2024 Capital" stroke="#770500" name="2024" />
                   <Bar dataKey="2025 Capital" barSize={10} fill="#247B5B" name="2025" />
-                  <Line type="monotone" dataKey="Average Capital" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
+                  <Line  dataKey="Average Capital" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
 
               {chartType === "opportunity_value_ex" && (
                 <>
-                  <Line type="monotone" dataKey="2023 Opportunity Value Ex" stroke="#8a009a" name="2023" />
-                  <Line type="monotone" dataKey="2024 Opportunity Value Ex" stroke="#770500" name="2024" />
+                  <Line  dataKey="2023 Opportunity Value Ex" stroke="#8a009a" name="2023" />
+                  <Line  dataKey="2024 Opportunity Value Ex" stroke="#770500" name="2024" />
                   <Bar dataKey="2025 Opportunity Value Ex" barSize={10} fill="#247B5B" name="2025" />
-                  <Line type="monotone" dataKey="Average Opportunity Value Ex" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
+                  <Line  dataKey="Average Opportunity Value Ex" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
 
               {chartType === "allocation_return" && (
                 <>
-                  <Line type="monotone" dataKey="2023 Allocation Return" stroke="#8a009a" name="2023" />
-                  <Line type="monotone" dataKey="2024 Allocation Return" stroke="#770500" name="2024" />
+                  <Line  dataKey="2023 Allocation Return" stroke="#8a009a" name="2023" />
+                  <Line  dataKey="2024 Allocation Return" stroke="#770500" name="2024" />
                   <Bar dataKey="2025 Allocation Return" barSize={10} fill="#247B5B" name="2025" />
-                  <Line type="monotone" dataKey="Average Allocation Return" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
+                  <Line  dataKey="Average Allocation Return" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
 
               {chartType === "monahsee_actual_total_PNL" && (
                 <>
-                  <Line type="monotone" dataKey="2023 Monahsee Actual Total PNL" stroke="#8a009a" name="2023" />
-                  <Line type="monotone" dataKey="2024 Monahsee Actual Total PNL" stroke="#770500" name="2024" />
+                  <Line  dataKey="2023 Monahsee Actual Total PNL" stroke="#8a009a" name="2023" />
+                  <Line  dataKey="2024 Monahsee Actual Total PNL" stroke="#770500" name="2024" />
                   <Bar dataKey="2025 Monahsee Actual Total PNL" barSize={10} fill="#247B5B" name="2025" />
-                  <Line type="monotone" dataKey="Average Monahsee Actual Total PNL" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
+                  <Line  dataKey="Average Monahsee Actual Total PNL" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
 
               {chartType === "model_actual_total_PNL" && (
                 <>
-                  <Line type="monotone" dataKey="2023 Model Actual Total PNL" stroke="#8a009a" name="2023" />
-                  <Line type="monotone" dataKey="2024 Model Actual Total PNL" stroke="#770500" name="2024" />
+                  <Line  dataKey="2023 Model Actual Total PNL" stroke="#8a009a" name="2023" />
+                  <Line  dataKey="2024 Model Actual Total PNL" stroke="#770500" name="2024" />
                   <Bar dataKey="2025 Model Actual Total PNL" barSize={10} fill="#247B5B" name="2025" />
-                  <Line type="monotone" dataKey="Average Model Actual Total PNL" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
+                  <Line  dataKey="Average Model Actual Total PNL" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
             </ComposedChart>

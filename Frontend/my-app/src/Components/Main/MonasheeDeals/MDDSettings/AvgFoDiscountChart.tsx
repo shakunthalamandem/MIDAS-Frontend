@@ -138,6 +138,8 @@ const AvgFoDiscountChart: React.FC<Props> = ({ data, handleCancel }) => {  // Ac
                   tickLine={false}
                   axisLine={{ stroke: theme.palette.divider }}
                   width={50}
+                  domain={[0, "dataMax + 1"]} // Set the domain to start from 0
+
                 />
                 <Tooltip
                   content={<CustomTooltip />}

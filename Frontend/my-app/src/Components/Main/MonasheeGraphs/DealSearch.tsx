@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import SelectedTicker from "./SelectedTicker";
+import { useNavigate } from "react-router-dom";
 
 // Define the type for the API response
 interface MDDResult {
@@ -27,6 +28,8 @@ const GlobalDealSearch: React.FC = () => {
   const [selectedTicker, setSelectedTicker] = useState<string>("AS"); // Set default ticker to "FANG"
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate(); 
+
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -55,6 +58,8 @@ const GlobalDealSearch: React.FC = () => {
       setResults(data);
     } catch (error) {
       console.error("Error fetching search results:", error);
+      navigate("/error");  
+
       setResults([]);
     } finally {
       setLoading(false);

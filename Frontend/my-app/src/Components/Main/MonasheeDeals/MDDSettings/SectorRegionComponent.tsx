@@ -130,6 +130,8 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       Model Allocation Gap
                     </TableCell>
+                
+
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       Monashee Exit Gap
                     </TableCell>
@@ -143,10 +145,16 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                       Monashee Actual AM PnL (Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
+                    Model PnL with Actual AM
+                    </TableCell>
+                    <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       Model PnL with model AM(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       AM Gap
+                    </TableCell>
+                    <TableCell sx={{ color: "white", minWidth: "40px" }}>
+                      AM Exit Gap
                     </TableCell>
                     <TableCell
                       sx={{
@@ -304,6 +312,14 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               minWidth: "40px",
                             }}
                           >
+                            {formatValue(values["Model Actual AM Return"])}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: isSummary ? "bold" : "normal",
+                              minWidth: "40px",
+                            }}
+                          >
                             {formatValue(values["Model AM Return"])}
                           </TableCell>
                         <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
@@ -313,6 +329,16 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               </strong>
                             ) : (
                               formatValue(values["AM Gap"] || 0)
+                            )}
+                          </TableCell>
+                          <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
+
+                          {isSummary ? (
+                              <strong>
+                                {formatValue(values["AM Exit Gap"] || 0)}
+                              </strong>
+                            ) : (
+                              formatValue(values["AM Exit Gap"] || 0)
                             )}
                           </TableCell>
                           <TableCell
