@@ -36,6 +36,8 @@ import MarketFilters from "../Components/Main/MonasheeCapitalMarkets/MarketFilte
 import ScreenerMain from "../Components/Main/MonasheeGraphs/ScreenerTable/ScreenerMain";
 import SkewTableMain from "../Components/Main/MonasheeGraphs/SkewTableMain";
 import MacroMain from "../Components/Macro/MacroMain";
+import News from "../Components/Macro/News";
+
 
 
 
@@ -101,6 +103,8 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
+        <Route path="/macro/news" element={<AuthGuard><News /></AuthGuard>} />
+
 
 
 
