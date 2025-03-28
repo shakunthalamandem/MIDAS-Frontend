@@ -125,7 +125,7 @@ const Logs = () => {
         User Logs
       </Button>
 
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xl" fullWidth>
         
 
         <DialogContent>
@@ -161,8 +161,18 @@ const Logs = () => {
           {loading ? (
             <CircularProgress />
           ) : (
-            <Box sx={{ height: 400, width:900 }}>
-              <DataGrid rows={getRows()} columns={columns[view]} />
+            <Box sx={{ height: 400 }}>
+<DataGrid
+  rows={getRows()}
+  columns={columns[view]}
+  rowHeight={35} // Adjust row height as needed
+  sx={{
+    "& .MuiDataGrid-columnHeaders": {
+      color: "#002060",
+      fontWeight:'bold' 
+    },
+  }}
+/>
             </Box>
           )}
         </DialogContent>
