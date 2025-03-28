@@ -124,14 +124,20 @@ const FooterMain: React.FC = () => {
         />
       </Box>
       
-      {/* Display Version Info dynamically from API */}
-      {versionInfo.version && (
-        <>
-          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-            {`Version ${versionInfo.version} - Updated ${formatDate(versionInfo.release_date)}`}
-          </Typography>
-        </>
-      )}
+      <Box sx={{ display: 'flex', gap: 2 ,alignContent:'center', justifyContent: 'center', marginTop: '5px',marginBottom: '5px' }}>
+  {versionInfo.version && (
+    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+      {`Version ${versionInfo.version} - Updated ${formatDate(versionInfo.release_date)}`}
+    </Typography>
+  )}
+  {versionInfo.data_up_to_date && (
+    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+      {`Data as of ${formatDate(versionInfo.data_up_to_date)}`}
+    </Typography>
+  )}
+</Box>
+
+
 
       {/* Conditionally render Key Updates with clickable text */}
       {versionInfo.key_updates && (
@@ -157,13 +163,7 @@ const FooterMain: React.FC = () => {
         </>
       )}
 
-      {/* Dynamically display the data as of date from the API */}
-      {versionInfo.data_up_to_date && (
-        <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-          {`Data as of ${formatDate(versionInfo.data_up_to_date)}`}
-        </Typography>
-      )}
-
+     
       <Box
         sx={{
           display: 'flex',
