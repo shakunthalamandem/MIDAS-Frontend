@@ -34,11 +34,13 @@ import MarketFilters from "../Components/Main/MonasheeCapitalMarkets/MarketFilte
 import ScreenerMain from "../Components/Main/MonasheeGraphs/ScreenerTable/ScreenerMain";
 import SkewTableMain from "../Components/Main/MonasheeGraphs/SkewTableMain";
 import MacroMain from "../Components/Macro/MacroMain";
+import News from "../Components/Macro/News";
 import ConvertsMain from "../Components/Converts/ConvertsMain";
-import ConvertsDealSearch from "../Components/Converts/Tabs/ConvertsDealSearch";
 import ConvertsDealStatsMain from "../Components/Converts/Tabs/ConvertsDealStatsMain";
 import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
 import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
+
+
 
 
 
@@ -115,6 +117,8 @@ const AppRouters: React.FC = () => {
 
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
         <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
+        <Route path="/macro/news" element={<AuthGuard><News /></AuthGuard>} />
+
 
 
 

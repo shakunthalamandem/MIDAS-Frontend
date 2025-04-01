@@ -3,7 +3,11 @@ import { Tabs, Tab, Box } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const pages = [
+ 
+
   "Sector Comparison",
+  "News",
+  // "Monashee Performance & Efficiency",
   // "Upload Market Indices",
   // "Portfolio Attribution",
 ];
@@ -17,8 +21,11 @@ const MacroNavbar: React.FC = () => {
       case "Sector Comparison":
         navigate("/macro/sector");
         break;
-      case "Upload Market Indices":
-        navigate("/upload");
+      case "News":
+        navigate("/macro/news");
+        break;
+      case "Monashee Performance & Efficiency":
+        navigate("/macro/monashee-deals");
         break;
       case "Portfolio Attribution":
         navigate("/macro/portfolio-attribution");
@@ -45,11 +52,10 @@ const MacroNavbar: React.FC = () => {
       case "/macro/monashee-deals/follow-on-discount":
       case "/macro/monashee-deals/gap-analysis":
         return 1;
-
-      case "/macro/portfolio-attribution":
+      case "/macro/news":
         return 2;
-        case "/":
-          return 3;
+      case "/macro/monashee-deals/gap-analysis":
+        return 3;
       default:
         return 3;
     }
