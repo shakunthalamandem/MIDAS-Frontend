@@ -20,18 +20,17 @@ const StockTickerNews = () => {
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Number of news per page
-
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     const fetchNews = async () => {
       setLoading(true);
       setError("");
 
       try {
-        const response = await fetch("http://192.168.1.40:9000/api/fetch_news/", {
+        const response = await fetch(`${API_BASE_URL}/api/fetch_news/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
         });
-
         const data = await response.json();
         console.log("Fetched News Data:", data);
 
