@@ -62,6 +62,9 @@ const StockTickerNews = () => {
     }
     setCurrentPage(1); // Reset to first page on search
   }, [searchTicker, allNews]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]); // Runs every time currentPage updates
 
   // Pagination logic
   const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
