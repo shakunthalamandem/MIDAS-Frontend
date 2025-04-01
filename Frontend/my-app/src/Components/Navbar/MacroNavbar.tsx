@@ -54,7 +54,7 @@ const MacroNavbar: React.FC = () => {
         return 1;
       case "/macro/news":
         return 2;
-      case "/macro/monashee-deals/gap-analysis":
+      case "/":
         return 3;
       default:
         return 3;
