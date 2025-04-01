@@ -43,6 +43,8 @@ const MacroNavbar: React.FC = () => {
       case "/macro/capital-markets/skew-table":
       case "/macro/capital-markets/deal-filter":
         return 0;
+      case "/macro/news":
+          return 1;
       case "/macro/monashee-deals":
       case "/macro/monashee-deals/":
       case "/macro/monashee-deals/deal-stats":
@@ -51,8 +53,6 @@ const MacroNavbar: React.FC = () => {
       case "/macro/monashee-deals/weekly-tracking":
       case "/macro/monashee-deals/follow-on-discount":
       case "/macro/monashee-deals/gap-analysis":
-        return 1;
-      case "/macro/news":
         return 2;
       case "/":
         return 3;
