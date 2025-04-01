@@ -6,7 +6,7 @@ const pages = [
  
 
   "Sector Comparison",
-  "News",
+  // "News",
   // "Monashee Performance & Efficiency",
   // "Upload Market Indices",
   // "Portfolio Attribution",
