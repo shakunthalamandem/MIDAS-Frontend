@@ -30,7 +30,7 @@ interface SkewTableOptions {
 const SectorBasedTable: React.FC = () => {
   // State for form values
   const [startYear, setStartYear] = useState<number>(2001);
-  const [endYear, setEndYear] = useState<number | string>(2024);
+  const [endYear, setEndYear] = useState<number | string>(2025); 
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
@@ -38,13 +38,12 @@ const SectorBasedTable: React.FC = () => {
 
   // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
-  const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
+  const [endYearOptions, setEndYearOptions] = useState<number[]>([2025]); 
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
   const [year_periodOptions, setYearPeriodOptions] = useState<string[]>([]);
   const navigate = useNavigate(); 
-
 
   // State to store the response data and the no data popup visibility
   const [responseData, setResponseData] = useState<any>(null);
@@ -60,25 +59,23 @@ const SectorBasedTable: React.FC = () => {
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
-        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`, 
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            }
-          });
+        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          }
+        });
         const data = response.data as SkewTableOptions;
 
         setStartYearOptions(data['start year']);
-        setEndYearOptions(data['end year']);
+        setEndYearOptions([2025]); 
         setDealTypeOptions(data['dealType']);
         setRegionOptions(data['region']);
         setSectorOptions(data['sector']);
-        setYearPeriodOptions(data['year_period']);  // Ensure year_period options are set here
+        setYearPeriodOptions(data['year_period']);
       } catch (error) {
         console.error('Error fetching filter options:', error);
         navigate("/error");  
-
       }
     };
 
@@ -90,11 +87,11 @@ const SectorBasedTable: React.FC = () => {
     const fetchData = async () => {
       const requestData = {
         filters: {
-          year_range: [startYear, endYear],
+          year_range: [startYear, 2025], 
           deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
           region: region === 'All' ? regionOptions : [region],
           sector: sector === 'All' ? sectorOptions : [sector],
-          year_period: year_period,  // Directly pass year_period as a string
+          year_period: year_period,
         },
       };
 
@@ -117,24 +114,22 @@ const SectorBasedTable: React.FC = () => {
           }
         );
 
-        // Check if the response contains the "No data found" error
         const responseData = response.data as { error?: string };
         if (responseData.error === "No data found matching the specified filters.") {
           setNoDataPopupOpen(true);
-          setResponseData(null);  // Clear previous response data
+          setResponseData(null);
         } else {
-          setResponseData(response.data);  // Store the response data in state
+          setResponseData(response.data);
         }
       } catch (error) {
         navigate("/error");  
       }  
     };
 
-    // Only fetch data when all required filters are selected
     if (dealType && region && sector) {
       fetchData();
     }
-  }, [startYear, endYear, dealType, region, sector,dealTypeOptions, regionOptions, sectorOptions, year_period]);
+  }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions, year_period]);
 
   const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
     setDealType(event.target.value);
@@ -155,7 +150,7 @@ const SectorBasedTable: React.FC = () => {
   const handleClosePopup = () => {
     setNoDataPopupOpen(false);  
     setStartYear(2001); 
-    setEndYear(2024);
+    setEndYear(2025);
     setDealType('All');
     setRegion('All');
     setSector('All');
@@ -193,7 +188,7 @@ const SectorBasedTable: React.FC = () => {
               {/* Region Selector */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
-                  <InputLabel>Region  </InputLabel>
+                  <InputLabel>Region</InputLabel>
                   <Select
                     value={region}
                     onChange={handleRegionChange}
@@ -251,12 +246,10 @@ const SectorBasedTable: React.FC = () => {
             </Grid>
           </Box>
 
-          {/* Pass responseData to SectorTableData */}
           {responseData && <SectorTableData data={responseData} />}
         </CardContent>
       </Card>
-      
-      {/* NoDataPopup */}
+
       <NoDataPopup open={noDataPopupOpen} onClose={handleClosePopup} />
     </Container>
   );
