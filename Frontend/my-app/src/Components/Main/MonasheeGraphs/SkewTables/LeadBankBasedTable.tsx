@@ -29,12 +29,11 @@ interface SkewTableOptions {
 const LeadBankBasedTable: React.FC = () => {
   // State for form values
   const [startYear, setStartYear] = useState<number>(2001);
-  const [endYear, setEndYear] = useState<number | string>(2024);
+  const [endYear, setEndYear] = useState<number | string>(2025); 
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
   const navigate = useNavigate(); 
-
 
   // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
@@ -57,13 +56,12 @@ const LeadBankBasedTable: React.FC = () => {
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
-        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            }
-          });
+        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          }
+        });
         const data = response.data as SkewTableOptions;
 
         setStartYearOptions(data['start year']);
@@ -74,7 +72,6 @@ const LeadBankBasedTable: React.FC = () => {
       } catch (error) {
         console.error('Error fetching filter options:', error);
         navigate("/error");  
-
       }
     };
 
@@ -95,7 +92,7 @@ const LeadBankBasedTable: React.FC = () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
-        
+
         if (!apiUrl) {
           throw new Error('API URL is not defined in environment variables');
         }
@@ -113,15 +110,13 @@ const LeadBankBasedTable: React.FC = () => {
 
         const responseData = response.data as { error?: string };
         if (responseData.error === "No data found matching the specified filters.") {
-          setNoDataPopupOpen(true); // Open the popup if no data is found
-          setResponseData(null); // Clear previous response data
+          setNoDataPopupOpen(true);
+          setResponseData(null);
         } else {
-          setResponseData(response.data); // Store the response data in state
+          setResponseData(response.data);
         }
-      }catch (error) {
-        // If an error occurs, show the popup instead of console.error
-        setNoDataPopupOpen(true); // Open the popup in case of error
-     
+      } catch (error) {
+        setNoDataPopupOpen(true);
       }
     };
 
@@ -136,8 +131,6 @@ const LeadBankBasedTable: React.FC = () => {
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
     const newStartYear = Number(event.target.value);
     setStartYear(newStartYear);
-
-    // Set end year to the next year after the selected start year
     setEndYear(newStartYear + 1);
   };
   const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
@@ -151,13 +144,13 @@ const LeadBankBasedTable: React.FC = () => {
   const handleSectorChange = (event: SelectChangeEvent<string>) => {
     setSector(event.target.value);
   };
-  const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear);
+
+  const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear );
 
   const handleClosePopup = () => {
-    setNoDataPopupOpen(false); // Close the NoDataPopup
-    // Reset filters if desired (example for startYear)
+    setNoDataPopupOpen(false);
     setStartYear(2001);
-    setEndYear(2024);
+    setEndYear(2025); // ✅ Reset to 2025
     setDealType("All");
     setRegion("All");
     setSector("All");
@@ -169,11 +162,9 @@ const LeadBankBasedTable: React.FC = () => {
         <CardContent>
           <Box p={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
-              Lead Bank  Based Filtered Data
+              Lead Bank Based Filtered Data
             </Typography>
             <Grid container spacing={2}>
-              {/* Deal Type Selector */}
-              {/* Start Year Selector */}
               <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Start Year</InputLabel>
@@ -200,7 +191,6 @@ const LeadBankBasedTable: React.FC = () => {
                 </FormControl>
               </Grid>
 
-              {/* End Year Selector */}
               <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>End Year</InputLabel>
@@ -227,13 +217,14 @@ const LeadBankBasedTable: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
+
               <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Deal Type</InputLabel>
                   <Select
                     value={dealType}
-                    label="Deal Type"
                     onChange={handleDealTypeChange}
+                    label="Deal Type"
                     sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
                   >
                     <MenuItem value="All">All</MenuItem>
@@ -246,7 +237,6 @@ const LeadBankBasedTable: React.FC = () => {
                 </FormControl>
               </Grid>
 
-              {/* Region Selector */}
               <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
@@ -266,7 +256,6 @@ const LeadBankBasedTable: React.FC = () => {
                 </FormControl>
               </Grid>
 
-              {/* Sector Selector */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Sector</InputLabel>
@@ -289,11 +278,9 @@ const LeadBankBasedTable: React.FC = () => {
           </Box>
 
           {responseData && <LeadBankTableData data={responseData} />}
-
         </CardContent>
       </Card>
 
-      {/* NoDataPopup */}
       <NoDataPopup open={noDataPopupOpen} onClose={handleClosePopup} />
     </Container>
   );
