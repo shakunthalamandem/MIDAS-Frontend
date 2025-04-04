@@ -46,7 +46,7 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
     // Check for 'year' filter and set it to 2024 by default if available in options
     const yearFilter = filtersData.find((filter) => filter['year_range']);
     if (yearFilter) {
-      initialSelectedValues['year_range'] = []; // Default to 2024
+      initialSelectedValues['year_range'] = []; // Default to a
     }
 
     setSelectedValues(initialSelectedValues);
