@@ -71,7 +71,7 @@ const StockTickerNews = () => {
   const paginatedNews = filteredNews.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}>
+    <div style={{ padding: "20px", maxWidth: "1000px", margin: "auto" }}>
       <h2 style={{ fontSize: "24px", fontWeight: "bold", textAlign: "center", marginBottom: "20px" }}>
         Latest News Summaries
       </h2>
@@ -134,7 +134,7 @@ const StockTickerNews = () => {
               <p style={{ fontSize: "14px", color: "#666", margin: "5px 0" }}>
                 Posted on : <strong>{news.date}</strong>
               </p>
-              <p style={{ fontSize: "14px", color: "#444", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <p style={{ fontSize: "15px", color: "#444", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {news.summary}
               </p>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
