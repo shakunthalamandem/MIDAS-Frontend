@@ -26,7 +26,7 @@ const TwoWeekDealData: React.FC = () => {
   const [regions, setRegions] = useState<string[]>([]);
   const [dealTypes, setDealTypes] = useState<string[]>([]);
 
-  const weeks = [ 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13];
+  const weeks = [ 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14];
 
   // Store applied filters separately
   const [appliedRegions, setAppliedRegions] = useState<string[]>([]);
