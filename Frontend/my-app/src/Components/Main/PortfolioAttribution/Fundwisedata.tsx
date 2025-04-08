@@ -117,9 +117,9 @@ const Fundwisedata: React.FC = () => {
                                     <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
                                         Feb
                                     </TableCell>
-                                    {/* <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                                    <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
                                         Mar
-                                    </TableCell> */}
+                                    </TableCell>
                                     <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
                                         YTD
                                     </TableCell>
@@ -143,10 +143,10 @@ const Fundwisedata: React.FC = () => {
                                         <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
                                             {formatNumber(row.Feb)}
                                         </TableCell>
-                                        {/* <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
+                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
                                             {formatNumber(row.Mar)}
-                                        </TableCell> */}
-                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center"}}>
+                                        </TableCell>
+                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
                                             {formatNumber(row.YTD)}
                                         </TableCell>
                                     </TableRow>
@@ -162,9 +162,9 @@ const Fundwisedata: React.FC = () => {
                                     <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
                                         {formatNumber(totalFeb)}
                                     </TableCell>
-                                    {/* <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
                                         {formatNumber(totalMar)}
-                                    </TableCell> */}
+                                    </TableCell>
                                     <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
                                         {formatNumber(totalYTD)}
                                     </TableCell>
