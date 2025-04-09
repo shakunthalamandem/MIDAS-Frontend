@@ -202,17 +202,7 @@ useEffect(() => {
           }
         />
 
-        {/* <Tab
-          label="Deal Search"
-          sx={{
-            backgroundColor: value === 0 ? "#9C27B0" : "#f5f5f5",
-            color: value === 0 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#9C27B0",
-              color: "#fff",
-            },
-          }}
-        /> */}
+
         <Tab
           label="Deal Stats"
           sx={{
