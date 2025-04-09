@@ -73,7 +73,7 @@ const DealFormMain: React.FC = () => {
               }}
             >
               <span className="marquee">
-                Bloomberg data pulled automatically by ticker{" "}
+                Data pulled automatically by ticker{" "}
               </span>
             </Typography>
           </Box>
