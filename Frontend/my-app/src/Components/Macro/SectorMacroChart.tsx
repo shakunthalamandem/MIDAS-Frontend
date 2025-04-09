@@ -20,6 +20,7 @@ import {
 } from "recharts";
 import USMarketIndexTable from "./USMarketIndexTable";
 
+
 // Define data interface
 interface ApiData {
   date: string;

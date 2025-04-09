@@ -41,6 +41,11 @@ import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
 import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 
 
+import MonasheDataDump from "../Components/Uploads/MonasheDataDump";
+
+import MainUpload from "../Components/Uploads/MainUpload";
+
+
 
 
 
@@ -118,6 +123,11 @@ const AppRouters: React.FC = () => {
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
         <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
         <Route path="/macro/news" element={<AuthGuard><News /></AuthGuard>} />
+
+
+
+        <Route path="/mdd_upload" element={<AuthGuard><MainUpload /></AuthGuard>} />
+        <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
 
 
 
