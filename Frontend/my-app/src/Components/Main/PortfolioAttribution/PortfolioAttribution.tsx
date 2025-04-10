@@ -3,6 +3,8 @@ import { Box, FormControl, FormControlLabel, Radio, RadioGroup, Typography } fro
 import Fundwisedata from "./Fundwisedata";
 import Sectorwisedata from "./Sectorwisedata";
 
+import DashboardFilter from "./DashboardFilter";
+
 const PortfolioAttribution: React.FC = () => {
   const [view, setView] = useState<string>("fund");
 
@@ -33,14 +35,21 @@ const PortfolioAttribution: React.FC = () => {
       <Box sx={{ display: "flex", justifyContent: "center", marginBottom: 2 }}>
         <FormControl component="fieldset">
           <RadioGroup row value={view} onChange={(e) => setView(e.target.value)}>
+            <FormControlLabel value="Dashboard" control={<Radio />} label="Dashboard" />
             <FormControlLabel value="fund" control={<Radio />} label="Fund" />
             <FormControlLabel value="sector" control={<Radio />} label="Sector" />
           </RadioGroup>
         </FormControl>
       </Box>
 
-      {/* Render the selected component */}
-      {view === "fund" ? <Fundwisedata /> : <Sectorwisedata />}
+      {/* Correct conditional rendering */}
+      {view === "Dashboard" ? (
+        <DashboardFilter />
+      ) : view === "fund" ? (
+        <Fundwisedata />
+      ) : (
+        <Sectorwisedata />
+      )}
     </Box>
   );
 };
