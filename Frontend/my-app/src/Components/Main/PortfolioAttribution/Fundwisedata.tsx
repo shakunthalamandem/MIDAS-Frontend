@@ -94,7 +94,7 @@ const Fundwisedata: React.FC = () => {
         <Box sx={{ width: "100%", backgroundColor: "#fff", p: 2 }}>
             <Container>
                 <Typography variant="h5" color="#002060" align="center" fontWeight={600} marginBottom={2}>
-                    2025 Apr Net of Hedge P&L Attribution by Fund
+                    2025 YTD Net of Hedge P&L Attribution by Fund
                 </Typography>
 
                 {loading ? (
