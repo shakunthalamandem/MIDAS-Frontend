@@ -133,7 +133,7 @@ const StockTickerNews = () => {
                 "&:hover": { transform: "scale(1.02)" },
               }}
             >
-              <CardContent sx={{ pb: 6 }}>
+              <CardContent sx={{ pb: 6, pr: 10 }}>
                 {/* Top right corner sentiment + date */}
                 <Box sx={{ position: "absolute", top: 16, right: 16, textAlign: "right" }}>
                   <Typography
