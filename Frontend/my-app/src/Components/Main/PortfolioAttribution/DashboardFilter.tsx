@@ -21,7 +21,7 @@ interface FilterOptions {
   funds: string[];
   regions: string[];
   deal_types: string[];
-  as_of_date_str: string[];
+  as_of_date_str: string; 
 }
 
 interface Filters {
@@ -31,27 +31,10 @@ interface Filters {
   as_of_date: string;
 }
 
-const getYesterdayDate = (): string => {
-  const date = new Date();
-  date.setDate(date.getDate() - 1);
-  return date.toISOString().split('T')[0];
-};
-
 const DashboardFilter: React.FC = () => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
-  const [selectedFilters, setSelectedFilters] = useState<Filters>({
-    funds: [],
-    broad_region: [],
-    deal_type: [],
-    as_of_date: getYesterdayDate(),
-  });
-
-  const [appliedFilters, setAppliedFilters] = useState<Filters>({
-    funds: [],
-    broad_region: [],
-    deal_type: [],
-    as_of_date: getYesterdayDate(),
-  });
+  const [selectedFilters, setSelectedFilters] = useState<Filters | null>(null); 
+  const [appliedFilters, setAppliedFilters] = useState<Filters | null>(null); 
 
   const navigate = useNavigate();
 
@@ -75,12 +58,11 @@ const DashboardFilter: React.FC = () => {
         const data = response.data as FilterOptions;
         setFilterOptions(data);
 
-        const yesterday = getYesterdayDate();
         const allFilters: Filters = {
           funds: data.funds,
           broad_region: data.regions,
           deal_type: data.deal_types,
-          as_of_date: yesterday,
+          as_of_date: data.as_of_date_str,
         };
 
         setSelectedFilters(allFilters);
@@ -108,14 +90,14 @@ const DashboardFilter: React.FC = () => {
         : filterOptions?.deal_types || [];
 
     if (value.includes('All')) {
-      const alreadySelectedAll = selectedFilters[field].length === allValues.length;
+      const alreadySelectedAll = selectedFilters?.[field].length === allValues.length;
       setSelectedFilters({
-        ...selectedFilters,
+        ...selectedFilters!,
         [field]: alreadySelectedAll ? [] : allValues,
       });
     } else {
       setSelectedFilters({
-        ...selectedFilters,
+        ...selectedFilters!,
         [field]: value,
       });
     }
@@ -123,17 +105,17 @@ const DashboardFilter: React.FC = () => {
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFilters({
-      ...selectedFilters,
+      ...selectedFilters!,
       as_of_date: e.target.value,
     });
   };
 
   const handleApplyFilters = () => {
     const filtersForPayload: Filters = {
-      funds: selectedFilters.funds,
-      broad_region: selectedFilters.broad_region,
-      deal_type: selectedFilters.deal_type,
-      as_of_date: selectedFilters.as_of_date,
+      funds: selectedFilters?.funds || [],
+      broad_region: selectedFilters?.broad_region || [],
+      deal_type: selectedFilters?.deal_type || [],
+      as_of_date: selectedFilters?.as_of_date || '',
     };
 
     setAppliedFilters(filtersForPayload);
@@ -143,31 +125,32 @@ const DashboardFilter: React.FC = () => {
   const handleResetFilters = () => {
     if (!filterOptions) return;
 
-    const yesterday = getYesterdayDate();
     const allFilters: Filters = {
       funds: filterOptions.funds,
       broad_region: filterOptions.regions,
       deal_type: filterOptions.deal_types,
-      as_of_date: yesterday,
+      as_of_date: filterOptions.as_of_date_str, 
     };
 
     setSelectedFilters(allFilters);
+    setAppliedFilters(allFilters);
   };
 
   return (
     <Container sx={{ paddingTop: 2 }}>
-      {filterOptions ? (
+      {filterOptions && selectedFilters ? (
         <Card sx={{ m: 2, p: 2 }}>
- <Typography
-      variant="h5"
-      align="center"
-      style={{ color: '#002060' ,marginBottom: '16px'}}
-    >
-      Dashboard Filters
-    </Typography>          <Grid container spacing={3}>
+          <Typography
+            variant="h5"
+            align="center"
+            style={{ color: '#002060', marginBottom: '16px' }}
+          >
+            Dashboard Filters
+          </Typography>
+          <Grid container spacing={3}>
             {/* Fund Dropdown */}
             <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth variant="outlined" size="small">
+              <FormControl fullWidth variant="outlined" size="small">
                 <InputLabel>Fund</InputLabel>
                 <Select
                   multiple
@@ -196,7 +179,7 @@ const DashboardFilter: React.FC = () => {
 
             {/* Region Dropdown */}
             <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth variant="outlined" size="small">
+              <FormControl fullWidth variant="outlined" size="small">
                 <InputLabel>Region</InputLabel>
                 <Select
                   multiple
@@ -225,7 +208,7 @@ const DashboardFilter: React.FC = () => {
 
             {/* Deal Type Dropdown */}
             <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth variant="outlined" size="small">
+              <FormControl fullWidth variant="outlined" size="small">
                 <InputLabel>Deal Type</InputLabel>
                 <Select
                   multiple
@@ -273,7 +256,7 @@ const DashboardFilter: React.FC = () => {
                   <Button
                     variant="contained"
                     onClick={handleApplyFilters}
-                    sx={{bgcolor:"#002060"}}
+                    sx={{ bgcolor: "#002060" }}
                   >
                     Apply
                   </Button>
@@ -296,7 +279,7 @@ const DashboardFilter: React.FC = () => {
       )}
 
       {/* Pass applied filters to DashboardAttribution */}
-      <DashboardAttribution selectedFilters={appliedFilters} />
+      <DashboardAttribution selectedFilters={appliedFilters || { funds: [], broad_region: [], deal_type: [], as_of_date: '' }} />
     </Container>
   );
 };
