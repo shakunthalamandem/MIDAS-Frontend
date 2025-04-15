@@ -22,21 +22,50 @@ const TwoWeekDealData: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
-  const [selectedWeeks, setSelectedWeeks] = useState<number[]>([]); // Changed to an array for multi-select
+  const [selectedWeeks, setSelectedWeeks] = useState<number[]>([]); 
   const [regions, setRegions] = useState<string[]>([]);
   const [dealTypes, setDealTypes] = useState<string[]>([]);
+  const [weeks, setWeeks] = useState<number[]>([]);
 
-  const weeks = [ 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14];
-
-  // Store applied filters separately
   const [appliedRegions, setAppliedRegions] = useState<string[]>([]);
   const [appliedDealTypes, setAppliedDealTypes] = useState<string[]>([]);
-  const [appliedWeeks, setAppliedWeeks] = useState<number[]>([]); // Changed to handle multiple weeks
+  const [appliedWeeks, setAppliedWeeks] = useState<number[]>([]); 
 
-  // Fetch data on mount and when the "Apply" button is clicked
   useEffect(() => {
+    fetchFilters();
     fetchData();
-  }, [appliedRegions, appliedDealTypes, appliedWeeks]); // Fetch only when "Apply" is clicked
+  }, [appliedRegions, appliedDealTypes, appliedWeeks]);
+
+  const fetchFilters = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      if (!apiUrl) {
+        throw new Error("API URL is not defined in environment variables");
+      }
+
+      const response = await fetch(`${apiUrl}/api/weekly_stat_filters/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setDealTypes(result.deal_type || []);
+        setRegions(result.broad_region || []);
+        setWeeks(result.week.map((w: string) => parseInt(w.replace("Week ", ""))));
+      } else {
+        throw new Error("Failed to fetch filters");
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred while fetching data");
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -69,16 +98,6 @@ const TwoWeekDealData: React.FC = () => {
 
       if (response.ok) {
         setData(result);
-        setRegions(Object.keys(result));
-
-        setDealTypes(
-          Object.keys(result[Object.keys(result)[0]]).filter(
-            (type) => type !== "TOTAL"
-          )
-        );
-        setRegions(
-          Object.keys(result).filter((region) => region !== "SUMMARY")
-        );
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -103,7 +122,7 @@ const TwoWeekDealData: React.FC = () => {
     setAppliedDealTypes([]);
     setAppliedWeeks([]);
   };
-
+console.log("data",appliedRegions)
   // Function to format multi-select display
   const formatMultiSelect = (selected: string[] | number[]) => {
     if (selected.length === 0) return "None";
@@ -116,7 +135,7 @@ const TwoWeekDealData: React.FC = () => {
       <Card sx={{ boxShadow: 3, p: 3, mb: 2 }}>
         <Card sx={{ p: 1, mb: 2 }}>
           <Typography variant="h5" color="#002060" align="center" gutterBottom>
-           2025 Weekly Deal Filters
+            2025 Weekly Deal Filters
           </Typography>
           <Box
             display="flex"
@@ -125,12 +144,7 @@ const TwoWeekDealData: React.FC = () => {
             justifyContent="center"
             alignItems="center"
           >
-            <Grid
-              container
-              spacing={2}
-              justifyContent="center"
-              alignItems="center"
-            >
+            <Grid container spacing={2} justifyContent="center" alignItems="center">
               {/* Deal Type Filter */}
               <Grid item>
                 <FormControl
@@ -151,17 +165,12 @@ const TwoWeekDealData: React.FC = () => {
                     }
                     renderValue={(selected) => formatMultiSelect(selected)}
                   >
-                    {/* Static options */}
-                    <MenuItem key="IPO" value="IPO">
-                      <Checkbox checked={selectedDealTypes.includes("IPO")} />
-                      <ListItemText primary="IPO" />
-                    </MenuItem>
-                    <MenuItem key="FO" value="FO">
-                      <Checkbox checked={selectedDealTypes.includes("FO")} />
-                      <ListItemText primary="FO" />
-                    </MenuItem>
-
-                    {/* Dynamic options from API */}
+                    {dealTypes.map((type) => (
+                      <MenuItem key={type} value={type}>
+                        <Checkbox checked={selectedDealTypes.includes(type)} />
+                        <ListItemText primary={type} />
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -184,27 +193,12 @@ const TwoWeekDealData: React.FC = () => {
                     input={<OutlinedInput label="Region" sx={{ height: 40 }} />}
                     renderValue={(selected) => formatMultiSelect(selected)}
                   >
-                    {/* Static options */}
-                    <MenuItem key="APAC" value="APAC">
-                      <Checkbox checked={selectedRegions.includes("APAC")} />
-                      <ListItemText primary="APAC" />
-                    </MenuItem>
-                    <MenuItem key="EMEA" value="EMEA">
-                      <Checkbox checked={selectedRegions.includes("EMEA")} />
-                      <ListItemText primary="EMEA" />
-                    </MenuItem>
-                    <MenuItem key="US" value="US">
-                      <Checkbox checked={selectedRegions.includes("US")} />
-                      <ListItemText primary="US" />
-                    </MenuItem>
-
-                    {/* Dynamic options from API use when your using dymanic filters  */}
-                    {/* {regions.map((region) => (
-    <MenuItem key={region} value={region}>
-      <Checkbox checked={selectedRegions.includes(region)} />
-      <ListItemText primary={region} />
-    </MenuItem>
-  ))} */}
+                    {regions.map((region) => (
+                      <MenuItem key={region} value={region}>
+                        <Checkbox checked={selectedRegions.includes(region)} />
+                        <ListItemText primary={region} />
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -226,9 +220,17 @@ const TwoWeekDealData: React.FC = () => {
                     }
                     input={<OutlinedInput label="Week" sx={{ height: 40 }} />}
                     renderValue={(selected) => formatMultiSelect(selected)}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}
+
                   >
                     {weeks.map((week) => (
-                      <MenuItem key={week} value={week}  sx={{ height: 35 }}>
+                      <MenuItem key={week} value={week}>
                         <Checkbox checked={selectedWeeks.includes(week)} />
                         <ListItemText primary={`Week ${week}`} />
                       </MenuItem>
