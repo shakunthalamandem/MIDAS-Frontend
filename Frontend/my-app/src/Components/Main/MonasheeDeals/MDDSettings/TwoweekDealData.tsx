@@ -220,6 +220,14 @@ console.log("data",appliedRegions)
                     }
                     input={<OutlinedInput label="Week" sx={{ height: 40 }} />}
                     renderValue={(selected) => formatMultiSelect(selected)}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 300, // Set the dropdown height
+                        },
+                      },
+                    }}
+
                   >
                     {weeks.map((week) => (
                       <MenuItem key={week} value={week}>
