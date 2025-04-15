@@ -22,17 +22,15 @@ const TwoWeekDealData: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
-  const [selectedWeeks, setSelectedWeeks] = useState<number[]>([]); // Changed to an array for multi-select
+  const [selectedWeeks, setSelectedWeeks] = useState<number[]>([]); 
   const [regions, setRegions] = useState<string[]>([]);
   const [dealTypes, setDealTypes] = useState<string[]>([]);
   const [weeks, setWeeks] = useState<number[]>([]);
 
-  // Store applied filters separately
   const [appliedRegions, setAppliedRegions] = useState<string[]>([]);
   const [appliedDealTypes, setAppliedDealTypes] = useState<string[]>([]);
-  const [appliedWeeks, setAppliedWeeks] = useState<number[]>([]); // Changed to handle multiple weeks
+  const [appliedWeeks, setAppliedWeeks] = useState<number[]>([]); 
 
-  // Fetch data on mount and when the "Apply" button is clicked
   useEffect(() => {
     fetchFilters();
   }, []);
