@@ -34,7 +34,7 @@ const TwoWeekDealData: React.FC = () => {
   useEffect(() => {
     fetchFilters();
     fetchData();
-  }, []);
+  }, [appliedRegions, appliedDealTypes, appliedWeeks]);
 
   const fetchFilters = async () => {
     try {
