@@ -33,6 +33,7 @@ const TwoWeekDealData: React.FC = () => {
 
   useEffect(() => {
     fetchFilters();
+    fetchData();
   }, []);
 
   const fetchFilters = async () => {
@@ -121,7 +122,7 @@ const TwoWeekDealData: React.FC = () => {
     setAppliedDealTypes([]);
     setAppliedWeeks([]);
   };
-
+console.log("data",appliedRegions)
   // Function to format multi-select display
   const formatMultiSelect = (selected: string[] | number[]) => {
     if (selected.length === 0) return "None";
