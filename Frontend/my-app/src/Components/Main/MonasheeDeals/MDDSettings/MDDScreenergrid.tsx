@@ -158,7 +158,7 @@ const handleClosePopup = () => {
           }}
         >
           <Link
-            to={`/monasheeperformance/${params.value}`}
+            to={`/equity/monasheeperformance/${params.value}`}
             style={{
               color: "brown",
               fontWeight: "bold",
