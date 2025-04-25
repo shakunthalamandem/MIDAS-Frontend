@@ -265,19 +265,18 @@ const MlEquityMain: React.FC = () => {
             <Grid container spacing={2} mb={4}>
               {fields.map((key, index) => {
                 const label = key.replace(/_/g, " ");
-                let options: string[] | null = null;
+                let options: string[] | { value: string; label: string }[] | null = null;
 
                 if (key === "sponsor_yn_category") options = sponsorOptions;
-                else if (key === "selected_bank_category")
-                  options = bankOptions;
+                else if (key === "selected_bank_category") options = bankOptions;
                 else if (key === "sector_category")
-                  options = sectorOptions.map((option) => option.label);
+                  options = sectorOptions;
 
                 return (
                   <Grid item xs={12} sm={6} md={3} key={key}>
                     <FormControl fullWidth>
-                    {options && <InputLabel>{label}</InputLabel>} 
-                    {options ? (
+                      {options && <InputLabel>{label}</InputLabel>}
+                      {options ? (
                         <Select
                           value={formData[key] ?? ""}
                           onChange={(e) =>
@@ -294,8 +293,8 @@ const MlEquityMain: React.FC = () => {
                           }}
                         >
                           {options.map((option) => (
-                            <MenuItem value={option} key={option}>
-                              {option}
+                            <MenuItem value={typeof option === "string" ? option : option.value} key={typeof option === "string" ? option : option.value}>
+                              {typeof option === "string" ? option : option.label}
                             </MenuItem>
                           ))}
                         </Select>
