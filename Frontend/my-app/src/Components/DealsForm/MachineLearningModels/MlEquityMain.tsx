@@ -112,9 +112,9 @@ const MlEquityMain: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="lg">
       <Box py={5} display="flex" flexDirection="column" alignItems="center">
-        <Typography variant="h4" fontWeight="bold" gutterBottom textAlign="center">
+        <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center" color='#002060'>
           ML Equity Predictor
         </Typography>
 
