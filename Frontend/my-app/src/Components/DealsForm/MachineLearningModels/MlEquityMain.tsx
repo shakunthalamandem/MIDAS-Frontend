@@ -16,7 +16,7 @@ import {
 import axios from "axios";
 
 type DealType = "IPO" | "FO";
-type Region = "US" | "Non-US";
+type Region = "US" | "Non-US " | "APAC" | "EMEA";
 type Target = "T1D" | "T1M";
 
 type FormDataType = {
@@ -218,9 +218,8 @@ const MlEquityMain: React.FC = () => {
                   >
                     <MenuItem value="US">US</MenuItem>
                     <MenuItem value="Non-US">Non-US</MenuItem>
-                    <MenuItem value="Non-US">APAC</MenuItem>
-
-                    <MenuItem value="Non-US">EMEA</MenuItem>
+                    <MenuItem value="APAC">APAC</MenuItem>
+                    <MenuItem value="EMEA">EMEA</MenuItem>
 
                   </Select>
                 </FormControl>
