@@ -22,7 +22,7 @@ const LastThreeDayDeals: React.FC = () => {
       }
 
       try {
-        const response = await axios.get<Deal[]>(`${apiUrl}/api/hihi/`, {
+        const response = await axios.get<Deal[]>(`${apiUrl}/api/prev_day_data/`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },
