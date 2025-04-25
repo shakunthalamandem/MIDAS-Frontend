@@ -220,7 +220,6 @@ const MlEquityMain: React.FC = () => {
                     <MenuItem value="Non-US">Non-US</MenuItem>
                     <MenuItem value="APAC">APAC</MenuItem>
                     <MenuItem value="EMEA">EMEA</MenuItem>
-
                   </Select>
                 </FormControl>
               </Grid>
@@ -268,12 +267,15 @@ const MlEquityMain: React.FC = () => {
             <Grid container spacing={2} mb={4}>
               {fields.map((key, index) => {
                 const label = key.replace(/_/g, " ");
-                let options: string[] | { value: string; label: string }[] | null = null;
+                let options:
+                  | string[]
+                  | { value: string; label: string }[]
+                  | null = null;
 
                 if (key === "sponsor_yn_category") options = sponsorOptions;
-                else if (key === "selected_bank_category") options = bankOptions;
-                else if (key === "sector_category")
-                  options = sectorOptions;
+                else if (key === "selected_bank_category")
+                  options = bankOptions;
+                else if (key === "sector_category") options = sectorOptions;
 
                 return (
                   <Grid item xs={12} sm={6} md={3} key={key}>
@@ -296,8 +298,21 @@ const MlEquityMain: React.FC = () => {
                           }}
                         >
                           {options.map((option) => (
-                            <MenuItem value={typeof option === "string" ? option : option.value} key={typeof option === "string" ? option : option.value}>
-                              {typeof option === "string" ? option : option.label}
+                            <MenuItem
+                              value={
+                                typeof option === "string"
+                                  ? option
+                                  : option.value
+                              }
+                              key={
+                                typeof option === "string"
+                                  ? option
+                                  : option.value
+                              }
+                            >
+                              {typeof option === "string"
+                                ? option
+                                : option.label}
                             </MenuItem>
                           ))}
                         </Select>
@@ -336,16 +351,16 @@ const MlEquityMain: React.FC = () => {
         {result && (
           <Card variant="outlined" sx={{ width: "100%", textAlign: "center" }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom color="#002060">
                 Prediction Result
               </Typography>
-              <Typography>
+              <Typography style={{ display: "inline", marginRight: "10px" }}>
                 <strong>Prediction:</strong> {result.prediction}
               </Typography>
-              <Typography>
+              <Typography style={{ display: "inline", marginRight: "10px" }}>
                 <strong>Lower Bound:</strong> {result.lower_bound}
               </Typography>
-              <Typography>
+              <Typography style={{ display: "inline" }}>
                 <strong>Upper Bound:</strong> {result.upper_bound}
               </Typography>
             </CardContent>
