@@ -354,10 +354,10 @@ const MlEquityMain: React.FC = () => {
               <Typography variant="h6" gutterBottom color="#002060">
                 Prediction Result
               </Typography>
-              <Typography style={{ display: "inline", marginRight: "10px" }}>
+              <Typography style={{ display: "inline", marginRight: "30px" }}>
                 <strong>Prediction:</strong> {result.prediction}
               </Typography>
-              <Typography style={{ display: "inline", marginRight: "10px" }}>
+              <Typography style={{ display: "inline", marginRight: "30px" }}>
                 <strong>Lower Bound:</strong> {result.lower_bound}
               </Typography>
               <Typography style={{ display: "inline" }}>
