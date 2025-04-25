@@ -218,6 +218,10 @@ const MlEquityMain: React.FC = () => {
                   >
                     <MenuItem value="US">US</MenuItem>
                     <MenuItem value="Non-US">Non-US</MenuItem>
+                    <MenuItem value="Non-US">APAC</MenuItem>
+
+                    <MenuItem value="Non-US">EMEA</MenuItem>
+
                   </Select>
                 </FormControl>
               </Grid>
