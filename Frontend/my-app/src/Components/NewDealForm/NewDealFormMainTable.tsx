@@ -30,7 +30,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
             },
           }
         );
-
         console.log('API Response:', response.data);
 
         // Initialize formData with the API response if needed (or set selecteditems directly)
@@ -57,26 +56,33 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem('access_token');
-
+  
       if (!apiUrl) throw new Error('API URL is not defined in environment variables');
-
+      if (!token) throw new Error('Access token is missing');
+  
+      const payload = {
+        ticker: selecteditems.ticker,  // pass ticker separately
+        ...formData,                  // rest of the form data
+      };
+  
       const response = await axios.put(
-        `${apiUrl}/api/equity_deal_form/`,
-        formData, // Send updated form data
+        `${apiUrl}/api/xxx/`,
+        payload,
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-
+  
       console.log('Save API Response:', response.data);
-      setIsEditable(false); // Disable edit mode after save
+      setIsEditable(false);
     } catch (error) {
       console.error('Error saving form:', error);
     }
   };
+  
 
   const renderFormFields = (section: string, sectionData: any) => {
     // Ensure that sectionData is defined before attempting to access its keys

@@ -1,10 +1,10 @@
 import React, { useState, ChangeEvent } from 'react';
-import { Grid, Box, Button, Typography, Snackbar, Alert, Container, FormControl, Card, CardContent, LinearProgress } from '@mui/material';
+import { Grid, Box, Button, Typography, Snackbar, Alert, Container, Card, CardContent, LinearProgress } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from 'axios';
 
 // Type for active upload (either 'market_indices' or 'monashee_deals')
-type UploadType = 'market_indices' | 'monashee_deals' | null;
+type UploadType = 'new_deal' | 'monashee_deals' | null;
 
 const MainUpload: React.FC = () => {
   const [activeUpload, setActiveUpload] = useState<UploadType>(null);
@@ -46,14 +46,11 @@ const MainUpload: React.FC = () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        // onUploadProgress: (progressEvent) => {
-        //   const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-        //   setUploadProgress(progress);
-        // },
+ 
       });
 
       setUploadSuccess(true);
-      setSnackbarMessage(`${activeUpload === 'market_indices' ? 'Market Indices' : 'Monashee Deal Data'} uploaded successfully.`);
+      setSnackbarMessage(`${activeUpload === 'new_deal' ? 'New Deal Data' : 'Monashee Deal Data'} uploaded successfully.`);
       setOpenSnackbar(true);
     } catch (err) {
       console.error('Upload Error:', err);
@@ -73,9 +70,9 @@ const MainUpload: React.FC = () => {
           </Typography>
           <Grid container spacing={2} justifyContent="center">
             <Grid item>
-              {/* <Button variant="contained" color="primary" onClick={() => setActiveUpload('market_indices')}>
-                Upload Market Indices Data
-              </Button> */}
+              <Button variant="contained" color="primary" onClick={() => setActiveUpload('new_deal')}>
+                Upload New Deal Data
+              </Button>
             </Grid>
             <Grid item>
               <Button variant="contained" color="secondary" onClick={() => setActiveUpload('monashee_deals')}>
@@ -91,7 +88,7 @@ const MainUpload: React.FC = () => {
         <Card sx={{ p: 2, boxShadow: 3 }}>
           <CardContent>
             <Typography variant="h6" color="primary" align="center" gutterBottom>
-              {activeUpload === 'market_indices' ? 'Upload Market Indices' : 'Upload Monashee Deal Data'}
+              {activeUpload === 'new_deal' ? 'Upload New Deal Data' : 'Upload Monashee Deal Data'}
             </Typography>
 
             <Box display="flex" justifyContent="center" alignItems="center" gap={2}>

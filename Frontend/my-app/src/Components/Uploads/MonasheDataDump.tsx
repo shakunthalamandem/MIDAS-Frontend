@@ -27,7 +27,7 @@ const MonasheDataDump = () => {
     }
 
     const formData = new FormData();
-    formData.append('file', file); // ✅ Correct key: 'file'
+    formData.append('file', file);
 
     setUploading(true);
     setError('');
@@ -40,9 +40,7 @@ const MonasheDataDump = () => {
         },
       });
 
-      console.log('Response:', response); // ✅ Debugging log
-
-      if (response.status === 200) { // ✅ Changed to 200 OK
+      if (response.status === 200) {
         setUploadSuccess(true);
         setSnackbarMessage('Monashee Deals Data uploaded successfully.');
         setOpenSnackbar(true);
@@ -52,6 +50,46 @@ const MonasheDataDump = () => {
       setError('Failed to upload the file. Please try again.');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const downloadExcelFile = async () => {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      alert("Access token not found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/api/download_deals/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error response:", error);
+        alert("Download failed.");
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "deals_launched_yesterday.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download error:", err);
+      alert("An error occurred while downloading.");
     }
   };
 
@@ -116,6 +154,14 @@ const MonasheDataDump = () => {
         <Grid item>
           <Button onClick={handleSubmit} variant="contained" disabled={uploading}>
             {uploading ? 'Uploading...' : 'Submit'}
+          </Button>
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={2} marginTop={'20px'} justifyContent="center">
+        <Grid item>
+          <Button onClick={downloadExcelFile} variant="contained">
+            Download Excel
           </Button>
         </Grid>
       </Grid>
