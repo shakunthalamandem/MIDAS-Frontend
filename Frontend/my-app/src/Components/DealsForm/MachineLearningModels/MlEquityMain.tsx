@@ -325,6 +325,7 @@ const MlEquityMain: React.FC = () => {
                           }
                           variant="outlined"
                           fullWidth
+                          required
                         />
                       )}
                     </FormControl>
