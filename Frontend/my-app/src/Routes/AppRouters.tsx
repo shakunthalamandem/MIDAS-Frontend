@@ -45,6 +45,7 @@ import MonasheDataDump from "../Components/Uploads/MonasheDataDump";
 
 import MainUpload from "../Components/Uploads/MainUpload";
 import DownloadDeals from "../Components/Uploads/DownloadDeals";
+import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 
 
 
@@ -63,6 +64,8 @@ const AppRouters: React.FC = () => {
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
         <Route path="/equity/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
+        <Route path="/equity/ml_equity" element={<AuthGuard><MlEquityMain /></AuthGuard>} />
+
 
 
 

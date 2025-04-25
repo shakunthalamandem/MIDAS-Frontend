@@ -167,7 +167,7 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
           }}
         >
           <Link
-            to={`/monasheeperformance/${params.value}`}
+            to={`/equity/monasheeperformance/${params.value}`}
             style={{ color: "brown", fontWeight: "bold", paddingLeft: 15, textDecoration: "none" }}
             target="_blank"
           >
