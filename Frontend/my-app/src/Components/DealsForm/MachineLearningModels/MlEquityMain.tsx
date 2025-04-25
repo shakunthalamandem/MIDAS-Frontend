@@ -7,7 +7,7 @@ import axios from 'axios';
 
 type DealType = 'IPO' | 'FO';
 type Region = 'US' | 'Non-US';
-type Target = 'T+1 Month Return' | 'T+1 Day Return';
+type Target = 'T1D' | 'T1M';
 
 type FormDataType = {
   [key: string]: string;
@@ -34,17 +34,56 @@ const FO_FIELDS = [
 ];
 
 const sponsorOptions = ['Y', 'N', '0'];
-const bankOptions = ['Credit Suisse', 'Morgan Stanley', 'Goldman Sachs'];
-const sectorOptions = [
-  'Technology', 'Healthcare', 'Financials', 'Energy', 'Consumer Discretionary',
-  'Consumer Staples', 'Industrials', 'Materials', 'Real Estate', 'Utilities',
-  'Communication Services'
+const bankOptions = [
+  "Barclays",
+  "Goldman Sachs",
+  "Citigroup Global Markets Inc",
+  "Others",
+  "UBS",
+  "Bank of America",
+  "Credit Suisse",
+  "JPMorgan",
+  "No Bank",
+  "Stifel",
+  "Jefferies LLC",
+  "Morgan Stanley",
+  "Deutsche Bank",
+  "Robert W Baird & Co",
+  "William Blair & Co LLC",
+  "RBC Capital Markets",
+  "Needham & Co LLC",
+  "Oppenheimer & Co Inc",
+  "Leerink Partners LLC",
+  "Canaccord Genuity",
+  "Raymond James & Associates Inc",
+  "BMO Capital Markets",
+  "Lazard Capital Markets",
+  "Cowen & Company LLC",
+  "SunTrust Robinson Humphrey Inc",
+  "JMP Securities LLC",
+  "Commerzbank Group",
+  "ABN AMRO Bank",
+  "SG Corporate & Investment Banking",
+  "Nomura Securities Co Ltd",
+  "TD Securities Inc",
+  "CIBC World Markets",
+  "BNP Paribas",
+  "HSBC",
+  "Keefe Bruyette & Woods",
+  "SVB Securities LLC",
+  "Evercore Inc"
 ];
+const sectorOptions = [
+  'sp500_information_technology','sp500_technology', 'sp500_healthcare', 'sp500_financials', 'sp500_energy', 'sp500_consumer_discretionary',
+  'sp500_consumer_staples', 'sp500_industrials', 'sp500_materials', 'sp500_real_estate', 'sp500_utilities', 'sp500_oil_gas', 'sp500_insurance_industry',
+  'sp500_telecom_services'
+];
+									
 
 const MlEquityMain: React.FC = () => {
   const [dealType, setDealType] = useState<DealType>('IPO');
   const [region, setRegion] = useState<Region>('US');
-  const [target, setTarget] = useState<Target>('T+1 Day Return');
+  const [target, setTarget] = useState<Target>('T1D');
   const [formData, setFormData] = useState<FormDataType>({});
   const [result, setResult] = useState<PredictionResult | null>(null);
 
@@ -103,8 +142,8 @@ const MlEquityMain: React.FC = () => {
             <FormControl fullWidth>
               <InputLabel>Target</InputLabel>
               <Select value={target} onChange={e => setTarget(e.target.value as Target)} label="Target">
-                <MenuItem value="T+1 Month Return">T+1 Month Return</MenuItem>
-                <MenuItem value="T+1 Day Return">T+1 Day Return</MenuItem>
+                <MenuItem value="T1M">T+1 Month Return</MenuItem>
+                <MenuItem value="T1D">T+1 Day Return</MenuItem>
               </Select>
             </FormControl>
           </Grid>
