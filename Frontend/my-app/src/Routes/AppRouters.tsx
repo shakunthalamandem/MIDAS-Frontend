@@ -44,6 +44,7 @@ import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 import MonasheDataDump from "../Components/Uploads/MonasheDataDump";
 
 import MainUpload from "../Components/Uploads/MainUpload";
+import DownloadDeals from "../Components/Uploads/DownloadDeals";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 
 
@@ -101,6 +102,7 @@ const AppRouters: React.FC = () => {
           <Route path="by-bank" element={<BankTable selectedFilters={{}} />} />
           <Route path="screener" element={<MDDScreener />} />
         </Route>
+        {/* <Route path="tharun" element={<DownloadDeals />} /> */}
 
 
 
@@ -138,6 +140,14 @@ const AppRouters: React.FC = () => {
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/upp" element={<MainUpload />} />
+
+
+        <Route path="/downloads" element={<AuthGuard><DownloadDeals/></AuthGuard>} />
+
+
+
+
       </Routes>
     </ErrorBoundary>
   );

@@ -3,12 +3,23 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface NewDealFormMainTableProps {
-  selecteditems: any; // Replace 'any' with the appropriate type for 'selecteditems'
+  selecteditems: any;
+}
+
+function flattenObject(obj: any, result: Record<string, any> = {}): Record<string, any> {
+  for (let key in obj) {
+    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+      flattenObject(obj[key], result);
+    } else {
+      result[key] = obj[key];
+    }
+  }
+  return result;
 }
 
 const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selecteditems }) => {
   const [formData, setFormData] = useState<any>({});
-  const [isEditable, setIsEditable] = useState<boolean>(false); // To toggle edit/save mode
+  const [isEditable, setIsEditable] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,7 +30,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         if (!apiUrl) throw new Error('API URL is not defined in environment variables');
         if (!token) throw new Error('Access token is missing');
 
-        // Hit the API with the selecteditems as payload
         const response = await axios.post(
           `${apiUrl}/api/equity_deal_form/`,
           selecteditems,
@@ -30,10 +40,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
             },
           }
         );
-
         console.log('API Response:', response.data);
-
-        // Initialize formData with the API response if needed (or set selecteditems directly)
         setFormData(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -59,90 +66,114 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
       const token = localStorage.getItem('access_token');
 
       if (!apiUrl) throw new Error('API URL is not defined in environment variables');
+      if (!token) throw new Error('Access token is missing');
 
-      const response = await axios.put(
-        `${apiUrl}/api/equity_deal_form/`,
-        formData, // Send updated form data
+      const flattenedData = flattenObject(formData);
+
+      const { company_details, ...payloadData } = flattenedData;
+
+// Sanitize the payload data to ensure no extra spaces and null values
+const sanitizedPayloadData = Object.keys(payloadData).reduce((acc: Record<string, any>, key) => {
+  const value = payloadData[key];
+
+  if (typeof value === "string") {
+    const trimmedValue = value.trim();
+    if (trimmedValue !== "") {
+      acc[key] = trimmedValue; // Add only non-empty strings
+    } else {
+      acc[key] = ""; // Set empty strings to "" instead of null
+    }
+  } else if (value !== null && value !== undefined) {
+    acc[key] = value; // Add non-string values or non-null fields
+  }
+
+  return acc;
+}, {});
+
+
+
+      const payload = {
+        ticker: selecteditems.ticker,
+        ...sanitizedPayloadData  
+      };
+
+      const response = await axios.post(
+        `${apiUrl}/api/get_data/`,
+        payload,
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       console.log('Save API Response:', response.data);
-      setIsEditable(false); // Disable edit mode after save
+      setIsEditable(false);
     } catch (error) {
       console.error('Error saving form:', error);
     }
   };
 
   const renderFormFields = (section: string, sectionData: any) => {
-    // Ensure that sectionData is defined before attempting to access its keys
     if (!sectionData) return null;
 
     const entries = Object.entries(sectionData);
 
-    // Split entries into groups of 3 (3 fields per row)
     const splitEntries = [];
     for (let i = 0; i < entries.length; i += 3) {
-      splitEntries.push(entries.slice(i, i + 3)); // Create groups of 3 fields
+      splitEntries.push(entries.slice(i, i + 3));
     }
 
     return splitEntries.map((pair, index) => (
       <tr key={index}>
         {pair.map(([key, value]) => (
           <td style={{ padding: '8px', width: '33%' }} key={key}>
-          
-          <TextField
-  fullWidth
-  value={value || ''}
-  onChange={(e) => handleInputChange(e, section, key)}
-  label={capitalizeLabel(key)}
-  variant="filled"
-  disabled={!isEditable} // Disable the field when not in edit mode
-  sx={{
-    width: '90%',
-    padding: '10px',
-    height: '40px',
-    display: 'flex',
-    justifyContent: 'center',
-    '& .MuiInput-root': {
-      height: '40px',
-      '&:hover:not(.Mui-disabled):before': {
-        borderBottom: '2px solid #002060', // Change border color on hover
-      },
-      '&.Mui-focused:before': {
-        borderBottom: '2px solid #002060', // Change border color when focused
-      },
-    },
-    '& .MuiInputBase-input': {
-      padding: '10px',
-      fontSize: '15px',
-      color: '#4d4d4d', // Set input text color
-    },
-    '& .MuiInputLabel-root': {
-      color: '#4d4d4d', // Set label color
-    },
-    '& .MuiInputLabel-root.Mui-focused': {
-      color: '#002060', // Label color when focused
-    },
-  }}
-/>
-
-
+            <TextField
+              fullWidth
+              value={value || ''}
+              onChange={(e) => handleInputChange(e, section, key)}
+              label={capitalizeLabel(key)}
+              variant="filled"
+              disabled={!isEditable}
+              sx={{
+                width: '90%',
+                padding: '10px',
+                height: '40px',
+                display: 'flex',
+                justifyContent: 'center',
+                '& .MuiInput-root': {
+                  height: '40px',
+                  '&:hover:not(.Mui-disabled):before': {
+                    borderBottom: '2px solid #002060',
+                  },
+                  '&.Mui-focused:before': {
+                    borderBottom: '2px solid #002060',
+                  },
+                },
+                '& .MuiInputBase-input': {
+                  padding: '10px',
+                  fontSize: '15px',
+                  color: '#4d4d4d',
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#4d4d4d',
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#002060',
+                },
+              }}
+            />
           </td>
         ))}
       </tr>
     ));
   };
 
-  // Function to format the label properly (capitalizing each word and replacing underscores with spaces)
   const capitalizeLabel = (key: string) => {
     return key
-      .replace(/_/g, ' ') // Replace underscores with spaces
-      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
   return (
