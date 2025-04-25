@@ -1,9 +1,23 @@
 import React, { useState, ChangeEvent } from 'react';
-import { Grid, Box, Button, Typography, Snackbar, Alert, Container, Card, CardContent, LinearProgress } from '@mui/material';
+import {
+  Grid,
+  Box,
+  Button,
+  Typography,
+  Snackbar,
+  Alert,
+  Container,
+  Card,
+  CardContent,
+  LinearProgress,
+  Divider,
+} from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from 'axios';
+import DownloadDeals from './DownloadDeals';
+import LastThreeDayDeals from './LastThreeDayDeals';
 
-// Type for active upload (either 'market_indices' or 'monashee_deals')
+// Upload type
 type UploadType = 'new_deal' | 'monashee_deals' | null;
 
 const MainUpload: React.FC = () => {
@@ -46,7 +60,6 @@ const MainUpload: React.FC = () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
- 
       });
 
       setUploadSuccess(true);
@@ -61,82 +74,106 @@ const MainUpload: React.FC = () => {
   };
 
   return (
-    <Container sx={{ marginTop: '40px' }}>
-      {/* Upload Data Button Card */}
-      <Card sx={{ mb: 3, p: 2, boxShadow: 3 }}>
-        <CardContent>
-          <Typography variant="h5" gutterBottom align="center" color="#012d3f">
-            <strong>Upload Data</strong>
-          </Typography>
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item>
-              <Button variant="contained" color="primary" onClick={() => setActiveUpload('new_deal')}>
-                Upload New Deal Data
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button variant="contained" color="secondary" onClick={() => setActiveUpload('monashee_deals')}>
-                Upload Monashee Deal Data
-              </Button>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      {/* Upload Form Card */}
-      {activeUpload && (
-        <Card sx={{ p: 2, boxShadow: 3 }}>
-          <CardContent>
-            <Typography variant="h6" color="primary" align="center" gutterBottom>
-              {activeUpload === 'new_deal' ? 'Upload New Deal Data' : 'Upload Monashee Deal Data'}
-            </Typography>
-
-            <Box display="flex" justifyContent="center" alignItems="center" gap={2}>
-              <CloudUploadIcon color="action" sx={{ fontSize: 50 }} />
-              <input
-                accept=".xlsx, .xls"
-                style={{ display: 'none' }}
-                id={`${activeUpload}-upload-file`}
-                type="file"
-                onChange={handleFileChange}
-              />
-              <label htmlFor={`${activeUpload}-upload-file`}>
-                <Button variant="outlined" component="span" color="primary">
-                  Choose File
-                </Button>
-              </label>
-            </Box>
-
-            {uploadedFileName && (
-              <Typography variant="body2" align="center" sx={{ mt: 1 }}>
-                <strong>Selected File:</strong> {uploadedFileName}
-              </Typography>
-            )}
-            {error && <Typography variant="body2" color="error" align="center">{error}</Typography>}
-
-            <Button onClick={handleUpload} variant="contained" disabled={uploading} color="success" sx={{ mt: 2 }}>
-              {uploading ? 'Uploading...' : 'Submit'}
-            </Button>
-
-            {/* Progress Bar */}
-            {uploading && (
-              <Box sx={{ mt: 2 }}>
-                <LinearProgress variant="determinate" value={uploadProgress} />
-                <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 1 }}>
-                  {/* Upload Progress: {uploadProgress}% */}
+    <Box sx={{ display: 'flex', position: 'relative', width: '100%' }}>
+      {/* Left side: Upload Form */}
+      <Container sx={{ marginTop: '100px', width: '70%' }}>
+        <Grid container spacing={4}>
+          <Grid item xs={12}>
+            <Card sx={{ mb: 3, p: 2, boxShadow: 3 }}>
+              <CardContent>
+                <Typography variant="h5" gutterBottom align="center" color="#012d3f">
+                  <strong>Upload Data</strong>
                 </Typography>
-              </Box>
-            )}
-          </CardContent>
-        </Card>
-      )}
+                <Grid container spacing={2} justifyContent="center">
+                  <Grid item>
+                    <Button variant="contained" color="primary" onClick={() => setActiveUpload('new_deal')}>
+                      Upload New Deal Data
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button variant="contained" color="secondary" onClick={() => setActiveUpload('monashee_deals')}>
+                      Upload Monashee Deal Data
+                    </Button>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
 
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
-        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Container>
+            {activeUpload && (
+              <Card sx={{ p: 2, boxShadow: 3 }}>
+                <CardContent>
+                  <Typography variant="h6" color="primary" align="center" gutterBottom>
+                    {activeUpload === 'new_deal' ? 'Upload New Deal Data' : 'Upload Monashee Deal Data'}
+                  </Typography>
+
+                  <Box display="flex" justifyContent="center" alignItems="center" gap={2}>
+                    <CloudUploadIcon color="action" sx={{ fontSize: 50 }} />
+                    <input
+                      accept=".xlsx, .xls"
+                      style={{ display: 'none' }}
+                      id={`${activeUpload}-upload-file`}
+                      type="file"
+                      onChange={handleFileChange}
+                    />
+                    <label htmlFor={`${activeUpload}-upload-file`}>
+                      <Button variant="outlined" component="span" color="primary">
+                        Choose File
+                      </Button>
+                    </label>
+                  </Box>
+
+                  {uploadedFileName && (
+                    <Typography variant="body2" align="center" sx={{ mt: 1 }}>
+                      <strong>Selected File:</strong> {uploadedFileName}
+                    </Typography>
+                  )}
+                  {error && (
+                    <Typography variant="body2" color="error" align="center">
+                      {error}
+                    </Typography>
+                  )}
+
+                  <Button onClick={handleUpload} variant="contained" disabled={uploading} color="success" sx={{ mt: 2 }}>
+                    {uploading ? 'Uploading...' : 'Submit'}
+                  </Button>
+
+                  {uploading && (
+                    <Box sx={{ mt: 2 }}>
+                      <LinearProgress variant="determinate" value={uploadProgress} />
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </Grid>
+        </Grid>
+
+        <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+          <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Container>
+
+      {/* Vertical Divider */}
+      <Divider orientation="vertical" flexItem sx={{ height: '100vh', borderColor: '#e0e0e0' }} />
+
+      {/* Right side: DownloadDeals component */}
+      <Box
+        sx={{
+          width: '15%',
+          padding: 3,
+          marginTop: '40px',
+          height: '100vh',
+          overflowY: 'auto',
+        }}
+      >
+  
+        <DownloadDeals />
+        <Divider sx={{ margin: '30px 0', color:"red" }} />
+        <LastThreeDayDeals />
+      </Box>
+    </Box>
   );
 };
 

@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { Box, Button, Typography, Container, Card, CardContent, Snackbar, Alert } from "@mui/material";
+import { Button, Typography, Container, Card, CardContent, Snackbar, Alert, Divider } from "@mui/material";
 
 const App: React.FC = () => {
   const [error, setError] = React.useState<string>("");
@@ -53,28 +53,29 @@ const App: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 5 }}>
+    <Container maxWidth="sm" sx={{ }}>
+      <Typography variant="h5" gutterBottom align="center" color="primary">
+                  Download Deals Data
+                </Typography>
       <Card sx={{ p: 3, boxShadow: 3 }}>
+             
         <CardContent>
-          <Typography variant="h5" color="primary" align="center" gutterBottom>
-            Deals Application
+          <Typography variant="body1" color="textSecondary" align="center" gutterBottom>
+            Click the button below to download the latest new deals data from New Deal Form in Excel format.
           </Typography>
-          <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" gap={2}>
-            <Typography variant="body1" color="textSecondary" align="center">
-              Click the button below to download the latest deals data in Excel format.
-            </Typography>
 
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={downloadExcelFile}
-              sx={{ width: "100%", height: "50px", fontSize: "16px" }}
-            >
-              Download Excel
-            </Button>
-          </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={downloadExcelFile}
+            sx={{ width: "100%", height: "50px", fontSize: "16px" }}
+          >
+            Download Excel
+          </Button>
         </CardContent>
       </Card>
+
+      {/* <Divider sx={{ my: 2 }} /> Divider between components */}
 
       <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
         <Alert onClose={() => setOpenSnackbar(false)} severity={error ? "error" : "success"} sx={{ width: "100%" }}>
