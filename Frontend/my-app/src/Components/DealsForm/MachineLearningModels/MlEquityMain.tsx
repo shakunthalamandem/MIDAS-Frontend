@@ -276,8 +276,8 @@ const MlEquityMain: React.FC = () => {
                 return (
                   <Grid item xs={12} sm={6} md={3} key={key}>
                     <FormControl fullWidth>
-                      <InputLabel>{label}</InputLabel>
-                      {options ? (
+                    {options && <InputLabel>{label}</InputLabel>} 
+                    {options ? (
                         <Select
                           value={formData[key] ?? ""}
                           onChange={(e) =>
