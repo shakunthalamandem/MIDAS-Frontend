@@ -217,8 +217,8 @@ const MlEquityMain: React.FC = () => {
                     label="Region"
                   >
                     <MenuItem value="US">US</MenuItem>
-                    {/* <MenuItem value="Non-US">Non-US</MenuItem>
-                    <MenuItem value="APAC">APAC</MenuItem> */}
+                    <MenuItem value="Non-US">Non-US</MenuItem>
+                    <MenuItem value="APAC">APAC</MenuItem>
                     <MenuItem value="EMEA">EMEA</MenuItem>
                   </Select>
                 </FormControl>
