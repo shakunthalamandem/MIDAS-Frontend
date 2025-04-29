@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Box,
-  Grid,
   Table,
   TableBody,
   TableCell,
@@ -13,6 +12,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  TextField,
 } from "@mui/material";
 
 type DealType = "IPO" | "FO";
@@ -29,7 +29,7 @@ interface FormComponentProps {
   setTarget: React.Dispatch<React.SetStateAction<Target>>;
   formData: FormDataType;
   setFormData: React.Dispatch<React.SetStateAction<FormDataType>>;
-  fields: string[];
+  fields: string[]; // Changed to string[] since keys are strings
 }
 
 const FormComponent: React.FC<FormComponentProps> = ({
@@ -43,21 +43,22 @@ const FormComponent: React.FC<FormComponentProps> = ({
   setFormData,
   fields,
 }) => {
-  const formatTableData = () => {
-    const tableData = [
-      { label: "Deal Type", value: dealType },
-      { label: "Region", value: region },
-      { label: "Target", value: target },
-      ...fields.map((key) => ({
-        label: key.replace(/_/g, " "),
-        value: formData[key] ?? "",
-      })),
-    ];
-    return tableData;
+  const handleInputChange = (key: string, value: string) => {
+    const updatedValue = isNaN(Number(value)) ? value : String(Number(value));
+    setFormData({ ...formData, [key]: updatedValue });
   };
 
-  const handleInputChange = (key: string, value: string) => {
-    setFormData({ ...formData, [key]: value });
+  const formatTableData = () => {
+    return [
+      { label: "Deal Type", key: "dealType", value: dealType },
+      { label: "Region", key: "region", value: region },
+      { label: "Target", key: "target", value: target },
+      ...fields.map((key) => ({
+        label: isNaN(Number(key)) ? key : key,
+        key,
+        value: formData[key] ?? "0", // Ensure it defaults to "0" as a string if not present
+      })),
+    ];
   };
 
   return (
@@ -66,7 +67,6 @@ const FormComponent: React.FC<FormComponentProps> = ({
         <Table>
           <TableBody>
             <TableRow>
-              {/* Left Column */}
               <TableCell sx={{ width: "50%", padding: 0 }}>
                 <Table>
                   <TableBody>
@@ -87,6 +87,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
                               <Select
                                 value={dealType}
                                 onChange={(e) => setDealType(e.target.value as DealType)}
+                                label="Deal Type"
                               >
                                 <MenuItem value="IPO">IPO</MenuItem>
                                 <MenuItem value="FO">FO</MenuItem>
@@ -98,6 +99,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
                               <Select
                                 value={region}
                                 onChange={(e) => setRegion(e.target.value as Region)}
+                                label="Region"
                               >
                                 <MenuItem value="US">US</MenuItem>
                                 <MenuItem value="Non-US">Non-US</MenuItem>
@@ -111,15 +113,19 @@ const FormComponent: React.FC<FormComponentProps> = ({
                               <Select
                                 value={target}
                                 onChange={(e) => setTarget(e.target.value as Target)}
+                                label="Target"
                               >
                                 <MenuItem value="T1D">T+1 Day Return</MenuItem>
                                 <MenuItem value="T1M">T+1 Month Return</MenuItem>
                               </Select>
                             </FormControl>
                           ) : (
-                            <input
-                              value={formData[item.label] || ""}
-                              onChange={(e) => handleInputChange(item.label, e.target.value)}
+                            <TextField
+                              fullWidth
+                              size="small"
+                              type="number"
+                              value={formData[item.key] || ""}
+                              onChange={(e) => handleInputChange(item.key, e.target.value)}
                               placeholder={item.label}
                             />
                           )}
