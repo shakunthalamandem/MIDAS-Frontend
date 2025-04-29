@@ -148,11 +148,11 @@ const MlEquityMain: React.FC = () => {
             target={target}
             setTarget={setTarget}
             formData={formData}
-            setFormData={setFormData}
+            // setFormData={setFormData}
             fields={fields}
-            sponsorOptions={sponsorOptions}
-            bankOptions={bankOptions}
-            sectorOptions={sectorOptions}
+            // sponsorOptions={sponsorOptions}
+            // bankOptions={bankOptions}
+            // sectorOptions={sectorOptions}
           />
         </Card>
 
