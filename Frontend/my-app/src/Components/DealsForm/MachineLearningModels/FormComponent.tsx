@@ -49,7 +49,7 @@ const sectorOptions = [
 ];
 
 const bankOptions = ["Goldman Sachs", "Morgan Stanley", "JPMorgan", "Citigroup", "Barclays"];
-const sponsorOptions = ["Yes", "No"];
+const sponsor_yn_categoryOptions = ["Y", "N","0"];
 
 const FormComponent: React.FC<FormComponentProps> = ({
   dealType,
@@ -103,12 +103,12 @@ const FormComponent: React.FC<FormComponentProps> = ({
       );
     }
 
-    if (item.key === "selected_bank") {
+    if (item.key === "selected_bank_category") {
       return (
         <FormControl fullWidth size="small">
           <Select
-            value={formData["selected_bank"] || ""}
-            onChange={(e) => handleInputChange("selected_bank", e.target.value)}
+            value={formData["selected_bank_category"] || ""}
+            onChange={(e) => handleInputChange("selected_bank_category", e.target.value)}
           >
             {bankOptions.map((bank) => (
               <MenuItem key={bank} value={bank}>
@@ -120,14 +120,14 @@ const FormComponent: React.FC<FormComponentProps> = ({
       );
     }
 
-    if (item.key === "sponsor") {
+    if (item.key === "sponsor_yn_category") {
       return (
         <FormControl fullWidth size="small">
           <Select
-            value={formData["sponsor"] || ""}
-            onChange={(e) => handleInputChange("sponsor", e.target.value)}
+            value={formData["sponsor_yn_category"] || ""}
+            onChange={(e) => handleInputChange("sponsor_yn_category", e.target.value)}
           >
-            {sponsorOptions.map((option) => (
+            {sponsor_yn_categoryOptions.map((option) => (
               <MenuItem key={option} value={option}>
                 {option}
               </MenuItem>
@@ -137,12 +137,12 @@ const FormComponent: React.FC<FormComponentProps> = ({
       );
     }
 
-    if (item.key === "sector") {
+    if (item.key === "sector_category") {
       return (
         <FormControl fullWidth size="small">
           <Select
-            value={formData["sector"] || ""}
-            onChange={(e) => handleInputChange("sector", e.target.value)}
+            value={formData["sector_category"] || ""}
+            onChange={(e) => handleInputChange("sector_category", e.target.value)}
           >
             {sectorOptions.map((sector) => (
               <MenuItem key={sector.value} value={sector.value}>
@@ -171,9 +171,9 @@ const FormComponent: React.FC<FormComponentProps> = ({
       { label: "Deal Type", key: "dealType" },
       { label: "Region", key: "region" },
       { label: "Target", key: "target" },
-      { label: "Selected Bank", key: "selected_bank" },
-      { label: "Sponsor", key: "sponsor" },
-      { label: "Sector", key: "sector" },
+      { label: "Selected Bank", key: "selected_bank_category" },
+      { label: "sponsor_yn_category", key: "sponsor_yn_category" },
+      { label: "Sector", key: "sector_category" },
       ...fields.map((key) => ({ label: key, key })),
     ];
   };

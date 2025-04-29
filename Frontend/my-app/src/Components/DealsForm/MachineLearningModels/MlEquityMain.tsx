@@ -25,8 +25,7 @@ const IPO_FIELDS = [
   "allocation_price_category",
   "allocated_shares_category",
   "subscription_bid_shares_category",
-  "total_shares_offered_category",
-  "selected_bank_category",
+  "total_shares_offered_category"
 ];
 
 const FO_FIELDS = [
