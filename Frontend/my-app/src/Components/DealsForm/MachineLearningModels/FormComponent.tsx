@@ -49,7 +49,24 @@ const sectorOptions = [
 ];
 
 const bankOptions = ["Goldman Sachs", "Morgan Stanley", "JPMorgan", "Citigroup", "Barclays"];
-const sponsor_yn_categoryOptions = ["Y", "N","0"];
+const sponsor_yn_categoryOptions = ["Y", "N", "0"];
+
+const labelMappings: Record<string, string> = {
+  deal_size_category: "Deal Size",
+  percentage_primary_category: "Percentage Primary",
+  allocation_deal_size_percentage_category: "Allocation Deal Size %",
+  allocation_percentage_category: "Allocation %",
+  issue_offer_price_category: "Issue Offer Price",
+  number_of_shares_offered_category: "Number of Shares Offered",
+  allocation_price_category: "Allocation Price",
+  allocated_shares_category: "Allocated Shares",
+  subscription_bid_shares_category: "Subscription Bid Shares",
+  total_shares_offered_category: "Total Shares Offered",
+  discount_from_announcement_price_category: "Discount From Announcement Price",
+  selected_bank_category: "Selected Bank",
+  sponsor_yn_category: "Sponsor (Y/N)",
+  sector_category: "Sector",
+};
 
 const FormComponent: React.FC<FormComponentProps> = ({
   dealType,
@@ -68,102 +85,93 @@ const FormComponent: React.FC<FormComponentProps> = ({
   };
 
   const renderInputField = (item: { key: string; label: string }) => {
-    if (item.key === "dealType") {
-      return (
-        <FormControl fullWidth size="small">
-          <Select value={dealType} onChange={(e) => setDealType(e.target.value as DealType)}>
-            <MenuItem value="IPO">IPO</MenuItem>
-            <MenuItem value="FO">FO</MenuItem>
-          </Select>
-        </FormControl>
-      );
+    switch (item.key) {
+      case "dealType":
+        return (
+          <FormControl fullWidth size="small">
+            <Select value={dealType} onChange={(e) => setDealType(e.target.value as DealType)}>
+              <MenuItem value="IPO">IPO</MenuItem>
+              <MenuItem value="FO">FO</MenuItem>
+            </Select>
+          </FormControl>
+        );
+      case "region":
+        return (
+          <FormControl fullWidth size="small">
+            <Select value={region} onChange={(e) => setRegion(e.target.value as Region)}>
+              <MenuItem value="US">US</MenuItem>
+              <MenuItem value="Non-US">Non-US</MenuItem>
+              <MenuItem value="APAC">APAC</MenuItem>
+              <MenuItem value="EMEA">EMEA</MenuItem>
+            </Select>
+          </FormControl>
+        );
+      case "target":
+        return (
+          <FormControl fullWidth size="small">
+            <Select value={target} onChange={(e) => setTarget(e.target.value as Target)}>
+              <MenuItem value="T1D">T+1 Day Return</MenuItem>
+              <MenuItem value="T1M">T+1 Month Return</MenuItem>
+            </Select>
+          </FormControl>
+        );
+      case "selected_bank_category":
+        return (
+          <FormControl fullWidth size="small">
+            <Select
+              value={formData[item.key] || ""}
+              onChange={(e) => handleInputChange(item.key, e.target.value)}
+            >
+              {bankOptions.map((bank) => (
+                <MenuItem key={bank} value={bank}>
+                  {bank}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      case "sponsor_yn_category":
+        return (
+          <FormControl fullWidth size="small">
+            <Select
+              value={formData[item.key] || ""}
+              onChange={(e) => handleInputChange(item.key, e.target.value)}
+            >
+              {sponsor_yn_categoryOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      case "sector_category":
+        return (
+          <FormControl fullWidth size="small">
+            <Select
+              value={formData[item.key] || ""}
+              onChange={(e) => handleInputChange(item.key, e.target.value)}
+            >
+              {sectorOptions.map((sector) => (
+                <MenuItem key={sector.value} value={sector.value}>
+                  {sector.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      default:
+        return (
+          <TextField
+            fullWidth
+            size="small"
+            type="number"
+            value={formData[item.key] || ""}
+            onChange={(e) => handleInputChange(item.key, e.target.value)}
+            placeholder=""
+          />
+        );
     }
-
-    if (item.key === "region") {
-      return (
-        <FormControl fullWidth size="small">
-          <Select value={region} onChange={(e) => setRegion(e.target.value as Region)}>
-            <MenuItem value="US">US</MenuItem>
-            <MenuItem value="Non-US">Non-US</MenuItem>
-            <MenuItem value="APAC">APAC</MenuItem>
-            <MenuItem value="EMEA">EMEA</MenuItem>
-          </Select>
-        </FormControl>
-      );
-    }
-
-    if (item.key === "target") {
-      return (
-        <FormControl fullWidth size="small">
-          <Select value={target} onChange={(e) => setTarget(e.target.value as Target)}>
-            <MenuItem value="T1D">T+1 Day Return</MenuItem>
-            <MenuItem value="T1M">T+1 Month Return</MenuItem>
-          </Select>
-        </FormControl>
-      );
-    }
-
-    if (item.key === "selected_bank_category") {
-      return (
-        <FormControl fullWidth size="small">
-          <Select
-            value={formData["selected_bank_category"] || ""}
-            onChange={(e) => handleInputChange("selected_bank_category", e.target.value)}
-          >
-            {bankOptions.map((bank) => (
-              <MenuItem key={bank} value={bank}>
-                {bank}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      );
-    }
-
-    if (item.key === "sponsor_yn_category") {
-      return (
-        <FormControl fullWidth size="small">
-          <Select
-            value={formData["sponsor_yn_category"] || ""}
-            onChange={(e) => handleInputChange("sponsor_yn_category", e.target.value)}
-          >
-            {sponsor_yn_categoryOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      );
-    }
-
-    if (item.key === "sector_category") {
-      return (
-        <FormControl fullWidth size="small">
-          <Select
-            value={formData["sector_category"] || ""}
-            onChange={(e) => handleInputChange("sector_category", e.target.value)}
-          >
-            {sectorOptions.map((sector) => (
-              <MenuItem key={sector.value} value={sector.value}>
-                {sector.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      );
-    }
-
-    return (
-      <TextField
-        fullWidth
-        size="small"
-        type="number"
-        value={formData[item.key] || ""}
-        onChange={(e) => handleInputChange(item.key, e.target.value)}
-        placeholder={item.label}
-      />
-    );
   };
 
   const formatTableData = () => {
@@ -171,10 +179,10 @@ const FormComponent: React.FC<FormComponentProps> = ({
       { label: "Deal Type", key: "dealType" },
       { label: "Region", key: "region" },
       { label: "Target", key: "target" },
-      { label: "Selected Bank", key: "selected_bank_category" },
-      { label: "sponsor_yn_category", key: "sponsor_yn_category" },
-      { label: "Sector", key: "sector_category" },
-      ...fields.map((key) => ({ label: key, key })),
+      { label: labelMappings["selected_bank_category"] || "Selected Bank", key: "selected_bank_category" },
+      { label: labelMappings["sponsor_yn_category"] || "Sponsor Y/N", key: "sponsor_yn_category" },
+      { label: labelMappings["sector_category"] || "Sector", key: "sector_category" },
+      ...fields.map((key) => ({ label: labelMappings[key] || key, key })),
     ];
   };
 
@@ -203,7 +211,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
                           <TableRow
                             key={item.key}
                             sx={{
-                              backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#ffffff",
+                              backgroundColor: index % 2 === 0 ? "#d1dbeb" : "#ffffff",
                             }}
                           >
                             <TableCell sx={{ fontSize: "0.875rem", padding: "8px 8px" }}>

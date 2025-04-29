@@ -33,8 +33,7 @@ const FO_FIELDS = [
   "discount_from_announcement_price_category",
   "percentage_primary_category",
   "allocation_deal_size_percentage_category",
-  "allocation_percentage_category",
-  "selected_bank_category",
+  "allocation_percentage_category"
 ];
 
 const MlEquityMain: React.FC = () => {
@@ -68,7 +67,7 @@ const MlEquityMain: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <Box py={5} display="flex" flexDirection="column" alignItems="center">
         <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center" color="#002060">
           ML Equity Predictor
