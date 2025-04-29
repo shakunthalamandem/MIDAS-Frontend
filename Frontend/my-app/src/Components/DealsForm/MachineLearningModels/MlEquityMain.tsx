@@ -1,10 +1,8 @@
-// MlEquityMain.tsx
 import React, { useState } from "react";
 import axios from "axios";
 import { Box, Button, Card, Container, Typography } from "@mui/material";
 import FormComponent from "./FormComponent";
 import PredictionResult from "./PredictionResult";
-
 
 type DealType = "IPO" | "FO";
 type Region = "US" | "Non-US" | "APAC" | "EMEA";
@@ -42,64 +40,6 @@ const FO_FIELDS = [
   "allocation_percentage_category",
   "selected_bank_category",
   "sector_category",
-];
-
-const sponsorOptions = ["Y", "N", "0"];
-const bankOptions = [
-  "Barclays",
-  "Goldman Sachs",
-  "Citigroup Global Markets Inc",
-  "Others",
-  "UBS",
-  "Bank of America",
-  "Credit Suisse",
-  "JPMorgan",
-  "No Bank",
-  "Stifel",
-  "Jefferies LLC",
-  "Morgan Stanley",
-  "Deutsche Bank",
-  "Robert W Baird & Co",
-  "William Blair & Co LLC",
-  "RBC Capital Markets",
-  "Needham & Co LLC",
-  "Oppenheimer & Co Inc",
-  "Leerink Partners LLC",
-  "Canaccord Genuity",
-  "Raymond James & Associates Inc",
-  "BMO Capital Markets",
-  "Lazard Capital Markets",
-  "Cowen & Company LLC",
-  "SunTrust Robinson Humphrey Inc",
-  "JMP Securities LLC",
-  "Commerzbank Group",
-  "ABN AMRO Bank",
-  "SG Corporate & Investment Banking",
-  "Nomura Securities Co Ltd",
-  "TD Securities Inc",
-  "CIBC World Markets",
-  "BNP Paribas",
-  "HSBC",
-  "Keefe Bruyette & Woods",
-  "SVB Securities LLC",
-  "Evercore Inc",
-];
-
-const sectorOptions = [
-  { value: "sp500_information_technology", label: "Information Technology" },
-  { value: "sp500_technology", label: "Technology" },
-  { value: "sp500_healthcare", label: "Healthcare" },
-  { value: "sp500_financials", label: "Financials" },
-  { value: "sp500_energy", label: "Energy" },
-  { value: "sp500_consumer_discretionary", label: "Consumer Discretionary" },
-  { value: "sp500_consumer_staples", label: "Consumer Staples" },
-  { value: "sp500_industrials", label: "Industrials" },
-  { value: "sp500_materials", label: "Materials" },
-  { value: "sp500_real_estate", label: "Real Estate" },
-  { value: "sp500_utilities", label: "Utilities" },
-  { value: "sp500_oil_gas", label: "Oil & Gas" },
-  { value: "sp500_insurance_industry", label: "Insurance Industry" },
-  { value: "sp500_telecom_services", label: "Telecom Services" },
 ];
 
 const MlEquityMain: React.FC = () => {
@@ -148,11 +88,8 @@ const MlEquityMain: React.FC = () => {
             target={target}
             setTarget={setTarget}
             formData={formData}
-            // setFormData={setFormData}
+            setFormData={setFormData}
             fields={fields}
-            // sponsorOptions={sponsorOptions}
-            // bankOptions={bankOptions}
-            // sectorOptions={sectorOptions}
           />
         </Card>
 
