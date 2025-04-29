@@ -80,8 +80,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
   fields,
 }) => {
   const handleInputChange = (key: string, value: string) => {
-    const updatedValue = isNaN(Number(value)) ? value : String(Number(value));
-    setFormData({ ...formData, [key]: updatedValue });
+    setFormData({ ...formData, [key]: value });
   };
 
   const renderInputField = (item: { key: string; label: string }) => {
@@ -166,6 +165,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
             fullWidth
             size="small"
             type="number"
+            inputProps={{ step: "any" }}
             value={formData[item.key] || ""}
             onChange={(e) => handleInputChange(item.key, e.target.value)}
             placeholder=""
@@ -211,7 +211,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
                           <TableRow
                             key={item.key}
                             sx={{
-                              backgroundColor: index % 2 === 0 ? "#d1dbeb" : "#ffffff",
+                              backgroundColor: index % 2 === 0 ? "#fff7f7" : "#ffffff",
                             }}
                           >
                             <TableCell sx={{ fontSize: "0.875rem", padding: "8px 8px" }}>
