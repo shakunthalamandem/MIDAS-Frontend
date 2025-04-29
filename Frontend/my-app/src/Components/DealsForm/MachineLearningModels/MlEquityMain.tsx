@@ -27,19 +27,15 @@ const IPO_FIELDS = [
   "subscription_bid_shares_category",
   "total_shares_offered_category",
   "selected_bank_category",
-  "sponsor_yn_category",
-  "sector_category",
 ];
 
 const FO_FIELDS = [
   "deal_size_category",
-  "sponsor_yn_category",
   "discount_from_announcement_price_category",
   "percentage_primary_category",
   "allocation_deal_size_percentage_category",
   "allocation_percentage_category",
   "selected_bank_category",
-  "sector_category",
 ];
 
 const MlEquityMain: React.FC = () => {
