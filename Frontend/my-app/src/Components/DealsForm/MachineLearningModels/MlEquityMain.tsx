@@ -1,28 +1,16 @@
+// MlEquityMain.tsx
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-  Grid,
-  Container,
-} from "@mui/material";
 import axios from "axios";
+import { Box, Button, Card, Container, Typography } from "@mui/material";
+import FormComponent from "./FormComponent";
+import PredictionResult from "./PredictionResult";
+
 
 type DealType = "IPO" | "FO";
-type Region = "US" | "Non-US " | "APAC" | "EMEA";
+type Region = "US" | "Non-US" | "APAC" | "EMEA";
 type Target = "T1D" | "T1M";
 
-type FormDataType = {
-  [key: string]: string;
-};
-
+type FormDataType = { [key: string]: string };
 type PredictionResult = {
   prediction: string;
   lower_bound: string;
@@ -123,10 +111,6 @@ const MlEquityMain: React.FC = () => {
 
   const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
 
-  const handleInputChange = (key: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
-
   const handlePredict = async () => {
     try {
       const payload = {
@@ -151,222 +135,34 @@ const MlEquityMain: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Box py={5} display="flex" flexDirection="column" alignItems="center">
-        <Typography
-          variant="h5"
-          fontWeight="bold"
-          gutterBottom
-          textAlign="center"
-          color="#002060"
-        >
+        <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center" color="#002060">
           ML Equity Predictor
         </Typography>
-        <Card
-          sx={{
-            margin: "0 auto",
-            width: "100%",
-            padding: 2,
-            boxShadow: 3,
-            borderRadius: 2,
-            marginBottom: 4,
-          }}
-        >
-          <CardContent>
-            <Grid container spacing={2}>
-              {/* Deal Type */}
-              <Grid item xs={12} sm={3}>
-                <FormControl
-                  sx={{
-                    "& .MuiInputBase-root": {
-                      height: 40,
-                      width: "200px",
-                    },
-                    "& .MuiInputLabel-root": {
-                      top: -5,
-                    },
-                  }}
-                >
-                  <InputLabel>Deal Type</InputLabel>
-                  <Select
-                    value={dealType}
-                    onChange={(e) => setDealType(e.target.value as DealType)}
-                    label="Deal Type"
-                  >
-                    <MenuItem value="IPO">IPO</MenuItem>
-                    <MenuItem value="FO">FO</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
 
-              {/* Region */}
-              <Grid item xs={12} sm={3}>
-                <FormControl
-                  sx={{
-                    "& .MuiInputBase-root": {
-                      height: 40,
-                      width: "200px",
-                    },
-                    "& .MuiInputLabel-root": {
-                      top: -5,
-                    },
-                  }}
-                >
-                  <InputLabel>Region</InputLabel>
-                  <Select
-                    value={region}
-                    onChange={(e) => setRegion(e.target.value as Region)}
-                    label="Region"
-                  >
-                    <MenuItem value="US">US</MenuItem>
-                    <MenuItem value="Non-US">Non-US</MenuItem>
-                    <MenuItem value="APAC">APAC</MenuItem>
-                    <MenuItem value="EMEA">EMEA</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              {/* Target */}
-              <Grid item xs={12} sm={3}>
-                <FormControl
-                  sx={{
-                    "& .MuiInputBase-root": {
-                      height: 40,
-                      width: "200px",
-                    },
-                    "& .MuiInputLabel-root": {
-                      top: -5,
-                    },
-                  }}
-                >
-                  <InputLabel>Target</InputLabel>
-                  <Select
-                    value={target}
-                    onChange={(e) => setTarget(e.target.value as Target)}
-                    label="Target"
-                  >
-                    <MenuItem value="T1M">T+1 Month Return</MenuItem>
-                    <MenuItem value="T1D">T+1 Day Return</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </CardContent>
+        <Card sx={{ margin: "0 auto", width: "100%", padding: 2, boxShadow: 3, borderRadius: 2, marginBottom: 4 }}>
+          <FormComponent
+            dealType={dealType}
+            setDealType={setDealType}
+            region={region}
+            setRegion={setRegion}
+            target={target}
+            setTarget={setTarget}
+            formData={formData}
+            setFormData={setFormData}
+            fields={fields}
+            sponsorOptions={sponsorOptions}
+            bankOptions={bankOptions}
+            sectorOptions={sectorOptions}
+          />
         </Card>
 
-        {/* Form Inputs (4 items per row) */}
-        <Card
-          sx={{
-            margin: "0 auto",
-            width: "100%",
-            padding: 2,
-            boxShadow: 3,
-            borderRadius: 2,
-            marginBottom: 4,
-          }}
-        >
-          <CardContent>
-            <Grid container spacing={2} mb={4}>
-              {fields.map((key, index) => {
-                const label = key.replace(/_/g, " ");
-                let options:
-                  | string[]
-                  | { value: string; label: string }[]
-                  | null = null;
-
-                if (key === "sponsor_yn_category") options = sponsorOptions;
-                else if (key === "selected_bank_category")
-                  options = bankOptions;
-                else if (key === "sector_category") options = sectorOptions;
-
-                return (
-                  <Grid item xs={12} sm={6} md={3} key={key}>
-                    <FormControl fullWidth>
-                      {options && <InputLabel>{label}</InputLabel>}
-                      {options ? (
-                        <Select
-                          value={formData[key] ?? ""}
-                          onChange={(e) =>
-                            handleInputChange(key, e.target.value)
-                          }
-                          label={label}
-                          MenuProps={{
-                            PaperProps: {
-                              style: {
-                                maxHeight: 200,
-                                overflowY: "auto",
-                              },
-                            },
-                          }}
-                        >
-                          {options.map((option) => (
-                            <MenuItem
-                              value={
-                                typeof option === "string"
-                                  ? option
-                                  : option.value
-                              }
-                              key={
-                                typeof option === "string"
-                                  ? option
-                                  : option.value
-                              }
-                            >
-                              {typeof option === "string"
-                                ? option
-                                : option.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      ) : (
-                        <TextField
-                          label={label}
-                          value={formData[key] ?? ""}
-                          onChange={(e) =>
-                            handleInputChange(key, e.target.value)
-                          }
-                          variant="outlined"
-                          fullWidth
-                          required
-                        />
-                      )}
-                    </FormControl>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </CardContent>
-        </Card>
-
-        {/* Predict Button */}
         <Box mb={4}>
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: "#002060" }}
-            onClick={handlePredict}
-            size="large"
-          >
+          <Button variant="contained" sx={{ backgroundColor: "#002060" }} onClick={handlePredict} size="large">
             Predict
           </Button>
         </Box>
 
-        {/* Result */}
-        {result && (
-          <Card variant="outlined" sx={{ width: "100%", textAlign: "center" }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom color="#002060">
-                Prediction Result
-              </Typography>
-              <Typography style={{ display: "inline", marginRight: "30px" }}>
-                <strong>Prediction:</strong> {result.prediction}
-              </Typography>
-              <Typography style={{ display: "inline", marginRight: "30px" }}>
-                <strong>Lower Bound:</strong> {result.lower_bound}
-              </Typography>
-              <Typography style={{ display: "inline" }}>
-                <strong>Upper Bound:</strong> {result.upper_bound}
-              </Typography>
-            </CardContent>
-          </Card>
-        )}
+        {result && <PredictionResult result={result} />}
       </Box>
     </Container>
   );
