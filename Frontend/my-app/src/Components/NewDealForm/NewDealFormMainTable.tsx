@@ -1,6 +1,26 @@
-import { Box, Typography, TextField, Button } from '@mui/material';
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Container,
+  Card,
+  CardContent,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  MenuItem,
+  Select,
+  InputAdornment,
+} from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { SelectChangeEvent } from '@mui/material/Select';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'; // Import DatePicker from MUI
 
 interface NewDealFormMainTableProps {
   selecteditems: any;
@@ -17,9 +37,21 @@ function flattenObject(obj: any, result: Record<string, any> = {}): Record<strin
   return result;
 }
 
+const dropdownOptions: Record<string, string[]> = {
+  region: ['US', 'EMEA', 'APAC', 'non-US America'],
+  deal_type: ['IPO', 'FO'],
+  fo_type: ['Marketed', 'Overnight', 'Block'],
+  sector: ['Technology', 'Healthcare', 'Finance', 'Energy'], // Example values
+  deal_captain: ['John Doe', 'Jane Smith', 'Alice Johnson'], // Example values
+};
 const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selecteditems }) => {
   const [formData, setFormData] = useState<any>({});
   const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+
+  const dateFields = [
+    "launch_date", "trade_date", "settlement_date", "next_results_date", "pricing_date"
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +72,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
             },
           }
         );
-        console.log('API Response:', response.data);
         setFormData(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -51,12 +82,18 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   }, [selecteditems]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<any> | SelectChangeEvent<any>,
     section: string,
     key: string
   ) => {
     const updatedFormData = { ...formData };
     updatedFormData[section][key] = e.target.value;
+    setFormData(updatedFormData);
+  };
+
+  const handleDateChange = (date: any, section: string, key: string) => {
+    const updatedFormData = { ...formData };
+    updatedFormData[section][key] = date;
     setFormData(updatedFormData);
   };
 
@@ -69,36 +106,26 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
       if (!token) throw new Error('Access token is missing');
 
       const flattenedData = flattenObject(formData);
-
       const { company_details, ...payloadData } = flattenedData;
 
-// Sanitize the payload data to ensure no extra spaces and null values
-const sanitizedPayloadData = Object.keys(payloadData).reduce((acc: Record<string, any>, key) => {
-  const value = payloadData[key];
-
-  if (typeof value === "string") {
-    const trimmedValue = value.trim();
-    if (trimmedValue !== "") {
-      acc[key] = trimmedValue; // Add only non-empty strings
-    } else {
-      acc[key] = ""; // Set empty strings to "" instead of null
-    }
-  } else if (value !== null && value !== undefined) {
-    acc[key] = value; // Add non-string values or non-null fields
-  }
-
-  return acc;
-}, {});
-
-
+      const sanitizedPayloadData = Object.keys(payloadData).reduce((acc: Record<string, any>, key) => {
+        const value = payloadData[key];
+        if (typeof value === "string") {
+          const trimmedValue = value.trim();
+          acc[key] = trimmedValue !== "" ? trimmedValue : "";
+        } else if (value !== null && value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
 
       const payload = {
         ticker: selecteditems.ticker,
-        ...sanitizedPayloadData  
+        ...sanitizedPayloadData
       };
 
       const response = await axios.post(
-        `${apiUrl}/api/get_data/`,
+        `${apiUrl}/api/update_data/`,
         payload,
         {
           headers: {
@@ -109,152 +136,162 @@ const sanitizedPayloadData = Object.keys(payloadData).reduce((acc: Record<string
       );
 
       console.log('Save API Response:', response.data);
+      setIsEditMode(false);
       setIsEditable(false);
     } catch (error) {
       console.error('Error saving form:', error);
     }
   };
 
+  const handleEditClick = () => {
+    setIsEditMode(true);
+    setIsEditable(true);
+  };
+
+  const capitalizeLabel = (key: string) => {
+    return key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const renderInputField = (section: string, key: string, value: any) => {
+    const isDropdown = Object.keys(dropdownOptions).includes(key);
+    const isDateField = dateFields.includes(key);
+
+    // if (isDateField) {
+    //   return (
+    //     <DatePicker
+    //       value={value || null}
+    //       onChange={(date) => handleDateChange(date, section, key)}
+    //       renderInput={(params) => (
+    //         <TextField
+    //           {...params}
+    //           variant="outlined"
+    //           fullWidth
+    //           disabled={!isEditable}
+    //           sx={{ fontSize: '15px' }}
+    //         />
+    //       )}
+    //       disabled={!isEditable}
+    //     />
+    //   );
+    // }
+
+    if (isDropdown) {
+      return (
+        <Select
+          fullWidth
+          value={value || ''}
+          onChange={(e) => handleInputChange(e, section, key)}
+          variant="outlined"
+          disabled={!isEditable}
+          sx={{ fontSize: '15px' }}
+        >
+          {dropdownOptions[key].map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      );
+    }
+
+    return (
+      <TextField
+        fullWidth
+        value={value || ''}
+        onChange={(e) => handleInputChange(e, section, key)}
+        variant="outlined"
+        disabled={!isEditable}
+        sx={{
+          '& .MuiInputBase-input': {
+            padding: '10px',
+            fontSize: '15px',
+            color: '#4d4d4d',
+          },
+        }}
+      />
+    );
+  };
+
   const renderFormFields = (section: string, sectionData: any) => {
     if (!sectionData) return null;
 
     const entries = Object.entries(sectionData);
+    const rows = [];
 
-    const splitEntries = [];
-    for (let i = 0; i < entries.length; i += 3) {
-      splitEntries.push(entries.slice(i, i + 3));
+    for (let i = 0; i < entries.length; i += 2) {
+      const firstField = entries[i];
+      const secondField = entries[i + 1];
+
+      rows.push(
+        <TableRow key={i} sx={{ backgroundColor: i % 4 === 0 ? '#f3f3f3' : '#fff' }} >
+          {/* First Field */}
+          <TableCell sx={{ fontWeight: 'bold', fontSize: '0.85rem', width: '15%', whiteSpace: 'nowrap' }}>
+            {capitalizeLabel(firstField[0])}
+          </TableCell>
+          <TableCell sx={{ width: '20%' }}>
+            {renderInputField(section, firstField[0], firstField[1])}
+          </TableCell>
+
+          {/* Second Field */}
+          {secondField ? (
+            <>
+              <TableCell sx={{ fontWeight: 'bold', fontSize: '0.85rem', width: '15%', whiteSpace: 'nowrap' }}>
+                {capitalizeLabel(secondField[0])}
+              </TableCell>
+              <TableCell sx={{ width: '20%' }}>
+                {renderInputField(section, secondField[0], secondField[1])}
+              </TableCell>
+            </>
+          ) : (
+            <>
+              <TableCell />
+              <TableCell />
+            </>
+          )}
+        </TableRow>
+      );
     }
 
-    return splitEntries.map((pair, index) => (
-      <tr key={index}>
-        {pair.map(([key, value]) => (
-          <td style={{ padding: '8px', width: '33%' }} key={key}>
-            <TextField
-              fullWidth
-              value={value || ''}
-              onChange={(e) => handleInputChange(e, section, key)}
-              label={capitalizeLabel(key)}
-              variant="filled"
-              disabled={!isEditable}
-              sx={{
-                width: '90%',
-                padding: '10px',
-                height: '40px',
-                display: 'flex',
-                justifyContent: 'center',
-                '& .MuiInput-root': {
-                  height: '40px',
-                  '&:hover:not(.Mui-disabled):before': {
-                    borderBottom: '2px solid #002060',
-                  },
-                  '&.Mui-focused:before': {
-                    borderBottom: '2px solid #002060',
-                  },
-                },
-                '& .MuiInputBase-input': {
-                  padding: '10px',
-                  fontSize: '15px',
-                  color: '#4d4d4d',
-                },
-                '& .MuiInputLabel-root': {
-                  color: '#4d4d4d',
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#002060',
-                },
-              }}
-            />
-          </td>
-        ))}
-      </tr>
-    ));
+    return rows;
   };
 
-  const capitalizeLabel = (key: string) => {
-    return key
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, (char) => char.toUpperCase());
-  };
+  const renderSection = (title: string, sectionKey: string) => (
+    <Container maxWidth="lg">
+      <Card sx={{ mt: 4 }}>
+        <CardContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="h5" align="center" color="#6501c4" fontWeight="bold">
+              {title}
+            </Typography>
+          </Box>
+          <Grid container spacing={2}>
+            <Grid item xs={12} textAlign="right">
+              <Button
+                variant="contained"
+                color={isEditMode ? 'success' : 'primary'}
+                onClick={isEditMode ? handleSave : handleEditClick}
+              >
+                {isEditMode ? 'Save' : 'Edit'}
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <TableContainer component={Paper}>
+                <Table size="small">
+                  <TableBody>{renderFormFields(sectionKey, formData[sectionKey])}</TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+    </Container>
+  );
 
   return (
-    <Box sx={{ marginTop: 3, padding: 2, border: '1px solid #ccc' }}>
-      <Box sx={{ marginTop: 3, display: 'flex', justifyContent: 'flex-end' }}>
-        {isEditable ? (
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: '#007777', '&:hover': { backgroundColor: '#005757' } }}
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: '#007777', '&:hover': { backgroundColor: '#005757' } }}
-            onClick={() => setIsEditable(true)}
-          >
-            Edit
-          </Button>
-        )}
-      </Box>
-
-      <form>
-        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
-          Company Details
-        </Typography>
-        <table style={{ width: '100%', marginBottom: '20px' }}>
-          <tbody>{renderFormFields('company_details', formData.company_details)}</tbody>
-        </table>
-
-        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
-          Participation Details
-        </Typography>
-        <table style={{ width: '100%', marginBottom: '20px' }}>
-          <tbody>{renderFormFields('participation_details', formData.participation_details)}</tbody>
-        </table>
-
-        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
-          Background Data
-        </Typography>
-        <table style={{ width: '100%', marginBottom: '20px' }}>
-          <tbody>{renderFormFields('background_data', formData.background_data)}</tbody>
-        </table>
-
-        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
-          Monashee Deal Activity
-        </Typography>
-        <table style={{ width: '100%', marginBottom: '20px' }}>
-          <tbody>{renderFormFields('monashee_deal_activity', formData.monashee_deal_activity)}</tbody>
-        </table>
-
-        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
-          Performance Statistics
-        </Typography>
-        <table style={{ width: '100%', marginBottom: '20px' }}>
-          <tbody>{renderFormFields('performance_statistics', formData.performance_statistics)}</tbody>
-        </table>
-
-        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
-          After Market Analysis
-        </Typography>
-        <table style={{ width: '100%', marginBottom: '20px' }}>
-          <tbody>{renderFormFields('after_market_analysis', formData.after_market_analysis)}</tbody>
-        </table>
-
-        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
-          Technical Analysis
-        </Typography>
-        <table style={{ width: '100%', marginBottom: '20px' }}>
-          <tbody>{renderFormFields('technical_analysis', formData.technical_analysis)}</tbody>
-        </table>
-
-        <Typography variant="h6" sx={{ margin: 2, color: '#002060', textAlign: 'center' }}>
-          Historical Data
-        </Typography>
-        <table style={{ width: '100%', marginBottom: '20px' }}>
-          <tbody>{renderFormFields('historical_data', formData.historical_data)}</tbody>
-        </table>
-      </form>
+    <Box sx={{ marginTop: 3, padding: 2, width: '100%' }}>
+      {renderSection('Basic Info', 'basic_info')}
+      {renderSection('Market Data', 'market_data')}
+      {renderSection('Deal Color', 'deal_color')}
     </Box>
   );
 };
