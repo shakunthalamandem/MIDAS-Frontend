@@ -79,6 +79,15 @@ const MlEquityMain: React.FC = () => {
     }
   };
 
+  // Reset Function
+  const handleReset = () => {
+    setDealType("IPO");
+    setRegion("US");
+    setTarget("T1D");
+    setFormData({});
+    setResult(null);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ padding: 2 }}>
       {/* Top Loading Bar */}
@@ -114,21 +123,45 @@ const MlEquityMain: React.FC = () => {
             setFormData={setFormData}
             fields={fields}
           />
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#002060",
-              display: "flex",
-              justifyContent: "center", // Center horizontally
-              alignItems: "center", // Center vertically
-              mx: "auto", // Center in the available space
-            }}
-            onClick={handlePredict}
-            size="small"
-            disabled={loading}
+          <Box
+            py={2}
+            display="flex"
+            flexDirection="row" // Align buttons horizontally
+            justifyContent="center" // Center the buttons horizontally
+            gap={2} // Add space between buttons
           >
-            {loading ? "Predicting..." : "Predict"}
-          </Button>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#002060",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100px", // Optional: You can define a fixed width if needed
+              }}
+              onClick={handlePredict}
+              size="small"
+              disabled={loading}
+            >
+              {loading ? "Predicting..." : "Predict"}
+            </Button>
+
+            <Button
+              variant="outlined"
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100px", // Optional: You can define a fixed width if needed
+                backgroundColor: "#f0f0f0",
+                color: "#002060",
+              }}
+              onClick={handleReset}
+              size="small"
+            >
+              Reset
+            </Button>
+          </Box>
 
           {result && (
             <PredictionResult
