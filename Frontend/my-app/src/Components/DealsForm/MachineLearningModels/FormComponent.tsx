@@ -198,7 +198,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
         return (
           <FormControl fullWidth size="small">
             <Select
-              value={formData[item.key] || ""}
+              value={formData[item.key]  ||bankOptions[0] || ""}
               onChange={(e) => handleInputChange(item.key, e.target.value)}
               {...commonSelectProps}
               sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
@@ -215,7 +215,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
         return (
           <FormControl fullWidth size="small">
             <Select
-              value={formData[item.key] || ""}
+              value={formData[item.key] ||sponsor_yn_categoryOptions[0] || ""}
               onChange={(e) => handleInputChange(item.key, e.target.value)}
               {...commonSelectProps}
               sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
@@ -236,7 +236,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
         return (
           <FormControl fullWidth size="small">
             <Select
-              value={formData[item.key] || ""}
+              value={formData[item.key] || sectorOptions[0].value || ""}
               onChange={(e) => handleInputChange(item.key, e.target.value)}
               {...commonSelectProps}
               sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
