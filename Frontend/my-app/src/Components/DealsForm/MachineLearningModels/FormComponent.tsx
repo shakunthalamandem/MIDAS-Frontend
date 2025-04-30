@@ -197,7 +197,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
   };
 
   return (
-    <Box py={5} display="flex" flexDirection="column" alignItems="center">
+    <Box py={2} display="flex" flexDirection="column" alignItems="center">
       <TableContainer component={Paper}>
         <Table>
           <TableBody>
@@ -221,13 +221,13 @@ const FormComponent: React.FC<FormComponentProps> = ({
                           <TableRow
                             key={item.key}
                             sx={{
-                              backgroundColor: index % 2 === 0 ? "#fff7f7" : "#ffffff",
+                              backgroundColor: index % 2 === 0 ? "#F0F0F0" : "#ffffff",
                             }}
                           >
-                            <TableCell sx={{ fontSize: "0.875rem", padding: "8px 8px" }}>
+                            <TableCell sx={{ fontSize: "0.875rem", padding: "4px 4px" }}>
                               <Typography variant="body2">{item.label}</Typography>
                             </TableCell>
-                            <TableCell sx={{ fontSize: "0.875rem", padding: "8px 8px" }}>
+                            <TableCell sx={{ fontSize: "0.875rem", padding: "4px 4px" }}>
                               {renderInputField(item)}
                             </TableCell>
                           </TableRow>

@@ -80,20 +80,11 @@ const MlEquityMain: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ padding: 2 }}>
+    <Container maxWidth="lg" sx={{ padding: 2 }}>
       {/* Top Loading Bar */}
-      {loading && <LinearProgress color="primary" sx={{ mb: 5 }} />}
 
-      <Box py={5} display="flex" flexDirection="column" alignItems="center">
-        <Typography
-          variant="h5"
-          fontWeight="bold"
-          gutterBottom
-          textAlign="center"
-          color="#002060"
-        >
-          ML Equity Predictor
-        </Typography>
+      <Box py={2} display="flex" flexDirection="column" alignItems="center">
+       
 
         <Card
           sx={{
@@ -105,6 +96,15 @@ const MlEquityMain: React.FC = () => {
             marginBottom: 4,
           }}
         >
+           <Typography
+          variant="h5"
+          fontWeight="bold"
+          gutterBottom
+          textAlign="center"
+          color="#002060"
+        >
+          ML Equity Predictor
+        </Typography>
           <FormComponent
             dealType={dealType}
             setDealType={setDealType}
@@ -116,18 +116,19 @@ const MlEquityMain: React.FC = () => {
             setFormData={setFormData}
             fields={fields}
           />
-        </Card>
-
-        <Box mb={4}>
-          <Button
+            <Button
             variant="contained"
-            sx={{ backgroundColor: "#002060" }}
+            sx={{ backgroundColor: "green" }}
             onClick={handlePredict}
             size="large"
             disabled={loading}
           >
             {loading ? "Predicting..." : "Predict"}
           </Button>
+        </Card>
+
+        <Box mb={4}>
+        
         </Box>
 
         {result && (
