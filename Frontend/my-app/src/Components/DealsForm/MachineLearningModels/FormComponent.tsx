@@ -1,3 +1,4 @@
+// components/FormComponent.tsx
 import React from "react";
 import {
   Box,
@@ -48,47 +49,16 @@ const sectorOptions = [
   { value: "sp500_telecom_services", label: "Telecom Services" },
 ];
 
-// const bankOptions = ["Goldman Sachs", "Morgan Stanley", "JPMorgan", "Citigroup", "Barclays"];
-
 const bankOptions = [
-  "Barclays",
-  "Goldman Sachs",
-  "Citigroup Global Markets Inc",
-  "Others",
-  "UBS",
-  "Bank of America",
-  "Credit Suisse",
-  "JPMorgan",
-  "No Bank",
-  "Stifel",
-  "Jefferies LLC",
-  "Morgan Stanley",
-  "Deutsche Bank",
-  "Robert W Baird & Co",
-  "William Blair & Co LLC",
-  "RBC Capital Markets",
-  "Needham & Co LLC",
-  "Oppenheimer & Co Inc",
-  "Leerink Partners LLC",
-  "Canaccord Genuity",
-  "Raymond James & Associates Inc",
-  "BMO Capital Markets",
-  "Lazard Capital Markets",
-  "Cowen & Company LLC",
-  "SunTrust Robinson Humphrey Inc",
-  "JMP Securities LLC",
-  "Commerzbank Group",
-  "ABN AMRO Bank",
-  "SG Corporate & Investment Banking",
-  "Nomura Securities Co Ltd",
-  "TD Securities Inc",
-  "CIBC World Markets",
-  "BNP Paribas",
-  "HSBC",
-  "Keefe Bruyette & Woods",
-  "SVB Securities LLC",
-  "Evercore Inc"
+  "Barclays", "Goldman Sachs", "Citigroup Global Markets Inc", "Others", "UBS", "Bank of America", "Credit Suisse",
+  "JPMorgan", "No Bank", "Stifel", "Jefferies LLC", "Morgan Stanley", "Deutsche Bank", "Robert W Baird & Co",
+  "William Blair & Co LLC", "RBC Capital Markets", "Needham & Co LLC", "Oppenheimer & Co Inc", "Leerink Partners LLC",
+  "Canaccord Genuity", "Raymond James & Associates Inc", "BMO Capital Markets", "Lazard Capital Markets",
+  "Cowen & Company LLC", "SunTrust Robinson Humphrey Inc", "JMP Securities LLC", "Commerzbank Group",
+  "ABN AMRO Bank", "SG Corporate & Investment Banking", "Nomura Securities Co Ltd", "TD Securities Inc",
+  "CIBC World Markets", "BNP Paribas", "HSBC", "Keefe Bruyette & Woods", "SVB Securities LLC", "Evercore Inc"
 ];
+
 const sponsor_yn_categoryOptions = ["Y", "N", "0"];
 
 const labelMappings: Record<string, string> = {
@@ -106,6 +76,15 @@ const labelMappings: Record<string, string> = {
   selected_bank_category: "Selected Bank",
   sponsor_yn_category: "Sponsor (Y/N)",
   sector_category: "Sector",
+};
+
+const commonSelectProps = {
+  sx: { height: 48 },
+  MenuProps: {
+    PaperProps: {
+      sx: { maxHeight: 300 },
+    },
+  },
 };
 
 const FormComponent: React.FC<FormComponentProps> = ({
@@ -128,7 +107,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
       case "dealType":
         return (
           <FormControl fullWidth size="small">
-            <Select value={dealType} onChange={(e) => setDealType(e.target.value as DealType)}>
+            <Select value={dealType} onChange={(e) => setDealType(e.target.value as DealType)} {...commonSelectProps}>
               <MenuItem value="IPO">IPO</MenuItem>
               <MenuItem value="FO">FO</MenuItem>
             </Select>
@@ -137,7 +116,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
       case "region":
         return (
           <FormControl fullWidth size="small">
-            <Select value={region} onChange={(e) => setRegion(e.target.value as Region)}>
+            <Select value={region} onChange={(e) => setRegion(e.target.value as Region)} {...commonSelectProps}>
               <MenuItem value="US">US</MenuItem>
               <MenuItem value="Non-US">Non-US</MenuItem>
               <MenuItem value="APAC">APAC</MenuItem>
@@ -148,7 +127,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
       case "target":
         return (
           <FormControl fullWidth size="small">
-            <Select value={target} onChange={(e) => setTarget(e.target.value as Target)}>
+            <Select value={target} onChange={(e) => setTarget(e.target.value as Target)} {...commonSelectProps}>
               <MenuItem value="T1D">T+1 Day Return</MenuItem>
               <MenuItem value="T1M">T+1 Month Return</MenuItem>
             </Select>
@@ -157,10 +136,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
       case "selected_bank_category":
         return (
           <FormControl fullWidth size="small">
-            <Select
-              value={formData[item.key] || ""}
-              onChange={(e) => handleInputChange(item.key, e.target.value)}
-            >
+            <Select value={formData[item.key] || ""} onChange={(e) => handleInputChange(item.key, e.target.value)} {...commonSelectProps}>
               {bankOptions.map((bank) => (
                 <MenuItem key={bank} value={bank}>
                   {bank}
@@ -172,10 +148,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
       case "sponsor_yn_category":
         return (
           <FormControl fullWidth size="small">
-            <Select
-              value={formData[item.key] || ""}
-              onChange={(e) => handleInputChange(item.key, e.target.value)}
-            >
+            <Select value={formData[item.key] || ""} onChange={(e) => handleInputChange(item.key, e.target.value)} {...commonSelectProps}>
               {sponsor_yn_categoryOptions.map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
@@ -187,10 +160,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
       case "sector_category":
         return (
           <FormControl fullWidth size="small">
-            <Select
-              value={formData[item.key] || ""}
-              onChange={(e) => handleInputChange(item.key, e.target.value)}
-            >
+            <Select value={formData[item.key] || ""} onChange={(e) => handleInputChange(item.key, e.target.value)} {...commonSelectProps}>
               {sectorOptions.map((sector) => (
                 <MenuItem key={sector.value} value={sector.value}>
                   {sector.label}
