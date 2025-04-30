@@ -1,10 +1,15 @@
-// MlEquityMain.tsx
 import React, { useState } from "react";
 import axios from "axios";
-import { Box, Button, Card, Container, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  Container,
+  LinearProgress,
+  Typography,
+} from "@mui/material";
 import FormComponent from "./FormComponent";
 import PredictionResult from "./PredictionResult";
-
 
 type DealType = "IPO" | "FO";
 type Region = "US" | "Non-US" | "APAC" | "EMEA";
@@ -12,9 +17,9 @@ type Target = "T1D" | "T1M";
 
 type FormDataType = { [key: string]: string };
 type PredictionResult = {
-  prediction: string;
-  lower_bound: string;
-  upper_bound: string;
+  prediction: number;
+  lower_bound: number;
+  upper_bound: number;
 };
 
 const IPO_FIELDS = [
@@ -28,78 +33,14 @@ const IPO_FIELDS = [
   "allocated_shares_category",
   "subscription_bid_shares_category",
   "total_shares_offered_category",
-  "selected_bank_category",
-  "sponsor_yn_category",
-  "sector_category",
 ];
 
 const FO_FIELDS = [
   "deal_size_category",
-  "sponsor_yn_category",
   "discount_from_announcement_price_category",
   "percentage_primary_category",
   "allocation_deal_size_percentage_category",
   "allocation_percentage_category",
-  "selected_bank_category",
-  "sector_category",
-];
-
-const sponsorOptions = ["Y", "N", "0"];
-const bankOptions = [
-  "Barclays",
-  "Goldman Sachs",
-  "Citigroup Global Markets Inc",
-  "Others",
-  "UBS",
-  "Bank of America",
-  "Credit Suisse",
-  "JPMorgan",
-  "No Bank",
-  "Stifel",
-  "Jefferies LLC",
-  "Morgan Stanley",
-  "Deutsche Bank",
-  "Robert W Baird & Co",
-  "William Blair & Co LLC",
-  "RBC Capital Markets",
-  "Needham & Co LLC",
-  "Oppenheimer & Co Inc",
-  "Leerink Partners LLC",
-  "Canaccord Genuity",
-  "Raymond James & Associates Inc",
-  "BMO Capital Markets",
-  "Lazard Capital Markets",
-  "Cowen & Company LLC",
-  "SunTrust Robinson Humphrey Inc",
-  "JMP Securities LLC",
-  "Commerzbank Group",
-  "ABN AMRO Bank",
-  "SG Corporate & Investment Banking",
-  "Nomura Securities Co Ltd",
-  "TD Securities Inc",
-  "CIBC World Markets",
-  "BNP Paribas",
-  "HSBC",
-  "Keefe Bruyette & Woods",
-  "SVB Securities LLC",
-  "Evercore Inc",
-];
-
-const sectorOptions = [
-  { value: "sp500_information_technology", label: "Information Technology" },
-  { value: "sp500_technology", label: "Technology" },
-  { value: "sp500_healthcare", label: "Healthcare" },
-  { value: "sp500_financials", label: "Financials" },
-  { value: "sp500_energy", label: "Energy" },
-  { value: "sp500_consumer_discretionary", label: "Consumer Discretionary" },
-  { value: "sp500_consumer_staples", label: "Consumer Staples" },
-  { value: "sp500_industrials", label: "Industrials" },
-  { value: "sp500_materials", label: "Materials" },
-  { value: "sp500_real_estate", label: "Real Estate" },
-  { value: "sp500_utilities", label: "Utilities" },
-  { value: "sp500_oil_gas", label: "Oil & Gas" },
-  { value: "sp500_insurance_industry", label: "Insurance Industry" },
-  { value: "sp500_telecom_services", label: "Telecom Services" },
 ];
 
 const MlEquityMain: React.FC = () => {
@@ -108,11 +49,15 @@ const MlEquityMain: React.FC = () => {
   const [target, setTarget] = useState<Target>("T1D");
   const [formData, setFormData] = useState<FormDataType>({});
   const [result, setResult] = useState<PredictionResult | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
 
   const handlePredict = async () => {
     try {
+      setLoading(true);
+      setResult(null);
+
       const payload = {
         deal_type: dealType,
         region,
@@ -129,17 +74,37 @@ const MlEquityMain: React.FC = () => {
       setResult(response.data as PredictionResult);
     } catch (error) {
       console.error("Prediction failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl" sx={{ padding: 2 }}>
+      {/* Top Loading Bar */}
+      {loading && <LinearProgress color="primary" sx={{ mb: 5 }} />}
+
       <Box py={5} display="flex" flexDirection="column" alignItems="center">
-        <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center" color="#002060">
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          gutterBottom
+          textAlign="center"
+          color="#002060"
+        >
           ML Equity Predictor
         </Typography>
 
-        <Card sx={{ margin: "0 auto", width: "100%", padding: 2, boxShadow: 3, borderRadius: 2, marginBottom: 4 }}>
+        <Card
+          sx={{
+            margin: "0 auto",
+            width: "100%",
+            padding: 2,
+            boxShadow: 3,
+            borderRadius: 2,
+            marginBottom: 4,
+          }}
+        >
           <FormComponent
             dealType={dealType}
             setDealType={setDealType}
@@ -148,21 +113,32 @@ const MlEquityMain: React.FC = () => {
             target={target}
             setTarget={setTarget}
             formData={formData}
-            // setFormData={setFormData}
+            setFormData={setFormData}
             fields={fields}
-            // sponsorOptions={sponsorOptions}
-            // bankOptions={bankOptions}
-            // sectorOptions={sectorOptions}
           />
         </Card>
 
         <Box mb={4}>
-          <Button variant="contained" sx={{ backgroundColor: "#002060" }} onClick={handlePredict} size="large">
-            Predict
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: "#002060" }}
+            onClick={handlePredict}
+            size="large"
+            disabled={loading}
+          >
+            {loading ? "Predicting..." : "Predict"}
           </Button>
         </Box>
 
-        {result && <PredictionResult result={result} />}
+        {result && (
+          <PredictionResult
+            result={{
+              prediction: result.prediction.toString(),
+              lower_bound: result.lower_bound.toString(),
+              upper_bound: result.upper_bound.toString(),
+            }}
+          />
+        )}
       </Box>
     </Container>
   );
