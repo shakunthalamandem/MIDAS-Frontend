@@ -50,25 +50,55 @@ const sectorOptions = [
 ];
 
 const bankOptions = [
-  "Barclays", "Goldman Sachs", "Citigroup Global Markets Inc", "Others", "UBS", "Bank of America", "Credit Suisse",
-  "JPMorgan", "No Bank", "Stifel", "Jefferies LLC", "Morgan Stanley", "Deutsche Bank", "Robert W Baird & Co",
-  "William Blair & Co LLC", "RBC Capital Markets", "Needham & Co LLC", "Oppenheimer & Co Inc", "Leerink Partners LLC",
-  "Canaccord Genuity", "Raymond James & Associates Inc", "BMO Capital Markets", "Lazard Capital Markets",
-  "Cowen & Company LLC", "SunTrust Robinson Humphrey Inc", "JMP Securities LLC", "Commerzbank Group",
-  "ABN AMRO Bank", "SG Corporate & Investment Banking", "Nomura Securities Co Ltd", "TD Securities Inc",
-  "CIBC World Markets", "BNP Paribas", "HSBC", "Keefe Bruyette & Woods", "SVB Securities LLC", "Evercore Inc"
+  "Barclays",
+  "Goldman Sachs",
+  "Citigroup Global Markets Inc",
+  "Others",
+  "UBS",
+  "Bank of America",
+  "Credit Suisse",
+  "JPMorgan",
+  "No Bank",
+  "Stifel",
+  "Jefferies LLC",
+  "Morgan Stanley",
+  "Deutsche Bank",
+  "Robert W Baird & Co",
+  "William Blair & Co LLC",
+  "RBC Capital Markets",
+  "Needham & Co LLC",
+  "Oppenheimer & Co Inc",
+  "Leerink Partners LLC",
+  "Canaccord Genuity",
+  "Raymond James & Associates Inc",
+  "BMO Capital Markets",
+  "Lazard Capital Markets",
+  "Cowen & Company LLC",
+  "SunTrust Robinson Humphrey Inc",
+  "JMP Securities LLC",
+  "Commerzbank Group",
+  "ABN AMRO Bank",
+  "SG Corporate & Investment Banking",
+  "Nomura Securities Co Ltd",
+  "TD Securities Inc",
+  "CIBC World Markets",
+  "BNP Paribas",
+  "HSBC",
+  "Keefe Bruyette & Woods",
+  "SVB Securities LLC",
+  "Evercore Inc",
 ];
 
 const sponsor_yn_categoryOptions = ["Y", "N", "0"];
 
 const labelMappings: Record<string, string> = {
-  deal_size_category: "Deal Size",
-  percentage_primary_category: "Percentage Primary",
-  allocation_deal_size_percentage_category: "Allocation Deal Size %",
-  allocation_percentage_category: "Allocation %",
-  issue_offer_price_category: "Issue Offer Price",
+  deal_size_category: "Deal Size (M)",
+  percentage_primary_category: "Percentage Primary(%)",
+  allocation_deal_size_percentage_category: "Allocation as  % of Deal Size",
+  allocation_percentage_category: "Allocation as % of IOI	",
+  issue_offer_price_category: "Issue Offer Price ($)",
   number_of_shares_offered_category: "Number of Shares Offered",
-  allocation_price_category: "Allocation Price",
+  allocation_price_category: "Allocation Price ($)",
   allocated_shares_category: "Allocated Shares",
   subscription_bid_shares_category: "Subscription Bid Shares",
   total_shares_offered_category: "Total Shares Offered",
@@ -107,38 +137,74 @@ const FormComponent: React.FC<FormComponentProps> = ({
       case "dealType":
         return (
           <FormControl fullWidth size="small">
-            <Select value={dealType} onChange={(e) => setDealType(e.target.value as DealType)} {...commonSelectProps}>
-              <MenuItem value="IPO">IPO</MenuItem>
-              <MenuItem value="FO">FO</MenuItem>
+            <Select
+              value={dealType}
+              onChange={(e) => setDealType(e.target.value as DealType)}
+              {...commonSelectProps}
+              sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
+            >
+              <MenuItem sx={{ fontSize: "0.8rem" }} value="IPO">
+                IPO
+              </MenuItem>
+              <MenuItem sx={{ fontSize: "0.8rem" }} value="FO">
+                FO
+              </MenuItem>
             </Select>
           </FormControl>
         );
       case "region":
         return (
           <FormControl fullWidth size="small">
-            <Select value={region} onChange={(e) => setRegion(e.target.value as Region)} {...commonSelectProps}>
-              <MenuItem value="US">US</MenuItem>
-              <MenuItem value="Non-US">Non-US</MenuItem>
-              <MenuItem value="APAC">APAC</MenuItem>
-              <MenuItem value="EMEA">EMEA</MenuItem>
+            <Select
+              value={region}
+              onChange={(e) => setRegion(e.target.value as Region)}
+              {...commonSelectProps}
+              sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
+            >
+              <MenuItem sx={{ fontSize: "0.8rem" }} value="US">
+                US
+              </MenuItem>
+              <MenuItem sx={{ fontSize: "0.8rem" }} value="Non-US">
+                Non-US
+              </MenuItem>
+              <MenuItem sx={{ fontSize: "0.8rem" }} value="APAC">
+                APAC
+              </MenuItem>
+              <MenuItem sx={{ fontSize: "0.8rem" }} value="EMEA">
+                EMEA
+              </MenuItem>
             </Select>
           </FormControl>
         );
       case "target":
         return (
           <FormControl fullWidth size="small">
-            <Select value={target} onChange={(e) => setTarget(e.target.value as Target)} {...commonSelectProps}>
-              <MenuItem value="T1D">T+1 Day Return</MenuItem>
-              <MenuItem value="T1M">T+1 Month Return</MenuItem>
+            <Select
+              value={target}
+              onChange={(e) => setTarget(e.target.value as Target)}
+              {...commonSelectProps}
+              sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
+            >
+              <MenuItem value="T1D" sx={{ fontSize: "0.8rem" }}>
+                T+1 Day Return
+              </MenuItem>
+              <MenuItem value="T1M" sx={{ fontSize: "0.8rem" }}>
+                T+1 Month Return
+              </MenuItem>
             </Select>
           </FormControl>
         );
       case "selected_bank_category":
         return (
           <FormControl fullWidth size="small">
-            <Select value={formData[item.key] || ""} onChange={(e) => handleInputChange(item.key, e.target.value)} {...commonSelectProps}>
+            <Select
+              value={formData[item.key] || ""}
+              onChange={(e) => handleInputChange(item.key, e.target.value)}
+              {...commonSelectProps}
+              sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
+            >
               {bankOptions.map((bank) => (
-                <MenuItem key={bank} value={bank}>
+                <MenuItem key={bank} value={bank} sx={{ fontSize: "0.8rem" }}>
                   {bank}
                 </MenuItem>
               ))}
@@ -148,9 +214,18 @@ const FormComponent: React.FC<FormComponentProps> = ({
       case "sponsor_yn_category":
         return (
           <FormControl fullWidth size="small">
-            <Select value={formData[item.key] || ""} onChange={(e) => handleInputChange(item.key, e.target.value)} {...commonSelectProps}>
+            <Select
+              value={formData[item.key] || ""}
+              onChange={(e) => handleInputChange(item.key, e.target.value)}
+              {...commonSelectProps}
+              sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
+            >
               {sponsor_yn_categoryOptions.map((option) => (
-                <MenuItem key={option} value={option}>
+                <MenuItem
+                  key={option}
+                  value={option}
+                  sx={{ fontSize: "0.8rem" }}
+                >
                   {option}
                 </MenuItem>
               ))}
@@ -160,9 +235,18 @@ const FormComponent: React.FC<FormComponentProps> = ({
       case "sector_category":
         return (
           <FormControl fullWidth size="small">
-            <Select value={formData[item.key] || ""} onChange={(e) => handleInputChange(item.key, e.target.value)} {...commonSelectProps}>
+            <Select
+              value={formData[item.key] || ""}
+              onChange={(e) => handleInputChange(item.key, e.target.value)}
+              {...commonSelectProps}
+              sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
+            >
               {sectorOptions.map((sector) => (
-                <MenuItem key={sector.value} value={sector.value}>
+                <MenuItem
+                  key={sector.value}
+                  value={sector.value}
+                  sx={{ fontSize: "0.8rem" }}
+                >
                   {sector.label}
                 </MenuItem>
               ))}
@@ -175,10 +259,16 @@ const FormComponent: React.FC<FormComponentProps> = ({
             fullWidth
             size="small"
             type="number"
-            inputProps={{ step: "any" }}
+            inputProps={{
+              step: "any",
+              sx: { padding: "4px 8px", fontSize: "0.75rem", height: "1.5rem" },
+            }}
             value={formData[item.key] || ""}
             onChange={(e) => handleInputChange(item.key, e.target.value)}
             placeholder=""
+            sx={{
+              "& .MuiInputBase-root": { height: "32px", fontSize: "0.75rem" },
+            }}
           />
         );
     }
@@ -189,9 +279,18 @@ const FormComponent: React.FC<FormComponentProps> = ({
       { label: "Deal Type", key: "dealType" },
       { label: "Region", key: "region" },
       { label: "Target", key: "target" },
-      { label: labelMappings["selected_bank_category"] || "Selected Bank", key: "selected_bank_category" },
-      { label: labelMappings["sponsor_yn_category"] || "Sponsor Y/N", key: "sponsor_yn_category" },
-      { label: labelMappings["sector_category"] || "Sector", key: "sector_category" },
+      {
+        label: labelMappings["selected_bank_category"] || "Selected Bank",
+        key: "selected_bank_category",
+      },
+      {
+        label: labelMappings["sponsor_yn_category"] || "Sponsor Y/N",
+        key: "sponsor_yn_category",
+      },
+      {
+        label: labelMappings["sector_category"] || "Sector",
+        key: "sector_category",
+      },
       ...fields.map((key) => ({ label: labelMappings[key] || key, key })),
     ];
   };
@@ -207,6 +306,7 @@ const FormComponent: React.FC<FormComponentProps> = ({
                   key={colIndex}
                   sx={{
                     width: "50%",
+                    height: "24px",
                     padding: 1,
                     verticalAlign: "top",
                     borderRight: colIndex === 0 ? "1px solid #ccc" : undefined,
@@ -221,13 +321,20 @@ const FormComponent: React.FC<FormComponentProps> = ({
                           <TableRow
                             key={item.key}
                             sx={{
-                              backgroundColor: index % 2 === 0 ? "#F0F0F0" : "#ffffff",
+                              backgroundColor:
+                                index % 2 === 0 ? "#F0F0F0" : "#ffffff",
                             }}
                           >
-                            <TableCell sx={{ fontSize: "0.875rem", padding: "4px 4px" }}>
-                              <Typography variant="body2">{item.label}</Typography>
+                            <TableCell
+                              sx={{ fontSize: "0.875rem", padding: "4px 4px" }}
+                            >
+                              <Typography variant="body2">
+                                {item.label}
+                              </Typography>
                             </TableCell>
-                            <TableCell sx={{ fontSize: "0.875rem", padding: "4px 4px" }}>
+                            <TableCell
+                              sx={{ fontSize: "0.875rem", padding: "4px 4px" }}
+                            >
                               {renderInputField(item)}
                             </TableCell>
                           </TableRow>
