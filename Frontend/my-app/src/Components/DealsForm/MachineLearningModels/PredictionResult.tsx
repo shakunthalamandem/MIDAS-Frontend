@@ -39,7 +39,7 @@ const PredictionResult: React.FC<PredictionResultProps> = ({ result }) => {
         Prediction
       </Typography>
       <Typography variant="body1">
-        The model has predicted the return to be{" "}
+        The model has predicted that the deal would be{" "}
         <strong>{getText(result.prediction)}</strong> and the expected range is{" "}
         <strong>{result.lower_bound}% to {result.upper_bound}</strong>%.
       </Typography>
