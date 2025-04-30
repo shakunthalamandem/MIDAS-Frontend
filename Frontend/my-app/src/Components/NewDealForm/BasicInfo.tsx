@@ -135,11 +135,11 @@ const DealForm = () => {
       <Card sx={{ marginTop: 4 }}>
         
         <CardContent>
-        <Box sx={{ marginTop: 8, padding: 2 }}>
+        <Box sx={{  padding: 2 }}>
         <Typography
           variant="h5"
           gutterBottom
-          color="#6501c4"
+          color="#002060"
           align="center"
           sx={{ fontWeight: 'bold' }}
         >
