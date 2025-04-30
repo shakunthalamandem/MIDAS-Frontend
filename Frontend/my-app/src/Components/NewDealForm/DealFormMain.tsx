@@ -39,7 +39,7 @@ const DealFormMain: React.FC = () => {
             color="#002060"
             sx={{ textAlign: "center", mt: 2 }}
           >
-            Deal Information Form
+            {/* Deal Information Form */}
           </Typography>
           <Box
             display="flex"
