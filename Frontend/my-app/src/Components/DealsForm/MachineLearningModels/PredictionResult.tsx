@@ -1,31 +1,48 @@
 import React from "react";
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, Typography } from "@mui/material";
 
-interface PredictionResultProps {
+type PredictionResultProps = {
   result: {
     prediction: string;
     lower_bound: string;
     upper_bound: string;
   };
-}
+};
 
 const PredictionResult: React.FC<PredictionResultProps> = ({ result }) => {
+  const getText = (prediction: string) => {
+    switch (prediction.toLowerCase()) {
+      case "positive":
+        return "slightly positive";
+      case "negative":
+        return "slightly negative";
+      case "neutral":
+        return "neutral";
+      default:
+        return prediction;
+    }
+  };
+
   return (
-    <Card variant="outlined" sx={{ width: "100%", textAlign: "center" }}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom color="#002060">
-          Prediction Result
-        </Typography>
-        <Typography style={{ display: "inline", marginRight: "30px" }}>
-          <strong>Prediction:</strong> {result.prediction}
-        </Typography>
-        <Typography style={{ display: "inline", marginRight: "30px" }}>
-          <strong>Lower Bound:</strong> {result.lower_bound}
-        </Typography>
-        <Typography style={{ display: "inline" }}>
-          <strong>Upper Bound:</strong> {result.upper_bound}
-        </Typography>
-      </CardContent>
+    <Card
+      sx={{
+        padding: 3,
+        borderRadius: 2,
+        boxShadow: 3,
+        backgroundColor: "#f5f5f5",
+        width: "130%",
+        maxWidth: 800,
+        textAlign: "center",
+      }}
+    >
+      <Typography variant="h6" fontWeight="bold" gutterBottom>
+        Prediction
+      </Typography>
+      <Typography variant="body1">
+        The model has predicted the return to be{" "}
+        <strong>{getText(result.prediction)}</strong> and the expected range is{" "}
+        <strong>{result.lower_bound}% to {result.upper_bound}</strong>%.
+      </Typography>
     </Card>
   );
 };
