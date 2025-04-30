@@ -48,7 +48,47 @@ const sectorOptions = [
   { value: "sp500_telecom_services", label: "Telecom Services" },
 ];
 
-const bankOptions = ["Goldman Sachs", "Morgan Stanley", "JPMorgan", "Citigroup", "Barclays"];
+// const bankOptions = ["Goldman Sachs", "Morgan Stanley", "JPMorgan", "Citigroup", "Barclays"];
+
+const bankOptions = [
+  "Barclays",
+  "Goldman Sachs",
+  "Citigroup Global Markets Inc",
+  "Others",
+  "UBS",
+  "Bank of America",
+  "Credit Suisse",
+  "JPMorgan",
+  "No Bank",
+  "Stifel",
+  "Jefferies LLC",
+  "Morgan Stanley",
+  "Deutsche Bank",
+  "Robert W Baird & Co",
+  "William Blair & Co LLC",
+  "RBC Capital Markets",
+  "Needham & Co LLC",
+  "Oppenheimer & Co Inc",
+  "Leerink Partners LLC",
+  "Canaccord Genuity",
+  "Raymond James & Associates Inc",
+  "BMO Capital Markets",
+  "Lazard Capital Markets",
+  "Cowen & Company LLC",
+  "SunTrust Robinson Humphrey Inc",
+  "JMP Securities LLC",
+  "Commerzbank Group",
+  "ABN AMRO Bank",
+  "SG Corporate & Investment Banking",
+  "Nomura Securities Co Ltd",
+  "TD Securities Inc",
+  "CIBC World Markets",
+  "BNP Paribas",
+  "HSBC",
+  "Keefe Bruyette & Woods",
+  "SVB Securities LLC",
+  "Evercore Inc"
+];
 const sponsor_yn_categoryOptions = ["Y", "N", "0"];
 
 const labelMappings: Record<string, string> = {
