@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 type PredictionResultProps = {
   result: {
@@ -12,38 +12,45 @@ type PredictionResultProps = {
 const PredictionResult: React.FC<PredictionResultProps> = ({ result }) => {
   const getText = (prediction: string) => {
     switch (prediction.toLowerCase()) {
-      case "positive":
+      case "positive deal":
         return "slightly positive";
-      case "negative":
+      case "negative deal":
         return "slightly negative";
-      case "neutral":
+      case "neutral deal":
         return "neutral";
       default:
         return prediction;
     }
   };
 
+  // Determine the color based on prediction
+  const getColor = (prediction: string) => {
+    switch (prediction.toLowerCase()) {
+      case "positive deal":
+        return "green";
+      case "negative deal":
+        return "red";
+      case "neutral deal":
+        return "orange";
+      default:
+        return "black"; // Default color if no match
+    }
+  };
+
   return (
-    <Card
-      sx={{
-        padding: 3,
-        borderRadius: 2,
-        boxShadow: 3,
-        backgroundColor: "#f5f5f5",
-        width: "130%",
-        maxWidth: 800,
-        textAlign: "center",
-      }}
-    >
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        Prediction
-      </Typography>
-      <Typography variant="body1">
+    <Box sx={{ marginTop: 2, display: "flex", justifyContent: "center" }}>
+      <Typography variant="body1" sx={{ textAlign: "center" }}>
         The model has predicted that the deal would be{" "}
-        <strong>{getText(result.prediction)}</strong> and the expected range is{" "}
-        <strong>{result.lower_bound}% to {result.upper_bound}</strong>%.
+        <strong style={{ color: getColor(result.prediction) }}>
+          {getText(result.prediction)}
+        </strong>{" "}
+        and the expected range is{" "}
+        <strong style={{ color: getColor(result.prediction) }}>
+          {result.lower_bound}% to {result.upper_bound}%
+        </strong>
+        .
       </Typography>
-    </Card>
+    </Box>
   );
 };
 

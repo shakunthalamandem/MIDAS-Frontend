@@ -84,8 +84,6 @@ const MlEquityMain: React.FC = () => {
       {/* Top Loading Bar */}
 
       <Box py={2} display="flex" flexDirection="column" alignItems="center">
-       
-
         <Card
           sx={{
             margin: "0 auto",
@@ -96,15 +94,15 @@ const MlEquityMain: React.FC = () => {
             marginBottom: 4,
           }}
         >
-           <Typography
-          variant="h5"
-          fontWeight="bold"
-          gutterBottom
-          textAlign="center"
-          color="#002060"
-        >
-          ML Equity Predictor
-        </Typography>
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            gutterBottom
+            textAlign="center"
+            color="#002060"
+          >
+            ML Equity Predictor
+          </Typography>
           <FormComponent
             dealType={dealType}
             setDealType={setDealType}
@@ -116,30 +114,32 @@ const MlEquityMain: React.FC = () => {
             setFormData={setFormData}
             fields={fields}
           />
-            <Button
+          <Button
             variant="contained"
-            sx={{ backgroundColor: "green" }}
+            sx={{
+              backgroundColor: "#002060",
+              display: "flex",
+              justifyContent: "center", // Center horizontally
+              alignItems: "center", // Center vertically
+              mx: "auto", // Center in the available space
+            }}
             onClick={handlePredict}
-            size="large"
+            size="small"
             disabled={loading}
           >
             {loading ? "Predicting..." : "Predict"}
           </Button>
+
+          {result && (
+            <PredictionResult
+              result={{
+                prediction: result.prediction.toString(),
+                lower_bound: result.lower_bound.toString(),
+                upper_bound: result.upper_bound.toString(),
+              }}
+            />
+          )}
         </Card>
-
-        <Box mb={4}>
-        
-        </Box>
-
-        {result && (
-          <PredictionResult
-            result={{
-              prediction: result.prediction.toString(),
-              lower_bound: result.lower_bound.toString(),
-              upper_bound: result.upper_bound.toString(),
-            }}
-          />
-        )}
       </Box>
     </Container>
   );
