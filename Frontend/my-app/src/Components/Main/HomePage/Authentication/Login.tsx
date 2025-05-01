@@ -76,8 +76,8 @@ const Login: React.FC = () => {
       ctx.fillRect(
         Math.random() * canvas.width,
         Math.random() * canvas.height,
-        Math.random() * 10,
-        Math.random() * 10
+        Math.random() * 4,
+        Math.random() * 4
       );
     }
 
