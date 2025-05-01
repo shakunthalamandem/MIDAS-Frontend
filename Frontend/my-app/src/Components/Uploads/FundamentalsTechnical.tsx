@@ -1,10 +1,9 @@
 // src/components/FundamentalsTechnical.tsx
 import React, { useState } from 'react';
 import { Button, CircularProgress, Stack, Typography } from '@mui/material';
+const apiUrl = process.env.REACT_APP_API_URL;
+const token = localStorage.getItem("access_token");
 
-// You can load these from env or a constants file
-const apiUrl = 'http://192.168.1.17:9000'; // Replace with your real API base URL
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2MDg5MTM0LCJpYXQiOjE3NDYwNzQ3MzQsImp0aSI6IjVkMDJiZmEzMTM3ZTRkZWU4NzE0ODlhN2ZhODZmZjdkIiwidXNlcl9pZCI6Mzd9.cRWgRudNEkglYVY3TvELvL6us8vDf0fvgRwzyqLcGes'; // Replace with your real token
 const FundamentalsTechnical: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
