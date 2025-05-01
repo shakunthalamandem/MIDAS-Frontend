@@ -44,6 +44,7 @@ import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 import MonasheDataDump from "../Components/Uploads/MonasheDataDump";
 
 import MainUpload from "../Components/Uploads/MainUpload";
+import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
 import DownloadDeals from "../Components/Uploads/DownloadDeals";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 
@@ -133,7 +134,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/mdd_upload" element={<AuthGuard><MainUpload /></AuthGuard>} />
         <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
-
+        <Route path="/data-upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
 
 
 
