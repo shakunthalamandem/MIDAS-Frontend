@@ -141,7 +141,6 @@ const AppRouters: React.FC = () => {
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/upp" element={<MainUpload />} />
 
 
         <Route path="/downloads" element={<AuthGuard><DownloadDeals/></AuthGuard>} />
