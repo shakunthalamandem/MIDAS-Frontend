@@ -54,23 +54,30 @@ const MlEquityMain: React.FC = () => {
   const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
 
   const handlePredict = async () => {
+    const missingFields = fields.filter((field) => !formData[field]?.trim());
+  
+    if (missingFields.length > 0) {
+      alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
+      return;
+    }
+  
     try {
       setLoading(true);
       setResult(null);
-
+  
       const payload = {
         deal_type: dealType,
         region,
         target,
         ...formData,
       };
-
+  
       const apiUrl = process.env.REACT_APP_API_URL;
       const response = await axios.post(
         `${apiUrl}/api/model_prediction/`,
         payload
       );
-
+  
       setResult(response.data as PredictionResult);
     } catch (error) {
       console.error("Prediction failed:", error);
@@ -78,6 +85,7 @@ const MlEquityMain: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   // Reset Function
   const handleReset = () => {
