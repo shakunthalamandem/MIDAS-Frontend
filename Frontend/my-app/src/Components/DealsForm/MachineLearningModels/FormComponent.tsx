@@ -200,9 +200,17 @@ const FormComponent: React.FC<FormComponentProps> = ({
             <Select
               value={formData[item.key] || ""}
               onChange={(e) => handleInputChange(item.key, e.target.value)}
+              displayEmpty
               {...commonSelectProps}
               sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
             >
+              <MenuItem
+                value=""
+                disabled
+                sx={{ fontSize: "0.8rem", color: "#aaa" }}
+              >
+                Select an option
+              </MenuItem>
               {bankOptions.map((bank) => (
                 <MenuItem key={bank} value={bank} sx={{ fontSize: "0.8rem" }}>
                   {bank}
@@ -217,9 +225,17 @@ const FormComponent: React.FC<FormComponentProps> = ({
             <Select
               value={formData[item.key] || ""}
               onChange={(e) => handleInputChange(item.key, e.target.value)}
+              displayEmpty
               {...commonSelectProps}
               sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
             >
+              <MenuItem
+                value=""
+                disabled
+                sx={{ fontSize: "0.8rem", color: "#aaa" }}
+              >
+                Select an option
+              </MenuItem>
               {sponsor_yn_categoryOptions.map((option) => (
                 <MenuItem
                   key={option}
@@ -238,9 +254,17 @@ const FormComponent: React.FC<FormComponentProps> = ({
             <Select
               value={formData[item.key] || ""}
               onChange={(e) => handleInputChange(item.key, e.target.value)}
+              displayEmpty
               {...commonSelectProps}
               sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
             >
+              <MenuItem
+                value=""
+                disabled
+                sx={{ fontSize: "0.8rem", color: "#aaa" }}
+              >
+                Select an option
+              </MenuItem>
               {sectorOptions.map((sector) => (
                 <MenuItem
                   key={sector.value}
