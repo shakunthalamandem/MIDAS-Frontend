@@ -1,6 +1,6 @@
 // src/components/FundamentalsTechnical.tsx
 import React, { useState } from 'react';
-import { Button, CircularProgress, Stack, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 const apiUrl = process.env.REACT_APP_API_URL;
 const token = localStorage.getItem("access_token");
 
@@ -42,8 +42,10 @@ const FundamentalsTechnical: React.FC = () => {
   };
 
   return (
+    <>
+    <Box mt={2} sx={{ padding: 2, backgroundColor: '#f9f9f9', boxShadow: 3 }}>
     <Stack spacing={2} alignItems="center">
-      <Typography variant="h6">Select Data Type</Typography>
+      <Typography variant="h6" color='#002060'>Select Data Type</Typography>
       <Stack direction="row" spacing={2}>
         <Button
           variant="contained"
@@ -65,6 +67,8 @@ const FundamentalsTechnical: React.FC = () => {
       {loading && <CircularProgress />}
       {response && <Typography>{response}</Typography>}
     </Stack>
+    </Box>
+    </>
   );
 };
 
