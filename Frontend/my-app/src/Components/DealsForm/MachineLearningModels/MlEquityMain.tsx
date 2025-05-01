@@ -89,7 +89,7 @@ const MlEquityMain: React.FC = () => {
       setResult(response.data as PredictionResultType);
     } catch (error) {
       console.error("Prediction failed:", error);
-      setSnackbarMessage("Prediction failed. Please try again.");
+      setSnackbarMessage("Prediction failed. Please try again. Check whether all fields are filled correctly.");
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
     } finally {
