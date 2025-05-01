@@ -99,6 +99,7 @@ const NewDealFormMain: React.FC = () => {
               <Button
                 variant="contained"
                 fullWidth
+                size="small"
                 sx={{
                   backgroundColor: "#015200",
                   "&:hover": {
