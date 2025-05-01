@@ -7,7 +7,9 @@ import {
   Container,
   LinearProgress,
   Typography,
+  Snackbar,
 } from "@mui/material";
+import MuiAlert, { AlertColor } from "@mui/material/Alert";
 import FormComponent from "./FormComponent";
 import PredictionResult from "./PredictionResult";
 
@@ -16,7 +18,7 @@ type Region = "US" | "Non-US" | "APAC" | "EMEA";
 type Target = "T1D" | "T1M";
 
 type FormDataType = { [key: string]: string };
-type PredictionResult = {
+type PredictionResultType = {
   prediction: number;
   lower_bound: number;
   upper_bound: number;
@@ -48,16 +50,29 @@ const MlEquityMain: React.FC = () => {
   const [region, setRegion] = useState<Region>("US");
   const [target, setTarget] = useState<Target>("T1D");
   const [formData, setFormData] = useState<FormDataType>({});
-  const [result, setResult] = useState<PredictionResult | null>(null);
+  const [result, setResult] = useState<PredictionResultType | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
 
+  // Snackbar state
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("error");
+
   const handlePredict = async () => {
+    const missingFields = fields.filter((field) => !formData[field]?.trim());
+
+    if (missingFields.length > 0) {
+      setSnackbarMessage("Please fill in all required fields.");
+      setSnackbarSeverity("warning");
+      setSnackbarOpen(true);
+      return;
+    }
+
     try {
       setLoading(true);
       setResult(null);
-
       const payload = {
         deal_type: dealType,
         region,
@@ -71,15 +86,17 @@ const MlEquityMain: React.FC = () => {
         payload
       );
 
-      setResult(response.data as PredictionResult);
+      setResult(response.data as PredictionResultType);
     } catch (error) {
       console.error("Prediction failed:", error);
+      setSnackbarMessage("Prediction failed. Please try again. Check whether all fields are filled correctly.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
   };
 
-  // Reset Function
   const handleReset = () => {
     setDealType("IPO");
     setRegion("US");
@@ -90,120 +107,125 @@ const MlEquityMain: React.FC = () => {
 
   return (
     <>
-    
-<Typography
-          variant="body2"
-          sx={{
-            fontWeight: 500,
-            color: "#FFFFFF",
-            fontSize: { xs: "1rem", sm: "1.2rem" },
-            backgroundColor: "#002060",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "4vh",
-            padding: "8px 16px",
-            borderRadius: "8px",
-            textAlign: "center",
-            marginBottom: "20px",
-            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-            animation: "fadeIn 1.5s ease-in-out",
-            "@keyframes fadeIn": {
-              "0%": { opacity: 0 },
-              "100%": { opacity: 1 },
-            },
-          }}
-        >
-Welcome to the Prediction Dashboard! Effortlessly input data and track all model outcomes, from feature details to prediction results and confidence levels        </Typography>
-    <Container maxWidth="lg" sx={{ padding: 2 }}>
+      <Typography
+        variant="body2"
+        sx={{
+          fontWeight: 500,
+          color: "#FFFFFF",
+          fontSize: { xs: "1rem", sm: "1.2rem" },
+          backgroundColor: "#002060",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "4vh",
+          padding: "8px 16px",
+          borderRadius: "8px",
+          textAlign: "center",
+          marginBottom: "20px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          animation: "fadeIn 1.5s ease-in-out",
+          "@keyframes fadeIn": {
+            "0%": { opacity: 0 },
+            "100%": { opacity: 1 },
+          },
+        }}
+      >
+        Welcome to the Prediction Dashboard! Effortlessly input data and track all model outcomes, from feature details to prediction results and confidence levels
+      </Typography>
 
-      {/* Top Loading Bar */}
-
-      <Box py={2} display="flex" flexDirection="column" alignItems="center">
-        <Card
-          sx={{
-            margin: "0 auto",
-            width: "100%",
-            padding: 2,
-            boxShadow: 3,
-            borderRadius: 2,
-            marginBottom: 4,
-          }}
-        >
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            gutterBottom
-            textAlign="center"
-            color="#002060"
+      <Container maxWidth="lg" sx={{ padding: 2 }}>
+        <Box py={2} display="flex" flexDirection="column" alignItems="center">
+          <Card
+            sx={{
+              margin: "0 auto",
+              width: "100%",
+              padding: 2,
+              boxShadow: 3,
+              borderRadius: 2,
+              marginBottom: 4,
+            }}
           >
-            ML Equity Predictor
-          </Typography>
-          <FormComponent
-            dealType={dealType}
-            setDealType={setDealType}
-            region={region}
-            setRegion={setRegion}
-            target={target}
-            setTarget={setTarget}
-            formData={formData}
-            setFormData={setFormData}
-            fields={fields}
-          />
-          <Box
-            py={2}
-            display="flex"
-            flexDirection="row" // Align buttons horizontally
-            justifyContent="center" // Center the buttons horizontally
-            gap={2} // Add space between buttons
-          >
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "#002060",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100px", // Optional: You can define a fixed width if needed
-              }}
-              onClick={handlePredict}
-              size="small"
-              disabled={loading}
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              gutterBottom
+              textAlign="center"
+              color="#002060"
             >
-              {loading ? "Predicting..." : "Predict"}
-            </Button>
+              ML Equity Predictor
+            </Typography>
 
-            <Button
-              variant="outlined"
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100px", // Optional: You can define a fixed width if needed
-                backgroundColor: "#f0f0f0",
-                color: "#002060",
-              }}
-              onClick={handleReset}
-              size="small"
-            >
-              Reset
-            </Button>
-          </Box>
-
-          {result && (
-            <PredictionResult
-              result={{
-                prediction: result.prediction.toString(),
-                lower_bound: result.lower_bound.toString(),
-                upper_bound: result.upper_bound.toString(),
-              }}
+            <FormComponent
+              dealType={dealType}
+              setDealType={setDealType}
+              region={region}
+              setRegion={setRegion}
+              target={target}
+              setTarget={setTarget}
+              formData={formData}
+              setFormData={setFormData}
+              fields={fields}
             />
-          )}
-        </Card>
-      </Box>
-    </Container>
-    </>
 
+            <Box py={2} display="flex" justifyContent="center" gap={2}>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: "#002060",
+                  width: "100px",
+                }}
+                onClick={handlePredict}
+                size="small"
+                disabled={loading}
+              >
+                {loading ? "Predicting..." : "Predict"}
+              </Button>
+
+              <Button
+                variant="outlined"
+                sx={{
+                  width: "100px",
+                  backgroundColor: "#f0f0f0",
+                  color: "#002060",
+                }}
+                onClick={handleReset}
+                size="small"
+              >
+                Reset
+              </Button>
+            </Box>
+
+            {result && (
+              <PredictionResult
+                result={{
+                  prediction: result.prediction.toString(),
+                  lower_bound: result.lower_bound.toString(),
+                  upper_bound: result.upper_bound.toString(),
+                }}
+              />
+            )}
+          </Card>
+        </Box>
+      </Container>
+
+      {/* Snackbar UI for alerts */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          severity={snackbarSeverity}
+          onClose={() => setSnackbarOpen(false)}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
+    </>
   );
 };
 
