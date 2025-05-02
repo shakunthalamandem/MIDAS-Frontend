@@ -110,11 +110,8 @@ const NewDealFormMain: React.FC = () => {
 
         </CardContent>
       </Card>
-
-      {/* Show table only when Get Data is clicked */}
       {selectedItems && <NewDealFormMainTable selecteditems={selectedItems} />}
 
-      {/* Optional: Show another form */}
       {showNewForm && <BasicInfo />}
     </Box>
   );

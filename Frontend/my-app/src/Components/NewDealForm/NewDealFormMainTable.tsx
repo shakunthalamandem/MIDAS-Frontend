@@ -335,7 +335,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
           >
             {capitalizeLabel(firstField[0])}
           </TableCell>
-          <TableCell sx={{ width: '20%', padding: '4px', height: '20px' }}>
+          <TableCell sx={{ width: '12%', padding: '4px', height: '20px' }}>
             {renderInputField(section, firstField[0], firstField[1])}
           </TableCell>
   
@@ -354,7 +354,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
               >
                 {capitalizeLabel(secondField[0])}
               </TableCell>
-              <TableCell sx={{ width: '20%', padding: '4px', height: '40px' }}>
+              <TableCell sx={{ width: '12%', padding: '4px', height: '40px' }}>
                 {renderInputField(section, secondField[0], secondField[1])}
               </TableCell>
             </>
