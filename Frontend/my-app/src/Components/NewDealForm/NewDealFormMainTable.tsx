@@ -38,11 +38,23 @@ function flattenObject(obj: any, result: Record<string, any> = {}): Record<strin
 }
 
 const dropdownOptions: Record<string, string[]> = {
-  region: ['US', 'EMEA', 'APAC', 'non-US America'],
+  region: ['US', 'EMEA', 'APAC', 'Non-US America'],
   deal_type: ['IPO', 'FO'],
   fo_type: ['Marketed', 'Overnight', 'Block'],
-  sector: ['Technology', 'Healthcare', 'Finance', 'Energy'], // Example values
-  deal_captain: ['John Doe', 'Jane Smith', 'Alice Johnson'], // Example values
+  sector:[
+    "Health Care",
+    "Information Technology",
+    "Financials",
+    "Consumer Staples",
+    "Real Estate",
+    "Materials",
+    "Industrials",
+    "Energy",
+    "Utilities",
+    "Consumer Discretionary",
+    "Communication Services"
+  ],
+  deal_captain: ['Robin','Tom','Block', 'HC', 'Jay','Others'], // Example values
 };
 const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selecteditems }) => {
   const [formData, setFormData] = useState<any>({});
@@ -156,24 +168,38 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     const isDropdown = Object.keys(dropdownOptions).includes(key);
     const isDateField = dateFields.includes(key);
 
-    // if (isDateField) {
-    //   return (
-    //     <DatePicker
-    //       value={value || null}
-    //       onChange={(date) => handleDateChange(date, section, key)}
-    //       renderInput={(params) => (
-    //         <TextField
-    //           {...params}
-    //           variant="outlined"
-    //           fullWidth
-    //           disabled={!isEditable}
-    //           sx={{ fontSize: '15px' }}
-    //         />
-    //       )}
-    //       disabled={!isEditable}
-    //     />
-    //   );
-    // }
+    if (isDateField) {
+      let formattedDate = '';
+      if (value) {
+        const date = new Date(value);
+        if (!isNaN(date.getTime())) {
+          formattedDate = date.toISOString().split('T')[0];
+        }
+      }
+    
+      return (
+        <TextField
+          fullWidth
+          type="date"
+          value={formattedDate}
+          onChange={(e) => handleInputChange(e, section, key)}
+          variant="outlined"
+          disabled={!isEditable}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          sx={{
+            '& .MuiInputBase-input': {
+              padding: '10px',
+              fontSize: '15px',
+              color: '#4d4d4d',
+            },
+          }}
+        />
+      );
+    }
+    
+    
 
     if (isDropdown) {
       return (
