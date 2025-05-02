@@ -65,6 +65,7 @@ const AppRouters: React.FC = () => {
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
         <Route path="/equity/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
+
         <Route path="/equity/ml_equity" element={<AuthGuard><MlEquityMain /></AuthGuard>} />
 
 

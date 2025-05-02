@@ -10,6 +10,9 @@ import {
 } from "@mui/material";
 import NewDealFormMainTable from "./NewDealFormMainTable";  // Import the NewDealFormMainTable component
 import SelectedTicker from "../Main/MonasheeGraphs/SelectedTicker";  // Import the NewDealFormMainTable component
+import BasicInfo from "./BasicInfo";
+import MarketData from "./MarketData";
+import DealColor from "./DealColor";
 
 const NewDealFormMain: React.FC = () => {
   const [ticker, setTicker] = useState("");
@@ -112,8 +115,20 @@ const NewDealFormMain: React.FC = () => {
       </Card>
 
       {selectedItems && <NewDealFormMainTable selecteditems={selectedItems} />}
-
+{/* <basic1 /> */}
       {selectedItems && <SelectedTicker ticker={selectedItems.ticker} />}
+
+      {!selectedItems && (
+  <>
+    <BasicInfo />
+
+  </>
+)}
+
+
+
+
+
     </Box>
   );
 };
