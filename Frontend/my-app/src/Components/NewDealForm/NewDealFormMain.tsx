@@ -8,10 +8,9 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import NewDealFormMainTable from "./NewDealFormMainTable";
-import BasicInfo from "./BasicInfo"; // IMPORT your new component
+import BasicInfo from "./BasicInfo"; 
 
 const NewDealFormMain: React.FC = () => {
   const [ticker, setTicker] = useState("");
@@ -20,14 +19,17 @@ const NewDealFormMain: React.FC = () => {
     ticker: string;
     launch_date: string;
   } | null>(null);
-  const [showNewForm, setShowNewForm] = useState(false); // <-- NEW state
+  const [showNewForm, setShowNewForm] = useState(false);
 
   const handleGetData = () => {
     setSelectedItems({ ticker, launch_date: launchDate });
   };
 
-  const handleAddClick = () => {
-    setShowNewForm(true); // <-- Show the form below
+  const handleReset = () => {
+    setTicker("");
+    setLaunchDate("");
+    setSelectedItems(null);
+    setShowNewForm(false);
   };
 
   return (
@@ -43,82 +45,76 @@ const NewDealFormMain: React.FC = () => {
           <Typography variant="h6" fontWeight="bold" color="#002060">
             Deal Information Form
           </Typography>
-
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={handleAddClick}
-            sx={{
-              position: "absolute",
-              right: 0,
-              top: "50%",
-              transform: "translateY(-50%)",
-              minWidth: "30px",
-              height: "30px",
-              padding: 0,
-              borderRadius: "6px",
-              border: "1px solid #1976d2",
-              "& svg": {
-                fontSize: "18px",
-              },
-              "&:hover": {
-                backgroundColor: "#e3f2fd",
-              },
-            }}
-          >
-            <AddIcon />
-          </Button>
         </Box>
 
         <CardContent>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={3}>
-              <TextField
-                label="Ticker Name"
-                variant="outlined"
-                size="small"
-                fullWidth
-                value={ticker}
-                onChange={(e) => setTicker(e.target.value.toUpperCase())}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <TextField
-                label="Launch Date"
-                type="date"
-                variant="outlined"
-                size="small" // Added to reduce height
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={launchDate}
-                onChange={(e) => setLaunchDate(e.target.value)}
-              />
-            </Grid>
+        <Grid container spacing={2} alignItems="center">
+  <Grid item xs={3}> {/* 4 instead of 3 */}
+    <TextField
+      label="Ticker Name"
+      variant="outlined"
+      size="small"
+      fullWidth
+      value={ticker}
+      onChange={(e) => setTicker(e.target.value.toUpperCase())}
+    />
+  </Grid>
+  <Grid item xs={3}> {/* 4 instead of 3 */}
+    <TextField
+      label="Launch Date"
+      type="date"
+      variant="outlined"
+      size="small"
+      fullWidth
+      InputLabelProps={{ shrink: true }}
+      value={launchDate}
+      onChange={(e) => setLaunchDate(e.target.value)}
+    />
+  </Grid>
 
-            <Grid item xs={2}>
-              <Button
-                variant="contained"
-                fullWidth
-                size="small"
-                sx={{
-                  backgroundColor: "#015200",
-                  "&:hover": {
-                    backgroundColor: "#001B4D",
-                  },
-                }}
-                onClick={handleGetData}
-              >
-                Get Data
-              </Button>
-            </Grid>
-          </Grid>
+  <Grid item xs={2}>
+    <Button
+      variant="contained"
+      fullWidth
+      sx={{
+        backgroundColor: "#015200",
+        "&:hover": {
+          backgroundColor: "#001B4D",
+        },
+      }}
+      onClick={handleGetData}
+    >
+      Get Data
+    </Button>
+  </Grid>
+
+  <Grid item xs={2}>
+    <Button
+      variant="outlined"
+      fullWidth
+      sx={{
+        borderColor: "#d32f2f",
+        color: "#d32f2f",
+        "&:hover": {
+          backgroundColor: "#ffebee",
+          borderColor: "#b71c1c",
+          color: "#b71c1c",
+        },
+      }}
+      onClick={handleReset}
+    >
+      Reset
+    </Button>
+  </Grid>
+</Grid>
+
         </CardContent>
       </Card>
 
       {/* Show table only when Get Data is clicked */}
       {selectedItems && <NewDealFormMainTable selecteditems={selectedItems} />}
 
-      {/* Show form below when + is clicked */}
+      {/* Optional: Show another form */}
       {showNewForm && <BasicInfo />}
     </Box>
   );
