@@ -8,9 +8,8 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import axios from "axios";
-import NewDealFormMainTable from "./NewDealFormMainTable";
-import BasicInfo from "./BasicInfo"; 
+import NewDealFormMainTable from "./NewDealFormMainTable";  // Import the NewDealFormMainTable component
+import SelectedTicker from "../Main/MonasheeGraphs/SelectedTicker";  // Import the NewDealFormMainTable component
 
 const NewDealFormMain: React.FC = () => {
   const [ticker, setTicker] = useState("");
@@ -21,10 +20,12 @@ const NewDealFormMain: React.FC = () => {
   } | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
 
+  // Handler to get the data based on ticker and launch date
   const handleGetData = () => {
     setSelectedItems({ ticker, launch_date: launchDate });
   };
 
+  // Handler to reset the form
   const handleReset = () => {
     setTicker("");
     setLaunchDate("");
@@ -48,71 +49,71 @@ const NewDealFormMain: React.FC = () => {
         </Box>
 
         <CardContent>
-        <Grid container spacing={2} alignItems="center">
-  <Grid item xs={3}> {/* 4 instead of 3 */}
-    <TextField
-      label="Ticker Name"
-      variant="outlined"
-      size="small"
-      fullWidth
-      value={ticker}
-      onChange={(e) => setTicker(e.target.value.toUpperCase())}
-    />
-  </Grid>
-  <Grid item xs={3}> {/* 4 instead of 3 */}
-    <TextField
-      label="Launch Date"
-      type="date"
-      variant="outlined"
-      size="small"
-      fullWidth
-      InputLabelProps={{ shrink: true }}
-      value={launchDate}
-      onChange={(e) => setLaunchDate(e.target.value)}
-    />
-  </Grid>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={3}>
+              <TextField
+                label="Ticker Name"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={ticker}
+                onChange={(e) => setTicker(e.target.value.toUpperCase())}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                label="Launch Date"
+                type="date"
+                variant="outlined"
+                size="small"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                value={launchDate}
+                onChange={(e) => setLaunchDate(e.target.value)}
+              />
+            </Grid>
 
-  <Grid item xs={2}>
-    <Button
-      variant="contained"
-      fullWidth
-      sx={{
-        backgroundColor: "#015200",
-        "&:hover": {
-          backgroundColor: "#001B4D",
-        },
-      }}
-      onClick={handleGetData}
-    >
-      Get Data
-    </Button>
-  </Grid>
+            <Grid item xs={2}>
+              <Button
+                variant="contained"
+                fullWidth
+                sx={{
+                  backgroundColor: "#015200",
+                  "&:hover": {
+                    backgroundColor: "#001B4D",
+                  },
+                }}
+                onClick={handleGetData}
+              >
+                Get Data
+              </Button>
+            </Grid>
 
-  <Grid item xs={2}>
-    <Button
-      variant="outlined"
-      fullWidth
-      sx={{
-        borderColor: "#d32f2f",
-        color: "#d32f2f",
-        "&:hover": {
-          backgroundColor: "#ffebee",
-          borderColor: "#b71c1c",
-          color: "#b71c1c",
-        },
-      }}
-      onClick={handleReset}
-    >
-      Reset
-    </Button>
-  </Grid>
-</Grid>
-
+            <Grid item xs={2}>
+              <Button
+                variant="outlined"
+                fullWidth
+                sx={{
+                  borderColor: "#d32f2f",
+                  color: "#d32f2f",
+                  "&:hover": {
+                    backgroundColor: "#ffebee",
+                    borderColor: "#b71c1c",
+                    color: "#b71c1c",
+                  },
+                }}
+                onClick={handleReset}
+              >
+                Reset
+              </Button>
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
+
       {selectedItems && <NewDealFormMainTable selecteditems={selectedItems} />}
 
-      {showNewForm && <BasicInfo />}
+      {selectedItems && <SelectedTicker ticker={selectedItems.ticker} />}
     </Box>
   );
 };
