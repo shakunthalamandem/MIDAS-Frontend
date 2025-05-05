@@ -1,5 +1,15 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  TableContainer,
+  Paper,
+} from "@mui/material";
 
 type PredictionResultProps = {
   result: {
@@ -10,47 +20,71 @@ type PredictionResultProps = {
 };
 
 const PredictionResult: React.FC<PredictionResultProps> = ({ result }) => {
-  const getText = (prediction: string) => {
+  const getLabel = (prediction: string) => {
     switch (prediction.toLowerCase()) {
       case "positive deal":
-        return "slightly positive";
+        return "Slightly Positive";
       case "negative deal":
-        return "slightly negative";
+        return "Slightly Negative";
       case "neutral deal":
-        return "neutral";
+        return "Neutral";
       default:
         return prediction;
     }
   };
 
-  // Determine the color based on prediction
   const getColor = (prediction: string) => {
     switch (prediction.toLowerCase()) {
       case "positive deal":
-        return "green";
+        return "#2e7d32"; // Green
       case "negative deal":
-        return "red";
+        return "#c62828"; // Red
       case "neutral deal":
-        return "orange";
+        return "#ef6c00"; // Orange
       default:
-        return "black"; // Default color if no match
+        return "#333";
     }
   };
 
+  const color = getColor(result.prediction);
+
   return (
-    <Box sx={{ marginTop: 2, display: "flex", justifyContent: "center" }}>
-      <Typography variant="body1" sx={{ textAlign: "center" }}>
-        The model has predicted that the deal would be{" "}
-        <strong style={{ color: getColor(result.prediction) }}>
-          {getText(result.prediction)}
-        </strong>{" "}
-        and the expected range is{" "}
-        <strong style={{ color: getColor(result.prediction) }}>
-          {result.lower_bound}% to {result.upper_bound}%
-        </strong>
-        .
-      </Typography>
-    </Box>
+    <Card
+      variant="outlined"
+      sx={{
+        minWidth: 320,
+        height: "100%",
+        boxShadow: 3,
+        borderRadius: 2,
+        backgroundColor: "#f9f9f9",
+      }}
+    >
+      <CardContent>
+        <Typography variant="h6" gutterBottom sx={{ color }}>
+          Prediction Summary
+        </Typography>
+        <TableContainer component={Paper} elevation={0}>
+          <Table size="small">
+            <TableBody>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600, backgroundColor: "#e3f2fd" }}>
+                  Expected to Provide
+                </TableCell>
+                <TableCell sx={{ color }}>{getLabel(result.prediction)}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600, backgroundColor: "#e3f2fd" }}>
+                  High Confidence Return Range
+                </TableCell>
+                <TableCell sx={{ color }}>
+                  {result.lower_bound}% to {result.upper_bound}%
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </CardContent>
+    </Card>
   );
 };
 
