@@ -8,8 +8,8 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import NewDealFormMainTable from "./NewDealFormMainTable";  // Import the NewDealFormMainTable component
-import SelectedTicker from "../Main/MonasheeGraphs/SelectedTicker";  // Import the NewDealFormMainTable component
+import NewDealFormMainTable from "./NewDealFormMainTable"; 
+import SelectedTicker from "../Main/MonasheeGraphs/SelectedTicker"; 
 import BasicInfo from "./BasicInfo";
 import MarketData from "./MarketData";
 import DealColor from "./DealColor";
@@ -23,12 +23,12 @@ const NewDealFormMain: React.FC = () => {
   } | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
 
-  // Handler to get the data based on ticker and launch date
+  const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
   const handleGetData = () => {
     setSelectedItems({ ticker, launch_date: launchDate });
   };
 
-  // Handler to reset the form
   const handleReset = () => {
     setTicker("");
     setLaunchDate("");
@@ -73,6 +73,9 @@ const NewDealFormMain: React.FC = () => {
                 InputLabelProps={{ shrink: true }}
                 value={launchDate}
                 onChange={(e) => setLaunchDate(e.target.value)}
+                inputProps={{
+                  max: today, // Restrict the date picker to today or earlier
+                }}
               />
             </Grid>
 
@@ -115,20 +118,13 @@ const NewDealFormMain: React.FC = () => {
       </Card>
 
       {selectedItems && <NewDealFormMainTable selecteditems={selectedItems} />}
-{/* <basic1 /> */}
       {selectedItems && <SelectedTicker ticker={selectedItems.ticker} />}
 
       {!selectedItems && (
-  <>
-    <BasicInfo />
-
-  </>
-)}
-
-
-
-
-
+        <>
+          <BasicInfo />
+        </>
+      )}
     </Box>
   );
 };
