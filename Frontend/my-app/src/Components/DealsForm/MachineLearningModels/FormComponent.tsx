@@ -143,9 +143,9 @@ const FormComponent: React.FC<FormComponentProps> = ({
               {...commonSelectProps}
               sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
             >
-              <MenuItem sx={{ fontSize: "0.8rem" }} value="IPO">
+              {/* <MenuItem sx={{ fontSize: "0.8rem" }} value="IPO">
                 IPO
-              </MenuItem>
+              </MenuItem> */}
               <MenuItem sx={{ fontSize: "0.8rem" }} value="FO">
                 FO
               </MenuItem>
