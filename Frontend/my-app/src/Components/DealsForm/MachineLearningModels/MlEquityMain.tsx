@@ -12,6 +12,7 @@ import {
 import MuiAlert, { AlertColor } from "@mui/material/Alert";
 import FormComponent from "./FormComponent";
 import PredictionResult from "./PredictionResult";
+import ExpectedReturnsTable from "./ExpectedReturnsTable";
 
 type DealType = "IPO" | "FO";
 type Region = "US" | "Non-US" | "APAC" | "EMEA";
@@ -22,6 +23,19 @@ type PredictionResultType = {
   prediction: number;
   lower_bound: number;
   upper_bound: number;
+};
+
+type nonAIResultType = {
+  region_type: {
+    allocation_weighted: number;
+    min_expectation: number;
+    max_expectation: number;
+  };
+  sector_type_region: {
+    allocation_weighted: number;
+    min_expectation: number;
+    max_expectation: number;
+  };
 };
 
 const IPO_FIELDS = [
@@ -51,6 +65,7 @@ const MlEquityMain: React.FC = () => {
   const [target, setTarget] = useState<Target>("T1D");
   const [formData, setFormData] = useState<FormDataType>({});
   const [result, setResult] = useState<PredictionResultType | null>(null);
+  const [nonAIResult, setNonAIResult] = useState<nonAIResultType | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
@@ -85,8 +100,19 @@ const MlEquityMain: React.FC = () => {
         `${apiUrl}/api/model_prediction/`,
         payload
       );
+      const response2 = await axios.post(
+        `${apiUrl}/api/model_prediction/`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
 
       setResult(response.data as PredictionResultType);
+      setNonAIResult(response2.data as nonAIResultType);
     } catch (error) {
       console.error("Prediction failed:", error);
       setSnackbarMessage("Prediction failed. Please try again. Check whether all fields are filled correctly.");
@@ -204,6 +230,10 @@ const MlEquityMain: React.FC = () => {
                 }}
               />
             )}
+            {
+              nonAIResult && (
+                <ExpectedReturnsTable data={nonAIResult as nonAIResultType} />
+              )}
           </Card>
         </Box>
       </Container>
