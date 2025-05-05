@@ -477,7 +477,7 @@ const Basci1: React.FC = () => {
        
           <Box sx={{ padding: 2 }}>
             <Typography variant="h5" gutterBottom color="#002060" align="center" sx={{ fontWeight: "bold" }}>
-              Model Color
+              Deal Color
             </Typography>
           </Box>
           <Grid container spacing={2}>

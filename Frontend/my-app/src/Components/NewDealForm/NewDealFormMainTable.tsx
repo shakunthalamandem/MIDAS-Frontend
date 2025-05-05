@@ -375,7 +375,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   
   const renderSection = (title: string, sectionKey: string) => (
     <Container maxWidth="lg">
-      <Card sx={{ mt: 4 }}>
+      <Card sx={{ mt: 2 }}>
         <CardContent>
           <Box sx={{ mt: 2 }}>
             <Typography
@@ -419,7 +419,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   return (
     <Box
       sx={{
-        marginTop: 5,
+        marginTop: 2,
         padding: 4,
         width: '100%',
         minHeight: '90vh',  
