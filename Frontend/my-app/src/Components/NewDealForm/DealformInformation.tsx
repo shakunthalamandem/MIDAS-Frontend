@@ -144,7 +144,7 @@ const DealformInformation = () => {
             elevation={3}
             sx={{
               padding: 1,
-              marginLeft:80,
+              marginLeft:110,
               maxHeight: 300,
               overflowY: 'auto',
               backgroundColor: '#ffffff',
