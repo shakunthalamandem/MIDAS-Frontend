@@ -149,7 +149,6 @@ const DealformInformation = () => {
               overflowY: 'auto',
               backgroundColor: '#ffffff',
               borderRadius: 2,
-              mb: 2,
             }}
           >
             {results.length === 0 ? (
