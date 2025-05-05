@@ -118,7 +118,7 @@ const NewDealFormMain: React.FC = () => {
       </Card>
 
       {selectedItems && <NewDealFormMainTable selecteditems={selectedItems} />}
-      {selectedItems && <SelectedTicker ticker={selectedItems.ticker} />}
+      {/* {selectedItems && <SelectedTicker ticker={selectedItems.ticker} />} */}
 
       {!selectedItems && (
         <>

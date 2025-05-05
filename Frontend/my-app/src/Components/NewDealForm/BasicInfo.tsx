@@ -250,21 +250,18 @@ const Basci1: React.FC = () => {
     formData[key as keyof typeof formData] !== "";
 
   return (
-    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 2 }}>
       {/* First Table in Card */}
-      <Card sx={{ marginTop: 4 }}>
+      <Card sx={{ marginTop: 2 }}>
         
         <CardContent>
-        <Box sx={{ textAlign: "right", marginTop: 4 }}>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Save Data
-        </Button>
-      </Box>
+       
           <Box sx={{ padding: 2 }}>
             <Typography variant="h5" gutterBottom color="#002060" align="center" sx={{ fontWeight: "bold" }}>
               Basic Info
             </Typography>
           </Box>
+         
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TableContainer component={Paper}>
@@ -356,17 +353,18 @@ const Basci1: React.FC = () => {
               </TableContainer>
             </Grid>
           </Grid>
+          <Box sx={{ textAlign: "right", marginTop: 4 }}>
+        <Button variant="contained" sx={{bgcolor:'#002060'}} onClick={handleSave}>
+          Save Data
+        </Button>
+      </Box>
         </CardContent>
       </Card>
 
       {/* Second Table in Card */}
       <Card sx={{ marginTop: 4 }}>
         <CardContent>
-        <Box sx={{ textAlign: "right", marginTop: 4 }}>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Save Data
-        </Button>
-      </Box>
+       
           <Box sx={{ padding: 2 }}>
             <Typography variant="h5" gutterBottom color="#002060" align="center" sx={{ fontWeight: "bold" }}>
               Market Data
@@ -463,17 +461,20 @@ const Basci1: React.FC = () => {
               </TableContainer>
             </Grid>
           </Grid>
+          <Box sx={{ textAlign: "right", marginTop: 4 }}>
+        <Button variant="contained" sx={{bgcolor:'#002060'}} onClick={handleSave}>
+          Save Data
+        </Button>
+        </Box>
+
+        
         </CardContent>
       </Card>
 
       {/* Third Table in Card */}
       <Card sx={{ marginTop: 4 }}>
         <CardContent>
-        <Box sx={{ textAlign: "right", marginTop: 4 }}>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Save Data
-        </Button>
-      </Box>
+       
           <Box sx={{ padding: 2 }}>
             <Typography variant="h5" gutterBottom color="#002060" align="center" sx={{ fontWeight: "bold" }}>
               Model Color
@@ -570,6 +571,11 @@ const Basci1: React.FC = () => {
               </TableContainer>
             </Grid>
           </Grid>
+          <Box sx={{ textAlign: "right", marginTop: 4 }}>
+        <Button variant="contained" sx={{bgcolor:'#002060'}} onClick={handleSave}>
+          Save Data
+        </Button>
+        </Box>
         </CardContent>
       </Card>
 

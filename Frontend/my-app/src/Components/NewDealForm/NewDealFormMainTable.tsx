@@ -59,6 +59,7 @@ const dropdownOptions: Record<string, string[]> = {
   deal_captain: ['Robin','Tom','Block', 'HC', 'Jay','Others'], // Example values
 };
 const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selecteditems }) => {
+  console.log(selecteditems)
   const [formData, setFormData] = useState<any>({});
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
