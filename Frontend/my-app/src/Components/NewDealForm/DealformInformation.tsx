@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Container,
@@ -13,72 +13,63 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-// Replace with your actual environment variable name
-const apiUrl = process.env.REACT_APP_API_URL;
-const token = localStorage.getItem("token");
+// Define the type for each result
+interface Data {
+  ticker: string;
+}
 
 const DealformInformation = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [selectedTicker, setSelectedTicker] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [results, setResults] = useState<Data[]>([]); // Fix to array of Data
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [selectedTicker, setSelectedTicker] = useState<string>('');
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('access_token');
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchTerm(query);
+
+    if (query.length < 2) {
+      setResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Construct the API URL by embedding the search term directly into the endpoint
+      const response = await fetch(`${apiUrl}/api/new-deal/search/${query}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch results');
+      }
+
+      const data = await response.json();
+      setResults(data); // Assuming the API returns an array of results
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+      setError('An error occurred while fetching data.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleItemClick = (ticker: string) => {
     setSelectedTicker(ticker);
-    setSearchTerm("");
+    setSearchTerm('');
     setResults([]);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!searchTerm) return;
-
-      setLoading(true);
-      setError("");
-
-      try {
-        if (!apiUrl) {
-          throw new Error("API URL is not defined in environment variables");
-        }
-
-        const payload = { ticker: searchTerm };
-        const response = await fetch(`${apiUrl}/api/new-deal/search/${searchTerm}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          setResults(result || []); // assuming it's an array like [{ ticker: "KGF" }]
-        } else {
-          throw new Error("Failed to fetch data");
-        }
-      } catch (err: any) {
-        setError(err.message || "An error occurred while fetching data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const delayDebounceFn = setTimeout(() => {
-      fetchData();
-    }, 500); // debounce to reduce unnecessary API calls
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
-
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
-      <Box sx={{ width: "100%", padding: 2 }}>
+      <Box sx={{ width: '100%', padding: 2 }}>
         <TextField
           label="Search Global Equity Market Deals"
           variant="outlined"
@@ -87,15 +78,15 @@ const DealformInformation = () => {
           autoComplete="off"
           placeholder="Enter ticker symbol..."
           style={{
-            marginBottom: "20px",
-            minWidth: "300px",
-            backgroundColor: "#f4f6f9",
-            borderRadius: "8px",
+            marginBottom: '20px',
+            minWidth: '300px',
+            backgroundColor: '#f4f6f9',
+            borderRadius: '8px',
           }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon sx={{ color: "#656565" }} />
+                <SearchIcon sx={{ color: '#656565' }} />
               </InputAdornment>
             ),
           }}
@@ -108,12 +99,12 @@ const DealformInformation = () => {
             <Paper
               elevation={3}
               style={{
-                padding: "10px",
-                maxWidth: "280px",
-                maxHeight: "300px",
-                overflowY: "auto",
-                backgroundColor: "#ffffff",
-                borderRadius: "8px",
+                padding: '10px',
+                maxWidth: '280px',
+                maxHeight: '300px',
+                overflowY: 'auto',
+                backgroundColor: '#ffffff',
+                borderRadius: '8px',
               }}
             >
               {results.length === 0 ? (
@@ -122,7 +113,7 @@ const DealformInformation = () => {
                 </Typography>
               ) : (
                 <List>
-                  {results.map((item: any, index: number) => (
+                  {results.map((item: Data, index: number) => (
                     <ListItem
                       key={index}
                       onClick={() => handleItemClick(item.ticker)}
@@ -130,20 +121,20 @@ const DealformInformation = () => {
                       style={{
                         backgroundColor:
                           selectedTicker === item.ticker
-                            ? "rgba(63, 81, 181, 0.1)"
-                            : "transparent",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        transition: "background-color 0.3s",
+                            ? 'rgba(63, 81, 181, 0.1)'
+                            : 'transparent',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.3s',
                       }}
                       onMouseOver={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#f0f0f0")
+                        (e.currentTarget.style.backgroundColor = '#f0f0f0')
                       }
                       onMouseOut={(e) =>
                         (e.currentTarget.style.backgroundColor =
                           selectedTicker === item.ticker
-                            ? "rgba(63, 81, 181, 0.1)"
-                            : "transparent")
+                            ? 'rgba(63, 81, 181, 0.1)'
+                            : 'transparent')
                       }
                     >
                       <ListItemText primary={<strong>{item.ticker}</strong>} />
