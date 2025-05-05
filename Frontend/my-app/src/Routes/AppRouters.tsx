@@ -104,7 +104,6 @@ const AppRouters: React.FC = () => {
           <Route path="by-bank" element={<BankTable selectedFilters={{}} />} />
           <Route path="screener" element={<MDDScreener />} />
         </Route>
-        {/* <Route path="tharun" element={<DownloadDeals />} /> */}
 
 
 
@@ -133,7 +132,7 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path="/mdd_upload" element={<AuthGuard><MainUpload /></AuthGuard>} />
+        <Route path="/uploads" element={<AuthGuard><MainUpload /></AuthGuard>} />
         <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
 
