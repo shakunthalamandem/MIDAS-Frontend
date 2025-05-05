@@ -8,12 +8,14 @@ import {
   LinearProgress,
   Typography,
   Snackbar,
+  CardContent,
 } from "@mui/material";
 import MuiAlert, { AlertColor } from "@mui/material/Alert";
 import FormComponent from "./FormComponent";
 import PredictionResult from "./PredictionResult";
+import ExpectedReturnsTable from "./ExpectedReturnsTable";
 
-type DealType = "IPO" | "FO";
+type DealType = "FO";
 type Region = "US" | "Non-US" | "APAC" | "EMEA";
 type Target = "T1D" | "T1M";
 
@@ -24,18 +26,31 @@ type PredictionResultType = {
   upper_bound: number;
 };
 
-const IPO_FIELDS = [
-  "deal_size_category",
-  "percentage_primary_category",
-  "allocation_deal_size_percentage_category",
-  "allocation_percentage_category",
-  "issue_offer_price_category",
-  "number_of_shares_offered_category",
-  "allocation_price_category",
-  "allocated_shares_category",
-  "subscription_bid_shares_category",
-  "total_shares_offered_category",
-];
+type NonAIResultType = {
+  region_type: {
+    allocation_weighted: number;
+    min_expectation: number;
+    max_expectation: number;
+  };
+  sector_type_region: {
+    allocation_weighted: number;
+    min_expectation: number;
+    max_expectation: number;
+  };
+};
+
+// const IPO_FIELDS = [
+//   "deal_size_category",
+//   "percentage_primary_category",
+//   "allocation_deal_size_percentage_category",
+//   "allocation_percentage_category",
+//   "issue_offer_price_category",
+//   "number_of_shares_offered_category",
+//   "allocation_price_category",
+//   "allocated_shares_category",
+//   "subscription_bid_shares_category",
+//   "total_shares_offered_category",
+// ];
 
 const FO_FIELDS = [
   "deal_size_category",
@@ -46,16 +61,17 @@ const FO_FIELDS = [
 ];
 
 const MlEquityMain: React.FC = () => {
-  const [dealType, setDealType] = useState<DealType>("IPO");
+  const [dealType, setDealType] = useState<DealType>("FO");
   const [region, setRegion] = useState<Region>("US");
   const [target, setTarget] = useState<Target>("T1D");
   const [formData, setFormData] = useState<FormDataType>({});
   const [result, setResult] = useState<PredictionResultType | null>(null);
+  const [nonAIResult, setNonAIResult] = useState<NonAIResultType | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
+  // const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
+  const fields = FO_FIELDS; // Assuming you want to use FO_FIELDS for now
 
-  // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("error");
@@ -64,15 +80,15 @@ const MlEquityMain: React.FC = () => {
     const missingFields = fields.filter((field) => !formData[field]?.trim());
 
     if (missingFields.length > 0) {
-      setSnackbarMessage("Please fill in all required fields.");
-      setSnackbarSeverity("warning");
-      setSnackbarOpen(true);
+      showSnackbar("Please fill in all required fields.", "warning");
       return;
     }
 
     try {
       setLoading(true);
       setResult(null);
+      setNonAIResult(null);
+
       const payload = {
         deal_type: dealType,
         region,
@@ -81,78 +97,73 @@ const MlEquityMain: React.FC = () => {
       };
 
       const apiUrl = process.env.REACT_APP_API_URL;
-      const response = await axios.post(
-        `${apiUrl}/api/model_prediction/`,
-        payload
-      );
 
-      setResult(response.data as PredictionResultType);
+      const [aiRes, nonAIRes] = await Promise.all([
+        axios.post(`${apiUrl}/api/model_prediction/`, payload, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }),
+        axios.post(`${apiUrl}/api/ml_deal_analysis/`, payload, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }),
+      ]);
+
+      setResult(aiRes.data as PredictionResultType);
+      setNonAIResult(nonAIRes.data as NonAIResultType);
     } catch (error) {
       console.error("Prediction failed:", error);
-      setSnackbarMessage("Prediction failed. Please try again. Check whether all fields are filled correctly.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      showSnackbar(
+        "Prediction failed. Please try again. Check whether all fields are filled correctly.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const showSnackbar = (message: string, severity: AlertColor) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
   const handleReset = () => {
-    setDealType("IPO");
+    setDealType("FO");
     setRegion("US");
     setTarget("T1D");
     setFormData({});
     setResult(null);
+    setNonAIResult(null);
   };
 
   return (
     <>
-      <Typography
-        variant="body2"
+      <Box
         sx={{
           fontWeight: 500,
           color: "#FFFFFF",
           fontSize: { xs: "1rem", sm: "1.2rem" },
           backgroundColor: "#002060",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "4vh",
-          padding: "8px 16px",
-          borderRadius: "8px",
           textAlign: "center",
-          marginBottom: "20px",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-          animation: "fadeIn 1.5s ease-in-out",
-          "@keyframes fadeIn": {
-            "0%": { opacity: 0 },
-            "100%": { opacity: 1 },
-          },
+          py: 1,
+          borderRadius: 2,
+          mb: 2,
+          boxShadow: 2,
         }}
       >
-        Welcome to the Prediction Dashboard! Effortlessly input data and track all model outcomes, from feature details to prediction results and confidence levels
-      </Typography>
+        Welcome to the Prediction Dashboard! Effortlessly input data and track all model outcomes, from feature details to prediction results and confidence levels.
+      </Box>
 
       <Container maxWidth="lg" sx={{ padding: 2 }}>
         <Box py={2} display="flex" flexDirection="column" alignItems="center">
-          <Card
-            sx={{
-              margin: "0 auto",
-              width: "100%",
-              padding: 2,
-              boxShadow: 3,
-              borderRadius: 2,
-              marginBottom: 4,
-            }}
-          >
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              gutterBottom
-              textAlign="center"
-              color="#002060"
-            >
-              ML Equity Predictor
+          <Card sx={{ width: "100%", p: 2, boxShadow: 3, borderRadius: 2, mb: 4 }}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center" color="#002060">
+              Indicative Deal Performance
             </Typography>
 
             <FormComponent
@@ -170,10 +181,7 @@ const MlEquityMain: React.FC = () => {
             <Box py={2} display="flex" justifyContent="center" gap={2}>
               <Button
                 variant="contained"
-                sx={{
-                  backgroundColor: "#002060",
-                  width: "100px",
-                }}
+                sx={{ backgroundColor: "#002060", width: "100px" }}
                 onClick={handlePredict}
                 size="small"
                 disabled={loading}
@@ -183,32 +191,45 @@ const MlEquityMain: React.FC = () => {
 
               <Button
                 variant="outlined"
-                sx={{
-                  width: "100px",
-                  backgroundColor: "#f0f0f0",
-                  color: "#002060",
-                }}
+                sx={{ width: "100px", backgroundColor: "#f0f0f0", color: "#002060" }}
                 onClick={handleReset}
                 size="small"
               >
                 Reset
               </Button>
             </Box>
-
-            {result && (
-              <PredictionResult
-                result={{
-                  prediction: result.prediction.toString(),
-                  lower_bound: result.lower_bound.toString(),
-                  upper_bound: result.upper_bound.toString(),
-                }}
-              />
+            {result && nonAIResult && (
+              <Box
+                display="flex"
+                flexDirection={{ xs: "column", md: "row" }}
+                justifyContent="center"
+                alignItems="stretch"
+                gap={3}
+                mt={4}
+              >
+                <Box flex={1}>
+                  <ExpectedReturnsTable data={nonAIResult} />
+                </Box>
+                <Box flex={1}>
+                  <Card variant="outlined" sx={{ height: "100%", p: 2 }}>
+                    <CardContent>
+                      <PredictionResult
+                        result={{
+                          prediction: result.prediction.toString(),
+                          lower_bound: result.lower_bound.toString(),
+                          upper_bound: result.upper_bound.toString(),
+                        }}
+                      />
+                    </CardContent>
+                  </Card>
+                </Box>
+              </Box>
             )}
+
           </Card>
         </Box>
       </Container>
 
-      {/* Snackbar UI for alerts */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}

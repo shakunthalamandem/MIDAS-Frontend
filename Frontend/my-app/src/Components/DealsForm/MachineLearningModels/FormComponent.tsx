@@ -15,7 +15,7 @@ import {
   TextField,
 } from "@mui/material";
 
-type DealType = "IPO" | "FO";
+type DealType = "FO";
 type Region = "US" | "Non-US" | "APAC" | "EMEA";
 type Target = "T1D" | "T1M";
 type FormDataType = { [key: string]: string };
@@ -143,9 +143,9 @@ const FormComponent: React.FC<FormComponentProps> = ({
               {...commonSelectProps}
               sx={{ padding: "4px", fontSize: "0.8rem", height: "2rem" }}
             >
-              <MenuItem sx={{ fontSize: "0.8rem" }} value="IPO">
+              {/* <MenuItem sx={{ fontSize: "0.8rem" }} value="IPO">
                 IPO
-              </MenuItem>
+              </MenuItem> */}
               <MenuItem sx={{ fontSize: "0.8rem" }} value="FO">
                 FO
               </MenuItem>
