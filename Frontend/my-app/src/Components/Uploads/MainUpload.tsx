@@ -18,7 +18,7 @@ import DownloadDeals from './DownloadDeals';
 import LastThreeDayDeals from './LastThreeDayDeals';
 
 // Upload type
-type UploadType = 'new_deal' | 'monashee_deals' | null;
+type UploadType = 'form' | 'monashee_deals' | null;
 
 const MainUpload: React.FC = () => {
   const [activeUpload, setActiveUpload] = useState<UploadType>(null);
@@ -63,7 +63,7 @@ const MainUpload: React.FC = () => {
       });
 
       setUploadSuccess(true);
-      setSnackbarMessage(`${activeUpload === 'new_deal' ? 'New Deal Data' : 'Monashee Deal Data'} uploaded successfully.`);
+      setSnackbarMessage(`${activeUpload === 'form' ? 'New Deal Data' : 'Monashee Deal Data'} uploaded successfully.`);
       setOpenSnackbar(true);
     } catch (err) {
       console.error('Upload Error:', err);
@@ -86,7 +86,7 @@ const MainUpload: React.FC = () => {
                 </Typography>
                 <Grid container spacing={2} justifyContent="center">
                   <Grid item>
-                    <Button variant="contained" color="primary" onClick={() => setActiveUpload('new_deal')}>
+                    <Button variant="contained" color="primary" onClick={() => setActiveUpload('form')}>
                       Upload New Deal Data
                     </Button>
                   </Grid>
@@ -103,7 +103,7 @@ const MainUpload: React.FC = () => {
               <Card sx={{ p: 2, boxShadow: 3 }}>
                 <CardContent>
                   <Typography variant="h6" color="primary" align="center" gutterBottom>
-                    {activeUpload === 'new_deal' ? 'Upload New Deal Data' : 'Upload Monashee Deal Data'}
+                    {activeUpload === 'form' ? 'Upload New Deal Data' : 'Upload Monashee Deal Data'}
                   </Typography>
 
                   <Box display="flex" justifyContent="center" alignItems="center" gap={2}>
