@@ -80,16 +80,15 @@ const DealformInformation = () => {
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4,marginTop:6 }}>
       {/* Card with title and search input side-by-side */}
-      <Card
+      {/* <Card
   elevation={3}
   sx={{
     mb: 4,
-    width:12,
     borderRadius: 3,
     backgroundColor: '#fefefe',
     border: '1px solid #e0e0e0',
   }}
->
+> */}
   <CardContent>
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
@@ -103,14 +102,14 @@ const DealformInformation = () => {
         sx={{
           fontWeight: 600,
           minWidth: 'fit-content',
-          color: 'primary.main',
+          color: '#002060',
         }}
       >
         Deal Information Form
       </Typography>
 
       <TextField
-        label="Search Global Equity Market Deals"
+        label="Search Ticker"
         variant="outlined"
         value={searchTerm}
         onChange={handleSearch}
@@ -119,7 +118,7 @@ const DealformInformation = () => {
         size="small"
         sx={{
           flexGrow: 1,
-          maxWidth: 400,
+          maxWidth: 200,
           backgroundColor: '#f9f9f9',
           borderRadius: 1,
         }}
@@ -133,7 +132,7 @@ const DealformInformation = () => {
       />
     </Stack>
   </CardContent>
-</Card>
+{/* </Card> */}
 
 
       {/* Autocomplete dropdown */}
@@ -146,7 +145,6 @@ const DealformInformation = () => {
             sx={{
               padding: 1,
               marginLeft:80,
-              maxWidth: 280,
               maxHeight: 300,
               overflowY: 'auto',
               backgroundColor: '#ffffff',

@@ -66,7 +66,7 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/logout" element={<Logout />} /> */}
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
-        <Route path="/equity/issue_market" element={<AuthGuard><DealFormMain /></AuthGuard>} />
+        <Route path="/equity/issue_markets" element={<AuthGuard><DealFormMain /></AuthGuard>} />
 
         <Route path="/equity/ml_equity" element={<AuthGuard><MlEquityMain /></AuthGuard>} />
 
@@ -125,7 +125,7 @@ const AppRouters: React.FC = () => {
         <Route path="/converts/dealperformance/:deal" element={<AuthGuard><ConvertsMain /></AuthGuard>} />
 
 
-        <Route path="/asd" element={<AuthGuard><DealformInformation /></AuthGuard>} />
+        <Route path="/equity/issue_market" element={<AuthGuard><DealformInformation /></AuthGuard>} />
 
 
 
