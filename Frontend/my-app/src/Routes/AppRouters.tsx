@@ -47,7 +47,7 @@ import MainUpload from "../Components/Uploads/MainUpload";
 import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
 import DownloadDeals from "../Components/Uploads/DownloadDeals";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
-import DealformInformation from "../Components/NewDealForm/DealformInformation";
+
 
 
 
@@ -131,7 +131,6 @@ const AppRouters: React.FC = () => {
         <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
         <Route path="/macro/news" element={<AuthGuard><News /></AuthGuard>} />
 
-        <Route path="/asd" element={<AuthGuard><DealformInformation /></AuthGuard>} />
 
 
         <Route path="/uploads" element={<AuthGuard><MainUpload /></AuthGuard>} />
