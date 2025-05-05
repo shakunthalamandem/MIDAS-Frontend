@@ -8,13 +8,14 @@ import {
   LinearProgress,
   Typography,
   Snackbar,
+  CardContent,
 } from "@mui/material";
 import MuiAlert, { AlertColor } from "@mui/material/Alert";
 import FormComponent from "./FormComponent";
 import PredictionResult from "./PredictionResult";
 import ExpectedReturnsTable from "./ExpectedReturnsTable";
 
-type DealType = "IPO" | "FO";
+type DealType = "FO";
 type Region = "US" | "Non-US" | "APAC" | "EMEA";
 type Target = "T1D" | "T1M";
 
@@ -38,18 +39,18 @@ type NonAIResultType = {
   };
 };
 
-const IPO_FIELDS = [
-  "deal_size_category",
-  "percentage_primary_category",
-  "allocation_deal_size_percentage_category",
-  "allocation_percentage_category",
-  "issue_offer_price_category",
-  "number_of_shares_offered_category",
-  "allocation_price_category",
-  "allocated_shares_category",
-  "subscription_bid_shares_category",
-  "total_shares_offered_category",
-];
+// const IPO_FIELDS = [
+//   "deal_size_category",
+//   "percentage_primary_category",
+//   "allocation_deal_size_percentage_category",
+//   "allocation_percentage_category",
+//   "issue_offer_price_category",
+//   "number_of_shares_offered_category",
+//   "allocation_price_category",
+//   "allocated_shares_category",
+//   "subscription_bid_shares_category",
+//   "total_shares_offered_category",
+// ];
 
 const FO_FIELDS = [
   "deal_size_category",
@@ -60,7 +61,7 @@ const FO_FIELDS = [
 ];
 
 const MlEquityMain: React.FC = () => {
-  const [dealType, setDealType] = useState<DealType>("IPO");
+  const [dealType, setDealType] = useState<DealType>("FO");
   const [region, setRegion] = useState<Region>("US");
   const [target, setTarget] = useState<Target>("T1D");
   const [formData, setFormData] = useState<FormDataType>({});
@@ -68,7 +69,8 @@ const MlEquityMain: React.FC = () => {
   const [nonAIResult, setNonAIResult] = useState<NonAIResultType | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
+  // const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
+  const fields = FO_FIELDS; // Assuming you want to use FO_FIELDS for now
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -131,7 +133,7 @@ const MlEquityMain: React.FC = () => {
   };
 
   const handleReset = () => {
-    setDealType("IPO");
+    setDealType("FO");
     setRegion("US");
     setTarget("T1D");
     setFormData({});
@@ -161,7 +163,7 @@ const MlEquityMain: React.FC = () => {
         <Box py={2} display="flex" flexDirection="column" alignItems="center">
           <Card sx={{ width: "100%", p: 2, boxShadow: 3, borderRadius: 2, mb: 4 }}>
             <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center" color="#002060">
-              ML Equity Predictor
+              Indicative Deal Performance
             </Typography>
 
             <FormComponent
@@ -196,17 +198,34 @@ const MlEquityMain: React.FC = () => {
                 Reset
               </Button>
             </Box>
-
-            {result && (
-              <PredictionResult
-                result={{
-                  prediction: result.prediction.toString(),
-                  lower_bound: result.lower_bound.toString(),
-                  upper_bound: result.upper_bound.toString(),
-                }}
-              />
+            {result && nonAIResult && (
+              <Box
+                display="flex"
+                flexDirection={{ xs: "column", md: "row" }}
+                justifyContent="center"
+                alignItems="stretch"
+                gap={3}
+                mt={4}
+              >
+                <Box flex={1}>
+                  <ExpectedReturnsTable data={nonAIResult} />
+                </Box>
+                <Box flex={1}>
+                  <Card variant="outlined" sx={{ height: "100%", p: 2 }}>
+                    <CardContent>
+                      <PredictionResult
+                        result={{
+                          prediction: result.prediction.toString(),
+                          lower_bound: result.lower_bound.toString(),
+                          upper_bound: result.upper_bound.toString(),
+                        }}
+                      />
+                    </CardContent>
+                  </Card>
+                </Box>
+              </Box>
             )}
-            {nonAIResult && <ExpectedReturnsTable data={nonAIResult} />}
+
           </Card>
         </Box>
       </Container>

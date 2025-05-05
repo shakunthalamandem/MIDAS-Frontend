@@ -15,7 +15,7 @@ import {
   TextField,
 } from "@mui/material";
 
-type DealType = "IPO" | "FO";
+type DealType = "FO";
 type Region = "US" | "Non-US" | "APAC" | "EMEA";
 type Target = "T1D" | "T1M";
 type FormDataType = { [key: string]: string };
