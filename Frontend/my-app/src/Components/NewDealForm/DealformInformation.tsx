@@ -79,7 +79,23 @@ const DealformInformation = () => {
   };
 
   return (
+    <>
+     <Box
+        sx={{
+          fontWeight: 500,
+          color: "#FFFFFF",
+          fontSize: { xs: "1rem", sm: "1.2rem" },
+          backgroundColor: "#002060",
+          textAlign: "center",
+          py: 1,
+          borderRadius: 2,
+          mb: 2,
+          boxShadow: 2,
+        }}
+      >
+Welcome to the Deal Information Form! Easily input all relevant details and track key deal parameters, from pricing and terms to deadlines and special conditions.      </Box>
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4,marginTop:6 }}>
+      
       {/* Card with title and search input side-by-side */}
       {/* <Card
   elevation={3}
@@ -194,6 +210,7 @@ const DealformInformation = () => {
 )}
 
     </Container>
+    </>
   );
 };
 
