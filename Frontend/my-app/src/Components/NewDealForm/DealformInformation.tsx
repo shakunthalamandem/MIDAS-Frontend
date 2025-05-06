@@ -18,6 +18,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import NewDealFormMainTable from './NewDealFormMainTable';
 import BasicInfo from './BasicInfo';
 import SelectedTicker from '../Main/MonasheeGraphs/SelectedTicker';
+import MDDSelectedTicker from '../Main/MonasheeDeals/MddGraphs/MDDSelectedTicker';
 
 interface Data {
   ticker: string;
@@ -194,7 +195,7 @@ Welcome to the Deal Information Form! Easily input all relevant details and trac
       {selectedTicker.ticker ? (
   <>
     <NewDealFormMainTable selecteditems={selectedTicker} />
-    <SelectedTicker ticker={selectedTicker.ticker} />
+    <MDDSelectedTicker ticker={selectedTicker.ticker} />
   </>
 ) : (
   <BasicInfo />
