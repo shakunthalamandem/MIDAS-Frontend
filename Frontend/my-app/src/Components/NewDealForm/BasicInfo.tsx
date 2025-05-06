@@ -134,7 +134,7 @@ function flattenObject(obj: any, result: Record<string, any> = {}): Record<strin
   return result;
 }
 
-const Basci1: React.FC = () => {
+const BasicInfo: React.FC = () => {
   const defaultData = {
     pricing_date: "",
     vendor_issuer: "",
@@ -609,4 +609,4 @@ const Basci1: React.FC = () => {
   );
 };
 
-export default Basci1;
+export default BasicInfo;

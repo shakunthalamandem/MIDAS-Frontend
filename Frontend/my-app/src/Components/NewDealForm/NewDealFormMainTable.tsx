@@ -18,6 +18,7 @@ import {
   InputAdornment,
   Tab,
   Tabs,
+  IconButton,
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -25,6 +26,8 @@ import { SelectChangeEvent } from '@mui/material/Select';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertColor } from '@mui/material/Alert';
+import { useNavigate } from 'react-router-dom';
+import AddIcon from '@mui/icons-material/Add';
 
 interface NewDealFormMainTableProps {
   selecteditems: any;
@@ -217,7 +220,11 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     updatedFormData[section][key] = date;
     setFormData(updatedFormData);
   };
+  const navigate = useNavigate();
 
+  const handleIconClick = () => {
+    navigate('/equity/issue_market');
+  };
 
   const formatFieldValue = (section: string, key: string, value: any): string => {
     const formatType = fieldFormatters[section]?.[key];
@@ -556,7 +563,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
                   >
 
         <Box style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-            <Box style={{ width: '93%', textAlign: 'center' }}>
+            <Box style={{ width: '90%', textAlign: 'center' }}>
               <Tabs
                 value={tabIndex}
                 onChange={(e, newTabIndex) => setTabIndex(newTabIndex)}
@@ -569,7 +576,10 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
               </Tabs>
             </Box>
 
-            <Box style={{ width: '7%', textAlign: 'right' }}>
+            <Box style={{ width: '10%', textAlign: 'right' }}>
+            <IconButton onClick={handleIconClick} color="primary" aria-label="go to issue market">
+      <AddIcon /> 
+    </IconButton>
               <Button
                 variant="contained"
                 color={isEditMode ? 'success' : 'primary'}
@@ -578,6 +588,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
               >
                 {isEditMode ? 'Save' : 'Edit'}
               </Button>
+              
             </Box>
           </Box>
       </Tabs>
