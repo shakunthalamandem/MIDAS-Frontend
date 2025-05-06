@@ -92,7 +92,7 @@ const EquityNavbar: React.FC = () => {
       },
       "& .Mui-selected": {
         backgroundColor: "#002060", // Background color for the selected tab
-        color: "#FFFFFF", // Text color for the selected tab
+        color: "#FFFFFF !important", // Text color for the selected tab
         border: "2px solid #FFFFFF", // You can adjust the border size here
       },
     }}
