@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, Tab, Box } from "@mui/material";
+import { Tabs, Tab, Box, useTheme, useMediaQuery } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const pages = [
@@ -14,6 +14,8 @@ const pages = [
 const EquityNavbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down("md")); // small screens
 
   const handleNavigate = (page: string) => {
     switch (page) {
@@ -42,8 +44,6 @@ const EquityNavbar: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-
-
       case "/equity/ml_equity":
         return 0;
       case "/equity/issue_market":
@@ -73,13 +73,26 @@ const EquityNavbar: React.FC = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+    <Box sx={{ width: "100%" }}>
       <Tabs
         value={getTabIndex()}
+        variant="fullWidth"
+        TabIndicatorProps={{ style: { display: "none" } }}
         sx={{
-          "& .MuiTabs-indicator": {
+          "& .MuiTab-root": {
+            fontSize: isSmall ? "12px" : "14px",
+            padding: isSmall ? "6px" : "10px",
+            textTransform: "none",
+            fontWeight: "bold",
+            whiteSpace: "normal", // allow text to wrap inside tab
+            lineHeight: 1.2,
+            minHeight: "48px",
+            color: "#bb4401",
+          },
+          "& .Mui-selected": {
             backgroundColor: "#002060",
-            display: "none",
+            color: "#FFFFFF",
+            border: "10px",
           },
         }}
       >
@@ -89,21 +102,11 @@ const EquityNavbar: React.FC = () => {
             label={page}
             onClick={() => handleNavigate(page)}
             sx={{
-              minWidth: 100,
-              fontWeight: "bold",
-              fontSize: "16px",
-              color: getTabIndex() === index ? "#FFFFFF" : "#bb4401",
-              backgroundColor: getTabIndex() === index ? "#002060" : "transparent",
-              textTransform: "none",
+              mx: 0.5,
+              borderRadius: "6px",
               "&:hover": {
                 backgroundColor: "#002060",
-                borderRadius: "6px",
                 color: "#FFFFFF",
-              },
-              "&.Mui-selected": {
-                backgroundColor: "#002060",
-                color: "#FFFFFF",
-                borderRadius: "6px",
               },
             }}
           />
