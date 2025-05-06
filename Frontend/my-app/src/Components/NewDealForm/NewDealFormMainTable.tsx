@@ -367,30 +367,12 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
 
   const renderSection = (title: string, sectionKey: string) => (
     <Container maxWidth="lg">
-      <Card sx={{ mt: 2 }}>
+      <Card sx={{ mt: 1 }}>
         <CardContent>
-          <Box sx={{ mt: 2 }}>
-            <Typography
-              variant="h5"
-              align="center"
-              color="#6501c4"
-              fontWeight="bold"
-              sx={{ mb: 2 }}
-            >
-              {title}
-            </Typography>
-          </Box>
+ 
 
           <Grid container spacing={2}>
-            <Grid item xs={12} textAlign="right">
-              <Button
-                variant="contained"
-                color={isEditMode ? 'success' : 'primary'}
-                onClick={isEditMode ? handleSave : handleEditClick}
-              >
-                {isEditMode ? 'Save' : 'Edit'}
-              </Button>
-            </Grid>
+           
 
             <Grid item xs={12}>
               <TableContainer component={Paper}>
@@ -401,6 +383,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
                 </Table>
               </TableContainer>
             </Grid>
+            
           </Grid>
         </CardContent>
       </Card>
@@ -418,15 +401,54 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
       }}
     >
       {/* Tabs component to manage different sections */}
-      <Tabs
-        value={tabIndex}
-        onChange={(e, newTabIndex) => setTabIndex(newTabIndex)}
-        aria-label="tab navigation"
-        sx={{ marginBottom: 2 }}
-      >
+ 
+        <Tabs
+                     value={tabIndex}
+                     onChange={(e, newTabIndex) => setTabIndex(newTabIndex)}
+                    centered
+                    TabIndicatorProps={{
+                      style: { display: "none" },
+                    }}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      margin: "10px 0",
+                      "& .MuiTab-root": {
+                        backgroundColor: "#E3E6F0", // Neutral background for unselected tabs
+                        color: "#002060", // Dark blue text for contrast
+                        borderRadius: "12px",
+                        padding: "10px 20px",
+                        fontSize: "0.9rem",
+                        fontWeight: "600",
+                        margin: "0 5px",
+                        textTransform: "none", // Avoid all caps
+                        transition: "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
+                        "&:hover": {
+                          backgroundColor: "#DCE6F0", // Slightly lighter shade on hover
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                        },
+                      },
+                      "& .Mui-selected": {
+                        backgroundColor: "#013e3a", // Vibrant orange for selected tab
+                        color: "#ffffff !important", // White text for selected tab
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Stronger shadow for selected tab
+                      },
+                    }}
+                  >
         <Tab label="Basic Info" />
         <Tab label="Market Data" />
         <Tab label="Deal Color" />
+        <Grid item xs={12} textAlign="left" >
+          <Button
+                variant="contained"
+                color={isEditMode ? 'success' : 'primary'}
+                onClick={isEditMode ? handleSave : handleEditClick}
+                sx={{marginRight:'10px'}}
+              >
+                {isEditMode ? 'Save' : 'Edit'}
+              </Button>
+            </Grid>
       </Tabs>
 
       {/* Conditionally render content based on selected tab */}
