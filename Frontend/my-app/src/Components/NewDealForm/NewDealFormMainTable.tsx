@@ -241,10 +241,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
       return isNaN(number) ? value : number.toFixed(2);
     }
   
-    // Debug log
-    // console.log(`[NO FORMAT] ${section}.${key} ➝`, value);
-    
-    // Always return a string
     return value?.toString() || '';
   };
   
@@ -288,7 +284,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         }
       );
 
-      // console.log('Save API Response:', response.data);
       setIsEditMode(false);
       setIsEditable(false);
 
@@ -297,7 +292,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
     } catch (error) {
-      // console.error('Error saving form:', error);
 
       // Show error snackbar
       setSnackbarMessage('Failed to save form. Please try again.');
@@ -319,7 +313,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   const renderInputField = (section: string, key: string, value: any) => {
     const isDropdown = Object.keys(dropdownOptions).includes(key);
     const isDateField = dateFields.includes(key);
-    console.log("isDateField",isDateField)
 
     const handleFieldClick = () => {
       if (!isEditMode) {
@@ -424,7 +417,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
 
     const entries = Object.entries(sectionData);
     const rows = [];
-    console.log(section,"This is the data in the secxtion ")
     for (let i = 0; i < entries.length; i += 2) {
       const firstField = entries[i];
       const secondField = entries[i + 1];
