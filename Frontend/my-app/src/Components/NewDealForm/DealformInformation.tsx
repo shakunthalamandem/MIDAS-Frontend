@@ -94,18 +94,9 @@ const DealformInformation = () => {
         }}
       >
 Welcome to the Deal Information Form! Easily input all relevant details and track key deal parameters, from pricing and terms to deadlines and special conditions.      </Box>
-    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4,marginTop:6 }}>
-      
-      {/* Card with title and search input side-by-side */}
-      {/* <Card
-  elevation={3}
-  sx={{
-    mb: 4,
-    borderRadius: 3,
-    backgroundColor: '#fefefe',
-    border: '1px solid #e0e0e0',
-  }}
-> */}
+    <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4,marginTop:2 }}>
+  
+
   <CardContent>
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
