@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 
 type DealType = "FO";
-type Region = "US" | "Non-US" | "APAC" | "EMEA";
+type Region = "US" | "Non-US America" | "APAC" | "EMEA";
 type Target = "T1D" | "T1M";
 type FormDataType = { [key: string]: string };
 
@@ -164,8 +164,8 @@ const FormComponent: React.FC<FormComponentProps> = ({
               <MenuItem sx={{ fontSize: "0.8rem" }} value="US">
                 US
               </MenuItem>
-              <MenuItem sx={{ fontSize: "0.8rem" }} value="Non-US">
-                Non-US
+              <MenuItem sx={{ fontSize: "0.8rem" }} value="Non-US America">
+                Non-US America
               </MenuItem>
               <MenuItem sx={{ fontSize: "0.8rem" }} value="APAC">
                 APAC
