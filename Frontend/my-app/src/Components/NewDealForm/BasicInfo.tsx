@@ -58,38 +58,38 @@ const tableLeft1: Row[] = [
 const tableRight1: Row[] = [
   { label: "Primary %", key: "percentage_primary", type: "number" },
   { label: "Issue Price ($)", key: "price_local_currency", type: "number" },
-  { label: "Discount from Announcement Price(%)", key: "discount_percentage", type: "number" },
+  { label: "Discount from Announcement Price (%)", key: "discount_percentage", type: "number" },
   { label: "Last Close Price ($)", key: "last_close_price", type: "number" },
-  { label: " IOI Amount (USD)", key: "final_indication_amount_usd", type: "number" },
+  { label: " IOI Amount ($ Million) ", key: "final_indication_amount_usd", type: "number" },
   { label: " IOI Shares", key: "final_indication_shares", type: "number" },
-  { label: " IOI Deal %", key: "final_indication_deal_percentage", type: "number" },
-  { label: "Allocation Amount (USD)", key: "allocation_amount_usd", type: "number" },
+  { label: " IOI as % of Deal Size", key: "final_indication_deal_percentage", type: "number" },
+  { label: "Allocation Amount ($ Million)", key: "allocation_amount_usd", type: "number" },
   { label: "Allocation Shares", key: "allocation_shares", type: "number" },
   { label: "Allocation as % of Deal Size", key: "allocation_deal_size_percentage", type: "number" },
   { label: "Allocation as % of IOI", key: "allocation_percentage", type: "number" },
 ];
 
 const tableLeft2: Row[] = [
-  { label: "% of Free Float (Current Float)", key: "percent_of_free_float_current_float" },
+  { label: "% of Free Float ", key: "percent_of_free_float_current_float" },
   { label: "Short Interest (Shares)", key: "short_interest_shares" },
-  { label: "Short Interest (Dollar Amount)", key: "short_interest_dollar_amount" },
-  { label: "Short Interest (Percentage of Deal)", key: "short_interest_percentage_of_deal" },
-  { label: "Shares Outstanding Pre-Deal", key: "shares_outstanding_pre_deal", type: "number" },
-  { label: "Market Cap Pre-Deal (USD)", key: "market_cap_pre_deal_usd", type: "number" },
+  { label: "Short Interest ($ Million)", key: "short_interest_dollar_amount" },
+  { label: "Short Interest (% of Deal Size)", key: "short_interest_percentage_of_deal" },
+  { label: "Shares Outstanding ", key: "shares_outstanding_pre_deal", type: "number" },
+  { label: "Market Cap ($ Million)", key: "market_cap_pre_deal_usd", type: "number" },
   { label: "Launch Date", key: "launch_date", type: "date" },
   { label: "Trade Date", key: "trade_date", type: "date" },
   { label: "Settlement Date", key: "settlement_date", type: "date" },
   { label: "Next Results Date", key: "next_results_date", type: "date" },
-  { label: "Percent Change Last 7 Days", key: "percent_change_last_7_days" },
-  { label: "52 Week High", key: "week_52_high", type: "number" },
-  { label: "Percent Below 52 Week High", key: "percent_below_52_week_high" },
+  { label: "Percentage Change in Last 7 Days", key: "percent_change_last_7_days" },
+  { label: "52 Week High($)", key: "week_52_high", type: "number" },
+  { label: "Percentage Below 52 Week High", key: "percent_below_52_week_high" },
 
   
 ];
 
 const tableRight2: Row[] = [
 
-  { label: "3M ADTV  USD", key: "three_month_adtv_local_usd" },
+  { label: "3M ADTV  ($ Million)", key: "three_month_adtv_local_usd" },
   { label: "3M ADTV  Shares", key: "three_month_adtv_local_shares" },
   { label: "Beta (S&P500)", key: "beta_smi", type: "number" },
   { label: "3M Volatility", key: "three_month_volatility", type: "number" },
@@ -117,9 +117,9 @@ const tableRight3: Row[] = [
   { label: "Aftermarket Order (Y/N)", key: "aftermarket_order", type: "select", options: ["True", "False"] },
   { label: "Aftermarket Strategy", key: "aftermarket_strategy" ,type: "select", options: ["True", "False"]},
   { label: "Top 10 Allocation Concentration (%)", key: "top_10_allocation_concentration_percent", type: "number" },
-  { label: "Target Price (Local)", key: "target_price_local", type: "number" },
+  { label: "Target Price($) ", key: "target_price_local", type: "number" },
   { label: "Target Price % Above Issue", key: "target_price_percentage_above_issue", type: "number" },
-  { label: "Stop Price (Local)", key: "stop_price_local", type: "number" },
+  { label: "Stop Price($) ", key: "stop_price_local", type: "number" },
   { label: "Stop Price % Below Issue", key: "stop_price_percentage_below_issue", type: "number" },
 ];
 
