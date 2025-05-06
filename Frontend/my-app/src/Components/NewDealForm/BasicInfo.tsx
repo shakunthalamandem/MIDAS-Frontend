@@ -31,9 +31,9 @@ interface Row {
 }
 
 const tableLeft1: Row[] = [
+  { label: "Ticker", key: "ticker" },
   { label: "Pricing Date", key: "launch_date", type: "date" },
   { label: "Issuer Name", key: "vendor_issuer" },
-  { label: "Ticker", key: "ticker" },
   { label: "Region", key: "region", type: "select", options: ["US", "EMEA", "APAC", "Non-US America"] },
   { label: "Deal Type", key: "deal_type", type: "select", options: ["IPO", "FO"] },
   { label: "FO Type", key: "fo_type", type: "select", options: ["Marketed", "Overnight", "Block"] },
@@ -48,38 +48,34 @@ const tableLeft1: Row[] = [
     "Utilities",
     "Consumer Discretionary",
     "Communication Services"] },
-  { label: "Deal Size Amount (USD)", key: "deal_size_amount_usd", type: "number" },
+  { label: "Deal Size (USD)(M)", key: "deal_size_amount_usd", type: "number" },
   { label: "Deal Size Shares", key: "deal_size_shares", type: "number" },
   { label: "Deal Captain", key: "deal_captain", type: "select", options: ['Robin','Tom','Block', 'HC', 'Jay','Others'] },
   { label: "Lead Bank", key: "invitation_bank" },
-  { label: "Sponsors (Y/N)", key: "sponsor", type: "select", options: ["Y", "N","0"] },
-  { label: "Primary %", key: "percentage_primary", type: "number" },
+  { label: "Sponsors (Y/N)", key: "sponsor", type: "select", options: ["Y", "N"] },
 ];
 
 const tableRight1: Row[] = [
   { label: "Primary %", key: "percentage_primary", type: "number" },
-  { label: "Price (Local Currency)", key: "price_local_currency", type: "number" },
-  { label: "Discount %", key: "discount_percentage", type: "number" },
-  { label: "Last Close Price", key: "last_close_price", type: "number" },
-  { label: "Initial Range", key: "initial_range" },
-  { label: "Final Indication Amount (USD)", key: "final_indication_amount_usd", type: "number" },
-  { label: "Final Indication Shares", key: "final_indication_shares", type: "number" },
-  { label: "Final Indication Deal %", key: "final_indication_deal_percentage", type: "number" },
+  { label: "Issue Price ($)", key: "price_local_currency", type: "number" },
+  { label: "Discount from Announcement Price(%)", key: "discount_percentage", type: "number" },
+  { label: "Last Close Price ($)", key: "last_close_price", type: "number" },
+  { label: " IOI Amount (USD)", key: "final_indication_amount_usd", type: "number" },
+  { label: " IOI Shares", key: "final_indication_shares", type: "number" },
+  { label: " IOI Deal %", key: "final_indication_deal_percentage", type: "number" },
   { label: "Allocation Amount (USD)", key: "allocation_amount_usd", type: "number" },
   { label: "Allocation Shares", key: "allocation_shares", type: "number" },
-  { label: "Allocation % of Deal Size", key: "allocation_deal_size_percentage", type: "number" },
-  { label: "Allocation % of IOI", key: "allocation_percentage", type: "number" },
+  { label: "Allocation as % of Deal Size", key: "allocation_deal_size_percentage", type: "number" },
+  { label: "Allocation as % of IOI", key: "allocation_percentage", type: "number" },
 ];
 
 const tableLeft2: Row[] = [
   { label: "% of Free Float (Current Float)", key: "percent_of_free_float_current_float" },
-  { label: "% of Free Float (Pre-Deal)", key: "percent_of_free_float_pre_deal" },
   { label: "Short Interest (Shares)", key: "short_interest_shares" },
   { label: "Short Interest (Dollar Amount)", key: "short_interest_dollar_amount" },
   { label: "Short Interest (Percentage of Deal)", key: "short_interest_percentage_of_deal" },
   { label: "Shares Outstanding Pre-Deal", key: "shares_outstanding_pre_deal", type: "number" },
   { label: "Market Cap Pre-Deal (USD)", key: "market_cap_pre_deal_usd", type: "number" },
-  { label: "Market Cap Pre-Deal (CHF)", key: "market_cap_pre_deal_chf", type: "number" },
   { label: "Launch Date", key: "launch_date", type: "date" },
   { label: "Trade Date", key: "trade_date", type: "date" },
   { label: "Settlement Date", key: "settlement_date", type: "date" },
@@ -92,20 +88,19 @@ const tableLeft2: Row[] = [
 ];
 
 const tableRight2: Row[] = [
-  { label: "3M ADTV (EU) USD", key: "three_month_adtv_eu_usd" },
-  { label: "3M ADTV (EU) Shares", key: "three_month_adtv_eu_shares" },
-  { label: "3M ADTV (Local) USD", key: "three_month_adtv_local_usd" },
-  { label: "3M ADTV (Local) Shares", key: "three_month_adtv_local_shares" },
-  { label: "Beta (SMI)", key: "beta_smi", type: "number" },
+
+  { label: "3M ADTV  USD", key: "three_month_adtv_local_usd" },
+  { label: "3M ADTV  Shares", key: "three_month_adtv_local_shares" },
+  { label: "Beta (S&P500)", key: "beta_smi", type: "number" },
   { label: "3M Volatility", key: "three_month_volatility", type: "number" },
   { label: "RSI (14D)", key: "rsi_14d", type: "number" },
   { label: "RSI (30D)", key: "rsi_30d", type: "number" },
   { label: "DMI (14D)", key: "dmi_14d", type: "number" },
   { label: "MACD (9D)", key: "macd_9d", type: "number" },
-  { label: "Stock Relative to MA (20D)", key: "stock_relative_to_ma_20d" },
-  { label: "Stock Relative to MA (50D)", key: "stock_relative_to_ma_50d" },
-  { label: "Stock Relative to MA (100D)", key: "stock_relative_to_ma_100d" },
-  { label: "Stock Relative to MA (200D)", key: "stock_relative_to_ma_200d" },
+  { label: "DMA 20", key: "stock_relative_to_ma_20d" },
+  { label: "DMA 50", key: "stock_relative_to_ma_50d" },
+  { label: "DMA 100", key: "stock_relative_to_ma_100d" },
+  { label: "DMA 200", key: "stock_relative_to_ma_200d" },
 ];
 
 const tableLeft3: Row[] = [

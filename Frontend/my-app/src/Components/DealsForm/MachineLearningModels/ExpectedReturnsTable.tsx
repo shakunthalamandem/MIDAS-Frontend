@@ -85,7 +85,7 @@ const ExpectedReturnsTable: React.FC<Props> = ({ data, target, region }) => {
                 </TableRow> */}
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600, backgroundColor: "#ede7f6" }}>
-                    {targetLabel} based on Sector (Deal Size Weighted)
+                    {targetLabel} Returns based on Sector (Deal Size Weighted)
                   </TableCell>
                   <TableCell>{sector_type_region.allocation_weighted.toFixed(2)}%</TableCell>
                 </TableRow>
