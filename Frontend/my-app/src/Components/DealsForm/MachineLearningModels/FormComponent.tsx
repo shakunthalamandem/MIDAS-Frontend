@@ -40,12 +40,12 @@ const sectorOptions = [
   { value: "sp500_healthcare", label: "Healthcare" },
   { value: "sp500_industrials", label: "Industrials" },
   { value: "sp500_information_technology", label: "Information Technology" },
-  { value: "sp500_insurance_industry", label: "Insurance Industry" },
+  // { value: "sp500_insurance_industry", label: "Insurance Industry" },
   { value: "sp500_materials", label: "Materials" },
-  { value: "sp500_oil_gas", label: "Oil & Gas" },
+  // { value: "sp500_oil_gas", label: "Oil & Gas" },
   { value: "sp500_real_estate", label: "Real Estate" },
-  { value: "sp500_technology", label: "Technology" },
-  { value: "sp500_telecom_services", label: "Telecom Services" },
+  // { value: "sp500_technology", label: "Technology" },
+  { value: "sp500_telecom_services", label: "Communication Services" },
   { value: "sp500_utilities", label: "Utilities" },
 ];
 
