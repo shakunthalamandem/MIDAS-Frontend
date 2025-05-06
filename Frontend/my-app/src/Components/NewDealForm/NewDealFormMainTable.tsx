@@ -394,22 +394,13 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     <Box
       sx={{
         marginTop: 0,
-        padding: 4,
+        padding: 2,
         width: '100%',
         minHeight: '90vh',
         backgroundColor: '#fafafa',
       }}
     >
-      <Grid item xs={12} textAlign="right" >
-          <Button
-                variant="contained"
-                color={isEditMode ? 'success' : 'primary'}
-                onClick={isEditMode ? handleSave : handleEditClick}
-                sx={{marginRight:'10px'}}
-              >
-                {isEditMode ? 'Save' : 'Edit'}
-              </Button>
-            </Grid>
+    
       {/* Tabs component to manage different sections */}
  
         <Tabs
@@ -449,6 +440,16 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         <Tab label="Basic Info" />
         <Tab label="Market Data" />
         <Tab label="Deal Color" />
+        <Grid item xs={12} textAlign="right" >
+          <Button
+                variant="contained"
+                color={isEditMode ? 'success' : 'primary'}
+                onClick={isEditMode ? handleSave : handleEditClick}
+                sx={{marginRight:'10px'}}
+              >
+                {isEditMode ? 'Save' : 'Edit'}
+              </Button>
+            </Grid>
         
       </Tabs>
 
