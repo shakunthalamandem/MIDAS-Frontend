@@ -211,8 +211,7 @@ const MlEquityMain: React.FC = () => {
                   <ExpectedReturnsTable data={nonAIResult} target={target} region={region}/>
                 </Box>
                 <Box flex={1}>
-                  <Card variant="outlined" sx={{ height: "100%", p: 2 }}>
-                    <CardContent>
+              
                       <PredictionResult
                         result={{
                           prediction: result.prediction.toString(),
@@ -220,8 +219,7 @@ const MlEquityMain: React.FC = () => {
                           upper_bound: result.upper_bound.toString(),
                         }}
                       />
-                    </CardContent>
-                  </Card>
+                  
                 </Box>
               </Box>
             )}
