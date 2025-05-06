@@ -83,7 +83,7 @@ const PredictionResult: React.FC<PredictionResultProps> = ({ result }) => {
                     sx={{
                       fontWeight: 600,
                       backgroundColor: "#e3f2fd",
-                      width: "50%",
+                      // width: "50%",
                     }}
                   >
                     Expected to Provide
