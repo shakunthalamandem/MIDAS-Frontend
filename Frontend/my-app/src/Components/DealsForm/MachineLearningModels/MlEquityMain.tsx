@@ -208,7 +208,7 @@ const MlEquityMain: React.FC = () => {
                 mt={4}
               >
                 <Box flex={1}>
-                  <ExpectedReturnsTable data={nonAIResult} />
+                  <ExpectedReturnsTable data={nonAIResult} target={target} region={region}/>
                 </Box>
                 <Box flex={1}>
                   <Card variant="outlined" sx={{ height: "100%", p: 2 }}>
