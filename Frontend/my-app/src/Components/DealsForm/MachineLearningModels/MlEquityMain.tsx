@@ -16,7 +16,7 @@ import PredictionResult from "./PredictionResult";
 import ExpectedReturnsTable from "./ExpectedReturnsTable";
 
 type DealType = "FO";
-type Region = "US" | "Non-US" | "APAC" | "EMEA";
+type Region = "US" | "Non-US America" | "APAC" | "EMEA";
 type Target = "T1D" | "T1M";
 
 type FormDataType = { [key: string]: string };
