@@ -40,6 +40,106 @@ function flattenObject(obj: any, result: Record<string, any> = {}): Record<strin
   }
   return result;
 }
+const fieldLabels: Record<string, Record<string, string>> = {
+  basic_info: {
+    pricing_date: "Pricing Date",
+    vendor_issuer: "Issuer Name",
+    ticker: "Ticker",
+    region: "Region",
+    deal_type: "Deal Type",
+    fo_type: "FO Type",
+    sector: "Sector",
+    deal_size_amount_usd: "Deal Size Amount (Usd)",
+    deal_size_shares: "Deal Size Shares",
+    deal_captain: "Deal Captain",
+    invitation_bank: "Lead Bank",
+    sponsor: "Sponsors",
+    percentage_primary: "Primary %",
+    price_local_currency: "Price (Local Currency)",
+    discount_percentage: "Discount Percentage",
+    last_close_price: "Last Close Price",
+    initial_range: "Initial Range",
+    final_indication_amount_usd: "Final Indication Amount (Usd)",
+    final_indication_shares: "Final Indication Shares",
+    final_indication_deal_percentage: "Final Indication Deal Percentage",
+    allocation_amount_usd: "Allocation Amount (Usd)",
+    allocation_shares: "Allocation Shares",
+    allocation_deal_size_percentage: "Allocation as % Deal Size",
+    allocation_percentage: "Allocation as % of IOI"
+  },
+  market_data:{
+    percent_of_free_float_current_float: "% of Free Float (Current Float)",
+    percent_of_free_float_pre_deal: "% of Free Float (Pre-Deal)",
+    short_interest_shares: "Short Interest (Shares)",
+    short_interest_dollar_amount: "Short Interest (Dollar Amount)",
+    short_interest_percentage_of_deal: "Short Interest (Percentage of Deal)",
+    shares_outstanding_pre_deal: "Shares Outstanding Pre-Deal",
+    market_cap_pre_deal_usd: "Market Cap Pre-Deal (USD)",
+    market_cap_pre_deal_chf: "Market Cap Pre-Deal (Local Currency)",
+    launch_date: "Launch Date",
+    trade_date: "Trade Date",
+    settlement_date: "Settlement Date",
+    next_results_date: "Next Results Date",
+    percent_change_last_7_days: "Percent Change Last 7 Days",
+    week_52_high: "52 Week High",
+    percent_below_52_week_high: "Percent Below 52 Week High",
+    three_month_adtv_eu_usd: "3M ADTV USD",
+    three_month_adtv_eu_shares: "3M ADTV Shares",
+    three_month_adtv_local_usd: "3M ADTV (Local) USD",
+    three_month_adtv_local_shares: "3M ADTV (Local) Shares",
+    beta_smi: "Beta (S&P500)",
+    three_month_volatility: "3M Volatility",
+    rsi_14d: "RSI (14D)",
+    rsi_30d: "RSI (30D)",
+    dmi_14d: "DMI (14D)",
+    macd_9d: "MACD (9D)",
+    stock_relative_to_ma_20d: "Stock Relative to MA (20D)",
+    stock_relative_to_ma_50d: "Stock Relative to MA (50D)",
+    stock_relative_to_ma_100d: "Stock Relative to MA (100D)",
+    stock_relative_to_ma_200d: "Stock Relative to MA (200D)"
+  },
+  deal_color: {
+    deal_colour: "Deal Colour",
+    institutional_allocation_percent: "Institutional Allocation (%)",
+    retail_allocation_percent: "Retail Allocation (%)",
+    long_only_allocation_percent: "Long Only Allocation (%)",
+    hedge_funds_allocation_percent: "Hedge Funds Allocation (%)",
+    local_allocation_percent: "Local Allocation (%)",
+    international_allocation_percent: "International Allocation (%)",
+    top_10_allocation_concentration_percent: "Top 10 Allocation Concentration (%)",
+    aftermarket_order: "Aftermarket Order",
+    aftermarket_strategy: "Aftermarket Strategy",
+    target_price_local: "Target Price (Local)",
+    target_price_percentage_above_issue: "Target Price % Above Issue",
+    stop_price_local: "Stop Price (Local)",
+    stop_price_percentage_below_issue: "Stop Price % Below Issue"
+}
+
+  // You can add 'market_data' and 'deal_color' labels similarly if needed
+};
+
+
+const fieldFormatters: Record<string, Record<string, 'currency' | 'percentage' | 'float'>> = {
+  basic_info: {
+    // Currency fields
+    price_local_currency: 'currency',
+    deal_size_amount_usd: 'currency',
+    final_indication_amount_usd: 'currency',
+    allocation_amount_usd: 'currency',
+    
+
+    // Percentage fields
+    discount_percentage: 'percentage',
+    percentage_primary: 'percentage',
+    final_indication_deal_percentage: 'percentage',
+    allocation_deal_size_percentage: 'percentage',
+    allocation_percentage: 'percentage',
+
+    // Float fields
+    last_close_price: 'float',
+  }
+};
+
 
 const dropdownOptions: Record<string, string[]> = {
   region: ['US', 'EMEA', 'APAC', 'Non-US America'],
@@ -122,6 +222,34 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     setFormData(updatedFormData);
   };
 
+
+  const formatFieldValue = (section: string, key: string, value: any): string => {
+    const formatType = fieldFormatters[section]?.[key];
+  
+    if (formatType === 'currency') {
+      const number = parseFloat(value);
+      return isNaN(number) ? value : `$${number.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+    }
+  
+    if (formatType === 'percentage') {
+      const number = parseFloat(value);
+      return isNaN(number) ? value : `${number.toFixed(2)}%`;
+    }
+  
+    if (formatType === 'float') {
+      const number = parseFloat(value);
+      return isNaN(number) ? value : number.toFixed(2);
+    }
+  
+    // Debug log
+    // console.log(`[NO FORMAT] ${section}.${key} ➝`, value);
+    
+    // Always return a string
+    return value?.toString() || '';
+  };
+  
+  
+
   const handleSave = async () => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
@@ -160,7 +288,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         }
       );
 
-      console.log('Save API Response:', response.data);
+      // console.log('Save API Response:', response.data);
       setIsEditMode(false);
       setIsEditable(false);
 
@@ -169,7 +297,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
     } catch (error) {
-      console.error('Error saving form:', error);
+      // console.error('Error saving form:', error);
 
       // Show error snackbar
       setSnackbarMessage('Failed to save form. Please try again.');
@@ -183,13 +311,15 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     setIsEditable(true);
   };
 
-  const capitalizeLabel = (key: string) => {
-    return key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
-  };
 
+  const capitalizeLabel = (section: string, key: string): string => {
+    return fieldLabels[section]?.[key] || key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+  
   const renderInputField = (section: string, key: string, value: any) => {
     const isDropdown = Object.keys(dropdownOptions).includes(key);
     const isDateField = dateFields.includes(key);
+    console.log("isDateField",isDateField)
 
     const handleFieldClick = () => {
       if (!isEditMode) {
@@ -200,35 +330,31 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     };
 
     if (isDateField) {
-      let formattedDate = '';
       if (value) {
         const date = new Date(value);
         if (!isNaN(date.getTime())) {
+          let formattedDate = '';
           formattedDate = date.toISOString().split('T')[0];
         }
       }
 
       return (
         <TextField
-          fullWidth
-          type="date"
-          value={formattedDate}
-          onClick={handleFieldClick}
-          onChange={(e) => handleInputChange(e, section, key)}
-          variant="outlined"
-          disabled={!isEditable}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          sx={{
-            '& .MuiInputBase-input': {
-              padding: '6px 8px',
-              fontSize: '12px',
-              color: '#4d4d4d',
-            },
-            height: '30px',
-          }}
-        />
+        fullWidth
+        value={isEditable ? value || '' : formatFieldValue(section, key, value)}
+        onClick={handleFieldClick}
+        onChange={(e) => handleInputChange(e, section, key)}
+        variant="outlined"
+        disabled={!isEditable}
+        sx={{
+          '& .MuiInputBase-input': {
+            padding: '6px 8px',
+            fontSize: '12px',
+            color: '#4d4d4d',
+          },
+          height: '30px',
+        }}
+      />
       );
     }
 
@@ -236,7 +362,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
       return (
         <Select
           fullWidth
-          value={value || ''}
+          value={isEditable ? value || '' : formatFieldValue(section, key, value)}
           onClick={handleFieldClick}
           onChange={(e) => handleInputChange(e, section, key)}
           variant="outlined"
@@ -298,7 +424,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
 
     const entries = Object.entries(sectionData);
     const rows = [];
-
+    console.log(section,"This is the data in the secxtion ")
     for (let i = 0; i < entries.length; i += 2) {
       const firstField = entries[i];
       const secondField = entries[i + 1];
@@ -327,7 +453,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
               padding: '4px',  
             }}
           >
-            {capitalizeLabel(firstField[0])}
+           {capitalizeLabel(section, firstField[0])}
           </TableCell>
           <TableCell sx={{ width: '12%', padding: '4px', height: '20px' }}>
             {renderInputField(section, firstField[0], firstField[1])}
@@ -346,7 +472,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
                   padding: '4px', 
                 }}
               >
-                {capitalizeLabel(secondField[0])}
+               {capitalizeLabel(section, secondField[0])}
               </TableCell>
               <TableCell sx={{ width: '12%', padding: '4px', height: '40px' }}>
                 {renderInputField(section, secondField[0], secondField[1])}
@@ -366,6 +492,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   };
 
   const renderSection = (title: string, sectionKey: string) => (
+    
     <Container maxWidth="lg">
       <Card sx={{ mt: 1 }}>
         <CardContent>
@@ -379,12 +506,14 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
                 <Table size="small">
                   <TableBody>
                     {renderFormFields(sectionKey, formData[sectionKey])}
+                    
                   </TableBody>
                 </Table>
               </TableContainer>
             </Grid>
             
           </Grid>
+          
         </CardContent>
       </Card>
     </Container>
@@ -438,33 +567,33 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
                     }}
                   >
 
-        <Box style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-            <Box style={{ width: '93%', textAlign: 'center' }}>
+        <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
+            <div style={{ width: '93%', textAlign: 'center' }}>
               <Tabs
                 value={tabIndex}
                 onChange={(e, newTabIndex) => setTabIndex(newTabIndex)}
                 centered
-                TabIndicatorProps={{ style: { display: 'none' } }}
-
               >
                 <Tab label="Basic Info" />
                 <Tab label="Market Data" />
                 <Tab label="Deal Color" />
               </Tabs>
-            </Box>
+            </div>
 
-            <Box style={{ width: '7%', textAlign: 'right' }}>
+            <div style={{ width: '7%', textAlign: 'right' }}>
               <Button
                 variant="contained"
-                color={isEditMode ? 'success' : 'secondary'}
+                color={isEditMode ? 'success' : 'primary'}
                 onClick={isEditMode ? handleSave : handleEditClick}
                 sx={{ marginRight: '15px' }} 
               >
                 {isEditMode ? 'Save' : 'Edit'}
               </Button>
-            </Box>
-          </Box>
+            </div>
+          </div>
       </Tabs>
+
+
 
 
       {/* Conditionally render content based on selected tab */}
