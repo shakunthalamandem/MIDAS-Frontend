@@ -26,7 +26,7 @@ const formatNumber = (value: number) => {
 };
 
 const Fundwisedata: React.FC = () => {
-    const [data, setData] = useState<{ fund: string; Jan: number; Feb: number; Mar: number; Apr: number; YTD: number }[]>([]);
+    const [data, setData] = useState<{ fund: string; Jan: number; Feb: number; Mar: number; Apr: number; May: number; YTD: number }[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -63,6 +63,7 @@ const Fundwisedata: React.FC = () => {
                     const Feb = fundValues.Feb || 0;
                     const Mar = fundValues.Mar || 0;
                     const Apr = fundValues.Apr || 0;
+                    const May = fundValues.May || 0;
                     const YTD = fundValues.YTD || 0; 
 
                     return {
@@ -70,7 +71,8 @@ const Fundwisedata: React.FC = () => {
                         Jan,
                         Feb,
                         Mar,
-                        Apr, // Add Apr column
+                        Apr,
+                        May,
                         YTD, // Add YTD column
                     };
                 });
@@ -91,6 +93,7 @@ const Fundwisedata: React.FC = () => {
     const totalFeb = data.reduce((sum, row) => sum + row.Feb, 0);
     const totalMar = data.reduce((sum, row) => sum + row.Mar, 0);
     const totalApr = data.reduce((sum, row) => sum + row.Apr, 0);
+    const totalMay = data.reduce((sum, row) => sum + row.May, 0);
     const totalYTD = data.reduce((sum, row) => sum + row.YTD, 0); // Calculate YTD total
 
     return (
@@ -127,6 +130,9 @@ const Fundwisedata: React.FC = () => {
                                         Apr
                                     </TableCell>
                                     <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
+                                        May
+                                    </TableCell>
+                                    <TableCell sx={{ color: "#ffffff", fontWeight: "bold", border: "1px solid #ddd", textAlign: "center" }}>
                                         YTD (Till Today)
                                     </TableCell>
                                 </TableRow>
@@ -156,6 +162,9 @@ const Fundwisedata: React.FC = () => {
                                             {formatNumber(row.Apr)}
                                         </TableCell>
                                         <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
+                                            {formatNumber(row.May)}
+                                        </TableCell>
+                                        <TableCell sx={{ border: "1px solid #ddd", textAlign: "center" }}>
                                             {formatNumber(row.YTD)}
                                         </TableCell>
                                     </TableRow>
@@ -176,6 +185,9 @@ const Fundwisedata: React.FC = () => {
                                     </TableCell>
                                     <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
                                         {formatNumber(totalApr)}
+                                    </TableCell>
+                                    <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
+                                        {formatNumber(totalMay)}
                                     </TableCell>
                                     <TableCell sx={{ border: "1px solid #ddd", textAlign: "center", fontWeight: "bold" }}>
                                         {formatNumber(totalYTD)}
