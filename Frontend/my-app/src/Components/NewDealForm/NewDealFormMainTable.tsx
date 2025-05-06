@@ -348,6 +348,10 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
             fontSize: '12px',
             color: '#4d4d4d',
           },
+          '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
+    opacity: 1,
+    '-webkit-text-fill-color': '#08001c',  // Change text color to red when disabled
+  },
           height: '30px',
         }}
       />
@@ -372,10 +376,15 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
             '& .MuiOutlinedInput-notchedOutline': {
               borderRadius: '4px',
             },
+            '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
+              opacity: 1,
+              '-webkit-text-fill-color': '#08001c',  // Change text color to red when disabled
+            },
             '& .MuiSelect-icon': {
               top: '50%',
               transform: 'translateY(-50%)',
             }
+
           }}
         >
           {dropdownOptions[key].map((option) => (
@@ -408,6 +417,10 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
             padding: '6px 8px',
             fontSize: '12px',
             color: '#4d4d4d',
+          },
+          '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
+            opacity: 1,
+            '-webkit-text-fill-color': '#08001c',  // Change text color to red when disabled
           },
           height: '30px',
         }}
