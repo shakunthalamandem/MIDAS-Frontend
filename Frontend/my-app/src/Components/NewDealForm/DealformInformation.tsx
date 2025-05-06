@@ -29,7 +29,7 @@ const DealformInformation = () => {
   const [results, setResults] = useState<Data[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [selectedTicker, setSelectedTicker] = useState<{ ticker: string }>({ ticker: '' });
+  const [selectedTicker, setSelectedTicker] = useState<{ ticker: string }>({ ticker: 'SARO' });
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('access_token');
