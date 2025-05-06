@@ -17,6 +17,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import NewDealFormMainTable from './NewDealFormMainTable';
 import BasicInfo from './BasicInfo';
+import SelectedTicker from '../Main/MonasheeGraphs/SelectedTicker';
 
 interface Data {
   ticker: string;
@@ -184,10 +185,14 @@ const DealformInformation = () => {
 
       {/* Conditional Rendering */}
       {selectedTicker.ticker ? (
-        <NewDealFormMainTable selecteditems={selectedTicker} />
-      ) : (
-        <BasicInfo />
-      )}
+  <>
+    <NewDealFormMainTable selecteditems={selectedTicker} />
+    <SelectedTicker ticker={selectedTicker.ticker} />
+  </>
+) : (
+  <BasicInfo />
+)}
+
     </Container>
   );
 };
