@@ -555,20 +555,21 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
                     }}
                   >
 
-        <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-            <div style={{ width: '93%', textAlign: 'center' }}>
+        <Box style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
+            <Box style={{ width: '93%', textAlign: 'center' }}>
               <Tabs
                 value={tabIndex}
                 onChange={(e, newTabIndex) => setTabIndex(newTabIndex)}
                 centered
+                TabIndicatorProps={{ style: { display: 'none' } }} // Hides the default indicator
               >
                 <Tab label="Basic Info" />
                 <Tab label="Market Data" />
                 <Tab label="Deal Color" />
               </Tabs>
-            </div>
+            </Box>
 
-            <div style={{ width: '7%', textAlign: 'right' }}>
+            <Box style={{ width: '7%', textAlign: 'right' }}>
               <Button
                 variant="contained"
                 color={isEditMode ? 'success' : 'primary'}
@@ -577,8 +578,8 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
               >
                 {isEditMode ? 'Save' : 'Edit'}
               </Button>
-            </div>
-          </div>
+            </Box>
+          </Box>
       </Tabs>
 
 
