@@ -47,7 +47,7 @@ const NewDealFormMain: React.FC = () => {
           }}
         >
           <Typography variant="h6" fontWeight="bold" color="#002060">
-            Deal Information Form
+            Deal Information Forms
           </Typography>
         </Box>
 

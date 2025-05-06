@@ -52,11 +52,11 @@ const tableLeft1: Row[] = [
   { label: "Deal Size Shares", key: "deal_size_shares", type: "number" },
   { label: "Deal Captain", key: "deal_captain", type: "select", options: ['Robin','Tom','Block', 'HC', 'Jay','Others'] },
   { label: "Lead Bank", key: "invitation_bank" },
-  { label: "Sponsors (Y/N)", key: "sponsor", type: "select", options: ["Y", "N","0"] },
-  { label: "Primary %", key: "percentage_primary", type: "number" },
+  { label: "Sponsors (Y/N)", key: "sponsor", type: "select", options: ["Y", "N"] },
 ];
 
 const tableRight1: Row[] = [
+  { label: "Primary %", key: "percentage_primary", type: "number" },
   { label: "Price (Local Currency)", key: "price_local_currency", type: "number" },
   { label: "Discount %", key: "discount_percentage", type: "number" },
   { label: "Last Close Price", key: "last_close_price", type: "number" },
@@ -86,10 +86,12 @@ const tableLeft2: Row[] = [
   { label: "Percent Change Last 7 Days", key: "percent_change_last_7_days" },
   { label: "52 Week High", key: "week_52_high", type: "number" },
   { label: "Percent Below 52 Week High", key: "percent_below_52_week_high" },
-  { label: "3M ADTV (EU) USD", key: "three_month_adtv_eu_usd" },
+
+  
 ];
 
 const tableRight2: Row[] = [
+  { label: "3M ADTV (EU) USD", key: "three_month_adtv_eu_usd" },
   { label: "3M ADTV (EU) Shares", key: "three_month_adtv_eu_shares" },
   { label: "3M ADTV (Local) USD", key: "three_month_adtv_local_usd" },
   { label: "3M ADTV (Local) Shares", key: "three_month_adtv_local_shares" },
@@ -113,13 +115,11 @@ const tableLeft3: Row[] = [
   { label: "Hedge Funds Allocation (%)", key: "hedge_funds_allocation_percent", type: "number" },
   { label: "Local Allocation (%)", key: "local_allocation_percent", type: "number" },
   { label: "International Allocation (%)", key: "international_allocation_percent", type: "number" },
-  { label: "Top 10 Allocation Concentration (%)", key: "top_10_allocation_concentration_percent", type: "number" },
 ];
 
 const tableRight3: Row[] = [
-  { label: "Aftermarket Order (Y/N)", key: "aftermarket_order", type: "select", options: ["True", "False"] },
-  { label: "Aftermarket Strategy", key: "aftermarket_strategy" ,type: "select", options: ["True", "False"]},
-
+  { label: "Aftermarket Order", key: "aftermarket_order" },
+  { label: "Aftermarket Strategy", key: "aftermarket_strategy" },
   { label: "Target Price (Local)", key: "target_price_local", type: "number" },
   { label: "Target Price % Above Issue", key: "target_price_percentage_above_issue", type: "number" },
   { label: "Stop Price (Local)", key: "stop_price_local", type: "number" },
