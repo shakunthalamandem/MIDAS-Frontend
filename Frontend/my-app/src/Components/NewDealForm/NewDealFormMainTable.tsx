@@ -437,21 +437,33 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
                       },
                     }}
                   >
-        <Tab label="Basic Info" />
-        <Tab label="Market Data" />
-        <Tab label="Deal Color" />
-        <Grid item xs={12} textAlign="right" >
-          <Button
+
+        <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
+            <div style={{ width: '93%', textAlign: 'center' }}>
+              <Tabs
+                value={tabIndex}
+                onChange={(e, newTabIndex) => setTabIndex(newTabIndex)}
+                centered
+              >
+                <Tab label="Basic Info" />
+                <Tab label="Market Data" />
+                <Tab label="Deal Color" />
+              </Tabs>
+            </div>
+
+            <div style={{ width: '7%', textAlign: 'right' }}>
+              <Button
                 variant="contained"
                 color={isEditMode ? 'success' : 'primary'}
                 onClick={isEditMode ? handleSave : handleEditClick}
-                sx={{marginRight:'10px'}}
+                sx={{ marginRight: '15px' }} 
               >
                 {isEditMode ? 'Save' : 'Edit'}
               </Button>
-            </Grid>
-        
+            </div>
+          </div>
       </Tabs>
+
 
       {/* Conditionally render content based on selected tab */}
       {tabIndex === 0 && renderSection('Basic Info', 'basic_info')}
