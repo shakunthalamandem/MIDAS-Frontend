@@ -73,7 +73,7 @@ const tableLeft2: Row[] = [
   { label: "% of Free Float ", key: "percent_of_free_float_current_float" },
   { label: "Short Interest (Shares)", key: "short_interest_shares" },
   { label: "Short Interest ($ Million)", key: "short_interest_dollar_amount" },
-  { label: "Short Interest (% of Deal Size)", key: "short_interest_percentage_of_deal" },
+  { label: "Short Interest as % of Deal Size", key: "short_interest_percentage_of_deal" },
   { label: "Shares Outstanding ", key: "shares_outstanding_pre_deal", type: "number" },
   { label: "Market Cap ($ Million)", key: "market_cap_pre_deal_usd", type: "number" },
   { label: "Launch Date", key: "launch_date", type: "date" },
@@ -82,7 +82,7 @@ const tableLeft2: Row[] = [
   { label: "Next Results Date", key: "next_results_date", type: "date" },
   { label: "Percentage Change in Last 7 Days", key: "percent_change_last_7_days" },
   { label: "52 Week High($)", key: "week_52_high", type: "number" },
-  { label: "Percentage Below 52 Week High", key: "percent_below_52_week_high" },
+  { label: "Percent Change from 52 Week High", key: "percent_below_52_week_high" },
 
   
 ];
@@ -104,7 +104,7 @@ const tableRight2: Row[] = [
 ];
 
 const tableLeft3: Row[] = [
-  { label: "Deal Color", key: "deal_color" },
+  { label: "Deal Colour", key: "deal_color" },
   { label: "Institutional Allocation (%)", key: "institutional_allocation_percent", type: "number" },
   { label: "Retail Allocation (%)", key: "retail_allocation_percent", type: "number" },
   { label: "Long Only Allocation (%)", key: "long_only_allocation_percent", type: "number" },
