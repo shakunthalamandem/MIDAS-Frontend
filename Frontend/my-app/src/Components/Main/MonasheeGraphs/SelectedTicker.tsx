@@ -95,7 +95,7 @@ const SelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
             }))
           );
         } else {
-          throw new Error("Failed to fetch data");
+          throw new Error("The Deal Information Not found in Past..!");
         }
       } catch (err: any) {
         setError(err.message || "An error occurred while fetching data");
