@@ -99,7 +99,7 @@ const DealformInformation = () => {
       flexWrap="wrap"
     >
       <Typography
-        variant="h6"
+        variant="h5"
         sx={{
           fontWeight: 600,
           minWidth: 'fit-content',
