@@ -52,7 +52,8 @@ const tableLeft1: Row[] = [
   { label: "Deal Size Shares", key: "deal_size_shares", type: "number" },
   { label: "Deal Captain", key: "deal_captain", type: "select", options: ['Robin','Tom','Block', 'HC', 'Jay','Others'] },
   { label: "Lead Bank", key: "invitation_bank" },
-  { label: "Sponsors (Y/N)", key: "sponsor", type: "select", options: ["Y", "N"] },
+  { label: "Sponsors (Y/N)", key: "sponsor", type: "select", options: ["Y", "N","0"] },
+  { label: "Primary %", key: "percentage_primary", type: "number" },
 ];
 
 const tableRight1: Row[] = [
@@ -118,8 +119,9 @@ const tableLeft3: Row[] = [
 ];
 
 const tableRight3: Row[] = [
-  { label: "Aftermarket Order", key: "aftermarket_order" },
-  { label: "Aftermarket Strategy", key: "aftermarket_strategy" },
+  { label: "Aftermarket Order (Y/N)", key: "aftermarket_order", type: "select", options: ["True", "False"] },
+  { label: "Aftermarket Strategy", key: "aftermarket_strategy" ,type: "select", options: ["True", "False"]},
+  { label: "Top 10 Allocation Concentration (%)", key: "top_10_allocation_concentration_percent", type: "number" },
   { label: "Target Price (Local)", key: "target_price_local", type: "number" },
   { label: "Target Price % Above Issue", key: "target_price_percentage_above_issue", type: "number" },
   { label: "Stop Price (Local)", key: "stop_price_local", type: "number" },
