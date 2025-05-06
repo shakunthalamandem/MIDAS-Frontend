@@ -223,7 +223,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   const navigate = useNavigate();
 
   const handleIconClick = () => {
-    navigate('/equity/issue_market');
+    window.location.href = '/equity/issue_market';
   };
 
   const formatFieldValue = (section: string, key: string, value: any): string => {
