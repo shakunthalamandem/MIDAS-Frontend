@@ -40,10 +40,10 @@ const ConvertYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
     "Deal Volume Without Nulls",
     "% of Positively Performing Deals",
     "% of Negatively Performing Deals",
-    "Weighted Avg T+1M Return (Positive Deals)",
-    "Weighted Avg T+1M Return (Negative Deals)",
+    "Weighted Avg T+2M Return (Positive Deals)",
+    "Weighted Avg T+2M Return (Negative Deals)",
     "Expected Returns",
-    "Opportunity Value (T + 1M)",
+    "Opportunity Value (T + 2M)",
   ];
 
   return (
