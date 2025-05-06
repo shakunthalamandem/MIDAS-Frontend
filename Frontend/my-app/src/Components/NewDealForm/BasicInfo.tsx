@@ -480,48 +480,60 @@ const Basci1: React.FC = () => {
           </Box>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <TableContainer component={Paper}>
-                <Table size="small">
-                  <TableBody>
-                    {tableLeft3.map((row, i) => (
-                      <TableRow
-                        key={row.key}
-                        sx={{
-                          backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff",
-                        }}
-                      >
-                        <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>{row.label}</TableCell>
-                        <TableCell>
-                          {row.type === "select" ? (
-                            <Select
-                              fullWidth
-                              size="small"
-                              name={row.key}
-                              value={formData[row.key as keyof typeof formData]}
-                              onChange={handleSelectChange}
-                            >
-                              {row.options?.map((opt) => (
-                                <MenuItem key={opt} value={opt}>
-                                  {opt}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          ) : (
-                            <TextField
-                              fullWidth
-                              size="small"
-                              type={row.type || "text"}
-                              name={row.key}
-                              value={formData[row.key as keyof typeof formData]}
-                              onChange={handleChange}
-                            />
-                          )}
-                        </TableCell>
-                      </TableRow>
+            <TableContainer component={Paper}>
+      <Table size="small">
+        <TableBody>
+          {tableLeft3.map((row, i) => (
+            <TableRow
+              key={row.key}
+              sx={{
+                backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff",
+              }}
+            >
+              <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
+                {row.label}
+              </TableCell>
+              <TableCell>
+                {row.type === "select" ? (
+                  <Select
+                    fullWidth
+                    size="small"
+                    name={row.key}
+                    value={formData[row.key as keyof typeof formData]}
+                    onChange={handleSelectChange}
+                  >
+                    {row.options?.map((opt) => (
+                      <MenuItem key={opt} value={opt}>
+                        {opt}
+                      </MenuItem>
                     ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                  </Select>
+                ) : row.key === "deal_color" ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    multiline
+                    minRows={3}
+                    name={row.key}
+                    value={formData[row.key as keyof typeof formData]}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    type={row.type || "text"}
+                    name={row.key}
+                    value={formData[row.key as keyof typeof formData]}
+                    onChange={handleChange}
+                  />
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
             </Grid>
 
             <Grid item xs={12} sm={6}>
