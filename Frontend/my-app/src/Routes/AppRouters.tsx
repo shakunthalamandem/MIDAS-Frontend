@@ -49,6 +49,7 @@ import DownloadDeals from "../Components/Uploads/DownloadDeals";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 import DealformInformation from "../Components/NewDealForm/DealformInformation";
 import BasicInfo from "../Components/NewDealForm/BasicInfo";
+import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
 
 
 
@@ -68,7 +69,7 @@ const AppRouters: React.FC = () => {
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
         <Route path="/equity/issue_markets" element={<AuthGuard><DealFormMain /></AuthGuard>} />
-        <Route path="/equity/create_form" element={<AuthGuard><  DealformInformation /></AuthGuard>} />
+        <Route path="/equity/create_form" element={<AuthGuard><  DealCreateForm /></AuthGuard>} />
 
 
         <Route path="/equity/ml_equity" element={<AuthGuard><MlEquityMain /></AuthGuard>} />
