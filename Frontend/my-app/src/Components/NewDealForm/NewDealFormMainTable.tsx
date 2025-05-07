@@ -420,7 +420,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
             padding: '6px 8px',
             fontSize: '12px',
             color: '#4d4d4d',
-            overflow: 'hidden', // Hide scrollbar
+            overflow: 'hidden', 
           },
           '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
             opacity: 1,
