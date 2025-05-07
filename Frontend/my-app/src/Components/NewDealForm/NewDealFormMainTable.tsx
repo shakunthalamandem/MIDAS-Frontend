@@ -413,21 +413,23 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         variant="outlined"
         disabled={!isEditable}
         multiline={key === "deal_colour"}
-        rows={key === "deal_colour" ? 10 : 1}
+        minRows={key === "deal_colour" ? 10 : 1}
+        maxRows={key === "deal_colour" ? undefined : 1}
         sx={{
           '& .MuiInputBase-input': {
             padding: '6px 8px',
             fontSize: '12px',
             color: '#4d4d4d',
+            overflow: 'hidden', // Hide scrollbar
           },
           '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
             opacity: 1,
-            '-webkit-text-fill-color': '#08001c',  // Change text color to red when disabled
+            '-webkit-text-fill-color': '#08001c',
           },
-          height: key === "deal_color" ? '30px':'auto' ,
         }}
       />
     );
+    
   };
 
   const renderFormFields = (section: string, sectionData: any) => {
