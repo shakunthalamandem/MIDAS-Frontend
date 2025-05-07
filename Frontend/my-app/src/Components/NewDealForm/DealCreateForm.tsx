@@ -114,8 +114,9 @@ Welcome to the Deal Information Form! Easily input all relevant details and trac
           color: '#002060',
         }}
       >
-        Deal Information Form
-      </Typography>
+New Deal Entry Form
+
+</Typography>
 
       <TextField
         label="Search Ticker"
