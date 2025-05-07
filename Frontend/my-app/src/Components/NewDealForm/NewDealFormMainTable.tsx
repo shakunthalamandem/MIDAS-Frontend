@@ -412,6 +412,8 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         onChange={(e) => handleInputChange(e, section, key)}
         variant="outlined"
         disabled={!isEditable}
+        multiline={key === "deal_colour"}
+        rows={key === "deal_colour" ? 3 : 1}
         sx={{
           '& .MuiInputBase-input': {
             padding: '6px 8px',
@@ -422,7 +424,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
             opacity: 1,
             '-webkit-text-fill-color': '#08001c',  // Change text color to red when disabled
           },
-          height: '30px',
+          height: key === "deal_color" ? '30px':'auto' ,
         }}
       />
     );
