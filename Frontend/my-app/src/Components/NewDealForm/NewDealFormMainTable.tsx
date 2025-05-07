@@ -413,7 +413,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         variant="outlined"
         disabled={!isEditable}
         multiline={key === "deal_colour"}
-        rows={key === "deal_colour" ? 3 : 1}
+        rows={key === "deal_colour" ? 10 : 1}
         sx={{
           '& .MuiInputBase-input': {
             padding: '6px 8px',
