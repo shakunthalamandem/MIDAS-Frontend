@@ -90,7 +90,7 @@ const tableLeft1: Row[] = [
 ];
 
 const tableRight1: Row[] = [
-  { label: "Primary %", key: "percentage_primary", type: "number" },
+  { label: "Primary %", key: "percentage_primary" },
   { label: "Issue Price ($)", key: "price_local_currency", type: "number" },
   {
     label: "Discount from Announcement Price (%)",
