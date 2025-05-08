@@ -141,6 +141,7 @@ const fieldFormatters: Record<string, Record<string, 'currency' | 'percentage' |
 
 
 const dropdownOptions: Record<string, string[]> = {
+  aftermarket_order:['True','False'],
   region: ['US', 'EMEA', 'APAC', 'Non-US America'],
   deal_type: ['IPO', 'FO'],
   fo_type: ['Marketed', 'Overnight', 'Block'],
