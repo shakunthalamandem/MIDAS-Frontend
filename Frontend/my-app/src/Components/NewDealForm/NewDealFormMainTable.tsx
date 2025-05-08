@@ -106,7 +106,7 @@ const fieldLabels: Record<string, Record<string, string>> = {
     local_allocation_percent: "Local Allocation (%)",
     international_allocation_percent: "International Allocation (%)",
     top_10_allocation_concentration_percent: "Top 10 Allocation Concentration (%)",
-    aftermarket_order: "Aftermarket Order",
+    aftermarket_order: "Aftermarket Order (Y/N)",
     aftermarket_strategy: "Aftermarket Strategy",
     target_price_local: "Target Price ($)",
     target_price_percentage_above_issue: "Target Price % Above Issue",
@@ -141,7 +141,7 @@ const fieldFormatters: Record<string, Record<string, 'currency' | 'percentage' |
 
 
 const dropdownOptions: Record<string, string[]> = {
-  aftermarket_order:['True','False'],
+  aftermarket_order:['Yes','No'],
   region: ['US', 'EMEA', 'APAC', 'Non-US America'],
   deal_type: ['IPO', 'FO'],
   fo_type: ['Marketed', 'Overnight', 'Block'],
@@ -150,6 +150,7 @@ const dropdownOptions: Record<string, string[]> = {
     "Materials", "Industrials", "Energy", "Utilities", "Consumer Discretionary", "Communication Services"
   ],
   deal_captain: ['Robin', 'Tom', 'Block', 'HC', 'Jay', 'Others'],
+  sponsor:['Y','N']
 };
 
 const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selecteditems }) => {

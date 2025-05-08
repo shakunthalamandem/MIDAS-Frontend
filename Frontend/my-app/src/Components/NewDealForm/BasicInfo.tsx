@@ -217,13 +217,11 @@ const tableRight3: Row[] = [
     label: "Aftermarket Order (Y/N)",
     key: "aftermarket_order",
     type: "select",
-    options: ["True", "False"],
+    options: ["Yes", "No"],
   },
   {
     label: "Aftermarket Strategy",
     key: "aftermarket_strategy",
-    type: "select",
-    options: ["True", "False"],
   },
   {
     label: "Top 10 Allocation Concentration (%)",
