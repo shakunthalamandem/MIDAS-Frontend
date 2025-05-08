@@ -34,7 +34,7 @@ interface Row {
 
 const tableLeft1: Row[] = [
   { label: "Ticker", key: "ticker" },
-  { label: "Pricing Date", key: "launch_date", type: "date" },
+  { label: "Pricing Date", key: "pricing_date", type: "date" },
   { label: "Issuer Name", key: "vendor_issuer" },
   {
     label: "Region",
@@ -90,7 +90,7 @@ const tableLeft1: Row[] = [
 ];
 
 const tableRight1: Row[] = [
-  { label: "Primary %", key: "percentage_primary" },
+  { label: "Primary %", key: "percentage_primary", type:"number" },
   { label: "Issue Price ($)", key: "price_local_currency", type: "number" },
   {
     label: "Discount from Announcement Price (%)",
@@ -128,14 +128,14 @@ const tableRight1: Row[] = [
 ];
 
 const tableLeft2: Row[] = [
-  { label: "Ltm Dividend Yield (%)", key: "ltm_dividend_yield" },
+  { label: "Ltm Dividend Yield (%)", key: "ltm_dividend_yield",type: "number" },
 
-  { label: "% of Free Float ", key: "percent_of_free_float_current_float" },
-  { label: "Short Interest (Shares)", key: "short_interest_shares" },
-  { label: "Short Interest ($ Million)", key: "short_interest_dollar_amount" },
+  { label: "% of Free Float ", key: "percent_of_free_float_current_float",type: "number" },
+  { label: "Short Interest (Shares)", key: "short_interest_shares" ,type: "number"},
+  { label: "Short Interest ($ Million)", key: "short_interest_dollar_amount",type: "number" },
   {
     label: "Short Interest as % of Deal Size",
-    key: "short_interest_percentage_of_deal",
+    key: "short_interest_percentage_of_deal",type: "number"
   },
   {
     label: "Shares Outstanding ",
@@ -153,29 +153,29 @@ const tableLeft2: Row[] = [
   { label: "Next Results Date", key: "next_results_date", type: "date" },
   {
     label: "Percentage Change in Last 7 Days",
-    key: "percent_change_last_7_days",
+    key: "percent_change_last_7_days",type: "number"
   },
   { label: "52 Week High($)", key: "week_52_high", type: "number" },
   {
     label: "Percent Change from 52 Week High",
-    key: "percent_below_52_week_high",
+    key: "percent_below_52_week_high",type :"number"
   },
 ];
 
 const tableRight2: Row[] = [
-  { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield" },
-  { label: "3M ADTV  ($ Million)", key: "three_month_adtv_local_usd" },
-  { label: "3M ADTV  Shares", key: "three_month_adtv_local_shares" },
+  { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield" , type: "number"},
+  { label: "3M ADTV  ($ Million)", key: "three_month_adtv_local_usd", type: "number" },
+  { label: "3M ADTV  Shares", key: "three_month_adtv_local_shares", type: "number" },
   { label: "Beta (S&P500)", key: "beta_smi", type: "number" },
   { label: "3M Volatility", key: "three_month_volatility", type: "number" },
   { label: "RSI (14D)", key: "rsi_14d", type: "number" },
   { label: "RSI (30D)", key: "rsi_30d", type: "number" },
   { label: "DMI (14D)", key: "dmi_14d", type: "number" },
   { label: "MACD (9D)", key: "macd_9d", type: "number" },
-  { label: "DMA 20 ", key: "stock_relative_to_ma_20d" },
-  { label: "DMA 50", key: "stock_relative_to_ma_50d" },
-  { label: "DMA 100", key: "stock_relative_to_ma_100d" },
-  { label: "DMA 200", key: "stock_relative_to_ma_200d" },
+  { label: "DMA 20 ", key: "stock_relative_to_ma_20d", type: "number" },
+  { label: "DMA 50", key: "stock_relative_to_ma_50d" , type: "number"},
+  { label: "DMA 100", key: "stock_relative_to_ma_100d" , type: "number"},
+  { label: "DMA 200", key: "stock_relative_to_ma_200d" , type: "number"},
 ];
 
 const tableLeft3: Row[] = [
@@ -295,10 +295,6 @@ const BasicInfo: React.FC = () => {
     shares_outstanding_pre_deal: "",
     market_cap_pre_deal_usd: "",
     market_cap_pre_deal_chf: "",
-    launch_date: "",
-    trade_date: "",
-    settlement_date: "",
-    next_results_date: "",
     percent_change_last_7_days: "",
     week_52_high: "",
     percent_below_52_week_high: "",
@@ -491,38 +487,42 @@ const BasicInfo: React.FC = () => {
               <Grid item xs={12} sm={6} key={index}>
                 <TableContainer component={Paper}>
                   <Table size="small">
-                    <TableBody>
-                      {tableData.map((row, i) => (
-                        <TableRow key={row.key} sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}>
-                          <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
-                            {row.label}
-                          </TableCell>
-                          <TableCell>
-                            {row.type === "select" ? (
-                              <Select
-                                fullWidth
-                                size="small"
-                                name={row.key}
-                                value={formData[row.key as keyof typeof formData]}                                onChange={handleSelectChange}
-                              >
-                                {row.options?.map((opt) => (
-                                  <MenuItem key={opt} value={opt}>
-                                    {opt}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            ) : (
-                              <TextField
-                                fullWidth
-                                size="small"
-                                name={row.key}
-                                value={formData[row.key as keyof typeof formData]}                                onChange={handleChange}
-                              />
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
+                  <TableBody>
+  {tableData.map((row, i) => (
+    <TableRow key={row.key} sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}>
+      <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
+        {row.label}
+      </TableCell>
+      <TableCell>
+        {row.type === "select" ? (
+          <Select
+            fullWidth
+            size="small"
+            name={row.key}
+            value={formData[row.key as keyof typeof formData]}
+            onChange={handleSelectChange}
+          >
+            {row.options?.map((opt) => (
+              <MenuItem key={opt} value={opt}>
+                {opt}
+              </MenuItem>
+            ))}
+          </Select>
+        ) : (
+          <TextField
+            fullWidth
+            size="small"
+            name={row.key}
+            value={formData[row.key as keyof typeof formData]}
+            onChange={handleChange}
+            type={row.type}  // Add this line to use the correct input type
+          />
+        )}
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
                   </Table>
                 </TableContainer>
               </Grid>
@@ -544,38 +544,41 @@ const BasicInfo: React.FC = () => {
               <Grid item xs={12} sm={6} key={index}>
                 <TableContainer component={Paper}>
                   <Table size="small">
-                    <TableBody>
-                      {tableData.map((row, i) => (
-                        <TableRow key={row.key} sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}>
-                          <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
-                            {row.label}
-                          </TableCell>
-                          <TableCell>
-                            {row.type === "select" ? (
-                              <Select
-                                fullWidth
-                                size="small"
-                                name={row.key}
-                                value={formData[row.key as keyof typeof formData]}                                onChange={handleSelectChange}
-                              >
-                                {row.options?.map((opt) => (
-                                  <MenuItem key={opt} value={opt}>
-                                    {opt}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            ) : (
-                              <TextField
-                                fullWidth
-                                size="small"
-                                name={row.key}
-                                value={formData[row.key as keyof typeof formData]}                                onChange={handleChange}
-                              />
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
+                  <TableBody>
+  {tableData.map((row, i) => (
+    <TableRow key={row.key} sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}>
+      <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
+        {row.label}
+      </TableCell>
+      <TableCell>
+        {row.type === "select" ? (
+          <Select
+            fullWidth
+            size="small"
+            name={row.key}
+            value={formData[row.key as keyof typeof formData]}
+            onChange={handleSelectChange}
+          >
+            {row.options?.map((opt) => (
+              <MenuItem key={opt} value={opt}>
+                {opt}
+              </MenuItem>
+            ))}
+          </Select>
+        ) : (
+          <TextField
+            fullWidth
+            size="small"
+            name={row.key}
+            value={formData[row.key as keyof typeof formData]}
+            onChange={handleChange}
+            type={row.type}  // Add this line to use the correct input type
+          />
+        )}
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
                   </Table>
                 </TableContainer>
               </Grid>
@@ -597,48 +600,41 @@ const BasicInfo: React.FC = () => {
               <Grid item xs={12} sm={6} key={index}>
                 <TableContainer component={Paper}>
                   <Table size="small">
-                    <TableBody>
-                      {tableData.map((row, i) => (
-                        <TableRow key={row.key} sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}>
-                          <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
-                            {row.label}
-                          </TableCell>
-                          <TableCell>
-                            {row.type === "select" ? (
-                              <Select
-                                fullWidth
-                                size="small"
-                                name={row.key}
-                                value={formData[row.key as keyof typeof formData]}                                onChange={handleSelectChange}
-                              >
-                                {row.options?.map((opt) => (
-                                  <MenuItem key={opt} value={opt}>
-                                    {opt}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            ) : row.key === "deal_color" ? (
-                              <TextField
-                                fullWidth
-                                size="small"
-                                multiline
-                                minRows={3}
-                                name={row.key}
-                                value={formData[row.key]}
-                                onChange={handleChange}
-                              />
-                            ) : (
-                              <TextField
-                                fullWidth
-                                size="small"
-                                name={row.key}
-                                value={formData[row.key as keyof typeof formData]}                                onChange={handleChange}
-                              />
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
+                  <TableBody>
+  {tableData.map((row, i) => (
+    <TableRow key={row.key} sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}>
+      <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
+        {row.label}
+      </TableCell>
+      <TableCell>
+        {row.type === "select" ? (
+          <Select
+            fullWidth
+            size="small"
+            name={row.key}
+            value={formData[row.key as keyof typeof formData]}
+            onChange={handleSelectChange}
+          >
+            {row.options?.map((opt) => (
+              <MenuItem key={opt} value={opt}>
+                {opt}
+              </MenuItem>
+            ))}
+          </Select>
+        ) : (
+          <TextField
+            fullWidth
+            size="small"
+            name={row.key}
+            value={formData[row.key as keyof typeof formData]}
+            onChange={handleChange}
+            type={row.type}  // Add this line to use the correct input type
+          />
+        )}
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
                   </Table>
                 </TableContainer>
               </Grid>
