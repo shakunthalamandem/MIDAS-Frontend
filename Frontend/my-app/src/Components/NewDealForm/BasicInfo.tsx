@@ -24,7 +24,6 @@ import {
 import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
 
-// Row type definition
 interface Row {
   label: string;
   key: string;
@@ -295,6 +294,9 @@ const BasicInfo: React.FC = () => {
     shares_outstanding_pre_deal: "",
     market_cap_pre_deal_usd: "",
     market_cap_pre_deal_chf: "",
+    three_month_adtv_local_usd:"",
+    ltm_fcf_yield:"",
+    ltm_dividend_yield:"",
     percent_change_last_7_days: "",
     week_52_high: "",
     percent_below_52_week_high: "",
