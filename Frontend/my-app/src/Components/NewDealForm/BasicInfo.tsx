@@ -129,7 +129,6 @@ const tableRight1: Row[] = [
 
 const tableLeft2: Row[] = [
   { label: "Ltm Dividend Yield (%)", key: "ltm_dividend_yield" },
-  { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield" },
 
   { label: "% of Free Float ", key: "percent_of_free_float_current_float" },
   { label: "Short Interest (Shares)", key: "short_interest_shares" },
@@ -164,6 +163,7 @@ const tableLeft2: Row[] = [
 ];
 
 const tableRight2: Row[] = [
+  { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield" },
   { label: "3M ADTV  ($ Million)", key: "three_month_adtv_local_usd" },
   { label: "3M ADTV  Shares", key: "three_month_adtv_local_shares" },
   { label: "Beta (S&P500)", key: "beta_smi", type: "number" },
