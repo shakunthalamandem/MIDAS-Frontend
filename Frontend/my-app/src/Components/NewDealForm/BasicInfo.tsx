@@ -72,7 +72,7 @@ const tableLeft1: Row[] = [
       "Communication Services",
     ],
   },
-  { label: "Deal Size ($)(M)", key: "deal_size_amount_usd", type: "number" },
+  { label: "Deal Size ($ Million)", key: "deal_size_amount_usd", type: "number" },
   { label: "Deal Size Shares", key: "deal_size_shares", type: "number" },
   {
     label: "Deal Captain",
@@ -128,6 +128,9 @@ const tableRight1: Row[] = [
 ];
 
 const tableLeft2: Row[] = [
+  { label: "Ltm Dividend Yield (%)", key: "percent_of_free_float_current_float" },
+  { label: "Ltm Fcf Yield (%)", key: "percent_of_free_float_current_float" },
+
   { label: "% of Free Float ", key: "percent_of_free_float_current_float" },
   { label: "Short Interest (Shares)", key: "short_interest_shares" },
   { label: "Short Interest ($ Million)", key: "short_interest_dollar_amount" },
@@ -169,7 +172,7 @@ const tableRight2: Row[] = [
   { label: "RSI (30D)", key: "rsi_30d", type: "number" },
   { label: "DMI (14D)", key: "dmi_14d", type: "number" },
   { label: "MACD (9D)", key: "macd_9d", type: "number" },
-  { label: "DMA 20", key: "stock_relative_to_ma_20d" },
+  { label: "DMA 20 ", key: "stock_relative_to_ma_20d" },
   { label: "DMA 50", key: "stock_relative_to_ma_50d" },
   { label: "DMA 100", key: "stock_relative_to_ma_100d" },
   { label: "DMA 200", key: "stock_relative_to_ma_200d" },
@@ -214,13 +217,11 @@ const tableRight3: Row[] = [
     label: "Aftermarket Order (Y/N)",
     key: "aftermarket_order",
     type: "select",
-    options: ["True", "False"],
+    options: ["Yes", "No"],
   },
   {
     label: "Aftermarket Strategy",
     key: "aftermarket_strategy",
-    type: "select",
-    options: ["True", "False"],
   },
   {
     label: "Top 10 Allocation Concentration (%)",

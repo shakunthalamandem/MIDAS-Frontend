@@ -52,7 +52,7 @@ const fieldLabels: Record<string, Record<string, string>> = {
     deal_type: "Deal Type",
     fo_type: "FO Type",
     sector: "Sector",
-    deal_size_amount_usd: "Deal Size  ($ million)",
+    deal_size_amount_usd: "Deal Size ($ Million)",
     deal_size_shares: "Deal Size Shares",
     deal_captain: "Deal Captain",
     invitation_bank: "Lead Bank",
@@ -92,10 +92,10 @@ const fieldLabels: Record<string, Record<string, string>> = {
     rsi_30d: "RSI (30D)",
     dmi_14d: "DMI (14D)",
     macd_9d: "MACD (9D)",
-    stock_relative_to_ma_20d: "DMA (20D)",
-    stock_relative_to_ma_50d: "DMA (50D)",  
-    stock_relative_to_ma_100d: "DMA (100D)",
-    stock_relative_to_ma_200d: "DMA (200D)",
+    stock_relative_to_ma_20d: "DMA 20",
+    stock_relative_to_ma_50d: "DMA 50",  
+    stock_relative_to_ma_100d: "DMA 100",
+    stock_relative_to_ma_200d: "DMA 200",
   },
   deal_color: {
     deal_colour: "Deal Colour",
@@ -106,11 +106,11 @@ const fieldLabels: Record<string, Record<string, string>> = {
     local_allocation_percent: "Local Allocation (%)",
     international_allocation_percent: "International Allocation (%)",
     top_10_allocation_concentration_percent: "Top 10 Allocation Concentration (%)",
-    aftermarket_order: "Aftermarket Order",
+    aftermarket_order: "Aftermarket Order (Y/N)",
     aftermarket_strategy: "Aftermarket Strategy",
-    target_price_local: "Target Price (Local)",
+    target_price_local: "Target Price ($)",
     target_price_percentage_above_issue: "Target Price % Above Issue",
-    stop_price_local: "Stop Price (Local)",
+    stop_price_local: "Stop Price ($)",
     stop_price_percentage_below_issue: "Stop Price % Below Issue"
 }
 
@@ -141,7 +141,7 @@ const fieldFormatters: Record<string, Record<string, 'currency' | 'percentage' |
 
 
 const dropdownOptions: Record<string, string[]> = {
-  aftermarket_order:['True','False'],
+  aftermarket_order:['Yes','No'],
   region: ['US', 'EMEA', 'APAC', 'Non-US America'],
   deal_type: ['IPO', 'FO'],
   fo_type: ['Marketed', 'Overnight', 'Block'],
@@ -150,6 +150,7 @@ const dropdownOptions: Record<string, string[]> = {
     "Materials", "Industrials", "Energy", "Utilities", "Consumer Discretionary", "Communication Services"
   ],
   deal_captain: ['Robin', 'Tom', 'Block', 'HC', 'Jay', 'Others'],
+  sponsor:['Y','N']
 };
 
 const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selecteditems }) => {
