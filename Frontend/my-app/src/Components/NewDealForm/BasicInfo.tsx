@@ -214,7 +214,7 @@ const tableLeft3: Row[] = [
 
 const tableRight3: Row[] = [
   {
-    label: "Aftermarket Order (Y/N)",
+    label: "Aftermarket Order (T/F)",
     key: "aftermarket_order",
     type: "select",
     options: ["True", "False"],
