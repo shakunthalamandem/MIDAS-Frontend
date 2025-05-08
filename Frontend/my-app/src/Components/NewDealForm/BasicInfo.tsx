@@ -268,55 +268,25 @@ const BasicInfo: React.FC = () => {
     deal_type: "",
     fo_type: "",
     sector: "",
-    deal_size_amount_usd: 0,
-    deal_size_shares: 0,
     deal_captain: "",
     invitation_bank: "",
     sponsor: "",
-    percentage_primary: 0,
-    price_local_currency: 0,
-    discount_percentage: 0,
-    last_close_price: 0,
     initial_range: "",
-    final_indication_amount_usd: 0,
-    final_indication_shares: 0,
-    final_indication_deal_percentage: 0,
-    allocation_amount_usd: 0,
-    allocation_shares: 0,
-    allocation_deal_size_percentage: 0,
-    allocation_percentage: 0,
-    // Add more default fields for the second and third table
     percent_of_free_float_current_float: "",
     percent_of_free_float_pre_deal: "",
     short_interest_shares: "",
     short_interest_dollar_amount: "",
     short_interest_percentage_of_deal: "",
-    shares_outstanding_pre_deal: 0,
-    market_cap_pre_deal_usd: 0,
-    market_cap_pre_deal_chf: 0,
     launch_date: "",
     trade_date: "",
     settlement_date: "",
     next_results_date: "",
     percent_change_last_7_days: "",
-    week_52_high: 0,
     percent_below_52_week_high: "",
     three_month_adtv_eu_usd: "",
-    // Add more fields for the third table
     deal_color: "",
-    institutional_allocation_percent: 0,
-    retail_allocation_percent: 0,
-    long_only_allocation_percent: 0,
-    hedge_funds_allocation_percent: 0,
-    local_allocation_percent: 0,
-    international_allocation_percent: 0,
-    top_10_allocation_concentration_percent: 0,
     aftermarket_order: "",
     aftermarket_strategy: "",
-    target_price_local: 0,
-    target_price_percentage_above_issue: 0,
-    stop_price_local: 0,
-    stop_price_percentage_below_issue: 0,
   };
 
   const [formData, setFormData] = useState(defaultData);
@@ -340,7 +310,9 @@ const BasicInfo: React.FC = () => {
     });
   };
 
-
+  const handleReset = () => {
+    setFormData(defaultData);  // Reset form to initial default values
+  };
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -455,6 +427,15 @@ const BasicInfo: React.FC = () => {
           Save
         </Button>
       </Box>
+      <Box>
+      <Box style={{ width: "10%", textAlign: "right" }}>
+      <Button onClick={handleReset} variant="outlined" color="secondary">
+    Reset
+  </Button>
+      </Box>
+
+</Box>
+
     </Box>
   </Box>
 
