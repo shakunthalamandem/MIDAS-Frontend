@@ -72,7 +72,7 @@ const tableLeft1: Row[] = [
       "Communication Services",
     ],
   },
-  { label: "Deal Size (USD)(M)", key: "deal_size_amount_usd", type: "number" },
+  { label: "Deal Size ($)(M)", key: "deal_size_amount_usd", type: "number" },
   { label: "Deal Size Shares", key: "deal_size_shares", type: "number" },
   {
     label: "Deal Captain",
