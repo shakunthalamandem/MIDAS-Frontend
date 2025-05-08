@@ -383,7 +383,7 @@ const BasicInfo: React.FC = () => {
     }}
   >
     <Box style={{ display: "flex", width: "100%", alignItems: "center" }}>
-      <Box style={{ width: "90%", textAlign: "center" }}>
+      <Box style={{ width: "80%", textAlign: "center" }}>
         <Tabs
           value={tabIndex}
           onChange={handleTabChange}
@@ -423,7 +423,7 @@ const BasicInfo: React.FC = () => {
           <Tab label="Deal Color" />
         </Tabs>
       </Box>
-      <Box style={{ width: "10%", textAlign: "right" }}>
+      <Box style={{ width: "10%", textAlign: "right"  }}>
         <Button variant="contained" sx={{ bgcolor: "#002060" }} onClick={handleSave}>
           Save
         </Button>
