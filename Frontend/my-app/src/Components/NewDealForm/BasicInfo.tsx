@@ -128,8 +128,8 @@ const tableRight1: Row[] = [
 ];
 
 const tableLeft2: Row[] = [
-  { label: "Ltm Dividend Yield (%)", key: "percent_of_free_float_current_float" },
-  { label: "Ltm Fcf Yield (%)", key: "percent_of_free_float_current_float" },
+  { label: "Ltm Dividend Yield (%)", key: "ltm_dividend_yield" },
+  { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield" },
 
   { label: "% of Free Float ", key: "percent_of_free_float_current_float" },
   { label: "Short Interest (Shares)", key: "short_interest_shares" },
@@ -303,7 +303,15 @@ const BasicInfo: React.FC = () => {
     week_52_high: "",
     percent_below_52_week_high: "",
     three_month_adtv_eu_usd: "",
-    // Add more fields for the third table
+    stock_relative_to_ma_200d:"",
+    stock_relative_to_ma_100d:"",
+    stock_relative_to_ma_50d:"",
+    stock_relative_to_ma_20d:"",
+    macd_9d:"",
+    dmi_14d:"",
+    rsi_30d:"",
+    rsi_14d:"",
+    three_month_volatility:"",
     deal_color: "",
     institutional_allocation_percent: "",
     retail_allocation_percent: "",
@@ -453,19 +461,19 @@ const BasicInfo: React.FC = () => {
           <Tab label="Deal Color" />
         </Tabs>
       </Box>
-      <Box style={{ width: "10%", textAlign: "right" }}>
-        <Button variant="contained" sx={{ bgcolor: "#002060" }} onClick={handleSave}>
-          Save
-        </Button>
-      </Box>
-      <Box>
-      <Box style={{ width: "10%", textAlign: "right" }}>
-      <Button onClick={handleReset} variant="outlined" color="secondary">
-    Reset
-  </Button>
-      </Box>
+      <Button variant="contained" sx={{ bgcolor: "#002060" }} onClick={handleSave}>
+  Save
+</Button>
 
-</Box>
+<Button 
+  onClick={handleReset} 
+  variant="outlined" 
+  color="secondary" 
+  sx={{ ml: 2 }}  // adds margin-left
+>
+  Reset
+</Button>
+
 
     </Box>
   </Box>
