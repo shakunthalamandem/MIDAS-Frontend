@@ -1,9 +1,8 @@
 import React from "react";
 import { Typography, Grid, Container, Button, Box } from "@mui/material";
 import "./SectionTwo.css";
-// import Imagecard from "../../Assets/Images/sec2image.jpg";
 import Imagecard from "../../Assets/images/sec2image.jpg";
-
+import logo from '../../Assets/images/MIDAS_logo.png' // Corrected import
 
 const SectionTwo: React.FC = () => (
   <Container maxWidth="lg" className="section-container">
@@ -36,7 +35,7 @@ const SectionTwo: React.FC = () => (
           gutterBottom
           style={{ fontWeight: "bold",fontSize:'28px' }} // Makes text bold
         >
-          BlockChain Proprietary Database for insights into IPO's and Follow-on's
+          Monashee Proprietary Database for insights into IPO's and Follow-on's
         </Typography>
         
         
@@ -54,10 +53,10 @@ const SectionTwo: React.FC = () => (
         }}
       >
         <Typography className="section-title" variant="h4" style={{color:'#002060',fontWeight:'bold'}}>
-        BlockChain Introduces New BlockChain Dashboard Platform 
+        Monashee Introduces New MIDAS Platform 
         </Typography>
         <Typography className="section-text" variant="body1">
-        BlockChain's new real-time data platform enables investment decisions based on performance of similar new issue transactions (by sub-sector, by bank, by strategy) and utilizing Artificial Intelligence (AI) based machine learning models to predict the potential returns and help improve the overall skew of the portfolio towards positively performing investments.
+        Monashee's new real-time data platform enables investment decisions based on performance of similar new issue transactions (by sub-sector, by bank, by strategy) and utilizing Artificial Intelligence (AI) based machine learning models to predict the potential returns and help improve the overall skew of the portfolio towards positively performing investments.
         </Typography>
         <br/>
         <Typography className="section-text" variant="body1" style={{fontWeight:'bold',color:'#002060'}}>
