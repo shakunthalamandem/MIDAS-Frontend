@@ -623,14 +623,22 @@ const BasicInfo: React.FC = () => {
               </MenuItem>
             ))}
           </Select>
+        ) : row.key === "deal_color" ? (
+          <TextField
+            fullWidth
+            size="small"
+            multiline
+            minRows={3}
+            name={row.key}
+            value={formData[row.key]}
+            onChange={handleChange}
+          />
         ) : (
           <TextField
             fullWidth
             size="small"
             name={row.key}
-            value={formData[row.key as keyof typeof formData]}
-            onChange={handleChange}
-            type={row.type}  // Add this line to use the correct input type
+            value={formData[row.key as keyof typeof formData]}                                onChange={handleChange}
           />
         )}
       </TableCell>
