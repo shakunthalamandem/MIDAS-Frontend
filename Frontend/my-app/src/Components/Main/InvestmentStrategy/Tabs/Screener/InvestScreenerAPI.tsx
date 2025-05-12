@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import InvestScreenerMain from './InvestScreenerMain';
 import CumulativeReturns from '../../TechnicalIndicators/CumulativeReturns';
 import CumulativeyearlyChart from '../../StrategyCharts/CumulativeChart';
+import NoDataPopup from '../../../../../Pages/NoDataPopup';
 
 interface InvestScreenerAPIProps {
   appliedValues: any;
@@ -14,6 +15,7 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
   const [error, setError] = useState<string | null>(null);
   const [totalRows, setTotalRows] = useState(0); // Total rows from API
   const [tickers, setTickers] = useState<string[]>([]); // State to store tickers
+  const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
 
   useEffect(() => {
     const transformAppliedValues = (values: any) => {
@@ -58,6 +60,9 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
           // Extract tickers from the response data
           const extractedTickers = rows.map((row: any) => row.ticker);
           setTickers(extractedTickers); // Set tickers state
+          if (appliedValues && rows.length === 0) {
+            setNoDataPopupOpen(true);
+          }
         } else {
           throw new Error("Failed to fetch investment screener data");
         }
@@ -86,6 +91,13 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
       {/* Pass the fetched data to the grid component */}
       <InvestScreenerMain rows={rows} loading={loading} totalRows={totalRows} />
       <CumulativeReturns tickerList={tickers} />
+      <NoDataPopup
+  open={noDataPopupOpen}
+  onClose={() => {
+    setNoDataPopupOpen(false);
+    window.location.reload();
+  }}
+/>
     </Box>
   );
 };
