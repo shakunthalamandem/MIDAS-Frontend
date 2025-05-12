@@ -1,14 +1,28 @@
 // src/components/FundamentalsTechnical.tsx
 import React, { useState } from 'react';
-import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  MenuItem,
+  Select,
+  Stack,
+  Typography,
+  SelectChangeEvent,
+  FormControl,
+  InputLabel,
+} from '@mui/material';
+
 const apiUrl = process.env.REACT_APP_API_URL;
 const token = localStorage.getItem("access_token");
 
 const FundamentalsTechnical: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState('');
 
-  const handleClick = async (type: 'technical' | 'fundamental') => {
+  const handleChange = async (event: SelectChangeEvent) => {
+    const type = event.target.value as 'technical' | 'fundamental';
+    setSelectedType(type);
     setLoading(true);
     setResponse(null);
 
@@ -24,7 +38,7 @@ const FundamentalsTechnical: React.FC = () => {
           'Content-Type': 'application/json',
           Authorization: token ? `Bearer ${token}` : '',
         },
-        body: JSON.stringify({}), 
+        body: JSON.stringify({}),
       });
 
       if (!res.ok) {
@@ -42,33 +56,28 @@ const FundamentalsTechnical: React.FC = () => {
   };
 
   return (
-    <>
     <Box mt={2} sx={{ padding: 2, backgroundColor: '#f9f9f9', boxShadow: 3 }}>
-    <Stack spacing={2} alignItems="center">
-      <Typography variant="h6" color='#002060'>Select Data Type</Typography>
-      <Stack direction="row" spacing={2}>
-        <Button
-          variant="contained"
-          color="primary"
-          disabled={loading}
-          onClick={() => handleClick('technical')}
-        >
-          Technicals
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          disabled={loading}
-          onClick={() => handleClick('fundamental')}
-        >
-          Fundamentals
-        </Button>
+      <Stack spacing={2} alignItems="center">
+        <Typography variant="h6" color="#002060">
+          Select Data Type
+        </Typography>
+        <FormControl sx={{ minWidth: 220 }} disabled={loading}>
+          <InputLabel id="data-type-label">Data Type</InputLabel>
+          <Select
+            labelId="data-type-label"
+            value={selectedType}
+            label="Data Type"
+            onChange={handleChange}
+          >
+            <MenuItem value="technical">Technicals</MenuItem>
+            <MenuItem value="fundamental">Fundamentals</MenuItem>
+          </Select>
+        </FormControl>
+
+        {loading && <CircularProgress />}
+        {response && <Typography>{response}</Typography>}
       </Stack>
-      {loading && <CircularProgress />}
-      {response && <Typography>{response}</Typography>}
-    </Stack>
     </Box>
-    </>
   );
 };
 
