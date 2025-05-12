@@ -10,6 +10,7 @@ import {
   SelectChangeEvent,
   FormControl,
   InputLabel,
+  Container,
 } from '@mui/material';
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -56,6 +57,7 @@ const FundamentalsTechnical: React.FC = () => {
   };
 
   return (
+    <Container maxWidth="md" sx={{ marginTop: 20 }}>
     <Box mt={2} sx={{ padding: 2, backgroundColor: '#f9f9f9', boxShadow: 3 }}>
       <Stack spacing={2} alignItems="center">
         <Typography variant="h6" color="#002060">
@@ -78,6 +80,7 @@ const FundamentalsTechnical: React.FC = () => {
         {response && <Typography>{response}</Typography>}
       </Stack>
     </Box>
+    </Container>
   );
 };
 
