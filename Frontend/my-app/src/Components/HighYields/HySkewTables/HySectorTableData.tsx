@@ -62,7 +62,7 @@ const formatNumber = (value: number): string => {
 const HySectorTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   // Ensure data exists before rendering
   if (!data?.Yearwise || !data?.yearwise_total || Object.keys(data.Yearwise).length === 0) {
-    return <div>No data available</div>;
+    return <div>No data available.Change filters</div>;
   }
 
   // Extract the Yearwise and Total data

@@ -71,7 +71,7 @@ const HySectorBasedTable: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true); // Start loading
-
+  
       const requestData = {
         filters: {
           year_range: [startYear, endYear],
@@ -79,31 +79,41 @@ const HySectorBasedTable: React.FC = () => {
           sector: sector === "All" ? sectorOptions : [sector],
         },
       };
-
+  
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
-
+  
         if (!apiUrl) throw new Error("API URL is not defined in environment variables");
-
+  
         const response = await axios.post(`${apiUrl}/api/hy_skewtable/calculations/`, requestData, {
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
         });
-
-        setResponseData(response.data && Object.keys(response.data).length ? response.data : null);
-        setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
+  
+        // Check if the response data is empty
+        const responseData = response.data;
+        
+        if (responseData && Object.keys(responseData).length > 0) {
+          setResponseData(responseData); // Set data if it exists
+          setNoDataPopupOpen(false); // Hide no data popup
+        } else {
+          setResponseData(null); // No data case
+          setNoDataPopupOpen(true); // Show no data popup
+        }
       } catch (error) {
-        navigate("/error");  
+        console.error("API error:", error);
+        navigate("/error"); // Redirect to error page
       } finally {
         setLoading(false); // Stop loading
       }
     };
-
-    if (rating) fetchData();
-  }, [startYear, endYear, rating, ratingOptions, sector, sectorOptions]);
+  
+    fetchData();
+  }, [startYear, endYear, rating, sector, ratingOptions, sectorOptions]); // Add dependencies for the filter changes
+  
 
   const handleRatingChange = (event: SelectChangeEvent<string>) => {
     setRating(event.target.value);
