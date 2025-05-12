@@ -602,9 +602,12 @@ const BasicInfo: React.FC = () => {
               <Grid item xs={12} sm={6} key={index}>
                 <TableContainer component={Paper}>
                   <Table size="small">
-                  <TableBody>
+                 <TableBody>
   {tableData.map((row, i) => (
-    <TableRow key={row.key} sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}>
+    <TableRow
+      key={row.key}
+      sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}
+    >
       <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
         {row.label}
       </TableCell>
@@ -623,28 +626,23 @@ const BasicInfo: React.FC = () => {
               </MenuItem>
             ))}
           </Select>
-        ) : row.key === "deal_color" ? (
-          <TextField
-            fullWidth
-            size="small"
-            multiline
-            minRows={3}
-            name={row.key}
-            value={formData[row.key]}
-            onChange={handleChange}
-          />
         ) : (
           <TextField
             fullWidth
             size="small"
             name={row.key}
-            value={formData[row.key as keyof typeof formData]}                                onChange={handleChange}
+            value={formData[row.key as keyof typeof formData]}
+            onChange={handleChange}
+            type={row.type}
+            multiline={row.key === "deal_color"}
+            minRows={row.key === "deal_color" ? 3 : undefined}
           />
         )}
       </TableCell>
     </TableRow>
   ))}
 </TableBody>
+
                   </Table>
                 </TableContainer>
               </Grid>
