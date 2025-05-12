@@ -59,7 +59,7 @@ const FundamentalsTechnical: React.FC = () => {
     <Box mt={2} sx={{ padding: 2, backgroundColor: '#f9f9f9', boxShadow: 3 }}>
       <Stack spacing={2} alignItems="center">
         <Typography variant="h6" color="#002060">
-          Select Data Type
+          Select Data Type to Download
         </Typography>
         <FormControl sx={{ minWidth: 220 }} disabled={loading}>
           <InputLabel id="data-type-label">Data Type</InputLabel>
