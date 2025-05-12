@@ -69,7 +69,7 @@ const formatNumber = (value: number): string => {
     // Ensure data exists before rendering
     
     if (!data?.Ratingswise || !data?.ratingswise_total || Object.keys(data.Ratingswise).length === 0) {
-      return <div>No data available</div>;
+      return <div>No data available.Change filters</div>;
     }
   
     // Extract the Yearwise and Total data

@@ -57,7 +57,9 @@ const HyYearlyTableData: React.FC<HySectorTableDataProps> = ({ data }) => {
   if (!sectorwiseData || !sectorwiseTotal) {
     return <div>No data available</div>;
   }
-
+  if (!data?.Sectorwise || !data?.sectorwise_total || Object.keys(data.Sectorwise).length === 0) {
+    return <div>No data available.Change filters</div>;
+  }
   // Columns for the table
   const columns = [
     'Sector',
