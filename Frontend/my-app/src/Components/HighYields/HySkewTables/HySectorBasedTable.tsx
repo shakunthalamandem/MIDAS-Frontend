@@ -93,16 +93,14 @@ const HySectorBasedTable: React.FC = () => {
           },
         });
   
-        // Check if the response data is empty
-        const responseData = response.data;
+        const responseData = response.data as { detail?: string };
+;
+
+        const noData = !responseData || responseData.detail === "No data found." || Object.keys(responseData).length === 0;
         
-        if (responseData && Object.keys(responseData).length > 0) {
-          setResponseData(responseData); // Set data if it exists
-          setNoDataPopupOpen(false); // Hide no data popup
-        } else {
-          setResponseData(null); // No data case
-          setNoDataPopupOpen(true); // Show no data popup
-        }
+        setResponseData(noData ? null : responseData);
+        setNoDataPopupOpen(noData);
+        
       } catch (error) {
         console.error("API error:", error);
         navigate("/error"); // Redirect to error page
