@@ -89,14 +89,16 @@ const HyRatingBasedTable: React.FC = () => {
           }
         });
 
-        const responseData = response.data as { error?: string };
-        if (responseData.error === "No data found matching the specified filters.") {
+        const responseData = response.data as { detail?: string };
+
+        if (responseData.detail === "No data found.") {
           setRatingData(null);
+          setNoDataPopupOpen(true);
         } else {
           setRatingData(response.data);
           setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
-
         }
+
       } catch (error) {
         navigate("/error");  
       }

@@ -98,9 +98,15 @@ const HyYearlyBasedTable: React.FC = () => {
             }
           }
         );
-        setTableData(response.data);
-        setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
+        const responseData = response.data as { detail?: string };
 
+        if (responseData.detail === "No data found.") {
+          setTableData(null); 
+          setNoDataPopupOpen(true);
+        } else {
+          setTableData(response.data);
+          setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
+        }
       } catch (error) {
         navigate("/error");  
       }  finally {
