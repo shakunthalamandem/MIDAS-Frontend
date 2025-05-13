@@ -39,6 +39,15 @@ interface BankData {
   t1m_return_from_bloomberg: number;
 }
 
+const columns: { label: string; key: keyof BankData }[] = [
+  { label: "Bank", key: "selected_bank" },
+  { label: "Deal count", key: "count" },
+  { label: "Deal Volume", key: "deal_size" },
+  { label: "Weighted Allocation as % of Deal Size", key: "Weighted Allocation as % of Deal Size" },
+  { label: "Weighted Allocation as % of IOI", key: "Weighted Allocation as % of IOI" },
+  { label: "t + 1M Return (AVG)", key: "t1m_return_from_bloomberg" },
+];
+
 const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
   const [data, setData] = useState<BankData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -77,84 +86,102 @@ const BankTable: React.FC<FilterTableProps> = ({ selectedFilters }) => {
 
   const handleSort = (column: keyof BankData) => {
     const isAsc = sortColumn === column && sortDirection === "asc";
-    setSortDirection(isAsc ? "desc" : "asc");
-    setSortColumn(column);
+    const direction = isAsc ? "desc" : "asc";
 
     const sortedData = [...data].sort((a, b) => {
       const valueA = a[column];
       const valueB = b[column];
-      return isAsc ? (valueA > valueB ? 1 : -1) : valueA < valueB ? 1 : -1;
+
+      if (typeof valueA === "string" && typeof valueB === "string") {
+        return direction === "asc"
+          ? valueA.localeCompare(valueB)
+          : valueB.localeCompare(valueA);
+      }
+
+      return direction === "asc"
+        ? (valueA as number) - (valueB as number)
+        : (valueB as number) - (valueA as number);
     });
 
+    setSortColumn(column);
+    setSortDirection(direction);
     setData(sortedData);
   };
 
   return (
     <Container>
-    <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 ,mt:5}}>
-      <CardContent>
-        <Typography variant="h6" mb={2} color="#002060" fontWeight="bold">
-          Top 10 Banks
-        </Typography>
-        {loading && <CircularProgress sx={{ display: "block", mx: "auto", my: 2 }} />}
-        {error && <Typography color="error">{error}</Typography>}
-        {!loading && !error && data.length === 0 && <Typography>No data available</Typography>}
-        {!loading && !error && data.length > 0 && (
-          <TableContainer
-            component={Paper}
-            sx={{
-              maxHeight: 600,
-              overflowY: "auto",
-              borderRadius: 1,
-              "&::-webkit-scrollbar": { width: "4px" },
-              "&::-webkit-scrollbar-thumb": { backgroundColor: "#888", borderRadius: "4px" },
-              "&::-webkit-scrollbar-thumb:hover": { backgroundColor: "#555" },
-            }}
-          >
-            <Table size="small" sx={{ minWidth: 500 }}>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "#466675" }}>
-                  {[
-                    "bank",
-                    "Deal count",
-                    "Deal Volume",
-                    "Weighted Allocation as % of Deal Size",
-                    "Weighted Allocation as % of IOI",
-                    "t + 1M Return (AVG)",
-                  ].map((col, index) => (
-                    <TableCell
-                      key={index}
-                      sx={{ color: "white", fontWeight: "bold", borderBottom: "2px solid #222" }}
-                    >
-                      <TableSortLabel
-                        active={sortColumn === col}
-                        direction={sortColumn === col ? sortDirection : "asc"}
-                        onClick={() => handleSort(col as keyof BankData)}
-                        sx={{ color: "white", "&.Mui-active": { color: "orange" } }}
+      <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2, mt: 5 }}>
+        <CardContent>
+          <Typography variant="h6" mb={2} color="#002060" fontWeight="bold">
+            Top 10 Banks
+          </Typography>
+          {loading && <CircularProgress sx={{ display: "block", mx: "auto", my: 2 }} />}
+          {error && <Typography color="error">{error}</Typography>}
+          {!loading && !error && data.length === 0 && <Typography>No data available</Typography>}
+          {!loading && !error && data.length > 0 && (
+            <TableContainer
+              component={Paper}
+              sx={{
+                maxHeight: 600,
+                overflowY: "auto",
+                borderRadius: 1,
+                "&::-webkit-scrollbar": { width: "4px" },
+                "&::-webkit-scrollbar-thumb": { backgroundColor: "#888", borderRadius: "4px" },
+                "&::-webkit-scrollbar-thumb:hover": { backgroundColor: "#555" },
+              }}
+            >
+              <Table size="small" stickyHeader sx={{ minWidth: 500 }}>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: "#466675" }}>
+                    {columns.map(({ label, key }) => (
+                      <TableCell
+                        key={key}
+                        sx={{ color: "#FFFFFF",bgcolor:'#466675', fontWeight: "bold", borderBottom: "2px solid #222" }}
                       >
-                        {col.replace(/_/g, " ").toUpperCase()}
-                      </TableSortLabel>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.map((row, index) => (
-                  <TableRow key={index} hover sx={{ "&:nth-of-type(odd)": { backgroundColor: "#f5f5f5" } }}>
-                    <TableCell>{row.selected_bank && row.selected_bank !== "0" ? row.selected_bank : "Not Available"}</TableCell>
-                    <TableCell>{row.count}</TableCell>
-                    <TableCell>{formatValue(Number(row.deal_size.toFixed(0)))}</TableCell>
-                    <TableCell>{row["Weighted Allocation as % of Deal Size"].toFixed(2)}%</TableCell>
-                    <TableCell>{row["Weighted Allocation as % of IOI"].toFixed(2)}%</TableCell>
-                    <TableCell>{row.t1m_return_from_bloomberg.toFixed(2)}%</TableCell>
+                        <TableSortLabel
+                          active={sortColumn === key}
+                          direction={sortColumn === key ? sortDirection : "asc"}
+                          onClick={() => handleSort(key)}
+                          sx={{ color: "#FFFFFF", "&.Mui-active": { color: "orange" } }}
+                        >
+                          {label.toUpperCase()}
+                        </TableSortLabel>
+                      </TableCell>
+                    ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </CardContent>
-    </Card>
+                </TableHead>
+                <TableBody>
+                  {data.map((row, index) => (
+                    <TableRow
+                      key={index}
+                      hover
+                      sx={{ "&:nth-of-type(odd)": { backgroundColor: "#f5f5f5" } }}
+                    >
+                      {columns.map(({ key }) => {
+                        let value = row[key];
+
+                        if (key === "selected_bank") {
+                          value = value && value !== "0" ? value : "Not Available";
+                        } else if (key === "deal_size") {
+                          value = formatValue(Number((value as number).toFixed(0)));
+                        } else if (
+                          key === "Weighted Allocation as % of Deal Size" ||
+                          key === "Weighted Allocation as % of IOI" ||
+                          key === "t1m_return_from_bloomberg"
+                        ) {
+                          value = `${(value as number).toFixed(2)}%`;
+                        }
+
+                        return <TableCell key={key}>{value}</TableCell>;
+                      })}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </CardContent>
+      </Card>
     </Container>
   );
 };
