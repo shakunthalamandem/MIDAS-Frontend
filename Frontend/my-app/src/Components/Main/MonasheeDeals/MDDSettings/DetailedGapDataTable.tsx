@@ -11,38 +11,20 @@ const DetailedGapDataTable: React.FC<DetailedGapDataTableProps> = ({ data }) => 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [rows, setRows] = useState<any[]>(data);
 
-  const cleanDealSize = (dealSize: any): number => {
-    if (dealSize == null || dealSize === "") return 0;
-    const cleanedValue = parseFloat(
-      dealSize.toString().replace(/[^0-9.-]+/g, "")
-    );
-    return isNaN(cleanedValue) ? 0 : cleanedValue;
-  };
+const cleanDealSize = (dealSize: any): number => {
+  if (dealSize == null || dealSize === "") return 0;
+  const cleanedValue = parseFloat(dealSize.toString().replace(/[^0-9.-]+/g, ""));
+  return isNaN(cleanedValue) ? 0 : cleanedValue;
+};
 
-  const formatDealSize = (dealSize: any) => {
-    const cleanedValue = cleanDealSize(dealSize);
-    let formattedNumber;
-    let suffix = "";
-  
-    if (Math.abs(cleanedValue) >= 1_000_000_000) {
-      formattedNumber = (cleanedValue / 1_000_000_000).toFixed();
-      suffix = "B";
-    } else if (Math.abs(cleanedValue) >= 1_000_000) {
-      formattedNumber = (cleanedValue / 1_000_000).toFixed();
-      suffix = "M";
-    } else if (Math.abs(cleanedValue) >= 1_000) {
-      formattedNumber = (cleanedValue / 1_000).toFixed();
-      suffix = "K";
-    } else {
-      formattedNumber = cleanedValue.toFixed();
-    }
-  
-    return cleanedValue < 0
-      ? `-$${Math.abs(Number(formattedNumber)).toLocaleString("en-US")}${suffix}`
-      : `$${Number(formattedNumber).toLocaleString("en-US")}${suffix}`;
-  };
-  
-  
+const formatDealSize = (dealSize: any) => {
+  const cleanedValue = cleanDealSize(dealSize);
+  const isNegative = cleanedValue < 0;
+  const absoluteValue = Math.abs(cleanedValue);
+  const formattedValue = absoluteValue.toLocaleString("en-US");
+  return (isNegative ? "-$" : "$") + formattedValue;
+};
+
 
   const preprocessRows = (rows: any[]) =>
     rows.map((row, index) => ({
