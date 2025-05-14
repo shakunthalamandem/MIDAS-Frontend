@@ -11,11 +11,13 @@ import {
   CardContent,
   LinearProgress,
   Divider,
+  Paper,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from 'axios';
 import DownloadDeals from './DownloadDeals';
 import LastThreeDayDeals from './LastThreeDayDeals';
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 
 // Upload type
 type UploadType = 'form' | 'monashee_deals' | null;
@@ -30,7 +32,66 @@ const MainUpload: React.FC = () => {
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
+  const isSuperUser = localStorage.getItem("is_superuser") === "true";
 
+if (!isSuperUser) {
+  return (
+    <Container
+      maxWidth="sm"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "50vh",
+        backgroundColor: "#fdfdfd",
+      }}
+    >
+      <Paper
+        elevation={6}
+        sx={{
+          padding: 4,
+          borderRadius: 3,
+          backgroundColor: "#fff5f5",
+          border: "1px solid #ffcdd2",
+          textAlign: "center",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <ReportProblemIcon sx={{ fontSize: 60, color: "#d32f2f" }} />
+
+          <Typography
+            variant="h6"
+            sx={{ color: "#b71c1c", fontWeight: "bold" }}
+          >
+            Access Denied
+          </Typography>
+
+          <Typography sx={{ color: "#c62828" }}>
+            You don't have permission to upload. <br />
+            Please contact the IT team for access.
+          </Typography>
+
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: "#d32f2f", "&:hover": { backgroundColor: "#b71c1c" } }}
+            onClick={() => {
+              window.location.href = "mailto:ghcit@goldenhillsindia.com";
+            }}
+          >
+            Contact IT Support
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
+  );
+}
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files ? event.target.files[0] : null;
     if (selectedFile) {

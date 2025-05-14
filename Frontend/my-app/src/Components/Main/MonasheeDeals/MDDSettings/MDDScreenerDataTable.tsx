@@ -59,6 +59,18 @@ const preprocessRows = (rows: any[]) =>
     tplus_1d_issueprice: row.tplus_1d_issueprice ? `${row.tplus_1d_issueprice.toFixed(2)}%` : "",
   }));
 
+
+
+  const formatPercentage = (value: number | null | undefined): string => {
+  if (value == null || isNaN(value)) return "";
+
+  const absVal = Math.abs(value);
+  if (absVal < 0.005) return "0.00%"; 
+
+  return `${value.toFixed(2)}%`;
+};
+
+
 const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseData,handleReset }) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -198,28 +210,28 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
       field: "t1m_returns",
       headerName: "T + 1M Absolute Returns",
       width: 150,
-      renderCell: (params) => params.value,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "t1d_returns",
       headerName: "T + 1D Return",
       width: 150,
-      renderCell: (params) => params.value,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "allocation_deal_size",
       headerName: "Allocation as % Deal Size",
       width: 150,
-      renderCell: (params) => params.value,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "allocation_ioi",
       headerName: "Allocation as % of  IOI",
       width: 150,
-      renderCell: (params) => params.value,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
@@ -227,10 +239,14 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
       headerName: "Average Hold Period",
       width: 150,
     },
-    { field: "tplus_1d_issueprice", headerName: "T + 1D issueprice", width: 100, renderCell: (params) => `${params.value}`,
-    sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),},
+    { field: "tplus_1d_issueprice", 
+      headerName: "T + 1D issueprice",
+      width: 100, 
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
     { field: "fo_discount", headerName: "Follow On Discount", width: 100,
-      renderCell: (params) => `${params.value}`,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {

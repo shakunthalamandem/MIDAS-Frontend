@@ -26,13 +26,18 @@ interface ScreenerDataTableProps {
 }
 
 const formatDealValue = (dealValue: number): string => {
-  // Assuming dealValue is a raw number, format it with the dollar sign
   return "$" + dealValue.toLocaleString();
 };
+  const formatPercentage = (value: number | null | undefined): string => {
+  if (value == null || isNaN(value)) return "";
 
+  const absVal = Math.abs(value);
+  if (absVal < 0.005) return "0.00%"; 
+
+  return `${value.toFixed(2)}%`;
+};
 const cleanDealSize = (dealSize: any) => {
   if (!dealSize) return 0;
-  // Remove any non-numeric characters including "$" and commas
   return parseFloat(dealSize.replace(/[^\d.-]/g, ""));
 };
 
@@ -40,8 +45,8 @@ const preprocessRows = (rows: any[]) =>
   rows.map((row, index) => ({
     id: index,
     ...row,
-    deal_value_raw: cleanDealSize(row.deal_value), // Clean the raw number for sorting
-    deal_value: row.deal_value ? formatDealValue(cleanDealSize(row.deal_value)) : "0%", // Format deal_value properly
+    deal_value_raw: cleanDealSize(row.deal_value), 
+    deal_value: row.deal_value ? formatDealValue(cleanDealSize(row.deal_value)) : "0%", 
     t_plus_1_return: row.t_plus_1_return ? `${row.t_plus_1_return.toFixed(2)}%` : "0%",
     t_plus_1m_returns: row.t_plus_1m_returns ? `${row.t_plus_1m_returns.toFixed(2)}%` : "0%",
     t_plus_1d_returns_index_returns: row.t_plus_1d_returns_index_returns
@@ -132,9 +137,6 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData ,h
   }, [rows, searchQuery]);
 
   const columns: GridColDef[] = [
-    // { field: "ticker_symbol", headerName: "Ticker", width: 100 },
-
-
     {
       field: "ticker_symbol",
       headerName: "Ticker",
@@ -175,28 +177,28 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData ,h
       field: "t_plus_1_return",
       headerName: "T + 1D Return",
       width: 100,
-      renderCell: (params) => `${params.value}`,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "t_plus_1d_returns_index_returns",
       headerName: "T + 1D Index Returns",
       width: 100,
-      renderCell: (params) => `${params.value}`,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "t_plus_1m_returns",
       headerName: "T + 1M Returns",
       width: 100,
-      renderCell: (params) => `${params.value}`,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "t_plus_1m_returns_index_returns",
       headerName: "T + 1M Index Returns",
       width: 100,
-      renderCell: (params) => `${params.value}`,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
