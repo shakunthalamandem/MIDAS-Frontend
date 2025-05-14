@@ -20,6 +20,7 @@ import {
   Alert,
   Tab,
   Tabs,
+  CircularProgress,
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
@@ -199,10 +200,16 @@ const tableLeft3: Row[] = [
     key: "hedge_funds_allocation_percent",
     type: "number",
   },
-  {
-    label: "Local Allocation (%)",
-    key: "local_allocation_percent",
-    type: "number",
+  // {
+  //   label: "Local Allocation (%)",
+  //   key: "local_allocation_percent",
+  //   type: "number",
+  // },
+    {
+    label: "Aftermarket Order (T/F)",
+    key: "aftermarket_order",
+    type: "select",
+    options: ["True", "False"],
   },
   {
     label: "International Allocation (%)",
@@ -212,12 +219,7 @@ const tableLeft3: Row[] = [
 ];
 
 const tableRight3: Row[] = [
-  {
-    label: "Aftermarket Order (T/F)",
-    key: "aftermarket_order",
-    type: "select",
-    options: ["True", "False"],
-  },
+
   {
     label: "Aftermarket Strategy",
     key: "aftermarket_strategy",
@@ -346,9 +348,11 @@ const BasicInfo: React.FC = () => {
       block: "start",
     });
   };
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const handleReset = () => {
-    setFormData(defaultData);  // Reset form to initial default values
+    setFormData(defaultData); 
   };
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -361,45 +365,48 @@ const BasicInfo: React.FC = () => {
     const value = e.target.value;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+const handleSave = async () => {
+  try {
+    setIsLoading(true); 
+    
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("access_token");
 
-  const handleSave = async () => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
+    if (!apiUrl) throw new Error("API URL is not defined");
+    if (!token) throw new Error("Access token is missing");
 
-      if (!apiUrl) throw new Error("API URL is not defined");
-      if (!token) throw new Error("Access token is missing");
+    const flattenedData = flattenObject(formData);
 
-      const flattenedData = flattenObject(formData);
+    const sanitizedPayload = Object.fromEntries(
+      Object.entries(flattenedData).filter(
+        ([_, val]) => val !== "" && val !== null
+      )
+    );
 
-      const sanitizedPayload = Object.fromEntries(
-        Object.entries(flattenedData).filter(
-          ([_, val]) => val !== "" && val !== null
-        )
-      );
+    const response = await axios.post(
+      `${apiUrl}/api/create_deal_form/`,
+      sanitizedPayload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      const response = await axios.post(
-        `${apiUrl}/api/create_deal_form/`,
-        sanitizedPayload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log("Saved:", response.data);
-      setSnackbarMessage("Data saved successfully and Email sent!");
-      setSnackbarSeverity("success");
-      setOpenSnackbar(true);
-    } catch (err) {
-      console.error("Save failed:", err);
-      setSnackbarMessage("Deal form already exists.");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
-    }
-  };
+    console.log("Saved:", response.data);
+    setSnackbarMessage("Data saved successfully and Email sent!");
+    setSnackbarSeverity("success");
+    setOpenSnackbar(true);
+  } catch (err) {
+    console.error("Save failed:", err);
+    setSnackbarMessage("Deal form already exists.");
+    setSnackbarSeverity("error");
+    setOpenSnackbar(true);
+  } finally {
+    setIsLoading(false); 
+  }
+};
 
   const isDataAvailable = (key: string) =>
     formData[key as keyof typeof formData] !== undefined &&
@@ -432,25 +439,25 @@ const BasicInfo: React.FC = () => {
             justifyContent: "center",
             margin: "10px 0",
             "& .MuiTab-root": {
-              backgroundColor: "#E3E6F0", // Neutral background for unselected tabs
-              color: "#002060", // Dark blue text for contrast
+              backgroundColor: "#E3E6F0", 
+              color: "#002060", 
               borderRadius: "12px",
               padding: "10px 20px",
               fontSize: "0.9rem",
               fontWeight: "600",
               margin: "0 5px",
-              textTransform: "none", // Avoid all caps
+              textTransform: "none", 
               transition: "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
               "&:hover": {
-                backgroundColor: "#DCE6F0", // Slightly lighter shade on hover
+                backgroundColor: "#DCE6F0", 
                 transform: "translateY(-2px)",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
               },
             },
             "& .Mui-selected": {
-              backgroundColor: "#013e3a", // Vibrant orange for selected tab
-              color: "#ffffff !important", // White text for selected tab
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Stronger shadow for selected tab
+              backgroundColor: "#013e3a", 
+              color: "#ffffff !important", 
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", 
             },
           }}
         >
@@ -459,8 +466,17 @@ const BasicInfo: React.FC = () => {
           <Tab label="Deal Color" />
         </Tabs>
       </Box>
-      <Button variant="contained" sx={{ bgcolor: "#002060" }} onClick={handleSave}>
-  Save
+   <Button
+  variant="contained"
+  sx={{ bgcolor: "#002060" }}
+  onClick={handleSave}
+  disabled={isLoading} // Disable button while loading
+>
+  {isLoading ? (
+    <CircularProgress size={24} sx={{ color: "white" }} />
+  ) : (
+    "Save"
+  )}
 </Button>
 
 <Button 
@@ -590,67 +606,118 @@ const BasicInfo: React.FC = () => {
       </Card>
     </div>
 
-    {/* Deal Color Card */}
-    <div ref={dealColorRef}>
-      <Card sx={{ marginTop: 4 }}>
-        <CardContent>
-          <Typography variant="h5" align="center" color="#002060" sx={{ fontWeight: "bold" }}>
-            Deal Color
-          </Typography>
-          <Grid container spacing={2} mt={2}>
-            {[tableLeft3, tableRight3].map((tableData, index) => (
-              <Grid item xs={12} sm={6} key={index}>
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                 <TableBody>
-  {tableData.map((row, i) => (
-    <TableRow
-      key={row.key}
-      sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}
-    >
-      <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
-        {row.label}
-      </TableCell>
-      <TableCell>
-        {row.type === "select" ? (
-          <Select
-            fullWidth
-            size="small"
-            name={row.key}
-            value={formData[row.key as keyof typeof formData]}
-            onChange={handleSelectChange}
-          >
-            {row.options?.map((opt) => (
-              <MenuItem key={opt} value={opt}>
-                {opt}
-              </MenuItem>
-            ))}
-          </Select>
-        ) : (
-          <TextField
-            fullWidth
-            size="small"
-            name={row.key}
-            value={formData[row.key as keyof typeof formData]}
-            onChange={handleChange}
-            type={row.type}
-            multiline={row.key === "deal_color"}
-            minRows={row.key === "deal_color" ? 3 : undefined}
-          />
-        )}
-      </TableCell>
-    </TableRow>
-  ))}
-</TableBody>
+   {/* Deal Color Card */}
+<div ref={dealColorRef}>
+  <Card sx={{ marginTop: 4 }}>
+    <CardContent>
+      <Typography variant="h5" align="center" color="#002060" sx={{ fontWeight: "bold" }}>
+        Deal Color
+      </Typography>
+      <Grid container spacing={2} mt={2}>
+        
+        {/* 🔵 Full-width Deal Color Row */}
+        <Grid item xs={12}>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableBody>
+                {(() => {
+                  const allRows = [...tableLeft3, ...tableRight3];
+                  const dealColorRow = allRows.find((row) => row.key === "deal_color");
+                  if (!dealColorRow) return null;
+                  return (
+                    <TableRow sx={{ backgroundColor: "#f3f3f3" }}>
+                      <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem", width: '20%' }}>
+                        {dealColorRow.label}
+                      </TableCell>
+                      <TableCell>
+                        {dealColorRow.type === "select" ? (
+                          <Select
+                            fullWidth
+                            size="small"
+                            name={dealColorRow.key}
+                            value={formData[dealColorRow.key as keyof typeof formData]}
+                            onChange={handleSelectChange}
+                          >
+                            {dealColorRow.options?.map((opt) => (
+                              <MenuItem key={opt} value={opt}>
+                                {opt}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        ) : (
+                          <TextField
+                            fullWidth
+                            size="small"
+                            name={dealColorRow.key}
+                            value={formData[dealColorRow.key as keyof typeof formData]}
+                            onChange={handleChange}
+                            type={dealColorRow.type}
+                          />
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })()}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
 
-                  </Table>
-                </TableContainer>
-              </Grid>
-            ))}
+        {/* 🟦 Two-column Remaining Table Rows */}
+        {[tableLeft3, tableRight3].map((tableData, index) => (
+          <Grid item xs={12} sm={6} key={index}>
+            <TableContainer component={Paper}>
+              <Table size="small">
+                <TableBody>
+                  {tableData
+                    .filter((row) => row.key !== "deal_color")
+                    .map((row, i) => (
+                      <TableRow
+                        key={row.key}
+                        sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}
+                      >
+                        <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
+                          {row.label}
+                        </TableCell>
+                        <TableCell>
+                          {row.type === "select" ? (
+                            <Select
+                              fullWidth
+                              size="small"
+                              name={row.key}
+                              value={formData[row.key as keyof typeof formData]}
+                              onChange={handleSelectChange}
+                            >
+                              {row.options?.map((opt) => (
+                                <MenuItem key={opt} value={opt}>
+                                  {opt}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          ) : (
+                            <TextField
+                              fullWidth
+                              size="small"
+                              name={row.key}
+                              value={formData[row.key as keyof typeof formData]}
+                              onChange={handleChange}
+                              type={row.type}
+                            />
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
-        </CardContent>
-      </Card>
-    </div>
+        ))}
+
+      </Grid>
+    </CardContent>
+  </Card>
+</div>
+
 
   {/* Snackbar */}
   <Snackbar
