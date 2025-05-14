@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom'; 
 import {
   Box,
   Container,
@@ -25,11 +26,22 @@ interface Data {
 }
 
 const DealformInformation = () => {
+  const location = useLocation();
+  const passedTicker = location.state?.ticker; 
+
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [results, setResults] = useState<Data[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [selectedTicker, setSelectedTicker] = useState<{ ticker: string }>({ ticker: 'SARO' });
+  const [selectedTicker, setSelectedTicker] = useState<{ ticker: string }>({
+    ticker: passedTicker || 'SARO', 
+  });
+
+  useEffect(() => {
+    if (passedTicker) {
+      setSelectedTicker({ ticker: passedTicker });
+    }
+  }, [passedTicker]);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('access_token');
@@ -52,13 +64,10 @@ const DealformInformation = () => {
           Authorization: token ? `Bearer ${token}` : '',
         },
       });
-
       if (!response.ok) {
         throw new Error('Failed to fetch results');
       }
-
       const data = await response.json();
-
       const formattedResults = data.map((item: Data) => ({
         ...item,
         ticker: item.ticker.toUpperCase(),

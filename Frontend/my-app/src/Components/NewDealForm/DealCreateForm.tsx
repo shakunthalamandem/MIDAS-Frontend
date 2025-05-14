@@ -19,6 +19,7 @@ import NewDealFormMainTable from './NewDealFormMainTable';
 import BasicInfo from './BasicInfo';
 import SelectedTicker from '../Main/MonasheeGraphs/SelectedTicker';
 import MDDSelectedTicker from '../Main/MonasheeDeals/MddGraphs/MDDSelectedTicker';
+import { useNavigate } from 'react-router-dom';
 
 interface Data {
   ticker: string;
@@ -72,11 +73,16 @@ const DealCreateForm = () => {
       setLoading(false);
     }
   };
+  const navigate = useNavigate();
 
   const handleItemClick = (ticker: string) => {
     setSelectedTicker({ ticker: ticker.toUpperCase() });
     setSearchTerm('');
     setResults([]);
+    navigate('/equity/issue_market', {
+      state: { ticker: ticker.toUpperCase() },
+    });
+    
   };
 
   return (
