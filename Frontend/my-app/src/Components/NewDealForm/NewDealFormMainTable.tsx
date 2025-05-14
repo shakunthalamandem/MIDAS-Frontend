@@ -250,60 +250,60 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   };
   
   
+const handleSave = async () => {
+  try {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem('access_token');
 
-  const handleSave = async () => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem('access_token');
+    if (!apiUrl) throw new Error('API URL is not defined in environment variables');
+    if (!token) throw new Error('Access token is missing');
 
-      if (!apiUrl) throw new Error('API URL is not defined in environment variables');
-      if (!token) throw new Error('Access token is missing');
+    const flattenedData = flattenObject(formData);
+    const { company_details, ...payloadData } = flattenedData;
 
-      const flattenedData = flattenObject(formData);
-      const { company_details, ...payloadData } = flattenedData;
+    const sanitizedPayloadData = Object.keys(payloadData).reduce((acc: Record<string, any>, key) => {
+      const value = payloadData[key];
+      if (typeof value === "string") {
+        const trimmedValue = value.trim();
+        acc[key] = trimmedValue !== "" ? trimmedValue : "";
+      } else if (value !== null && value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
 
-      const sanitizedPayloadData = Object.keys(payloadData).reduce((acc: Record<string, any>, key) => {
-        const value = payloadData[key];
-        if (typeof value === "string") {
-          const trimmedValue = value.trim();
-          acc[key] = trimmedValue !== "" ? trimmedValue : "";
-        } else if (value !== null && value !== undefined) {
-          acc[key] = value;
-        }
-        return acc;
-      }, {});
+    const payload = {
+      ticker: selecteditems.ticker,
+      ...sanitizedPayloadData
+    };
 
-      const payload = {
-        ticker: selecteditems.ticker,
-        ...sanitizedPayloadData
-      };
+    const response = await axios.post(
+      `${apiUrl}/api/update_data/`,
+      payload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      const response = await axios.post(
-        `${apiUrl}/api/update_data/`,
-        payload,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    setIsEditMode(false);
+    setIsEditable(false);
 
-      setIsEditMode(false);
-      setIsEditable(false);
+    setSnackbarMessage('Form updated successfully!');
+    setSnackbarSeverity('success');
+    setSnackbarOpen(true);
 
-      // Show success snackbar
-      setSnackbarMessage('Form updated successfully!');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
-    } catch (error) {
 
-      // Show error snackbar
-      setSnackbarMessage('Failed to save form. Please try again.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
-  };
+  } catch (error) {
+    console.error('Error updating data:', error);
+    setSnackbarMessage('An error occurred while updating the form.');
+    setSnackbarSeverity('error');
+    setSnackbarOpen(true);
+  }
+};
+
 
   const handleEditClick = () => {
     setIsEditMode(true);
@@ -326,40 +326,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         setSnackbarOpen(true);
       }
     };
-
-    if (isDateField) {
-      if (value) {
-        const date = new Date(value);
-        if (!isNaN(date.getTime())) {
-          let formattedDate = '';
-          formattedDate = date.toISOString().split('T')[0];
-        }
-      }
-
-      return (
-        <TextField
-        fullWidth
-        value={isEditable ? value || '' : formatFieldValue(section, key, value)}
-        onClick={handleFieldClick}
-        onChange={(e) => handleInputChange(e, section, key)}
-        variant="outlined"
-        disabled={!isEditable}
-        sx={{
-          '& .MuiInputBase-input': {
-            padding: '6px 8px',
-            fontSize: '12px',
-            color: '#4d4d4d',
-          },
-          '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
-    opacity: 1,
-    '-webkit-text-fill-color': '#08001c',  // Change text color to red when disabled
-  },
-          height: '30px',
-        }}
-      />
-      );
-    }
-
     if (isDropdown) {
       return (
         <Select
@@ -407,32 +373,32 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     }
 
     return (
-      <TextField
-        fullWidth
-        value={value || ''}
-        onClick={handleFieldClick}
-        onChange={(e) => handleInputChange(e, section, key)}
-        variant="outlined"
-        disabled={!isEditable}
-        multiline={key === "deal_colour"}
-        minRows={key === "deal_colour" ? 2 : 1}
-        maxRows={key === "deal_colour" ? undefined : 1}
-        sx={{
-          '& .MuiInputBase-input': {
-            padding: '6px 8px',
-            fontSize: '12px',
-            color: '#4d4d4d',
-            overflow: 'hidden', 
-          },
-          '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
-            opacity: 1,
-            '-webkit-text-fill-color': '#08001c',
-          },
-        }}
-      />
-    );
-    
-  };
+       <TextField
+      fullWidth
+      value={value || ''}
+      onClick={handleFieldClick}
+      onChange={(e) => handleInputChange(e, section, key)}
+      variant="outlined"
+      disabled={!isEditable}
+      multiline={key === "deal_colour"}  // Keeping deal_colour logic as is
+      minRows={key === "deal_colour" ? 2 : 1}
+      maxRows={key === "deal_colour" ? undefined : 1}
+      type={isDateField ? "date" : "text"}  // Set type to "date" for date fields
+      sx={{
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+          fontSize: '12px',
+          color: '#4d4d4d',
+          overflow: 'hidden', 
+        },
+        '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
+          opacity: 1,
+          '-webkit-text-fill-color': '#08001c',
+        },
+      }}
+    />
+  );
+};
 
   const renderFormFields = (section: string, sectionData: any) => {
     if (!sectionData) return null;
