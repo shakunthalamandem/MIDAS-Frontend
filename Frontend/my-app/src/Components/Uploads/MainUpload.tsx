@@ -43,19 +43,11 @@ if (!isSuperUser) {
         justifyContent: "center",
         alignItems: "center",
         height: "50vh",
+        width:"70%",
         backgroundColor: "#fdfdfd",
       }}
     >
-      <Paper
-        elevation={6}
-        sx={{
-          padding: 4,
-          borderRadius: 3,
-          backgroundColor: "#fff5f5",
-          border: "1px solid #ffcdd2",
-          textAlign: "center",
-        }}
-      >
+
         <Box
           sx={{
             display: "flex",
@@ -73,12 +65,12 @@ if (!isSuperUser) {
             Access Denied
           </Typography>
 
-          <Typography sx={{ color: "#c62828" }}>
-            You don't have permission to upload. <br />
+          <Typography sx={{ color: "#ff0000	",fontSize:"20px" }}>
+            You don't have permission to upload. 
             Please contact the IT team for access.
           </Typography>
 
-          <Button
+          {/* <Button
             variant="contained"
             sx={{ backgroundColor: "#d32f2f", "&:hover": { backgroundColor: "#b71c1c" } }}
             onClick={() => {
@@ -86,9 +78,8 @@ if (!isSuperUser) {
             }}
           >
             Contact IT Support
-          </Button>
+          </Button> */}
         </Box>
-      </Paper>
     </Container>
   );
 }
