@@ -64,8 +64,9 @@ const DealformInformation = () => {
           Authorization: token ? `Bearer ${token}` : '',
         },
       });
-
-      if (!response.ok) throw new Error('Failed to fetch results');
+      if (!response.ok) {
+        throw new Error('Failed to fetch results');
+      }
       const data = await response.json();
       const formattedResults = data.map((item: Data) => ({
         ...item,
