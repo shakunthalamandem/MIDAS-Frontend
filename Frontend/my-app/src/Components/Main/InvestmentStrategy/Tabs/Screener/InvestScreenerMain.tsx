@@ -22,12 +22,12 @@ const preprocessRows = (rows: any[]) =>
     deal_size: row.deal_size ? formatDealSize(row.deal_size) : "",
     t1d_returns: row.t1d_returns ? `${(row.t1d_returns).toFixed(2)}%` : "",
     t1m_returns: row.t1m_returns ? `${(row.t1m_returns).toFixed(2)}%` : "",
-    beta: row.beta ? `${(row.beta).toFixed(2)}%` : "",
-    roe: row.roe ? `${(row.roe).toFixed(2)}%` : "",
-    roce: row.roce ? `${(row.roce).toFixed(2)}%` : "",
-    net_debt_ebitda: row.net_debt_ebitda ? `${row.net_debt_ebitda.toFixed(2)}%` : "",
-    debt_equity: row.debt_equity ? `${row.debt_equity.toFixed(2)}%` : "",
-    div_yield: row.div_yield ? `${row.div_yield.toFixed(2)}%` : "",
+    beta: row.beta ? `${(row.beta).toFixed(2)}%` : "0.00%",
+    roe: row.roe ? `${(row.roe).toFixed(2)}%` : "0.00%",
+    roce: row.roce ? `${(row.roce).toFixed(2)}%` : "0.00%",
+    net_debt_ebitda: row.net_debt_ebitda ? `${row.net_debt_ebitda.toFixed(2)}%` : "0.00%",
+    debt_equity: row.debt_equity ? `${row.debt_equity.toFixed(2)}%` : "0.00%",
+    div_yield: row.div_yield ? `${row.div_yield.toFixed(2)}%` : "0.00%",
     allocation_ioi: row.allocation_ioi ? `${row.allocation_ioi.toFixed(2)}%` : "",
     allocation_deal_size: row.allocation_deal_size ? `${row.allocation_deal_size.toFixed(2)}%` : "",
     percentage_primary: row.percentage_primary ? `${row.percentage_primary.toFixed(2)}%` : "",
@@ -163,7 +163,7 @@ const columns: GridColDef[] = [
   {
     field: "ev_sales", headerName: "EV/Sales", width: 80, renderCell: (params) => {
       const value = parseFloat(params.value);
-      return value ? value.toFixed(2) : ""; // Format to 2 decimal places
+      return value ? value.toFixed(2) : "0.00"; // Format to 2 decimal places
     },
   },
   {
@@ -222,7 +222,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US")}`
-        : "0";
+        : "$0";
     },
   },
   {
@@ -233,7 +233,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
   {
@@ -244,7 +244,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
   {
@@ -255,7 +255,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
   {
@@ -266,7 +266,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
 
@@ -278,7 +278,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
   {
@@ -289,7 +289,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
   {
@@ -300,7 +300,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
   {
@@ -311,7 +311,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
   {
@@ -322,7 +322,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
   {
@@ -333,7 +333,7 @@ const columns: GridColDef[] = [
       const value = parseFloat(params.value);
       return value
         ? `${value < 0 ? "-$" : "$"}${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : "0";
+        : "$0";
     },
   },
   {

@@ -141,6 +141,14 @@ const handleClosePopup = () => {
     setOpenNoDataPopup(false);
     resetFilters(handleCancel); // Reset filters when closing popup
   };
+  const formatPercentage = (value: number | null | undefined): string => {
+  if (value == null || isNaN(value)) return "";
+
+  const absVal = Math.abs(value);
+  if (absVal < 0.005) return "0.00%"; 
+
+  return `${value.toFixed(2)}%`;
+};
 
   const columns: GridColDef[] = [
     {
@@ -195,24 +203,26 @@ const handleClosePopup = () => {
       field: "t1m_returns",
       headerName: "T + 1M Absolute Returns",
       width: 200,
-      renderCell: (params) => params.value,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "t1d_returns",
       headerName: "T + 1D Return ",
       width: 220,
-      renderCell: (params) => params.value,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "allocation_deal_size",
       headerName: "Allocation as % of Deal Size",
       width: 250,
-      renderCell: (params) => params.value,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { field: "allocation_ioi", headerName: "Allocation as % of IOI", width: 180, renderCell: (params) => params.value,
+    { field: "allocation_ioi", headerName: "Allocation as % of IOI", width: 180, 
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
+
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2), },
     {
       field: "average_hold_period",
@@ -225,14 +235,14 @@ const handleClosePopup = () => {
       field: "tplus_1d_issueprice",
       headerName: "T + 1D issueprice",
       width: 180,
-      renderCell: (params) => params.value,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
       field: "fo_discount",
       headerName: "Follow On Discount",
       width: 180,
-      renderCell: (params) => params.value,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
