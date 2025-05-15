@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { Button, Typography, Container, Card, CardContent, Snackbar, Alert, Divider } from "@mui/material";
 
-const App: React.FC = () => {
+const NewDealDownload: React.FC = () => {
   const [error, setError] = React.useState<string>("");
   const [openSnackbar, setOpenSnackbar] = React.useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState<string>("");
@@ -86,4 +86,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default NewDealDownload;
