@@ -133,7 +133,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h5" gutterBottom align="center" color="primary">
+      <Typography variant="h5" gutterBottom align="center" color="#002060">
         Download Filtered Deals Data
       </Typography>
 

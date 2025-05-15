@@ -212,15 +212,7 @@ const MainUpload: React.FC = () => {
       <Divider orientation="vertical" flexItem sx={{ height: '100vh', borderColor: '#e0e0e0' }} />
 
       {/* Right side: DownloadDeals component */}
-      <Box
-        sx={{
-          width: '15%',
-          padding: 3,
-          marginTop: '40px',
-          height: '100vh',
-          overflowY: 'auto',
-        }}
-      >
+
   
         {/* <DownloadDeals />
         <Divider sx={{ margin: '30px 0', color:"red" }} />
@@ -228,7 +220,6 @@ const MainUpload: React.FC = () => {
 
 
         <NewDealDownloadWithFilter />
-      </Box>
     </Box>
   );
 };
