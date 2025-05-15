@@ -50,6 +50,8 @@ import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquity
 import DealformInformation from "../Components/NewDealForm/DealformInformation";
 import BasicInfo from "../Components/NewDealForm/BasicInfo";
 import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
+import NewDealTickerSelector from "../Components/Uploads/NewDealTickerSelector";
+import NewDealDownloadWithFilter from "../Components/Uploads/NewDealDownloadWithFilter";
 
 
 
@@ -141,6 +143,7 @@ const AppRouters: React.FC = () => {
         <Route path="/uploads" element={<AuthGuard><MainUpload /></AuthGuard>} />
         <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
+        <Route path="/uploadticker" element={<AuthGuard><NewDealDownloadWithFilter/></AuthGuard>} />
 
 
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -13,8 +14,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -31,7 +30,7 @@ const MenuProps = {
 const NewDealTickerSelector: React.FC = () => {
   const [tickers, setTickers] = useState<string[]>([]);
   const [selectedTickers, setSelectedTickers] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(""); // Store date as string (YYYY-MM-DD)
   const [loading, setLoading] = useState<boolean>(false);
   const [submittedData, setSubmittedData] = useState<any>(null);
 
@@ -39,13 +38,24 @@ const NewDealTickerSelector: React.FC = () => {
     const fetchTickers = async () => {
       setLoading(true);
       try {
-        const response = await fetch("/api/newdeal_tickers/", {
-          headers: {
-            Authorization: "Bearer YOUR_TOKEN_HERE", // Replace with actual token or use interceptor
-          },
-        });
-        const data = await response.json();
-        setTickers(data.distinct_tickers || []);
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
+
+        if (!apiUrl) {
+          throw new Error("API URL is not defined in environment variables");
+        }
+
+        const response = await axios.get<{ distinct_tickers: string[] }>(
+          `${apiUrl}/api/newdeal_tickers/`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          }
+        );
+
+        setTickers(response.data.distinct_tickers || []);
       } catch (error) {
         console.error("Error fetching tickers:", error);
       } finally {
@@ -59,11 +69,11 @@ const NewDealTickerSelector: React.FC = () => {
   const handleSubmit = () => {
     const payload = {
       tickers: selectedTickers,
-      date: selectedDate ? selectedDate.toISOString().split("T")[0] : null,
+      date: selectedDate || null,
     };
     console.log("Submitted JSON:", payload);
     setSubmittedData(payload);
-    // Optionally: Send payload to backend
+    // Optional: Send payload to backend here
   };
 
   return (
@@ -89,23 +99,26 @@ const NewDealTickerSelector: React.FC = () => {
             >
               {tickers.map((ticker) => (
                 <MenuItem key={ticker} value={ticker}>
-                  <Checkbox checked={selectedTickers.indexOf(ticker) > -1} />
+                  <Checkbox checked={selectedTickers.includes(ticker)} />
                   <ListItemText primary={ticker} />
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            {/* <DatePicker
-              label="Select Date"
-              value={selectedDate}
-              onChange={(newDate) => setSelectedDate(newDate)}
-              renderInput={(params) => (
-                <TextField fullWidth margin="normal" {...params} />
-              )}
-            /> */}
-          </LocalizationProvider>
+          <TextField
+            fullWidth
+            variant="outlined"
+            size="small"
+            label="As Of Date"
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            margin="normal"
+          />
 
           <Button
             variant="contained"
