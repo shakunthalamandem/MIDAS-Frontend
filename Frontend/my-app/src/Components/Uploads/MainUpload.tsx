@@ -18,6 +18,7 @@ import axios from 'axios';
 import DownloadDeals from './DownloadDeals';
 import LastThreeDayDeals from './LastThreeDayDeals';
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import NewDealDownloadWithFilter from './NewDealDownloadWithFilter';
 
 // Upload type
 type UploadType = 'form' | 'monashee_deals' | null;
@@ -221,9 +222,12 @@ const MainUpload: React.FC = () => {
         }}
       >
   
-        <DownloadDeals />
+        {/* <DownloadDeals />
         <Divider sx={{ margin: '30px 0', color:"red" }} />
-        <LastThreeDayDeals />
+        <LastThreeDayDeals /> */}
+
+
+        <NewDealDownloadWithFilter />
       </Box>
     </Box>
   );
