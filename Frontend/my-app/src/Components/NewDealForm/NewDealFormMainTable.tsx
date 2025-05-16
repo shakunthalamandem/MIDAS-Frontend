@@ -400,7 +400,6 @@ const handleSave = async () => {
   );
 };
 
-
 const renderFormFields = (section: string, sectionData: any) => {
   if (!sectionData) return null;
 
@@ -410,7 +409,7 @@ const renderFormFields = (section: string, sectionData: any) => {
   for (let i = 0; i < entries.length; i++) {
     const [key, value] = entries[i];
 
-    // Special case for `deal_colour` — full row
+    // Special styling for `deal_colour` - full row
     if (section === 'deal_color' && key === 'deal_colour') {
       rows.push(
         <TableRow
@@ -442,10 +441,10 @@ const renderFormFields = (section: string, sectionData: any) => {
           </TableCell>
         </TableRow>
       );
-      continue;
+      continue; // skip to next
     }
 
-    // Handle the remaining fields as pairs
+    // Next field to pair with
     const nextEntry = entries[i + 1];
     const isLast = i === entries.length - 1 || nextEntry?.[0] === 'deal_colour';
 
@@ -479,7 +478,7 @@ const renderFormFields = (section: string, sectionData: any) => {
           {renderInputField(section, key, value)}
         </TableCell>
 
-        {/* Second Field or Empty */}
+        {/* Second Field (if available and not deal_colour) */}
         {isLast ? (
           <>
             <TableCell />
@@ -507,7 +506,7 @@ const renderFormFields = (section: string, sectionData: any) => {
       </TableRow>
     );
 
-    if (!isLast) i++; // Skip next if already used
+    if (!isLast) i++; 
   }
 
   return rows;
