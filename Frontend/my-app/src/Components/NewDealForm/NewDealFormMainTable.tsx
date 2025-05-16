@@ -248,60 +248,60 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   };
   
   
+const handleSave = async () => {
+  try {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem('access_token');
 
-  const handleSave = async () => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem('access_token');
+    if (!apiUrl) throw new Error('API URL is not defined in environment variables');
+    if (!token) throw new Error('Access token is missing');
 
-      if (!apiUrl) throw new Error('API URL is not defined in environment variables');
-      if (!token) throw new Error('Access token is missing');
+    const flattenedData = flattenObject(formData);
+    const { company_details, ...payloadData } = flattenedData;
 
-      const flattenedData = flattenObject(formData);
-      const { company_details, ...payloadData } = flattenedData;
+    const sanitizedPayloadData = Object.keys(payloadData).reduce((acc: Record<string, any>, key) => {
+      const value = payloadData[key];
+      if (typeof value === "string") {
+        const trimmedValue = value.trim();
+        acc[key] = trimmedValue !== "" ? trimmedValue : "";
+      } else if (value !== null && value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
 
-      const sanitizedPayloadData = Object.keys(payloadData).reduce((acc: Record<string, any>, key) => {
-        const value = payloadData[key];
-        if (typeof value === "string") {
-          const trimmedValue = value.trim();
-          acc[key] = trimmedValue !== "" ? trimmedValue : "";
-        } else if (value !== null && value !== undefined) {
-          acc[key] = value;
-        }
-        return acc;
-      }, {});
+    const payload = {
+      ticker: selecteditems.ticker,
+      ...sanitizedPayloadData
+    };
 
-      const payload = {
-        ticker: selecteditems.ticker,
-        ...sanitizedPayloadData
-      };
+    const response = await axios.post(
+      `${apiUrl}/api/update_data/`,
+      payload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      const response = await axios.post(
-        `${apiUrl}/api/update_data/`,
-        payload,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    setIsEditMode(false);
+    setIsEditable(false);
 
-      setIsEditMode(false);
-      setIsEditable(false);
+    setSnackbarMessage('Form updated successfully!');
+    setSnackbarSeverity('success');
+    setSnackbarOpen(true);
 
-      // Show success snackbar
-      setSnackbarMessage('Form updated successfully!');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
-    } catch (error) {
 
-      // Show error snackbar
-      setSnackbarMessage('Failed to save form. Please try again.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
-  };
+  } catch (error) {
+    console.error('Error updating data:', error);
+    setSnackbarMessage('An error occurred while updating the form.');
+    setSnackbarSeverity('error');
+    setSnackbarOpen(true);
+  }
+};
+
 
   const handleEditClick = () => {
     setIsEditMode(true);
@@ -324,40 +324,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
         setSnackbarOpen(true);
       }
     };
-
-    if (isDateField) {
-      if (value) {
-        const date = new Date(value);
-        if (!isNaN(date.getTime())) {
-          let formattedDate = '';
-          formattedDate = date.toISOString().split('T')[0];
-        }
-      }
-
-      return (
-        <TextField
-        fullWidth
-        value={isEditable ? value || '' : formatFieldValue(section, key, value)}
-        onClick={handleFieldClick}
-        onChange={(e) => handleInputChange(e, section, key)}
-        variant="outlined"
-        disabled={!isEditable}
-        sx={{
-          '& .MuiInputBase-input': {
-            padding: '6px 8px',
-            fontSize: '12px',
-            color: '#4d4d4d',
-          },
-          '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
-    opacity: 1,
-    '-webkit-text-fill-color': '#08001c',  // Change text color to red when disabled
-  },
-          height: '30px',
-        }}
-      />
-      );
-    }
-
     if (isDropdown) {
       return (
         <Select
@@ -405,48 +371,50 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
     }
 
     return (
-      <TextField
-        fullWidth
-        value={value || ''}
-        onClick={handleFieldClick}
-        onChange={(e) => handleInputChange(e, section, key)}
-        variant="outlined"
-        disabled={!isEditable}
-        multiline={key === "deal_colour"}
-        minRows={key === "deal_colour" ? 2 : 1}
-        maxRows={key === "deal_colour" ? undefined : 1}
-        sx={{
-          '& .MuiInputBase-input': {
-            padding: '6px 8px',
-            fontSize: '12px',
-            color: '#4d4d4d',
-            overflow: 'hidden', 
-          },
-          '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
-            opacity: 1,
-            '-webkit-text-fill-color': '#08001c',
-          },
-        }}
-      />
-    );
-    
-  };
+       <TextField
+      fullWidth
+      value={value || ''}
+      onClick={handleFieldClick}
+      onChange={(e) => handleInputChange(e, section, key)}
+      variant="outlined"
+      disabled={!isEditable}
+      multiline={key === "deal_colour"}  // Keeping deal_colour logic as is
+      minRows={key === "deal_colour" ? 2 : 1}
+      maxRows={key === "deal_colour" ? undefined : 1}
+      type={isDateField ? "date" : "text"}  // Set type to "date" for date fields
+      sx={{
+        '& .MuiInputBase-input': {
+          padding: '6px 8px',
+          fontSize: '12px',
+          color: '#4d4d4d',
+          overflow: 'hidden', 
+        },
+        '& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled': {
+          opacity: 1,
+          '-webkit-text-fill-color': '#08001c',
+        },
+      }}
+    />
+  );
+};
 
-  const renderFormFields = (section: string, sectionData: any) => {
-    if (!sectionData) return null;
+const renderFormFields = (section: string, sectionData: any) => {
+  if (!sectionData) return null;
 
-    const entries = Object.entries(sectionData);
-    const rows = [];
-    for (let i = 0; i < entries.length; i += 2) {
-      const firstField = entries[i];
-      const secondField = entries[i + 1];
+  const entries = Object.entries(sectionData);
+  const rows = [];
 
+  for (let i = 0; i < entries.length; i++) {
+    const [key, value] = entries[i];
+
+    // Special styling for `deal_colour` - full row
+    if (section === 'deal_color' && key === 'deal_colour') {
       rows.push(
         <TableRow
-          key={i}
+          key={key}
           sx={{
             backgroundColor: i % 4 === 0 ? '#f3f3f3' : '#fff',
-            height: '40px', 
+            height: '40px',
             '& td': {
               padding: '4px',
               height: '40px',
@@ -454,54 +422,98 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
             },
           }}
         >
-          {/* First Field */}
           <TableCell
             sx={{
               fontWeight: 'bold',
               fontSize: '0.85rem',
               width: '15%',
               whiteSpace: 'nowrap',
-              height: '40px',  
-              padding: '4px',  
+              height: '40px',
+              padding: '4px',
             }}
           >
-           {capitalizeLabel(section, firstField[0])}
+            {capitalizeLabel(section, key)}
           </TableCell>
-          <TableCell sx={{ width: '12%', padding: '4px', height: '20px' }}>
-            {renderInputField(section, firstField[0], firstField[1])}
+          <TableCell colSpan={3} sx={{ padding: '4px' }}>
+            {renderInputField(section, key, value)}
           </TableCell>
-
-          {/* Second Field */}
-          {secondField ? (
-            <>
-              <TableCell
-                sx={{
-                  fontWeight: 'bold',
-                  fontSize: '0.85rem',
-                  width: '15%',
-                  whiteSpace: 'nowrap',
-                  height: '40px', 
-                  padding: '4px', 
-                }}
-              >
-               {capitalizeLabel(section, secondField[0])}
-              </TableCell>
-              <TableCell sx={{ width: '12%', padding: '4px', height: '40px' }}>
-                {renderInputField(section, secondField[0], secondField[1])}
-              </TableCell>
-            </>
-          ) : (
-            <>
-              <TableCell />
-              <TableCell />
-            </>
-          )}
         </TableRow>
       );
+      continue; // skip to next
     }
 
-    return rows;
-  };
+    // Next field to pair with
+    const nextEntry = entries[i + 1];
+    const isLast = i === entries.length - 1 || nextEntry?.[0] === 'deal_colour';
+
+    rows.push(
+      <TableRow
+        key={key}
+        sx={{
+          backgroundColor: i % 4 === 0 ? '#f3f3f3' : '#fff',
+          height: '40px',
+          '& td': {
+            padding: '4px',
+            height: '40px',
+            verticalAlign: 'middle',
+          },
+        }}
+      >
+        {/* First Field */}
+        <TableCell
+          sx={{
+            fontWeight: 'bold',
+            fontSize: '0.85rem',
+            width: '15%',
+            whiteSpace: 'nowrap',
+            height: '40px',
+            padding: '4px',
+          }}
+        >
+          {capitalizeLabel(section, key)}
+        </TableCell>
+        <TableCell sx={{ width: '12%', padding: '4px', height: '20px' }}>
+          {renderInputField(section, key, value)}
+        </TableCell>
+
+        {/* Second Field (if available and not deal_colour) */}
+        {isLast ? (
+          <>
+            <TableCell />
+            <TableCell />
+          </>
+        ) : (
+          <>
+            <TableCell
+              sx={{
+                fontWeight: 'bold',
+                fontSize: '0.85rem',
+                width: '15%',
+                whiteSpace: 'nowrap',
+                height: '40px',
+                padding: '4px',
+              }}
+            >
+              {capitalizeLabel(section, nextEntry[0])}
+            </TableCell>
+            <TableCell sx={{ width: '12%', padding: '4px', height: '40px' }}>
+              {renderInputField(section, nextEntry[0], nextEntry[1])}
+            </TableCell>
+          </>
+        )}
+      </TableRow>
+    );
+
+    if (!isLast) i++; 
+  }
+
+  return rows;
+};
+
+
+
+
+
 
   const renderSection = (title: string, sectionKey: string) => (
     
