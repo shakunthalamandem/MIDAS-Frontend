@@ -73,7 +73,7 @@ const tableLeft1: Row[] = [
     ],
   },
   { label: "Deal Size ($ Million)", key: "deal_size_amount_usd", type: "number" },
-  { label: "Deal Size Shares", key: "deal_size_shares", type: "number" },
+  // { label: "Deal Size Shares", key: "deal_size_shares", type: "number" },
   {
     label: "Deal Captain",
     key: "deal_captain",
@@ -97,13 +97,13 @@ const tableRight1: Row[] = [
     key: "discount_percentage",
     type: "number",
   },
-  { label: "Last Close Price ($)", key: "last_close_price", type: "number" },
+  // { label: "Last Close Price ($)", key: "last_close_price", type: "number" },
   {
     label: " IOI Amount ($ Million) ",
     key: "final_indication_amount_usd",
     type: "number",
   },
-  { label: " IOI Shares", key: "final_indication_shares", type: "number" },
+  // { label: " IOI Shares", key: "final_indication_shares", type: "number" },
   {
     label: " IOI as % of Deal Size",
     key: "final_indication_deal_percentage",
@@ -114,7 +114,7 @@ const tableRight1: Row[] = [
     key: "allocation_amount_usd",
     type: "number",
   },
-  { label: "Allocation Shares", key: "allocation_shares", type: "number" },
+  // { label: "Allocation Shares", key: "allocation_shares", type: "number" },
   {
     label: "Allocation as % of Deal Size",
     key: "allocation_deal_size_percentage",
