@@ -124,12 +124,12 @@ const Logs = () => {
                 marginTop:'8px',
                 height:'30px',
 
-                backgroundColor: '#3399ff',
+                backgroundColor: '#21004b',
                 fontWeight: 'bold',
                 fontFamily: 'Roboto, sans-serif',
                 '&:hover': { backgroundColor: '#bb4401' },
               }} onClick={() => setOpen(true)}>
-        User Logs
+        Logs
       </Button>
 
       <Dialog
