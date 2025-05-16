@@ -400,21 +400,24 @@ const handleSave = async () => {
   );
 };
 
-  const renderFormFields = (section: string, sectionData: any) => {
-    if (!sectionData) return null;
 
-    const entries = Object.entries(sectionData);
-    const rows = [];
-    for (let i = 0; i < entries.length; i += 2) {
-      const firstField = entries[i];
-      const secondField = entries[i + 1];
+const renderFormFields = (section: string, sectionData: any) => {
+  if (!sectionData) return null;
 
+  const entries = Object.entries(sectionData);
+  const rows = [];
+
+  for (let i = 0; i < entries.length; i++) {
+    const [key, value] = entries[i];
+
+    // Special case for `deal_colour` — full row
+    if (section === 'deal_color' && key === 'deal_colour') {
       rows.push(
         <TableRow
-          key={i}
+          key={key}
           sx={{
             backgroundColor: i % 4 === 0 ? '#f3f3f3' : '#fff',
-            height: '40px', 
+            height: '40px',
             '& td': {
               padding: '4px',
               height: '40px',
@@ -422,54 +425,98 @@ const handleSave = async () => {
             },
           }}
         >
-          {/* First Field */}
           <TableCell
             sx={{
               fontWeight: 'bold',
               fontSize: '0.85rem',
               width: '15%',
               whiteSpace: 'nowrap',
-              height: '40px',  
-              padding: '4px',  
+              height: '40px',
+              padding: '4px',
             }}
           >
-           {capitalizeLabel(section, firstField[0])}
+            {capitalizeLabel(section, key)}
           </TableCell>
-          <TableCell sx={{ width: '12%', padding: '4px', height: '20px' }}>
-            {renderInputField(section, firstField[0], firstField[1])}
+          <TableCell colSpan={3} sx={{ padding: '4px' }}>
+            {renderInputField(section, key, value)}
           </TableCell>
-
-          {/* Second Field */}
-          {secondField ? (
-            <>
-              <TableCell
-                sx={{
-                  fontWeight: 'bold',
-                  fontSize: '0.85rem',
-                  width: '15%',
-                  whiteSpace: 'nowrap',
-                  height: '40px', 
-                  padding: '4px', 
-                }}
-              >
-               {capitalizeLabel(section, secondField[0])}
-              </TableCell>
-              <TableCell sx={{ width: '12%', padding: '4px', height: '40px' }}>
-                {renderInputField(section, secondField[0], secondField[1])}
-              </TableCell>
-            </>
-          ) : (
-            <>
-              <TableCell />
-              <TableCell />
-            </>
-          )}
         </TableRow>
       );
+      continue;
     }
 
-    return rows;
-  };
+    // Handle the remaining fields as pairs
+    const nextEntry = entries[i + 1];
+    const isLast = i === entries.length - 1 || nextEntry?.[0] === 'deal_colour';
+
+    rows.push(
+      <TableRow
+        key={key}
+        sx={{
+          backgroundColor: i % 4 === 0 ? '#f3f3f3' : '#fff',
+          height: '40px',
+          '& td': {
+            padding: '4px',
+            height: '40px',
+            verticalAlign: 'middle',
+          },
+        }}
+      >
+        {/* First Field */}
+        <TableCell
+          sx={{
+            fontWeight: 'bold',
+            fontSize: '0.85rem',
+            width: '15%',
+            whiteSpace: 'nowrap',
+            height: '40px',
+            padding: '4px',
+          }}
+        >
+          {capitalizeLabel(section, key)}
+        </TableCell>
+        <TableCell sx={{ width: '12%', padding: '4px', height: '20px' }}>
+          {renderInputField(section, key, value)}
+        </TableCell>
+
+        {/* Second Field or Empty */}
+        {isLast ? (
+          <>
+            <TableCell />
+            <TableCell />
+          </>
+        ) : (
+          <>
+            <TableCell
+              sx={{
+                fontWeight: 'bold',
+                fontSize: '0.85rem',
+                width: '15%',
+                whiteSpace: 'nowrap',
+                height: '40px',
+                padding: '4px',
+              }}
+            >
+              {capitalizeLabel(section, nextEntry[0])}
+            </TableCell>
+            <TableCell sx={{ width: '12%', padding: '4px', height: '40px' }}>
+              {renderInputField(section, nextEntry[0], nextEntry[1])}
+            </TableCell>
+          </>
+        )}
+      </TableRow>
+    );
+
+    if (!isLast) i++; // Skip next if already used
+  }
+
+  return rows;
+};
+
+
+
+
+
 
   const renderSection = (title: string, sectionKey: string) => (
     
