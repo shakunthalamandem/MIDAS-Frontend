@@ -515,6 +515,7 @@ const BasicInfo: React.FC = () => {
                                   fullWidth
                                   size="small"
                                   name={row.key}
+                                  minRows={row.key === "deal_color" ? 3 : undefined}
                                   value={formData[row.key as keyof typeof formData]}
                                   onChange={handleSelectChange}
                                 >
@@ -626,33 +627,38 @@ const BasicInfo: React.FC = () => {
                             <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem", width: '20%' }}>
                               {dealColorRow.label}
                             </TableCell>
-                            <TableCell>
-                              {dealColorRow.type === "textarea" ? (
-                                <Select
-                                  fullWidth
-                                  size="small"
-                                  name={dealColorRow.key}
-                                  value={formData[dealColorRow.key as keyof typeof formData]}
-                                  onChange={handleSelectChange}
-                                >
-                                  {dealColorRow.options?.map((opt) => (
-                                    <MenuItem key={opt} value={opt}>
-                                      {opt}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              ) : (
-                                <TextField
-  
-                                  fullWidth
-                                  size="small"
-                                  name={dealColorRow.key}
-                                  value={formData[dealColorRow.key as keyof typeof formData]}
-                                  onChange={handleChange}
-                                  type={dealColorRow.type}
-                                />
-                              )}
-                            </TableCell>
+                          <TableCell>
+  {dealColorRow.type === "textarea" ? (
+    <Select
+      fullWidth
+      size="small"
+      name={dealColorRow.key}
+      value={formData[dealColorRow.key as keyof typeof formData]}
+      onChange={handleSelectChange}
+      sx={{ ml: 2 }}
+    >
+      {dealColorRow.options?.map((opt) => (
+        <MenuItem key={opt} value={opt}>
+          {opt}
+        </MenuItem>
+      ))}
+    </Select>
+  ) : (
+    <TextField
+      fullWidth
+      size="small"
+      name={dealColorRow.key}
+      value={formData[dealColorRow.key as keyof typeof formData]}
+      onChange={handleChange}
+      type={dealColorRow.type}
+      multiline
+      sx={{ ml: 2 }} // <-- margin left for the input
+    />
+  )}
+</TableCell>
+
+
+
                           </TableRow>
                         );
                       })()}
