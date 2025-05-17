@@ -393,11 +393,41 @@ const BasicInfo: React.FC = () => {
   const handleReset = () => {
     setFormData(defaultData);
   };
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  setFormData((prev) => {
+    const updated = { ...prev, [name]: value };
+
+    const dealSizeStr = updated.deal_size_amount_usd;
+    const allocationAmountStr = updated.allocation_amount_usd;
+    const ioiAmountStr = updated.final_indication_amount_usd;
+
+    const dealSize = parseFloat(dealSizeStr);
+    const allocationAmount = parseFloat(allocationAmountStr);
+    const ioiAmount = parseFloat(ioiAmountStr);
+
+    if (dealSizeStr && allocationAmountStr && dealSize > 0) {
+      updated.allocation_deal_size_percentage = ((allocationAmount / dealSize) * 100).toFixed(2);
+    } else {
+      updated.allocation_deal_size_percentage = "";
+    }
+
+    if (ioiAmountStr && allocationAmountStr && ioiAmount > 0) {
+      updated.allocation_percentage = ((allocationAmount / ioiAmount) * 100).toFixed(2);
+    } else {
+      updated.allocation_percentage = "";
+    }
+
+    if (dealSizeStr && ioiAmountStr && dealSize > 0) {
+      updated.final_indication_deal_percentage = ((ioiAmount / dealSize) * 100).toFixed(2);
+    } else {
+      updated.final_indication_deal_percentage = "";
+    }
+
+    return updated;
+  });
+};
 
   const handleSelectChange = (e: SelectChangeEvent<string | number>) => {
     const name = e.target.name as string;
@@ -439,7 +469,7 @@ const BasicInfo: React.FC = () => {
       setOpenSnackbar(true);
     } catch (err) {
       console.error("Save failed:", err);
-      setSnackbarMessage("Deal form already exists.");
+      setSnackbarMessage("Something went wrong..");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
     } finally {
@@ -531,64 +561,106 @@ const BasicInfo: React.FC = () => {
         </Box>
       </Box>
 
-{/* Basic Info Card */}
-      <div ref={basicInfoRef}>
-        <Card sx={{ marginTop: 4 }}>
-          <CardContent>
-            <Typography variant="h5" align="center" color="#002060" sx={{ fontWeight: "bold" }}>
-              Basic Info
-            </Typography>
-            <Grid container spacing={2} mt={2}>
-              {[tableLeft1, tableRight1].map((tableData, index) => (
-                <Grid item xs={12} sm={6} key={index}>
-                  <TableContainer component={Paper}>
-                    <Table size="small">
-                      <TableBody>
-                        {tableData.map((row, i) => (
-                          <TableRow key={row.key} sx={{ backgroundColor: i % 2 === 0 ? "#f3f3f3" : "#fff" }}>
-                            <TableCell sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
-                              {row.label}
-                            </TableCell>
-                            <TableCell>
-                              {row.type === "select" ? (
-                                <Select
-                                  fullWidth
-                                  size="small"
-                                  name={row.key}
-                                  minRows={row.key === "deal_color" ? 3 : undefined}
-                                  value={formData[row.key as keyof typeof formData]}
-                                  onChange={handleSelectChange}
-                                >
-                                  {row.options?.map((opt) => (
-                                    <MenuItem key={opt} value={opt}>
-                                      {opt}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              ) : (
-                                <TextField
-                                  fullWidth
-                                  size="small"
-                                  name={row.key}
-                                  value={formData[row.key as keyof typeof formData]}
-                                  onChange={handleChange}
-                                  type={row.type} 
-                                  minRows={row.key === "deal_color" ? 3 : undefined}
-                                />
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
+<div ref={basicInfoRef}>
+  <Card
+    sx={{
+      marginTop: 4,
+      background: " #e6f2ff",
+      borderRadius: 3,
+      padding: 2,
+      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+      border: "1px solid #e0e0e0",
+      width: "100%", 
+      maxWidth: "1200px",
+      marginLeft: "auto",
+      marginRight: "auto",
+    }}
+  >
+    <CardContent sx={{ px: 3, py: 2, background: "#e6f2ff" }}>
+      <Typography variant="h5" align="center" color="#002060" sx={{ fontWeight: "bold" }}>
+        Basic Info
+      </Typography>
 
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Ensure Grid is set for 4 items per row */}
+      <Grid container spacing={2} mt={2}>
+        {[tableLeft1, tableRight1].flat().map((row) => (
+          <Grid item xs={12} sm={6} md={3} key={row.key}> 
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+                backgroundColor: "#fff", 
+                borderRadius: 2,
+                p: 2,
+                boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                height: "100%",
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ color: "#333", fontWeight: 600 }}>
+                {row.label}
+              </Typography>
+
+              {row.type === "select" ? (
+                <Select
+                  fullWidth
+                  size="small"
+                  name={row.key}
+                  value={formData[row.key as keyof typeof formData]}
+                  onChange={handleSelectChange}
+                  sx={{
+                    backgroundColor: "#fff", 
+                    borderRadius: 1,
+                    "& .MuiSelect-select": { padding: "10px" },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#b0bec5", 
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#90a4ae", 
+                    },
+                  }}
+                >
+                  {row.options?.map((opt) => (
+                    <MenuItem key={opt} value={opt}>
+                      {opt}
+                    </MenuItem>
+                  ))}
+                </Select>
+              ) : (
+                <TextField
+                  fullWidth
+                  size="small"
+                  name={row.key}
+                  value={formData[row.key as keyof typeof formData]}
+                  onChange={handleChange}
+                  type={row.type}
+                  multiline={row.key === "deal_color"}
+                  minRows={row.key === "deal_color" ? 3 : undefined}
+                  sx={{
+                    backgroundColor: "#fff", 
+                    borderRadius: 1,
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#b0bec5", 
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#90a4ae", 
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#90a4ae", 
+                      },
+                    },
+                  }}
+                />
+              )}
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
+    </CardContent>
+  </Card>
+</div>
+
 
 {/* Market Data Card */}
       <div ref={marketDataRef}>
