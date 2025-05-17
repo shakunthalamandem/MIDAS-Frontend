@@ -566,289 +566,187 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 {/* Basic Info Card */}
  <div ref={basicInfoRef}>
-      <Card
-        sx={{
-          mt: 4,
-          backgroundColor: "#e6f2ff",
-          borderRadius: 3,
-          p: 2,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          border: "1px solid #e0e0e0",
-          width: "100%",
-          maxWidth: "2000px",
-          mx: "auto", // centers horizontally
-        }}
-      >
-        <CardContent sx={{ px: 3, py: 2, backgroundColor: "#e6f2ff" }}>
-          <Typography
-            variant="h5"
-            align="center"
-            color="#002060"
-            sx={{ fontWeight: "bold", mb: 2 }}
-          >
-            Basic Info
-          </Typography>
+    <Card
+  sx={{
+    mt: 4,
+    backgroundColor: "#e6f2ff", // light blue
+    borderRadius: 3,
+    p: 2,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    border: "1px solid #e0e0e0",
+    width: "100%",
+    maxWidth: "2000px",
+    mx: "auto",
+  }}
+>
+  <CardContent sx={{ px: 3, py: 2 }}>
+    <Typography
+      variant="h5"
+      align="center"
+      color="#002060"
+      sx={{ fontWeight: "bold", mb: 2 }}
+    >
+      Basic Info
+    </Typography>
 
-          {/* Input fields container */}
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)", // 4 fields per row
-              gap: 2,
-              backgroundColor: "#fff",
-              borderRadius: 2,
-              p: 2,
-              boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-              width: "103.3%",
-              ml: "-31.5px", // custom offset alignment
-            }}
-          >
-            {[...tableLeft1, ...tableRight1].map((row) => (
-              <Box
-                key={row.key}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 1,
-                }}
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 2,
+        borderRadius: 2,
+        p: 2,
+        backgroundColor: "#e6f2ff", // match card background
+        width: "100%", // fixed width
+      }}
+    >
+      {[...tableLeft1, ...tableRight1].map((row) => (
+        <Box key={row.key}>
+          {row.type === "select" ? (
+            <FormControl variant="standard" size="small" fullWidth>
+              <InputLabel>{row.label}</InputLabel>
+              <Select
+                name={row.key}
+                value={formData[row.key as keyof typeof formData]}
+                onChange={handleSelectChange}
               >
-                {/* Field Label */}
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: "#333",
-                    fontWeight: 600,
-                    minWidth: "150px",
-                  }}
-                >
-                  {row.label}
-                </Typography>
+                {row.options?.map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    {opt}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <TextField
+              fullWidth
+              size="small"
+              variant="standard"
+              name={row.key}
+              label={row.label}
+              value={formData[row.key as keyof typeof formData]}
+              onChange={handleChange}
+              type={row.type}
 
-                {/* Field Input */}
-                {row.type === "select" ? (
-                  <Select
-                    fullWidth
-                    size="small"
-                    name={row.key}
-                  value={formData[row.key as keyof typeof formData]}
-                    onChange={handleSelectChange}
-                    sx={{
-                      backgroundColor: "#fff",
-                      borderRadius: 1,
-                      height: "40px",
-                      minWidth: "200px",
-                      "& .MuiSelect-select": { padding: "10px" },
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#b0bec5",
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#90a4ae",
-                      },
-                    }}
-                  >
-                    {row.options?.map((opt) => (
-                      <MenuItem key={opt} value={opt}>
-                        {opt}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : (
-                  <TextField
-                    fullWidth
-                    size="small"
-                    name={row.key}
-                  value={formData[row.key as keyof typeof formData]}
-                    onChange={handleChange}
-                    type={row.type}
-                    sx={{
-                      backgroundColor: "#fff",
-                      borderRadius: 1,
-                      height: "40px",
-                      minWidth: "200px",
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderColor: "#b0bec5",
-                        },
-                        "&:hover fieldset": {
-                          borderColor: "#90a4ae",
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "#90a4ae",
-                        },
-                      },
-                    }}
-                  />
-                )}
-              </Box>
-            ))}
-          </Box>
-        </CardContent>
-      </Card>
+            />
+          )}
+        </Box>
+      ))}
+    </Box>
+  </CardContent>
+</Card>
+
     </div>    
 
 {/* Market Data Card */}
       <div ref={marketDataRef}>
      <Card
-        sx={{
-          mt: 4,
-          backgroundColor: "#e6f2ff",
-          borderRadius: 3,
-          p: 2,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          border: "1px solid #e0e0e0",
-          width: "100%",
-          maxWidth: "2000px",
-          mx: "auto", // centers horizontally
-        }}
-      >
-        <CardContent sx={{ px: 3, py: 2, backgroundColor: "#e6f2ff" }}>
-          <Typography
-            variant="h5"
-            align="center"
-            color="#002060"
-            sx={{ fontWeight: "bold", mb: 2 }}
-          >
-            Market Data
-          </Typography>
+  sx={{
+    mt: 4,
+    backgroundColor: "#e6f2ff", // light blue
+    borderRadius: 3,
+    p: 2,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    border: "1px solid #e0e0e0",
+    width: "100%",
+    maxWidth: "2000px",
+    mx: "auto",
+  }}
+>
+  <CardContent sx={{ px: 3, py: 2 }}>
+    <Typography
+      variant="h5"
+      align="center"
+      color="#002060"
+      sx={{ fontWeight: "bold", mb: 2 }}
+    >
+      Market Data
+    </Typography>
 
-          {/* Input fields container */}
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)", // 4 fields per row
-              gap: 2,
-              backgroundColor: "#fff",
-              borderRadius: 2,
-              p: 2,
-              boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-              width: "103.3%",
-              ml: "-31.5px", // custom offset alignment
-            }}
-          >
-            {[...tableLeft2, ...tableRight2].map((row) => (
-              <Box
-                key={row.key}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 1,
-                }}
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 2,
+        borderRadius: 2,
+        p: 2,
+        backgroundColor: "#e6f2ff", // match card background
+        width: "100%", // fixed width
+      }}
+    >
+      {[...tableLeft2, ...tableRight2].map((row) => (
+        <Box key={row.key}>
+          {row.type === "select" ? (
+            <FormControl variant="standard" size="small" fullWidth>
+              <InputLabel>{row.label}</InputLabel>
+              <Select
+                name={row.key}
+                value={formData[row.key as keyof typeof formData]}
+                onChange={handleSelectChange}
               >
-                {/* Field Label */}
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: "#333",
-                    fontWeight: 600,
-                    minWidth: "150px",
-                  }}
-                >
-                  {row.label}
-                </Typography>
+                {row.options?.map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    {opt}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <TextField
+              fullWidth
+              size="small"
+              variant="standard"
+              name={row.key}
+              label={row.label}
+              value={formData[row.key as keyof typeof formData]}
+              onChange={handleChange}
+              type={row.type}
 
-                {/* Field Input */}
-                {row.type === "select" ? (
-                  <Select
-                    fullWidth
-                    size="small"
-                    name={row.key}
-                  value={formData[row.key as keyof typeof formData]}
-                    onChange={handleSelectChange}
-                    sx={{
-                      backgroundColor: "#fff",
-                      borderRadius: 1,
-                      height: "40px",
-                      minWidth: "200px",
-                      "& .MuiSelect-select": { padding: "10px" },
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#b0bec5",
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#90a4ae",
-                      },
-                    }}
-                  >
-                    {row.options?.map((opt) => (
-                      <MenuItem key={opt} value={opt}>
-                        {opt}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : (
-                  <TextField
-                    fullWidth
-                    size="small"
-                    name={row.key}
-                  value={formData[row.key as keyof typeof formData]}
-                    onChange={handleChange}
-                    type={row.type}
-                    sx={{
-                      backgroundColor: "#fff",
-                      borderRadius: 1,
-                      height: "40px",
-                      minWidth: "200px",
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderColor: "#b0bec5",
-                        },
-                        "&:hover fieldset": {
-                          borderColor: "#90a4ae",
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "#90a4ae",
-                        },
-                      },
-                    }}
-                  />
-                )}
-              </Box>
-            ))}
-          </Box>
-        </CardContent>
-      </Card>
+            />
+          )}
+        </Box>
+      ))}
+    </Box>
+  </CardContent>
+</Card>
       </div>
 
 {/* Deal Color Card */}
       <div ref={dealColorRef}>
-       <Card
-        sx={{
-          mt: 4,
-          backgroundColor: "#e6f2ff",
-          borderRadius: 3,
-          p: 2,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          border: "1px solid #e0e0e0",
-          width: "100%",
-          maxWidth: "2000px",
-          mx: "auto", // centers horizontally
-        }}
-      >
-        <CardContent sx={{ px: 3, py: 2, backgroundColor: "#e6f2ff" }}>
-          <Typography
-            variant="h5"
-            align="center"
-            color="#002060"
-            sx={{ fontWeight: "bold", mb: 2 }}
-          >
-            Deal Color
-          </Typography>
-
-          {/* Input fields container */}
-          <Box
+        <Card
   sx={{
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 2,
-    backgroundColor: "#fff",
-    borderRadius: 2,
+    mt: 4,
+    backgroundColor: "#e6f2ff", // light blue
+    borderRadius: 3,
     p: 2,
-    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-    width: "103.3%",
-    ml: "-31.5px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    border: "1px solid #e0e0e0",
+    width: "100%",
+    maxWidth: "2000px",
+    mx: "auto",
   }}
 >
+  <CardContent sx={{ px: 3, py: 2 }}>
+    <Typography
+      variant="h5"
+      align="center"
+      color="#002060"
+      sx={{ fontWeight: "bold", mb: 2 }}
+    >
+      Deal Color
+    </Typography>
+
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 2,
+        borderRadius: 2,
+        p: 2,
+        backgroundColor: "#e6f2ff", // match card background
+        width: "100%", // fixed width
+      }}
+    >
   {[...tableLeft3, ...tableRight3].map((row) => (
     <Box
       key={row.key}
@@ -860,80 +758,39 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         gridColumn: row.key === "deal_color" ? "1 / -1" : undefined,
       }}
     >
-      {/* Field Label */}
-      <Typography
-        variant="subtitle2"
-        sx={{
-          color: "#333",
-          fontWeight: 600,
-          minWidth: "150px",
-        }}
-      >
-        {row.label}
-      </Typography>
+          {row.type === "select" ? (
+            <FormControl variant="standard" size="small" fullWidth>
+              <InputLabel>{row.label}</InputLabel>
+              <Select
+                name={row.key}
+                value={formData[row.key as keyof typeof formData]}
+                onChange={handleSelectChange}
+              >
+                {row.options?.map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    {opt}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <TextField
+              fullWidth
+              size="small"
+              variant="standard"
+              name={row.key}
+              label={row.label}
+              value={formData[row.key as keyof typeof formData]}
+              onChange={handleChange}
+              type={row.type}
 
-      {/* Field Input */}
-      {row.type === "select" ? (
-        <Select
-          fullWidth
-          size="small"
-          name={row.key}
-          value={formData[row.key as keyof typeof formData]}
-          onChange={handleSelectChange}
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: 1,
-            height: "40px",
-            minWidth: "200px",
-            "& .MuiSelect-select": { padding: "10px" },
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: "#b0bec5",
-            },
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: "#90a4ae",
-            },
-          }}
-        >
-          {row.options?.map((opt) => (
-            <MenuItem key={opt} value={opt}>
-              {opt}
-            </MenuItem>
-          ))}
-        </Select>
-      ) : (
-        <TextField
-          fullWidth
-          size="small"
-          name={row.key}
-          value={formData[row.key as keyof typeof formData]}
-          onChange={handleChange}
-          type={row.type}
-          multiline={row.key === "deal_color"}
-          minRows={row.key === "deal_color" ? 3 : undefined}
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: 1,
-            height: row.key === "deal_color" ? "auto" : "40px",
-            minWidth: "200px",
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: "#b0bec5",
-              },
-              "&:hover fieldset": {
-                borderColor: "#90a4ae",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "#90a4ae",
-              },
-            },
-          }}
-        />
-      )}
+            />
+          )}
+        </Box>
+      ))}
     </Box>
-  ))}
-</Box>
-        </CardContent>
-      </Card>
+  </CardContent>
+</Card>
       </div>
 
 
