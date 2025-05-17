@@ -44,7 +44,7 @@ import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 
 import MainUpload from "../Components/Uploads/MainUpload";
 import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
-import DownloadDeals from "../Components/Uploads/DownloadDeals";
+// import DownloadDeals from "../Components/Uploads/DownloadDeals";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 import DealformInformation from "../Components/NewDealForm/DealformInformation";
 import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
@@ -148,7 +148,7 @@ const AppRouters: React.FC = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
 
 
-        <Route path="/downloads" element={<AuthGuard><DownloadDeals/></AuthGuard>} />
+        {/* <Route path="/downloads" element={<AuthGuard><DownloadDeals/></AuthGuard>} /> */}
 
 
 

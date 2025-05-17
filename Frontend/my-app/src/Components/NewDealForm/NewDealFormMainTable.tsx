@@ -435,150 +435,99 @@ const handleSave = async () => {
   );
 };
 
+
+
+
 const renderFormFields = (section: string, sectionData: any) => {
   if (!sectionData) return null;
 
-  const entries = Object.entries(sectionData);
-  const rows = [];
-
-  for (let i = 0; i < entries.length; i++) {
-    const [key, value] = entries[i];
-
-    // Special styling for `deal_colour` - full row
-    if (section === 'deal_color' && key === 'deal_colour') {
-      rows.push(
-        <TableRow
+  return (
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "1fr",
+          sm: "repeat(2, 1fr)",
+          md: "repeat(3, 1fr)",
+        },
+        gap: 2,
+        backgroundColor: "#fff",  // white inner box
+        borderRadius: 2,
+        p: 2,
+        boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+        width: "100%",
+        ml: "-18.5px",
+      }}
+    >
+      {Object.entries(sectionData).map(([key, value]) => (
+        <Box
           key={key}
           sx={{
-            backgroundColor: i % 4 === 0 ? '#f3f3f3' : '#fff',
-            height: '40px',
-            '& td': {
-              padding: '4px',
-              height: '40px',
-              verticalAlign: 'middle',
-            },
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-start",
+            gap: 1.5,
+            gridColumn: key === "deal_colour" ? "1 / -1" : undefined,
+            minHeight: "40px",
           }}
         >
-          <TableCell
+          <Typography
+            variant="body2"
             sx={{
-              fontWeight: 'bold',
-              fontSize: '0.85rem',
-              width: '15%',
-              whiteSpace: 'nowrap',
-              height: '40px',
-              padding: '4px',
+              fontWeight: 600,
+              fontSize: "0.85rem",
+              color: "#333",
+              wordBreak: "break-word",
+              whiteSpace: "normal",
+              flexShrink: 0,
+              width: "130px",
+              lineHeight: 1.2,
+              pt: "6px",
             }}
           >
             {capitalizeLabel(section, key)}
-          </TableCell>
-          <TableCell colSpan={3} sx={{ padding: '4px' }}>
+          </Typography>
+          <Box sx={{ flex: 1 }}>
             {renderInputField(section, key, value)}
-          </TableCell>
-        </TableRow>
-      );
-      continue; // skip to next
-    }
-
-    // Next field to pair with
-    const nextEntry = entries[i + 1];
-    const isLast = i === entries.length - 1 || nextEntry?.[0] === 'deal_colour';
-
-    rows.push(
-      <TableRow
-        key={key}
-        sx={{
-          backgroundColor: i % 4 === 0 ? '#f3f3f3' : '#fff',
-          height: '40px',
-          '& td': {
-            padding: '4px',
-            height: '40px',
-            verticalAlign: 'middle',
-          },
-        }}
-      >
-        {/* First Field */}
-        <TableCell
-          sx={{
-            fontWeight: 'bold',
-            fontSize: '0.85rem',
-            width: '15%',
-            whiteSpace: 'nowrap',
-            height: '40px',
-            padding: '4px',
-          }}
-        >
-          {capitalizeLabel(section, key)}
-        </TableCell>
-        <TableCell sx={{ width: '12%', padding: '4px', height: '20px' }}>
-          {renderInputField(section, key, value)}
-        </TableCell>
-
-        {/* Second Field (if available and not deal_colour) */}
-        {isLast ? (
-          <>
-            <TableCell />
-            <TableCell />
-          </>
-        ) : (
-          <>
-            <TableCell
-              sx={{
-                fontWeight: 'bold',
-                fontSize: '0.85rem',
-                width: '15%',
-                whiteSpace: 'nowrap',
-                height: '40px',
-                padding: '4px',
-              }}
-            >
-              {capitalizeLabel(section, nextEntry[0])}
-            </TableCell>
-            <TableCell sx={{ width: '12%', padding: '4px', height: '40px' }}>
-              {renderInputField(section, nextEntry[0], nextEntry[1])}
-            </TableCell>
-          </>
-        )}
-      </TableRow>
-    );
-
-    if (!isLast) i++; 
-  }
-
-  return rows;
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
 };
 
 
-
-
-
-
-  const renderSection = (title: string, sectionKey: string) => (
-    
-    <Container maxWidth="lg">
-      <Card sx={{ mt: 1 }}>
-        <CardContent>
- 
-
-          <Grid container spacing={2}>
-           
-
-            <Grid item xs={12}>
-              <TableContainer component={Paper}>
-                <Table size="small">
-                  <TableBody>
-                    {renderFormFields(sectionKey, formData[sectionKey])}
-                    
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
+const renderSection = (title: string, sectionKey: string) => (
+  <Container maxWidth="lg">
+    <Card
+            sx={{
+              mt: 4,
+              backgroundColor: "#e6f2ff",
+              borderRadius: 3,
+              p: 2,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              border: "1px solid #e0e0e0",
+              width: "100%",
+              maxWidth: "2000px",
+              mx: "auto", // centers horizontally
+            }}
+          >
+        <CardContent sx={{ px: 3, py: 2, backgroundColor: "#e6f2ff" }}>
+ <Typography
+            variant="h5"
+            align="center"
+            color="#002060"
             
-          </Grid>
-          
-        </CardContent>
-      </Card>
-    </Container>
-  );
+            sx={{ fontWeight: "bold", mb: 2 }}
+          >
+           {title}
+          </Typography>
+        {renderFormFields(sectionKey, formData[sectionKey])}
+      </CardContent>
+    </Card>
+  </Container>
+);
+
 
   return (
     <Box
