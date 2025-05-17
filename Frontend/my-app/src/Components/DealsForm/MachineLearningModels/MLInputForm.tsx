@@ -116,7 +116,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Deal Size (in Million $)</Typography>
+              <Typography>Deal Size ($ Million)</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -125,11 +125,11 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 value={formData.dealSize}
                 onChange={handleChange}
                 type="number"
+                placeholder="e.g., 100"
                 InputProps={{
                   sx: { width: inputWidth },
-                  endAdornment: (
-                    <InputAdornment position="end">M</InputAdornment>
-                  ),
+                  startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  endAdornment: <InputAdornment position="end">Million</InputAdornment>,
                 }}
               />
             </Grid>
@@ -157,42 +157,6 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Percentage Primary (%)</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                size="small"
-                name="percentagePrimary"
-                value={formData.percentagePrimary}
-                onChange={handleChange}
-                type="number"
-                InputProps={{ sx: { width: inputWidth } }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Selected Bank</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                select
-                size="small"
-                name="selectedBank"
-                value={formData.selectedBank}
-                onChange={handleChange}
-                InputProps={{ sx: { width: inputWidth } }}
-              >
-                {options.selected_bank.map((bank) => (
-                  <MenuItem key={bank} value={bank}>
-                    {bank}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
               <Typography>Discount from Announcement Price (%)</Typography>
             </Grid>
             <Grid item xs={6}>
@@ -202,7 +166,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 value={formData.discountFromAnnPrice}
                 onChange={handleChange}
                 type="number"
-                InputProps={{ sx: { width: inputWidth } }}
+                placeholder="e.g., 2"
+                InputProps={{ sx: { width: inputWidth },
+                  endAdornment: (
+                        <InputAdornment position="end">%</InputAdornment>
+                      ),
+                 }}
               />
             </Grid>
           </Grid>
@@ -229,6 +198,47 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
+              <Typography>Percentage Primary (%)</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                size="small"
+                name="percentagePrimary"
+                value={formData.percentagePrimary}
+                onChange={handleChange}
+                type="number"
+                placeholder="e.g., 100"
+                InputProps={{ sx: { width: inputWidth },
+                  endAdornment: (
+                        <InputAdornment position="end">%</InputAdornment>
+                      ),
+                 }}
+              />
+            </Grid>
+          </Grid>
+          <Grid item xs={6} container alignItems="center">
+            <Grid item xs={6}>
+              <Typography>Selected Bank</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                select
+                size="small"
+                name="selectedBank"
+                value={formData.selectedBank}
+                onChange={handleChange}
+                InputProps={{ sx: { width: inputWidth } }}
+              >
+                {options.selected_bank.map((bank) => (
+                  <MenuItem key={bank} value={bank}>
+                    {bank}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          </Grid>
+          <Grid item xs={6} container alignItems="center">
+            <Grid item xs={6}>
               <Typography>Allocation as % of Deal Size</Typography>
             </Grid>
             <Grid item xs={6}>
@@ -238,7 +248,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 value={formData.allocationPercentDeal}
                 onChange={handleChange}
                 type="number"
-                InputProps={{ sx: { width: inputWidth } }}
+                placeholder="e.g., 0.5"
+                InputProps={{ sx: { width: inputWidth },
+                  endAdornment: (
+                        <InputAdornment position="end">%</InputAdornment>
+                      ),
+                 }}
               />
             </Grid>
           </Grid>
@@ -253,7 +268,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 value={formData.allocationPercentIOI}
                 onChange={handleChange}
                 type="number"
-                InputProps={{ sx: { width: inputWidth } }}
+                placeholder="e.g., 30"
+                InputProps={{ sx: { width: inputWidth },
+                  endAdornment: (
+                        <InputAdornment position="end">%</InputAdornment>
+                      ),
+                 }}
               />
             </Grid>
           </Grid>
