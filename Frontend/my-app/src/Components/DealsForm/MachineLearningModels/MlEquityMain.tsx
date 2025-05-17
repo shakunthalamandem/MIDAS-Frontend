@@ -1,13 +1,49 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
   Container,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import MLInputForm from "./MLInputForm";
+import axios from "axios";
+
+
+type OptionsResponse = {
+  deal_type: string[];
+  region: string[];
+  selected_bank: string[];
+  sponsor: string[];
+  sector: string[];
+  target: string[];
+};
 
 const MlEquityMain: React.FC = () => {
+  const [options, setOptions] = useState<OptionsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('access_token');
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const response = await axios.get<OptionsResponse>(`${apiUrl}/api/ml_input_parameters/`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
+        setOptions(response.data);
+      } catch (err) {
+        console.error("Failed to fetch options", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOptions();
+  }, []);
 
   return (
     <>
@@ -32,15 +68,25 @@ const MlEquityMain: React.FC = () => {
             <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center" color="#002060">
               Indicative Deal Performance - 🧠 Machine Learning Equity Deal Predictor
             </Typography>
-            <Typography variant="body1" gutterBottom sx={{marginLeft: 5, mt: 2, mb: 2}}>
+            <Typography variant="body1" gutterBottom sx={{ marginLeft: 5, mt: 2, mb: 2 }}>
               Welcome to the ML-powered equity deal predictor for <strong>US follow-on offerings</strong>. Input key market and macroeconomic parameters to forecast deal outcomes using advanced machine learning models trained on over 4000 historical deal records.
             </Typography>
+
             <Box sx={{ backgroundColor: "#f4f6f8", p: 4 }}>
-              <MLInputForm />
+              {loading ? (
+                <Box display="flex" justifyContent="center" py={4}>
+                  <CircularProgress />
+                </Box>
+              ) : options ? (
+                <MLInputForm options={options} />
+              ) : (
+                <Typography color="error" textAlign="center">
+                  Failed to load options.
+                </Typography>
+              )}
             </Box>
           </Card>
         </Box>
-
       </Container>
     </>
   );

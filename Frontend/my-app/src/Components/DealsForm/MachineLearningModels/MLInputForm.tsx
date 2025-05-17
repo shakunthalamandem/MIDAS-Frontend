@@ -30,8 +30,11 @@ type FormData = {
   sponsor: string;
   sector: string;
 };
+type MLInputFormProps = {
+  options: OptionsResponse;
+};
 
-const MLInputForm: React.FC = () => {
+const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
   const defaultFormData = {
     sponsor: "",
     dealSize: "",
@@ -42,43 +45,10 @@ const MLInputForm: React.FC = () => {
     allocationPercentDeal: "",
     allocationPercentIOI: "",
   };
-  const [options, setOptions] = useState<OptionsResponse | null>(null);
   const [formData, setFormData] = useState(defaultFormData);
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
   const inputWidth = 250;
-
-  useEffect(() => {
-    // Simulate fetching dropdown options
-    const fetchOptions = async () => {
-      // Replace with API call
-      const response: OptionsResponse = {
-        deal_type: ["FO"],
-        region: ["US"],
-        selected_bank: [
-          /* full bank list here */
-        ],
-        sponsor: ["Y", "N"],
-        sector: [
-          "Communication Services",
-          "Consumer Discretionary",
-          "Consumer Staples",
-          "Energy",
-          "Financials",
-          "Health Care",
-          "Industrials",
-          "Information Technology",
-          "Materials",
-          "Real Estate",
-          "Utilities",
-        ],
-        target: ["T+1 Day Return"],
-      };
-      setOptions(response);
-    };
-
-    fetchOptions();
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
@@ -89,7 +59,6 @@ const MLInputForm: React.FC = () => {
 
   const handlePredict = async () => {
     setLoading(true);
-    // Replace this with your prediction API call
     const fakePrediction = {
       model1: "Positive Deal",
       model2: "Yes",
@@ -105,7 +74,7 @@ const MLInputForm: React.FC = () => {
     setFormData(defaultFormData);
   };
 
-  if (!options) return <CircularProgress />;
+  if (!options || !options.selected_bank?.length) return <Typography>Loading form options...</Typography>;
 
   return (
     <>
