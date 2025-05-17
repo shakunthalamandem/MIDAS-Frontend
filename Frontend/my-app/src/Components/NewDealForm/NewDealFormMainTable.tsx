@@ -196,6 +196,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({ selectedite
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
   const [tabIndex, setTabIndex] = useState(0); // State to manage active tab
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
   const dateFields = ["launch_date", "trade_date", "settlement_date", "next_results_date", "pricing_date"];
 
@@ -322,13 +323,14 @@ const handleSave = async () => {
         },
       }
     );
-
+    // setSelectedTicker(ResponsiveContainer.ticker)
     setIsEditMode(false);
     setIsEditable(false);
 
     setSnackbarMessage('Form updated successfully!');
     setSnackbarSeverity('success');
     setSnackbarOpen(true);
+
 
 
   } catch (error) {
@@ -436,8 +438,6 @@ const handleSave = async () => {
 };
 
 
-
-
 const renderFormFields = (section: string, sectionData: any) => {
   if (!sectionData) return null;
 
@@ -451,7 +451,7 @@ const renderFormFields = (section: string, sectionData: any) => {
           md: "repeat(3, 1fr)",
         },
         gap: 2,
-        backgroundColor: "#fff",  // white inner box
+        backgroundColor: "#fff",
         borderRadius: 2,
         p: 2,
         boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
@@ -487,8 +487,21 @@ const renderFormFields = (section: string, sectionData: any) => {
           >
             {capitalizeLabel(section, key)}
           </Typography>
-          <Box sx={{ flex: 1 }}>
-            {renderInputField(section, key, value)}
+
+          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+            {key === 'ticker' ? (
+              <>
+                <TextField
+                  value={value}
+                  fullWidth
+                  size="small"
+                  disabled
+sx={{ height: "40px", '& .MuiInputBase-root': { height: "30px",fontSize: "0.75rem" } }}                  variant="outlined"
+                />
+              </>
+            ) : (
+              renderInputField(section, key, value)
+            )}
           </Box>
         </Box>
       ))}
@@ -608,7 +621,7 @@ const renderSection = (title: string, sectionKey: string) => (
           </Box>
       </Tabs>
 
-
+ 
 
 
       {/* Conditionally render content based on selected tab */}
@@ -628,6 +641,7 @@ const renderSection = (title: string, sectionKey: string) => (
         </MuiAlert>
       </Snackbar>
     </Box>
+    
   );
 };
 
