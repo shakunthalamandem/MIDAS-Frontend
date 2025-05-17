@@ -18,6 +18,7 @@ import axios from 'axios';
 import DownloadDeals from './DownloadDeals';
 import LastThreeDayDeals from './LastThreeDayDeals';
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import NewDealDownloadWithFilter from './NewDealDownloadWithFilter';
 
 // Upload type
 type UploadType = 'form' | 'monashee_deals' | null;
@@ -32,57 +33,57 @@ const MainUpload: React.FC = () => {
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
-  const isSuperUser = localStorage.getItem("is_superuser") === "true";
+  // const isSuperUser = localStorage.getItem("is_superuser") === "true";
 
-if (!isSuperUser) {
-  return (
-    <Container
-      maxWidth="sm"
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "50vh",
-        width:"70%",
-        backgroundColor: "#fdfdfd",
-      }}
-    >
+// if (!isSuperUser) {
+//   return (
+//     <Container
+//       maxWidth="sm"
+//       sx={{
+//         display: "flex",
+//         justifyContent: "center",
+//         alignItems: "center",
+//         height: "50vh",
+//         width:"70%",
+//         backgroundColor: "#fdfdfd",
+//       }}
+//     >
 
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 2,
-          }}
-        >
-          <ReportProblemIcon sx={{ fontSize: 60, color: "#d32f2f" }} />
+//         <Box
+//           sx={{
+//             display: "flex",
+//             flexDirection: "column",
+//             alignItems: "center",
+//             gap: 2,
+//           }}
+//         >
+//           <ReportProblemIcon sx={{ fontSize: 60, color: "#d32f2f" }} />
 
-          <Typography
-            variant="h6"
-            sx={{ color: "#b71c1c", fontWeight: "bold" }}
-          >
-            Access Denied
-          </Typography>
+//           <Typography
+//             variant="h6"
+//             sx={{ color: "#b71c1c", fontWeight: "bold" }}
+//           >
+//             Access Denied
+//           </Typography>
 
-          <Typography sx={{ color: "#ff0000	",fontSize:"20px" }}>
-            You don't have permission to upload. 
-            Please contact the IT team for access.
-          </Typography>
+//           <Typography sx={{ color: "#ff0000	",fontSize:"20px" }}>
+//             You don't have permission to upload. 
+//             Please contact the IT team for access.
+//           </Typography>
 
-          {/* <Button
-            variant="contained"
-            sx={{ backgroundColor: "#d32f2f", "&:hover": { backgroundColor: "#b71c1c" } }}
-            onClick={() => {
-              window.location.href = "mailto:ghcit@goldenhillsindia.com";
-            }}
-          >
-            Contact IT Support
-          </Button> */}
-        </Box>
-    </Container>
-  );
-}
+//           {/* <Button
+//             variant="contained"
+//             sx={{ backgroundColor: "#d32f2f", "&:hover": { backgroundColor: "#b71c1c" } }}
+//             onClick={() => {
+//               window.location.href = "mailto:ghcit@goldenhillsindia.com";
+//             }}
+//           >
+//             Contact IT Support
+//           </Button> */}
+//         </Box>
+//     </Container>
+//   );
+// }
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files ? event.target.files[0] : null;
     if (selectedFile) {
@@ -211,20 +212,14 @@ if (!isSuperUser) {
       <Divider orientation="vertical" flexItem sx={{ height: '100vh', borderColor: '#e0e0e0' }} />
 
       {/* Right side: DownloadDeals component */}
-      <Box
-        sx={{
-          width: '15%',
-          padding: 3,
-          marginTop: '40px',
-          height: '100vh',
-          overflowY: 'auto',
-        }}
-      >
+
   
-        <DownloadDeals />
+        {/* <DownloadDeals />
         <Divider sx={{ margin: '30px 0', color:"red" }} />
-        <LastThreeDayDeals />
-      </Box>
+        <LastThreeDayDeals /> */}
+
+
+        <NewDealDownloadWithFilter />
     </Box>
   );
 };
