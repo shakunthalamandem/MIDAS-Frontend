@@ -437,7 +437,6 @@ const handleSave = async () => {
   );
 };
 
-
 const renderFormFields = (section: string, sectionData: any) => {
   if (!sectionData) return null;
 
@@ -460,50 +459,25 @@ const renderFormFields = (section: string, sectionData: any) => {
       }}
     >
       {Object.entries(sectionData).map(([key, value]) => (
-        <Box
+        <TextField
           key={key}
+          label={capitalizeLabel(section, key)}
+          value={value}
+          fullWidth
+          size="small"
+          disabled={key === 'ticker'}
+          variant="standard"
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "flex-start",
-            gap: 1.5,
-            gridColumn: key === "deal_colour" ? "1 / -1" : undefined,
-            minHeight: "40px",
+            fontSize: "0.75rem",
+            '& .MuiInputBase-input': {
+              fontSize: "0.75rem",
+              padding: "4px 0",
+            },
+            '& .MuiInputLabel-root': {
+              fontSize: "0.75rem",
+            },
           }}
-        >
-          <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 600,
-              fontSize: "0.85rem",
-              color: "#333",
-              wordBreak: "break-word",
-              whiteSpace: "normal",
-              flexShrink: 0,
-              width: "130px",
-              lineHeight: 1.2,
-              pt: "6px",
-            }}
-          >
-            {capitalizeLabel(section, key)}
-          </Typography>
-
-          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-            {key === 'ticker' ? (
-              <>
-                <TextField
-                  value={value}
-                  fullWidth
-                  size="small"
-                  disabled
-sx={{ height: "40px", '& .MuiInputBase-root': { height: "30px",fontSize: "0.75rem" } }}                  variant="outlined"
-                />
-              </>
-            ) : (
-              renderInputField(section, key, value)
-            )}
-          </Box>
-        </Box>
+        />
       ))}
     </Box>
   );
