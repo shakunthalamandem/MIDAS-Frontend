@@ -109,7 +109,15 @@ const MLInputForm: React.FC = () => {
 
   return (
     <>
-      <Paper sx={{ p: 4, borderRadius: 2, backgroundColor: "e6f2ff" }}>
+      <Paper
+        sx={{
+          p: 4,
+          borderRadius: 3,
+          backgroundColor: "#ffffff",
+          boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.06)",
+          border: "1px solid #e0e0e0",
+        }}
+      >
         <Grid container spacing={2}>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
