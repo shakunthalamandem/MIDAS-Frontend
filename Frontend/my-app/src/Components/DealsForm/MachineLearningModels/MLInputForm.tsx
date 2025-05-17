@@ -10,6 +10,16 @@ import {
   InputAdornment,
 } from "@mui/material";
 import PredictionResults from "./PredictionResults";
+import { MenuProps } from "@mui/material";
+
+const menuProps: Partial<MenuProps> = {
+  PaperProps: {
+    style: {
+      maxHeight: 200, // Adjust height as needed
+      width: 250, // Adjust width if needed
+    },
+  },
+};
 
 type OptionsResponse = {
   deal_type: string[];
@@ -74,7 +84,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
     setFormData(defaultFormData);
   };
 
-  if (!options || !options.selected_bank?.length) return <Typography>Loading form options...</Typography>;
+  if (!options || !options.selected_bank?.length)
+    return <Typography>Loading form options...</Typography>;
 
   return (
     <>
@@ -128,8 +139,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 placeholder="e.g., 100"
                 InputProps={{
                   sx: { width: inputWidth },
-                  startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                  endAdornment: <InputAdornment position="end">Million</InputAdornment>,
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">Million</InputAdornment>
+                  ),
                 }}
               />
             </Grid>
@@ -146,6 +161,9 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 value={formData.sponsor}
                 onChange={handleChange}
                 InputProps={{ sx: { width: inputWidth } }}
+                SelectProps={{
+                  MenuProps: menuProps,
+                }}
               >
                 {options.sponsor.map((opt) => (
                   <MenuItem key={opt} value={opt}>
@@ -167,11 +185,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 2"
-                InputProps={{ sx: { width: inputWidth },
+                InputProps={{
+                  sx: { width: inputWidth },
                   endAdornment: (
-                        <InputAdornment position="end">%</InputAdornment>
-                      ),
-                 }}
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
               />
             </Grid>
           </Grid>
@@ -187,6 +206,9 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 value={formData.sector}
                 onChange={handleChange}
                 InputProps={{ sx: { width: inputWidth } }}
+                SelectProps={{
+                  MenuProps: menuProps,
+                }}
               >
                 {options.sector.map((sector) => (
                   <MenuItem key={sector} value={sector}>
@@ -208,11 +230,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 100"
-                InputProps={{ sx: { width: inputWidth },
+                InputProps={{
+                  sx: { width: inputWidth },
                   endAdornment: (
-                        <InputAdornment position="end">%</InputAdornment>
-                      ),
-                 }}
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
               />
             </Grid>
           </Grid>
@@ -228,6 +251,9 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 value={formData.selectedBank}
                 onChange={handleChange}
                 InputProps={{ sx: { width: inputWidth } }}
+                SelectProps={{
+                  MenuProps: menuProps,
+                }}
               >
                 {options.selected_bank.map((bank) => (
                   <MenuItem key={bank} value={bank}>
@@ -249,11 +275,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 0.5"
-                InputProps={{ sx: { width: inputWidth },
+                InputProps={{
+                  sx: { width: inputWidth },
                   endAdornment: (
-                        <InputAdornment position="end">%</InputAdornment>
-                      ),
-                 }}
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
               />
             </Grid>
           </Grid>
@@ -269,11 +296,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 30"
-                InputProps={{ sx: { width: inputWidth },
+                InputProps={{
+                  sx: { width: inputWidth },
                   endAdornment: (
-                        <InputAdornment position="end">%</InputAdornment>
-                      ),
-                 }}
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
               />
             </Grid>
           </Grid>
