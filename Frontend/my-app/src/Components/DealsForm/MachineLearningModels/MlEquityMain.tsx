@@ -1,145 +1,52 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
   Box,
-  Button,
   Card,
   Container,
-  LinearProgress,
   Typography,
-  Snackbar,
-  CardContent,
+  CircularProgress,
 } from "@mui/material";
-import MuiAlert, { AlertColor } from "@mui/material/Alert";
-import FormComponent from "./FormComponent";
-import PredictionResult from "./PredictionResult";
-import ExpectedReturnsTable from "./ExpectedReturnsTable";
+import MLInputForm from "./MLInputForm";
+import axios from "axios";
 
-type DealType = "FO";
-type Region = "US" | "Non-US America" | "APAC" | "EMEA";
-type Target = "T1D" | "T1M";
 
-type FormDataType = { [key: string]: string };
-type PredictionResultType = {
-  prediction: number;
-  lower_bound: number;
-  upper_bound: number;
+type OptionsResponse = {
+  deal_type: string[];
+  region: string[];
+  selected_bank: string[];
+  sponsor: string[];
+  sector: string[];
+  gdp: string[];
+  inflation: string[];
+  treasury_rates: string[];
+  target: string[];
 };
-
-type NonAIResultType = {
-  region_type: {
-    allocation_weighted: number;
-    min_expectation: number;
-    max_expectation: number;
-  };
-  sector_type_region: {
-    allocation_weighted: number;
-    min_expectation: number;
-    max_expectation: number;
-  };
-};
-
-// const IPO_FIELDS = [
-//   "deal_size_category",
-//   "percentage_primary_category",
-//   "allocation_deal_size_percentage_category",
-//   "allocation_percentage_category",
-//   "issue_offer_price_category",
-//   "number_of_shares_offered_category",
-//   "allocation_price_category",
-//   "allocated_shares_category",
-//   "subscription_bid_shares_category",
-//   "total_shares_offered_category",
-// ];
-
-const FO_FIELDS = [
-  "deal_size_category",
-  "discount_from_announcement_price_category",
-  "percentage_primary_category",
-  "allocation_deal_size_percentage_category",
-  "allocation_percentage_category",
-];
 
 const MlEquityMain: React.FC = () => {
-  const [dealType, setDealType] = useState<DealType>("FO");
-  const [region, setRegion] = useState<Region>("US");
-  const [target, setTarget] = useState<Target>("T1D");
-  const [formData, setFormData] = useState<FormDataType>({});
-  const [result, setResult] = useState<PredictionResultType | null>(null);
-  const [nonAIResult, setNonAIResult] = useState<NonAIResultType | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState<OptionsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('access_token');
 
-  // const fields = dealType === "IPO" ? IPO_FIELDS : FO_FIELDS;
-  const fields = FO_FIELDS; // Assuming you want to use FO_FIELDS for now
-
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("error");
-
-  const handlePredict = async () => {
-    const missingFields = fields.filter((field) => !formData[field]?.trim());
-
-    if (missingFields.length > 0) {
-      showSnackbar("Please fill in all required fields.", "warning");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setResult(null);
-      setNonAIResult(null);
-
-      const payload = {
-        deal_type: dealType,
-        region,
-        target,
-        ...formData,
-      };
-
-      const apiUrl = process.env.REACT_APP_API_URL;
-
-      const [aiRes, nonAIRes] = await Promise.all([
-        axios.post(`${apiUrl}/api/model_prediction/`, payload, {
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const response = await axios.get<OptionsResponse>(`${apiUrl}/api/ml_input_parameters/`, {
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '',
           },
-        }),
-        axios.post(`${apiUrl}/api/ml_deal_analysis/`, payload, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }),
-      ]);
+        });
+        setOptions(response.data);
+      } catch (err) {
+        console.error("Failed to fetch options", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setResult(aiRes.data as PredictionResultType);
-      setNonAIResult(nonAIRes.data as NonAIResultType);
-    } catch (error) {
-      console.error("Prediction failed:", error);
-      showSnackbar(
-        "Prediction failed. Please try again. Check whether all fields are filled correctly.",
-        "error"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const showSnackbar = (message: string, severity: AlertColor) => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
-
-  const handleReset = () => {
-    setDealType("FO");
-    setRegion("US");
-    setTarget("T1D");
-    setFormData({});
-    setResult(null);
-    setNonAIResult(null);
-  };
+    fetchOptions();
+  }, []);
 
   return (
     <>
@@ -158,92 +65,32 @@ const MlEquityMain: React.FC = () => {
       >
         Welcome to the Prediction Dashboard! Effortlessly input data and track all model outcomes, from feature details to prediction results and confidence levels.
       </Box>
-
       <Container maxWidth="lg" sx={{ padding: 2 }}>
         <Box py={2} display="flex" flexDirection="column" alignItems="center">
           <Card sx={{ width: "100%", p: 2, boxShadow: 3, borderRadius: 2, mb: 4 }}>
             <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center" color="#002060">
-              Indicative Deal Performance
+              Indicative Deal Performance - 🧠 Machine Learning Equity Deal Predictor
+            </Typography>
+            <Typography variant="body1" gutterBottom sx={{ marginLeft: 5, mt: 2, mb: 2 }}>
+              Welcome to the ML-powered equity deal predictor for <strong>US follow-on offerings</strong>. Input key market and macroeconomic parameters to forecast deal outcomes using advanced machine learning models trained on over 4000 historical deal records.
             </Typography>
 
-            <FormComponent
-              dealType={dealType}
-              setDealType={setDealType}
-              region={region}
-              setRegion={setRegion}
-              target={target}
-              setTarget={setTarget}
-              formData={formData}
-              setFormData={setFormData}
-              fields={fields}
-            />
-
-            <Box py={2} display="flex" justifyContent="center" gap={2}>
-              <Button
-                variant="contained"
-                sx={{ backgroundColor: "#002060", width: "100px" }}
-                onClick={handlePredict}
-                size="small"
-                disabled={loading}
-              >
-                {loading ? "Predicting..." : "Predict"}
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{ width: "100px", backgroundColor: "#f0f0f0", color: "#002060" }}
-                onClick={handleReset}
-                size="small"
-              >
-                Reset
-              </Button>
+            <Box sx={{ backgroundColor: "#f4f6f8", p: 4 }}>
+              {loading ? (
+                <Box display="flex" justifyContent="center" py={4}>
+                  <CircularProgress />
+                </Box>
+              ) : options ? (
+                <MLInputForm options={options} />
+              ) : (
+                <Typography color="error" textAlign="center">
+                  Failed to load options.
+                </Typography>
+              )}
             </Box>
-            {result && nonAIResult && (
-              <Box
-                display="flex"
-                flexDirection={{ xs: "column", md: "row" }}
-                justifyContent="center"
-                alignItems="stretch"
-                gap={3}
-                mt={4}
-              >
-                <Box flex={1}>
-                  <ExpectedReturnsTable data={nonAIResult} target={target} region={region}/>
-                </Box>
-                <Box flex={1}>
-              
-                      <PredictionResult
-                        result={{
-                          prediction: result.prediction.toString(),
-                          lower_bound: result.lower_bound.toString(),
-                          upper_bound: result.upper_bound.toString(),
-                        }}
-                      />
-                  
-                </Box>
-              </Box>
-            )}
-
           </Card>
         </Box>
       </Container>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={4000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          severity={snackbarSeverity}
-          onClose={() => setSnackbarOpen(false)}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </MuiAlert>
-      </Snackbar>
     </>
   );
 };
