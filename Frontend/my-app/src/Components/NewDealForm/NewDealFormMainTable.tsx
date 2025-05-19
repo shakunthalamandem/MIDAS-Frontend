@@ -388,122 +388,106 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
       key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
     );
   };
-
   const renderInputField = (section: string, key: string, value: any) => {
-    const isDropdown = Object.keys(dropdownOptions).includes(key);
-    const isDateField = dateFields.includes(key);
+  const isDropdown = Object.keys(dropdownOptions).includes(key);
+  const isDateField = dateFields.includes(key);
 
-    const handleFieldClick = () => {
-      if (!isEditMode) {
-        setSnackbarMessage('Please click "Edit" to make changes');
-        setSnackbarSeverity("warning");
-        setSnackbarOpen(true);
-      }
-    };
-    if (isDropdown) {
-      return (
-        <Select
-          fullWidth
-          value={
-            isEditable ? value || "" : formatFieldValue(section, key, value)
-          }
-          onClick={handleFieldClick}
-          onChange={(e) => handleInputChange(e, section, key)}
-          variant="outlined"
-          disabled={!isEditable}
-          sx={{
-            fontSize: "13px",
-            height: "30px",
-            "& .MuiInputBase-root": {
-              padding: "4px 10px",
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderRadius: "4px",
-            },
-            "& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled": {
-              opacity: 1,
-              "-webkit-text-fill-color": "#08001c", // Change text color to red when disabled
-            },
-            "& .MuiSelect-icon": {
-              top: "50%",
-              transform: "translateY(-50%)",
-            },
-          }}
-        >
-          {dropdownOptions[key].map((option) => (
-            <MenuItem
-              key={option}
-              value={option}
-              sx={{
-                fontSize: "12px",
-                padding: "4px 10px",
-                height: "30px",
-              }}
-            >
-              {option}
-            </MenuItem>
-          ))}
-        </Select>
-      );
+  const handleFieldClick = () => {
+    if (!isEditMode) {
+      setSnackbarMessage('Please click "Edit" to make changes');
+      setSnackbarSeverity("warning");
+      setSnackbarOpen(true);
     }
+  };
 
+  if (isDropdown) {
     return (
       <TextField
+        id="standard-basic"
+        select
+        label={capitalizeLabel(section, key)}
+        value={value || ""}
+        onClick={handleFieldClick}
+        onChange={(e) => handleInputChange(e, section, key)}
         fullWidth
-        size="small"
         variant="standard"
+        disabled={!isEditable}
         InputLabelProps={{
-          shrink: key.toLowerCase().includes("date"), // optional: handle date fields
+          style: { fontSize: "14px" },
         }}
-      />
-    );
-  };
-
-  const renderFormFields = (section: string, sectionData: any) => {
-    if (!sectionData) return null;
-
-    return (
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            sm: "repeat(2, 1fr)",
-            md: "repeat(3, 1fr)",
+        InputProps={{
+          style: { fontSize: "13px" },
+        }}
+        SelectProps={{
+          MenuProps: {
+            PaperProps: {
+              style: {
+                fontSize: "13px",
+              },
+            },
           },
-          gap: 2,
-          backgroundColor: "#fff",
-          borderRadius: 2,
-          p: 2,
-          boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-          width: "100%",
-          ml: "-18.5px",
         }}
       >
-        {Object.entries(sectionData).map(([key, value]) => (
-          <TextField
-            key={key}
-            label={capitalizeLabel(section, key)}
-            value={value}
-            fullWidth
-            size="small"
-            disabled={key === "ticker"}
-            variant="standard"
-            sx={{
-              fontSize: "0.75rem",
-              "& .MuiInputBase-input": {
-                fontSize: "0.75rem",
-                padding: "4px 0",
-              },
-              "& .MuiInputLabel-root": {
-                fontSize: "0.75rem",
-              },
-            }}
-          />
+        {dropdownOptions[key].map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
+          </MenuItem>
         ))}
-      </Box>
+      </TextField>
     );
-  };
+  }
+
+  return (
+    <TextField
+      id="standard-basic"
+      label={capitalizeLabel(section, key)}
+      type={isDateField ? "date" : "text"}
+      value={value || ""}
+      onClick={handleFieldClick}
+      onChange={(e) => handleInputChange(e, section, key)}
+      fullWidth
+      variant="standard"
+      disabled={!isEditable}
+      InputLabelProps={{
+        shrink: true,
+        style: { fontSize: "14px" },
+      }}
+      InputProps={{
+        style: { fontSize: "13px" },
+      }}
+    />
+  );
+};
+
+const renderFormFields = (section: string, sectionData: any) => {
+  if (!sectionData) return null;
+
+  return (
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "1fr",
+          sm: "repeat(2, 1fr)",
+          md: "repeat(3, 1fr)",
+        },
+        gap: 2,
+        backgroundColor: "#fff",
+        borderRadius: 2,
+        p: 2,
+        boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+        width: "100%",
+        ml: "-18.5px",
+      }}
+    >
+      {Object.entries(sectionData).map(([key, value]) => (
+        <Box key={key}>{renderInputField(section, key, value)}</Box>
+      ))}
+    </Box>
+  );
+};
+
+
 
   const renderSection = (title: string, sectionKey: string) => (
     <Container maxWidth="lg">
