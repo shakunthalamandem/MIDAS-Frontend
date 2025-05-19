@@ -649,7 +649,7 @@ const BasicInfo: React.FC = () => {
                 <Box key={row.key}>
                   {row.type === "select" ? (
                     <FormControl variant="standard" size="small" fullWidth>
-                      <InputLabel sx={{ color: "#6501c4", fontSize: "14px" }}>
+                      <InputLabel sx={{ color: "#d45c04", fontSize: "14px" }}>
                         {row.label}
                       </InputLabel>
                       <Select
@@ -692,7 +692,7 @@ const BasicInfo: React.FC = () => {
                       onChange={handleChange}
                       InputLabelProps={{
                         shrink: true,
-                        sx: { fontSize: "18px", color: "#6501c4" },
+                        sx: { fontSize: "18px", color: "#d45c04" },
                       }}
                       InputProps={{
                         sx: { fontSize: "14px" },
@@ -716,7 +716,7 @@ const BasicInfo: React.FC = () => {
                       onChange={handleChange}
                       type={row.type}
                       InputLabelProps={{
-                        sx: { fontSize: "14px", color: "#6501c4" },
+                        sx: { fontSize: "14px", color: "#d45c04" },
                       }}
                       InputProps={{
                         sx: { fontSize: "14px" },
@@ -776,7 +776,7 @@ const BasicInfo: React.FC = () => {
                 <Box key={row.key}>
                   {row.type === "select" ? (
                     <FormControl variant="standard" size="small" fullWidth>
-                      <InputLabel sx={{ color: "#6501c4", fontSize: "14px" }}>
+                      <InputLabel sx={{ color: "#d45c04", fontSize: "14px" }}>
                         {row.label}
                       </InputLabel>
                       <Select
@@ -819,7 +819,7 @@ const BasicInfo: React.FC = () => {
                       onChange={handleChange}
                       InputLabelProps={{
                         shrink: true,
-                        sx: { fontSize: "18px", color: "#6501c4" },
+                        sx: { fontSize: "18px", color: "#d45c04" },
                       }}
                       InputProps={{
                         sx: { fontSize: "14px" },
@@ -844,7 +844,7 @@ const BasicInfo: React.FC = () => {
                       type={row.type}
                       InputLabelProps={{
                         shrink: true,
-                        sx: { fontSize: "18px", color: "#6501c4" },
+                        sx: { fontSize: "18px", color: "#d45c04" },
                       }}
                       InputProps={{
                         sx: { fontSize: "14px" },
@@ -914,7 +914,7 @@ const BasicInfo: React.FC = () => {
                 >
                   {row.type === "select" ? (
                     <FormControl variant="standard" size="small" fullWidth>
-                      <InputLabel sx={{ color: "#6501c4", fontSize: "14px" }}>
+                      <InputLabel sx={{ color: "#d45c04", fontSize: "14px" }}>
                         {row.label}
                       </InputLabel>
                       <Select
@@ -957,7 +957,7 @@ const BasicInfo: React.FC = () => {
                       type={row.type}
                       InputLabelProps={{
                         shrink: true,
-                        sx: { fontSize: "18px", color: "#6501c4" },
+                        sx: { fontSize: "18px", color: "#d45c04" },
                       }}
                       InputProps={{
                         sx: { fontSize: "14px" },
