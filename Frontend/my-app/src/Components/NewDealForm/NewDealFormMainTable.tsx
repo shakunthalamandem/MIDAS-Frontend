@@ -96,7 +96,7 @@ const fieldLabels: Record<string, Record<string, string>> = {
     percent_below_52_week_high: "Percent Change from 52 Week High",
     three_month_adtv_local_usd: "3M ADTV ($ Million)",
     three_month_adtv_local_shares: "3M ADTV Shares",
-    beta_smi: "Beta (S&P500)",
+    beta_sx5e: "Beta (S&P500)",
     three_month_volatility: "3M Volatility",
     rsi_14d: "RSI (14D)",
     rsi_30d: "RSI (30D)",

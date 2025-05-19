@@ -237,7 +237,7 @@ const tableRight2: Row[] = [
     key: "three_month_adtv_local_shares",
     type: "number",
   },
-  { label: "Beta (S&P500)", key: "beta_smi", type: "number" },
+  { label: "Beta (S&P500)", key: "beta_sx5e", type: "number" },
   { label: "3M Volatility", key: "three_month_volatility", type: "number" },
   { label: "RSI (14D)", key: "rsi_14d", type: "number" },
   { label: "RSI (30D)", key: "rsi_30d", type: "number" },
