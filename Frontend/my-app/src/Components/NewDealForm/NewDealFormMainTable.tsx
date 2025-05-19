@@ -601,7 +601,7 @@ const renderFormFields = (section: string, sectionData: any) => {
 
           <Button
             variant="contained"
-            startIcon={isEditMode ? <AddCircleIcon /> : <EditIcon />}
+            startIcon={isEditMode ? <SaveIcon /> : <EditIcon />}
             color={isEditMode ? "success" : "primary"}
             onClick={isEditMode ? handleSave : handleEditClick}
             sx={{
