@@ -215,8 +215,8 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
   selecteditems,
 }) => {
   const [formData, setFormData] = useState<any>({});
-  const [isEditable, setIsEditable] = useState<boolean>(false);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isEditable, setIsEditable] = useState<boolean>(true);
+  const [isEditMode, setIsEditMode] = useState<boolean>(true);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] =
@@ -400,12 +400,14 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
     }
   };
 
+  const labelText = capitalizeLabel(section, key);
+
   if (isDropdown) {
     return (
       <TextField
         id="standard-basic"
         select
-        label={capitalizeLabel(section, key)}
+        label={labelText}
         value={value || ""}
         onClick={handleFieldClick}
         onChange={(e) => handleInputChange(e, section, key)}
@@ -413,17 +415,16 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
         variant="standard"
         disabled={!isEditable}
         InputLabelProps={{
-          style: { fontSize: "14px" },
+          shrink: true,
+          sx: { fontSize: "20px", color: "#000" }, // 👈 Bigger label
         }}
         InputProps={{
-          style: { fontSize: "13px" },
+          sx: { fontSize: "20" },
         }}
         SelectProps={{
           MenuProps: {
             PaperProps: {
-              style: {
-                fontSize: "13px",
-              },
+              sx: { fontSize: "20px" },
             },
           },
         }}
@@ -440,7 +441,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
   return (
     <TextField
       id="standard-basic"
-      label={capitalizeLabel(section, key)}
+      label={labelText}
       type={isDateField ? "date" : "text"}
       value={value || ""}
       onClick={handleFieldClick}
@@ -450,14 +451,15 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
       disabled={!isEditable}
       InputLabelProps={{
         shrink: true,
-        style: { fontSize: "14px" },
+        sx: { fontSize: "16px", color: "#000" },
       }}
       InputProps={{
-        style: { fontSize: "13px" },
+        sx: { fontSize: "14px" },
       }}
     />
   );
 };
+
 
 const renderFormFields = (section: string, sectionData: any) => {
   if (!sectionData) return null;
