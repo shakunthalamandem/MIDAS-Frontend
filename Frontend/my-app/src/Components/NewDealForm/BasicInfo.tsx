@@ -593,7 +593,7 @@ const BasicInfo: React.FC = () => {
               backgroundColor: "#002060",
               textTransform: "none",
               borderRadius: 2,
-              mr:2,
+              mr: 2,
               "&:hover": { backgroundColor: "#001540" },
             }}
           >
@@ -612,7 +612,7 @@ const BasicInfo: React.FC = () => {
             sx={{
               backgroundColor: "#002060",
               textTransform: "none",
-              color:'#FFFFFF',
+              color: "#FFFFFF",
               borderRadius: 2,
               "&:hover": { backgroundColor: "#001540" },
             }}
@@ -646,7 +646,6 @@ const BasicInfo: React.FC = () => {
             >
               Basic Info
             </Typography>
-
             <Box
               sx={{
                 display: "grid",
@@ -654,8 +653,8 @@ const BasicInfo: React.FC = () => {
                 gap: 2,
                 borderRadius: 2,
                 p: 2,
-                backgroundColor: "#e6f2ff", // match card background
-                width: "100%", // fixed width
+                backgroundColor: "#e6f2ff",
+                width: "100%",
               }}
             >
               {[...tableLeft1, ...tableRight1].map((row) => (
@@ -675,6 +674,20 @@ const BasicInfo: React.FC = () => {
                         ))}
                       </Select>
                     </FormControl>
+                  ) : row.type === "date" ? (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      name={row.key}
+                      label={row.label}
+                      type="date"
+                      value={formData[row.key as keyof typeof formData]}
+                      onChange={handleChange}
+                      InputLabelProps={{
+                        shrink: true, // Ensures label does not overlap with the date
+                      }}
+                    />
                   ) : (
                     <TextField
                       fullWidth
@@ -718,7 +731,6 @@ const BasicInfo: React.FC = () => {
             >
               Market Data
             </Typography>
-
             <Box
               sx={{
                 display: "grid",
@@ -726,8 +738,8 @@ const BasicInfo: React.FC = () => {
                 gap: 2,
                 borderRadius: 2,
                 p: 2,
-                backgroundColor: "#e6f2ff", // match card background
-                width: "100%", // fixed width
+                backgroundColor: "#e6f2ff",
+                width: "100%",
               }}
             >
               {[...tableLeft2, ...tableRight2].map((row) => (
@@ -747,6 +759,20 @@ const BasicInfo: React.FC = () => {
                         ))}
                       </Select>
                     </FormControl>
+                  ) : row.type === "date" ? (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      name={row.key}
+                      label={row.label}
+                      type="date"
+                      value={formData[row.key as keyof typeof formData]}
+                      onChange={handleChange}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
                   ) : (
                     <TextField
                       fullWidth
