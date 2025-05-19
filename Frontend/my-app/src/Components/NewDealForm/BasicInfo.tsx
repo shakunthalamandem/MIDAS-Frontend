@@ -5,14 +5,7 @@ import {
   CardContent,
   Box,
   Typography,
-  Grid,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Paper,
   TextField,
   Select,
   MenuItem,
@@ -26,10 +19,8 @@ import {
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
-import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 interface Row {
   label: string;
@@ -233,7 +224,6 @@ const tableLeft2: Row[] = [
     type: "number",
   },
 ];
-const fields = [...tableLeft1, ...tableRight1];
 
 const tableRight2: Row[] = [
   { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield", type: "number" },
@@ -525,10 +515,6 @@ const BasicInfo: React.FC = () => {
     }
   };
 
-  const isDataAvailable = (key: string) =>
-    formData[key as keyof typeof formData] !== undefined &&
-    formData[key as keyof typeof formData] !== "";
-
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 2 }}>
       {/* Sticky Tabs */}
@@ -590,9 +576,10 @@ const BasicInfo: React.FC = () => {
             onClick={handleSave}
             disabled={isLoading}
             sx={{
-              backgroundColor: "#002060",
+              backgroundColor: "#00732d",
               textTransform: "none",
               borderRadius: 2,
+              fontWeight: "bold",
               mr: 2,
               "&:hover": { backgroundColor: "#001540" },
             }}
@@ -610,11 +597,12 @@ const BasicInfo: React.FC = () => {
             variant="outlined"
             color="secondary"
             sx={{
-              backgroundColor: "#002060",
+              backgroundColor: "#ffffff",
               textTransform: "none",
-              color: "#FFFFFF",
+              color: "#d10000",
+              fontWeight: "bold",
               borderRadius: 2,
-              "&:hover": { backgroundColor: "#001540" },
+              "&:hover": { backgroundColor: "#002060", color: "#ffffff" },
             }}
           >
             Reset
@@ -668,7 +656,7 @@ const BasicInfo: React.FC = () => {
                         onChange={handleSelectChange}
                       >
                         {row.options?.map((opt) => (
-                          <MenuItem key={opt} value={opt}>
+                          <MenuItem key={opt} value={opt} >
                             {opt}
                           </MenuItem>
                         ))}
@@ -685,7 +673,18 @@ const BasicInfo: React.FC = () => {
                       value={formData[row.key as keyof typeof formData]}
                       onChange={handleChange}
                       InputLabelProps={{
-                        shrink: true, // Ensures label does not overlap with the date
+                        shrink: true,
+                        sx: { fontSize: "18px", color: "#6501c4" },
+                      }}
+                      InputProps={{
+                        sx: { fontSize: "14px" },
+                      }}
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: { fontSize: "14px", maxHeight: "300px" },
+                          },
+                        },
                       }}
                     />
                   ) : (
@@ -698,6 +697,19 @@ const BasicInfo: React.FC = () => {
                       value={formData[row.key as keyof typeof formData]}
                       onChange={handleChange}
                       type={row.type}
+                      InputLabelProps={{
+                        sx: { fontSize: "14px", color: "#6501c4" },
+                      }}
+                      InputProps={{
+                        sx: { fontSize: "14px" },
+                      }}
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: { fontSize: "14px", maxHeight: "300px" },
+                          },
+                        },
+                      }}
                     />
                   )}
                 </Box>
@@ -751,6 +763,7 @@ const BasicInfo: React.FC = () => {
                         name={row.key}
                         value={formData[row.key as keyof typeof formData]}
                         onChange={handleSelectChange}
+                        sx={{maxHeight: "300px"}}
                       >
                         {row.options?.map((opt) => (
                           <MenuItem key={opt} value={opt}>
@@ -771,6 +784,17 @@ const BasicInfo: React.FC = () => {
                       onChange={handleChange}
                       InputLabelProps={{
                         shrink: true,
+                        sx: { fontSize: "18px", color: "#6501c4" },
+                      }}
+                      InputProps={{
+                        sx: { fontSize: "14px" },
+                      }}
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: { fontSize: "14px", maxHeight: "300px" },
+                          },
+                        },
                       }}
                     />
                   ) : (
@@ -783,6 +807,20 @@ const BasicInfo: React.FC = () => {
                       value={formData[row.key as keyof typeof formData]}
                       onChange={handleChange}
                       type={row.type}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: { fontSize: "18px", color: "#6501c4" },
+                      }}
+                      InputProps={{
+                        sx: { fontSize: "14px" },
+                      }}
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: { fontSize: "14px", maxHeight: "300px" },
+                          },
+                        },
+                      }}
                     />
                   )}
                 </Box>
@@ -824,8 +862,8 @@ const BasicInfo: React.FC = () => {
                 gap: 2,
                 borderRadius: 2,
                 p: 2,
-                backgroundColor: "#e6f2ff", // match card background
-                width: "100%", // fixed width
+                backgroundColor: "#e6f2ff",
+                width: "100%",
               }}
             >
               {[...tableLeft3, ...tableRight3].map((row) => (
@@ -864,6 +902,20 @@ const BasicInfo: React.FC = () => {
                       value={formData[row.key as keyof typeof formData]}
                       onChange={handleChange}
                       type={row.type}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: { fontSize: "18px", color: "#6501c4" },
+                      }}
+                      InputProps={{
+                        sx: { fontSize: "14px" },
+                      }}
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: { fontSize: "14px", maxHeight: "300px" },
+                          },
+                        },
+                      }}
                     />
                   )}
                 </Box>
