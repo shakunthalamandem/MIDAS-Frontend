@@ -96,7 +96,7 @@ const fieldLabels: Record<string, Record<string, string>> = {
     percent_below_52_week_high: "Percent Change from 52 Week High",
     three_month_adtv_local_usd: "3M ADTV ($ Million)",
     three_month_adtv_local_shares: "3M ADTV Shares",
-    beta_sx5e: "Beta (S&P500)",
+    beta_smi: "Beta (S&P500)",
     three_month_volatility: "3M Volatility",
     rsi_14d: "RSI (14D)",
     rsi_30d: "RSI (30D)",
@@ -412,21 +412,21 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
         disabled={!isEditable}
         InputLabelProps={{
           shrink: true,
-          sx: { fontSize: "18px", color: "#6501c4", }, 
+          sx: { fontSize: "18px", color: "#6501c4", fontWeight: "bold",}, // 👈 Bigger label
         }}
         InputProps={{
-          sx: { fontSize: "13px" },
+          sx: { fontSize: "20" },
         }}
         SelectProps={{
           MenuProps: {
             PaperProps: {
-              sx: { fontSize: "14px" ,  maxHeight: "300px",},
+              sx: { fontSize: "20px" },
             },
           },
         }}
       >
         {dropdownOptions[key].map((option) => (
-          <MenuItem key={option} value={option} sx={{ fontSize: "14px" }}>
+          <MenuItem key={option} value={option}>
             {option}
           </MenuItem>
         ))}
@@ -447,10 +447,10 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
       disabled={!isEditable}
         InputLabelProps={{
           shrink: true,
-          sx: { fontSize: "18px", color: "#6501c4"},  
+          sx: { fontSize: "18px", color: "#f85a1a"},  
         }}
       InputProps={{
-        sx: { fontSize: "13px" },
+        sx: { fontSize: "14px" },
       }}
     />
   );
@@ -479,13 +479,23 @@ const renderFormFields = (section: string, sectionData: any) => {
       }}
     >
       {Object.entries(sectionData).map(([key, value]) => (
-        <Box key={key}>{renderInputField(section, key, value)}</Box>
+        <Box
+          key={key}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-start",
+            gap: 1.5,
+            gridColumn: key === "deal_colour" ? "1 / -1" : undefined,
+            minHeight: "40px",
+          }}
+        >
+          
+          {renderInputField(section, key, value)}</Box>
       ))}
     </Box>
   );
 };
-
-
 
   const renderSection = (title: string, sectionKey: string) => (
     <Container maxWidth="lg">
