@@ -487,6 +487,7 @@ const renderFormFields = (section: string, sectionData: any) => {
             alignItems: "flex-start",
             gap: 1.5,
             gridColumn: key === "deal_colour" ? "1 / -1" : undefined,
+
             minHeight: "40px",
           }}
         >
