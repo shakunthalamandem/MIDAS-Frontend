@@ -277,7 +277,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Deal Size ($ Million)*</Typography>
+              <Typography>Deal Size ($ Million)</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -303,7 +303,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Sponsor (Y/N)*</Typography>
+              <Typography>Sponsor (Y/N)</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -329,7 +329,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Discount from Announcement Price (%)*</Typography>
+              <Typography>Discount from Announcement Price (%)</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -354,7 +354,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Sector*</Typography>
+              <Typography>Sector</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -380,7 +380,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Percentage Primary (%)*</Typography>
+              <Typography>Percentage Primary (%)</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -403,7 +403,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Selected Bank*</Typography>
+              <Typography>Selected Bank</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -429,7 +429,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Allocation as % of Deal Size*</Typography>
+              <Typography>Allocation as % of Deal Size</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -452,7 +452,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>GDP Growth*</Typography>
+              <Typography>GDP Growth</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -478,7 +478,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Allocation as % of IOI*</Typography>
+              <Typography>Allocation as % of IOI</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -501,7 +501,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Inflation Rate*</Typography>
+              <Typography>Inflation Rate</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -527,7 +527,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Treasury Rates*</Typography>
+              <Typography>Treasury Rates</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField

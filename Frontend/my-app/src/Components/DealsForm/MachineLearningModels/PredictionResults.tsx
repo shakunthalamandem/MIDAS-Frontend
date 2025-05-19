@@ -141,7 +141,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
 
       <Typography variant="body1" gutterBottom>
         Using a <strong>Random Forest algorithm</strong> trained on approximately <strong>4,000 historical equity deals</strong>,
-        we present predictions from three specialized models. These are designed to provide insight into the potential
+        We present predictions from <strong>Three specialized models</strong>. These are designed to provide insight into the potential
         return profile of an upcoming equity deal under current market conditions.
       </Typography>
 
