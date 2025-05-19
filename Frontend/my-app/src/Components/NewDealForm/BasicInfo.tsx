@@ -649,14 +649,32 @@ const BasicInfo: React.FC = () => {
                 <Box key={row.key}>
                   {row.type === "select" ? (
                     <FormControl variant="standard" size="small" fullWidth>
-                      <InputLabel>{row.label}</InputLabel>
+                      <InputLabel sx={{ color: "#6501c4", fontSize: "14px" }}>
+                        {row.label}
+                      </InputLabel>
                       <Select
                         name={row.key}
                         value={formData[row.key as keyof typeof formData]}
                         onChange={handleSelectChange}
+                        sx={{
+                          fontSize: "14px",
+                          maxHeight: "300px",
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            sx: {
+                              maxHeight: 300,
+                              fontSize: "14px",
+                            },
+                          },
+                        }}
                       >
                         {row.options?.map((opt) => (
-                          <MenuItem key={opt} value={opt} >
+                          <MenuItem
+                            key={opt}
+                            value={opt}
+                            sx={{ fontSize: "14px" }}
+                          >
                             {opt}
                           </MenuItem>
                         ))}
@@ -758,15 +776,32 @@ const BasicInfo: React.FC = () => {
                 <Box key={row.key}>
                   {row.type === "select" ? (
                     <FormControl variant="standard" size="small" fullWidth>
-                      <InputLabel>{row.label}</InputLabel>
+                      <InputLabel sx={{ color: "#6501c4", fontSize: "14px" }}>
+                        {row.label}
+                      </InputLabel>
                       <Select
                         name={row.key}
                         value={formData[row.key as keyof typeof formData]}
                         onChange={handleSelectChange}
-                        sx={{maxHeight: "300px"}}
+                        sx={{
+                          fontSize: "14px",
+                          maxHeight: "300px",
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            sx: {
+                              maxHeight: 300,
+                              fontSize: "14px",
+                            },
+                          },
+                        }}
                       >
                         {row.options?.map((opt) => (
-                          <MenuItem key={opt} value={opt}>
+                          <MenuItem
+                            key={opt}
+                            value={opt}
+                            sx={{ fontSize: "14px" }}
+                          >
                             {opt}
                           </MenuItem>
                         ))}
@@ -879,14 +914,32 @@ const BasicInfo: React.FC = () => {
                 >
                   {row.type === "select" ? (
                     <FormControl variant="standard" size="small" fullWidth>
-                      <InputLabel>{row.label}</InputLabel>
+                      <InputLabel sx={{ color: "#6501c4", fontSize: "14px" }}>
+                        {row.label}
+                      </InputLabel>
                       <Select
                         name={row.key}
                         value={formData[row.key as keyof typeof formData]}
                         onChange={handleSelectChange}
+                        sx={{
+                          fontSize: "14px",
+                          maxHeight: "300px",
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            sx: {
+                              maxHeight: 300,
+                              fontSize: "14px",
+                            },
+                          },
+                        }}
                       >
                         {row.options?.map((opt) => (
-                          <MenuItem key={opt} value={opt}>
+                          <MenuItem
+                            key={opt}
+                            value={opt}
+                            sx={{ fontSize: "14px" }}
+                          >
                             {opt}
                           </MenuItem>
                         ))}
