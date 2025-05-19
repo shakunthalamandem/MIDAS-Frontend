@@ -125,7 +125,6 @@ const fieldLabels: Record<string, Record<string, string>> = {
     stop_price_percentage_below_issue: "Stop Price % Below Issue",
   },
 
-  // You can add 'market_data' and 'deal_color' labels similarly if needed
 };
 
 const fieldFormatters: Record<
@@ -133,20 +132,17 @@ const fieldFormatters: Record<
   Record<string, "currency" | "percentage" | "float">
 > = {
   basic_info: {
-    // Currency fields
     price_local_currency: "currency",
     deal_size_amount_usd: "currency",
     final_indication_amount_usd: "currency",
     allocation_amount_usd: "currency",
 
-    // Percentage fields
     discount_percentage: "percentage",
     percentage_primary: "percentage",
     final_indication_deal_percentage: "percentage",
     allocation_deal_size_percentage: "percentage",
     allocation_percentage: "percentage",
 
-    // Float fields
     last_close_price: "float",
   },
 };
@@ -221,7 +217,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] =
     useState<AlertColor>("success");
-  const [tabIndex, setTabIndex] = useState(0); // State to manage active tab
+  const [tabIndex, setTabIndex] = useState(0); 
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -451,7 +447,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
       disabled={!isEditable}
         InputLabelProps={{
           shrink: true,
-          sx: { fontSize: "18px", color: "#f85a1a", fontWeight: "bold",}, // 👈 Bigger label
+          sx: { fontSize: "18px", color: "#f85a1a", fontWeight: "bold",},  
         }}
       InputProps={{
         sx: { fontSize: "14px" },
@@ -503,7 +499,7 @@ const renderFormFields = (section: string, sectionData: any) => {
           border: "1px solid #e0e0e0",
           width: "100%",
           maxWidth: "2000px",
-          mx: "auto", // centers horizontally
+          mx: "auto", 
         }}
       >
         <CardContent sx={{ px: 3, py: 2, backgroundColor: "#e6f2ff" }}>
@@ -545,26 +541,26 @@ const renderFormFields = (section: string, sectionData: any) => {
           justifyContent: "center",
           margin: "10px 0",
           "& .MuiTab-root": {
-            backgroundColor: "#E3E6F0", // Neutral background for unselected tabs
-            color: "#002060", // Dark blue text for contrast
+            backgroundColor: "#E3E6F0", 
+            color: "#002060",
             borderRadius: "12px",
             padding: "10px 20px",
             fontSize: "0.9rem",
             fontWeight: "600",
             margin: "0 5px",
-            textTransform: "none", // Avoid all caps
+            textTransform: "none",
             transition:
               "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
             "&:hover": {
-              backgroundColor: "#DCE6F0", // Slightly lighter shade on hover
+              backgroundColor: "#DCE6F0", 
               transform: "translateY(-2px)",
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
             },
           },
           "& .Mui-selected": {
-            backgroundColor: "#013e3a", // Vibrant orange for selected tab
-            color: "#ffffff !important", // White text for selected tab
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Stronger shadow for selected tab
+            backgroundColor: "#013e3a",  
+            color: "#ffffff !important", 
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", 
           },
         }}
       >
@@ -574,7 +570,7 @@ const renderFormFields = (section: string, sectionData: any) => {
               value={tabIndex}
               onChange={(e, newTabIndex) => setTabIndex(newTabIndex)}
               centered
-              TabIndicatorProps={{ style: { display: "none" } }} // Hides the default indicator
+              TabIndicatorProps={{ style: { display: "none" } }}
             >
               <Tab label="Basic Info" />
               <Tab label="Market Data" />
