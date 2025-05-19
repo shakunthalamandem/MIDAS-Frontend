@@ -11,7 +11,7 @@ import {
 import NewDealFormMainTable from "./NewDealFormMainTable"; 
 import SelectedTicker from "../Main/MonasheeGraphs/SelectedTicker"; 
 import BasicInfo from "./BasicInfo";
-import MarketData from "./MarketData";
+// import MarketData from "./MarketData";
 import DealColor from "./DealColor";
 
 const NewDealFormMain: React.FC = () => {
