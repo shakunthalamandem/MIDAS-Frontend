@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Grid, Paper, Typography } from '@mui/material';
+import { Container, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import {
   LineChart,
   Line,
@@ -165,46 +165,62 @@ const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFil
     );
   };
 
-  const renderTopSummary = () => {
-    if (!data?.summary) return null;
+const renderTopSummary = () => {
+  if (!data?.summary) return null;
 
-    const summaryLabels: { label: string; key: Period }[] = [
-      { label: 'WTD', key: 'wtd' },
-      { label: 'MTD', key: 'mtd' },
-      { label: 'QTD', key: 'qtd' },
-      { label: 'YTD', key: 'ytd' },
-    ];
+  const periods: Period[] = ['wtd', 'mtd', 'qtd', 'ytd'];
 
-    return (
-      <Paper sx={{ padding: 2, marginBottom: 4 }}>
-        <Typography variant="h6" sx={{ textAlign: 'center', marginBottom: 2, color: '#002060' }}>
-          Portfolio Attribution Summary
-        </Typography>
-        <Grid container spacing={0} sx={{ border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden' }}>
-          {summaryLabels.map(({ label, key }, index) => (
-            <Grid
-              item
-              xs={6}
-              sm={3}
-              key={key}
-              sx={{
-                borderRight: (index + 1) % 4 !== 0 ? '1px solid #ccc' : 'none',
-                borderBottom: index < summaryLabels.length - 4 ? '1px solid #ccc' : 'none',
-                padding: 2,
-              }}
-            >
-              <Typography variant="subtitle2" sx={{ textAlign: 'center', color: 'gray' }}>
-                {label}
-              </Typography>
-              <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-                {formatNumber(data.summary[key].total_pnl)}
-              </Typography>
-            </Grid>
-          ))}
-        </Grid>
-      </Paper>
-    );
-  };
+  return (
+    <Paper sx={{ padding: 2, marginBottom: 4 }}>
+      <Typography variant="h6" sx={{ textAlign: 'center', marginBottom: 2, color: '#002060' }}>
+        Portfolio Attribution Summary
+      </Typography>
+
+      <TableContainer>
+        <Table sx={{ border: '1px solid #ccc', minWidth: 400 }}>
+          <TableHead>
+            <TableRow>
+              <TableCell
+                sx={{
+                  border: '1px solid #ccc',
+                  backgroundColor: '#f5f5f5',
+                  fontWeight: 'bold',
+                }}
+              >
+                
+              </TableCell>
+              {periods.map((period) => (
+                <TableCell
+                  key={period}
+                  align="center"
+                  sx={{ border: '1px solid #ccc', backgroundColor: '#f5f5f5', fontWeight: 'bold' }}
+                >
+                  {period.toUpperCase()}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell sx={{ border: '1px solid #ccc', fontWeight: 'bold' }}>Total PnL</TableCell>
+              {periods.map((period) => (
+                <TableCell
+                  key={period}
+                  align="center"
+                  sx={{ border: '1px solid #ccc' }}
+                >
+                  {formatNumber(data.summary[period].total_pnl)}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
+  );
+};
+
+
 
   if (loading) {
     return (
