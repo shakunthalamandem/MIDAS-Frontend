@@ -18,6 +18,7 @@ import axios from 'axios';
 import DownloadDeals from './DownloadDeals';
 import LastThreeDayDeals from './LastThreeDayDeals';
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import NewDealDownloadWithFilter from './NewDealDownloadWithFilter';
 
 // Upload type
 type UploadType = 'form' | 'monashee_deals' | null;
@@ -211,20 +212,14 @@ const MainUpload: React.FC = () => {
       <Divider orientation="vertical" flexItem sx={{ height: '100vh', borderColor: '#e0e0e0' }} />
 
       {/* Right side: DownloadDeals component */}
-      <Box
-        sx={{
-          width: '15%',
-          padding: 3,
-          marginTop: '40px',
-          height: '100vh',
-          overflowY: 'auto',
-        }}
-      >
+
   
-        <DownloadDeals />
+        {/* <DownloadDeals />
         <Divider sx={{ margin: '30px 0', color:"red" }} />
-        <LastThreeDayDeals />
-      </Box>
+        <LastThreeDayDeals /> */}
+
+
+        <NewDealDownloadWithFilter />
     </Box>
   );
 };

@@ -41,15 +41,14 @@ import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
 import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 
 
-import MonasheDataDump from "../Components/Uploads/MonasheDataDump";
 
 import MainUpload from "../Components/Uploads/MainUpload";
 import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
 import DownloadDeals from "../Components/Uploads/DownloadDeals";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 import DealformInformation from "../Components/NewDealForm/DealformInformation";
-import BasicInfo from "../Components/NewDealForm/BasicInfo";
 import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
+
 
 
 
