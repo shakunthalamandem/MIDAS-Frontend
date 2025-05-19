@@ -590,9 +590,10 @@ const BasicInfo: React.FC = () => {
             onClick={handleSave}
             disabled={isLoading}
             sx={{
-              backgroundColor: "#002060",
+              backgroundColor: "#00732d",
               textTransform: "none",
               borderRadius: 2,
+                  fontWeight: "bold",
               mr: 2,
               "&:hover": { backgroundColor: "#001540" },
             }}
@@ -610,11 +611,12 @@ const BasicInfo: React.FC = () => {
             variant="outlined"
             color="secondary"
             sx={{
-              backgroundColor: "#002060",
+              backgroundColor: "#ffffff",
               textTransform: "none",
-              color: "#FFFFFF",
+              color: "#d10000",
+              fontWeight: "bold",
               borderRadius: 2,
-              "&:hover": { backgroundColor: "#001540" },
+              "&:hover": { backgroundColor: "#002060",color: "#ffffff" },
             }}
           >
             Reset
