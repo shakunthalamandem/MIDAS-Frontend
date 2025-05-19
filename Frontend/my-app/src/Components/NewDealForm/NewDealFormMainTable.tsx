@@ -412,7 +412,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
         disabled={!isEditable}
         InputLabelProps={{
           shrink: true,
-          sx: { fontSize: "18px", color: "#f85a1a", }, 
+          sx: { fontSize: "18px", color: "#6501c4", }, 
         }}
         InputProps={{
           sx: { fontSize: "13px" },
@@ -447,7 +447,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
       disabled={!isEditable}
         InputLabelProps={{
           shrink: true,
-          sx: { fontSize: "18px", color: "#f85a1a"},  
+          sx: { fontSize: "18px", color: "#6501c4"},  
         }}
       InputProps={{
         sx: { fontSize: "13px" },
@@ -524,7 +524,6 @@ const renderFormFields = (section: string, sectionData: any) => {
         padding: 2,
         width: "100%",
         minHeight: "90vh",
-        backgroundColor: "#fafafa",
       }}
     >
       {/* Tabs component to manage different sections */}
