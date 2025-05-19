@@ -472,7 +472,7 @@ const renderFormFields = (section: string, sectionData: any) => {
           md: "repeat(3, 1fr)",
         },
         gap: 2,
-        backgroundColor: "#fff",
+        backgroundColor: "#e6f2ff",
         borderRadius: 2,
         p: 2,
         boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
