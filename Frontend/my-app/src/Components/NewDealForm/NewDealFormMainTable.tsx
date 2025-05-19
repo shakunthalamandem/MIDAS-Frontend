@@ -420,7 +420,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
         SelectProps={{
           MenuProps: {
             PaperProps: {
-              sx: { fontSize: "20px" },
+              sx: { fontSize: "20px",maxHeight: "300px" },
             },
           },
         }}
@@ -593,12 +593,13 @@ const renderFormFields = (section: string, sectionData: any) => {
             variant="outlined"
             color="secondary"
             sx={{
-              backgroundColor: "#00732d",
+              backgroundColor: "#cdcdcd",
               textTransform: "none",
-              color: "#FFFFFF",
+              color: "#002060",
               borderRadius: 2,
+              borderColor:'#002060',
               mr: 2,
-              "&:hover": { backgroundColor: "#001540" },
+              "&:hover": { backgroundColor: "#002060",fontWeight: "bold", color: "#ffffff" },
             }}
           >
             Create
@@ -610,7 +611,7 @@ const renderFormFields = (section: string, sectionData: any) => {
             color={isEditMode ? "success" : "primary"}
             onClick={isEditMode ? handleSave : handleEditClick}
             sx={{
-              backgroundColor: "#002060",
+              backgroundColor: "#005b06",
               textTransform: "none",
               borderRadius: 2,
               "&:hover": { backgroundColor: "#001540" },
