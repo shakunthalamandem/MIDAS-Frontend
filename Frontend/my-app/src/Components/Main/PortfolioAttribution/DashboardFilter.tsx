@@ -21,7 +21,7 @@ interface FilterOptions {
   funds: string[];
   regions: string[];
   deal_types: string[];
-  as_of_date_str: string; 
+  as_of_date_str: string;
 }
 
 interface Filters {
@@ -33,8 +33,8 @@ interface Filters {
 
 const DashboardFilter: React.FC = () => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
-  const [selectedFilters, setSelectedFilters] = useState<Filters | null>(null); 
-  const [appliedFilters, setAppliedFilters] = useState<Filters | null>(null); 
+  const [selectedFilters, setSelectedFilters] = useState<Filters | null>(null);
+  const [appliedFilters, setAppliedFilters] = useState<Filters | null>(null);
 
   const navigate = useNavigate();
 
@@ -129,7 +129,7 @@ const DashboardFilter: React.FC = () => {
       funds: filterOptions.funds,
       broad_region: filterOptions.regions,
       deal_type: filterOptions.deal_types,
-      as_of_date: filterOptions.as_of_date_str, 
+      as_of_date: filterOptions.as_of_date_str,
     };
 
     setSelectedFilters(allFilters);
@@ -160,6 +160,14 @@ const DashboardFilter: React.FC = () => {
                     selected.length === filterOptions.funds.length ? 'All' : selected.join(', ')
                   }
                   label="Fund"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 300,
+                        width: 250,
+                      },
+                    },
+                  }}
                 >
                   <MenuItem value="All">
                     <Checkbox
