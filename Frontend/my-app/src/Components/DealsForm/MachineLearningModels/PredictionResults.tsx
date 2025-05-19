@@ -9,6 +9,7 @@ import {
   TableRow,
   Box,
   Divider,
+  LinearProgress,
 } from "@mui/material";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
@@ -19,15 +20,39 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 
 interface PredictionResultsProps {
   result: {
-    outcomeCategory: "Negative" | "Neutral" | "Positive";
-    highPositiveLikelihood: boolean;
-    highNegativeRisk: boolean;
+    main_model: {
+      prediction: string;
+      accuracy: string;
+    };
+    positive_model: {
+      prediction: string;
+      confidence: number;
+    };
+    negative_model: {
+      prediction: string;
+      confidence: number;
+    };
   };
 }
 
 const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
+  // Determine outcome category based on main model result
+  const getOutcomeCategory = (): "Negative" | "Neutral" | "Positive" => {
+    const resultText = result.main_model.prediction.toLowerCase();
+    if (resultText.includes("negative")) return "Negative";
+    if (resultText.includes("neutral")) return "Neutral";
+    if (resultText.includes("positive")) return "Positive";
+    return "Neutral"; // Default case
+  };
+
+  const outcomeCategory = getOutcomeCategory();
+  
+  // Convert string prediction to boolean
+  const isPositive = result.positive_model.prediction.toLowerCase() === "true";
+  const isNegative = result.negative_model.prediction.toLowerCase() === "true";
+
   const renderOutcome = () => {
-    switch (result.outcomeCategory) {
+    switch (outcomeCategory) {
       case "Negative":
         return (
           <Box display="flex" alignItems="center" color="error.main">
@@ -68,6 +93,35 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
     </Box>
   );
 
+  const renderConfidenceLevel = (confidence: number) => {
+    // Determine color based on confidence level
+    let color = "#f44336"; // red - low confidence
+    if (confidence >= 70) color = "#4caf50"; // green - high confidence
+    else if (confidence >= 50) color = "#ff9800"; // orange - moderate confidence
+
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
+          <Typography variant="body2" color="text.secondary">
+            {confidence.toFixed(1)}%
+          </Typography>
+        </Box>
+        <LinearProgress
+          variant="determinate"
+          value={confidence}
+          sx={{
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: "rgba(0,0,0,0.05)",
+            "& .MuiLinearProgress-bar": {
+              backgroundColor: color,
+            },
+          }}
+        />
+      </Box>
+    );
+  };
+
   return (
     <Paper
       sx={{
@@ -97,9 +151,10 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
         <Table>
           <TableBody>
             <TableRow sx={{ bgcolor: "#f0f4f8" }}>
-              <TableCell sx={{ fontWeight: 600, width: "25%" }}>Model</TableCell>
+              <TableCell sx={{ fontWeight: 600, width: "20%" }}>Model</TableCell>
               <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
-              <TableCell sx={{ fontWeight: 600, width: "25%" }}>Result</TableCell>
+              <TableCell sx={{ fontWeight: 600, width: "20%" }}>Result</TableCell>
+              <TableCell sx={{ fontWeight: 600, width: "20%" }}>Confidence</TableCell>
             </TableRow>
 
             <TableRow>
@@ -111,6 +166,11 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
                 <br />📈 <strong>Positive:</strong> Return &gt; 1%
               </TableCell>
               <TableCell>{renderOutcome()}</TableCell>
+              <TableCell>
+                <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                  {renderConfidenceLevel(parseFloat(result.main_model.accuracy))}
+                </Typography>
+              </TableCell>
             </TableRow>
 
             <TableRow>
@@ -118,9 +178,10 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
               <TableCell>
                 Binary classifier predicting the likelihood of a strong gain.
                 <br />
-                <strong>Threshold:</strong> Return &gt; 5%
+                <strong>Threshold:</strong> Return &gt; 3%
               </TableCell>
-              <TableCell>{renderBinaryResult(result.highPositiveLikelihood)}</TableCell>
+              <TableCell>{renderBinaryResult(isPositive)}</TableCell>
+              <TableCell>{renderConfidenceLevel(result.positive_model.confidence)}</TableCell>
             </TableRow>
 
             <TableRow>
@@ -128,9 +189,10 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
               <TableCell>
                 Binary classifier estimating risk of significant loss.
                 <br />
-                <strong>Threshold:</strong> Return &lt; -5%
+                <strong>Threshold:</strong> Return &lt; -2%
               </TableCell>
-              <TableCell>{renderBinaryResult(result.highNegativeRisk)}</TableCell>
+              <TableCell>{renderBinaryResult(isNegative)}</TableCell>
+              <TableCell>{renderConfidenceLevel(result.negative_model.confidence)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

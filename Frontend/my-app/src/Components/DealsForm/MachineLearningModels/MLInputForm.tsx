@@ -78,11 +78,27 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
 
   const handlePredict = async () => {
     setLoading(true);
+    // const response = await fetch('/api/predict', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(formData)
+    // });
+    // const data = await response.json();
     const fakePrediction = {
-      model1: "Positive Deal",
-      model2: "Yes",
-      model3: "No",
-    };
+        main_model: {
+          prediction: "Positive",
+          accuracy: 61.87
+        },
+        positive_model: {
+          prediction: "False",
+          confidence: 64.84
+        },
+        negative_model: {
+          prediction: "False",
+          confidence: 61
+        }
+      };
+    
     setTimeout(() => {
       setPrediction(fakePrediction);
       setLoading(false);
