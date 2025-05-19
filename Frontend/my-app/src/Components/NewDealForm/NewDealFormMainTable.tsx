@@ -602,7 +602,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
             variant="outlined"
             color="secondary"
             sx={{
-              backgroundColor: "#002060",
+              backgroundColor: "#00732d",
               textTransform: "none",
               color: "#FFFFFF",
               borderRadius: 2,
