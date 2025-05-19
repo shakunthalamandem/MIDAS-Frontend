@@ -540,9 +540,16 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           </Box>
           <Button
             variant="contained"
-            sx={{ bgcolor: "#002060" }}
+            startIcon={<SaveIcon />}
             onClick={handleSave}
             disabled={isLoading} 
+            sx={{
+                    backgroundColor: "#002060",
+                    textTransform: "none",
+                    px: 3,
+                    borderRadius: 2,
+                    "&:hover": { backgroundColor: "#001540" },
+                  }}
           >
             {isLoading ? (
               <CircularProgress size={24} sx={{ color: "white" }} />
@@ -551,11 +558,20 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             )}
           </Button>
 
+  
+
           <Button
             onClick={handleReset}
+             startIcon={<SaveIcon />}
             variant="outlined"
             color="secondary"
-            sx={{ ml: 2 }} 
+            sx={{
+                    backgroundColor: "#002060",
+                    textTransform: "none",
+                    px: 3,
+                    borderRadius: 2,
+                    "&:hover": { backgroundColor: "#001540" },
+                  }}
           >
             Reset
           </Button>
