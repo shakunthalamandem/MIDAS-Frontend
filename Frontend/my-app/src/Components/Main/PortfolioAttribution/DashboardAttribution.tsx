@@ -111,8 +111,8 @@ const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFil
     let formattedValue = absValue >= 1_000_000
       ? (absValue / 1_000_000).toFixed(2) + "M"
       : absValue >= 1_000
-      ? (absValue / 1_000).toFixed(0) + "K"
-      : absValue.toFixed(2);
+        ? (absValue / 1_000).toFixed(0) + "K"
+        : absValue.toFixed(2);
     return isNegative ? `-$${formattedValue}` : `$${formattedValue}`;
   };
 
@@ -165,66 +165,66 @@ const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFil
     );
   };
 
-const renderTopSummary = () => {
-  if (!data?.summary) return null;
+  const renderTopSummary = () => {
+    if (!data?.summary) return null;
 
-  const summaryLabels: { label: string; key: Period }[] = [
-    { label: 'WTD', key: 'wtd' },
-    { label: 'MTD', key: 'mtd' },
-    { label: 'QTD', key: 'qtd' },
-    { label: 'YTD', key: 'ytd' },
-  ];
+    const summaryLabels: { label: string; key: Period }[] = [
+      { label: 'WTD', key: 'wtd' },
+      { label: 'MTD', key: 'mtd' },
+      { label: 'QTD', key: 'qtd' },
+      { label: 'YTD', key: 'ytd' },
+    ];
 
-  return (
-    <Paper sx={{ padding: 2, marginBottom: 4 }}>
-      <Typography variant="h6" sx={{ textAlign: 'center', marginBottom: 2, color: '#002060' }}>
-        Portfolio Attribution Summary
-      </Typography>
-      <Grid container spacing={0} sx={{ border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden' }}>
-        {summaryLabels.map(({ label, key }, index) => (
-          <Grid
-            item
-            xs={6}
-            sm={3}
-            key={key}
-            sx={{
-              borderRight: (index + 1) % 4 !== 0 ? '1px solid #ccc' : 'none',
-              borderBottom: index < summaryLabels.length - 4 ? '1px solid #ccc' : 'none',
-              padding: 2,
-            }}
-          >
-            <Typography variant="subtitle2" sx={{ textAlign: 'center', color: 'gray' }}>
-              {label}
-            </Typography>
-            <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-              {formatNumber(data.summary[key].total_pnl)}
-            </Typography>
-          </Grid>
-        ))}
-      </Grid>
-    </Paper>
-  );
-};
+    return (
+      <Paper sx={{ padding: 2, marginBottom: 4 }}>
+        <Typography variant="h6" sx={{ textAlign: 'center', marginBottom: 2, color: '#002060' }}>
+          Portfolio Attribution Summary
+        </Typography>
+        <Grid container spacing={0} sx={{ border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden' }}>
+          {summaryLabels.map(({ label, key }, index) => (
+            <Grid
+              item
+              xs={6}
+              sm={3}
+              key={key}
+              sx={{
+                borderRight: (index + 1) % 4 !== 0 ? '1px solid #ccc' : 'none',
+                borderBottom: index < summaryLabels.length - 4 ? '1px solid #ccc' : 'none',
+                padding: 2,
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ textAlign: 'center', color: 'gray' }}>
+                {label}
+              </Typography>
+              <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                {formatNumber(data.summary[key].total_pnl)}
+              </Typography>
+            </Grid>
+          ))}
+        </Grid>
+      </Paper>
+    );
+  };
 
-if (loading) {
-  return (
-    <Container>
-      <Typography variant="h6" color="textSecondary">
-        Loading data...
-      </Typography>
-    </Container>
-  );
-}
+  if (loading) {
+    return (
+      <Container>
+        <Typography variant="h6" color="textSecondary">
+          Loading data...
+        </Typography>
+      </Container>
+    );
+  }
 
-if (!data) {
-  return (
-    <Container>
-      <Typography variant="h6" color="textSecondary">
-        No data available
-      </Typography>
-    </Container>
-  );
-}
+  if (!data) {
+    return (
+      <Container>
+        <Typography variant="h6" color="textSecondary">
+          No data available
+        </Typography>
+      </Container>
+    );
+  }
 
   // Fixed color assignment for each fund
   const getFundColor = (fund: string, index: number) => {
@@ -251,7 +251,13 @@ if (!data) {
                   <LineChart data={chartData}>
                     <XAxis dataKey="date" />
                     <YAxis tickFormatter={(value) => formatNumber(value as number)} />
-                    <Tooltip formatter={(value) => formatNumber(value as number)} />
+                    <Tooltip
+                      formatter={(value) => formatNumber(value as number)}
+                      contentStyle={{ fontSize: '12px', padding: '6px 10px' }}
+                      itemStyle={{ marginBottom: 2 }}
+                      labelStyle={{ fontSize: '12px', color: '#666' }}
+                    />
+
                     <Legend />
                     {fundList.map((fund, index) => (
                       <Line
