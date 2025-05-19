@@ -5,14 +5,7 @@ import {
   CardContent,
   Box,
   Typography,
-  Grid,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Paper,
   TextField,
   Select,
   MenuItem,
@@ -26,10 +19,8 @@ import {
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
-import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 interface Row {
   label: string;
@@ -233,7 +224,6 @@ const tableLeft2: Row[] = [
     type: "number",
   },
 ];
-const fields = [...tableLeft1, ...tableRight1];
 
 const tableRight2: Row[] = [
   { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield", type: "number" },
