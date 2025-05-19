@@ -15,8 +15,8 @@ import { MenuProps } from "@mui/material";
 const menuProps: Partial<MenuProps> = {
   PaperProps: {
     style: {
-      maxHeight: 200, // Adjust height as needed
-      width: 250, // Adjust width if needed
+      maxHeight: 200,
+      width: 250,
     },
   },
 };
@@ -27,6 +27,9 @@ type OptionsResponse = {
   selected_bank: string[];
   sponsor: string[];
   sector: string[];
+  gdp: string[];
+  inflation: string[];
+  treasury_rates: string[];
   target: string[];
 };
 
@@ -39,6 +42,9 @@ type FormData = {
   selectedBank: string;
   sponsor: string;
   sector: string;
+  gdp: string;
+  inflation: string;
+  treasury_rates: string;
 };
 type MLInputFormProps = {
   options: OptionsResponse;
@@ -54,6 +60,9 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
     discountFromAnnPrice: "",
     allocationPercentDeal: "",
     allocationPercentIOI: "",
+    gdp: "",
+    inflation: "",
+    treasury_rates: "",
   };
   const [formData, setFormData] = useState(defaultFormData);
   const [loading, setLoading] = useState(false);
@@ -286,6 +295,30 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
+              <Typography>GDP Growth</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                select
+                size="small"
+                name="gdp"
+                value={formData.gdp}
+                onChange={handleChange}
+                InputProps={{ sx: { width: inputWidth } }}
+                SelectProps={{
+                  MenuProps: menuProps,
+                }}
+              >
+                {options.gdp.map((gdp_value) => (
+                  <MenuItem key={gdp_value} value={gdp_value}>
+                    {gdp_value}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          </Grid>
+          <Grid item xs={6} container alignItems="center">
+            <Grid item xs={6}>
               <Typography>Allocation as % of IOI</Typography>
             </Grid>
             <Grid item xs={6}>
@@ -303,6 +336,54 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
                   ),
                 }}
               />
+            </Grid>
+          </Grid>
+          <Grid item xs={6} container alignItems="center">
+            <Grid item xs={6}>
+              <Typography>Infaltion Rate</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                select
+                size="small"
+                name="inflation"
+                value={formData.inflation}
+                onChange={handleChange}
+                InputProps={{ sx: { width: inputWidth } }}
+                SelectProps={{
+                  MenuProps: menuProps,
+                }}
+              >
+                {options.inflation.map((inflation_value) => (
+                  <MenuItem key={inflation_value} value={inflation_value}>
+                    {inflation_value}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          </Grid>
+          <Grid item xs={6} container alignItems="center">
+            <Grid item xs={6}>
+              <Typography>Treasury Rates</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                select
+                size="small"
+                name="treasury_rates"
+                value={formData.treasury_rates}
+                onChange={handleChange}
+                InputProps={{ sx: { width: inputWidth } }}
+                SelectProps={{
+                  MenuProps: menuProps,
+                }}
+              >
+                {options.treasury_rates.map((treasury_rates_value) => (
+                  <MenuItem key={treasury_rates_value} value={treasury_rates_value}>
+                    {treasury_rates_value}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
           </Grid>
           <Grid item xs={6} container alignItems="center">

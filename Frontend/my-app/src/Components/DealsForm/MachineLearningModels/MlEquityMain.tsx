@@ -16,6 +16,9 @@ type OptionsResponse = {
   selected_bank: string[];
   sponsor: string[];
   sector: string[];
+  gdp: string[];
+  inflation: string[];
+  treasury_rates: string[];
   target: string[];
 };
 
