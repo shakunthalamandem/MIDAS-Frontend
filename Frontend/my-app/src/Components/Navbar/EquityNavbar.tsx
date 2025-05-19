@@ -3,8 +3,8 @@ import { Tabs, Tab, Box, useTheme, useMediaQuery } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const pages = [
-  "ML Equity",
   "New Deal Data",
+  "Machine Learning",
   "Equity Market Opportunity",
   "Monashee Performance & Efficiency",
   "PRIME Investment Strategies",
@@ -19,11 +19,11 @@ const EquityNavbar: React.FC = () => {
 
   const handleNavigate = (page: string) => {
     switch (page) {
-      case "ML Equity":
-        navigate("/equity/ml_equity");
-        break;
       case "New Deal Data":
         navigate("/equity/issue_market");
+        break;
+      case "Machine Learning":
+        navigate("/equity/ml_equity");
         break;
       case "Equity Market Opportunity":
         navigate("/equity/capital-markets");
@@ -44,9 +44,9 @@ const EquityNavbar: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case "/equity/ml_equity":
-        return 0;
       case "/equity/issue_market":
+        return 0;
+      case "/equity/ml_equity":
         return 1;
       case "/equity/capital-markets":
       case "/equity/capital-markets/":
