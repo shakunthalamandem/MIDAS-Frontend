@@ -515,11 +515,9 @@ const BasicInfo: React.FC = () => {
     }
   };
 
-  const isDataAvailable = (key: string) =>
-    formData[key as keyof typeof formData] !== undefined &&
-    formData[key as keyof typeof formData] !== "";
 
-  return (
+
+   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 2 }}>
       {/* Sticky Tabs */}
       <Box
@@ -816,8 +814,8 @@ const BasicInfo: React.FC = () => {
                 gap: 2,
                 borderRadius: 2,
                 p: 2,
-                backgroundColor: "#e6f2ff", // match card background
-                width: "100%", // fixed width
+                backgroundColor: "#e6f2ff", 
+                width: "100%", 
               }}
             >
               {[...tableLeft3, ...tableRight3].map((row) => (
