@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Grid, Paper, Typography } from '@mui/material';
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 import axios from 'axios';
 
 interface PnlData {
@@ -41,13 +49,20 @@ interface DashboardAttributionProps {
   };
 }
 
-const colors = [
-  '#82ca9d', // Green
-  '#8884d8', // Blue
-  '#FFBB28', // Yellow
-  '#0088FE', // Dark Blue
-  '#FF8042', // Orange
-];
+// 🎨 Fund color mappings (11 colors)
+const fundColors: { [key: string]: string } = {
+  'Fund A': '#82ca9d', // Green
+  'Fund B': '#8884d8', // Purple
+  'Fund C': '#FFBB28', // Yellow
+  'Fund D': '#0088FE', // Blue
+  'Fund E': '#FF8042', // Orange
+  'Fund F': '#A28FD0', // Light Purple
+  'Fund G': '#00C49F', // Teal
+  'Fund H': '#FF6666', // Red
+  'Fund I': '#FF33CC', // Pink
+  'Fund J': '#9966CC', // Lavender
+  'Fund K': '#4DC0B5', // Light Teal
+};
 
 const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFilters }) => {
   const [data, setData] = useState<ApiResponse | null>(null);
@@ -56,7 +71,6 @@ const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFil
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem('access_token');
 
@@ -94,44 +108,35 @@ const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFil
     if (value === undefined || value === null) return "-";
     const isNegative = value < 0;
     const absValue = Math.abs(value);
-    let formattedValue = absValue >= 1_000 ? (absValue / 1_000).toFixed(0) + "K" : absValue.toFixed(2);
+    let formattedValue = absValue >= 1_000_000
+      ? (absValue / 1_000_000).toFixed(2) + "M"
+      : absValue >= 1_000
+      ? (absValue / 1_000).toFixed(0) + "K"
+      : absValue.toFixed(2);
     return isNegative ? `-$${formattedValue}` : `$${formattedValue}`;
   };
 
   const createChartData = (period: Period): Array<{ date: string } & { [fund: string]: number }> => {
     if (!data?.values[period]) return [];
 
-    const allDates = new Set<string>();
-    const chartData: { [date: string]: { [fund: string]: number } } = {};
+    const chartDataMap: { [date: string]: { [fund: string]: number } } = {};
 
-    // Collect all unique dates
-    data.values[period].forEach((entry: PnlData) => {
-      allDates.add(entry.date);
+    data.values[period].forEach(({ date }) => {
+      if (!chartDataMap[date]) {
+        chartDataMap[date] = {};
+      }
     });
 
-    const sortedDates = Array.from(allDates).sort(); // Sort dates
-
-    // Structure data by date
-    sortedDates.forEach((date) => {
-      chartData[date] = {};
+    data.values[period].forEach(({ date, fund, cumulative_pnl }) => {
+      chartDataMap[date][fund] = cumulative_pnl;
     });
 
-    // Fill in the chart data with cumulative PNL values for each fund
-    data.values[period].forEach((entry: PnlData) => {
-      if (!chartData[entry.date]) chartData[entry.date] = {};
-      chartData[entry.date][entry.fund] = entry.cumulative_pnl;
-    });
+    const sortedDates = Object.keys(chartDataMap).sort();
 
-    // Convert chart data to an array with sorted dates
     return sortedDates.map((date) => {
-      const funds = data.values[period].reduce((acc, entry) => {
-        acc[entry.fund] = chartData[date]?.[entry.fund] || 0;
-        return acc;
-      }, {} as { [fund: string]: number });
-
       return {
         date,
-        ...funds,
+        ...chartDataMap[date],
       } as { date: string } & { [fund: string]: number };
     });
   };
@@ -160,6 +165,37 @@ const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFil
     );
   };
 
+  const renderTopSummary = () => {
+    if (!data?.summary) return null;
+
+    const summaryLabels: { label: string; key: Period }[] = [
+      { label: 'WTD', key: 'wtd' },
+      { label: 'MTD', key: 'mtd' },
+      { label: 'QTD', key: 'qtd' },
+      { label: 'YTD', key: 'ytd' },
+    ];
+
+    return (
+      <Paper sx={{ padding: 2, marginBottom: 4 }}>
+        <Typography variant="h6" sx={{ textAlign: 'center', marginBottom: 2, color: '#002060' }}>
+          Portfolio Attribution Summary
+        </Typography>
+        <Grid container spacing={2}>
+          {summaryLabels.map(({ label, key }) => (
+            <Grid item xs={6} sm={3} key={key}>
+              <Typography variant="subtitle2" sx={{ textAlign: 'center', color: 'gray' }}>
+                {label}
+              </Typography>
+              <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                {formatNumber(data.summary[key].total_pnl)}
+              </Typography>
+            </Grid>
+          ))}
+        </Grid>
+      </Paper>
+    );
+  };
+
   if (loading) {
     return (
       <Container>
@@ -180,15 +216,24 @@ const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFil
     );
   }
 
+  // Fixed color assignment for each fund
+  const getFundColor = (fund: string, index: number) => {
+    return fundColors[fund] || fundColors[`Fund ${String.fromCharCode(65 + index)}`];
+  };
+
   return (
     <Container>
+      {renderTopSummary()}
       <Grid container spacing={2}>
         {(['wtd', 'mtd', 'qtd', 'ytd'] as Period[]).map((period) => {
-          const chartData = createChartData(period);  // Calculate the chart data once for the period
+          const chartData = createChartData(period);
+          const fundSet = new Set(data.values[period].map(d => d.fund));
+          const fundList = Array.from(fundSet);
+
           return (
             <Grid item xs={12} sm={6} key={period}>
               <Paper sx={{ padding: 2 }}>
-                <Typography variant="h6" sx={{ textAlign: 'center', marginBottom: 2  ,color: '#002060'}}>
+                <Typography variant="h6" sx={{ textAlign: 'center', marginBottom: 2, color: '#002060' }}>
                   {period.toUpperCase()}
                 </Typography>
                 {renderSummary(period)}
@@ -198,13 +243,13 @@ const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFil
                     <YAxis tickFormatter={(value) => formatNumber(value as number)} />
                     <Tooltip formatter={(value) => formatNumber(value as number)} />
                     <Legend />
-                    {Object.keys(data.values[period].reduce((acc, { fund }) => ({ ...acc, [fund]: true }), {})).map((fund, index) => (
+                    {fundList.map((fund, index) => (
                       <Line
                         key={fund}
                         dataKey={fund}
-                        stroke={colors[index % colors.length]}
+                        stroke={getFundColor(fund, index)}
                         name={fund}
-                        dot={false} 
+                        dot={false}
                       />
                     ))}
                   </LineChart>
@@ -217,6 +262,5 @@ const DashboardAttribution: React.FC<DashboardAttributionProps> = ({ selectedFil
     </Container>
   );
 };
-
 
 export default DashboardAttribution;
