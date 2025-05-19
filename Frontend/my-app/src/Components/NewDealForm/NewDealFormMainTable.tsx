@@ -96,7 +96,7 @@ const fieldLabels: Record<string, Record<string, string>> = {
     percent_below_52_week_high: "Percent Change from 52 Week High",
     three_month_adtv_local_usd: "3M ADTV ($ Million)",
     three_month_adtv_local_shares: "3M ADTV Shares",
-    beta_sx5e: "Beta (S&P500)",
+    beta_smi: "Beta (S&P500)",
     three_month_volatility: "3M Volatility",
     rsi_14d: "RSI (14D)",
     rsi_30d: "RSI (30D)",
@@ -265,8 +265,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
     if (reason === "clickaway") return;
     setSnackbarOpen(false);
   };
-
-  const handleInputChange = (
+const handleInputChange = (
     e: React.ChangeEvent<any> | SelectChangeEvent<any>,
     section: string,
     key: string
@@ -279,7 +278,73 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
     }
 
     const updatedFormData = { ...formData };
-    updatedFormData[section][key] = e.target.value;
+    let value = e.target.value;
+
+    // Clean the value: remove $ or % if present
+    if (typeof value === "string") {
+      value = value.replace(/[$,%]/g, "");
+    }
+
+    updatedFormData[section][key] = value;
+
+    // ===== Derived field calculation logic =====
+    const updated = {
+      ...updatedFormData["basic_info"],
+    };
+
+    const cleanNumber = (str: any): number => {
+      if (typeof str === "string") {
+        return parseFloat(str.replace(/[$,%]/g, ""));
+      }
+      return parseFloat(str);
+    };
+
+    const dealSize = cleanNumber(updated.deal_size_amount_usd);
+    const allocationAmount = cleanNumber(updated.allocation_amount_usd);
+    const ioiAmount = cleanNumber(updated.final_indication_amount_usd);
+
+    if (
+      updated.deal_size_amount_usd &&
+      updated.allocation_amount_usd &&
+      dealSize > 0
+    ) {
+      updated.allocation_deal_size_percentage = (
+        (allocationAmount / dealSize) *
+        100
+      ).toFixed(2);
+    } else {
+      updated.allocation_deal_size_percentage = "";
+    }
+
+    if (
+      updated.final_indication_amount_usd &&
+      updated.allocation_amount_usd &&
+      ioiAmount > 0
+    ) {
+      updated.allocation_percentage = (
+        (allocationAmount / ioiAmount) *
+        100
+      ).toFixed(2);
+    } else {
+      updated.allocation_percentage = "";
+    }
+
+    if (
+      updated.deal_size_amount_usd &&
+      updated.final_indication_amount_usd &&
+      dealSize > 0
+    ) {
+      updated.final_indication_deal_percentage = (
+        (ioiAmount / dealSize) *
+        100
+      ).toFixed(2);
+    } else {
+      updated.final_indication_deal_percentage = "";
+    }
+
+    updatedFormData["basic_info"] = updated;
+    // ============================================
+
     setFormData(updatedFormData);
   };
 
@@ -384,136 +449,177 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
       key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
     );
   };
+  
   const renderInputField = (section: string, key: string, value: any) => {
-  const isDropdown = Object.keys(dropdownOptions).includes(key);
-  const isDateField = dateFields.includes(key);
+    const isDropdown = Object.keys(dropdownOptions).includes(key);
+    const isDateField = dateFields.includes(key);
 
-  const handleFieldClick = () => {
-    if (!isEditMode) {
-      setSnackbarMessage('Please click "Edit" to make changes');
-      setSnackbarSeverity("warning");
-      setSnackbarOpen(true);
+    const handleFieldClick = () => {
+      if (!isEditMode) {
+        setSnackbarMessage('Please click "Edit" to make changes');
+        setSnackbarSeverity("warning");
+        setSnackbarOpen(true);
+      }
+    };
+
+    const labelText = capitalizeLabel(section, key);
+
+    if (isDropdown) {
+      return (
+        <TextField
+          id="standard-basic"
+          select
+          label={labelText}
+          value={value || ""}
+          onClick={handleFieldClick}
+          onChange={(e) => handleInputChange(e, section, key)}
+          fullWidth
+          variant="standard"
+          disabled={!isEditable}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              fontSize: "18px", color: "#d45c04",
+
+              "&.Mui-disabled": {
+                color: "#002060",
+
+              },
+
+            },
+          }}
+
+          InputProps={{
+            sx: {
+              fontSize: "20",
+              color: isEditMode ? "black" : "red",
+            },
+
+          }}
+
+          SelectProps={{
+            MenuProps: {
+              PaperProps: {
+                sx: {
+                  fontWeight: isEditMode ? "normal" : "bold",
+
+                  fontSize: "20px", maxHeight: "300px"
+                },
+              },
+            },
+          }}
+        >
+          {dropdownOptions[key].map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </TextField>
+      );
     }
-  };
 
-  const labelText = capitalizeLabel(section, key);
-
-  if (isDropdown) {
     return (
       <TextField
         id="standard-basic"
-        select
         label={labelText}
+        type={isDateField ? "date" : "text"}
         value={value || ""}
         onClick={handleFieldClick}
         onChange={(e) => handleInputChange(e, section, key)}
         fullWidth
         variant="standard"
         disabled={!isEditable}
+        sx={{
+          color: isEditMode ? "#d45c04" : "#f6f1b2",
+        }}
         InputLabelProps={{
           shrink: true,
-          sx: { fontSize: "18px", color: "#d45c04"}, 
-        }}
-        InputProps={{
-          sx: { fontSize: "20" },
-        }}
-        SelectProps={{
-          MenuProps: {
-            PaperProps: {
-              sx: { fontSize: "20px",maxHeight: "300px" },
+          sx: {
+            fontSize: "18px",
+            color: isEditMode ? "#d45c04" : "#f6f1b2",
+            "&.Mui-disabled": {
+              color: "#002060",
             },
           },
         }}
-      >
-        {dropdownOptions[key].map((option) => (
-          <MenuItem key={option} value={option}>
-            {option}
-          </MenuItem>
-        ))}
-      </TextField>
-    );
-  }
-
-  return (
-    <TextField
-      id="standard-basic"
-      label={labelText}
-      type={isDateField ? "date" : "text"}
-      value={value || ""}
-      onClick={handleFieldClick}
-      onChange={(e) => handleInputChange(e, section, key)}
-      fullWidth
-      variant="standard"
-      disabled={!isEditable}
-        InputLabelProps={{
-          shrink: true,
-          sx: { fontSize: "18px", color: "#d45c04"},  
+        InputProps={{
+          sx: {
+            fontSize: "14px",
+            color: isEditMode ? "#000000" : "#f6f1b2",
+          },
         }}
-      InputProps={{
-        sx: { fontSize: "14px" },
-      }}
-    />
-  );
-};
+      />
+
+    );
+  };
 
 
-const renderFormFields = (section: string, sectionData: any) => {
-  if (!sectionData) return null;
+  const renderFormFields = (section: string, sectionData: any) => {
+    if (!sectionData) return null;
 
-  return (
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: {
-          xs: "1fr",
-          sm: "repeat(2, 1fr)",
-          md: "repeat(3, 1fr)",
-        },
-        gap: 2,
-        backgroundColor: "#e6f2ff",
-        borderRadius: 2,
-        p: 2,
-        boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-        width: "100%",
-        ml: "-18.5px",
-      }}
-    >
-      {Object.entries(sectionData).map(([key, value]) => (
-        <Box
-          key={key}
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "flex-start",
-            gap: 1.5,
-            gridColumn: key === "deal_colour" ? "1 / -1" : undefined,
+    return (
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(3, 1fr)",
+          },
+          backgroundColor: isEditMode ? "#e6f2ff" : "#f7f6ea", // white in edit mode, light blue after save
+          gap: 2,
+          borderRadius: 2,
+          p: 2,
+          boxShadow: "0 2px 6px rgba(19, 92, 226, 0.05)",
+          width: "100%",
+          ml: "-18.5px",
+        }}
+      >
+        {Object.entries(sectionData).map(([key, value]) => (
+          <Box
+            key={key}
+            sx={{
+              display: "flex",
+              color: "red",
+              flexDirection: "row",
+              alignItems: "flex-start",
+              gap: 1.5,
+              gridColumn: key === "deal_colour" ? "1 / -1" : undefined,
 
-            minHeight: "40px",
-          }}
-        >
-          
-          {renderInputField(section, key, value)}</Box>
-      ))}
-    </Box>
-  );
-};
+              minHeight: "40px",
+            }}
+          >
+
+            {renderInputField(section, key, value)}</Box>
+        ))}
+      </Box>
+    );
+  };
 
   const renderSection = (title: string, sectionKey: string) => (
     <Container maxWidth="lg">
       <Card
         sx={{
           mt: 4,
-          backgroundColor: "#e6f2ff",
+          backgroundColor: isEditMode ? "#e6f2ff" : "#f7f6ea",// white in edit mode, light blue after save
           borderRadius: 3,
           p: 2,
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
           border: "1px solid #e0e0e0",
           width: "100%",
           maxWidth: "2000px",
-          mx: "auto", 
+          mx: "auto",
+          transition: "background-color 0.3s ease", // smooth color transition
         }}
       >
-        <CardContent sx={{ px: 3, py: 2, backgroundColor: "#e6f2ff" }}>
+        <CardContent
+          sx={{
+            px: 3,
+            py: 2,
+            backgroundColor: isEditMode ? "#e6f2ff" : "#f7f6ea", // keep consistent with Card
+            transition: "background-color 0.3s ease",
+          }}
+        >
           <Typography
             variant="h5"
             align="center"
