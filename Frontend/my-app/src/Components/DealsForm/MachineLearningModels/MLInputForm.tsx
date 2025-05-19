@@ -21,6 +21,20 @@ const menuProps: Partial<MenuProps> = {
   },
 };
 
+const sectorLabels: Record<string, string> = {
+  sp500_telecom_services: 'Communication Services',
+  sp500_consumer_discretionary: 'Consumer Discretionary',
+  sp500_consumer_staples: 'Consumer Staples',
+  sp500_energy: 'Energy',
+  sp500_financials: 'Financials',
+  sp500_healthcare: 'Health Care',
+  sp500_industrials: 'Industrials',
+  sp500_information_technology: 'Information Technology',
+  sp500_materials: 'Materials',
+  sp500_real_estate: 'Real Estate',
+  sp500_utilities: 'Utilities',
+};
+
 type OptionsResponse = {
   deal_type: string[];
   region: string[];
@@ -231,29 +245,30 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
             </Grid>
           </Grid>
           <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Sector</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                select
-                size="small"
-                name="sector_category"
-                value={formData.sector_category}
-                onChange={handleChange}
-                InputProps={{ sx: { width: inputWidth } }}
-                SelectProps={{
-                  MenuProps: menuProps,
-                }}
-              >
-                {options.sector.map((sector) => (
-                  <MenuItem key={sector} value={sector}>
-                    {sector}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
+          <Grid item xs={6}>
+            <Typography>Sector</Typography>
           </Grid>
+          <Grid item xs={6}>
+            <TextField
+              select
+              size="small"
+              name="sector_category"
+              value={formData.sector_category}
+              onChange={handleChange}
+              InputProps={{ sx: { width: inputWidth } }}
+              SelectProps={{
+                MenuProps: menuProps,
+              }}
+            >
+              {options.sector.map((sectorSlug) => (
+                <MenuItem key={sectorSlug} value={sectorSlug}>
+                  {sectorLabels[sectorSlug] || sectorSlug}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        </Grid>
+
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
               <Typography>Percentage Primary (%)</Typography>

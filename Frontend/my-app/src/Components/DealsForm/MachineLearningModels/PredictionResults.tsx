@@ -22,15 +22,15 @@ interface PredictionResultsProps {
   result: {
     main_model: {
       prediction: string;
-      accuracy: string;
+      accuracy: number;
     };
     positive_model: {
       prediction: string;
-      confidence: number;
+      accuracy: number;
     };
     negative_model: {
       prediction: string;
-      confidence: number;
+      accuracy: number;
     };
   };
 }
@@ -168,7 +168,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
               <TableCell>{renderOutcome()}</TableCell>
               <TableCell>
                 <Typography variant="body2" color="text.secondary" fontStyle="italic">
-                  {renderConfidenceLevel(parseFloat(result.main_model.accuracy))}
+                  {renderConfidenceLevel(result.main_model.accuracy)}
                 </Typography>
               </TableCell>
             </TableRow>
@@ -181,7 +181,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
                 <strong>Threshold:</strong> Return &gt; 3%
               </TableCell>
               <TableCell>{renderBinaryResult(isPositive)}</TableCell>
-              <TableCell>{renderConfidenceLevel(result.positive_model.confidence)}</TableCell>
+              <TableCell>{renderConfidenceLevel(result.positive_model.accuracy)}</TableCell>
             </TableRow>
 
             <TableRow>
@@ -192,7 +192,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
                 <strong>Threshold:</strong> Return &lt; -2%
               </TableCell>
               <TableCell>{renderBinaryResult(isNegative)}</TableCell>
-              <TableCell>{renderConfidenceLevel(result.negative_model.confidence)}</TableCell>
+              <TableCell>{renderConfidenceLevel(result.negative_model.accuracy)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
