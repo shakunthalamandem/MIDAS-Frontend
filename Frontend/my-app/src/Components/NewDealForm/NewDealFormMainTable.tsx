@@ -18,6 +18,7 @@ import {
   Tab,
   Tabs,
   IconButton,
+  CircularProgress,
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -26,6 +27,10 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertColor } from '@mui/material/Alert';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 interface NewDealFormMainTableProps {
   selecteditems: any;
@@ -565,13 +570,40 @@ const renderSection = (title: string, sectionKey: string) => (
             <Box style={{ width: '10%', textAlign: 'right' }}>
             <IconButton onClick={handleIconClick} color="primary" aria-label="go to issue market">
       <AddIcon /> 
+
     </IconButton>
+
+          <Button
+            variant="contained"
+            startIcon={<SaveIcon />}
+            onClick={handleIconClick}
+            disabled={isLoading}
+            sx={{
+              backgroundColor: "#002060",
+              textTransform: "none",
+              borderRadius: 2,
+              mr:2,
+              "&:hover": { backgroundColor: "#001540" },
+            }}
+          >
+            {isLoading ? (
+              <CircularProgress size={24} sx={{ color: "white" }} />
+            ) : (
+              "Save"
+            )}
+          </Button>
+
               <Button
                 variant="contained"
+                startIcon={isEditMode ? <AddCircleIcon />: <EditIcon />}
                 color={isEditMode ? 'success' : 'primary'}
                 onClick={isEditMode ? handleSave : handleEditClick}
-                sx={{ marginRight: '15px' }} 
-              >
+ sx={{
+              backgroundColor: "#002060",
+              textTransform: "none",
+              borderRadius: 2,
+              "&:hover": { backgroundColor: "#001540" },
+            }}              >
                 {isEditMode ? 'Save' : 'Edit'}
               </Button>
               

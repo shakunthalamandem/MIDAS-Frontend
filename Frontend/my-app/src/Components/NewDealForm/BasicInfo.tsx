@@ -26,6 +26,10 @@ import {
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 interface Row {
   label: string;
@@ -74,7 +78,11 @@ const tableLeft1: Row[] = [
       "Communication Services",
     ],
   },
-  { label: "Deal Size ($ Million)", key: "deal_size_amount_usd", type: "number" },
+  {
+    label: "Deal Size ($ Million)",
+    key: "deal_size_amount_usd",
+    type: "number",
+  },
   // { label: "Deal Size Shares", key: "deal_size_shares", type: "number" },
   {
     label: "Deal Captain",
@@ -92,46 +100,49 @@ const tableLeft1: Row[] = [
 ];
 
 const tableRight1: Row[] = [
-    { label: "Lead Bank", key: "invitation_bank" ,
-          type: "select",
+  {
+    label: "Lead Bank",
+    key: "invitation_bank",
+    type: "select",
     options: [
-  "ABN AMRO Bank",
-  "Bank of America",
-  "Barclays",
-  "BMO Capital Markets",
-  "BNP Paribas",
-  "Canaccord Genuity",
-  "CIBC World Markets",
-  "Citigroup Global Markets Inc",
-  "Commerzbank Group",
-  "Cowen & Company LLC",
-  "Credit Suisse",
-  "Deutsche Bank",
-  "Evercore Inc",
-  "Goldman Sachs",
-  "HSBC",
-  "Jefferies LLC",
-  "JMP Securities LLC",
-  "JPMorgan",
-  "Keefe Bruyette & Woods",
-  "Lazard Capital Markets",
-  "Leerink Partners LLC",
-  "Morgan Stanley",
-  "Needham & Co LLC",
-  "Nomura Securities Co Ltd",
-  "Oppenheimer & Co Inc",
-  "Raymond James & Associates Inc",
-  "RBC Capital Markets",
-  "Robert W Baird & Co",
-  "SG Corporate & Investment Banking",
-  "Stifel",
-  "SunTrust Robinson Humphrey Inc",
-  "SVB Securities LLC",
-  "TD Securities Inc",
-  "UBS",
-  "William Blair & Co LLC",
-  "Others"]
-},
+      "ABN AMRO Bank",
+      "Bank of America",
+      "Barclays",
+      "BMO Capital Markets",
+      "BNP Paribas",
+      "Canaccord Genuity",
+      "CIBC World Markets",
+      "Citigroup Global Markets Inc",
+      "Commerzbank Group",
+      "Cowen & Company LLC",
+      "Credit Suisse",
+      "Deutsche Bank",
+      "Evercore Inc",
+      "Goldman Sachs",
+      "HSBC",
+      "Jefferies LLC",
+      "JMP Securities LLC",
+      "JPMorgan",
+      "Keefe Bruyette & Woods",
+      "Lazard Capital Markets",
+      "Leerink Partners LLC",
+      "Morgan Stanley",
+      "Needham & Co LLC",
+      "Nomura Securities Co Ltd",
+      "Oppenheimer & Co Inc",
+      "Raymond James & Associates Inc",
+      "RBC Capital Markets",
+      "Robert W Baird & Co",
+      "SG Corporate & Investment Banking",
+      "Stifel",
+      "SunTrust Robinson Humphrey Inc",
+      "SVB Securities LLC",
+      "TD Securities Inc",
+      "UBS",
+      "William Blair & Co LLC",
+      "Others",
+    ],
+  },
   { label: "Primary %", key: "percentage_primary", type: "number" },
   { label: "Issue Price ($)", key: "price_local_currency", type: "number" },
   {
@@ -170,14 +181,31 @@ const tableRight1: Row[] = [
 ];
 
 const tableLeft2: Row[] = [
-  { label: "Ltm Dividend Yield (%)", key: "ltm_dividend_yield", type: "number" },
+  {
+    label: "Ltm Dividend Yield (%)",
+    key: "ltm_dividend_yield",
+    type: "number",
+  },
 
-  { label: "% of Free Float ", key: "percent_of_free_float_current_float", type: "number" },
-  { label: "Short Interest (Shares)", key: "short_interest_shares", type: "number" },
-  { label: "Short Interest ($ Million)", key: "short_interest_dollar_amount", type: "number" },
+  {
+    label: "% of Free Float ",
+    key: "percent_of_free_float_current_float",
+    type: "number",
+  },
+  {
+    label: "Short Interest (Shares)",
+    key: "short_interest_shares",
+    type: "number",
+  },
+  {
+    label: "Short Interest ($ Million)",
+    key: "short_interest_dollar_amount",
+    type: "number",
+  },
   {
     label: "Short Interest as % of Deal Size",
-    key: "short_interest_percentage_of_deal", type: "number"
+    key: "short_interest_percentage_of_deal",
+    type: "number",
   },
   {
     label: "Shares Outstanding ",
@@ -195,20 +223,30 @@ const tableLeft2: Row[] = [
   { label: "Next Results Date", key: "next_results_date", type: "date" },
   {
     label: "Percentage Change in Last 7 Days",
-    key: "percent_change_last_7_days", type: "number"
+    key: "percent_change_last_7_days",
+    type: "number",
   },
   { label: "52 Week High($)", key: "week_52_high", type: "number" },
   {
     label: "Percent Change from 52 Week High",
-    key: "percent_below_52_week_high", type: "number"
+    key: "percent_below_52_week_high",
+    type: "number",
   },
 ];
-  const fields = [...tableLeft1, ...tableRight1];
+const fields = [...tableLeft1, ...tableRight1];
 
 const tableRight2: Row[] = [
   { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield", type: "number" },
-  { label: "3M ADTV  ($ Million)", key: "three_month_adtv_local_usd", type: "number" },
-  { label: "3M ADTV  Shares", key: "three_month_adtv_local_shares", type: "number" },
+  {
+    label: "3M ADTV  ($ Million)",
+    key: "three_month_adtv_local_usd",
+    type: "number",
+  },
+  {
+    label: "3M ADTV  Shares",
+    key: "three_month_adtv_local_shares",
+    type: "number",
+  },
   { label: "Beta (S&P500)", key: "beta_smi", type: "number" },
   { label: "3M Volatility", key: "three_month_volatility", type: "number" },
   { label: "RSI (14D)", key: "rsi_14d", type: "number" },
@@ -262,7 +300,6 @@ const tableLeft3: Row[] = [
 ];
 
 const tableRight3: Row[] = [
-
   {
     label: "Aftermarket Strategy",
     key: "aftermarket_strategy",
@@ -392,45 +429,53 @@ const BasicInfo: React.FC = () => {
   };
   const [isLoading, setIsLoading] = useState(false);
 
-
   const handleReset = () => {
     setFormData(defaultData);
   };
-const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
 
-  setFormData((prev) => {
-    const updated = { ...prev, [name]: value };
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
 
-    const dealSizeStr = updated.deal_size_amount_usd;
-    const allocationAmountStr = updated.allocation_amount_usd;
-    const ioiAmountStr = updated.final_indication_amount_usd;
+      const dealSizeStr = updated.deal_size_amount_usd;
+      const allocationAmountStr = updated.allocation_amount_usd;
+      const ioiAmountStr = updated.final_indication_amount_usd;
 
-    const dealSize = parseFloat(dealSizeStr);
-    const allocationAmount = parseFloat(allocationAmountStr);
-    const ioiAmount = parseFloat(ioiAmountStr);
+      const dealSize = parseFloat(dealSizeStr);
+      const allocationAmount = parseFloat(allocationAmountStr);
+      const ioiAmount = parseFloat(ioiAmountStr);
 
-    if (dealSizeStr && allocationAmountStr && dealSize > 0) {
-      updated.allocation_deal_size_percentage = ((allocationAmount / dealSize) * 100).toFixed(2);
-    } else {
-      updated.allocation_deal_size_percentage = "";
-    }
+      if (dealSizeStr && allocationAmountStr && dealSize > 0) {
+        updated.allocation_deal_size_percentage = (
+          (allocationAmount / dealSize) *
+          100
+        ).toFixed(2);
+      } else {
+        updated.allocation_deal_size_percentage = "";
+      }
 
-    if (ioiAmountStr && allocationAmountStr && ioiAmount > 0) {
-      updated.allocation_percentage = ((allocationAmount / ioiAmount) * 100).toFixed(2);
-    } else {
-      updated.allocation_percentage = "";
-    }
+      if (ioiAmountStr && allocationAmountStr && ioiAmount > 0) {
+        updated.allocation_percentage = (
+          (allocationAmount / ioiAmount) *
+          100
+        ).toFixed(2);
+      } else {
+        updated.allocation_percentage = "";
+      }
 
-    if (dealSizeStr && ioiAmountStr && dealSize > 0) {
-      updated.final_indication_deal_percentage = ((ioiAmount / dealSize) * 100).toFixed(2);
-    } else {
-      updated.final_indication_deal_percentage = "";
-    }
+      if (dealSizeStr && ioiAmountStr && dealSize > 0) {
+        updated.final_indication_deal_percentage = (
+          (ioiAmount / dealSize) *
+          100
+        ).toFixed(2);
+      } else {
+        updated.final_indication_deal_percentage = "";
+      }
 
-    return updated;
-  });
-};
+      return updated;
+    });
+  };
 
   const handleSelectChange = (e: SelectChangeEvent<string | number>) => {
     const name = e.target.name as string;
@@ -519,7 +564,8 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                   fontWeight: "600",
                   margin: "0 5px",
                   textTransform: "none",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
+                  transition:
+                    "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
                   "&:hover": {
                     backgroundColor: "#DCE6F0",
                     transform: "translateY(-2px)",
@@ -542,14 +588,14 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             variant="contained"
             startIcon={<SaveIcon />}
             onClick={handleSave}
-            disabled={isLoading} 
+            disabled={isLoading}
             sx={{
-                    backgroundColor: "#002060",
-                    textTransform: "none",
-                    px: 3,
-                    borderRadius: 2,
-                    "&:hover": { backgroundColor: "#001540" },
-                  }}
+              backgroundColor: "#002060",
+              textTransform: "none",
+              borderRadius: 2,
+              mr:2,
+              "&:hover": { backgroundColor: "#001540" },
+            }}
           >
             {isLoading ? (
               <CircularProgress size={24} sx={{ color: "white" }} />
@@ -558,257 +604,248 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             )}
           </Button>
 
-  
-
           <Button
             onClick={handleReset}
-             startIcon={<SaveIcon />}
+            startIcon={<RestartAltIcon />}
             variant="outlined"
             color="secondary"
             sx={{
-                    backgroundColor: "#002060",
-                    textTransform: "none",
-                    px: 3,
-                    borderRadius: 2,
-                    "&:hover": { backgroundColor: "#001540" },
-                  }}
+              backgroundColor: "#002060",
+              textTransform: "none",
+              color:'#FFFFFF',
+              borderRadius: 2,
+              "&:hover": { backgroundColor: "#001540" },
+            }}
           >
             Reset
           </Button>
-
-
         </Box>
       </Box>
 
-{/* Basic Info Card */}
- <div ref={basicInfoRef}>
-    <Card
-  sx={{
-    mt: 4,
-    backgroundColor: "#e6f2ff", // light blue
-    borderRadius: 3,
-    p: 2,
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-    border: "1px solid #e0e0e0",
-    width: "100%",
-    maxWidth: "2000px",
-    mx: "auto",
-  }}
->
-  <CardContent sx={{ px: 3, py: 2 }}>
-    <Typography
-      variant="h5"
-      align="center"
-      color="#002060"
-      sx={{ fontWeight: "bold", mb: 2 }}
-    >
-      Basic Info
-    </Typography>
+      {/* Basic Info Card */}
+      <div ref={basicInfoRef}>
+        <Card
+          sx={{
+            mt: 4,
+            backgroundColor: "#e6f2ff", // light blue
+            borderRadius: 3,
+            p: 2,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            border: "1px solid #e0e0e0",
+            width: "100%",
+            maxWidth: "2000px",
+            mx: "auto",
+          }}
+        >
+          <CardContent sx={{ px: 3, py: 2 }}>
+            <Typography
+              variant="h5"
+              align="center"
+              color="#002060"
+              sx={{ fontWeight: "bold", mb: 2 }}
+            >
+              Basic Info
+            </Typography>
 
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 2,
-        borderRadius: 2,
-        p: 2,
-        backgroundColor: "#e6f2ff", // match card background
-        width: "100%", // fixed width
-      }}
-    >
-      {[...tableLeft1, ...tableRight1].map((row) => (
-        <Box key={row.key}>
-          {row.type === "select" ? (
-            <FormControl variant="standard" size="small" fullWidth>
-              <InputLabel>{row.label}</InputLabel>
-              <Select
-                name={row.key}
-                value={formData[row.key as keyof typeof formData]}
-                onChange={handleSelectChange}
-              >
-                {row.options?.map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    {opt}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          ) : (
-            <TextField
-              fullWidth
-              size="small"
-              variant="standard"
-              name={row.key}
-              label={row.label}
-              value={formData[row.key as keyof typeof formData]}
-              onChange={handleChange}
-              type={row.type}
-
-            />
-          )}
-        </Box>
-      ))}
-    </Box>
-  </CardContent>
-</Card>
-
-    </div>    
-
-{/* Market Data Card */}
-      <div ref={marketDataRef}>
-     <Card
-  sx={{
-    mt: 4,
-    backgroundColor: "#e6f2ff", // light blue
-    borderRadius: 3,
-    p: 2,
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-    border: "1px solid #e0e0e0",
-    width: "100%",
-    maxWidth: "2000px",
-    mx: "auto",
-  }}
->
-  <CardContent sx={{ px: 3, py: 2 }}>
-    <Typography
-      variant="h5"
-      align="center"
-      color="#002060"
-      sx={{ fontWeight: "bold", mb: 2 }}
-    >
-      Market Data
-    </Typography>
-
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 2,
-        borderRadius: 2,
-        p: 2,
-        backgroundColor: "#e6f2ff", // match card background
-        width: "100%", // fixed width
-      }}
-    >
-      {[...tableLeft2, ...tableRight2].map((row) => (
-        <Box key={row.key}>
-          {row.type === "select" ? (
-            <FormControl variant="standard" size="small" fullWidth>
-              <InputLabel>{row.label}</InputLabel>
-              <Select
-                name={row.key}
-                value={formData[row.key as keyof typeof formData]}
-                onChange={handleSelectChange}
-              >
-                {row.options?.map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    {opt}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          ) : (
-            <TextField
-              fullWidth
-              size="small"
-              variant="standard"
-              name={row.key}
-              label={row.label}
-              value={formData[row.key as keyof typeof formData]}
-              onChange={handleChange}
-              type={row.type}
-
-            />
-          )}
-        </Box>
-      ))}
-    </Box>
-  </CardContent>
-</Card>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 2,
+                borderRadius: 2,
+                p: 2,
+                backgroundColor: "#e6f2ff", // match card background
+                width: "100%", // fixed width
+              }}
+            >
+              {[...tableLeft1, ...tableRight1].map((row) => (
+                <Box key={row.key}>
+                  {row.type === "select" ? (
+                    <FormControl variant="standard" size="small" fullWidth>
+                      <InputLabel>{row.label}</InputLabel>
+                      <Select
+                        name={row.key}
+                        value={formData[row.key as keyof typeof formData]}
+                        onChange={handleSelectChange}
+                      >
+                        {row.options?.map((opt) => (
+                          <MenuItem key={opt} value={opt}>
+                            {opt}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      name={row.key}
+                      label={row.label}
+                      value={formData[row.key as keyof typeof formData]}
+                      onChange={handleChange}
+                      type={row.type}
+                    />
+                  )}
+                </Box>
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
       </div>
 
-{/* Deal Color Card */}
+      {/* Market Data Card */}
+      <div ref={marketDataRef}>
+        <Card
+          sx={{
+            mt: 4,
+            backgroundColor: "#e6f2ff", // light blue
+            borderRadius: 3,
+            p: 2,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            border: "1px solid #e0e0e0",
+            width: "100%",
+            maxWidth: "2000px",
+            mx: "auto",
+          }}
+        >
+          <CardContent sx={{ px: 3, py: 2 }}>
+            <Typography
+              variant="h5"
+              align="center"
+              color="#002060"
+              sx={{ fontWeight: "bold", mb: 2 }}
+            >
+              Market Data
+            </Typography>
+
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 2,
+                borderRadius: 2,
+                p: 2,
+                backgroundColor: "#e6f2ff", // match card background
+                width: "100%", // fixed width
+              }}
+            >
+              {[...tableLeft2, ...tableRight2].map((row) => (
+                <Box key={row.key}>
+                  {row.type === "select" ? (
+                    <FormControl variant="standard" size="small" fullWidth>
+                      <InputLabel>{row.label}</InputLabel>
+                      <Select
+                        name={row.key}
+                        value={formData[row.key as keyof typeof formData]}
+                        onChange={handleSelectChange}
+                      >
+                        {row.options?.map((opt) => (
+                          <MenuItem key={opt} value={opt}>
+                            {opt}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      name={row.key}
+                      label={row.label}
+                      value={formData[row.key as keyof typeof formData]}
+                      onChange={handleChange}
+                      type={row.type}
+                    />
+                  )}
+                </Box>
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Deal Color Card */}
       <div ref={dealColorRef}>
         <Card
-  sx={{
-    mt: 4,
-    backgroundColor: "#e6f2ff", // light blue
-    borderRadius: 3,
-    p: 2,
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-    border: "1px solid #e0e0e0",
-    width: "100%",
-    maxWidth: "2000px",
-    mx: "auto",
-  }}
->
-  <CardContent sx={{ px: 3, py: 2 }}>
-    <Typography
-      variant="h5"
-      align="center"
-      color="#002060"
-      sx={{ fontWeight: "bold", mb: 2 }}
-    >
-      Deal Color
-    </Typography>
+          sx={{
+            mt: 4,
+            backgroundColor: "#e6f2ff", // light blue
+            borderRadius: 3,
+            p: 2,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            border: "1px solid #e0e0e0",
+            width: "100%",
+            maxWidth: "2000px",
+            mx: "auto",
+          }}
+        >
+          <CardContent sx={{ px: 3, py: 2 }}>
+            <Typography
+              variant="h5"
+              align="center"
+              color="#002060"
+              sx={{ fontWeight: "bold", mb: 2 }}
+            >
+              Deal Color
+            </Typography>
 
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 2,
-        borderRadius: 2,
-        p: 2,
-        backgroundColor: "#e6f2ff", // match card background
-        width: "100%", // fixed width
-      }}
-    >
-  {[...tableLeft3, ...tableRight3].map((row) => (
-    <Box
-      key={row.key}
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 1,
-        gridColumn: row.key === "deal_color" ? "1 / -1" : undefined,
-      }}
-    >
-          {row.type === "select" ? (
-            <FormControl variant="standard" size="small" fullWidth>
-              <InputLabel>{row.label}</InputLabel>
-              <Select
-                name={row.key}
-                value={formData[row.key as keyof typeof formData]}
-                onChange={handleSelectChange}
-              >
-                {row.options?.map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    {opt}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          ) : (
-            <TextField
-              fullWidth
-              size="small"
-              variant="standard"
-              name={row.key}
-              label={row.label}
-              value={formData[row.key as keyof typeof formData]}
-              onChange={handleChange}
-              type={row.type}
-
-            />
-          )}
-        </Box>
-      ))}
-    </Box>
-  </CardContent>
-</Card>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 2,
+                borderRadius: 2,
+                p: 2,
+                backgroundColor: "#e6f2ff", // match card background
+                width: "100%", // fixed width
+              }}
+            >
+              {[...tableLeft3, ...tableRight3].map((row) => (
+                <Box
+                  key={row.key}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 1,
+                    gridColumn: row.key === "deal_color" ? "1 / -1" : undefined,
+                  }}
+                >
+                  {row.type === "select" ? (
+                    <FormControl variant="standard" size="small" fullWidth>
+                      <InputLabel>{row.label}</InputLabel>
+                      <Select
+                        name={row.key}
+                        value={formData[row.key as keyof typeof formData]}
+                        onChange={handleSelectChange}
+                      >
+                        {row.options?.map((opt) => (
+                          <MenuItem key={opt} value={opt}>
+                            {opt}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      name={row.key}
+                      label={row.label}
+                      value={formData[row.key as keyof typeof formData]}
+                      onChange={handleChange}
+                      type={row.type}
+                    />
+                  )}
+                </Box>
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
       </div>
-
 
       {/* Snackbar */}
       <Snackbar
@@ -825,7 +862,6 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         </Alert>
       </Snackbar>
     </Container>
-
   );
 };
 
