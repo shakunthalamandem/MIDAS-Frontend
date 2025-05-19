@@ -34,17 +34,20 @@ type OptionsResponse = {
 };
 
 type FormData = {
-  dealSize: string;
-  percentagePrimary: string;
-  discountFromAnnPrice: string;
-  allocationPercentDeal: string;
-  allocationPercentIOI: string;
-  selectedBank: string;
-  sponsor: string;
-  sector: string;
-  gdp: string;
-  inflation: string;
-  treasury_rates: string;
+  deal_type: string;
+  region: string;
+  target: string;
+  deal_size_category: string;
+  percentage_primary_category: string;
+  discount_from_announcement_price_category: string;
+  allocation_deal_size_percentage_category: string;
+  allocation_percentage_category: string;
+  selected_bank_category: string;
+  sponsor_yn_category: string;
+  sector_category: string;
+  GDP: string;
+  Inflation: string;
+  Treasury: string;
 };
 type MLInputFormProps = {
   options: OptionsResponse;
@@ -52,22 +55,27 @@ type MLInputFormProps = {
 
 const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
   const defaultFormData = {
-    sponsor: "",
-    dealSize: "",
-    selectedBank: "",
-    percentagePrimary: "",
-    sector: "",
-    discountFromAnnPrice: "",
-    allocationPercentDeal: "",
-    allocationPercentIOI: "",
-    gdp: "",
-    inflation: "",
-    treasury_rates: "",
+    deal_type: "FO",
+    region: "US",
+    target: "T1D",
+    sponsor_yn_category: "",
+    deal_size_category: "",
+    selected_bank_category: "",
+    percentage_primary_category: "",
+    sector_category: "",
+    discount_from_announcement_price_category: "",
+    allocation_deal_size_percentage_category: "",
+    allocation_percentage_category: "",
+    GDP: "",
+    Inflation: "",
+    Treasury: "",
   };
   const [formData, setFormData] = useState(defaultFormData);
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
   const inputWidth = 250;
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('access_token');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
@@ -78,29 +86,32 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
 
   const handlePredict = async () => {
     setLoading(true);
-    // const response = await fetch('/api/predict', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(formData)
-    // });
-    // const data = await response.json();
-    const fakePrediction = {
-        main_model: {
-          prediction: "Positive",
-          accuracy: 61.87
-        },
-        positive_model: {
-          prediction: "False",
-          confidence: 64.84
-        },
-        negative_model: {
-          prediction: "False",
-          confidence: 61
-        }
-      };
+    const response = await fetch(`${apiUrl}/api/ml_multi_model_prediction/`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+      body: JSON.stringify(formData)
+    });
+    const data = await response.json();
+    // const fakePrediction = {
+    //     main_model: {
+    //       prediction: "Positive",
+    //       accuracy: 61.87
+    //     },
+    //     positive_model: {
+    //       prediction: "False",
+    //       confidence: 64.84
+    //     },
+    //     negative_model: {
+    //       prediction: "False",
+    //       confidence: 61
+    //     }
+    //   };
     
     setTimeout(() => {
-      setPrediction(fakePrediction);
+      setPrediction(data);
       setLoading(false);
     }, 1000);
   };
@@ -157,8 +168,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
             <Grid item xs={6}>
               <TextField
                 size="small"
-                name="dealSize"
-                value={formData.dealSize}
+                name="deal_size_category"
+                value={formData.deal_size_category}
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 100"
@@ -182,8 +193,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
               <TextField
                 select
                 size="small"
-                name="sponsor"
-                value={formData.sponsor}
+                name="sponsor_yn_category"
+                value={formData.sponsor_yn_category}
                 onChange={handleChange}
                 InputProps={{ sx: { width: inputWidth } }}
                 SelectProps={{
@@ -205,8 +216,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
             <Grid item xs={6}>
               <TextField
                 size="small"
-                name="discountFromAnnPrice"
-                value={formData.discountFromAnnPrice}
+                name="discount_from_announcement_price_category"
+                value={formData.discount_from_announcement_price_category}
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 2"
@@ -227,8 +238,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
               <TextField
                 select
                 size="small"
-                name="sector"
-                value={formData.sector}
+                name="sector_category"
+                value={formData.sector_category}
                 onChange={handleChange}
                 InputProps={{ sx: { width: inputWidth } }}
                 SelectProps={{
@@ -250,8 +261,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
             <Grid item xs={6}>
               <TextField
                 size="small"
-                name="percentagePrimary"
-                value={formData.percentagePrimary}
+                name="percentage_primary_category"
+                value={formData.percentage_primary_category}
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 100"
@@ -272,8 +283,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
               <TextField
                 select
                 size="small"
-                name="selectedBank"
-                value={formData.selectedBank}
+                name="selected_bank_category"
+                value={formData.selected_bank_category}
                 onChange={handleChange}
                 InputProps={{ sx: { width: inputWidth } }}
                 SelectProps={{
@@ -295,8 +306,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
             <Grid item xs={6}>
               <TextField
                 size="small"
-                name="allocationPercentDeal"
-                value={formData.allocationPercentDeal}
+                name="allocation_deal_size_percentage_category"
+                value={formData.allocation_deal_size_percentage_category}
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 0.5"
@@ -317,8 +328,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
               <TextField
                 select
                 size="small"
-                name="gdp"
-                value={formData.gdp}
+                name="GDP"
+                value={formData.GDP}
                 onChange={handleChange}
                 InputProps={{ sx: { width: inputWidth } }}
                 SelectProps={{
@@ -340,8 +351,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
             <Grid item xs={6}>
               <TextField
                 size="small"
-                name="allocationPercentIOI"
-                value={formData.allocationPercentIOI}
+                name="allocation_percentage_category"
+                value={formData.allocation_percentage_category}
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 30"
@@ -356,14 +367,14 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
           </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
-              <Typography>Infaltion Rate</Typography>
+              <Typography>Inflation Rate</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
                 select
                 size="small"
-                name="inflation"
-                value={formData.inflation}
+                name="Inflation"
+                value={formData.Inflation}
                 onChange={handleChange}
                 InputProps={{ sx: { width: inputWidth } }}
                 SelectProps={{
@@ -386,8 +397,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
               <TextField
                 select
                 size="small"
-                name="treasury_rates"
-                value={formData.treasury_rates}
+                name="Treasury"
+                value={formData.Treasury}
                 onChange={handleChange}
                 InputProps={{ sx: { width: inputWidth } }}
                 SelectProps={{
