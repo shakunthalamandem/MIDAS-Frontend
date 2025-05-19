@@ -497,8 +497,6 @@ const renderFormFields = (section: string, sectionData: any) => {
   );
 };
 
-
-
   const renderSection = (title: string, sectionKey: string) => (
     <Container maxWidth="lg">
       <Card
