@@ -412,7 +412,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
         disabled={!isEditable}
         InputLabelProps={{
           shrink: true,
-          sx: { fontSize: "18px", color: "#6501c4", fontWeight: "bold",}, // 👈 Bigger label
+          sx: { fontSize: "18px", color: "#6501c4"}, 
         }}
         InputProps={{
           sx: { fontSize: "20" },
