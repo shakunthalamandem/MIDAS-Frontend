@@ -5,11 +5,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 const pages = [
  
 
-  "Sector Comparison",
-  "News",
+  // "Sector Comparison",
+  // "News",
   // "Monashee Performance & Efficiency",
   // "Upload Market Indices",
-  // "Portfolio Attribution",
+  "Portfolio Attribution",
 ];
 
 const MacroNavbar: React.FC = () => {
@@ -18,6 +18,9 @@ const MacroNavbar: React.FC = () => {
 
   const handleNavigate = (page: string) => {
     switch (page) {
+      case "Portfolio Attribution":
+        navigate("/portfolio-attribution");
+        break;
       case "Sector Comparison":
         navigate("/macro/sector");
         break;
@@ -27,9 +30,7 @@ const MacroNavbar: React.FC = () => {
       case "Monashee Performance & Efficiency":
         navigate("/macro/monashee-deals");
         break;
-      case "Portfolio Attribution":
-        navigate("/macro/portfolio-attribution");
-        break;
+
       default:
         break;
     }
@@ -37,7 +38,7 @@ const MacroNavbar: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-      case "/macro/sector":
+      case "/portfolio-attribution":
       case "/macro/capital-markets/":
       case "/macro/capital-markets/deal-stats":
       case "/macro/capital-markets/skew-table":

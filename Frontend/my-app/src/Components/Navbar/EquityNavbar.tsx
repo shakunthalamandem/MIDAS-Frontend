@@ -8,7 +8,7 @@ const pages = [
   "Equity Market Opportunity",
   "Monashee Performance & Efficiency",
   "PRIME Investment Strategies",
-  "Portfolio Attribution",
+  // "Portfolio Attribution",
 ];
 
 const EquityNavbar: React.FC = () => {
@@ -33,9 +33,6 @@ const EquityNavbar: React.FC = () => {
         break;
       case "PRIME Investment Strategies":
         navigate("/equity/strategies");
-        break;
-      case "Portfolio Attribution":
-        navigate("/equity/portfolio-attribution");
         break;
       default:
         break;
@@ -65,8 +62,6 @@ const EquityNavbar: React.FC = () => {
         return 3;
       case "/equity/strategies":
         return 4;
-      case "/equity/portfolio-attribution":
-        return 5;
       default:
         return false;
     }
