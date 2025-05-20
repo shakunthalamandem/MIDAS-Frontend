@@ -1,115 +1,157 @@
-import React from "react";
-import { Tabs, Tab, Box, useTheme, useMediaQuery } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Tabs,
+  Tab,
+  Box,
+  useTheme,
+  useMediaQuery,
+  Menu,
+  MenuItem,
+  Button,
+} from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
-
-const pages = [
-  "New Deal Data",
-  "Machine Learning",
-  "Equity Market Opportunity",
-  "Monashee Performance & Efficiency",
-  "PRIME Investment Strategies",
-  // "Portfolio Attribution",
-];
 
 const EquityNavbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
-  const isSmall = useMediaQuery(theme.breakpoints.down("md")); // small screens
+  const isSmall = useMediaQuery(theme.breakpoints.down("md"));
 
-  const handleNavigate = (page: string) => {
-    switch (page) {
-      case "New Deal Data":
-        navigate("/equity/issue_market");
-        break;
-      case "Machine Learning":
-        navigate("/equity/ml_equity");
-        break;
-      case "Equity Market Opportunity":
-        navigate("/equity/capital-markets");
-        break;
-      case "Monashee Performance & Efficiency":
-        navigate("/equity/monashee-deals");
-        break;
-      case "PRIME Investment Strategies":
-        navigate("/equity/strategies");
-        break;
-      default:
-        break;
-    }
+  // Dropdown menus state
+  const [anchorElOp, setAnchorElOp] = useState<null | HTMLElement>(null);
+  const [anchorElPrime, setAnchorElPrime] = useState<null | HTMLElement>(null);
+
+  const handleMenuClick = (setter: any) => (event: React.MouseEvent<HTMLElement>) => {
+    setter(event.currentTarget);
+  };
+
+  const handleMenuClose = (setter: any) => () => {
+    setter(null);
+  };
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setAnchorElOp(null);
+    setAnchorElPrime(null);
   };
 
   const getTabIndex = () => {
     switch (location.pathname) {
       case "/equity/issue_market":
-        return 0;
-      case "/equity/ml_equity":
         return 1;
-      case "/equity/capital-markets":
-      case "/equity/capital-markets/":
-      case "/equity/capital-markets/deal-stats":
-      case "/equity/capital-markets/skew-table":
-      case "/equity/capital-markets/deal-filter":
+      case "/equity/ml_equity":
         return 2;
-      case "/equity/monashee-deals":
-      case "/equity/monashee-deals/":
-      case "/equity/monashee-deals/deal-stats":
-      case "/equity/monashee-deals/screener":
-      case "/equity/monashee-deals/by-bank":
-      case "/equity/monashee-deals/weekly-tracking":
-      case "/equity/monashee-deals/follow-on-discount":
-      case "/equity/monashee-deals/gap-analysis":
-        return 3;
-      case "/equity/strategies":
-        return 4;
       default:
         return false;
     }
   };
 
   return (
-<Box sx={{ width: "100%" }}>
-  <Tabs
-    value={getTabIndex()}
-    variant="fullWidth"
-    TabIndicatorProps={{ style: { display: "none" } }} // Hides the default indicator
-    sx={{
-      "& .MuiTab-root": {
-        fontSize: isSmall ? "12px" : "14px",
-        padding: isSmall ? "6px" : "10px",
-        textTransform: "none",
-        fontWeight: "bold",
-        whiteSpace: "normal", // Allow text to wrap inside the tab
-        lineHeight: 1.2,
-        minHeight: "48px",
-        color: "#bb4401", // Default color for the tabs
-        transition: "background-color 0.3s ease, color 0.3s ease", // Smooth transition for hover/active states
-      },
-      "& .Mui-selected": {
-        backgroundColor: "#002060", // Background color for the selected tab
-        color: "#FFFFFF !important", // Text color for the selected tab
-        border: "2px solid #FFFFFF", // You can adjust the border size here
-      },
-    }}
-  >
-    {pages.map((page, index) => (
-      <Tab
-        key={page}
-        label={page}
-        onClick={() => handleNavigate(page)}
+    <Box sx={{ width: "100%" }}>
+      <Tabs
+        value={getTabIndex()}
+        variant="fullWidth"
+        TabIndicatorProps={{ style: { display: "none" } }}
         sx={{
-          mx: 0.5,
-          borderRadius: "6px",
-          "&:hover": {
-            backgroundColor: "#002060", // Change background color on hover
-            color: "#FFFFFF", // Ensure the text turns white on hover
+          "& .MuiTab-root": {
+            fontSize: isSmall ? "12px" : "14px",
+            // padding: isSmall ? "6px" : "10px",
+            textTransform: "none",
+            fontWeight: "bold",
+            whiteSpace: "normal",
+            lineHeight: 1.2,
+            minHeight: "48px",
+            color: "#bb4401",
+            transition: "background-color 0.3s ease, color 0.3s ease",
+          },
+          "& .Mui-selected": {
+            backgroundColor: "#002060",
+            color: "#FFFFFF !important",
+            border: "2px solid #FFFFFF",
           },
         }}
-      />
-    ))}
-  </Tabs>
-</Box>
+      >
+        {/* Dropdown: Opportunity & Performance */}
+        <Tab
+          label="Opportunity & Performance"
+          onClick={handleMenuClick(setAnchorElOp)}
+          sx={{
+            mx: 0.5,
+            borderRadius: "6px",
+            "&:hover": {
+              backgroundColor: "#002060",
+              color: "#FFFFFF",
+            },
+          }}
+        />
+        {/* Tab: New Deal Form */}
+        <Tab
+          label="New Deal Form"
+          onClick={() => handleNavigate("/equity/issue_market")}
+          sx={{
+            mx: 0.5,
+            borderRadius: "6px",
+            "&:hover": {
+              backgroundColor: "#002060",
+              color: "#FFFFFF",
+            },
+          }}
+        />
+        {/* Tab: AI Model */}
+        <Tab
+          label="AI Model"
+          onClick={() => handleNavigate("/equity/ml_equity")}
+          sx={{
+            mx: 0.5,
+            borderRadius: "6px",
+            "&:hover": {
+              backgroundColor: "#002060",
+              color: "#FFFFFF",
+            },
+          }}
+        />
+        {/* Dropdown: PRIME */}
+        <Tab
+          label="PRIME"
+          onClick={handleMenuClick(setAnchorElPrime)}
+          sx={{
+            mx: 0.5,
+            borderRadius: "6px",
+            "&:hover": {
+              backgroundColor: "#002060",
+              color: "#FFFFFF",
+            },
+          }}
+        />
+      </Tabs>
 
+      {/* Menu for Opportunity & Performance */}
+      <Menu
+        anchorEl={anchorElOp}
+        open={Boolean(anchorElOp)}
+        onClose={handleMenuClose(setAnchorElOp)}
+      >
+        <MenuItem onClick={() => handleNavigate("/equity/capital-markets")}>
+          Equity Market Opportunity
+        </MenuItem>
+        <MenuItem onClick={() => handleNavigate("/equity/monashee-deals")}>
+          Monashee Performance & Efficiency
+        </MenuItem>
+      </Menu>
+
+      {/* Menu for PRIME */}
+      <Menu
+        anchorEl={anchorElPrime}
+        open={Boolean(anchorElPrime)}
+        onClose={handleMenuClose(setAnchorElPrime)}
+      >
+        <MenuItem onClick={() => handleNavigate("/equity/strategies")}>
+          PRIME Investment Strategies
+        </MenuItem>
+        <MenuItem onClick={() => handleNavigate("/macro/news")}>News</MenuItem>
+        <MenuItem onClick={() => handleNavigate("/macro/sector")}>Sector Comparison</MenuItem>
+      </Menu>
+    </Box>
   );
 };
 
