@@ -83,6 +83,13 @@ const WeeklyStatsChart: React.FC = () => {
     | "monahsee_actual_total_PNL"
     | "model_actual_total_PNL"
   >("count"); // Track selected chart type
+const getMondayOfWeek = (week: number, year: number): string => {
+  const simple = new Date(year, 0, 1 + (week - 1) * 7);
+  const dow = simple.getDay();
+  const monday = new Date(simple);
+  monday.setDate(simple.getDate() - ((dow + 6) % 7)); // adjust to Monday
+  return monday.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+};
 
   useEffect(() => {
     const fetchData = async () => {
@@ -184,7 +191,29 @@ const WeeklyStatsChart: React.FC = () => {
             <ComposedChart data={chartData}>
               <XAxis dataKey="name" />
               <YAxis tickFormatter={formatNumber} />
-              <Tooltip formatter={(value: any) => formatNumber(Number(value))} />
+<Tooltip
+  content={({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      // const weekNum = parseInt(label);
+      const weekNum = parseInt(label.replace(/\D/g, ""));
+
+      const monday = getMondayOfWeek(weekNum, 2025); 
+
+      return (
+        <Box sx={{ backgroundColor: "white", padding: 2, border: "1px solid #ccc" }}>
+          <Typography variant="body2"><strong>{label}</strong></Typography>
+          <Typography variant="body2">Week Start Date: {monday}</Typography>
+          {payload.map((entry:any, index) => (
+            <Typography key={index} variant="body2" color={entry.color}>
+              {entry.name}: {formatNumber(entry.value)}
+            </Typography>
+          ))}
+        </Box>
+      );
+    }
+    return null;
+  }}
+/>
               <ReferenceLine y={0} stroke="#a4a4a4" strokeWidth={1} />
 
               <Legend />
