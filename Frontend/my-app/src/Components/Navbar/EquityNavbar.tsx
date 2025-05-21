@@ -35,16 +35,35 @@ const EquityNavbar: React.FC = () => {
     setAnchorElPrime(null);
   };
 
-  const getTabIndex = () => {
-    switch (location.pathname) {
-      case "/equity/issue_market":
-        return 1;
-      case "/equity/ml_equity":
-        return 2;
-      default:
-        return false;
-    }
-  };
+const getTabIndex = () => {
+  const path = location.pathname;
+
+  if (
+    path === "/equity/capital-markets" ||
+    path === "/equity/monashee-deals"
+  ) {
+    return 0; // Opportunity & Performance
+  }
+
+  if (path === "/equity/issue_market") {
+    return 1; // New Deal Form
+  }
+
+  if (path === "/equity/ml_equity") {
+    return 2; // AI Model
+  }
+
+  if (
+    path === "/equity/strategies" ||
+    path === "/macro/news" ||
+    path === "/macro/sector"
+  ) {
+    return 3; // PRIME
+  }
+
+  return false;
+};
+
 
   const renderDropdownLabel = (label: string) => (
     <Box display="flex" alignItems="center" gap={0.5}>
