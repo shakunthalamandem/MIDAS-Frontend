@@ -40,7 +40,7 @@ const NavbarMain: React.FC = () => {
     setSelectedTab(tabName);
     localStorage.setItem("selectedTab", tabName); // Save to localStorage immediately
     if (tabName === "Equity") {
-      navigate("/equity/capital-markets");
+      navigate("/equity/dashboard");
     } else if (tabName === "Converts") {
       navigate("/converts/capital-markets");
     } else if (tabName === "High Yield") {
