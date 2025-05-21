@@ -38,9 +38,9 @@ useEffect(() => {
       case "skew-table":
         setValue(2);
         break;
-      case "deal-filter":
-        setValue(3);
-        break;
+      // case "deal-filter":
+      //   setValue(3);
+      //   break;
       default:
         setValue(0);
         break;
@@ -225,7 +225,7 @@ useEffect(() => {
             },
           }}
         />
-        <Tab
+        {/* <Tab
           label="Deal Filter"
           sx={{
             backgroundColor: value === 3 ? "#FF9800" : "#f5f5f5",
@@ -235,7 +235,7 @@ useEffect(() => {
               color: "#fff",
             },
           }}
-        />
+        /> */}
       </Tabs>
 
       {loading ? (
@@ -298,7 +298,7 @@ useEffect(() => {
       )}
       {value === 1 && <MarketFilters />}
       {value === 2 && <SkewTableMain />}
-      {value === 3 && <ScreenerMain />}
+      {/* {value === 3 && <ScreenerMain />} */}
     </Box>
   );
 };

@@ -42,12 +42,12 @@ const MonasheeDeals: React.FC = () => {
       case "weekly-tracking":
         setValue(4);
         break;
-      case "by-bank":
-        setValue(5);
-        break;
-      case "screener":
-        setValue(6);
-        break;
+      // case "by-bank":
+      //   setValue(5);
+      //   break;
+      // case "screener":
+      //   setValue(6);
+      //   break;
       default:
         setValue(0);
         break;
@@ -64,8 +64,8 @@ const MonasheeDeals: React.FC = () => {
       "gap-analysis",
       "follow-on-discount",
       "weekly-tracking",
-      "by-bank",
-      "screener"
+      // "by-bank",
+      // "screener"
     ];
 
     // Update the URL based on the tab index
@@ -220,8 +220,8 @@ const MonasheeDeals: React.FC = () => {
         <Tab label="GAP Analysis" />
         <Tab label="Follow-On Discount" />
         <Tab label="Weekly Tracking" />
-        <Tab label="By Bank" />
-        <Tab label="Screener" />
+        {/* <Tab label="By Bank" />
+        <Tab label="Screener" /> */}
       </Tabs>
 
       {/* Search results displayed outside the tabs */}
@@ -290,8 +290,8 @@ const MonasheeDeals: React.FC = () => {
       {value === 2 && <AllocationCaptureReturn />}
       {value === 3 && <FOllowOnDiscount />}
       {value === 4 && <WeeklyStatsChart />}
-      {value === 5 && <ByBankTable />}
-      {value === 6 && <MDDScreener />}
+      {/* {value === 5 && <ByBankTable />}
+      {value === 6 && <MDDScreener />} */}
     </Box>
   );
 };
