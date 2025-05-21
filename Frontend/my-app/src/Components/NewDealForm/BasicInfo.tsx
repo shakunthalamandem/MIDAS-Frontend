@@ -690,6 +690,7 @@ const BasicInfo: React.FC = () => {
                       type="date"
                       value={formData[row.key as keyof typeof formData]}
                       onChange={handleChange}
+                      required={row.key === "pricing_date"}
                       InputLabelProps={{
                         shrink: true,
                         sx: { fontSize: "18px", color: "#d45c04" },
@@ -715,6 +716,9 @@ const BasicInfo: React.FC = () => {
                       value={formData[row.key as keyof typeof formData]}
                       onChange={handleChange}
                       type={row.type}
+                      required={
+                        row.key === "ticker"
+                      }
                       InputLabelProps={{
                         sx: { fontSize: "14px", color: "#d45c04" },
                       }}
