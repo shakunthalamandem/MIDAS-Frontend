@@ -7,8 +7,9 @@ import {
   useMediaQuery,
   Menu,
   MenuItem,
-  Button,
+  Typography,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const EquityNavbar: React.FC = () => {
@@ -17,7 +18,6 @@ const EquityNavbar: React.FC = () => {
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("md"));
 
-  // Dropdown menus state
   const [anchorElOp, setAnchorElOp] = useState<null | HTMLElement>(null);
   const [anchorElPrime, setAnchorElPrime] = useState<null | HTMLElement>(null);
 
@@ -46,21 +46,31 @@ const EquityNavbar: React.FC = () => {
     }
   };
 
+  const renderDropdownLabel = (label: string) => (
+    <Box display="flex" alignItems="center" gap={0.5}>
+      <Typography fontWeight="bold">{label}</Typography>
+      <ExpandMoreIcon fontSize="small" />
+    </Box>
+  );
+
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
       <Tabs
         value={getTabIndex()}
-        variant="fullWidth"
         TabIndicatorProps={{ style: { display: "none" } }}
         sx={{
+          "& .MuiTabs-flexContainer": {
+            justifyContent: "center",
+            gap: 1,
+          },
           "& .MuiTab-root": {
             fontSize: isSmall ? "12px" : "14px",
-            // padding: isSmall ? "6px" : "10px",
+            padding: isSmall ? "6px 12px" : "10px 20px",
             textTransform: "none",
             fontWeight: "bold",
-            whiteSpace: "normal",
-            lineHeight: 1.2,
+            whiteSpace: "nowrap",
             minHeight: "48px",
+            borderRadius: "6px",
             color: "#bb4401",
             transition: "background-color 0.3s ease, color 0.3s ease",
           },
@@ -71,57 +81,21 @@ const EquityNavbar: React.FC = () => {
           },
         }}
       >
-        {/* Dropdown: Opportunity & Performance */}
         <Tab
-          label="Opportunity & Performance"
+          label={renderDropdownLabel("Opportunity & Performance")}
           onClick={handleMenuClick(setAnchorElOp)}
-          sx={{
-            mx: 0.5,
-            borderRadius: "6px",
-            "&:hover": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
-            },
-          }}
         />
-        {/* Tab: New Deal Form */}
         <Tab
           label="New Deal Form"
           onClick={() => handleNavigate("/equity/issue_market")}
-          sx={{
-            mx: 0.5,
-            borderRadius: "6px",
-            "&:hover": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
-            },
-          }}
         />
-        {/* Tab: AI Model */}
         <Tab
           label="AI Model"
           onClick={() => handleNavigate("/equity/ml_equity")}
-          sx={{
-            mx: 0.5,
-            borderRadius: "6px",
-            "&:hover": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
-            },
-          }}
         />
-        {/* Dropdown: PRIME */}
         <Tab
-          label="PRIME"
+          label={renderDropdownLabel("PRIME")}
           onClick={handleMenuClick(setAnchorElPrime)}
-          sx={{
-            mx: 0.5,
-            borderRadius: "6px",
-            "&:hover": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
-            },
-          }}
         />
       </Tabs>
 
@@ -148,8 +122,12 @@ const EquityNavbar: React.FC = () => {
         <MenuItem onClick={() => handleNavigate("/equity/strategies")}>
           PRIME Investment Strategies
         </MenuItem>
-        <MenuItem onClick={() => handleNavigate("/macro/news")}>News</MenuItem>
-        <MenuItem onClick={() => handleNavigate("/macro/sector")}>Sector Comparison</MenuItem>
+        <MenuItem onClick={() => handleNavigate("/macro/news")}>
+          News
+        </MenuItem>
+        <MenuItem onClick={() => handleNavigate("/macro/sector")}>
+          Sector Comparison
+        </MenuItem>
       </Menu>
     </Box>
   );
