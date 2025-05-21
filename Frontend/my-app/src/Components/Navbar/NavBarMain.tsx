@@ -45,8 +45,8 @@ const NavbarMain: React.FC = () => {
       navigate("/converts/capital-markets");
     } else if (tabName === "High Yield") {
       navigate("/highyield/capital-markets");
-    } else if (tabName === "Macro") {
-      navigate("/macro/sector");
+    } else if (tabName === "Portfolio Attribution") {
+      navigate("/portfolio-attribution");
     }
   };
 
@@ -157,7 +157,7 @@ const NavbarMain: React.FC = () => {
           </Link>
 
           <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }} onClick={handleSidebarToggle}>
-            <Typography variant="body1" fontWeight="bold">
+            <Typography variant="body1" fontWeight="bold" padding={"0 10px"}>
               {selectedTab}
             </Typography>
           </Button>
@@ -165,7 +165,7 @@ const NavbarMain: React.FC = () => {
           {selectedTab === "Equity" && <EquityNavbar />}
           {selectedTab === "Converts" && <ConvertsNavbar />}
           {selectedTab === "High Yield" && <HighYieldNavbar />}
-          {selectedTab === "Macro" && <MacroNavbar />}
+          {selectedTab === "Portfolio Attribution" && <MacroNavbar />}
 
           {isLoggedIn && isSuperUser && (
             <Button sx={{ color: "black", fontWeight: "bold", marginRight: "20px" }} onClick={() => setShowLogs(true)}>
