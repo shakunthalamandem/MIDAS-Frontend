@@ -7,9 +7,8 @@ import {
   useMediaQuery,
   Menu,
   MenuItem,
-  Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const EquityNavbar: React.FC = () => {
@@ -18,16 +17,9 @@ const EquityNavbar: React.FC = () => {
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("md"));
 
+  // Dropdown menus state
   const [anchorElOp, setAnchorElOp] = useState<null | HTMLElement>(null);
   const [anchorElPrime, setAnchorElPrime] = useState<null | HTMLElement>(null);
-
-  const handleMenuClick = (setter: any) => (event: React.MouseEvent<HTMLElement>) => {
-    setter(event.currentTarget);
-  };
-
-  const handleMenuClose = (setter: any) => () => {
-    setter(null);
-  };
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -35,40 +27,33 @@ const EquityNavbar: React.FC = () => {
     setAnchorElPrime(null);
   };
 
-const getTabIndex = () => {
-  const path = location.pathname;
+  const isActivePath = (path: string) => location.pathname === path;
 
-  if (
-    path === "/equity/capital-markets" ||
-    path === "/equity/monashee-deals"
-  ) {
-    return 0; // Opportunity & Performance
-  }
+  const getTabIndex = () => {
+    const path = location.pathname;
 
-  if (path === "/equity/issue_market") {
-    return 1; // New Deal Form
-  }
+    if (
+      path === "/equity/capital-markets" ||
+      path === "/equity/monashee-deals"
+    ) return 0;
 
-  if (path === "/equity/ml_equity") {
-    return 2; // AI Model
-  }
+    if (path === "/equity/issue_market") return 1;
 
-  if (
-    path === "/equity/strategies" ||
-    path === "/macro/news" ||
-    path === "/macro/sector"
-  ) {
-    return 3; // PRIME
-  }
+    if (path === "/equity/ml_equity") return 2;
 
-  return false;
-};
+    if (
+      path === "/equity/strategies" ||
+      path === "/macro/news" ||
+      path === "/macro/sector"
+    ) return 3;
 
+    return false;
+  };
 
   const renderDropdownLabel = (label: string) => (
     <Box display="flex" alignItems="center" gap={0.5}>
-      <Typography fontWeight="bold">{label}</Typography>
-      <ExpandMoreIcon fontSize="small" />
+      {label}
+      <ArrowDropDownIcon fontSize="small" />
     </Box>
   );
 
@@ -78,20 +63,26 @@ const getTabIndex = () => {
         value={getTabIndex()}
         TabIndicatorProps={{ style: { display: "none" } }}
         sx={{
+          display: "flex",
+          justifyContent: "center",
           "& .MuiTabs-flexContainer": {
-            justifyContent: "center",
             gap: 1,
           },
           "& .MuiTab-root": {
             fontSize: isSmall ? "12px" : "14px",
-            padding: isSmall ? "6px 12px" : "10px 20px",
+            padding: isSmall ? "6px" : "10px",
             textTransform: "none",
             fontWeight: "bold",
-            whiteSpace: "nowrap",
+            whiteSpace: "normal",
+            lineHeight: 1,
             minHeight: "48px",
-            borderRadius: "6px",
             color: "#bb4401",
             transition: "background-color 0.3s ease, color 0.3s ease",
+            borderRadius: "6px",
+            "&:hover": {
+              backgroundColor: "#002060",
+              color: "#FFFFFF",
+            },
           },
           "& .Mui-selected": {
             backgroundColor: "#002060",
@@ -100,51 +91,120 @@ const getTabIndex = () => {
           },
         }}
       >
+        {/* Dropdown: Opportunity & Performance */}
         <Tab
           label={renderDropdownLabel("Opportunity & Performance")}
-          onClick={handleMenuClick(setAnchorElOp)}
+          onMouseEnter={(e) => setAnchorElOp(e.currentTarget)}
+          onMouseLeave={() =>
+            setTimeout(() => {
+              if (!document.getElementById("op-menu")?.matches(":hover")) {
+                setAnchorElOp(null);
+              }
+            }, 200)
+          }
         />
+
+        {/* Tab: New Deal Form */}
         <Tab
           label="New Deal Form"
           onClick={() => handleNavigate("/equity/issue_market")}
         />
+
+        {/* Tab: AI Model */}
         <Tab
           label="AI Model"
           onClick={() => handleNavigate("/equity/ml_equity")}
         />
+
+        {/* Dropdown: PRIME */}
         <Tab
           label={renderDropdownLabel("PRIME")}
-          onClick={handleMenuClick(setAnchorElPrime)}
+          onMouseEnter={(e) => setAnchorElPrime(e.currentTarget)}
+          onMouseLeave={() =>
+            setTimeout(() => {
+              if (!document.getElementById("prime-menu")?.matches(":hover")) {
+                setAnchorElPrime(null);
+              }
+            }, 200)
+          }
         />
       </Tabs>
 
       {/* Menu for Opportunity & Performance */}
       <Menu
+        id="op-menu"
         anchorEl={anchorElOp}
         open={Boolean(anchorElOp)}
-        onClose={handleMenuClose(setAnchorElOp)}
+        onClose={() => setAnchorElOp(null)}
+        MenuListProps={{
+          onMouseLeave: () => setAnchorElOp(null),
+        }}
       >
-        <MenuItem onClick={() => handleNavigate("/equity/capital-markets")}>
+        <MenuItem
+          onClick={() => handleNavigate("/equity/capital-markets")}
+          selected={isActivePath("/equity/capital-markets")}
+          sx={
+            isActivePath("/equity/capital-markets")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
           Equity Market Opportunity
         </MenuItem>
-        <MenuItem onClick={() => handleNavigate("/equity/monashee-deals")}>
+        <MenuItem
+          onClick={() => handleNavigate("/equity/monashee-deals")}
+          selected={isActivePath("/equity/monashee-deals")}
+          sx={
+            isActivePath("/equity/monashee-deals")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
           Monashee Performance & Efficiency
         </MenuItem>
       </Menu>
 
       {/* Menu for PRIME */}
       <Menu
+        id="prime-menu"
         anchorEl={anchorElPrime}
         open={Boolean(anchorElPrime)}
-        onClose={handleMenuClose(setAnchorElPrime)}
+        onClose={() => setAnchorElPrime(null)}
+        MenuListProps={{
+          onMouseLeave: () => setAnchorElPrime(null),
+        }}
       >
-        <MenuItem onClick={() => handleNavigate("/equity/strategies")}>
+        <MenuItem
+          onClick={() => handleNavigate("/equity/strategies")}
+          selected={isActivePath("/equity/strategies")}
+          sx={
+            isActivePath("/equity/strategies")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
           PRIME Investment Strategies
         </MenuItem>
-        <MenuItem onClick={() => handleNavigate("/macro/news")}>
+        <MenuItem
+          onClick={() => handleNavigate("/macro/news")}
+          selected={isActivePath("/macro/news")}
+          sx={
+            isActivePath("/macro/news")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
           News
         </MenuItem>
-        <MenuItem onClick={() => handleNavigate("/macro/sector")}>
+        <MenuItem
+          onClick={() => handleNavigate("/macro/sector")}
+          selected={isActivePath("/macro/sector")}
+          sx={
+            isActivePath("/macro/sector")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
           Sector Comparison
         </MenuItem>
       </Menu>

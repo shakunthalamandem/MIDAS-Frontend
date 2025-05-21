@@ -157,7 +157,7 @@ const NavbarMain: React.FC = () => {
           </Link>
 
           <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }} onClick={handleSidebarToggle}>
-            <Typography variant="body1" fontWeight="bold">
+            <Typography variant="body1" fontWeight="bold" padding={"0 10px"}>
               {selectedTab}
             </Typography>
           </Button>
