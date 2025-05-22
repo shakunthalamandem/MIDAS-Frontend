@@ -31,6 +31,7 @@ const formatDealSize = (dealSize: any) => {
       id: index,
       ...row,
       deal_size: row.deal_size ? formatDealSize(row.deal_size.toFixed()) : "$0",
+      issue_offer_price: row.issue_offer_price ? formatDealSize(row.issue_offer_price.toFixed()) : "$0",
       allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
       allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed()}%` : "0%",
       model_am_return: row.model_am_return ? `${formatDealSize(row.model_am_return.toFixed())}` : "$0",
@@ -97,6 +98,7 @@ const formatDealSize = (dealSize: any) => {
     },    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "deal_type", headerName: "Deal Type", width: 80 },
+    { field: "fo_type", headerName: "FO Type", width: 80 },
     { field: "broad_region", headerName: "Region", width: 80 },
     {
       field: "deal_size",
@@ -105,7 +107,24 @@ const formatDealSize = (dealSize: any) => {
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
+        {
+      field: "issue_offer_price",
+      headerName: "Issue Offer Price",
+      width: 120,
+      renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
     { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 180 },
+{
+  field: "number_of_shares_offered",
+  headerName: "Shares Offered",
+  width: 120,
+  valueFormatter: (params) => {
+    const value = Number(params);
+    return isNaN(value) ? '' : value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+}
+,
   { 
     field: "allocation_deal_size_percentage", 
     headerName: "Allocation % of Deal Size", 
