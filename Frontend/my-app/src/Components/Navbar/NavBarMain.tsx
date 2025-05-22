@@ -226,12 +226,12 @@ const NavbarMain: React.FC = () => {
                     sx={{
                       width: "100%",
                       color: "#002060",
-                      padding: "10px 16px",
-                      borderRadius: "6px",
+                      padding: "4px 0px",
+                      borderRadius: "3px",
                       textAlign: "center",
                       '&:hover': {
                         backgroundColor: "#bb4401",
-                        cursor: "pointer"
+                        color: "#FFFFFF",
                       }
                     }}
                   >
