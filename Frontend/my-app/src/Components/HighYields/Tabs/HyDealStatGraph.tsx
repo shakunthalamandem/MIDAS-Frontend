@@ -61,7 +61,7 @@ const HyDealStatGraph = ({ selectedFilters }: { selectedFilters: SelectedFilters
         setData(result.main_aggregation);
       } catch (error) {
         setError((error as any).message);
-        navigate("/error");  
+        // navigate("/error");  
 
       } finally {
         setLoading(false);

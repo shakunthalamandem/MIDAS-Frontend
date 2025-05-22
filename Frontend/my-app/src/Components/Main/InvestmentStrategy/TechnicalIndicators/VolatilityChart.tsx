@@ -54,7 +54,7 @@ const VolatilityChart: React.FC<VolatilityChartProps> = ({ ticker }) => {
         setData(VolatilityGraphData); // Update the state with the extracted Volatility graph data
       } catch (error) {
         console.error('Error fetching data:', error);
-        navigate("/error");  
+        // navigate("/error");  
 
       }
     };

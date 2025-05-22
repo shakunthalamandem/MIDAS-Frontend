@@ -101,7 +101,7 @@ const FundWiseTable: React.FC = () => {
             ? error.message
             : "An error occurred while fetching data"
         );
-        navigate("/error");
+        // navigate("/error");
       } finally {
         setLoading(false);
       }

@@ -74,7 +74,7 @@ interface DealsDataFilterProps {
         setApiData(response.data);
       } catch (error) {
         console.error("Failed to fetch data:", error);
-        navigate("/error");  
+        // navigate("/error");  
 
       } finally {
         setLoading(false);

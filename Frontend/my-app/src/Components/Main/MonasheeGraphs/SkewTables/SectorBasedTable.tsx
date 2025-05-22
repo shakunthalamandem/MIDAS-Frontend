@@ -75,7 +75,7 @@ const SectorBasedTable: React.FC = () => {
         setYearPeriodOptions(data['year_period']);
       } catch (error) {
         console.error('Error fetching filter options:', error);
-        navigate("/error");  
+        // navigate("/error");  
       }
     };
 
@@ -122,7 +122,7 @@ const SectorBasedTable: React.FC = () => {
           setResponseData(response.data);
         }
       } catch (error) {
-        navigate("/error");  
+        // navigate("/error");  
       }  
     };
 

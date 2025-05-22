@@ -47,7 +47,7 @@ const TickerDropdown: React.FC<TickerDropdownProps> = ({ onSelectTicker }) => {
         setFilteredTickers(formattedTickers);
       } catch (error) {
         console.error('Error fetching tickers:', error);
-        navigate("/error");  
+        // navigate("/error");  
 
       }
     };

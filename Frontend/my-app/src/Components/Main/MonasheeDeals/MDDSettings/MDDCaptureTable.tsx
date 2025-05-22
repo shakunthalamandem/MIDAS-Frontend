@@ -120,7 +120,7 @@ const MDDCaptureTable: React.FC<MDDCaptureTableProps> = ({
       // setChartData(formatChartData(data));
     } catch (error) {
       console.error("Error fetching data", error);
-      navigate("/error");  
+      // navigate("/error");  
 
       // setChartData([]);
     } finally {

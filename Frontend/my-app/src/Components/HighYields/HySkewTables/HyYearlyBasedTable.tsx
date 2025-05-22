@@ -64,7 +64,7 @@ const HyYearlyBasedTable: React.FC = () => {
         setEndYearOptions(data['end year'] || []);
         } catch (error) {
         console.error('Error fetching filter options:', error);
-        navigate("/error");  
+        // navigate("/error");  
 
       }
     };
@@ -108,7 +108,7 @@ const HyYearlyBasedTable: React.FC = () => {
           setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
         }
       } catch (error) {
-        navigate("/error");  
+        // navigate("/error");  
       }  finally {
         setLoading(false); 
       }

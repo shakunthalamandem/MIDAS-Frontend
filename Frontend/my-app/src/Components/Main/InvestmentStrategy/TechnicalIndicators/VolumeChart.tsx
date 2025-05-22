@@ -58,7 +58,7 @@ const VolumeChart: React.FC<VolumeChartProps> = ({ ticker }) => {
         setData(volumeGraphData); // Update the state with the volume graph data
       } catch (error) {
         console.error('Error fetching data:', error);
-        navigate("/error");  
+        // navigate("/error");  
 
       }
     };

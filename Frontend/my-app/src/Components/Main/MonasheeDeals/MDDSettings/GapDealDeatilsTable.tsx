@@ -26,7 +26,7 @@ const GapDealDeatilsTable: React.FC = () => {
     selectedFilters = filters;
   } catch (error) {
     console.error("Invalid filters format", error);
-    navigate("/error");  
+    // navigate("/error");  
 
   }
   selectedFilters.years = [2025];
@@ -54,7 +54,7 @@ const GapDealDeatilsTable: React.FC = () => {
         setData(result.data || []);
       } catch (error) {
         setError(error instanceof Error ? error.message : "Unknown error");
-        navigate("/error");  
+        // navigate("/error");  
 
       } finally {
         setLoading(false);

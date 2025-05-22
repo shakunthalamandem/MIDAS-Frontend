@@ -107,7 +107,7 @@ const getMondayOfWeek = (week: number, year: number): string => {
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
-        navigate("/error");  
+        // navigate("/error");  
 
       }
     };
