@@ -436,7 +436,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                               variant="body2"
                               fontWeight={isSummary ? "bold" : "normal"}
                             >
-                              {formatValue(values["Model AM Return"] || 0)}
+                              {formatValue(values["Model Actual AM Return"] || 0)}
                             </Typography>
                             {isSummary && (
                               <Typography
