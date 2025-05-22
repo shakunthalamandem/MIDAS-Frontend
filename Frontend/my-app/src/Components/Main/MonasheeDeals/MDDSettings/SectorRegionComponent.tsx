@@ -151,10 +151,10 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                       Model PnL with model AM(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
-                      AM Gap
+                      Model AM Gap
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
-                      AM Exit Gap
+                      Monashee AM Exit Gap
                     </TableCell>
                     <TableCell
                       sx={{
