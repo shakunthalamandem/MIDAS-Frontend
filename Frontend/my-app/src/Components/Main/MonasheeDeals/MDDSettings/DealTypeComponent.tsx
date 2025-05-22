@@ -323,37 +323,64 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                           </Box>
                         </TableCell>
 
-                       <TableCell>
-                        <Box>
-                          <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                            {formatValue(values["Model Actual Return"] || 0)}
-                          </Typography>
-                          {isSummary && (
-                            <Typography variant="caption" color="red" fontWeight="bold">
-                              (B)
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-                       <TableCell>
+                        <TableCell>
                           <Box>
-                            <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                              {formatValue(values["Model Return 1% Allocation"] || 0)}
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(values["Model Actual Return"] || 0)}
                             </Typography>
                             {isSummary && (
-                              <Typography variant="caption" color="red" fontWeight="bold">
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
+                                (B)
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(
+                                values["Model Return 1% Allocation"] || 0
+                              )}
+                            </Typography>
+                            {isSummary && (
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
                                 (C)
                               </Typography>
                             )}
                           </Box>
                         </TableCell>
-                       <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
+                        <TableCell
+                          sx={{
+                            bgcolor: !isSummary ? "#f8f9cd" : "transparent",
+                          }}
+                        >
                           <Box>
-                            <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
                               {formatValue(values["Model Allocation Gap"] || 0)}
                             </Typography>
                             {isSummary && (
-                              <Typography variant="caption" color="red" fontWeight="bold">
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
                                 (B - C)
                               </Typography>
                             )}
@@ -361,128 +388,208 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                         </TableCell>
 
                         {/* Monashee Exit Gap */}
-                        <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
+                        <TableCell
+                          sx={{
+                            bgcolor: !isSummary ? "#f8f9cd" : "transparent",
+                          }}
+                        >
                           <Box>
-                            <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
                               {formatValue(values["Monashee Exit Gap"] || 0)}
                             </Typography>
                             {isSummary && (
-                              <Typography variant="caption" color="red" fontWeight="bold">
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
                                 (A - B)
                               </Typography>
                             )}
                           </Box>
                         </TableCell>
-                      <TableCell sx={{ borderLeft: "2px solid #484547" }}>
-                        <Box>
-                          <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                            {formatValue(values["AM Return"] || 0)}
-                          </Typography>
-                          {isSummary && (
-                            <Typography variant="caption" color="red" fontWeight="bold">
-                              (D)
+                        <TableCell sx={{ borderLeft: "2px solid #484547" }}>
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(values["AM Return"] || 0)}
                             </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Box>
-                          <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                            {formatValue(values["Model AM Return"] || 0)}
-                          </Typography>
-                          {isSummary && (
-                            <Typography variant="caption" color="red" fontWeight="bold">
-                              (E)
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-                       <TableCell>
-                        <Box>
-                          <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                            {formatValue(values["Model AM Return"] || 0)}
-                          </Typography>
-                          {isSummary && (
-                            <Typography variant="caption" color="red" fontWeight="bold">
-                              (F)
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-                       
-                      {/* AM Gap */}
-                      <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
-                        <Box>
-                          <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                            {formatValue(values["AM Gap"] || 0)}
-                          </Typography>
-                          {isSummary && (
-                            <Typography variant="caption" color="red" fontWeight="bold">
-                              (E - F)
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-
-                      {/* AM Exit Gap */}
-                      <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
-                        <Box>
-                          <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                            {formatValue(values["AM Exit Gap"] || 0)}
-                          </Typography>
-                          {isSummary && (
-                            <Typography variant="caption" color="red" fontWeight="bold">
-                              (D - E)
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-                     <TableCell sx={{ borderLeft: "2px solid #484547" }}>
-                      <Box>
-                        <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                          {formatValue(
-                            (values["Allocation Return"] || 0) + (values["AM Return"] || 0)
-                          )}
-                        </Typography>
-                        {isSummary && (
-                          <Typography variant="caption" color="red" fontWeight="bold">
-                            (G)
-                          </Typography>
-                        )}
-                      </Box>
-                    </TableCell>
-                       <TableCell>
-                        <Box>
-                          <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                            {formatValue(
-                              (values["Model Return 1% Allocation"] || 0) +
-                              (values["Model AM Return"] || 0)
+                            {isSummary && (
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
+                                (D)
+                              </Typography>
                             )}
-                          </Typography>
-                          {isSummary && (
-                            <Typography variant="caption" color="red" fontWeight="bold">
-                              (H)
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(values["Model AM Return"] || 0)}
                             </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-                 <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
-                    <Box>
-                      <Typography variant="body2" fontWeight={isSummary ? "bold" : "normal"}>
-                        {formatValue(
-                          (values["Allocation Return"] || 0) +
-                          (values["AM Return"] || 0) -
-                          (values["Model Return 1% Allocation"] || 0) -
-                          (values["Model AM Return"] || 0)
-                        )}
-                      </Typography>
-                      {isSummary && (
-                        <Typography variant="caption" color="red" fontWeight="bold">
-                          (G-H)
-                        </Typography>
-                      )}
-                    </Box>
-                  </TableCell>
+                            {isSummary && (
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
+                                (E)
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(values["Model AM Return"] || 0)}
+                            </Typography>
+                            {isSummary && (
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
+                                (F)
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+
+                        {/* AM Gap */}
+                        <TableCell
+                          sx={{
+                            bgcolor: !isSummary ? "#f8f9cd" : "transparent",
+                          }}
+                        >
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(values["AM Gap"] || 0)}
+                            </Typography>
+                            {isSummary && (
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
+                                (E - F)
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+
+                        {/* AM Exit Gap */}
+                        <TableCell
+                          sx={{
+                            bgcolor: !isSummary ? "#f8f9cd" : "transparent",
+                          }}
+                        >
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(values["AM Exit Gap"] || 0)}
+                            </Typography>
+                            {isSummary && (
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
+                                (D - E)
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+                        <TableCell sx={{ borderLeft: "2px solid #484547" }}>
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(
+                                (values["Allocation Return"] || 0) +
+                                  (values["AM Return"] || 0)
+                              )}
+                            </Typography>
+                            {isSummary && (
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
+                                (G)
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(
+                                (values["Model Return 1% Allocation"] || 0) +
+                                  (values["Model AM Return"] || 0)
+                              )}
+                            </Typography>
+                            {isSummary && (
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
+                                (H)
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            bgcolor: !isSummary ? "#f8f9cd" : "transparent",
+                          }}
+                        >
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              fontWeight={isSummary ? "bold" : "normal"}
+                            >
+                              {formatValue(
+                                (values["Allocation Return"] || 0) +
+                                  (values["AM Return"] || 0) -
+                                  (values["Model Return 1% Allocation"] || 0) -
+                                  (values["Model AM Return"] || 0)
+                              )}
+                            </Typography>
+                            {isSummary && (
+                              <Typography
+                                variant="caption"
+                                color="red"
+                                fontWeight="bold"
+                              >
+                                (G-H)
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
