@@ -314,7 +314,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (A)
@@ -334,7 +334,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (B)
@@ -355,7 +355,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (C)
@@ -378,7 +378,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (B - C)
@@ -403,7 +403,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (A - B)
@@ -422,7 +422,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (D)
@@ -441,7 +441,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (E)
@@ -460,7 +460,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (F)
@@ -485,7 +485,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (E - F)
@@ -510,7 +510,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (D - E)
@@ -532,7 +532,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (G)
@@ -554,7 +554,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (H)
@@ -582,7 +582,7 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
                             {isSummary && (
                               <Typography
                                 variant="caption"
-                                color="red"
+                                color="#002060"
                                 fontWeight="bold"
                               >
                                 (G-H)

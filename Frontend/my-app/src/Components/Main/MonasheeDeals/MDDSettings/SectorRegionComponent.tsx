@@ -273,7 +273,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (A)
@@ -299,7 +299,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (B)
@@ -327,7 +327,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (C)
@@ -354,7 +354,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (B - C)
@@ -379,7 +379,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (A - B)
@@ -406,7 +406,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (D)
@@ -432,7 +432,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (E)
@@ -458,7 +458,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (F)
@@ -483,7 +483,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (E - F)
@@ -508,7 +508,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (D - E)
@@ -538,7 +538,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (G)
@@ -567,7 +567,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (H)
@@ -598,7 +598,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
                               {isSummary && (
                                 <Typography
                                   variant="caption"
-                                  color="red"
+                                  color="#002060"
                                   fontWeight="bold"
                                 >
                                   (G - H)
