@@ -59,11 +59,13 @@ const formatNumber = (value: number, isCurrency = false, isPercentage = false): 
     formattedValue = absValue.toString();
   }
 
-   let result = value < 0 ? `-${formattedValue}` : formattedValue;
-  if (isCurrency) result = `$${result}`;
-  if (isPercentage) result = `${result}%`;
+  if (isCurrency) formattedValue = `$${formattedValue}`;
+  if (isPercentage) formattedValue = `${formattedValue}%`;
 
+ 
+  const result = value < 0 ? `-${formattedValue}` : formattedValue;
   return result;
+
 };
 
 
