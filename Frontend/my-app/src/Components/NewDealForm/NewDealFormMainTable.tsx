@@ -81,6 +81,8 @@ const fieldLabels: Record<string, Record<string, string>> = {
     allocation_percentage: "Allocation as % of IOI",
   },
   market_data: {
+    ltm_fcf_yield: "LTM FCF Yield (%)",
+    ltm_dividend_yield: "LTM Dividend Yield (%)",
     percent_of_free_float_current_float: "% of Free Float ",
     short_interest_shares: "Short Interest (Shares)",
     short_interest_dollar_amount: "Short Interest ($ Million)",

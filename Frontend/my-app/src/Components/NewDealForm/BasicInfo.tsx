@@ -173,7 +173,7 @@ const tableRight1: Row[] = [
 
 const tableLeft2: Row[] = [
   {
-    label: "Ltm Dividend Yield (%)",
+    label: "LTM Dividend Yield (%)",
     key: "ltm_dividend_yield",
     type: "number",
   },
@@ -226,7 +226,7 @@ const tableLeft2: Row[] = [
 ];
 
 const tableRight2: Row[] = [
-  { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield", type: "number" },
+  { label: "LTM FCF Yield (%)", key: "ltm_fcf_yield", type: "number" },
   {
     label: "3M ADTV  ($ Million)",
     key: "three_month_adtv_local_usd",
