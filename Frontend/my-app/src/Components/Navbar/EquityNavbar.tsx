@@ -27,15 +27,15 @@ const EquityNavbar: React.FC = () => {
     setAnchorElPrime(null);
   };
 
-  const isActivePath = (path: string) => location.pathname === path;
+  const isActivePath = (basePath: string) => {
+    return location.pathname.startsWith(basePath);
+  };
 
   const getTabIndex = () => {
     const path = location.pathname;
 
-    if (
-      path === "/equity/capital-markets" ||
-      path === "/equity/monashee-deals"
-    ) return 0;
+    if (path.startsWith("/equity/capital-markets")) return 0;
+    if (path.startsWith("/equity/monashee-deals")) return 0;
 
     if (path === "/equity/issue_market") return 1;
 
@@ -45,7 +45,8 @@ const EquityNavbar: React.FC = () => {
       path === "/equity/strategies" ||
       path === "/macro/news" ||
       path === "/macro/sector"
-    ) return 3;
+    )
+      return 3;
 
     return false;
   };
@@ -151,6 +152,7 @@ const EquityNavbar: React.FC = () => {
         >
           Equity Market Opportunity
         </MenuItem>
+
         <MenuItem
           onClick={() => handleNavigate("/equity/monashee-deals")}
           selected={isActivePath("/equity/monashee-deals")}
