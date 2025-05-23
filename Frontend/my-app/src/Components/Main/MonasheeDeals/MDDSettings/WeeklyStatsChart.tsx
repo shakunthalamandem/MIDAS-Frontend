@@ -76,12 +76,18 @@ const WeeklyStatsChart: React.FC = () => {
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null);
 
 
-
-  const handleChartClick = (e: any) => {
+const handleChartClick = (e: any) => {
   if (e && e.activeLabel) {
-    setSelectedWeek(e.activeLabel); // this is the "name" key from chartData
+    setSelectedWeek(e.activeLabel);
+
+    const target = document.getElementById("details-section");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
   }
 };
+
+
 
   const [chartType, setChartType] = useState<
     | "count"
