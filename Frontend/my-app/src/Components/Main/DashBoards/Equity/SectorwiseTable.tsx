@@ -41,10 +41,11 @@ const metricDisplayNames: Record<keyof SectorMetrics, string> = {
 };
 
 // Format large numbers with suffixes like K, M, B
-const formatNumber = (value: number): string => {
+const formatNumber = (value: number, isCurrency = false, isPercentage = false): string => {
   if (value === null || value === undefined) {
     return 'N/A';
   }
+
   const absValue = Math.abs(value);
   let formattedValue: string;
 
@@ -58,8 +59,15 @@ const formatNumber = (value: number): string => {
     formattedValue = absValue.toString();
   }
 
-  return value < 0 ? `-${formattedValue}` : formattedValue;
+  if (isCurrency) formattedValue = `$${formattedValue}`;
+  if (isPercentage) formattedValue = `${formattedValue}%`;
+
+ 
+  const result = value < 0 ? `-${formattedValue}` : formattedValue;
+  return result;
+
 };
+
 
 export default function SectorwiseTable() {
   const [sectorData, setSectorData] = useState<Record<string, SectorMetrics>>({});
@@ -102,18 +110,20 @@ export default function SectorwiseTable() {
             {Object.entries(sectorData).map(([sector, data]) => (
               <TableRow key={sector}>
                 <TableCell>{sector}</TableCell>
-                {metrics.map((metric) => {
+               {metrics.map((metric) => {
                   const isTop3 = top3Values[metric]?.includes(data[metric]) ?? false;
+                  const isCurrency = metric === "Long_Opportunity_Value" || metric === "Total_Deal_Volume";
+                  const isPercentage = metric === "Positively_Performing_Deals_Percentage" || metric === "Expected_Returns_Excess";
                   return (
                     <TableCell
                       key={metric}
                       sx={{
-                        backgroundColor: isTop3 ? " #ffd9b3" : "inherit",
+                        backgroundColor: isTop3 ? "#ffd9b3" : "inherit",
                         fontWeight: isTop3 ? "bold" : "normal",
                       }}
                     >
                       {typeof data[metric] === "number"
-                        ? formatNumber(data[metric])
+                        ? formatNumber(data[metric], isCurrency,isPercentage)
                         : data[metric]}
                     </TableCell>
                   );
