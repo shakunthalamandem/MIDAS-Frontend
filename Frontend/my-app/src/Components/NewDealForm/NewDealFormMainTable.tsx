@@ -211,7 +211,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
   selecteditems,
 }) => {
   const [formData, setFormData] = useState<any>({});
-  const [isEditable, setIsEditable] = useState<boolean>(true);
+  const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(true);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -348,43 +348,13 @@ const handleInputChange = (
     setFormData(updatedFormData);
   };
 
-  const handleDateChange = (date: any, section: string, key: string) => {
-    const updatedFormData = { ...formData };
-    updatedFormData[section][key] = date;
-    setFormData(updatedFormData);
-  };
+
   const navigate = useNavigate();
 
   const handleIconClick = () => {
     navigate("/equity/create_form");
   };
 
-  const formatFieldValue = (
-    section: string,
-    key: string,
-    value: any
-  ): string => {
-    const formatType = fieldFormatters[section]?.[key];
-
-    if (formatType === "currency") {
-      const number = parseFloat(value);
-      return isNaN(number)
-        ? value
-        : `$${number.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-    }
-
-    if (formatType === "percentage") {
-      const number = parseFloat(value);
-      return isNaN(number) ? value : `${number.toFixed(2)}%`;
-    }
-
-    if (formatType === "float") {
-      const number = parseFloat(value);
-      return isNaN(number) ? value : number.toFixed(2);
-    }
-
-    return value?.toString() || "";
-  };
 
   const handleSave = async () => {
     try {
@@ -423,8 +393,7 @@ const handleInputChange = (
           Authorization: `Bearer ${token}`,
         },
       });
-      // setSelectedTicker(ResponsiveContainer.ticker)
-      setIsEditMode(false);
+      setIsEditMode(true);
       setIsEditable(false);
 
       setSnackbarMessage("Form updated successfully!");
@@ -439,7 +408,7 @@ const handleInputChange = (
   };
 
   const handleEditClick = () => {
-    setIsEditMode(true);
+    setIsEditMode(false);
     setIsEditable(true);
   };
 
@@ -455,7 +424,7 @@ const handleInputChange = (
     const isDateField = dateFields.includes(key);
 
     const handleFieldClick = () => {
-      if (!isEditMode) {
+      if (isEditMode) {
         setSnackbarMessage('Please click "Edit" to make changes');
         setSnackbarSeverity("warning");
         setSnackbarOpen(true);
@@ -491,8 +460,8 @@ const handleInputChange = (
 
           InputProps={{
             sx: {
-              fontSize: "20",
-              color: isEditMode ? "black" : "red",
+              fontSize: "15px",
+              color: isEditMode ? "black" : "black",
             },
 
           }}
@@ -536,7 +505,7 @@ const handleInputChange = (
           shrink: true,
           sx: {
             fontSize: "18px",
-            color: isEditMode ? "#d45c04" : "#f6f1b2",
+            color: isEditMode ? "black" : "#d45c04",
             "&.Mui-disabled": {
               color: "#002060",
             },
@@ -545,7 +514,7 @@ const handleInputChange = (
         InputProps={{
           sx: {
             fontSize: "14px",
-            color: isEditMode ? "#000000" : "#f6f1b2",
+            color: isEditMode ? "#000000" : "#black",
           },
         }}
       />
@@ -566,7 +535,7 @@ const handleInputChange = (
             sm: "repeat(2, 1fr)",
             md: "repeat(3, 1fr)",
           },
-          backgroundColor: isEditMode ? "#e6f2ff" : "#f7f6ea", // white in edit mode, light blue after save
+          backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff",
           gap: 2,
           borderRadius: 2,
           p: 2,
@@ -601,7 +570,7 @@ const handleInputChange = (
       <Card
         sx={{
           mt: 4,
-          backgroundColor: isEditMode ? "#e6f2ff" : "#f7f6ea",// white in edit mode, light blue after save
+          backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff",// white in edit mode, light blue after save
           borderRadius: 3,
           p: 2,
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
@@ -616,7 +585,7 @@ const handleInputChange = (
           sx={{
             px: 3,
             py: 2,
-            backgroundColor: isEditMode ? "#e6f2ff" : "#f7f6ea", // keep consistent with Card
+          backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff",// white in edit mode, light blue after save
             transition: "background-color 0.3s ease",
           }}
         >
@@ -714,9 +683,9 @@ const handleInputChange = (
 
           <Button
             variant="contained"
-            startIcon={isEditMode ? <SaveIcon /> : <EditIcon />}
+            startIcon={isEditMode ? <EditIcon /> : < SaveIcon/>}
             color={isEditMode ? "success" : "primary"}
-            onClick={isEditMode ? handleSave : handleEditClick}
+            onClick={isEditMode ? handleEditClick : handleSave}
             sx={{
               backgroundColor: "#005b06",
               textTransform: "none",
@@ -724,7 +693,7 @@ const handleInputChange = (
               "&:hover": { backgroundColor: "#001540" },
             }}
           >
-            {isEditMode ? "Save" : "Edit"}
+            {isEditMode ? "Edit" : "Save"}
           </Button>
         </Box>
       </Tabs>
