@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, Typography, useTheme } from '@mui/material';
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, Typography, useTheme } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -9,11 +9,11 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   ReferenceLine,
-} from 'recharts';
+} from "recharts";
 
 const formatYAxis = (value: any) => {
   const absValue = Math.abs(value);
-  let formatted = '';
+  let formatted = "";
 
   if (absValue >= 1_000_000) {
     formatted = `${(absValue / 1_000_000).toFixed(1)}M`;
@@ -39,57 +39,75 @@ const SummaryGapGraph = () => {
 
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem('access_token');
+        const token = localStorage.getItem("access_token");
 
         const response = await fetch(`${apiUrl}/api/gap_analysis/`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(payload),
         });
 
         const result = await response.json();
-        const yearData = result?.['2025'];
+        const yearData = result?.["2025"];
 
         // FO Summary Data
-        const foSummary = yearData?.['FO']?.['Summary'];
+        const foSummary = yearData?.["FO"]?.["Summary"];
         if (foSummary) {
           const barData: any = [
-            { name: 'Model Allocation Gap', value: foSummary['Model Allocation Gap'] },
-            { name: 'Model AM Gap', value: foSummary['AM Gap'] },
             {
-              name: 'Exit Gap Sum',
-              value: (foSummary['Monashee Exit Gap'] || 0) + (foSummary['AM Exit Gap'] || 0),
+              name: "Model Allocation Gap",
+              value: foSummary["Model Allocation Gap"],
+            },
+            { name: "Model AM Gap", value: foSummary["AM Gap"] },
+            {
+              name: "Exit Gap Sum",
+              value:
+                (foSummary["Monashee Exit Gap"] || 0) +
+                (foSummary["AM Exit Gap"] || 0),
             },
             {
-              name: 'Total Gap',
-              value: (foSummary['Model Return 1% Allocation'] || 0) + (foSummary['Total Return'] || 0),
+              name: "Total Gap",
+              value:
+                (foSummary["Allocation Return"] || 0) +
+                (foSummary["AM Return"] || 0) -
+                (foSummary["Model Return 1% Allocation"] || 0) -
+                (foSummary["Model AM Return"] || 0),
             },
           ];
           setFoData(barData);
         }
 
         // IPO Summary Data
-        const ipoSummary = yearData?.['IPO']?.['Summary'];
+        const ipoSummary = yearData?.["IPO"]?.["Summary"];
         if (ipoSummary) {
           const barData: any = [
-            { name: 'Model Allocation Gap', value: ipoSummary['Model Allocation Gap'] },
-            { name: 'Model AM Gap', value: ipoSummary['AM Gap'] },
             {
-              name: 'Exit Gap Sum',
-              value: (ipoSummary['Monashee Exit Gap'] || 0) + (ipoSummary['AM Exit Gap'] || 0),
+              name: "Model Allocation Gap",
+              value: ipoSummary["Model Allocation Gap"],
+            },
+            { name: "Model AM Gap", value: ipoSummary["AM Gap"] },
+            {
+              name: "Exit Gap Sum",
+              value:
+                (ipoSummary["Monashee Exit Gap"] || 0) +
+                (ipoSummary["AM Exit Gap"] || 0),
             },
             {
-              name: 'Total Gap',
-              value: (ipoSummary['Model Return 1% Allocation'] || 0) + (ipoSummary['Total Return'] || 0),
+              name: "Total Gap",
+              value:
+                (ipoSummary["Allocation Return"] || 0) +
+                (ipoSummary["AM Return"] || 0) -
+                (ipoSummary["Model Return 1% Allocation"] || 0) -
+                (ipoSummary["Model AM Return"] || 0),
             },
           ];
           setIpoData(barData);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -97,7 +115,7 @@ const SummaryGapGraph = () => {
   }, []);
 
   const renderChart = (title: string, data: any[]) => (
-    <Card elevation={3} sx={{ width: '48%', height: 350, p: 2 }}>
+    <Card elevation={3} sx={{ width: "48%", height: 350, p: 2 }}>
       <CardContent>
         <Typography
           variant="h6"
@@ -125,14 +143,14 @@ const SummaryGapGraph = () => {
   return (
     <div
       style={{
-        display: 'flex',
-        justifyContent: 'space-between',
+        display: "flex",
+        justifyContent: "space-between",
         gap: 16,
-        width: '100%',
+        width: "100%",
       }}
     >
-      {renderChart('FO Summary Gap Metrics - 2025', foData)}
-      {renderChart('IPO Summary Gap Metrics - 2025', ipoData)}
+      {renderChart("FO Summary Gap Metrics - 2025", foData)}
+      {renderChart("IPO Summary Gap Metrics - 2025", ipoData)}
     </div>
   );
 };
