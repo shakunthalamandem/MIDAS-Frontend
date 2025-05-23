@@ -48,6 +48,7 @@ import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 import DealformInformation from "../Components/NewDealForm/DealformInformation";
 import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
+import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
 
 
 
@@ -112,7 +113,7 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path="/equity/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} />
+        <Route path="/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} />
         <Route path="/equity/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/equity/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
         <Route path="/equity/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
@@ -146,6 +147,10 @@ const AppRouters: React.FC = () => {
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+
+
+        <Route path="/equity/dashboard" element={<AuthGuard><LandingPageMain/></AuthGuard>} />
+
 
 
         {/* <Route path="/downloads" element={<AuthGuard><DownloadDeals/></AuthGuard>} /> */}

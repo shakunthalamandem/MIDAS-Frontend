@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AppBar, Toolbar, Button, Box, Typography, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Button, Box, Typography, IconButton, Menu, MenuItem, Avatar, Tooltip } from "@mui/material";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
@@ -15,7 +15,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [selectedTab, setSelectedTab] = useState<string>(() => {
     return localStorage.getItem("selectedTab") || "Equity"; // Retrieve tab from localStorage or default to "Equity"
   });
@@ -26,6 +26,8 @@ const NavbarMain: React.FC = () => {
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // For dropdown menu
+  const open = Boolean(anchorEl);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -40,18 +42,18 @@ const NavbarMain: React.FC = () => {
     setSelectedTab(tabName);
     localStorage.setItem("selectedTab", tabName); // Save to localStorage immediately
     if (tabName === "Equity") {
-      navigate("/equity/capital-markets");
+      navigate("/equity/dashboard");
     } else if (tabName === "Converts") {
       navigate("/converts/capital-markets");
     } else if (tabName === "High Yield") {
       navigate("/highyield/capital-markets");
-    } else if (tabName === "Macro") {
-      navigate("/macro/sector");
+    } else if (tabName === "Portfolio Attribution") {
+      navigate("/portfolio-attribution");
     }
   };
 
   const handleLogoutClick = () => {
-    setShowLogout(true);
+    setShowLogout(true); // Show the logout confirmation dialog
   };
 
   const handleConfirmLogout = async () => {
@@ -82,13 +84,27 @@ const NavbarMain: React.FC = () => {
   };
 
   const handleCancelLogout = () => {
-    setShowLogout(false);
+    setShowLogout(false); // Cancel logout confirmation
   };
 
   const isLoggedIn = !!localStorage.getItem("access_token");
 
   const handleSidebarToggle = () => {
     setDrawerOpen(!drawerOpen);
+  };
+
+  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget); // Open the dropdown
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null); // Close the dropdown
+  };
+
+  // Update logout to trigger handleLogoutClick when clicked
+  const handleLogout = () => {
+    handleLogoutClick(); // Call the function that shows the logout confirmation
+    handleMenuClose(); // Close the dropdown menu
   };
 
   return (
@@ -157,7 +173,7 @@ const NavbarMain: React.FC = () => {
           </Link>
 
           <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }} onClick={handleSidebarToggle}>
-            <Typography variant="body1" fontWeight="bold">
+            <Typography variant="body1" fontWeight="bold" padding={"0 10px"}>
               {selectedTab}
             </Typography>
           </Button>
@@ -165,7 +181,7 @@ const NavbarMain: React.FC = () => {
           {selectedTab === "Equity" && <EquityNavbar />}
           {selectedTab === "Converts" && <ConvertsNavbar />}
           {selectedTab === "High Yield" && <HighYieldNavbar />}
-          {selectedTab === "Macro" && <MacroNavbar />}
+          {selectedTab === "Portfolio Attribution" && <MacroNavbar />}
 
           {isLoggedIn && isSuperUser && (
             <Button sx={{ color: "black", fontWeight: "bold", marginRight: "20px" }} onClick={() => setShowLogs(true)}>
@@ -174,11 +190,60 @@ const NavbarMain: React.FC = () => {
           )}
 
           {isLoggedIn ? (
-            <Button sx={{ color: "#FFFFFF", backgroundColor: "#bb4401", fontWeight: "bold" }} onClick={handleLogoutClick}>
-              Logout
-            </Button>
+            <>
+              <Tooltip title="Open Profile Menu">
+                <IconButton onClick={handleProfileClick} sx={{ p: 0 }}>
+                  <Avatar sx={{ bgcolor: "#bb4401" }} >
+                    {user?.charAt(0).toUpperCase() || "P"}
+                  </Avatar>
+                </IconButton>
+              </Tooltip>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleMenuClose}
+                PaperProps={{
+                  elevation: 3,
+                  sx: {
+                    mt: 1.5,
+                    minWidth: 150,
+                  },
+                }}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                {/* Make the Logout items look like buttons */}
+
+                <MenuItem disableRipple>
+                  <Box
+                    onClick={handleLogout}
+                    sx={{
+                      width: "100%",
+                      color: "#002060",
+                      padding: "4px 0px",
+                      borderRadius: "3px",
+                      textAlign: "center",
+                      '&:hover': {
+                        backgroundColor: "#bb4401",
+                        color: "#FFFFFF",
+                      }
+                    }}
+                  >
+                    Logout
+                  </Box>
+                </MenuItem>
+
+              </Menu>
+            </>
           ) : (
-            <Button sx={{ color: "#FFFFFF", backgroundColor: "#002060", fontWeight: "bold" }} onClick={() => navigate("/login")}>
+            <Button sx={{ color: "#FFFFFF", backgroundColor: "#002060", fontWeight: "bold", paddingX: "18px" }} onClick={() => navigate("/login")}>
               Login
             </Button>
           )}
