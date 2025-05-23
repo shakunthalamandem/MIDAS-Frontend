@@ -66,7 +66,7 @@ export default function SectorwiseTable() {
 
   // Fetch data from API
   useEffect(() => {
-    fetch("http://192.168.1.38:9000/api/zxx/")
+    fetch("http://192.168.1.69:9000/api/zxx/")
       .then((res) => res.json())
       .then((data: ApiResponse) => setSectorData(data.Sectorwise))
       .catch(console.error);
