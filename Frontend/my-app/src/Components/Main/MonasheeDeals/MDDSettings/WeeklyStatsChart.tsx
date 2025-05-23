@@ -229,9 +229,9 @@ const getMondayOfWeek = (week: number, year: number): string => {
 
               {chartType === "count" && (
                 <>
-                  <Line  dataKey="2023" stroke="#ff7300" name="2023" />
+                  <Line  dataKey="2023" stroke="#ff7300" name="2023"  />
                   <Line  dataKey="2024" stroke="#770500" name="2024" />
-                  <Bar dataKey="2025" barSize={10} fill="#247B5B" name="2025" />
+                  <Bar dataKey="2025" barSize={10} fill="#247B5B" name="2025"   cursor="pointer" />
                   <Line  dataKey="Average" stroke="#002060" name="Avg(2022, 2023, 2024)" strokeWidth={2} />
                 </>
               )}
