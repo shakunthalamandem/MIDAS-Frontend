@@ -47,7 +47,7 @@ const HYsppiechart = ({ selectedFilters }: { selectedFilters: SelectedFilters })
       } catch (error) {
         if (error instanceof Error) {
           setError(error);
-          navigate("/error");  
+          // navigate("/error");  
 
 
         }

@@ -32,7 +32,7 @@ const DealFormSearch: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching tickers:", error);
-        navigate("/error");  
+        // navigate("/error");  
       }
     };
 

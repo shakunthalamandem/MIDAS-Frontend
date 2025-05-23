@@ -95,7 +95,7 @@ const RegionPieChart: React.FC<RegionPieChartProps> = ({
     } catch (error) {
       console.error("Error fetching years:", error);
       setError("Failed to fetch years. Please try again later.");
-      navigate("/error");  
+      // navigate("/error");  
 
     }
   }, []);
@@ -130,7 +130,7 @@ const token = localStorage.getItem("access_token");
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
-      navigate("/error");  
+      // navigate("/error");  
 
     }
   }, [startYear, endYear, type, sector, opportunity_value_on_abs_basis, opportunity_value_ex, deal_value, deal_count]);

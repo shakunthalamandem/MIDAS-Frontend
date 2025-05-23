@@ -53,7 +53,7 @@ const LeadBankFilter: React.FC<LeadBankFilterProps> = ({ values, setFieldValue }
         }
       } catch (error) {
         console.error("Error fetching selected_bank options:", error);
-        navigate("/error");  
+        // navigate("/error");  
 
       } finally {
         setLoading(false);

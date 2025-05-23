@@ -26,7 +26,7 @@ const DetailedGapData: React.FC = () => {
     selectedFilters = filters;
   } catch (error) {
     console.error("Invalid filters format", error);
-    navigate("/error");  
+    // navigate("/error");  
 
   }
 
@@ -52,7 +52,7 @@ const DetailedGapData: React.FC = () => {
         const result = await response.json();
         setData(result.data || []);
       } catch (error) {
-        navigate("/error");  
+        // navigate("/error");  
 
         setError(error instanceof Error ? error.message : "Unknown error");
       } finally {

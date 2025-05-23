@@ -39,7 +39,7 @@ const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
         setFiltersData(data || []);
       } catch (error) {
         console.error("Error loading filters:", error);
-        navigate("/error");  
+        // navigate("/error");  
 
       }
     };

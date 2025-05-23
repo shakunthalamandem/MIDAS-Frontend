@@ -57,7 +57,7 @@ const ConvertsYearlyBased: React.FC = () => {
         setSectorOptions(Array.isArray(data.sector) ? data.sector : []);
       } catch (error) {
         console.error("Error fetching filter options:", error);
-        navigate("/error");  // Redirect to error page
+        // navigate("/error");  // Redirect to error page
       }
     };
 
@@ -91,7 +91,7 @@ const ConvertsYearlyBased: React.FC = () => {
         setResponseData(response.data && Object.keys(response.data).length ? response.data : null);
         setNoDataPopupOpen(!response.data || Object.keys(response.data).length === 0);
       } catch (error) {
-        navigate("/error");  
+        // navigate("/error");  
 
       } finally {
         setLoading(false); // Stop loading

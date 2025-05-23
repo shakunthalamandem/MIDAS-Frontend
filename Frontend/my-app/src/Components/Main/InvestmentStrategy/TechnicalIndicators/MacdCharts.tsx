@@ -75,7 +75,7 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
         setData(transformedData);
       } catch (error) {
         console.error('Error fetching data:', error);
-        navigate("/error");  
+        // navigate("/error");  
 
       }
     };

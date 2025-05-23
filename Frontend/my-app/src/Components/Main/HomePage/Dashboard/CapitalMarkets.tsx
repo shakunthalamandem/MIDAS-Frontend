@@ -87,7 +87,7 @@ useEffect(() => {
     } catch (error) {
       console.error("Error fetching search results:", error);
       setResults([]);
-      navigate("/error");  
+      // navigate("/error");  
 
     } finally {
       setLoading(false);

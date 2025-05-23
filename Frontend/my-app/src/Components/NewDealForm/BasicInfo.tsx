@@ -173,7 +173,7 @@ const tableRight1: Row[] = [
 
 const tableLeft2: Row[] = [
   {
-    label: "Ltm Dividend Yield (%)",
+    label: "LTM Dividend Yield (%)",
     key: "ltm_dividend_yield",
     type: "number",
   },
@@ -226,7 +226,7 @@ const tableLeft2: Row[] = [
 ];
 
 const tableRight2: Row[] = [
-  { label: "Ltm Fcf Yield (%)", key: "ltm_fcf_yield", type: "number" },
+  { label: "LTM FCF Yield (%)", key: "ltm_fcf_yield", type: "number" },
   {
     label: "3M ADTV  ($ Million)",
     key: "three_month_adtv_local_usd",
@@ -690,6 +690,7 @@ const BasicInfo: React.FC = () => {
                       type="date"
                       value={formData[row.key as keyof typeof formData]}
                       onChange={handleChange}
+                      required={row.key === "pricing_date"}
                       InputLabelProps={{
                         shrink: true,
                         sx: { fontSize: "18px", color: "#d45c04" },
@@ -715,6 +716,9 @@ const BasicInfo: React.FC = () => {
                       value={formData[row.key as keyof typeof formData]}
                       onChange={handleChange}
                       type={row.type}
+                      required={
+                        row.key === "ticker"
+                      }
                       InputLabelProps={{
                         sx: { fontSize: "14px", color: "#d45c04" },
                       }}

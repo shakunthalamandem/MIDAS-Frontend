@@ -37,7 +37,7 @@ const WeeklyFiltersData: React.FC<WeeklyFiltersDataProps> = ({ apiName }) => {
         setFiltersData(data || []);
       } catch (error) {
         console.error("Error loading filters:", error);
-        navigate("/error");  
+        // navigate("/error");  
       }
     };
 
