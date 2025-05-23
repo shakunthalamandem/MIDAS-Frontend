@@ -1,8 +1,13 @@
 import React from 'react'
+import SummaryGapGraph from './SummaryGapGrapgh'
 
 const MDDDashboardMain = () => {
   return (
-    <div>MDDDashboardMain</div>
+    
+    <>
+
+    <SummaryGapGraph />
+    </>
   )
 }
 
