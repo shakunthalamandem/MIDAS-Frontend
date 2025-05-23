@@ -73,6 +73,15 @@ const formatNumber = (value: number) => {
 const WeeklyStatsChart: React.FC = () => {
   const [data, setData] = useState<APIResponse | null>(null);
   const navigate = useNavigate(); 
+  const [selectedWeek, setSelectedWeek] = useState<string | null>(null);
+
+
+
+  const handleChartClick = (e: any) => {
+  if (e && e.activeLabel) {
+    setSelectedWeek(e.activeLabel); // this is the "name" key from chartData
+  }
+};
 
   const [chartType, setChartType] = useState<
     | "count"
@@ -107,7 +116,7 @@ const getMondayOfWeek = (week: number, year: number): string => {
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
-        // navigate("/error");  
+        navigate("/error");  
 
       }
     };
@@ -188,7 +197,7 @@ const getMondayOfWeek = (week: number, year: number): string => {
           </Typography>
 
           <ResponsiveContainer width="100%" height={400}>
-            <ComposedChart data={chartData}>
+              <ComposedChart data={chartData} onClick={handleChartClick}>
               <XAxis dataKey="name" />
               <YAxis tickFormatter={formatNumber} />
 <Tooltip
@@ -366,7 +375,7 @@ const getMondayOfWeek = (week: number, year: number): string => {
           </Box>
         </CardContent>
       </Card>
-      <TwoWeekDealData />
+      <TwoWeekDealData selectedWeek={selectedWeek} />
       <GapDealDeatilsTable />
     </Container>
   );

@@ -16,7 +16,13 @@ import {
 import React, { useEffect, useState } from "react";
 import WeeklyDealTable from "./WeeklyDealTable";
 
-const TwoWeekDealData: React.FC = () => {
+
+interface TwoWeekDealDataProps {
+  selectedWeek: string | null;
+}
+
+
+const TwoWeekDealData: React.FC<TwoWeekDealDataProps> = ({ selectedWeek }) => {
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,10 +37,27 @@ const TwoWeekDealData: React.FC = () => {
   const [appliedDealTypes, setAppliedDealTypes] = useState<string[]>([]);
   const [appliedWeeks, setAppliedWeeks] = useState<number[]>([]); 
 
-  useEffect(() => {
-    fetchFilters();
-    fetchData();
-  }, [appliedRegions, appliedDealTypes, appliedWeeks]);
+useEffect(() => {
+  fetchFilters();
+}, []);
+
+useEffect(() => {
+  if (selectedWeek) {
+  const weekNumber = parseInt(selectedWeek.replace("W", ""));
+  setSelectedRegions([]);
+  setSelectedDealTypes([]);
+  setSelectedWeeks([weekNumber]);
+  setAppliedRegions([]);
+  setAppliedDealTypes([]);
+  setAppliedWeeks([weekNumber]);
+}
+
+}, [selectedWeek]);
+
+useEffect(() => {
+  fetchData();
+}, [appliedRegions, appliedDealTypes, appliedWeeks]);
+
 
   const fetchFilters = async () => {
     try {
