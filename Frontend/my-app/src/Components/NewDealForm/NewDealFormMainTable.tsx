@@ -270,7 +270,7 @@ const handleInputChange = (
     section: string,
     key: string
   ) => {
-    if (!isEditMode) {
+    if (isEditMode) {
       setSnackbarMessage('Please click "Edit" to make changes');
       setSnackbarSeverity("warning");
       setSnackbarOpen(true);
