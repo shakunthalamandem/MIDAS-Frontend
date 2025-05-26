@@ -119,7 +119,7 @@ const NumerSummary: React.FC = () => {
 const metrics = Object.keys(metricNames);
 
   return (
-    <Grid container spacing={2} style={{ padding: 20 }}>
+    <Grid container spacing={2} >
         <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold"}}>
   Deal Flow – IPO and FO (2023 to 2025) by Quarter
 </Typography>

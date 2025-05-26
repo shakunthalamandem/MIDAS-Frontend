@@ -111,7 +111,7 @@ export default function SectorwiseTable() {
   });
 
   return (
-    <Box sx={{ width: "60%", margin: "auto", mt: 4 }}>
+    <Box>
       <TableContainer component={Paper}>
         <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold"}}>
           Sectorwise SkewTable for 2025(Q1) with Top 3 Highlights

@@ -8,7 +8,7 @@ import NumerSummary from './NumerSummary';
 const EquityDashboard = () => {
   return (
     <>
-      <Grid item xs={9} p={2} sx={{ overflowY: 'hidden' }}>
+      <Grid item  p={2} >
         <Box 
           sx={{ 
             display: 'flex', 
@@ -20,10 +20,10 @@ const EquityDashboard = () => {
             overflowX: 'auto'      
           }}
         >
-          <Box sx={{ flex: '1 1 50%', minWidth: 0 }}>
+          <Box >
             <RegionWiseTable />
           </Box>
-          <Box sx={{ flex: '1 1 50%', minWidth: 0 }}>
+          <Box >
             <QuarterlyDealsTable />
           </Box>
         </Box>

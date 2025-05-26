@@ -137,7 +137,7 @@ const processData = (yearwise: { [key: string]: QuarterData }) => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Box sx={{ width: '50%', height: 'auto', float: 'left' }}>
+    <Box >
       <TableContainer component={Paper}>
                 <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold"}}>
  Skew Table - IPO and FO Deals from 2023 to 2025 for Q1</Typography>
