@@ -21,7 +21,7 @@ const EquityDashboard = () => {
           }}
         >
           <Box >
-            <RegionWiseTable />
+            <NumerSummary />
           </Box>
           <Box >
             <QuarterlyDealsTable />
@@ -29,8 +29,8 @@ const EquityDashboard = () => {
         </Box>
 
         <Box sx={{ padding: 2 }}>
-          <NumerSummary />
         </Box>
+            <RegionWiseTable />
 
         <Box sx={{ padding: 2 }}>
           <SectorwiseTable />
