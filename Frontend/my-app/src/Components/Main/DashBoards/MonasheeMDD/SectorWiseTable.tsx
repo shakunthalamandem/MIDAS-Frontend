@@ -7,10 +7,10 @@ import {
     TableHead,
     TableRow,
     Paper,
-    Typography,
     CircularProgress,
-    Grid,
     Box,
+    Typography,
+    Grid,
 } from "@mui/material";
 
 interface SectorData {
@@ -74,7 +74,7 @@ const SectorWiseTable: React.FC = () => {
     }, [apiUrl, token]);
 
     const formatValue = (value?: number): string => {
-        if (value === undefined || value === null || isNaN(value)) return "N/A";
+        if (value === undefined || value === null || isNaN(value)) return "-";
 
         const absValue = Math.abs(value);
         const sign = value < 0 ? "-" : "";
@@ -89,8 +89,31 @@ const SectorWiseTable: React.FC = () => {
         return `${sign}$${absValue.toFixed(2)}`;
     };
 
-    const renderTable = (data: SectorData, title: string) => {
-        const entries = Object.entries(data);
+    const addUtilitiesRowIfMissing = (data: SectorData | null): SectorData | null => {
+        if (!data) return data;
+
+        if (!data["Utilities"]) {
+            return {
+                ...data,
+                Utilities: {
+                    "Allocation Return": NaN,
+                    "AM Return": NaN,
+                    "Model Return 1% Allocation": NaN,
+                    "Model AM Return": NaN,
+                },
+            };
+        }
+        return data;
+    };
+
+    const renderTable = (data: SectorData | null, title: string) => {
+        if (!data) return null;
+
+        const dataWithUtilities = title === "IPO Deals" ? addUtilitiesRowIfMissing(data) : data;
+
+        if (!dataWithUtilities) return null;
+
+        const entries = Object.entries(dataWithUtilities);
         const summaryEntry = entries.find(([key]) => key === "Summary");
         const nonSummaryEntries = entries.filter(([key]) => key !== "Summary");
 
@@ -100,76 +123,134 @@ const SectorWiseTable: React.FC = () => {
         ];
 
         return (
-            <Box>
-                <Typography variant="h6" sx={{ mb: 2 }}>
-                    {title}
-                </Typography>
-                <TableContainer component={Paper}>
-                    <Table size="small">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: "bold" }}>Sector</TableCell>
-                                <TableCell sx={{ fontWeight: "bold", minWidth: 150 }}>
-                                    Monashee Actual Total PnL (Gross)
+            <>
+                <TableHead>
+                    <TableRow>
+                        <TableCell
+                            colSpan={4}
+                            sx={{
+                                backgroundColor: "#002060",
+                                color: "#fff",
+                                fontWeight: "bold",
+                                textAlign: "center",
+                                fontSize: "1rem",
+                            }}
+                        >
+                            {title}
+                        </TableCell>
+                    </TableRow>
+                </TableHead>
+
+                <TableHead>
+                    <TableRow sx={{ backgroundColor: "#466675" }}>
+                        <TableCell
+                            sx={{ color: "#fff", fontWeight: "bold", borderRight: "1px solid #ccc" }}
+                        >
+                            Sector
+                        </TableCell>
+                        <TableCell
+                            sx={{ color: "#fff", fontWeight: "bold", borderRight: "1px solid #ccc" }}
+                        >
+                            Monashee Actual Total PnL (Gross)
+                        </TableCell>
+                        <TableCell
+                            sx={{ color: "#fff", fontWeight: "bold", borderRight: "1px solid #ccc" }}
+                        >
+                            Model Actual Total PnL (Gross)
+                        </TableCell>
+                        <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Total Gap</TableCell>
+                    </TableRow>
+                </TableHead>
+
+                <TableBody>
+                    {allEntries.map(([sector, values]) => {
+                        const isSummary = sector === "Summary";
+
+                        const monasheeTotal =
+                            isNaN(values["Allocation Return"] || NaN) || isNaN(values["AM Return"] || NaN)
+                                ? NaN
+                                : (values["Allocation Return"] || 0) + (values["AM Return"] || 0);
+
+                        const modelTotal =
+                            isNaN(values["Model Return 1% Allocation"] || NaN) ||
+                            isNaN(values["Model AM Return"] || NaN)
+                                ? NaN
+                                : (values["Model Return 1% Allocation"] || 0) +
+                                  (values["Model AM Return"] || 0);
+
+                        const gap = isNaN(monasheeTotal) || isNaN(modelTotal) ? NaN : monasheeTotal - modelTotal;
+
+                        return (
+                            <TableRow
+                                key={sector}
+                                sx={{
+                                    backgroundColor: isSummary ? "#7bcf60" : "inherit",
+                                }}
+                            >
+                                <TableCell
+                                    sx={{
+                                        fontWeight: isSummary ? "bold" : "normal",
+                                        borderRight: "1px solid #ccc",
+                                    }}
+                                >
+                                    {sector}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: "bold", minWidth: 150 }}>
-                                    Model Actual Total PnL (Gross)
+                                <TableCell
+                                    sx={{
+                                        fontWeight: isSummary ? "bold" : "normal",
+                                        borderRight: "1px solid #ccc",
+                                    }}
+                                >
+                                    {isNaN(monasheeTotal) ? "-" : formatValue(monasheeTotal)}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: "bold", minWidth: 100 }}>
-                                    Total Gap
+                                <TableCell
+                                    sx={{
+                                        fontWeight: isSummary ? "bold" : "normal",
+                                        borderRight: "1px solid #ccc",
+                                    }}
+                                >
+                                    {isNaN(modelTotal) ? "-" : formatValue(modelTotal)}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: isSummary ? "bold" : "normal" }}>
+                                    {isNaN(gap) ? "-" : formatValue(gap)}
                                 </TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {allEntries.map(([sector, values]) => {
-                                const isSummary = sector === "Summary";
-                                const monasheeTotal =
-                                    (values["Allocation Return"] || 0) + (values["AM Return"] || 0);
-                                const modelTotal =
-                                    (values["Model Return 1% Allocation"] || 0) +
-                                    (values["Model AM Return"] || 0);
-                                const gap = monasheeTotal - modelTotal;
-
-                                return (
-                                    <TableRow key={sector}>
-                                        <TableCell sx={{ fontWeight: isSummary ? "bold" : "normal" }}>
-                                            {sector}
-                                        </TableCell>
-                                        <TableCell sx={{ fontWeight: isSummary ? "bold" : "normal" }}>
-                                            {formatValue(monasheeTotal)}
-                                        </TableCell>
-                                        <TableCell sx={{ fontWeight: isSummary ? "bold" : "normal" }}>
-                                            {formatValue(modelTotal)}
-                                        </TableCell>
-                                        <TableCell
-                                            sx={{
-                                                bgcolor: !isSummary ? "#f8f9cd" : "transparent",
-                                                fontWeight: isSummary ? "bold" : "normal",
-                                            }}
-                                        >
-                                            {formatValue(gap)}
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
+                        );
+                    })}
+                </TableBody>
+            </>
         );
     };
 
     if (loading) return <CircularProgress />;
 
     return (
-        <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-                {foData && renderTable(foData, "FO Deals")}
+        <Box>
+            <Typography
+                variant="h6"
+                sx={{
+                    mb: 2,
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    color: "#002060",
+                }}
+            >
+                Sector Wise IPO and FO Data for 2025
+            </Typography>
+
+            <Grid container spacing={0}>
+                <Grid item xs={12} md={6}>
+                    <TableContainer component={Paper}>
+                        <Table size="small">{renderTable(foData, "FO Deals")}</Table>
+                    </TableContainer>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                    <TableContainer component={Paper}>
+                        <Table size="small">{renderTable(ipoData, "IPO Deals")}</Table>
+                    </TableContainer>
+                </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-                {ipoData && renderTable(ipoData, "IPO Deals")}
-            </Grid>
-        </Grid>
+        </Box>
     );
 };
 
