@@ -67,7 +67,7 @@ const SummaryGapGraph = () => {
         if (foSummary) {
           const barData: any = [
             {
-              name: "Model Allocation Gap",
+              name: " Model Allocation Gap",
               value: foSummary["Model Allocation Gap"],
             },
             { name: "Model AM Gap", value: foSummary["AM Gap"] },
@@ -94,7 +94,7 @@ const SummaryGapGraph = () => {
         if (ipoSummary) {
           const barData: any = [
             {
-              name: "Model Allocation Gap",
+              name: "Model Allocation Gap ",
               value: ipoSummary["Model Allocation Gap"],
             },
             { name: "Model AM Gap", value: ipoSummary["AM Gap"] },
@@ -140,8 +140,8 @@ const SummaryGapGraph = () => {
           {title}
         </Typography>
         <ResponsiveContainer width="100%" height={280} style={{ cursor: "pointer" }}>
-          <BarChart data={data} margin={{ left: 20 }}>
-            <XAxis dataKey="name" />
+          <BarChart data={data} margin={{ left: 10 }}>
+            <XAxis dataKey="name" style={{fontSize:'12px',color:'red'}} />
             <YAxis tickFormatter={formatYAxis} />
             <Tooltip formatter={(value) => formatYAxis(value)} />
             <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
