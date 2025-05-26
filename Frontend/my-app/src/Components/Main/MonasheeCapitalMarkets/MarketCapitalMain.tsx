@@ -16,6 +16,7 @@ import SectorWiseDeals from "./NavigationTabs/SectorWiseDeals";
 import YearlySectorChart from "./YearlySectorChart";
 import RegionWiseChart from "./RegionWiseChart";
 import NoDataPopup from "../../../Pages/NoDataPopup";
+
 interface MarketCapitalMainProps {
   selectedFilters: Record<string, string | number | (string | number)[]>; 
   handleReset: () => void;
