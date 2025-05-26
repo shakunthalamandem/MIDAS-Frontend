@@ -45,14 +45,20 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
   data = {},
   selectedFilters = {},
 }) => {
-  const handleClick = (year: number) => {
-    const filters = { ...selectedFilters, years: [year] };
 
-    const url = new URL(window.location.origin + "/equity/detailed_gap_analysis");
-    url.searchParams.set("filters", JSON.stringify(filters));
 
-    window.open(url.toString(), "_blank");
-  };
+
+
+const handleClick = (year: number) => {
+  const filters = { ...selectedFilters, years: [year] };
+
+  // Save filters to sessionStorage
+  sessionStorage.setItem("gapAnalysisFilters", JSON.stringify(filters));
+
+  // Open new tab without query params
+  window.open("/equity/detailed_gap_analysis", "_blank");
+};
+
 
   const sortedYears = Object.keys(data).sort(
     (a, b) => parseInt(b) - parseInt(a)
