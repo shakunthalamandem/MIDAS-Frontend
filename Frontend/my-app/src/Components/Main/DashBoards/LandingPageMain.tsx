@@ -7,7 +7,7 @@ import MDDDashboardMain from './MonasheeMDD/MDDDashboardMain';
 
 const LandingPageMain: React.FC = () => {
   return (
-    <Grid container height="100vh">
+    <Grid container >
       {/* Left side: 75% */}
       <Grid item xs={9} p={2} sx={{ overflowY: 'auto' }}>
         <Box display="flex" flexDirection="column" gap={2}>
