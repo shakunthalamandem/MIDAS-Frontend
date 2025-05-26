@@ -100,7 +100,7 @@ const RegionWiseTable = () => {
     value === max ? { fontWeight: 'bold', backgroundColor: '#ffd9b3' } : {};
 
   return (
-    <Box sx={{ width: '60%', margin: 'auto', mt: 4 }}>
+    <Box >
       <TableContainer component={Paper}>
         <Typography variant="h6" sx={{ p: 2, fontWeight: "bold" }}>
           RegionWise SkewTable - IPO and FO Deals for 2025 (Q1) with Top1 Highlights
