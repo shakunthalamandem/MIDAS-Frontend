@@ -10,6 +10,8 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
+import { useNavigate } from "react-router-dom";
+
 
 const formatYAxis = (value: any) => {
   const absValue = Math.abs(value);
@@ -30,6 +32,13 @@ const SummaryGapGraph = () => {
   const [foData, setFoData] = useState([]);
   const [ipoData, setIpoData] = useState([]);
   const theme = useTheme();
+  const navigate = useNavigate();
+
+
+  
+  const handleNavigationClick = () => {
+    navigate("/equity/monashee-deals/gap-analysis");
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,8 +124,10 @@ const SummaryGapGraph = () => {
   }, []);
 
   const renderChart = (title: string, data: any[]) => (
-    <Card elevation={3} sx={{ width: "48%", height: 350, p: 2 }}>
-      <CardContent>
+    <Card elevation={3} sx={{ width: "48%", height: 350, p: 2 ,        cursor: "pointer",
+}}       onClick={handleNavigationClick}
+>
+      <CardContent sx={{  cursor: "pointer"}}>
         <Typography
           variant="h6"
           component="div"
@@ -124,16 +135,17 @@ const SummaryGapGraph = () => {
           align="center"
           fontWeight="bold"
           mb={2}
+          
         >
           {title}
         </Typography>
-        <ResponsiveContainer width="100%" height={280}>
+        <ResponsiveContainer width="100%" height={280} style={{ cursor: "pointer" }}>
           <BarChart data={data} margin={{ left: 20 }}>
             <XAxis dataKey="name" />
             <YAxis tickFormatter={formatYAxis} />
             <Tooltip formatter={(value) => formatYAxis(value)} />
             <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
-            <Bar dataKey="value" fill="#e26d3e" barSize={20} />
+            <Bar dataKey="value" fill="#e26d3e" barSize={20}   cursor="pointer" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
