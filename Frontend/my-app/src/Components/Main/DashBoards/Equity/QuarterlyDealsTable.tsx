@@ -154,16 +154,46 @@ const QuarterlyDealsTable = () => {
   return (
     <Box>
       <TableContainer component={Paper}>
-        <Typography
-          variant="body1"
-          sx={{ p: 2, fontWeight: "bold", color: "#054511" }}
+        <Box
+          sx={{
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            width: "100%",
+          }}
         >
-          Skew Table - IPO and FO Deals from 2023 to 2025 for Q1
-        </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              display: "inline-block",
+              animation: "scroll-left 15s linear infinite",
+              fontWeight: "bold",
+              color: "#054511",
+              p: 2,
+            }}
+          >
+            Skew Table - IPO and FO Deals from 2023 to 2025 for Q1
+          </Typography>
+
+          <style>
+            {`
+      @keyframes scroll-left {
+        0% {
+          transform: translateX(100%);
+        }
+        100% {
+          transform: translateX(-100%);
+        }
+      }
+    `}
+          </style>
+        </Box>
+
         <Table size="small">
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" ,minWidth:'80px' }}>Quarter</TableCell>
+              <TableCell sx={{ fontWeight: "bold", minWidth: "80px" }}>
+                Quarter
+              </TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>
                 Total Deal Count
               </TableCell>
