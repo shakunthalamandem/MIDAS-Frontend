@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 
+// Types
 type SectorMetrics = {
   Total_Deal_Count: number;
   Total_Deal_Volume: number;
@@ -23,6 +24,7 @@ type ApiResponse = {
   Sectorwise: Record<string, SectorMetrics>;
 };
 
+// Metrics to show in table
 const metrics: (keyof SectorMetrics)[] = [
   "Total_Deal_Count",
   "Total_Deal_Volume",
@@ -31,20 +33,22 @@ const metrics: (keyof SectorMetrics)[] = [
   "Expected_Returns_Excess",
 ];
 
-// Manual display names for columns
+// Display names
 const metricDisplayNames: Record<keyof SectorMetrics, string> = {
   Total_Deal_Count: "Total Deal Count",
-  Total_Deal_Volume: "Total Deal Volume",
-  Long_Opportunity_Value: "Long Opportunity Value",
-  Positively_Performing_Deals_Percentage: "Positively Performing Deals %",
-  Expected_Returns_Excess: "Expected Returns Excess",
+  Total_Deal_Volume: "Total Deal Volume ($)",
+  Long_Opportunity_Value: "Opportunity Value (T + 1M Excess)",
+  Positively_Performing_Deals_Percentage: "% of Positively Performing Deals",
+  Expected_Returns_Excess: "Expected Returns Excess (T + 1M)",
 };
 
-// Format large numbers with suffixes like K, M, B
-const formatNumber = (value: number, isCurrency = false, isPercentage = false): string => {
-  if (value === null || value === undefined) {
-    return 'N/A';
-  }
+// Format function
+const formatNumber = (
+  value: number,
+  isCurrency = false,
+  isPercentage = false
+): string => {
+  if (value === null || value === undefined) return "N/A";
 
   const absValue = Math.abs(value);
   let formattedValue: string;
@@ -60,27 +64,44 @@ const formatNumber = (value: number, isCurrency = false, isPercentage = false): 
   }
 
   if (isCurrency) formattedValue = `$${formattedValue}`;
-  if (isPercentage) formattedValue = `${formattedValue}%`;
+if (isPercentage) formattedValue = `${parseFloat(formattedValue).toFixed(1)}%`;
 
- 
-  const result = value < 0 ? `-${formattedValue}` : formattedValue;
-  return result;
-
+  return value < 0 ? `-${formattedValue}` : formattedValue;
 };
-
 
 export default function SectorwiseTable() {
   const [sectorData, setSectorData] = useState<Record<string, SectorMetrics>>({});
 
-  // Fetch data from API
   useEffect(() => {
-    fetch("http://192.168.1.69:9000/api/zxx/")
-      .then((res) => res.json())
-      .then((data: ApiResponse) => setSectorData(data.Sectorwise))
-      .catch(console.error);
+    const fetchDeals = async () => {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      if (!apiUrl) {
+        console.error("API URL is not defined in environment variables");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiUrl}/api/zxx/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        const data: ApiResponse = await response.json();
+        setSectorData(data.Sectorwise);
+      } catch (error) {
+        console.error("Error fetching sector data:", error);
+      }
+    };
+
+    fetchDeals();
   }, []);
 
-  // Compute top 3 values per metric
+  // Compute top 3 values for each metric
   const top3Values: Partial<Record<keyof SectorMetrics, number[]>> = {};
   metrics.forEach((metric) => {
     const sortedValues = Object.values(sectorData)
@@ -92,7 +113,7 @@ export default function SectorwiseTable() {
   return (
     <Box sx={{ width: "60%", margin: "auto", mt: 4 }}>
       <TableContainer component={Paper}>
-        <Typography variant="h6" sx={{ p: 2 }}>
+        <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold"}}>
           Sectorwise SkewTable for 2025(Q1) with Top 3 Highlights
         </Typography>
         <Table size="small">
@@ -110,10 +131,13 @@ export default function SectorwiseTable() {
             {Object.entries(sectorData).map(([sector, data]) => (
               <TableRow key={sector}>
                 <TableCell>{sector}</TableCell>
-               {metrics.map((metric) => {
+                {metrics.map((metric) => {
                   const isTop3 = top3Values[metric]?.includes(data[metric]) ?? false;
-                  const isCurrency = metric === "Long_Opportunity_Value" || metric === "Total_Deal_Volume";
-                  const isPercentage = metric === "Positively_Performing_Deals_Percentage" || metric === "Expected_Returns_Excess";
+                  const isCurrency =
+                    metric === "Long_Opportunity_Value" || metric === "Total_Deal_Volume";
+                  const isPercentage =
+                    metric === "Positively_Performing_Deals_Percentage" ||
+                    metric === "Expected_Returns_Excess";
                   return (
                     <TableCell
                       key={metric}
@@ -123,7 +147,7 @@ export default function SectorwiseTable() {
                       }}
                     >
                       {typeof data[metric] === "number"
-                        ? formatNumber(data[metric], isCurrency,isPercentage)
+                        ? formatNumber(data[metric], isCurrency, isPercentage)
                         : data[metric]}
                     </TableCell>
                   );

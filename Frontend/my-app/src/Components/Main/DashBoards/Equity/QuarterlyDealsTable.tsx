@@ -83,15 +83,36 @@ const QuarterlyDealsTable = () => {
       return data.Yearwise;
     };
 
-    const processData = (yearwise: { [key: string]: QuarterData }) => {
-      return Object.keys(yearwise)
-        .sort()
-        .filter(q => ['2023 Q1', '2024 Q1', '2025 Q1'].includes(q))
-        .map(key => ({
+const processData = (yearwise: { [key: string]: QuarterData }) => {
+  const getLastCompletedQuarterIn2025 = (): string => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth(); // 0 = Jan
+
+    const quarter = Math.floor(month / 3); // 0 = Q1
+    const completedQuarter = quarter === 0 ? 4 : quarter;
+    const targetQuarter = year === 2025 ? completedQuarter : 4;
+
+    return `Q${targetQuarter}`;
+  };
+
+  const quarterName = getLastCompletedQuarterIn2025();
+  const years = ['2023', '2024', '2025'];
+
+  return years
+    .map(year => {
+      const key = `${year} ${quarterName}`;
+      if (yearwise[key]) {
+        return {
           quarter: key,
           data: yearwise[key],
-        }));
-    };
+        };
+      }
+      return null;
+    })
+    .filter((item): item is { quarter: string; data: QuarterData } => item !== null); // ✅ type-safe filter
+};
+
 
     try {
       const [ipoYearwise, foYearwise] = await Promise.all([
@@ -118,7 +139,8 @@ const QuarterlyDealsTable = () => {
   return (
     <Box sx={{ width: '50%', height: 'auto', float: 'left' }}>
       <TableContainer component={Paper}>
-        <Typography variant="h6" sx={{ p: 2 }}>Skew Table - IPO and FO Deals from 2023 to 2025 for Q1</Typography>
+                <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold"}}>
+ Skew Table - IPO and FO Deals from 2023 to 2025 for Q1</Typography>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -129,11 +151,11 @@ const QuarterlyDealsTable = () => {
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold' }}>Quarter</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Total Deal Count</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Total Deal Volume</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Total Deal Volume ($)</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Opportunity Value (T + 1M Excess)
               </TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>% of Positively Performing Deals</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Expected Returns Excess</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Expected Returns Excess(T + 1M)</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

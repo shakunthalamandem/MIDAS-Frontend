@@ -118,7 +118,7 @@ const QuarterlyRegionTable = () => {
   return (
     <Box sx={{ width: '50%', height: 'auto', float: 'left' }}>
       <TableContainer component={Paper}>
-        <Typography variant="h6" sx={{ p: 2, fontWeight:"bold"}}>Skew Table - IPO and FO Deals from 2023 to 2025 for Q1</Typography>
+        <Typography variant="h6" sx={{ p: 2, fontWeight:"bold"}}>Skew - IPO and FO Deals from 2023 to 2025 for Q1</Typography>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -129,7 +129,7 @@ const QuarterlyRegionTable = () => {
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold' }}>Quarter</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Total Deal Count</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Total Deal Volume</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Total Deal Volume ($)</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Opportunity Value (T + 1M Excess)
               </TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>% of Positively Performing Deals</TableCell>

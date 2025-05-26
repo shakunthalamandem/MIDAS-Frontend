@@ -13,19 +13,32 @@ const LandingPageMain: React.FC = () => {
   return (
     <Grid container height="100vh">
       {/* Left side: 75% */}
-      <Grid item xs={9} p={2} sx={{ overflowY: 'auto' }}>
-      <Box sx={{  gap: 2, padding: 2 ,width:'80%'}}>
-        <Box sx={{ flex: 1 }}>
-          <NumerSummary />
-          <QuarterlyDealsTable />
+      <Grid item xs={9} p={2} sx={{ overflowY: 'hidden' }}>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            padding: 2, 
+            width: '100%', 
+            boxSizing: 'border-box',
+            flexWrap: 'nowrap',    
+            overflowX: 'auto'      
+          }}
+        >
+          <Box sx={{ flex: '1 1 50%', minWidth: 0 }}>
+            <RegionWiseTable />
+          </Box>
+          <Box sx={{ flex: '1 1 50%', minWidth: 0 }}>
+            <QuarterlyDealsTable />
+          </Box>
         </Box>
-        <Box sx={{ flex: 1 }}>
-          <RegionWiseTable />
-        </Box>
-      </Box>
 
-      <Box sx={{ padding: 2 }}>
-        <SectorwiseTable />
+        <Box sx={{ padding: 2 }}>
+          <NumerSummary />
+        </Box>
+
+        <Box sx={{ padding: 2 }}>
+          <SectorwiseTable />
         </Box>
       </Grid>
 

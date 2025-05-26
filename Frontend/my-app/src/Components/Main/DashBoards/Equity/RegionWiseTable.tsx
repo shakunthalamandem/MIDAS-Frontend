@@ -88,7 +88,7 @@ const RegionWiseTable = () => {
   return (
     <Box sx={{ width: '60%', margin: 'auto', mt: 4 }}>
       <TableContainer component={Paper}>
-        <Typography variant="h6" sx={{ p: 2 }}>
+        <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold"}}>
           RegionWise SkewTable -IPO and FO Deals for 2025 (Q1) with Top1 Highlights
         </Typography>
         <Table size="small">
@@ -96,10 +96,11 @@ const RegionWiseTable = () => {
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold' }}>Region</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Total Deal Count</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Total Deal Volume</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Opportunity Value</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>% Positively Performing Deals</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Expected Returns Excess</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Total Deal Volume ($)</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Opportunity Value (T + 1M Excess)
+              </TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>% of Positively Performing Deals</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Expected Returns Excess(T + 1M)</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
