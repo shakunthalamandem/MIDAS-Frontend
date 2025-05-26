@@ -8,12 +8,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 
-const metrics = ["count", "deal_value", "opportunity_value_ex"];
 const metricNames: Record<string, string> = {
   count: "Deal Count",
-  deal_value: "Deal Value",
+  deal_value: "Deal Volume",
   opportunity_value_ex: "Opportunity Value (T + 1M Excess)",
 };
 
@@ -34,12 +33,12 @@ const NumerSummary: React.FC = () => {
       }
 
       try {
-        const response = await fetch(`${apiUrl}/api/dealogic_data/`, {
+        const response = await fetch(`${apiUrl}/api/dealogic_dashboard/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : "",
-          }
+            Authorization: token ? `Bearer ${token}` : "",
+          },
         });
 
         if (!response.ok) {
@@ -47,9 +46,9 @@ const NumerSummary: React.FC = () => {
         }
 
         const json = await response.json();
-        console.log(json,"data might be in json")
+        console.log(json, "data might be in json");
         if (json.deal_type) {
-          setData(json.deal_type); 
+          setData(json.deal_type);
         } else {
           setError("Invalid response format: missing 'deal_type'");
         }
@@ -61,7 +60,7 @@ const NumerSummary: React.FC = () => {
       }
     };
 
-    fetchDeals(); 
+    fetchDeals();
   }, []);
 
   const formatNumber = (value: number, metric: string): string => {
@@ -88,7 +87,9 @@ const NumerSummary: React.FC = () => {
     if (active && payload && payload.length) {
       const total = payload.reduce((sum, item) => sum + (item.value || 0), 0);
       return (
-        <div style={{ background: "#fff", border: "1px solid #ccc", padding: 10 }}>
+        <div
+          style={{ background: "#fff", border: "1px solid #ccc", padding: 10 }}
+        >
           <p>{`Period: ${label}`}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color, margin: 0 }}>
@@ -115,36 +116,52 @@ const NumerSummary: React.FC = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div style={{ color: "red" }}>{error}</div>;
-  if (!data || Object.keys(data).length === 0) return <div>No data available.</div>;
-const metrics = Object.keys(metricNames);
+  if (!data || Object.keys(data).length === 0)
+    return <div>No data available.</div>;
+  const metrics = Object.keys(metricNames);
 
   return (
-    <Grid container spacing={2} >
-        <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold"}}>
-  Deal Flow – IPO and FO (2023 to 2025) by Quarter
-</Typography>
-
 <Grid container spacing={2}>
+  <Grid item xs={12}>
+    <Typography
+      variant="h6"
+      sx={{
+        fontWeight: "bold",
+        color: "#002060",
+        textAlign: "center",
+      }}
+    >
+      Deal Flow – IPO and FO (2023 to 2025) by Quarter
+    </Typography>
+  </Grid>
+
   {metrics.map((metric) => (
     <Grid item xs={12} md={4} key={metric}>
-      <Box>
-        <Typography  align="center" gutterBottom sx={{ p: 2 ,fontWeight: "bold"}}>
-          {metricNames[metric]}
-        </Typography>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={generateChartData(metric)}>
-            <XAxis dataKey="year" />
-            <YAxis tickFormatter={(val) => formatNumber(val, metric)} />
-            <Tooltip content={<CustomTooltip metric={metric} />} />
-            <Legend />
-            <Bar dataKey="IPO" stackId="a" fill="#8884d8" />
-            <Bar dataKey="FO" stackId="a" fill="#82ca9d" />
-          </BarChart>
-        </ResponsiveContainer>
-      </Box>
+      <Card elevation={4}>
+        <CardContent>
+          <Typography
+            align="center"
+            gutterBottom
+            sx={{ p: 2, color: "#bd3600" }}
+          >
+            {metricNames[metric]}
+          </Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={generateChartData(metric)}>
+              <XAxis dataKey="year" />
+              <YAxis tickFormatter={(val) => formatNumber(val, metric)} />
+              <Tooltip content={<CustomTooltip metric={metric} />} />
+              <Legend />
+              <Bar dataKey="IPO" stackId="a" fill="#8884d8" barSize={10} />
+              <Bar dataKey="FO" stackId="a" fill="#82ca9d" barSize={10} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
     </Grid>
   ))}
-</Grid></Grid>
+</Grid>
+
   );
 };
 
