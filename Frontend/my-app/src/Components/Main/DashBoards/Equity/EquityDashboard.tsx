@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid } from '@mui/material'; 
+import { Box, Grid, Paper } from '@mui/material';
 import SectorwiseTable from './SectorwiseTable';
 import QuarterlyDealsTable from './QuarterlyDealsTable';
 import RegionWiseTable from './RegionWiseTable';
@@ -7,35 +7,29 @@ import NumerSummary from './NumerSummary';
 
 const EquityDashboard = () => {
   return (
-    <>
-      <Grid item  p={2} >
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            padding: 2, 
-            width: '100%', 
-            boxSizing: 'border-box',
-            flexWrap: 'nowrap',    
-            overflowX: 'auto'      
-          }}
-        >
+    <Box sx={{ p: 2 }}>
+      <Grid container spacing={2}>
+        {/* First Row: Single full-width component */}
+        <Grid item xs={12}>
             <NumerSummary />
-        
+        </Grid>
+
+        {/* Second Row: Two components side by side */}
+        <Grid item xs={12} md={6}>
             <QuarterlyDealsTable />
-          
-
-
+        </Grid>
+        <Grid item xs={12} md={6}>
             <RegionWiseTable />
+        </Grid>
 
-          <SectorwiseTable />
-          </Box>
-
-        
+        {/* Third Row: Single full-width component */}
+        <Grid item xs={12}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <SectorwiseTable />
+          </Paper>
+        </Grid>
       </Grid>
-
-
-    </>
+    </Box>
   );
 };
 

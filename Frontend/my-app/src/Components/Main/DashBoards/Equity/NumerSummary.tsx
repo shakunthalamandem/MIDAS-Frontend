@@ -121,45 +121,47 @@ const NumerSummary: React.FC = () => {
   const metrics = Object.keys(metricNames);
 
   return (
-    <Grid container spacing={2}>
-      <Typography
-        variant="h6"
-        align="center"
-        sx={{ p: 2, fontWeight: "bold", color: "#002060" }}
-      >
-        Deal Flow – IPO and FO (2023 to 2025) by Quarter
-      </Typography>
+<Grid container spacing={2}>
+  <Grid item xs={12}>
+    <Typography
+      variant="h6"
+      sx={{
+        fontWeight: "bold",
+        color: "#002060",
+        textAlign: "center",
+      }}
+    >
+      Deal Flow – IPO and FO (2023 to 2025) by Quarter
+    </Typography>
+  </Grid>
 
-      <Grid container spacing={2}>
-        {metrics.map((metric) => (
-          <Grid item xs={12} md={4} key={metric}>
-            <Card elevation={4}>
-              {" "}
-              {/* You can adjust elevation (1-24) */}
-              <CardContent>
-                <Typography
-                  align="center"
-                  gutterBottom
-                  sx={{ p: 2, color: "#bd3600" }}
-                >
-                  {metricNames[metric]}
-                </Typography>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={generateChartData(metric)}>
-                    <XAxis dataKey="year" />
-                    <YAxis tickFormatter={(val) => formatNumber(val, metric)} />
-                    <Tooltip content={<CustomTooltip metric={metric} />} />
-                    <Legend />
-                    <Bar dataKey="IPO" stackId="a" fill="#8884d8" barSize={5} />
-                    <Bar dataKey="FO" stackId="a" fill="#82ca9d" barSize={5} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+  {metrics.map((metric) => (
+    <Grid item xs={12} md={4} key={metric}>
+      <Card elevation={4}>
+        <CardContent>
+          <Typography
+            align="center"
+            gutterBottom
+            sx={{ p: 2, color: "#bd3600" }}
+          >
+            {metricNames[metric]}
+          </Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={generateChartData(metric)}>
+              <XAxis dataKey="year" />
+              <YAxis tickFormatter={(val) => formatNumber(val, metric)} />
+              <Tooltip content={<CustomTooltip metric={metric} />} />
+              <Legend />
+              <Bar dataKey="IPO" stackId="a" fill="#8884d8" barSize={10} />
+              <Bar dataKey="FO" stackId="a" fill="#82ca9d" barSize={10} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
     </Grid>
+  ))}
+</Grid>
+
   );
 };
 

@@ -123,7 +123,7 @@ const SectorwiseTable: React.FC = () => {
           variant="h6"
           sx={{ p: 2, fontWeight: "bold", color: "#002060" }}
         >
-          Sectorwise Skew Table for 2025 (Q1) with Todddp 3 Highlights
+          Sectorwise Skew Table for 2025 (Q1) with Top 3 Highlights
         </Typography>
         <Table size="small">
           <TableHead>
