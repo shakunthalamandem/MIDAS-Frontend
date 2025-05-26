@@ -118,19 +118,47 @@ const SectorwiseTable: React.FC = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper} elevation={3}>
-        <Typography
-          variant="h6"
-          sx={{ p: 2, fontWeight: "bold", color: "#002060" }}
+      <TableContainer component={Paper} elevation={4}>
+        <Box
+          sx={{
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            width: "100%",
+          }}
         >
-          Sectorwise Skew Table for 2025 (Q1) with Top 3 Highlights
-        </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              display: "inline-block",
+              animation: "scroll-left 15s linear infinite",
+              fontWeight: "bold",
+              color: "#054511",
+              p: 1.5,
+            }}
+          >
+         Sectorwise Skew Table for 2025 (Q1) with  <span style={{ color: "red" }}>Top3</span> Highlights
+
+          </Typography>
+
+          <style>
+            {`
+      @keyframes scroll-left {
+        0% {
+          transform: translateX(100%);
+        }
+        100% {
+          transform: translateX(-100%);
+        }
+      }
+    `}
+          </style>
+        </Box>
         <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Sector</TableCell>
+          <TableHead sx={{ backgroundColor: "#002060", }}>
+            <TableRow sx={{ color: "white" }}>
+              <TableCell sx={{ fontWeight: "bold",color:'#FFFFFF' }}>Sector</TableCell>
               {metrics.map((metric) => (
-                <TableCell key={metric} sx={{ fontWeight: "bold" }}>
+                <TableCell key={metric} sx={{ fontWeight: "bold", color:'#FFFFFF'}}>
                   {metricDisplayNames[metric]}
                 </TableCell>
               ))}

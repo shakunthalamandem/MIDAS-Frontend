@@ -24,9 +24,7 @@ const EquityDashboard = () => {
 
         {/* Third Row: Single full-width component */}
         <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 2 }}>
             <SectorwiseTable />
-          </Paper>
         </Grid>
       </Grid>
     </Box>
