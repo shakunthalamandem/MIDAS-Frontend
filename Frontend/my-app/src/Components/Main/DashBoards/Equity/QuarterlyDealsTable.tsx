@@ -153,7 +153,7 @@ const QuarterlyDealsTable = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} elevation={4}>
         <Box
           sx={{
             overflow: "hidden",
@@ -168,7 +168,7 @@ const QuarterlyDealsTable = () => {
               animation: "scroll-left 15s linear infinite",
               fontWeight: "bold",
               color: "#054511",
-              p: 2,
+              p: 1.5,
             }}
           >
             Skew Table - IPO and FO Deals from 2023 to 2025 for Q1

@@ -132,7 +132,7 @@ const RegionWiseTable = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} elevation={4}>
         <Box
           sx={{
             overflow: "hidden",
@@ -147,7 +147,7 @@ const RegionWiseTable = () => {
               animation: "scroll-left 15s linear infinite",
               fontWeight: "bold",
               color: "#054511",
-              p: 2,
+              p: 1.5,
             }}
           >
             RegionWise SkewTable - IPO and FO Deals for 2025 (Q1) with{" "}
