@@ -50,27 +50,30 @@ const formatNumber = (
 ): string => {
   if (value === null || value === undefined) return "N/A";
 
-  const absValue = Math.abs(value);
   let formattedValue: string;
+  const absValue = Math.abs(value);
 
   if (absValue >= 1e9) {
-    formattedValue = `${(absValue / 1e9).toFixed()}B`;
+    formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
   } else if (absValue >= 1e6) {
-    formattedValue = `${(absValue / 1e6).toFixed()}M`;
+    formattedValue = `${(absValue / 1e6).toFixed(1)}M`;
   } else if (absValue >= 1e3) {
-    formattedValue = `${(absValue / 1e3).toFixed()}K`;
+    formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
   } else {
-    formattedValue = absValue.toString();
+    formattedValue = absValue.toFixed(1);
   }
 
   if (isCurrency) formattedValue = `$${formattedValue}`;
-if (isPercentage) formattedValue = `${parseFloat(formattedValue).toFixed(1)}%`;
+  if (isPercentage)
+    formattedValue = `${parseFloat(formattedValue).toFixed(1)}%`;
 
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
-export default function SectorwiseTable() {
-  const [sectorData, setSectorData] = useState<Record<string, SectorMetrics>>({});
+const SectorwiseTable: React.FC = () => {
+  const [sectorData, setSectorData] = useState<Record<string, SectorMetrics>>(
+    {}
+  );
 
   useEffect(() => {
     const fetchDeals = async () => {
@@ -91,8 +94,10 @@ export default function SectorwiseTable() {
           },
         });
 
+        if (!response.ok) throw new Error("Failed to fetch sector data");
+
         const data: ApiResponse = await response.json();
-        setSectorData(data.Sectorwise);
+        setSectorData(data.Sectorwise || {});
       } catch (error) {
         console.error("Error fetching sector data:", error);
       }
@@ -106,15 +111,19 @@ export default function SectorwiseTable() {
   metrics.forEach((metric) => {
     const sortedValues = Object.values(sectorData)
       .map((data) => data[metric])
+      .filter((val): val is number => typeof val === "number")
       .sort((a, b) => b - a);
     top3Values[metric] = sortedValues.slice(0, 3);
   });
 
   return (
     <Box>
-      <TableContainer component={Paper}>
-        <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold"}}>
-          Sectorwise SkewTable for 2025(Q1) with Top 3 Highlights
+      <TableContainer component={Paper} elevation={3}>
+        <Typography
+          variant="h6"
+          sx={{ p: 2, fontWeight: "bold", color: "#002060" }}
+        >
+          Sectorwise Skew Table for 2025 (Q1) with Todddp 3 Highlights
         </Typography>
         <Table size="small">
           <TableHead>
@@ -132,12 +141,15 @@ export default function SectorwiseTable() {
               <TableRow key={sector}>
                 <TableCell>{sector}</TableCell>
                 {metrics.map((metric) => {
-                  const isTop3 = top3Values[metric]?.includes(data[metric]) ?? false;
+                  const value = data[metric];
+                  const isTop3 = top3Values[metric]?.includes(value) ?? false;
                   const isCurrency =
-                    metric === "Long_Opportunity_Value" || metric === "Total_Deal_Volume";
+                    metric === "Total_Deal_Volume" ||
+                    metric === "Long_Opportunity_Value";
                   const isPercentage =
                     metric === "Positively_Performing_Deals_Percentage" ||
                     metric === "Expected_Returns_Excess";
+
                   return (
                     <TableCell
                       key={metric}
@@ -146,9 +158,7 @@ export default function SectorwiseTable() {
                         fontWeight: isTop3 ? "bold" : "normal",
                       }}
                     >
-                      {typeof data[metric] === "number"
-                        ? formatNumber(data[metric], isCurrency, isPercentage)
-                        : data[metric]}
+                      {formatNumber(value, isCurrency, isPercentage)}
                     </TableCell>
                   );
                 })}
@@ -159,4 +169,5 @@ export default function SectorwiseTable() {
       </TableContainer>
     </Box>
   );
-}
+};
+export default SectorwiseTable;

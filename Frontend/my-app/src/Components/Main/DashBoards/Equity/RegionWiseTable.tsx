@@ -102,7 +102,7 @@ const RegionWiseTable = () => {
   return (
     <Box >
       <TableContainer component={Paper}>
-        <Typography variant="h6" sx={{ p: 2, fontWeight: "bold" }}>
+        <Typography variant="h6" sx={{ p: 2, fontWeight: "bold", color: "#002060"}}>
           RegionWise SkewTable - IPO and FO Deals for 2025 (Q1) with Top1 Highlights
         </Typography>
         <Table size="small">

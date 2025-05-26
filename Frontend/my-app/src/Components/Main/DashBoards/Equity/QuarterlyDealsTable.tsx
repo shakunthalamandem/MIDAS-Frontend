@@ -139,7 +139,7 @@ const processData = (yearwise: { [key: string]: QuarterData }) => {
   return (
     <Box >
       <TableContainer component={Paper}>
-                <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold"}}>
+                <Typography variant="h6" sx={{ p: 2 ,fontWeight: "bold" , color: "#002060"}}>
  Skew Table - IPO and FO Deals from 2023 to 2025 for Q1</Typography>
         <Table size="small">
           <TableHead>

@@ -20,27 +20,16 @@ const EquityDashboard = () => {
             overflowX: 'auto'      
           }}
         >
-          <Box >
             <NumerSummary />
-          </Box>
-          <Box >
+        
             <QuarterlyDealsTable />
-          </Box>
-        </Box>
+          
 
-        <Box sx={{ padding: 2 }}>
-        </Box>
+
             <RegionWiseTable />
 
-        <Box sx={{ padding: 2 }}>
           <SectorwiseTable />
-        </Box>
-
-
-
-         <Box sx={{ padding: 2 }}>
-          <SectorwiseTable />
-        </Box>
+          </Box>
 
         
       </Grid>
