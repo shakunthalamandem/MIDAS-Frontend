@@ -136,7 +136,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
         variant="subtitle1"
         sx={{
           color: "#000",
-          fontWeight: "bold",
+          // Removed fontWeight bold here per your request
           mb: 1,
           textAlign: "center",
           width: "100%",
@@ -165,7 +165,9 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             tickFormatter={(value) => yAxisFormatter(value as number)}
           />
           <Tooltip formatter={(value) => yAxisFormatter(value as number)} />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend 
+            wrapperStyle={{ fontSize: 14, bottom: 10}} 
+          />
           {data.length > 0 &&
             Object.keys(data[0])
               .filter((key) => key !== "year")
@@ -187,7 +189,17 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   return (
     <Container>
       <Card elevation={5} sx={{ padding: 3, mt: 3 }}>
-        {/* Removed Deal Statistics title */}
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: "bold",
+            textAlign: "center",
+            mb: 3,
+            color: "#000",
+          }}
+        >
+          Weighted Allocation for 2024 and 2025 by Quarterly
+        </Typography>
 
         {loading ? (
           <Box
