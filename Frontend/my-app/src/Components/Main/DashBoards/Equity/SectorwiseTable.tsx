@@ -86,7 +86,7 @@ const SectorwiseTable: React.FC = () => {
       }
 
       try {
-        const response = await fetch(`${apiUrl}/api/summary_data/`, {
+        const response = await fetch(`${apiUrl}/api/dealogic_summary_data/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

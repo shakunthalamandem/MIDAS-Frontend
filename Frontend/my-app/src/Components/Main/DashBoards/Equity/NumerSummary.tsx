@@ -33,7 +33,7 @@ const NumerSummary: React.FC = () => {
       }
 
       try {
-        const response = await fetch(`${apiUrl}/api/dealogic_data/`, {
+        const response = await fetch(`${apiUrl}/api/dealogic_dashboard/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
