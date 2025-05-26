@@ -55,7 +55,7 @@ const RegionWiseTable = () => {
       }
 
       try {
-        const response = await fetch(`${apiUrl}/api/zxx/`, {
+        const response = await fetch(`${apiUrl}/api/summary_data/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
