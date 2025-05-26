@@ -48,10 +48,8 @@ import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 import DealformInformation from "../Components/NewDealForm/DealformInformation";
 import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
-import QuarterlyDealsTable from "../Components/Main/DashBoards/Equity/QuarterlyDealsTable";
-import QuarterlyRegionTable from "../Components/Main/DashBoards/Equity/QuarterlyRegionTable";
+
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
-import EquityDashboard from "../Components/Main/DashBoards/Equity/EquityDashboard";
 
 
 
@@ -147,11 +145,8 @@ const AppRouters: React.FC = () => {
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
 
 
-        <Route path="/landing" element={<EquityDashboard />} />
 
 
-        <Route path="/reset" element={<QuarterlyDealsTable />} />
-        <Route path="/reset1" element={<QuarterlyRegionTable />} />
 
 
 
