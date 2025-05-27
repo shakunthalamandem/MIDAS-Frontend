@@ -57,6 +57,10 @@ const QuarterlyDealsTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+
+const handleCardClick = () => {
+  window.open("/equity/capital-markets/skew-table", "_blank");
+};
   useEffect(() => {
     const fetchDeals = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
@@ -153,7 +157,7 @@ const QuarterlyDealsTable = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper} elevation={4}>
+      <TableContainer component={Paper} elevation={4} onClick={handleCardClick} >
         <Box
           sx={{
             overflow: "hidden",
