@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from "react";
-import {XAxis,YAxis,Tooltip,Legend,ResponsiveContainer,LineChart,Line,} from "recharts";
-import {Box,Card,Typography,CircularProgress,} from "@mui/material";
+import {
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
+import {
+  Box,
+  Card,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 interface ChartData {
@@ -18,7 +31,7 @@ interface ApiResponse {
   };
 }
 
-interface DealStatsGraphProps {
+interface AllocationGraphsMainProps {
   selectedFilters: { [key: string]: (string | number)[] };
 }
 
@@ -28,7 +41,7 @@ const formatValue = (value: number): string => {
   return `${sign}${absValue.toFixed(2)}%`;
 };
 
-const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
+const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFilters }) => {
   const [dealSizeData, setDealSizeData] = useState<ChartData[]>([]);
   const [allocationData, setAllocationData] = useState<ChartData[]>([]);
   const [dealCountData, setDealCountData] = useState<ChartData[]>([]);
@@ -51,10 +64,9 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
         fo_type: ["Marketed", "Overnight"],
       };
 
-      const payload = {
-        ...defaultFilters,
-        ...selectedFilters,
-      };
+      // ✅ Combine default filters and selected filters (keep empty arrays)
+      const payload = Object.assign({}, defaultFilters, selectedFilters);
+      console.log("Payload sent to API:", payload);
 
       const response = await fetch(`${apiUrl}/api/mdd_deals_graph/`, {
         method: "POST",
@@ -129,7 +141,6 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
           color: titleColor,
           mb: 1.5,
           textAlign: "center",
-          fontWeight: "bold",
           fontSize: "0.95rem",
         }}
       >
@@ -138,7 +149,7 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
       <ResponsiveContainer width="100%" height={240}>
         <LineChart
           data={data}
-          margin={{ top: 10, right: 10, left: 10, bottom: 30 }}
+          margin={{ top: 20, right: 10, left: 10, bottom: 30 }}
         >
           <XAxis
             dataKey="year"
@@ -146,8 +157,9 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             tick={{ fill: "#000", fontSize: 12 }}
             label={{
               value: "Year",
+              align: "center",
               position: "insideBottom",
-              dy: 18,
+              dy: 20,
               fill: "#002060",
               fontSize: 12,
             }}
@@ -158,7 +170,11 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
             tick={{ fontSize: 11 }}
           />
           <Tooltip formatter={(value) => yAxisFormatter(value as number)} />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend
+            verticalAlign="bottom"
+            align="center"
+            wrapperStyle={{ paddingTop: 20, fontSize: 12 }}
+          />
           {data.length > 0 &&
             Object.keys(data[0])
               .filter((key) => key !== "year")
@@ -239,4 +255,4 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
   );
 };
 
-export default DealStatsGraph;
+export default AllocationGraphsMain;
