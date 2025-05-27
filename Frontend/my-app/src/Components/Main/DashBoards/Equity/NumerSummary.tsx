@@ -26,6 +26,10 @@ const NumerSummary: React.FC = () => {
     year_period: ["Quarterly"],
   };
 
+const handleCardClick = () => {
+  window.open("/equity/capital-markets/deal-stats", "_blank");
+};
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -140,7 +144,8 @@ const NumerSummary: React.FC = () => {
 
       {metrics.map((metric) => (
         <Grid item xs={12} md={4} key={metric}>
-          <Card elevation={4}>
+          <Card elevation={4}  onClick={handleCardClick} 
+      sx={{ cursor: 'pointer' }}>
             <CardContent>
               <Typography
                 align="center"
@@ -149,14 +154,14 @@ const NumerSummary: React.FC = () => {
               >
                 {metricNames[metric]}
               </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={generateChartData(metric)}>
+              <ResponsiveContainer width="100%" height={300} style={{ cursor: "pointer" }}>
+                <BarChart data={generateChartData(metric)} >
                   <XAxis dataKey="year" />
                   <YAxis tickFormatter={(val) => formatNumber(val, metric)} />
                   <Tooltip content={<CustomTooltip metric={metric} />} />
                   <Legend />
-                  <Bar dataKey="IPO" stackId="a" fill="#8884d8" barSize={10} />
-                  <Bar dataKey="FO" stackId="a" fill="#82ca9d" barSize={10} />
+                  <Bar dataKey="IPO" stackId="a" fill="#8884d8" barSize={10} cursor="pointer" />
+                  <Bar dataKey="FO" stackId="a" fill="#82ca9d" barSize={10} cursor="pointer" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
