@@ -98,10 +98,12 @@ const WeekelyMDD: React.FC<WeekelyMDDProps> = ({ selectedWeek }) => {
       setLoading(false);
     }
   };
-
+const handleCardClick = () => {
+  window.open("/equity/monashee-deals/weekly-tracking", "_blank");
+};
   return (
     <Container maxWidth="lg" sx={{ py: 0 }}>
-      <Card sx={{ boxShadow: 3, p: 3, mb: 2 }}>
+      <Card sx={{ boxShadow: 3, p: 3, mb: 2 }} elevation={3}  onClick={handleCardClick}>
         <Typography variant="h5" color="#002060" align="center" gutterBottom>
           2025 YTD Table
         </Typography>

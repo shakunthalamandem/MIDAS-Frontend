@@ -89,7 +89,9 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
       setLoading(false);
     }
   };
-
+const handleCardClick = () => {
+  window.open("/equity/capital-markets/deal-stats", "_blank");
+};
   const formatChartData = (data: ApiResponse) => {
     const dealSize: ChartData[] = [];
     const allocation: ChartData[] = [];
@@ -193,7 +195,7 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
   );
 
   return (
-    <Box sx={{ padding: 2 }}>
+    <Box sx={{ padding: 2 }}  onClick={handleCardClick}>
       <Typography
         variant="h6"
         sx={{

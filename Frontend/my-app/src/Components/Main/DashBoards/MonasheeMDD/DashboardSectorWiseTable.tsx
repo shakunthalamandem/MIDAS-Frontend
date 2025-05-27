@@ -84,6 +84,11 @@ const DashboardSectorWiseTable: React.FC = () => {
     fetchData();
   }, [apiUrl, token]);
 
+
+  const handleCardClick = () => {
+  window.open("/equity/monashee-deals/gap-analysis", "_blank");
+};
+
   const formatValue = (value?: number): string => {
     if (value === undefined || value === null || isNaN(value)) return "-";
     const absValue = Math.abs(value);
@@ -187,7 +192,7 @@ const DashboardSectorWiseTable: React.FC = () => {
   };
 
   return (
-    <Box sx={{maxWidth:'1000px'}}>
+    <Box sx={{maxWidth:'1000px'}}  onClick={handleCardClick}>
       <Typography
         variant="h6"
         sx={{
@@ -201,7 +206,7 @@ const DashboardSectorWiseTable: React.FC = () => {
       </Typography>
 
       <TableContainer component={Paper}>
-        <Table size="small">
+        <Table size="small" sx={{borderRadius: 3, overflow: 'hidden'}}>
           <TableHead>
             <TableRow>
               <TableCell
@@ -213,6 +218,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                   border: 1,
                   textAlign: "center",
                   verticalAlign: "middle",
+                  minWidth: 160,
                 }}
               >
                 Sector
@@ -222,7 +228,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                 colSpan={3}
                 align="center"
                 sx={{
-                  backgroundColor: "#002060",
+                  backgroundColor: "#0F4A85",
                   color: "#fff",
                   fontWeight: "bold",
                   border: 1,
@@ -234,7 +240,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                 colSpan={3}
                 align="center"
                 sx={{
-                  backgroundColor: "#002060",
+                  backgroundColor: "#0F4A85",
                   color: "#fff",
                   fontWeight: "bold",
                   border: 1,
