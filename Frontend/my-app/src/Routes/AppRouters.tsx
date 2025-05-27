@@ -48,7 +48,9 @@ import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 import DealformInformation from "../Components/NewDealForm/DealformInformation";
 import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
+
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
+
 
 
 
@@ -141,6 +143,11 @@ const AppRouters: React.FC = () => {
         <Route path="/uploads" element={<AuthGuard><MainUpload /></AuthGuard>} />
         <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
+
+
+
+
+
 
 
 
