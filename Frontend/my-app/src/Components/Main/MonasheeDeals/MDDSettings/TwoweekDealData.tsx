@@ -154,7 +154,7 @@ console.log("data",appliedRegions)
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 0 }}>
+    <Container maxWidth="lg" sx={{ py: 0 }} id="details-section" >
       <Card sx={{ boxShadow: 3, p: 3, mb: 2 }}>
         <Card sx={{ p: 1, mb: 2 }}>
           <Typography variant="h5" color="#002060" align="center" gutterBottom>

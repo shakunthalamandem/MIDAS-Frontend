@@ -36,8 +36,10 @@ const EquityNavbar: React.FC = () => {
 
     if (path.startsWith("/equity/capital-markets")) return 0;
     if (path.startsWith("/equity/monashee-deals")) return 0;
+    if (path.startsWith("/equity/detailed_gap_analysis")) return 0;
 
     if (path === "/equity/issue_market") return 1;
+    if (path === "/equity/create_form") return 1;
 
     if (path === "/equity/ml_equity") return 2;
 

@@ -45,38 +45,45 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   }>({});
   const [appliedFilters, setAppliedFilters] = useState<{
     [key: string]: (string | number)[];
-  }>({})  
+  }>({});
 
   const [expanded, setExpanded] = useState<string | false>(false);
-  const [payload, setPayload] = useState<{ [key: string]: (string | number)[] }>({});
+  const [payload, setPayload] = useState<{
+    [key: string]: (string | number)[];
+  }>({});
   const [apiData, setApiData] = useState({});
   const [searchValue, setSearchValue] = useState<string>("");
   const [searchKey, setSearchKey] = useState<string | null>(null);
 
   useEffect(() => {
     const initialSelectedValues: { [key: string]: (string | number)[] } = {};
-  
+
     filtersData.forEach((filter) => {
       const key = Object.keys(filter)[0];
       const { options } = filter[key];
-  
-      // Only select "Marketed" and "Overnight" when API is "mdd_deals_graph"
-      initialSelectedValues[key] =
-        apiName === "mdd_deals_graph"
-          ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
-          : [];
+
+      if (key === "fo_type") {
+        initialSelectedValues[key] =
+          apiName === "mdd_deals_graph"
+            ? options.filter((opt) =>
+                ["Marketed", "Overnight"].includes(opt.toString())
+              )
+            : apiName === "gap_analysis"
+              ? options.filter((opt) =>
+                  ["Marketed", "Overnight", "Block"].includes(opt.toString())
+                )
+              : [];
+      }
     });
-  
-    if (JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)) {
+
+    if (
+      JSON.stringify(initialSelectedValues) !== JSON.stringify(selectedValues)
+    ) {
       setSelectedValues(initialSelectedValues);
       setAppliedFilters(initialSelectedValues);
       handleSubmit(initialSelectedValues);
     }
   }, [filtersData, apiName]); // Added apiName as a dependency
-  
-
-
-
 
   const handleSelectionChange = (key: string, value: (string | number)[]) => {
     setSelectedValues((prevState) => ({
@@ -104,26 +111,25 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       Object.keys(filters).forEach((key) => {
         payload[key] = filters[key] || [];
       });
-  
+
       setPayload(payload);
       setAppliedFilters(filters);
 
-  
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
       if (!apiUrl) {
         throw new Error("API URL is not defined in environment variables");
       }
-  
+
       const response = await fetch(`${apiUrl}/api/${apiName}/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token}` : "",
+          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify(payload),
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         setApiData(result);
@@ -137,42 +143,49 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     }
   };
 
-    const handleCancel = () => {
-        const resetSelectedValues: { [key: string]: (string | number)[] } = {};
-      
-        filtersData.forEach((filter) => {
-          const key = Object.keys(filter)[0];
-          const { options } = filter[key];
-      
-          resetSelectedValues[key] =
-            apiName === "mdd_deals_graph"
-              ? options.filter((opt) => ["Marketed", "Overnight"].includes(opt.toString()))
+  const handleCancel = () => {
+    const resetSelectedValues: { [key: string]: (string | number)[] } = {};
+
+    filtersData.forEach((filter) => {
+      const key = Object.keys(filter)[0];
+      const { options } = filter[key];
+
+      if (key === "fo_type") {
+        resetSelectedValues[key] =
+          apiName === "mdd_deals_graph"
+            ? options.filter((opt) =>
+                ["Marketed", "Overnight"].includes(opt.toString())
+              )
+            : apiName === "gap_analysis"
+              ? options.filter((opt) =>
+                  ["Marketed", "Overnight", "Block"].includes(opt.toString())
+                )
               : [];
-               console.log("filters reset");
-        });
-      
+      }
+    });
+
     setSelectedValues(resetSelectedValues);
     setAppliedFilters(resetSelectedValues);
     setSearchValue("");
     setSearchKey(null);
     handleSubmit(resetSelectedValues);
   };
-  
 
   return (
     <Box
-      
       sx={{
         padding: 0,
         marginBottom: 20,
         display: "flex",
         marginLeft: 0,
         marginTop: 0,
-        width: '100%'
+        width: "100%",
       }}
     >
-      <Box width="320px" sx={{ marginRight: 5,marginLeft:5}}>  
-        <Card sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}>
+      <Box width="320px" sx={{ marginRight: 5, marginLeft: 5 }}>
+        <Card
+          sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}
+        >
           <CardContent>
             <Box width="250px" sx={{ p: 2 }}>
               <Typography variant="h5" color="#002060" mb={4}>
@@ -182,9 +195,13 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                 .filter((filter) => {
                   const key = Object.keys(filter)[0];
                   return !(
-                    (apiName === "fo_discount" && (key === "deal_type" || key === "period")) ||
+                    (apiName === "fo_discount" &&
+                      (key === "deal_type" || key === "period")) ||
                     (apiName === "gap_analysis" && key === "period") ||
-                    (apiName === "by_bank" && (key === "period" || key === "selected_bank" || key=== "deal_captain"))
+                    (apiName === "by_bank" &&
+                      (key === "period" ||
+                        key === "selected_bank" ||
+                        key === "deal_captain"))
                   );
                 })
                 .map((filter) => {
@@ -204,7 +221,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                     <Accordion
                       key={key}
                       expanded={expanded === key}
-                      onChange={() => setExpanded(expanded === key ? false : key)}
+                      onChange={() =>
+                        setExpanded(expanded === key ? false : key)
+                      }
                       sx={{
                         marginBottom: "10px",
                         "&:before": {
@@ -228,7 +247,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                           },
                         }}
                       >
-                        <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
+                        <Typography sx={{ fontWeight: "bold" }}>
+                          {label}
+                        </Typography>
                       </AccordionSummary>
                       {label === "Lead Bank" && (
                         <div
@@ -244,7 +265,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                             size="small"
                             placeholder="Search"
                             value={searchKey === key ? searchValue : ""}
-                            onChange={(e) => handleSearchChange(e.target.value, key)}
+                            onChange={(e) =>
+                              handleSearchChange(e.target.value, key)
+                            }
                             sx={{ mb: 2 }}
                           />
                         </div>
@@ -262,7 +285,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                         {isPeriodFilter ? (
                           <RadioGroup
                             value={selectedValues[key]?.[0] || ""}
-                            onChange={(e) => handleSingleSelectionChange(key, e.target.value)}
+                            onChange={(e) =>
+                              handleSingleSelectionChange(key, e.target.value)
+                            }
                           >
                             {options.map((option) => (
                               <FormControlLabel
@@ -279,12 +304,21 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                               key={option}
                               control={
                                 <Checkbox
-                                key={`${key}-${option}-${selectedValues[key]?.includes(option)}`}
-                                  checked={selectedValues[key]?.includes(option)}
+                                  key={`${key}-${option}-${selectedValues[key]?.includes(option)}`}
+                                  checked={selectedValues[key]?.includes(
+                                    option
+                                  )}
                                   onChange={() => {
-                                    const newValues = selectedValues[key]?.includes(option)
-                                      ? selectedValues[key].filter((item) => item !== option)
-                                      : [...(selectedValues[key] || []), option];
+                                    const newValues = selectedValues[
+                                      key
+                                    ]?.includes(option)
+                                      ? selectedValues[key].filter(
+                                          (item) => item !== option
+                                        )
+                                      : [
+                                          ...(selectedValues[key] || []),
+                                          option,
+                                        ];
                                     handleSelectionChange(key, newValues);
                                   }}
                                   sx={{
@@ -340,7 +374,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </CardContent>
         </Card>
       </Box>
-      <Box  width="100%" mt={1} flex={1}>
+      <Box width="100%" mt={1} flex={1}>
         {loading ? (
           <Box
             sx={{
@@ -356,26 +390,32 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </Box>
         ) : (
           <>
-      {apiName === "gap_analysis" ? (
-        <Gap selectedFilters={appliedFilters} handleCancel={handleCancel}/>
-      ) : apiName === "fo_discount" ? (
-        <AvgFoDiscountChart data={apiData} handleCancel={handleCancel} />) : apiName === "by_bank" ? (
-          <BankTable selectedFilters={appliedFilters} />      ) : (
-        <>
-          <DealStatsGraph selectedFilters={appliedFilters} />
-          <MDDScreenergrid sectorwiseData={payload} handleCancel={handleCancel} />
-        </>
-      )}
-    </>
+            {apiName === "gap_analysis" ? (
+              <Gap
+                selectedFilters={appliedFilters}
+                handleCancel={handleCancel}
+              />
+            ) : apiName === "fo_discount" ? (
+              <AvgFoDiscountChart data={apiData} handleCancel={handleCancel} />
+            ) : apiName === "by_bank" ? (
+              <BankTable selectedFilters={appliedFilters} />
+            ) : (
+              <>
+                <DealStatsGraph selectedFilters={appliedFilters} />
+                <MDDScreenergrid
+                  sectorwiseData={payload}
+                  handleCancel={handleCancel}
+                />
+              </>
+            )}
+          </>
         )}
       </Box>
-      </Box>
-
+    </Box>
   );
 };
 export const resetFilters = (handleCancel: () => void) => {
-  console.log("Filters have been reset.");
-  handleCancel();  // Call the existing handleCancel function
+  handleCancel(); 
 };
 
 export default MDDFilters;
