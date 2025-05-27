@@ -30,7 +30,7 @@ interface CombinedSectorData {
   };
 }
 
-const SectorWiseTable: React.FC = () => {
+const DashboardSectorWiseTable: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL!;
   const token = localStorage.getItem("access_token");
 
@@ -172,7 +172,9 @@ const SectorWiseTable: React.FC = () => {
 
   // Utility to get top 3 unique values sorted descending
   const getTop3 = (arr: number[]) => {
-    return Array.from(new Set(arr)).sort((a, b) => b - a).slice(0, 3);
+    return Array.from(new Set(arr))
+      .sort((a, b) => b - a)
+      .slice(0, 3);
   };
 
   const top3 = {
@@ -185,7 +187,7 @@ const SectorWiseTable: React.FC = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{maxWidth:'1000px'}}>
       <Typography
         variant="h6"
         sx={{
@@ -204,21 +206,39 @@ const SectorWiseTable: React.FC = () => {
             <TableRow>
               <TableCell
                 rowSpan={2}
-                sx={{ backgroundColor: "#002060", color: "#fff", fontWeight: "bold", border: 1 }}
+                sx={{
+                  backgroundColor: "#002060",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  border: 1,
+                  textAlign: "center",
+                  verticalAlign: "middle",
+                }}
               >
                 Sector
               </TableCell>
+
               <TableCell
                 colSpan={3}
                 align="center"
-                sx={{ backgroundColor: "#002060", color: "#fff", fontWeight: "bold", border: 1 }}
+                sx={{
+                  backgroundColor: "#002060",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  border: 1,
+                }}
               >
                 FO
               </TableCell>
               <TableCell
                 colSpan={3}
                 align="center"
-                sx={{ backgroundColor: "#002060", color: "#fff", fontWeight: "bold", border: 1 }}
+                sx={{
+                  backgroundColor: "#002060",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  border: 1,
+                }}
               >
                 IPO
               </TableCell>
@@ -231,7 +251,12 @@ const SectorWiseTable: React.FC = () => {
               ].map((label, index) => (
                 <TableCell
                   key={`fo-header-${index}`}
-                  sx={{ backgroundColor: "#002060", color: "#fff", fontWeight: "bold", border: 1 }}
+                  sx={{
+                    backgroundColor: "#002060",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    border: 1,
+                  }}
                 >
                   <span dangerouslySetInnerHTML={{ __html: label }} />
                 </TableCell>
@@ -243,7 +268,12 @@ const SectorWiseTable: React.FC = () => {
               ].map((label, index) => (
                 <TableCell
                   key={`ipo-header-${index}`}
-                  sx={{ backgroundColor: "#002060", color: "#fff", fontWeight: "bold", border: 1 }}
+                  sx={{
+                    backgroundColor: "#002060",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    border: 1,
+                  }}
                 >
                   <span dangerouslySetInnerHTML={{ __html: label }} />
                 </TableCell>
@@ -258,12 +288,16 @@ const SectorWiseTable: React.FC = () => {
               const foActual = calculateTotal(fo);
               const foModel = calculateModelTotal(fo);
               const foGap =
-                foActual !== null && foModel !== null ? foActual - foModel : null;
+                foActual !== null && foModel !== null
+                  ? foActual - foModel
+                  : null;
 
               const ipoActual = calculateTotal(ipo);
               const ipoModel = calculateModelTotal(ipo);
               const ipoGap =
-                ipoActual !== null && ipoModel !== null ? ipoActual - ipoModel : null;
+                ipoActual !== null && ipoModel !== null
+                  ? ipoActual - ipoModel
+                  : null;
 
               return (
                 <TableRow key={sector}>
@@ -347,7 +381,8 @@ const SectorWiseTable: React.FC = () => {
                   const data = summary[type as keyof typeof summary];
                   const actual = calculateTotal(data);
                   const model = calculateModelTotal(data);
-                  const gap = actual !== null && model !== null ? actual - model : null;
+                  const gap =
+                    actual !== null && model !== null ? actual - model : null;
 
                   return [
                     <TableCell
@@ -379,4 +414,4 @@ const SectorWiseTable: React.FC = () => {
   );
 };
 
-export default SectorWiseTable;
+export default DashboardSectorWiseTable;

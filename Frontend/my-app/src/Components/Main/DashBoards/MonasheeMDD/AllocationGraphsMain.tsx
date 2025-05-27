@@ -232,7 +232,7 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
           }}
         >
           {renderLineChart(
-            "Deal Count per Year",
+            "Deal Count ",
             dealCountData,
             (val) => `${val}`,
             "#bd3600"

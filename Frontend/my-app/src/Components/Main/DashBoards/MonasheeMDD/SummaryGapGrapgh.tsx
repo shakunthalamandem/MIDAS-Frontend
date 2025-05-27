@@ -126,7 +126,7 @@ const SummaryGapGraph = () => {
   const renderChart = (title: string, data: any[]) => (
  <Card
     elevation={3}
-    sx={{ width: "50%", height: 350, p: 2, cursor: "pointer" }}
+    sx={{ width: "90%", height: 400, p: 2, cursor: "pointer" }}
     onClick={handleNavigationClick}
   >
     <CardContent sx={{ cursor: "pointer" }}>
@@ -171,13 +171,13 @@ const SummaryGapGraph = () => {
         color="#002060"
         align="center"
         fontWeight="bold"
-        mb={2}
-        mt={2}
+        mb={4}
+        mt={4}
       >
         Summary Gap Metrics
       </Typography>
 
-      <Stack direction="row" spacing={2} justifyContent="space-between">
+      <Stack direction="column" spacing={2} justifyContent="space-between">
         {renderChart("FO Summary Gap Metrics - 2025", foData)}
         {renderChart("IPO Summary Gap Metrics - 2025", ipoData)}
       </Stack>
