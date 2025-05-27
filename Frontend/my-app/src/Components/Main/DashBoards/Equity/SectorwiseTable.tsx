@@ -74,7 +74,9 @@ const SectorwiseTable: React.FC = () => {
   const [sectorData, setSectorData] = useState<Record<string, SectorMetrics>>(
     {}
   );
-
+const handleCardClick = () => {
+  window.open("/equity/capital-markets/skew-table", "_blank");
+};
   useEffect(() => {
     const fetchDeals = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
@@ -118,7 +120,7 @@ const SectorwiseTable: React.FC = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper} elevation={4}>
+      <TableContainer component={Paper} elevation={4} onClick={handleCardClick}>
         <Box
           sx={{
             overflow: "hidden",

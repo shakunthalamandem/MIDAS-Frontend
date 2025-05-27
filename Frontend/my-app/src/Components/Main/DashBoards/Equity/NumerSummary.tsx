@@ -8,7 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Grid, Typography } from "@mui/material";
 
 const metricNames: Record<string, string> = {
   count: "Deal Count",
@@ -21,34 +21,44 @@ const NumerSummary: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchDeals = async () => {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
+  const selectedFilters = {
+    start_year: [2023],
+    year_period: ["Quarterly"],
+  };
 
-      if (!apiUrl) {
-        setError("API URL is not defined in environment variables");
-        setLoading(false);
-        return;
-      }
+const handleCardClick = () => {
+  window.open("/equity/capital-markets/deal-stats", "_blank");
+};
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
 
       try {
-        const response = await fetch(`${apiUrl}/api/dealogic_dashboard/`, {
-          method: "GET",
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
+
+        if (!apiUrl) {
+          throw new Error("API URL is not defined in environment variables");
+        }
+
+        const response = await fetch(`${apiUrl}/api/dealogic_graph/`, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
+          body: JSON.stringify(selectedFilters),
         });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const json = await response.json();
-        console.log(json, "data might be in json");
-        if (json.deal_type) {
-          setData(json.deal_type);
+        const jsonData = await response.json();
+        if (jsonData.deal_type) {
+          setData(jsonData.deal_type);
         } else {
           setError("Invalid response format: missing 'deal_type'");
         }
@@ -60,7 +70,7 @@ const NumerSummary: React.FC = () => {
       }
     };
 
-    fetchDeals();
+    fetchData();
   }, []);
 
   const formatNumber = (value: number, metric: string): string => {
@@ -118,50 +128,47 @@ const NumerSummary: React.FC = () => {
   if (error) return <div style={{ color: "red" }}>{error}</div>;
   if (!data || Object.keys(data).length === 0)
     return <div>No data available.</div>;
+
   const metrics = Object.keys(metricNames);
 
   return (
-<Grid container spacing={2}>
-  <Grid item xs={12}>
-    <Typography
-      variant="h6"
-      sx={{
-        fontWeight: "bold",
-        color: "#002060",
-        textAlign: "center",
-      }}
-    >
-      Deal Flow – IPO and FO (2023 to 2025) by Quarter
-    </Typography>
-  </Grid>
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "bold", color: "#002060", textAlign: "center" }}
+        >
+          Deal Flow – IPO and FO (2023 to 2025) by Quarter
+        </Typography>
+      </Grid>
 
-  {metrics.map((metric) => (
-    <Grid item xs={12} md={4} key={metric}>
-      <Card elevation={4}>
-        <CardContent>
-          <Typography
-            align="center"
-            gutterBottom
-            sx={{ p: 2, color: "#bd3600" }}
-          >
-            {metricNames[metric]}
-          </Typography>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={generateChartData(metric)}>
-              <XAxis dataKey="year" />
-              <YAxis tickFormatter={(val) => formatNumber(val, metric)} />
-              <Tooltip content={<CustomTooltip metric={metric} />} />
-              <Legend />
-              <Bar dataKey="IPO" stackId="a" fill="#8884d8" barSize={10} />
-              <Bar dataKey="FO" stackId="a" fill="#82ca9d" barSize={10} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      {metrics.map((metric) => (
+        <Grid item xs={12} md={4} key={metric}>
+          <Card elevation={4}  onClick={handleCardClick} 
+      sx={{ cursor: 'pointer' }}>
+            <CardContent>
+              <Typography
+                align="center"
+                gutterBottom
+                sx={{ p: 2, color: "#bd3600" }}
+              >
+                {metricNames[metric]}
+              </Typography>
+              <ResponsiveContainer width="100%" height={300} style={{ cursor: "pointer" }}>
+                <BarChart data={generateChartData(metric)} >
+                  <XAxis dataKey="year" />
+                  <YAxis tickFormatter={(val) => formatNumber(val, metric)} />
+                  <Tooltip content={<CustomTooltip metric={metric} />} />
+                  <Legend />
+                  <Bar dataKey="IPO" stackId="a" fill="#8884d8" barSize={10} cursor="pointer" />
+                  <Bar dataKey="FO" stackId="a" fill="#82ca9d" barSize={10} cursor="pointer" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
     </Grid>
-  ))}
-</Grid>
-
   );
 };
 
