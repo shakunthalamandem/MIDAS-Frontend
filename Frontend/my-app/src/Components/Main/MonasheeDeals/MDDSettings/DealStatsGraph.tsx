@@ -175,20 +175,37 @@ const DealStatsGraph: React.FC<DealStatsGraphProps> = ({ selectedFilters }) => {
     }
   };
 
-  const formatChartData = (data: ApiResponse): ChartData[] => {
-    if (!data || typeof data !== "object") return [];
-    return Object.keys(data).map((year) => {
-      const categories = data[year];
-      let formatted: ChartData = { year };
-      Object.keys(categories).forEach((category) => {
-        formatted[category] =
-          categories[category][
-            selectedField as keyof (typeof categories)[typeof category]
-          ] || 0;
-      });
-      return formatted;
+const formatChartData = (data: ApiResponse): ChartData[] => {
+  if (!data || typeof data !== "object") return [];
+
+  const isLineChart = [
+    "weighted_allocation_deal_size_percentage",
+    "weighted_allocation_percentage",
+  ].includes(selectedField);
+
+  return Object.keys(data).map((year) => {
+    const categories = data[year];
+    let formatted: ChartData = { year };
+
+    Object.keys(categories).forEach((category) => {
+      // Skip "Block" ONLY if filter is deal_captain AND it's a line chart
+      if (
+        selectedFilter.payload?.filter_type === "deal_captain" &&
+        category === "Block" &&
+        isLineChart
+      ) {
+        return;
+      }
+
+      formatted[category] =
+        categories[category][
+          selectedField as keyof (typeof categories)[typeof category]
+        ] || 0;
     });
-  };
+
+    return formatted;
+  });
+};
 
   useEffect(() => {
     setChartData((prevData) => {
