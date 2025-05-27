@@ -84,7 +84,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters, handleCancel }) => {
       }
     } catch (error) {
       console.error("Error fetching data", error);
-      navigate("/error");  
+      // navigate("/error");  
 
       setError("Failed to fetch data.");
     } finally {

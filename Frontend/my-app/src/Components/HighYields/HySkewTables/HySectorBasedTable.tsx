@@ -60,7 +60,7 @@ const HySectorBasedTable: React.FC = () => {
         setSectorOptions(Array.isArray(data.sector) ? data.sector : []);
       } catch (error) {
         console.error("Error fetching filter options:", error);
-        navigate("/error");  
+        // navigate("/error");  
 
       }
     };
@@ -103,7 +103,7 @@ const HySectorBasedTable: React.FC = () => {
         
       } catch (error) {
         console.error("API error:", error);
-        navigate("/error"); // Redirect to error page
+        // navigate("/error"); // Redirect to error page
       } finally {
         setLoading(false); // Stop loading
       }

@@ -16,7 +16,20 @@ const DetailedGapData: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+
+
+
+  let selectedFilters: SelectedFilters = {}; // Explicitly using the typed interface
+
+  try {
+    const filters = JSON.parse(searchParams.get("filters") || "{}");
+    selectedFilters = filters;
+  } catch (error) {
+    console.error("Invalid filters format", error);
+    // navigate("/error");  
+
+  }
 
   useEffect(() => {
     try {
@@ -54,10 +67,10 @@ const DetailedGapData: React.FC = () => {
 
         const result = await response.json();
         setData(result.data || []);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(err instanceof Error ? err.message : "Unknown error");
-        navigate("/error");
+      } catch (error) {
+        // navigate("/error");  
+
+        setError(error instanceof Error ? error.message : "Unknown error");
       } finally {
         setLoading(false);
       }

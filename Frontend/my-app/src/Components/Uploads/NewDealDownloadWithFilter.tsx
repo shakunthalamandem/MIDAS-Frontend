@@ -34,7 +34,7 @@ const MenuProps = {
 
 const NewDealDownloadWithFilter: React.FC = () => {
   const [tickers, setTickers] = useState<string[]>([]);
-  const [selectedTickers, setSelectedTickers] = useState<string[]>([]);
+  const [selectedDealId, setselectedDealId] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -79,11 +79,10 @@ const NewDealDownloadWithFilter: React.FC = () => {
     }
 
     const payload = {
-      tickers: selectedTickers,
-      date: selectedDate,
+      deal_id: selectedDealId,
     };
 
-    if (!payload.tickers.length || !payload.date) {
+    if (!payload.deal_id.length ) {
       setError("Please select at least one ticker and a date.");
       setOpenSnackbar(true);
       return;
@@ -148,22 +147,22 @@ const NewDealDownloadWithFilter: React.FC = () => {
                 <Select
                   labelId="ticker-label"
                   multiple
-                  value={selectedTickers}
-                  onChange={(e) => setSelectedTickers(e.target.value as string[])}
+                  value={selectedDealId}
+                  onChange={(e) => setselectedDealId(e.target.value as string[])}
                   input={<OutlinedInput label="Tickers" />}
                   renderValue={(selected) => selected.join(", ")}
                   MenuProps={MenuProps}
                 >
                   {tickers.map((ticker) => (
                     <MenuItem key={ticker} value={ticker}>
-                      <Checkbox checked={selectedTickers.includes(ticker)} />
+                      <Checkbox checked={selectedDealId.includes(ticker)} />
                       <ListItemText primary={ticker} />
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
 
-              <TextField
+              {/* <TextField
                 fullWidth
                 variant="outlined"
                 size="small"
@@ -173,7 +172,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
                 onChange={(e) => setSelectedDate(e.target.value)}
                 InputLabelProps={{ shrink: true }}
                 margin="normal"
-              />
+              /> */}
 
               <Button
                 variant="contained"

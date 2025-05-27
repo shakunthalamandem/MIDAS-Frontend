@@ -53,7 +53,7 @@ const FooterMain: React.FC = () => {
         });
       } catch (error) {
         console.error("Error fetching version info:", error);
-        navigate("/error");  
+        // navigate("/error");  
       }
     };
 

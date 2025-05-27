@@ -95,7 +95,7 @@ const SectorPieChart: React.FC<SectorPieChartProps> = ({
     } catch (error) {
       console.error("Error fetching years:", error);
       setError("Failed to fetch years. Please try again later.");
-      navigate("/error");  
+      // navigate("/error");  
 
     }
   }, []);
@@ -135,7 +135,7 @@ const token = localStorage.getItem("access_token");
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
-      navigate("/error");  
+      // navigate("/error");  
 
 
     }

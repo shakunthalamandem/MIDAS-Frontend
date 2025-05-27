@@ -55,7 +55,7 @@ const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
         const rsiGraphData = jsonData.technical_data?.rsi_graph || [];
         setData(rsiGraphData); // Update the state with the extracted RSI graph data
       } catch (error) {
-        navigate("/error");  
+        // navigate("/error");  
 
         console.error('Error fetching data:', error);
       }

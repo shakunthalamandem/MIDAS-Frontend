@@ -71,7 +71,7 @@ const LeadBankBasedTable: React.FC = () => {
         setSectorOptions(data['sector']);
       } catch (error) {
         console.error('Error fetching filter options:', error);
-        navigate("/error");  
+        // navigate("/error");  
       }
     };
 

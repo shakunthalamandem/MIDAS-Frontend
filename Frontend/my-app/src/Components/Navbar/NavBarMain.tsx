@@ -77,7 +77,8 @@ const NavbarMain: React.FC = () => {
     } catch (error) {
       setLoading(false);
       console.error("Logout failed:", error);
-      navigate("/error");
+      // navigate("/error");  
+
     }
     setShowLogout(false);
   };

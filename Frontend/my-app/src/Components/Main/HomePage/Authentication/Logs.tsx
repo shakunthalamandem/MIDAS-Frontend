@@ -39,7 +39,7 @@ const Logs = () => {
       setLogs(response.data);
     } catch (error) {
       console.error("Error fetching logs:", error);
-      navigate("/error");
+      // navigate("/error");
     }
     setLoading(false);
   };
