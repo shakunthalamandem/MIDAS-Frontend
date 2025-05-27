@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import PredictionResults from "./PredictionResults";
 import { MenuProps } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const menuProps: Partial<MenuProps> = {
   PaperProps: {
@@ -50,6 +52,8 @@ type OptionsResponse = {
 };
 
 type FormData = {
+  ticker: string;
+  pricing_date: Date | null;
   deal_type: string;
   region: string;
   target: string;
@@ -76,6 +80,8 @@ type MLInputFormProps = {
 
 const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
   const defaultFormData = {
+    ticker: "",
+    pricing_date: null,
     deal_type: "FO",
     region: "US",
     target: "T1D",
@@ -155,7 +161,11 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
     return isValid;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e:
+      | { target: { name: string; value: any } }
+      | React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -249,6 +259,44 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
         }}
       >
         <Grid container spacing={2}>
+          <Grid item xs={6} container alignItems="center">
+            <Grid item xs={6}>
+              <Typography>Ticker Symbol</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                size="small"
+                name="ticker"
+                value={formData.ticker}
+                onChange={handleChange}
+                type="string"
+                placeholder="e.g., AAPL"
+                error={!!formErrors.ticker}
+                helperText={formErrors.ticker}
+                InputProps={{
+                  sx: { width: inputWidth },
+                }}
+              />
+            </Grid>
+          </Grid>
+          <Grid item xs={6} container alignItems="center">
+            <Grid item xs={6}>
+              <Typography>Pricing Date</Typography>
+            </Grid>
+
+            <Grid item xs={6}>
+              <TextField
+                size="small"
+                type="date"
+                name="pricing_date"
+                value={formData.pricing_date}
+                onChange={handleChange}
+                InputProps={{
+                  sx: { width: inputWidth },
+                }}
+              />
+            </Grid>
+          </Grid>
           <Grid item xs={6} container alignItems="center">
             <Grid item xs={6}>
               <Typography>Deal Type</Typography>
