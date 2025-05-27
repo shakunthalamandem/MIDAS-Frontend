@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, Typography, useTheme } from "@mui/material";
+import { Box, Card, CardContent, Stack, Typography, useTheme } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
+  Cell,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 
@@ -123,46 +124,64 @@ const SummaryGapGraph = () => {
   }, []);
 
   const renderChart = (title: string, data: any[]) => (
-    <Card elevation={3} sx={{ width: "48%", height: 350, p: 2 ,        cursor: "pointer",
-}}       onClick={handleNavigationClick}
->
-      <CardContent sx={{  cursor: "pointer"}}>
-        <Typography
-          variant="h6"
-          component="div"
-          color="#002060"
-          align="center"
-          fontWeight="bold"
-          mb={2}
-          
-        >
-          {title}
-        </Typography>
-        <ResponsiveContainer width="100%" height={280} style={{ cursor: "pointer" }}>
-          <BarChart data={data} margin={{ left: 10 }}>
-            <XAxis dataKey="name" style={{fontSize:'12px',color:'red'}} />
-            <YAxis tickFormatter={formatYAxis} />
-            <Tooltip formatter={(value) => formatYAxis(value)} />
-            <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
-            <Bar dataKey="value" fill="#e26d3e" barSize={20}   cursor="pointer" />
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+ <Card
+    elevation={3}
+    sx={{ width: "50%", height: 350, p: 2, cursor: "pointer" }}
+    onClick={handleNavigationClick}
+  >
+    <CardContent sx={{ cursor: "pointer" }}>
+      <Typography
+        variant="h6"
+        component="div"
+        color="#002060"
+        align="center"
+        fontWeight="bold"
+        mb={2}
+      >
+        {title}
+      </Typography>
+      <ResponsiveContainer width="100%" height={280}>
+        <BarChart data={data} margin={{ left: 10 }}>
+          <XAxis dataKey="name" style={{ fontSize: "12px" }} />
+          <YAxis tickFormatter={formatYAxis} />
+          <Tooltip formatter={(value) => formatYAxis(value)} />
+          <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
+          <Bar dataKey="value" barSize={20}>
+            {data.map((entry, index) => {
+              let fill = "#e26d3e";
+
+              if (index === data.length - 1) {
+                fill = entry.value < 0 ? "#f44336" : "#4caf50"; 
+              }
+
+              return <Cell key={`cell-${index}`} fill={fill} cursor="pointer" />;
+            })}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </CardContent>
+  </Card>
   );
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        gap: 16,
-        width: "100%",
-      }}
-    >
-      {renderChart("FO Summary Gap Metrics - 2025", foData)}
-      {renderChart("IPO Summary Gap Metrics - 2025", ipoData)}
-    </div>
+ <Box width="100%">
+      <Typography
+        variant="h6"
+        component="div"
+        color="#002060"
+        align="center"
+        fontWeight="bold"
+        mb={2}
+        mt={2}
+      >
+        Summary Gap Metrics
+      </Typography>
+
+      <Stack direction="row" spacing={2} justifyContent="space-between">
+        {renderChart("FO Summary Gap Metrics - 2025", foData)}
+        {renderChart("IPO Summary Gap Metrics - 2025", ipoData)}
+      </Stack>
+    </Box>
   );
 };
 
