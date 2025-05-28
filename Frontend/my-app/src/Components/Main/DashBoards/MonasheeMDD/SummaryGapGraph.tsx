@@ -139,13 +139,13 @@ const SummaryGapGraph: React.FC = () => {
         </Typography>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data} margin={{ left: 10 }}>
-            <XAxis dataKey="name" style={{ fontSize: "10px" }} />
-            <YAxis tickFormatter={formatYAxis} />
+            <XAxis dataKey="name" style={{ fontSize: "12px" }} />
+            <YAxis tickFormatter={formatYAxis} style={{ fontSize: "12px" }} />
             <Tooltip formatter={(value: number) => formatYAxis(value)} />
             <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
             <Bar dataKey="value" barSize={15}>
               {data.map((entry, index) => {
-                let fill = "#e26d3e";
+                let fill = "#7a4bb9";
                 if (index === data.length - 1) {
                   fill = entry.value < 0 ? "#f44336" : "#4caf50";
                 }
