@@ -144,7 +144,7 @@ const handleCardClick = () => {
 
       {metrics.map((metric) => (
         <Grid item xs={12} md={4} key={metric}>
-          <Card elevation={4}  onClick={handleCardClick} 
+          <Card elevation={4}  
       sx={{ cursor: 'pointer' }}>
             <CardContent>
               <Typography

@@ -94,12 +94,12 @@ const SummaryGapGraph = () => {
         if (ipoSummary) {
           const barData: any = [
             {
-              name: "Model Allocation Gap ",
+              name: "Allocation ",
               value: ipoSummary["Model Allocation Gap"],
             },
-            { name: "Model AM Gap", value: ipoSummary["AM Gap"] },
+            { name: "AM", value: ipoSummary["AM Gap"] },
             {
-              name: "Exit Gap Sum",
+              name: "Exit",
               value:
                 (ipoSummary["Monashee Exit Gap"] || 0) +
                 (ipoSummary["AM Exit Gap"] || 0),
@@ -127,7 +127,6 @@ const SummaryGapGraph = () => {
  <Card
     elevation={3}
     sx={{ width: "90%", height: 400, p: 2, cursor: "pointer" }}
-    onClick={handleNavigationClick}
   >
     <CardContent sx={{ cursor: "pointer" }}>
       <Typography

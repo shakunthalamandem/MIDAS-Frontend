@@ -3,6 +3,7 @@ import SummaryGapGraph from './SummaryGapGrapgh'
 import AllocationGraphsMain from './AllocationGraphsMain'
 import WeekelyMDD from './WeekelyMDD'
 import DashboardSectorWiseTable from './DashboardSectorWiseTable'
+import SummaryGraphsGap from './SummaryGraphsGap'
 
 const MDDDashboardMain = () => {
   return (
@@ -17,10 +18,11 @@ const MDDDashboardMain = () => {
         </div>
 
         {/* Right side: Single tall component */}
-        <div style={{ flex: 1 }}>
+        {/* <div style={{ flex: 1 }}>
           <SummaryGapGraph />
-        </div>
+        </div> */}
       </div>
+      <SummaryGraphsGap />
     </>
   )
 }

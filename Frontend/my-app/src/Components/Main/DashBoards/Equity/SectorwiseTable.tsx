@@ -120,7 +120,7 @@ const handleCardClick = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper} elevation={4} onClick={handleCardClick}>
+      <TableContainer component={Paper} elevation={4} >
         <Box
           sx={{
             overflow: "hidden",
@@ -139,7 +139,7 @@ const handleCardClick = () => {
               p: 1.5,
             }}
           >
-         Sectorwise Skew Table for 2025 (Q1) with  <span style={{ color: "red" }}>Top3</span> Highlights
+         Sector-wise Skew Table for 2025 (Q1) with  <span style={{ color: "red" }}>Top 3</span> Highlights
 
           </Typography>
 {/* 

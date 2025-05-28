@@ -33,11 +33,11 @@ const formatNumber = (value: number): string => {
   let formattedValue: string;
 
   if (absValue >= 1e9) {
-    formattedValue = `${(absValue / 1e9).toFixed()}B`;
+    formattedValue = `$${(absValue / 1e9).toFixed(1)}B`;
   } else if (absValue >= 1e6) {
-    formattedValue = `${(absValue / 1e6).toFixed()}M`;
+    formattedValue = `$${(absValue / 1e6).toFixed(1)}M`;
   } else if (absValue >= 1e3) {
-    formattedValue = `${(absValue / 1e3).toFixed()}K`;
+    formattedValue = `$${(absValue / 1e3).toFixed(1)}K`;
   } else {
     formattedValue = absValue.toString();
   }
@@ -135,7 +135,7 @@ const RegionWiseTable = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper} elevation={4} onClick={handleCardClick}>
+      <TableContainer component={Paper} elevation={4} >
         <Box
           sx={{
             overflow: "hidden",
@@ -154,8 +154,8 @@ const RegionWiseTable = () => {
               p: 1.5,
             }}
           >
-            RegionWise SkewTable - IPO and FO Deals for 2025 (Q1) with{" "}
-            <span style={{ color: "red" }}>Top1</span> Highlights
+            Region-wise Skew Table - IPO and FO Deals for 2025 (Q1) with{" "}
+            <span style={{ color: "red" }}>Top</span> Highlights
           </Typography>
 
           {/* <style>
