@@ -142,61 +142,67 @@ const handleCardClick = () => {
          Sector-wise Skew Table for 2025 (Q1) with  <span style={{ color: "red" }}>Top 3</span> Highlights
 
           </Typography>
-{/* 
-          <style>
-            {`
-      @keyframes scroll-left {
-        0% {
-          transform: translateX(100%);
-        }
-        100% {
-          transform: translateX(-100%);
-        }
-      }
-    `}
-          </style> */}
-        </Box>
-        <Table size="small">
-          <TableHead sx={{ backgroundColor: "#002060", }}>
-            <TableRow sx={{ color: "white" }}>
-              <TableCell sx={{ fontWeight: "bold",color:'#FFFFFF' }}>Sector</TableCell>
-              {metrics.map((metric) => (
-                <TableCell key={metric} sx={{ fontWeight: "bold", color:'#FFFFFF'}}>
-                  {metricDisplayNames[metric]}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Object.entries(sectorData).map(([sector, data]) => (
-              <TableRow key={sector}>
-                <TableCell>{sector}</TableCell>
-                {metrics.map((metric) => {
-                  const value = data[metric];
-                  const isTop3 = top3Values[metric]?.includes(value) ?? false;
-                  const isCurrency =
-                    metric === "Total_Deal_Volume" ||
-                    metric === "Long_Opportunity_Value";
-                  const isPercentage =
-                    metric === "Positively_Performing_Deals_Percentage" ||
-                    metric === "Expected_Returns_Excess";
 
-                  return (
-                    <TableCell
-                      key={metric}
-                      sx={{
-                        backgroundColor: isTop3 ? "#ffd9b3" : "inherit",
-                        fontWeight: isTop3 ? "bold" : "normal",
-                      }}
-                    >
-                      {formatNumber(value, isCurrency, isPercentage)}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        </Box>
+   <Table size="small">
+  <TableHead sx={{ backgroundColor: "#002060" }}>
+    <TableRow>
+      <TableCell
+        sx={{
+          fontWeight: "bold",
+          color: "#FFFFFF",
+          border: "1px solidrgb(172, 172, 172)",
+        }}
+      >
+        Sector
+      </TableCell>
+      {metrics.map((metric) => (
+        <TableCell
+          key={metric}
+          sx={{
+            fontWeight: "bold",
+            color: "#FFFFFF",
+            border: "1px solid #d8d8d8",
+          }}
+        >
+          {metricDisplayNames[metric]}
+        </TableCell>
+      ))}
+    </TableRow>
+  </TableHead>
+  <TableBody>
+    {Object.entries(sectorData).map(([sector, data]) => (
+      <TableRow key={sector}>
+        <TableCell sx={{ border: "1px solid #d8d8d8" }} >{sector}</TableCell>
+        {metrics.map((metric) => {
+          const value = data[metric];
+          const isTop3 = top3Values[metric]?.includes(value) ?? false;
+          const isCurrency =
+            metric === "Total_Deal_Volume" ||
+            metric === "Long_Opportunity_Value";
+          const isPercentage =
+            metric === "Positively_Performing_Deals_Percentage" ||
+            metric === "Expected_Returns_Excess";
+
+          return (
+            <TableCell
+              key={metric}
+              align="center"
+              sx={{
+                backgroundColor: isTop3 ? "#ffd9b3" : "inherit",
+                fontWeight: isTop3 ? "bold" : "normal",
+                border: "1px solid #d8d8d8",
+              }}
+            >
+              {formatNumber(value, isCurrency, isPercentage)}
+            </TableCell>
+          );
+        })}
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+
       </TableContainer>
     </Box>
   );
