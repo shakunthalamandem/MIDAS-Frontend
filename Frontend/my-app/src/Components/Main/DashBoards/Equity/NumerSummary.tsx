@@ -77,10 +77,10 @@ const handleCardClick = () => {
     if (metric === "count") return value.toString();
     const abs = Math.abs(value);
     let formatted = value.toString();
-    if (abs >= 1e9) formatted = `${(abs / 1e9).toFixed(1)}B`;
-    else if (abs >= 1e6) formatted = `${(abs / 1e6).toFixed(1)}M`;
-    else if (abs >= 1e3) formatted = `${(abs / 1e3).toFixed(1)}K`;
-    return value < 0 ? `-${formatted}` : formatted;
+    if (abs >= 1e9) formatted = `$${(abs / 1e9).toFixed(1)}B`;
+    else if (abs >= 1e6) formatted = `$${(abs / 1e6).toFixed(1)}M`;
+    else if (abs >= 1e3) formatted = `$${(abs / 1e3).toFixed(1)}K`;
+    return value < 0 ? `-$${formatted}` : formatted;
   };
 
   const CustomTooltip = ({
