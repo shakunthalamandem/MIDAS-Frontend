@@ -7,25 +7,25 @@ import MDDDashboardMain from './MonasheeMDD/MDDDashboardMain';
 
 const LandingPageMain: React.FC = () => {
   return (
-    <Grid container height="100vh">
-      {/* Left side: 75% */}
-      <Grid item xs={9} p={2} sx={{ overflowY: 'auto' }}>
-        <Box display="flex" flexDirection="column" gap={2}>
-          <Paper elevation={3} sx={{ p: 2 }}>
-            <EquityDashboard />
-          </Paper>
-          <Paper elevation={3} sx={{ p: 2 }}>
-            <MDDDashboardMain />
-          </Paper>
-          {/* Add more components here as needed */}
-        </Box>
-      </Grid>
+    <Box display="flex">
+  {/* Left side: 85% */}
+  <Box sx={{ width: '85%', p: 2, overflowY: 'auto' }}>
+    <Box display="flex" flexDirection="column" gap={2}>
+      <Paper elevation={3} sx={{ p: 2,backgroundColor: '#f4f7ff' }}>
+        <EquityDashboard />
+      </Paper>
+      <Paper elevation={3} sx={{ p: 2 ,backgroundColor: '#fcfbe8' }}>
+        <MDDDashboardMain />
+      </Paper>
+    </Box>
+  </Box>
 
-      {/* Right side: 25% */}
-      <Grid item xs={3} p={2} sx={{ backgroundColor: '#f5f5f5' }}>
-        <InsightsMain />
-      </Grid>
-    </Grid>
+  {/* Right side: 15% */}
+  <Box sx={{ width: '15%', p: 2, backgroundColor: '#f5f5f5' }}>
+    <InsightsMain />
+  </Box>
+</Box>
+
   );
 };
 
