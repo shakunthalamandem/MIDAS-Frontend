@@ -1,14 +1,21 @@
 import React from 'react';
-import { Box, Grid, Paper } from '@mui/material';
+import { Box, Grid, Paper, Typography } from '@mui/material';
 import SectorwiseTable from './SectorwiseTable';
 import QuarterlyDealsTable from './QuarterlyDealsTable';
 import RegionWiseTable from './RegionWiseTable';
 import NumerSummary from './NumerSummary';
+import AiDashboard from './AiDashboard';
 
 const EquityDashboard = () => {
   return (
     <Box sx={{ p: 2 }}>
       <Grid container spacing={2}>
+        <Typography variant="h5" sx={{ mb: 2, color: '#002060', textAlign: 'center' }}>
+          Todays Deals Dashboard
+        </Typography>
+        <Grid item xs={12}>
+          <AiDashboard />
+        </Grid>
         {/* First Row: Single full-width component */}
         <Grid item xs={12}>
             <NumerSummary />
