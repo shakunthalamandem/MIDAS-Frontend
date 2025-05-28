@@ -33,11 +33,11 @@ const formatNumber = (value: number): string => {
   let formattedValue: string;
 
   if (absValue >= 1e9) {
-    formattedValue = `$${(absValue / 1e9).toFixed()}B`;
+    formattedValue = `$${(absValue / 1e9).toFixed(1)}B`;
   } else if (absValue >= 1e6) {
-    formattedValue = `$${(absValue / 1e6).toFixed()}M`;
+    formattedValue = `$${(absValue / 1e6).toFixed(1)}M`;
   } else if (absValue >= 1e3) {
-    formattedValue = `$${(absValue / 1e3).toFixed()}K`;
+    formattedValue = `$${(absValue / 1e3).toFixed(1)}K`;
   } else {
     formattedValue = absValue.toString();
   }
