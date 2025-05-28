@@ -127,7 +127,6 @@ const SummaryGapGraph = () => {
  <Card
     elevation={3}
     sx={{ width: "90%", height: 400, p: 2, cursor: "pointer" }}
-    onClick={handleNavigationClick}
   >
     <CardContent sx={{ cursor: "pointer" }}>
       <Typography

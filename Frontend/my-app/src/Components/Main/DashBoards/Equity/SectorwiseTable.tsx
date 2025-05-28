@@ -120,7 +120,7 @@ const handleCardClick = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper} elevation={4} onClick={handleCardClick}>
+      <TableContainer component={Paper} elevation={4} >
         <Box
           sx={{
             overflow: "hidden",

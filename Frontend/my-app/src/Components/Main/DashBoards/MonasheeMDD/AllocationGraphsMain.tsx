@@ -64,9 +64,7 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
         fo_type: ["Marketed", "Overnight"],
       };
 
-      // ✅ Combine default filters and selected filters (keep empty arrays)
       const payload = Object.assign({}, defaultFilters, selectedFilters);
-      console.log("Payload sent to API:", payload);
 
       const response = await fetch(`${apiUrl}/api/mdd_deals_graph/`, {
         method: "POST",
@@ -195,7 +193,7 @@ const handleCardClick = () => {
   );
 
   return (
-    <Box sx={{ padding: 2 }}  onClick={handleCardClick}>
+    <Box sx={{ padding: 2 }}  >
       <Typography
         variant="h6"
         sx={{

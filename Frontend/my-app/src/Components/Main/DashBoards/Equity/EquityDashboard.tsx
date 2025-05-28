@@ -26,6 +26,7 @@ const EquityDashboard = () => {
         <Grid item xs={12}>
             <SectorwiseTable />
         </Grid>
+             
       </Grid>
     </Box>
   );
