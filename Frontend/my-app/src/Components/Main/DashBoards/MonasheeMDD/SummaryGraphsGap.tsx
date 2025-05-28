@@ -123,7 +123,7 @@ const SummaryGapGraph: React.FC = () => {
 
   const renderChart = (title: string, data: ChartDataPoint[]) => (
     <Card
-      elevation={3}
+      
       sx={{ width: "100%", height: 280, cursor: "pointer" }}
     //   onClick={() => navigate("/equity/monashee-deals/gap-analysis")}
     >
@@ -190,7 +190,7 @@ const SummaryGapGraph: React.FC = () => {
             <Typography variant="h6" fontWeight="bold" align="center">
               US 2025
             </Typography>
-            <Box sx={{ display: "flex", gap: 2, flexGrow: 1 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
                 {renderChart("FO", foDataUS)}
               </Box>
@@ -218,7 +218,7 @@ const SummaryGapGraph: React.FC = () => {
             <Typography variant="h6" fontWeight="bold" align="center">
               EMEA 2025
             </Typography>
-            <Box sx={{ display: "flex", gap: 2, flexGrow: 1 }}>
+            <Box sx={{ display: "flex", gap: 2}}>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
                 {renderChart("FO", foDataEMEA)}
               </Box>
