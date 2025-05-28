@@ -154,8 +154,8 @@ const RegionWiseTable = () => {
               p: 1.5,
             }}
           >
-            RegionWise SkewTable - IPO and FO Deals for 2025 (Q1) with{" "}
-            <span style={{ color: "red" }}>Top1</span> Highlights
+            Region-wise Skew Table - IPO and FO Deals for 2025 (Q1) with{" "}
+            <span style={{ color: "red" }}>Top</span> Highlights
           </Typography>
 
           {/* <style>
