@@ -60,7 +60,7 @@ const formatNumber = (
   } else if (absValue >= 1e3) {
     formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
   } else {
-    formattedValue = absValue.toFixed(1);
+    formattedValue = absValue.toFixed(0);
   }
 
   if (isCurrency) formattedValue = `$${formattedValue}`;
