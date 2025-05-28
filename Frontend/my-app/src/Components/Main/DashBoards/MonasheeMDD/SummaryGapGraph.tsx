@@ -120,10 +120,9 @@ const SummaryGapGraph: React.FC = () => {
     fetchData("US");
     fetchData("EMEA");
   }, []);
-
 const renderChart = (title: string, data: ChartDataPoint[], yMin: number, yMax: number) => (
-  <Card sx={{ width: "100%", height: 280, cursor: "pointer" }}>
-    <CardContent>
+  <Card sx={{ width: "100%", height: 300, cursor: "pointer" }}>
+    <CardContent sx={{ p: 2 }}>
       <Typography
         variant="subtitle1"
         align="center"
@@ -134,21 +133,33 @@ const renderChart = (title: string, data: ChartDataPoint[], yMin: number, yMax: 
         {title}
       </Typography>
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data} margin={{ left: 10 }}>
-          <XAxis dataKey="name" style={{ fontSize: "12px" }} />
-          <YAxis 
+        <BarChart
+          data={data}
+          margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+        >
+          <XAxis
+            dataKey="name"
+            style={{ fontSize: "12px" }}
+            axisLine={true}
+            tickLine={false}
+          />
+          <YAxis
             tickFormatter={formatYAxis}
             style={{ fontSize: "12px" }}
             domain={[yMin, yMax]}
+            axisLine
+            tickLine
           />
           <Tooltip formatter={(value: number) => formatYAxis(value)} />
           <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
           <Bar dataKey="value" barSize={15}>
             {data.map((entry, index) => {
-              let fill = "#7a4bb9";
-              if (index === data.length - 1) {
-                fill = entry.value < 0 ? "#f44336" : "#4caf50";
-              }
+              const isLast = index === data.length - 1;
+              const fill = isLast
+                ? entry.value < 0
+                  ? "#f44336"
+                  : "#4caf50"
+                : "#7a4bb9";
               return (
                 <Cell key={`cell-${index}`} fill={fill} cursor="pointer" />
               );
