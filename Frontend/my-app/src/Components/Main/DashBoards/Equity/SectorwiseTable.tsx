@@ -131,17 +131,18 @@ const handleCardClick = () => {
           <Typography
             variant="body1"
             sx={{
-              display: "inline-block",
-              animation: "scroll-left 15s linear infinite",
+              // display: "inline-block",
+              // animation: "scroll-left 15s linear infinite",
               fontWeight: "bold",
               color: "#054511",
+              textAlign: "center",
               p: 1.5,
             }}
           >
          Sectorwise Skew Table for 2025 (Q1) with  <span style={{ color: "red" }}>Top3</span> Highlights
 
           </Typography>
-
+{/* 
           <style>
             {`
       @keyframes scroll-left {
@@ -153,7 +154,7 @@ const handleCardClick = () => {
         }
       }
     `}
-          </style>
+          </style> */}
         </Box>
         <Table size="small">
           <TableHead sx={{ backgroundColor: "#002060", }}>

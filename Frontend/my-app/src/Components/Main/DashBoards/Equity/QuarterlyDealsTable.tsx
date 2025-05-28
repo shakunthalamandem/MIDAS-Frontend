@@ -168,17 +168,19 @@ const handleCardClick = () => {
           <Typography
             variant="body1"
             sx={{
-              display: "inline-block",
-              animation: "scroll-left 15s linear infinite",
+              // display: "inline-block",
+              // animation: "scroll-left 15s linear infinite",
               fontWeight: "bold",
               color: "#054511",
+              alignContent: "center",
+              textAlign: "center",
               p: 1.5,
             }}
           >
             Skew Table - IPO and FO Deals from 2023 to 2025 for Q1
           </Typography>
 
-          <style>
+          {/* <style>
             {`
       @keyframes scroll-left {
         0% {
@@ -189,7 +191,7 @@ const handleCardClick = () => {
         }
       }
     `}
-          </style>
+          </style> */}
         </Box>
 
         <Table size="small">

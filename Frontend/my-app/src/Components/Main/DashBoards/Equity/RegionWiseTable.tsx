@@ -146,10 +146,11 @@ const RegionWiseTable = () => {
           <Typography
             variant="body1"
             sx={{
-              display: "inline-block",
-              animation: "scroll-left 15s linear infinite",
+              // display: "inline-block",
+              // animation: "scroll-left 15s linear infinite",
               fontWeight: "bold",
               color: "#054511",
+              textAlign: "center",
               p: 1.5,
             }}
           >
@@ -157,7 +158,7 @@ const RegionWiseTable = () => {
             <span style={{ color: "red" }}>Top1</span> Highlights
           </Typography>
 
-          <style>
+          {/* <style>
             {`
       @keyframes scroll-left {
         0% {
@@ -168,7 +169,7 @@ const RegionWiseTable = () => {
         }
       }
     `}
-          </style>
+          </style> */}
         </Box>
 
         <Table size="small">
