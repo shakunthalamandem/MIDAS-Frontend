@@ -8,7 +8,9 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardContent, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Grid, IconButton, Typography } from "@mui/material";
+import SwitchAccessShortcutIcon from '@mui/icons-material/SwitchAccessShortcut';
+
 
 const metricNames: Record<string, string> = {
   count: "Deal Count",
@@ -140,6 +142,7 @@ const handleCardClick = () => {
         >
           Deal Flow – IPO and FO (2023 to 2025) by Quarter
         </Typography>
+        
       </Grid>
 
       {metrics.map((metric) => (
@@ -147,6 +150,9 @@ const handleCardClick = () => {
           <Card elevation={4}  
       sx={{ cursor: 'pointer' }}>
             <CardContent>
+                  <IconButton onClick={handleCardClick} aria-label="View Details">
+      <SwitchAccessShortcutIcon sx={{color:"#491daf"}} />
+    </IconButton>
               <Typography
                 align="center"
                 gutterBottom
@@ -154,6 +160,7 @@ const handleCardClick = () => {
               >
                 {metricNames[metric]}
               </Typography>
+           
               <ResponsiveContainer width="100%" height={300} style={{ cursor: "pointer" }}>
                 <BarChart data={generateChartData(metric)} >
                   <XAxis dataKey="year" />
