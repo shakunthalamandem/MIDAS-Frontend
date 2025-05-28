@@ -206,7 +206,7 @@ const handleCardClick = () => {
           fontWeight: "bold",
           textAlign: "center",
           mb: 2,
-          color: "#002060",
+          color: "#004d2a",
         }}
       >
         Weighted Allocation for 2024 and 2025 by Quarterly

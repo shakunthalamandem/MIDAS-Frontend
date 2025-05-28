@@ -199,7 +199,7 @@ const DashboardSectorWiseTable: React.FC = () => {
           mb: 2,
           fontWeight: "bold",
           textAlign: "center",
-          color: "#002060",
+          color: "#004d2a",
         }}
       >
         Sector Wise IPO and FO Data for 2025
