@@ -157,7 +157,7 @@ const handleCardClick = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper} elevation={4} onClick={handleCardClick} >
+      <TableContainer component={Paper} elevation={4}  >
         <Box
           sx={{
             overflow: "hidden",
@@ -197,7 +197,7 @@ const handleCardClick = () => {
         <Table size="small">
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold", minWidth: "80px" }}>
+              <TableCell sx={{ fontWeight: "bold", minWidth: "80px", py: 2 }}>
                 Quarter
               </TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>
@@ -233,7 +233,7 @@ const handleCardClick = () => {
           <TableBody>
             {ipoData.map((row) => (
               <TableRow key={`IPO-${row.quarter}`}>
-                <TableCell>{row.quarter}</TableCell>
+                <TableCell sx={{ py: 1 }}>{row.quarter}</TableCell>
                 <TableCell>{row.data.Total_Deal_Count}</TableCell>
                 <TableCell>
                   {formatNumber(row.data.Total_Deal_Volume)}
@@ -263,7 +263,7 @@ const handleCardClick = () => {
             </TableRow>
             {foData.map((row) => (
               <TableRow key={`FO-${row.quarter}`}>
-                <TableCell>{row.quarter}</TableCell>
+                <TableCell sx={{ py: 1.1 }}>{row.quarter}</TableCell>
                 <TableCell>{row.data.Total_Deal_Count}</TableCell>
                 <TableCell>
                   {formatNumber(row.data.Total_Deal_Volume)}
