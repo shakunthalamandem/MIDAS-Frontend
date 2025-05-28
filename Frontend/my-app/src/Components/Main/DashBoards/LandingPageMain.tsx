@@ -11,10 +11,10 @@ const LandingPageMain: React.FC = () => {
   {/* Left side: 85% */}
   <Box sx={{ width: '85%', p: 2, overflowY: 'auto' }}>
     <Box display="flex" flexDirection="column" gap={2}>
-      <Paper elevation={3} sx={{ p: 2 }}>
+      <Paper elevation={3} sx={{ p: 2,backgroundColor: '#f4f7ff' }}>
         <EquityDashboard />
       </Paper>
-      <Paper elevation={3} sx={{ p: 2 }}>
+      <Paper elevation={3} sx={{ p: 2 ,backgroundColor: '#fcfbe8' }}>
         <MDDDashboardMain />
       </Paper>
     </Box>
