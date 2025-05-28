@@ -1,9 +1,8 @@
 import React from 'react'
-import SummaryGapGraph from './SummaryGapGrapgh'
 import AllocationGraphsMain from './AllocationGraphsMain'
 import WeekelyMDD from './WeekelyMDD'
 import DashboardSectorWiseTable from './DashboardSectorWiseTable'
-import SummaryGraphsGap from './SummaryGraphsGap'
+import SummaryGraphsGap from './SummaryGapGraph'
 
 const MDDDashboardMain = () => {
   return (
@@ -17,10 +16,6 @@ const MDDDashboardMain = () => {
           <DashboardSectorWiseTable />
         </div>
 
-        {/* Right side: Single tall component */}
-        {/* <div style={{ flex: 1 }}>
-          <SummaryGapGraph />
-        </div> */}
       </div>
       <SummaryGraphsGap />
     </>
