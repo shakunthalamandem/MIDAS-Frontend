@@ -37,9 +37,9 @@ const metrics: (keyof SectorMetrics)[] = [
 const metricDisplayNames: Record<keyof SectorMetrics, string> = {
   Total_Deal_Count: "Total Deal Count",
   Total_Deal_Volume: "Total Deal Volume ($)",
-  Long_Opportunity_Value: "Opportunity Value (T + 1M Excess)",
+  Long_Opportunity_Value: "Opportunity Value (T+1M Excess)",
   Positively_Performing_Deals_Percentage: "% of Positively Performing Deals",
-  Expected_Returns_Excess: "Expected Returns Excess (T + 1M)",
+  Expected_Returns_Excess: "Expected Returns Excess",
 };
 
 // Format function

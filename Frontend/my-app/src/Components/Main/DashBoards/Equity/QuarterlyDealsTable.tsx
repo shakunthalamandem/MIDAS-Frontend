@@ -207,13 +207,13 @@ const handleCardClick = () => {
                 Total Deal Volume ($)
               </TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>
-                Opportunity Value (T + 1M Excess)
+                Opportunity Value (T+1M Excess)
               </TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>
                 % of Positively Performing Deals
               </TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>
-                Expected Returns Excess(T + 1M)
+                Expected Returns Excess
               </TableCell>
             </TableRow>
             <TableRow>
