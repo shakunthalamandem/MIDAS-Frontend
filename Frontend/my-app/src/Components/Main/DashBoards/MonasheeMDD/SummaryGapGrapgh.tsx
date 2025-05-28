@@ -67,12 +67,12 @@ const SummaryGapGraph = () => {
         if (foSummary) {
           const barData: any = [
             {
-              name: " Model Allocation Gap",
+              name: " Allocation",
               value: foSummary["Model Allocation Gap"],
             },
-            { name: "Model AM Gap", value: foSummary["AM Gap"] },
+            { name: "AM", value: foSummary["AM Gap"] },
             {
-              name: "Exit Gap Sum",
+              name: "Exit",
               value:
                 (foSummary["Monashee Exit Gap"] || 0) +
                 (foSummary["AM Exit Gap"] || 0),
@@ -178,8 +178,8 @@ const SummaryGapGraph = () => {
       </Typography>
 
       <Stack direction="column" spacing={2} justifyContent="space-between">
-        {renderChart("FO Summary Gap Metrics - 2025", foData)}
-        {renderChart("IPO Summary Gap Metrics - 2025", ipoData)}
+        {renderChart("FO  2025", foData)}
+        {renderChart("IPO 2025", ipoData)}
       </Stack>
     </Box>
   );
