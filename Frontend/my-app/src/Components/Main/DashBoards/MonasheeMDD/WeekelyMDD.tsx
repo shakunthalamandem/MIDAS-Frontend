@@ -102,7 +102,6 @@ const WeekelyMDD: React.FC<WeekelyMDDProps> = ({ selectedWeek }) => {
   };
 
   return (
-    <Container  sx={{ py: 0 }}>
       <Card sx={{ boxShadow: 3, p: 3, mb: 2 }} elevation={3}>
         <Typography variant="h5" color="#002060" align="center" gutterBottom>
           2025 YTD GAP Analysis 
@@ -120,7 +119,6 @@ const WeekelyMDD: React.FC<WeekelyMDDProps> = ({ selectedWeek }) => {
           />
         )}
       </Card>
-    </Container>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from "@mui/material";
+import { Table, TableHead, TableRow, TableCell, TableBody, Typography, Box } from "@mui/material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const formatValue = (value: number): string => {
@@ -19,14 +19,32 @@ const formatValue = (value: number): string => {
 const formatNegativeValue = (value: number, isTotalRow: boolean) => {
   const formattedValue = formatValue(value);
   return value < 0 ? (
-    <Typography sx={{ color: "red", display: "flex", alignItems: "center", fontSize: "13px", fontWeight: isTotalRow ? "bold" : "normal"  }}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",   // centers horizontally
+        alignItems: "center",       // centers vertically
+        fontSize: "13px",
+        fontWeight: isTotalRow ? "bold" : "normal",
+        color: "red",
+      }}
+    >
+      <ArrowDownwardIcon sx={{ fontSize: "13px", mr: "4px" }} />
       {formattedValue}
-      <ArrowDownwardIcon sx={{ fontSize: "13px", marginRight: "4px" }} />
-    </Typography>
+    </Box>
   ) : (
-    formattedValue
+    <Typography
+      sx={{
+        fontSize: "13px",
+        fontWeight: isTotalRow ? "bold" : "normal",
+        textAlign: "center", // horizontal text alignment
+      }}
+    >
+      {formattedValue}
+    </Typography>
   );
 };
+
 
 interface DealStats {
   count: number;
@@ -113,16 +131,16 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({ data, selectedRegions
                     {region}
                   </TableCell>
                 )}
-                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{dealType}</TableCell>
-                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{dealStats.count}</TableCell>
-                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.volume, isTotalRow)}</TableCell>
-                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.allocation_capital, isTotalRow)}</TableCell>
-                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }} align="center">{dealType}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }} align="center">{dealStats.count}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }} align="center">{formatNegativeValue(dealStats.volume, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }} align="center">{formatNegativeValue(dealStats.allocation_capital, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}   align="center" >
                   {dealStats.allocation_weighted ? dealStats.allocation_weighted.toFixed(2) : "N/A"}%
                 </TableCell>
-                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.monahsee_actual_total, isTotalRow)}</TableCell>
-                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.model_actual_total, isTotalRow)}</TableCell>
-                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}>{formatNegativeValue(dealStats.GAP, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }} align="center" >{formatNegativeValue(dealStats.monahsee_actual_total, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }} align="center" >{formatNegativeValue(dealStats.model_actual_total, isTotalRow)}</TableCell>
+                <TableCell sx={{ fontWeight: isTotalRow ? "bold" : "normal" }} align="center" >{formatNegativeValue(dealStats.GAP, isTotalRow)}</TableCell>
               </TableRow>
             );
           })
