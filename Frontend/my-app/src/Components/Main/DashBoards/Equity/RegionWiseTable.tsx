@@ -157,19 +157,6 @@ const RegionWiseTable = () => {
             Region-wise Skew Table - IPO and FO Deals for 2025 (Q1) with{" "}
             <span style={{ color: "red" }}>Top</span> Highlights
           </Typography>
-
-          {/* <style>
-            {`
-      @keyframes scroll-left {
-        0% {
-          transform: translateX(100%);
-        }
-        100% {
-          transform: translateX(-100%);
-        }
-      }
-    `}
-          </style> */}
         </Box>
 
         <Table size="small">
@@ -303,6 +290,7 @@ const RegionWiseTable = () => {
                   {row.data.Positively_Performing_Deals_Percentage}%
                 </TableCell>
                 <TableCell
+                
                   sx={getStyle(
                     row.data.Expected_Returns_Excess,
                     foMax.Expected_Returns_Excess
