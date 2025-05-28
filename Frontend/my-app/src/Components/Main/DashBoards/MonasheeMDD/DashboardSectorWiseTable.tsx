@@ -192,7 +192,7 @@ const DashboardSectorWiseTable: React.FC = () => {
   };
 
   return (
-    <Box sx={{maxWidth:'1000px'}}  >
+    <Box   >
       <Typography
         variant="h6"
         sx={{
