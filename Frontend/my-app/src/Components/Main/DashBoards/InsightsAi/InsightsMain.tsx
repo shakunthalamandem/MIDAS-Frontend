@@ -11,17 +11,46 @@ const componentData = [
   { title: 'Summary Gap Metrics', content: 'This section summarizes the gap metrics across multiple segments for easy review.' },
 ];
 
+const cardStyles = [
+  { height: '440px', padding: '1px' },
+  { height: '430px', padding: '1px' },
+  { height: '480px', padding: '1px', mb: '20px' }, 
+  { height: '420px', padding: '1px' },
+  { height: '460px', padding: '1px', mb: '100px' },
+  { height: '560px', padding: '1px', mb: '200px'},
+  { height: '500px', padding: '1px' },
+];
+
 const InsightsMain = () => {
   return (
     <>
-      <Typography color="#0bbaf1" align="center" variant="h6" fontWeight="bold">
+      <Typography
+        color="#0bbaf1"
+        align="center"
+        variant="h6"
+        fontWeight="bold"
+        sx={{ mb: 2.5, mt: 2.5 }} 
+      >
         AI Insights
       </Typography>
 
       {componentData.map((item, index) => (
-        <Box key={index} sx={{ height: 300, p: 2 }}>
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <CardContent>
+        <Box
+          key={index}
+          sx={{
+            height: cardStyles[index]?.height || '440px',
+            p: 1,
+          }}
+        >
+          <Card
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              ...cardStyles[index],
+            }}
+          >
+            <CardContent sx={{ height: '100%' }}>
               <Typography variant="h6" gutterBottom fontWeight="bold">
                 {item.title}
               </Typography>
