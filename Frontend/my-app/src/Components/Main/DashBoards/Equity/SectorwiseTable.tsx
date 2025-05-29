@@ -37,9 +37,9 @@ const metrics: (keyof SectorMetrics)[] = [
 const metricDisplayNames: Record<keyof SectorMetrics, string> = {
   Total_Deal_Count: "Total Deal Count",
   Total_Deal_Volume: "Total Deal Volume ($)",
-  Long_Opportunity_Value: "Opportunity Value (T + 1M Excess)",
+  Long_Opportunity_Value: "Opportunity Value (T+1M Excess)",
   Positively_Performing_Deals_Percentage: "% of Positively Performing Deals",
-  Expected_Returns_Excess: "Expected Returns Excess (T + 1M)",
+  Expected_Returns_Excess: "Expected Returns Excess",
 };
 
 // Format function
@@ -54,18 +54,43 @@ const formatNumber = (
   const absValue = Math.abs(value);
 
   if (absValue >= 1e9) {
-    formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
+
+     if(Number.isInteger(Number((absValue / 1e9).toFixed(1)))){
+      formattedValue = `${(absValue / 1e9).toFixed(0)}B`;
+     }else {
+      formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
+     }
   } else if (absValue >= 1e6) {
-    formattedValue = `${(absValue / 1e6).toFixed(1)}M`;
+     if(Number.isInteger(Number((absValue / 1e6).toFixed(1)))){
+        formattedValue = `${(absValue / 1e6).toFixed(0)}M`;
+     }else{
+      formattedValue = `${(absValue / 1e6).toFixed(1)}M`;
+     }
   } else if (absValue >= 1e3) {
-    formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
+    if(Number.isInteger(Number((absValue / 1e3).toFixed(1)))){
+        formattedValue = `${(absValue / 1e3).toFixed(0)}K`;
+     }else{
+      formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
+     }
   } else {
-    formattedValue = absValue.toFixed(0);
+      if(Number.isInteger(Number((absValue).toFixed(1)))){
+        formattedValue = absValue.toFixed(0);
+      }else{
+        formattedValue = absValue.toFixed(1);
+      }
   }
 
   if (isCurrency) formattedValue = `$${formattedValue}`;
-  if (isPercentage)
-    formattedValue = `${parseFloat(formattedValue).toFixed(1)}%`;
+  if (isPercentage){ 
+
+    const value = Number(parseFloat(formattedValue).toFixed(1));
+
+    if(Number.isInteger(value)){
+       formattedValue = `${parseFloat(formattedValue).toFixed(0)}%`; 
+    }else{
+      formattedValue = `${parseFloat(formattedValue).toFixed(1)}%`; 
+    }
+  }
 
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
@@ -130,6 +155,7 @@ const handleCardClick = () => {
         >
           <Typography
             variant="body1"
+            onClick={handleCardClick}
             sx={{
               // display: "inline-block",
               // animation: "scroll-left 15s linear infinite",
@@ -142,61 +168,68 @@ const handleCardClick = () => {
          Sector-wise Skew Table for 2025 (Q1) with  <span style={{ color: "red" }}>Top 3</span> Highlights
 
           </Typography>
-{/* 
-          <style>
-            {`
-      @keyframes scroll-left {
-        0% {
-          transform: translateX(100%);
-        }
-        100% {
-          transform: translateX(-100%);
-        }
-      }
-    `}
-          </style> */}
-        </Box>
-        <Table size="small">
-          <TableHead sx={{ backgroundColor: "#002060", }}>
-            <TableRow sx={{ color: "white" }}>
-              <TableCell sx={{ fontWeight: "bold",color:'#FFFFFF' }}>Sector</TableCell>
-              {metrics.map((metric) => (
-                <TableCell key={metric} sx={{ fontWeight: "bold", color:'#FFFFFF'}}>
-                  {metricDisplayNames[metric]}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Object.entries(sectorData).map(([sector, data]) => (
-              <TableRow key={sector}>
-                <TableCell>{sector}</TableCell>
-                {metrics.map((metric) => {
-                  const value = data[metric];
-                  const isTop3 = top3Values[metric]?.includes(value) ?? false;
-                  const isCurrency =
-                    metric === "Total_Deal_Volume" ||
-                    metric === "Long_Opportunity_Value";
-                  const isPercentage =
-                    metric === "Positively_Performing_Deals_Percentage" ||
-                    metric === "Expected_Returns_Excess";
 
-                  return (
-                    <TableCell
-                      key={metric}
-                      sx={{
-                        backgroundColor: isTop3 ? "#ffd9b3" : "inherit",
-                        fontWeight: isTop3 ? "bold" : "normal",
-                      }}
-                    >
-                      {formatNumber(value, isCurrency, isPercentage)}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        </Box>
+   <Table size="small">
+  <TableHead sx={{ backgroundColor: "#002060" }}>
+    <TableRow>
+      <TableCell
+        sx={{
+          fontWeight: "bold",
+          color: "#FFFFFF",
+          border: "1px solidrgb(172, 172, 172)",
+        }}
+      >
+        Sector
+      </TableCell>
+      {metrics.map((metric) => (
+        <TableCell
+          key={metric}
+          sx={{
+            fontWeight: "bold",
+            color: "#FFFFFF",
+            border: "1px solid #d8d8d8",
+            textAlign: "center",
+          }}
+        >
+          {metricDisplayNames[metric]}
+        </TableCell>
+      ))}
+    </TableRow>
+  </TableHead>
+  <TableBody>
+    {Object.entries(sectorData).map(([sector, data]) => (
+      <TableRow key={sector}>
+        <TableCell sx={{ border: "1px solid #d8d8d8" }} >{sector}</TableCell>
+        {metrics.map((metric) => {
+          const value = data[metric];
+          const isTop3 = top3Values[metric]?.includes(value) ?? false;
+          const isCurrency =
+            metric === "Total_Deal_Volume" ||
+            metric === "Long_Opportunity_Value";
+          const isPercentage =
+            metric === "Positively_Performing_Deals_Percentage" ||
+            metric === "Expected_Returns_Excess";
+
+          return (
+            <TableCell
+              key={metric}
+              align="center"
+              sx={{
+                backgroundColor: isTop3 ? "#ffd9b3" : "inherit",
+                fontWeight: isTop3 ? "bold" : "normal",
+                border: "1px solid #d8d8d8",
+              }}
+            >
+              {formatNumber(value, isCurrency, isPercentage)}
+            </TableCell>
+          );
+        })}
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+
       </TableContainer>
     </Box>
   );

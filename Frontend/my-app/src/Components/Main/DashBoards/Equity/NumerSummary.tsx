@@ -8,7 +8,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardContent, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Grid, IconButton, Typography } from "@mui/material";
+import OpenWithIcon from '@mui/icons-material/OpenWith';
 
 const metricNames: Record<string, string> = {
   count: "Deal Count",
@@ -77,10 +78,10 @@ const handleCardClick = () => {
     if (metric === "count") return value.toString();
     const abs = Math.abs(value);
     let formatted = value.toString();
-    if (abs >= 1e9) formatted = `${(abs / 1e9).toFixed(1)}B`;
-    else if (abs >= 1e6) formatted = `${(abs / 1e6).toFixed(1)}M`;
-    else if (abs >= 1e3) formatted = `${(abs / 1e3).toFixed(1)}K`;
-    return value < 0 ? `-${formatted}` : formatted;
+    if (abs >= 1e9) formatted = `$${(abs / 1e9).toFixed(1)}B`;
+    else if (abs >= 1e6) formatted = `$${(abs / 1e6).toFixed(1)}M`;
+    else if (abs >= 1e3) formatted = `$${(abs / 1e3).toFixed(1)}K`;
+    return value < 0 ? `-$${formatted}` : formatted;
   };
 
   const CustomTooltip = ({
@@ -140,6 +141,7 @@ const handleCardClick = () => {
         >
           Deal Flow – IPO and FO (2023 to 2025) by Quarter
         </Typography>
+        
       </Grid>
 
       {metrics.map((metric) => (
@@ -147,13 +149,18 @@ const handleCardClick = () => {
           <Card elevation={4}  
       sx={{ cursor: 'pointer' }}>
             <CardContent>
+                  <IconButton onClick={handleCardClick} aria-label="View Details">
+      <OpenWithIcon sx={{color:"#491daf"}} />
+    </IconButton>
               <Typography
                 align="center"
+                onClick={handleCardClick}
                 gutterBottom
                 sx={{ p: 2, color: "#bd3600" }}
               >
                 {metricNames[metric]}
               </Typography>
+           
               <ResponsiveContainer width="100%" height={300} style={{ cursor: "pointer" }}>
                 <BarChart data={generateChartData(metric)} >
                   <XAxis dataKey="year" />

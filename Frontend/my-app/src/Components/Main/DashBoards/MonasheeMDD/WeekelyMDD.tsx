@@ -17,7 +17,7 @@ const WeekelyMDD: React.FC<WeekelyMDDProps> = ({ selectedWeek }) => {
   const [error, setError] = useState<string | null>(null);
 
   const [appliedRegions, setAppliedRegions] = useState<string[]>([]);
-  const [appliedDealTypes, setAppliedDealTypes] = useState<string[]>([]);
+  const [appliedDealTypes, setAppliedDealTypes] = useState<string[]>(["FO", "IPO"]);
   const [appliedWeeks, setAppliedWeeks] = useState<number[]>([]);
 
   useEffect(() => {
@@ -46,9 +46,9 @@ const WeekelyMDD: React.FC<WeekelyMDDProps> = ({ selectedWeek }) => {
       }
 
       const body = {
-        broad_region: appliedRegions.length > 0 ? appliedRegions : undefined,
-        deal_type: appliedDealTypes.length > 0 ? appliedDealTypes : undefined,
-        week: appliedWeeks.length > 0 ? appliedWeeks : undefined,
+        broad_region: appliedRegions,
+        deal_type: appliedDealTypes,
+        week: appliedWeeks,
       };
 
       const response = await fetch(`${apiUrl}/api/weekly_dealstat/`, {
@@ -63,12 +63,10 @@ const WeekelyMDD: React.FC<WeekelyMDDProps> = ({ selectedWeek }) => {
       const result = await response.json();
 
       if (response.ok) {
-        // Remove "Strategic" key inside each region object
         if (typeof result === "object" && result !== null) {
           const filteredResult = Object.keys(result).reduce((acc, regionKey) => {
             const regionData = result[regionKey];
             if (typeof regionData === "object" && regionData !== null) {
-              // Copy all categories except "Strategic"
               const filteredCategories = Object.keys(regionData).reduce(
                 (catAcc, catKey) => {
                   if (catKey !== "Strategic") {
@@ -101,26 +99,36 @@ const WeekelyMDD: React.FC<WeekelyMDDProps> = ({ selectedWeek }) => {
 const handleCardClick = () => {
   window.open("/equity/monashee-deals/weekly-tracking", "_blank");
 };
-  return (
-    <Container maxWidth="lg" sx={{ py: 0 }}>
-      <Card sx={{ boxShadow: 3, p: 3, mb: 2 }} elevation={3}  >
-        <Typography variant="h5" color="#002060" align="center" gutterBottom>
-          2025 YTD GAP Analysis 
-        </Typography>
 
-        {loading ? (
-          <Typography>Loading...</Typography>
-        ) : error ? (
-          <Typography color="error">{error}</Typography>
-        ) : (
-          <WeeklyDealTable
-            data={data}
-            selectedRegions={appliedRegions}
-            selectedDealTypes={appliedDealTypes}
-          />
-        )}
-      </Card>
-    </Container>
+return (
+  <Card sx={{ boxShadow: 3, p: 3, mb: 2 }} elevation={3}>
+    <Box
+      onClick={handleCardClick}
+      sx={{ cursor: "pointer", textAlign: "center" }}
+    >
+      <Typography
+        variant="h6"
+        color="#004d2a"
+        fontWeight="bold"
+        gutterBottom
+        sx={{ mb: 2 }}
+      >
+        2025 YTD GAP Analysis
+      </Typography>
+    </Box>
+
+    {loading ? (
+      <Typography>Loading...</Typography>
+    ) : error ? (
+      <Typography color="error">{error}</Typography>
+    ) : (
+      <WeeklyDealTable
+        data={data}
+        selectedRegions={appliedRegions}
+        selectedDealTypes={appliedDealTypes}
+      />
+    )}
+  </Card>
   );
 };
 
