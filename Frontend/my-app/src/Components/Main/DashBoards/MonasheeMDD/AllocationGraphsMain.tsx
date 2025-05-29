@@ -209,8 +209,13 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
           color: "#004d2a",
         }}
       >
-          <Typography>
-        Weighted Allocation for 2024 and 2025 by Quarterly
+     <Typography
+        variant="h6"
+        color="#004d2a"
+        fontWeight="bold"
+        gutterBottom
+        sx={{ mb: 2 }}
+      >        Weighted Allocation for 2024 and 2025 by Quarterly
       </Typography>
 
       {loading ? (
