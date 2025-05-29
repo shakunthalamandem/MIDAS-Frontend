@@ -215,7 +215,7 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
         fontWeight="bold"
         gutterBottom
         sx={{ mb: 2 }}
-      >        Weighted Allocation for 2024 and 2025 by Quarterly
+      >        Quarterly Weighted Allocation Trends (2024–2025)
       </Typography>
 
       {loading ? (
