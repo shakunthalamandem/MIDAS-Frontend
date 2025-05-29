@@ -53,6 +53,7 @@ const AiDashboard: React.FC = () => {
                     },
                 });
                 const responseData = await response.json();
+                console.log("Response Data:", responseData);
                 setData(Array.isArray(responseData.data) ? responseData.data : []);
             } catch {
                 setData([]);
@@ -63,11 +64,10 @@ const AiDashboard: React.FC = () => {
         fetchData();
     }, []);
 
-    const handleCardClick = (item: PredictedForm) => {
-        const params = new URLSearchParams(item as any).toString();
-        window.open(`/equity/ml_equity?${params}`, "_blank");
-    };
 
+  const handleCardClick = (item: PredictedForm) => {
+    window.open("/equity/ml_equity", "_blank");
+  };
     if (loading)
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
