@@ -30,6 +30,9 @@ const formatYAxis = (value: number) => {
   return value.toString();
 };
 
+  const handleCardClick = () => {
+  window.open("/equity/monashee-deals/gap-analysis", "_blank");
+};
 const SummaryGapGraph: React.FC = () => {
   const [foDataUS, setFoDataUS] = useState<ChartDataPoint[]>([]);
   const [ipoDataUS, setIpoDataUS] = useState<ChartDataPoint[]>([]);
@@ -174,6 +177,7 @@ const renderChart = (title: string, data: ChartDataPoint[], yMin: number, yMax: 
   return (
     <Box width="100%" px={2} py={4}>
       <Typography
+      onClick={handleCardClick}
         variant="h5"
         align="center"
         color="#004d2a"
