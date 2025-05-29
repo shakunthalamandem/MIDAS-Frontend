@@ -26,7 +26,7 @@ type OptionsResponse = {
 const MlEquityMain: React.FC = () => {
   const [options, setOptions] = useState<OptionsResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialData, setInitialData] = useState<any>(null); // <-- Selected form data
+  const [initialData, setInitialData] = useState<any>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('access_token');
 
@@ -46,6 +46,17 @@ const MlEquityMain: React.FC = () => {
         setLoading(false);
       }
     };
+
+    // Read session data
+    const storedData = sessionStorage.getItem("selected_form_data");
+    if (storedData) {
+      try {
+        setInitialData(JSON.parse(storedData));
+        sessionStorage.removeItem("selected_form_data");
+      } catch (e) {
+        console.error("Invalid JSON in sessionStorage");
+      }
+    }
 
     fetchOptions();
   }, []);
@@ -74,43 +85,41 @@ const MlEquityMain: React.FC = () => {
       <Container maxWidth="lg" sx={{ padding: 2 }}>
         <Box py={2} display="flex" flexDirection="column" alignItems="center">
           <Card sx={{ width: "100%", p: 2, boxShadow: 3, borderRadius: 2, mb: 4 }}>
-    <Typography
-      variant="h5"
-      fontWeight="bold"
-      gutterBottom
-      textAlign="center"
-      color="#002060"
-    >
-      Indicative Deal Performance - 🧠 Machine Learning Equity Deal Predictor
-    </Typography>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              gutterBottom
+              textAlign="center"
+              color="#002060"
+            >
+              Indicative Deal Performance - 🧠 Machine Learning Equity Deal Predictor
+            </Typography>
 
-    <Typography variant="body1" gutterBottom sx={{ marginLeft: 5, mt: 2, mb: 2 }}>
-      Welcome to the ML-powered equity deal predictor for{" "}
-      <strong>US follow-on offerings</strong>. Input key market and macroeconomic
-      parameters to forecast deal outcomes using advanced machine learning models
-      trained on over 4000 historical deal records.
-    </Typography>
+            <Typography variant="body1" gutterBottom sx={{ marginLeft: 5, mt: 2, mb: 2 }}>
+              Welcome to the ML-powered equity deal predictor for{" "}
+              <strong>US follow-on offerings</strong>. Input key market and macroeconomic
+              parameters to forecast deal outcomes using advanced machine learning models
+              trained on over 4000 historical deal records.
+            </Typography>
 
-    <Box sx={{ backgroundColor: "#f4f6f8", p: 4 }}>
-      {loading ? (
-        <Box display="flex" justifyContent="center" py={4}>
-          <CircularProgress />
+            <Box sx={{ backgroundColor: "#f4f6f8", p: 4 }}>
+              {loading ? (
+                <Box display="flex" justifyContent="center" py={4}>
+                  <CircularProgress />
+                </Box>
+              ) : options ? (
+                <MLInputForm options={options} initialData={initialData} />
+              ) : (
+                <Typography color="error">Failed to load options.</Typography>
+              )}
+            </Box>
+          </Card>
         </Box>
-      ) : options ? (
-        <MLInputForm options={options} initialData={initialData} />
-      ) : (
-        <Typography color="error">Failed to load options.</Typography>
-      )}
-    </Box>
-  </Card>
-</Box>
 
-{/* RandomInfoPanel completely outside, 25% width, next to the container */}
-<Box sx={{ width: "25%", display: "inline-block", verticalAlign: "top" }}>
-  <RandomInfoPanel onSelect={handleFormSelect} />
-</Box>
-
-
+        {/* RandomInfoPanel completely outside, 25% width, next to the container */}
+        <Box sx={{ width: "25%", display: "inline-block", verticalAlign: "top" }}>
+          <RandomInfoPanel onSelect={handleFormSelect} />
+        </Box>
       </Container>
     </>
   );
