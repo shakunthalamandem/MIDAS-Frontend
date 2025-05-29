@@ -98,14 +98,9 @@ const defaultFormData: FormData = {
   Treasury: "",
 };
 
-// Initialize with props.initialData if available
-// const [formData, setFormData] = useState<FormData>({
-//   ...defaultFormData,
-//   ...initialData,
-// });
-console.log("This is the initialData",initialData)
-  // const [formData, setFormData] = useState(defaultFormData);
-  const [formData, setFormData] = useState<FormData>(defaultFormData);
+
+
+const [formData, setFormData] = useState<FormData>(defaultFormData);
 
 useEffect(() => {
   if (initialData) {
