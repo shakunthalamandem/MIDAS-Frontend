@@ -9,8 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, Grid, IconButton, Typography } from "@mui/material";
-import SwitchAccessShortcutIcon from '@mui/icons-material/SwitchAccessShortcut';
-
+import OpenWithIcon from '@mui/icons-material/OpenWith';
 
 const metricNames: Record<string, string> = {
   count: "Deal Count",
@@ -151,7 +150,7 @@ const handleCardClick = () => {
       sx={{ cursor: 'pointer' }}>
             <CardContent>
                   <IconButton onClick={handleCardClick} aria-label="View Details">
-      <SwitchAccessShortcutIcon sx={{color:"#491daf"}} />
+      <OpenWithIcon sx={{color:"#491daf"}} />
     </IconButton>
               <Typography
                 align="center"
