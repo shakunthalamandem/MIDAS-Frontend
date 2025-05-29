@@ -192,18 +192,22 @@ const DashboardSectorWiseTable: React.FC = () => {
   };
 
   return (
-    <Box   >
-      <Typography
-        variant="h6"
-        sx={{
-          mb: 2,
-          fontWeight: "bold",
-          textAlign: "center",
-          color: "#004d2a",
-        }}
-      >
-        Sector Wise IPO and FO Data for 2025
-      </Typography>
+  <Box>
+    <Typography
+      variant="h6"
+      onClick={handleCardClick}
+      sx={{
+        mb: 2,
+        fontWeight: "bold",
+        textAlign: "center",
+        color: "#004d2a",
+        cursor: "pointer",
+        userSelect: "none",
+        textDecoration: "none", 
+      }}
+    >
+      Sector Wise IPO and FO Data for 2025
+    </Typography>
 
       <TableContainer component={Paper}>
         <Table size="small" sx={{borderRadius: 3, overflow: 'hidden'}}>

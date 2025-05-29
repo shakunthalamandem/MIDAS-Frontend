@@ -96,29 +96,39 @@ const WeekelyMDD: React.FC<WeekelyMDDProps> = ({ selectedWeek }) => {
       setLoading(false);
     }
   };
+const handleCardClick = () => {
+  window.open("/equity/monashee-deals/weekly-tracking", "_blank");
+};
 
-  const handleCardClick = () => {
-    window.open("/equity/monashee-deals/weekly-tracking", "_blank");
-  };
+return (
+  <Card sx={{ boxShadow: 3, p: 3, mb: 2 }} elevation={3}>
+    <Box
+      onClick={handleCardClick}
+      sx={{ cursor: "pointer", textAlign: "center" }}
+    >
+      <Typography
+        variant="h6"
+        color="#004d2a"
+        fontWeight="bold"
+        gutterBottom
+        sx={{ mb: 2 }}
+      >
+        2025 YTD GAP Analysis
+      </Typography>
+    </Box>
 
-  return (
-      <Card sx={{ boxShadow: 3, p: 3, mb: 2 }} elevation={3}>
-        <Typography variant="h6" color="#004d2a" align="center" fontWeight={"bold"} gutterBottom>
-          2025 YTD GAP Analysis 
-        </Typography>
-
-        {loading ? (
-          <Typography>Loading...</Typography>
-        ) : error ? (
-          <Typography color="error">{error}</Typography>
-        ) : (
-          <WeeklyDealTable
-            data={data}
-            selectedRegions={appliedRegions}
-            selectedDealTypes={appliedDealTypes}
-          />
-        )}
-      </Card>
+    {loading ? (
+      <Typography>Loading...</Typography>
+    ) : error ? (
+      <Typography color="error">{error}</Typography>
+    ) : (
+      <WeeklyDealTable
+        data={data}
+        selectedRegions={appliedRegions}
+        selectedDealTypes={appliedDealTypes}
+      />
+    )}
+  </Card>
   );
 };
 
