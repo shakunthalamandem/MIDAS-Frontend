@@ -188,6 +188,7 @@ const handleCardClick = () => {
             fontWeight: "bold",
             color: "#FFFFFF",
             border: "1px solid #d8d8d8",
+            textAlign: "center",
           }}
         >
           {metricDisplayNames[metric]}

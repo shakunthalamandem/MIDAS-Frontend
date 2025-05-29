@@ -162,7 +162,6 @@ const handleCardClick = () => {
             stroke="#b2b2b2"
             tick={{ fill: "#000", fontSize: 12 }}
             label={{
-              value: "Year",
               align: "center",
               position: "insideBottom",
               dy: 20,
@@ -209,8 +208,7 @@ const handleCardClick = () => {
           color: "#004d2a",
         }}
       >
-        Weighted Allocation for 2024 and 2025 by Quarterly
-      </Typography>
+Quarterly Weighted Allocation Trends (2024-2025)      </Typography>
 
       {loading ? (
         <Box
