@@ -162,7 +162,6 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
             stroke="#b2b2b2"
             tick={{ fill: "#000", fontSize: 12 }}
             label={{
-              value: "Year",
               align: "center",
               position: "insideBottom",
               dy: 20,
@@ -207,19 +206,11 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
           cursor: "pointer",
           textAlign: "center",
           mb: 2,
+          color: "#004d2a",
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: "bold",
-            color: "#004d2a",
-            textDecoration: "none",
-          }}
-        >
-          Weighted Allocation for 2024 and 2025 by Quarterly
-        </Typography>
-      </Box>
+        Weighted Allocation for 2024 and 2025 by Quarterly
+      </Typography>
 
       {loading ? (
         <Box

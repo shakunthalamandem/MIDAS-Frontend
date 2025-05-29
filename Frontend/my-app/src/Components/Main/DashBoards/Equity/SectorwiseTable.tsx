@@ -54,18 +54,43 @@ const formatNumber = (
   const absValue = Math.abs(value);
 
   if (absValue >= 1e9) {
-    formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
+
+     if(Number.isInteger(Number((absValue / 1e9).toFixed(1)))){
+      formattedValue = `${(absValue / 1e9).toFixed(0)}B`;
+     }else {
+      formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
+     }
   } else if (absValue >= 1e6) {
-    formattedValue = `${(absValue / 1e6).toFixed(1)}M`;
+     if(Number.isInteger(Number((absValue / 1e6).toFixed(1)))){
+        formattedValue = `${(absValue / 1e6).toFixed(0)}M`;
+     }else{
+      formattedValue = `${(absValue / 1e6).toFixed(1)}M`;
+     }
   } else if (absValue >= 1e3) {
-    formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
+    if(Number.isInteger(Number((absValue / 1e3).toFixed(1)))){
+        formattedValue = `${(absValue / 1e3).toFixed(0)}K`;
+     }else{
+      formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
+     }
   } else {
-    formattedValue = absValue.toFixed(1);
+      if(Number.isInteger(Number((absValue).toFixed(1)))){
+        formattedValue = absValue.toFixed(0);
+      }else{
+        formattedValue = absValue.toFixed(1);
+      }
   }
 
   if (isCurrency) formattedValue = `$${formattedValue}`;
-  if (isPercentage)
-    formattedValue = `${parseFloat(formattedValue).toFixed(1)}%`;
+  if (isPercentage){ 
+
+    const value = Number(parseFloat(formattedValue).toFixed(1));
+
+    if(Number.isInteger(value)){
+       formattedValue = `${parseFloat(formattedValue).toFixed(0)}%`; 
+    }else{
+      formattedValue = `${parseFloat(formattedValue).toFixed(1)}%`; 
+    }
+  }
 
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
@@ -164,6 +189,7 @@ const handleCardClick = () => {
             fontWeight: "bold",
             color: "#FFFFFF",
             border: "1px solid #d8d8d8",
+            textAlign: "center",
           }}
         >
           {metricDisplayNames[metric]}
