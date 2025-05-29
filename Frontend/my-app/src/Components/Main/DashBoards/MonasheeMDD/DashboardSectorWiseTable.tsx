@@ -266,6 +266,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     color: "#fff",
                     fontWeight: "bold",
                     border: 1,
+                    textAlign: "center",
                   }}
                 >
                   <span dangerouslySetInnerHTML={{ __html: label }} />
@@ -283,6 +284,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     color: "#fff",
                     fontWeight: "bold",
                     border: 1,
+                    textAlign: "center",
                   }}
                 >
                   <span dangerouslySetInnerHTML={{ __html: label }} />
@@ -319,6 +321,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                       backgroundColor: top3.foActual.includes(foActual ?? NaN)
                         ? "#ffd9b3"
                         : undefined,
+                       textAlign: "center",
                     }}
                   >
                     {formatValue(foActual ?? NaN)}
@@ -330,6 +333,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                       backgroundColor: top3.foModel.includes(foModel ?? NaN)
                         ? "#ffd9b3"
                         : undefined,
+                         textAlign: "center",
                     }}
                   >
                     {formatValue(foModel ?? NaN)}
@@ -341,6 +345,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                       backgroundColor: top3.foGap.includes(foGap ?? NaN)
                         ? "#ffd9b3"
                         : undefined,
+                         textAlign: "center",
                     }}
                   >
                     {formatValue(foGap ?? NaN)}
@@ -352,6 +357,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                       backgroundColor: top3.ipoActual.includes(ipoActual ?? NaN)
                         ? "#ffd9b3"
                         : undefined,
+                         textAlign: "center",
                     }}
                   >
                     {formatValue(ipoActual ?? NaN)}
@@ -363,6 +369,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                       backgroundColor: top3.ipoModel.includes(ipoModel ?? NaN)
                         ? "#ffd9b3"
                         : undefined,
+                         textAlign: "center",
                     }}
                   >
                     {formatValue(ipoModel ?? NaN)}
@@ -374,6 +381,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                       backgroundColor: top3.ipoGap.includes(ipoGap ?? NaN)
                         ? "#ffd9b3"
                         : undefined,
+                         textAlign: "center",
                     }}
                   >
                     {formatValue(ipoGap ?? NaN)}
@@ -397,19 +405,19 @@ const DashboardSectorWiseTable: React.FC = () => {
                   return [
                     <TableCell
                       key={`${type}-actual`}
-                      sx={{ fontWeight: "bold", border: 1 }}
+                      sx={{ fontWeight: "bold", border: 1,  textAlign: "center" }}
                     >
                       {formatValue(actual ?? NaN)}
                     </TableCell>,
                     <TableCell
                       key={`${type}-model`}
-                      sx={{ fontWeight: "bold", border: 1 }}
+                      sx={{ fontWeight: "bold", border: 1,  textAlign: "center" }}
                     >
                       {formatValue(model ?? NaN)}
                     </TableCell>,
                     <TableCell
                       key={`${type}-gap`}
-                      sx={{ fontWeight: "bold", border: 1 }}
+                      sx={{ fontWeight: "bold", border: 1,  textAlign: "center" }}
                     >
                       {formatValue(gap ?? NaN)}
                     </TableCell>,
