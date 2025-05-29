@@ -154,6 +154,7 @@ const handleCardClick = () => {
     </IconButton>
               <Typography
                 align="center"
+                onClick={handleCardClick}
                 gutterBottom
                 sx={{ p: 2, color: "#bd3600" }}
               >

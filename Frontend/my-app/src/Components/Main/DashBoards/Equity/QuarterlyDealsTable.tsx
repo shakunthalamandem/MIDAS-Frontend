@@ -167,6 +167,7 @@ const handleCardClick = () => {
         >
           <Typography
             variant="body1"
+            onClick={handleCardClick}
             sx={{
               // display: "inline-block",
               // animation: "scroll-left 15s linear infinite",

@@ -93,9 +93,9 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
       setLoading(false);
     }
   };
-const handleCardClick = () => {
-  window.open("/equity/capital-markets/deal-stats", "_blank");
-};
+  const handleCardClick = () => {
+    window.open("/equity/capital-markets/deal-stats", "_blank");
+  };
   const formatChartData = (data: ApiResponse) => {
     const dealSize: ChartData[] = [];
     const allocation: ChartData[] = [];
@@ -198,17 +198,20 @@ const handleCardClick = () => {
   );
 
   return (
-    <Box sx={{ padding: 2 }}  >
-      <Typography
-        variant="h6"
+    <Box sx={{ padding: 2 }}>
+      {/* Clickable Title */}
+      <Box
+        onClick={handleCardClick}
         sx={{
-          fontWeight: "bold",
+          cursor: "pointer",
           textAlign: "center",
           mb: 2,
           color: "#004d2a",
         }}
       >
-Quarterly Weighted Allocation Trends (2024-2025)      </Typography>
+          <Typography>
+        Weighted Allocation for 2024 and 2025 by Quarterly
+      </Typography>
 
       {loading ? (
         <Box
@@ -255,6 +258,7 @@ Quarterly Weighted Allocation Trends (2024-2025)      </Typography>
           )}
         </Box>
       )}
+    </Box>
     </Box>
   );
 };
