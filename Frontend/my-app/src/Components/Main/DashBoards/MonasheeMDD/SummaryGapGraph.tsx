@@ -120,52 +120,63 @@ const SummaryGapGraph: React.FC = () => {
     fetchData("US");
     fetchData("EMEA");
   }, []);
-
-  const renderChart = (title: string, data: ChartDataPoint[]) => (
-    <Card
-      elevation={3}
-      sx={{ width: "100%", height: 280, cursor: "pointer" }}
-    //   onClick={() => navigate("/equity/monashee-deals/gap-analysis")}
-    >
-      <CardContent>
-        <Typography
-          variant="subtitle1"
-          align="center"
-          fontWeight="bold"
-          color="#002060"
-          mb={2}
+const renderChart = (title: string, data: ChartDataPoint[], yMin: number, yMax: number) => (
+  <Card sx={{ width: "100%", height: 300, cursor: "pointer" }}>
+    <CardContent sx={{ p: 2 }}>
+      <Typography
+        variant="subtitle1"
+        align="center"
+        fontWeight="bold"
+        color="#004d2a"
+        mb={2}
+      >
+        {title}
+      </Typography>
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart
+          data={data}
+          margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
         >
-          {title}
-        </Typography>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={data} margin={{ left: 10 }}>
-            <XAxis dataKey="name" style={{ fontSize: "10px" }} />
-            <YAxis tickFormatter={formatYAxis} />
-            <Tooltip formatter={(value: number) => formatYAxis(value)} />
-            <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
-            <Bar dataKey="value" barSize={15}>
-              {data.map((entry, index) => {
-                let fill = "#e26d3e";
-                if (index === data.length - 1) {
-                  fill = entry.value < 0 ? "#f44336" : "#4caf50";
-                }
-                return (
-                  <Cell key={`cell-${index}`} fill={fill} cursor="pointer" />
-                );
-              })}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
-  );
+          <XAxis
+            dataKey="name"
+            style={{ fontSize: "12px" }}
+            axisLine={true}
+            tickLine={false}
+          />
+          <YAxis
+            tickFormatter={formatYAxis}
+            style={{ fontSize: "12px" }}
+            domain={[yMin, yMax]}
+            axisLine
+            tickLine
+          />
+          <Tooltip formatter={(value: number) => formatYAxis(value)} />
+          <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
+          <Bar dataKey="value" barSize={15}>
+            {data.map((entry, index) => {
+              const isLast = index === data.length - 1;
+              const fill = isLast
+                ? entry.value < 0
+                  ? "#f44336"
+                  : "#4caf50"
+                : "#7a4bb9";
+              return (
+                <Cell key={`cell-${index}`} fill={fill} cursor="pointer" />
+              );
+            })}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </CardContent>
+  </Card>
+);
 
   return (
     <Box width="100%" px={2} py={4}>
       <Typography
         variant="h5"
         align="center"
-        color="#002060"
+        color="#004d2a"
         fontWeight="bold"
         mb={4}
       >
@@ -190,12 +201,12 @@ const SummaryGapGraph: React.FC = () => {
             <Typography variant="h6" fontWeight="bold" align="center">
               US 2025
             </Typography>
-            <Box sx={{ display: "flex", gap: 2, flexGrow: 1 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("FO", foDataUS)}
+                {renderChart("FO", foDataUS, -1000000, 1000000)}
               </Box>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("IPO", ipoDataUS)}
+                {renderChart("IPO", ipoDataUS, -1000000, 1000000)}
               </Box>
             </Box>
           </Box>
@@ -218,12 +229,12 @@ const SummaryGapGraph: React.FC = () => {
             <Typography variant="h6" fontWeight="bold" align="center">
               EMEA 2025
             </Typography>
-            <Box sx={{ display: "flex", gap: 2, flexGrow: 1 }}>
+            <Box sx={{ display: "flex", gap: 2}}>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("FO", foDataEMEA)}
+                {renderChart("FO", foDataEMEA, -1000000, 1000000)}
               </Box>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("IPO", ipoDataEMEA)}
+                {renderChart("IPO", ipoDataEMEA, -1000000, 1000000)}
               </Box>
             </Box>
           </Box>

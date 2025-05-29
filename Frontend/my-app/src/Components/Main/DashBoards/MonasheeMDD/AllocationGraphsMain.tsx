@@ -41,6 +41,12 @@ const formatValue = (value: number): string => {
   return `${sign}${absValue.toFixed(2)}%`;
 };
 
+const formatValuesized = (value: number): string => {
+  const absValue = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+  return `${sign}${absValue.toFixed(1)}%`;
+};
+
 const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFilters }) => {
   const [dealSizeData, setDealSizeData] = useState<ChartData[]>([]);
   const [allocationData, setAllocationData] = useState<ChartData[]>([]);
@@ -200,7 +206,7 @@ const handleCardClick = () => {
           fontWeight: "bold",
           textAlign: "center",
           mb: 2,
-          color: "#002060",
+          color: "#004d2a",
         }}
       >
         Weighted Allocation for 2024 and 2025 by Quarterly
@@ -246,7 +252,7 @@ const handleCardClick = () => {
           {renderLineChart(
             "Weighted Allocation as % of IOI",
             allocationData,
-            formatValue,
+            formatValuesized,
             "#bd3600"
           )}
         </Box>
