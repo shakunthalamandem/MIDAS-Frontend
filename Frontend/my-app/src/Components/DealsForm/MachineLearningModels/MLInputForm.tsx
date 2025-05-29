@@ -73,32 +73,50 @@ type FormData = {
 type FormErrors = {
   [key in keyof FormData]?: string;
 };
-
 type MLInputFormProps = {
   options: OptionsResponse;
+  initialData?: Partial<FormData>; // <-- Add this
 };
 
-const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
-  const defaultFormData = {
-    ticker: "",
-    pricing_date: null,
-    deal_type: "FO",
-    region: "US",
-    target: "T1D",
-    sponsor_yn_category: "",
-    deal_size_category: "",
-    selected_bank_category: "",
-    percentage_primary_category: "",
-    sector_category: "",
-    discount_from_announcement_price_category: "",
-    allocation_deal_size_percentage_category: "",
-    allocation_percentage_category: "",
-    GDP: "",
-    Inflation: "",
-    Treasury: "",
-  };
 
-  const [formData, setFormData] = useState(defaultFormData);
+const MLInputForm: React.FC<MLInputFormProps> = ({ options,initialData  }) => {
+const defaultFormData: FormData = {
+  ticker: "",
+  pricing_date: null,
+  deal_type: "FO",
+  region: "US",
+  target: "T1D",
+  sponsor_yn_category: "",
+  deal_size_category: "",
+  selected_bank_category: "",
+  percentage_primary_category: "",
+  sector_category: "",
+  discount_from_announcement_price_category: "",
+  allocation_deal_size_percentage_category: "",
+  allocation_percentage_category: "",
+  GDP: "",
+  Inflation: "",
+  Treasury: "",
+};
+
+// Initialize with props.initialData if available
+// const [formData, setFormData] = useState<FormData>({
+//   ...defaultFormData,
+//   ...initialData,
+// });
+console.log("This is the initialData",initialData)
+  // const [formData, setFormData] = useState(defaultFormData);
+  const [formData, setFormData] = useState<FormData>(defaultFormData);
+
+useEffect(() => {
+  if (initialData) {
+    setFormData((prev) => ({
+      ...prev,
+      ...initialData,
+    }));
+  }
+}, [initialData]);
+
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
@@ -285,16 +303,23 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
             </Grid>
 
             <Grid item xs={6}>
-              <TextField
-                size="small"
-                type="date"
-                name="pricing_date"
-                value={formData.pricing_date}
-                onChange={handleChange}
-                InputProps={{
-                  sx: { width: inputWidth },
-                }}
-              />
+          <TextField
+            size="small"
+            type="date"
+            name="pricing_date"
+            value={
+              formData.pricing_date
+                ? new Date(formData.pricing_date).toISOString().split("T")[0]
+                : ""
+            }
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                pricing_date: e.target.value ? new Date(e.target.value) : null,
+              }))
+            }
+            InputProps={{ sx: { width: inputWidth } }}
+          />
             </Grid>
           </Grid>
           <Grid item xs={6} container alignItems="center">
@@ -331,7 +356,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
               <TextField
                 size="small"
                 name="deal_size_category"
-                value={formData.deal_size_category}
+                value={String(formData.deal_size_category || "")}
                 onChange={handleChange}
                 type="number"
                 placeholder="e.g., 100"
