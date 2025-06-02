@@ -185,7 +185,7 @@ const renderChart = (title: string, data: ChartDataPoint[]) => {
 
 
   return (
-    <Box width="100%" >
+    <Box width="100%"  mb={7}>
       <Typography
       onClick={handleCardClick}
         variant="h5"
