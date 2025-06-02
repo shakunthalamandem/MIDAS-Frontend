@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-
-  Typography,
-
-} from "@mui/material";
-import { MenuProps } from "@mui/material";
+import { Typography, MenuProps } from "@mui/material";
 import EquityMLFormData from "./EquityMLFormData";
-
 
 const menuProps: Partial<MenuProps> = {
   PaperProps: {
@@ -65,45 +59,40 @@ type FormData = {
 type FormErrors = {
   [key in keyof FormData]?: string;
 };
+
 type MLInputFormProps = {
   options: OptionsResponse;
-  initialData?: Partial<FormData>; // <-- Add this
+  initialData?: Partial<FormData>;
+  autoPredict?: boolean;
 };
 
+const MLInputForm: React.FC<MLInputFormProps> = ({
+  options,
+  initialData,
+  autoPredict,
+}) => {
+  const defaultFormData: FormData = {
+    ticker: "",
+    pricing_date: null,
+    deal_type: "FO",
+    region: "US",
+    target: "T1D",
+    sponsor_yn_category: "",
+    deal_size_category: "",
+    selected_bank_category: "",
+    percentage_primary_category: "",
+    sector_category: "",
+    discount_from_announcement_price_category: "",
+    allocation_deal_size_percentage_category: "",
+    allocation_percentage_category: "",
+    GDP: "",
+    Inflation: "",
+    Treasury: "",
+  };
 
-const MLInputForm: React.FC<MLInputFormProps> = ({ options,initialData  }) => {
-const defaultFormData: FormData = {
-  ticker: "",
-  pricing_date: null,
-  deal_type: "FO",
-  region: "US",
-  target: "T1D",
-  sponsor_yn_category: "",
-  deal_size_category: "",
-  selected_bank_category: "",
-  percentage_primary_category: "",
-  sector_category: "",
-  discount_from_announcement_price_category: "",
-  allocation_deal_size_percentage_category: "",
-  allocation_percentage_category: "",
-  GDP: "",
-  Inflation: "",
-  Treasury: "",
-};
 
 
-
-const [formData, setFormData] = useState<FormData>(defaultFormData);
-
-useEffect(() => {
-  if (initialData) {
-    setFormData((prev) => ({
-      ...prev,
-      ...initialData,
-    }));
-  }
-}, [initialData]);
-
+  const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
@@ -117,11 +106,42 @@ useEffect(() => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
+  // Fill formData when initialData arrives
+  useEffect(() => {
+    if (initialData) {
+      setFormData((prev) => ({
+        ...prev,
+        ...initialData,
+      }));
+    }
+  }, [initialData]);
+
+  // Compare formData with initialData
+  const isFormDataReady = (initial: Partial<FormData>, current: FormData): boolean => {
+    return Object.entries(initial).every(([key, value]) => {
+      const currentValue = current[key as keyof FormData];
+      if (value instanceof Date && currentValue instanceof Date) {
+        return value.getTime() === currentValue.getTime();
+      }
+      return value === currentValue;
+    });
+  };
+
+  useEffect(() => {
+    if (autoPredict && initialData && isFormDataReady(initialData, formData)) {
+      const isValid = validateForm();
+      if (isValid) {
+        handlePredict();
+      } else {
+        console.log("Error");
+      }
+    }
+  }, [autoPredict, initialData, formData]);
+
   const validateForm = (): boolean => {
     const errors: FormErrors = {};
     let isValid = true;
 
-    // Check all required fields
     Object.entries(formData).forEach(([key, value]) => {
       if (
         !value &&
@@ -134,7 +154,6 @@ useEffect(() => {
       }
     });
 
-    // Validate numeric fields
     if (parseFloat(formData.deal_size_category) <= 0) {
       errors.deal_size_category = "Must be greater than 0";
       isValid = false;
@@ -238,7 +257,7 @@ useEffect(() => {
     return <Typography>Loading form options...</Typography>;
 
   return (
- <>
+
     <EquityMLFormData
       snackbar={snackbar}
       handleSnackbarClose={handleSnackbarClose}
@@ -255,7 +274,6 @@ useEffect(() => {
       inputWidth={inputWidth}
       menuProps={menuProps}
     />
- </>
   );
 };
 

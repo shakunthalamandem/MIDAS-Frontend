@@ -9,7 +9,7 @@ import {
   Box,
 } from "@mui/material";
 
-interface PredictedForm {
+export interface PredictedForm {
   ticker_symbol: string;
   pricing_date: string;
   deal_type: string;
@@ -64,6 +64,8 @@ const AiDashboard: React.FC = () => {
 
   const handleCardClick = (item: PredictedForm) => {
     sessionStorage.setItem("selected_form_data", JSON.stringify(item));
+    sessionStorage.setItem("auto_predict", "true");
+    console.log('AI dashboard called');
     window.open("/equity/ml_equity", "_blank");
   };
 

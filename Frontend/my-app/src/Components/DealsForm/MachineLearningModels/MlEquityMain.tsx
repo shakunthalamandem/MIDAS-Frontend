@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { PredictedForm } from "../../Main/DashBoards/Equity/AiDashboard";
 import {
   Box,
   Card,
@@ -27,8 +28,27 @@ const MlEquityMain: React.FC = () => {
   const [options, setOptions] = useState<OptionsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [initialData, setInitialData] = useState<any>(null);
+  const [autoPredict, setAutoPredict] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('access_token');
+
+
+  
+
+useEffect(() => {
+  const val = sessionStorage.getItem("auto_predict");
+  const autoPredictFlag = val === "true";
+
+  setAutoPredict(autoPredictFlag);
+}, []);
+
+
+useEffect(() => {
+  if (autoPredict) {
+    sessionStorage.removeItem("auto_predict");
+  }
+}, [autoPredict]);
+
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -47,11 +67,31 @@ const MlEquityMain: React.FC = () => {
       }
     };
 
-    // Read session data
     const storedData = sessionStorage.getItem("selected_form_data");
     if (storedData) {
       try {
-        setInitialData(JSON.parse(storedData));
+        const rawData: PredictedForm = JSON.parse(storedData);
+
+        const mappedData = {
+          ticker: rawData.ticker_symbol,
+          pricing_date: rawData.pricing_date ? new Date(rawData.pricing_date) : null,
+          deal_type: rawData.deal_type,
+          region: rawData.region,
+          target: rawData.target_variable,
+          sponsor_yn_category: rawData.sponsor,
+          deal_size_category: String(rawData.deal_size_million),
+          selected_bank_category: rawData.selected_bank,
+          percentage_primary_category: String(rawData.percentage_primary),
+          sector_category: rawData.sector,
+          discount_from_announcement_price_category: String(rawData.discount_announcement_price),
+          allocation_deal_size_percentage_category: String(rawData.allocation_percentage_of_deal),
+          allocation_percentage_category: String(rawData.allocation_percentage_of_ioi),
+          GDP: rawData.gdp_growth,
+          Inflation: rawData.inflation_rate,
+          Treasury: rawData.treasury_rates,
+        };
+
+        setInitialData(mappedData);
         sessionStorage.removeItem("selected_form_data");
       } catch (e) {
         console.error("Invalid JSON in sessionStorage");
@@ -108,7 +148,7 @@ const MlEquityMain: React.FC = () => {
                   <CircularProgress />
                 </Box>
               ) : options ? (
-                <MLInputForm options={options} initialData={initialData} />
+                <MLInputForm options={options} initialData={initialData} autoPredict={autoPredict}/>
               ) : (
                 <Typography color="error">Failed to load options.</Typography>
               )}
