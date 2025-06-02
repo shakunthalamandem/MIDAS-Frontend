@@ -319,7 +319,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     sx={{
                       border: 1,
                       backgroundColor: top3.foActual.includes(foActual ?? NaN)
-                        ? "#ffd9b3"
+                        ? "#cfcfcf"
                         : undefined,
                        textAlign: "center",
                     }}
@@ -331,7 +331,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     sx={{
                       border: 1,
                       backgroundColor: top3.foModel.includes(foModel ?? NaN)
-                        ? "#ffd9b3"
+                        ? "#cfcfcf"
                         : undefined,
                          textAlign: "center",
                     }}
@@ -343,7 +343,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     sx={{
                       border: 1,
                       backgroundColor: top3.foGap.includes(foGap ?? NaN)
-                        ? "#ffd9b3"
+                        ? "#cfcfcf"
                         : undefined,
                          textAlign: "center",
                     }}
@@ -355,7 +355,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     sx={{
                       border: 1,
                       backgroundColor: top3.ipoActual.includes(ipoActual ?? NaN)
-                        ? "#ffd9b3"
+                        ? "#cfcfcf"
                         : undefined,
                          textAlign: "center",
                     }}
@@ -367,7 +367,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     sx={{
                       border: 1,
                       backgroundColor: top3.ipoModel.includes(ipoModel ?? NaN)
-                        ? "#ffd9b3"
+                        ? "#cfcfcf"
                         : undefined,
                          textAlign: "center",
                     }}
@@ -379,7 +379,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     sx={{
                       border: 1,
                       backgroundColor: top3.ipoGap.includes(ipoGap ?? NaN)
-                        ? "#ffd9b3"
+                        ? "#cfcfcf"
                         : undefined,
                          textAlign: "center",
                     }}

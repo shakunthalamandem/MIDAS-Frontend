@@ -3,6 +3,8 @@ import AllocationGraphsMain from './AllocationGraphsMain'
 import WeekelyMDD from './WeekelyMDD'
 import DashboardSectorWiseTable from './DashboardSectorWiseTable'
 import SummaryGraphsGap from './SummaryGapGraph'
+import { Typography, Grid } from '@mui/material'
+import AiDashboard from '../Equity/AiDashboard'
 
 const MDDDashboardMain = () => {
   return (
@@ -18,6 +20,13 @@ const MDDDashboardMain = () => {
 
       </div>
       <SummaryGraphsGap />
+
+        <Typography variant="h5" sx={{ m: 2, color: '#002060', textAlign: 'center' }}>
+          Todays Deals Dashboard
+        </Typography>
+        <Grid item xs={12}>
+          <AiDashboard />
+        </Grid>
     </>
   )
 }

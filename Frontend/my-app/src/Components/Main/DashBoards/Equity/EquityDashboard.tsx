@@ -10,12 +10,7 @@ const EquityDashboard = () => {
   return (
     <Box sx={{ p: 2 }}>
       <Grid container spacing={2}>
-        <Typography variant="h5" sx={{ mb: 2, color: '#002060', textAlign: 'center' }}>
-          Todays Deals Dashboard
-        </Typography>
-        <Grid item xs={12}>
-          <AiDashboard />
-        </Grid>
+        
         {/* First Row: Single full-width component */}
         <Grid item xs={12}>
             <NumerSummary />
@@ -33,6 +28,8 @@ const EquityDashboard = () => {
         <Grid item xs={12}>
             <SectorwiseTable />
         </Grid>
+
+      
              
       </Grid>
     </Box>
