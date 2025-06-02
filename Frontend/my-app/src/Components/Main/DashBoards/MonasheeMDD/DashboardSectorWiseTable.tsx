@@ -84,10 +84,9 @@ const DashboardSectorWiseTable: React.FC = () => {
     fetchData();
   }, [apiUrl, token]);
 
-
   const handleCardClick = () => {
-  window.open("/equity/monashee-deals/gap-analysis", "_blank");
-};
+    window.open("/equity/monashee-deals/gap-analysis", "_blank");
+  };
 
   const formatValue = (value?: number): string => {
     if (value === undefined || value === null || isNaN(value)) return "-";
@@ -143,74 +142,33 @@ const DashboardSectorWiseTable: React.FC = () => {
   const sectorNames = Object.keys(combinedData).filter((s) => s !== "Summary");
   const summary = combinedData["Summary"];
 
-  // Prepare arrays of values for each FO and IPO metric (actual, model, gap)
-  const foActualValues: number[] = [];
-  const foModelValues: number[] = [];
-  const foGapValues: number[] = [];
-
-  const ipoActualValues: number[] = [];
-  const ipoModelValues: number[] = [];
-  const ipoGapValues: number[] = [];
-
-  sectorNames.forEach((sector) => {
-    const fo = combinedData[sector]?.FO;
-    const ipo = combinedData[sector]?.IPO;
-
-    const foActual = calculateTotal(fo);
-    const foModel = calculateModelTotal(fo);
-    const foGap =
-      foActual !== null && foModel !== null ? foActual - foModel : null;
-
-    const ipoActual = calculateTotal(ipo);
-    const ipoModel = calculateModelTotal(ipo);
-    const ipoGap =
-      ipoActual !== null && ipoModel !== null ? ipoActual - ipoModel : null;
-
-    if (foActual !== null) foActualValues.push(foActual);
-    if (foModel !== null) foModelValues.push(foModel);
-    if (foGap !== null) foGapValues.push(foGap);
-
-    if (ipoActual !== null) ipoActualValues.push(ipoActual);
-    if (ipoModel !== null) ipoModelValues.push(ipoModel);
-    if (ipoGap !== null) ipoGapValues.push(ipoGap);
-  });
-
-  // Utility to get top 3 unique values sorted descending
-  const getTop3 = (arr: number[]) => {
-    return Array.from(new Set(arr))
-      .sort((a, b) => b - a)
-      .slice(0, 3);
-  };
-
-  const top3 = {
-    foActual: getTop3(foActualValues),
-    foModel: getTop3(foModelValues),
-    foGap: getTop3(foGapValues),
-    ipoActual: getTop3(ipoActualValues),
-    ipoModel: getTop3(ipoModelValues),
-    ipoGap: getTop3(ipoGapValues),
-  };
+  const highlightSectors = [
+    "Consumer Discretionary",
+    "Information Technology",
+    "Health Care",
+    "Industrials",
+  ];
 
   return (
-  <Box>
-    <Typography
-      variant="h6"
-      onClick={handleCardClick}
-      sx={{
-        mb: 2,
-        fontWeight: "bold",
-        textAlign: "center",
-        color: "#004d2a",
-        cursor: "pointer",
-        userSelect: "none",
-        textDecoration: "none", 
-      }}
-    >
-      Sector Wise IPO and FO Data for 2025
-    </Typography>
+    <Box>
+      <Typography
+        variant="h6"
+        onClick={handleCardClick}
+        sx={{
+          mb: 2,
+          fontWeight: "bold",
+          textAlign: "center",
+          color: "#004d2a",
+          cursor: "pointer",
+          userSelect: "none",
+          textDecoration: "none",
+        }}
+      >
+        Sector Wise IPO and FO Data for 2025
+      </Typography>
 
       <TableContainer component={Paper}>
-        <Table size="small" sx={{borderRadius: 3, overflow: 'hidden'}}>
+        <Table size="small" sx={{ borderRadius: 3, overflow: "hidden" }}>
           <TableHead>
             <TableRow>
               <TableCell
@@ -227,7 +185,6 @@ const DashboardSectorWiseTable: React.FC = () => {
               >
                 Sector
               </TableCell>
-
               <TableCell
                 colSpan={3}
                 align="center"
@@ -311,79 +268,32 @@ const DashboardSectorWiseTable: React.FC = () => {
                   ? ipoActual - ipoModel
                   : null;
 
-              return (
-                <TableRow key={sector}>
-                  <TableCell sx={{ border: 1 }}>{sector}</TableCell>
+              const isHighlighted = highlightSectors.includes(sector);
 
-                  <TableCell
-                    sx={{
-                      border: 1,
-                      backgroundColor: top3.foActual.includes(foActual ?? NaN)
-                        ? "#cfcfcf"
-                        : undefined,
-                       textAlign: "center",
-                    }}
-                  >
+              return (
+                <TableRow
+                  key={sector}
+                  sx={{
+                    backgroundColor: isHighlighted ? "#cfcfcf" : undefined,
+                  }}
+                >
+                  <TableCell sx={{ border: 1 }}>{sector}</TableCell>
+                  <TableCell sx={{ border: 1, textAlign: "center" }}>
                     {formatValue(foActual ?? NaN)}
                   </TableCell>
-
-                  <TableCell
-                    sx={{
-                      border: 1,
-                      backgroundColor: top3.foModel.includes(foModel ?? NaN)
-                        ? "#cfcfcf"
-                        : undefined,
-                         textAlign: "center",
-                    }}
-                  >
+                  <TableCell sx={{ border: 1, textAlign: "center" }}>
                     {formatValue(foModel ?? NaN)}
                   </TableCell>
-
-                  <TableCell
-                    sx={{
-                      border: 1,
-                      backgroundColor: top3.foGap.includes(foGap ?? NaN)
-                        ? "#cfcfcf"
-                        : undefined,
-                         textAlign: "center",
-                    }}
-                  >
+                  <TableCell sx={{ border: 1, textAlign: "center" }}>
                     {formatValue(foGap ?? NaN)}
                   </TableCell>
-
-                  <TableCell
-                    sx={{
-                      border: 1,
-                      backgroundColor: top3.ipoActual.includes(ipoActual ?? NaN)
-                        ? "#cfcfcf"
-                        : undefined,
-                         textAlign: "center",
-                    }}
-                  >
+                  <TableCell sx={{ border: 1, textAlign: "center" }}>
                     {formatValue(ipoActual ?? NaN)}
                   </TableCell>
-
-                  <TableCell
-                    sx={{
-                      border: 1,
-                      backgroundColor: top3.ipoModel.includes(ipoModel ?? NaN)
-                        ? "#cfcfcf"
-                        : undefined,
-                         textAlign: "center",
-                    }}
-                  >
+                  <TableCell sx={{ border: 1, textAlign: "center" }}>
                     {formatValue(ipoModel ?? NaN)}
                   </TableCell>
-
-                  <TableCell
-                    sx={{
-                      border: 1,
-                      backgroundColor: top3.ipoGap.includes(ipoGap ?? NaN)
-                        ? "#cfcfcf"
-                        : undefined,
-                         textAlign: "center",
-                    }}
-                  >
+                  <TableCell sx={{ border: 1, textAlign: "center" }}>
                     {formatValue(ipoGap ?? NaN)}
                   </TableCell>
                 </TableRow>
@@ -405,19 +315,19 @@ const DashboardSectorWiseTable: React.FC = () => {
                   return [
                     <TableCell
                       key={`${type}-actual`}
-                      sx={{ fontWeight: "bold", border: 1,  textAlign: "center" }}
+                      sx={{ fontWeight: "bold", border: 1, textAlign: "center" }}
                     >
                       {formatValue(actual ?? NaN)}
                     </TableCell>,
                     <TableCell
                       key={`${type}-model`}
-                      sx={{ fontWeight: "bold", border: 1,  textAlign: "center" }}
+                      sx={{ fontWeight: "bold", border: 1, textAlign: "center" }}
                     >
                       {formatValue(model ?? NaN)}
                     </TableCell>,
                     <TableCell
                       key={`${type}-gap`}
-                      sx={{ fontWeight: "bold", border: 1,  textAlign: "center" }}
+                      sx={{ fontWeight: "bold", border: 1, textAlign: "center" }}
                     >
                       {formatValue(gap ?? NaN)}
                     </TableCell>,
