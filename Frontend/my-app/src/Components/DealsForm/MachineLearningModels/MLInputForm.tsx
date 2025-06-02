@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Grid,
-  TextField,
-  MenuItem,
-  Button,
-  Paper,
-  Typography,
-  CircularProgress,
-  InputAdornment,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import PredictionResults from "./PredictionResults";
-import { MenuProps } from "@mui/material";
+import { Typography, MenuProps } from "@mui/material";
+import EquityMLFormData from "./EquityMLFormData";
 
 const menuProps: Partial<MenuProps> = {
   PaperProps: {
@@ -50,6 +38,8 @@ type OptionsResponse = {
 };
 
 type FormData = {
+  ticker: string;
+  pricing_date: Date | null;
   deal_type: string;
   region: string;
   target: string;
@@ -72,10 +62,18 @@ type FormErrors = {
 
 type MLInputFormProps = {
   options: OptionsResponse;
+  initialData?: Partial<FormData>;
+  autoPredict?: boolean;
 };
 
-const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
-  const defaultFormData = {
+const MLInputForm: React.FC<MLInputFormProps> = ({
+  options,
+  initialData,
+  autoPredict,
+}) => {
+  const defaultFormData: FormData = {
+    ticker: "",
+    pricing_date: null,
     deal_type: "FO",
     region: "US",
     target: "T1D",
@@ -92,7 +90,9 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
     Treasury: "",
   };
 
-  const [formData, setFormData] = useState(defaultFormData);
+
+
+  const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
@@ -106,11 +106,42 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
+  // Fill formData when initialData arrives
+  useEffect(() => {
+    if (initialData) {
+      setFormData((prev) => ({
+        ...prev,
+        ...initialData,
+      }));
+    }
+  }, [initialData]);
+
+  // Compare formData with initialData
+  const isFormDataReady = (initial: Partial<FormData>, current: FormData): boolean => {
+    return Object.entries(initial).every(([key, value]) => {
+      const currentValue = current[key as keyof FormData];
+      if (value instanceof Date && currentValue instanceof Date) {
+        return value.getTime() === currentValue.getTime();
+      }
+      return value === currentValue;
+    });
+  };
+
+  useEffect(() => {
+    if (autoPredict && initialData && isFormDataReady(initialData, formData)) {
+      const isValid = validateForm();
+      if (isValid) {
+        handlePredict();
+      } else {
+        console.log("Error");
+      }
+    }
+  }, [autoPredict, initialData, formData]);
+
   const validateForm = (): boolean => {
     const errors: FormErrors = {};
     let isValid = true;
 
-    // Check all required fields
     Object.entries(formData).forEach(([key, value]) => {
       if (
         !value &&
@@ -123,7 +154,6 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
       }
     });
 
-    // Validate numeric fields
     if (parseFloat(formData.deal_size_category) <= 0) {
       errors.deal_size_category = "Must be greater than 0";
       isValid = false;
@@ -155,7 +185,11 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
     return isValid;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e:
+      | { target: { name: string; value: any } }
+      | React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -223,379 +257,23 @@ const MLInputForm: React.FC<MLInputFormProps> = ({ options }) => {
     return <Typography>Loading form options...</Typography>;
 
   return (
-    <>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
 
-      <Paper
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          backgroundColor: "#ffffff",
-          boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.06)",
-          border: "1px solid #e0e0e0",
-        }}
-      >
-        <Grid container spacing={2}>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Deal Type</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                size="small"
-                value="FO"
-                disabled
-                InputProps={{ sx: { width: inputWidth } }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Region</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                size="small"
-                value="US"
-                disabled
-                InputProps={{ sx: { width: inputWidth } }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Deal Size ($ Million)</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                size="small"
-                name="deal_size_category"
-                value={formData.deal_size_category}
-                onChange={handleChange}
-                type="number"
-                placeholder="e.g., 100"
-                error={!!formErrors.deal_size_category}
-                helperText={formErrors.deal_size_category}
-                InputProps={{
-                  sx: { width: inputWidth },
-                  startAdornment: (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">Million</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Sponsor (Y/N)</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                select
-                size="small"
-                name="sponsor_yn_category"
-                value={formData.sponsor_yn_category}
-                onChange={handleChange}
-                error={!!formErrors.sponsor_yn_category}
-                helperText={formErrors.sponsor_yn_category}
-                InputProps={{ sx: { width: inputWidth } }}
-                SelectProps={{
-                  MenuProps: menuProps,
-                }}
-              >
-                {options.sponsor.map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    {opt}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Discount from Announcement Price (%)</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                size="small"
-                name="discount_from_announcement_price_category"
-                value={formData.discount_from_announcement_price_category}
-                onChange={handleChange}
-                type="number"
-                placeholder="e.g., 2"
-                error={!!formErrors.discount_from_announcement_price_category}
-                helperText={
-                  formErrors.discount_from_announcement_price_category
-                }
-                InputProps={{
-                  sx: { width: inputWidth },
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Sector</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                select
-                size="small"
-                name="sector_category"
-                value={formData.sector_category}
-                onChange={handleChange}
-                error={!!formErrors.sector_category}
-                helperText={formErrors.sector_category}
-                InputProps={{ sx: { width: inputWidth } }}
-                SelectProps={{
-                  MenuProps: menuProps,
-                }}
-              >
-                {options.sector.map((sectorSlug) => (
-                  <MenuItem key={sectorSlug} value={sectorSlug}>
-                    {sectorLabels[sectorSlug] || sectorSlug}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Percentage Primary (%)</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                size="small"
-                name="percentage_primary_category"
-                value={formData.percentage_primary_category}
-                onChange={handleChange}
-                type="number"
-                placeholder="e.g., 100"
-                error={!!formErrors.percentage_primary_category}
-                helperText={formErrors.percentage_primary_category}
-                InputProps={{
-                  sx: { width: inputWidth },
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Selected Bank</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                select
-                size="small"
-                name="selected_bank_category"
-                value={formData.selected_bank_category}
-                onChange={handleChange}
-                error={!!formErrors.selected_bank_category}
-                helperText={formErrors.selected_bank_category}
-                InputProps={{ sx: { width: inputWidth } }}
-                SelectProps={{
-                  MenuProps: menuProps,
-                }}
-              >
-                {options.selected_bank.map((bank) => (
-                  <MenuItem key={bank} value={bank}>
-                    {bank}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Allocation as % of Deal Size</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                size="small"
-                name="allocation_deal_size_percentage_category"
-                value={formData.allocation_deal_size_percentage_category}
-                onChange={handleChange}
-                type="number"
-                placeholder="e.g., 0.5"
-                error={!!formErrors.allocation_deal_size_percentage_category}
-                helperText={formErrors.allocation_deal_size_percentage_category}
-                InputProps={{
-                  sx: { width: inputWidth },
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>GDP Growth</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                select
-                size="small"
-                name="GDP"
-                value={formData.GDP}
-                onChange={handleChange}
-                error={!!formErrors.GDP}
-                helperText={formErrors.GDP}
-                InputProps={{ sx: { width: inputWidth } }}
-                SelectProps={{
-                  MenuProps: menuProps,
-                }}
-              >
-                {options.gdp.map((gdp_value) => (
-                  <MenuItem key={gdp_value} value={gdp_value}>
-                    {gdp_value}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Allocation as % of IOI</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                size="small"
-                name="allocation_percentage_category"
-                value={formData.allocation_percentage_category}
-                onChange={handleChange}
-                type="number"
-                placeholder="e.g., 30"
-                error={!!formErrors.allocation_percentage_category}
-                helperText={formErrors.allocation_percentage_category}
-                InputProps={{
-                  sx: { width: inputWidth },
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Inflation Rate</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                select
-                size="small"
-                name="Inflation"
-                value={formData.Inflation}
-                onChange={handleChange}
-                error={!!formErrors.Inflation}
-                helperText={formErrors.Inflation}
-                InputProps={{ sx: { width: inputWidth } }}
-                SelectProps={{
-                  MenuProps: menuProps,
-                }}
-              >
-                {options.inflation.map((inflation_value) => (
-                  <MenuItem key={inflation_value} value={inflation_value}>
-                    {inflation_value}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Treasury Rates</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                select
-                size="small"
-                name="Treasury"
-                value={formData.Treasury}
-                onChange={handleChange}
-                error={!!formErrors.Treasury}
-                helperText={formErrors.Treasury}
-                InputProps={{ sx: { width: inputWidth } }}
-                SelectProps={{
-                  MenuProps: menuProps,
-                }}
-              >
-                {options.treasury_rates.map((treasury_rates_value) => (
-                  <MenuItem
-                    key={treasury_rates_value}
-                    value={treasury_rates_value}
-                  >
-                    {treasury_rates_value}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} container alignItems="center">
-            <Grid item xs={6}>
-              <Typography>Target Variable</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                size="small"
-                value="T+1 Day Return"
-                disabled
-                InputProps={{ sx: { width: inputWidth } }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={12} container justifyContent="flex-end" spacing={2}>
-            <Grid item>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleReset}
-                disabled={loading}
-              >
-                Reset
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handlePredict}
-                disabled={loading}
-                startIcon={
-                  loading && <CircularProgress size={20} color="inherit" />
-                }
-              >
-                {loading ? "Predicting..." : "Predict"}
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Paper>
-      {prediction && <PredictionResults result={prediction} />}
-    </>
+    <EquityMLFormData
+      snackbar={snackbar}
+      handleSnackbarClose={handleSnackbarClose}
+      formData={formData}
+      setFormData={setFormData}
+      formErrors={formErrors}
+      handleChange={handleChange}
+      handleReset={handleReset}
+      handlePredict={handlePredict}
+      loading={loading}
+      prediction={prediction}
+      options={options}
+      sectorLabels={sectorLabels}
+      inputWidth={inputWidth}
+      menuProps={menuProps}
+    />
   );
 };
 

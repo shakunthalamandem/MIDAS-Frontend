@@ -116,7 +116,11 @@ const EquityNavbar: React.FC = () => {
         {/* Tab: AI Model */}
         <Tab
           label="AI Model"
-          onClick={() => handleNavigate("/equity/ml_equity")}
+          onClick={() => {
+            sessionStorage.removeItem("selected_form_data");
+            sessionStorage.removeItem("auto_predict");
+            handleNavigate("/equity/ml_equity")
+          }}
         />
 
         {/* Dropdown: PRIME */}
