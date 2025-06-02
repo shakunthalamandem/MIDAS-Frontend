@@ -2,15 +2,14 @@ import React from 'react';
 import { Typography, Card, CardContent, Box } from '@mui/material';
 
 const componentData = [
-  { title: 'Deal Flow – IPO and FO (2023 to 2025) by Quarter', content: 'This section contains data on IPO and FO deal flow from 2023 to 2025, broken down by each quarter.' },
-  { title: 'Skew Table - IPO and FO Deals from 2023 to 2025 for Q1', content: 'This section shows the skew analysis of IPO and FO deals for Q1 across 2023 to 2025.' },
-  { title: 'Sector-wise Skew Table for 2025 (Q1) with Top 3 Highlights', content: 'Sector-based analysis for Q1 2025 with top 3 sectoral highlights included.' },
-  { title: 'Quarterly Weighted Allocation Trends (2024-2025)', content: 'Weighted allocation trends for each quarter from 2024 to 2025 are analyzed here.' },
+  { title: '2025 Q1 Opportunity Value Falls Sharply Despite Strong Deal Flow', content: 'When comparing 2025 Q1 with Q1 of 2024 and 2023, both IPO and FO deal flow show steady or slightly increasing activity. However, Opportunity Value (T + 1M Excess) has dropped to one of its lowest points in the last two years. For IPOs in particular, expected return excess is down nearly 75% vs prior Q1s, signaling weaker post-deal performance. ' },
+  { title: 'Flat Opportunity Value Amid Stable FO Activity', content: 'Follow-on (FO) deal volumes and counts in 2025 Q1 remain consistent with prior quarters, showing resilience. However, the Opportunity Value for these deals has sharply declined, pointing to a more cautious or saturated market environment where increased issuance is not translating into incremental investor gains.' },
+  { title: 'US Market Sees High Deal Volume but Weak Return Metrics', content: 'Despite US IPOs in 2025 Q1 recording 2.5x higher deal volume than EMEA ($11.5B vs $4.8B), their Opportunity Value and Expected Returns Excess (ERE) are significantly lower. A similar trend is observed in Follow-ons, where the US FO deal volume is 16% higher than EMEA, yet the Opportunity Value in EMEA is nearly 5x that of the US—highlighting weaker post-deal performance in the US.' },
+  { title: 'APAC Positioned Midway in Return Potential Across Regions', content: ' APAC ranks in the middle in terms of Opportunity Value and Expected Returns Excess for both IPOs and FOs. With a moderate ERE of 7.42% for IPOs and 1.01% for FOs, it outperforms the US but lags behind EMEA—indicating a more balanced but less aggressive return environment.' },
   { title: '2025 YTD GAP Analysis', content: 'A year-to-date gap analysis for 2025 summarizing discrepancies and performance.' },
   { title: 'Sector Wise IPO and FO Data for 2025', content: 'A breakdown of IPO and FO activity across various sectors for the year 2025.' },
   { title: 'Summary Gap Metrics', content: 'This section summarizes the gap metrics across multiple segments for easy review.' },
 ];
-
 //Styles added
 
 const cardStyles = [
