@@ -11,6 +11,8 @@ const componentData = [
   { title: 'Summary Gap Metrics', content: 'This section summarizes the gap metrics across multiple segments for easy review.' },
 ];
 
+//Styles added
+
 const cardStyles = [
   { height: '440px', padding: '1px' },
   { height: '430px', padding: '1px' },
