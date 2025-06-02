@@ -26,7 +26,7 @@ const InsightsMain = () => {
   return (
     <>
       <Typography
-        color="#0bbaf1"
+        color="#1300fc"
         align="center"
         variant="h6"
         fontWeight="bold"
@@ -41,6 +41,7 @@ const InsightsMain = () => {
           sx={{
             height: cardStyles[index]?.height || '440px',
             p: 1,
+            borderRadius: 1,
           }}
         >
           <Card
@@ -52,10 +53,10 @@ const InsightsMain = () => {
             }}
           >
             <CardContent sx={{ height: '100%' }}>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
+              <Typography variant="body1" color='#fc0004' fontWeight="bold">
                 {item.title}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="#002060" sx={{ mt: 1 }}>
                 {item.content}
               </Typography>
             </CardContent>
