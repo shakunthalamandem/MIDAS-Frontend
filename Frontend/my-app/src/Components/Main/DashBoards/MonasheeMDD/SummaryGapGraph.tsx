@@ -185,15 +185,16 @@ const renderChart = (title: string, data: ChartDataPoint[]) => {
 
 
   return (
-    <Box width="100%" px={2} py={4}>
+    <Box width="100%" >
       <Typography
       onClick={handleCardClick}
         variant="h5"
         align="center"
         color="#004d2a"
         fontWeight="bold"
-        mb={4}
         sx={{ cursor: "pointer" }}
+        mb={2}
+        mt={2}
       >
         Summary Gap Metrics
       </Typography>

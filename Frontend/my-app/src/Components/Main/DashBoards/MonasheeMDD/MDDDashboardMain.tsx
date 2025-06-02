@@ -21,7 +21,7 @@ const MDDDashboardMain = () => {
       </div>
       <SummaryGraphsGap />
 
-        <Typography variant="h5" sx={{ m: 2, color: '#002060', textAlign: 'center' }}>
+        <Typography variant="h5" sx={{  color: '#002060', textAlign: 'center' }}>
           Todays Deals Dashboard
         </Typography>
         <Grid item xs={12}>
