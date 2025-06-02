@@ -123,56 +123,66 @@ const SummaryGapGraph: React.FC = () => {
     fetchData("US");
     fetchData("EMEA");
   }, []);
-const renderChart = (title: string, data: ChartDataPoint[], yMin: number, yMax: number) => (
-  <Card sx={{ width: "100%", height: 300, cursor: "pointer" }}>
-    <CardContent sx={{ p: 2 }}>
-      <Typography
-        variant="subtitle1"
-        align="center"
-        fontWeight="bold"
-        color="#004d2a"
-        mb={2}
-      >
-        {title}
-      </Typography>
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart
-          data={data}
-          margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+
+  const getSymmetricDomain = (data: ChartDataPoint[]): [number, number] => {
+  const maxAbs = Math.max(...data.map(d => Math.abs(d.value)), 1); // avoid zero
+  const rounded = Math.ceil(maxAbs / 1_000_000) * 1_000_000; // round to nearest million
+  return [-rounded, rounded];
+};
+
+const renderChart = (title: string, data: ChartDataPoint[]) => {
+  const [yMin, yMax] = getSymmetricDomain(data);
+
+  return (
+    <Card sx={{ width: "100%", height: 300, cursor: "pointer" }}>
+      <CardContent sx={{ p: 2 }}>
+        <Typography
+          variant="subtitle1"
+          align="center"
+          fontWeight="bold"
+          color="#004d2a"
+          mb={2}
         >
-          <XAxis
-            dataKey="name"
-            style={{ fontSize: "12px" }}
-            axisLine={true}
-            tickLine={false}
-          />
-          <YAxis
-            tickFormatter={formatYAxis}
-            style={{ fontSize: "12px" }}
-            domain={[yMin, yMax]}
-            axisLine
-            tickLine
-          />
-          <Tooltip formatter={(value: number) => formatYAxis(value)} />
-          <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
-          <Bar dataKey="value" barSize={15}>
-            {data.map((entry, index) => {
-              const isLast = index === data.length - 1;
-              const fill = isLast
-                ? entry.value < 0
-                  ? "#f44336"
-                  : "#4caf50"
-                : "#7a4bb9";
-              return (
-                <Cell key={`cell-${index}`} fill={fill} cursor="pointer" />
-              );
-            })}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </CardContent>
-  </Card>
-);
+          {title}
+        </Typography>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart
+            data={data}
+            margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+          >
+            <XAxis
+              dataKey="name"
+              style={{ fontSize: "12px" }}
+              axisLine={true}
+              tickLine={false}
+            />
+            <YAxis
+              domain={[yMin, yMax]} 
+              tickFormatter={formatYAxis}
+              style={{ fontSize: "12px" }}
+              axisLine
+              tickLine
+            />
+            <Tooltip formatter={(value: number) => formatYAxis(value)} />
+            <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
+            <Bar dataKey="value" barSize={15}>
+              {data.map((entry, index) => {
+                const isLast = index === data.length - 1;
+                const fill = isLast
+                  ? entry.value < 0
+                    ? "#f44336"
+                    : "#4caf50"
+                  : "#7a4bb9";
+                return <Cell key={`cell-${index}`} fill={fill} cursor="pointer" />;
+              })}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+};
+
 
   return (
     <Box width="100%" px={2} py={4}>
@@ -207,10 +217,10 @@ const renderChart = (title: string, data: ChartDataPoint[], yMin: number, yMax: 
             </Typography>
             <Box sx={{ display: "flex", gap: 2 }}>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("FO", foDataUS, -1000000, 1000000)}
+                {renderChart("FO", foDataUS)}
               </Box>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("IPO", ipoDataUS, -1000000, 1000000)}
+                {renderChart("IPO", ipoDataUS)}
               </Box>
             </Box>
           </Box>
@@ -235,10 +245,10 @@ const renderChart = (title: string, data: ChartDataPoint[], yMin: number, yMax: 
             </Typography>
             <Box sx={{ display: "flex", gap: 2}}>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("FO", foDataEMEA, -1000000, 1000000)}
+                {renderChart("FO", foDataEMEA)}
               </Box>
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("IPO", ipoDataEMEA, -1000000, 1000000)}
+                {renderChart("IPO", ipoDataEMEA)}
               </Box>
             </Box>
           </Box>
