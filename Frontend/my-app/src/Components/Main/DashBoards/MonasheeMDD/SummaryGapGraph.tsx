@@ -193,6 +193,7 @@ const renderChart = (title: string, data: ChartDataPoint[]) => {
         color="#004d2a"
         fontWeight="bold"
         mb={4}
+        sx={{ cursor: "pointer" }}
       >
         Summary Gap Metrics
       </Typography>
