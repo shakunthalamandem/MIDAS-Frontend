@@ -45,27 +45,16 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
-const getMaxValues = (data: { region: string; data: RegionData }[]) => ({
-  Total_Deal_Count: Math.max(...data.map((d) => d.data.Total_Deal_Count)),
-  Total_Deal_Volume: Math.max(...data.map((d) => d.data.Total_Deal_Volume)),
-  Long_Opportunity_Value: Math.max(
-    ...data.map((d) => d.data.Long_Opportunity_Value)
-  ),
-  Positively_Performing_Deals_Percentage: Math.max(
-    ...data.map((d) => d.data.Positively_Performing_Deals_Percentage)
-  ),
-  Expected_Returns_Excess: Math.max(
-    ...data.map((d) => d.data.Expected_Returns_Excess)
-  ),
-});
+const getRowStyle = (type: "IPO" | "FO", region: string) => {
+  if ((type === "IPO" && region === "US") || (type === "FO" && region === "EMEA")) {
+    return { backgroundColor: "#d1e7dd" }; // light green background
+  }
+  return {};
+};
 
 const RegionWiseTable = () => {
-  const [ipoData, setIpoData] = useState<{ region: string; data: RegionData }[]>(
-    []
-  );
-  const [foData, setFoData] = useState<{ region: string; data: RegionData }[]>(
-    []
-  );
+  const [ipoData, setIpoData] = useState<{ region: string; data: RegionData }[]>([]);
+  const [foData, setFoData] = useState<{ region: string; data: RegionData }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -129,14 +118,6 @@ const RegionWiseTable = () => {
       </Typography>
     );
 
-  const ipoMax = getMaxValues(ipoData);
-  const foMax = getMaxValues(foData);
-
-  const getStyle = (value: number, max: number) =>
-    value === max
-      ? { fontWeight: "bold", backgroundColor: "#ffd9b3", border: "1px solid #ccc" }
-      : { border: "1px solid #ccc" };
-
   return (
     <Box>
       <TableContainer component={Paper} elevation={4}>
@@ -156,13 +137,12 @@ const RegionWiseTable = () => {
               color: "#054511",
               textAlign: "center",
               p: 1.5,
-              cursor: "pointer"
+              cursor: "pointer",
             }}
           >
             Region-wise Skew Table - IPO and FO Deals for 2025 (Q1) with{" "}
             <span style={{ color: "red" }}>Top</span> Highlights
           </Typography>
-
         </Box>
 
         <Table
@@ -203,21 +183,21 @@ const RegionWiseTable = () => {
             </TableRow>
 
             {ipoData.map((row) => (
-              <TableRow key={`IPO-${row.region}`}>
+              <TableRow key={`IPO-${row.region}`} sx={getRowStyle("IPO", row.region)}>
                 <TableCell sx={{ border: "1px solid #ccc" }}>{row.region}</TableCell>
-                <TableCell sx={getStyle(row.data.Total_Deal_Count, ipoMax.Total_Deal_Count)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {row.data.Total_Deal_Count}
                 </TableCell>
-                <TableCell sx={getStyle(row.data.Total_Deal_Volume, ipoMax.Total_Deal_Volume)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {formatNumber(row.data.Total_Deal_Volume)}
                 </TableCell>
-                <TableCell sx={getStyle(row.data.Long_Opportunity_Value, ipoMax.Long_Opportunity_Value)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {formatNumber(row.data.Long_Opportunity_Value)}
                 </TableCell>
-                <TableCell sx={getStyle(row.data.Positively_Performing_Deals_Percentage, ipoMax.Positively_Performing_Deals_Percentage)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {row.data.Positively_Performing_Deals_Percentage}%
                 </TableCell>
-                <TableCell sx={getStyle(row.data.Expected_Returns_Excess, ipoMax.Expected_Returns_Excess)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {row.data.Expected_Returns_Excess}%
                 </TableCell>
               </TableRow>
@@ -230,21 +210,21 @@ const RegionWiseTable = () => {
             </TableRow>
 
             {foData.map((row) => (
-              <TableRow key={`FO-${row.region}`}>
+              <TableRow key={`FO-${row.region}`} sx={getRowStyle("FO", row.region)}>
                 <TableCell sx={{ border: "1px solid #ccc" }}>{row.region}</TableCell>
-                <TableCell sx={getStyle(row.data.Total_Deal_Count, foMax.Total_Deal_Count)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {row.data.Total_Deal_Count}
                 </TableCell>
-                <TableCell sx={getStyle(row.data.Total_Deal_Volume, foMax.Total_Deal_Volume)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {formatNumber(row.data.Total_Deal_Volume)}
                 </TableCell>
-                <TableCell sx={getStyle(row.data.Long_Opportunity_Value, foMax.Long_Opportunity_Value)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {formatNumber(row.data.Long_Opportunity_Value)}
                 </TableCell>
-                <TableCell sx={getStyle(row.data.Positively_Performing_Deals_Percentage, foMax.Positively_Performing_Deals_Percentage)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {row.data.Positively_Performing_Deals_Percentage}%
                 </TableCell>
-                <TableCell sx={getStyle(row.data.Expected_Returns_Excess, foMax.Expected_Returns_Excess)}>
+                <TableCell sx={{ border: "1px solid #ccc" }}>
                   {row.data.Expected_Returns_Excess}%
                 </TableCell>
               </TableRow>
