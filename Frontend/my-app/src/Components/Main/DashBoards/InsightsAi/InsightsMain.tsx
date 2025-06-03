@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Typography, Card, CardContent, Box } from '@mui/material';
+import React, { useEffect, useState } from "react";
+import { Typography, Card, CardContent, Box } from "@mui/material";
 
 type InsightItem = {
   card_id?: string | number;
@@ -14,25 +14,25 @@ const InsightsMain = () => {
   useEffect(() => {
     const fetchData = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem('access_token');
+      const token = localStorage.getItem("access_token");
 
       try {
         const response = await fetch(`${apiUrl}/api/ai_insights_data/`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch data');
+          throw new Error("Failed to fetch data");
         }
 
         const result = await response.json();
         setData(result);
       } catch (error) {
-        console.error('Error fetching AI Insights data:', error);
+        console.error("Error fetching AI Insights data:", error);
       }
     };
 
@@ -41,7 +41,7 @@ const InsightsMain = () => {
 
   // Inject rainbow animation once
   useEffect(() => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.innerHTML = `
       @keyframes rainbowBorder {
         0% { border-color: red; }
@@ -77,22 +77,57 @@ const InsightsMain = () => {
           <Card
             elevation={4}
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              padding: '1px',
-              border: '3px solid red',
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              padding: "1px",
+              border: "3px solid red",
               animation: `rainbowBorder 4s linear infinite`,
               animationDelay: `${index * 0.3}s`,
-              borderRadius: '20px',
+              borderRadius: "20px",
             }}
           >
-            <CardContent sx={{ height: '100%' }}>
+            <CardContent sx={{ height: "100%" }}>
               <Typography variant="body1" color="#95001b" fontWeight="bold">
                 {item.title}
               </Typography>
-              <Typography variant="body2" color="#000000" sx={{ mt: 1, whiteSpace: 'pre-line' }}>
-                {item.description}
+              <Typography
+                component="div"
+                variant="body2"
+                color="#000000"
+                sx={{
+                  mt: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                }}
+              >
+                {item.description
+                  .split("•")
+                  .filter((line) => line.trim())
+                  .map((line, i) => (
+                    <Box
+                      key={i}
+                      sx={{ display: "flex", alignItems: "flex-start" }}
+                    >
+                      <Box
+                        component="span"
+                        sx={{
+                          minWidth: "1em",
+                          mr: 1,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        •
+                      </Box>
+                      <Box
+                        component="span"
+                        sx={{ flex: 1, whiteSpace: "normal" }}
+                      >
+                        {line.trim()}
+                      </Box>
+                    </Box>
+                  ))}
               </Typography>
             </CardContent>
           </Card>
