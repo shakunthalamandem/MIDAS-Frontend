@@ -9,9 +9,7 @@ import {
   Stack,
   Slide,
 } from "@mui/material";
-
 import { motion } from "framer-motion";
-import axios from "axios";
 
 const AiInsightsInputForm: React.FC = () => {
   const [date, setDate] = useState<Date | null>(null);
@@ -21,17 +19,39 @@ const AiInsightsInputForm: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async () => {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("access_token");
+
+    if (!apiUrl) {
+      console.error("API URL is not defined in environment variables");
+      return;
+    }
+
+    const payload = {
+      card_id: cardId,
+      date: date?.toISOString().split("T")[0],
+      title,
+      description,
+    };
+
     try {
-      const payload = {
-        date,
-        cardId,
-        title,
-        description,
-      };
-      await axios.post("/api/ai_insights_form/", payload);
+      const response = await fetch(`${apiUrl}/api/ai_insights_data/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
       setSubmitted(true);
     } catch (error) {
       console.error("Submission error:", error);
+      alert("Form submission failed.");
     }
   };
 
@@ -58,18 +78,18 @@ const AiInsightsInputForm: React.FC = () => {
             AI Insights Input Form
           </Typography>
           <Stack spacing={3}>
-            <TextField
-              label="Date"
-              type="date"
-              fullWidth
-              value={date}
-              onChange={(e) =>
-                setDate(e.target.value ? new Date(e.target.value) : null)
-              }
-              InputLabelProps={{
-                shrink: true, // Important so the label doesn't overlap the date
-              }}
-            />
+          <TextField
+        label="Date"
+        type="date"
+        fullWidth
+        value={date ? date.toISOString().split("T")[0] : ""}
+        onChange={(e) => {
+          const selectedDate = e.target.value;
+          setDate(selectedDate ? new Date(selectedDate) : null);
+        }}
+        InputLabelProps={{ shrink: true }}
+      />
+
 
             <TextField
               label="Card ID"
