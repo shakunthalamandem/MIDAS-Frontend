@@ -32,23 +32,17 @@ const MlEquityMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('access_token');
 
+  useEffect(() => {
+    const val = sessionStorage.getItem("auto_predict");
+    const autoPredictFlag = val === "true";
+    setAutoPredict(autoPredictFlag);
+  }, []);
 
-  
-
-useEffect(() => {
-  const val = sessionStorage.getItem("auto_predict");
-  const autoPredictFlag = val === "true";
-
-  setAutoPredict(autoPredictFlag);
-}, []);
-
-
-useEffect(() => {
-  if (autoPredict) {
-    sessionStorage.removeItem("auto_predict");
-  }
-}, [autoPredict]);
-
+  useEffect(() => {
+    if (autoPredict) {
+      sessionStorage.removeItem("auto_predict");
+    }
+  }, [autoPredict]);
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -116,51 +110,71 @@ useEffect(() => {
           textAlign: "center",
           py: 1,
           borderRadius: 2,
-          mb: 2,
           boxShadow: 2,
         }}
       >
         Welcome to the Prediction Dashboard! Effortlessly input data and track all model outcomes, from feature details to prediction results and confidence levels.
       </Box>
-      <Container maxWidth="lg" sx={{ padding: 2 }}>
-        <Box py={2} display="flex" flexDirection="column" alignItems="center">
-          <Card sx={{ width: "100%", p: 2, boxShadow: 3, borderRadius: 2, mb: 4 }}>
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              gutterBottom
-              textAlign="center"
-              color="#002060"
-            >
-              Indicative Deal Performance - 🧠 Machine Learning Equity Deal Predictor
-            </Typography>
 
-            <Typography variant="body1" gutterBottom sx={{ marginLeft: 5, mt: 2, mb: 2 }}>
-              Welcome to the ML-powered equity deal predictor for{" "}
-              <strong>US follow-on offerings</strong>. Input key market and macroeconomic
-              parameters to forecast deal outcomes using advanced machine learning models
-              trained on over 4000 historical deal records.
-            </Typography>
+      <div
+        style={{
+          width: "fit-content",
+          marginLeft: "40px",
+        }}
+      >
+        <Container maxWidth="lg" sx={{ padding: 2 }}>
+          <Box py={2} display="flex" flexDirection="column" alignItems="center">
+            <Card sx={{ width: "100%", p: 2, boxShadow: 3, borderRadius: 2, mb: 4 }}>
+              <Typography
+                variant="h5"
+                fontWeight="bold"
+                gutterBottom
+                textAlign="center"
+                color="#002060"
+              >
+                Indicative Deal Performance - 🧠 Machine Learning Equity Deal Predictor
+              </Typography>
 
-            <Box sx={{ backgroundColor: "#f4f6f8", p: 4 }}>
-              {loading ? (
-                <Box display="flex" justifyContent="center" py={4}>
-                  <CircularProgress />
-                </Box>
-              ) : options ? (
-                <MLInputForm options={options} initialData={initialData} autoPredict={autoPredict}/>
-              ) : (
-                <Typography color="error">Failed to load options.</Typography>
-              )}
-            </Box>
-          </Card>
-        </Box>
+              <Typography variant="body1" gutterBottom sx={{ marginLeft: 5, mt: 2, mb: 2 }}>
+                Welcome to the ML-powered equity deal predictor for{" "}
+                <strong>US follow-on offerings</strong>. Input key market and macroeconomic
+                parameters to forecast deal outcomes using advanced machine learning models
+                trained on over 4000 historical deal records.
+              </Typography>
 
-        {/* RandomInfoPanel completely outside, 25% width, next to the container */}
-        <Box sx={{ width: "25%", display: "inline-block", verticalAlign: "top" }}>
-          <RandomInfoPanel onSelect={handleFormSelect} />
-        </Box>
-      </Container>
+              <Box sx={{ backgroundColor: "#f4f6f8", p: 4 }}>
+                {loading ? (
+                  <Box display="flex" justifyContent="center" py={4}>
+                    <CircularProgress />
+                  </Box>
+                ) : options ? (
+                  <MLInputForm options={options} initialData={initialData} autoPredict={autoPredict} />
+                ) : (
+                  <Typography color="error">Failed to load options.</Typography>
+                )}
+              </Box>
+            </Card>
+          </Box>
+        </Container>
+      </div>
+
+      {/* Fixed RandomInfoPanel to the right side of the screen */}
+      <Box
+        sx={{
+          position: "absolute",
+          right: 0,
+          top: "calc(51.5% + 88px)", 
+          transform: "translateY(-50%)",
+          width: "25%",
+          backgroundColor: "#fff",
+          boxShadow: 2,
+          padding: 2,
+          marginRight: "100px",
+        }}
+      >
+        <RandomInfoPanel onSelect={handleFormSelect} />
+      </Box>
+
     </>
   );
 };
