@@ -22,45 +22,46 @@ const IpoDashboardCalendar: React.FC = () => {
   const [offerAmount, setOfferAmount] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async () => {
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem("access_token");
+const handleSubmit = async () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
-    if (!apiUrl) {
-      console.error("API URL is not defined in environment variables");
-      return;
-    }
+  if (!apiUrl) {
+    console.error("API URL is not defined in environment variables");
+    return;
+  }
 
-    const payload = {
-      date: date?.toISOString().split("T")[0],
-      ticker,
-      company_name: companyName,
-      expected_date: expectedDate?.toISOString().split("T")[0],
-      lowprice: lowprice,
-        highprice: highprice,
-      exchange,
-      offer_amount: offerAmount,
-    };
-
-    try {
-      const response = await fetch(`${apiUrl}/api/ai_insights_upload/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      setSubmitted(true);
-    } catch (error) {
-      alert("Form submission failed.");
-    }
+  const payload = {
+    "uploaded date": date?.toISOString().split("T")[0],   // maps to "uploaded date"
+    "ticker": ticker,
+    "company name": companyName,
+    "expected date": expectedDate?.toISOString().split("T")[0],
+    "minimun price": lowprice || null,   // Note: backend has typo 'minimun'
+    "maximum price": highprice || null,
+    "exchange": exchange,
+    "offer amount": offerAmount ? parseFloat(offerAmount) : null
   };
+
+  try {
+    const response = await fetch(`${apiUrl}/api/upload_ipo_dashboard/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    setSubmitted(true);
+  } catch (error) {
+    alert("Form submission failed.");
+    console.error(error);
+  }
+};
 
   const handleReset = () => {
     setDate(null);
@@ -130,14 +131,14 @@ const IpoDashboardCalendar: React.FC = () => {
             />
 
             <TextField
-              label="LowPrice "
+              label="minimum price "
               variant="outlined"
               fullWidth
               value={lowprice}
               onChange={(e) => setLowPrice(e.target.value)}
             />
                <TextField
-              label="HighPrice"
+              label="maximum price"
               variant="outlined"
               fullWidth
               value={highprice}
