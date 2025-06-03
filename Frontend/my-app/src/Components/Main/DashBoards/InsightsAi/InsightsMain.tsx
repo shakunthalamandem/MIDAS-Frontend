@@ -91,7 +91,7 @@ const InsightsMain = () => {
               <Typography variant="body1" color="#95001b" fontWeight="bold">
                 {item.title}
               </Typography>
-              <Typography variant="body2" color="#002060" sx={{ mt: 1, whiteSpace: 'pre-line' }}>
+              <Typography variant="body2" color="#000000" sx={{ mt: 1, whiteSpace: 'pre-line' }}>
                 {item.description}
               </Typography>
             </CardContent>
