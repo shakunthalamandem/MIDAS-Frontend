@@ -13,13 +13,13 @@ const componentData = [
 //Styles added
 
 const cardStyles = [
-  { height: '440px', padding: '1px' },
-  { height: '430px', padding: '1px' },
-  { height: '480px', padding: '1px', mb: '20px' }, 
-  { height: '420px', padding: '1px' },
-  { height: '460px', padding: '1px', mb: '100px' },
-  { height: '560px', padding: '1px', mb: '200px'},
-  { height: '500px', padding: '1px' },
+  {  padding: '1px' },
+  {  padding: '1px' },
+  {  padding: '1px',  }, 
+  {  padding: '1px' },
+  {  padding: '1px',  },
+  {  padding: '1px',},
+  {  padding: '1px' },
 ];
 
 const InsightsMain = () => {
@@ -39,7 +39,7 @@ const InsightsMain = () => {
         <Box
           key={index}
           sx={{
-            height: cardStyles[index]?.height || '440px',
+            // height: cardStyles[index]?.height || '440px',
             p: 1,
             borderRadius: 1,
           }}
