@@ -20,13 +20,6 @@ const MDDDashboardMain = () => {
 
       </div>
       <SummaryGraphsGap />
-
-        <Typography variant="h5" sx={{  color: '#002060', textAlign: 'center' ,marginBottom:'20px'}}>
-          Today Deals Dashboard
-        </Typography>
-        <Grid item xs={12}>
-          <AiDashboard />
-        </Grid>
     </>
   )
 }
