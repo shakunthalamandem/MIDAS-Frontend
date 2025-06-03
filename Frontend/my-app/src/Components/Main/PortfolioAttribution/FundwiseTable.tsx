@@ -19,47 +19,35 @@ import {
   FormControl,
 } from "@mui/material";
 
-
-interface FundData {
+interface BaseData {
   broad_region: string;
-  custom_group_1: string;
-  Jan_pnl: number;
-  Feb_pnl: number;
-  Mar_pnl: number;
-  Apr_pnl: number;
   YTD_pnl: number;
+  [key: string]: string | number; // Allows dynamic access to month keys
 }
 
-interface SectorData {
-  broad_region: string;
+interface FundData extends BaseData {
+  custom_group_1: string;
+}
+
+interface SectorData extends BaseData {
   custom_group_2: string;
-  Jan_pnl: number;
-  Feb_pnl: number;
-  Mar_pnl: number;
-  Apr_pnl: number;
-  YTD_pnl: number;
 }
 
 const formatNumber = (value: number) => {
   const isNegative = value < 0;
   const absValue = Math.abs(value);
-  let formattedValue;
-
-  if (absValue >= 1_000) {
-    formattedValue = (absValue / 1_000).toFixed(0) + "K";
-  } else {
-    formattedValue = absValue.toFixed(2);
-  }
-
-  return isNegative ? `-$${formattedValue}` : `$${formattedValue}`;
+  const formatted = absValue >= 1000 ? `${(absValue / 1000).toFixed(0)}K` : absValue.toFixed(2);
+  return isNegative ? `-$${formatted}` : `$${formatted}`;
 };
+
+const months = ["Jan", "Feb", "Mar", "Apr", "May"]; // You can add more months here
 
 const FundWiseTable: React.FC = () => {
   const { fund } = useParams<{ fund: string }>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<FundData[] | SectorData[]>([]);
-  const [view, setView] = useState<"fund" | "sector">("fund"); // Default view is "fund"
+  const [data, setData] = useState<(FundData | SectorData)[]>([]);
+  const [view, setView] = useState<"fund" | "sector">("fund");
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const navigate = useNavigate();
@@ -68,13 +56,9 @@ const FundWiseTable: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        let response;
         const endpoint =
-          view === "fund"
-            ? "/api/detailed_fund_pnl/"
-            : "/api/detailed_sector_pnl/";
-
-        response = await fetch(`${apiUrl}${endpoint}`, {
+          view === "fund" ? "/api/detailed_fund_pnl/" : "/api/detailed_sector_pnl/";
+        const response = await fetch(`${apiUrl}${endpoint}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -83,77 +67,57 @@ const FundWiseTable: React.FC = () => {
           body: JSON.stringify({ fund }),
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch data from the API.");
-        }
-
-        const responseData = await response.json();
-
-        // Check for specific error from API response
-        if (responseData.error === "No data found.") {
-          setData([]); // Set empty data if no data found
+        const result = await response.json();
+        if (!response.ok || result.error === "No data found.") {
+          setData([]);
         } else {
-          setData(responseData); // Update the data
+          setData(result);
         }
-      } catch (error) {
-        setError(
-          error instanceof Error
-            ? error.message
-            : "An error occurred while fetching data"
-        );
-        // navigate("/error");
+      } catch (err: any) {
+        setError(err.message || "An error occurred");
       } finally {
         setLoading(false);
       }
     };
 
-    if (fund) {
-      fetchData();
-    }
+    if (fund) fetchData();
   }, [fund, apiUrl, token, view]);
 
-  // Region totals and overall totals initialization
-  let regionTotals: Record<
-    string,
-    { Jan_pnl: number; Feb_pnl: number; Mar_pnl: number; Apr_pnl: number; YTD_pnl: number }
-  > = {};
-  let overallTotal = { Jan_pnl: 0, Feb_pnl: 0, Mar_pnl: 0, Apr_pnl: 0, YTD_pnl: 0 };
+  // Initialize totals
+  const regionTotals: Record<string, Record<string, number>> = {};
+  const overallTotal: Record<string, number> = {};
 
-  if (Array.isArray(data)) {
-    data.forEach(
-      ({ broad_region, Jan_pnl, Feb_pnl, Mar_pnl, Apr_pnl, YTD_pnl }: FundData | SectorData) => {
-        if (!regionTotals[broad_region]) {
-          regionTotals[broad_region] = { Jan_pnl: 0, Feb_pnl: 0, Mar_pnl: 0, Apr_pnl: 0, YTD_pnl: 0 };
-        }
-        regionTotals[broad_region].Jan_pnl += Jan_pnl;
-        regionTotals[broad_region].Feb_pnl += Feb_pnl;
-        regionTotals[broad_region].Mar_pnl += Mar_pnl;
-        regionTotals[broad_region].Apr_pnl += Apr_pnl;
-        regionTotals[broad_region].YTD_pnl += YTD_pnl;
+  months.forEach((m) => (overallTotal[`${m}_pnl`] = 0));
+  overallTotal["YTD_pnl"] = 0;
 
-        overallTotal.Jan_pnl += Jan_pnl;
-        overallTotal.Feb_pnl += Feb_pnl;
-        overallTotal.Mar_pnl += Mar_pnl;
-        overallTotal.Apr_pnl += Apr_pnl;
-        overallTotal.YTD_pnl += YTD_pnl;
-      }
-    );
-  }
+  data.forEach((row) => {
+    const region = row.broad_region;
+    if (!regionTotals[region]) {
+      regionTotals[region] = {};
+      months.forEach((m) => (regionTotals[region][`${m}_pnl`] = 0));
+      regionTotals[region]["YTD_pnl"] = 0;
+    }
 
-  // Row span logic
-  let rowSpans: Record<string, number> = {};
+    months.forEach((m) => {
+      regionTotals[region][`${m}_pnl`] += Number(row[`${m}_pnl`] || 0);
+      overallTotal[`${m}_pnl`] += Number(row[`${m}_pnl`] || 0);
+    });
+
+    regionTotals[region]["YTD_pnl"] += Number(row.YTD_pnl || 0);
+    overallTotal["YTD_pnl"] += Number(row.YTD_pnl || 0);
+  });
+
+  const rowSpans: Record<string, number> = {};
   let previousRegion: string | null = null;
 
-  if (Array.isArray(data)) {
-    data.forEach(({ broad_region }: FundData | SectorData) => {
-      if (broad_region !== previousRegion) {
-        rowSpans[broad_region] = 1;
-      } else {
-        rowSpans[broad_region]++;
-      }
-      previousRegion = broad_region;
-    });
-  }
+  data.forEach(({ broad_region }) => {
+    if (broad_region !== previousRegion) {
+      rowSpans[broad_region] = 1;
+    } else {
+      rowSpans[broad_region]++;
+    }
+    previousRegion = broad_region;
+  });
 
   return (
     <Box sx={{ p: 3 }}>
@@ -163,20 +127,11 @@ const FundWiseTable: React.FC = () => {
             <FormControl>
               <RadioGroup
                 row
-                aria-labelledby="view-toggle-label"
                 value={view}
                 onChange={(e) => setView(e.target.value as "fund" | "sector")}
               >
-                <FormControlLabel
-                  value="fund"
-                  control={<Radio />}
-                  label="Fund Detail"
-                />
-                <FormControlLabel
-                  value="sector"
-                  control={<Radio />}
-                  label="Sector Detail"
-                />
+                <FormControlLabel value="fund" control={<Radio />} label="Fund Detail" />
+                <FormControlLabel value="sector" control={<Radio />} label="Sector Detail" />
               </RadioGroup>
             </FormControl>
           </Grid>
@@ -188,232 +143,93 @@ const FundWiseTable: React.FC = () => {
               <Typography color="error">{error}</Typography>
             ) : (
               <Box>
-                <Typography
-                  variant="h5"
-                  align="center"
-                  color="#002060"
-                  fontWeight={500}
-                  marginBottom={2}
-                >
+                <Typography variant="h5" align="center" fontWeight={500} mb={2} color="#002060">
                   {view === "sector"
                     ? `${fund}: 2025 YTD Net of Hedge P&L by Sector`
-                    : `${fund} : 2025 YTD Net of Hedge P&L Strategy`}
+                    : `${fund}: 2025 YTD Net of Hedge P&L Strategy`}
                 </Typography>
-                <TableContainer component={Paper} sx={{ marginTop: 2 }}>
-                  <Table size="small" sx={{ borderCollapse: "collapse" }}>
+                <TableContainer component={Paper}>
+                  <Table size="small">
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#466675" }}>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                            border: "1px solid black",
-                            textAlign: "center",
-                          }}
-                        >
-                          <b>Region</b>
+                        <TableCell sx={{ color: "#fff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                          Region
                         </TableCell>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                            border: "1px solid black",
-                            textAlign: "center",
-                          }}
-                        >
-                          <b>{view === "sector" ? "Sector" : "Deal Type"}</b>
+                        <TableCell sx={{ color: "#fff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                          {view === "sector" ? "Sector" : "Deal Type"}
                         </TableCell>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                            border: "1px solid black",
-                            textAlign: "center",
-                          }}
-                        >
-                          <b>Jan-2025</b>
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                            border: "1px solid black",
-                            textAlign: "center",
-                          }}
-                        >
-                          <b>Feb-2025</b>
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                            border: "1px solid black",
-                            textAlign: "center",
-                          }}
-                        >
-                          <b>Mar-2025</b>
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                            border: "1px solid black",
-                            textAlign: "center",
-                          }}
-                        >
-                          <b>Apr-2025</b>
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                            border: "1px solid black",
-                            textAlign: "center",
-                          }}
-                        >
-                          <b>2025 YTD (Till Today)</b>
+                        {months.map((month) => (
+                          <TableCell
+                            key={month}
+                            sx={{ color: "#fff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}
+                          >
+                            {month}-2025
+                          </TableCell>
+                        ))}
+                        <TableCell sx={{ color: "#fff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
+                          2025 YTD
                         </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {Array.isArray(data) &&
-                        data.map((row, index, array) => {
-                          const isLastInRegion =
-                            index === array.length - 1 ||
-                            array[index + 1].broad_region !== row.broad_region;
-                          const regionSpan = rowSpans[row.broad_region];
+                      {data.map((row, index, array) => {
+                        const isLastInRegion =
+                          index === array.length - 1 || array[index + 1].broad_region !== row.broad_region;
+                        const regionSpan = rowSpans[row.broad_region];
 
-                          return (
-                            <React.Fragment key={index}>
-                              <TableRow>
-                                {index === 0 ||
-                                array[index - 1].broad_region !==
-                                  row.broad_region ? (
-                                  <TableCell
-                                    rowSpan={regionSpan}
-                                    sx={{ border: "1px solid black" }}
-                                  >
-                                    {row.broad_region}
+                        return (
+                          <React.Fragment key={index}>
+                            <TableRow>
+                              {index === 0 || array[index - 1].broad_region !== row.broad_region ? (
+                                <TableCell rowSpan={regionSpan} sx={{ border: "1px solid black" }}>
+                                  {row.broad_region}
+                                </TableCell>
+                              ) : null}
+                              <TableCell sx={{ border: "1px solid black" }}>
+                                {view === "sector"
+                                  ? (row as SectorData).custom_group_2
+                                  : (row as FundData).custom_group_1}
+                              </TableCell>
+                              {months.map((m) => (
+                                <TableCell key={m} sx={{ border: "1px solid black" }}>
+                                  {formatNumber(Number(row[`${m}_pnl`] || 0))}
+                                </TableCell>
+                              ))}
+                              <TableCell sx={{ border: "1px solid black" }}>
+                                {formatNumber(row.YTD_pnl)}
+                              </TableCell>
+                            </TableRow>
+
+                            {isLastInRegion && (
+                              <TableRow sx={{ backgroundColor: "#91ce89" }}>
+                                <TableCell colSpan={2} sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                                  Total for {row.broad_region}
+                                </TableCell>
+                                {months.map((m) => (
+                                  <TableCell key={m} sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                                    {formatNumber(regionTotals[row.broad_region][`${m}_pnl`])}
                                   </TableCell>
-                                ) : null}
-                                <TableCell sx={{ border: "1px solid black" }}>
-                                  {view === "sector"
-                                    ? (row as SectorData).custom_group_2
-                                    : (row as FundData).custom_group_1}
-                                </TableCell>
-                                <TableCell sx={{ border: "1px solid black" }}>
-                                  {formatNumber(row.Jan_pnl)}
-                                </TableCell>
-                                <TableCell sx={{ border: "1px solid black" }}>
-                                  {formatNumber(row.Feb_pnl)}
-                                </TableCell>
-                                <TableCell sx={{ border: "1px solid black" }}>
-                                  {formatNumber(row.Mar_pnl)}
-                                </TableCell>
-                                <TableCell sx={{ border: "1px solid black" }}>
-                                  {formatNumber(row.Apr_pnl)}
-                                </TableCell>
-                                <TableCell sx={{ border: "1px solid black" }}>
-                                  {formatNumber(row.YTD_pnl)}
+                                ))}
+                                <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                                  {formatNumber(regionTotals[row.broad_region]["YTD_pnl"])}
                                 </TableCell>
                               </TableRow>
-                              {isLastInRegion && (
-                                <TableRow sx={{ backgroundColor: "#91ce89" }}>
-                                  <TableCell
-                                    colSpan={2}
-                                    sx={{
-                                      fontWeight: "bold",
-                                      border: "1px solid black",
-                                    }}
-                                  >
-                                    Total for {row.broad_region}
-                                  </TableCell>
-                                  <TableCell
-                                    sx={{
-                                      fontWeight: "bold",
-                                      border: "1px solid black",
-                                    }}
-                                  >
-                                    {formatNumber(
-                                      regionTotals[row.broad_region].Jan_pnl
-                                    )}
-                                  </TableCell>
-                                  <TableCell
-                                    sx={{
-                                      fontWeight: "bold",
-                                      border: "1px solid black",
-                                    }}
-                                  >
-                                    {formatNumber(
-                                      regionTotals[row.broad_region].Feb_pnl
-                                    )}
-                                  </TableCell>
-                                  <TableCell
-                                    sx={{
-                                      fontWeight: "bold",
-                                      border: "1px solid black",
-                                    }}
-                                  >
-                                    {formatNumber(
-                                      regionTotals[row.broad_region].Mar_pnl
-                                    )}
-                                  </TableCell>
-                                  <TableCell
-                                    sx={{
-                                      fontWeight: "bold",
-                                      border: "1px solid black",
-                                    }}
-                                  >
-                                    {formatNumber(
-                                      regionTotals[row.broad_region].Apr_pnl
-                                    )}
-                                  </TableCell>
-                                  <TableCell
-                                    sx={{
-                                      fontWeight: "bold",
-                                      border: "1px solid black",
-                                    }}
-                                  >
-                                    {formatNumber(
-                                      regionTotals[row.broad_region].YTD_pnl
-                                    )}
-                                  </TableCell>
-                                </TableRow>
-                              )}
-                            </React.Fragment>
-                          );
-                        })}
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+
                       <TableRow sx={{ backgroundColor: "#cfd8dc" }}>
-                        <TableCell
-                          colSpan={2}
-                          sx={{ fontWeight: "bold", border: "1px solid black" }}
-                        >
+                        <TableCell colSpan={2} sx={{ fontWeight: "bold", border: "1px solid black" }}>
                           Overall Total
                         </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: "bold", border: "1px solid black" }}
-                        >
-                          {formatNumber(overallTotal.Jan_pnl)}
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: "bold", border: "1px solid black" }}
-                        >
-                          {formatNumber(overallTotal.Feb_pnl)}
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: "bold", border: "1px solid black" }}
-                        >
-                          {formatNumber(overallTotal.Mar_pnl)}
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: "bold", border: "1px solid black" }}
-                        >
-                          {formatNumber(overallTotal.Apr_pnl)}
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: "bold", border: "1px solid black" }}
-                        >
-                          {formatNumber(overallTotal.YTD_pnl)}
+                        {months.map((m) => (
+                          <TableCell key={m} sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                            {formatNumber(overallTotal[`${m}_pnl`])}
+                          </TableCell>
+                        ))}
+                        <TableCell sx={{ fontWeight: "bold", border: "1px solid black" }}>
+                          {formatNumber(overallTotal["YTD_pnl"])}
                         </TableCell>
                       </TableRow>
                     </TableBody>

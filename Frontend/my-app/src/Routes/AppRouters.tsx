@@ -50,6 +50,7 @@ import DealformInformation from "../Components/NewDealForm/DealformInformation";
 import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
 
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
+import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
 
 
 
@@ -160,7 +161,7 @@ const AppRouters: React.FC = () => {
 
 
 
-        {/* <Route path="/downloads" element={<AuthGuard><DownloadDeals/></AuthGuard>} /> */}
+        <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
 
 
 
