@@ -164,7 +164,6 @@ const AppRouters: React.FC = () => {
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
 
-        <Route path="/ai_upload" element={<AuthGuard><AiInsightsInputForm/></AuthGuard>} />
 
 
 

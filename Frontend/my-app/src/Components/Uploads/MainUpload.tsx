@@ -19,6 +19,7 @@ import DownloadDeals from './DownloadDeals';
 import LastThreeDayDeals from './LastThreeDayDeals';
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import NewDealDownloadWithFilter from './NewDealDownloadWithFilter';
+import AiInsightsInputForm from '../Main/DashBoards/InsightsAi/UploadsInsights/AiInsightsInputForm';
 
 // Upload type
 type UploadType = 'form' | 'monashee_deals' | null;
@@ -127,6 +128,7 @@ const MainUpload: React.FC = () => {
   };
 
   return (
+    <>
     <Box sx={{ display: 'flex', position: 'relative', width: '100%' }}>
       {/* Left side: Upload Form */}
       <Container sx={{ marginTop: '100px', width: '70%' }}>
@@ -209,7 +211,7 @@ const MainUpload: React.FC = () => {
       </Container>
 
       {/* Vertical Divider */}
-      <Divider orientation="vertical" flexItem sx={{ height: '100vh', borderColor: '#e0e0e0' }} />
+      <Divider orientation="vertical" flexItem sx={{ height: '60vh', borderColor: '#e0e0e0' }} />
 
       {/* Right side: DownloadDeals component */}
 
@@ -221,6 +223,10 @@ const MainUpload: React.FC = () => {
 
         <NewDealDownloadWithFilter />
     </Box>
+
+            <AiInsightsInputForm />
+            </>
+
   );
 };
 
