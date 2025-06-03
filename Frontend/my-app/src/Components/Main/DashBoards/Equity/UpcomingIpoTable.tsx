@@ -59,22 +59,22 @@ const UpcomingIpoTable: React.FC = () => {
   }, [apiUrl, token]);
 
 
-const formatNumber = (value: number): string => {
-  const absValue = Math.abs(value);
-  let formattedValue: string;
+  const formatNumber = (value: number): string => {
+    const absValue = Math.abs(value);
+    let formattedValue: string;
 
-  if (absValue >= 1e9) {
-    formattedValue = `$${(absValue / 1e9).toFixed(1)}B`; // Billion
-  } else if (absValue >= 1e6) {
-    formattedValue = `$${(absValue / 1e6).toFixed(1)}M`; // Million
-  } else if (absValue >= 1e3) {
-    formattedValue = `$${(absValue / 1e3).toFixed(1)}K`; // Thousand
-  } else {
-    formattedValue = `$${absValue.toFixed(2)}`; // Small value with cents
-  }
+    if (absValue >= 1e9) {
+      formattedValue = `$${(absValue / 1e9).toFixed(1)}B`; // Billion
+    } else if (absValue >= 1e6) {
+      formattedValue = `$${(absValue / 1e6).toFixed(1)}M`; // Million
+    } else if (absValue >= 1e3) {
+      formattedValue = `$${(absValue / 1e3).toFixed(1)}K`; // Thousand
+    } else {
+      formattedValue = `$${absValue.toFixed(2)}`; // Small value with cents
+    }
 
-  return value < 0 ? `-${formattedValue}` : formattedValue;
-};
+    return value < 0 ? `-${formattedValue}` : formattedValue;
+  };
 
 
   return (
@@ -132,9 +132,9 @@ const formatNumber = (value: number): string => {
                   <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
                     {row.exchange}
                   </TableCell>
-            <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
-  {row.offer_amount !== null ? formatNumber(row.offer_amount) : '-'}
-</TableCell>
+                  <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
+                    {row.offer_amount !== null ? formatNumber(row.offer_amount) : '-'}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
