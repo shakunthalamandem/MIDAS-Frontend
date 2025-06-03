@@ -94,11 +94,11 @@ const AiInsightsInputForm: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <Box display="flex" justifyContent="space-between" gap={2}>
+            <Box display="flex" justifyContent="flex-end" gap={2}>
               <Button
                 variant="contained"
-                color="primary"
                 onClick={handleSubmit}
+                sx={{ color: "#fff", backgroundColor: "#002060" }}
               >
                 Submit
               </Button>
@@ -110,6 +110,7 @@ const AiInsightsInputForm: React.FC = () => {
                 Reset
               </Button>
             </Box>
+
             {submitted && (
               <Slide direction="up" in={submitted} mountOnEnter unmountOnExit>
                 <Typography variant="body1" color="success.main">
