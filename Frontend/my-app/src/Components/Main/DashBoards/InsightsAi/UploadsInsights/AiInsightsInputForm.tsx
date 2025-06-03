@@ -58,18 +58,20 @@ const AiInsightsInputForm: React.FC = () => {
             AI Insights Input Form
           </Typography>
           <Stack spacing={3}>
-            <TextField
-              label="Date"
-              type="date"
-              fullWidth
-              value={date}
-              onChange={(e) =>
-                setDate(e.target.value ? new Date(e.target.value) : null)
-              }
-              InputLabelProps={{
-                shrink: true, // Important so the label doesn't overlap the date
-              }}
-            />
+      <TextField
+  label="Date"
+  type="date"
+  fullWidth
+  value={date ? date.toISOString().split("T")[0] : ""}
+  onChange={(e) => {
+    const newDate = e.target.value ? new Date(e.target.value) : null;
+    setDate(newDate);
+  }}
+  InputLabelProps={{
+    shrink: true,
+  }}
+/>
+
 
             <TextField
               label="Card ID"
