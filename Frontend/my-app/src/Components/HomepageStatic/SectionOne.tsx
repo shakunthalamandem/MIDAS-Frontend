@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { Box, Typography, Button, Grid } from "@mui/material";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import RequestDemoModal from "./RequestDemoModal";
 import "./SectionOne.css";
 
 const SectionOne: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
+  const navigate = useNavigate();
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
+  const handleNavigate = () => navigate("/equity/dashboard");
 
   return (
     <Box className="section-one">
@@ -36,6 +39,7 @@ const SectionOne: React.FC = () => {
             >
               <Button
                 variant="contained"
+                onClick={handleNavigate}
                 sx={{
                   background: "linear-gradient(45deg, #ff7e5f, #feb47b)",
                   fontWeight: "bold",
@@ -52,6 +56,7 @@ const SectionOne: React.FC = () => {
               </Button>
               <Button
                 variant="contained"
+                // onClick={handleOpenModal}
                 sx={{
                   background: "linear-gradient(45deg, #36d1dc, #5b86e5)",
                   fontWeight: "bold",
@@ -63,7 +68,6 @@ const SectionOne: React.FC = () => {
                     background: "linear-gradient(45deg, #2db9c3, #4a74c5)",
                   },
                 }}
-                // onClick={handleOpenModal}
               >
                 Request Demo
               </Button>
