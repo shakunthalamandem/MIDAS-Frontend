@@ -4,11 +4,17 @@ import SectorwiseTable from './SectorwiseTable';
 import QuarterlyDealsTable from './QuarterlyDealsTable';
 import RegionWiseTable from './RegionWiseTable';
 import NumerSummary from './NumerSummary';
-import AiDashboard from './AiDashboard';
+import UpcomingIpoTable from './UpcomingIpoTable';
 
 const EquityDashboard = () => {
   return (
     <Box sx={{ p: 2 }}>
+
+
+      <UpcomingIpoTable />
+
+
+      
       <Grid container spacing={2}>
         
         {/* First Row: Single full-width component */}

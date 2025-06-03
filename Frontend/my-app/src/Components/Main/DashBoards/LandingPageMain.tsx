@@ -3,12 +3,11 @@ import { Grid, Box, Paper } from '@mui/material';
 import EquityDashboard from './Equity/EquityDashboard';
 import InsightsMain from './InsightsAi/InsightsMain';
 import MDDDashboardMain from './MonasheeMDD/MDDDashboardMain';
-import UpcomingIpoTable from './Equity/UpcomingIpoTable';
 
 
 const LandingPageMain: React.FC = () => {
   return (
-    <><UpcomingIpoTable />
+    <>
     <Box display="flex">
 
       {/* Left side: 85% */}
