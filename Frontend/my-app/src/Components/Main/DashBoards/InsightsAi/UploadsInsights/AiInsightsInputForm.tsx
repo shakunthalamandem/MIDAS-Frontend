@@ -35,7 +35,7 @@ const AiInsightsInputForm: React.FC = () => {
     };
 
     try {
-      const response = await fetch(`${apiUrl}/api/ai_insights_data/`, {
+      const response = await fetch(`${apiUrl}/api/ai_insights_upload/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
