@@ -130,6 +130,8 @@ const MainUpload: React.FC = () => {
 
   return (
     <>
+        <Box sx={{ width: '100%' }}>
+
     <Box sx={{ display: 'flex', position: 'relative', width: '100%' }}>
       {/* Left side: Upload Form */}
       <Container sx={{ marginTop: '100px', width: '70%' }}>
@@ -226,10 +228,15 @@ const MainUpload: React.FC = () => {
     </Box>
 
            
-    <Box sx={{ display: 'flex',  width: '100%' }}>
-  <AiInsightsInputForm />
-  <IpoDashboardCalendar />
-</Box>
+  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, px: 4 }}>
+    <Box sx={{ flex: 1, mr: 2 }}>
+      <AiInsightsInputForm />
+    </Box>
+    <Box sx={{ flex: 1, ml: 2 }}>
+      <IpoDashboardCalendar />
+    </Box>
+  </Box>
+   </Box>
             </>
 
   );
