@@ -11,11 +11,15 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 
-const AiInsightsInputForm: React.FC = () => {
+const IpoDashboardCalendar: React.FC = () => {
   const [date, setDate] = useState<Date | null>(null);
-  const [cardId, setCardId] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [ticker, setTicker] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [expectedDate, setExpectedDate] = useState<Date | null>(null);
+  const [lowprice, setLowPrice] = useState("");
+  const [highprice, setHighPrice] = useState("");
+  const [exchange, setExchange] = useState("");
+  const [offerAmount, setOfferAmount] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async () => {
@@ -28,10 +32,14 @@ const AiInsightsInputForm: React.FC = () => {
     }
 
     const payload = {
-      card_id: cardId,
       date: date?.toISOString().split("T")[0],
-      title,
-      description,
+      ticker,
+      company_name: companyName,
+      expected_date: expectedDate?.toISOString().split("T")[0],
+      lowprice: lowprice,
+        highprice: highprice,
+      exchange,
+      offer_amount: offerAmount,
     };
 
     try {
@@ -56,15 +64,17 @@ const AiInsightsInputForm: React.FC = () => {
 
   const handleReset = () => {
     setDate(null);
-    setCardId("");
-    setTitle("");
-    setDescription("");
+    setTicker("");
+    setCompanyName("");
+    setExpectedDate(null);
+    setLowPrice("");
+    setHighPrice("");
+    setExchange("");
+    setOfferAmount("");
     setSubmitted(false);
   };
 
   return (
-    <>
-    <Box>
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -76,7 +86,7 @@ const AiInsightsInputForm: React.FC = () => {
       >
         <CardContent>
           <Typography variant="h5" color="#002060" gutterBottom align="center">
-            AI Insights Input Form
+            IPO Dashboard Calendar
           </Typography>
           <Stack spacing={3}>
             <TextField
@@ -88,35 +98,68 @@ const AiInsightsInputForm: React.FC = () => {
                 const newDate = e.target.value ? new Date(e.target.value) : null;
                 setDate(newDate);
               }}
-              InputLabelProps={{
-                shrink: true,
+              InputLabelProps={{ shrink: true }}
+            />
+
+            <TextField
+              label="Ticker"
+              variant="outlined"
+              fullWidth
+              value={ticker}
+              onChange={(e) => setTicker(e.target.value)}
+            />
+
+            <TextField
+              label="Company Name"
+              variant="outlined"
+              fullWidth
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+            />
+
+            <TextField
+              label="Expected Date"
+              type="date"
+              fullWidth
+              value={expectedDate ? expectedDate.toISOString().split("T")[0] : ""}
+              onChange={(e) => {
+                const newExpectedDate = e.target.value ? new Date(e.target.value) : null;
+                setExpectedDate(newExpectedDate);
               }}
+              InputLabelProps={{ shrink: true }}
             />
 
+            <TextField
+              label="LowPrice "
+              variant="outlined"
+              fullWidth
+              value={lowprice}
+              onChange={(e) => setLowPrice(e.target.value)}
+            />
+               <TextField
+              label="HighPrice"
+              variant="outlined"
+              fullWidth
+              value={highprice}
+              onChange={(e) => setHighPrice(e.target.value)}
+            />
 
             <TextField
-              label="Card ID"
+              label="Exchange"
               variant="outlined"
               fullWidth
-              value={cardId}
-              onChange={(e) => setCardId(e.target.value)}
+              value={exchange}
+              onChange={(e) => setExchange(e.target.value)}
             />
+
             <TextField
-              label="Title"
+              label="Offer Amount"
               variant="outlined"
               fullWidth
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={offerAmount}
+              onChange={(e) => setOfferAmount(e.target.value)}
             />
-            <TextField
-              label="Description"
-              variant="outlined"
-              fullWidth
-              multiline
-              minRows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
+
             <Box display="flex" justifyContent="flex-end" gap={2}>
               <Button
                 variant="contained"
@@ -145,9 +188,7 @@ const AiInsightsInputForm: React.FC = () => {
         </CardContent>
       </Card>
     </motion.div>
-    </Box>
-    </>
   );
 };
 
-export default AiInsightsInputForm;
+export default IpoDashboardCalendar;

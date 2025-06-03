@@ -20,6 +20,7 @@ import LastThreeDayDeals from './LastThreeDayDeals';
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import NewDealDownloadWithFilter from './NewDealDownloadWithFilter';
 import AiInsightsInputForm from '../Main/DashBoards/InsightsAi/UploadsInsights/AiInsightsInputForm';
+import IpoDashboardCalendar from '../Main/DashBoards/InsightsAi/UploadsInsights/IpoDashboardCalender';
 
 // Upload type
 type UploadType = 'form' | 'monashee_deals' | null;
@@ -224,7 +225,11 @@ const MainUpload: React.FC = () => {
         <NewDealDownloadWithFilter />
     </Box>
 
-            <AiInsightsInputForm />
+           
+    <Box sx={{ display: 'flex',  width: '100%' }}>
+  <AiInsightsInputForm />
+  <IpoDashboardCalendar />
+</Box>
             </>
 
   );
