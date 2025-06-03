@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -8,18 +8,16 @@ import {
   Box,
   Stack,
   Slide,
-} from '@mui/material';
-// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { motion } from 'framer-motion';
-import axios from 'axios';
+} from "@mui/material";
+
+import { motion } from "framer-motion";
+import axios from "axios";
 
 const AiInsightsInputForm: React.FC = () => {
   const [date, setDate] = useState<Date | null>(null);
-  const [cardId, setCardId] = useState('');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [cardId, setCardId] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async () => {
@@ -30,86 +28,99 @@ const AiInsightsInputForm: React.FC = () => {
         title,
         description,
       };
-      await axios.post('/api/ai_insights_form/', payload);
+      await axios.post("/api/ai_insights_form/", payload);
       setSubmitted(true);
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error("Submission error:", error);
     }
   };
 
   const handleReset = () => {
     setDate(null);
-    setCardId('');
-    setTitle('');
-    setDescription('');
+    setCardId("");
+    setTitle("");
+    setDescription("");
     setSubmitted(false);
   };
 
   return (
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <Card
+        elevation={6}
+        sx={{ maxWidth: 600, mx: "auto", mt: 5, p: 3, borderRadius: 4 }}
       >
-        <Card elevation={6} sx={{ maxWidth: 600, mx: 'auto', mt: 5, p: 3, borderRadius: 4 }}>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>
-              AI Insights Input Form
-            </Typography>
-            <Stack spacing={3}>
-              <TextField
-  label="Date"
-  type="date"
-  fullWidth
-  value={date}
-  onChange={(e) => setDate(e.target.value ? new Date(e.target.value) : null)}
-  InputLabelProps={{
-    shrink: true, // Important so the label doesn't overlap the date
-  }}
-/>
+        <CardContent>
+          <Typography variant="h5" color="#002060" gutterBottom align="center">
+            AI Insights Input Form
+          </Typography>
+          <Stack spacing={3}>
+            <TextField
+              label="Date"
+              type="date"
+              fullWidth
+              value={date}
+              onChange={(e) =>
+                setDate(e.target.value ? new Date(e.target.value) : null)
+              }
+              InputLabelProps={{
+                shrink: true, // Important so the label doesn't overlap the date
+              }}
+            />
 
-              <TextField
-                label="Card ID"
+            <TextField
+              label="Card ID"
+              variant="outlined"
+              fullWidth
+              value={cardId}
+              onChange={(e) => setCardId(e.target.value)}
+            />
+            <TextField
+              label="Title"
+              variant="outlined"
+              fullWidth
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <TextField
+              label="Description"
+              variant="outlined"
+              fullWidth
+              multiline
+              minRows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <Box display="flex" justifyContent="space-between" gap={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+              >
+                Submit
+              </Button>
+              <Button
                 variant="outlined"
-                fullWidth
-                value={cardId}
-                onChange={(e) => setCardId(e.target.value)}
-              />
-              <TextField
-                label="Title"
-                variant="outlined"
-                fullWidth
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                multiline
-                minRows={4}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-              <Box display="flex" justifyContent="space-between" gap={2}>
-                <Button variant="contained" color="primary" onClick={handleSubmit}>
-                  Submit
-                </Button>
-                <Button variant="outlined" color="secondary" onClick={handleReset}>
-                  Reset
-                </Button>
-              </Box>
-              {submitted && (
-                <Slide direction="up" in={submitted} mountOnEnter unmountOnExit>
-                  <Typography variant="body1" color="success.main">
-                    Form submitted successfully!
-                  </Typography>
-                </Slide>
-              )}
-            </Stack>
-          </CardContent>
-        </Card>
-      </motion.div>
+                color="secondary"
+                onClick={handleReset}
+              >
+                Reset
+              </Button>
+            </Box>
+            {submitted && (
+              <Slide direction="up" in={submitted} mountOnEnter unmountOnExit>
+                <Typography variant="body1" color="success.main">
+                  Form submitted successfully!
+                </Typography>
+              </Slide>
+            )}
+          </Stack>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 
