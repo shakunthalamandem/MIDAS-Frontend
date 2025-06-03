@@ -51,6 +51,7 @@ import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
 
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
 import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
+import AiInsightsInputForm from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/AiInsightsInputForm";
 
 
 
@@ -162,6 +163,9 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
+
+        <Route path="/ai_upload" element={<AuthGuard><AiInsightsInputForm/></AuthGuard>} />
+
 
 
 
