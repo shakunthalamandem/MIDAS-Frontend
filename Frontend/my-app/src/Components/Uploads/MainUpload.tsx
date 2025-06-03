@@ -232,7 +232,7 @@ const MainUpload: React.FC = () => {
     <Box sx={{ flex: 1, mr: 2 }}>
       <AiInsightsInputForm />
     </Box>
-    <Box sx={{ flex: 1, ml: 2 }}>
+    <Box sx={{ flex: 1, m: 2 }}>
       <IpoDashboardCalendar />
     </Box>
   </Box>
