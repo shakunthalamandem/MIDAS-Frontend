@@ -51,7 +51,7 @@ const InsightsMain = () => {
         57% { border-color: blue; }
         71% { border-color: indigo; }
         85% { border-color: violet; }
-        100% { border-color: black; }
+        100% { border-color: pink; }
       }
     `;
     document.head.appendChild(style);
@@ -81,13 +81,14 @@ const InsightsMain = () => {
               flexDirection: 'column',
               justifyContent: 'center',
               padding: '1px',
-              border: '2px solid red',
+              border: '3px solid red',
               animation: `rainbowBorder 4s linear infinite`,
               animationDelay: `${index * 0.3}s`,
+              borderRadius: '20px',
             }}
           >
             <CardContent sx={{ height: '100%' }}>
-              <Typography variant="body1" color="#fc0004" fontWeight="bold">
+              <Typography variant="body1" color="#95001b" fontWeight="bold">
                 {item.title}
               </Typography>
               <Typography variant="body2" color="#002060" sx={{ mt: 1, whiteSpace: 'pre-line' }}>
