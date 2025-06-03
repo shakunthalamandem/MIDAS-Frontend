@@ -50,7 +50,6 @@ const AiInsightsInputForm: React.FC = () => {
 
       setSubmitted(true);
     } catch (error) {
-      console.error("Submission error:", error);
       alert("Form submission failed.");
     }
   };
