@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Typography, Card, CardContent, Box } from '@mui/material';
 
 const componentData = [
@@ -10,19 +10,29 @@ const componentData = [
   { title: 'Sector Wise IPO and FO Data for 2025', content: 'A breakdown of IPO and FO activity across various sectors for the year 2025.' },
   { title: 'Summary Gap Metrics', content: 'This section summarizes the gap metrics across multiple segments for easy review.' },
 ];
-//Styles added
-
-const cardStyles = [
-  {  padding: '1px' },
-  {  padding: '1px' },
-  {  padding: '1px',  }, 
-  {  padding: '1px' },
-  {  padding: '1px',  },
-  {  padding: '1px',},
-  {  padding: '1px' },
-];
 
 const InsightsMain = () => {
+  // Inject rainbow border keyframes once
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes rainbowBorder {
+        0% { border-color: red; }
+        14% { border-color: orange; }
+        28% { border-color: yellow; }
+        42% { border-color: green; }
+        57% { border-color: blue; }
+        71% { border-color: indigo; }
+        85% { border-color: violet; }
+        100% { border-color: black; }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <>
       <Typography
@@ -39,19 +49,23 @@ const InsightsMain = () => {
         <Box
           key={index}
           sx={{
-            // height: cardStyles[index]?.height || '440px',
             p: 1,
             borderRadius: 1,
           }}
         >
-          <Card
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              ...cardStyles[index],
-            }}
-          >
+      <Card
+  elevation={4}
+  sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: '1px',
+    border: '2px solid red',
+    animation: `rainbowBorder 4s linear infinite`,
+    animationDelay: `${index * 0.3}s`, // staggered animation
+  }}
+>
+
             <CardContent sx={{ height: '100%' }}>
               <Typography variant="body1" color='#fc0004' fontWeight="bold">
                 {item.title}
@@ -67,4 +81,4 @@ const InsightsMain = () => {
   );
 };
 
-export default InsightsMain;
+    export default InsightsMain;
