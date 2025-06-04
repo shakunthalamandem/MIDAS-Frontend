@@ -350,7 +350,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                     // select
                     size="small"
                     // name="GDP"
-                    value="Decelerating"
+                    value="Stable"
                     disabled
                     // value={formData.GDP}
                     // onChange={handleChange}
@@ -400,7 +400,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                   <TextField
                     // select
                     size="small"
-                    value="Accelerating"
+                    value="Stable"
                     disabled
                     // name="Inflation"
                     // value={formData.Inflation}
@@ -428,7 +428,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                   <TextField
                     // select
                     size="small"
-                    value="Accelerating"
+                    value="Stable"
                     disabled
                     // name="Treasury"
                     // value={formData.Treasury}

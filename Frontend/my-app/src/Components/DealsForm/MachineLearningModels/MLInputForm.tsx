@@ -85,9 +85,9 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     discount_from_announcement_price_category: "",
     allocation_deal_size_percentage_category: "",
     allocation_percentage_category: "",
-    GDP: "Decelerating",
-    Inflation: "Accelerating",
-    Treasury: "Accelerating",
+    GDP: "Stable",
+    Inflation: "Stable",
+    Treasury: "Stable",
   };
 
 
