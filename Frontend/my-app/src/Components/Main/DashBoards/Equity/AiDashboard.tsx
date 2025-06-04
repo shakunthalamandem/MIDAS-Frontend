@@ -168,15 +168,16 @@ const AiDashboard: React.FC = () => {
                   {renderPredictionChip(item.main_model_predicted)}
                 </Box>
 
-                <Typography variant="caption" color="#002060">
-                  {formatDate(item.pricing_date)}
-                </Typography>
-
-                <Box mt={1} mb={0.5}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={0.5}>
                   <Typography variant="body2" color="#002060">
                     Discount: <strong>{item.discount_announcement_price}%</strong>
                   </Typography>
+
+                  <Typography variant="caption" color="#002060">
+                    {formatDate(item.pricing_date)}
+                  </Typography>
                 </Box>
+
 
                 <Divider sx={{ my: 1 }} />
 
