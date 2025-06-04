@@ -165,7 +165,7 @@ const SectorwiseTable: React.FC = () => {
                 sx={{
                   fontWeight: "bold",
                   color: "#FFFFFF",
-                  border: "1px solid #d8d8d8",
+                  border: "1px solid #000000",
                 }}
               >
                 Sector
@@ -176,7 +176,7 @@ const SectorwiseTable: React.FC = () => {
                   sx={{
                     fontWeight: "bold",
                     color: "#FFFFFF",
-                    border: "1px solid #d8d8d8",
+                    border: "1px solid #000000",
                     textAlign: "center",
                   }}
                 >
@@ -188,7 +188,7 @@ const SectorwiseTable: React.FC = () => {
           <TableBody>
             {Object.entries(sectorData).map(([sector, data]) => (
               <TableRow key={sector} sx={getRowStyle(sector)}>
-                <TableCell sx={{ border: "1px solid #d8d8d8" }}>
+                <TableCell sx={{ border: "1px solid #000000" }}>
                   {sector}
                 </TableCell>
                 {metrics.map((metric) => {
@@ -205,7 +205,7 @@ const SectorwiseTable: React.FC = () => {
                       key={metric}
                       align="center"
                       sx={{
-                        border: "1px solid #d8d8d8",
+                        border: "1px solid #000000",
                       }}
                     >
                       {formatNumber(value, isCurrency, isPercentage)}
