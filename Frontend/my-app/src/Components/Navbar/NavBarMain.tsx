@@ -20,7 +20,7 @@ import Logout from "../Main/HomePage/Authentication/Logout";
 import EquityNavbar from "./EquityNavbar";
 import ConvertsNavbar from "./ConvertsNavbar";
 import HighYieldNavbar from "./HighYieldNavbar";
-import MacroNavbar from "./MacroNavbar";
+// import MacroNavbar from "./MacroNavbar";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -268,7 +268,7 @@ const NavbarMain: React.FC = () => {
         {selectedTab === "Equity" && <EquityNavbar />}
         {selectedTab === "Converts" && <ConvertsNavbar />}
         {selectedTab === "High Yield" && <HighYieldNavbar />}
-        {selectedTab === "Portfolio Attribution" && <MacroNavbar />}
+        {/* {selectedTab === "Portfolio Attribution" && <MacroNavbar />} */}
       </Box>
 
       {/* Logout Confirmation Dialog */}
