@@ -149,7 +149,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                     size="small"
                     value="FO"
                     disabled
-                    InputProps={{ sx: { width: inputWidth } }}
+                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
                   />
                 </Grid>
               </Grid>
@@ -162,7 +162,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                     size="small"
                     value="US"
                     disabled
-                    InputProps={{ sx: { width: inputWidth } }}
+                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
                   />
                 </Grid>
               </Grid>
@@ -347,17 +347,19 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    select
+                    // select
                     size="small"
-                    name="GDP"
-                    value={formData.GDP}
-                    onChange={handleChange}
-                    error={!!formErrors.GDP}
-                    helperText={formErrors.GDP}
-                    InputProps={{ sx: { width: inputWidth } }}
-                    SelectProps={{
-                      MenuProps: menuProps,
-                    }}
+                    // name="GDP"
+                    value="Decelerating"
+                    disabled
+                    // value={formData.GDP}
+                    // onChange={handleChange}
+                    // error={!!formErrors.GDP}
+                    // helperText={formErrors.GDP}
+                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
+                    // SelectProps={{
+                    //   MenuProps: menuProps,
+                    // }}
                   >
                     {options.gdp.map((gdp_value) => (
                       <MenuItem key={gdp_value} value={gdp_value}>
@@ -396,17 +398,19 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    select
+                    // select
                     size="small"
-                    name="Inflation"
-                    value={formData.Inflation}
-                    onChange={handleChange}
-                    error={!!formErrors.Inflation}
-                    helperText={formErrors.Inflation}
-                    InputProps={{ sx: { width: inputWidth } }}
-                    SelectProps={{
-                      MenuProps: menuProps,
-                    }}
+                    value="Accelerating"
+                    disabled
+                    // name="Inflation"
+                    // value={formData.Inflation}
+                    // onChange={handleChange}
+                    // error={!!formErrors.Inflation}
+                    // helperText={formErrors.Inflation}
+                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
+                    // SelectProps={{
+                    //   MenuProps: menuProps,
+                    // }}
                   >
                     {options.inflation.map((inflation_value) => (
                       <MenuItem key={inflation_value} value={inflation_value}>
@@ -422,17 +426,19 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    select
+                    // select
                     size="small"
-                    name="Treasury"
-                    value={formData.Treasury}
-                    onChange={handleChange}
-                    error={!!formErrors.Treasury}
-                    helperText={formErrors.Treasury}
-                    InputProps={{ sx: { width: inputWidth } }}
-                    SelectProps={{
-                      MenuProps: menuProps,
-                    }}
+                    value="Accelerating"
+                    disabled
+                    // name="Treasury"
+                    // value={formData.Treasury}
+                    // onChange={handleChange}
+                    // error={!!formErrors.Treasury}
+                    // helperText={formErrors.Treasury}
+                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
+                    // SelectProps={{
+                    //   MenuProps: menuProps,
+                    // }}
                   >
                     {options.treasury_rates.map((treasury_rates_value) => (
                       <MenuItem
@@ -449,12 +455,12 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 <Grid item xs={6}>
                   <Typography>Target Variable</Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={6} sx={{color: "#002060"}}>
                   <TextField
                     size="small"
                     value="T+1 Day Return"
                     disabled
-                    InputProps={{ sx: { width: inputWidth } }}
+                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
                   />
                 </Grid>
               </Grid>
