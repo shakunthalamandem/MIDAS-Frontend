@@ -206,12 +206,12 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
           cursor: "pointer",
           textAlign: "center",
           mb: 2,
-          color: "#004d2a",
+          color: "#002060",
         }}
       >
      <Typography
         variant="h6"
-        color="#004d2a"
+        color="#002060"
         fontWeight="bold"
         gutterBottom
         sx={{ mb: 2 }}

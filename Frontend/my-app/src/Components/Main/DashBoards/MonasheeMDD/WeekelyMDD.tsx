@@ -104,7 +104,7 @@ return (
 <> 
       <Typography
         variant="h6"
-        color="#004d2a"
+        color="#002060"
         fontWeight="bold"
         align="center"
         gutterBottom
