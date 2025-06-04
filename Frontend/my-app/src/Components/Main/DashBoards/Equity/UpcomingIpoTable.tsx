@@ -19,7 +19,7 @@ interface IpoData {
   expected_date: string;
   price: string | number | null;
   exchange: string;
-  offer_amount: number | null;
+  deal_size: number | null;
 }
 
 const UpcomingIpoTable: React.FC = () => {
@@ -133,7 +133,7 @@ const UpcomingIpoTable: React.FC = () => {
                     {row.exchange}
                   </TableCell>
                   <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
-                    {row.offer_amount !== null ? formatNumber(row.offer_amount) : '-'}
+                    {row.deal_size !== null ? formatNumber(row.deal_size) : '-'}
                   </TableCell>
                 </TableRow>
               ))}
