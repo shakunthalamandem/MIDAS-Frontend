@@ -88,7 +88,7 @@ const InsightsMain = () => {
             }}
           >
             <CardContent sx={{ height: "100%" }}>
-              <Typography variant="body1" color="#4b70ab" fontWeight="bold">
+              <Typography variant="body1" color="#017055" fontWeight="bold">
                 {item.title}
               </Typography>
               <Typography
