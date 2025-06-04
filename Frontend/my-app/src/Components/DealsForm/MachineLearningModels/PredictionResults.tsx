@@ -154,7 +154,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
               <TableCell sx={{ fontWeight: 600, width: "20%" }}>Model</TableCell>
               <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
               <TableCell sx={{ fontWeight: 600, width: "20%" }}>Result</TableCell>
-              <TableCell sx={{ fontWeight: 600, width: "20%" }}>Confidence</TableCell>
+              <TableCell sx={{ fontWeight: 600, width: "20%" }}>Accuracy</TableCell>
             </TableRow>
 
             <TableRow>
