@@ -31,7 +31,7 @@ const formatDealSize = (dealSize: any) => {
       id: index,
       ...row,
       deal_size: row.deal_size ? formatDealSize(row.deal_size.toFixed()) : "$0",
-      issue_offer_price: row.issue_offer_price ? formatDealSize(row.issue_offer_price.toFixed()) : "$0",
+      issue_offer_price: row.issue_offer_price ? formatDealSize(row.issue_offer_price.toFixed(2)) : "$0",
       allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
       allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed()}%` : "0%",
       model_am_return: row.model_am_return ? `${formatDealSize(row.model_am_return.toFixed())}` : "$0",
