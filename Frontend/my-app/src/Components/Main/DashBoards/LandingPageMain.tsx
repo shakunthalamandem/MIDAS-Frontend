@@ -14,14 +14,14 @@ const LandingPageMain: React.FC = () => {
           <Paper elevation={3} sx={{ p: 2, backgroundColor: '#a3b5e7' }}>
             <EquityDashboard />
           </Paper>
-          <Paper elevation={3} sx={{ p: 2, backgroundColor: '#fcfbe8' }}>
+          <Paper elevation={3} sx={{ p: 2, backgroundColor: '#9ed4c6' }}>
             <MDDDashboardMain />
           </Paper>
         </Box>
       </Box>
 
       {/* Right side: 15% */}
-      <Box sx={{ width: '15%', p: 2, backgroundColor: '#9de3c1 ', mt: 2, mb: 2}}>
+      <Box sx={{ width: '15%', p: 2, backgroundColor: '#0f4a85 ', mt: 2, mb: 2}}>
         <InsightsMain />
       </Box>
     </Box></>
