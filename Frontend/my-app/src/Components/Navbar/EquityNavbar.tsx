@@ -191,7 +191,7 @@ const EquityNavbar: React.FC = () => {
               : {}
           }
         >
-          Equity Market Opportunity
+          Equity Market Opportunity (Dealogic)
         </MenuItem>
         <MenuItem
           onClick={() => handleNavigate("/equity/monashee-deals")}
@@ -202,7 +202,7 @@ const EquityNavbar: React.FC = () => {
               : {}
           }
         >
-          Monashee Performance & Efficiency
+          Monashee Performance & Efficiency (MDD)
         </MenuItem>
       </Menu>
 
