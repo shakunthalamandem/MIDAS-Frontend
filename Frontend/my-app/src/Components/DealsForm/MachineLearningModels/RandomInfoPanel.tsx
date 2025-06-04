@@ -7,7 +7,7 @@ import {
   CircularProgress,
   Chip,
   Divider,
-  Stack,
+  Grid,
   Tooltip,
 } from "@mui/material";
 import { green, red, grey } from "@mui/material/colors";
@@ -61,12 +61,11 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
           const text = await response.text();
           throw new Error(`HTTP ${response.status}: ${text}`);
         }
-
         const json: ApiResponse = await response.json();
         const sorted = json.data.sort(
           (a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime()
         );
-        setForms(sorted.slice(0, 3));
+        setForms(sorted.slice(0, 4)); // max 4 cards, i.e., 2 rows
       } catch (err: any) {
         setError(err.message || "Something went wrong");
       } finally {
@@ -88,11 +87,11 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
       prediction === "Positive"
         ? green[600]
         : prediction === "Negative"
-          ? red[600]
-          : grey[600];
+        ? red[600]
+        : grey[600];
     return (
       <Chip
-        label={prediction}
+        label={prediction.toUpperCase()}
         size="small"
         sx={{
           backgroundColor: color,
@@ -102,6 +101,23 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
         }}
       />
     );
+  };
+
+  const formatSector = (raw: string) => {
+    const cleaned = raw.replace(/^(sp500_|nasdaq_|nyse_)/i, "");
+    return cleaned
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString("en-GB", options);
   };
 
   if (loading)
@@ -126,16 +142,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
     );
 
   return (
-
-    <Box
-      sx={{
-        maxWidth: 900,
-        marginX: "auto",
-        paddingX: 2,
-        paddingBottom: 3,
-        position: "relative",
-      }}
-    >
+    <Box sx={{ width: "100%", px: 2, pb: 3 }}>
       <Typography
         variant="subtitle1"
         fontWeight={600}
@@ -147,67 +154,71 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
         📝 Last Entered Prediction Details
       </Typography>
 
-      <Stack spacing={2}>
+      <Grid container spacing={2}>
         {forms.map((form, i) => (
-          <Card
-            key={i}
-            onClick={() => handleCardClick(form)}
-            sx={{
-              width: "100%",
-              cursor: "pointer",
-              transition: "box-shadow 0.2s, transform 0.15s",
-              "&:hover": {
-                boxShadow: 4,
-                transform: "translateY(-3px)",
-              },
-              borderRadius: 2,
-              backgroundColor: "#F8F3D9",
-              minHeight: 180,
-            }}
-            variant="outlined"
-          >
-            <CardContent sx={{ py: 2, px: 2 }}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={0.5}>
-                <Typography variant="body2" fontWeight={600} color="#002060">
-                  {form.ticker_symbol}
-                </Typography>
-                {renderPredictionChip(form.main_model_predicted)}
-              </Box>
-
-              <Typography variant="caption" color="text.secondary">
-                {form.pricing_date}
-              </Typography>
-
-              <Divider sx={{ my: 1 }} />
-
-              <Stack spacing={0.5}>
-                <Tooltip title="Deal Size (in million USD)">
-                  <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                    💰 Deal Size :<strong>${form.deal_size_million}</strong>
+          <Grid item xs={12} sm={6} key={i}>
+            <Card
+              onClick={() => handleCardClick(form)}
+              sx={{
+                cursor: "pointer",
+                transition: "box-shadow 0.2s, transform 0.15s",
+                "&:hover": { boxShadow: 4, transform: "translateY(-3px)" },
+                borderRadius: 2,
+                backgroundColor: "#F8F3D9",
+                minHeight: 180,
+              }}
+              variant="outlined"
+            >
+              <CardContent sx={{ py: 2, px: 2 }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="body2" fontWeight={600} color="#002060">
+                    {form.ticker_symbol}
                   </Typography>
-                </Tooltip>
-                <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                  🏦 Selected Bank :<strong>{form.selected_bank}</strong>
-                </Typography>
-                <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                  🎯Deal Type | Region :<strong>{form.deal_type}</strong> | {form.region}
-                </Typography>
-                <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                  📊 Sector: <strong>{form.sector}</strong>
-                </Typography>
-                <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                  📉 Discount: {form.discount_announcement_price}%
-                </Typography>
-                <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                  👔 Sponsor: {form.sponsor}
-                </Typography>
-              </Stack>
-            </CardContent>
-          </Card>
-        ))}
-      </Stack>
-    </Box>
+                  {renderPredictionChip(form.main_model_predicted)}
+                </Box>
 
+                <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
+                  <Typography variant="body2" color="#002060">
+                    Discount: <strong>{form.discount_announcement_price}%</strong>
+                  </Typography>
+                  <Typography variant="caption" color="#002060">
+                    {formatDate(form.pricing_date)}
+                  </Typography>
+                </Box>
+
+                <Divider sx={{ my: 1 }} />
+
+                <Box display="flex" justifyContent="space-between">
+                  <Typography variant="caption">Deal Size</Typography>
+                  <Typography variant="caption">${form.deal_size_million}M</Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between">
+                  <Typography variant="caption">Sector</Typography>
+                  <Typography variant="caption">{formatSector(form.sector)}</Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between">
+                  <Typography variant="caption">Deal Type</Typography>
+                  <Typography variant="caption">{form.deal_type}</Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between">
+                  <Typography variant="caption">Region</Typography>
+                  <Typography variant="caption">{form.region}</Typography>
+                </Box>
+
+                <Box display="flex" justifyContent="space-between" mt={2}>
+                  <Typography variant="caption" color="#002060">
+                    {form.selected_bank}
+                  </Typography>
+                  <Typography variant="caption" color="#002060">
+                    {form.sponsor === "Y" ? "Sponsored" : "Not Sponsored"}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 };
 
