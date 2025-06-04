@@ -64,6 +64,7 @@ import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdash
 
 
 
+
 const AppRouters: React.FC = () => {
   return (
     <ErrorBoundary>
@@ -166,7 +167,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
-        <Route path="/equity/writeupsdashboard" element={<AuthGuard><WriteUpdashboardMain/></AuthGuard>} />
+        <Route path="/equity/writeupsdashboard" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
 
 
