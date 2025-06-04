@@ -17,14 +17,15 @@ const EquityNavbar: React.FC = () => {
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("md"));
 
-  // Dropdown menus state
   const [anchorElOp, setAnchorElOp] = useState<null | HTMLElement>(null);
   const [anchorElPrime, setAnchorElPrime] = useState<null | HTMLElement>(null);
+  const [anchorElDeals, setAnchorElDeals] = useState<null | HTMLElement>(null);
 
   const handleNavigate = (path: string) => {
     navigate(path);
     setAnchorElOp(null);
     setAnchorElPrime(null);
+    setAnchorElDeals(null);
   };
 
   const isActivePath = (basePath: string) => {
@@ -34,13 +35,20 @@ const EquityNavbar: React.FC = () => {
   const getTabIndex = () => {
     const path = location.pathname;
 
-    if (path.startsWith("/equity/capital-markets")) return 0;
-    if (path.startsWith("/equity/dashboard")) return 0;
-    if (path.startsWith("/equity/monashee-deals")) return 0;
-    if (path.startsWith("/equity/detailed_gap_analysis")) return 0;
+    if (
+      path.startsWith("/equity/capital-markets") ||
+      path.startsWith("/equity/dashboard") ||
+      path.startsWith("/equity/monashee-deals") ||
+      path.startsWith("/equity/detailed_gap_analysis")
+    )
+      return 0;
 
-    if (path === "/equity/issue_market") return 1;
-    if (path === "/equity/create_form") return 1;
+    if (
+      path === "/equity/issue_market" ||
+      path === "/equity/create_form" ||
+      path === "/equity/intelligence-dashboard"
+    )
+      return 1;
 
     if (path === "/equity/ml_equity") return 2;
 
@@ -50,6 +58,8 @@ const EquityNavbar: React.FC = () => {
       path === "/macro/sector"
     )
       return 3;
+
+    if (path === "/equity/writeupsdashboard") return 4;
 
     return false;
   };
@@ -95,7 +105,7 @@ const EquityNavbar: React.FC = () => {
           },
         }}
       >
-        {/* Dropdown: Opportunity & Performance */}
+        {/* Opportunity & Performance Dropdown */}
         <Tab
           label={renderDropdownLabel("Opportunity & Performance")}
           onMouseEnter={(e) => setAnchorElOp(e.currentTarget)}
@@ -108,23 +118,30 @@ const EquityNavbar: React.FC = () => {
           }
         />
 
-        {/* Tab: New Deal Form */}
+        {/* Current Deals Dropdown */}
         <Tab
-          label="New Deal Form"
-          onClick={() => handleNavigate("/equity/issue_market")}
+          label={renderDropdownLabel("Current Deals")}
+          onMouseEnter={(e) => setAnchorElDeals(e.currentTarget)}
+          onMouseLeave={() =>
+            setTimeout(() => {
+              if (!document.getElementById("deals-menu")?.matches(":hover")) {
+                setAnchorElDeals(null);
+              }
+            }, 200)
+          }
         />
 
-        {/* Tab: AI Model */}
+        {/* AI Model */}
         <Tab
           label="AI Model"
           onClick={() => {
             sessionStorage.removeItem("selected_form_data");
             sessionStorage.removeItem("auto_predict");
-            handleNavigate("/equity/ml_equity")
+            handleNavigate("/equity/ml_equity");
           }}
         />
 
-        {/* Dropdown: PRIME */}
+        {/* PRIME Dropdown */}
         <Tab
           label={renderDropdownLabel("PRIME")}
           onMouseEnter={(e) => setAnchorElPrime(e.currentTarget)}
@@ -136,9 +153,15 @@ const EquityNavbar: React.FC = () => {
             }, 200)
           }
         />
+
+        {/* NEW TAB: Writeups & Analytics */}
+        <Tab
+          label="Writeups & Analytics"
+          onClick={() => handleNavigate("/equity/writeupsdashboard")}
+        />
       </Tabs>
 
-      {/* Menu for Opportunity & Performance */}
+      {/* Menu: Opportunity & Performance */}
       <Menu
         id="op-menu"
         anchorEl={anchorElOp}
@@ -160,17 +183,6 @@ const EquityNavbar: React.FC = () => {
           Summary Dashboard
         </MenuItem>
         <MenuItem
-          onClick={() => handleNavigate("/equity/intelligence-dashboard")}
-          selected={isActivePath("/equity/intelligence-dashboard")}
-          sx={
-            isActivePath("/equity/intelligence-dashboard")
-              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
-              : {}
-          }
-        >
-          Intelligence Dashboard
-        </MenuItem>
-        <MenuItem
           onClick={() => handleNavigate("/equity/capital-markets")}
           selected={isActivePath("/equity/capital-markets")}
           sx={
@@ -181,7 +193,6 @@ const EquityNavbar: React.FC = () => {
         >
           Equity Market Opportunity
         </MenuItem>
-
         <MenuItem
           onClick={() => handleNavigate("/equity/monashee-deals")}
           selected={isActivePath("/equity/monashee-deals")}
@@ -195,7 +206,41 @@ const EquityNavbar: React.FC = () => {
         </MenuItem>
       </Menu>
 
-      {/* Menu for PRIME */}
+      {/* Menu: Current Deals */}
+      <Menu
+        id="deals-menu"
+        anchorEl={anchorElDeals}
+        open={Boolean(anchorElDeals)}
+        onClose={() => setAnchorElDeals(null)}
+        MenuListProps={{
+          onMouseLeave: () => setAnchorElDeals(null),
+        }}
+      >
+        <MenuItem
+          onClick={() => handleNavigate("/equity/issue_market")}
+          selected={isActivePath("/equity/issue_market")}
+          sx={
+            isActivePath("/equity/issue_market")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
+          New Deal Form
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleNavigate("/equity/intelligence-dashboard")}
+          selected={isActivePath("/equity/intelligence-dashboard")}
+          sx={
+            isActivePath("/equity/intelligence-dashboard")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
+          Dashboard
+        </MenuItem>
+      </Menu>
+
+      {/* Menu: PRIME */}
       <Menu
         id="prime-menu"
         anchorEl={anchorElPrime}
