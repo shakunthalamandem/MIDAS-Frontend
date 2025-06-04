@@ -5,7 +5,7 @@ const CustomAnalysiswriteups = () => {
   return (
     <>
       <Container>
-        <Box padding={4}>
+        <Box padding={2}>
           <Typography
             variant="h6"
             mb={3}
