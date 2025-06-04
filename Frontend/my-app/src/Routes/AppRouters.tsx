@@ -53,6 +53,7 @@ import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
 import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
 import AiInsightsInputForm from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/AiInsightsInputForm";
 import IntelligenceDashboard from "../Components/Main/DashBoards/IntelligenceDashboard";
+import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdashboardMain";
 
 
 
@@ -165,6 +166,8 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
+        <Route path="/equity/writeupsdashboard" element={<AuthGuard><WriteUpdashboardMain/></AuthGuard>} />
+
 
 
 

@@ -21,7 +21,6 @@ import EquityNavbar from "./EquityNavbar";
 import ConvertsNavbar from "./ConvertsNavbar";
 import HighYieldNavbar from "./HighYieldNavbar";
 import MacroNavbar from "./MacroNavbar";
-import MenuIcon from '@mui/icons-material/Menu';
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
