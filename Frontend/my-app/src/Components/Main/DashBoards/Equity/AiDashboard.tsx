@@ -8,8 +8,6 @@ import {
   Box,
   Chip,
   Divider,
-  Stack,
-  Tooltip,
 } from "@mui/material";
 import { green, red, grey } from "@mui/material/colors";
 
@@ -43,6 +41,30 @@ const AiDashboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+
+  const formatSector = (raw: string) => {
+    const cleaned = raw.replace(/^(sp500_|nasdaq_|nyse_)/i, "");
+    return cleaned
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const formatDate = (rawDate: string) => {
+    const date = new Date(rawDate);
+    const day = date.getDate();
+    const daySuffix =
+      day % 10 === 1 && day !== 11
+        ? "st"
+        : day % 10 === 2 && day !== 12
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+        ? "rd"
+        : "th";
+    const month = date.toLocaleString("default", { month: "long" });
+    const year = date.getFullYear();
+    return `${day}${daySuffix} ${month} ${year}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,12 +103,15 @@ const AiDashboard: React.FC = () => {
         : grey[600];
     return (
       <Chip
-        label={prediction}
+        label={prediction.toUpperCase()}
         size="small"
         sx={{
           backgroundColor: color,
           color: "white",
           fontWeight: "bold",
+          px: 1.5,
+          py: 0.5,
+          borderRadius: 1,
         }}
       />
     );
@@ -110,14 +135,11 @@ const AiDashboard: React.FC = () => {
     <Box>
       <Box mb={4}>
         <Typography variant="h5" fontWeight={600} gutterBottom>
-          📈 Today's Deal Activity Overview
+          📊 Today's AI-Powered Deal Insights
         </Typography>
-        <Typography variant="body1" color="text.secondary">
-          A snapshot of equity deals priced today with predictive insights from our AI models. 
-          Click any card for a detailed breakdown and model rationale.
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Real-time analysis and predictions for today's equity deals. Our AI models analyze market conditions, deal structures, and economic indicators to provide actionable insights for investment decisions.
+        <Typography variant="body1" color="#002060">
+          Explore today’s equity deals with real-time predictions powered by our financial AI models. 
+          Each card summarizes a live deal, giving you a sharp snapshot before deeper analysis.
         </Typography>
       </Box>
 
@@ -128,13 +150,15 @@ const AiDashboard: React.FC = () => {
               onClick={() => handleCardClick(item)}
               sx={{
                 cursor: "pointer",
-                transition: "box-shadow 0.3s",
-                "&:hover": {
-                  boxShadow: 6,
-                },
+                transition: "all 0.3s ease-in-out",
+                "&:hover": { boxShadow: 8, transform: "translateY(-3px)" },
                 borderRadius: 3,
+                border: "1px solid #e0e0e0",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: "100%",
               }}
-              variant="outlined"
             >
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -144,35 +168,78 @@ const AiDashboard: React.FC = () => {
                   {renderPredictionChip(item.main_model_predicted)}
                 </Box>
 
-                <Typography variant="caption" color="text.secondary">
-                  {item.pricing_date}
+                <Typography variant="caption" color="#002060">
+                  {formatDate(item.pricing_date)}
                 </Typography>
 
-                <Divider sx={{ my: 1.5 }} />
+                <Box mt={1} mb={0.5}>
+                  <Typography variant="body2" color="#002060">
+                    Discount: <strong>{item.discount_announcement_price}%</strong>
+                  </Typography>
+                </Box>
 
-                <Stack spacing={0.5}>
-                  <Tooltip title="Deal Size (in million USD)">
-                    <Typography variant="body2">
-                      💰Deal Size : <strong>${item.deal_size_million}M</strong>
+                <Divider sx={{ my: 1 }} />
+
+                <Grid container spacing={0.5}>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="#002060">
+                      Deal Size
                     </Typography>
-                  </Tooltip>
-                  <Typography variant="body2">
-                    🏦 <strong>{item.selected_bank}</strong>
-                  </Typography>
-                  <Typography variant="body2">
-                    🎯 <strong>{item.deal_type}</strong> | {item.region}
-                  </Typography>
-                  <Typography variant="body2">
-                    📊 Sector: <strong>{item.sector}</strong>
-                  </Typography>
-                  <Typography variant="body2">
-                    📉 Discount: {item.discount_announcement_price}%
-                  </Typography>
-                  <Typography variant="body2">
-                    👔 Sponsor: {item.sponsor}
-                  </Typography>
-                </Stack>
+                  </Grid>
+                  <Grid item xs={6} textAlign="right">
+                    <Typography variant="body2" fontWeight={500}>
+                      ${item.deal_size_million}M
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="#002060">
+                      Sector
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} textAlign="right">
+                    <Typography
+                      variant="body2"
+                      noWrap
+                      sx={{
+                        whiteSpace: "nowrap",
+                        overflow: "visible",
+                        textOverflow: "clip",
+                        fontSize: "0.83rem",
+                      }}
+                    >
+                      {formatSector(item.sector)}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="#002060">
+                      Deal Type
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} textAlign="right">
+                    <Typography variant="body2">{item.deal_type}</Typography>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="#002060">
+                      Region
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} textAlign="right">
+                    <Typography variant="body2">{item.region}</Typography>
+                  </Grid>
+                </Grid>
               </CardContent>
+
+              <Box display="flex" justifyContent="space-between" px={2} pb={1.5}>
+                <Typography variant="caption" color="#002060">
+                  🏦 {item.selected_bank}
+                </Typography>
+                <Typography variant="caption" color="#002060">
+                  {item.sponsor === "Y" ? "Sponsored" : "Not Sponsored"}
+                </Typography>
+
+              </Box>
             </Card>
           </Grid>
         ))}
