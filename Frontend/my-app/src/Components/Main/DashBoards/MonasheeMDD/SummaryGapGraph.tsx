@@ -146,7 +146,7 @@ const SummaryGapGraph: React.FC = () => {
             variant="subtitle1"
             align="center"
             fontWeight="bold"
-            color="#004d2a"
+            color="#002060"
             mb={2}
           >
             {title}
@@ -197,7 +197,7 @@ const SummaryGapGraph: React.FC = () => {
         onClick={handleCardClick}
         variant="h5"
         align="center"
-        color="#004d2a"
+        color="#002060"
         fontWeight="bold"
         sx={{ cursor: "pointer" }}
         mb={2}

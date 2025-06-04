@@ -158,7 +158,7 @@ const DashboardSectorWiseTable: React.FC = () => {
           mb: 2,
           fontWeight: "bold",
           textAlign: "center",
-          color: "#004d2a",
+          color: "#002060",
           cursor: "pointer",
           userSelect: "none",
           textDecoration: "none",
