@@ -151,7 +151,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
         textAlign="center"
         color="#002060"
       >
-        📝 Last Entered Prediction Details
+        Recent Predictions
       </Typography>
 
       <Grid container spacing={2}>
@@ -164,7 +164,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                 transition: "box-shadow 0.2s, transform 0.15s",
                 "&:hover": { boxShadow: 4, transform: "translateY(-3px)" },
                 borderRadius: 2,
-                backgroundColor: "#F8F3D9",
+                backgroundColor: "#e8f4fc",
                 minHeight: 180,
               }}
               variant="outlined"

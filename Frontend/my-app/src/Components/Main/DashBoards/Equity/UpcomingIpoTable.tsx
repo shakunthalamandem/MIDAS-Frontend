@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
+  Box,
+  Container,
+  Typography,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Typography,
-  Box,
-  Container,
-} from '@mui/material';
+  useTheme,
+} from "@mui/material";
 
-// Step 1: Define the type
 interface IpoData {
   ticker: string;
   company_name: string;
@@ -25,138 +25,144 @@ interface IpoData {
 const UpcomingIpoTable: React.FC = () => {
   const [ipoData, setIpoData] = useState<IpoData[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchIpoData = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/ipo_dashboard_data/`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch IPO data');
-        }
+        if (!response.ok) throw new Error("Failed to fetch IPO data");
 
         const data: IpoData[] = await response.json();
 
-        // Step 2: Filter duplicates
         const uniqueRows = Array.from(
           new Map(data.map((item) => [`${item.ticker}_${item.expected_date}`, item])).values()
         );
 
         setIpoData(uniqueRows);
       } catch (error) {
-        console.error('Error fetching IPO data:', error);
+        console.error("Error fetching IPO data:", error);
       }
     };
 
     fetchIpoData();
   }, [apiUrl, token]);
 
-
   const formatNumber = (value: number): string => {
-    const absValue = Math.abs(value);
-    let formattedValue: string;
-
-    if (absValue >= 1e9) {
-      formattedValue = `$${(absValue / 1e9).toFixed(1)}B`; // Billion
-    } else if (absValue >= 1e6) {
-      formattedValue = `$${(absValue / 1e6).toFixed(1)}M`; // Million
-    } else if (absValue >= 1e3) {
-      formattedValue = `$${(absValue / 1e3).toFixed(1)}K`; // Thousand
-    } else {
-      formattedValue = `$${absValue.toFixed(2)}`; // Small value with cents
-    }
-
-    return value < 0 ? `-${formattedValue}` : formattedValue;
+    const abs = Math.abs(value);
+    if (abs >= 1e9) return `$${(abs / 1e9).toFixed(1)}B`;
+    if (abs >= 1e6) return `$${(abs / 1e6).toFixed(1)}M`;
+    if (abs >= 1e3) return `$${(abs / 1e3).toFixed(1)}K`;
+    return `$${abs.toFixed(2)}`;
   };
-const getOrdinalSuffix = (day: number): string => {
-  if (day > 3 && day < 21) return 'th';
-  switch (day % 10) {
-    case 1: return 'st';
-    case 2: return 'nd';
-    case 3: return 'rd';
-    default: return 'th';
-  }
-};
 
-const formatDate = (dateStr: string): string => {
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr; // Fallback for invalid dates
+  const getOrdinalSuffix = (day: number): string => {
+    if (day > 3 && day < 21) return "th";
+    switch (day % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
+    }
+  };
 
-  const day = date.getDate();
-  const suffix = getOrdinalSuffix(day);
-  const month = date.toLocaleString('default', { month: 'long' });
-  const year = date.getFullYear();
+  const formatDate = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const day = date.getDate();
+    const suffix = getOrdinalSuffix(day);
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}${suffix} ${month} ${year}`;
+  };
 
-  return `${day}${suffix} ${month} ${year}`;
-};
-
-
-
+  const headers = [
+    "Symbol",
+    "Company",
+    "Expected Date",
+    "Offer Price",
+    "Exchange",
+    "Deal Size",
+  ];
 
   return (
-    <Container maxWidth="lg" sx={{ marginTop: '20px', marginBottom: '20px', marginLeft: '0' }}>
-      <Box sx={{ padding: '20px', backgroundColor: '#fff4f4' }}>
+    <Container maxWidth="lg" sx={{ px: 0 }}>
+      <Box
+        sx={{
+          backgroundColor: "#f9f9f9",
+          borderRadius: 3,
+          boxShadow: 2,
+          p: 3,
+          mt: 2,
+          mb: 4,
+        }}
+      >
         <Typography
-          variant="h5"
-          gutterBottom
-          sx={{
-            color: '#054511',
-            fontWeight: 'bold',
-            textAlign: 'center',
-            paddingBottom: '10px',
-          }}
+          variant="h6"
+          fontWeight="bold"
+          textAlign="center"
+          color="#002060"
+          mb={2}
         >
-          Upcoming IPOs of June 2025
+          📈 Upcoming IPOs – June 2025
         </Typography>
-        <TableContainer component={Paper} sx={{ width: '100%' }}>
-          <Table aria-label="upcoming IPOs">
+
+        <TableContainer component={Paper} sx={{ borderRadius: 2, overflow: "hidden" }}>
+          <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: '#002060' }}>
-                {['Ticker', 'Company Name', 'Expected Date', 'Price', 'Exchange', 'Offer Amount'].map(
-                  (heading) => (
-                    <TableCell
-                      key={heading}
-                      sx={{
-                        fontSize: '0.9rem',
-                        padding: '8px',
-                        color: 'white',
-                        border: '1px solid #ddd',
-                      }}
-                    >
-                      {heading}
-                    </TableCell>
-                  )
-                )}
+              <TableRow sx={{ backgroundColor: "#002060" }}>
+                {headers.map((heading) => (
+                  <TableCell
+                    key={heading}
+                    sx={{
+                      color: "#ffffff",
+                      fontWeight: 600,
+                      fontSize: "0.85rem",
+                      borderBottom: "1px solid #ccc",
+                      padding: "10px 12px",
+                    }}
+                  >
+                    {heading}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
               {ipoData.map((row, index) => (
-                <TableRow hover key={index}>
-                  <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
+                <TableRow
+                  key={index}
+                  hover
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f0f8ff",
+                    },
+                  }}
+                >
+                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
                     {row.ticker}
                   </TableCell>
-                  <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
+                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
                     {row.company_name}
                   </TableCell>
-                  <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
+                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
                     {formatDate(row.expected_date)}
                   </TableCell>
-                  <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
-                    {row.price !== null ? `$${row.price}` : '-'}
+                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
+                    {row.price !== null ? `$${row.price}` : "—"}
                   </TableCell>
-
-                  <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
+                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
                     {row.exchange}
                   </TableCell>
-                  <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
-                    {row.deal_size !== null ? formatNumber(row.deal_size) : '-'}
+                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
+                    {row.deal_size !== null ? formatNumber(row.deal_size) : "—"}
                   </TableCell>
                 </TableRow>
               ))}
