@@ -264,7 +264,7 @@ const NavbarMain: React.FC = () => {
       </AppBar>
 
       {/* Subnavbar BELOW AppBar */}
-      <Box sx={{ width: "100%", backgroundColor: "#f3f3f3", padding: "10px 0" }}>
+      <Box sx={{ width: "100%", backgroundColor: "#f3f3f3", padding: "5px 0" }}>
         {selectedTab === "Equity" && <EquityNavbar />}
         {selectedTab === "Converts" && <ConvertsNavbar />}
         {selectedTab === "High Yield" && <HighYieldNavbar />}
