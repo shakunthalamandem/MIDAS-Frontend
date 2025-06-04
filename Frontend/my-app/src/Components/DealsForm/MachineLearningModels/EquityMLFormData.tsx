@@ -149,7 +149,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                     size="small"
                     value="FO"
                     disabled
-                    InputProps={{ sx: { width: inputWidth } }}
+                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
                   />
                 </Grid>
               </Grid>
@@ -162,7 +162,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                     size="small"
                     value="US"
                     disabled
-                    InputProps={{ sx: { width: inputWidth } }}
+                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
                   />
                 </Grid>
               </Grid>
@@ -354,7 +354,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                     onChange={handleChange}
                     error={!!formErrors.GDP}
                     helperText={formErrors.GDP}
-                    InputProps={{ sx: { width: inputWidth } }}
+                    InputProps={{ sx: { width: inputWidth, color: "#00000", fontWeight: 600 } }}
                     SelectProps={{
                       MenuProps: menuProps,
                     }}
@@ -403,7 +403,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                     onChange={handleChange}
                     error={!!formErrors.Inflation}
                     helperText={formErrors.Inflation}
-                    InputProps={{ sx: { width: inputWidth } }}
+                    InputProps={{ sx: { width: inputWidth, color: "#00000", fontWeight: 600 } }}
                     SelectProps={{
                       MenuProps: menuProps,
                     }}
@@ -429,7 +429,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                     onChange={handleChange}
                     error={!!formErrors.Treasury}
                     helperText={formErrors.Treasury}
-                    InputProps={{ sx: { width: inputWidth } }}
+                    InputProps={{ sx: { width: inputWidth, color: "#00000", fontWeight: 600 } }}
                     SelectProps={{
                       MenuProps: menuProps,
                     }}
@@ -449,12 +449,12 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 <Grid item xs={6}>
                   <Typography>Target Variable</Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={6} sx={{color: "#002060"}}>
                   <TextField
                     size="small"
                     value="T+1 Day Return"
                     disabled
-                    InputProps={{ sx: { width: inputWidth } }}
+                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
                   />
                 </Grid>
               </Grid>

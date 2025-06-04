@@ -191,7 +191,7 @@ const EquityNavbar: React.FC = () => {
               : {}
           }
         >
-          Equity Market Opportunity
+          Equity Market Opportunity (Dealogic)
         </MenuItem>
         <MenuItem
           onClick={() => handleNavigate("/equity/monashee-deals")}
@@ -202,7 +202,7 @@ const EquityNavbar: React.FC = () => {
               : {}
           }
         >
-          Monashee Performance & Efficiency
+          Monashee Performance & Efficiency (MDD)
         </MenuItem>
       </Menu>
 
@@ -216,6 +216,17 @@ const EquityNavbar: React.FC = () => {
           onMouseLeave: () => setAnchorElDeals(null),
         }}
       >
+         <MenuItem
+          onClick={() => handleNavigate("/equity/intelligence-dashboard")}
+          selected={isActivePath("/equity/intelligence-dashboard")}
+          sx={
+            isActivePath("/equity/intelligence-dashboard")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
+          Dashboard
+        </MenuItem>
         <MenuItem
           onClick={() => handleNavigate("/equity/issue_market")}
           selected={isActivePath("/equity/issue_market")}
@@ -227,17 +238,7 @@ const EquityNavbar: React.FC = () => {
         >
           New Deal Form
         </MenuItem>
-        <MenuItem
-          onClick={() => handleNavigate("/equity/intelligence-dashboard")}
-          selected={isActivePath("/equity/intelligence-dashboard")}
-          sx={
-            isActivePath("/equity/intelligence-dashboard")
-              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
-              : {}
-          }
-        >
-          Dashboard
-        </MenuItem>
+       
       </Menu>
 
       {/* Menu: PRIME */}

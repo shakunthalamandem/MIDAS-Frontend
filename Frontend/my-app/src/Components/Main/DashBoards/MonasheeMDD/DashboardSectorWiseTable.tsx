@@ -158,7 +158,7 @@ const DashboardSectorWiseTable: React.FC = () => {
           mb: 2,
           fontWeight: "bold",
           textAlign: "center",
-          color: "#004d2a",
+          color: "#002060",
           cursor: "pointer",
           userSelect: "none",
           textDecoration: "none",
@@ -168,7 +168,7 @@ const DashboardSectorWiseTable: React.FC = () => {
       </Typography>
 
       <TableContainer component={Paper}>
-        <Table size="small" sx={{ borderRadius: 3, overflow: "hidden" }}>
+        <Table size="small" sx={{ borderRadius: 3, overflow: "hidden" , }}>
           <TableHead>
             <TableRow>
               <TableCell
@@ -177,10 +177,11 @@ const DashboardSectorWiseTable: React.FC = () => {
                   backgroundColor: "#002060",
                   color: "#fff",
                   fontWeight: "bold",
-                  border: 1,
+                
                   textAlign: "center",
                   verticalAlign: "middle",
                   minWidth: 160,
+                  border: "1px solid #000"
                 }}
               >
                 Sector
@@ -192,7 +193,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                   backgroundColor: "#0F4A85",
                   color: "#fff",
                   fontWeight: "bold",
-                  border: 1,
+                  border: "1px solid #000",
                 }}
               >
                 FO
@@ -204,7 +205,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                   backgroundColor: "#0F4A85",
                   color: "#fff",
                   fontWeight: "bold",
-                  border: 1,
+                  border: "1px solid #000",
                 }}
               >
                 IPO
@@ -222,7 +223,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     backgroundColor: "#002060",
                     color: "#fff",
                     fontWeight: "bold",
-                    border: 1,
+                    border: "1px solid #000",
                     textAlign: "center",
                   }}
                 >
@@ -240,7 +241,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                     backgroundColor: "#002060",
                     color: "#fff",
                     fontWeight: "bold",
-                    border: 1,
+                    border: "1px solid #000",
                     textAlign: "center",
                   }}
                 >
@@ -274,7 +275,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                 <TableRow
                   key={sector}
                   sx={{
-                    backgroundColor: isHighlighted ? "#cfcfcf" : undefined,
+                    backgroundColor: isHighlighted ? "#e3d681" : undefined,
                   }}
                 >
                   <TableCell sx={{ border: 1 }}>{sector}</TableCell>

@@ -54,6 +54,7 @@ import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost"
 import AiInsightsInputForm from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/AiInsightsInputForm";
 import IntelligenceDashboard from "../Components/Main/DashBoards/IntelligenceDashboard";
 import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdashboardMain";
+import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 
 
 
@@ -159,6 +160,15 @@ const AppRouters: React.FC = () => {
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/converts/monashee-deals" element={<PageUnderDevelopment />} />
+        <Route path="/converts/portfolio-attribution" element={<PageUnderDevelopment />} />
+
+        <Route path="/highyield/monashee-deals" element={<PageUnderDevelopment />} />
+
+        <Route path="/highyield/portfolio-attribution" element={<PageUnderDevelopment />} />
+
+
+
 
 
         <Route path="/equity/dashboard" element={<AuthGuard><LandingPageMain/></AuthGuard>} />

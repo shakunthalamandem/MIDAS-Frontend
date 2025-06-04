@@ -8,21 +8,33 @@ import NumerSummary from "./NumerSummary";
 const EquityDashboard = () => {
   return (
     <Box sx={{ p: 2 }}>
+      <Paper elevation={3} sx={{ p: 3, backgroundColor: "#f5faff", mb: 3 }}>
+        <Typography
+          variant="h5"
+          sx={{ color: "#002060", fontWeight: "bold", mb: 1 }}
+        >
+          📊 Equity Markets Deep Dive – Deal Trends & Insights
+        </Typography>
+        <Typography variant="body2" sx={{ color: "#000000"}}>
+          This dashboard provides a comprehensive view of equity deal activity across various dimensions time, geography, and sector. 
+          It summarizes key indicators such as deal count, total volume, opportunity value, and excess returns. 
+          Use this tab to understand market performance dynamics, evaluate emerging patterns, and uncover regional or sectoral strengths based on 2025 activity and year-on-year quarterly trends.
+        </Typography>
+      </Paper>
+
       <Grid container spacing={2}>
-        {/* First Row: Single full-width component */}
         <Grid item xs={12}>
           <NumerSummary />
         </Grid>
 
-        {/* Second Row: Two components side by side */}
         <Grid item xs={12} md={6}>
           <QuarterlyDealsTable />
         </Grid>
+
         <Grid item xs={12} md={6}>
           <RegionWiseTable />
         </Grid>
 
-        {/* Third Row: Single full-width component */}
         <Grid item xs={12}>
           <SectorwiseTable />
         </Grid>
