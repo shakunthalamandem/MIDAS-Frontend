@@ -22,7 +22,7 @@ import {
 interface BaseData {
   broad_region: string;
   YTD_pnl: number;
-  [key: string]: string | number; // Allows dynamic access to month keys
+  [key: string]: string | number;
 }
 
 interface FundData extends BaseData {
@@ -34,13 +34,25 @@ interface SectorData extends BaseData {
 }
 
 const formatNumber = (value: number) => {
+  if (value === undefined || value === null || isNaN(value)) return "-";
   const isNegative = value < 0;
   const absValue = Math.abs(value);
-  const formatted = absValue >= 1000 ? `${(absValue / 1000).toFixed(0)}K` : absValue.toFixed(2);
-  return isNegative ? `-$${formatted}` : `$${formatted}`;
-};
+  let formattedValue: string;
 
-const months = ["Jan", "Feb", "Mar", "Apr", "May"]; // You can add more months here
+  if (absValue === 0) {
+    formattedValue = "0";
+  } else if (absValue >= 1000) {
+    const thousands = Math.floor(absValue / 1000);
+    formattedValue = thousands.toLocaleString() + "K";
+  } else {
+    formattedValue = absValue.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+  }
+
+  return isNegative ? `-$${formattedValue}` : `$${formattedValue}`;
+};
 
 const FundWiseTable: React.FC = () => {
   const { fund } = useParams<{ fund: string }>();
@@ -48,6 +60,7 @@ const FundWiseTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<(FundData | SectorData)[]>([]);
   const [view, setView] = useState<"fund" | "sector">("fund");
+  const [months, setMonths] = useState<string[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const navigate = useNavigate();
@@ -72,6 +85,11 @@ const FundWiseTable: React.FC = () => {
           setData([]);
         } else {
           setData(result);
+          const sample = result[0];
+          const dynamicMonths = Object.keys(sample)
+            .filter((key) => key.endsWith("_pnl") && key !== "YTD_pnl")
+            .map((key) => key.replace("_pnl", ""));
+          setMonths(dynamicMonths);
         }
       } catch (err: any) {
         setError(err.message || "An error occurred");
@@ -83,7 +101,6 @@ const FundWiseTable: React.FC = () => {
     if (fund) fetchData();
   }, [fund, apiUrl, token, view]);
 
-  // Initialize totals
   const regionTotals: Record<string, Record<string, number>> = {};
   const overallTotal: Record<string, number> = {};
 
@@ -167,7 +184,7 @@ const FundWiseTable: React.FC = () => {
                           </TableCell>
                         ))}
                         <TableCell sx={{ color: "#fff", fontWeight: "bold", border: "1px solid black", textAlign: "center" }}>
-                          2025 YTD
+                          YTD (Till Today)
                         </TableCell>
                       </TableRow>
                     </TableHead>
