@@ -20,7 +20,8 @@ const LandingPageMain: React.FC = () => {
         </Box>
       </Box>
 
-      <Box sx={{ width: '15%', p: 2, backgroundColor: '#faf8d0' }}>
+      {/* Right side: 15% */}
+      <Box sx={{ width: '15%', p: 2, backgroundColor: '#f5fffa ', mt: 2, mb: 2}}>
         <InsightsMain />
       </Box>
     </Box></>

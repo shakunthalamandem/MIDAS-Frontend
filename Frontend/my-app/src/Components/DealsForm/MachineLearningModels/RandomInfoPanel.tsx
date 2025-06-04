@@ -183,14 +183,14 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
               <Stack spacing={0.5}>
                 <Tooltip title="Deal Size (in million USD)">
                   <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                    💰 <strong>${form.deal_size_million}</strong>
+                    💰 Deal Size :<strong>${form.deal_size_million}</strong>
                   </Typography>
                 </Tooltip>
                 <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                  🏦 <strong>{form.selected_bank}</strong>
+                  🏦 Selected Bank :<strong>{form.selected_bank}</strong>
                 </Typography>
                 <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
-                  🎯 <strong>{form.deal_type}</strong> | {form.region}
+                  🎯Deal Type | Region :<strong>{form.deal_type}</strong> | {form.region}
                 </Typography>
                 <Typography variant="caption" sx={{ lineHeight: 1.4 }}>
                   📊 Sector: <strong>{form.sector}</strong>

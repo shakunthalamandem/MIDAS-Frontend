@@ -24,13 +24,17 @@ type ChartDataPoint = {
 };
 
 const formatYAxis = (value: number) => {
-  const absValue = Math.abs(value);
-  if (absValue >= 1_000_000) return `${(absValue / 1_000_000).toFixed(1)}M`;
-  if (absValue >= 1_000) return `${(absValue / 1_000).toFixed(1)}K`;
+  if (value >= 1_000_000 || value <= -1_000_000) {
+    return `${(value / 1_000_000).toFixed(1)}M`;
+  }
+  if (value >= 1_000 || value <= -1_000) {
+    return `${(value / 1_000).toFixed(1)}K`;
+  }
   return value.toString();
 };
 
-  const handleCardClick = () => {
+
+const handleCardClick = () => {
   window.open("/equity/monashee-deals/gap-analysis", "_blank");
 };
 const SummaryGapGraph: React.FC = () => {
@@ -67,45 +71,45 @@ const SummaryGapGraph: React.FC = () => {
         const foSummary = yearData?.["FO"]?.["Summary"];
         const foBarData: ChartDataPoint[] = foSummary
           ? [
-              { name: "Allocation", value: foSummary["Model Allocation Gap"] },
-              { name: "AM", value: foSummary["AM Gap"] },
-              {
-                name: "Exit",
-                value:
-                  (foSummary["Monashee Exit Gap"] || 0) +
-                  (foSummary["AM Exit Gap"] || 0),
-              },
-              {
-                name: "Total Gap",
-                value:
-                  (foSummary["Allocation Return"] || 0) +
-                  (foSummary["AM Return"] || 0) -
-                  (foSummary["Model Return 1% Allocation"] || 0) -
-                  (foSummary["Model AM Return"] || 0),
-              },
-            ]
+            { name: "Allocation", value: foSummary["Model Allocation Gap"] },
+            { name: "AM", value: foSummary["AM Gap"] },
+            {
+              name: "Exit",
+              value:
+                (foSummary["Monashee Exit Gap"] || 0) +
+                (foSummary["AM Exit Gap"] || 0),
+            },
+            {
+              name: "Total Gap",
+              value:
+                (foSummary["Allocation Return"] || 0) +
+                (foSummary["AM Return"] || 0) -
+                (foSummary["Model Return 1% Allocation"] || 0) -
+                (foSummary["Model AM Return"] || 0),
+            },
+          ]
           : [];
 
         const ipoSummary = yearData?.["IPO"]?.["Summary"];
         const ipoBarData: ChartDataPoint[] = ipoSummary
           ? [
-              { name: "Allocation", value: ipoSummary["Model Allocation Gap"] },
-              { name: "AM", value: ipoSummary["AM Gap"] },
-              {
-                name: "Exit",
-                value:
-                  (ipoSummary["Monashee Exit Gap"] || 0) +
-                  (ipoSummary["AM Exit Gap"] || 0),
-              },
-              {
-                name: "Total Gap",
-                value:
-                  (ipoSummary["Allocation Return"] || 0) +
-                  (ipoSummary["AM Return"] || 0) -
-                  (ipoSummary["Model Return 1% Allocation"] || 0) -
-                  (ipoSummary["Model AM Return"] || 0),
-              },
-            ]
+            { name: "Allocation", value: ipoSummary["Model Allocation Gap"] },
+            { name: "AM", value: ipoSummary["AM Gap"] },
+            {
+              name: "Exit",
+              value:
+                (ipoSummary["Monashee Exit Gap"] || 0) +
+                (ipoSummary["AM Exit Gap"] || 0),
+            },
+            {
+              name: "Total Gap",
+              value:
+                (ipoSummary["Allocation Return"] || 0) +
+                (ipoSummary["AM Return"] || 0) -
+                (ipoSummary["Model Return 1% Allocation"] || 0) -
+                (ipoSummary["Model AM Return"] || 0),
+            },
+          ]
           : [];
 
         if (region === "US") {
@@ -125,69 +129,72 @@ const SummaryGapGraph: React.FC = () => {
   }, []);
 
   const getSymmetricDomain = (data: ChartDataPoint[]): [number, number] => {
-  const maxAbs = Math.max(...data.map(d => Math.abs(d.value)), 1); // avoid zero
-  const rounded = Math.ceil(maxAbs / 1_000_000) * 1_000_000; // round to nearest million
-  return [-rounded, rounded];
-};
+    const maxAbs = Math.max(...data.map(d => Math.abs(d.value)), 1); // avoid zero
+    const rounded = (Math.ceil(maxAbs / 1_000_000) * 1_000_000) + 1_000_000; // round to nearest million
+    return [-rounded, rounded];
+  };
 
-const renderChart = (title: string, data: ChartDataPoint[]) => {
-  const [yMin, yMax] = getSymmetricDomain(data);
+  
 
-  return (
-    <Card sx={{ width: "100%", height: 300, cursor: "pointer" }}>
-      <CardContent sx={{ p: 2 }}>
-        <Typography
-          variant="subtitle1"
-          align="center"
-          fontWeight="bold"
-          color="#004d2a"
-          mb={2}
-        >
-          {title}
-        </Typography>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart
-            data={data}
-            margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+  const renderChart = (title: string, data: ChartDataPoint[]) => {
+    const [yMin, yMax] = getSymmetricDomain(data);
+
+    return (
+      <Card sx={{ width: "100%", height: 300, cursor: "pointer" }}>
+        <CardContent sx={{ p: 2 }}>
+          <Typography
+            variant="subtitle1"
+            align="center"
+            fontWeight="bold"
+            color="#004d2a"
+            mb={2}
           >
-            <XAxis
-              dataKey="name"
-              style={{ fontSize: "12px" }}
-              axisLine={true}
-              tickLine={false}
-            />
-            <YAxis
-              domain={[yMin, yMax]} 
-              tickFormatter={formatYAxis}
-              style={{ fontSize: "12px" }}
-              axisLine
-              tickLine
-            />
-            <Tooltip formatter={(value: number) => formatYAxis(value)} />
-            <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
-            <Bar dataKey="value" barSize={15}>
-              {data.map((entry, index) => {
-                const isLast = index === data.length - 1;
-                const fill = isLast
-                  ? entry.value < 0
-                    ? "#f44336"
-                    : "#4caf50"
-                  : "#7a4bb9";
-                return <Cell key={`cell-${index}`} fill={fill} cursor="pointer" />;
-              })}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
-  );
-};
+            {title}
+          </Typography>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart
+              data={data}
+              margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+            >
+              <XAxis
+                dataKey="name"
+                style={{ fontSize: "12px" }}
+                axisLine={true}
+                tickLine={false}
+              />
+              <YAxis
+                domain={[yMin, yMax]}
+                tickFormatter={formatYAxis}
+                style={{ fontSize: "12px" }}
+                axisLine
+                tickLine
+              />
+
+              <Tooltip formatter={(value: number) => formatYAxis(value)} />
+              <ReferenceLine y={0} stroke="#0f0f0f" strokeWidth={1} />
+              <Bar dataKey="value" barSize={15}>
+                {data.map((entry, index) => {
+                  const isLast = index === data.length - 1;
+                  const fill = isLast
+                    ? entry.value < 0
+                      ? "#f44336"
+                      : "#4caf50"
+                    : "#7a4bb9";
+                  return <Cell key={`cell-${index}`} fill={fill} cursor="pointer" />;
+                })}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    );
+  };
 
 
   return (
     <Box width="100%"  mb={7}>
       <Typography
-      onClick={handleCardClick}
+        onClick={handleCardClick}
         variant="h5"
         align="center"
         color="#004d2a"

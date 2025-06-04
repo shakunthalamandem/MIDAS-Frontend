@@ -44,14 +44,14 @@ const InsightsMain = () => {
     const style = document.createElement("style");
     style.innerHTML = `
       @keyframes rainbowBorder {
-        0% { border-color: red; }
-        14% { border-color: orange; }
-        28% { border-color: yellow; }
-        42% { border-color: green; }
-        57% { border-color: blue; }
-        71% { border-color: indigo; }
-        85% { border-color: violet; }
-        100% { border-color: pink; }
+      0%   { border-color: #f0f0f0; }
+      14%  { border-color: #d9d9d9; }
+      28%  { border-color: #bfbfbf; }
+      42%  { border-color: #a6a6a6; }
+      57%  { border-color: #8c8c8c; }
+      71%  { border-color: #737373; }
+      85%  { border-color: #595959; }
+      100% { border-color: #f0f0f0; }
       }
     `;
     document.head.appendChild(style);
@@ -73,7 +73,7 @@ const InsightsMain = () => {
       </Typography>
 
       {data.map((item, index) => (
-        <Box key={item.card_id || index} sx={{ p: 1, borderRadius: 1 }}>
+        <Box key={item.card_id || index} sx={{ p: 1, borderRadius: 1}}>
           <Card
             elevation={4}
             sx={{
@@ -88,7 +88,7 @@ const InsightsMain = () => {
             }}
           >
             <CardContent sx={{ height: "100%" }}>
-              <Typography variant="body1" color="#2661a4" fontWeight="bold">
+              <Typography variant="body1" color="#4b70ab" fontWeight="bold">
                 {item.title}
               </Typography>
               <Typography
@@ -133,8 +133,8 @@ const InsightsMain = () => {
           </Card>
         </Box>
       ))}
-    </>
-  );
+</>  
+);
 };
 
 export default InsightsMain;
