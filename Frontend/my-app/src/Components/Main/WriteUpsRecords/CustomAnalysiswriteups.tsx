@@ -36,7 +36,6 @@ const CustomAnalysiswriteups = () => {
           },
         });
         const responseData = await response.json();
-        console.log("API response:", responseData);
 
         if (Array.isArray(responseData)) {
           setData(responseData);

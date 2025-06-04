@@ -36,7 +36,6 @@ const GapAnalysisWriteups = () => {
           },
         });
         const responseData = await response.json();
-        console.log("GAP API response:", responseData);
 
         if (Array.isArray(responseData)) {
           setData(responseData);
