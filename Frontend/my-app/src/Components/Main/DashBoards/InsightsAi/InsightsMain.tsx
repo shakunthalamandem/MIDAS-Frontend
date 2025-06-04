@@ -61,7 +61,7 @@ const InsightsMain = () => {
   }, []);
 
   return (
-    <div style={{backgroundColor: "#f8f9ea"}}>
+    <>
       <Typography
         color="#1300fc"
         align="center"
@@ -133,8 +133,8 @@ const InsightsMain = () => {
           </Card>
         </Box>
       ))}
-    </div>
-  );
+</>  
+);
 };
 
 export default InsightsMain;
