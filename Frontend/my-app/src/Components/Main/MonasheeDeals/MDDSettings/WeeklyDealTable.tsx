@@ -222,10 +222,8 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
                   sx={{border: "1px solid #000", fontWeight: isTotalRow ? "bold" : "normal" }}
                   align="center"
                 >
-                  {dealStats.allocation_weighted
-                    ? dealStats.allocation_weighted.toFixed(2)
-                    : "N/A"}
-                  %
+                {(dealStats.allocation_weighted ?? 0).toFixed(2)}%
+
                 </TableCell>
                 <TableCell
                   sx={{ border: "1px solid #000",fontWeight: isTotalRow ? "bold" : "normal" }}
