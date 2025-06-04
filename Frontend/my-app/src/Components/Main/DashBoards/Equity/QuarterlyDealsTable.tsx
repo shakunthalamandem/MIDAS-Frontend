@@ -196,24 +196,24 @@ const handleCardClick = () => {
         </Box>
 
         <Table size="small">
-          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+          <TableHead sx={{ backgroundColor: "#f5f5f5",border: "1px solid #000" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold", minWidth: "80px", py: 2 }}>
+              <TableCell sx={{ fontWeight: "bold", minWidth: "80px", py: 2, border: "1px solid #000" }}>
                 Quarter
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000" }}>
                 Total Deal Count
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000" }}>
                 Total Deal Volume ($)
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000" }}>
                 Opportunity Value (T+1M Excess)
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000" }}>
                 % of Positively Performing Deals
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000" }}>
                 Expected Returns Excess
               </TableCell>
             </TableRow>
@@ -225,6 +225,7 @@ const handleCardClick = () => {
                   backgroundColor: "#002060",
                   color: "white",
                   textAlign: "center",
+                  border: "1px solid #000",
                 }}
               >
                 IPO
@@ -234,19 +235,19 @@ const handleCardClick = () => {
           <TableBody>
             {ipoData.map((row) => (
               <TableRow key={`IPO-${row.quarter}`}>
-                <TableCell sx={{ py: 1 }}>{row.quarter}</TableCell>
-                <TableCell>{row.data.Total_Deal_Count}</TableCell>
-                <TableCell>
+                <TableCell sx={{ py: 0.5, border: "1px solid #000" }}>{row.quarter}</TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>{row.data.Total_Deal_Count}</TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>
                   {formatNumber(row.data.Total_Deal_Volume)}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>
                   {formatNumber(row.data.Long_Opportunity_Value)}
                 </TableCell>
 
-                <TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>
                   {row.data.Positively_Performing_Deals_Percentage}%
                 </TableCell>
-                <TableCell>{row.data.Expected_Returns_Excess}%</TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>{row.data.Expected_Returns_Excess}%</TableCell>
               </TableRow>
             ))}
             <TableRow>
@@ -257,6 +258,7 @@ const handleCardClick = () => {
                   backgroundColor: "#002060",
                   color: "white",
                   textAlign: "center",
+                  border: "1px solid #000",
                 }}
               >
                 FO
@@ -264,18 +266,18 @@ const handleCardClick = () => {
             </TableRow>
             {foData.map((row) => (
               <TableRow key={`FO-${row.quarter}`}>
-                <TableCell sx={{ py: 1.1 }}>{row.quarter}</TableCell>
-                <TableCell>{row.data.Total_Deal_Count}</TableCell>
-                <TableCell>
+                <TableCell sx={{ py: 1.4 ,border: "1px solid #000" }}>{row.quarter}</TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>{row.data.Total_Deal_Count}</TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>
                   {formatNumber(row.data.Total_Deal_Volume)}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>
                   {formatNumber(row.data.Long_Opportunity_Value)}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>
                   {row.data.Positively_Performing_Deals_Percentage}%
                 </TableCell>
-                <TableCell>{row.data.Expected_Returns_Excess}%</TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>{row.data.Expected_Returns_Excess}%</TableCell>
               </TableRow>
             ))}
           </TableBody>

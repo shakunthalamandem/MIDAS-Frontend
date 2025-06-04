@@ -155,9 +155,9 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
   return (
     <Table size="small">
       <TableHead>
-        <TableRow sx={{ backgroundColor: "#002060" }}>
+        <TableRow sx={{ backgroundColor: "#002060",border: "1px solid #000" }}>
           {["Region", "Deal Type", "Deal Count", "Deal Volume", "Allocation Capital", "Weighted Allocation as % of deal size", "Monashee Actual Total PnL(Gross)", "Model Actual Total PnL(Gross)", "Total Gap"].map((heading) => (
-            <TableCell key={heading} sx={{ color: "white", minWidth: "40px" }}>
+            <TableCell key={heading} sx={{ color: "white", minWidth: "40px",border: "1px solid #000" }}>
               {heading}
             </TableCell>
           ))}
@@ -184,42 +184,42 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
             return (
               <TableRow
                 key={`${region}-${dealType}`}
-                sx={{ backgroundColor: rowColor, fontWeight: isTotalRow || isSummaryRow ? "bold" : "normal" }}
+                sx={{ border: "1px solid #000",backgroundColor: rowColor, fontWeight: isTotalRow || isSummaryRow ? "bold" : "normal" }}
               >
                 {showRegion && (
                   <TableCell
                     rowSpan={rowSpans[region]}
-                    sx={{ fontWeight: "bold", textAlign: "center", verticalAlign: "middle" }}
+                    sx={{ border: "1px solid #000",fontWeight: "bold", textAlign: "center", verticalAlign: "middle" }}
                   >
                     {region}
                   </TableCell>
                 )}
                 <TableCell
-                  sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}
+                  sx={{ border: "1px solid #000",fontWeight: isTotalRow ? "bold" : "normal" }}
                   align="center"
                 >
                   {dealType}
                 </TableCell>
                 <TableCell
-                  sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}
+                  sx={{ border: "1px solid #000",fontWeight: isTotalRow ? "bold" : "normal" }}
                   align="center"
                 >
                   {dealStats.count}
                 </TableCell>
                 <TableCell
-                  sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}
+                  sx={{border: "1px solid #000", fontWeight: isTotalRow ? "bold" : "normal" }}
                   align="center"
                 >
                   {formatNegativeValue(dealStats.volume, isTotalRow)}
                 </TableCell>
                 <TableCell
-                  sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}
+                  sx={{ border: "1px solid #000",fontWeight: isTotalRow ? "bold" : "normal" }}
                   align="center"
                 >
                   {formatNegativeValue(dealStats.allocation_capital, isTotalRow)}
                 </TableCell>
                 <TableCell
-                  sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}
+                  sx={{border: "1px solid #000", fontWeight: isTotalRow ? "bold" : "normal" }}
                   align="center"
                 >
                   {dealStats.allocation_weighted
@@ -228,7 +228,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
                   %
                 </TableCell>
                 <TableCell
-                  sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}
+                  sx={{ border: "1px solid #000",fontWeight: isTotalRow ? "bold" : "normal" }}
                   align="center"
                 >
                   {formatNegativeValue(
@@ -237,7 +237,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
                   )}
                 </TableCell>
                 <TableCell
-                  sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}
+                  sx={{ border: "1px solid #000",fontWeight: isTotalRow ? "bold" : "normal" }}
                   align="center"
                 >
                   {formatNegativeValue(
@@ -246,7 +246,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
                   )}
                 </TableCell>
                 <TableCell
-                  sx={{ fontWeight: isTotalRow ? "bold" : "normal" }}
+                  sx={{ border: "1px solid #000",fontWeight: isTotalRow ? "bold" : "normal" }}
                   align="center"
                 >
                   {formatNegativeValue(dealStats.GAP, isTotalRow)}
