@@ -47,7 +47,7 @@ const formatNumber = (value: number): string => {
 
 const getRowStyle = (type: "IPO" | "FO", region: string) => {
   if ((type === "IPO" && region === "US") || (type === "FO" && region === "EMEA")) {
-    return { backgroundColor: "#cfcfcf" }; // light green background
+    return { backgroundColor: "#e3d681" }; 
   }
   return {};
 };
@@ -154,22 +154,22 @@ const RegionWiseTable = () => {
         >
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold", border: "1px solid #ccc", minWidth: "110px" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000", minWidth: "110px" }}>
                 Region
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", border: "1px solid #ccc", minWidth: "40px" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000", minWidth: "40px" }}>
                 Total Deal Count
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", border: "1px solid #ccc", minWidth: "60px" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000", minWidth: "60px" }}>
                 Total Deal Volume ($)
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", border: "1px solid #ccc", minWidth: "70px" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000", minWidth: "70px" }}>
                 Opportunity Value (T+1M Excess)
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", border: "1px solid #ccc", minWidth: "80px" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000", minWidth: "80px" }}>
                 % of Positively Performing Deals
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", border: "1px solid #ccc", minWidth: "80px" }}>
+              <TableCell sx={{ fontWeight: "bold", border: "1px solid #000", minWidth: "80px" }}>
                 Expected Returns Excess
               </TableCell>
             </TableRow>
@@ -177,54 +177,54 @@ const RegionWiseTable = () => {
 
           <TableBody>
             <TableRow>
-              <TableCell colSpan={6} sx={{ fontWeight: "bold", backgroundColor: "#002060", color: "white", textAlign: "center", border: "1px solid #ccc" }}>
+              <TableCell colSpan={6} sx={{ fontWeight: "bold", backgroundColor: "#002060", color: "white", textAlign: "center", border: "1px solid #000" }}>
                 IPO
               </TableCell>
             </TableRow>
 
             {ipoData.map((row) => (
               <TableRow key={`IPO-${row.region}`} sx={getRowStyle("IPO", row.region)}>
-                <TableCell sx={{ border: "1px solid #ccc" }}>{row.region}</TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>{row.region}</TableCell>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {row.data.Total_Deal_Count}
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {formatNumber(row.data.Total_Deal_Volume)}
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {formatNumber(row.data.Long_Opportunity_Value)}
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {row.data.Positively_Performing_Deals_Percentage}%
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {row.data.Expected_Returns_Excess}%
                 </TableCell>
               </TableRow>
             ))}
 
             <TableRow>
-              <TableCell colSpan={6} sx={{ fontWeight: "bold", backgroundColor: "#002060", color: "white", textAlign: "center", border: "1px solid #ccc" }}>
+              <TableCell colSpan={6} sx={{ fontWeight: "bold", backgroundColor: "#002060", color: "white", textAlign: "center", border: "1px solid #000" }}>
                 FO
               </TableCell>
             </TableRow>
 
             {foData.map((row) => (
               <TableRow key={`FO-${row.region}`} sx={getRowStyle("FO", row.region)}>
-                <TableCell sx={{ border: "1px solid #ccc" }}>{row.region}</TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>{row.region}</TableCell>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {row.data.Total_Deal_Count}
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {formatNumber(row.data.Total_Deal_Volume)}
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {formatNumber(row.data.Long_Opportunity_Value)}
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {row.data.Positively_Performing_Deals_Percentage}%
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #ccc" }}>
+                <TableCell sx={{ border: "1px solid #000" }}>
                   {row.data.Expected_Returns_Excess}%
                 </TableCell>
               </TableRow>

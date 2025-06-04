@@ -274,7 +274,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                 <TableRow
                   key={sector}
                   sx={{
-                    backgroundColor: isHighlighted ? "#cfcfcf" : undefined,
+                    backgroundColor: isHighlighted ? "#e3d681" : undefined,
                   }}
                 >
                   <TableCell sx={{ border: 1 }}>{sector}</TableCell>

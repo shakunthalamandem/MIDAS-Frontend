@@ -174,7 +174,7 @@ const WeeklyDealTable: React.FC<WeeklyDealTableProps> = ({
           rows.map(({ region, dealType, dealStats }) => {
             const isSummaryRow = region === "SUMMARY";
             const isTotalRow = dealType === "TOTAL";
-            const rowColor = isSummaryRow ? "#91ce89" : isTotalRow ? "#f0f0f0" : "#ffffff";
+            const rowColor = isSummaryRow ? "#91ce89" : isTotalRow ? "#e3d681" : "#ffffff";
             const showRegion = !renderedRegions[region];
 
             if (showRegion) {
