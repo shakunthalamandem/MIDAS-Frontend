@@ -347,19 +347,17 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    // select
+                    select
                     size="small"
-                    // name="GDP"
-                    value="Stable"
-                    disabled
-                    // value={formData.GDP}
-                    // onChange={handleChange}
-                    // error={!!formErrors.GDP}
-                    // helperText={formErrors.GDP}
-                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
-                    // SelectProps={{
-                    //   MenuProps: menuProps,
-                    // }}
+                    name="GDP"
+                    value={formData.GDP}
+                    onChange={handleChange}
+                    error={!!formErrors.GDP}
+                    helperText={formErrors.GDP}
+                    InputProps={{ sx: { width: inputWidth, color: "#00000", fontWeight: 600 } }}
+                    SelectProps={{
+                      MenuProps: menuProps,
+                    }}
                   >
                     {options.gdp.map((gdp_value) => (
                       <MenuItem key={gdp_value} value={gdp_value}>
@@ -398,19 +396,17 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    // select
+                    select
                     size="small"
-                    value="Stable"
-                    disabled
-                    // name="Inflation"
-                    // value={formData.Inflation}
-                    // onChange={handleChange}
-                    // error={!!formErrors.Inflation}
-                    // helperText={formErrors.Inflation}
-                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
-                    // SelectProps={{
-                    //   MenuProps: menuProps,
-                    // }}
+                    name="Inflation"
+                    value={formData.Inflation}
+                    onChange={handleChange}
+                    error={!!formErrors.Inflation}
+                    helperText={formErrors.Inflation}
+                    InputProps={{ sx: { width: inputWidth, color: "#00000", fontWeight: 600 } }}
+                    SelectProps={{
+                      MenuProps: menuProps,
+                    }}
                   >
                     {options.inflation.map((inflation_value) => (
                       <MenuItem key={inflation_value} value={inflation_value}>
@@ -426,19 +422,17 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    // select
+                    select
                     size="small"
-                    value="Stable"
-                    disabled
-                    // name="Treasury"
-                    // value={formData.Treasury}
-                    // onChange={handleChange}
-                    // error={!!formErrors.Treasury}
-                    // helperText={formErrors.Treasury}
-                    InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
-                    // SelectProps={{
-                    //   MenuProps: menuProps,
-                    // }}
+                    name="Treasury"
+                    value={formData.Treasury}
+                    onChange={handleChange}
+                    error={!!formErrors.Treasury}
+                    helperText={formErrors.Treasury}
+                    InputProps={{ sx: { width: inputWidth, color: "#00000", fontWeight: 600 } }}
+                    SelectProps={{
+                      MenuProps: menuProps,
+                    }}
                   >
                     {options.treasury_rates.map((treasury_rates_value) => (
                       <MenuItem
