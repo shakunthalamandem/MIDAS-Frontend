@@ -9,7 +9,7 @@ const PageUnderDevelopment: React.FC = () => {
   return (
     <Box
       sx={{
-        height: "100vh",
+        // height: "100vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -28,9 +28,9 @@ const PageUnderDevelopment: React.FC = () => {
       </Typography>
       <Button
         variant="contained"
-        color="primary"
+       
         onClick={() => navigate("/")}
-        sx={{ borderRadius: "20px", px: 4 }}
+        sx={{ borderRadius: "20px", px: 4 ,bgcolor: "#124124", color: "#fff", "&:hover": { bgcolor: "#FF9800" } }}
       >
         Go to Home
       </Button>
