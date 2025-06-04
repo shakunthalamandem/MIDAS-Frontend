@@ -30,7 +30,7 @@ const MlEquityMain: React.FC = () => {
   const [initialData, setInitialData] = useState<any>(null);
   const [autoPredict, setAutoPredict] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const val = sessionStorage.getItem("auto_predict");
@@ -68,7 +68,9 @@ const MlEquityMain: React.FC = () => {
 
         const mappedData = {
           ticker: rawData.ticker_symbol,
-          pricing_date: rawData.pricing_date ? new Date(rawData.pricing_date) : null,
+          pricing_date: rawData.pricing_date
+            ? new Date(rawData.pricing_date)
+            : null,
           deal_type: rawData.deal_type,
           region: rawData.region,
           target: rawData.target_variable,
@@ -77,9 +79,15 @@ const MlEquityMain: React.FC = () => {
           selected_bank_category: rawData.selected_bank,
           percentage_primary_category: String(rawData.percentage_primary),
           sector_category: rawData.sector,
-          discount_from_announcement_price_category: String(rawData.discount_announcement_price),
-          allocation_deal_size_percentage_category: String(rawData.allocation_percentage_of_deal),
-          allocation_percentage_category: String(rawData.allocation_percentage_of_ioi),
+          discount_from_announcement_price_category: String(
+            rawData.discount_announcement_price
+          ),
+          allocation_deal_size_percentage_category: String(
+            rawData.allocation_percentage_of_deal
+          ),
+          allocation_percentage_category: String(
+            rawData.allocation_percentage_of_ioi
+          ),
           GDP: rawData.gdp_growth,
           Inflation: rawData.inflation_rate,
           Treasury: rawData.treasury_rates,
@@ -100,31 +108,29 @@ const MlEquityMain: React.FC = () => {
   };
 
   return (
-    <>
-      <Box
-        sx={{
-          fontWeight: 500,
-          color: "#FFFFFF",
-          fontSize: { xs: "1rem", sm: "1.2rem" },
-          backgroundColor: "#002060",
-          textAlign: "center",
-          py: 1,
-          borderRadius: 2,
-          boxShadow: 2,
-        }}
-      >
-        Welcome to the Prediction Dashboard! Effortlessly input data and track all model outcomes, from feature details to prediction results and confidence levels.
-      </Box>
+    <Box sx={{ display: "flex", gap: 2, padding: 2 }}>
+      <Box sx={{ flex: 3 }}>
+        <Box
+          sx={{
+            fontWeight: 500,
+            color: "#FFFFFF",
+            fontSize: { xs: "1rem", sm: "1.2rem" },
+            backgroundColor: "#002060",
+            textAlign: "center",
+            py: 1,
+            borderRadius: 2,
+            boxShadow: 2,
+            mb: 2,
+          }}
+        >
+          Welcome to the Prediction Dashboard! Effortlessly input data and track
+          all model outcomes, from feature details to prediction results and
+          confidence levels.
+        </Box>
 
-      <div
-        style={{
-          width: "fit-content",
-          marginLeft: "40px",
-        }}
-      >
-        <Container maxWidth="lg" sx={{ padding: 2 }}>
-          <Box py={2} display="flex" flexDirection="column" alignItems="center">
-            <Card sx={{ width: "100%", p: 2, boxShadow: 3, borderRadius: 2, mb: 4 }}>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Container maxWidth="lg" sx={{ padding: 0, flex: 3 }}>
+            <Card sx={{ p: 3, boxShadow: 3, borderRadius: 2 }}>
               <Typography
                 variant="h5"
                 fontWeight="bold"
@@ -132,50 +138,49 @@ const MlEquityMain: React.FC = () => {
                 textAlign="center"
                 color="#002060"
               >
-                Indicative Deal Performance - 🧠 Machine Learning Equity Deal Predictor
+                Indicative Deal Performance - 🧠 Machine Learning Equity Deal
+                Predictor
               </Typography>
 
-              <Typography variant="body1" gutterBottom sx={{ marginLeft: 5, mt: 2, mb: 2 }}>
+              <Typography
+                variant="body1"
+                gutterBottom
+                sx={{ ml: 2, mt: 2, mb: 2 }}
+              >
                 Welcome to the ML-powered equity deal predictor for{" "}
-                <strong>US follow-on offerings</strong>. Input key market and macroeconomic
-                parameters to forecast deal outcomes using advanced machine learning models
-                trained on over 4000 historical deal records.
+                <strong>US follow-on offerings</strong>. Input key market and
+                macroeconomic parameters to forecast deal outcomes using
+                advanced machine learning models trained on over 4000 historical
+                deal records.
               </Typography>
 
-              <Box sx={{ backgroundColor: "#f4f6f8", p: 4 }}>
+              <Box sx={{ backgroundColor: "#f4f6f8", p: 3, borderRadius: 1 }}>
                 {loading ? (
                   <Box display="flex" justifyContent="center" py={4}>
                     <CircularProgress />
                   </Box>
                 ) : options ? (
-                  <MLInputForm options={options} initialData={initialData} autoPredict={autoPredict} />
+                  <MLInputForm
+                    options={options}
+                    initialData={initialData}
+                    autoPredict={autoPredict}
+                  />
                 ) : (
                   <Typography color="error">Failed to load options.</Typography>
                 )}
               </Box>
             </Card>
+          </Container>
+
+          {/* Right-side Panel */}
+          <Box
+            sx={{ flex: 1, position: "sticky", top: 20, height: "fit-content" }}
+          >
+            <RandomInfoPanel onSelect={handleFormSelect} />
           </Box>
-        </Container>
-      </div>
-
-      {/* Fixed RandomInfoPanel to the right side of the screen */}
-      <Box
-        sx={{
-          position: "absolute",
-          right: 0,
-          top: "calc(51.5% + 88px)", 
-          transform: "translateY(-50%)",
-          width: "25%",
-          backgroundColor: "#fff",
-          boxShadow: 2,
-          padding: 2,
-          marginRight: "100px",
-        }}
-      >
-        <RandomInfoPanel onSelect={handleFormSelect} />
+        </Box>
       </Box>
-
-    </>
+    </Box>
   );
 };
 
