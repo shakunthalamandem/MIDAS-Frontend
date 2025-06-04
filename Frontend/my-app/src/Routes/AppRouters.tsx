@@ -52,6 +52,7 @@ import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
 import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
 import AiInsightsInputForm from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/AiInsightsInputForm";
+import IntelligenceDashboard from "../Components/Main/DashBoards/IntelligenceDashboard";
 
 
 
@@ -159,6 +160,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/equity/dashboard" element={<AuthGuard><LandingPageMain/></AuthGuard>} />
+        <Route path="/equity/intelligence-dashboard" element={<AuthGuard><IntelligenceDashboard/></AuthGuard>} />
 
 
 

@@ -153,7 +153,7 @@ const AiDashboard: React.FC = () => {
                 <Stack spacing={0.5}>
                   <Tooltip title="Deal Size (in million USD)">
                     <Typography variant="body2">
-                      💰 <strong>${item.deal_size_million}</strong>
+                      💰Deal Size : <strong>${item.deal_size_million}M</strong>
                     </Typography>
                   </Tooltip>
                   <Typography variant="body2">

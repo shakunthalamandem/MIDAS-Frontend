@@ -148,6 +148,28 @@ const EquityNavbar: React.FC = () => {
         }}
       >
         <MenuItem
+          onClick={() => handleNavigate("/equity/dashboard")}
+          selected={isActivePath("/equity/dashboard")}
+          sx={
+            isActivePath("/equity/dashboard")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
+          Overview of Equity & Performance
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleNavigate("/equity/intelligence-dashboard")}
+          selected={isActivePath("/equity/intelligence-dashboard")}
+          sx={
+            isActivePath("/equity/intelligence-dashboard")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        >
+          Intelligence Dashboard
+        </MenuItem>
+        <MenuItem
           onClick={() => handleNavigate("/equity/capital-markets")}
           selected={isActivePath("/equity/capital-markets")}
           sx={
