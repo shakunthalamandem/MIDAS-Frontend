@@ -7,7 +7,10 @@ import {
   Typography,
   Grid,
   CircularProgress,
+  Container,
 } from '@mui/material';
+import CryptoReportCardVideo from '../../../Assets/videos/CryptoReportCard.mp4';
+
 
 interface WriteUpReport {
   id: number;
@@ -27,9 +30,8 @@ const WriteUpdashboardMain: React.FC = () => {
   const [data, setData] = useState<WriteUpReport[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Replace with your actual API URL or environment variable
-  const apiUrl = process.env.REACT_APP_API_URL || 'https://your-api-url.com';
-  const token = localStorage.getItem('authToken') || '';
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,13 +47,9 @@ const WriteUpdashboardMain: React.FC = () => {
         const responseData = await response.json();
         console.log('API response:', responseData);
 
-        // Adjust here depending on your API response structure:
-        // if the API returns an array directly:
         if (Array.isArray(responseData)) {
           setData(responseData);
-        }
-        // if the API returns { data: [...] }:
-        else if (Array.isArray(responseData.data)) {
+        } else if (Array.isArray(responseData.data)) {
           setData(responseData.data);
         } else {
           setData([]);
@@ -77,40 +75,84 @@ const WriteUpdashboardMain: React.FC = () => {
   }
 
   return (
-    <Box padding={4}>
-      <Typography variant="h4" mb={3}>
-        Write Up Reports
-      </Typography>
+    <Container>
+      <Box padding={4}>
+        <Typography variant="h4" mb={3}>
+          Write Up Reports
+        </Typography>
 
-      {data.length === 0 ? (
-        <Typography>No reports to show.</Typography>
-      ) : (
-        <Grid container spacing={3}>
-          {data.map((report) => (
-            <Grid item xs={12} sm={6} md={4} key={report.id}>
-              <Card sx={{ border: '1px solid #ccc' }}>
-                <CardActionArea onClick={() => window.open(report.document_link, '_blank')}>
-                  <CardContent>
-                    <Typography variant="h6" fontWeight="bold">
-                      {report.company_name} ({report.ticker} | {report.exchange_name})
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" mt={1}>
-                      Deal Type: {report.deal_type || 'N/A'}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Trade Date: {report.trade_date || 'N/A'}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Region: {report.region}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-    </Box>
+        {data.length === 0 ? (
+          <Typography>No reports to show.</Typography>
+        ) : (
+          <Grid container spacing={3}>
+            {data.map((report) => (
+              <Grid item xs={12} sm={6} md={4} key={report.id}>
+                <Card
+                  sx={{
+                    height: "250px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    color: "#fff",
+                    position: "relative",
+                    overflow: "hidden", // Ensures video does not overflow card
+                    padding: 2,
+                    marginBottom: '16px',
+                    boxShadow: '0 4px 8px 0 #C6F5E4, 0 6px 20px 0 #C6F5E4'
+                  }}
+                >
+                  {/* Background Video */}
+                  <video
+                    src={CryptoReportCardVideo}
+                      autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      zIndex: 0, // Ensures the video is behind the content
+                    }}
+                  />
+
+
+                  {/* Card Content on Top */}
+                  <CardActionArea
+                    onClick={() => window.open(report.document_link, '_blank')}
+                    sx={{
+                      position: 'relative',
+                      zIndex: 1,
+                      height: '100%',
+                      color: '#fff',
+                      // backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    }}
+                  >
+                    <CardContent>
+                      <Typography variant="body1" fontWeight="bold">
+                        {report.company_name} ({report.ticker} | {report.exchange_name})
+                      </Typography>
+                      <Typography variant="body2" mt={1}>
+                        Deal Type: {report.deal_type || 'N/A'}
+                      </Typography>
+                      <Typography variant="body2">
+                        Trade Date: {report.trade_date || 'N/A'}
+                      </Typography>
+                      <Typography variant="body2">
+                        Region: {report.region}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Box>
+    </Container>
   );
 };
 
