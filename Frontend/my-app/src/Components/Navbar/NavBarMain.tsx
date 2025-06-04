@@ -179,7 +179,7 @@ const NavbarMain: React.FC = () => {
             <img
               src={logo}
               alt="MIDAS Logo"
-              style={{ width: "130px", height: "50px", marginLeft: "10px" }}
+              style={{ width: "130px", height: "60px", marginLeft: "10px" }}
             />
           </Link>
 
