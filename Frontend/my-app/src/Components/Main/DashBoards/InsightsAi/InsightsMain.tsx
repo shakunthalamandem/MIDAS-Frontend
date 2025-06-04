@@ -63,7 +63,7 @@ const InsightsMain = () => {
   return (
     <>
       <Typography
-        color="#1300fc"
+        color="#FFFFFF"
         align="center"
         variant="h6"
         fontWeight="bold"
