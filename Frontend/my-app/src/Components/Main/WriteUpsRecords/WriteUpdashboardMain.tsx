@@ -6,7 +6,7 @@ import GapAnalysisWriteups from './GapAnalysisWriteups'
 const WriteUpdashboardMain = () => {
   return (
    <>
-   <WriteupsReports />
+    <WriteupsReports />
     <CustomAnalysiswriteups />
     <GapAnalysisWriteups /> 
    </>
