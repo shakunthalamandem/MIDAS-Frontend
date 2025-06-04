@@ -35,6 +35,7 @@ const EquityNavbar: React.FC = () => {
     const path = location.pathname;
 
     if (path.startsWith("/equity/capital-markets")) return 0;
+    if (path.startsWith("/equity/dashboard")) return 0;
     if (path.startsWith("/equity/monashee-deals")) return 0;
     if (path.startsWith("/equity/detailed_gap_analysis")) return 0;
 
@@ -156,7 +157,7 @@ const EquityNavbar: React.FC = () => {
               : {}
           }
         >
-          Overview of Equity & Performance
+          Summary Dashboard
         </MenuItem>
         <MenuItem
           onClick={() => handleNavigate("/equity/intelligence-dashboard")}
