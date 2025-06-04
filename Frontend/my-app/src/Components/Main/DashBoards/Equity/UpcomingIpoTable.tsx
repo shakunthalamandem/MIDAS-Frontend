@@ -75,6 +75,29 @@ const UpcomingIpoTable: React.FC = () => {
 
     return value < 0 ? `-${formattedValue}` : formattedValue;
   };
+const getOrdinalSuffix = (day: number): string => {
+  if (day > 3 && day < 21) return 'th';
+  switch (day % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+};
+
+const formatDate = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr; // Fallback for invalid dates
+
+  const day = date.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = date.toLocaleString('default', { month: 'long' });
+  const year = date.getFullYear();
+
+  return `${day}${suffix} ${month} ${year}`;
+};
+
+
 
 
   return (
@@ -123,7 +146,7 @@ const UpcomingIpoTable: React.FC = () => {
                     {row.company_name}
                   </TableCell>
                   <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
-                    {row.expected_date}
+                    {formatDate(row.expected_date)}
                   </TableCell>
                   <TableCell sx={{ fontSize: '0.85rem', padding: '8px', border: '1px solid #ddd' }}>
                     {row.price !== null ? `$${row.price}` : '-'}
