@@ -186,22 +186,24 @@ const NavbarMain: React.FC = () => {
           {/* Tabs Centered */}
           <Box sx={{ flexGrow: 1, textAlign: "center" }}>
             {["Equity", "Converts", "High Yield", "Portfolio Attribution"].map((tab) => (
-              <Button
-                key={tab}
-                onClick={() => handleTabSelect(tab)}
-                sx={{
-                  color: selectedTab === tab ? "#FFFFFF" : "#bb4401",
-                  backgroundColor: selectedTab === tab ? "#bb4401" : "transparent",
-                  fontWeight: "bold",
-                  mx: 1,
-                  "&:hover": {
-                    backgroundColor: "#bb4401",
-                    color: "#FFFFFF",
-                  },
-                }}
-              >
-                {tab}
-              </Button>
+           <Button
+  key={tab}
+  onClick={() => handleTabSelect(tab)}
+  sx={{
+    color: selectedTab === tab ? "#005166" : "#005166",
+    fontWeight: "bold",
+    mx: 1,
+    borderBottom: selectedTab === tab ? "3px solid #005166" : "3px solid transparent",
+    borderRadius: 0,
+    "&:hover": {
+      borderBottom: "3px solid #005166",
+      backgroundColor: "transparent",
+    },
+  }}
+>
+  {tab}
+</Button>
+
             ))}
           </Box>
 
@@ -217,7 +219,7 @@ const NavbarMain: React.FC = () => {
               <>
                 <Tooltip title="Open Profile Menu">
                   <IconButton onClick={handleProfileClick} sx={{ p: 0 }}>
-                    <Avatar sx={{ bgcolor: "#bb4401" }}>
+                    <Avatar sx={{ bgcolor: "#005166" }}>
                       {user?.charAt(0).toUpperCase() || "P"}
                     </Avatar>
                   </IconButton>
@@ -241,7 +243,7 @@ const NavbarMain: React.FC = () => {
                       borderRadius: "3px",
                       textAlign: "center",
                       '&:hover': {
-                        backgroundColor: "#bb4401",
+                        backgroundColor: "#005166",
                         color: "#FFFFFF",
                       }
                     }}
