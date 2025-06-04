@@ -12,7 +12,7 @@ const MDDDashboardMain = () => {
     <Box sx={{ p: 2 }}>
     <Paper elevation={3} sx={{ p: 3, backgroundColor: '#f5faff', mb: 3 }}>
         <Typography variant="h5" sx={{ color: '#002060', fontWeight: 'bold', mb: 1 }}>
-          📉 MDD Performance & Allocation Gap Dashboard
+          📉 Monashee Performance & Allocation Gap Dashboard
         </Typography>
         <Typography variant="body2" sx={{ color: '#333' }}>
           This dashboard delivers an in-depth analysis of deal allocations and PnL performance gaps between modeled and actual results across sectors, regions, and deal types. 
