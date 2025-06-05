@@ -36,11 +36,11 @@ const MonasheeDeals: React.FC = () => {
       case "gap-analysis":
         setValue(2);
         break;
-      case "follow-on-discount":
-        setValue(3);
-        break;
+      // case "follow-on-discount":
+      //   setValue(3);
+      //   break;
       case "weekly-tracking":
-        setValue(4);
+        setValue(3);
         break;
       // case "by-bank":
       //   setValue(5);
@@ -62,7 +62,7 @@ const MonasheeDeals: React.FC = () => {
       " ",
       "deal-stats",
       "gap-analysis",
-      "follow-on-discount",
+      // "follow-on-discount",
       "weekly-tracking",
       // "by-bank",
       // "screener"
@@ -218,7 +218,7 @@ const MonasheeDeals: React.FC = () => {
         />
         <Tab label="Deal Stats" />
         <Tab label="GAP Analysis" />
-        <Tab label="Follow-On Discount" />
+        {/* <Tab label="Follow-On Discount" /> */}
         <Tab label="Weekly Tracking" />
         {/* <Tab label="By Bank" />
         <Tab label="Screener" /> */}
@@ -288,8 +288,8 @@ const MonasheeDeals: React.FC = () => {
       {value === 0 && selectedTicker && <MDDSelectedTicker ticker={selectedTicker} />}
       {value === 1 && <DealStats />}
       {value === 2 && <AllocationCaptureReturn />}
-      {value === 3 && <FOllowOnDiscount />}
-      {value === 4 && <WeeklyStatsChart />}
+      {/* {value === 3 && <FOllowOnDiscount />} */}
+      {value === 3 && <WeeklyStatsChart />}
       {/* {value === 5 && <ByBankTable />}
       {value === 6 && <MDDScreener />} */}
     </Box>
