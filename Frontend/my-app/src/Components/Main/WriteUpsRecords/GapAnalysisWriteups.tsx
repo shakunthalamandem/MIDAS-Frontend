@@ -10,6 +10,7 @@ import {
 import React, { useEffect, useState } from "react";
 import CryptoReportCardVideo from "../../../Assets/videos/CryptoReportCard.mp4";
 import bgimage from "../../../Assets/images/bgimage.jpg";
+import gapimage from "../../../Assets/images/gapimgae.jpg"
 
 interface GapReport {
   id: number;
@@ -93,7 +94,7 @@ const GapAnalysisWriteups = () => {
                   }}
                 >
                   <img
-                    src={bgimage}
+                    src={gapimage}
                     alt=""
                     style={{
                       position: "absolute",
