@@ -9,7 +9,8 @@ import {
   CircularProgress,
   Container,
 } from '@mui/material';
-import CryptoReportCardVideo from '../../../Assets/videos/CryptoReportCard.mp4';
+// import CryptoReportCardVideo from '../../../Assets/videos/CryptoReportCard.mp4';
+import bgimage from '../../../Assets/images/bgimage.jpg'
 
 
 interface WriteUpReport {
@@ -75,84 +76,75 @@ const WriteupsReports: React.FC = () => {
   }
 
   return (
-    <Container>
-      <Box padding={4}>
-        <Typography variant="h6" mb={3} color='#002060' fontWeight='bold' align='center'>
-          Write Up Reports
-        </Typography>
-
+     <Container>
+          <Box padding={2}>
+            <Typography
+              variant="h6"
+              mb={3}
+              color="#002060"
+              fontWeight="bold"
+              align="center"
+            >
+              Write Up Reports
+            </Typography>
+    
         {data.length === 0 ? (
           <Typography>No reports to show.</Typography>
-        ) : (
-          <Grid container spacing={3}>
-            {data.map((report) => (
-              <Grid item xs={12} sm={6} md={4} key={report.id}>
-                <Card
-                  sx={{
-                    height: "250px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    color: "#fff",
-                    position: "relative",
-                    overflow: "hidden", // Ensures video does not overflow card
-                    padding: 2,
-                    marginBottom: '16px',
-                    boxShadow: '0 4px 8px 0 #C6F5E4, 0 6px 20px 0 #C6F5E4'
-                  }}
-                >
-                  {/* Background Video */}
-                  <video
-                    src={CryptoReportCardVideo}
-                      autoPlay
-                    loop
-                    muted
-                    playsInline
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      zIndex: 0, // Ensures the video is behind the content
-                    }}
-                  />
-
-
-                  {/* Card Content on Top */}
-                  <CardActionArea
-                    onClick={() => window.open(report.document_link, '_blank')}
-                    sx={{
-                      position: 'relative',
-                      zIndex: 1,
-                      height: '100%',
-                      color: '#fff',
-                      // backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    }}
-                  >
-                    <CardContent>
-                      <Typography variant="body1" fontWeight="bold">
+            ) : (
+              <Grid container spacing={3}>
+                {data.map((report) => (
+                  <Grid item xs={12} sm={6} md={4} key={report.id}>
+                    <Card
+                      sx={{
+                        height: "250px",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        color: "#fff",
+                        position: "relative",
+                        overflow: "hidden",
+                        padding: 2,
+                        marginBottom: "16px",
+                        boxShadow: "0 4px 8px 0 #C6F5E4, 0 6px 20px 0 #C6F5E4",
+                      }}
+                    >
+    
+                      <img
+                        src={bgimage}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          zIndex: 0, // Ensures the image is behind the content
+                        }}
+                      />
+    
+                      <CardActionArea
+                        onClick={() => window.open(report.document_link, "_blank")}
+                        sx={{ position: "relative", zIndex: 1 }}
+                      >
+                        <CardContent>
+                      <Typography variant="body1" fontWeight="bold" marginBottom={1}>
                         {report.company_name} ({report.ticker} | {report.exchange_name})
-                      </Typography>
-                      <Typography variant="body2" mt={1}>
-                        Deal Type: {report.deal_type || 'N/A'}
-                      </Typography>
-                      <Typography variant="body2">
-                        Trade Date: {report.trade_date || 'N/A'}
-                      </Typography>
-                      <Typography variant="body2">
-                        Region: {report.region}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
+                          </Typography>
+                          <Typography variant="body2" color="#fff">
+                            Year: {report.trade_date}
+                          </Typography>
+                          <Typography variant="body2" mt={1} color="#fff">
+                            Click to view analysis
+                          </Typography>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-        )}
-      </Box>
-    </Container>
+            )}
+          </Box>
+        </Container>
   );
 };
 

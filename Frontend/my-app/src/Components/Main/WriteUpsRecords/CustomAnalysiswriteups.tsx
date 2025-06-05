@@ -8,7 +8,8 @@ import {
   CardContent,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import CryptoReportCardVideo from '../../../Assets/videos/CryptoReportCard.mp4';
+// import CryptoReportCardVideo from '../../../Assets/videos/CryptoReportCard.mp4';
+import bgimage from '../../../Assets/images/bgimage.jpg'
 
 
 interface WriteUpReport {
@@ -91,13 +92,9 @@ const CustomAnalysiswriteups = () => {
                     boxShadow: '0 4px 8px 0 #C6F5E4, 0 6px 20px 0 #C6F5E4'
                   }}
                 >
-                  {/* Background Video */}
-                  <video
-                    src={CryptoReportCardVideo}
-                      autoPlay
-                    loop
-                    muted
-                    playsInline
+
+                    <img
+                    src={bgimage}
                     style={{
                       position: "absolute",
                       top: 0,
@@ -105,11 +102,11 @@ const CustomAnalysiswriteups = () => {
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
-                      zIndex: 0, // Ensures the video is behind the content
+                      zIndex: 0, // Ensures the image is behind the content
                     }}
                   />
                   <CardActionArea
-                    onClick={() => window.open(report.custom_analytics, "_blank")}
+                    onClick={() => window.open(report.custom_analytics, "_blank") } 
                   >
                     <CardContent>
                       <Typography variant="body1" fontWeight="bold" gutterBottom>
