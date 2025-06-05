@@ -131,7 +131,7 @@ const SectorwiseTable: React.FC = () => {
   ];
   const getRowStyle = (sector: string) =>
     highlightSectors.includes(sector)
-      ? { border: "2px solid #002060",  }
+      ? { backgroundColor: "#e1afb3",  }
       : {};
 
   return (
@@ -188,7 +188,7 @@ const SectorwiseTable: React.FC = () => {
           <TableBody>
             {Object.entries(sectorData).map(([sector, data]) => (
               <TableRow key={sector} sx={getRowStyle(sector)}>
-                <TableCell sx={{ border: "1px solid rgb(228, 228, 228)" }}>
+                <TableCell sx={{ border: "1px solid #000000" }}>
                   {sector}
                 </TableCell>
                 {metrics.map((metric) => {
@@ -205,7 +205,7 @@ const SectorwiseTable: React.FC = () => {
                       key={metric}
                       align="center"
                       sx={{
-                        border: "1px solid rgb(228, 228, 228)",
+                        border: "1px solid #000000",
                       }}
                     >
                       {formatNumber(value, isCurrency, isPercentage)}
