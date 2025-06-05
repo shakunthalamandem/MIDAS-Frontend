@@ -111,6 +111,7 @@ const WriteupsReports: React.FC = () => {
     
                       <img
                         src={bgimage}
+                        alt=""
                         style={{
                           position: "absolute",
                           top: 0,
@@ -131,7 +132,7 @@ const WriteupsReports: React.FC = () => {
                         {report.company_name} ({report.ticker} | {report.exchange_name})
                           </Typography>
                          <Typography variant="body2">
-  Trade Date: {report.trade_date ? new Date(report.trade_date).getFullYear() : 'N/A'}
+  Year: {report.trade_date ? new Date(report.trade_date).getFullYear() : 'N/A'}
 </Typography>
 
                           <Typography variant="body2" mt={1} color="#fff">

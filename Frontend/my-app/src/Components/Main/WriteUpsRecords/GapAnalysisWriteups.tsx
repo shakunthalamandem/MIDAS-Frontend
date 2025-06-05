@@ -8,8 +8,8 @@ import {
   CardContent,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import CryptoReportCardVideo from '../../../Assets/videos/CryptoReportCard.mp4';
-import bgimage from '../../../Assets/images/bgimage.jpg'
+import CryptoReportCardVideo from "../../../Assets/videos/CryptoReportCard.mp4";
+import bgimage from "../../../Assets/images/bgimage.jpg";
 
 interface GapReport {
   id: number;
@@ -92,11 +92,9 @@ const GapAnalysisWriteups = () => {
                     boxShadow: "0 4px 8px 0 #C6F5E4, 0 6px 20px 0 #C6F5E4",
                   }}
                 >
-              
-                
-
                   <img
                     src={bgimage}
+                    alt=""
                     style={{
                       position: "absolute",
                       top: 0,
@@ -113,7 +111,11 @@ const GapAnalysisWriteups = () => {
                     sx={{ position: "relative", zIndex: 1 }}
                   >
                     <CardContent>
-                      <Typography variant="body1" fontWeight="bold" gutterBottom>
+                      <Typography
+                        variant="body1"
+                        fontWeight="bold"
+                        gutterBottom
+                      >
                         {report.title}
                       </Typography>
                       <Typography variant="body2" color="#fff">

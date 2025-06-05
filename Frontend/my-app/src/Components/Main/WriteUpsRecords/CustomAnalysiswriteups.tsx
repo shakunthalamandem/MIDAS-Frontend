@@ -95,6 +95,7 @@ const CustomAnalysiswriteups = () => {
 
                     <img
                     src={bgimage}
+                    alt=""
                     style={{
                       position: "absolute",
                       top: 0,
@@ -104,7 +105,7 @@ const CustomAnalysiswriteups = () => {
                       objectFit: "cover",
                       zIndex: 0, // Ensures the image is behind the content
                     }}
-                  />
+                   />
                   <CardActionArea
                     onClick={() => window.open(report.custom_analytics, "_blank") } 
                   >
