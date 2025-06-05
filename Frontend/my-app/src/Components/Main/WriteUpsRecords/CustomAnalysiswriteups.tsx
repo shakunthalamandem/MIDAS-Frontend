@@ -10,6 +10,7 @@ import {
 import React, { useEffect, useState } from "react";
 // import CryptoReportCardVideo from '../../../Assets/videos/CryptoReportCard.mp4';
 import bgimage from '../../../Assets/images/bgimage.jpg'
+import glboeed from '../../../Assets/images/glboeed.jpg'
 
 
 interface WriteUpReport {
@@ -94,7 +95,7 @@ const CustomAnalysiswriteups = () => {
                 >
 
                     <img
-                    src={bgimage}
+                    src={glboeed}
                     alt=""
                     style={{
                       position: "absolute",
