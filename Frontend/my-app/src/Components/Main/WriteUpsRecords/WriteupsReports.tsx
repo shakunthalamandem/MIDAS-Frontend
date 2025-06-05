@@ -130,9 +130,10 @@ const WriteupsReports: React.FC = () => {
                       <Typography variant="body1" fontWeight="bold" marginBottom={1}>
                         {report.company_name} ({report.ticker} | {report.exchange_name})
                           </Typography>
-                          <Typography variant="body2" color="#fff">
-                            Year: {report.trade_date}
-                          </Typography>
+                         <Typography variant="body2">
+  Trade Date: {report.trade_date ? new Date(report.trade_date).getFullYear() : 'N/A'}
+</Typography>
+
                           <Typography variant="body2" mt={1} color="#fff">
                             Click to view analysis
                           </Typography>
