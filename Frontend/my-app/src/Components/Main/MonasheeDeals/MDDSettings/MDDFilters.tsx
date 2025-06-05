@@ -390,23 +390,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </Box>
         ) : (
           <>
-            <Typography
-              alignItems={"center"}
-              sx={{
-                color: "#002060",
-                fontSize: "1rem",
-                marginBottom: 2,
-                textAlign: "justify",
-                padding: "10px",
-              }}
-            >
-              As for the below GAP Analysis, we have assumed that 0.5% IPO
-              Allocation, 1% for FO Allocation, and 0.5% AM for both IPOs and
-              FOs. There is a Position limit of $30M. Also note that, for each
-              year deals issued in that year are considered, and the EXIT date
-              for actual PnL could be in future years. For Model, the EXIT date
-              is always T+1Month. This analysis includes SPACs and PIPEs.
-            </Typography>
+           
             {apiName === "gap_analysis" ? (
               <Gap
                 selectedFilters={appliedFilters}
