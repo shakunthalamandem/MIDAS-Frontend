@@ -47,7 +47,7 @@ const formatNumber = (value: number): string => {
 
 const getRowStyle = (type: "IPO" | "FO", region: string) => {
   if ((type === "IPO" && region === "US") || (type === "FO" && region === "EMEA")) {
-    return { backgroundColor: "#e3d681" }; 
+    return { backgroundColor: "#cef5f1" }; 
   }
   return {};
 };

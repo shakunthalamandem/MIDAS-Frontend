@@ -225,12 +225,14 @@ const SummaryGapGraph: React.FC = () => {
               US 2025
             </Typography>
             <Box sx={{ display: "flex", gap: 2 }}>
-              <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("FO", foDataUS)}
-              </Box>
+
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
                 {renderChart("IPO", ipoDataUS)}
               </Box>
+              <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
+                {renderChart("FO", foDataUS)}
+              </Box>
+              
             </Box>
           </Box>
         </Grid>
@@ -253,12 +255,14 @@ const SummaryGapGraph: React.FC = () => {
               EMEA 2025
             </Typography>
             <Box sx={{ display: "flex", gap: 2}}>
-              <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("FO", foDataEMEA)}
-              </Box>
+
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
                 {renderChart("IPO", ipoDataEMEA)}
               </Box>
+              <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
+                {renderChart("FO", foDataEMEA)}
+              </Box>
+              
             </Box>
           </Box>
         </Grid>

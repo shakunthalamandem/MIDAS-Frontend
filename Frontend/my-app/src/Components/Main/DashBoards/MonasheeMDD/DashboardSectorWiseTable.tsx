@@ -186,18 +186,7 @@ const DashboardSectorWiseTable: React.FC = () => {
               >
                 Sector
               </TableCell>
-              <TableCell
-                colSpan={3}
-                align="center"
-                sx={{
-                  backgroundColor: "#0F4A85",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  border: "1px solid #000",
-                }}
-              >
-                FO
-              </TableCell>
+
               <TableCell
                 colSpan={3}
                 align="center"
@@ -210,15 +199,29 @@ const DashboardSectorWiseTable: React.FC = () => {
               >
                 IPO
               </TableCell>
+              <TableCell
+                colSpan={3}
+                align="center"
+                sx={{
+                  backgroundColor: "#0F4A85",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  border: "1px solid #000",
+                }}
+              >
+                FO
+              </TableCell>
+              
             </TableRow>
             <TableRow>
+              
               {[
                 "Monashee Actual<br />Total PnL (Gross)",
                 "Model Actual<br />Total PnL (Gross)",
                 "Total Gap",
               ].map((label, index) => (
                 <TableCell
-                  key={`fo-header-${index}`}
+                  key={`ipo-header-${index}`}
                   sx={{
                     backgroundColor: "#002060",
                     color: "#fff",
@@ -230,13 +233,14 @@ const DashboardSectorWiseTable: React.FC = () => {
                   <span dangerouslySetInnerHTML={{ __html: label }} />
                 </TableCell>
               ))}
+
               {[
                 "Monashee Actual<br />Total PnL (Gross)",
                 "Model Actual<br />Total PnL (Gross)",
                 "Total Gap",
               ].map((label, index) => (
                 <TableCell
-                  key={`ipo-header-${index}`}
+                  key={`fo-header-${index}`}
                   sx={{
                     backgroundColor: "#002060",
                     color: "#fff",
@@ -275,19 +279,10 @@ const DashboardSectorWiseTable: React.FC = () => {
                 <TableRow
                   key={sector}
                   sx={{
-                    backgroundColor: isHighlighted ? "#e3d681" : undefined,
+                    backgroundColor: isHighlighted ? "#cef5f1" : undefined,
                   }}
                 >
                   <TableCell sx={{ border: 1 }}>{sector}</TableCell>
-                  <TableCell sx={{ border: 1, textAlign: "center" }}>
-                    {formatValue(foActual ?? NaN)}
-                  </TableCell>
-                  <TableCell sx={{ border: 1, textAlign: "center" }}>
-                    {formatValue(foModel ?? NaN)}
-                  </TableCell>
-                  <TableCell sx={{ border: 1, textAlign: "center" }}>
-                    {formatValue(foGap ?? NaN)}
-                  </TableCell>
                   <TableCell sx={{ border: 1, textAlign: "center" }}>
                     {formatValue(ipoActual ?? NaN)}
                   </TableCell>
@@ -297,6 +292,16 @@ const DashboardSectorWiseTable: React.FC = () => {
                   <TableCell sx={{ border: 1, textAlign: "center" }}>
                     {formatValue(ipoGap ?? NaN)}
                   </TableCell>
+                  <TableCell sx={{ border: 1, textAlign: "center" }}>
+                    {formatValue(foActual ?? NaN)}
+                  </TableCell>
+                  <TableCell sx={{ border: 1, textAlign: "center" }}>
+                    {formatValue(foModel ?? NaN)}
+                  </TableCell>
+                  <TableCell sx={{ border: 1, textAlign: "center" }}>
+                    {formatValue(foGap ?? NaN)}
+                  </TableCell>
+                  
                 </TableRow>
               );
             })}
@@ -306,7 +311,7 @@ const DashboardSectorWiseTable: React.FC = () => {
                 <TableCell sx={{ fontWeight: "bold", border: 1 }}>
                   Summary
                 </TableCell>
-                {["FO", "IPO"].flatMap((type) => {
+                {["IPO", "FO"].flatMap((type) => {
                   const data = summary[type as keyof typeof summary];
                   const actual = calculateTotal(data);
                   const model = calculateModelTotal(data);

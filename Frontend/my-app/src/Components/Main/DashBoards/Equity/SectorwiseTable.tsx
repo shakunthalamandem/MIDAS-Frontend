@@ -131,7 +131,7 @@ const SectorwiseTable: React.FC = () => {
   ];
   const getRowStyle = (sector: string) =>
     highlightSectors.includes(sector)
-      ? { backgroundColor: "#e1afb3",  }
+      ? { backgroundColor: "#cef5f1",  }
       : {};
 
   return (
