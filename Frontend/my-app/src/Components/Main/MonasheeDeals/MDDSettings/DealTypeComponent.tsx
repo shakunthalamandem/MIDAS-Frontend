@@ -49,15 +49,15 @@ const DealTypeComponent: React.FC<DealTypeComponentProps> = ({
 
 
 
-const handleClick = (year: number) => {
-  const filters = { ...selectedFilters, years: [year] };
+  const handleClick = (year: number) => {
+    const filters = { ...selectedFilters, years: [year] };
 
-  // Save filters to sessionStorage
-  sessionStorage.setItem("gapAnalysisFilters", JSON.stringify(filters));
+    // Save filters to sessionStorage
+    sessionStorage.setItem("gapAnalysisFilters", JSON.stringify(filters));
 
-  // Open new tab without query params
-  window.open("/equity/detailed_gap_analysis", "_blank");
-};
+    // Open new tab without query params
+    window.open("/equity/detailed_gap_analysis", "_blank");
+  };
 
 
   const sortedYears = Object.keys(data).sort(
@@ -68,7 +68,7 @@ const handleClick = (year: number) => {
   }>(sortedYears.reduce((acc, year) => ({ ...acc, [year]: "IPO" }), {}));
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center">
+    <Box display="flex" flexDirection="column" alignItems="center" flexWrap="wrap">
       {sortedYears.map((year) => {
         const selectedType = selectedTypes[year];
         const tableData = data[year]?.[selectedType] || {};
@@ -84,7 +84,10 @@ const handleClick = (year: number) => {
             sx={{
               padding: 5,
               marginBottom: 3,
-              width: "1300px",
+              width: "100%",
+              maxWidth: "1300px",
+              minWidth: "300px",
+              flex: "1 1 100%",
               background: "#F5E8DC",
             }}
           >
@@ -221,7 +224,7 @@ const handleClick = (year: number) => {
                       Monashee Actual AM PnL(Gross)
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
-                    Model PnL with Actual AM
+                      Model PnL with Actual AM
                     </TableCell>
                     <TableCell sx={{ color: "white", minWidth: "40px" }}>
                       Model PnL with model AM(Gross)
@@ -338,7 +341,7 @@ const handleClick = (year: number) => {
                           )}
                         </TableCell>
                         <TableCell sx={{ bgcolor: !isSummary ? "#f8f9cd" : "transparent" }}>
-                        {isSummary ? (
+                          {isSummary ? (
                             <strong>
                               {formatValue(values["Model Allocation Gap"] || 0)}
                             </strong>

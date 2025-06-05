@@ -180,6 +180,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         marginLeft: 0,
         marginTop: 0,
         width: "100%",
+        flexWrap: "wrap"
       }}
     >
       <Box width="320px" sx={{ marginRight: 5, marginLeft: 5 }}>
