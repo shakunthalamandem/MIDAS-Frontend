@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import glboeed from "../../../Assets/images/candlesbgimg.jpg";
+import glboeed from "../../../Assets/images/finanical.jpg";
 
 interface WriteUpReport {
   id: number;
