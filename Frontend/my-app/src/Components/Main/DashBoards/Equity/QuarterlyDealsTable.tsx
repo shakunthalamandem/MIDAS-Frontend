@@ -47,10 +47,6 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
-function truncateToOneDecimal(numtoformat: number): number {
-  return Math.trunc(numtoformat * 10) / 10;
-}
-
 
 const QuarterlyDealsTable = () => {
   const [ipoData, setIpoData] = useState<
@@ -250,9 +246,9 @@ const handleCardClick = () => {
                 </TableCell>
 
                 <TableCell sx={{ border: "1px solid #000"}}>
-                  {truncateToOneDecimal(row.data.Positively_Performing_Deals_Percentage).toFixed(1)}%
+                  {(row.data.Positively_Performing_Deals_Percentage).toFixed(1)}%
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #000"}}>{truncateToOneDecimal(row.data.Expected_Returns_Excess).toFixed(1)}%</TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>{(row.data.Expected_Returns_Excess).toFixed(1)}%</TableCell>
               </TableRow>
             ))}
             <TableRow>
@@ -280,9 +276,9 @@ const handleCardClick = () => {
                   {formatNumber(row.data.Long_Opportunity_Value)}
                 </TableCell>
                 <TableCell sx={{ border: "1px solid #000"}}>
-                  {truncateToOneDecimal(row.data.Positively_Performing_Deals_Percentage).toFixed(1)}%
+                  {(row.data.Positively_Performing_Deals_Percentage).toFixed(1)}%
                 </TableCell>
-                <TableCell sx={{ border: "1px solid #000"}}>{truncateToOneDecimal(row.data.Expected_Returns_Excess).toFixed(1)}%</TableCell>
+                <TableCell sx={{ border: "1px solid #000"}}>{(row.data.Expected_Returns_Excess).toFixed(1)}%</TableCell>
               </TableRow>
             ))}
           </TableBody>
