@@ -9,9 +9,8 @@ import {
   CircularProgress,
   Container,
 } from '@mui/material';
-// import CryptoReportCardVideo from '../../../Assets/videos/CryptoReportCard.mp4';
-import bgimage from '../../../Assets/images/bgimage.jpg'
-
+import { motion } from 'framer-motion';
+import bgimage from '../../../Assets/images/bgimage.jpg';
 
 interface WriteUpReport {
   id: number;
@@ -76,77 +75,87 @@ const WriteupsReports: React.FC = () => {
   }
 
   return (
-     <Container>
-          <Box padding={2}>
-            <Typography
-              variant="h6"
-              mb={3}
-              color="#90008e"
-              fontWeight="bold"
-              align="center"
-            >
-              Write Up Reports
-            </Typography>
-    
+    <Container>
+      <Box padding={2}>
+        <Typography
+          variant="h6"
+          mb={3}
+          color="#90008e"
+          fontWeight="bold"
+          align="center"
+        >
+          Write Up Reports
+        </Typography>
+
         {data.length === 0 ? (
           <Typography>No reports to show.</Typography>
-            ) : (
-              <Grid container spacing={3}>
-                {data.map((report) => (
-                  <Grid item xs={12} sm={6} md={4} key={report.id}>
-                    <Card
+        ) : (
+          <Grid container spacing={3}>
+            {data.map((report) => (
+              <Grid item xs={12} sm={6} md={4} key={report.id}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <Card
+                    sx={{
+                      height: "250px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      color: "#fff",
+                      position: "relative",
+                      overflow: "hidden",
+                      padding: 2,
+                      marginBottom: "16px",
+                      boxShadow: "0 4px 8px 0 #C6F5E4, 0 6px 20px 0 #C6F5E4",
+                      borderRadius: "16px",
+                      backgroundColor: "transparent",
+                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    }}
+                  >
+                    {/* Background image with blur and opacity */}
+                    <Box
                       sx={{
-                        height: "250px",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                        color: "#fff",
-                        position: "relative",
-                        overflow: "hidden",
-                        padding: 2,
-                        marginBottom: "16px",
-                        boxShadow: "0 4px 8px 0 #C6F5E4, 0 6px 20px 0 #C6F5E4",
-                      }}
-                    >
-    
-                      <img
-                        src={bgimage}
-                        alt=""
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          zIndex: 0, // Ensures the image is behind the content
-                        }}
-                      />
-    
-                      <CardActionArea
-                        onClick={() => window.open(report.document_link, "_blank")}
-                        sx={{ position: "relative", zIndex: 1 }}
-                      >
-                        <CardContent>
-                      <Typography variant="body1" fontWeight="bold" marginBottom={1}>
-                        {report.company_name} ({report.ticker} | {report.exchange_name})
-                          </Typography>
-                         <Typography variant="body2">
-  Year: {report.trade_date ? new Date(report.trade_date).getFullYear() : 'N/A'}
-</Typography>
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundImage: `url(${bgimage})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
 
-                          <Typography variant="body2" mt={1} color="#fff">
-                            Click to view analysis
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </Grid>
-                ))}
+                        zIndex: 0,
+                      }}
+                    />
+
+                    <CardActionArea
+                      onClick={() => window.open(report.document_link, "_blank")}
+                      sx={{ position: "relative", zIndex: 1 }}
+                    >
+                      <CardContent>
+                        <Typography variant="body1" fontWeight="bold" gutterBottom>
+                          {report.company_name} ({report.ticker} | {report.exchange_name})
+                        </Typography>
+                        <Typography variant="body2">
+                          Year: {report.trade_date ? new Date(report.trade_date).getFullYear() : 'N/A'}
+                        </Typography>
+                        <Typography variant="body2" mt={1} color="#fff">
+                          Click to view analysis
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                </motion.div>
               </Grid>
-            )}
-          </Box>
-        </Container>
+            ))}
+          </Grid>
+        )}
+      </Box>
+    </Container>
   );
 };
 
