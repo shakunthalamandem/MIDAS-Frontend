@@ -472,6 +472,12 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
                 },
               },
             },
+             sx: {
+      "& .MuiSelect-select": {
+        WebkitTextFillColor: "#2c2828",
+        color: "#b41401",
+      },
+    },
           }}
         >
           {dropdownOptions[key].map((option) => (
@@ -512,12 +518,12 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
             fontSize: "14px",
             color: isEditMode ? "#000000" : "#b41401",
             "& input": {
-              WebkitTextFillColor: isEditMode ? "#000000" : "#b41401",
+        WebkitTextFillColor: "#2c2828",
             },
             "&.Mui-disabled": {
               color: isEditMode ? "#000000" : "#b41401",
               "& input": {
-                WebkitTextFillColor: isEditMode ? "#000000" : "#b41401",
+        WebkitTextFillColor: "#2c2828",
               },
             },
           },
