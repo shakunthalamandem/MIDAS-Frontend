@@ -434,58 +434,68 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
 
     if (isDropdown) {
       return (
-        <TextField
-          id="standard-basic"
-          select
-          label={labelText}
-          value={value || ""}
-          onClick={handleFieldClick}
-          onChange={(e) => handleInputChange(e, section, key)}
-          fullWidth
-          variant="standard"
-          disabled={!isEditable}
-          InputLabelProps={{
-            shrink: true,
-            sx: {
-              fontSize: "18px",
-              color: "#d45c04",
-
-              "&.Mui-disabled": {
-                color: "#002060",
-              },
-            },
-          }}
-          InputProps={{
-            sx: {
-              fontSize: "15px",
-              color: isEditMode ? "black" : "black",
-            },
-          }}
-          SelectProps={{
-            MenuProps: {
-              PaperProps: {
-                sx: {
-                  fontWeight: isEditMode ? "normal" : "bold",
-
-                  fontSize: "20px",
-                  maxHeight: "300px",
-                },
-              },
-            },
-             sx: {
-      "& .MuiSelect-select": {
-        WebkitTextFillColor: "#2c2828",
-        color: "#b41401",
+<TextField
+  id="standard-basic"
+  select
+  label={labelText}
+  value={value || ""}
+  onClick={handleFieldClick}
+  onChange={(e) => handleInputChange(e, section, key)}
+  fullWidth
+  variant="standard"
+  disabled={!isEditable}
+  InputLabelProps={{
+    shrink: true,
+    sx: {
+      fontSize: "18px",
+      color: "#d45c04",
+      "&.Mui-disabled": {
+        color: "#002060",
       },
     },
-          }}
-        >
-          {dropdownOptions[key].map((option) => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </TextField>
+  }}
+  InputProps={{
+    sx: {
+      "& .MuiInput-input": {
+        fontSize: "15px",
+        color: "#2c2828",
+        WebkitTextFillColor: "#2c2828",
+      },
+      "& .Mui-disabled": {
+        color: "#2c2828 !important",
+        WebkitTextFillColor: "#2c2828 !important",
+      },
+    },
+  }}
+  SelectProps={{
+    MenuProps: {
+      PaperProps: {
+        sx: {
+          fontWeight: isEditMode ? "normal" : "bold",
+          fontSize: "20px",
+          maxHeight: "300px",
+        },
+      },
+    },
+    sx: {
+      "& .MuiSelect-select": {
+        color: "#b41401",
+        WebkitTextFillColor: "#2c2828",
+        "&.Mui-disabled": {
+          color: "#2c2828",
+          WebkitTextFillColor: "#2c2828",
+        },
+      },
+    },
+  }}
+>
+  {dropdownOptions[key].map((option) => (
+    <MenuItem key={option} value={option}>
+      {option}
+    </MenuItem>
+  ))}
+</TextField>
+
       );
     }
 
