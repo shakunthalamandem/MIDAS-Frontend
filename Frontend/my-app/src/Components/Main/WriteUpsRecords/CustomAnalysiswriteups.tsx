@@ -59,16 +59,38 @@ const CustomAnalysiswriteups = () => {
   return (
     <Container>
       <Box padding={2}>
-        <Typography
-          variant="h6"
-          mb={3}
-          color="#007277"
-          fontWeight="bold"
-          align="center"
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          Custom Analysis Writeups
-        </Typography>
+          <Box
+            sx={{
+              background: "linear-gradient(135deg, #e0f7f6, #ccf2f0)",
+              borderRadius: "12px",
+              boxShadow: "0 4px 20px rgba(0, 114, 119, 0.2)",
+              padding: "10px",
+              marginBottom: "24px",
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                color: "#007277",
+                fontWeight: "bold",
+                letterSpacing: 1,
+              }}
+            >
+              Custom Analysis Writeups
+            </Typography>
 
+            {/* Optional subtitle */}
+            {/* <Typography variant="body2" sx={{ color: "#005b5e", marginTop: "8px" }}>
+      Explore tailored analytics reports generated with precision.
+    </Typography> */}
+          </Box>
+        </motion.div>
         {loading ? (
           <Typography align="center">Loading...</Typography>
         ) : data.length === 0 ? (
@@ -118,7 +140,9 @@ const CustomAnalysiswriteups = () => {
 
                     {/* Foreground content */}
                     <CardActionArea
-                      onClick={() => window.open(report.custom_analytics, "_blank")}
+                      onClick={() =>
+                        window.open(report.custom_analytics, "_blank")
+                      }
                       sx={{ position: "relative", zIndex: 1 }}
                     >
                       <CardContent>

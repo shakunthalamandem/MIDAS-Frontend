@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -8,9 +8,9 @@ import {
   Grid,
   CircularProgress,
   Container,
-} from '@mui/material';
-import { motion } from 'framer-motion';
-import bgimage from '../../../Assets/images/bgimage.jpg';
+} from "@mui/material";
+import { motion } from "framer-motion";
+import bgimage from "../../../Assets/images/bgimage.jpg";
 
 interface WriteUpReport {
   id: number;
@@ -38,14 +38,14 @@ const WriteupsReports: React.FC = () => {
       setLoading(true);
       try {
         const response = await fetch(`${apiUrl}/api/write_up_reports/`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
         });
         const responseData = await response.json();
-        console.log('API response:', responseData);
+        console.log("API response:", responseData);
 
         if (Array.isArray(responseData)) {
           setData(responseData);
@@ -53,10 +53,10 @@ const WriteupsReports: React.FC = () => {
           setData(responseData.data);
         } else {
           setData([]);
-          console.warn('Unexpected response data format');
+          console.warn("Unexpected response data format");
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
+        console.error("Failed to fetch data:", error);
         setData([]);
       } finally {
         setLoading(false);
@@ -68,7 +68,12 @@ const WriteupsReports: React.FC = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <CircularProgress />
       </Box>
     );
@@ -77,16 +82,38 @@ const WriteupsReports: React.FC = () => {
   return (
     <Container>
       <Box padding={2}>
-        <Typography
-          variant="h6"
-          mb={3}
-          color="#90008e"
-          fontWeight="bold"
-          align="center"
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          Write Up Reports
-        </Typography>
+          <Box
+            sx={{
+              background: "linear-gradient(135deg, #ffe6f7, #f5ccff)",
+              borderRadius: "12px",
+              boxShadow: "0 4px 20px rgba(144, 0, 142, 0.2)",
+              padding: "10px",
+              marginBottom: "24px",
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                color: "#90008e",
+                fontWeight: "bold",
+                letterSpacing: 1,
+              }}
+            >
+              Write Up Reports
+            </Typography>
 
+            {/* Optional: add a subtitle or description */}
+            {/* <Typography variant="body2" sx={{ color: "#4a004a", marginTop: "8px" }}>
+      Explore the latest write-up reports curated with detailed analysis.
+    </Typography> */}
+          </Box>
+        </motion.div>
         {data.length === 0 ? (
           <Typography>No reports to show.</Typography>
         ) : (
@@ -133,15 +160,21 @@ const WriteupsReports: React.FC = () => {
                     />
 
                     <CardActionArea
-                      onClick={() => window.open(report.document_link, "_blank")}
+                      onClick={() =>
+                        window.open(report.document_link, "_blank")
+                      }
                       sx={{ position: "relative", zIndex: 1 }}
                     >
                       <CardContent>
                         <Typography variant="h6" fontWeight="bold" gutterBottom>
-                          {report.company_name} ({report.ticker} | {report.exchange_name})
+                          {report.company_name} ({report.ticker} |{" "}
+                          {report.exchange_name})
                         </Typography>
                         <Typography variant="body2">
-                          Year: {report.trade_date ? new Date(report.trade_date).getFullYear() : 'N/A'}
+                          Year:{" "}
+                          {report.trade_date
+                            ? new Date(report.trade_date).getFullYear()
+                            : "N/A"}
                         </Typography>
                         <Typography variant="body2" mt={1} color="#fff">
                           Click to view analysis

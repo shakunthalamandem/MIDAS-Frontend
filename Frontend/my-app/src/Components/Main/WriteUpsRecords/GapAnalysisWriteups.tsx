@@ -60,15 +60,38 @@ const GapAnalysisWriteups = () => {
   return (
     <Container>
       <Box padding={2}>
-        <Typography
-          variant="h6"
-          mb={3}
-          color="#780000"
-          fontWeight="bold"
-          align="center"
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          Gap Analysis Writeups
-        </Typography>
+          <Box
+            sx={{
+              background: "linear-gradient(135deg, #ffe3e0, #ffcccc)",
+              borderRadius: "12px",
+              boxShadow: "0 4px 20px rgba(120, 0, 0, 0.2)",
+              padding: "10px",
+              marginBottom: "24px",
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                color: "#780000",
+                fontWeight: "bold",
+                letterSpacing: 1,
+              }}
+            >
+              Gap Analysis Writeups
+            </Typography>
+
+            {/* Optional subtitle */}
+            {/* <Typography variant="body2" sx={{ color: "#500000", marginTop: "8px" }}>
+      Insightful gap analysis reports curated for key market trends.
+    </Typography> */}
+          </Box>
+        </motion.div>
 
         {loading ? (
           <Typography align="center">Loading...</Typography>
@@ -111,7 +134,7 @@ const GapAnalysisWriteups = () => {
                         backgroundImage: `url(${gapimage})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
-                       
+
                         zIndex: 0,
                       }}
                     />
@@ -121,11 +144,7 @@ const GapAnalysisWriteups = () => {
                       sx={{ position: "relative", zIndex: 1 }}
                     >
                       <CardContent>
-                        <Typography
-                          variant="h6"
-                          fontWeight="bold"
-                          gutterBottom
-                        >
+                        <Typography variant="h6" fontWeight="bold" gutterBottom>
                           {report.title}
                         </Typography>
                         <Typography variant="body2" color="#fff">
