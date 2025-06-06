@@ -164,7 +164,7 @@ const DashboardSectorWiseTable: React.FC = () => {
           textDecoration: "none",
         }}
       >
-        Sector Wise IPO and FO Data for 2025
+        Sector Wise IPO and FO Data for 2025 YTD
       </Typography>
 
       <TableContainer component={Paper}>
