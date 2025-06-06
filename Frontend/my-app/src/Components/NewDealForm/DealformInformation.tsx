@@ -11,14 +11,12 @@ import {
   List,
   ListItem,
   ListItemText,
-  Card,
   CardContent,
   Stack,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import NewDealFormMainTable from "./NewDealFormMainTable";
 import BasicInfo from "./BasicInfo";
-import SelectedTicker from "../Main/MonasheeGraphs/SelectedTicker";
 import MDDSelectedTicker from "../Main/MonasheeDeals/MddGraphs/MDDSelectedTicker";
 
 interface Data {
@@ -32,11 +30,16 @@ const DealformInformation = () => {
 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<Data[]>([]);
+  const [allTickers, setAllTickers] = useState<Data[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [selectedTicker, setSelectedTicker] = useState<{ ticker: string }>({
     ticker: passedTicker || "SARO",
   });
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     if (passedTicker) {
@@ -44,51 +47,52 @@ const DealformInformation = () => {
     }
   }, [passedTicker]);
 
-  const apiUrl = process.env.REACT_APP_API_URL;
-  const token = localStorage.getItem("access_token");
-
-  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchTerm(query);
-
-    if (query.length < 2) {
-      setResults([]);
-      return;
-    }
-
+  const fetchAllTickers = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${apiUrl}/api/new_deal_search/${query.toUpperCase()}/`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/new_deal_search_all/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
       if (!response.ok) {
-        throw new Error("Failed to fetch results");
+        throw new Error("Failed to fetch tickers");
       }
       const data = await response.json();
-      const formattedResults = data.map((item: Data) => ({
+      const formatted = data.map((item: Data) => ({
         ...item,
         ticker: item.ticker.toUpperCase(),
       }));
-
-      setResults(formattedResults);
-    } catch (error) {
-      console.error("Error fetching search results:", error);
-      setError("An error occurred while fetching data.");
+      setAllTickers(formatted);
+      setResults(formatted); // initial full list
+    } catch (err) {
+      console.error("Error fetching tickers:", err);
+      setError("Failed to load tickers.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchTerm(query);
+
+    if (query.trim() === "") {
+      setResults(allTickers);
+    } else {
+      const filtered = allTickers.filter((item) =>
+        item.ticker.toLowerCase().includes(query.toLowerCase())
+      );
+      setResults(filtered);
     }
   };
 
   const handleItemClick = (ticker: string) => {
     setSelectedTicker({ ticker: ticker.toUpperCase() });
     setSearchTerm("");
+    setShowDropdown(false);
     setResults([]);
   };
 
@@ -109,12 +113,10 @@ const DealformInformation = () => {
       >
         Welcome to the Deal Information Form! Easily input all relevant details
         and track key deal parameters, from pricing and terms to deadlines and
-        special conditions.{" "}
+        special conditions.
       </Box>
-      <Container
-        maxWidth="lg"
-        sx={{ padding: 0, marginBottom: 4, marginTop: 2 }}
-      >
+
+      <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4, marginTop: 2 }}>
         <CardContent>
           <Stack
             direction={{ xs: "column", sm: "row" }}
@@ -125,11 +127,7 @@ const DealformInformation = () => {
           >
             <Typography
               variant="h5"
-              sx={{
-                fontWeight: 600,
-                minWidth: "fit-content",
-                color: "#002060",
-              }}
+              sx={{ fontWeight: 600, minWidth: "fit-content", color: "#002060" }}
             >
               Deal Information Form
             </Typography>
@@ -139,6 +137,15 @@ const DealformInformation = () => {
               variant="outlined"
               value={searchTerm}
               onChange={handleSearch}
+              onFocus={() => {
+                setShowDropdown(true);
+                if (allTickers.length === 0) {
+                  fetchAllTickers();
+                } else {
+                  setResults(allTickers);
+                }
+              }}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
               autoComplete="off"
               placeholder="Enter ticker symbol..."
               size="small"
@@ -158,66 +165,56 @@ const DealformInformation = () => {
             />
           </Stack>
         </CardContent>
-        {/* </Card> */}
 
-        {/* Autocomplete dropdown */}
         {loading ? (
           <CircularProgress />
         ) : (
-          searchTerm.length > 0 && (
+          showDropdown && results.length > 0 && (
             <Paper
               elevation={3}
               sx={{
                 padding: 1,
-                marginLeft: 110,
+                position: "absolute",
+                marginTop: "-10px",
+                marginLeft: { xs: 0, sm: 110 },
                 maxHeight: 300,
                 overflowY: "auto",
                 backgroundColor: "#ffffff",
                 borderRadius: 2,
+                zIndex: 10,
               }}
             >
-              {results.length === 0 ? (
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  align="center"
-                >
-                  No results found.
-                </Typography>
-              ) : (
-                <List>
-                  {results.map((item: Data, index: number) => (
-                    <ListItem
-                      key={index}
-                      onClick={() => handleItemClick(item.ticker)}
-                      component="li"
-                      style={{
-                        backgroundColor:
-                          selectedTicker.ticker === item.ticker
-                            ? "rgba(63, 81, 181, 0.1)"
-                            : "transparent",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        transition: "background-color 0.3s",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#f0f0f0")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.backgroundColor =
-                          selectedTicker.ticker === item.ticker
-                            ? "rgba(63, 81, 181, 0.1)"
-                            : "transparent")
-                      }
-                    >
-                      <ListItemText
-                        primary={<strong>{item.ticker}</strong>}
-                        secondary={item.deal_id}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              )}
+              <List>
+                {results.map((item: Data, index: number) => (
+                  <ListItem
+                    key={index}
+                    onClick={() => handleItemClick(item.ticker)}
+                    style={{
+                      backgroundColor:
+                        selectedTicker.ticker === item.ticker
+                          ? "rgba(63, 81, 181, 0.1)"
+                          : "transparent",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s",
+                    }}
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#f0f0f0")
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.backgroundColor =
+                        selectedTicker.ticker === item.ticker
+                          ? "rgba(63, 81, 181, 0.1)"
+                          : "transparent")
+                    }
+                  >
+                    <ListItemText
+                      primary={<strong>{item.ticker}</strong>}
+                      secondary={item.deal_id}
+                    />
+                  </ListItem>
+                ))}
+              </List>
             </Paper>
           )
         )}
