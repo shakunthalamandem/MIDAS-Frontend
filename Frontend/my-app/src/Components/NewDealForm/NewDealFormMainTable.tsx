@@ -126,7 +126,6 @@ const fieldLabels: Record<string, Record<string, string>> = {
     stop_price_local: "Stop Price ($)",
     stop_price_percentage_below_issue: "Stop Price % Below Issue",
   },
-
 };
 
 const fieldFormatters: Record<
@@ -219,7 +218,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] =
     useState<AlertColor>("success");
-  const [tabIndex, setTabIndex] = useState(0); 
+  const [tabIndex, setTabIndex] = useState(0);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -267,7 +266,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
     if (reason === "clickaway") return;
     setSnackbarOpen(false);
   };
-const handleInputChange = (
+  const handleInputChange = (
     e: React.ChangeEvent<any> | SelectChangeEvent<any>,
     section: string,
     key: string
@@ -350,13 +349,11 @@ const handleInputChange = (
     setFormData(updatedFormData);
   };
 
-
   const navigate = useNavigate();
 
   const handleIconClick = () => {
     navigate("/equity/create_form");
   };
-
 
   const handleSave = async () => {
     try {
@@ -420,7 +417,7 @@ const handleInputChange = (
       key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
     );
   };
-  
+
   const renderInputField = (section: string, key: string, value: any) => {
     const isDropdown = Object.keys(dropdownOptions).includes(key);
     const isDateField = dateFields.includes(key);
@@ -450,31 +447,28 @@ const handleInputChange = (
           InputLabelProps={{
             shrink: true,
             sx: {
-              fontSize: "18px", color: "#d45c04",
+              fontSize: "18px",
+              color: "#d45c04",
 
               "&.Mui-disabled": {
                 color: "#002060",
-
               },
-
             },
           }}
-
           InputProps={{
             sx: {
               fontSize: "15px",
               color: isEditMode ? "black" : "black",
             },
-
           }}
-
           SelectProps={{
             MenuProps: {
               PaperProps: {
                 sx: {
                   fontWeight: isEditMode ? "normal" : "bold",
 
-                  fontSize: "20px", maxHeight: "300px"
+                  fontSize: "20px",
+                  maxHeight: "300px",
                 },
               },
             },
@@ -516,14 +510,21 @@ const handleInputChange = (
         InputProps={{
           sx: {
             fontSize: "14px",
-            color: isEditMode ? "#000000" : "#black",
+            color: isEditMode ? "#000000" : "#b41401",
+            "& input": {
+              WebkitTextFillColor: isEditMode ? "#000000" : "#b41401",
+            },
+            "&.Mui-disabled": {
+              color: isEditMode ? "#000000" : "#b41401",
+              "& input": {
+                WebkitTextFillColor: isEditMode ? "#000000" : "#b41401",
+              },
+            },
           },
         }}
       />
-
     );
   };
-
 
   const renderFormFields = (section: string, sectionData: any) => {
     if (!sectionData) return null;
@@ -560,8 +561,8 @@ const handleInputChange = (
               minHeight: "40px",
             }}
           >
-
-            {renderInputField(section, key, value)}</Box>
+            {renderInputField(section, key, value)}
+          </Box>
         ))}
       </Box>
     );
@@ -572,7 +573,7 @@ const handleInputChange = (
       <Card
         sx={{
           mt: 4,
-          backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff",// white in edit mode, light blue after save
+          backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff", // white in edit mode, light blue after save
           borderRadius: 3,
           p: 2,
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
@@ -587,7 +588,7 @@ const handleInputChange = (
           sx={{
             px: 3,
             py: 2,
-          backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff",// white in edit mode, light blue after save
+            backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff", // white in edit mode, light blue after save
             transition: "background-color 0.3s ease",
           }}
         >
@@ -628,7 +629,7 @@ const handleInputChange = (
           justifyContent: "center",
           margin: "10px 0",
           "& .MuiTab-root": {
-            backgroundColor: "#E3E6F0", 
+            backgroundColor: "#E3E6F0",
             color: "#002060",
             borderRadius: "12px",
             padding: "10px 20px",
@@ -639,15 +640,15 @@ const handleInputChange = (
             transition:
               "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
             "&:hover": {
-              backgroundColor: "#DCE6F0", 
+              backgroundColor: "#DCE6F0",
               transform: "translateY(-2px)",
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
             },
           },
           "& .Mui-selected": {
-            backgroundColor: "#013e3a",  
-            color: "#ffffff !important", 
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", 
+            backgroundColor: "#013e3a",
+            color: "#ffffff !important",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
           },
         }}
       >
@@ -675,9 +676,13 @@ const handleInputChange = (
               textTransform: "none",
               color: "#002060",
               borderRadius: 2,
-              borderColor:'#002060',
+              borderColor: "#002060",
               mr: 2,
-              "&:hover": { backgroundColor: "#002060",fontWeight: "bold", color: "#ffffff" },
+              "&:hover": {
+                backgroundColor: "#002060",
+                fontWeight: "bold",
+                color: "#ffffff",
+              },
             }}
           >
             Create
@@ -685,7 +690,7 @@ const handleInputChange = (
 
           <Button
             variant="contained"
-            startIcon={isEditMode ? <EditIcon /> : < SaveIcon/>}
+            startIcon={isEditMode ? <EditIcon /> : <SaveIcon />}
             color={isEditMode ? "success" : "primary"}
             onClick={isEditMode ? handleEditClick : handleSave}
             sx={{
