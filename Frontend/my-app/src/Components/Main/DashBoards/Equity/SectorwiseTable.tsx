@@ -74,9 +74,7 @@ const formatNumber = (
   if (isCurrency) formattedValue = `$${formattedValue}`;
   if (isPercentage) {
     const val = parseFloat(formattedValue);
-    formattedValue = Number.isInteger(val)
-      ? `${val.toFixed(0)}%`
-      : `${val.toFixed(1)}%`;
+    formattedValue =  `${val.toFixed(1)}%`;
   }
 
   return value < 0 ? `-${formattedValue}` : formattedValue;
