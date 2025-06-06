@@ -122,7 +122,7 @@ const GapAnalysisWriteups = () => {
                     >
                       <CardContent>
                         <Typography
-                          variant="body1"
+                          variant="h6"
                           fontWeight="bold"
                           gutterBottom
                         >

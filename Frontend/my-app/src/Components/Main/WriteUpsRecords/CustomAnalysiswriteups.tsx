@@ -122,7 +122,7 @@ const CustomAnalysiswriteups = () => {
                       sx={{ position: "relative", zIndex: 1 }}
                     >
                       <CardContent>
-                        <Typography variant="body1" fontWeight="bold" gutterBottom>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom>
                           {report.title}
                         </Typography>
                         <br />

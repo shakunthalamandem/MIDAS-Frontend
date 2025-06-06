@@ -137,7 +137,7 @@ const WriteupsReports: React.FC = () => {
                       sx={{ position: "relative", zIndex: 1 }}
                     >
                       <CardContent>
-                        <Typography variant="body1" fontWeight="bold" gutterBottom>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom>
                           {report.company_name} ({report.ticker} | {report.exchange_name})
                         </Typography>
                         <Typography variant="body2">
