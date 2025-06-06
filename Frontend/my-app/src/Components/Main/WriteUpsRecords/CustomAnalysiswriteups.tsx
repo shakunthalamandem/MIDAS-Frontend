@@ -8,9 +8,7 @@ import {
   CardContent,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-// import CryptoReportCardVideo from '../../../Assets/videos/CryptoReportCard.mp4';
-import bgimage from '../../../Assets/images/bgimage.jpg'
-import glboeed from '../../../Assets/images/glboeed.jpg'
+import glboeed from '../../../Assets/images/candlesbgimg.jpg'
 
 
 interface WriteUpReport {
