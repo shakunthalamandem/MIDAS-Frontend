@@ -81,7 +81,7 @@ const WriteupsReports: React.FC = () => {
             <Typography
               variant="h6"
               mb={3}
-              color="#002060"
+              color="#90008e"
               fontWeight="bold"
               align="center"
             >

@@ -64,7 +64,7 @@ const CustomAnalysiswriteups = () => {
         <Typography
           variant="h6"
           mb={3}
-          color="#002060"
+          color="#007277"
           fontWeight="bold"
           align="center"
         >
