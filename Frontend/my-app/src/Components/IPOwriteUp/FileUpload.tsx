@@ -18,6 +18,7 @@ const FileUpload: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
+    const apiUrl = process.env.REACT_APP_API_URL;
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
     if (selectedFile?.type !== 'application/pdf') {
@@ -49,7 +50,7 @@ const FileUpload: React.FC = () => {
     setSnackbarOpen(false);
 
     try {
-      const response = await fetch('http://192.168.1.38:9000/api/xx_data_upload/', {
+    const response = await fetch(`${apiUrl}/api/upload_s1/`, {
         method: 'POST',
         body: formData,
       });

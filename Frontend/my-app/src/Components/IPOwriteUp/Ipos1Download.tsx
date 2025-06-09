@@ -49,7 +49,7 @@ const Ipos1Download: React.FC = () => {
         const token = localStorage.getItem("access_token");
 
         const response = await axios.get<{ distinct_tickers: string[] }>(
-          `${apiUrl}/api/ipos1_tickers/`,
+          `${apiUrl}/api/ipo_writeup_tickers/`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -89,7 +89,7 @@ const Ipos1Download: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${apiUrl}/api/download_ipos1/`, {
+      const response = await fetch(`${apiUrl}/api/download_writeup_data/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

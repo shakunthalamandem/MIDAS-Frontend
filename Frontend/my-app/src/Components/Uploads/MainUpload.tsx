@@ -39,9 +39,9 @@ const uploadConfigs = [
     buttonColor: 'secondary',
   },
   {
-    key: 'ipos1_data',
+    key: 'writeup',
     label: 'Upload IPO writeUp Data',
-    apiEndpoint: 'ipos1_data_upload',
+    apiEndpoint: 'writeup_data_upload',
     buttonColor: 'error',
   },
   {
