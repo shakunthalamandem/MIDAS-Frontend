@@ -55,6 +55,7 @@ import AiInsightsInputForm from "../Components/Main/DashBoards/InsightsAi/Upload
 import IntelligenceDashboard from "../Components/Main/DashBoards/IntelligenceDashboard";
 import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdashboardMain";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
+import FileUpload from "../Components/IPOwriteUp/FileUpload";
 
 
 
@@ -183,6 +184,7 @@ const AppRouters: React.FC = () => {
 
 
 
+        <Route path="/xx" element={<FileUpload />} />
 
 
       </Routes>

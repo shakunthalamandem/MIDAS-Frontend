@@ -32,7 +32,7 @@ const MenuProps = {
   },
 };
 
-const NewDealDownloadWithFilter: React.FC = () => {
+const Ipos1Download: React.FC = () => {
   const [tickers, setTickers] = useState<string[]>([]);
   const [selectedDealId, setselectedDealId] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -49,7 +49,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
         const token = localStorage.getItem("access_token");
 
         const response = await axios.get<{ distinct_tickers: string[] }>(
-          `${apiUrl}/api/newdeal_tickers/`,
+          `${apiUrl}/api/ipos1_tickers/`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -89,7 +89,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${apiUrl}/api/download_deals/`, {
+      const response = await fetch(`${apiUrl}/api/download_ipos1/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -108,7 +108,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
 
       const contentDisposition = response.headers.get("Content-Disposition");
       const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
-      const filename = filenameMatch ? filenameMatch[1] : "matched_deals.xlsx";
+      const filename = filenameMatch ? filenameMatch[1] : "writeUp_data.xlsx";
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -133,7 +133,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
   return (
     <Container maxWidth="sm">
       <Typography variant="h5" gutterBottom align="center" color="#002060">
-        Download New Deals Data
+        Download IPO Writeup Data
       </Typography>
 
       <Card sx={{ p: 3, boxShadow: 3 }}>
@@ -201,4 +201,4 @@ const NewDealDownloadWithFilter: React.FC = () => {
   );
 };
 
-export default NewDealDownloadWithFilter;
+export default Ipos1Download;
