@@ -180,6 +180,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
         marginLeft: 0,
         marginTop: 0,
         width: "100%",
+        flexWrap: "wrap"
       }}
     >
       <Box width="320px" sx={{ marginRight: 5, marginLeft: 5 }}>
@@ -390,6 +391,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </Box>
         ) : (
           <>
+           
             {apiName === "gap_analysis" ? (
               <Gap
                 selectedFilters={appliedFilters}
@@ -415,7 +417,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   );
 };
 export const resetFilters = (handleCancel: () => void) => {
-  handleCancel(); 
+  handleCancel();
 };
 
 export default MDDFilters;

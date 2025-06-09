@@ -1,8 +1,15 @@
 import React from 'react'
+import WriteupsReports from './WriteupsReports'
+import CustomAnalysiswriteups from './CustomAnalysiswriteups'
+import GapAnalysisWriteups from './GapAnalysisWriteups'
 
 const WriteUpdashboardMain = () => {
   return (
-    <div>WriteUpdashboardMain</div>
+   <>
+    <WriteupsReports />
+    <CustomAnalysiswriteups />
+    <GapAnalysisWriteups /> 
+   </>
   )
 }
 

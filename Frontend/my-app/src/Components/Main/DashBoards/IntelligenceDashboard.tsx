@@ -24,9 +24,9 @@ const IntelligenceDashboard: React.FC = () => {
               </Typography>
 
               <Typography
-                variant="body2"
+                variant="body1"
                 sx={{
-                  color: "#444",
+                  color: "#000000",
                   marginBottom: "20px",
                   lineHeight: 1.6,
                 }}

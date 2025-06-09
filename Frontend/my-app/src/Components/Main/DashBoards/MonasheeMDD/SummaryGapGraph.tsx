@@ -146,7 +146,7 @@ const SummaryGapGraph: React.FC = () => {
             variant="subtitle1"
             align="center"
             fontWeight="bold"
-            color="#004d2a"
+            color="#002060"
             mb={2}
           >
             {title}
@@ -197,7 +197,7 @@ const SummaryGapGraph: React.FC = () => {
         onClick={handleCardClick}
         variant="h5"
         align="center"
-        color="#004d2a"
+        color="#002060"
         fontWeight="bold"
         sx={{ cursor: "pointer" }}
         mb={2}
@@ -225,12 +225,14 @@ const SummaryGapGraph: React.FC = () => {
               US 2025
             </Typography>
             <Box sx={{ display: "flex", gap: 2 }}>
-              <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("FO", foDataUS)}
-              </Box>
+
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
                 {renderChart("IPO", ipoDataUS)}
               </Box>
+              <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
+                {renderChart("FO", foDataUS)}
+              </Box>
+              
             </Box>
           </Box>
         </Grid>
@@ -253,12 +255,14 @@ const SummaryGapGraph: React.FC = () => {
               EMEA 2025
             </Typography>
             <Box sx={{ display: "flex", gap: 2}}>
-              <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
-                {renderChart("FO", foDataEMEA)}
-              </Box>
+
               <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
                 {renderChart("IPO", ipoDataEMEA)}
               </Box>
+              <Box sx={{ flex: 1, bgcolor: "white", borderRadius: 1 }}>
+                {renderChart("FO", foDataEMEA)}
+              </Box>
+              
             </Box>
           </Box>
         </Grid>

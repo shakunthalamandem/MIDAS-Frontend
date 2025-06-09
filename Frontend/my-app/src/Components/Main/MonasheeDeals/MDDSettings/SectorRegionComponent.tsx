@@ -46,7 +46,7 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
   option,
 }) => {
   return (
-    <div>
+    <div style={{marginLeft: "59px"}}>
       {Object.entries(data)
         .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
         .map(([year, categories]) => (
@@ -55,7 +55,10 @@ const SectorRegionComponent: React.FC<SectorRegionTypeComponentProps> = ({
             sx={{
               padding: 5,
               marginBottom: 3,
-              width: "1300px",
+               width: "100%",
+               maxWidth: "1300px",
+               minWidth: "300px",
+               flex: "1 1 100%",
               background: "#F5E8DC",
             }}
           >

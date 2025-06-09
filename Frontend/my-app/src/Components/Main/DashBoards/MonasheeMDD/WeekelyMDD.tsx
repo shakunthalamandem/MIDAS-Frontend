@@ -101,21 +101,19 @@ const handleCardClick = () => {
 };
 
 return (
-  <Card sx={{ boxShadow: 3, p: 3, mb: 2 }} elevation={3}>
-    <Box
-      onClick={handleCardClick}
-      sx={{ cursor: "pointer", textAlign: "center" }}
-    >
+<> 
       <Typography
         variant="h6"
-        color="#004d2a"
+        color="#002060"
         fontWeight="bold"
+        align="center"
         gutterBottom
         sx={{ mb: 2 }}
+         onClick={handleCardClick}
       >
         2025 YTD GAP Analysis
       </Typography>
-    </Box>
+
 
     {loading ? (
       <Typography>Loading...</Typography>
@@ -128,8 +126,7 @@ return (
         selectedDealTypes={appliedDealTypes}
       />
     )}
-  </Card>
-  );
+</>  );
 };
 
 export default WeekelyMDD;

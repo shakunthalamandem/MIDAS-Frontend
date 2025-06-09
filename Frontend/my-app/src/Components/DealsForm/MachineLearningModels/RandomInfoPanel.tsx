@@ -65,7 +65,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
         const sorted = json.data.sort(
           (a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime()
         );
-        setForms(sorted.slice(0, 4)); // max 4 cards, i.e., 2 rows
+        setForms(sorted.slice(0, 10)); // max 4 cards, i.e., 2 rows
       } catch (err: any) {
         setError(err.message || "Something went wrong");
       } finally {
