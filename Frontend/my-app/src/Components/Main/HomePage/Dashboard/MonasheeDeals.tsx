@@ -289,7 +289,7 @@ const MonasheeDeals: React.FC = () => {
       {value === 1 && <DealStats />}
       {value === 2 && <AllocationCaptureReturn />}
       {/* {value === 3 && <FOllowOnDiscount />} */}
-      {value === 3 && <WeeklyStatsChart />}
+      {/* {value === 3 && <WeeklyStatsChart />} */}
       {/* {value === 5 && <ByBankTable />}
       {value === 6 && <MDDScreener />} */}
     </Box>

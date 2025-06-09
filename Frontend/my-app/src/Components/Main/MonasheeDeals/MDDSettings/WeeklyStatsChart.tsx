@@ -23,9 +23,14 @@ import {
   Container,
 } from "@mui/material";
 import axios from "axios";
-import GapDealDeatilsTable from "./GapDealDeatilsTable";
 import TwoWeekDealData from "./TwoweekDealData";
-import { useNavigate } from "react-router-dom";
+
+interface Filters {
+  deal_type: string[];
+  broad_region: string[];
+  week: number[]; // 🔄 Change from string[] to number[]
+  fo_type: string[];
+}
 
 interface WeeklyData {
   Count: number;
@@ -50,6 +55,10 @@ interface APIResponse {
   };
 }
 
+interface Props {
+  filters: Filters;
+}
+
 const formatNumber = (value: number) => {
   const isNegative = value < 0;
   const absValue = Math.abs(value); // Work with absolute value to handle negative numbers
@@ -70,9 +79,9 @@ const formatNumber = (value: number) => {
   return isNegative ? `-${formattedValue}` : formattedValue;
 };
 
-const WeeklyStatsChart: React.FC = () => {
+const WeeklyStatsChart: React.FC<Props> = ({ filters }) => {
   const [data, setData] = useState<APIResponse | null>(null);
-  const navigate = useNavigate(); 
+  // const navigate = useNavigate(); 
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null);
 
 
@@ -107,27 +116,23 @@ const getMondayOfWeek = (week: number, year: number): string => {
 };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetch = async () => {
       try {
-        const apiUrl = process.env.REACT_APP_API_URL;
+        const url = `${process.env.REACT_APP_API_URL}/api/weekly_stats/`;
         const token = localStorage.getItem("access_token");
-        if (!apiUrl) throw new Error("API URL is not defined in environment variables");
-
-        const response = await axios.get<APIResponse>(`${apiUrl}/api/weekly_stats/`, {
+        const resp = await axios.post<APIResponse>(url, filters, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
           },
         });
-        setData(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        navigate("/error");  
-
+        setData(resp.data);
+      } catch (e) {
+        console.error(e);
       }
     };
-    fetchData();
-  }, []);
+    fetch();
+  }, [filters]);
 
   if (!data) {
     return (
@@ -382,7 +387,7 @@ const getMondayOfWeek = (week: number, year: number): string => {
         </CardContent>
       </Card>
       <TwoWeekDealData selectedWeek={selectedWeek} />
-      <GapDealDeatilsTable />
+      {/* <GapDealDeatilsTable /> */}
     </Container>
   );
 };
