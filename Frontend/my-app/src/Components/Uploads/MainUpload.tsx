@@ -11,6 +11,10 @@ import {
   LinearProgress,
   Grid,
   Divider,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from 'axios';
@@ -21,7 +25,6 @@ import IpoDashboardCalendar from '../Main/DashBoards/InsightsAi/UploadsInsights/
 import Ipos1Download from '../IPOwriteUp/Ipos1Download';
 import FileUpload from '../IPOwriteUp/FileUpload';
 
-// Configuration for multiple upload types
 const uploadConfigs = [
   {
     key: 'form',
@@ -35,7 +38,7 @@ const uploadConfigs = [
     apiEndpoint: 'monashee_deals_data_upload',
     buttonColor: 'secondary',
   },
-      {
+  {
     key: 'ipos1_data',
     label: 'Upload IPO writeUp Data',
     apiEndpoint: 'ipos1_data_upload',
@@ -52,18 +55,11 @@ const uploadConfigs = [
     label: 'Upload Companymetric Data',
     apiEndpoint: 'companymetric_data_upload',
     buttonColor: 'warning',
-  }, 
-  //  {
-  //   key: 'xx',
-  //   label: 'Upload IPO S1 Document',
-  //   apiEndpoint: 'xx_data_upload',
-  //   buttonColor: 'error',
-  // },
-
+  },
 ];
 
 const MainUpload: React.FC = () => {
-  const [activeUpload, setActiveUpload] = useState<string | null>(null);
+  const [activeUpload, setActiveUpload] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
@@ -103,11 +99,18 @@ const MainUpload: React.FC = () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-
+        // Optional: to track progress, you can add onUploadProgress here
+        // onUploadProgress: (progressEvent) => {
+        //   const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        //   setUploadProgress(percentCompleted);
+        // },
       });
 
       setSnackbarMessage(`${config.label} uploaded successfully.`);
       setOpenSnackbar(true);
+      setFile(null);
+      setUploadedFileName('');
+      setActiveUpload('');
     } catch (err) {
       console.error('Upload Error:', err);
       setError('Upload failed. Please try again.');
@@ -118,130 +121,140 @@ const MainUpload: React.FC = () => {
 
   return (
     <>
-    <Box sx={{ width: '100%' }}>
-      <Box sx={{ display: 'flex', width: '100%' }}>
-        <Container sx={{ mt: '100px', width: '70%' }}>
-          <Grid container spacing={4}>
-            <Grid item xs={12}>
-              <Card sx={{ mb: 3, p: 2 }}>
-                <CardContent>
-                <Typography
-                  variant="h5"
-                  align="center"
-                  color="#012d3f"
-                  sx={{ mb: 3 }}  // mb = margin-bottom
-                >
-                  <strong>Upload Data</strong>
-                </Typography>
-                  <Grid container spacing={2} justifyContent="center">
-                    {uploadConfigs.map((config) => (
-                      <Grid item key={config.key}>
-                        <Button
-                          variant="contained"
-                          color={config.buttonColor as any}
-                          onClick={() => {
-                            setActiveUpload(config.key);
-                            setFile(null);
-                            setUploadedFileName('');
-                            setError('');
-                          }}
-                        >
-                          {config.label}
-                        </Button>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </CardContent>
-              </Card>
-
-              {activeUpload && (
-                <Card sx={{ p: 2 }}>
-                  <CardContent>
-                    <Typography variant="h6" align="center" color="primary" gutterBottom>
-                      {uploadConfigs.find((cfg) => cfg.key === activeUpload)?.label}
+<Box sx={{ width: '100%', backgroundColor: 'white', minHeight: '100vh', py: 4 }}>
+  <Box sx={{ display: 'flex', width: '100%',height:"70%" }}>
+    <Container sx={{ mt: '34px', width: '50%' }}>
+      <Grid container spacing={4}>
+        <Grid item xs={12}>
+          <Card sx={{ mb: 3, p: 2, backgroundColor: '#f5f1f9' }}>
+            <CardContent>.
+              
+                    <Typography
+                      variant="h5"
+                      align="center"
+                      color="#012d3f"
+                      sx={{ mb: 3, backgroundColor: '#f5f1f9', }} // mb = margin-bottom
+                    >
+                      <strong>Upload Data</strong>
                     </Typography>
 
-                    <Box display="flex" justifyContent="center" gap={2} alignItems="center">
-                      <CloudUploadIcon sx={{ fontSize: 50 }} />
-                      <input
-                        accept=".xlsx, .xls"
-                        style={{ display: 'none' }}
-                        id="file-upload"
-                        type="file"
-                        onChange={handleFileChange}
-                      />
-                      <label htmlFor="file-upload">
-                        <Button variant="outlined" component="span" color="primary">
-                          Choose File
-                        </Button>
-                      </label>
-                    </Box>
-
-                    {uploadedFileName && (
-                      <Typography align="center" sx={{ mt: 1 }}>
-                        <strong>Selected File:</strong> {uploadedFileName}
-                      </Typography>
-                    )}
-                    {error && (
-                      <Typography color="error" align="center">
-                        {error}
-                      </Typography>
-                    )}
-
-                    <Button
-                      onClick={handleUpload}
-                      variant="contained"
-                      disabled={uploading}
-                      color="success"
-                      sx={{ mt: 2 }}
-                    >
-                      {uploading ? 'Uploading...' : 'Submit'}
-                    </Button>
-
-                    {uploading && (
-                      <Box sx={{ mt: 2 }}>
-                        <LinearProgress variant="determinate" value={uploadProgress} />
-                      </Box>
-                    )}
+                    <FormControl fullWidth sx={{ maxWidth: 400, mx: 'auto' }}>
+                      <InputLabel id="upload-type-label">Select Upload Type</InputLabel>
+                      <Select
+                        labelId="upload-type-label"
+                        id="upload-type"
+                        value={activeUpload}
+                        label="Select Upload Type"
+                        onChange={(e) => {
+                          setActiveUpload(e.target.value);
+                          setFile(null);
+                          setUploadedFileName('');
+                          setError('');
+                        }}
+                      >
+                        {uploadConfigs.map((config) => (
+                          <MenuItem key={config.key} value={config.key}>
+                            {config.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </CardContent>
                 </Card>
-              )}
+
+                {activeUpload && (
+                  <Card sx={{ p: 2 , backgroundColor: '#f5f1f9'}}>
+                    <CardContent>
+                      <Typography variant="h6" align="center" color="primary" gutterBottom>
+                        {uploadConfigs.find((cfg) => cfg.key === activeUpload)?.label}
+                      </Typography>
+
+                      <Box display="flex" justifyContent="center" gap={2} alignItems="center">
+                        <CloudUploadIcon sx={{ fontSize: 50 }} />
+                        <input
+                          accept=".xlsx, .xls"
+                          style={{ display: 'none' }}
+                          id="file-upload"
+                          type="file"
+                          onChange={handleFileChange}
+                        />
+                        <label htmlFor="file-upload">
+                          <Button variant="outlined" component="span" color="primary">
+                            Choose File
+                          </Button>
+                        </label>
+                      </Box>
+
+                      {uploadedFileName && (
+                        <Typography align="center" sx={{ mt: 1 }}>
+                          <strong>Selected File:</strong> {uploadedFileName}
+                        </Typography>
+                      )}
+                      {error && (
+                        <Typography color="error" align="center">
+                          {error}
+                        </Typography>
+                      )}
+
+                      <Button
+                        onClick={handleUpload}
+                        variant="contained"
+                        disabled={uploading}
+                        color="success"
+                        sx={{ mt: 2 }}
+                      >
+                        {uploading ? 'Uploading...' : 'Submit'}
+                      </Button>
+
+                      {uploading && (
+                        <Box sx={{ mt: 2 }}>
+                          <LinearProgress variant="determinate" value={uploadProgress} />
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </Grid>
             </Grid>
-          </Grid>
 
-          <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
-            <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
-              {snackbarMessage}
-            </Alert>
-          </Snackbar>
-        </Container>
+            <Snackbar
+              open={openSnackbar}
+              autoHideDuration={6000}
+              onClose={() => setOpenSnackbar(false)}
+            >
+              <Alert
+                onClose={() => setOpenSnackbar(false)}
+                severity="success"
+                sx={{ width: '100%' }}
+              >
+                {snackbarMessage}
+              </Alert>
+            </Snackbar>
+          </Container>
 
-        <Box sx={{height: '60vh' }}>
             <FileUpload />
+
+          <Divider orientation="vertical" flexItem sx={{ height: '60vh', borderColor: '#e0e0e0' }} />
+          <Box sx={{ display: 'flex', height: '60vh' }}>
+            <Divider orientation="vertical" flexItem sx={{ borderColor: '#e0e0e0' }} />
+            <Box sx={{ display: 'flex', flexDirection: 'column', ml: 2, gap: 2 }}>
+              <NewDealDownloadWithFilter />
+              <Ipos1Download />
+            </Box>
+          </Box>
         </Box>
 
-        <Divider orientation="vertical" flexItem sx={{ height: '60vh', borderColor: '#e0e0e0' }} />
-        <Box sx={{ display: 'flex', height: '60vh' }}>
-          <Divider orientation="vertical" flexItem sx={{ borderColor: '#e0e0e0' }} />
-          <Box sx={{ display: 'flex', flexDirection: 'column', ml: 2, gap: 2 }}>
-            <NewDealDownloadWithFilter />
-            <Ipos1Download />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, px: 4 }}>
+          <Box sx={{ flex: 1, mr: 2 }}>
+            <AiInsightsInputForm />
+          </Box>
+          <Box sx={{ flex: 1, m: 2 }}>
+            <IpoDashboardCalendar />
           </Box>
         </Box>
       </Box>
-
-           
-  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, px: 4 }}>
-    <Box sx={{ flex: 1, mr: 2 }}>
-      <AiInsightsInputForm />
-    </Box>
-    <Box sx={{ flex: 1, m: 2 }}>
-      <IpoDashboardCalendar />
-    </Box>
-  </Box>
-   </Box>
-            </>
-   );
+    </>
+  );
 };
 
 export default MainUpload;

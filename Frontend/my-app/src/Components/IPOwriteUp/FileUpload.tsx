@@ -4,7 +4,8 @@ import {
   Button,
   Typography,
   CircularProgress,
-  Paper,
+  Card,
+  CardContent,
   Snackbar,
   Alert,
 } from '@mui/material';
@@ -50,7 +51,6 @@ const FileUpload: React.FC = () => {
     try {
       const response = await fetch('http://192.168.1.38:9000/api/xx_data_upload/', {
         method: 'POST',
-        // headers: { 'Authorization': 'Bearer your_token_here' }, // Uncomment if needed
         body: formData,
       });
 
@@ -74,45 +74,47 @@ const FileUpload: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5, p: 3 }}>
-      <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
-        <Typography variant="h5" gutterBottom>
-          Upload IPO S1 PDF
-        </Typography>
-
-        <Button
-          variant="outlined"
-          component="label"
-          startIcon={<CloudUploadIcon />}
-          sx={{ mt: 2 }}
-        >
-          Select PDF File
-          <input
-            type="file"
-            hidden
-            accept="application/pdf"
-            onChange={handleFileChange}
-          />
-        </Button>
-
-        {file && (
-          <Typography variant="body2" sx={{ mt: 2 }}>
-            Selected: {file.name}
+    <Box sx={{  width: '45%', margin: 'auto', mt: 5, px: 2 }}>
+      <Card elevation={3} sx={{ mb: 3, p: 2, backgroundColor: '#f5f1f9' }}>
+        <CardContent sx={{ textAlign: 'center' }}>
+          <Typography variant="h5" gutterBottom>
+            Upload IPO S1 PDF
           </Typography>
-        )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading || !file}
-            fullWidth
+            variant="outlined"
+            component="label"
+            startIcon={<CloudUploadIcon />}
+            sx={{ mt: 2 }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Upload'}
+            Select PDF File
+            <input
+              type="file"
+              hidden
+              accept="application/pdf"
+              onChange={handleFileChange}
+            />
           </Button>
-        </Box>
-      </Paper>
+
+          {file && (
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              Selected: {file.name}
+            </Typography>
+          )}
+
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading || !file}
+              fullWidth
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Upload'}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
 
       <Snackbar
         open={snackbarOpen}
