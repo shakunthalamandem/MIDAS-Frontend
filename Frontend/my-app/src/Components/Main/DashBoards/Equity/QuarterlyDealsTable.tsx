@@ -23,7 +23,7 @@ type QuarterData = {
 
 type ApiResponse = {
   Yearwise: {
-    [quarter: string]: QuarterData;
+    [period: string]: QuarterData;
   };
 };
 
@@ -59,9 +59,9 @@ const QuarterlyDealsTable = () => {
   const [error, setError] = useState<string | null>(null);
 
 
-const handleCardClick = () => {
-  window.open("/equity/capital-markets/skew-table", "_blank");
-};
+  const handleCardClick = () => {
+    window.open("/equity/capital-markets/skew-table", "_blank");
+  };
   useEffect(() => {
     const fetchDeals = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
@@ -77,7 +77,7 @@ const handleCardClick = () => {
         filters: {
           year_range: [2023, 2025],
           region: ["Non-US America", "US", "EMEA", "APAC"],
-          year_period: "Quarterly",
+          year_period: "HalfYearly", // <-- Changed to HalfYearly
         },
       };
 
@@ -103,28 +103,32 @@ const handleCardClick = () => {
       };
 
       const processData = (yearwise: { [key: string]: QuarterData }) => {
-        const getLastCompletedQuarterIn2025 = (): string => {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = now.getMonth(); // 0 = Jan
 
-          const quarter = Math.floor(month / 3); // 0 = Q1
-          const completedQuarter = quarter === 0 ? 4 : quarter;
-          const targetQuarter = year === 2025 ? completedQuarter : 4;
-
-          return `Q${targetQuarter}`;
-        };
-
-        const quarterName = getLastCompletedQuarterIn2025();
+        // Helper to build list of H1 keys for 2023-2025
+      const getFirstHalfLabel = (): string[] => {
         const years = ["2023", "2024", "2025"];
+        return years.map((year) => `${year} H1`);
+      };
 
-        return years
-          .map((year) => {
-            const key = `${year} ${quarterName}`;
-            if (yearwise[key]) {
+      // const getLastCompletedQuarterIn2025 = (): string => {
+      //     const now = new Date();
+      //     const year = now.getFullYear();
+      //     const month = now.getMonth(); // 0 = Jan
+
+      //     const quarter = Math.floor(month / 3); // 0 = Q1
+      //     const completedQuarter = quarter === 0 ? 4 : quarter;
+      //     const targetQuarter = year === 2025 ? completedQuarter : 4;
+
+      //     return `Q${targetQuarter}`;
+      //   };
+        const labels = getFirstHalfLabel();
+
+        return labels
+          .map((label) => {
+            if (yearwise[label]) {
               return {
-                quarter: key,
-                data: yearwise[key],
+                quarter: label,
+                data: yearwise[label],
               };
             }
             return null;
@@ -179,7 +183,7 @@ const handleCardClick = () => {
               p: 1.5,
             }}
           >
-            Skew Table - IPO and FO Deals from 2023 to 2025 for Q1
+            Skew Table - IPO and FO Deals from 2023 to 2025 for H1
           </Typography>
 
           {/* <style>
@@ -200,7 +204,7 @@ const handleCardClick = () => {
           <TableHead sx={{ backgroundColor: "#f5f5f5",border: "1px solid #000" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold", minWidth: "80px", py: 2, border: "1px solid #000" }}>
-                Quarter
+                HalfYearly
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", border: "1px solid #000" }}>
                 Total Deal Count
