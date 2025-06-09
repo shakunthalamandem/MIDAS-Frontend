@@ -216,7 +216,7 @@ const WeeklyMain: React.FC = () => {
         {/* </Card> */}
       </Container>
 
-      <WeeklyStatsChart filters={appliedFilters} />
+      <WeeklyStatsChart  />
     </>
   );
 };
