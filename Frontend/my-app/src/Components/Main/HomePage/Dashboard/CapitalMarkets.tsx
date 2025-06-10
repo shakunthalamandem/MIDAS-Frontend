@@ -27,7 +27,7 @@ const CapitalMarkets: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "AS");
-  const [results, setResults] = useState<MDDResult[]>([]);
+  const [results, setResults] = useState<CombinedDataResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   useEffect(() => {
@@ -53,7 +53,7 @@ const CapitalMarkets: React.FC = () => {
     const tabPaths = ["", "deal-stats", "skew-table", "deal-filter"];
     navigate(`/equity/capital-markets/${tabPaths[newValue]}`);
   };
-  interface MDDResult {
+  interface CombinedDataResult {
     ticker_symbol: string;
     issuer_name: string;
   }
@@ -83,18 +83,15 @@ const CapitalMarkets: React.FC = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }
-      // const data = await response.json();
-      // console.log("Search results:", data);
-    const data: MDDResult[] = await response.json(); // Type the response
+
+    const data: CombinedDataResult[] = await response.json();
 
       setResults(data);
-      // console.log("Formatted ticker list:", tickerList);
-      // setResults(tickerList);
+    
 
     } catch (error) {
       console.error("Error fetching search results:", error);
       setResults([]);
-      // navigate("/error");  
 
     } finally {
       setLoading(false);
