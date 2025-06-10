@@ -486,8 +486,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
               </Grid>
             </Grid>
           </Paper>
-          <T1DPriceCategory />
-          {prediction && <PredictionResults result={prediction} />}
+          {prediction && <T1DPriceCategory result={prediction} />}
         </>
       );
     };

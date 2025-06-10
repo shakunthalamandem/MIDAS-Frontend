@@ -6,8 +6,21 @@ import {
   Button,
   Box,
 } from '@mui/material';
+import PredictionResults from './PredictionResults'; // Adjust path as needed
 
-const T1DPriceCategory = (): JSX.Element => {
+// Define props interface
+interface PredictionModel {
+  prediction: string;
+  Accuracy: number;
+  model: string;
+  range: string;
+}
+
+interface T1DPriceCategoryProps {
+  result?: Record<string, PredictionModel>;
+}
+
+const T1DPriceCategory = ({ result }: T1DPriceCategoryProps): JSX.Element => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [price, setPrice] = useState<string>('');
 
@@ -19,29 +32,28 @@ const T1DPriceCategory = (): JSX.Element => {
     setPrice(event.target.value);
   };
 
-
   const handleRepredict = (): void => {
     console.log('Repredicting with price:', price);
   };
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 2 }}>
-    
+    <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 2, width: '100%' }}>
       <FormControlLabel
         control={
           <Checkbox
             checked={isChecked}
             onChange={handleCheckboxChange}
             sx={{
-              color: '#002060', 
+              color: '#002060',
               '&.Mui-checked': {
                 color: '#002060',
               },
             }}
           />
         }
-        label="Do you have the T + 1Day Open Category Price for the deal ?"
+        label="Do you have the T + 1Day Open Category Price for the deal?"
       />
+
       {isChecked && (
         <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
           <TextField
@@ -52,12 +64,18 @@ const T1DPriceCategory = (): JSX.Element => {
             size="small"
             sx={{ mr: 2 }}
           />
-        
-          <Button variant="outlined" onClick={handleRepredict} sx={{ backgroundColor: '#002060', color: '#fff' }}>
+          <Button
+            variant="outlined"
+            onClick={handleRepredict}
+            sx={{ backgroundColor: '#002060', color: '#fff' }}
+          >
             Repredict
           </Button>
         </Box>
       )}
+
+      {/* Always show prediction results if available */}
+      {result && <PredictionResults result={result} />}
     </Box>
   );
 };
