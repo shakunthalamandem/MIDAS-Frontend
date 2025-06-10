@@ -156,7 +156,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
 
       <Grid container spacing={2}>
         {forms.map((form, i) => (
-          <Grid item xs={12} sm={6} key={i}>
+<Grid item xs={12} key={i}>
             <Card
               onClick={() => handleCardClick(form)}
               sx={{

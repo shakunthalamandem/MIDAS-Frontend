@@ -129,7 +129,7 @@ const MlEquityMain: React.FC = () => {
         </Box>
 
         <Box sx={{ display: "flex", gap: 2 }}>
-          <Container maxWidth="lg" sx={{ padding: 0, flex: 3 }}>
+          <Container maxWidth="xl" sx={{ padding: 0, flex: 3 }}>
             <Card sx={{ p: 3, boxShadow: 3, borderRadius: 2 }}>
               <Typography
                 variant="h5"
