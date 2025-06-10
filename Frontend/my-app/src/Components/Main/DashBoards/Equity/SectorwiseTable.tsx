@@ -21,7 +21,9 @@ type SectorMetrics = {
 };
 
 type ApiResponse = {
-  Sectorwise: Record<string, SectorMetrics>;
+  Sectorwise:
+    | Record<string, SectorMetrics>
+    | Record<string, Record<string, SectorMetrics>>;
 };
 
 // Metrics to show in table
@@ -111,7 +113,30 @@ const SectorwiseTable: React.FC = () => {
         if (!response.ok) throw new Error("Failed to fetch sector data");
 
         const data: ApiResponse = await response.json();
-        setSectorData(data.Sectorwise || {});
+
+        // Handle nested structure: Sectorwise: { "2025 H1": { ... }, ... }
+        let sectorObj: Record<string, SectorMetrics> = {};
+
+        if (
+          data.Sectorwise &&
+          typeof Object.values(data.Sectorwise)[0] === "object" &&
+          !Array.isArray(Object.values(data.Sectorwise)[0])
+        ) {
+          // Nested by period
+          if ((data.Sectorwise as Record<string, any>)["2025 H1"]) {
+            sectorObj = (data.Sectorwise as Record<string, any>)["2025 H1"];
+          } else {
+            // fallback: pick the latest period if "2025 H1" not found
+            const periods = Object.keys(data.Sectorwise);
+            const latest = periods.sort().reverse()[0];
+            sectorObj = (data.Sectorwise as Record<string, any>)[latest] || {};
+          }
+        } else {
+          // Flat structure
+          sectorObj = data.Sectorwise as Record<string, SectorMetrics>;
+        }
+
+        setSectorData(sectorObj || {});
       } catch (error) {
         console.error("Error fetching sector data:", error);
       }
@@ -152,7 +177,7 @@ const SectorwiseTable: React.FC = () => {
               p: 1.5,
             }}
           >
-            Sector-wise Skew Table for 2025 (Q1) –{" "}
+            Sector-wise Skew Table for 2025 (H1) –{" "}
             <span style={{ color: "red" }}>Highlighted Key Sectors</span>
           </Typography>
         </Box>

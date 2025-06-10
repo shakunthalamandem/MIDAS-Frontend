@@ -186,8 +186,8 @@ const generateChartData = (metric: string) => {
                   <Legend />
                   <Bar dataKey="dealogic_IPO" stackId="dealogic" barSize={17} fill="#8884d8" name="Dealogic IPO" />
                   <Bar dataKey="dealogic_FO" stackId="dealogic" barSize={17} fill="#82ca9d" name="Dealogic FO" />
-                  <Bar dataKey="mdd_IPO" stackId="mdd" barSize={17} fill="#f582e9" name="MDD IPO" />
-                  <Bar dataKey="mdd_FO" stackId="mdd" barSize={17} fill="#f5b051" name="MDD FO" />
+                  <Bar dataKey="mdd_IPO" stackId="mdd" barSize={17} fill="#f97316" name="MDD IPO" />
+                  <Bar dataKey="mdd_FO" stackId="mdd" barSize={17} fill="#60a5fa" name="MDD FO" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
