@@ -9,6 +9,7 @@ import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 import MDDSelectedTicker from "../../MonasheeDeals/MddGraphs/MDDSelectedTicker";
 import WeeklyStatsChart from "../../MonasheeDeals/MDDSettings/WeeklyStatsChart";
 import ByBankTable from "../../MonasheeDeals/MddGraphs/ByBankTable";
+import WeeklyMain from "../../MonasheeDeals/MDDSettings/WeeklyMain";
 
 // Define the type for the API response
 interface MDDResult {
@@ -289,7 +290,7 @@ const MonasheeDeals: React.FC = () => {
       {value === 1 && <DealStats />}
       {value === 2 && <AllocationCaptureReturn />}
       {/* {value === 3 && <FOllowOnDiscount />} */}
-      {/* {value === 3 && <WeeklyStatsChart />} */}
+      {value === 3 && <WeeklyMain />}
       {/* {value === 5 && <ByBankTable />}
       {value === 6 && <MDDScreener />} */}
     </Box>

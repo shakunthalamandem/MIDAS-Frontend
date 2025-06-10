@@ -116,7 +116,7 @@ const AppRouters: React.FC = () => {
           <Route path="deal-stats" element={<DealStats />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
           <Route path="follow-on-discount" element={<FOllowOnDiscount />} />
-          {/* <Route path="weekly-tracking" element={<WeeklyStatsChart />} /> */}
+          <Route path="weekly-tracking" element={<WeeklyMain />} />
           <Route path="by-bank" element={<BankTable selectedFilters={{}} />} />
           <Route path="screener" element={<MDDScreener />} />
         </Route>
