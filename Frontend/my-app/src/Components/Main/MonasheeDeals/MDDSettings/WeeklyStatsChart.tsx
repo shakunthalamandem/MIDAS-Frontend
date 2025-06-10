@@ -386,8 +386,7 @@ const getMondayOfWeek = (week: number, year: number): string => {
           </Box>
         </CardContent>
       </Card>
-      <TwoWeekDealData selectedWeek={selectedWeek} />
-      {/* <GapDealDeatilsTable /> */}
+     
     </Container>
   );
 };

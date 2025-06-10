@@ -18,6 +18,7 @@ import {
 import WeeklyStatsChart from "./WeeklyStatsChart";
 import GapDealDeatilsTable from "./GapDealDeatilsTable";
 import TwoWeekDealData from "./TwoweekDealData";
+import WeeklyGapTable from "./WeeklyGapTable";
 
 interface FiltersResponse {
   deal_type: string[];
@@ -116,7 +117,7 @@ const handleApply = () => {
     <>
       <Container maxWidth="lg" sx={{ py: 0 }} id="details-section">
         <Card sx={{ boxShadow: 3, p: 3, mb: 2 }}>
-          <Typography variant="h5" color="#002060" align="center" gutterBottom>
+          <Typography variant="h6" color="#002060" align="center" gutterBottom>
             2025 Weekly Deal Filters
           </Typography>
 
@@ -209,7 +210,7 @@ const handleApply = () => {
             {/* Apply / Reset Buttons */}
             <Grid item>
               <Box display="flex" gap={1}>
-                <Button variant="contained" color="primary" size="small" onClick={handleApply}>
+                <Button variant="contained" sx={{color:'#FFFFFF',bgcolor:'#002060'}} size="small" onClick={handleApply}>
                   Apply
                 </Button>
                 <Button variant="outlined" color="secondary" size="small" onClick={handleReset}>
@@ -221,10 +222,9 @@ const handleApply = () => {
         </Card>
       </Container>
 
-      {/* Charts and Tables */}
       <WeeklyStatsChart filters={appliedFilters} />
-      {/* <TwoWeekDealData filters={appliedFilters} />
-      <GapDealDeatilsTable filters={appliedFilters} /> */}
+      <TwoWeekDealData filters={appliedFilters} />
+      <WeeklyGapTable filters={appliedFilters} />
     </>
   );
 };
