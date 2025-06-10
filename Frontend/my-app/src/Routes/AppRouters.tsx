@@ -180,13 +180,6 @@ const AppRouters: React.FC = () => {
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
         <Route path="/equity/writeupsdashboard" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
-
-
-
-
-        <Route path="/xx" element={<FileUpload />} />
-
-
       </Routes>
     </ErrorBoundary>
   );
