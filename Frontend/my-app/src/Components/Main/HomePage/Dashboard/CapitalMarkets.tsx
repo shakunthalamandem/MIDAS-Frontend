@@ -83,12 +83,13 @@ const CapitalMarkets: React.FC = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }
-      const data = await response.json();
-      const tickerList = data.tickers.map((ticker_symbol: string,issuer_name:string) => ({
-        ticker_symbol: ticker_symbol,
-        issuer_name: issuer_name, // Placeholder, since your API doesn’t provide issuer_name
-      }));
-      setResults(tickerList);
+      // const data = await response.json();
+      // console.log("Search results:", data);
+    const data: MDDResult[] = await response.json(); // Type the response
+
+      setResults(data);
+      // console.log("Formatted ticker list:", tickerList);
+      // setResults(tickerList);
 
     } catch (error) {
       console.error("Error fetching search results:", error);
