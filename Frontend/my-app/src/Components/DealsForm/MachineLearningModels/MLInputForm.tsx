@@ -216,7 +216,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
 
     setLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/api/ml_multi_model_prediction/`, {
+      const response = await fetch(`${apiUrl}/api/ml_prediction_v2/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

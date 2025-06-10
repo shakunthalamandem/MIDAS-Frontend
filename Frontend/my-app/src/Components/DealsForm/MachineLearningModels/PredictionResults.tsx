@@ -20,25 +20,26 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 
 interface PredictionResultsProps {
   result: {
-    main_model: {
+    v1_main: {
       prediction: string;
-      accuracy: number;
+      Accuracy: number;
     };
-    positive_model: {
+    v1_positive: {
       prediction: string;
-      accuracy: number;
+      Accuracy: number;
     };
-    negative_model: {
+    v1_negative: {
       prediction: string;
-      accuracy: number;
+      Accuracy: number;
     };
   };
 }
 
 const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
+  console.log("Prediction Results:", result);
   // Determine outcome category based on main model result
   const getOutcomeCategory = (): "Negative" | "Neutral" | "Positive" => {
-    const resultText = result.main_model.prediction.toLowerCase();
+    const resultText = result.v1_main.prediction.toLowerCase();
     if (resultText.includes("negative")) return "Negative";
     if (resultText.includes("neutral")) return "Neutral";
     if (resultText.includes("positive")) return "Positive";
@@ -48,8 +49,8 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
   const outcomeCategory = getOutcomeCategory();
   
   // Convert string prediction to boolean
-  const isPositive = result.positive_model.prediction.toLowerCase() === "true";
-  const isNegative = result.negative_model.prediction.toLowerCase() === "true";
+  const isPositive = result.v1_positive.prediction.toLowerCase() === "true";
+  const isNegative = result.v1_negative.prediction.toLowerCase() === "true";
 
   const renderOutcome = () => {
     switch (outcomeCategory) {
@@ -168,7 +169,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
               <TableCell>{renderOutcome()}</TableCell>
               <TableCell>
                 <Typography variant="body2" color="text.secondary" fontStyle="italic">
-                  {renderConfidenceLevel(result.main_model.accuracy)}
+                  {renderConfidenceLevel(result.v1_main.Accuracy)}
                 </Typography>
               </TableCell>
             </TableRow>
@@ -181,7 +182,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
                 <strong>Threshold:</strong> Return &gt; 3%
               </TableCell>
               <TableCell>{renderBinaryResult(isPositive)}</TableCell>
-              <TableCell>{renderConfidenceLevel(result.positive_model.accuracy)}</TableCell>
+              <TableCell>{renderConfidenceLevel(result.v1_positive.Accuracy)}</TableCell>
             </TableRow>
 
             <TableRow>
@@ -192,7 +193,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
                 <strong>Threshold:</strong> Return &lt; -2%
               </TableCell>
               <TableCell>{renderBinaryResult(isNegative)}</TableCell>
-              <TableCell>{renderConfidenceLevel(result.negative_model.accuracy)}</TableCell>
+              <TableCell>{renderConfidenceLevel(result.v1_negative.Accuracy)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
