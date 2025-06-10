@@ -12,6 +12,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
+import SelectedTicker from "./SelectedTicker";
 import { useNavigate } from "react-router-dom";
 import CombinedSelectedTicker from "./CombinedSelectedTicker";
 
@@ -21,7 +22,7 @@ interface MDDResult {
   issuer_name: string;
 }
 
-const GlobalDealSearch: React.FC = () => {
+const CombinedDealSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<MDDResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -54,8 +55,9 @@ const GlobalDealSearch: React.FC = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }
-      const data: MDDResult[] = await response.json(); // Type the response
+      const data = await response.json(); // Type the response
       setResults(data);
+      console.log(data)
     } catch (error) {
       console.error("Error fetching search results:", error);
       // navigate("/error");  
@@ -161,4 +163,4 @@ const GlobalDealSearch: React.FC = () => {
   );
 };
 
-export default GlobalDealSearch;
+export default CombinedDealSearch;

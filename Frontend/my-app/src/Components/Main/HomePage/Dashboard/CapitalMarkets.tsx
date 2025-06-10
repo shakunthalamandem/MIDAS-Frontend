@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import SkewTableMain from "../../MonasheeGraphs/SkewTableMain";
 import ScreenerMain from "../../MonasheeGraphs/ScreenerTable/ScreenerMain";
 import MarketFilters from "../../MonasheeCapitalMarkets/MarketFilters";
@@ -22,15 +22,15 @@ import CombinedSelectedTicker from "../../MonasheeGraphs/CombinedSelectedTicker"
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState<number>(0);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { ticker: routeTicker } = useParams<{ ticker: string }>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "AS"); 
+  const [selectedTicker, setSelectedTicker] = useState<string>(routeTicker || "AS");
   const [results, setResults] = useState<MDDResult[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-useEffect(() => {
+  useEffect(() => {
     const path = window.location.pathname.split("/").pop();
     switch (path) {
       case "deal-stats":
@@ -47,7 +47,7 @@ useEffect(() => {
         break;
     }
   }, [window.location.pathname]);
-  
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     const tabPaths = ["", "deal-stats", "skew-table", "deal-filter"];
@@ -69,22 +69,27 @@ useEffect(() => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/api/dealogic_search/${query}`, {
+      const response = await fetch(`${apiUrl}/api/combined_ticker_list/${query}`, {
         method: "GET",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
         },
-    });
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
-    }
+      }
       if (!response.ok) {
         throw new Error("Failed to fetch results");
       }
-      const data: MDDResult[] = await response.json(); // Type the response
-      setResults(data);
+      const data = await response.json();
+      const tickerList = data.tickers.map((ticker: string) => ({
+        ticker_symbol: ticker,
+        issuer_name: "", // Placeholder, since your API doesn’t provide issuer_name
+      }));
+      setResults(tickerList);
+
     } catch (error) {
       console.error("Error fetching search results:", error);
       setResults([]);
@@ -165,7 +170,7 @@ useEffect(() => {
           },
         }}
       >
-               <Tab sx={{ backgroundColor: value === 0 ? "#dce6f0" : "#f5f5f5", color: value === 0 ? "#fff" : "#777", "&.Mui-selected": { backgroundColor: "#dce6f0", color: "#fff" } }} 
+        <Tab sx={{ backgroundColor: value === 0 ? "#dce6f0" : "#f5f5f5", color: value === 0 ? "#fff" : "#777", "&.Mui-selected": { backgroundColor: "#dce6f0", color: "#fff" } }}
           label={
             <TextField
               label=""
@@ -178,7 +183,7 @@ useEffect(() => {
                 marginBottom: "1px",
                 width: "200px",
                 height: "40px",
-                borderRadius: "32px", 
+                borderRadius: "32px",
                 backgroundColor: "#f4f6f9",
               }}
               InputProps={{
@@ -294,12 +299,12 @@ useEffect(() => {
         )
       )}
 
-{/*       
-      {value === 0 && selectedTicker && (
-        <CombinedSelectedTicker ticker={selectedTicker} /> */}
 
       {value === 0 && selectedTicker && (
-        <SelectedTicker ticker={selectedTicker} />
+        <CombinedSelectedTicker ticker={selectedTicker} />
+
+        // {value === 0 && selectedTicker && (
+        //   <SelectedTicker ticker={selectedTicker} />
 
 
       )}
