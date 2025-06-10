@@ -84,9 +84,9 @@ const CapitalMarkets: React.FC = () => {
         throw new Error("Failed to fetch results");
       }
       const data = await response.json();
-      const tickerList = data.tickers.map((ticker: string) => ({
-        ticker_symbol: ticker,
-        issuer_name: "", // Placeholder, since your API doesn’t provide issuer_name
+      const tickerList = data.tickers.map((ticker_symbol: string,issuer_name:string) => ({
+        ticker_symbol: ticker_symbol,
+        issuer_name: issuer_name, // Placeholder, since your API doesn’t provide issuer_name
       }));
       setResults(tickerList);
 
