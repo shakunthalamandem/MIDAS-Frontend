@@ -51,18 +51,12 @@ interface MDDRow {
   percentage_total_return: number | null;
   t1m_return_from_bloomberg: number | null;
   all_bank: string;
-  sector: string | null;
-  region: string | null;
   deal_type: string | null;
   deal_size: number | null;
   issue_offer_price: number | null;
   deal_captain: string | null;
   sponsor: string | null;
   ticker: string | null;
-  mdd: number | null;
-  mdd_date: string | null;
-  mdd_ticker: string | null;
-
 }
 
 interface ApiResponse {
@@ -430,9 +424,9 @@ const CombinedSelectedTicker : React.FC<SelectedTickerProps> = ({ ticker }) => {
                               { label: "Ticker", value: item.ticker || "N/A" },
                               {
                                 label: "Sector",
-                                value: item.gics_sector_from_bloomberg || item.sector || "N/A",
+                                value: item.gics_sector_from_bloomberg || item.gics_sector_from_bloomberg || "N/A",
                               },
-                              { label: "Region", value: item.broad_region || item.region || "N/A" },
+                              { label: "Region", value: item.broad_region || item.broad_region || "N/A" },
                               { label: "Deal Type", value: item.deal_type || "N/A" },
                               {
                                 label: "Deal Size",
@@ -602,7 +596,7 @@ const CombinedSelectedTicker : React.FC<SelectedTickerProps> = ({ ticker }) => {
                                 </TableCell>
                                 <TableCell sx={{ border: "1px solid #ccc" }}>{row.value}</TableCell>
                               </TableRow>
-                            ))}
+                            ))}  
                           </TableBody>
                         </Table>
                       </TableContainer>

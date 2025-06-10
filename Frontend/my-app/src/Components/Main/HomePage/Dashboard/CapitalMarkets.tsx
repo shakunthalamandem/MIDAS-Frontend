@@ -18,6 +18,7 @@ import {
   CircularProgress,
   Paper,
 } from "@mui/material";
+import CombinedSelectedTicker from "../../MonasheeGraphs/CombinedSelectedTicker";
 
 const CapitalMarkets: React.FC = () => {
   const [value, setValue] = useState<number>(0);
@@ -293,8 +294,14 @@ useEffect(() => {
         )
       )}
 
+{/*       
+      {value === 0 && selectedTicker && (
+        <CombinedSelectedTicker ticker={selectedTicker} /> */}
+
       {value === 0 && selectedTicker && (
         <SelectedTicker ticker={selectedTicker} />
+
+
       )}
       {value === 1 && <MarketFilters />}
       {value === 2 && <SkewTableMain />}

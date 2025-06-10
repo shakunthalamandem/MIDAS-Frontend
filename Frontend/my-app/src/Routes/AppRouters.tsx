@@ -55,6 +55,7 @@ import AiInsightsInputForm from "../Components/Main/DashBoards/InsightsAi/Upload
 import IntelligenceDashboard from "../Components/Main/DashBoards/IntelligenceDashboard";
 import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdashboardMain";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
+import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
 
 
 
@@ -88,6 +89,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/equity/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} >
           <Route path="search" element={<SelectedTicker ticker={'AS'}/>} />
+          <Route path="search" element={<CombinedSelectedTicker ticker={'AS'} />} />
           <Route path="deal-stats" element={<MarketFilters />} />
           <Route path="skew-table" element={<SkewTableMain />} />
           <Route path="deal-filter" element={<ScreenerMain />} />
