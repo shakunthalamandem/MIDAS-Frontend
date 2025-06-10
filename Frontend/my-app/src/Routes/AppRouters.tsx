@@ -56,7 +56,6 @@ import IntelligenceDashboard from "../Components/Main/DashBoards/IntelligenceDas
 import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdashboardMain";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
-import CombinedDealSearch from "../Components/Main/MonasheeGraphs/CombinedDealSearch";
 
 
 
@@ -181,7 +180,6 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
-        <Route path="/searchbar" element={<AuthGuard><CombinedDealSearch/></AuthGuard>} />
         <Route path="/equity/writeupsdashboard" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
 
