@@ -28,6 +28,13 @@ const NumerSummary: React.FC = () => {
     year_period: ["Yearly"],
   };
 
+  const selectedMddFilters = {
+    start_year: [2023],
+    year_period: ["Yearly"],
+    fo_type: ["Marketed","Overnight"],
+    deal_type: ["IPO", "FO"],
+  };
+
   const handleCardClick = () => {
     window.open("/equity/capital-markets/deal-stats", "_blank");
   };
@@ -58,7 +65,7 @@ const NumerSummary: React.FC = () => {
           fetch(`${apiUrl}/api/mdd_deals_graph/`, {
             method: "POST",
             headers,
-            body: JSON.stringify(selectedFilters),
+            body: JSON.stringify(selectedMddFilters),
           }),
         ]);
 
