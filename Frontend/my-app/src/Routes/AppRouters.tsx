@@ -190,7 +190,6 @@ const AppRouters: React.FC = () => {
         <Route path="/equity/writeupsdashboard" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
 
-        <Route path="/weeklydata" element={<AuthGuard><WeeklyMain/></AuthGuard>} />
 
 
       </Routes>
