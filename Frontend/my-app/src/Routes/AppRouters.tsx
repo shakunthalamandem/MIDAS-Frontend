@@ -58,6 +58,7 @@ import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 import FileUpload from "../Components/IPOwriteUp/FileUpload";
 import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
 import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketOpportnuityMain";
+import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
 
 
 
@@ -123,7 +124,7 @@ const AppRouters: React.FC = () => {
           <Route path="mdd_deal_stats" element={<DealStats />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
           <Route path="follow-on-discount" element={<FOllowOnDiscount />} />
-          <Route path="weekly-tracking" element={<WeeklyStatsChart />} />
+          <Route path="weekly-tracking" element={<WeeklyMain />} />
           <Route path="by-bank" element={<BankTable selectedFilters={{}} />} />
           <Route path="screener" element={<MDDScreener />} />
         </Route>

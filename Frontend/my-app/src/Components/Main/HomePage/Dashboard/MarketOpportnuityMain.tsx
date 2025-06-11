@@ -20,6 +20,7 @@ import CombinedSelectedTicker from "../../MonasheeGraphs/CombinedSelectedTicker"
 import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import WeeklyStatsChart from "../../MonasheeDeals/MDDSettings/WeeklyStatsChart";
+import WeeklyMain from "../../MonasheeDeals/MDDSettings/WeeklyMain";
 
 const MarketOpportnuityMain: React.FC = () => {
   const [value, setValue] = useState<number>(0);
@@ -287,7 +288,7 @@ const MarketOpportnuityMain: React.FC = () => {
       {value === 2 && <SkewTableMain />}
       {value === 3 && <DealStats />}
       {value === 4 && <AllocationCaptureReturn />}
-      {value === 5 && <WeeklyStatsChart />}
+      {value === 5 && <WeeklyMain />}
       
     </Box>
   );
