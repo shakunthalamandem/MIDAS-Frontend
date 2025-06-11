@@ -97,7 +97,7 @@ const AppRouters: React.FC = () => {
           <Route path="skew-table" element={<SkewTableMain />} />
           <Route path="deal-filter" element={<ScreenerMain />} />
           <Route path="mdd_deal_stats" element={<DealStats />} />
-          <Route path="weekly-tracking" element={<WeeklyStatsChart />} />
+          <Route path="weekly-tracking" element={<WeeklyMain />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
 
 
@@ -188,6 +188,10 @@ const AppRouters: React.FC = () => {
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
         <Route path="/equity/writeupsdashboard" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
+
+
+        <Route path="/weeklydata" element={<AuthGuard><WeeklyMain/></AuthGuard>} />
+
 
       </Routes>
     </ErrorBoundary>
