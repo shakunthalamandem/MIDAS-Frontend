@@ -96,7 +96,7 @@ const NumerSummary: React.FC = () => {
     if (abs >= 1e9) formatted = `$${(abs / 1e9).toFixed(1)}B`;
     else if (abs >= 1e6) formatted = `$${(abs / 1e6).toFixed(1)}M`;
     else if (abs >= 1e3) formatted = `$${(abs / 1e3).toFixed(1)}K`;
-    return value < 0 ? `-$${formatted}` : formatted;
+    return value < 0 ? `-${formatted}` : formatted;
   };
 
   const CustomTooltip = ({
