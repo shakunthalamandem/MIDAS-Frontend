@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import gapimage from "../../../Assets/images/gapimgae.jpg";
+import gapimage from "../../../Assets/images/finanical.jpg";
 
 interface GapReport {
   id: number;

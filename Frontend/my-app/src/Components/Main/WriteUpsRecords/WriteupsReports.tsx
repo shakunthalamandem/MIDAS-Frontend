@@ -10,7 +10,7 @@ import {
   Container,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import bgimage from "../../../Assets/images/bgimage.jpg";
+import bgimage from "../../../Assets/images/greenbgcolor.jpg";
 
 interface WriteUpReport {
   id: number;
