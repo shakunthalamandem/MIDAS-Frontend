@@ -214,9 +214,9 @@ const MarketOpportnuityMain: React.FC = () => {
         />
 
 
-        <Tab label="Deal Stats" />
+        <Tab label="Deal Stats From Dealogic" />
         <Tab label="Skew Table"/>
-        <Tab label="Deal Stats" />
+        <Tab label="Monashee Transactions" />
         <Tab label="GAP Analysis" />
         <Tab label="Weekly Tracking" />
 
