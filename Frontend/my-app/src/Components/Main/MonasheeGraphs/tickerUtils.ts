@@ -87,3 +87,5 @@ export const formatNumber = (num: number | null | undefined, decimals = 2) => {
         maximumFractionDigits: decimals,
     });
 };
+
+
