@@ -33,7 +33,7 @@ const ArrowValue = ({ value }: { value: number | null | undefined }) => {
 };
 
 
-export const renderMonasheeDeals = (data: any, ticker: string) => {
+ const renderMonasheeDeals = (data: any, ticker: string) => {
   const mddDeals = data?.mdd_data?.data;
 
   if (!Array.isArray(mddDeals) || mddDeals.length === 0) {
@@ -249,3 +249,4 @@ export const renderMonasheeDeals = (data: any, ticker: string) => {
     </Grid>
   );
 };
+export default renderMonasheeDeals;

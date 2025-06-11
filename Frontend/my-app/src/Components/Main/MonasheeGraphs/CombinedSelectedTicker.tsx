@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 import { SelectedTickerProps, ApiResponse } from "./tickerUtils";
 import HistoricalDealogicCards from "./HistoricalDealogicCards";
-import { renderMonasheeDeals } from "./MonasheeDealsCards";
+import renderMonasheeDeals from "./MonasheeDealsCards";
 
 const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
   const [data, setData] = useState<ApiResponse | null>(null);
