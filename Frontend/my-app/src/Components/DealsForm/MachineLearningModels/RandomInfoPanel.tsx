@@ -142,7 +142,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
     );
 
   return (
-    <Box sx={{ width: "100%", px: 2, pb: 3 }}>
+    <Box sx={{ width: "100%",}}>
       <Typography
         variant="subtitle1"
         fontWeight={600}
