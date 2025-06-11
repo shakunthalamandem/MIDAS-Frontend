@@ -1,55 +1,24 @@
 import React, { useEffect, useState } from "react";
 import {
   Grid,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
   CircularProgress,
   Box,
+  FormControlLabel,
+  Checkbox,
+  Container,
 } from "@mui/material";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-
 import axios from "axios";
-import MDDSearchSummary from "../MonasheeDeals/MddGraphs/MDDSearchSummary";
-import {
-  SelectedTickerProps,
-  ApiResponse,
-  formatDate,
-  formatNumber,
-} from "./tickerUtils";
+import { SelectedTickerProps, ApiResponse } from "./tickerUtils";
 import HistoricalDealogicCards from "./HistoricalDealogicCards";
 import { renderMonasheeDeals } from "./MonasheeDealsCards";
-
-const ArrowValue = ({ value }: { value: number | null | undefined }) => {
-  if (value === null || value === undefined) return <>N/A</>;
-
-  const color = value > 0 ? "green" : value < 0 ? "red" : "black";
-  const Icon =
-    value > 0
-      ? ArrowDropUpIcon
-      : value < 0
-        ? ArrowDropDownIcon
-        : ArrowDropDownIcon;
-
-  return (
-    <span style={{ color, display: "flex", alignItems: "center" }}>
-      {value.toFixed(2)}%
-      <Icon sx={{ color, ml: 0.5, fontSize: 20 }} />
-    </span>
-  );
-};
 
 const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<any>(null);
+  const [showDealogic, setShowDealogic] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -98,10 +67,17 @@ const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
     );
 
   if (!data) return null;
+
+  const hasMddData =
+    Array.isArray(data.mdd_data?.data) && data.mdd_data.data.length > 0;
+  const hasDealogicData =
+    Array.isArray(data.dealogic_data?.data) &&
+    data.dealogic_data.data.length > 0;
+
   return (
     <Box
       sx={{
-        width: "100",
+        width: "100%",
         minHeight: "100vh",
         padding: 3,
         bgcolor: "#fafafa",
@@ -109,16 +85,62 @@ const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
       }}
     >
       <Grid container spacing={3}>
-        {/* === Dealogic Data === */}
-        <Grid item xs={12} md={6}>
-          {HistoricalDealogicCards(ticker, data?.dealogic_data?.data || [])}
-        </Grid>
+        {/* === Case 1: Only MDD Available === */}
+        {hasMddData && !hasDealogicData && (
+          <Container>{renderMonasheeDeals(data, ticker)}</Container>
+        )}
 
-        {/* === MDD Data === */}
+        {/* === Case 2: Only Dealogic Available === */}
+        {!hasMddData && hasDealogicData && (
+          <Container>
+            {HistoricalDealogicCards(ticker, data.dealogic_data.data)}
+          </Container>
+        )}
 
-        <Grid item xs={12} md={6}>
-          {renderMonasheeDeals(data, ticker)}
-        </Grid>
+        {/* === Case 3: Both Available === */}
+        {hasMddData && hasDealogicData && (
+          <>
+            <Container>{renderMonasheeDeals(data, ticker)}</Container>
+            <Container>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={showDealogic}
+                    onChange={(e) => setShowDealogic(e.target.checked)}
+                    sx={{
+                      color: "#002060",
+                      "&.Mui-checked": {
+                        color: "#002060",
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography
+                    variant="body1"
+                    sx={{ color: "#002060", fontWeight: 500 }}
+                  >
+                    Do you want to see Dealogic deals?
+                  </Typography>
+                }
+              />
+            </Container>
+            {showDealogic && (
+              <Container>
+                {HistoricalDealogicCards(ticker, data.dealogic_data.data)}
+              </Container>
+            )}
+          </>
+        )}
+
+        {/* === Case 4: No Data === */}
+        {!hasMddData && !hasDealogicData && (
+          <Grid item xs={12}>
+            <Typography textAlign="center" color="textSecondary">
+              No data available for this ticker.
+            </Typography>
+          </Grid>
+        )}
       </Grid>
     </Box>
   );
