@@ -60,7 +60,6 @@ import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSe
 import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketOpportnuityMain";
 import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
 
-import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
 
 
 
@@ -98,7 +97,7 @@ const AppRouters: React.FC = () => {
           <Route path="skew-table" element={<SkewTableMain />} />
           <Route path="deal-filter" element={<ScreenerMain />} />
           <Route path="mdd_deal_stats" element={<DealStats />} />
-          <Route path="weekly-tracking" element={<WeeklyStatsChart />} />
+          <Route path="weekly-tracking" element={<WeeklyMain />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
 
 
