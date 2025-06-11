@@ -54,13 +54,13 @@ const T1DPriceCategory = ({ result, onRepredict }: T1DPriceCategoryProps): JSX.E
             }}
           />
         }
-        label="Do you have the T + 1Day Open Category Price for the deal?"
+        label="Do you have the T+1 Day(Return) for the deal?"
       />
 
       {isChecked && (
         <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
           <TextField
-            label="Enter Price"
+            label="Enter Return (%)"
             variant="outlined"
             value={price}
             onChange={handlePriceChange}
