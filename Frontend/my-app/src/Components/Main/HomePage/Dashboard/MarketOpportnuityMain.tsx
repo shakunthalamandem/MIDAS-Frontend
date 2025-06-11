@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SkewTableMain from "../../MonasheeGraphs/SkewTableMain";
-import ScreenerMain from "../../MonasheeGraphs/ScreenerTable/ScreenerMain";
 import MarketFilters from "../../MonasheeCapitalMarkets/MarketFilters";
 import SearchIcon from "@mui/icons-material/Search";
-import SelectedTicker from "../../MonasheeGraphs/SelectedTicker";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -19,8 +17,12 @@ import {
   Paper,
 } from "@mui/material";
 import CombinedSelectedTicker from "../../MonasheeGraphs/CombinedSelectedTicker";
+import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
+import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCaptureReturn";
+import WeeklyStatsChart from "../../MonasheeDeals/MDDSettings/WeeklyStatsChart";
+import WeeklyMain from "../../MonasheeDeals/MDDSettings/WeeklyMain";
 
-const CapitalMarkets: React.FC = () => {
+const MarketOpportnuityMain: React.FC = () => {
   const [value, setValue] = useState<number>(0);
   const navigate = useNavigate();
   const { ticker: routeTicker } = useParams<{ ticker: string }>();
@@ -39,9 +41,15 @@ const CapitalMarkets: React.FC = () => {
       case "skew-table":
         setValue(2);
         break;
-      // case "deal-filter":
-      //   setValue(3);
-      //   break;
+      case "mdd_deal_stats":
+        setValue(3);
+        break;
+      case "gap-analysis":
+        setValue(4);
+        break;
+      case "weekly-tracking":
+        setValue(5);
+        break;
       default:
         setValue(0);
         break;
@@ -50,7 +58,7 @@ const CapitalMarkets: React.FC = () => {
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
-    const tabPaths = ["", "deal-stats", "skew-table", "deal-filter"];
+    const tabPaths = ["", "deal-stats", "skew-table", "mdd_deal_stats", "gap-analysis", "weekly-tracking"];
     navigate(`/equity/capital-markets/${tabPaths[newValue]}`);
   };
   interface CombinedDataResult {
@@ -207,39 +215,12 @@ const CapitalMarkets: React.FC = () => {
         />
 
 
-        <Tab
-          label="Deal Stats"
-          sx={{
-            backgroundColor: value === 1 ? "#9C27B0" : "#f5f5f5",
-            color: value === 1 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#9C27B0",
-              color: "#fff",
-            },
-          }}
-        />
-        <Tab
-          label="Skew Table"
-          sx={{
-            backgroundColor: value === 2 ? "#9C27B0" : "#f5f5f5",
-            color: value === 2 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#9C27B0",
-              color: "#fff",
-            },
-          }}
-        />
-        {/* <Tab
-          label="Deal Filter"
-          sx={{
-            backgroundColor: value === 3 ? "#FF9800" : "#f5f5f5",
-            color: value === 3 ? "#fff" : "#777",
-            "&.Mui-selected": {
-              backgroundColor: "#9C27B0",
-              color: "#fff",
-            },
-          }}
-        /> */}
+        <Tab label="Deal Stats From Dealogic" />
+        <Tab label="Skew Table"/>
+        <Tab label="Monashee Transactions" />
+        <Tab label="GAP Analysis" />
+        <Tab label="Weekly Tracking" />
+
       </Tabs>
 
       {loading ? (
@@ -301,17 +282,16 @@ const CapitalMarkets: React.FC = () => {
       {value === 0 && selectedTicker && (
         <CombinedSelectedTicker ticker={selectedTicker} />
 
-        // {value === 0 && selectedTicker && (
-        //   <SelectedTicker ticker={selectedTicker} />
-
 
       )}
       {value === 1 && <MarketFilters />}
       {value === 2 && <SkewTableMain />}
+      {value === 3 && <DealStats />}
+      {value === 4 && <AllocationCaptureReturn />}
+      {value === 5 && <WeeklyMain />}
       
-      {/* {value === 3 && <ScreenerMain />} */}
     </Box>
   );
 };
 
-export default CapitalMarkets;
+export default MarketOpportnuityMain;
