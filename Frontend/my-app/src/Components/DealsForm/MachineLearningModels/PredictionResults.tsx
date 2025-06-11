@@ -10,6 +10,7 @@ import {
   Box,
   Divider,
   LinearProgress,
+  Container,
 } from "@mui/material";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
@@ -146,6 +147,7 @@ Threshold: Return < -2%`,
   };
 
   return (
+    <Container maxWidth="xl" sx={{ mt: 4 }}>
     <Paper
       sx={{
         p: 3,
@@ -223,6 +225,7 @@ Threshold: Return < -2%`,
         </Table>
       </TableContainer>
     </Paper>
+    </Container>
   );
 };
 

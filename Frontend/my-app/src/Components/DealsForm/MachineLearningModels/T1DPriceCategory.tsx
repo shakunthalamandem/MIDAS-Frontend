@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Checkbox,
   FormControlLabel,
   TextField,
   Button,
   Box,
-} from '@mui/material';
-import PredictionResults from './PredictionResults'; // Adjust path as needed
+} from "@mui/material";
+import PredictionResults from "./PredictionResults";
 
-// Define props interface
 interface PredictionModel {
   prediction: string;
   Accuracy: number;
@@ -18,11 +17,12 @@ interface PredictionModel {
 
 interface T1DPriceCategoryProps {
   result?: Record<string, PredictionModel>;
+  onRepredict?: (price: number) => void;
 }
 
-const T1DPriceCategory = ({ result }: T1DPriceCategoryProps): JSX.Element => {
+const T1DPriceCategory = ({ result, onRepredict }: T1DPriceCategoryProps): JSX.Element => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
-  const [price, setPrice] = useState<string>('');
+  const [price, setPrice] = useState<string>("");
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setIsChecked(event.target.checked);
@@ -33,20 +33,23 @@ const T1DPriceCategory = ({ result }: T1DPriceCategoryProps): JSX.Element => {
   };
 
   const handleRepredict = (): void => {
-    console.log('Repredicting with price:', price);
+    const numericPrice = parseFloat(price);
+    if (!isNaN(numericPrice)) {
+      onRepredict?.(numericPrice);
+    }
   };
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 2, width: '100%' }}>
+    <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 2, width: "100%" }}>
       <FormControlLabel
         control={
           <Checkbox
             checked={isChecked}
             onChange={handleCheckboxChange}
             sx={{
-              color: '#002060',
-              '&.Mui-checked': {
-                color: '#002060',
+              color: "#002060",
+              "&.Mui-checked": {
+                color: "#002060",
               },
             }}
           />
@@ -55,7 +58,7 @@ const T1DPriceCategory = ({ result }: T1DPriceCategoryProps): JSX.Element => {
       />
 
       {isChecked && (
-        <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
           <TextField
             label="Enter Price"
             variant="outlined"
@@ -67,14 +70,13 @@ const T1DPriceCategory = ({ result }: T1DPriceCategoryProps): JSX.Element => {
           <Button
             variant="outlined"
             onClick={handleRepredict}
-            sx={{ backgroundColor: '#002060', color: '#fff' }}
+            sx={{ backgroundColor: "#002060", color: "#fff" }}
           >
             Repredict
           </Button>
         </Box>
       )}
 
-      {/* Always show prediction results if available */}
       {result && <PredictionResults result={result} />}
     </Box>
   );
