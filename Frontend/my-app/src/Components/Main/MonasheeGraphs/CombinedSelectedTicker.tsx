@@ -418,6 +418,8 @@ const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
 
 
 
+                {/* === MDD Data === */}
+
                 <Grid item xs={12} md={6}>
                     {/* <Paper sx={{ p: 2, bgcolor: "#f9f9f9", overflowX: "auto" }} elevation={3}> */}
                     {Array.isArray(data.mdd_data.data) && data.mdd_data.data.length > 0 ? (
