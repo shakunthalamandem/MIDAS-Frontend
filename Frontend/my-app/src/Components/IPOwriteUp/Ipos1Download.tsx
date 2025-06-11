@@ -181,7 +181,7 @@ const Ipos1Download: React.FC = () => {
                 onClick={downloadExcelFile}
                 sx={{ mt: 2 }}
               >
-                Download Excel
+                Download
               </Button>
             </>
           )}

@@ -58,7 +58,7 @@ import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 import FileUpload from "../Components/IPOwriteUp/FileUpload";
 import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
 
-
+import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 
 
 
@@ -155,7 +155,7 @@ const AppRouters: React.FC = () => {
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
 
 
-
+        <Route path="/ipo-dashboard" element={<AuthGuard><IPODashboardMain/></AuthGuard>} />
 
 
 
