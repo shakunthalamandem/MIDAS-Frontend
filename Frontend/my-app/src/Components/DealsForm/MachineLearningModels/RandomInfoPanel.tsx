@@ -29,9 +29,9 @@ interface FormData {
   gdp_growth: string;
   inflation_rate: string;
   treasury_rates: string;
-  main_model_predicted: string;
-  positive_model_predicted: boolean;
-  negative_model_predicted: boolean;
+  v1_main_model_predicted: string;
+  v1_positive_model_predicted: boolean;
+  v1_negative_model_predicted: boolean;
   main_model_actual: string | null;
   positive_model_actual: string | null;
   negative_model_actual: string | null;
@@ -174,7 +174,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                   <Typography variant="body2" fontWeight={600} color="#002060">
                     {form.ticker_symbol}
                   </Typography>
-                  {renderPredictionChip(form.main_model_predicted)}
+                  {renderPredictionChip(form.v1_main_model_predicted)}
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
