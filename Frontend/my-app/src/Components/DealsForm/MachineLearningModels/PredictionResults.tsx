@@ -210,7 +210,7 @@ Threshold: Return < -2%`,
           {onRepredict && (
             <Box display="flex" alignItems="center">
               <TextField
-                label="T+1 Day Open Price %"
+                label="T+1 Day Return"
                 variant="outlined"
                 value={price}
                 onChange={handlePriceChange}
