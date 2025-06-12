@@ -23,18 +23,18 @@ interface PnLData {
 const timeRanges = ["1D", "1W", "1M", "3M", "MTD", "QTD", "YTD"];
 
 const formatValue = (value: number) => {
-  return value?.toLocaleString(undefined, {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
+  const inThousands = value / 1000;
+  return `${inThousands.toLocaleString(undefined, {
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  })}K`;
 };
+
 
 const getCellStyle = (value: number | undefined) => {
   if (value === undefined) return {};
-  if (value > 0)
-    return { color: green[600], fontWeight: 500 };
-  if (value < 0)
-    return { color: red[500], fontWeight: 500 };
+  if (value > 0) return { color: green[600], fontWeight: 500 };
+  if (value < 0) return { color: red[500], fontWeight: 500 };
   return { color: "#666" };
 };
 
@@ -112,18 +112,41 @@ const PnLSummary: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {Object.entries(data).map(([assetType, values]) => (
-                <TableRow key={assetType}>
-                  <TableCell sx={{ fontWeight: 500 }}>{assetType}</TableCell>
+              {[
+                ...Object.entries(data).filter(([k]) => k !== "Total"),
+                ...(data["Total"]
+                  ? [
+                      ["Total", data["Total"]] as [
+                        string,
+                        { [key: string]: number },
+                      ],
+                    ]
+                  : []),
+              ].map(([assetType, values]) => (
+                <TableRow
+                  key={assetType}
+                  sx={
+                    assetType === "Total" ? { backgroundColor: "#f0f0f0" } : {}
+                  }
+                >
+                  <TableCell
+                    sx={{ fontWeight: assetType === "Total" ? "bold" : 500 }}
+                  >
+                    {assetType}
+                  </TableCell>
                   {timeRanges.map((range) => {
                     const val = values[range];
                     return (
                       <TableCell
                         key={range}
                         align="right"
-                        sx={getCellStyle(val)}
+                        sx={{
+                          ...getCellStyle(val),
+                          fontWeight:
+                            assetType === "Total" ? "bold" : undefined,
+                        }}
                       >
-                        {val !== undefined ? formatValue(val) : "-"}
+                        $ {val !== undefined ? formatValue(val) : "-"}
                       </TableCell>
                     );
                   })}
