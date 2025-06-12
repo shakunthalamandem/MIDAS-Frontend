@@ -108,7 +108,7 @@ const formatNumber = (
 
 const IPODashboardMain: React.FC = () => {
   // Comparable Company Metrics state
-  const [ticker, setTicker] = useState("AAPL");
+  const [ticker, setTicker] = useState("CRWV");
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -182,7 +182,7 @@ const IPODashboardMain: React.FC = () => {
 
   // Fetch default data on mount
   useEffect(() => {
-    handleFetch("AAPL");
+    handleFetch("CRWV");
     setForecastsInput("CRWV");
     setForecastsTicker("CRWV");
     handleFetchForecasts("CRWV");
