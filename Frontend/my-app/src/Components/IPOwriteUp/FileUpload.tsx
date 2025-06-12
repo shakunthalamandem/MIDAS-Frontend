@@ -75,8 +75,8 @@ const FileUpload: React.FC = () => {
   };
 
   return (
-    <Box sx={{  width: '45%', margin: 'auto', mt: 5, px: 2 }}>
-      <Card elevation={3} sx={{ mb: 3, p: 2, backgroundColor: '#f5f1f9' }}>
+    <Box sx={{  width: '100%', margin: 'auto', mt: 8, px: 2,ml:4 }}>
+      <Card elevation={3} sx={{ mb: 3, p: 2, backgroundColor: '#f5f1f9',width: '300px',}}>
         <CardContent sx={{ textAlign: 'center' }}>
           <Typography variant="h5" gutterBottom>
             Upload IPO S1 PDF
