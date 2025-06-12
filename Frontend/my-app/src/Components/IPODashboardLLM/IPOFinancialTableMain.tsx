@@ -128,7 +128,7 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                     textAlign: "center",
                   }}
                 >
-                  $US M
+                  ($US M)
                 </TableCell>
                 {forecastYearLabels.map((label) => (
                   <TableCell

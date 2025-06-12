@@ -62,7 +62,7 @@ import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain"
 
 import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 
-
+import IPODashboardAll from "../Components/IPODashboardLLM/IPODashboardAll";
 
 
 
@@ -162,6 +162,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/ipo-dashboard" element={<AuthGuard><IPODashboardMain/></AuthGuard>} />
+        <Route path="/ipo-dashboard/all" element={<AuthGuard><IPODashboardAll/></AuthGuard>} />
 
 
 

@@ -49,6 +49,15 @@ const columns: { key: keyof ComparableMetric; label: string; isCurrency?: boolea
   { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
 ];
 
+const columnsWithX = new Set([
+  "present_year_ev_sales",
+  "one_year_later_ev_sales",
+  "present_year_price_earning",
+  "one_year_later_price_earning",
+  "present_year_ev_fcf",
+  "one_year_later_ev_fcf",
+]);
+
 const formatNumber = (
   value: number,
   isCurrency = false,
@@ -126,10 +135,10 @@ const IPODashboardMain: React.FC = () => {
     Object.values(data).every((metrics) => !metrics || metrics.length === 0);
 
   return (
-    <Box sx={{ p: 3, maxWidth: "1300px", margin: "auto" }}>
+    <Box sx={{ p: 0, width: "100%" }}>
       {/* Comparable Company Metrics Table */}
       <Typography variant="h6" sx={{ mb: 2 }}>
-         Comparative Trading Multiples & Performance Metrics
+        Comparative Trading Multiples & Performance Metrics
       </Typography>
       <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
         <TextField
@@ -157,8 +166,8 @@ const IPODashboardMain: React.FC = () => {
         <Alert severity="info">No data found for this ticker.</Alert>
       )}
       {!loading && !error && data && !noData && (
-        <TableContainer component={Paper} elevation={4} sx={{ mb: 4 }}>
-          <Table size="small">
+        <TableContainer component={Paper} elevation={4} sx={{ mb: 4, width: "100%" }}>
+          <Table size="small" sx={{ width: "100%" }}>
             <TableHead sx={{ backgroundColor: "#002060" }}>
               <TableRow>
                 {columns.map((col) => (
@@ -182,6 +191,27 @@ const IPODashboardMain: React.FC = () => {
                   <TableRow key={`${tickerKey}-${idx}`}>
                     {columns.map((col) => {
                       const value = metric[col.key];
+                      // Add 'x' for specific columns, show N/A if null
+                      if (columnsWithX.has(col.key)) {
+                        return (
+                          <TableCell
+                            key={col.key}
+                            align="center"
+                            sx={{ border: "1px solid #000000" }}
+                          >
+                            {value === null ||
+                            value === undefined ||
+                            (typeof value === "number" && isNaN(value))
+                              ? "N/A"
+                              : `${formatNumber(
+                                  value as number,
+                                  col.isCurrency,
+                                  col.isPercentage
+                                )}x`}
+                          </TableCell>
+                        );
+                      }
+                      // Default rendering for other columns
                       return (
                         <TableCell
                           key={col.key}
@@ -211,8 +241,6 @@ const IPODashboardMain: React.FC = () => {
           </Table>
         </TableContainer>
       )}
-
-      <FinancialForecastTable defaultTicker="CRWV" />
     </Box>
   );
 };
