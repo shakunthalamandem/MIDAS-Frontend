@@ -31,7 +31,7 @@ const NumerSummary: React.FC = () => {
   const selectedMddFilters = {
     start_year: [2023],
     year_period: ["Yearly"],
-    fo_type: ["Marketed","Overnight"],
+    fo_type: ["Marketed","Overnight","Block"],
     deal_type: ["IPO", "FO"],
   };
 
