@@ -56,6 +56,7 @@ import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketO
 import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
 import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 import PnlAttributionMain from "../Components/PNLAttribution/PnlAttributionMain";
+import PnLSummary from "../Components/PNLAttribution/PnLSummary";
 
 
 
@@ -127,7 +128,13 @@ const AppRouters: React.FC = () => {
 
 
         {/* <Route path="/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} /> */}
-        <Route path="/portfolio-attribution" element={<AuthGuard><PnlAttributionMain /></AuthGuard>} />
+        {/* <Route path="/pnl/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} >
+          <Route path="/basic" element={ <PnlAttributionMain /> }/>
+        </Route> */}
+        <Route path="/portfolio-attribution" element={<AuthGuard><PnLSummary /></AuthGuard>} />
+
+
+
         <Route path="/equity/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
         <Route path="/equity/strategies" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
         <Route path="/equity/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
