@@ -154,7 +154,7 @@ const generateChartData = (metric: string) => {
           variant="h6"
           sx={{ fontWeight: "bold", color: "#002060", textAlign: "center" }}
         >
-          Deal Flow – IPO and FO (2023 to 2025) by Quarter
+          Deal Flow – IPO and FO (2023 to 2025) by H1(Half Yearly)
         </Typography>
 
       </Grid>
