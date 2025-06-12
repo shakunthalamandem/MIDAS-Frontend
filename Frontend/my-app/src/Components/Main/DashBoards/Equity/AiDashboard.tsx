@@ -28,9 +28,9 @@ export interface PredictedForm {
   gdp_growth: string;
   inflation_rate: string;
   treasury_rates: string;
-  main_model_predicted: string;
-  positive_model_predicted: boolean;
-  negative_model_predicted: boolean;
+  v1_main_model_predicted: string;
+  v1_positive_model_predicted: boolean;
+  v1_negative_model_predicted: boolean;
   main_model_actual: string | null;
   positive_model_actual: string | null;
   negative_model_actual: string | null;
@@ -165,7 +165,7 @@ const AiDashboard: React.FC = () => {
                   <Typography variant="h6" fontWeight={600}>
                     {item.ticker_symbol}
                   </Typography>
-                  {renderPredictionChip(item.main_model_predicted)}
+                  {renderPredictionChip(item.v1_main_model_predicted)}
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={0.5}>
