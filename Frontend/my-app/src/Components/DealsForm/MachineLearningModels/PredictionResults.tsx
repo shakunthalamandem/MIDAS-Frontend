@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Paper,
   Typography,
@@ -11,6 +11,8 @@ import {
   Divider,
   LinearProgress,
   Container,
+  Button,
+  TextField,
 } from "@mui/material";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
@@ -18,6 +20,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
+
 
 interface PredictionModel {
   prediction: string;
@@ -28,9 +31,21 @@ interface PredictionModel {
 
 interface PredictionResultsProps {
   result: Record<string, PredictionModel>;
+  onRepredict?: (t1dOpenPrice: number) => void;
 }
+const PredictionResults: React.FC<PredictionResultsProps> = ({ result, onRepredict,}) => {
+  const [t1dOpenPrice, setT1dOpenPrice] = useState<number | "">("");
+  const [price, setPrice] = useState<number | "">("");
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPrice(value === "" ? "" : parseFloat(value));
+  };
 
-const PredictionResults: React.FC<PredictionResultsProps> = ({ result }) => {
+  const handleRepredict = () => {
+    if (typeof price === "number" && onRepredict) {
+      onRepredict(price);
+    }
+  };
   console.log("Prediction Results:", result);
 
   // Extract available versions from keys (e.g. v1, v2)
@@ -157,13 +172,44 @@ Threshold: Return < -2%`,
         boxShadow: 3,
       }}
     >
-      <Box display="flex" alignItems="center" mb={2}>
-        <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
-        <Typography variant="h6" color="primary">
-          📊 Model Prediction Results
-        </Typography>
-      </Box>
+<Box
+  display="flex"
+  alignItems="center"
+  justifyContent="space-between"
+  mb={2}
+>
+  {/* Left side: Title */}
+  <Box display="flex" alignItems="center">
+    <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
+    <Typography variant="h6" color="primary">
+      📊 Model Prediction Results
+    </Typography>
+  </Box>
 
+  {/* Right side: Input + Button */}
+  {onRepredict && (
+    <Box display="flex" alignItems="center">
+      <TextField
+        label="T+1 Day Open Price %"
+        variant="outlined"
+        value={price}
+        onChange={handlePriceChange}
+        size="small"
+        sx={{ mr: 2, width: "200px" }}
+        type="number"
+      />
+      <Button
+        variant="outlined"
+        onClick={handleRepredict}
+        sx={{ backgroundColor: "#002060", color: "#FFF" }}
+      >
+        Repredict
+      </Button>
+    </Box>
+  )}
+</Box>
+
+  
       <Typography variant="body1" gutterBottom>
         Using trained machine learning models, this report provides insights into the expected return profile
         of a prospective equity deal under current conditions.

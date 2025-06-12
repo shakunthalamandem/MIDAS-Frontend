@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Typography, MenuProps } from "@mui/material";
 import EquityMLFormData from "./EquityMLFormData";
 import T1DPriceCategory from "./T1DPriceCategory";
+import PredictionResults from "./PredictionResults";
 
 const menuProps: Partial<MenuProps> = {
   PaperProps: {
@@ -303,7 +304,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
         menuProps={menuProps}
       />
       {prediction && (
-        <T1DPriceCategory result={prediction} onRepredict={handleRepredictWithPrice} />
+       <PredictionResults result={prediction}  onRepredict={handleRepredictWithPrice}/>
       )}
     </>
   );
