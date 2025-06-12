@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { Alert } from "@mui/material";
 import PredictionResults from "./PredictionResults"; // Assuming this component is defined elsewhere
+import T1DPriceCategory from "./T1DPriceCategory";
 
 interface EquityMLFormDataProps {
   snackbar: { open: boolean; severity: "success" | "info" | "warning" | "error"; message: string };
@@ -485,7 +486,6 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
               </Grid>
             </Grid>
           </Paper>
-          {prediction && <PredictionResults result={prediction} />}
         </>
       );
     };

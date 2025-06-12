@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Typography, MenuProps } from "@mui/material";
 import EquityMLFormData from "./EquityMLFormData";
+import T1DPriceCategory from "./T1DPriceCategory";
+import PredictionResults from "./PredictionResults";
 
 const menuProps: Partial<MenuProps> = {
   PaperProps: {
@@ -90,8 +92,6 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     Treasury: "",
   };
 
-
-
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
@@ -106,7 +106,6 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // Fill formData when initialData arrives
   useEffect(() => {
     if (initialData) {
       setFormData((prev) => ({
@@ -116,7 +115,6 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     }
   }, [initialData]);
 
-  // Compare formData with initialData
   const isFormDataReady = (initial: Partial<FormData>, current: FormData): boolean => {
     return Object.entries(initial).every(([key, value]) => {
       const currentValue = current[key as keyof FormData];
@@ -132,8 +130,6 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
       const isValid = validateForm();
       if (isValid) {
         handlePredict();
-      } else {
-        console.log("Error");
       }
     }
   }, [autoPredict, initialData, formData]);
@@ -186,16 +182,14 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
   };
 
   const handleChange = (
-    e:
-      | { target: { name: string; value: any } }
-      | React.ChangeEvent<HTMLInputElement>
+    e: { target: { name: string; value: any } } | React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    // Clear error when field is modified
+
     if (formErrors[name as keyof FormData]) {
       setFormErrors((prev) => ({
         ...prev,
@@ -216,7 +210,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
 
     setLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/api/ml_multi_model_prediction/`, {
+      const response = await fetch(`${apiUrl}/api/ml_prediction_v2/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -243,6 +237,41 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     }
   };
 
+  const handleRepredictWithPrice = async (t1dOpenPrice: number) => {
+    const updatedPayload = {
+      ...formData,
+      t1d_open_category: t1dOpenPrice,
+    };
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${apiUrl}/api/ml_prediction_v2/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(updatedPayload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Reprediction failed");
+      }
+
+      const data = await response.json();
+      setPrediction(data);
+    } catch (error) {
+      console.error("Reprediction error:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to repredict. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleReset = () => {
     setFormData(defaultFormData);
     setFormErrors({});
@@ -257,23 +286,27 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     return <Typography>Loading form options...</Typography>;
 
   return (
-
-    <EquityMLFormData
-      snackbar={snackbar}
-      handleSnackbarClose={handleSnackbarClose}
-      formData={formData}
-      setFormData={setFormData}
-      formErrors={formErrors}
-      handleChange={handleChange}
-      handleReset={handleReset}
-      handlePredict={handlePredict}
-      loading={loading}
-      prediction={prediction}
-      options={options}
-      sectorLabels={sectorLabels}
-      inputWidth={inputWidth}
-      menuProps={menuProps}
-    />
+    <>
+      <EquityMLFormData
+        snackbar={snackbar}
+        handleSnackbarClose={handleSnackbarClose}
+        formData={formData}
+        setFormData={setFormData}
+        formErrors={formErrors}
+        handleChange={handleChange}
+        handleReset={handleReset}
+        handlePredict={handlePredict}
+        loading={loading}
+        prediction={prediction}
+        options={options}
+        sectorLabels={sectorLabels}
+        inputWidth={inputWidth}
+        menuProps={menuProps}
+      />
+      {prediction && (
+       <PredictionResults result={prediction}  onRepredict={handleRepredictWithPrice}/>
+      )}
+    </>
   );
 };
 

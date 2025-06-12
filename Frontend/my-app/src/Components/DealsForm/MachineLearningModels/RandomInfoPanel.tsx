@@ -142,7 +142,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
     );
 
   return (
-    <Box sx={{ width: "100%", px: 2, pb: 3 }}>
+    <Box sx={{ width: "100%",}}>
       <Typography
         variant="subtitle1"
         fontWeight={600}
@@ -156,7 +156,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
 
       <Grid container spacing={2}>
         {forms.map((form, i) => (
-          <Grid item xs={12} sm={6} key={i}>
+          <Grid item xs={12} key={i}>
             <Card
               onClick={() => handleCardClick(form)}
               sx={{
@@ -169,19 +169,19 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
               }}
               variant="outlined"
             >
-              <CardContent sx={{ py: 2, px: 2 }}>
+              <CardContent sx={{ py: 4, px: 4 }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2" fontWeight={600} color="#002060">
+                  <Typography variant="body1" fontWeight={600} color="#002060">
                     {form.ticker_symbol}
                   </Typography>
                   {renderPredictionChip(form.v1_main_model_predicted)}
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
-                  <Typography variant="body2" color="#002060">
+                  <Typography variant="body1" color="#002060">
                     Discount: <strong>{form.discount_announcement_price}%</strong>
                   </Typography>
-                  <Typography variant="caption" color="#002060">
+                  <Typography variant="body1" color="#002060">
                     {formatDate(form.pricing_date)}
                   </Typography>
                 </Box>
@@ -189,27 +189,27 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                 <Divider sx={{ my: 1 }} />
 
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="caption">Deal Size</Typography>
-                  <Typography variant="caption">${form.deal_size_million}M</Typography>
+                  <Typography variant="body1">Deal Size</Typography>
+                  <Typography variant="body1">${form.deal_size_million}M</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="caption">Sector</Typography>
-                  <Typography variant="caption">{formatSector(form.sector)}</Typography>
+                  <Typography variant="body1">Sector</Typography>
+                  <Typography variant="body1">{formatSector(form.sector)}</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="caption">Deal Type</Typography>
-                  <Typography variant="caption">{form.deal_type}</Typography>
+                  <Typography variant="body1">Deal Type</Typography>
+                  <Typography variant="body1">{form.deal_type}</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="caption">Region</Typography>
-                  <Typography variant="caption">{form.region}</Typography>
+                  <Typography variant="body1">Region</Typography>
+                  <Typography variant="body1">{form.region}</Typography>
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" mt={2}>
-                  <Typography variant="caption" color="#002060">
+                  <Typography variant="body1" color="#002060">
                     {form.selected_bank}
                   </Typography>
-                  <Typography variant="caption" color="#002060">
+                  <Typography variant="body1" color="#002060">
                     {form.sponsor === "Y" ? "Sponsored" : "Not Sponsored"}
                   </Typography>
                 </Box>
