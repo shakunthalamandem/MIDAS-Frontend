@@ -19,6 +19,7 @@ import WeeklyStatsChart from "./WeeklyStatsChart";
 import GapDealDeatilsTable from "./GapDealDeatilsTable";
 import TwoWeekDealData from "./TwoweekDealData";
 import WeeklyGapTable from "./WeeklyGapTable";
+import StrategicData from "./StrategicData";
 
 interface FiltersResponse {
   deal_type: string[];
@@ -224,6 +225,7 @@ const handleApply = () => {
 
       <WeeklyStatsChart filters={appliedFilters} />
       <TwoWeekDealData filters={appliedFilters} />
+      <StrategicData filters={appliedFilters} />
       <WeeklyGapTable filters={appliedFilters} />
     </>
   );
