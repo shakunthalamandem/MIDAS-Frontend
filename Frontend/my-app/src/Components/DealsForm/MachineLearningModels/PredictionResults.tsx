@@ -21,9 +21,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
 
-
 interface PredictionModel {
-  prediction: string;
+  prediction: string | null;
   Accuracy: number;
   model: string;
   range: string;
@@ -33,9 +32,10 @@ interface PredictionResultsProps {
   result: Record<string, PredictionModel>;
   onRepredict?: (t1dOpenPrice: number) => void;
 }
-const PredictionResults: React.FC<PredictionResultsProps> = ({ result, onRepredict,}) => {
-  const [t1dOpenPrice, setT1dOpenPrice] = useState<number | "">("");
+
+const PredictionResults: React.FC<PredictionResultsProps> = ({result, onRepredict,}) => {
   const [price, setPrice] = useState<number | "">("");
+
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPrice(value === "" ? "" : parseFloat(value));
@@ -46,23 +46,22 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result, onRepredi
       onRepredict(price);
     }
   };
-  console.log("Prediction Results:", result);
 
-  // Extract available versions from keys (e.g. v1, v2)
   const modelVersions = Array.from(
     new Set(Object.keys(result).map((key) => key.split("_")[0]))
   );
 
-  // Extract model types (main, positive, negative)
   const modelTypes = ["main", "positive", "negative"];
 
-  // Helper: get model key for a given version and type
   const getModelKey = (version: string, type: string): string => {
     const regex = new RegExp(`^${version}.*${type}`);
     return Object.keys(result).find((key) => regex.test(key)) || "";
   };
 
-  const getOutcomeCategory = (prediction: string): "Negative" | "Neutral" | "Positive" => {
+  const getOutcomeCategory = (
+    prediction: string | null | undefined
+  ): "Negative" | "Neutral" | "Positive" => {
+    if (!prediction || typeof prediction !== "string") return "Neutral";
     const lower = prediction.toLowerCase();
     if (lower.includes("negative")) return "Negative";
     if (lower.includes("neutral")) return "Neutral";
@@ -70,7 +69,15 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result, onRepredi
     return "Neutral";
   };
 
-  const renderOutcome = (prediction: string) => {
+  const renderOutcome = (prediction: string | null | undefined) => {
+    if (!prediction) {
+      return (
+        <Box display="flex" alignItems="center" color="text.disabled">
+          N/A
+        </Box>
+      );
+    }
+
     const outcomeCategory = getOutcomeCategory(prediction);
     switch (outcomeCategory) {
       case "Negative":
@@ -95,11 +102,23 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result, onRepredi
           </Box>
         );
       default:
-        return "N/A";
+        return (
+          <Box display="flex" alignItems="center" color="text.disabled">
+            N/A
+          </Box>
+        );
     }
   };
 
-  const renderBinaryResult = (value: string) => {
+  const renderBinaryResult = (value: string | null | undefined) => {
+    if (!value) {
+      return (
+        <Box display="flex" alignItems="center" color="text.disabled">
+          N/A
+        </Box>
+      );
+    }
+
     const isTrue = value.toLowerCase() === "true";
     return (
       <Box display="flex" alignItems="center" color={isTrue ? "success.main" : "error.main"}>
@@ -116,10 +135,18 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({ result, onRepredi
     );
   };
 
-  const renderConfidenceLevel = (confidence: number) => {
-    let color = "#f44336"; // red
-    if (confidence >= 70) color = "#4caf50"; // green
-    else if (confidence >= 50) color = "#ff9800"; // orange
+  const renderConfidenceLevel = (confidence: number | null | undefined) => {
+    if (confidence == null || isNaN(confidence)) {
+      return (
+        <Box display="flex" alignItems="center" color="text.disabled">
+          N/A
+        </Box>
+      );
+    }
+
+    let color = "#f44336";
+    if (confidence >= 70) color = "#4caf50";
+    else if (confidence >= 50) color = "#ff9800";
 
     return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -163,114 +190,110 @@ Threshold: Return < -2%`,
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
-    <Paper
-      sx={{
-        p: 3,
-        mt: 4,
-        bgcolor: "#f9fafb",
-        borderRadius: 3,
-        boxShadow: 3,
-      }}
-    >
-<Box
-  display="flex"
-  alignItems="center"
-  justifyContent="space-between"
-  mb={2}
->
-  {/* Left side: Title */}
-  <Box display="flex" alignItems="center">
-    <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
-    <Typography variant="h6" color="primary">
-      📊 Model Prediction Results
-    </Typography>
-  </Box>
-
-  {/* Right side: Input + Button */}
-  {onRepredict && (
-    <Box display="flex" alignItems="center">
-      <TextField
-        label="T+1 Day Open Price %"
-        variant="outlined"
-        value={price}
-        onChange={handlePriceChange}
-        size="small"
-        sx={{ mr: 2, width: "200px" }}
-        type="number"
-      />
-      <Button
-        variant="outlined"
-        onClick={handleRepredict}
-        sx={{ backgroundColor: "#002060", color: "#FFF" }}
+      <Paper
+        sx={{
+          p: 3,
+          mt: 4,
+          bgcolor: "#f9fafb",
+          borderRadius: 3,
+          boxShadow: 3,
+        }}
       >
-        Repredict
-      </Button>
-    </Box>
-  )}
-</Box>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+          <Box display="flex" alignItems="center">
+            <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
+            <Typography variant="h6" color="primary">
+              📊 Model Prediction Results
+            </Typography>
+          </Box>
 
-  
-      <Typography variant="body1" gutterBottom>
-        Using trained machine learning models, this report provides insights into the expected return profile
-        of a prospective equity deal under current conditions.
-      </Typography>
+          {onRepredict && (
+            <Box display="flex" alignItems="center">
+              <TextField
+                label="T+1 Day Open Price %"
+                variant="outlined"
+                value={price}
+                onChange={handlePriceChange}
+                size="small"
+                sx={{ mr: 2, width: "200px" }}
+                type="number"
+              />
+              <Button
+                variant="outlined"
+                onClick={handleRepredict}
+                sx={{ backgroundColor: "#002060", color: "#FFF" }}
+              >
+                Repredict
+              </Button>
+            </Box>
+          )}
+        </Box>
 
-      <Divider sx={{ my: 3 }} />
+        <Typography variant="body1" gutterBottom>
+          Using trained machine learning models, this report provides insights into the expected return profile
+          of a prospective equity deal under current conditions.
+        </Typography>
 
-      <TableContainer>
-        <Table>
-          <TableBody>
-            <TableRow sx={{ bgcolor: "#f0f4f8" }}>
-              <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
-              {modelVersions.map((version) => (
-                <React.Fragment key={version}>
-                  <TableCell sx={{ fontWeight: 600 }}>{`${version.toUpperCase()} Result`}</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>{`${version.toUpperCase()} Accuracy`}</TableCell>
-                </React.Fragment>
-              ))}
-            </TableRow>
+        <Divider sx={{ my: 3 }} />
 
-            {modelTypes.map((type) => (
-              <TableRow key={type}>
-                <TableCell>{rowLabels[type]}</TableCell>
-                <TableCell>
-                  <Typography variant="body2" whiteSpace="pre-line">
-                    {rowExplanations[type]}
-                  </Typography>
-                </TableCell>
+        <TableContainer>
+          <Table>
+            <TableBody>
+              <TableRow sx={{ bgcolor: "#f0f4f8" }}>
+                <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
+                {modelVersions.map((version) => (
+                  <React.Fragment key={version}>
+                    <TableCell sx={{ fontWeight: 600 }}>{`${version.toUpperCase()} Result`}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{`${version.toUpperCase()} Accuracy`}</TableCell>
+                  </React.Fragment>
+                ))}
+              </TableRow>
 
-                {modelVersions.map((version) => {
-                  const key = getModelKey(version, type);
-                  const modelData = result[key];
+              {modelTypes.map((type) => (
+                <TableRow key={type}>
+                  <TableCell>{rowLabels[type]}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2" whiteSpace="pre-line">
+                      {rowExplanations[type]}
+                    </Typography>
+                  </TableCell>
 
-                  if (!modelData) {
+                  {modelVersions.map((version) => {
+                    const key = getModelKey(version, type);
+                    const modelData = result[key];
+
+                    if (!modelData) {
+                      return (
+                        <React.Fragment key={version}>
+                          <TableCell>
+                            <Box color="text.disabled">N/A</Box>
+                          </TableCell>
+                          <TableCell>
+                            <Box color="text.disabled">N/A</Box>
+                          </TableCell>
+                        </React.Fragment>
+                      );
+                    }
+
+                    const renderResult =
+                      type === "main"
+                        ? renderOutcome(modelData.prediction)
+                        : renderBinaryResult(modelData.prediction);
+
                     return (
                       <React.Fragment key={version}>
-                        <TableCell>N/A</TableCell>
-                        <TableCell>N/A</TableCell>
+                        <TableCell>{renderResult}</TableCell>
+                        <TableCell>{renderConfidenceLevel(modelData.Accuracy)}</TableCell>
                       </React.Fragment>
                     );
-                  }
-
-                  const renderResult =
-                    type === "main"
-                      ? renderOutcome(modelData.prediction)
-                      : renderBinaryResult(modelData.prediction);
-
-                  return (
-                    <React.Fragment key={version}>
-                      <TableCell>{renderResult}</TableCell>
-                      <TableCell>{renderConfidenceLevel(modelData.Accuracy)}</TableCell>
-                    </React.Fragment>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Paper>
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
     </Container>
   );
 };
