@@ -21,8 +21,8 @@ type RegionData = {
 };
 
 type ApiRegionResponse = {
-  Regionwise_IPO: { [region: string]: RegionData };
-  Regionwise_FO: { [region: string]: RegionData };
+  Regionwise_IPO: Record<string, Record<string, RegionData>> | Record<string, RegionData>;
+  Regionwise_FO: Record<string, Record<string, RegionData>> | Record<string, RegionData>;
 };
 
 const formatNumber = (value: number): string => {
@@ -45,11 +45,9 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
-
-
 const getRowStyle = (type: "IPO" | "FO", region: string) => {
   if ((type === "IPO" && region === "US") || (type === "FO" && region === "EMEA")) {
-    return { backgroundColor: "#cef5f1" }; 
+    return { backgroundColor: "#cef5f1" };
   }
   return {};
 };
@@ -64,48 +62,70 @@ const RegionWiseTable = () => {
     window.open("/equity/capital-markets/skew-table", "_blank");
   };
 
-  useEffect(() => {
-    const fetchDeals = async () => {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
+useEffect(() => {
+  const fetchDeals = async () => {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("access_token");
 
-      if (!apiUrl) {
-        setError("API URL is not defined in environment variables");
-        setLoading(false);
-        return;
+    if (!apiUrl) {
+      setError("API URL is not defined in environment variables");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/api/dealogic_summary_data/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch data");
+
+      const result: ApiRegionResponse = await response.json();
+
+      // --- MINIMAL CHANGE: Extract "2025 H1" or latest period if nested ---
+      let ipo = result.Regionwise_IPO;
+      let fo = result.Regionwise_FO;
+
+      if (
+        ipo &&
+        typeof Object.values(ipo)[0] === "object" &&
+        !Array.isArray(Object.values(ipo)[0])
+      ) {
+        ipo = (ipo as any)["2025 H1"] || ipo[Object.keys(ipo).sort().reverse()[0]] || {};
+      }
+      if (
+        fo &&
+        typeof Object.values(fo)[0] === "object" &&
+        !Array.isArray(Object.values(fo)[0])
+      ) {
+        fo = (fo as any)["2025 H1"] || fo[Object.keys(fo).sort().reverse()[0]] || {};
       }
 
-      try {
-        const response = await fetch(`${apiUrl}/api/dealogic_summary_data/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
+      // Force type to satisfy TypeScript
+       const processData = (regionwise: { [region: string]: RegionData }) =>
+        Object.entries(regionwise).map(([region, data]) => ({
+          region,
+          data,
+        }));
+        
+      setIpoData(processData(ipo as { [region: string]: RegionData }));
+      setFoData(processData(fo as { [region: string]: RegionData }));
 
-        if (!response.ok) throw new Error("Failed to fetch data");
+     
 
-        const result: ApiRegionResponse = await response.json();
+    } catch (err) {
+      setError("Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        const processData = (regionwise: { [region: string]: RegionData }) =>
-          Object.entries(regionwise).map(([region, data]) => ({
-            region,
-            data,
-          }));
-
-        setIpoData(processData(result.Regionwise_IPO));
-        setFoData(processData(result.Regionwise_FO));
-      } catch (err) {
-        setError("Failed to fetch data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDeals();
-  }, []);
-
+  fetchDeals();
+}, []);
   if (loading)
     return (
       <Box textAlign="center" mt={4}>
@@ -142,7 +162,7 @@ const RegionWiseTable = () => {
               cursor: "pointer",
             }}
           >
-            Region-wise Skew Table - IPO and FO Deals for 2025 (Q1) with{" "}
+            Region-wise Skew Table - IPO and FO Deals for 2025 (H1) with{" "}
             <span style={{ color: "red" }}>Top</span> Highlights
           </Typography>
         </Box>
