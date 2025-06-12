@@ -40,7 +40,7 @@ const HistoricalDealogicCards = (
         gutterBottom
         sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
       >
-        Historical Deals Overview for{" "}
+        Historical Deals from Dealogic  for{" "}
         <span style={{ color: "#ff6005", fontStyle: "italic" }}>
           {ticker} - {deals.length} deals
         </span>

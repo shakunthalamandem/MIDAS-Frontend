@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Grid,
   Typography,
@@ -19,6 +19,8 @@ const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<any>(null);
   const [showDealogic, setShowDealogic] = useState(false);
+
+  const dealogicRef = useRef<HTMLDivElement>(null); // 👈 For scrolling
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -51,6 +53,13 @@ const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
         setLoading(false);
       });
   }, [ticker, apiUrl, token]);
+
+  useEffect(() => {
+    // 👇 Scroll into view when Dealogic section is shown
+    if (showDealogic && dealogicRef.current) {
+      dealogicRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [showDealogic]);
 
   if (loading)
     return (
@@ -100,8 +109,9 @@ const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
         {/* === Case 3: Both Available === */}
         {hasMddData && hasDealogicData && (
           <>
-            <Container>{renderMonasheeDeals(data, ticker)}</Container>
-            <Container>
+            <Container
+              sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}
+            >
               <FormControlLabel
                 control={
                   <Checkbox
@@ -125,8 +135,17 @@ const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
                 }
               />
             </Container>
+
+            <Container>{renderMonasheeDeals(data, ticker)}</Container>
+
             {showDealogic && (
-              <Container>
+              <Container
+                ref={dealogicRef}
+                sx={{
+                  scrollMarginTop: "100px", 
+                  mt: 4,
+                }}
+              >
                 {HistoricalDealogicCards(ticker, data.dealogic_data.data)}
               </Container>
             )}
