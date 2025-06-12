@@ -60,7 +60,7 @@ import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSe
 import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketOpportnuityMain";
 import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
 
-
+import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 
 
 
@@ -161,7 +161,7 @@ const AppRouters: React.FC = () => {
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
 
 
-
+        <Route path="/ipo-dashboard" element={<AuthGuard><IPODashboardMain/></AuthGuard>} />
 
 
 

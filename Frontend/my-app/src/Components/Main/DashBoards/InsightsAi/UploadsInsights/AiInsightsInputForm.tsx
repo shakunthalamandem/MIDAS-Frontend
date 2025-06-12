@@ -71,7 +71,7 @@ const AiInsightsInputForm: React.FC = () => {
       transition={{ duration: 0.6 }}
     >
       <Card
-        elevation={6}
+        elevation={0}
         sx={{ maxWidth: 600, mx: "auto", mt: 5, p: 3, borderRadius: 4 }}
       >
         <CardContent>
