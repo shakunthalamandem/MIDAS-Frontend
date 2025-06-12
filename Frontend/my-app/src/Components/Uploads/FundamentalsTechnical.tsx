@@ -1,4 +1,3 @@
-// src/components/FundamentalsTechnical.tsx
 import React, { useState } from 'react';
 import {
   Box,
@@ -11,6 +10,7 @@ import {
   FormControl,
   InputLabel,
   Container,
+  Button,
 } from '@mui/material';
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -21,16 +21,28 @@ const FundamentalsTechnical: React.FC = () => {
   const [response, setResponse] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState('');
 
-  const handleChange = async (event: SelectChangeEvent) => {
-    const type = event.target.value as 'technical' | 'fundamental';
-    setSelectedType(type);
+  const handleChange = (event: SelectChangeEvent) => {
+    setSelectedType(event.target.value as 'technical' | 'fundamental' | 'news');
+    setResponse(null); // clear previous messages
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedType) {
+      setResponse("Please select a data type first.");
+      return;
+    }
+
     setLoading(true);
     setResponse(null);
 
-    const endpoint =
-      type === 'technical'
-        ? `${apiUrl}/api/technical_data_download/`
-        : `${apiUrl}/api/fundamental_data_download/`;
+    let endpoint = '';
+    if (selectedType === 'technical') {
+      endpoint = `${apiUrl}/api/technical_data_download/`;
+    } else if (selectedType === 'fundamental') {
+      endpoint = `${apiUrl}/api/fundamental_data_download/`;
+    } else if (selectedType === 'news') {
+      endpoint = `${apiUrl}/api/upload_news/`;
+    }
 
     try {
       const res = await fetch(endpoint, {
@@ -48,7 +60,7 @@ const FundamentalsTechnical: React.FC = () => {
       }
 
       const data = await res.json();
-      setResponse(`Success: ${data.message || 'Data received'}`);
+      setResponse(`Success: ${data.message || 'Data uploaded successfully!'}`);
     } catch (error: any) {
       setResponse(`Error: ${error.message}`);
     } finally {
@@ -58,28 +70,38 @@ const FundamentalsTechnical: React.FC = () => {
 
   return (
     <Container maxWidth="md" sx={{ marginTop: 20 }}>
-    <Box mt={2} sx={{ padding: 2, backgroundColor: '#f9f9f9', boxShadow: 3 }}>
-      <Stack spacing={2} alignItems="center">
-        <Typography variant="h6" color="#002060">
-          Select Data Type to Download
-        </Typography>
-        <FormControl sx={{ minWidth: 220 }} disabled={loading}>
-          <InputLabel id="data-type-label">Data Type</InputLabel>
-          <Select
-            labelId="data-type-label"
-            value={selectedType}
-            label="Data Type"
-            onChange={handleChange}
-          >
-            <MenuItem value="technical">Technicals</MenuItem>
-            <MenuItem value="fundamental">Fundamentals</MenuItem>
-          </Select>
-        </FormControl>
+      <Box mt={2} sx={{ padding: 2, backgroundColor: '#f9f9f9', boxShadow: 3 }}>
+        <Stack spacing={2} alignItems="center">
+          <Typography variant="h6" color="#002060">
+            Select Data Type to Upload
+          </Typography>
+          <FormControl sx={{ minWidth: 220 }} disabled={loading}>
+            <InputLabel id="data-type-label">Data Type</InputLabel>
+            <Select
+              labelId="data-type-label"
+              value={selectedType}
+              label="Data Type"
+              onChange={handleChange}
+            >
+              <MenuItem value="technical">Technicals</MenuItem>
+              <MenuItem value="fundamental">Fundamentals</MenuItem>
+              <MenuItem value="news">Upload News</MenuItem>
+            </Select>
+          </FormControl>
 
-        {loading && <CircularProgress />}
-        {response && <Typography>{response}</Typography>}
-      </Stack>
-    </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={loading || !selectedType}
+          >
+            Submit
+          </Button>
+
+          {loading && <CircularProgress />}
+          {response && <Typography>{response}</Typography>}
+        </Stack>
+      </Box>
     </Container>
   );
 };

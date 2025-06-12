@@ -61,7 +61,7 @@ const NavbarMain: React.FC = () => {
       case "High Yield":
         navigate("/highyield/capital-markets");
         break;
-      case "Portfolio Attribution":
+      case "P&L":
         navigate("/portfolio-attribution");
         break;
       default:
@@ -185,7 +185,7 @@ const NavbarMain: React.FC = () => {
 
           {/* Tabs Centered */}
           <Box sx={{ flexGrow: 1, textAlign: "center" }}>
-            {["Equity", "Converts", "High Yield", "Portfolio Attribution"].map((tab) => (
+            {["Equity", "Converts", "High Yield", "P&L"].map((tab) => (
            <Button
   key={tab}
   onClick={() => handleTabSelect(tab)}

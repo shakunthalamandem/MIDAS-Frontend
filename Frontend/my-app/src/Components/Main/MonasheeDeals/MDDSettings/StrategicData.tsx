@@ -5,18 +5,23 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import WeeklyDealTable from "./WeeklyDealTable";
+import StrategicDealTable from "./StrategicDealTable";
 
-interface TwoWeekDealDataProps {
+// Add the prop type for StrategicDealTable
+interface StrategicDealTableProps {
+  data: any;
+}
+
+interface StrategicDataProps {
   filters: {
     deal_type: string[];
     broad_region: string[];
     week: number[];
-    fo_type: string[]; // Currently unused but preserved for consistency
+    fo_type: string[]; // Still unused unless backend supports it
   };
 }
 
-const TwoWeekDealData: React.FC<TwoWeekDealDataProps> = ({ filters }) => {
+const StrategicData: React.FC<StrategicDataProps> = ({ filters }) => {
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,16 +44,14 @@ const TwoWeekDealData: React.FC<TwoWeekDealDataProps> = ({ filters }) => {
         broad_region: filters.broad_region.length > 0 ? filters.broad_region : undefined,
         deal_type: filters.deal_type.length > 0 ? filters.deal_type : undefined,
         week: filters.week.length > 0 ? filters.week : undefined,
-        // Optionally include fo_type if needed by backend
       };
 
-      const response = await fetch(`${apiUrl}/api/weekly_dealstat/`, {
-        method: "POST",
+      const response = await fetch(`${apiUrl}/api/strategic_weekly_table/`, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify(body),
       });
 
       const result = await response.json();
@@ -73,16 +76,7 @@ const TwoWeekDealData: React.FC<TwoWeekDealDataProps> = ({ filters }) => {
           <Typography color="error">{error}</Typography>
         ) : (
           <>
-
-            <Typography variant="h6" color="#002060" align="center" gutterBottom>
-                      2025 YTD Gap Overview
-                    </Typography>
-          
-          <WeeklyDealTable
-            data={data}
-            selectedRegions={filters.broad_region}
-            selectedDealTypes={filters.deal_type}
-          />
+            <StrategicDealTable data={data} />
           </>
         )}
       </Card>
@@ -90,4 +84,4 @@ const TwoWeekDealData: React.FC<TwoWeekDealDataProps> = ({ filters }) => {
   );
 };
 
-export default TwoWeekDealData;
+export default StrategicData;

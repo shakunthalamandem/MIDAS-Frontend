@@ -18,13 +18,11 @@ import DealFormMain from "../Components/DealsForm/DealFormMain";
 
 import Logs from "../Components/Main/HomePage/Authentication/Logs";
 import DealStats from "../Components/Main/MonasheeDeals/MddGraphs/DealStats";
-import WeeklyStatsChart from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyStatsChart";
 import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
 import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
 import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
-import SelectedTicker from "../Components/Main/MonasheeGraphs/SelectedTicker";
 import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable";
 import HighYieldsMain from "../Components/HighYields/HighYieldsMain";
 import DealStatsMain from "../Components/HighYields/Tabs/DealStatsMain";
@@ -44,19 +42,19 @@ import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 
 import MainUpload from "../Components/Uploads/MainUpload";
 import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
-// import DownloadDeals from "../Components/Uploads/DownloadDeals";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 import DealformInformation from "../Components/NewDealForm/DealformInformation";
 import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
 
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
 import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
-import AiInsightsInputForm from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/AiInsightsInputForm";
 import IntelligenceDashboard from "../Components/Main/DashBoards/IntelligenceDashboard";
 import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdashboardMain";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
-import FileUpload from "../Components/IPOwriteUp/FileUpload";
-
+import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
+import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketOpportnuityMain";
+import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
+import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 
 
 
@@ -87,11 +85,16 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path="/equity/capital-markets" element={<AuthGuard><CapitalMarkets /></AuthGuard>} >
-          <Route path="search" element={<SelectedTicker ticker={'AS'}/>} />
+        <Route path="/equity/capital-markets" element={<AuthGuard><MarketOpportnuityMain /></AuthGuard>} >
+          <Route path="search" element={<CombinedSelectedTicker ticker={'AS'} />} />
           <Route path="deal-stats" element={<MarketFilters />} />
           <Route path="skew-table" element={<SkewTableMain />} />
           <Route path="deal-filter" element={<ScreenerMain />} />
+          <Route path="mdd_deal_stats" element={<DealStats />} />
+          <Route path="weekly-tracking" element={<WeeklyMain />} />
+          <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
+
+
         </Route>
 
         <Route path="/highyield/capital-markets" element={<AuthGuard><HighYieldsMain /></AuthGuard>} >
@@ -112,10 +115,10 @@ const AppRouters: React.FC = () => {
 
         <Route path="/equity/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
           <Route path="search" element={<MDDSelectedTicker ticker={'CGRX'}/>} />
-          <Route path="deal-stats" element={<DealStats />} />
+          <Route path="mdd_deal_stats" element={<DealStats />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
           <Route path="follow-on-discount" element={<FOllowOnDiscount />} />
-          <Route path="weekly-tracking" element={<WeeklyStatsChart />} />
+          <Route path="weekly-tracking" element={<WeeklyMain />} />
           <Route path="by-bank" element={<BankTable selectedFilters={{}} />} />
           <Route path="screener" element={<MDDScreener />} />
         </Route>
@@ -152,7 +155,7 @@ const AppRouters: React.FC = () => {
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
 
 
-
+        <Route path="/equity/ipo_dashboard" element={<AuthGuard><IPODashboardMain/></AuthGuard>} />
 
 
 
@@ -179,6 +182,9 @@ const AppRouters: React.FC = () => {
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
         <Route path="/equity/writeupsdashboard" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
+
+
+
 
       </Routes>
     </ErrorBoundary>
