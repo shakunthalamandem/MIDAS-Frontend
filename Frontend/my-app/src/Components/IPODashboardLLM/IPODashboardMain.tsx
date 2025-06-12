@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -14,6 +14,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import FinancialForecastTable from "./IPOFinancialTableMain";
 
 // Types for API response
 type ComparableMetric = {
@@ -33,7 +34,6 @@ type ComparableMetric = {
 
 type ApiResponse = Record<string, ComparableMetric[]>;
 
-// Table columns
 const columns: { key: keyof ComparableMetric; label: string; isCurrency?: boolean; isPercentage?: boolean }[] = [
   { key: "ticker_names", label: "Ticker" },
   { key: "price_usd", label: "Price (USD)", isCurrency: true },
@@ -49,7 +49,15 @@ const columns: { key: keyof ComparableMetric; label: string; isCurrency?: boolea
   { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
 ];
 
-// Format function
+const columnsWithX = new Set([
+  "present_year_ev_sales",
+  "one_year_later_ev_sales",
+  "present_year_price_earning",
+  "one_year_later_price_earning",
+  "present_year_ev_fcf",
+  "one_year_later_ev_fcf",
+]);
+
 const formatNumber = (
   value: number,
   isCurrency = false,
@@ -84,12 +92,12 @@ const formatNumber = (
 };
 
 const IPODashboardMain: React.FC = () => {
-  const [ticker, setTicker] = useState("");
+  const [ticker, setTicker] = useState("CRWV");
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleFetch = async () => {
+  const handleFetch = async (customTicker?: string) => {
     setLoading(true);
     setError(null);
     setData(null);
@@ -103,7 +111,7 @@ const IPODashboardMain: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({ ticker }),
+        body: JSON.stringify({ ticker: customTicker ?? ticker }),
       });
       const json = await response.json();
       if (!response.ok) {
@@ -117,15 +125,20 @@ const IPODashboardMain: React.FC = () => {
     }
   };
 
-  // Check if there is no data for the ticker
+  useEffect(() => {
+    handleFetch("CRWV");
+    // eslint-disable-next-line
+  }, []);
+
   const noData =
     data &&
     Object.values(data).every((metrics) => !metrics || metrics.length === 0);
 
   return (
-    <Box sx={{ p: 3, maxWidth: "1300px", margin: "auto" }}>
+    <Box sx={{ p: 0, width: "100%" }}>
+      {/* Comparable Company Metrics Table */}
       <Typography variant="h6" sx={{ mb: 2 }}>
-        Comparable Company Metrics
+        Comparative Trading Multiples & Performance Metrics
       </Typography>
       <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
         <TextField
@@ -134,14 +147,14 @@ const IPODashboardMain: React.FC = () => {
           onChange={(e) => setTicker(e.target.value)}
           size="small"
           onKeyDown={(e) => {
-          if (e.key === "Enter" && !loading && ticker) {
-            handleFetch();
-          }
-    }}
+            if (e.key === "Enter" && !loading && ticker) {
+              handleFetch();
+            }
+          }}
         />
         <Button
           variant="contained"
-          onClick={handleFetch}
+          onClick={() => handleFetch()}
           disabled={loading || !ticker}
         >
           Fetch
@@ -153,8 +166,8 @@ const IPODashboardMain: React.FC = () => {
         <Alert severity="info">No data found for this ticker.</Alert>
       )}
       {!loading && !error && data && !noData && (
-        <TableContainer component={Paper} elevation={4}>
-          <Table size="small">
+        <TableContainer component={Paper} elevation={4} sx={{ mb: 4, width: "100%" }}>
+          <Table size="small" sx={{ width: "100%" }}>
             <TableHead sx={{ backgroundColor: "#002060" }}>
               <TableRow>
                 {columns.map((col) => (
@@ -178,6 +191,27 @@ const IPODashboardMain: React.FC = () => {
                   <TableRow key={`${tickerKey}-${idx}`}>
                     {columns.map((col) => {
                       const value = metric[col.key];
+                      // Add 'x' for specific columns, show N/A if null
+                      if (columnsWithX.has(col.key)) {
+                        return (
+                          <TableCell
+                            key={col.key}
+                            align="center"
+                            sx={{ border: "1px solid #000000" }}
+                          >
+                            {value === null ||
+                            value === undefined ||
+                            (typeof value === "number" && isNaN(value))
+                              ? "N/A"
+                              : `${formatNumber(
+                                  value as number,
+                                  col.isCurrency,
+                                  col.isPercentage
+                                )}x`}
+                          </TableCell>
+                        );
+                      }
+                      // Default rendering for other columns
                       return (
                         <TableCell
                           key={col.key}
