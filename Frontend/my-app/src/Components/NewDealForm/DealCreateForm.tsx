@@ -124,7 +124,7 @@ New Deal Entry Form
 
 </Typography>
 
-      <TextField
+      {/* <TextField
         label="Search Ticker"
         variant="outlined"
         value={searchTerm}
@@ -145,7 +145,7 @@ New Deal Entry Form
             </InputAdornment>
           ),
         }}
-      />
+      /> */}
     </Stack>
   </CardContent>
 {/* </Card> */}
