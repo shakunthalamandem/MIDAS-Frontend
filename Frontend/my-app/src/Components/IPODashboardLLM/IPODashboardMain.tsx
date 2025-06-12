@@ -1,248 +1,226 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-  CircularProgress,
-  Alert,
-  TextField,
-  Button,
-} from "@mui/material";
+import React, { useEffect, useState } from "react";
 import FinancialForecastTable from "./IPOFinancialTableMain";
+import IPODashboardMainTable from "./IPODashboardMainTable";
 
-// Types for API response
-type ComparableMetric = {
-  ticker_names: string;
-  price_usd: string;
-  market_cap: number | null;
-  ev_usd_million: number | null;
-  present_year_ev_sales: number | null;
-  one_year_later_ev_sales: number | null;
-  present_year_price_earning: number | null;
-  one_year_later_price_earning: number | null;
-  present_year_ev_fcf: number | null;
-  one_year_later_ev_fcf: number | null;
-  sales_growth: number | null;
-  eps_growth: number | null;
+const cardStyle: React.CSSProperties = {
+    background: "#fff",
+    border: "1px solid #e0e0e0",
+    borderRadius: 10,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+    padding: 20,
+    minHeight: 320,
+    width: "100%",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
 };
 
-type ApiResponse = Record<string, ComparableMetric[]>;
+const cardsContainer: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: "50% 50%",
+    gridTemplateRows: "repeat(3, 1fr)",
+    gap: 16,
+    marginBottom: 24,
+    width: "100%",
+};
 
-const columns: { key: keyof ComparableMetric; label: string; isCurrency?: boolean; isPercentage?: boolean }[] = [
-  { key: "ticker_names", label: "Ticker" },
-  { key: "price_usd", label: "Price (USD)", isCurrency: true },
-  { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
-  { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
-  { key: "present_year_ev_sales", label: "2025 EV/Sales" },
-  { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
-  { key: "present_year_price_earning", label: "2025 P/E" },
-  { key: "one_year_later_price_earning", label: "2026 P/E" },
-  { key: "present_year_ev_fcf", label: "2025 EV/FCF" },
-  { key: "one_year_later_ev_fcf", label: "2026 EV/FCF" },
-  { key: "sales_growth", label: "Sales Growth (25-26)", isPercentage: true },
-  { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
-];
+const fullWidthStyle: React.CSSProperties = {
+    gridColumn: "1 / span 2",
+    width: "100%",
+    marginBottom: 24,
+};
 
-const columnsWithX = new Set([
-  "present_year_ev_sales",
-  "one_year_later_ev_sales",
-  "present_year_price_earning",
-  "one_year_later_price_earning",
-  "present_year_ev_fcf",
-  "one_year_later_ev_fcf",
-]);
+const infoTableStyle: React.CSSProperties = {
+    width: "100%",
+    borderCollapse: "separate",
+    borderSpacing: 0,
+    margin: "24px 0",
+    background: "#fff",
+    borderRadius: 10,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+    overflow: "hidden",
+};
 
-const formatNumber = (
-  value: number,
-  isCurrency = false,
-  isPercentage = false
-): string => {
-  if (value === null || value === undefined || isNaN(value)) return "N/A";
-  let formattedValue: string;
-  const absValue = Math.abs(value);
+const infoHeaderCell: React.CSSProperties = {
+    background: "#f5f6fa",
+    fontWeight: 600,
+    padding: "12px 10px",
+    borderBottom: "1px solid #e0e0e0",
+    textAlign: "center",
+    fontSize: 15,
+    color: "#002060",
+};
 
-  if (absValue >= 1e9) {
-    formattedValue = Number.isInteger(absValue / 1e9)
-      ? `${(absValue / 1e9).toFixed(0)}B`
-      : `${(absValue / 1e9).toFixed(1)}B`;
-  } else if (absValue >= 1e6) {
-    formattedValue = Number.isInteger(absValue / 1e6)
-      ? `${(absValue / 1e6).toFixed(0)}M`
-      : `${(absValue / 1e6).toFixed(1)}M`;
-  } else if (absValue >= 1e3) {
-    formattedValue = Number.isInteger(absValue / 1e3)
-      ? `${(absValue / 1e3).toFixed(0)}K`
-      : `${(absValue / 1e3).toFixed(1)}K`;
-  } else {
-    formattedValue = Number.isInteger(absValue)
-      ? absValue.toFixed(0)
-      : absValue.toFixed(2);
-  }
+const infoCell: React.CSSProperties = {
+    padding: "12px 10px",
+    borderBottom: "1px solid #e0e0e0",
+    textAlign: "center",
+    fontSize: 15,
+    color: "#222",
+};
 
-  if (isCurrency) formattedValue = `$${formattedValue}`;
-  if (isPercentage) formattedValue = `${value.toFixed(1)}%`;
-
-  return value < 0 ? `-${formattedValue}` : formattedValue;
+const formatPriceRange = (lower: number | null, upper: number | null) => {
+    if (lower && upper) return `$${lower} - $${upper}`;
+    if (lower) return `$${lower}`;
+    if (upper) return `$${upper}`;
+    return "N/A";
 };
 
 const IPODashboardMain: React.FC = () => {
-  const [ticker, setTicker] = useState("CRWV");
-  const [data, setData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    const [ipoData, setIpoData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-  const handleFetch = async (customTicker?: string) => {
-    setLoading(true);
-    setError(null);
-    setData(null);
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
-      if (!apiUrl) throw new Error("API URL not set");
-      const response = await fetch(`${apiUrl}/api/companymetric_data_view/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({ ticker: customTicker ?? ticker }),
-      });
-      const json = await response.json();
-      if (!response.ok) {
-        throw new Error(json.error || json.message || "Failed to fetch data");
-      }
-      setData(json);
-    } catch (e: any) {
-      setError(e.message || "Unknown error");
-    } finally {
-      setLoading(false);
-    }
-  };
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            setError(null);
 
-  useEffect(() => {
-    handleFetch("CRWV");
-    // eslint-disable-next-line
-  }, []);
+            try {
+                const apiUrl = process.env.REACT_APP_API_URL;
+                const token = localStorage.getItem("access_token");
 
-  const noData =
-    data &&
-    Object.values(data).every((metrics) => !metrics || metrics.length === 0);
+                if (!apiUrl) {
+                    throw new Error("API URL is not defined in environment variables");
+                }
 
-  return (
-    <Box sx={{ p: 0, width: "100%" }}>
-      {/* Comparable Company Metrics Table */}
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Comparative Trading Multiples & Performance Metrics
-      </Typography>
-      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-        <TextField
-          label="Ticker"
-          value={ticker}
-          onChange={(e) => setTicker(e.target.value)}
-          size="small"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !loading && ticker) {
-              handleFetch();
+                const response = await fetch(`${apiUrl}/api/writeup_data/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: token ? `Bearer ${token}` : "",
+                    },
+                    body: JSON.stringify({ ticker: "CRWV" }),
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const jsonData = await response.json();
+                setIpoData(jsonData);
+            } catch (err: any) {
+                console.error("Failed to fetch IPO data", err);
+                setError("Failed to fetch IPO data");
+            } finally {
+                setLoading(false);
             }
-          }}
-        />
-        <Button
-          variant="contained"
-          onClick={() => handleFetch()}
-          disabled={loading || !ticker}
-        >
-          Fetch
-        </Button>
-      </Box>
-      {loading && <CircularProgress />}
-      {error && <Alert severity="error">{error}</Alert>}
-      {noData && (
-        <Alert severity="info">No data found for this ticker.</Alert>
-      )}
-      {!loading && !error && data && !noData && (
-        <TableContainer component={Paper} elevation={4} sx={{ mb: 4, width: "100%" }}>
-          <Table size="small" sx={{ width: "100%" }}>
-            <TableHead sx={{ backgroundColor: "#002060" }}>
-              <TableRow>
-                {columns.map((col) => (
-                  <TableCell
-                    key={col.key}
-                    sx={{
-                      fontWeight: "bold",
-                      color: "#FFFFFF",
-                      border: "1px solid #000000",
-                      textAlign: "center",
-                    }}
-                  >
-                    {col.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.entries(data).map(([tickerKey, metrics]) =>
-                metrics.map((metric, idx) => (
-                  <TableRow key={`${tickerKey}-${idx}`}>
-                    {columns.map((col) => {
-                      const value = metric[col.key];
-                      // Add 'x' for specific columns, show N/A if null
-                      if (columnsWithX.has(col.key)) {
-                        return (
-                          <TableCell
-                            key={col.key}
-                            align="center"
-                            sx={{ border: "1px solid #000000" }}
-                          >
-                            {value === null ||
-                            value === undefined ||
-                            (typeof value === "number" && isNaN(value))
-                              ? "N/A"
-                              : `${formatNumber(
-                                  value as number,
-                                  col.isCurrency,
-                                  col.isPercentage
-                                )}x`}
-                          </TableCell>
-                        );
-                      }
-                      // Default rendering for other columns
-                      return (
-                        <TableCell
-                          key={col.key}
-                          align="center"
-                          sx={{ border: "1px solid #000000" }}
-                        >
-                          {col.key === "price_usd"
-                            ? value || "N/A"
-                            : value === null ||
-                              value === undefined ||
-                              (typeof value === "number" && isNaN(value))
-                            ? "N/A"
-                            : typeof value === "number"
-                            ? formatNumber(
-                                value as number,
-                                col.isCurrency,
-                                col.isPercentage
-                              )
-                            : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-    </Box>
-  );
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div style={{ color: "red" }}>{error}</div>;
+
+    return (
+        <div style={{ marginLeft: 16, marginRight: 16 }}>
+            {ipoData && (
+                <>
+                    <h2>
+                        {ipoData.company_name} ({ipoData.ticker_name} | {ipoData.exchange})
+                    </h2>
+                    {/* Info Table */}
+                    <table style={infoTableStyle}>
+                        <thead>
+                            <tr>
+                                <th style={infoHeaderCell}>Pricing Date</th>
+                                <th style={infoHeaderCell}>Price Range</th>
+                                <th style={infoHeaderCell}>Deal Size</th>
+                                <th style={infoHeaderCell}>Industry</th>
+                                <th style={infoHeaderCell}>Shares Offered</th>
+                                <th style={infoHeaderCell}>No. Shares Out (NoSH)</th>
+                                <th style={infoHeaderCell}>Established</th>
+                                <th style={infoHeaderCell}>Bookrunners</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style={infoCell}>{ipoData.pricing_date || "N/A"}</td>
+                                <td style={infoCell}>
+                                    {formatPriceRange(ipoData.lower_bound, ipoData.upper_bound)}
+                                </td>
+                                <td style={infoCell}>
+                                    {ipoData.deal_size ? `$${ipoData.deal_size.toLocaleString()}` : "N/A"}
+                                </td>
+                                <td style={infoCell}>{ipoData.industry || "N/A"}</td>
+                                <td style={infoCell}>
+                                    {ipoData.shares_offered ? ipoData.shares_offered.toLocaleString() : "N/A"}
+                                </td>
+                                <td style={infoCell}>
+                                    {ipoData.nosh ? ipoData.nosh.toLocaleString() : "N/A"}
+                                </td>
+                                <td style={infoCell}>{ipoData.established_year || "N/A"}</td>
+                                <td style={infoCell}>
+                                    {ipoData.bookrunners ? ipoData.bookrunners.join(", ") : "N/A"}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style={cardsContainer}>
+                        <div style={cardStyle}>
+                            <h3 style={{ color: "#002060", marginBottom: 12 }}>Business Overview</h3>
+                            <ul style={{ paddingLeft: 18 }}>
+                                {ipoData.business_overview?.map((item: string, idx: number) => (
+                                    <li key={idx} style={{ marginBottom: 8 }}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div style={cardStyle}>
+                            <h3 style={{ color: "#002060", marginBottom: 12 }}>Key Highlights</h3>
+                            <ul style={{ paddingLeft: 18 }}>
+                                {ipoData.key_highlights?.map((item: string, idx: number) => (
+                                    <li key={idx} style={{ marginBottom: 8 }}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div style={cardStyle}>
+                            <h3 style={{ color: "#002060", marginBottom: 12 }}>Strengths</h3>
+                            <ul style={{ paddingLeft: 18 }}>
+                                {ipoData.strengths?.map((item: string, idx: number) => (
+                                    <li key={idx} style={{ marginBottom: 8 }}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div style={cardStyle}>
+                            <h3 style={{ color: "#002060", marginBottom: 12 }}>Concerns</h3>
+                            <ul style={{ paddingLeft: 18 }}>
+                                {ipoData.concerns?.map((item: string, idx: number) => (
+                                    <li key={idx} style={{ marginBottom: 8 }}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div style={cardStyle}>
+                            <h3 style={{ color: "#002060", marginBottom: 12 }}>Principal Stockholders (pre-IPO)</h3>
+                            <ul style={{ paddingLeft: 18 }}>
+                                {ipoData.principal_stockholders_preipo?.map((item: string, idx: number) => (
+                                    <li key={idx} style={{ marginBottom: 8 }}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div style={cardStyle}>
+                            <h3 style={{ color: "#002060", marginBottom: 12 }}>Key Management Personnel</h3>
+                            <ul style={{ paddingLeft: 18 }}>
+                                {ipoData.key_management_personnel?.map((item: string, idx: number) => (
+                                    <li key={idx} style={{ marginBottom: 8 }}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        {/* Financial Table Full Width */}
+                        <div style={fullWidthStyle}>
+                            <FinancialForecastTable defaultTicker="CRWV" />
+                        </div>
+                        {/* IPODashboardMain Full Width */}
+                        <div style={fullWidthStyle}>
+                            <IPODashboardMainTable />
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    );
 };
 
 export default IPODashboardMain;

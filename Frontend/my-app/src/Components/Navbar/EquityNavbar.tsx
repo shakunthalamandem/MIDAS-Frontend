@@ -46,6 +46,7 @@ const EquityNavbar: React.FC = () => {
     if (
       path === "/equity/issue_market" ||
       path === "/equity/create_form" ||
+      path === "/equity/ipo_dashboard" ||
       path === "/equity/intelligence-dashboard"
     )
       return 1;
@@ -237,6 +238,16 @@ const EquityNavbar: React.FC = () => {
           }
         >
           New Deal Form
+        </MenuItem>
+         <MenuItem
+          onClick={() => handleNavigate("/equity/ipo_dashboard")}
+          selected={isActivePath("/equity/ipo_dashboard")}
+          sx={
+            isActivePath("/equity/ipo_dashboard")
+              ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
+              : {}
+          }
+        > IPO Dashboard
         </MenuItem>
        
       </Menu>
