@@ -14,6 +14,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import FinancialForecastTable from "./IPOFinancialTableMain";
 
 // Types for API response
 type ComparableMetric = {
@@ -33,7 +34,6 @@ type ComparableMetric = {
 
 type ApiResponse = Record<string, ComparableMetric[]>;
 
-// Table columns
 const columns: { key: keyof ComparableMetric; label: string; isCurrency?: boolean; isPercentage?: boolean }[] = [
   { key: "ticker_names", label: "Ticker" },
   { key: "price_usd", label: "Price (USD)", isCurrency: true },
@@ -49,30 +49,6 @@ const columns: { key: keyof ComparableMetric; label: string; isCurrency?: boolea
   { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
 ];
 
-// Forecasts table columns
-const forecastYearKeys = [
-  "two_years_before",
-  "one_year_before",
-  "current_year",
-  "one_year_later",
-  "two_years_later",
-  "three_years_later",
-  "four_years_later",
-  "five_years_later",
-];
-
-const forecastYearLabels = [
-  "2023 A",
-  "2024 A",
-  "2025 E",
-  "2026 E",
-  "2027 E",
-  "2028 E",
-  "2029 E",
-  "2030 E",
-];
-
-// Format function
 const formatNumber = (
   value: number,
   isCurrency = false,
@@ -107,20 +83,11 @@ const formatNumber = (
 };
 
 const IPODashboardMain: React.FC = () => {
-  // Comparable Company Metrics state
   const [ticker, setTicker] = useState("CRWV");
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Financial Forecasts state
-  const [forecastsInput, setForecastsInput] = useState("CRWV");
-  const [forecastsTicker, setForecastsTicker] = useState("CRWV");
-  const [forecasts, setForecasts] = useState<any | null>(null);
-  const [forecastsLoading, setForecastsLoading] = useState(false);
-  const [forecastsError, setForecastsError] = useState<string | null>(null);
-
-  // Fetch Comparable Company Metrics
   const handleFetch = async (customTicker?: string) => {
     setLoading(true);
     setError(null);
@@ -149,47 +116,11 @@ const IPODashboardMain: React.FC = () => {
     }
   };
 
-  // Fetch Financial Forecasts
-  const handleFetchForecasts = async (customTicker?: string) => {
-    setForecastsLoading(true);
-    setForecastsError(null);
-    setForecasts(null);
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
-      if (!apiUrl) throw new Error("API URL not set");
-      const tickerToFetch = customTicker ?? forecastsInput;
-      const response = await fetch(`${apiUrl}/api/financial_forecasts_data_view/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({ ticker: tickerToFetch }),
-      });
-      const json = await response.json();
-      if (!response.ok) {
-        throw new Error(json.error || json.message || "Failed to fetch forecasts");
-      }
-      setForecasts(json);
-      setForecastsTicker(tickerToFetch);
-    } catch (e: any) {
-      setForecastsError(e.message || "Unknown error");
-    } finally {
-      setForecastsLoading(false);
-    }
-  };
-
-  // Fetch default data on mount
   useEffect(() => {
     handleFetch("CRWV");
-    setForecastsInput("CRWV");
-    setForecastsTicker("CRWV");
-    handleFetchForecasts("CRWV");
     // eslint-disable-next-line
   }, []);
 
-  // Check if there is no data for the ticker
   const noData =
     data &&
     Object.values(data).every((metrics) => !metrics || metrics.length === 0);
@@ -281,92 +212,7 @@ const IPODashboardMain: React.FC = () => {
         </TableContainer>
       )}
 
-      {/* Financial Forecasts Table */}
-      <Typography variant="h6" sx={{ mb: 2, mt: 4 }}>
-        Financial Forecasts (FYE Dec 31, Internal Estimates) 
-      </Typography>
-      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-        <TextField
-          label="Ticker"
-          value={forecastsInput}
-          onChange={(e) => setForecastsInput(e.target.value)}
-          size="small"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !forecastsLoading && forecastsInput) {
-              handleFetchForecasts();
-            }
-          }}
-        />
-        <Button
-          variant="contained"
-          onClick={() => handleFetchForecasts()}
-          disabled={forecastsLoading || !forecastsInput}
-        >
-          Fetch 
-        </Button>
-      </Box>
-      {forecastsLoading && <CircularProgress />}
-      {forecastsError && <Alert severity="error">{forecastsError}</Alert>}
-      {!forecastsLoading && forecasts && forecasts[forecastsTicker.toUpperCase()] && (
-        <TableContainer component={Paper} elevation={4}>
-          <Table size="small">
-            <TableHead sx={{ backgroundColor: "#002060" }}>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#FFFFFF",
-                    border: "1px solid #000000",
-                    textAlign: "center",
-                  }}
-                >
-                  $US M
-                </TableCell>
-                {forecastYearLabels.map((label) => (
-                  <TableCell
-                    key={label}
-                    sx={{
-                      fontWeight: "bold",
-                      color: "#FFFFFF",
-                      border: "1px solid #000000",
-                      textAlign: "center",
-                    }}
-                  >
-                    {label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.entries(forecasts[forecastsTicker.toUpperCase()] || {}).map(
-                ([metricName, years]: [string, any]) => (
-                  <TableRow key={metricName}>
-                    <TableCell
-                      sx={{ border: "1px solid #000000", fontWeight: "bold" }}
-                    >
-                      {metricName}
-                    </TableCell>
-                    {forecastYearKeys.map((yearKey) => (
-                      <TableCell
-                        key={yearKey}
-                        align="center"
-                        sx={{ border: "1px solid #000000" }}
-                      >
-                        {years[yearKey] !== null && years[yearKey] !== undefined
-                          ? years[yearKey]
-                          : "N/A"}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                )
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-      {!forecastsLoading && forecasts && !forecasts[forecastsTicker.toUpperCase()] && (
-        <Alert severity="info">No forecasts found for this ticker.</Alert>
-      )}
+      <FinancialForecastTable defaultTicker="CRWV" />
     </Box>
   );
 };
