@@ -21,6 +21,10 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import CancelIcon from '@mui/icons-material/Cancel';
+
+import { useNavigate } from "react-router-dom";
+
 
 interface Row {
   label: string;
@@ -408,6 +412,7 @@ const BasicInfo: React.FC = () => {
   const basicInfoRef = useRef<HTMLDivElement>(null);
   const marketDataRef = useRef<HTMLDivElement>(null);
   const dealColorRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
@@ -421,6 +426,10 @@ const BasicInfo: React.FC = () => {
 
   const handleReset = () => {
     setFormData(defaultData);
+  };
+    const handleCancel = () => {
+          navigate("/equity/issue_market");
+
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -602,10 +611,28 @@ const BasicInfo: React.FC = () => {
               color: "#d10000",
               fontWeight: "bold",
               borderRadius: 2,
+                  mr: 2,
               "&:hover": { backgroundColor: "#002060", color: "#ffffff" },
             }}
           >
             Reset
+          </Button>
+          <Button
+            onClick={handleCancel}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+            color="secondary"
+            sx={{
+              backgroundColor: "#adadad",
+              textTransform: "none",
+              color: "#000000",
+              fontWeight: "bold",
+              border: "1px solid #000000",
+              borderRadius: 2,
+              "&:hover": { backgroundColor: "#002060", color: "#ffffff" },
+            }}
+          >
+            Cancel
           </Button>
         </Box>
       </Box>
