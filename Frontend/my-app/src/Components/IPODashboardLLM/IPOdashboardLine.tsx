@@ -1,5 +1,12 @@
 import React from "react";
-import { Card, CardContent, Grid, Typography, Box, Container } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Box,
+  Container,
+} from "@mui/material";
 import { motion } from "framer-motion";
 
 interface IPOdashboardLineProps {
@@ -83,7 +90,12 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
                   >
                     <Typography
                       variant="caption"
-                      sx={{ mt: 1, display: "block", fontWeight: 500, color: "#333" }}
+                      sx={{
+                        mt: 1,
+                        display: "block",
+                        fontWeight: 500,
+                        color: "#333",
+                      }}
                     >
                       {value || "N/A"}
                     </Typography>
@@ -94,12 +106,12 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
                     <Box
                       sx={{
                         position: "absolute",
-                        top: "8px",
+                        top: "50%",
                         left: "50%",
-                        right: "-50%",
+                        width: "100%",
                         height: 2,
-                        backgroundColor: "#90caf9",
-                        zIndex: 1,
+                        backgroundColor: "#003e36",
+                        transform: "translateX(8px) translateY(-50%)",
                       }}
                     />
                   )}
