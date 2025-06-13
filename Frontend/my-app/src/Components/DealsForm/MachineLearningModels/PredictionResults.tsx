@@ -276,7 +276,7 @@ Threshold: Return < -2%`,
             <TableCell
               sx={{
                 fontWeight: 600,
-                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6", // Light blue for V1, light purple for V2
+                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6", 
               }}
             >
               {`${version.toUpperCase()} Result`}
