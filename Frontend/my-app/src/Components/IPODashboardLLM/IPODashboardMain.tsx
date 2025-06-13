@@ -3,78 +3,45 @@ import {
   Box,
   Typography,
   Grid,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  List,
-  ListItem,
   CircularProgress,
   Container,
   Card,
   CardContent,
+  List,
+  ListItem,
   ListItemIcon,
   ListItemText,
-  InputAdornment,
-  TextField,
-  Autocomplete,
 } from "@mui/material";
+import { useParams } from "react-router-dom";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+
+import IPODashboardHeader from "./IPODashboardHeader";
+import IPODashboardCardRatings from "./IPODashboardCardRatings";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import SearchIcon from "@mui/icons-material/Search";
-import IPODashboardCardRatings from "./IPODashboardCardRatings";
-import IPOdashboardLine from "./IPOdashboardLine";
-
-const cardStyle = {
-  background: "#fff",
-  border: "1px solid #e0e0e0",
-  borderRadius: 2,
-  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-  padding: 2.5,
-  minHeight: 320,
-  width: "100%",
-  display: "flex",
-  flexDirection: "column" as const,
-};
-
-const cardColors = [
-  "#f3f6f9",
-  "#fdf5e6",
-  "#e6f7f1",
-  "#fff0f6",
-  "#f0f5ff",
-  "#f9f0ff",
-];
-
-const formatPriceRange = (lower: number | null, upper: number | null) => {
-  const format = (value: number) => `$${value.toLocaleString("en-US")}`;
-
-  if (lower != null && upper != null)
-    return `${format(lower)} - ${format(upper)}`;
-  if (lower != null) return format(lower);
-  if (upper != null) return format(upper);
-  return "N/A";
-};
+import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
 
 const IPODashboardMain: React.FC = () => {
+  const { ticker } = useParams<{ ticker: string }>();
   const [ipoData, setIpoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [allIpoTickers, setAllIpoTickers] = useState<string[]>([]);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>("CRWV");
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(
+    ticker || "CRWV"
+  );
 
   useEffect(() => {
     const fetchAllIpoTickers = async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
-        if (!apiUrl) throw new Error("API URL is not defined in environment variables");
+        const savedTicker = localStorage.getItem("selected_ticker");
+        setSelectedTicker(savedTicker || "CRWV");
+        if (!apiUrl) throw new Error("API URL not defined");
 
         const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
-          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
@@ -85,7 +52,7 @@ const IPODashboardMain: React.FC = () => {
         const data = await response.json();
         setAllIpoTickers(data.distinct_tickers || []);
       } catch (err) {
-        console.error("Failed to fetch IPO tickers", err);
+        console.error("Ticker fetch failed", err);
       }
     };
 
@@ -99,8 +66,7 @@ const IPODashboardMain: React.FC = () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
-        if (!apiUrl)
-          throw new Error("API URL is not defined in environment variables");
+        if (!apiUrl) throw new Error("API URL not defined");
 
         const response = await fetch(`${apiUrl}/api/writeup_data/`, {
           method: "POST",
@@ -113,176 +79,44 @@ const IPODashboardMain: React.FC = () => {
 
         if (!response.ok) {
           const errData = await response.json();
-          throw new Error(
-            errData.error || `HTTP error! status: ${response.status}`
-          );
+          throw new Error(errData.error || `HTTP error!`);
         }
 
         const jsonData = await response.json();
         setIpoData(jsonData);
       } catch (err: any) {
-        console.error("Failed to fetch IPO data", err);
+        console.error("IPO data fetch failed", err);
         setError("Failed to fetch IPO data");
       } finally {
         setLoading(false);
       }
     };
 
-    if (selectedTicker) {
-      fetchData();
-    }
+    if (selectedTicker) fetchData();
   }, [selectedTicker]);
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  const cardSections = [
-    { key: "business_overview", title: "Business Overview" },
-    { key: "key_highlights", title: "Key Highlights" },
-    { key: "strengths", title: "Strengths" },
-    { key: "concerns", title: "Concerns" },
-    // We'll inject FinancialForecastTable dynamically after this
-    {
-      key: "principal_stockholders_preipo",
-      title: "Principal Stockholders (pre-IPO)",
-    },
-    { key: "key_management_personnel", title: "Key Management Personnel" },
-  ];
-
   return (
     <Box sx={{ px: 2 }}>
       {ipoData && (
         <>
-          {/* Header and Search */}
-          <Container maxWidth="xl" sx={{ mb: 2 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mt: 2,
-                mb: 2,
-                flexWrap: "wrap",
-                gap: 2,
-              }}
-            >
-              <Typography
-                variant="h5"
-                color="#002060"
-                sx={{ fontWeight: 600, mt: 2, mb: 2 }}
-              >
-                {ipoData.company_name} ({ipoData.ticker_name} |{" "}
-                {ipoData.exchange})
-              </Typography>
-
-              <Autocomplete
-                size="small"
-                options={allIpoTickers}
-                value={selectedTicker}
-                onChange={(_, newValue) => {
-                  setSelectedTicker(newValue);
-                  setSearchText(newValue || "");
-                }}
-                inputValue={searchText}
-                onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
-                sx={{ width: { xs: "100%", sm: "300px" } }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Search ticker..."
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                )}
-                freeSolo
-              />
-            </Box>
-                      <IPOdashboardLine ipodata={ipoData} />
-
-
-    
-          </Container>
+          <IPODashboardHeader
+            ipoData={ipoData}
+            allIpoTickers={allIpoTickers}
+            selectedTicker={selectedTicker}
+            searchText={searchText}
+            setSelectedTicker={setSelectedTicker}
+            setSearchText={setSearchText}
+          />
 
           <IPODashboardCardRatings ipodata={ipoData} />
 
-          {/* Dynamic Cards */}
           <Container maxWidth="xl" sx={{ mb: 3 }}>
             <Grid container spacing={2} sx={{ mb: 3 }}>
               {cardSections.map((section, index) => {
                 const content = ipoData[section.key];
-                const isList = Array.isArray(content);
-
-                // After 'concerns', insert FinancialForecastTable
-                if (section.key === "concerns") {
-                  return (
-                    <React.Fragment key={section.key}>
-                      <Grid item xs={12} md={6}>
-                        <Card
-                          sx={{
-                            backgroundColor:
-                              cardColors[index % cardColors.length],
-                            borderRadius: 2,
-                            boxShadow: 3,
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-                            <Typography
-                              variant="h6"
-                              sx={{
-                                color: "#002060",
-                                mb: 1,
-                                fontWeight: "bold",
-                              }}
-                              align="center"
-                            >
-                              {section.title}
-                            </Typography>
-                            <List dense>
-                              {content?.map((item: string, idx: number) => (
-                                <ListItem
-                                  key={idx}
-                                  alignItems="flex-start"
-                                  sx={{ pl: 0 }}
-                                >
-                                  <ListItemIcon
-                                    sx={{ minWidth: 24, mt: "5px" }}
-                                  >
-                                    <FiberManualRecordIcon
-                                      sx={{ fontSize: 8, color: "#002060" }}
-                                    />
-                                  </ListItemIcon>
-                                  <ListItemText primary={item} />
-                                </ListItem>
-                              ))}
-                            </List>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-
-                      {/* Inject Financial Forecast Table */}
-                      <Grid item xs={12}>
-                        <Box
-                          sx={{
-                            ...cardStyle,
-                            p: 2,
-                            backgroundColor: "#f4f5f7",
-                          }}
-                        >
-                          <FinancialForecastTable defaultTicker={selectedTicker || "CRWV"} />
-                        </Box>
-                      </Grid>
-                    </React.Fragment>
-                  );
-                }
 
                 return (
                   <Grid item xs={12} md={6} key={section.key}>
@@ -306,11 +140,7 @@ const IPODashboardMain: React.FC = () => {
                         </Typography>
                         <List dense>
                           {content?.map((item: string, idx: number) => (
-                            <ListItem
-                              key={idx}
-                              alignItems="flex-start"
-                              sx={{ pl: 0 }}
-                            >
+                            <ListItem key={idx} sx={{ pl: 0 }}>
                               <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
                                 <FiberManualRecordIcon
                                   sx={{ fontSize: 8, color: "#002060" }}
@@ -326,7 +156,14 @@ const IPODashboardMain: React.FC = () => {
                 );
               })}
 
-              {/* Final Section: Main Data Table */}
+              <Grid item xs={12}>
+                <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                  <FinancialForecastTable
+                    defaultTicker={selectedTicker || "CRWV"}
+                  />
+                </Box>
+              </Grid>
+
               <Grid item xs={12}>
                 <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                   <IPODashboardMainTable />

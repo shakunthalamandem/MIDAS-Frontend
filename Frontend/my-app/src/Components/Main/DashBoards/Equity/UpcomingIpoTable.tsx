@@ -10,8 +10,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  useTheme,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface IpoData {
   ticker: string;
@@ -24,15 +24,15 @@ interface IpoData {
 
 const UpcomingIpoTable: React.FC = () => {
   const [ipoData, setIpoData] = useState<IpoData[]>([]);
+  const [dashboardTickers, setDashboardTickers] = useState<string[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  const theme = useTheme();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchIpoData = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/ipo_dashboard_data/`, {
-          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
@@ -42,9 +42,10 @@ const UpcomingIpoTable: React.FC = () => {
         if (!response.ok) throw new Error("Failed to fetch IPO data");
 
         const data: IpoData[] = await response.json();
-
         const uniqueRows = Array.from(
-          new Map(data.map((item) => [`${item.ticker}_${item.expected_date}`, item])).values()
+          new Map(
+            data.map((item) => [`${item.ticker}_${item.expected_date}`, item])
+          ).values()
         );
 
         setIpoData(uniqueRows);
@@ -53,7 +54,26 @@ const UpcomingIpoTable: React.FC = () => {
       }
     };
 
+    const fetchDashboardTickers = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch dashboard tickers");
+
+        const data = await response.json();
+        setDashboardTickers(data.distinct_tickers || []);
+      } catch (error) {
+        console.error("Error fetching dashboard tickers:", error);
+      }
+    };
+
     fetchIpoData();
+    fetchDashboardTickers();
   }, [apiUrl, token]);
 
   const formatNumber = (value: number): string => {
@@ -67,10 +87,14 @@ const UpcomingIpoTable: React.FC = () => {
   const getOrdinalSuffix = (day: number): string => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
-      case 1: return "st";
-      case 2: return "nd";
-      case 3: return "rd";
-      default: return "th";
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
     }
   };
 
@@ -84,17 +108,8 @@ const UpcomingIpoTable: React.FC = () => {
     return `${day}${suffix} ${month} ${year}`;
   };
 
-  const headers = [
-    "Symbol",
-    "Company",
-    "Expected Date",
-    "Offer Price",
-    "Exchange",
-    "Deal Size",
-  ];
-
   return (
-    <Container maxWidth="lg" sx={{ px: 0 }}>
+    <Container maxWidth="lg">
       <Box
         sx={{
           backgroundColor: "#f9f9f9",
@@ -115,18 +130,24 @@ const UpcomingIpoTable: React.FC = () => {
           📈 Upcoming IPOs – June 2025
         </Typography>
 
-        <TableContainer component={Paper} sx={{ borderRadius: 2, overflow: "hidden" }}>
+        <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
-                {headers.map((heading) => (
+                {[
+                  "Symbol",
+                  "Company",
+                  "Expected Date",
+                  "Offer Price",
+                  "Exchange",
+                  "Deal Size",
+                ].map((heading) => (
                   <TableCell
                     key={heading}
                     sx={{
-                      color: "#ffffff",
+                      color: "#fff",
                       fontWeight: 600,
                       fontSize: "0.85rem",
-                      borderBottom: "1px solid #ccc",
                       padding: "10px 12px",
                     }}
                   >
@@ -140,14 +161,32 @@ const UpcomingIpoTable: React.FC = () => {
                 <TableRow
                   key={index}
                   hover
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#f0f8ff",
-                    },
-                  }}
+                  sx={{ "&:hover": { backgroundColor: "#f0f8ff" } }}
                 >
                   <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
-                    {row.ticker}
+                    {dashboardTickers.includes(row.ticker) ? (
+                      <Box
+                        component="span"
+                        sx={{
+                          color: "#fc1400",
+                          textDecoration: "underline",
+                          cursor: "pointer",
+                          fontWeight: 600,
+                          "&:hover": {
+                            color: "#8f0082",
+                            textDecoration: "none",
+                          },
+                        }}
+                        onClick={() => {
+                          localStorage.setItem("selected_ticker", row.ticker);
+                          window.open("/equity/ipo_dashboard", "_blank");
+                        }}
+                      >
+                        {row.ticker}
+                      </Box>
+                    ) : (
+                      row.ticker
+                    )}
                   </TableCell>
                   <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
                     {row.company_name}
