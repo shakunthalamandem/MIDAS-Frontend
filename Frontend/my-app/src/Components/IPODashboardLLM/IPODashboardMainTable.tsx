@@ -38,19 +38,19 @@ const columns: {
   isCurrency?: boolean;
   isPercentage?: boolean;
 }[] = [
-    { key: "competitor", label: "Ticker" },
-    { key: "price_usd", label: "Price (USD)", isCurrency: true },
-    { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
-    { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
-    { key: "present_year_ev_sales", label: "2025 EV/Sales" },
-    { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
-    { key: "present_year_price_earning", label: "2025 P/E" },
-    { key: "one_year_later_price_earning", label: "2026 P/E" },
-    { key: "present_year_ev_fcf", label: "2025 EV/FCF" },
-    { key: "one_year_later_ev_fcf", label: "2026 EV/FCF" },
-    { key: "sales_growth", label: "Sales Growth (25-26)", isPercentage: true },
-    { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
-  ];
+  { key: "competitor", label: "Ticker" },
+  { key: "price_usd", label: "Price (USD)", isCurrency: true },
+  { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
+  { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
+  { key: "present_year_ev_sales", label: "2025 EV/Sales" },
+  { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
+  { key: "present_year_price_earning", label: "2025 P/E" },
+  { key: "one_year_later_price_earning", label: "2026 P/E" },
+  { key: "present_year_ev_fcf", label: "2025 EV/FCF" },
+  { key: "one_year_later_ev_fcf", label: "2026 EV/FCF" },
+  { key: "sales_growth", label: "Sales Growth (25-26)", isPercentage: true },
+  { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
+];
 
 const columnsWithX = new Set([
   "present_year_ev_sales",
@@ -86,8 +86,12 @@ const formatNumber = (
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
-const IPODashboardMainTable: React.FC = () => {
-  const [ticker, setTicker] = useState("CRWV");
+
+interface IPODashboardMainTableProps {
+  ticker: string;
+}
+
+const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker }) => {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,10 +124,11 @@ const IPODashboardMainTable: React.FC = () => {
     }
   };
 
+  // Fetch data when ticker prop changes
   useEffect(() => {
-    handleFetch("CRWV");
+    handleFetch(ticker);
     // eslint-disable-next-line
-  }, []);
+  }, [ticker]);
 
   const noData =
     data &&
@@ -193,22 +198,22 @@ const IPODashboardMainTable: React.FC = () => {
 
                         const displayValue =
                           value === null ||
-                            value === undefined ||
-                            (typeof value === "number" && isNaN(value))
+                          value === undefined ||
+                          (typeof value === "number" && isNaN(value))
                             ? "N/A"
                             : col.key === "price_usd"
-                              ? value
-                              : col.key === "market_cap" || col.key === "ev_usd_million"
-                                ? typeof value === "number"
-                                  ? value.toLocaleString(undefined, { maximumFractionDigits: 1 })
-                                  : value
-                                : typeof value === "number"
-                                  ? formatNumber(
-                                    value,
-                                    col.isCurrency,
-                                    col.isPercentage
-                                  )
-                                  : value;
+                            ? value
+                            : col.key === "market_cap" || col.key === "ev_usd_million"
+                            ? typeof value === "number"
+                              ? value.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                              : value
+                            : typeof value === "number"
+                            ? formatNumber(
+                                value,
+                                col.isCurrency,
+                                col.isPercentage
+                              )
+                            : value;
 
                         return (
                           <TableCell
@@ -221,7 +226,7 @@ const IPODashboardMainTable: React.FC = () => {
                             }}
                           >
                             {columnsWithX.has(col.key) &&
-                              typeof value === "number"
+                            typeof value === "number"
                               ? `${displayValue}x`
                               : displayValue}
                           </TableCell>
