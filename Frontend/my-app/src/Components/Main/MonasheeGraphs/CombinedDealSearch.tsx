@@ -57,7 +57,6 @@ const CombinedDealSearch: React.FC = () => {
       }
       const data = await response.json(); // Type the response
       setResults(data);
-      console.log(data)
     } catch (error) {
       console.error("Error fetching search results:", error);
       // navigate("/error");  

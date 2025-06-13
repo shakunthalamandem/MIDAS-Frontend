@@ -42,7 +42,6 @@ const DealFormSearch: React.FC = () => {
   // Handler for creating a new ticker (You can modify this logic as needed)
   const handleCreateNewTicker = () => {
     // Logic to create a new ticker or handle new item
-    console.log("Creating a new ticker...");
     // Example: navigate to the create page or show a modal
     navigate("/create-ticker");
   };

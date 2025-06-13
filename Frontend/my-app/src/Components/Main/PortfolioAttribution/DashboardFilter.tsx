@@ -119,7 +119,6 @@ const DashboardFilter: React.FC = () => {
     };
 
     setAppliedFilters(filtersForPayload);
-    console.log('Applied Filters:', filtersForPayload);
   };
 
   const handleResetFilters = () => {

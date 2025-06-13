@@ -68,7 +68,6 @@ const Sectorwisedata: React.FC = () => {
                 }
 
                 const result = await response.json();
-                console.log("result", result);
 
                 const formattedData: SectorData[] = Object.entries(result).map(
                     ([sector, regions]: [string, unknown]) => {

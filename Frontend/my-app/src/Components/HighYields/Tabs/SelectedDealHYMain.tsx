@@ -59,7 +59,6 @@ const SelectedDealHYMain: React.FC<SelectedIssuerProps> = ({ issuer_name }) => {
         }
 
         const result = await response.json();
-        console.log("Fetched data:", result);
 
         // Ensure response data is valid
         if (!result.data || !Array.isArray(result.data)) {
