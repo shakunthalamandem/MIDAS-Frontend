@@ -8,7 +8,6 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Paper,
   List,
   ListItem,
   CircularProgress,
@@ -17,10 +16,14 @@ import {
   CardContent,
   ListItemIcon,
   ListItemText,
+  InputAdornment,
+  TextField,
 } from "@mui/material";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"; // bullet icon
+import { isVisible } from "@testing-library/user-event/dist/utils";
+import SearchIcon from "@mui/icons-material/Search";
 
 const cardStyle = {
   background: "#fff",
@@ -52,7 +55,13 @@ const IPODashboardMain: React.FC = () => {
   const [ipoData, setIpoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState("");
 
+  // const combinedString = `${ipoData.company_name} (${ipoData.ticker_name} | ${ipoData.exchange})`;
+
+  // const isVisible = combinedString
+  //   .toLowerCase()
+  //   .includes(searchText.toLowerCase());
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -94,22 +103,48 @@ const IPODashboardMain: React.FC = () => {
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
-  console.log("IPO Data:", ipoData);
   return (
     <Box sx={{ px: 2 }}>
       {ipoData && (
         <>
-        
-
           {/* Info Table */}
           <Container maxWidth="xl" sx={{ mb: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mt: 2,
+                mb: 2,
+                flexWrap: "wrap", // for responsiveness
+                gap: 2,
+              }}
+            >
               <Typography
-            variant="h5"
-            color="#002060"
-            sx={{ fontWeight: 600, mt: 2, mb: 2 }}
-          >
-            {ipoData.company_name} ({ipoData.ticker_name} | {ipoData.exchange})
-          </Typography>
+                variant="h5"
+                color="#002060"
+                sx={{ fontWeight: 600, mt: 2, mb: 2 }}
+              >
+                {ipoData.company_name} ({ipoData.ticker_name} |{" "}
+                {ipoData.exchange})
+              </Typography>
+
+              <TextField
+                size="small"
+                placeholder="Search company..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                sx={{ width: { xs: "100%", sm: "300px" } }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+
             <Table>
               <TableHead sx={{ backgroundColor: "#f5f6fa" }}>
                 <TableRow>
@@ -204,7 +239,11 @@ const IPODashboardMain: React.FC = () => {
                     }}
                   >
                     <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-                      <Typography variant="h6" sx={{ color: "#002060", mb: 1,fontWeight:'bold' }} align="center">
+                      <Typography
+                        variant="h6"
+                        sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
+                        align="center"
+                      >
                         {section.title}
                       </Typography>
                       <List dense>
