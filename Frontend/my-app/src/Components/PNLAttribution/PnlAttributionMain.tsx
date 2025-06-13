@@ -6,7 +6,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
+  Container,
   Typography,
 } from "@mui/material";
 
@@ -91,7 +91,7 @@ const PnlAttributionMain = () => {
     return <Typography>No data available</Typography>;
 
   return (
-    <Paper sx={{ p: 1 }}>
+    <Container maxWidth="lg"  sx={{mb:4}}>
       <Typography
         variant="h5"
         gutterBottom
@@ -110,7 +110,6 @@ const PnlAttributionMain = () => {
           sx={{
             fontFamily: "Roboto, Helvetica, Arial, sans-serif",
             borderCollapse: "collapse",
-            // tableLayout: "fixed", // fix column widths
           }}
         >
           <TableHead>
@@ -127,7 +126,7 @@ const PnlAttributionMain = () => {
                   border: "1px solid black",
                   fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                   fontSize: "0.75rem",
-                  width: 110,
+                
                   padding: "4px 8px",
                 }}
               >
@@ -141,7 +140,7 @@ const PnlAttributionMain = () => {
                   border: "1px solid black",
                   fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                   fontSize: "0.75rem",
-                  width: 110,
+                
                   padding: "4px 8px",
                 }}
               >
@@ -157,7 +156,7 @@ const PnlAttributionMain = () => {
                     border: "1px solid black",
                     fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                     fontSize: "0.75rem",
-                    width: 90,
+                  
                     padding: "4px 8px",
                     textAlign: "right",
                     whiteSpace: "nowrap",
@@ -211,7 +210,7 @@ const PnlAttributionMain = () => {
                               fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                               fontSize: "0.75rem",
                               fontWeight: "bold",
-                              width: 110,
+                           
                               padding: "4px 8px",
                             }}
                           >
@@ -309,7 +308,7 @@ const PnlAttributionMain = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Paper>
+    </Container>
   );
 };
 
