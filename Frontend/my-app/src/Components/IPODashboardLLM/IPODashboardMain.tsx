@@ -12,6 +12,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+import { useParams } from "react-router-dom";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 import IPODashboardHeader from "./IPODashboardHeader";
@@ -21,18 +22,23 @@ import IPODashboardMainTable from "./IPODashboardMainTable";
 import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
 
 const IPODashboardMain: React.FC = () => {
+  const { ticker } = useParams<{ ticker: string }>();
   const [ipoData, setIpoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [allIpoTickers, setAllIpoTickers] = useState<string[]>([]);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>("CRWV");
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(
+    ticker || "CRWV"
+  );
 
   useEffect(() => {
     const fetchAllIpoTickers = async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
+        const savedTicker = localStorage.getItem("selected_ticker");
+        setSelectedTicker(savedTicker || "CRWV");
         if (!apiUrl) throw new Error("API URL not defined");
 
         const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
@@ -112,60 +118,6 @@ const IPODashboardMain: React.FC = () => {
               {cardSections.map((section, index) => {
                 const content = ipoData[section.key];
 
-                if (section.key === "concerns") {
-                  return (
-                    <React.Fragment key={section.key}>
-                      <Grid item xs={12} md={6}>
-                        <Card
-                          sx={{
-                            backgroundColor:
-                              cardColors[index % cardColors.length],
-                            borderRadius: 2,
-                            boxShadow: 3,
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-                            <Typography
-                              variant="h6"
-                              sx={{
-                                color: "#002060",
-                                mb: 1,
-                                fontWeight: "bold",
-                              }}
-                              align="center"
-                            >
-                              {section.title}
-                            </Typography>
-                            <List dense>
-                              {content?.map((item: string, idx: number) => (
-                                <ListItem key={idx} sx={{ pl: 0 }}>
-                                  <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                                    <FiberManualRecordIcon
-                                      sx={{ fontSize: 8, color: "#002060" }}
-                                    />
-                                  </ListItemIcon>
-                                  <ListItemText primary={item} />
-                                </ListItem>
-                              ))}
-                            </List>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                          <FinancialForecastTable
-                            defaultTicker={selectedTicker || "CRWV"}
-                          />
-                        </Box>
-                      </Grid>
-                    </React.Fragment>
-                  );
-                }
-
                 return (
                   <Grid item xs={12} md={6} key={section.key}>
                     <Card
@@ -203,6 +155,14 @@ const IPODashboardMain: React.FC = () => {
                   </Grid>
                 );
               })}
+
+              <Grid item xs={12}>
+                <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                  <FinancialForecastTable
+                    defaultTicker={selectedTicker || "CRWV"}
+                  />
+                </Box>
+              </Grid>
 
               <Grid item xs={12}>
                 <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
