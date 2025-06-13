@@ -21,8 +21,7 @@ import {
 } from "@mui/material";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"; // bullet icon
-import { isVisible } from "@testing-library/user-event/dist/utils";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import SearchIcon from "@mui/icons-material/Search";
 
 const cardStyle = {
@@ -37,12 +36,6 @@ const cardStyle = {
   flexDirection: "column" as const,
 };
 
-const formatPriceRange = (lower: number | null, upper: number | null) => {
-  if (lower && upper) return `$${lower} - $${upper}`;
-  if (lower) return `$${lower}`;
-  if (upper) return `$${upper}`;
-  return "N/A";
-};
 const cardColors = [
   "#f3f6f9",
   "#fdf5e6",
@@ -51,17 +44,20 @@ const cardColors = [
   "#f0f5ff",
   "#f9f0ff",
 ];
+
+const formatPriceRange = (lower: number | null, upper: number | null) => {
+  if (lower && upper) return `$${lower} - $${upper}`;
+  if (lower) return `$${lower}`;
+  if (upper) return `$${upper}`;
+  return "N/A";
+};
+
 const IPODashboardMain: React.FC = () => {
   const [ipoData, setIpoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
 
-  // const combinedString = `${ipoData.company_name} (${ipoData.ticker_name} | ${ipoData.exchange})`;
-
-  // const isVisible = combinedString
-  //   .toLowerCase()
-  //   .includes(searchText.toLowerCase());
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -103,11 +99,22 @@ const IPODashboardMain: React.FC = () => {
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
+
+  const cardSections = [
+    { key: "business_overview", title: "Business Overview" },
+    { key: "key_highlights", title: "Key Highlights" },
+    { key: "strengths", title: "Strengths" },
+    { key: "concerns", title: "Concerns" },
+    // We'll inject FinancialForecastTable dynamically after this
+    { key: "principal_stockholders_preipo", title: "Principal Stockholders (pre-IPO)" },
+    { key: "key_management_personnel", title: "Key Management Personnel" },
+  ];
+
   return (
     <Box sx={{ px: 2 }}>
       {ipoData && (
         <>
-          {/* Info Table */}
+          {/* Header and Search */}
           <Container maxWidth="xl" sx={{ mb: 2 }}>
             <Box
               sx={{
@@ -116,7 +123,7 @@ const IPODashboardMain: React.FC = () => {
                 alignItems: "center",
                 mt: 2,
                 mb: 2,
-                flexWrap: "wrap", // for responsiveness
+                flexWrap: "wrap",
                 gap: 2,
               }}
             >
@@ -145,6 +152,7 @@ const IPODashboardMain: React.FC = () => {
               />
             </Box>
 
+            {/* IPO Info Table */}
             <Table>
               <TableHead sx={{ backgroundColor: "#f5f6fa" }}>
                 <TableRow>
@@ -209,70 +217,101 @@ const IPODashboardMain: React.FC = () => {
             </Table>
           </Container>
 
-          {/* Cards Section */}
-
+          {/* Dynamic Cards */}
           <Container maxWidth="xl" sx={{ mb: 3 }}>
             <Grid container spacing={2} sx={{ mb: 3 }}>
-              {[
-                { title: "Business Overview", data: ipoData.business_overview },
-                { title: "Key Highlights", data: ipoData.key_highlights },
-                { title: "Strengths", data: ipoData.strengths },
-                { title: "Concerns", data: ipoData.concerns },
-                {
-                  title: "Principal Stockholders (pre-IPO)",
-                  data: ipoData.principal_stockholders_preipo,
-                },
-                {
-                  title: "Key Management Personnel",
-                  data: ipoData.key_management_personnel,
-                },
-              ].map((section, index) => (
-                <Grid item xs={12} md={6} key={index}>
-                  <Card
-                    sx={{
-                      backgroundColor: cardColors[index % cardColors.length],
-                      borderRadius: 2,
-                      boxShadow: 3,
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
-                        align="center"
-                      >
-                        {section.title}
-                      </Typography>
-                      <List dense>
-                        {section.data?.map((item: string, idx: number) => (
-                          <ListItem
-                            key={idx}
-                            alignItems="flex-start"
-                            sx={{ pl: 0 }}
-                          >
-                            <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                              <FiberManualRecordIcon
-                                sx={{ fontSize: 8, color: "#002060" }}
-                              />
-                            </ListItemIcon>
-                            <ListItemText primary={item} />
-                          </ListItem>
-                        ))}
-                      </List>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
+              {cardSections.map((section, index) => {
+                const content = ipoData[section.key];
+                const isList = Array.isArray(content);
 
-              {/* Full-width Components */}
-              <Grid item xs={12}>
-                <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                  <FinancialForecastTable defaultTicker="CRWV" />
-                </Box>
-              </Grid>
+                // After 'concerns', insert FinancialForecastTable
+                if (section.key === "concerns") {
+                  return (
+                    <React.Fragment key={section.key}>
+                      <Grid item xs={12} md={6}>
+                        <Card
+                          sx={{
+                            backgroundColor: cardColors[index % cardColors.length],
+                            borderRadius: 2,
+                            boxShadow: 3,
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <CardContent sx={{ overflowY: "auto", flex: 1 }}>
+                            <Typography
+                              variant="h6"
+                              sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
+                              align="center"
+                            >
+                              {section.title}
+                            </Typography>
+                            <List dense>
+                              {content?.map((item: string, idx: number) => (
+                                <ListItem key={idx} alignItems="flex-start" sx={{ pl: 0 }}>
+                                  <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
+                                    <FiberManualRecordIcon
+                                      sx={{ fontSize: 8, color: "#002060" }}
+                                    />
+                                  </ListItemIcon>
+                                  <ListItemText primary={item} />
+                                </ListItem>
+                              ))}
+                            </List>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+
+                      {/* Inject Financial Forecast Table */}
+                      <Grid item xs={12}>
+                        <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                          <FinancialForecastTable defaultTicker="CRWV" />
+                        </Box>
+                      </Grid>
+                    </React.Fragment>
+                  );
+                }
+
+                return (
+                  <Grid item xs={12} md={6} key={section.key}>
+                    <Card
+                      sx={{
+                        backgroundColor: cardColors[index % cardColors.length],
+                        borderRadius: 2,
+                        boxShadow: 3,
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <CardContent sx={{ overflowY: "auto", flex: 1 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
+                          align="center"
+                        >
+                          {section.title}
+                        </Typography>
+                        <List dense>
+                          {content?.map((item: string, idx: number) => (
+                            <ListItem key={idx} alignItems="flex-start" sx={{ pl: 0 }}>
+                              <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
+                                <FiberManualRecordIcon
+                                  sx={{ fontSize: 8, color: "#002060" }}
+                                />
+                              </ListItemIcon>
+                              <ListItemText primary={item} />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })}
+
+              {/* Final Section: Main Data Table */}
               <Grid item xs={12}>
                 <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                   <IPODashboardMainTable />
