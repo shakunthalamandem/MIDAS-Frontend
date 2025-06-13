@@ -18,13 +18,11 @@ import DealFormMain from "../Components/DealsForm/DealFormMain";
 
 import Logs from "../Components/Main/HomePage/Authentication/Logs";
 import DealStats from "../Components/Main/MonasheeDeals/MddGraphs/DealStats";
-import WeeklyStatsChart from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyStatsChart";
 import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
 import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
 import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
-import SelectedTicker from "../Components/Main/MonasheeGraphs/SelectedTicker";
 import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable";
 import HighYieldsMain from "../Components/HighYields/HighYieldsMain";
 import DealStatsMain from "../Components/HighYields/Tabs/DealStatsMain";
@@ -44,22 +42,18 @@ import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 
 import MainUpload from "../Components/Uploads/MainUpload";
 import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
-// import DownloadDeals from "../Components/Uploads/DownloadDeals";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 import DealformInformation from "../Components/NewDealForm/DealformInformation";
 import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
 
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
 import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
-import AiInsightsInputForm from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/AiInsightsInputForm";
 import IntelligenceDashboard from "../Components/Main/DashBoards/IntelligenceDashboard";
 import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdashboardMain";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
-import FileUpload from "../Components/IPOwriteUp/FileUpload";
 import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
 import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketOpportnuityMain";
 import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
-
 import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 
 
@@ -161,7 +155,16 @@ const AppRouters: React.FC = () => {
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
 
 
-        <Route path="/ipo-dashboard" element={<AuthGuard><IPODashboardMain/></AuthGuard>} />
+<Route
+  path="/equity/ipo_dashboard"
+  element={
+    <AuthGuard>
+      <IPODashboardMain />
+    </AuthGuard>
+  }
+/>
+
+
 
 
 

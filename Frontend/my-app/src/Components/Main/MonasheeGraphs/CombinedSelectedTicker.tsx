@@ -7,6 +7,7 @@ import {
   FormControlLabel,
   Checkbox,
   Container,
+  Alert,
 } from "@mui/material";
 import axios from "axios";
 import { SelectedTickerProps, ApiResponse } from "./tickerUtils";
@@ -100,11 +101,18 @@ const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
         )}
 
         {/* === Case 2: Only Dealogic Available === */}
-        {!hasMddData && hasDealogicData && (
-          <Container>
-            {HistoricalDealogicCards(ticker, data.dealogic_data.data)}
-          </Container>
-        )}
+     {!hasMddData && hasDealogicData && (
+ 
+<Container>
+  <Alert severity="info" sx={{ mb: 2 }}>
+    <strong>Note:</strong> No Monashee participation for this deal
+  </Alert>
+  {HistoricalDealogicCards(ticker, data.dealogic_data.data)}
+</Container>
+ 
+
+)}
+
 
         {/* === Case 3: Both Available === */}
         {hasMddData && hasDealogicData && (

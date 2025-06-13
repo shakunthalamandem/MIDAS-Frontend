@@ -72,7 +72,6 @@ const DealStatsMain = () => {
           },
         });
         setFilters(response.data as HighYieldOptions);
-        console.log("Fetched Filters:", response.data);
       } catch (error) {
         setError('Failed to fetch filter options');
         console.error('Error fetching filter options:', error);

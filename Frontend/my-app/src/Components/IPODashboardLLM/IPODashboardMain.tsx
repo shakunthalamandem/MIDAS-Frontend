@@ -1,211 +1,177 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
+  Grid,
   CircularProgress,
-  Alert,
-  TextField,
-  Button,
+  Container,
+  Card,
+  CardContent,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
+import { useParams } from "react-router-dom";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
-// Types for API response
-type ComparableMetric = {
-  ticker_names: string;
-  price_usd: string;
-  market_cap: number | null;
-  ev_usd_million: number | null;
-  present_year_ev_sales: number | null;
-  one_year_later_ev_sales: number | null;
-  present_year_price_earning: number | null;
-  one_year_later_price_earning: number | null;
-  present_year_ev_fcf: number | null;
-  one_year_later_ev_fcf: number | null;
-  sales_growth: number | null;
-  eps_growth: number | null;
-};
-
-type ApiResponse = Record<string, ComparableMetric[]>;
-
-// Table columns
-const columns: { key: keyof ComparableMetric; label: string; isCurrency?: boolean; isPercentage?: boolean }[] = [
-  { key: "ticker_names", label: "Ticker" },
-  { key: "price_usd", label: "Price (USD)", isCurrency: true },
-  { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
-  { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
-  { key: "present_year_ev_sales", label: "2025 EV/Sales" },
-  { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
-  { key: "present_year_price_earning", label: "2025 P/E" },
-  { key: "one_year_later_price_earning", label: "2026 P/E" },
-  { key: "present_year_ev_fcf", label: "2025 EV/FCF" },
-  { key: "one_year_later_ev_fcf", label: "2026 EV/FCF" },
-  { key: "sales_growth", label: "Sales Growth (25-26)", isPercentage: true },
-  { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
-];
-
-// Format function
-const formatNumber = (
-  value: number,
-  isCurrency = false,
-  isPercentage = false
-): string => {
-  if (value === null || value === undefined || isNaN(value)) return "N/A";
-  let formattedValue: string;
-  const absValue = Math.abs(value);
-
-  if (absValue >= 1e9) {
-    formattedValue = Number.isInteger(absValue / 1e9)
-      ? `${(absValue / 1e9).toFixed(0)}B`
-      : `${(absValue / 1e9).toFixed(1)}B`;
-  } else if (absValue >= 1e6) {
-    formattedValue = Number.isInteger(absValue / 1e6)
-      ? `${(absValue / 1e6).toFixed(0)}M`
-      : `${(absValue / 1e6).toFixed(1)}M`;
-  } else if (absValue >= 1e3) {
-    formattedValue = Number.isInteger(absValue / 1e3)
-      ? `${(absValue / 1e3).toFixed(0)}K`
-      : `${(absValue / 1e3).toFixed(1)}K`;
-  } else {
-    formattedValue = Number.isInteger(absValue)
-      ? absValue.toFixed(0)
-      : absValue.toFixed(2);
-  }
-
-  if (isCurrency) formattedValue = `$${formattedValue}`;
-  if (isPercentage) formattedValue = `${value.toFixed(1)}%`;
-
-  return value < 0 ? `-${formattedValue}` : formattedValue;
-};
+import IPODashboardHeader from "./IPODashboardHeader";
+import IPODashboardCardRatings from "./IPODashboardCardRatings";
+import FinancialForecastTable from "./IPOFinancialTableMain";
+import IPODashboardMainTable from "./IPODashboardMainTable";
+import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
 
 const IPODashboardMain: React.FC = () => {
-  const [ticker, setTicker] = useState("");
-  const [data, setData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { ticker } = useParams<{ ticker: string }>();
+  const [ipoData, setIpoData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState("");
+  const [allIpoTickers, setAllIpoTickers] = useState<string[]>([]);
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(
+    ticker || "CRWV"
+  );
 
-  const handleFetch = async () => {
-    setLoading(true);
-    setError(null);
-    setData(null);
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
-      if (!apiUrl) throw new Error("API URL not set");
-      const response = await fetch(`${apiUrl}/api/companymetric_data_view/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({ ticker }),
-      });
-      const json = await response.json();
-      if (!response.ok) {
-        throw new Error(json.error || json.message || "Failed to fetch data");
+  useEffect(() => {
+    const fetchAllIpoTickers = async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
+        const savedTicker = localStorage.getItem("selected_ticker");
+        setSelectedTicker(savedTicker || "CRWV");
+        if (!apiUrl) throw new Error("API URL not defined");
+
+        const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch IPO tickers");
+        const data = await response.json();
+        setAllIpoTickers(data.distinct_tickers || []);
+      } catch (err) {
+        console.error("Ticker fetch failed", err);
       }
-      setData(json);
-    } catch (e: any) {
-      setError(e.message || "Unknown error");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  // Check if there is no data for the ticker
-  const noData =
-    data &&
-    Object.values(data).every((metrics) => !metrics || metrics.length === 0);
+    fetchAllIpoTickers();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
+        if (!apiUrl) throw new Error("API URL not defined");
+
+        const response = await fetch(`${apiUrl}/api/writeup_data/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ ticker: selectedTicker || "CRWV" }),
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error || `HTTP error!`);
+        }
+
+        const jsonData = await response.json();
+        setIpoData(jsonData);
+      } catch (err: any) {
+        console.error("IPO data fetch failed", err);
+        setError("Failed to fetch IPO data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (selectedTicker) fetchData();
+  }, [selectedTicker]);
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Box sx={{ p: 3, maxWidth: "1300px", margin: "auto" }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Comparable Company Metrics
-      </Typography>
-      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-        <TextField
-          label="Ticker"
-          value={ticker}
-          onChange={(e) => setTicker(e.target.value)}
-          size="small"
-          onKeyDown={(e) => {
-          if (e.key === "Enter" && !loading && ticker) {
-            handleFetch();
-          }
-    }}
-        />
-        <Button
-          variant="contained"
-          onClick={handleFetch}
-          disabled={loading || !ticker}
-        >
-          Fetch
-        </Button>
-      </Box>
-      {loading && <CircularProgress />}
-      {error && <Alert severity="error">{error}</Alert>}
-      {noData && (
-        <Alert severity="info">No data found for this ticker.</Alert>
-      )}
-      {!loading && !error && data && !noData && (
-        <TableContainer component={Paper} elevation={4}>
-          <Table size="small">
-            <TableHead sx={{ backgroundColor: "#002060" }}>
-              <TableRow>
-                {columns.map((col) => (
-                  <TableCell
-                    key={col.key}
-                    sx={{
-                      fontWeight: "bold",
-                      color: "#FFFFFF",
-                      border: "1px solid #000000",
-                      textAlign: "center",
-                    }}
-                  >
-                    {col.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.entries(data).map(([tickerKey, metrics]) =>
-                metrics.map((metric, idx) => (
-                  <TableRow key={`${tickerKey}-${idx}`}>
-                    {columns.map((col) => {
-                      const value = metric[col.key];
-                      return (
-                        <TableCell
-                          key={col.key}
+    <Box sx={{ px: 2 }}>
+      {ipoData && (
+        <>
+          <IPODashboardHeader
+            ipoData={ipoData}
+            allIpoTickers={allIpoTickers}
+            selectedTicker={selectedTicker}
+            searchText={searchText}
+            setSelectedTicker={setSelectedTicker}
+            setSearchText={setSearchText}
+          />
+
+          <IPODashboardCardRatings ipodata={ipoData} />
+
+          <Container maxWidth="xl" sx={{ mb: 3 }}>
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              {cardSections.map((section, index) => {
+                const content = ipoData[section.key];
+
+                return (
+                  <Grid item xs={12} md={6} key={section.key}>
+                    <Card
+                      sx={{
+                        backgroundColor: cardColors[index % cardColors.length],
+                        borderRadius: 2,
+                        boxShadow: 3,
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <CardContent sx={{ overflowY: "auto", flex: 1 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
                           align="center"
-                          sx={{ border: "1px solid #000000" }}
                         >
-                          {col.key === "price_usd"
-                            ? value || "N/A"
-                            : value === null ||
-                              value === undefined ||
-                              (typeof value === "number" && isNaN(value))
-                            ? "N/A"
-                            : typeof value === "number"
-                            ? formatNumber(
-                                value as number,
-                                col.isCurrency,
-                                col.isPercentage
-                              )
-                            : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                          {section.title}
+                        </Typography>
+                        <List dense>
+                          {content?.map((item: string, idx: number) => (
+                            <ListItem key={idx} sx={{ pl: 0 }}>
+                              <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
+                                <FiberManualRecordIcon
+                                  sx={{ fontSize: 8, color: "#002060" }}
+                                />
+                              </ListItemIcon>
+                              <ListItemText primary={item} />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })}
+
+              <Grid item xs={12}>
+                <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                  <FinancialForecastTable
+                    defaultTicker={selectedTicker || "CRWV"}
+                  />
+                </Box>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                  <IPODashboardMainTable />
+                </Box>
+              </Grid>
+            </Grid>
+          </Container>
+        </>
       )}
     </Box>
   );

@@ -97,7 +97,7 @@ const MDDSearchSummary: React.FC<MDDSearchSummaryProps> = ({ summary }) => {
         sx={{
           padding: 1.5,
           borderBottom: "1px solid #e0e0e0",
-          backgroundColor: "#f5f5f5",
+          // backgroundColor: "#ecf6bb",
           borderRadius: "8px 8px 0 0",
         }}
       >

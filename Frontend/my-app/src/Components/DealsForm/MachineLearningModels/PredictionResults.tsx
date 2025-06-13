@@ -13,6 +13,7 @@ import {
   Container,
   Button,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
@@ -33,20 +34,29 @@ interface PredictionResultsProps {
   onRepredict?: (t1dOpenPrice: number) => void;
 }
 
-const PredictionResults: React.FC<PredictionResultsProps> = ({result, onRepredict,}) => {
+const PredictionResults: React.FC<PredictionResultsProps> = ({
+  result,
+  onRepredict,
+}) => {
   const [price, setPrice] = useState<number | "">("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPrice(value === "" ? "" : parseFloat(value));
   };
 
-  const handleRepredict = () => {
+  const handleRepredict = async () => {
     if (typeof price === "number" && onRepredict) {
       onRepredict(price);
+      setIsLoading(true);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000)); 
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
-
   const modelVersions = Array.from(
     new Set(Object.keys(result).map((key) => key.split("_")[0]))
   );
@@ -121,7 +131,11 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({result, onRepredic
 
     const isTrue = value.toLowerCase() === "true";
     return (
-      <Box display="flex" alignItems="center" color={isTrue ? "success.main" : "error.main"}>
+      <Box
+        display="flex"
+        alignItems="center"
+        color={isTrue ? "success.main" : "error.main"}
+      >
         {isTrue ? (
           <>
             <CheckCircleIcon sx={{ mr: 1 }} /> Yes
@@ -199,7 +213,12 @@ Threshold: Return < -2%`,
           boxShadow: 3,
         }}
       >
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={2}
+        >
           <Box display="flex" alignItems="center">
             <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
             <Typography variant="h6" color="primary">
@@ -210,7 +229,7 @@ Threshold: Return < -2%`,
           {onRepredict && (
             <Box display="flex" alignItems="center">
               <TextField
-                label="T+1 Day Open Price %"
+                label="T+1 Day Open Return"
                 variant="outlined"
                 value={price}
                 onChange={handlePriceChange}
@@ -221,17 +240,27 @@ Threshold: Return < -2%`,
               <Button
                 variant="outlined"
                 onClick={handleRepredict}
-                sx={{ backgroundColor: "#002060", color: "#FFF" }}
+                disabled={isLoading}
+                sx={{
+                  backgroundColor: "#002060",
+                  color: "#fff",
+                  "&:disabled": { backgroundColor: "#002060", color: "#ccc" },
+                }}
               >
-                Repredict
+                {isLoading ? (
+                  <CircularProgress size={24} sx={{ color: "#fff" }} />
+                ) : (
+                  "Repredict"
+                )}
               </Button>
             </Box>
           )}
         </Box>
 
         <Typography variant="body1" gutterBottom>
-          Using trained machine learning models, this report provides insights into the expected return profile
-          of a prospective equity deal under current conditions.
+          Using trained machine learning models, this report provides insights
+          into the expected return profile of a prospective equity deal under
+          current conditions.
         </Typography>
 
         <Divider sx={{ my: 3 }} />
@@ -296,21 +325,18 @@ Threshold: Return < -2%`,
                 ? renderOutcome(modelData.prediction)
                 : renderBinaryResult(modelData.prediction);
 
-            return (
-              <React.Fragment key={version}>
-                <TableCell sx={{ bgcolor: cellColor }}>{renderResult}</TableCell>
-                <TableCell sx={{ bgcolor: cellColor }}>
-                  {renderConfidenceLevel(modelData.Accuracy)}
-                </TableCell>
-              </React.Fragment>
-            );
-          })}
-        </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-</TableContainer>
-
+                    return (
+                      <React.Fragment key={version}>
+                        <TableCell>{renderResult}</TableCell>
+                        <TableCell>{renderConfidenceLevel(modelData.Accuracy)}</TableCell>
+                      </React.Fragment>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Paper>
     </Container>
   );

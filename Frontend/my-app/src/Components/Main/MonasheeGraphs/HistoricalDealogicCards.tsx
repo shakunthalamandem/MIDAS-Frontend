@@ -45,11 +45,18 @@ const HistoricalDealogicCards = (
           {ticker} - {deals.length} deals
         </span>
       </Typography>
-
+      <Paper
+        sx={{
+          p: 3,
+          bgcolor: "#a3b5e7",
+          mb: 4,
+        }}
+        elevation={2}
+      >
       {deals.map((deal, idx) => (
         <Paper
           key={idx}
-          sx={{ mb: 3, p: 2, bgcolor: "#ffffff", borderRadius: 1 }}
+          sx={{ mb: 3, p: 2, borderRadius: 1 }}
           elevation={1}
         >
           <Typography
@@ -188,6 +195,7 @@ const HistoricalDealogicCards = (
           </Grid>
         </Paper>
       ))}
+      </Paper>
     </>
   );
 };

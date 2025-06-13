@@ -158,7 +158,7 @@ const MainUpload: React.FC = () => {
                 </FormControl>
 
                 { (
-                  <Box sx={{ mt: 4, height: "240px" }}>
+                  <Box sx={{ mt: 4, height: "340px" }}>
                     <Typography variant="subtitle1" align="center" color="textSecondary" gutterBottom>
                       {uploadConfigs.find((cfg) => cfg.key === activeUpload)?.label}
                     </Typography>

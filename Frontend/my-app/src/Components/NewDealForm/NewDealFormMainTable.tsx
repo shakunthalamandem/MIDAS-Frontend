@@ -31,6 +31,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import CancelIcon from '@mui/icons-material/Cancel';
+
 
 interface NewDealFormMainTableProps {
   selecteditems: any;
@@ -229,6 +231,9 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
     "next_results_date",
     "pricing_date",
   ];
+ const handleCancel = () => {
+  window.location.href = "/equity/issue_market"; 
+};
 
   useEffect(() => {
     const fetchData = async () => {
@@ -713,11 +718,31 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
               backgroundColor: "#005b06",
               textTransform: "none",
               borderRadius: 2,
+                mr: 2,
               "&:hover": { backgroundColor: "#001540" },
             }}
           >
             {isEditMode ? "Edit" : "Save"}
           </Button>
+     {!isEditMode && (
+    <Button
+      onClick={handleCancel}
+      startIcon={<CancelIcon />}
+      variant="outlined"
+      color="secondary"
+      sx={{
+        backgroundColor: "#ffffff",
+        textTransform: "none",
+        color: "red",
+        fontWeight: "bold",
+        border: "1px solid red",
+        borderRadius: 2,
+        "&:hover": { backgroundColor: "#002060", color: "#ffffff" },
+      }}
+    >
+      Cancel
+    </Button>
+  )}
         </Box>
       </Tabs>
 
