@@ -33,18 +33,26 @@ const statusIcon = {
 const InsightCard = ({ title, metric, change, status, comment }: InsightCardProps) => (
   <Card sx={{ borderRadius: 1, borderLeft: `6px solid ${status === "up" ? "green" : status === "down" ? "red" : "grey"}`, p: 2 }}>
     <CardContent>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
+      <Box alignItems="center" justifyContent="space-between">
         <Typography variant="subtitle1" fontWeight="bold">
           {title}
         </Typography>
       </Box>
       <Chip
-          icon={statusIcon[status]}
-          label={change}
-          variant="outlined"
-          size="small"
-        />
-      <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
+        icon={statusIcon[status]}
+        label={change}
+        variant="outlined"
+        size="small"
+        sx={(theme) => ({
+          backgroundColor:
+            status === "up"
+              ? theme.palette.success.light
+              : status === "down"
+              ? theme.palette.error.light
+              : theme.palette.grey[200],
+        })}
+      />
+      <Typography variant="body1" color="primary" sx={{ mt: 1 }}>
         {metric}
       </Typography>
       <Typography variant="body2" sx={{ mt: 1 }}>
@@ -97,6 +105,13 @@ const InsightsMain = () => {
     "change": "+15% / +12%",
     "status": "up",
     "comment": "High premium returns in both sectors driven by robust pipelines."
+  },
+  {
+    "title": "Allocation Trends",
+    "metric": "IPO vs FO",
+    "change": "-0.1% / -0.2%",
+    "status": "down",
+    "comment": "Allocations are down in both segments"
   },
   {
     "title": "APAC Region (2025 YTD)",
