@@ -18,16 +18,7 @@ const ratingFields = [
 ];
 
 const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({ ipodata }) => {
-  console.log("IPODashboardCardRatings ipodata:", {
-    profitability: ipodata?.profitability,
-    leverage: ipodata?.leverage,
-    management_quality: ipodata?.management_quality,
-    customer_mix: ipodata?.customer_mix,
-    barriers_to_entry: ipodata?.barriers_to_entry,
-    proprietary_solution: ipodata?.proprietary_solution,
-    near_term_catalyst: ipodata?.near_term_catalyst,
-    valuation_attractiveness: ipodata?.valuation_attractiveness,
-  });
+
 
   if (!ipodata || Object.keys(ipodata).length === 0) {
     return null; // Or show a loader/placeholder
