@@ -57,7 +57,7 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({ ipoda
                     <Box>
                       <Typography
                         variant="body1"
-                        sx={{ fontWeight: 600, mb: 1, textTransform: "capitalize", color: "#002060" }}
+                        sx={{ fontWeight: 600, mb: 1, textTransform: "capitalize", color: "#124180" }}
                       >
                         {field.replace(/_/g, " ")}
                       </Typography>
@@ -66,17 +66,18 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({ ipoda
                         {[1, 2, 3, 4, 5].map((index) => (
                           <Grid item key={index}>
                             <motion.div
-                              initial={{ scaleX: 0 }}
-                              animate={{ scaleX: index <= value ? 1 : 0 }}
+                              initial={{ scaleX: index <= value ? 0 : 1 }}
+                              animate={{ scaleX: 1 }}
                               transition={{ duration: 0.5 }}
                               style={{
                                 transformOrigin: "left",
                                 width: 30,
                                 height: 8,
                                 borderRadius: 2,
-                                backgroundColor: index <= value ? "#002060" : "#000000",
+                                backgroundColor: index <= value ? "#213682" : "#ccc", // Gray for unfilled
                               }}
                             />
+
                           </Grid>
                         ))}
                       </Grid>
