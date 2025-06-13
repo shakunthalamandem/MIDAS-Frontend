@@ -110,7 +110,7 @@ const PnlAttributionMain = () => {
           sx={{
             fontFamily: "Roboto, Helvetica, Arial, sans-serif",
             borderCollapse: "collapse",
-            tableLayout: "fixed", // fix column widths
+            // tableLayout: "fixed", // fix column widths
           }}
         >
           <TableHead>
@@ -168,6 +168,7 @@ const PnlAttributionMain = () => {
                   {month}
                 </TableCell>
               ))}
+
             </TableRow>
           </TableHead>
 
@@ -256,52 +257,50 @@ const PnlAttributionMain = () => {
                     );
                   })}
 
- <TableRow
-  sx={{
-    backgroundColor: "rgb(145, 206, 137)",
-    fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-    fontWeight: "bold",
-    fontSize: "0.75rem",
-    height: 26,
-  }}
->
-  <TableCell
-    colSpan={1}
-    sx={{ border: "1px solid black", padding: "4px 8px", textAlign: "left" }}
-  ></TableCell>
+                  <TableRow
+                    sx={{
+                      backgroundColor: "rgb(145, 206, 137)",
+                      fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+                      fontWeight: "bold",
+                      fontSize: "0.75rem",
+                      // height: 26,
+                    }}
+                  >
+                    <TableCell
+                      sx={{
+                        border: "1px solid black",
+                        padding: "4px 8px",
+                        fontWeight: "bold",
+                        fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+                        fontSize: "0.75rem",
+                        textAlign: "left",
+                      }}
+                    >
+                      Total
+                    </TableCell>
 
-  <TableCell
-    sx={{
-      border: "1px solid black",
-      padding: "4px 8px",
-      fontWeight: "bold",
-      fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-      fontSize: "0.75rem",
-      textAlign: "left",
-    }}
-  >
-    {assetType} Total
-  </TableCell>
 
-  {allMonths.map((month) => (
-    <TableCell
-      key={month}
-      sx={{
-        border: "1px solid black",
-        fontWeight: "bold",
-        textAlign: "right",
-        padding: "4px 8px",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-        fontSize: "0.75rem",
-      }}
-    >
-      {formatNumber(totals[month])}
-    </TableCell>
-  ))}
-</TableRow>
+
+
+                    {allMonths.map((month) => (
+                      <TableCell
+                        key={month}
+                        sx={{
+                          border: "1px solid black",
+                          fontWeight: "bold",
+                          textAlign: "right",
+                          padding: "4px 8px",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        {formatNumber(totals[month])}
+                      </TableCell>
+                    ))}
+                  </TableRow>
 
 
                 </React.Fragment>
