@@ -317,13 +317,14 @@ const PnlAttributionMain = () => {
                     );
                   })}
 
-                  {/* Total Row without icon */}
+                  {/* Total Row with collapse icon on Fund Name */}
                   <TableRow
                     sx={{
                       backgroundColor: "rgb(145, 206, 137)",
                       fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                       fontWeight: "bold",
                       fontSize: "0.75rem",
+                      height: 26,
                     }}
                   >
                     <TableCell
@@ -335,9 +336,27 @@ const PnlAttributionMain = () => {
                         fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                         fontSize: "0.75rem",
                         textAlign: "left",
+                        position: "relative",
+                        paddingRight: "32px", // space for icon
+                        cursor: "pointer",
+                        userSelect: "none",
                       }}
+                      onClick={() => handleToggleExpand(assetType)}
                     >
                       Total
+                      <IconButton
+                        size="small"
+                        sx={{
+                          position: "absolute",
+                          right: 4,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          padding: "2px",
+                        }}
+                        aria-label="Collapse"
+                      >
+                        <Remove fontSize="small" />
+                      </IconButton>
                     </TableCell>
                     {allMonths.map((month) => (
                       <TableCell
