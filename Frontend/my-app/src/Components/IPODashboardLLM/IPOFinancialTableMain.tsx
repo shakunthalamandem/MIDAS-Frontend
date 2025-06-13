@@ -43,6 +43,15 @@ interface FinancialForecastTableProps {
   defaultTicker?: string;
 }
 
+function formatFinancialValue(value: number | string): string {
+  if (value === null || value === undefined || value === "N/A") return "N/A";
+  const num = Number(value);
+  if (isNaN(num)) return String(value);
+
+  const absValue = Math.abs(num).toLocaleString("en-US");
+  return num < 0 ? `(${absValue})` : absValue;
+}
+
 const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
   defaultTicker = "CRWV",
 }) => {
@@ -105,7 +114,7 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
       >
         Financial Forecasts (FYE Dec 31, Internal Estimates)
       </Typography>
-   
+
       {forecastsLoading && <CircularProgress />}
       {forecastsError && <Alert severity="error">{forecastsError}</Alert>}
       {!forecastsLoading &&
@@ -156,9 +165,7 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                         align="center"
                         sx={{ border: "1px solid #000000" }}
                       >
-                        {years[yearKey] !== null && years[yearKey] !== undefined
-                          ? years[yearKey]
-                          : "N/A"}
+                        {formatFinancialValue(years[yearKey])}
                       </TableCell>
                     ))}
                   </TableRow>
