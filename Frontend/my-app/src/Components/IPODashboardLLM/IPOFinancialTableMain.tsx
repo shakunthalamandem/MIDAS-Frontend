@@ -13,6 +13,7 @@ import {
   Alert,
   TextField,
   Button,
+  Container,
 } from "@mui/material";
 
 // Forecasts table columns
@@ -90,7 +91,8 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
 
   return (
     <Box>
-      <Typography variant="h6" sx={{ mb: 2, mt: 4 }}>
+      <Container sx={{ maxWidth: "xl", b: 4 }}>
+      <Typography variant="h6" sx={{ mb: 2, mt: 4 }} color="#002060" fontWeight={600} align="center">
         Financial Forecasts (FYE Dec 31, Internal Estimates)
       </Typography>
       <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
@@ -175,6 +177,7 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
       {!forecastsLoading && forecasts && !forecasts[forecastsTicker.toUpperCase()] && (
         <Alert severity="info">No forecasts found for this ticker.</Alert>
       )}
+      </Container>
     </Box>
   );
 };
