@@ -23,6 +23,7 @@ import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import SearchIcon from "@mui/icons-material/Search";
+import IPODashboardCardRatings from "./IPODashboardCardRatings";
 
 const cardStyle = {
   background: "#fff",
@@ -151,6 +152,9 @@ const IPODashboardMain: React.FC = () => {
                 }}
               />
             </Box>
+
+            <IPODashboardCardRatings ipodata={ipoData} />
+
 
             {/* IPO Info Table */}
             <Table>
