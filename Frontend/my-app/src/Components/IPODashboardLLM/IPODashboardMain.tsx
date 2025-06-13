@@ -99,16 +99,17 @@ const IPODashboardMain: React.FC = () => {
     <Box sx={{ px: 2 }}>
       {ipoData && (
         <>
+        
+
           {/* Info Table */}
           <Container maxWidth="xl" sx={{ mb: 2 }}>
-            <Typography
-              variant="h5"
-              color="#002060"
-              sx={{ fontWeight: 600, mt: 2, mb: 2 }}
-            >
-              {ipoData.company_name} ({ipoData.ticker_name} | {ipoData.exchange}
-              )
-            </Typography>
+              <Typography
+            variant="h5"
+            color="#002060"
+            sx={{ fontWeight: 600, mt: 2, mb: 2 }}
+          >
+            {ipoData.company_name} ({ipoData.ticker_name} | {ipoData.exchange})
+          </Typography>
             <Table>
               <TableHead sx={{ backgroundColor: "#f5f6fa" }}>
                 <TableRow>
@@ -203,11 +204,7 @@ const IPODashboardMain: React.FC = () => {
                     }}
                   >
                     <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
-                        align="center"
-                      >
+                      <Typography variant="h6" sx={{ color: "#002060", mb: 1,fontWeight:'bold' }} align="center">
                         {section.title}
                       </Typography>
                       <List dense>

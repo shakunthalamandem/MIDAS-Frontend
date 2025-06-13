@@ -136,29 +136,10 @@ const IPODashboardMainTable: React.FC = () => {
   return (
     <Box sx={{ p: 0, width: "100%" }}>
       {/* Comparable Company Metrics Table */}
-      <Typography variant="h6" sx={{ mb: 2 }}>
+      <Typography variant="h6" sx={{ mb: 2 }} color="#002060" align="center" fontWeight={600}>
         Comparative Trading Multiples & Performance Metrics
       </Typography>
-      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-        <TextField
-          label="Ticker"
-          value={ticker}
-          onChange={(e) => setTicker(e.target.value)}
-          size="small"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !loading && ticker) {
-              handleFetch();
-            }
-          }}
-        />
-        <Button
-          variant="contained"
-          onClick={() => handleFetch()}
-          disabled={loading || !ticker}
-        >
-          Fetch
-        </Button>
-      </Box>
+    
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
       {noData && (
