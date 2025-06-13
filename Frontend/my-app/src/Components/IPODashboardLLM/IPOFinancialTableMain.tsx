@@ -61,17 +61,22 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
       const token = localStorage.getItem("access_token");
       if (!apiUrl) throw new Error("API URL not set");
       const tickerToFetch = customTicker ?? forecastsInput;
-      const response = await fetch(`${apiUrl}/api/financial_forecasts_data_view/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({ ticker: tickerToFetch }),
-      });
+      const response = await fetch(
+        `${apiUrl}/api/financial_forecasts_data_view/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ ticker: tickerToFetch }),
+        }
+      );
       const json = await response.json();
       if (!response.ok) {
-        throw new Error(json.error || json.message || "Failed to fetch forecasts");
+        throw new Error(
+          json.error || json.message || "Failed to fetch forecasts"
+        );
       }
       setForecasts(json);
       setForecastsTicker(tickerToFetch);
@@ -90,51 +95,27 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
   }, [defaultTicker]);
 
   return (
-    <Box>
-      <Container sx={{ maxWidth: "xl", b: 4 }}>
-      <Typography variant="h6" sx={{ mb: 2, mt: 4 }} color="#002060" fontWeight={600} align="center">
+    <Container sx={{ maxWidth: "xl", b: 4 }}>
+      <Typography
+        variant="h6"
+        sx={{ mb: 2, mt: 4 }}
+        color="#002060"
+        fontWeight={600}
+        align="center"
+      >
         Financial Forecasts (FYE Dec 31, Internal Estimates)
       </Typography>
-      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-        <TextField
-          label="Ticker"
-          value={forecastsInput}
-          onChange={(e) => setForecastsInput(e.target.value)}
-          size="small"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !forecastsLoading && forecastsInput) {
-              handleFetchForecasts();
-            }
-          }}
-        />
-        <Button
-          variant="contained"
-          onClick={() => handleFetchForecasts()}
-          disabled={forecastsLoading || !forecastsInput}
-        >
-          Fetch
-        </Button>
-      </Box>
+   
       {forecastsLoading && <CircularProgress />}
       {forecastsError && <Alert severity="error">{forecastsError}</Alert>}
-      {!forecastsLoading && forecasts && forecasts[forecastsTicker.toUpperCase()] && (
-        <TableContainer component={Paper} elevation={4}>
-          <Table size="small">
-            <TableHead sx={{ backgroundColor: "#002060" }}>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#FFFFFF",
-                    border: "1px solid #000000",
-                    textAlign: "center",
-                  }}
-                >
-                  ($US M)
-                </TableCell>
-                {forecastYearLabels.map((label) => (
+      {!forecastsLoading &&
+        forecasts &&
+        forecasts[forecastsTicker.toUpperCase()] && (
+          <TableContainer component={Paper} elevation={4}>
+            <Table size="small">
+              <TableHead sx={{ backgroundColor: "#002060" }}>
+                <TableRow>
                   <TableCell
-                    key={label}
                     sx={{
                       fontWeight: "bold",
                       color: "#FFFFFF",
@@ -142,14 +123,27 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                       textAlign: "center",
                     }}
                   >
-                    {label}
+                    ($US M)
                   </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.entries(forecasts[forecastsTicker.toUpperCase()] || {}).map(
-                ([metricName, years]: [string, any]) => (
+                  {forecastYearLabels.map((label) => (
+                    <TableCell
+                      key={label}
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#FFFFFF",
+                        border: "1px solid #000000",
+                        textAlign: "center",
+                      }}
+                    >
+                      {label}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Object.entries(
+                  forecasts[forecastsTicker.toUpperCase()] || {}
+                ).map(([metricName, years]: [string, any]) => (
                   <TableRow key={metricName}>
                     <TableCell
                       sx={{ border: "1px solid #000000", fontWeight: "bold" }}
@@ -168,17 +162,17 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                       </TableCell>
                     ))}
                   </TableRow>
-                )
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-      {!forecastsLoading && forecasts && !forecasts[forecastsTicker.toUpperCase()] && (
-        <Alert severity="info">No forecasts found for this ticker.</Alert>
-      )}
-      </Container>
-    </Box>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      {!forecastsLoading &&
+        forecasts &&
+        !forecasts[forecastsTicker.toUpperCase()] && (
+          <Alert severity="info">No forecasts found for this ticker.</Alert>
+        )}
+    </Container>
   );
 };
 
