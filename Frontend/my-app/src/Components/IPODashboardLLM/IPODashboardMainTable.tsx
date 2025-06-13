@@ -38,19 +38,19 @@ const columns: {
   isCurrency?: boolean;
   isPercentage?: boolean;
 }[] = [
-  { key: "competitor", label: "Ticker" },
-  { key: "price_usd", label: "Price (USD)", isCurrency: true },
-  { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
-  { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
-  { key: "present_year_ev_sales", label: "2025 EV/Sales" },
-  { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
-  { key: "present_year_price_earning", label: "2025 P/E" },
-  { key: "one_year_later_price_earning", label: "2026 P/E" },
-  { key: "present_year_ev_fcf", label: "2025 EV/FCF" },
-  { key: "one_year_later_ev_fcf", label: "2026 EV/FCF" },
-  { key: "sales_growth", label: "Sales Growth (25-26)", isPercentage: true },
-  { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
-];
+    { key: "competitor", label: "Ticker" },
+    { key: "price_usd", label: "Price (USD)", isCurrency: true },
+    { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
+    { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
+    { key: "present_year_ev_sales", label: "2025 EV/Sales" },
+    { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
+    { key: "present_year_price_earning", label: "2025 P/E" },
+    { key: "one_year_later_price_earning", label: "2026 P/E" },
+    { key: "present_year_ev_fcf", label: "2025 EV/FCF" },
+    { key: "one_year_later_ev_fcf", label: "2026 EV/FCF" },
+    { key: "sales_growth", label: "Sales Growth (25-26)", isPercentage: true },
+    { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
+  ];
 
 const columnsWithX = new Set([
   "present_year_ev_sales",
@@ -71,21 +71,13 @@ const formatNumber = (
   const absValue = Math.abs(value);
 
   if (absValue >= 1e9) {
-    formattedValue = Number.isInteger(absValue / 1e9)
-      ? `${(absValue / 1e9).toFixed(0)}B`
-      : `${(absValue / 1e9).toFixed(1)}B`;
+    formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
   } else if (absValue >= 1e6) {
-    formattedValue = Number.isInteger(absValue / 1e6)
-      ? `${(absValue / 1e6).toFixed(0)}M`
-      : `${(absValue / 1e6).toFixed(1)}M`;
+    formattedValue = `${(absValue / 1e6).toFixed(1)}M`;
   } else if (absValue >= 1e3) {
-    formattedValue = Number.isInteger(absValue / 1e3)
-      ? `${(absValue / 1e3).toFixed(0)}K`
-      : `${(absValue / 1e3).toFixed(1)}K`;
+    formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
   } else {
-    formattedValue = Number.isInteger(absValue)
-      ? absValue.toFixed(0)
-      : absValue.toFixed(2);
+    formattedValue = absValue.toFixed(1);
   }
 
   if (isCurrency) formattedValue = `$${formattedValue}`;
@@ -201,18 +193,22 @@ const IPODashboardMainTable: React.FC = () => {
 
                         const displayValue =
                           value === null ||
-                          value === undefined ||
-                          (typeof value === "number" && isNaN(value))
+                            value === undefined ||
+                            (typeof value === "number" && isNaN(value))
                             ? "N/A"
                             : col.key === "price_usd"
                               ? value
-                              : typeof value === "number"
-                                ? formatNumber(
+                              : col.key === "market_cap" || col.key === "ev_usd_million"
+                                ? typeof value === "number"
+                                  ? value.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                                  : value
+                                : typeof value === "number"
+                                  ? formatNumber(
                                     value,
                                     col.isCurrency,
                                     col.isPercentage
                                   )
-                                : value;
+                                  : value;
 
                         return (
                           <TableCell
@@ -225,7 +221,7 @@ const IPODashboardMainTable: React.FC = () => {
                             }}
                           >
                             {columnsWithX.has(col.key) &&
-                            typeof value === "number"
+                              typeof value === "number"
                               ? `${displayValue}x`
                               : displayValue}
                           </TableCell>
