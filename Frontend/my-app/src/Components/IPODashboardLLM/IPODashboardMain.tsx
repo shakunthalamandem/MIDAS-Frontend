@@ -18,6 +18,7 @@ import {
   ListItemText,
   InputAdornment,
   TextField,
+  Autocomplete,
 } from "@mui/material";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
@@ -61,6 +62,34 @@ const IPODashboardMain: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
+  const [allIpoTickers, setAllIpoTickers] = useState<string[]>([]);
+  const [selectedTicker, setSelectedTicker] = useState<string | null>("CRWV");
+
+  useEffect(() => {
+    const fetchAllIpoTickers = async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
+        if (!apiUrl) throw new Error("API URL is not defined in environment variables");
+
+        const response = await fetch(`${apiUrl}/api/all_ipo_tickers/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch IPO tickers");
+        const data = await response.json();
+        setAllIpoTickers(data.distinct_tickers || []);
+      } catch (err) {
+        console.error("Failed to fetch IPO tickers", err);
+      }
+    };
+
+    fetchAllIpoTickers();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,7 +107,7 @@ const IPODashboardMain: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker: "CRWV" }),
+          body: JSON.stringify({ ticker: selectedTicker || "CRWV" }),
         });
 
         if (!response.ok) {
@@ -98,8 +127,10 @@ const IPODashboardMain: React.FC = () => {
       }
     };
 
-    fetchData();
-  }, []);
+    if (selectedTicker) {
+      fetchData();
+    }
+  }, [selectedTicker]);
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
@@ -143,19 +174,32 @@ const IPODashboardMain: React.FC = () => {
                 {ipoData.exchange})
               </Typography>
 
-              <TextField
+              <Autocomplete
                 size="small"
-                placeholder="Search company..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                sx={{ width: { xs: "100%", sm: "300px" } }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
+                options={allIpoTickers}
+                value={selectedTicker}
+                onChange={(_, newValue) => {
+                  setSelectedTicker(newValue);
+                  setSearchText(newValue || "");
                 }}
+                inputValue={searchText}
+                onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
+                sx={{ width: { xs: "100%", sm: "300px" } }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search ticker..."
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+                freeSolo
               />
             </Box>
 
@@ -291,7 +335,7 @@ const IPODashboardMain: React.FC = () => {
                             backgroundColor: "#f4f5f7",
                           }}
                         >
-                          <FinancialForecastTable defaultTicker="CRWV" />
+                          <FinancialForecastTable defaultTicker={selectedTicker || "CRWV"} />
                         </Box>
                       </Grid>
                     </React.Fragment>
