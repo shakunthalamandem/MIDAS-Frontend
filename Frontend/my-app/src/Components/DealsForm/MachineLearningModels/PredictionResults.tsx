@@ -269,14 +269,14 @@ Threshold: Return < -2%`,
   <Table>
     <TableBody>
       <TableRow sx={{ bgcolor: "#f0f4f8" }}>
-        <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
-        <TableCell sx={{ fontWeight: 600}}>Explanation</TableCell>
+        <TableCell sx={{ fontWeight: 600}}>Model</TableCell>
+        <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
         {modelVersions.map((version, idx) => (
           <React.Fragment key={version}>
             <TableCell
               sx={{
                 fontWeight: 600,
-                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6", 
+                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6", // Light blue for V1, light purple for V2
               }}
             >
               {`${version.toUpperCase()} Result`}
@@ -284,7 +284,7 @@ Threshold: Return < -2%`,
             <TableCell
               sx={{
                 fontWeight: 600,
-                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f5",
+                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
               }}
             >
               {`${version.toUpperCase()} Accuracy`}
@@ -325,18 +325,21 @@ Threshold: Return < -2%`,
                 ? renderOutcome(modelData.prediction)
                 : renderBinaryResult(modelData.prediction);
 
-                    return (
-                      <React.Fragment key={version}>
-                        <TableCell>{renderResult}</TableCell>
-                        <TableCell>{renderConfidenceLevel(modelData.Accuracy)}</TableCell>
-                      </React.Fragment>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            return (
+              <React.Fragment key={version}>
+                <TableCell sx={{ bgcolor: cellColor }}>{renderResult}</TableCell>
+                <TableCell sx={{ bgcolor: cellColor }}>
+                  {renderConfidenceLevel(modelData.Accuracy)}
+                </TableCell>
+              </React.Fragment>
+            );
+          })}
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</TableContainer>
+
       </Paper>
     </Container>
   );
