@@ -125,21 +125,21 @@ const NumerSummary: React.FC = () => {
     return null;
   };
 
-const generateChartData = (metric: string) => {
-  const years = ["2023", "2024", "2025"];
+  const generateChartData = (metric: string) => {
+    const years = ["2023", "2024", "2025"];
 
-  return years.map((year) => {
-    const mddMetricKey = metric === "deal_value" ? "deal_size" : metric;
+    return years.map((year) => {
+      const mddMetricKey = metric === "deal_value" ? "deal_size" : metric;
 
-    return {
-      year,
-      dealogic_IPO: dealogicData?.[year]?.IPO?.[metric] || 0,
-      dealogic_FO: dealogicData?.[year]?.FO?.[metric] || 0,
-      mdd_IPO: mddData?.[year]?.IPO?.[mddMetricKey] || 0,
-      mdd_FO: mddData?.[year]?.FO?.[mddMetricKey] || 0,
-    };
-  });
-};
+      return {
+        year,
+        dealogic_IPO: dealogicData?.[year]?.IPO?.[metric] || 0,
+        dealogic_FO: dealogicData?.[year]?.FO?.[metric] || 0,
+        mdd_IPO: mddData?.[year]?.IPO?.[mddMetricKey] || 0,
+        mdd_FO: mddData?.[year]?.FO?.[mddMetricKey] || 0,
+      };
+    });
+  };
 
 
   if (loading) return <div>Loading...</div>;
@@ -162,7 +162,7 @@ const generateChartData = (metric: string) => {
       {metrics.map((metric) => (
         <Grid item xs={12} md={4} key={metric}>
           <Card elevation={4}
-           sx={{ cursor: "pointer" }}>
+            sx={{ cursor: "pointer" }}>
             <CardContent>
               <IconButton onClick={handleCardClick}>
                 <OpenWithIcon sx={{ color: "#491daf" }} />
@@ -190,6 +190,15 @@ const generateChartData = (metric: string) => {
                   <Bar dataKey="mdd_FO" stackId="mdd" barSize={17} fill="#60a5fa" name="MDD FO" />
                 </BarChart>
               </ResponsiveContainer>
+              <Typography
+                variant="caption"
+                align="center"
+                display="block"
+                sx={{ mt: 2, color: "#888" }}
+              >
+                Note: 1) Dealogic and MDD deals do not include Strategic deals.<br />
+                2) MDD FO's are Marketed, Overnight and Block deals.
+              </Typography>
             </CardContent>
           </Card>
         </Grid>

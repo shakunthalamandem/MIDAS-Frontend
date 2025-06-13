@@ -67,7 +67,7 @@ const ArrowValue = ({ value }: { value: number | null | undefined }) => {
       )}
 
       {mddDeals.map((item: any, idx: number) => (
-        <Paper key={idx} sx={{ mb: 3, p: 2, bgcolor: "#ffffff", borderRadius: 1 }} elevation={1}>
+        <Paper key={idx} sx={{ mb: 3, p: 2, bgcolor: "#ecf6bb", borderRadius: 1 }} elevation={1}>
           <Typography variant="subtitle1" sx={{ textAlign: "center", fontWeight: "bold", mb: 1 }}>
             Deal Information for{" "}
             <span style={{ color: "#0073E6" }}>{item.ticker || "N/A"}</span> on{" "}
