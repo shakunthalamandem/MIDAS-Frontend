@@ -61,13 +61,22 @@ const ArrowValue = ({ value }: { value: number | null | undefined }) => {
           {ticker} - {mddDeals.length} deals
         </span>
       </Typography>
+      <Paper
+      sx={{
+        p: 3,
+        backgroundColor: "#ecf6bb", 
+        mb: 4,
+      }}
+      elevation={2}
+    >
 
       {mddDeals.length > 1 && data.mdd_data.summary && (
         <MDDSearchSummary summary={data.mdd_data.summary} />
       )}
 
+
       {mddDeals.map((item: any, idx: number) => (
-        <Paper key={idx} sx={{ mb: 3, p: 2, bgcolor: "#ecf6bb", borderRadius: 1 }} elevation={1}>
+        <Paper key={idx} sx={{ mb: 3, p: 2,  borderRadius: 1 }} elevation={1}>
           <Typography variant="subtitle1" sx={{ textAlign: "center", fontWeight: "bold", mb: 1 }}>
             Deal Information for{" "}
             <span style={{ color: "#0073E6" }}>{item.ticker || "N/A"}</span> on{" "}
@@ -245,7 +254,9 @@ const ArrowValue = ({ value }: { value: number | null | undefined }) => {
             </Grid>
           </Grid>
         </Paper>
+      
       ))}
+      </Paper>
     </Grid>
   );
 };
