@@ -47,9 +47,12 @@ const cardColors = [
 ];
 
 const formatPriceRange = (lower: number | null, upper: number | null) => {
-  if (lower && upper) return `$${lower} - $${upper}`;
-  if (lower) return `$${lower}`;
-  if (upper) return `$${upper}`;
+  const format = (value: number) => `$${value.toLocaleString("en-US")}`;
+
+  if (lower != null && upper != null)
+    return `${format(lower)} - ${format(upper)}`;
+  if (lower != null) return format(lower);
+  if (upper != null) return format(upper);
   return "N/A";
 };
 
@@ -107,7 +110,10 @@ const IPODashboardMain: React.FC = () => {
     { key: "strengths", title: "Strengths" },
     { key: "concerns", title: "Concerns" },
     // We'll inject FinancialForecastTable dynamically after this
-    { key: "principal_stockholders_preipo", title: "Principal Stockholders (pre-IPO)" },
+    {
+      key: "principal_stockholders_preipo",
+      title: "Principal Stockholders (pre-IPO)",
+    },
     { key: "key_management_personnel", title: "Key Management Personnel" },
   ];
 
@@ -152,9 +158,6 @@ const IPODashboardMain: React.FC = () => {
                 }}
               />
             </Box>
-
-            <IPODashboardCardRatings ipodata={ipoData} />
-
 
             {/* IPO Info Table */}
             <Table>
@@ -220,6 +223,7 @@ const IPODashboardMain: React.FC = () => {
               </TableBody>
             </Table>
           </Container>
+          <IPODashboardCardRatings ipodata={ipoData} />
 
           {/* Dynamic Cards */}
           <Container maxWidth="xl" sx={{ mb: 3 }}>
@@ -235,7 +239,8 @@ const IPODashboardMain: React.FC = () => {
                       <Grid item xs={12} md={6}>
                         <Card
                           sx={{
-                            backgroundColor: cardColors[index % cardColors.length],
+                            backgroundColor:
+                              cardColors[index % cardColors.length],
                             borderRadius: 2,
                             boxShadow: 3,
                             height: "100%",
@@ -246,15 +251,25 @@ const IPODashboardMain: React.FC = () => {
                           <CardContent sx={{ overflowY: "auto", flex: 1 }}>
                             <Typography
                               variant="h6"
-                              sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
+                              sx={{
+                                color: "#002060",
+                                mb: 1,
+                                fontWeight: "bold",
+                              }}
                               align="center"
                             >
                               {section.title}
                             </Typography>
                             <List dense>
                               {content?.map((item: string, idx: number) => (
-                                <ListItem key={idx} alignItems="flex-start" sx={{ pl: 0 }}>
-                                  <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
+                                <ListItem
+                                  key={idx}
+                                  alignItems="flex-start"
+                                  sx={{ pl: 0 }}
+                                >
+                                  <ListItemIcon
+                                    sx={{ minWidth: 24, mt: "5px" }}
+                                  >
                                     <FiberManualRecordIcon
                                       sx={{ fontSize: 8, color: "#002060" }}
                                     />
@@ -269,7 +284,13 @@ const IPODashboardMain: React.FC = () => {
 
                       {/* Inject Financial Forecast Table */}
                       <Grid item xs={12}>
-                        <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                        <Box
+                          sx={{
+                            ...cardStyle,
+                            p: 2,
+                            backgroundColor: "#f4f5f7",
+                          }}
+                        >
                           <FinancialForecastTable defaultTicker="CRWV" />
                         </Box>
                       </Grid>
@@ -299,7 +320,11 @@ const IPODashboardMain: React.FC = () => {
                         </Typography>
                         <List dense>
                           {content?.map((item: string, idx: number) => (
-                            <ListItem key={idx} alignItems="flex-start" sx={{ pl: 0 }}>
+                            <ListItem
+                              key={idx}
+                              alignItems="flex-start"
+                              sx={{ pl: 0 }}
+                            >
                               <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
                                 <FiberManualRecordIcon
                                   sx={{ fontSize: 8, color: "#002060" }}
