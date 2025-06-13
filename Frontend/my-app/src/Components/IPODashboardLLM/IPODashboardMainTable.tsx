@@ -14,11 +14,10 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import FinancialForecastTable from "./IPOFinancialTableMain";
 
 // Types for API response
 type ComparableMetric = {
-  ticker_names: string;
+  competitor: string;
   price_usd: string;
   market_cap: number | null;
   ev_usd_million: number | null;
@@ -35,7 +34,7 @@ type ComparableMetric = {
 type ApiResponse = Record<string, ComparableMetric[]>;
 
 const columns: { key: keyof ComparableMetric; label: string; isCurrency?: boolean; isPercentage?: boolean }[] = [
-  { key: "ticker_names", label: "Ticker" },
+  { key: "competitor", label: "Ticker" },
   { key: "price_usd", label: "Price (USD)", isCurrency: true },
   { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
   { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },

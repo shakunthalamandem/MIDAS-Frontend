@@ -49,7 +49,7 @@ const HistoricalDealogicCards = (
       {deals.map((deal, idx) => (
         <Paper
           key={idx}
-          sx={{ mb: 3, p: 2, bgcolor: "#ffffff", borderRadius: 1 }}
+          sx={{ mb: 3, p: 2, bgcolor: "#a3b5e7", borderRadius: 1 }}
           elevation={1}
         >
           <Typography
