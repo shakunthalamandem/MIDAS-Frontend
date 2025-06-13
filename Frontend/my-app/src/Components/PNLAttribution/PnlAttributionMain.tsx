@@ -8,24 +8,15 @@ import {
   TableRow,
   Container,
   Typography,
+  IconButton,
 } from "@mui/material";
-
-interface FundData {
-  asset_type: string;
-  [month: string]: number | string;
-}
-
-interface AssetTypeData {
-  [fundName: string]: FundData;
-}
-
-interface ApiResponse {
-  [assetType: string]: AssetTypeData;
-}
+import { Add, Remove } from "@mui/icons-material";
+import { ApiResponse, formatNumber } from "./UtilisPnlAttribution";
 
 const PnlAttributionMain = () => {
   const [data, setData] = useState<ApiResponse>({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -72,26 +63,20 @@ const PnlAttributionMain = () => {
     return monthsArray;
   }, [data]);
 
-  const formatNumber = (value: number | string) => {
-    if (typeof value !== "number") return value;
-    const absValue = Math.abs(value);
-    let formatted: string;
-
-    if (absValue >= 1e9) formatted = `$${(absValue / 1e9).toFixed(1)}B`;
-    else if (absValue >= 1e6) formatted = `$${(absValue / 1e6).toFixed(1)}M`;
-    else if (absValue >= 1e3) formatted = `$${(absValue / 1e3).toFixed(1)}K`;
-    else formatted = `$${absValue.toFixed(2)}`;
-
-    return value < 0 ? `-${formatted.slice(1)}` : formatted;
-  };
-
   if (loading) return <Typography>Loading...</Typography>;
 
   if (!data || Object.keys(data).length === 0)
     return <Typography>No data available</Typography>;
 
+  const handleToggleExpand = (assetType: string) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [assetType]: !prev[assetType],
+    }));
+  };
+
   return (
-    <Container maxWidth="lg"  sx={{mb:4}}>
+    <Container maxWidth="lg" sx={{ mb: 4 }}>
       <Typography
         variant="h5"
         gutterBottom
@@ -115,7 +100,7 @@ const PnlAttributionMain = () => {
           <TableHead>
             <TableRow
               sx={{
-                height: 30, // reduce header row height
+                height: 30,
               }}
             >
               <TableCell
@@ -126,7 +111,6 @@ const PnlAttributionMain = () => {
                   border: "1px solid black",
                   fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                   fontSize: "0.75rem",
-                
                   padding: "4px 8px",
                 }}
               >
@@ -140,7 +124,6 @@ const PnlAttributionMain = () => {
                   border: "1px solid black",
                   fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                   fontSize: "0.75rem",
-                
                   padding: "4px 8px",
                 }}
               >
@@ -156,7 +139,6 @@ const PnlAttributionMain = () => {
                     border: "1px solid black",
                     fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                     fontSize: "0.75rem",
-                  
                     padding: "4px 8px",
                     textAlign: "right",
                     whiteSpace: "nowrap",
@@ -167,13 +149,14 @@ const PnlAttributionMain = () => {
                   {month}
                 </TableCell>
               ))}
-
             </TableRow>
           </TableHead>
 
           <TableBody>
             {Object.entries(data).map(([assetType, funds]) => {
               const fundNames = Object.keys(funds);
+
+              // Calculate totals for asset type
               const totals = allMonths.reduce<Record<string, number>>(
                 (acc, month) => {
                   acc[month] = 0;
@@ -181,6 +164,7 @@ const PnlAttributionMain = () => {
                 },
                 {}
               );
+
               fundNames.forEach((fundName) => {
                 const fund = funds[fundName];
                 allMonths.forEach((month) => {
@@ -189,6 +173,85 @@ const PnlAttributionMain = () => {
                 });
               });
 
+              const isExpanded = expanded[assetType] || false;
+
+              if (!isExpanded) {
+                // Collapsed: show one row per asset type with Total and expand icon on Fund Name cell
+                return (
+                  <TableRow
+                    key={assetType}
+                    sx={{
+                      fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+                      height: 26,
+                    }}
+                  >
+                    <TableCell
+                      sx={{
+                        border: "1px solid black",
+                        fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        padding: "4px 8px",
+                        verticalAlign: "middle",
+                      }}
+                    >
+                      {assetType}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        border: "1px solid black",
+                        fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        padding: "4px 8px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        position: "relative",
+                        paddingRight: "32px", // space for icon
+                        cursor: "pointer",
+                        userSelect: "none",
+                      }}
+                      onClick={() => handleToggleExpand(assetType)}
+                    >
+                      Total
+                      <IconButton
+                        size="small"
+                        sx={{
+                          position: "absolute",
+                          right: 4,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          padding: "2px",
+                        }}
+                        aria-label="Expand"
+                      >
+                        <Add fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                    {allMonths.map((month) => (
+                      <TableCell
+                        key={month}
+                        sx={{
+                          border: "1px solid black",
+                          fontWeight: "bold",
+                          textAlign: "right",
+                          padding: "4px 8px",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        {formatNumber(totals[month])}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              }
+
+              // Expanded: show all funds plus total row, with asset type cell spanning all fund+total rows
               return (
                 <React.Fragment key={assetType}>
                   {fundNames.map((fundName, idx) => {
@@ -198,19 +261,18 @@ const PnlAttributionMain = () => {
                         key={fundName}
                         sx={{
                           fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-                          height: 26, // reduce row height
+                          height: 26,
                         }}
                       >
                         {idx === 0 ? (
                           <TableCell
-                            rowSpan={fundNames.length + 1}
+                            rowSpan={fundNames.length + 1} // all funds + total row
                             sx={{
                               border: "1px solid black",
                               verticalAlign: "middle",
                               fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                               fontSize: "0.75rem",
                               fontWeight: "bold",
-                           
                               padding: "4px 8px",
                             }}
                           >
@@ -231,7 +293,6 @@ const PnlAttributionMain = () => {
                         >
                           {fundName}
                         </TableCell>
-
                         {allMonths.map((month) => {
                           const val = fund[month];
                           return (
@@ -256,16 +317,17 @@ const PnlAttributionMain = () => {
                     );
                   })}
 
+                  {/* Total Row without icon */}
                   <TableRow
                     sx={{
                       backgroundColor: "rgb(145, 206, 137)",
                       fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                       fontWeight: "bold",
                       fontSize: "0.75rem",
-                      // height: 26,
                     }}
                   >
                     <TableCell
+                      colSpan={1}
                       sx={{
                         border: "1px solid black",
                         padding: "4px 8px",
@@ -277,10 +339,6 @@ const PnlAttributionMain = () => {
                     >
                       Total
                     </TableCell>
-
-
-
-
                     {allMonths.map((month) => (
                       <TableCell
                         key={month}
@@ -300,8 +358,6 @@ const PnlAttributionMain = () => {
                       </TableCell>
                     ))}
                   </TableRow>
-
-
                 </React.Fragment>
               );
             })}
