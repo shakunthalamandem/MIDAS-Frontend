@@ -22,7 +22,7 @@ const timelineFields = [
 
 const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
+    <Container maxWidth="xl" sx={{ mt: 4 }}>
       <Card
         sx={{
           borderRadius: 4,
