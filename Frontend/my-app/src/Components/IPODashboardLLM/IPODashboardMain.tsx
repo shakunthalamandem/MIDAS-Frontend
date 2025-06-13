@@ -3,11 +3,7 @@ import {
   Box,
   Typography,
   Grid,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
+
   List,
   ListItem,
   CircularProgress,
@@ -48,15 +44,7 @@ const cardColors = [
   "#f9f0ff",
 ];
 
-const formatPriceRange = (lower: number | null, upper: number | null) => {
-  const format = (value: number) => `$${value.toLocaleString("en-US")}`;
 
-  if (lower != null && upper != null)
-    return `${format(lower)} - ${format(upper)}`;
-  if (lower != null) return format(lower);
-  if (upper != null) return format(upper);
-  return "N/A";
-};
 
 const IPODashboardMain: React.FC = () => {
   const [ipoData, setIpoData] = useState<any>(null);
