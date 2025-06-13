@@ -73,7 +73,7 @@ const IPODashboardMain: React.FC = () => {
         const token = localStorage.getItem("access_token");
         if (!apiUrl) throw new Error("API URL is not defined in environment variables");
 
-        const response = await fetch(`${apiUrl}/api/all_ipo_tickers/`, {
+        const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
