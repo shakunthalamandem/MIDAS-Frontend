@@ -453,7 +453,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 <Grid item xs={6} sx={{color: "#002060"}}>
                   <TextField
                     size="small"
-                    value="T+1 Day Return"
+                    value="T+1 Day Return(close)"
                     disabled
                     InputProps={{ sx: { width: inputWidth, color: "#e8f4fc", fontWeight: 600 } }}
                   />

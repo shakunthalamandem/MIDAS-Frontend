@@ -135,12 +135,9 @@ const AiDashboard: React.FC = () => {
     <Box>
       <Box mb={4}>
         <Typography variant="h5" fontWeight={600} gutterBottom>
-          📊 Recent AI-Powered Deal Insights
+          📊 Recent Follow-on's AI Powered Insights
         </Typography>
-        <Typography variant="body1" color="#002060">
-          Explore equity deals with real-time predictions powered by our financial AI models. 
-          Each card summarizes a live deal, giving you a sharp snapshot before deeper analysis.
-        </Typography>
+
       </Box>
 
       <Grid container spacing={3}>
