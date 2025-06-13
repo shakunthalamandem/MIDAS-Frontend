@@ -231,10 +231,10 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
     "next_results_date",
     "pricing_date",
   ];
-   const handleCancel = () => {
-          navigate("/equity/issue_market");
+ const handleCancel = () => {
+  window.location.href = "/equity/issue_market"; 
+};
 
-  };
   useEffect(() => {
     const fetchData = async () => {
       try {
