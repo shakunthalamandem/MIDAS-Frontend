@@ -11,6 +11,7 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  Fade,
 
 } from "@mui/material";
 
@@ -145,80 +146,85 @@ const IPODashboardMainTable: React.FC = () => {
         <Alert severity="info">No data found for this ticker.</Alert>
       )}
       {!loading && !error && data && !noData && (
-        <TableContainer component={Paper} elevation={4} sx={{ mb: 4, width: "100%" }}>
-          <Table size="small" sx={{ width: "100%" }}>
-            <TableHead sx={{ backgroundColor: "#002060" }}>
-              <TableRow>
-                {columns.map((col) => (
+  <TableContainer
+  component={Paper}
+  elevation={4}
+  sx={{
+    mb: 4,
+    width: "100%",
+    borderRadius: 2,
+    overflowX: "auto",
+  }}
+>
+  <Table size="small" sx={{ width: "100%" }}>
+    <TableHead sx={{ backgroundColor: "#002060" }}>
+      <TableRow>
+        {columns.map((col) => (
+          <TableCell
+            key={col.key}
+            sx={{
+              fontWeight: "bold",
+              color: "#FFFFFF",
+              textAlign: "center",
+              borderBottom: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {col.label}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {Object.entries(data).map(([tickerKey, metrics]) =>
+        metrics.map((metric, idx) => (
+          <Fade in timeout={500} key={`${tickerKey}-${idx}`}>
+            <TableRow
+              sx={{
+                backgroundColor: idx % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                transition: "background-color 0.3s",
+                "&:hover": {
+                  backgroundColor: "#e3f2fd",
+                },
+              }}
+            >
+              {columns.map((col) => {
+                const value = metric[col.key];
+
+                const displayValue =
+                  value === null ||
+                  value === undefined ||
+                  (typeof value === "number" && isNaN(value))
+                    ? "N/A"
+                    : col.key === "price_usd"
+                    ? value
+                    : typeof value === "number"
+                    ? formatNumber(value, col.isCurrency, col.isPercentage)
+                    : value;
+
+                return (
                   <TableCell
                     key={col.key}
+                    align="center"
                     sx={{
-                      fontWeight: "bold",
-                      color: "#FFFFFF",
-                      border: "1px solid #000000",
-                      textAlign: "center",
+                      borderBottom: "none",
+                      color: "#333",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    {col.label}
+                    {columnsWithX.has(col.key) && typeof value === "number"
+                      ? `${displayValue}x`
+                      : displayValue}
                   </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.entries(data).map(([tickerKey, metrics]) =>
-                metrics.map((metric, idx) => (
-                  <TableRow key={`${tickerKey}-${idx}`}>
-                    {columns.map((col) => {
-                      const value = metric[col.key];
-                      // Add 'x' for specific columns, show N/A if null
-                      if (columnsWithX.has(col.key)) {
-                        return (
-                          <TableCell
-                            key={col.key}
-                            align="center"
-                            sx={{ border: "1px solid #000000" }}
-                          >
-                            {value === null ||
-                            value === undefined ||
-                            (typeof value === "number" && isNaN(value))
-                              ? "N/A"
-                              : `${formatNumber(
-                                  value as number,
-                                  col.isCurrency,
-                                  col.isPercentage
-                                )}x`}
-                          </TableCell>
-                        );
-                      }
-                      // Default rendering for other columns
-                      return (
-                        <TableCell
-                          key={col.key}
-                          align="center"
-                          sx={{ border: "1px solid #000000" }}
-                        >
-                          {col.key === "price_usd"
-                            ? value || "N/A"
-                            : value === null ||
-                              value === undefined ||
-                              (typeof value === "number" && isNaN(value))
-                            ? "N/A"
-                            : typeof value === "number"
-                            ? formatNumber(
-                                value as number,
-                                col.isCurrency,
-                                col.isPercentage
-                              )
-                            : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                );
+              })}
+            </TableRow>
+          </Fade>
+        ))
+      )}
+    </TableBody>
+  </Table>
+</TableContainer>
       )}
     </Box>
   );
