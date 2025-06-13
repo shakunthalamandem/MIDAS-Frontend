@@ -12,7 +12,6 @@ import {
   CircularProgress,
   Alert,
   Fade,
-
 } from "@mui/material";
 
 // Types for API response
@@ -33,7 +32,12 @@ type ComparableMetric = {
 
 type ApiResponse = Record<string, ComparableMetric[]>;
 
-const columns: { key: keyof ComparableMetric; label: string; isCurrency?: boolean; isPercentage?: boolean }[] = [
+const columns: {
+  key: keyof ComparableMetric;
+  label: string;
+  isCurrency?: boolean;
+  isPercentage?: boolean;
+}[] = [
   { key: "competitor", label: "Ticker" },
   { key: "price_usd", label: "Price (USD)", isCurrency: true },
   { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
@@ -136,95 +140,104 @@ const IPODashboardMainTable: React.FC = () => {
   return (
     <Box sx={{ p: 0, width: "100%" }}>
       {/* Comparable Company Metrics Table */}
-      <Typography variant="h6" sx={{ mb: 2 }} color="#002060" align="center" fontWeight={600}>
+      <Typography
+        variant="h6"
+        sx={{ mb: 2 }}
+        color="#002060"
+        align="center"
+        fontWeight={600}
+      >
         Comparative Trading Multiples & Performance Metrics
       </Typography>
-    
+
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
-      {noData && (
-        <Alert severity="info">No data found for this ticker.</Alert>
-      )}
+      {noData && <Alert severity="info">No data found for this ticker.</Alert>}
       {!loading && !error && data && !noData && (
-  <TableContainer
-  component={Paper}
-  elevation={4}
-  sx={{
-    mb: 4,
-    width: "100%",
-    borderRadius: 2,
-    overflowX: "auto",
-  }}
->
-  <Table size="small" sx={{ width: "100%" }}>
-    <TableHead sx={{ backgroundColor: "#002060" }}>
-      <TableRow>
-        {columns.map((col) => (
-          <TableCell
-            key={col.key}
-            sx={{
-              fontWeight: "bold",
-              color: "#FFFFFF",
-              textAlign: "center",
-              borderBottom: "none",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {col.label}
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {Object.entries(data).map(([tickerKey, metrics]) =>
-        metrics.map((metric, idx) => (
-          <Fade in timeout={500} key={`${tickerKey}-${idx}`}>
-            <TableRow
-              sx={{
-                backgroundColor: idx % 2 === 0 ? "#f9f9f9" : "#ffffff",
-                transition: "background-color 0.3s",
-                "&:hover": {
-                  backgroundColor: "#e3f2fd",
-                },
-              }}
-            >
-              {columns.map((col) => {
-                const value = metric[col.key];
-
-                const displayValue =
-                  value === null ||
-                  value === undefined ||
-                  (typeof value === "number" && isNaN(value))
-                    ? "N/A"
-                    : col.key === "price_usd"
-                    ? value
-                    : typeof value === "number"
-                    ? formatNumber(value, col.isCurrency, col.isPercentage)
-                    : value;
-
-                return (
+        <TableContainer
+          component={Paper}
+          elevation={4}
+          sx={{
+            mb: 4,
+            width: "100%",
+            borderRadius: 2,
+            overflowX: "auto",
+          }}
+        >
+          <Table size="small" sx={{ width: "100%" }}>
+            <TableHead sx={{ backgroundColor: "#002060" }}>
+              <TableRow>
+                {columns.map((col) => (
                   <TableCell
                     key={col.key}
-                    align="center"
                     sx={{
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
+                      textAlign: "center",
                       borderBottom: "none",
-                      color: "#333",
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {columnsWithX.has(col.key) && typeof value === "number"
-                      ? `${displayValue}x`
-                      : displayValue}
+                    {col.label}
                   </TableCell>
-                );
-              })}
-            </TableRow>
-          </Fade>
-        ))
-      )}
-    </TableBody>
-  </Table>
-</TableContainer>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Object.entries(data).map(([tickerKey, metrics]) =>
+                metrics.map((metric, idx) => (
+                  <Fade in timeout={500} key={`${tickerKey}-${idx}`}>
+                    <TableRow
+                      sx={{
+                        backgroundColor: idx % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                        transition: "background-color 0.3s",
+                        "&:hover": {
+                          backgroundColor: "#e3f2fd",
+                        },
+                      }}
+                    >
+                      {columns.map((col) => {
+                        const value = metric[col.key];
+
+                        const displayValue =
+                          value === null ||
+                          value === undefined ||
+                          (typeof value === "number" && isNaN(value))
+                            ? "N/A"
+                            : col.key === "price_usd"
+                              ? value
+                              : typeof value === "number"
+                                ? formatNumber(
+                                    value,
+                                    col.isCurrency,
+                                    col.isPercentage
+                                  )
+                                : value;
+
+                        return (
+                          <TableCell
+                            key={col.key}
+                            align="center"
+                            sx={{
+                              borderBottom: "none",
+                              color: "#333",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {columnsWithX.has(col.key) &&
+                            typeof value === "number"
+                              ? `${displayValue}x`
+                              : displayValue}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  </Fade>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </Box>
   );
