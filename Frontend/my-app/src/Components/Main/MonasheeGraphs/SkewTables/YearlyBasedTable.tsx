@@ -110,7 +110,6 @@ const YearlyBasedTable: React.FC = () => {
           setOpenNoDataPopup(true); // Show No Data popup if API returns error
         } else {
           setSectorwiseData(response.data); // Store data if available
-          console.log("data found");
         }
       }catch (error) {
   

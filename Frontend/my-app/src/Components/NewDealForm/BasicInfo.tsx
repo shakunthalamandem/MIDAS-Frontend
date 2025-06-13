@@ -510,7 +510,6 @@ const BasicInfo: React.FC = () => {
         }
       );
 
-      console.log("Saved:", response.data);
       setSnackbarMessage("Data saved successfully and Email sent!");
       setSnackbarSeverity("success");
       setOpenSnackbar(true);

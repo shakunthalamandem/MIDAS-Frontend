@@ -205,6 +205,5 @@ const Filters: React.FC<FiltersProps> = ({ filtersData }) => {
 export default Filters;
 
 export const resetFilters = (handleCancel: () => void) => {
-  console.log("Filters have been reset.");
   handleCancel();  // Call the existing handleCancel function
 };
