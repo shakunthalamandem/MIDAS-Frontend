@@ -24,6 +24,7 @@ import IPODashboardMainTable from "./IPODashboardMainTable";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import SearchIcon from "@mui/icons-material/Search";
 import IPODashboardCardRatings from "./IPODashboardCardRatings";
+import IPOdashboardLine from "./IPOdashboardLine";
 
 const cardStyle = {
   background: "#fff",
@@ -223,6 +224,8 @@ const IPODashboardMain: React.FC = () => {
               </TableBody>
             </Table>
           </Container>
+          <IPOdashboardLine ipodata={ipoData} />
+
           <IPODashboardCardRatings ipodata={ipoData} />
 
           {/* Dynamic Cards */}
