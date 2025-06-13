@@ -203,72 +203,11 @@ const IPODashboardMain: React.FC = () => {
                 freeSolo
               />
             </Box>
+                      <IPOdashboardLine ipodata={ipoData} />
 
-            {/* IPO Info Table */}
-            <Table>
-              <TableHead sx={{ backgroundColor: "#f5f6fa" }}>
-                <TableRow>
-                  {[
-                    "Pricing Date",
-                    "Price Range",
-                    "Deal Size",
-                    "Industry",
-                    "Shares Offered",
-                    "No. Shares Out (NoSH)",
-                    "Established",
-                    "Bookrunners",
-                  ].map((header) => (
-                    <TableCell
-                      key={header}
-                      sx={{
-                        fontWeight: 600,
-                        textAlign: "center",
-                        fontSize: 15,
-                        color: "#006164",
-                      }}
-                    >
-                      {header}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow>
-                  <TableCell align="center">
-                    {ipoData.pricing_date || "N/A"}
-                  </TableCell>
-                  <TableCell align="center">
-                    {formatPriceRange(ipoData.lower_bound, ipoData.upper_bound)}
-                  </TableCell>
-                  <TableCell align="center">
-                    {ipoData.deal_size
-                      ? `$${ipoData.deal_size.toLocaleString()}`
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell align="center">
-                    {ipoData.industry || "N/A"}
-                  </TableCell>
-                  <TableCell align="center">
-                    {ipoData.shares_offered
-                      ? ipoData.shares_offered.toLocaleString()
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell align="center">
-                    {ipoData.nosh ? ipoData.nosh.toLocaleString() : "N/A"}
-                  </TableCell>
-                  <TableCell align="center">
-                    {ipoData.established_year || "N/A"}
-                  </TableCell>
-                  <TableCell align="center">
-                    {ipoData.bookrunners
-                      ? ipoData.bookrunners.join(", ")
-                      : "N/A"}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+
+    
           </Container>
-          <IPOdashboardLine ipodata={ipoData} />
 
           <IPODashboardCardRatings ipodata={ipoData} />
 
