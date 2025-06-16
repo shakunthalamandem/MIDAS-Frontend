@@ -25,7 +25,7 @@ export interface ApiResponse {
   else formatted = `$${absValue.toFixed(2)}`;
 
   if (value < 0) {
-    return `$ -${formatted.slice(2)}`;
+    return `-$ ${formatted.slice(2)}`;
   }
 
   return formatted;  
