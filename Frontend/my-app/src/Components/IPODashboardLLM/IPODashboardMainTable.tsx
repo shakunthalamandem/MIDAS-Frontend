@@ -197,7 +197,13 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
             </TableHead>
             <TableBody>
               {Object.entries(data).map(([tickerKey, metricsObj]) => {
-                const metrics = metricsObj.data || [];
+                const metrics = metricsObj.data
+                  ? [...metricsObj.data].sort((a, b) => {
+                      if (a.competitor === tickerKey) return -1;
+                      if (b.competitor === tickerKey) return 1;
+                      return 0;
+                    })
+                  : [];
                 const averages = metricsObj.Averages;
 
                 return (
