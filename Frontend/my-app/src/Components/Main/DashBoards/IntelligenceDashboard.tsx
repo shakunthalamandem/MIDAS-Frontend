@@ -31,7 +31,7 @@ const IntelligenceDashboard: React.FC = () => {
                   lineHeight: 1.6,
                 }}
               >
-                Gain real-time insights into upcoming IPOs and recent follow-on
+                Gain Information insights into upcoming IPOs and recent follow-on
                 deals. This dashboard highlights market activity from the past
                 month along with predictions powered by advanced AI models to
                 support data-driven investment decisions.

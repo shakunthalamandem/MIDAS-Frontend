@@ -265,69 +265,81 @@ Threshold: Return < -2%`,
 
         <Divider sx={{ my: 3 }} />
 
-        <TableContainer>
-          <Table>
-            <TableBody>
-              <TableRow sx={{ bgcolor: "#f0f4f8" }}>
-                <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
-                {modelVersions.map((version) => (
-                  <React.Fragment key={version}>
-                    <TableCell
-                      sx={{ fontWeight: 600 }}
-                    >{`${version.toUpperCase()} Result`}</TableCell>
-                    <TableCell
-                      sx={{ fontWeight: 600 }}
-                    >{`${version.toUpperCase()} Accuracy`}</TableCell>
-                  </React.Fragment>
-                ))}
-              </TableRow>
+<TableContainer>
+  <Table>
+    <TableBody>
+      <TableRow sx={{ bgcolor: "#f0f4f8" }}>
+        <TableCell sx={{ fontWeight: 600}}>Model</TableCell>
+        <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
+        {modelVersions.map((version, idx) => (
+          <React.Fragment key={version}>
+            <TableCell
+              sx={{
+                fontWeight: 600,
+                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6", 
+              }}
+            >
+              {`${version.toUpperCase()} Result`}
+            </TableCell>
+            <TableCell
+              sx={{
+                fontWeight: 600,
+                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
+              }}
+            >
+              {`${version.toUpperCase()} Accuracy`}
+            </TableCell>
+          </React.Fragment>
+        ))}
+      </TableRow>
 
-              {modelTypes.map((type) => (
-                <TableRow key={type}>
-                  <TableCell>{rowLabels[type]}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2" whiteSpace="pre-line">
-                      {rowExplanations[type]}
-                    </Typography>
+      {modelTypes.map((type) => (
+        <TableRow key={type}>
+          <TableCell >{rowLabels[type]}</TableCell>
+          <TableCell >
+            <Typography variant="body2" whiteSpace="pre-line">
+              {rowExplanations[type]}
+            </Typography>
+          </TableCell>
+
+          {modelVersions.map((version, idx) => {
+            const key = getModelKey(version, type);
+            const modelData = result[key];
+            const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
+
+            if (!modelData) {
+              return (
+                <React.Fragment key={version}>
+                  <TableCell sx={{ bgcolor: cellColor }}>
+                    <Box color="text.disabled">N/A</Box>
                   </TableCell>
+                  <TableCell sx={{ bgcolor: cellColor }}>
+                    <Box color="text.disabled">N/A</Box>
+                  </TableCell>
+                </React.Fragment>
+              );
+            }
 
-                  {modelVersions.map((version) => {
-                    const key = getModelKey(version, type);
-                    const modelData = result[key];
+            const renderResult =
+              type === "main"
+                ? renderOutcome(modelData.prediction)
+                : renderBinaryResult(modelData.prediction);
 
-                    if (!modelData) {
-                      return (
-                        <React.Fragment key={version}>
-                          <TableCell>
-                            <Box color="text.disabled">N/A</Box>
-                          </TableCell>
-                          <TableCell>
-                            <Box color="text.disabled">N/A</Box>
-                          </TableCell>
-                        </React.Fragment>
-                      );
-                    }
+            return (
+              <React.Fragment key={version}>
+                <TableCell sx={{ bgcolor: cellColor }}>{renderResult}</TableCell>
+                <TableCell sx={{ bgcolor: cellColor }}>
+                  {renderConfidenceLevel(modelData.Accuracy)}
+                </TableCell>
+              </React.Fragment>
+            );
+          })}
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</TableContainer>
 
-                    const renderResult =
-                      type === "main"
-                        ? renderOutcome(modelData.prediction)
-                        : renderBinaryResult(modelData.prediction);
-
-                    return (
-                      <React.Fragment key={version}>
-                        <TableCell>{renderResult}</TableCell>
-                        <TableCell>
-                          {renderConfidenceLevel(modelData.Accuracy)}
-                        </TableCell>
-                      </React.Fragment>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
       </Paper>
     </Container>
   );
