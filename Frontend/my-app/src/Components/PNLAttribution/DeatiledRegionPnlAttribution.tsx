@@ -96,8 +96,14 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
     );
   }
 
-  return (
-    <Container>
+  return (<Container sx={{ mt: 4, mb: 4 }}>
+    <Typography
+    variant="h6"
+    gutterBottom
+    sx={{ fontWeight: "bold", color: "#002060", mb: 2, textAlign: "center"  }}
+  >
+    Detailed Region-wise PnL
+  </Typography>
       <TableContainer component={Paper} sx={{ border: "1px solid #000" }}>
         <Table aria-label="Detailed Region PnL Attribution" sx={{ borderCollapse: "collapse" }}>
           <TableHead>

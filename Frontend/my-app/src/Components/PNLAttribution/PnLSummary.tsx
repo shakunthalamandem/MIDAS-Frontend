@@ -23,13 +23,18 @@ interface PnLData {
 
 const timeRanges = ["1D", "MTD", "QTD", "YTD"];
 
-const formatValue = (value: number) => {
-  const inThousands = value / 1000;
-  return `${inThousands.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
-  })}K`;
-};
+
+  const formatValue = (value?: number): string => {
+    if (value === undefined || value === null || isNaN(value)) return "-";
+    const absValue = Math.abs(value);
+    const sign = value < 0 ? "-" : "";
+    if (absValue >= 1_000_000_000)
+      return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
+    if (absValue >= 1_000_000)
+      return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
+    if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
+    return `${sign}$${absValue.toFixed(2)}`;
+  };
 
 const getCellStyle = (value: number | undefined) => {
   if (value === undefined) return {};
@@ -76,9 +81,14 @@ const PnLSummary: React.FC = () => {
   return (
     <Container>
     <Box p={2}>
-      <Typography variant="h6" gutterBottom>
-        📊 PnL Summary by Asset Type
-      </Typography>
+      <Typography
+            variant="h3"
+            align="center"
+            sx={{ color: "#005166", fontSize: "1.75rem", mb: 3 }}
+          >
+     PnL Summary by Asset Type
+  </Typography>
+
 
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
