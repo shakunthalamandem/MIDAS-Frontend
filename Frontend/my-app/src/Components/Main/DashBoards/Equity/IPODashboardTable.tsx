@@ -43,14 +43,6 @@ const formatCurrency = (value?: number): string => {
   return `$${value.toFixed(2)}`;
 };
 
-const getDealColor = (value?: number): string => {
-  if (!value) return "#f0f0f0";
-  if (value >= 1_000_000_000) return "#003366";
-  if (value >= 500_000_000) return "#005b96";
-  if (value >= 100_000_000) return "#0077b6";
-  if (value >= 10_000_000) return "#00a8e8";
-  return "#dff6ff";
-};
 
 const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
   const monthData: { [index: number]: DealData } = {};
@@ -65,17 +57,16 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
 
   return (
     <Zoom in>
-      <Paper
-        elevation={4}
-        sx={{
-          p: 3,
-          mb: 3,
-          borderRadius: 3,
-          backgroundColor: "#f9fbfd",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-        }}
-      >
-        <Typography
+
+  
+        <TableContainer   component={Paper}
+                  sx={{
+                    backgroundColor: "#fcfcdc",
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    p: 2,
+                  }}>
+                <Typography
           variant="h6"
           gutterBottom
           align="center"
@@ -83,10 +74,9 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
         >
           IPO Deal Summary (Jan - June 2025)
         </Typography>
-        <TableContainer>
           <Table size="small">
             <TableHead>
-              <TableRow sx={{ backgroundColor: "#e0e7ff" }}>
+              <TableRow >
                 <TableCell sx={{ fontWeight: 600 }}>Metric</TableCell>
                 {monthNames.slice(0, 6).map((name, idx) => (
                   <TableCell key={idx} align="center" sx={{ fontWeight: 600 }}>
@@ -122,8 +112,6 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
                       key={idx}
                       align="center"
                       sx={{
-                        backgroundColor: getDealColor(value),
-                        color: value ? "#fff" : "#000",
                         fontWeight: 500,
                         borderRadius: 1,
                       }}
@@ -136,7 +124,6 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Paper>
     </Zoom>
   );
 };

@@ -44,14 +44,6 @@ const formatCurrency = (value?: number): string => {
   return `₹${value.toFixed(2)}`;
 };
 
-const getDealColor = (value?: number): string => {
-  if (!value) return "#f0f0f0";
-  if (value >= 1_000_000_000) return "#004d00";
-  if (value >= 500_000_000) return "#1a6600";
-  if (value >= 100_000_000) return "#339900";
-  if (value >= 10_000_000) return "#66cc33";
-  return "#e6ffe6";
-};
 
 const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload }) => {
   const monthData: { [index: number]: DealData } = {};
@@ -66,26 +58,26 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload }) => {
 
   return (
     <Fade in timeout={600}>
-      <Box mt={4}>
-        <Typography
-          variant="h6"
-          color="#002060"
-          gutterBottom
-          align="center"
-          sx={{ fontWeight: 600 }}
-        >
-          FO Deal Summary (Till June 2025)
-        </Typography>
+      <Box mb={2}>
+       
         <TableContainer
           component={Paper}
           sx={{
-            backgroundColor: "#f9fafb",
+            backgroundColor: "#fcfcdc",
             borderRadius: 2,
             boxShadow: 3,
             p: 2,
           }}
         >
-          <Table>
+           <Typography
+                 variant="h6"
+                 gutterBottom
+                 align="center"
+                 sx={{ color: "#002060", fontWeight: 600 }}
+               >
+                 FO Deal Summary (Jan - June 2025)
+               </Typography>
+          <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold", backgroundColor: "#e3f2fd" }}>
@@ -128,8 +120,6 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload }) => {
                       key={idx}
                       align="center"
                       sx={{
-                        backgroundColor: getDealColor(value),
-                        color: value ? "#fff" : "#000",
                         fontWeight: 500,
                         borderRadius: 1,
                       }}
