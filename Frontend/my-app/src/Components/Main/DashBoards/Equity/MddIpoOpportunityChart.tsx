@@ -83,7 +83,7 @@ const MddIpoOpportunityChart: React.FC = () => {
 
   return (
     <Paper sx={{ p: 3, mt: 4, mb:2 }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom align="center"  color="#002060">
         Opportunity Value Trends in IPO's in 2025
       </Typography>
 
