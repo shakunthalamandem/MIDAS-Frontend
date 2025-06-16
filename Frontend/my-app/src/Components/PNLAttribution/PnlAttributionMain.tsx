@@ -29,7 +29,7 @@ const PnlAttributionMain = () => {
           },
         }}
       >
-        Welcome to P&L's for the monashee transactions
+        Welcome to Monashee's latest P&L performance overview.
       </Typography>
 
       {/* Components section */}

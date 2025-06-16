@@ -23,18 +23,17 @@ interface PnLData {
 
 const timeRanges = ["1D", "MTD", "QTD", "YTD"];
 
-
-  const formatValue = (value?: number): string => {
-    if (value === undefined || value === null || isNaN(value)) return "-";
-    const absValue = Math.abs(value);
-    const sign = value < 0 ? "-" : "";
-    if (absValue >= 1_000_000_000)
-      return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
-    if (absValue >= 1_000_000)
-      return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
-    if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
-    return `${sign}$${absValue.toFixed(2)}`;
-  };
+const formatValue = (value?: number): string => {
+  if (value === undefined || value === null || isNaN(value)) return "-";
+  const absValue = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+  if (absValue >= 1_000_000_000)
+    return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
+  if (absValue >= 1_000_000)
+    return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
+  if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
+  return `${sign}$${absValue.toFixed(2)}`;
+};
 
 const getCellStyle = (value: number | undefined) => {
   if (value === undefined) return {};
@@ -80,118 +79,125 @@ const PnLSummary: React.FC = () => {
 
   return (
     <Container>
-    <Box p={2}>
-      <Typography
-            variant="h3"
-            align="center"
-            sx={{ color: "#005166", fontSize: "1.75rem", mb: 3 }}
-          >
-     PnL Summary by Asset Type
-  </Typography>
-
-
-      {loading && <CircularProgress />}
-      {error && <Alert severity="error">{error}</Alert>}
-
-      {data && (
-        <TableContainer
-          component={Paper}
-          sx={{
-            mt: 2,
-            maxHeight: 500,
-            overflow: "auto",
-            border: "1px solid #000",
-          }}
+      <Box p={2}>
+        <Typography
+          variant="h3"
+          align="left"
+          sx={{ color: "#005166", fontSize: "1.75rem", mb: 3 }}
         >
-          <Table
-            stickyHeader
-            size="small"
+          P&L Summary by Asset Class
+        </Typography>
+        <Typography variant="body1" align="left" sx={{ color: "#666", mb: 2 }}>
+          Gain a quick snapshot of Monashee’s profit and loss across major asset
+          types including Cash, Equities, Bonds, and Derivatives, measured over
+          multiple timeframes: 1 Day (1D), Month-to-Date (MTD), Quarter-to-Date
+          (QTD), and Year-to-Date (YTD). This summary highlights where gains or
+          losses are concentrated at a portfolio-wide level.
+        </Typography>
+
+        {loading && <CircularProgress />}
+        {error && <Alert severity="error">{error}</Alert>}
+
+        {data && (
+          <TableContainer
+            component={Paper}
             sx={{
-              borderCollapse: "collapse",
-              "& th, & td": {
-                border: "1px solid #000",
-                padding: "6px 10px",
-                maxWidth: 80,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              },
-              "& th:nth-of-type(1), & td:nth-of-type(1)": {
-                maxWidth: 150,
-              },
-              "& thead th": {
-                backgroundColor: "#002060",
-                color: "#fff",
-                fontWeight: "bold",
-                textAlign: "center",
-              },
-              "& tbody tr.total-row": {
-                backgroundColor: "rgb(145, 206, 137)",
-                fontWeight: "bold",
-                color: "#000",
-              },
-              "& tbody tr.total-row td": {
-                fontWeight: "bold",
-                color: "#000",
-              },
-              "& tbody td": {
-                textAlign: "right",
-              },
-              "& tbody td:first-of-type": {
-                textAlign: "left",
-              },
+              mt: 2,
+              maxHeight: 500,
+              overflow: "auto",
+              border: "1px solid #000",
             }}
           >
-            <TableHead>
-              <TableRow>
-                <TableCell>Asset Type</TableCell>
-                {timeRanges.map((range) => (
-                  <TableCell key={range}>{range}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {[
-                ...Object.entries(data).filter(([k]) => k !== "Total"),
-                ...(data["Total"]
-                  ? [
-                      ["Total", data["Total"]] as [
-                        string,
-                        { [key: string]: number },
-                      ],
-                    ]
-                  : []),
-              ].map(([assetType, values]) => (
-                <TableRow
-                  key={assetType}
-                  className={assetType === "Total" ? "total-row" : undefined}
-                >
-                  <TableCell
-                    sx={{ fontWeight: assetType === "Total" ? "bold" : 500 }}
-                  >
-                    {assetType}
-                  </TableCell>
-                  {timeRanges.map((range) => {
-                    const val = values[range];
-                    return (
-                      <TableCell
-                        key={range}
-                        sx={{
-                          ...getCellStyle(val),
-                          fontWeight: assetType === "Total" ? "bold" : undefined,
-                        }}
-                      >
-                        $ {val !== undefined ? formatValue(val) : "-"}
-                      </TableCell>
-                    );
-                  })}
+            <Table
+              stickyHeader
+              size="small"
+              sx={{
+                borderCollapse: "collapse",
+                "& th, & td": {
+                  border: "1px solid #000",
+                  padding: "6px 10px",
+                  maxWidth: 80,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                },
+                "& th:nth-of-type(1), & td:nth-of-type(1)": {
+                  maxWidth: 150,
+                },
+                "& thead th": {
+                  backgroundColor: "#002060",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                },
+                "& tbody tr.total-row": {
+                  backgroundColor: "rgb(145, 206, 137)",
+                  fontWeight: "bold",
+                  color: "#000",
+                },
+                "& tbody tr.total-row td": {
+                  fontWeight: "bold",
+                  color: "#000",
+                },
+                "& tbody td": {
+                  textAlign: "right",
+                },
+                "& tbody td:first-of-type": {
+                  textAlign: "left",
+                },
+              }}
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Asset Type</TableCell>
+                  {timeRanges.map((range) => (
+                    <TableCell key={range}>{range}</TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-    </Box>
+              </TableHead>
+              <TableBody>
+                {[
+                  ...Object.entries(data).filter(([k]) => k !== "Total"),
+                  ...(data["Total"]
+                    ? [
+                        ["Total", data["Total"]] as [
+                          string,
+                          { [key: string]: number },
+                        ],
+                      ]
+                    : []),
+                ].map(([assetType, values]) => (
+                  <TableRow
+                    key={assetType}
+                    className={assetType === "Total" ? "total-row" : undefined}
+                  >
+                    <TableCell
+                      sx={{ fontWeight: assetType === "Total" ? "bold" : 500 }}
+                    >
+                      {assetType}
+                    </TableCell>
+                    {timeRanges.map((range) => {
+                      const val = values[range];
+                      return (
+                        <TableCell
+                          key={range}
+                          sx={{
+                            ...getCellStyle(val),
+                            fontWeight:
+                              assetType === "Total" ? "bold" : undefined,
+                          }}
+                        >
+                          $ {val !== undefined ? formatValue(val) : "-"}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Box>
     </Container>
   );
 };

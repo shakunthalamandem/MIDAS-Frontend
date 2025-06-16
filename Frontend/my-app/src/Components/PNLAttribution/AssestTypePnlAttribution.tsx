@@ -76,11 +76,10 @@ const AssestTypePnlAttribution: React.FC = () => {
     return monthsArray;
   }, [data]);
 
-const handleAssetClick = (assetType: string) => {
-  const url = `/portfolio-attribution/details/${encodeURIComponent(assetType)}`;
-  window.open(url, "_blank");
-};
-
+  const handleAssetClick = (assetType: string) => {
+    const url = `/portfolio-attribution/details/${encodeURIComponent(assetType)}`;
+    window.open(url, "_blank");
+  };
 
   const sortedAssetTypes = assetOrder.filter((key) => data.hasOwnProperty(key));
 
@@ -89,13 +88,19 @@ const handleAssetClick = (assetType: string) => {
     return <Typography>No data available</Typography>;
 
   return (
-    <Container maxWidth="lg" sx={{ mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mb: 4, mt: 2 }}>
       <Typography
         variant="h3"
-        align="center"
+        align="left"
         sx={{ color: "#005166", fontSize: "1.75rem", mb: 3 }}
       >
-        Portfolio Attribution
+        Fund-Level Performance Breakdown
+      </Typography>
+      <Typography variant="body1" align="left" sx={{ color: "#666", mb: 2 }}>
+        Dive deeper into the performance drivers by analyzing how each
+        individual fund has contributed to overall P&L. This breakdown allows
+        for a granular view of asset-specific returns, strategy effectiveness,
+        and risk-adjusted performance across the Monashee platform.
       </Typography>
 
       <TableContainer>
@@ -153,10 +158,13 @@ const handleAssetClick = (assetType: string) => {
               const fundNames = Object.keys(funds);
 
               // Calculate totals per month
-              const totals = allMonths.reduce<Record<string, number>>((acc, month) => {
-                acc[month] = 0;
-                return acc;
-              }, {});
+              const totals = allMonths.reduce<Record<string, number>>(
+                (acc, month) => {
+                  acc[month] = 0;
+                  return acc;
+                },
+                {}
+              );
 
               fundNames.forEach((fundName) => {
                 const fund = funds[fundName];
@@ -331,67 +339,73 @@ const handleAssetClick = (assetType: string) => {
                       fontSize: "0.75rem",
                     }}
                   >
-                   <TableCell
-  colSpan={1}
-  onClick={() => {
-    if (!alwaysExpandedAssets.includes(assetType)) {
-      setExpanded((prev) => ({
-        ...prev,
-        [assetType]: false,
-      }));
-    }
-  }}
-  sx={{
-    border: "1px solid black",
-    padding: "4px 8px",
-    position: "relative",
-    paddingRight: alwaysExpandedAssets.includes(assetType)
-      ? "8px"
-      : "32px",
-    cursor: alwaysExpandedAssets.includes(assetType)
-      ? "default"
-      : "pointer",
-  }}
-  role={!alwaysExpandedAssets.includes(assetType) ? "button" : undefined}
-  tabIndex={!alwaysExpandedAssets.includes(assetType) ? 0 : undefined}
-  onKeyPress={(e) => {
-    if (
-      !alwaysExpandedAssets.includes(assetType) &&
-      (e.key === "Enter" || e.key === " ")
-    ) {
-      setExpanded((prev) => ({
-        ...prev,
-        [assetType]: false,
-      }));
-    }
-  }}
->
-  <Typography sx={{ fontWeight: "bold" }}>
-    Total
-  </Typography>
-  {!alwaysExpandedAssets.includes(assetType) && (
-    <IconButton
-      size="small"
-      sx={{
-        position: "absolute",
-        right: 4,
-        top: "50%",
-        transform: "translateY(-50%)",
-        padding: "2px",
-      }}
-      aria-label={`Collapse ${assetType}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        setExpanded((prev) => ({
-          ...prev,
-          [assetType]: false,
-        }));
-      }}
-    >
-      <Remove fontSize="small" />
-    </IconButton>
-  )}
-</TableCell>
+                    <TableCell
+                      colSpan={1}
+                      onClick={() => {
+                        if (!alwaysExpandedAssets.includes(assetType)) {
+                          setExpanded((prev) => ({
+                            ...prev,
+                            [assetType]: false,
+                          }));
+                        }
+                      }}
+                      sx={{
+                        border: "1px solid black",
+                        padding: "4px 8px",
+                        position: "relative",
+                        paddingRight: alwaysExpandedAssets.includes(assetType)
+                          ? "8px"
+                          : "32px",
+                        cursor: alwaysExpandedAssets.includes(assetType)
+                          ? "default"
+                          : "pointer",
+                      }}
+                      role={
+                        !alwaysExpandedAssets.includes(assetType)
+                          ? "button"
+                          : undefined
+                      }
+                      tabIndex={
+                        !alwaysExpandedAssets.includes(assetType)
+                          ? 0
+                          : undefined
+                      }
+                      onKeyPress={(e) => {
+                        if (
+                          !alwaysExpandedAssets.includes(assetType) &&
+                          (e.key === "Enter" || e.key === " ")
+                        ) {
+                          setExpanded((prev) => ({
+                            ...prev,
+                            [assetType]: false,
+                          }));
+                        }
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: "bold" }}>Total</Typography>
+                      {!alwaysExpandedAssets.includes(assetType) && (
+                        <IconButton
+                          size="small"
+                          sx={{
+                            position: "absolute",
+                            right: 4,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            padding: "2px",
+                          }}
+                          aria-label={`Collapse ${assetType}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpanded((prev) => ({
+                              ...prev,
+                              [assetType]: false,
+                            }));
+                          }}
+                        >
+                          <Remove fontSize="small" />
+                        </IconButton>
+                      )}
+                    </TableCell>
 
                     {allMonths.map((month) => (
                       <TableCell
