@@ -243,6 +243,7 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                                   borderBottom: "none",
                                   color: "#333",
                                   whiteSpace: "nowrap",
+                                  fontWeight: metric.competitor === tickerKey ? "bold" : "normal",
                                 }}
                               >
                                 {columnsWithX.has(col.key) &&
