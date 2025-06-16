@@ -51,7 +51,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
       onRepredict(price);
       setIsLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); 
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       } finally {
         setIsLoading(false);
       }
@@ -234,7 +234,7 @@ Threshold: Return < -2%`,
                 value={price}
                 onChange={handlePriceChange}
                 size="small"
-                sx={{ mr: 2, width: "200px" }}
+                sx={{ mr: 2, width: "194px", position: "relative", top: "18px",backgroundColor: "#ede7f6" }}
                 type="number"
               />
               <Button
@@ -242,6 +242,8 @@ Threshold: Return < -2%`,
                 onClick={handleRepredict}
                 disabled={isLoading}
                 sx={{
+                  position: "relative", 
+                  top: "18px",
                   backgroundColor: "#002060",
                   color: "#fff",
                   "&:disabled": { backgroundColor: "#002060", color: "#ccc" },
@@ -255,90 +257,92 @@ Threshold: Return < -2%`,
               </Button>
             </Box>
           )}
+
+
         </Box>
 
-        <Typography variant="body1" gutterBottom>
+        {/* <Typography variant="body1" gutterBottom>
           Using trained machine learning models, this report provides insights
           into the expected return profile of a prospective equity deal under
           current conditions.
-        </Typography>
+        </Typography> */}
 
         <Divider sx={{ my: 3 }} />
 
-<TableContainer>
-  <Table>
-    <TableBody>
-      <TableRow sx={{ bgcolor: "#f0f4f8" }}>
-        <TableCell sx={{ fontWeight: 600}}>Model</TableCell>
-        <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
-        {modelVersions.map((version, idx) => (
-          <React.Fragment key={version}>
-            <TableCell
-              sx={{
-                fontWeight: 600,
-                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6", 
-              }}
-            >
-              {`T + 1D Closing Result`}
-            </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: 600,
-                bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
-              }}
-            >
-              {`T + 1D Closing Accuracy`}
-            </TableCell>
-          </React.Fragment>
-        ))}
-      </TableRow>
+        <TableContainer>
+          <Table>
+            <TableBody>
+              <TableRow sx={{ bgcolor: "#f0f4f8" }}>
+                <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
+                {modelVersions.map((version, idx) => (
+                  <React.Fragment key={version}>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
+                      }}
+                    >
+                      {`T + 1D Closing Result`}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
+                      }}
+                    >
+                      {`T + 1D Closing Accuracy`}
+                    </TableCell>
+                  </React.Fragment>
+                ))}
+              </TableRow>
 
-      {modelTypes.map((type) => (
-        <TableRow key={type}>
-          <TableCell >{rowLabels[type]}</TableCell>
-          <TableCell >
-            <Typography variant="body2" whiteSpace="pre-line">
-              {rowExplanations[type]}
-            </Typography>
-          </TableCell>
-
-          {modelVersions.map((version, idx) => {
-            const key = getModelKey(version, type);
-            const modelData = result[key];
-            const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
-
-            if (!modelData) {
-              return (
-                <React.Fragment key={version}>
-                  <TableCell sx={{ bgcolor: cellColor }}>
-                    <Box color="text.disabled">N/A</Box>
+              {modelTypes.map((type) => (
+                <TableRow key={type}>
+                  <TableCell >{rowLabels[type]}</TableCell>
+                  <TableCell >
+                    <Typography variant="body2" whiteSpace="pre-line">
+                      {rowExplanations[type]}
+                    </Typography>
                   </TableCell>
-                  <TableCell sx={{ bgcolor: cellColor }}>
-                    <Box color="text.disabled">N/A</Box>
-                  </TableCell>
-                </React.Fragment>
-              );
-            }
 
-            const renderResult =
-              type === "main"
-                ? renderOutcome(modelData.prediction)
-                : renderBinaryResult(modelData.prediction);
+                  {modelVersions.map((version, idx) => {
+                    const key = getModelKey(version, type);
+                    const modelData = result[key];
+                    const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
 
-            return (
-              <React.Fragment key={version}>
-                <TableCell sx={{ bgcolor: cellColor }}>{renderResult}</TableCell>
-                <TableCell sx={{ bgcolor: cellColor }}>
-                  {renderConfidenceLevel(modelData.Accuracy)}
-                </TableCell>
-              </React.Fragment>
-            );
-          })}
-        </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-</TableContainer>
+                    if (!modelData) {
+                      return (
+                        <React.Fragment key={version}>
+                          <TableCell sx={{ bgcolor: cellColor }}>
+                            <Box color="text.disabled">N/A</Box>
+                          </TableCell>
+                          <TableCell sx={{ bgcolor: cellColor }}>
+                            <Box color="text.disabled">N/A</Box>
+                          </TableCell>
+                        </React.Fragment>
+                      );
+                    }
+
+                    const renderResult =
+                      type === "main"
+                        ? renderOutcome(modelData.prediction)
+                        : renderBinaryResult(modelData.prediction);
+
+                    return (
+                      <React.Fragment key={version}>
+                        <TableCell sx={{ bgcolor: cellColor }}>{renderResult}</TableCell>
+                        <TableCell sx={{ bgcolor: cellColor }}>
+                          {renderConfidenceLevel(modelData.Accuracy)}
+                        </TableCell>
+                      </React.Fragment>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
       </Paper>
     </Container>
