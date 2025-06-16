@@ -34,7 +34,7 @@ const formatValue = (value: number): string => {
   }
 };
 
-const MddDealsOpportunityChart: React.FC = () => {
+const MddIpoOpportunityChart: React.FC = () => {
   const [data, setData] = useState<OpportunityData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,14 +94,24 @@ const MddDealsOpportunityChart: React.FC = () => {
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
+            <XAxis
+              dataKey="month"
+              tickFormatter={(month) => {
+                const parts = month.split(" ");
+                const monthNumber = parseInt(parts[1], 10);
+                const monthNames = [
+                  "January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"
+                ];
+                return monthNames[monthNumber - 1] ?? month;
+              }}
+            />
             <YAxis tickFormatter={formatValue} width={100} />
             <Tooltip
               formatter={(value: number) => formatValue(value)}
               labelFormatter={(label) => `Month: ${label}`}
             />
-            <Bar dataKey="opportunity_value_ex" fill="#1976d2" />
+            <Bar dataKey="opportunity_value_ex" fill="#F97316" />
           </BarChart>
         </ResponsiveContainer>
       )}
@@ -109,4 +119,4 @@ const MddDealsOpportunityChart: React.FC = () => {
   );
 };
 
-export default MddDealsOpportunityChart;
+export default MddIpoOpportunityChart;

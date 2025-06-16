@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import MddDealsOpportunityChart from "./MddDealsOpportunityChart";
+import MddIpoOpportunityChart from "./MddIpoOpportunityChart";
 
 interface IpoData {
   ticker: string;
@@ -212,7 +212,8 @@ const UpcomingIpoTable: React.FC = () => {
         </TableContainer>
       </Box>
     </Container>
-    <MddDealsOpportunityChart />
+    <MddIpoOpportunityChart />
+
     </>
   );
 };
