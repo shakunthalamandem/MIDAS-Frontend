@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PredictedForm } from "../../Main/DashBoards/Equity/AiDashboard";
+import { PredictedForm } from "../../Main/DashBoards/Equity/FoPredictionCards";
 import {
   Box,
   Card,

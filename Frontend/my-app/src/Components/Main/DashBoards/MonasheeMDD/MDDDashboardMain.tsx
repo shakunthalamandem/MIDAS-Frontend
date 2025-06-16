@@ -4,7 +4,7 @@ import WeekelyMDD from './WeekelyMDD'
 import DashboardSectorWiseTable from './DashboardSectorWiseTable'
 import SummaryGraphsGap from './SummaryGapGraph'
 import { Typography, Grid, Paper, Box } from '@mui/material'
-import AiDashboard from '../Equity/AiDashboard'
+import AiDashboard from '../Equity/FoPredictionCards'
 
 const MDDDashboardMain = () => {
   return (
