@@ -82,7 +82,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
       deal_id: selectedDealId,
     };
 
-    if (!payload.deal_id.length ) {
+    if (!payload.deal_id.length) {
       setError("Please select at least one ticker and a date.");
       setOpenSnackbar(true);
       return;
@@ -148,11 +148,32 @@ const NewDealDownloadWithFilter: React.FC = () => {
                   labelId="ticker-label"
                   multiple
                   value={selectedDealId}
-                  onChange={(e) => setselectedDealId(e.target.value as string[])}
+                  onChange={(e) => {
+                    const value = e.target.value as string[];
+
+                    if (value.includes("all")) {
+                      // If all is selected, either select all or clear all
+                      setselectedDealId(
+                        selectedDealId.length === tickers.length ? [] : tickers
+                      );
+                    } else {
+                      setselectedDealId(value);
+                    }
+                  }}
                   input={<OutlinedInput label="Tickers" />}
                   renderValue={(selected) => selected.join(", ")}
                   MenuProps={MenuProps}
                 >
+                  <MenuItem value="all">
+                    <Checkbox
+                      checked={selectedDealId.length === tickers.length}
+                      indeterminate={
+                        selectedDealId.length > 0 &&
+                        selectedDealId.length < tickers.length
+                      }
+                    />
+                    <ListItemText primary="Select All" />
+                  </MenuItem>
                   {tickers.map((ticker) => (
                     <MenuItem key={ticker} value={ticker}>
                       <Checkbox checked={selectedDealId.includes(ticker)} />
@@ -188,7 +209,11 @@ const NewDealDownloadWithFilter: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+      >
         <Alert
           onClose={() => setOpenSnackbar(false)}
           severity={error ? "error" : "success"}
