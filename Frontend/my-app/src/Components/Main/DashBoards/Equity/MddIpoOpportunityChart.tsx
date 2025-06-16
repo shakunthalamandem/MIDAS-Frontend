@@ -17,14 +17,16 @@ import {
   ReferenceLine,
 } from "recharts";
 import IPODashboardTable from "./IPODashboardTable"; // import your table component
-
 interface ApiResponse {
   [month: string]: {
     [dealType: string]: {
       opportunity_value_ex: number;
+      deal_size?: number;
+      count?: number;
     };
   };
 }
+
 
 interface OpportunityData {
   month: string;
@@ -74,12 +76,13 @@ const MddIpoOpportunityChart: React.FC = () => {
         setFullPayload(response.data);
 
         // Prepare chart data
-        const transformedData: OpportunityData[] = Object.entries(response.data).map(
-          ([month, value]) => ({
-            month,
-            opportunity_value_ex: value["IPO"].opportunity_value_ex,
-          })
-        );
+    const transformedData: OpportunityData[] = Object.entries(response.data).map(
+  ([month, value]) => ({
+    month,
+    opportunity_value_ex: value["IPO"].opportunity_value_ex,
+  })
+);
+
 
         setData(transformedData);
         setError(null);
@@ -96,7 +99,7 @@ const MddIpoOpportunityChart: React.FC = () => {
 
   return (
     <Paper sx={{ p: 3, mt: 4, mb: 2 }}>
-                {fullPayload && <IPODashboardTable payload={fullPayload} />}
+{fullPayload && <IPODashboardTable payload={fullPayload} />}
 
       <Typography variant="h6" gutterBottom align="center" color="#002060">
         Opportunity Value Trends in IPO's in 2025

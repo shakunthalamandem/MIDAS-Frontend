@@ -1,19 +1,18 @@
 import React from "react";
 import {
+  Paper,
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
   Typography,
-  Paper,
-  TableContainer,
-  Box,
-  Fade,
+  Zoom,
 } from "@mui/material";
 
 interface DealData {
-  opportunity_value_ex: number;
+  deal_size?: number;
   count?: number;
 }
 
@@ -27,20 +26,20 @@ interface IPODashboardTableProps {
 
 const monthNames = [
   "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "July", "August", "September", "October", "November", "December",
 ];
 
 const getMonthIndex = (monthKey: string): number => {
   const parts = monthKey.match(/\d+/g);
-  if (!parts) return 0;
-  const monthNum = parseInt(parts[parts.length - 1], 10);
+  const monthNum = parseInt(parts?.[1] || "1", 10);
   return monthNum - 1;
 };
 
-const formatValue = (value: number): string => {
-  if (Math.abs(value) >= 1_000_000_000) return `₹${(value / 1_000_000_000).toFixed(2)}B`;
-  if (Math.abs(value) >= 1_000_000) return `₹${(value / 1_000_000).toFixed(2)}M`;
-  return `₹${value.toFixed(2)}`;
+const formatCurrency = (value?: number): string => {
+  if (!value || isNaN(value)) return "-";
+  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
+  return `$${value.toFixed(2)}`;
 };
 
 const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
@@ -48,70 +47,50 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
 
   Object.entries(payload).forEach(([month, dealTypes]) => {
     const idx = getMonthIndex(month);
-    if (idx <= 5) {
-      const deal = dealTypes["IPO"];
-      if (deal) monthData[idx] = deal;
+    const deal = dealTypes["IPO"] || dealTypes["FO"]; // fallback to FO if IPO is missing
+    if (deal) {
+      monthData[idx] = deal;
     }
   });
 
   return (
-    <Fade in timeout={600}>
-      <Box mt={4}>
-        <Typography
-          variant="h6"
-          color="#002060"
-          gutterBottom
-          align="center"
-          sx={{ fontWeight: 600 }}
-        >
-          IPO Deal Summary (Till June 2025)
+    <Zoom in>
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600}>
+         IPO Deal Summary (Jan - June 2025)
         </Typography>
-        <TableContainer
-          component={Paper}
-          sx={{
-            backgroundColor: "#f9fafb",
-            borderRadius: 2,
-            boxShadow: 3,
-            p: 2,
-          }}
-        >
-          <Table>
+        <TableContainer>
+          <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold", backgroundColor: "#e8f5e9" }}>
-                  Metric
-                </TableCell>
+                <TableCell>Metric</TableCell>
                 {monthNames.slice(0, 6).map((name, idx) => (
-                  <TableCell key={idx} align="center" sx={{ backgroundColor: "#e8f5e9" }}>
-                    {name.slice(0, 3)}
-                  </TableCell>
+                  <TableCell key={idx} align="center">{name.slice(0, 3)}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 500 }}>Count</TableCell>
+              <TableRow hover>
+                <TableCell>Count</TableCell>
                 {monthNames.slice(0, 6).map((_, idx) => (
                   <TableCell key={idx} align="center">
                     {monthData[idx]?.count ?? "-"}
                   </TableCell>
                 ))}
               </TableRow>
-              <TableRow sx={{ backgroundColor: "#fff3e0" }}>
-                <TableCell sx={{ fontWeight: 500 }}>Deal Value</TableCell>
+              <TableRow hover>
+                <TableCell>Deal Size</TableCell>
                 {monthNames.slice(0, 6).map((_, idx) => (
                   <TableCell key={idx} align="center">
-                    {monthData[idx]?.opportunity_value_ex
-                      ? formatValue(monthData[idx].opportunity_value_ex)
-                      : "-"}
+                    {formatCurrency(monthData[idx]?.deal_size)}
                   </TableCell>
                 ))}
               </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
-      </Box>
-    </Fade>
+      </Paper>
+    </Zoom>
   );
 };
 
