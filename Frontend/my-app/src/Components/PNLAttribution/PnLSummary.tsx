@@ -20,7 +20,7 @@ interface PnLData {
   };
 }
 
-const timeRanges = ["1D", "1W", "1M", "3M", "MTD", "QTD", "YTD"];
+const timeRanges = ["1D","MTD", "QTD", "YTD"];
 
 const formatValue = (value: number) => {
   const inThousands = value / 1000;
