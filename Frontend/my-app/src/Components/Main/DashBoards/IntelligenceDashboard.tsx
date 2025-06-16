@@ -1,7 +1,7 @@
 import React from "react";
 import UpcomingIpoTable from "./Equity/UpcomingIpoTable";
-import AiDashboard from "./Equity/AiDashboard";
 import { Grid, Box, Paper, Typography } from "@mui/material";
+import FoPredictionCards from "./Equity/FoPredictionCards";
 
 const IntelligenceDashboard: React.FC = () => {
   return (
@@ -43,7 +43,7 @@ const IntelligenceDashboard: React.FC = () => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, height: "100%" }}>
-                  <AiDashboard />
+                  <FoPredictionCards />
                 </Paper>
               </Grid>
             </Grid>
