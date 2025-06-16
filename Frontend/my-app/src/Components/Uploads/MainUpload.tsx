@@ -47,7 +47,7 @@ const uploadConfigs = [
   {
     key: 'financialForecasts',
     label: 'Upload IPO S1 FinancialForecasts',
-    apiEndpoint: 'financialForecasts_data_upload',
+    apiEndpoint: 'financial_forecasts_data_upload',
     buttonColor: 'success',
   },
   {
@@ -98,6 +98,7 @@ const MainUpload: React.FC = () => {
       await axios.post(`${apiUrl}/api/${config.apiEndpoint}/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
         },
         // Optional: to track progress, you can add onUploadProgress here
         // onUploadProgress: (progressEvent) => {
