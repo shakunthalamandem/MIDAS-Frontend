@@ -188,6 +188,7 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                       textAlign: "center",
                       borderBottom: "none",
                       whiteSpace: "nowrap",
+                      fontSize: "0.75rem",
                     }}
                   >
                     {col.label}
