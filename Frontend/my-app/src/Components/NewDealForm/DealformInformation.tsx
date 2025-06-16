@@ -28,22 +28,24 @@ const DealformInformation = () => {
   const location = useLocation();
   const passedTicker = location.state?.ticker;
 
+  // Now selectedTicker holds both ticker and deal_id
+  const [selectedTicker, setSelectedTicker] = useState<{ ticker: string; deal_id?: string }>({
+    ticker: passedTicker || "SARO",
+    deal_id: undefined,
+  });
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<Data[]>([]);
   const [allTickers, setAllTickers] = useState<Data[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-  const [selectedTicker, setSelectedTicker] = useState<{ ticker: string }>({
-    ticker: passedTicker || "SARO",
-  });
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     if (passedTicker) {
-      setSelectedTicker({ ticker: passedTicker });
+      setSelectedTicker({ ticker: passedTicker, deal_id: undefined });
     }
   }, [passedTicker]);
 
@@ -89,8 +91,9 @@ const DealformInformation = () => {
     }
   };
 
-  const handleItemClick = (ticker: string) => {
-    setSelectedTicker({ ticker: ticker.toUpperCase() });
+  // Now handleItemClick sets both ticker and deal_id
+  const handleItemClick = (ticker: string, deal_id: string) => {
+    setSelectedTicker({ ticker: ticker.toUpperCase(), deal_id });
     setSearchTerm("");
     setShowDropdown(false);
     setResults([]);
@@ -188,7 +191,7 @@ const DealformInformation = () => {
                 {results.map((item: Data, index: number) => (
                   <ListItem
                     key={index}
-                    onClick={() => handleItemClick(item.ticker)}
+                    onClick={() => handleItemClick(item.ticker, item.deal_id)}
                     style={{
                       backgroundColor:
                         selectedTicker.ticker === item.ticker

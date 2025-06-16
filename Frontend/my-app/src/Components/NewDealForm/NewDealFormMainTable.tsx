@@ -17,25 +17,24 @@ import {
   Select,
   Tab,
   Tabs,
-  IconButton,
-  CircularProgress,
+  Snackbar,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SelectChangeEvent } from "@mui/material/Select";
-import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertColor } from "@mui/material/Alert";
 import { useNavigate } from "react-router-dom";
-import AddIcon from "@mui/icons-material/Add";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import CancelIcon from '@mui/icons-material/Cancel';
-
+import CancelIcon from "@mui/icons-material/Cancel";
 
 interface NewDealFormMainTableProps {
-  selecteditems: any;
+  selecteditems: {
+    ticker: string;
+    deal_id?: string;
+    [key: string]: any;
+  };
 }
 
 function flattenObject(
@@ -55,6 +54,7 @@ function flattenObject(
   }
   return result;
 }
+
 const fieldLabels: Record<string, Record<string, string>> = {
   basic_info: {
     ticker: "Ticker",
@@ -221,8 +221,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
   const [snackbarSeverity, setSnackbarSeverity] =
     useState<AlertColor>("success");
   const [tabIndex, setTabIndex] = useState(0);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const dateFields = [
     "launch_date",
@@ -231,9 +229,10 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
     "next_results_date",
     "pricing_date",
   ];
- const handleCancel = () => {
-  window.location.href = "/equity/issue_market"; 
-};
+
+  const handleCancel = () => {
+    window.location.href = "/equity/issue_market";
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -245,9 +244,15 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
           throw new Error("API URL is not defined in environment variables");
         if (!token) throw new Error("Access token is missing");
 
+        // Send both ticker and deal_id to the backend
+        const payload = {
+          ticker: selecteditems.ticker,
+          deal_id: selecteditems.deal_id,
+        };
+
         const response = await axios.post(
           `${apiUrl}/api/equity_deal_form/`,
-          selecteditems,
+          payload,
           {
             headers: {
               "Content-Type": "application/json",
@@ -271,6 +276,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
     if (reason === "clickaway") return;
     setSnackbarOpen(false);
   };
+
   const handleInputChange = (
     e: React.ChangeEvent<any> | SelectChangeEvent<any>,
     section: string,
@@ -386,8 +392,10 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
         {}
       );
 
+      // Send both ticker and deal_id to the backend
       const payload = {
         ticker: selecteditems.ticker,
+        deal_id: selecteditems.deal_id,
         ...sanitizedPayloadData,
       };
 
@@ -439,68 +447,67 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
 
     if (isDropdown) {
       return (
-<TextField
-  id="standard-basic"
-  select
-  label={labelText}
-  value={value || ""}
-  onClick={handleFieldClick}
-  onChange={(e) => handleInputChange(e, section, key)}
-  fullWidth
-  variant="standard"
-  disabled={!isEditable}
-  InputLabelProps={{
-    shrink: true,
-    sx: {
-      fontSize: "18px",
-      color: "#d45c04",
-      "&.Mui-disabled": {
-        color: "#002060",
-      },
-    },
-  }}
-  InputProps={{
-    sx: {
-      "& .MuiInput-input": {
-        fontSize: "15px",
-        color: "#2c2828",
-        WebkitTextFillColor: "#2c2828",
-      },
-      "& .Mui-disabled": {
-        color: "#2c2828 !important",
-        WebkitTextFillColor: "#2c2828 !important",
-      },
-    },
-  }}
-  SelectProps={{
-    MenuProps: {
-      PaperProps: {
-        sx: {
-          fontWeight: isEditMode ? "normal" : "bold",
-          fontSize: "20px",
-          maxHeight: "300px",
-        },
-      },
-    },
-    sx: {
-      "& .MuiSelect-select": {
-        color: "#b41401",
-        WebkitTextFillColor: "#2c2828",
-        "&.Mui-disabled": {
-          color: "#2c2828",
-          WebkitTextFillColor: "#2c2828",
-        },
-      },
-    },
-  }}
->
-  {dropdownOptions[key].map((option) => (
-    <MenuItem key={option} value={option}>
-      {option}
-    </MenuItem>
-  ))}
-</TextField>
-
+        <TextField
+          id="standard-basic"
+          select
+          label={labelText}
+          value={value || ""}
+          onClick={handleFieldClick}
+          onChange={(e) => handleInputChange(e, section, key)}
+          fullWidth
+          variant="standard"
+          disabled={!isEditable}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              fontSize: "18px",
+              color: "#d45c04",
+              "&.Mui-disabled": {
+                color: "#002060",
+              },
+            },
+          }}
+          InputProps={{
+            sx: {
+              "& .MuiInput-input": {
+                fontSize: "15px",
+                color: "#2c2828",
+                WebkitTextFillColor: "#2c2828",
+              },
+              "& .Mui-disabled": {
+                color: "#2c2828 !important",
+                WebkitTextFillColor: "#2c2828 !important",
+              },
+            },
+          }}
+          SelectProps={{
+            MenuProps: {
+              PaperProps: {
+                sx: {
+                  fontWeight: isEditMode ? "normal" : "bold",
+                  fontSize: "20px",
+                  maxHeight: "300px",
+                },
+              },
+            },
+            sx: {
+              "& .MuiSelect-select": {
+                color: "#b41401",
+                WebkitTextFillColor: "#2c2828",
+                "&.Mui-disabled": {
+                  color: "#2c2828",
+                  WebkitTextFillColor: "#2c2828",
+                },
+              },
+            },
+          }}
+        >
+          {dropdownOptions[key].map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </TextField>
       );
     }
 
@@ -533,12 +540,12 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
             fontSize: "14px",
             color: isEditMode ? "#000000" : "#b41401",
             "& input": {
-        WebkitTextFillColor: "#2c2828",
+              WebkitTextFillColor: "#2c2828",
             },
             "&.Mui-disabled": {
               color: isEditMode ? "#000000" : "#b41401",
               "& input": {
-        WebkitTextFillColor: "#2c2828",
+                WebkitTextFillColor: "#2c2828",
               },
             },
           },
@@ -578,7 +585,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
               alignItems: "flex-start",
               gap: 1.5,
               gridColumn: key === "deal_colour" ? "1 / -1" : undefined,
-
               minHeight: "40px",
             }}
           >
@@ -594,7 +600,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
       <Card
         sx={{
           mt: 4,
-          backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff", // white in edit mode, light blue after save
+          backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff",
           borderRadius: 3,
           p: 2,
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
@@ -602,14 +608,14 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
           width: "100%",
           maxWidth: "2000px",
           mx: "auto",
-          transition: "background-color 0.3s ease", // smooth color transition
+          transition: "background-color 0.3s ease",
         }}
       >
         <CardContent
           sx={{
             px: 3,
             py: 2,
-            backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff", // white in edit mode, light blue after save
+            backgroundColor: isEditMode ? "#f7f6ea" : "#e6f2ff",
             transition: "background-color 0.3s ease",
           }}
         >
@@ -636,8 +642,6 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
         minHeight: "90vh",
       }}
     >
-      {/* Tabs component to manage different sections */}
-
       <Tabs
         value={tabIndex}
         onChange={(e, newTabIndex) => setTabIndex(newTabIndex)}
@@ -718,31 +722,31 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
               backgroundColor: "#005b06",
               textTransform: "none",
               borderRadius: 2,
-                mr: 2,
+              mr: 2,
               "&:hover": { backgroundColor: "#001540" },
             }}
           >
             {isEditMode ? "Edit" : "Save"}
           </Button>
-     {!isEditMode && (
-    <Button
-      onClick={handleCancel}
-      startIcon={<CancelIcon />}
-      variant="outlined"
-      color="secondary"
-      sx={{
-        backgroundColor: "#ffffff",
-        textTransform: "none",
-        color: "red",
-        fontWeight: "bold",
-        border: "1px solid red",
-        borderRadius: 2,
-        "&:hover": { backgroundColor: "#002060", color: "#ffffff" },
-      }}
-    >
-      Cancel
-    </Button>
-  )}
+          {!isEditMode && (
+            <Button
+              onClick={handleCancel}
+              startIcon={<CancelIcon />}
+              variant="outlined"
+              color="secondary"
+              sx={{
+                backgroundColor: "#ffffff",
+                textTransform: "none",
+                color: "red",
+                fontWeight: "bold",
+                border: "1px solid red",
+                borderRadius: 2,
+                "&:hover": { backgroundColor: "#002060", color: "#ffffff" },
+              }}
+            >
+              Cancel
+            </Button>
+          )}
         </Box>
       </Tabs>
 

@@ -71,21 +71,13 @@ const formatNumber = (
   const absValue = Math.abs(value);
 
   if (absValue >= 1e9) {
-    formattedValue = Number.isInteger(absValue / 1e9)
-      ? `${(absValue / 1e9).toFixed(0)}B`
-      : `${(absValue / 1e9).toFixed(1)}B`;
+    formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
   } else if (absValue >= 1e6) {
-    formattedValue = Number.isInteger(absValue / 1e6)
-      ? `${(absValue / 1e6).toFixed(0)}M`
-      : `${(absValue / 1e6).toFixed(1)}M`;
+    formattedValue = `${(absValue / 1e6).toFixed(1)}M`;
   } else if (absValue >= 1e3) {
-    formattedValue = Number.isInteger(absValue / 1e3)
-      ? `${(absValue / 1e3).toFixed(0)}K`
-      : `${(absValue / 1e3).toFixed(1)}K`;
+    formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
   } else {
-    formattedValue = Number.isInteger(absValue)
-      ? absValue.toFixed(0)
-      : absValue.toFixed(2);
+    formattedValue = absValue.toFixed(1);
   }
 
   if (isCurrency) formattedValue = `$${formattedValue}`;
@@ -94,8 +86,12 @@ const formatNumber = (
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
-const IPODashboardMainTable: React.FC = () => {
-  const [ticker, setTicker] = useState("CRWV");
+
+interface IPODashboardMainTableProps {
+  ticker: string;
+}
+
+const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker }) => {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,10 +124,11 @@ const IPODashboardMainTable: React.FC = () => {
     }
   };
 
+  // Fetch data when ticker prop changes
   useEffect(() => {
-    handleFetch("CRWV");
+    handleFetch(ticker);
     // eslint-disable-next-line
-  }, []);
+  }, [ticker]);
 
   const noData =
     data &&
@@ -205,14 +202,18 @@ const IPODashboardMainTable: React.FC = () => {
                           (typeof value === "number" && isNaN(value))
                             ? "N/A"
                             : col.key === "price_usd"
-                              ? value
-                              : typeof value === "number"
-                                ? formatNumber(
-                                    value,
-                                    col.isCurrency,
-                                    col.isPercentage
-                                  )
-                                : value;
+                            ? value
+                            : col.key === "market_cap" || col.key === "ev_usd_million"
+                            ? typeof value === "number"
+                              ? value.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                              : value
+                            : typeof value === "number"
+                            ? formatNumber(
+                                value,
+                                col.isCurrency,
+                                col.isPercentage
+                              )
+                            : value;
 
                         return (
                           <TableCell

@@ -166,7 +166,7 @@ const IPODashboardMain: React.FC = () => {
 
               <Grid item xs={12}>
                 <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                  <IPODashboardMainTable />
+                  <IPODashboardMainTable ticker={selectedTicker || "CRWV"}/>
                 </Box>
               </Grid>
             </Grid>
