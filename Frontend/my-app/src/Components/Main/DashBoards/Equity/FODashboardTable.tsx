@@ -1,15 +1,14 @@
 import React from "react";
 import {
+  Paper,
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
   Typography,
-  Paper,
-  TableContainer,
-  Box,
-  Fade,
+  Zoom,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -28,7 +27,7 @@ interface FODashboardTableProps {
 
 const monthNames = [
   "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "July", "August", "September", "October", "November", "December",
 ];
 
 const getMonthIndex = (monthKey: string): number => {
@@ -39,9 +38,9 @@ const getMonthIndex = (monthKey: string): number => {
 
 const formatCurrency = (value?: number): string => {
   if (!value || isNaN(value)) return "-";
-  if (value >= 1_000_000_000) return `₹${(value / 1_000_000_000).toFixed(2)}B`;
-  if (value >= 1_000_000) return `₹${(value / 1_000_000).toFixed(2)}M`;
-  return `₹${value.toFixed(2)}`;
+  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
+  return `$${value.toFixed(2)}`;
 };
 
 
@@ -50,45 +49,37 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload }) => {
 
   Object.entries(payload).forEach(([month, dealTypes]) => {
     const idx = getMonthIndex(month);
-    if (idx <= 5) {
-      const deal = dealTypes["FO"];
-      if (deal) monthData[idx] = deal;
+    const deal =  dealTypes["FO"];
+    if (deal) {
+      monthData[idx] = deal;
     }
   });
 
   return (
-    <Fade in timeout={600}>
-      <Box mb={2}>
-       
-        <TableContainer
-          component={Paper}
-          sx={{
-            backgroundColor: "#fcfcdc",
-            borderRadius: 2,
-            boxShadow: 3,
-            p: 2,
-          }}
+    <Zoom in>
+
+  
+        <TableContainer   component={Paper}
+                  sx={{
+                    backgroundColor: "#fcfcdc",
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    p: 2,
+                  }}>
+                <Typography
+          variant="h6"
+          gutterBottom
+          align="center"
+          sx={{ color: "#002060", fontWeight: 600 }}
         >
-           <Typography
-                 variant="h6"
-                 gutterBottom
-                 align="center"
-                 sx={{ color: "#002060", fontWeight: 600 }}
-               >
-                 FO Deal Summary (Jan - June 2025)
-               </Typography>
+          FO Deal Summary (Jan - June 2025)
+        </Typography>
           <Table size="small">
             <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: "bold", backgroundColor: "#e3f2fd" }}>
-                  Metric
-                </TableCell>
+              <TableRow >
+                <TableCell sx={{ fontWeight: 600 }}>Metric</TableCell>
                 {monthNames.slice(0, 6).map((name, idx) => (
-                  <TableCell
-                    key={idx}
-                    align="center"
-                    sx={{ backgroundColor: "#e3f2fd", fontWeight: 600 }}
-                  >
+                  <TableCell key={idx} align="center" sx={{ fontWeight: 600 }}>
                     {name.slice(0, 3)}
                   </TableCell>
                 ))}
@@ -100,19 +91,20 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <TableCell sx={{ fontWeight: 500 }}>Count</TableCell>
+                <TableCell>Count</TableCell>
                 {monthNames.slice(0, 6).map((_, idx) => (
                   <TableCell key={idx} align="center">
                     {monthData[idx]?.count ?? "-"}
                   </TableCell>
                 ))}
               </motion.tr>
+
               <motion.tr
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                <TableCell sx={{ fontWeight: 500 }}>Deal Size</TableCell>
+                <TableCell>Deal Size</TableCell>
                 {monthNames.slice(0, 6).map((_, idx) => {
                   const value = monthData[idx]?.deal_size;
                   return (
@@ -132,8 +124,7 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload }) => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Box>
-    </Fade>
+    </Zoom>
   );
 };
 

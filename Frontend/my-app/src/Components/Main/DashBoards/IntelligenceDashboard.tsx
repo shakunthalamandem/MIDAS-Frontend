@@ -12,6 +12,8 @@ const IntelligenceDashboard: React.FC = () => {
   return (
     <Box display="flex" width="100%" p={2} bgcolor="#f5f9fc">
       <Box display="flex" flexDirection="column" gap={4} width="100%">
+
+        {/* First Section: Equity Intelligence */}
         <MotionPaper
           elevation={3}
           sx={{
@@ -49,42 +51,17 @@ const IntelligenceDashboard: React.FC = () => {
             AI-powered predictions to support data-driven investment decisions.
           </Typography>
 
-          {/* First Group */}
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <MotionPaper
-                elevation={2}
-                sx={{
-                  p: 2,
-                  height: "100%",
-                  borderRadius: 3,
-                  background: "#ffffff",
-                }}
-                whileHover={{ scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 120 }}
-              >
-                <UpcomingIpoTable />
-              </MotionPaper>
+              <UpcomingIpoTable />
             </Grid>
             <Grid item xs={12} md={6}>
-              <MotionPaper
-                elevation={2}
-                sx={{
-                  p: 2,
-                  height: "100%",
-                  borderRadius: 3,
-                  background: "#ffffff",
-                }}
-                whileHover={{ scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 120 }}
-              >
-                <FoPredictionCards />
-              </MotionPaper>
+              <FoPredictionCards />
             </Grid>
           </Grid>
         </MotionPaper>
 
-        {/* Second Group */}
+        {/* Second Section: Charts */}
         <MotionPaper
           elevation={3}
           sx={{
@@ -99,34 +76,10 @@ const IntelligenceDashboard: React.FC = () => {
         >
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <MotionPaper
-                elevation={2}
-                sx={{
-                  p: 2,
-                  height: "100%",
-                  borderRadius: 3,
-                  background: "#ffffff",
-                }}
-                whileHover={{ scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 120 }}
-              >
-                <MddIpoOpportunityChart />
-              </MotionPaper>
+              <MddIpoOpportunityChart />
             </Grid>
             <Grid item xs={12} md={6}>
-              <MotionPaper
-                elevation={2}
-                sx={{
-                  p: 2,
-                  height: "100%",
-                  borderRadius: 3,
-                  background: "#ffffff",
-                }}
-                whileHover={{ scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 120 }}
-              >
-                <MddFoDealsOpportunityChart />
-              </MotionPaper>
+              <MddFoDealsOpportunityChart />
             </Grid>
           </Grid>
         </MotionPaper>
