@@ -13,6 +13,8 @@ import {
 import { Add, Remove } from "@mui/icons-material";
 import { ApiResponse, formatNumber } from "./UtilisPnlAttribution";
 
+const alwaysExpandedAssets = ["Equities", "Convertible Bond", "Corporate Bond"];
+
 const PnlAttributionMain = () => {
   const [data, setData] = useState<ApiResponse>({});
   const [loading, setLoading] = useState<boolean>(true);
@@ -69,6 +71,7 @@ const PnlAttributionMain = () => {
     return <Typography>No data available</Typography>;
 
   const handleToggleExpand = (assetType: string) => {
+    if (alwaysExpandedAssets.includes(assetType)) return;
     setExpanded((prev) => ({
       ...prev,
       [assetType]: !prev[assetType],
@@ -90,26 +93,15 @@ const PnlAttributionMain = () => {
       </Typography>
 
       <TableContainer>
-        <Table
-          size="small"
-          sx={{
-            fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-            borderCollapse: "collapse",
-          }}
-        >
+        <Table size="small" sx={{ borderCollapse: "collapse" }}>
           <TableHead>
-            <TableRow
-              sx={{
-                height: 30,
-              }}
-            >
+            <TableRow sx={{ height: 30 }}>
               <TableCell
                 sx={{
                   backgroundColor: "rgb(70, 102, 117)",
                   color: "#fff",
                   fontWeight: "bold",
                   border: "1px solid black",
-                  fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                   fontSize: "0.75rem",
                   padding: "4px 8px",
                 }}
@@ -122,7 +114,6 @@ const PnlAttributionMain = () => {
                   color: "#fff",
                   fontWeight: "bold",
                   border: "1px solid black",
-                  fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                   fontSize: "0.75rem",
                   padding: "4px 8px",
                 }}
@@ -137,13 +128,9 @@ const PnlAttributionMain = () => {
                     color: "#fff",
                     fontWeight: "bold",
                     border: "1px solid black",
-                    fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                     fontSize: "0.75rem",
                     padding: "4px 8px",
                     textAlign: "right",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
                   }}
                 >
                   {month}
@@ -156,7 +143,6 @@ const PnlAttributionMain = () => {
             {Object.entries(data).map(([assetType, funds]) => {
               const fundNames = Object.keys(funds);
 
-              // Calculate totals for asset type
               const totals = allMonths.reduce<Record<string, number>>(
                 (acc, month) => {
                   acc[month] = 0;
@@ -173,46 +159,33 @@ const PnlAttributionMain = () => {
                 });
               });
 
-              const isExpanded = expanded[assetType] || false;
+              const isExpanded =
+                alwaysExpandedAssets.includes(assetType) || expanded[assetType];
 
               if (!isExpanded) {
-                // Collapsed: show one row per asset type with Total and expand icon on Fund Name cell
                 return (
-                  <TableRow
-                    key={assetType}
-                    sx={{
-                      fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-                      height: 26,
-                    }}
-                  >
+                  <TableRow key={assetType}>
                     <TableCell
                       sx={{
                         border: "1px solid black",
-                        fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-                        fontSize: "0.75rem",
                         fontWeight: "bold",
+                        fontSize: "0.75rem",
                         padding: "4px 8px",
-                        verticalAlign: "middle",
                       }}
                     >
                       {assetType}
                     </TableCell>
                     <TableCell
+                      onClick={() => handleToggleExpand(assetType)}
                       sx={{
                         border: "1px solid black",
-                        fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-                        fontSize: "0.75rem",
                         fontWeight: "bold",
+                        fontSize: "0.75rem",
                         padding: "4px 8px",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
                         position: "relative",
-                        paddingRight: "32px", // space for icon
                         cursor: "pointer",
-                        userSelect: "none",
+                        paddingRight: "32px",
                       }}
-                      onClick={() => handleToggleExpand(assetType)}
                     >
                       Total
                       <IconButton
@@ -234,13 +207,8 @@ const PnlAttributionMain = () => {
                         key={month}
                         sx={{
                           border: "1px solid black",
-                          fontWeight: "bold",
                           textAlign: "right",
                           padding: "4px 8px",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                           fontSize: "0.75rem",
                         }}
                       >
@@ -251,125 +219,100 @@ const PnlAttributionMain = () => {
                 );
               }
 
-              // Expanded: show all funds plus total row, with asset type cell spanning all fund+total rows
               return (
                 <React.Fragment key={assetType}>
                   {fundNames.map((fundName, idx) => {
                     const fund = funds[fundName];
                     return (
-                      <TableRow
-                        key={fundName}
-                        sx={{
-                          fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-                          height: 26,
-                        }}
-                      >
-                        {idx === 0 ? (
+                      <TableRow key={fundName}>
+                        {idx === 0 && (
                           <TableCell
-                            rowSpan={fundNames.length + 1} // all funds + total row
+                            rowSpan={fundNames.length + 1}
                             sx={{
                               border: "1px solid black",
-                              verticalAlign: "middle",
-                              fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-                              fontSize: "0.75rem",
                               fontWeight: "bold",
+                              fontSize: "0.75rem",
                               padding: "4px 8px",
+                              verticalAlign: "middle",
                             }}
                           >
                             {assetType}
                           </TableCell>
-                        ) : null}
+                        )}
                         <TableCell
                           sx={{
                             border: "1px solid black",
-                            fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                             fontSize: "0.75rem",
-                            fontWeight: "normal",
                             padding: "4px 8px",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
                           }}
                         >
                           {fundName}
                         </TableCell>
-                        {allMonths.map((month) => {
-                          const val = fund[month];
-                          return (
-                            <TableCell
-                              key={month}
-                              sx={{
-                                border: "1px solid black",
-                                fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-                                fontSize: "0.75rem",
-                                textAlign: "right",
-                                padding: "4px 8px",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {val !== undefined ? formatNumber(val) : "N/A"}
-                            </TableCell>
-                          );
-                        })}
+                        {allMonths.map((month) => (
+                          <TableCell
+                            key={month}
+                            sx={{
+                              border: "1px solid black",
+                              textAlign: "right",
+                              padding: "4px 8px",
+                              fontSize: "0.75rem",
+                            }}
+                          >
+                            {fund[month] !== undefined
+                              ? formatNumber(fund[month])
+                              : "N/A"}
+                          </TableCell>
+                        ))}
                       </TableRow>
                     );
                   })}
 
-                  {/* Total Row with collapse icon on Fund Name */}
                   <TableRow
                     sx={{
                       backgroundColor: "rgb(145, 206, 137)",
-                      fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                       fontWeight: "bold",
                       fontSize: "0.75rem",
-                      height: 26,
                     }}
                   >
                     <TableCell
                       colSpan={1}
+                      onClick={() => handleToggleExpand(assetType)}
                       sx={{
                         border: "1px solid black",
                         padding: "4px 8px",
-                        fontWeight: "bold",
-                        fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-                        fontSize: "0.75rem",
-                        textAlign: "left",
                         position: "relative",
-                        paddingRight: "32px", // space for icon
-                        cursor: "pointer",
-                        userSelect: "none",
+                        paddingRight: alwaysExpandedAssets.includes(assetType)
+                          ? "8px"
+                          : "32px",
+                        cursor: alwaysExpandedAssets.includes(assetType)
+                          ? "default"
+                          : "pointer",
                       }}
-                      onClick={() => handleToggleExpand(assetType)}
                     >
                       Total
-                      <IconButton
-                        size="small"
-                        sx={{
-                          position: "absolute",
-                          right: 4,
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          padding: "2px",
-                        }}
-                        aria-label="Collapse"
-                      >
-                        <Remove fontSize="small" />
-                      </IconButton>
+                      {!alwaysExpandedAssets.includes(assetType) && (
+                        <IconButton
+                          size="small"
+                          sx={{
+                            position: "absolute",
+                            right: 4,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            padding: "2px",
+                          }}
+                          aria-label="Collapse"
+                        >
+                          <Remove fontSize="small" />
+                        </IconButton>
+                      )}
                     </TableCell>
-                    {allMonths.map((month) => (
+                                        {allMonths.map((month) => (
                       <TableCell
                         key={month}
                         sx={{
                           border: "1px solid black",
-                          fontWeight: "bold",
                           textAlign: "right",
                           padding: "4px 8px",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                           fontSize: "0.75rem",
                         }}
                       >
