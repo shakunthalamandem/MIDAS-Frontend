@@ -11,6 +11,7 @@ import {
   Paper,
   CircularProgress,
   Alert,
+  Container,
 } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 
@@ -20,7 +21,7 @@ interface PnLData {
   };
 }
 
-const timeRanges = ["1D","MTD", "QTD", "YTD"];
+const timeRanges = ["1D", "MTD", "QTD", "YTD"];
 
 const formatValue = (value: number) => {
   const inThousands = value / 1000;
@@ -29,7 +30,6 @@ const formatValue = (value: number) => {
     minimumFractionDigits: 0,
   })}K`;
 };
-
 
 const getCellStyle = (value: number | undefined) => {
   if (value === undefined) return {};
@@ -74,6 +74,7 @@ const PnLSummary: React.FC = () => {
   }, [token]);
 
   return (
+    <Container>
     <Box p={2}>
       <Typography variant="h6" gutterBottom>
         📊 PnL Summary by Asset Type
@@ -89,25 +90,53 @@ const PnLSummary: React.FC = () => {
             mt: 2,
             maxHeight: 500,
             overflow: "auto",
-            border: "1px solid #eee",
+            border: "1px solid #000",
           }}
         >
-          <Table stickyHeader size="small">
+          <Table
+            stickyHeader
+            size="small"
+            sx={{
+              borderCollapse: "collapse",
+              "& th, & td": {
+                border: "1px solid #000",
+                padding: "6px 10px",
+                maxWidth: 80,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              },
+              "& th:nth-of-type(1), & td:nth-of-type(1)": {
+                maxWidth: 150,
+              },
+              "& thead th": {
+                backgroundColor: "#002060",
+                color: "#fff",
+                fontWeight: "bold",
+                textAlign: "center",
+              },
+              "& tbody tr.total-row": {
+                backgroundColor: "rgb(145, 206, 137)",
+                fontWeight: "bold",
+                color: "#000",
+              },
+              "& tbody tr.total-row td": {
+                fontWeight: "bold",
+                color: "#000",
+              },
+              "& tbody td": {
+                textAlign: "right",
+              },
+              "& tbody td:first-of-type": {
+                textAlign: "left",
+              },
+            }}
+          >
             <TableHead>
               <TableRow>
-                <TableCell
-                  sx={{ fontWeight: "bold", backgroundColor: "#f8f9fa" }}
-                >
-                  Asset Type
-                </TableCell>
+                <TableCell>Asset Type</TableCell>
                 {timeRanges.map((range) => (
-                  <TableCell
-                    key={range}
-                    align="right"
-                    sx={{ fontWeight: "bold", backgroundColor: "#f8f9fa" }}
-                  >
-                    {range}
-                  </TableCell>
+                  <TableCell key={range}>{range}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
@@ -125,9 +154,7 @@ const PnLSummary: React.FC = () => {
               ].map(([assetType, values]) => (
                 <TableRow
                   key={assetType}
-                  sx={
-                    assetType === "Total" ? { backgroundColor: "#f0f0f0" } : {}
-                  }
+                  className={assetType === "Total" ? "total-row" : undefined}
                 >
                   <TableCell
                     sx={{ fontWeight: assetType === "Total" ? "bold" : 500 }}
@@ -139,11 +166,9 @@ const PnLSummary: React.FC = () => {
                     return (
                       <TableCell
                         key={range}
-                        align="right"
                         sx={{
                           ...getCellStyle(val),
-                          fontWeight:
-                            assetType === "Total" ? "bold" : undefined,
+                          fontWeight: assetType === "Total" ? "bold" : undefined,
                         }}
                       >
                         $ {val !== undefined ? formatValue(val) : "-"}
@@ -157,6 +182,7 @@ const PnLSummary: React.FC = () => {
         </TableContainer>
       )}
     </Box>
+    </Container>
   );
 };
 

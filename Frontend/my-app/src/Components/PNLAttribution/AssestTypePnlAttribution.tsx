@@ -95,7 +95,7 @@ const handleAssetClick = (assetType: string) => {
         align="center"
         sx={{ color: "#005166", fontSize: "1.75rem", mb: 3 }}
       >
-        PnL Attribution
+        Portfolio Attribution
       </Typography>
 
       <TableContainer>
@@ -104,7 +104,7 @@ const handleAssetClick = (assetType: string) => {
             <TableRow sx={{ height: 30 }}>
               <TableCell
                 sx={{
-                  backgroundColor: "rgb(70, 102, 117)",
+                  backgroundColor: "#002060",
                   color: "#fff",
                   fontWeight: "bold",
                   border: "1px solid black",
@@ -116,7 +116,7 @@ const handleAssetClick = (assetType: string) => {
               </TableCell>
               <TableCell
                 sx={{
-                  backgroundColor: "rgb(70, 102, 117)",
+                  backgroundColor: "#002060",
                   color: "#fff",
                   fontWeight: "bold",
                   border: "1px solid black",
@@ -132,7 +132,7 @@ const handleAssetClick = (assetType: string) => {
                 <TableCell
                   key={month}
                   sx={{
-                    backgroundColor: "rgb(70, 102, 117)",
+                    backgroundColor: "#002060",
                     color: "#fff",
                     fontWeight: "bold",
                     border: "1px solid black",
