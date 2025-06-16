@@ -42,18 +42,21 @@ const forecastYearLabels = [
 interface FinancialForecastTableProps {
   defaultTicker?: string;
 }
-
 function formatFinancialValue(value: number | string): string {
   if (value === null || value === undefined || value === "N/A") return "N/A";
+
   const num = Number(value);
   if (isNaN(num)) return String(value);
 
-  const absValue = Math.abs(num).toLocaleString("en-US");
-  return num < 0 ? `(${absValue})` : absValue;
+  const rounded = Math.round(num); // ✅ Round to 0 decimal places
+  const absValue = Math.abs(rounded).toLocaleString("en-US");
+
+  return rounded < 0 ? `(${absValue})` : absValue;
 }
 
+
 const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
-  defaultTicker = "CRWV",
+  defaultTicker = "",
 }) => {
   const [forecastsInput, setForecastsInput] = useState(defaultTicker);
   const [forecastsTicker, setForecastsTicker] = useState(defaultTicker);
