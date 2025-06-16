@@ -88,13 +88,19 @@ const AssestTypePnlAttribution: React.FC = () => {
     return <Typography>No data available</Typography>;
 
   return (
-    <Container maxWidth="lg" sx={{ mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mb: 4, mt: 2 }}>
       <Typography
         variant="h3"
-        align="center"
+        align="left"
         sx={{ color: "#005166", fontSize: "1.75rem", mb: 3 }}
       >
-        Portfolio Attribution
+        Fund-Level Performance Breakdown
+      </Typography>
+      <Typography variant="body1" align="left" sx={{ color: "#666", mb: 2 }}>
+        Dive deeper into the performance drivers by analyzing how each
+        individual fund has contributed to overall P&L. This breakdown allows
+        for a granular view of asset-specific returns, strategy effectiveness,
+        and risk-adjusted performance across the Monashee platform.
       </Typography>
 
       <TableContainer>

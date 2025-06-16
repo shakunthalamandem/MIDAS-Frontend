@@ -90,10 +90,17 @@ const PnLSummary: React.FC = () => {
       <Box p={2}>
         <Typography
           variant="h3"
-          align="center"
+          align="left"
           sx={{ color: "#005166", fontSize: "1.75rem", mb: 3 }}
         >
-          PnL Summary by Asset Type
+          P&L Summary by Asset Class
+        </Typography>
+        <Typography variant="body1" align="left" sx={{ color: "#666", mb: 2 }}>
+          Gain a quick snapshot of Monashee’s profit and loss across major asset
+          types including Cash, Equities, Bonds, and Derivatives, measured over
+          multiple timeframes: 1 Day (1D), Month-to-Date (MTD), Quarter-to-Date
+          (QTD), and Year-to-Date (YTD). This summary highlights where gains or
+          losses are concentrated at a portfolio-wide level.
         </Typography>
 
         {loading && <CircularProgress />}
