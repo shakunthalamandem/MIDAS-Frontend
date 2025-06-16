@@ -96,14 +96,15 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
     );
   }
 
-  return (<Container sx={{ mt: 4, mb: 4 }}>
-    <Typography
-    variant="h6"
-    gutterBottom
-    sx={{ fontWeight: "bold", color: "#002060", mb: 2, textAlign: "center"  }}
-  >
-    Detailed Region-wise PnL
-  </Typography>
+  return (
+    <Container sx={{ mt: 4, mb: 4 }}>
+      <Typography
+        variant="h6"
+        gutterBottom
+        sx={{ fontWeight: "bold", color: "#002060", mb: 2, textAlign: "center" }}
+      >
+        Detailed Region-wise PnL
+      </Typography>
       <TableContainer component={Paper} sx={{ border: "1px solid #000" }}>
         <Table aria-label="Detailed Region PnL Attribution" sx={{ borderCollapse: "collapse" }}>
           <TableHead>
@@ -125,6 +126,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                 sx={{
                   color: "#fff",
                   border: "1px solid #000",
+                  textAlign: "center",
                   fontWeight: "bold",
                   padding: "4px 8px",
                   fontSize: "0.875rem",
@@ -136,10 +138,10 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
               {monthColumns.map((month) => (
                 <TableCell
                   key={month}
-                  align="right"
                   sx={{
                     color: "#fff",
                     border: "1px solid #000",
+                    textAlign: "center", // Ensures the month columns are also center-aligned
                     fontWeight: "bold",
                     padding: "4px 8px",
                     fontSize: "0.875rem",
@@ -150,10 +152,10 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
               ))}
 
               <TableCell
-                align="right"
                 sx={{
                   color: "#fff",
                   border: "1px solid #000",
+                  textAlign: "center", // Ensures YTD column is center-aligned
                   fontWeight: "bold",
                   padding: "4px 8px",
                   fontSize: "0.875rem",
@@ -166,7 +168,9 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
 
           <TableBody>
             {Object.entries(data).map(([region, keys]) => {
-              const fundEntries = Object.entries(keys);
+              const fundEntries = Object.entries(keys).sort(([fundA], [fundB]) =>
+                fundA.localeCompare(fundB)
+              ); // Sort the funds alphabetically
               const regionSpan = fundEntries.length;
 
               // Calculate totals for the region
@@ -201,10 +205,10 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                               border: "none",
                               borderRight: "1px solid #000",
                               borderBottom: isLastInRegion ? "2px solid #000" : "none",
-                              textAlign: "center",
+                              textAlign: "center", // Center-align broad region column
                               verticalAlign: "middle",
                               fontWeight: "bold",
-                              backgroundColor: "#f5f5f5",
+                            //   backgroundColor: "#f5f5f5",
                               width: "120px",
                               padding: "4px 8px",
                               fontSize: "0.875rem",
@@ -217,6 +221,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                         <TableCell
                           sx={{
                             border: "1px solid #000",
+                            textAlign: "center", // Center-align fund column
                             padding: "4px 8px",
                             fontSize: "0.875rem",
                           }}
@@ -227,16 +232,24 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                         {monthColumns.map((month) => (
                           <TableCell
                             key={`${region}-${key}-${month}`}
-                            align="right"
-                            sx={{ border: "1px solid #000", padding: "4px 8px", fontSize: "0.875rem" }}
+                            sx={{
+                              border: "1px solid #000",
+                              textAlign: "center", // Center-align month columns
+                              padding: "4px 8px",
+                              fontSize: "0.875rem",
+                            }}
                           >
                             {formatNumber(row[month] as number)}
                           </TableCell>
                         ))}
 
                         <TableCell
-                          align="right"
-                          sx={{ border: "1px solid #000", padding: "4px 8px", fontSize: "0.875rem" }}
+                          sx={{
+                            border: "1px solid #000",
+                            textAlign: "center", // Center-align YTD column
+                            padding: "4px 8px",
+                            fontSize: "0.875rem",
+                          }}
                         >
                           {formatNumber(row.YTD as number)}
                         </TableCell>
@@ -247,7 +260,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                   {/* Total Row for region */}
                   <TableRow
                     sx={{
-                      backgroundColor: "#e6f0ff",
+                      backgroundColor: "rgb(145, 206, 137)", // Apply background color for the entire row
                       fontWeight: "bold",
                       borderTop: "2px solid #000",
                       borderBottom: "2px solid #000",
@@ -259,9 +272,9 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                       sx={{
                         border: "1px solid #000",
                         fontWeight: "bold",
+                        textAlign: "center", // Center-align the text in this cell
                         padding: "4px 8px",
                         fontSize: "0.875rem",
-                        textAlign: "center",
                       }}
                     >
                       Total for {region}
@@ -270,16 +283,24 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                     {monthColumns.map((month) => (
                       <TableCell
                         key={`${region}-total-${month}`}
-                        align="right"
-                        sx={{ border: "1px solid #000", padding: "4px 8px", fontSize: "0.875rem" }}
+                        sx={{
+                          border: "1px solid #000",
+                          textAlign: "center", // Center-align month totals
+                          padding: "4px 8px",
+                          fontSize: "0.875rem",
+                        }}
                       >
                         {formatNumber(totals[month])}
                       </TableCell>
                     ))}
 
                     <TableCell
-                      align="right"
-                      sx={{ border: "1px solid #000", padding: "4px 8px", fontSize: "0.875rem" }}
+                      sx={{
+                        border: "1px solid #000",
+                        textAlign: "center", // Center-align total YTD
+                        padding: "4px 8px",
+                        fontSize: "0.875rem",
+                      }}
                     >
                       {formatNumber(totals.YTD)}
                     </TableCell>

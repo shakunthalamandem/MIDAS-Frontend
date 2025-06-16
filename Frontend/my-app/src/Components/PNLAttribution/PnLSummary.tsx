@@ -21,18 +21,26 @@ interface PnLData {
   };
 }
 
-const timeRanges = ["1D", "MTD", "QTD", "YTD"];
+const timeRanges = ["DTD", "MTD", "QTD", "YTD"];
+const assetOrder = [
+  "Equities",
+  "Convertible Bond",
+  "Corporate Bond",
+  "Cash",
+  "Warrants",
+  "Futures",
+];
 
 const formatValue = (value?: number): string => {
-  if (value === undefined || value === null || isNaN(value)) return "-";
+  if (value === undefined || value === null || isNaN(value)) return "-$";
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
   if (absValue >= 1_000_000_000)
-    return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
+    return `${sign}${(absValue / 1_000_000_000).toFixed(1)}B`;
   if (absValue >= 1_000_000)
-    return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
-  if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(1)}K`;
-  return `${sign}$${absValue.toFixed(2)}`;
+    return `${sign}${(absValue / 1_000_000).toFixed(1)}M`;
+  if (absValue >= 1_000) return `${sign}${(absValue / 1_000).toFixed(1)}K`;
+  return `${sign}${absValue.toFixed(2)}`;
 };
 
 const getCellStyle = (value: number | undefined) => {
@@ -120,6 +128,7 @@ const PnLSummary: React.FC = () => {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
+                  textAlign: "center", // Added textAlign center for all cells
                 },
                 "& th:nth-of-type(1), & td:nth-of-type(1)": {
                   maxWidth: 150,
@@ -140,10 +149,10 @@ const PnLSummary: React.FC = () => {
                   color: "#000",
                 },
                 "& tbody td": {
-                  textAlign: "right",
+                  textAlign: "center", // Ensured text is centered for all rows
                 },
                 "& tbody td:first-of-type": {
-                  textAlign: "left",
+                  textAlign: "center", // Centered the first column (Asset Type)
                 },
               }}
             >
@@ -156,43 +165,35 @@ const PnLSummary: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {[
-                  ...Object.entries(data).filter(([k]) => k !== "Total"),
-                  ...(data["Total"]
-                    ? [
-                        ["Total", data["Total"]] as [
-                          string,
-                          { [key: string]: number },
-                        ],
-                      ]
-                    : []),
-                ].map(([assetType, values]) => (
-                  <TableRow
-                    key={assetType}
-                    className={assetType === "Total" ? "total-row" : undefined}
-                  >
-                    <TableCell
-                      sx={{ fontWeight: assetType === "Total" ? "bold" : 500 }}
+                {assetOrder.map((assetType) => {
+                  const values = data[assetType];
+                  return (
+                    <TableRow
+                      key={assetType}
+                      className={assetType === "Total" ? "total-row" : undefined}
                     >
-                      {assetType}
-                    </TableCell>
-                    {timeRanges.map((range) => {
-                      const val = values[range];
-                      return (
-                        <TableCell
-                          key={range}
-                          sx={{
-                            ...getCellStyle(val),
-                            fontWeight:
-                              assetType === "Total" ? "bold" : undefined,
-                          }}
-                        >
-                          $ {val !== undefined ? formatValue(val) : "-"}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
+                      <TableCell
+                        sx={{ fontWeight: assetType === "Total" ? "bold" : 500 }}
+                      >
+                        {assetType}
+                      </TableCell>
+                      {timeRanges.map((range) => {
+                        const val = values?.[range];
+                        return (
+                          <TableCell
+                            key={range}
+                            sx={{
+                              ...getCellStyle(val),
+                              fontWeight: assetType === "Total" ? "bold" : undefined,
+                            }}
+                          >
+                            {val !== undefined ? `$ ${formatValue(val)}` : "-$"}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>

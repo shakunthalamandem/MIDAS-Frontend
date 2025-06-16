@@ -115,6 +115,8 @@ const AssestTypePnlAttribution: React.FC = () => {
                   border: "1px solid black",
                   fontSize: "0.75rem",
                   padding: "4px 8px",
+                  textAlign: "center",
+                  // textDecoration: "underline", // Underlining the asset type header
                 }}
               >
                 Asset Type
@@ -129,6 +131,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                   padding: "4px 8px",
                   minWidth: "80px",
                   maxWidth: "120px",
+                  textAlign: "center",
                 }}
               >
                 Fund Name
@@ -143,7 +146,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                     border: "1px solid black",
                     fontSize: "0.75rem",
                     padding: "4px 8px",
-                    textAlign: "right",
+                    textAlign: "center",
                   }}
                 >
                   {month}
@@ -155,16 +158,14 @@ const AssestTypePnlAttribution: React.FC = () => {
           <TableBody>
             {sortedAssetTypes.map((assetType) => {
               const funds = data[assetType];
-              const fundNames = Object.keys(funds);
+              const fundNames = Object.keys(funds).sort(); // Sort fund names alphabetically
 
               // Calculate totals per month
-              const totals = allMonths.reduce<Record<string, number>>(
-                (acc, month) => {
-                  acc[month] = 0;
-                  return acc;
-                },
-                {}
-              );
+              const totals = allMonths.reduce<Record<string, number>>((acc, month) => {
+                acc[month] = 0;
+
+                return acc;
+              }, {});
 
               fundNames.forEach((fundName) => {
                 const fund = funds[fundName];
@@ -184,23 +185,16 @@ const AssestTypePnlAttribution: React.FC = () => {
                       sx={{
                         border: "1px solid black",
                         fontWeight: "bold",
-                        fontSize: "0.75rem",
+                        fontSize: "0.85rem",
                         padding: "4px 8px",
+                        color: "#f52a0a",
+                        textAlign: "center",
+                        cursor: "pointer", // Indicating clickability
+                        textDecoration: "underline", // Underline asset type column
                       }}
+                      onClick={() => handleAssetClick(assetType)}
                     >
-                      <span
-                        onClick={() => handleAssetClick(assetType)}
-                        style={{ cursor: "pointer", fontWeight: "bold" }}
-                        role="button"
-                        tabIndex={0}
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            handleAssetClick(assetType);
-                          }
-                        }}
-                      >
-                        {assetType}
-                      </span>
+                      {assetType}
                     </TableCell>
                     <TableCell
                       onClick={() =>
@@ -219,16 +213,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                         paddingRight: "32px",
                         minWidth: "80px",
                         maxWidth: "120px",
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          setExpanded((prev) => ({
-                            ...prev,
-                            [assetType]: true,
-                          }));
-                        }
+                        textAlign: "center",
                       }}
                     >
                       Total
@@ -258,7 +243,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                         key={month}
                         sx={{
                           border: "1px solid black",
-                          textAlign: "right",
+                          textAlign: "center",
                           padding: "4px 8px",
                           fontSize: "0.75rem",
                         }}
@@ -274,6 +259,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                 <React.Fragment key={assetType}>
                   {fundNames.map((fundName, idx) => {
                     const fund = funds[fundName];
+                    console.log("fund",fund)
                     return (
                       <TableRow key={fundName}>
                         {idx === 0 && (
@@ -282,24 +268,17 @@ const AssestTypePnlAttribution: React.FC = () => {
                             sx={{
                               border: "1px solid black",
                               fontWeight: "bold",
-                              fontSize: "0.75rem",
+                              fontSize: "0.85rem",
                               padding: "4px 8px",
+                              color: "#f52a0a",
                               verticalAlign: "middle",
+                              textAlign: "center",
+                              cursor: "pointer", // Indicating clickability
+                              textDecoration: "underline", // Underline asset type column
                             }}
+                            onClick={() => handleAssetClick(assetType)}
                           >
-                            <span
-                              onClick={() => handleAssetClick(assetType)}
-                              style={{ cursor: "pointer" }}
-                              role="button"
-                              tabIndex={0}
-                              onKeyPress={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                  handleAssetClick(assetType);
-                                }
-                              }}
-                            >
-                              {assetType}
-                            </span>
+                            {assetType}
                           </TableCell>
                         )}
                         <TableCell
@@ -309,6 +288,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                             padding: "4px 8px",
                             minWidth: "80px",
                             maxWidth: "120px",
+                            textAlign: "center",
                           }}
                         >
                           {fundName}
@@ -318,7 +298,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                             key={month}
                             sx={{
                               border: "1px solid black",
-                              textAlign: "right",
+                              textAlign: "center",
                               padding: "4px 8px",
                               fontSize: "0.75rem",
                             }}
@@ -359,27 +339,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                         cursor: alwaysExpandedAssets.includes(assetType)
                           ? "default"
                           : "pointer",
-                      }}
-                      role={
-                        !alwaysExpandedAssets.includes(assetType)
-                          ? "button"
-                          : undefined
-                      }
-                      tabIndex={
-                        !alwaysExpandedAssets.includes(assetType)
-                          ? 0
-                          : undefined
-                      }
-                      onKeyPress={(e) => {
-                        if (
-                          !alwaysExpandedAssets.includes(assetType) &&
-                          (e.key === "Enter" || e.key === " ")
-                        ) {
-                          setExpanded((prev) => ({
-                            ...prev,
-                            [assetType]: false,
-                          }));
-                        }
+                        textAlign: "center",
                       }}
                     >
                       <Typography sx={{ fontWeight: "bold" }}>Total</Typography>
@@ -406,13 +366,12 @@ const AssestTypePnlAttribution: React.FC = () => {
                         </IconButton>
                       )}
                     </TableCell>
-
                     {allMonths.map((month) => (
                       <TableCell
                         key={month}
                         sx={{
                           border: "1px solid black",
-                          textAlign: "right",
+                          textAlign: "center",
                           padding: "4px 8px",
                           fontSize: "0.75rem",
                         }}
