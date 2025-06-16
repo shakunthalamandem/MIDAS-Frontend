@@ -105,7 +105,7 @@ const MddFoDealsOpportunityChart: React.FC = () => {
       {fullPayload && <FODashboardTable payload={fullPayload} />}
 
 
-      <Typography variant="h6" gutterBottom align="center" color="#002060">
+      <Typography variant="h6" gutterBottom align="center" color="#002060" mt={2}>
         Opportunity Value Trends in Follow-on's in 2025
       </Typography>
 

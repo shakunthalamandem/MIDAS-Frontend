@@ -64,7 +64,7 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
                     backgroundColor: "#fcfcdc",
                     borderRadius: 2,
                     boxShadow: 3,
-                    p: 2,
+                    paddingTop:2
                   }}>
                 <Typography
           variant="h6"
@@ -77,9 +77,9 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
           <Table size="small">
             <TableHead>
               <TableRow >
-                <TableCell sx={{ fontWeight: 600 }}>Metric</TableCell>
+                <TableCell sx={{ fontWeight: 600,backgroundColor:'#f0f0f0' }}>Metric</TableCell>
                 {monthNames.slice(0, 6).map((name, idx) => (
-                  <TableCell key={idx} align="center" sx={{ fontWeight: 600 }}>
+                  <TableCell key={idx} align="center" sx={{ fontWeight: 600 ,backgroundColor:'#f0f0f0'}}>
                     {name.slice(0, 3)}
                   </TableCell>
                 ))}

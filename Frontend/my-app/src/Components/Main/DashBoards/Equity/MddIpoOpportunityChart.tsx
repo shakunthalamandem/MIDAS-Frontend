@@ -101,7 +101,7 @@ const MddIpoOpportunityChart: React.FC = () => {
     <Paper sx={{ p: 3, mt: 4, mb: 2 }}>
 {fullPayload && <IPODashboardTable payload={fullPayload} />}
 
-      <Typography variant="h6" gutterBottom align="center" color="#002060">
+      <Typography variant="h6" gutterBottom align="center" color="#002060" mt={2}>
         Opportunity Value Trends in IPO's in 2025
       </Typography>
 
