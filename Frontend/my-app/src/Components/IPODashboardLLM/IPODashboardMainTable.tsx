@@ -202,7 +202,7 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                           (typeof value === "number" && isNaN(value))
                             ? "N/A"
                             : col.key === "price_usd"
-                            ? value
+                            ? Number(value).toFixed(1)
                             : col.key === "market_cap" || col.key === "ev_usd_million"
                             ? typeof value === "number"
                               ? value.toLocaleString(undefined, { maximumFractionDigits: 1 })
