@@ -279,7 +279,7 @@ Threshold: Return < -2%`,
                 bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6", 
               }}
             >
-              {`${version.toUpperCase()} Result`}
+              {`T + 1D Closing Result`}
             </TableCell>
             <TableCell
               sx={{
@@ -287,7 +287,7 @@ Threshold: Return < -2%`,
                 bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
               }}
             >
-              {`${version.toUpperCase()} Accuracy`}
+              {`T + 1D Closing Accuracy`}
             </TableCell>
           </React.Fragment>
         ))}
