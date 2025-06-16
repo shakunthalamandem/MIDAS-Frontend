@@ -1,4 +1,16 @@
 import React from "react";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Typography,
+  Paper,
+  TableContainer,
+  Box,
+  Fade,
+} from "@mui/material";
 
 interface DealData {
   opportunity_value_ex: number;
@@ -21,7 +33,7 @@ const monthNames = [
 const getMonthIndex = (monthKey: string): number => {
   const parts = monthKey.match(/\d+/g);
   if (!parts) return 0;
-  const monthNum = parseInt(parts[parts.length - 1], 10); // assumes MM is at end
+  const monthNum = parseInt(parts[parts.length - 1], 10);
   return monthNum - 1;
 };
 
@@ -36,44 +48,70 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
 
   Object.entries(payload).forEach(([month, dealTypes]) => {
     const idx = getMonthIndex(month);
-    const deal = dealTypes["IPO"];
-    if (deal) {
-      monthData[idx] = deal;
+    if (idx <= 5) {
+      const deal = dealTypes["IPO"];
+      if (deal) monthData[idx] = deal;
     }
   });
 
   return (
-    <div>
-      <h3>IPO Deal Summary by Month</h3>
-      <table border={1} cellPadding={8} style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th>Metric</th>
-            {monthNames.map((name, idx) => (
-              <th key={idx}>{name.slice(0, 3)}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Count</td>
-            {monthNames.map((_, idx) => (
-              <td key={idx}>{monthData[idx]?.count ?? "-"}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>Deal Value</td>
-            {monthNames.map((_, idx) => (
-              <td key={idx}>
-                {monthData[idx]?.opportunity_value_ex
-                  ? formatValue(monthData[idx].opportunity_value_ex)
-                  : "-"}
-              </td>
-            ))}
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <Fade in timeout={600}>
+      <Box mt={4}>
+        <Typography
+          variant="h6"
+          color="#002060"
+          gutterBottom
+          align="center"
+          sx={{ fontWeight: 600 }}
+        >
+          IPO Deal Summary (Till June 2025)
+        </Typography>
+        <TableContainer
+          component={Paper}
+          sx={{
+            backgroundColor: "#f9fafb",
+            borderRadius: 2,
+            boxShadow: 3,
+            p: 2,
+          }}
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold", backgroundColor: "#e8f5e9" }}>
+                  Metric
+                </TableCell>
+                {monthNames.slice(0, 6).map((name, idx) => (
+                  <TableCell key={idx} align="center" sx={{ backgroundColor: "#e8f5e9" }}>
+                    {name.slice(0, 3)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 500 }}>Count</TableCell>
+                {monthNames.slice(0, 6).map((_, idx) => (
+                  <TableCell key={idx} align="center">
+                    {monthData[idx]?.count ?? "-"}
+                  </TableCell>
+                ))}
+              </TableRow>
+              <TableRow sx={{ backgroundColor: "#fff3e0" }}>
+                <TableCell sx={{ fontWeight: 500 }}>Deal Value</TableCell>
+                {monthNames.slice(0, 6).map((_, idx) => (
+                  <TableCell key={idx} align="center">
+                    {monthData[idx]?.opportunity_value_ex
+                      ? formatValue(monthData[idx].opportunity_value_ex)
+                      : "-"}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </Fade>
   );
 };
 

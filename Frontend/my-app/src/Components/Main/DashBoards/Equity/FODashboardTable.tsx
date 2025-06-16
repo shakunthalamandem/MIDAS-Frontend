@@ -1,8 +1,20 @@
 import React from "react";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Typography,
+  Paper,
+  TableContainer,
+  Box,
+  Fade,
+} from "@mui/material";
 
 interface DealData {
   opportunity_value_ex: number;
-  count?: number; // Optional if not in response yet
+  count?: number;
 }
 
 interface FODashboardTableProps {
@@ -35,42 +47,70 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload }) => {
 
   Object.entries(payload).forEach(([month, dealTypes]) => {
     const idx = getMonthIndex(month);
-    const deal = dealTypes["FO"];
-    if (deal) monthData[idx] = deal;
+    if (idx <= 5) { // Only include up to June
+      const deal = dealTypes["FO"];
+      if (deal) monthData[idx] = deal;
+    }
   });
 
   return (
-    <div>
-      <h3>FO Deal Summary by Month</h3>
-      <table border={1} cellPadding={8} style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th>Metric</th>
-            {monthNames.map((name, idx) => (
-              <th key={idx}>{name.slice(0, 3)}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Count</td>
-            {monthNames.map((_, idx) => (
-              <td key={idx}>{monthData[idx]?.count ?? "-"}</td>
-            ))}
-          </tr>
-          <tr>
-            <td>Deal Value</td>
-            {monthNames.map((_, idx) => (
-              <td key={idx}>
-                {monthData[idx]?.opportunity_value_ex
-                  ? formatValue(monthData[idx].opportunity_value_ex)
-                  : "-"}
-              </td>
-            ))}
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <Fade in timeout={600}>
+      <Box mt={4}>
+        <Typography
+          variant="h6"
+          color="#002060"
+          gutterBottom
+          align="center"
+          sx={{ fontWeight: 600 }}
+        >
+          FO Deal Summary (Till June 2025)
+        </Typography>
+        <TableContainer
+          component={Paper}
+          sx={{
+            backgroundColor: "#f9fafb",
+            borderRadius: 2,
+            boxShadow: 3,
+            p: 2,
+          }}
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold", backgroundColor: "#e3f2fd" }}>
+                  Metric
+                </TableCell>
+                {monthNames.slice(0, 6).map((name, idx) => (
+                  <TableCell key={idx} align="center" sx={{ backgroundColor: "#e3f2fd" }}>
+                    {name.slice(0, 3)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 500 }}>Count</TableCell>
+                {monthNames.slice(0, 6).map((_, idx) => (
+                  <TableCell key={idx} align="center">
+                    {monthData[idx]?.count ?? "-"}
+                  </TableCell>
+                ))}
+              </TableRow>
+              <TableRow sx={{ backgroundColor: "#fff7e6" }}>
+                <TableCell sx={{ fontWeight: 500 }}>Deal Value</TableCell>
+                {monthNames.slice(0, 6).map((_, idx) => (
+                  <TableCell key={idx} align="center">
+                    {monthData[idx]?.opportunity_value_ex
+                      ? formatValue(monthData[idx].opportunity_value_ex)
+                      : "-"}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </Fade>
   );
 };
 
