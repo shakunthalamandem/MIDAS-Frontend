@@ -23,15 +23,17 @@ interface ApiResponse {
   [month: string]: {
     [dealType: string]: {
       opportunity_value_ex: number;
+      deal_size?: number;
+      count?: number;
     };
   };
 }
+
 
 interface OpportunityData {
   month: string;
   opportunity_value_ex: number;
 }
-
 const formatValue = (value: number): string => {
   if (Math.abs(value) >= 1_000_000_000) {
     return `${(value / 1_000_000_000).toFixed(2)}B`;
@@ -101,6 +103,7 @@ const MddFoDealsOpportunityChart: React.FC = () => {
   return (
     <Paper sx={{ p: 3, mt: 4, mb: 2 }}>
       {fullPayload && <FODashboardTable payload={fullPayload} />}
+
 
       <Typography variant="h6" gutterBottom align="center" color="#002060">
         Opportunity Value Trends in Follow-on's in 2025
