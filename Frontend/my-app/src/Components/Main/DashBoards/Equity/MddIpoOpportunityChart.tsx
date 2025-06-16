@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  ReferenceLine,
 } from "recharts";
 
 interface ApiResponse {
@@ -82,18 +83,25 @@ const MddIpoOpportunityChart: React.FC = () => {
   }, []);
 
   return (
-    <Paper sx={{ p: 3, mt: 4, mb:2 }}>
-      <Typography variant="h6" gutterBottom align="center"  color="#002060">
+    <Paper sx={{ p: 3, mt: 4, mb: 2 }}>
+      <Typography variant="h6" gutterBottom align="center" color="#002060">
         Opportunity Value Trends in IPO's in 2025
       </Typography>
 
       {loading ? (
-        <CircularProgress />
+        <Box display="flex" justifyContent="center" alignItems="center" height={300}>
+          <CircularProgress />
+        </Box>
       ) : error ? (
         <Alert severity="error">{error}</Alert>
       ) : (
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={data}>
+          <BarChart
+            data={data}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            style={{ backgroundColor: "#f9fafb", borderRadius: 8 }}
+          >
+            {/* <CartesianGrid strokeDasharray="3 3" vertical={false} /> */}
             <XAxis
               dataKey="month"
               tickFormatter={(month) => {
@@ -106,12 +114,20 @@ const MddIpoOpportunityChart: React.FC = () => {
                 return monthNames[monthNumber - 1] ?? month;
               }}
             />
-            <YAxis tickFormatter={formatValue} width={100} />
+            <YAxis tickFormatter={formatValue} width={90} />
+              <ReferenceLine y={0} stroke="#999" strokeWidth={2} />
+
             <Tooltip
               formatter={(value: number) => formatValue(value)}
               labelFormatter={(label) => `Month: ${label}`}
             />
-            <Bar dataKey="opportunity_value_ex" fill="#F97316" />
+            <Bar
+              dataKey="opportunity_value_ex"
+              fill="#F97316"
+              barSize={24} // smaller width
+              animationDuration={800}
+              isAnimationActive
+            />
           </BarChart>
         </ResponsiveContainer>
       )}
