@@ -21,6 +21,27 @@ import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
 
+
+const getOrdinalSuffix = (n: number): string => {
+  if (n > 3 && n < 21) return "th";
+  switch (n % 10) {
+    case 1: return "st";
+    case 2: return "nd";
+    case 3: return "rd";
+    default: return "th";
+  }
+};
+
+const formatDate = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  const day = date.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = date.toLocaleString("default", { month: "short" });
+  const year = date.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
+
 const IPODashboardMain: React.FC = () => {
   const { ticker } = useParams<{ ticker: string }>();
   const [ipoData, setIpoData] = useState<any>(null);
@@ -83,7 +104,16 @@ const IPODashboardMain: React.FC = () => {
         }
 
         const jsonData = await response.json();
-        setIpoData(jsonData);
+
+        const dateFields = ["pricing_date", "filed_date", "term_date", "trade_date"];
+        const formattedData = { ...jsonData };
+        dateFields.forEach(field => {
+          if (formattedData[field]) {
+            formattedData[field] = formatDate(formattedData[field]);
+          }
+        });
+
+        setIpoData(formattedData);
       } catch (err: any) {
         console.error("IPO data fetch failed", err);
         setError("Failed to fetch IPO data");
