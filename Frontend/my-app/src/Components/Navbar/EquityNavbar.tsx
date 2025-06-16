@@ -239,7 +239,7 @@ const EquityNavbar: React.FC = () => {
         >
           New Deal Form
         </MenuItem>
-         <MenuItem
+         {/* <MenuItem
           onClick={() => handleNavigate("/equity/ipo_dashboard")}
           selected={isActivePath("/equity/ipo_dashboard")}
           sx={
@@ -248,7 +248,7 @@ const EquityNavbar: React.FC = () => {
               : {}
           }
         > IPO Dashboard
-        </MenuItem>
+        </MenuItem> */}
        
       </Menu>
 
