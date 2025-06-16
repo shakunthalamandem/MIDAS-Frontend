@@ -32,7 +32,7 @@ const infoFields: { label: string; key: string }[] = [
   { label: "Deal Size", key: "deal_size" },
   { label: "Industry", key: "industry" },
   { label: "Shares Offered", key: "shares_offered" },
-  { label: "No. Shares Out", key: "nosh" },
+  { label: "No of Shares Outstanding", key: "nosh" },
   { label: "Established", key: "established_year" },
   { label: "Bookrunners", key: "bookrunners" },
 ];
@@ -43,14 +43,22 @@ const formatValue = (key: string, value: any, ipodata: Record<string, any>) => {
       ? `$${ipodata.lower_bound} - $${ipodata.upper_bound}`
       : "N/A";
   }
-  if (key === "deal_size" || key === "shares_offered" || key === "nosh") {
-    return value ? value.toLocaleString() : "N/A";
+
+  if (key === "deal_size" || key === "shares_offered") {
+    return value ? Number(value).toLocaleString() : "N/A";
   }
+
+  if (key === "nosh") {
+    return value ? `${Number(value).toLocaleString()}M` : "N/A";
+  }
+
   if (key === "bookrunners") {
-    return Array.isArray(value) ? value.join(", ") : "N/A";
+    return Array.isArray(value) && value.length > 0 ? value.join(", ") : "N/A";
   }
+
   return value || "N/A";
 };
+
 
 const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
   ipodata,
