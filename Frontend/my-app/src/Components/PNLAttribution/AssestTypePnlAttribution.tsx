@@ -253,6 +253,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                 <React.Fragment key={assetType}>
                   {fundNames.map((fundName, idx) => {
                     const fund = funds[fundName];
+                    console.log("fund",fund)
                     return (
                       <TableRow key={fundName}>
                         {idx === 0 && (

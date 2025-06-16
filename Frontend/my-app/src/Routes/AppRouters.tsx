@@ -58,6 +58,7 @@ import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 import PnlAttributionMain from "../Components/PNLAttribution/PnlAttributionMain";
 import PnLSummary from "../Components/PNLAttribution/PnLSummary";
 import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
+import PnlAttributionTable from "../Components/PNLAttribution/PnlAttributionTable";
 
 
 
@@ -133,6 +134,7 @@ const AppRouters: React.FC = () => {
           <Route path="/basic" element={ <PnlAttributionMain /> }/>
         </Route> */}
         <Route path="/portfolio-attribution" element={<AuthGuard><PnlAttributionMain /></AuthGuard>} />
+                <Route path="/pnldata" element={<AuthGuard><PnlAttributionTable /></AuthGuard>} />
         <Route path="/portfolio-attribution/details/:assetType" element={<AuthGuard><DeatiledRegionPnlAttribution /></AuthGuard>}/>
     
 
