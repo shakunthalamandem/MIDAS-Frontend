@@ -10,6 +10,7 @@ import {
   Divider,
 } from "@mui/material";
 import { green, red, grey } from "@mui/material/colors";
+import MddFoDealsOpportunityChart from "./MddFoDealsOpportunityChart";
 
 export interface PredictedForm {
   ticker_symbol: string;
@@ -36,7 +37,7 @@ export interface PredictedForm {
   negative_model_actual: string | null;
 }
 
-const AiDashboard: React.FC = () => {
+const FoPredictionCards: React.FC = () => {
   const [data, setData] = useState<PredictedForm[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -117,6 +118,10 @@ const AiDashboard: React.FC = () => {
     );
   };
 
+  const latestData = [...data]
+    .sort((a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime())
+    .slice(0, 4);
+
   if (loading)
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
@@ -132,16 +137,16 @@ const AiDashboard: React.FC = () => {
     );
 
   return (
+    <>
     <Box>
-      <Box mb={4}>
+      <Box mb={4} mt={2}>
         <Typography variant="h5" fontWeight={600} gutterBottom>
           📊 Recent Follow-on's AI Powered Insights
         </Typography>
-
       </Box>
 
       <Grid container spacing={3}>
-        {data.map((item, idx) => (
+        {latestData.map((item, idx) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
             <Card
               onClick={() => handleCardClick(item)}
@@ -243,7 +248,9 @@ const AiDashboard: React.FC = () => {
         ))}
       </Grid>
     </Box>
+    <MddFoDealsOpportunityChart />
+    </>
   );
 };
 
-export default AiDashboard;
+export default FoPredictionCards;
