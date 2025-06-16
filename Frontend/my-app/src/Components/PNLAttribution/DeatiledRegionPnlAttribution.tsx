@@ -103,7 +103,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
         gutterBottom
         sx={{ fontWeight: "bold", color: "#002060", mb: 2, textAlign: "center" }}
       >
-        Detailed Region-wise PnL
+        Detailed Region-wise PnL for  {assetType}
       </Typography>
       <TableContainer component={Paper} sx={{ border: "1px solid #000" }}>
         <Table aria-label="Detailed Region PnL Attribution" sx={{ borderCollapse: "collapse" }}>
@@ -214,7 +214,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                               fontSize: "0.875rem",
                             }}
                           >
-                            {row.broad_region}
+                            {region}
                           </TableCell>
                         )}
 
