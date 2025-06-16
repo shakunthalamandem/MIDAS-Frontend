@@ -248,7 +248,6 @@ const FoPredictionCards: React.FC = () => {
         ))}
       </Grid>
     </Box>
-    <MddFoDealsOpportunityChart />
     </>
   );
 };
