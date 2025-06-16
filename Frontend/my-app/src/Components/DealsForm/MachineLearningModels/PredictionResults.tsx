@@ -234,7 +234,7 @@ Threshold: Return < -2%`,
                 value={price}
                 onChange={handlePriceChange}
                 size="small"
-                sx={{ mr: 2, width: "194px", position: "relative", top: "18px",backgroundColor: "#ede7f6" }}
+                sx={{ mr: 2, width: "194px", position: "relative", top: "18px",backgroundColor: "#ede7f6", borderRadius: "4px" }}
                 type="number"
               />
               <Button
@@ -244,8 +244,9 @@ Threshold: Return < -2%`,
                 sx={{
                   position: "relative", 
                   top: "18px",
-                  backgroundColor: "#002060",
-                  color: "#fff",
+                  backgroundColor: "#ede7f6",
+                  color: "#002060",
+                  border: "1px solid #B99976",
                   "&:disabled": { backgroundColor: "#002060", color: "#ccc" },
                 }}
               >
@@ -261,11 +262,7 @@ Threshold: Return < -2%`,
 
         </Box>
 
-        {/* <Typography variant="body1" gutterBottom>
-          Using trained machine learning models, this report provides insights
-          into the expected return profile of a prospective equity deal under
-          current conditions.
-        </Typography> */}
+
 
         <Divider sx={{ my: 3 }} />
 
