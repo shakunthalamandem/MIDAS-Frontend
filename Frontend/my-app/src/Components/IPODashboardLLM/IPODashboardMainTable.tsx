@@ -16,6 +16,7 @@ import {
 
 // Types for API response
 type ComparableMetric = {
+  ticker: string;
   competitor: string;
   price_usd: string;
   market_cap: number | null;
@@ -30,7 +31,19 @@ type ComparableMetric = {
   eps_growth: number | null;
 };
 
-type ApiResponse = Record<string, ComparableMetric[]>;
+type AveragesType = {
+  [key: string]: {
+    average?: number;
+    median?: number;
+  };
+};
+
+type ApiResponse = {
+  [ticker: string]: {
+    data: ComparableMetric[];
+    Averages?: AveragesType;
+  };
+};
 
 const columns: {
   key: keyof ComparableMetric;
@@ -132,7 +145,9 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
 
   const noData =
     data &&
-    Object.values(data).every((metrics) => !metrics || metrics.length === 0);
+    Object.values(data).every(
+      (metrics) => !metrics.data || metrics.data.length === 0
+    );
 
   return (
     <Box sx={{ p: 0, width: "100%" }}>
@@ -181,61 +196,133 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
               </TableRow>
             </TableHead>
             <TableBody>
-              {Object.entries(data).map(([tickerKey, metrics]) =>
-                metrics.map((metric, idx) => (
-                  <Fade in timeout={500} key={`${tickerKey}-${idx}`}>
-                    <TableRow
-                      sx={{
-                        backgroundColor: idx % 2 === 0 ? "#f9f9f9" : "#ffffff",
-                        transition: "background-color 0.3s",
-                        "&:hover": {
-                          backgroundColor: "#e3f2fd",
-                        },
-                      }}
-                    >
-                      {columns.map((col) => {
-                        const value = metric[col.key];
+              {Object.entries(data).map(([tickerKey, metricsObj]) => {
+                const metrics = metricsObj.data || [];
+                const averages = metricsObj.Averages;
 
-                        const displayValue =
-                          value === null ||
-                          value === undefined ||
-                          (typeof value === "number" && isNaN(value))
-                            ? "N/A"
-                            : col.key === "price_usd"
-                            ? value
-                            : col.key === "market_cap" || col.key === "ev_usd_million"
-                            ? typeof value === "number"
-                              ? value.toLocaleString(undefined, { maximumFractionDigits: 1 })
-                              : value
-                            : typeof value === "number"
-                            ? formatNumber(
-                                value,
-                                col.isCurrency,
-                                col.isPercentage
-                              )
-                            : value;
+                return (
+                  <React.Fragment key={tickerKey}>
+                    {metrics.map((metric, idx) => (
+                      <Fade in timeout={500} key={`${tickerKey}-${idx}`}>
+                        <TableRow
+                          sx={{
+                            backgroundColor: idx % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                            transition: "background-color 0.3s",
+                            "&:hover": {
+                              backgroundColor: "#e3f2fd",
+                            },
+                          }}
+                        >
+                          {columns.map((col) => {
+                            const value = metric[col.key];
 
-                        return (
-                          <TableCell
-                            key={col.key}
-                            align="center"
-                            sx={{
-                              borderBottom: "none",
-                              color: "#333",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {columnsWithX.has(col.key) &&
-                            typeof value === "number"
-                              ? `${displayValue}x`
-                              : displayValue}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  </Fade>
-                ))
-              )}
+                            const displayValue =
+                              value === null ||
+                              value === undefined ||
+                              (typeof value === "number" && isNaN(value))
+                                ? "N/A"
+                                : col.key === "price_usd"
+                                ? Number(value).toFixed(1)
+                                : col.key === "market_cap" || col.key === "ev_usd_million"
+                                ? typeof value === "number"
+                                  ? value.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                                  : value
+                                : typeof value === "number"
+                                ? formatNumber(
+                                    value,
+                                    col.isCurrency,
+                                    col.isPercentage
+                                  )
+                                : value;
+
+                            return (
+                              <TableCell
+                                key={col.key}
+                                align="center"
+                                sx={{
+                                  borderBottom: "none",
+                                  color: "#333",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {columnsWithX.has(col.key) &&
+                                typeof value === "number"
+                                  ? `${displayValue}x`
+                                  : displayValue}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      </Fade>
+                    ))}
+
+                    {averages && (
+                      <>
+                        <TableRow>
+                          {columns.map((col, colIdx) => (
+                            <TableCell
+                              key={col.key}
+                              align="center"
+                              sx={{
+                                borderBottom: "none",
+                                color: "#0288d1", // sky blue text
+                                fontWeight: "bold",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {colIdx === 0
+                                ? "Overall Average"
+                                : averages[col.key] && averages[col.key].average !== undefined
+                                ? columnsWithX.has(col.key)
+                                  ? `${formatNumber(
+                                      averages[col.key].average!,
+                                      col.isCurrency,
+                                      col.isPercentage
+                                    )}x`
+                                  : formatNumber(
+                                      averages[col.key].average!,
+                                      col.isCurrency,
+                                      col.isPercentage
+                                    )
+                                : ""}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                        <TableRow>
+                          {columns.map((col, colIdx) => (
+                            <TableCell
+                              key={col.key}
+                              align="center"
+                              sx={{
+                                borderBottom: "none",
+                                color: "#0288d1", 
+                                fontWeight: "bold",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {colIdx === 0
+                                ? "Overall Median"
+                                : averages[col.key] && averages[col.key].median !== undefined
+                                ? columnsWithX.has(col.key)
+                                  ? `${formatNumber(
+                                      averages[col.key].median!,
+                                      col.isCurrency,
+                                      col.isPercentage
+                                    )}x`
+                                  : formatNumber(
+                                      averages[col.key].median!,
+                                      col.isCurrency,
+                                      col.isPercentage
+                                    )
+                                : ""}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </>
+                    )}
+                  </React.Fragment>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
