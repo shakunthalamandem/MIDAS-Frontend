@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -11,6 +11,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import { ApiResponse, formatNumber } from "./UtilisPnlAttribution";
 
 const assetOrder = [
@@ -24,10 +25,11 @@ const assetOrder = [
 
 const alwaysExpandedAssets = ["Equities", "Convertible Bond", "Corporate Bond"];
 
-const AssestTypePnlAttribution = () => {
+const AssestTypePnlAttribution: React.FC = () => {
   const [data, setData] = useState<ApiResponse>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const navigate = useNavigate();
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -74,30 +76,24 @@ const AssestTypePnlAttribution = () => {
     return monthsArray;
   }, [data]);
 
+const handleAssetClick = (assetType: string) => {
+  const url = `/portfolio-attribution/details/${encodeURIComponent(assetType)}`;
+  window.open(url, "_blank");
+};
+
+
+  const sortedAssetTypes = assetOrder.filter((key) => data.hasOwnProperty(key));
+
   if (loading) return <Typography>Loading...</Typography>;
   if (!data || Object.keys(data).length === 0)
     return <Typography>No data available</Typography>;
-
-  const handleToggleExpand = (assetType: string) => {
-    if (alwaysExpandedAssets.includes(assetType)) return;
-    setExpanded((prev) => ({
-      ...prev,
-      [assetType]: !prev[assetType],
-    }));
-  };
-
-  const sortedAssetTypes = assetOrder.filter((key) => data.hasOwnProperty(key));
 
   return (
     <Container maxWidth="lg" sx={{ mb: 4 }}>
       <Typography
         variant="h3"
         align="center"
-        sx={{
-          color: "#005166",
-          fontSize: "1.75rem",
-          mb: 3,
-        }}
+        sx={{ color: "#005166", fontSize: "1.75rem", mb: 3 }}
       >
         PnL Attribution
       </Typography>
@@ -156,13 +152,11 @@ const AssestTypePnlAttribution = () => {
               const funds = data[assetType];
               const fundNames = Object.keys(funds);
 
-              const totals = allMonths.reduce<Record<string, number>>(
-                (acc, month) => {
-                  acc[month] = 0;
-                  return acc;
-                },
-                {}
-              );
+              // Calculate totals per month
+              const totals = allMonths.reduce<Record<string, number>>((acc, month) => {
+                acc[month] = 0;
+                return acc;
+              }, {});
 
               fundNames.forEach((fundName) => {
                 const fund = funds[fundName];
@@ -186,10 +180,27 @@ const AssestTypePnlAttribution = () => {
                         padding: "4px 8px",
                       }}
                     >
-                      {assetType}
+                      <span
+                        onClick={() => handleAssetClick(assetType)}
+                        style={{ cursor: "pointer", fontWeight: "bold" }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            handleAssetClick(assetType);
+                          }
+                        }}
+                      >
+                        {assetType}
+                      </span>
                     </TableCell>
                     <TableCell
-                      onClick={() => handleToggleExpand(assetType)}
+                      onClick={() =>
+                        setExpanded((prev) => ({
+                          ...prev,
+                          [assetType]: true,
+                        }))
+                      }
                       sx={{
                         border: "1px solid black",
                         fontWeight: "bold",
@@ -200,6 +211,16 @@ const AssestTypePnlAttribution = () => {
                         paddingRight: "32px",
                         minWidth: "80px",
                         maxWidth: "120px",
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          setExpanded((prev) => ({
+                            ...prev,
+                            [assetType]: true,
+                          }));
+                        }
                       }}
                     >
                       Total
@@ -212,7 +233,14 @@ const AssestTypePnlAttribution = () => {
                           transform: "translateY(-50%)",
                           padding: "2px",
                         }}
-                        aria-label="Expand"
+                        aria-label={`Expand ${assetType}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpanded((prev) => ({
+                            ...prev,
+                            [assetType]: true,
+                          }));
+                        }}
                       >
                         <Add fontSize="small" />
                       </IconButton>
@@ -251,7 +279,19 @@ const AssestTypePnlAttribution = () => {
                               verticalAlign: "middle",
                             }}
                           >
-                            {assetType}
+                            <span
+                              onClick={() => handleAssetClick(assetType)}
+                              style={{ cursor: "pointer" }}
+                              role="button"
+                              tabIndex={0}
+                              onKeyPress={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  handleAssetClick(assetType);
+                                }
+                              }}
+                            >
+                              {assetType}
+                            </span>
                           </TableCell>
                         )}
                         <TableCell
@@ -293,7 +333,14 @@ const AssestTypePnlAttribution = () => {
                   >
                     <TableCell
                       colSpan={1}
-                      onClick={() => handleToggleExpand(assetType)}
+                      onClick={() => {
+                        if (!alwaysExpandedAssets.includes(assetType)) {
+                          setExpanded((prev) => ({
+                            ...prev,
+                            [assetType]: false,
+                          }));
+                        }
+                      }}
                       sx={{
                         border: "1px solid black",
                         padding: "4px 8px",
@@ -304,6 +351,19 @@ const AssestTypePnlAttribution = () => {
                         cursor: alwaysExpandedAssets.includes(assetType)
                           ? "default"
                           : "pointer",
+                      }}
+                      role={!alwaysExpandedAssets.includes(assetType) ? "button" : undefined}
+                      tabIndex={!alwaysExpandedAssets.includes(assetType) ? 0 : undefined}
+                      onKeyPress={(e) => {
+                        if (
+                          !alwaysExpandedAssets.includes(assetType) &&
+                          (e.key === "Enter" || e.key === " ")
+                        ) {
+                          setExpanded((prev) => ({
+                            ...prev,
+                            [assetType]: false,
+                          }));
+                        }
                       }}
                     >
                       Total
@@ -317,7 +377,14 @@ const AssestTypePnlAttribution = () => {
                             transform: "translateY(-50%)",
                             padding: "2px",
                           }}
-                          aria-label="Collapse"
+                          aria-label={`Collapse ${assetType}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpanded((prev) => ({
+                              ...prev,
+                              [assetType]: false,
+                            }));
+                          }}
                         >
                           <Remove fontSize="small" />
                         </IconButton>

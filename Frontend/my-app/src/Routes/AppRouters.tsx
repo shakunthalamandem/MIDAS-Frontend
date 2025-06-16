@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useParams } from "react-router-dom";
 import CapitalMarketsStatic from "../Components/HomepageStatic/CapitalMarketsStatic";
 import Login from "../Components/Main/HomePage/Authentication/Login";
 import SignUp from "../Components/Main/HomePage/Authentication/SignUp";
@@ -57,6 +57,7 @@ import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain"
 import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 import PnlAttributionMain from "../Components/PNLAttribution/PnlAttributionMain";
 import PnLSummary from "../Components/PNLAttribution/PnLSummary";
+import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
 
 
 
@@ -132,7 +133,8 @@ const AppRouters: React.FC = () => {
           <Route path="/basic" element={ <PnlAttributionMain /> }/>
         </Route> */}
         <Route path="/portfolio-attribution" element={<AuthGuard><PnlAttributionMain /></AuthGuard>} />
-
+        <Route path="/portfolio-attribution/details/:assetType" element={<AuthGuard><DeatiledRegionPnlAttribution /></AuthGuard>}/>
+    
 
 
         <Route path="/equity/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>} />
@@ -197,8 +199,11 @@ const AppRouters: React.FC = () => {
 
       </Routes>
     </ErrorBoundary>
+    
   );
+  
 };
+
 
 
 
