@@ -17,6 +17,7 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
+import FODashboardTable from "./FODashboardTable";
 
 interface ApiResponse {
   [month: string]: {
@@ -47,6 +48,10 @@ const MddFoDealsOpportunityChart: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const [fullPayload, setFullPayload] = useState<ApiResponse | null>(null);
+
+
+
 
   useEffect(() => {
     const fetchGraphData = async () => {
@@ -68,12 +73,15 @@ const MddFoDealsOpportunityChart: React.FC = () => {
           }
         );
 
-        const transformedData: OpportunityData[] = Object.entries(
-          response.data
-        ).map(([month, value]) => ({
-          month,
-          opportunity_value_ex: value["FO"].opportunity_value_ex,
-        }));
+      setFullPayload(response.data);
+
+        // Prepare chart data
+        const transformedData: OpportunityData[] = Object.entries(response.data).map(
+          ([month, value]) => ({
+            month,
+            opportunity_value_ex: value["FO"].opportunity_value_ex,
+          })
+        );
 
         setData(transformedData);
         setError(null);
@@ -88,8 +96,12 @@ const MddFoDealsOpportunityChart: React.FC = () => {
     fetchGraphData();
   }, []);
 
+
+
   return (
     <Paper sx={{ p: 3, mt: 4, mb: 2 }}>
+      {fullPayload && <FODashboardTable payload={fullPayload} />}
+
       <Typography variant="h6" gutterBottom align="center" color="#002060">
         Opportunity Value Trends in Follow-on's in 2025
       </Typography>
