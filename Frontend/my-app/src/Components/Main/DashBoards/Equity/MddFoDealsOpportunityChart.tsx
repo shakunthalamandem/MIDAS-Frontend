@@ -17,20 +17,23 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
+import FODashboardTable from "./FODashboardTable";
 
 interface ApiResponse {
   [month: string]: {
     [dealType: string]: {
       opportunity_value_ex: number;
+      deal_size?: number;
+      count?: number;
     };
   };
 }
+
 
 interface OpportunityData {
   month: string;
   opportunity_value_ex: number;
 }
-
 const formatValue = (value: number): string => {
   if (Math.abs(value) >= 1_000_000_000) {
     return `${(value / 1_000_000_000).toFixed(2)}B`;
@@ -47,6 +50,10 @@ const MddFoDealsOpportunityChart: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const [fullPayload, setFullPayload] = useState<ApiResponse | null>(null);
+
+
+
 
   useEffect(() => {
     const fetchGraphData = async () => {
@@ -68,12 +75,15 @@ const MddFoDealsOpportunityChart: React.FC = () => {
           }
         );
 
-        const transformedData: OpportunityData[] = Object.entries(
-          response.data
-        ).map(([month, value]) => ({
-          month,
-          opportunity_value_ex: value["FO"].opportunity_value_ex,
-        }));
+      setFullPayload(response.data);
+
+        // Prepare chart data
+        const transformedData: OpportunityData[] = Object.entries(response.data).map(
+          ([month, value]) => ({
+            month,
+            opportunity_value_ex: value["FO"].opportunity_value_ex,
+          })
+        );
 
         setData(transformedData);
         setError(null);
@@ -88,9 +98,14 @@ const MddFoDealsOpportunityChart: React.FC = () => {
     fetchGraphData();
   }, []);
 
+
+
   return (
     <Paper sx={{ p: 3, mt: 4, mb: 2 }}>
-      <Typography variant="h6" gutterBottom align="center" color="#002060">
+      {fullPayload && <FODashboardTable payload={fullPayload} />}
+
+
+      <Typography variant="h6" gutterBottom align="center" color="#002060" mt={2}>
         Opportunity Value Trends in Follow-on's in 2025
       </Typography>
 
