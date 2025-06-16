@@ -198,7 +198,13 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
             </TableHead>
             <TableBody>
               {Object.entries(data).map(([tickerKey, metricsObj]) => {
-                const metrics = metricsObj.data || [];
+                const metrics = metricsObj.data
+                  ? [...metricsObj.data].sort((a, b) => {
+                      if (a.competitor === tickerKey) return -1;
+                      if (b.competitor === tickerKey) return 1;
+                      return 0;
+                    })
+                  : [];
                 const averages = metricsObj.Averages;
 
                 return (
@@ -244,6 +250,7 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                                   borderBottom: "none",
                                   color: "#333",
                                   whiteSpace: "nowrap",
+                                  fontWeight: metric.competitor === tickerKey ? "bold" : "normal",
                                 }}
                               >
                                 {columnsWithX.has(col.key) &&
@@ -260,64 +267,104 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                     {averages && (
                       <>
                         <TableRow>
-                          {columns.map((col, colIdx) => (
-                            <TableCell
-                              key={col.key}
-                              align="center"
-                              sx={{
-                                borderBottom: "none",
-                                color: "#0288d1", // sky blue text
-                                fontWeight: "bold",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {colIdx === 0
-                                ? "Overall Average"
-                                : averages[col.key] && averages[col.key].average !== undefined
-                                ? columnsWithX.has(col.key)
-                                  ? `${formatNumber(
-                                      averages[col.key].average!,
-                                      col.isCurrency,
-                                      col.isPercentage
-                                    )}x`
-                                  : formatNumber(
-                                      averages[col.key].average!,
-                                      col.isCurrency,
-                                      col.isPercentage
-                                    )
-                                : ""}
-                            </TableCell>
-                          ))}
+                          {columns.map((col, colIdx) => {
+                            if (colIdx === 0) {
+                              return (
+                                <TableCell
+                                  key="overall-average-label"
+                                  align="center"
+                                  colSpan={4}
+                                  sx={{
+                                    borderBottom: "none",
+                                    color: "#0288d1",
+                                    fontWeight: "bold",
+                                    whiteSpace: "nowrap",
+                                    textAlign: "center",
+                                    fontSize: "1rem",
+                                  }}
+                                >
+                                  Overall Average
+                                </TableCell>
+                              );
+                            }
+                            if (colIdx < 4) return null;
+                            return (
+                              <TableCell
+                                key={col.key}
+                                align="center"
+                                sx={{
+                                  borderBottom: "none",
+                                  color: "#0288d1",
+                                  fontWeight: "bold",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {averages[col.key] && averages[col.key].average !== undefined
+                                  ? columnsWithX.has(col.key)
+                                    ? `${formatNumber(
+                                        averages[col.key].average!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )}x`
+                                    : formatNumber(
+                                        averages[col.key].average!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )
+                                  : ""}
+                              </TableCell>
+                            );
+                          })}
                         </TableRow>
                         <TableRow>
-                          {columns.map((col, colIdx) => (
-                            <TableCell
-                              key={col.key}
-                              align="center"
-                              sx={{
-                                borderBottom: "none",
-                                color: "#0288d1", 
-                                fontWeight: "bold",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {colIdx === 0
-                                ? "Overall Median"
-                                : averages[col.key] && averages[col.key].median !== undefined
-                                ? columnsWithX.has(col.key)
-                                  ? `${formatNumber(
-                                      averages[col.key].median!,
-                                      col.isCurrency,
-                                      col.isPercentage
-                                    )}x`
-                                  : formatNumber(
-                                      averages[col.key].median!,
-                                      col.isCurrency,
-                                      col.isPercentage
-                                    )
-                                : ""}
-                            </TableCell>
-                          ))}
+                          {columns.map((col, colIdx) => {
+                            if (colIdx === 0) {
+                              return (
+                                <TableCell
+                                  key="overall-median-label"
+                                  align="center"
+                                  colSpan={4}
+                                  sx={{
+                                    borderBottom: "none",
+                                    color: "#0288d1",
+                                    fontWeight: "bold",
+                                    whiteSpace: "nowrap",
+                                    textAlign: "center",
+                                    fontSize: "1rem",
+                                  }}
+                                >
+                                  Overall Median
+                                </TableCell>
+                              );
+                            }
+                            if (colIdx < 4) return null;
+                            return (
+                              <TableCell
+                                key={col.key}
+                                align="center"
+                                sx={{
+                                  borderBottom: "none",
+                                  color: "#0288d1",
+                                  fontWeight: "bold",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {averages[col.key] && averages[col.key].median !== undefined
+                                  ? columnsWithX.has(col.key)
+                                    ? `${formatNumber(
+                                        averages[col.key].median!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )}x`
+                                    : formatNumber(
+                                        averages[col.key].median!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )
+                                  : ""}
+                              </TableCell>
+                            );
+                          })}
                         </TableRow>
                       </>
                     )}
