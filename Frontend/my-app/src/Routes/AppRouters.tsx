@@ -80,8 +80,6 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/logout" element={<Logout />} /> */}
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
-        <Route path="/deals/new_deal_forms" element={<AuthGuard><DealFormMain /></AuthGuard>} />
-        <Route path="/equity/create_form" element={<AuthGuard><  DealCreateForm /></AuthGuard>} />
         <Route path="/form" element={<AuthGuard><  EquityNewDealFormMain /></AuthGuard>} />
 
 
@@ -155,7 +153,7 @@ const AppRouters: React.FC = () => {
         <Route path="/converts/dealperformance/:deal" element={<AuthGuard><ConvertsMain /></AuthGuard>} />
 
 
-        <Route path="/deals/new_deal_form" element={<AuthGuard><DealformInformation /></AuthGuard>} />
+        <Route path="/deals/new_deal_form" element={<AuthGuard><EquityNewDealFormMain /></AuthGuard>} />
 
 
 
