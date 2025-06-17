@@ -62,9 +62,31 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
         }
 
         const jsonData: Record<string, Record<string, BaseData>> = await response.json();
-        setData(jsonData);
+        const cleanedData: Record<string, Record<string, BaseData>> = {};
+        for (const region in jsonData) {
+          const funds = jsonData[region];
+          const filteredFunds: Record<string, BaseData> = {};
 
-        const firstRegion = Object.values(jsonData)[0];
+          for (const [fundName, fundData] of Object.entries(funds)) {
+            const knownKeys = new Set(["broad_region", "YTD", "asset_type"]);
+            const allZero = Object.entries(fundData)
+              .filter(([key]) => !knownKeys.has(key))
+              .every(([, value]) => Number(value) === 0 || value === undefined);
+            const ytdZero = !fundData.YTD || Number(fundData.YTD) === 0;
+
+            if (!(allZero && ytdZero)) {
+              filteredFunds[fundName] = fundData;
+            }
+          }
+
+          if (Object.keys(filteredFunds).length > 0) {
+            cleanedData[region] = filteredFunds;
+          }
+        }
+
+        setData(cleanedData);
+
+        const firstRegion = Object.values(cleanedData)[0];
         const firstFund = firstRegion ? Object.values(firstRegion)[0] : null;
 
         if (firstFund) {
@@ -186,8 +208,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                 const totals = fundEntries.reduce(
                   (acc, [, row]) => {
                     monthColumns.forEach((month) => {
-                      const val = Number(row[month]) || 0;
-                      acc[month] = (acc[month] || 0) + val;
+                      acc[month] = (acc[month] || 0) + (Number(row[month]) || 0);
                     });
                     acc.YTD = (acc.YTD || 0) + (Number(row.YTD) || 0);
                     return acc;
@@ -242,7 +263,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                                 fontSize: "0.875rem",
                               }}
                             >
-                              {formatNumber(row[month] as number)}
+                              {formatNumber(Number(row[month] ?? 0))}
                             </TableCell>
                           ))}
                           <TableCell
@@ -253,7 +274,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                               fontSize: "0.875rem",
                             }}
                           >
-                            {formatNumber(row.YTD)}
+                            {formatNumber(Number(row.YTD ?? 0))}
                           </TableCell>
                         </TableRow>
                       );
