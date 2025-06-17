@@ -66,17 +66,27 @@ const PnlAttributionTable: React.FC = () => {
         const rows: TableRowData[] = [];
         const monthSet: Set<string> = new Set();
 
-        Object.entries(result).forEach(([assetType, funds]) => {
-          Object.entries(funds).forEach(([fundName, fundData]) => {
-            const { asset_type, ...rest } = fundData;
-            Object.keys(rest).forEach((month) => monthSet.add(month));
-            rows.push({
-              assetType,
-              fundName,
-              values: rest as { [month: string]: number },
-            });
-          });
-        });
+   Object.entries(result).forEach(([assetType, funds]) => {
+  Object.entries(funds).forEach(([fundName, fundData]) => {
+    const { asset_type, ...rest } = fundData;
+    const monthValues = rest as { [month: string]: number };
+
+    // Check if all values are 0 or null or undefined
+    const isAllZero = Object.values(monthValues).every(
+      (value) => !value || value === 0
+    );
+
+    if (!isAllZero) {
+      Object.keys(monthValues).forEach((month) => monthSet.add(month));
+      rows.push({
+        assetType,
+        fundName,
+        values: monthValues,
+      });
+    }
+  });
+});
+
 
         const sortedMonths = Array.from(monthSet).sort((a, b) => {
           const order = [
