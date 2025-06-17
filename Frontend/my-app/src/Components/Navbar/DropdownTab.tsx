@@ -51,7 +51,7 @@ const DropdownTab: React.FC<DropdownTabProps> = ({ label, menuItems, selectedTab
       </Button>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {menuItems.map((item) => (
-          <MenuItem key={item.label} onClick={() => handleMenuItemClick(item.path)}>
+          <MenuItem key={item.label} onClick={() => handleMenuItemClick(item.path)} sx={{ color: "#005166" }}>
             {item.label}
           </MenuItem>
         ))}
