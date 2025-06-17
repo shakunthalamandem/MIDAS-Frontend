@@ -10,7 +10,10 @@ import {
   CircularProgress,
   Typography,
   Container,
+  IconButton,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 type FundData = {
   asset_type: string;
@@ -42,12 +45,30 @@ const PnlAttributionTable: React.FC = () => {
   const [data, setData] = useState<TableRowData[]>([]);
   const [months, setMonths] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+
+  const collapsedOnlyAssets = ["Cash", "Warrants", "Futures"];
+
   const handleAssetClick = (assetType: string) => {
-    const url = `/portfolio-attribution/details/${encodeURIComponent(assetType)}`;
+    const url = `/portfolio-attribution/details/${encodeURIComponent(
+      assetType
+    )}`;
     window.open(url, "_blank");
+  };
+
+  const toggleExpand = (assetType: string) => {
+    setExpandedAssets((prev) => {
+      const updated = new Set(prev);
+      if (updated.has(assetType)) {
+        updated.delete(assetType);
+      } else {
+        updated.add(assetType);
+      }
+      return updated;
+    });
   };
 
   useEffect(() => {
@@ -66,27 +87,27 @@ const PnlAttributionTable: React.FC = () => {
         const rows: TableRowData[] = [];
         const monthSet: Set<string> = new Set();
 
-   Object.entries(result).forEach(([assetType, funds]) => {
-  Object.entries(funds).forEach(([fundName, fundData]) => {
-    const { asset_type, ...rest } = fundData;
-    const monthValues = rest as { [month: string]: number };
+        Object.entries(result).forEach(([assetType, funds]) => {
+          Object.entries(funds).forEach(([fundName, fundData]) => {
+            const { asset_type, ...rest } = fundData;
+            const monthValues = rest as { [month: string]: number };
 
-    // Check if all values are 0 or null or undefined
-    const isAllZero = Object.values(monthValues).every(
-      (value) => !value || value === 0
-    );
+            const isAllZero = Object.values(monthValues).every(
+              (value) => !value || value === 0
+            );
 
-    if (!isAllZero) {
-      Object.keys(monthValues).forEach((month) => monthSet.add(month));
-      rows.push({
-        assetType,
-        fundName,
-        values: monthValues,
-      });
-    }
-  });
-});
-
+            if (!isAllZero) {
+              Object.keys(monthValues).forEach((month) =>
+                monthSet.add(month)
+              );
+              rows.push({
+                assetType,
+                fundName,
+                values: monthValues,
+              });
+            }
+          });
+        });
 
         const sortedMonths = Array.from(monthSet).sort((a, b) => {
           const order = [
@@ -179,57 +200,45 @@ const PnlAttributionTable: React.FC = () => {
                   ([a], [b]) => assetOrder.indexOf(a) - assetOrder.indexOf(b)
                 );
 
-                sortedGroupedEntries.forEach(
-                  ([assetType, fundRows], assetIdx) => {
-                    fundRows.forEach((row, idx) => {
-                      rows.push(
-                        <TableRow key={`${assetType}-${idx}`}>
-                          {idx === 0 && (
-                            <TableCell
-                              rowSpan={fundRows.length + 1}
-                              sx={{
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                                textDecoration: "underline",
-                                bgcolor: "#e3f2fd",
-                                color: "#d10b02",
-                                "&:hover": {
-                                  textDecoration: "underline",
-                                  opacity: 0.8,
-                                },
-                              }}
-                              onClick={() => handleAssetClick(assetType)}
-                            >
-                              {assetType}
-                            </TableCell>
-                          )}
+                sortedGroupedEntries.forEach(([assetType, fundRows]) => {
+                  const showCollapsed = collapsedOnlyAssets.includes(assetType);
+                  const isExpanded = expandedAssets.has(assetType);
 
-                          <TableCell>{row.fundName}</TableCell>
-                          {months.map((month) => (
-                            <TableCell key={month} align="right">
-                              {formatCurrency(row.values[month] ?? 0)}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      );
-                    });
+                  const totals: { [month: string]: number } = {};
+                  months.forEach((month) => {
+                    totals[month] = fundRows.reduce(
+                      (sum, row) => sum + (row.values[month] ?? 0),
+                      0
+                    );
+                  });
 
-                    // Add Total row for the assetType
-                    const totals: { [month: string]: number } = {};
-                    months.forEach((month) => {
-                      totals[month] = fundRows.reduce(
-                        (sum, row) => sum + (row.values[month] ?? 0),
-                        0
-                      );
-                    });
-
+                  if (showCollapsed && !isExpanded) {
                     rows.push(
                       <TableRow
                         key={`${assetType}-total`}
                         sx={{ backgroundColor: "#c8e6c9" }}
                       >
-                        <TableCell colSpan={1}>
-                          <b>Total</b>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            textDecoration: "underline",
+                            color: "#9b1c02",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleAssetClick(assetType)}
+                        >
+                          {assetType}
+                        </TableCell>
+                        <TableCell>
+                          <b>
+                            <IconButton
+                              size="small"
+                              onClick={() => toggleExpand(assetType)}
+                            >
+                              <AddIcon fontSize="small" />
+                            </IconButton>
+                            Total
+                          </b>
                         </TableCell>
                         {months.map((month) => (
                           <TableCell key={month} align="right">
@@ -238,8 +247,70 @@ const PnlAttributionTable: React.FC = () => {
                         ))}
                       </TableRow>
                     );
+                    return;
                   }
-                );
+
+                  fundRows.forEach((row, idx) => {
+                    rows.push(
+                      <TableRow key={`${assetType}-${idx}`}>
+                        {idx === 0 && (
+                          <TableCell
+                            rowSpan={fundRows.length + 1}
+                            sx={{
+                              cursor: "pointer",
+                              fontWeight: "bold",
+                              textDecoration: "underline",
+                              bgcolor: "#e3f2fd",
+                              color: "#9b1c02",
+                              "&:hover": {
+                                textDecoration: "underline",
+                                opacity: 0.8,
+                              },
+                            }}
+                            onClick={() => handleAssetClick(assetType)}
+                          >
+                            {assetType}
+                          </TableCell>
+                        )}
+
+                        <TableCell>{row.fundName}</TableCell>
+                        {months.map((month) => (
+                          <TableCell key={month} align="right">
+                            {formatCurrency(row.values[month] ?? 0)}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  });
+
+                  rows.push(
+                    <TableRow
+                      key={`${assetType}-total`}
+                      sx={{ backgroundColor: "#c8e6c9" }}
+                    >
+                      <TableCell colSpan={1}>
+                        {collapsedOnlyAssets.includes(assetType) ? (
+                          <b>
+                            <IconButton
+                              size="small"
+                              onClick={() => toggleExpand(assetType)}
+                            >
+                              <RemoveIcon fontSize="small" />
+                            </IconButton>
+                            Total
+                          </b>
+                        ) : (
+                          <b>Total</b>
+                        )}
+                      </TableCell>
+                      {months.map((month) => (
+                        <TableCell key={month} align="right">
+                          <b>{formatCurrency(totals[month])}</b>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                });
 
                 return rows;
               })()}
