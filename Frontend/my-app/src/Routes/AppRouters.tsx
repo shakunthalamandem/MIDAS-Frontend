@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useParams } from "react-router-dom";
+import { Routes, Route, } from "react-router-dom";
 import CapitalMarketsStatic from "../Components/HomepageStatic/CapitalMarketsStatic";
 import Login from "../Components/Main/HomePage/Authentication/Login";
 import SignUp from "../Components/Main/HomePage/Authentication/SignUp";
@@ -14,14 +14,12 @@ import ErrorBoundary from "../Pages/ErrorBoundary";
 import AuthGuard from "./AuthGuard";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
 import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/DetailedGapData";
-import DealFormMain from "../Components/DealsForm/DealFormMain";
 
 import Logs from "../Components/Main/HomePage/Authentication/Logs";
 import DealStats from "../Components/Main/MonasheeDeals/MddGraphs/DealStats";
 import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount";
 import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
 import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
-import PortfolioAttribution from "../Components/Main/PortfolioAttribution/PortfolioAttribution";
 import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
 import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable";
 import HighYieldsMain from "../Components/HighYields/HighYieldsMain";
@@ -43,8 +41,7 @@ import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 import MainUpload from "../Components/Uploads/MainUpload";
 import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
 import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
-import DealformInformation from "../Components/NewDealForm/DealformInformation";
-import DealCreateForm from "../Components/NewDealForm/DealCreateForm";
+
 
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
 import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
@@ -56,9 +53,7 @@ import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketO
 import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
 import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 import PnlAttributionMain from "../Components/PNLAttribution/PnlAttributionMain";
-import PnLSummary from "../Components/PNLAttribution/PnLSummary";
 import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
-import PnlAttributionTable from "../Components/PNLAttribution/PnlAttributionTable";
 import EquityNewDealFormMain from "../Components/EquityNewDealFormMain/EquityNewDealFormMain";
 
 
@@ -80,7 +75,6 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/logout" element={<Logout />} /> */}
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
-        <Route path="/form" element={<AuthGuard><  EquityNewDealFormMain /></AuthGuard>} />
 
 
         <Route path="/machine_learning/equity" element={<AuthGuard><MlEquityMain /></AuthGuard>} />

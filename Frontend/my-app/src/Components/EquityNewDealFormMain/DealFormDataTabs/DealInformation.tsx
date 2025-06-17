@@ -75,37 +75,46 @@ const DealInformation: React.FC<FormSectionProps> = ({
     "Others",
   ];
 
-  const renderSelectField = (
-    label: string,
-    name: string,
-    options: string[]
-  ) => (
-    <Grid item xs={12} sm={6} md={4}>
-      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-        {label}
-      </Typography>
-      <TextField
-        select
-        name={name}
-        value={data[name] || ""}
-        onChange={handleChange}
-        fullWidth
-        size="small"
-        variant="standard"
-        disabled={!editable}
-        InputProps={{
-          disableUnderline: !editable,
-          style: { color: "#002060" },
-        }}
-      >
-        {options.map((option) => (
-          <MenuItem key={option} value={option}>
-            {option}
-          </MenuItem>
-        ))}
-      </TextField>
-    </Grid>
-  );
+const renderSelectField = (
+  label: string,
+  name: string,
+  options: string[]
+) => (
+  <Grid item xs={12} sm={6} md={4}>
+    <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+      {label}
+    </Typography>
+    <TextField
+      select
+      name={name}
+      value={data[name] || ""}
+      onChange={handleChange}
+      fullWidth
+      size="small"
+      variant="standard"
+      disabled={!editable}
+      InputProps={{
+        disableUnderline: !editable,
+        style: { color: "#002060" },
+      }}
+      SelectProps={{
+        MenuProps: {
+          PaperProps: {
+            style: {
+              maxHeight: 400,
+            },
+          },
+        },
+      }}
+    >
+      {options.map((option) => (
+        <MenuItem key={option} value={option}>
+          {option}
+        </MenuItem>
+      ))}
+    </TextField>
+  </Grid>
+);
 
   const renderTextField = (
     label: string,
