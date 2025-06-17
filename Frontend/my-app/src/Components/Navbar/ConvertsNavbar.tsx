@@ -15,10 +15,10 @@ const ConvertsNavbar: React.FC = () => {
   const handleNavigate = (page: string) => {
     switch (page) {
       case "Converts Market Opportunity":
-        navigate("/converts/capital-markets");
+        navigate("/opportunity/converts");
         break;
       case "Monashee Performance & Efficiency":
-        navigate("/converts/monashee-deals");
+        navigate("/machine_learning/converts");
         break;
       case "Portfolio Attribution":
         navigate("/converts/portfolio-attribution");
@@ -31,20 +31,20 @@ const ConvertsNavbar: React.FC = () => {
   const getTabIndex = () => {
     switch (location.pathname) {
 
-      case "/converts/capital-markets":
-      case "/converts/capital-markets/":
-      case "/converts/capital-markets/deal-stats":
-      case "/converts/capital-markets/skew-table":
-      case "/converts/capital-markets/deal-filter":
+      case "/opportunity/converts":
+      case "/opportunity/converts/":
+      case "/opportunity/converts/deal-stats":
+      case "/opportunity/converts/skew-table":
+      case "/opportunity/converts/deal-filter":
         return 0;
-      case "/converts/monashee-deals":
-      case "/converts/monashee-deals/":
-      case "/converts/monashee-deals/deal-stats":
-      case "/converts/monashee-deals/screener":
-      case "/converts/monashee-deals/by-bank":
-      case "/converts/monashee-deals/weekly-tracking":
-      case "/converts/monashee-deals/follow-on-discount":
-      case "/converts/monashee-deals/gap-analysis":
+      case "/machine_learning/converts":
+      case "/machine_learning/converts/":
+      case "/machine_learning/converts/deal-stats":
+      case "/machine_learning/converts/screener":
+      case "/machine_learning/converts/by-bank":
+      case "/machine_learning/converts/weekly-tracking":
+      case "/machine_learning/converts/follow-on-discount":
+      case "/machine_learning/converts/gap-analysis":
         return 1;
 
       case "/converts/portfolio-attribution":

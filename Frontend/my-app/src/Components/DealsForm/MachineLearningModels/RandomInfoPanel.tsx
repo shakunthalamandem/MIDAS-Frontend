@@ -79,7 +79,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
   const handleCardClick = (item: FormData) => {
     sessionStorage.setItem("selected_form_data", JSON.stringify(item));
     sessionStorage.setItem("auto_predict", "true");
-    window.open("/equity/ml_equity");
+    window.open("/machine_learning/equity");
   };
 
   const renderPredictionChip = (prediction: string) => {

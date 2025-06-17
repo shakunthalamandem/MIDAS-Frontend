@@ -15,10 +15,10 @@ const HighYieldNavbar: React.FC = () => {
   const handleNavigate = (page: string) => {
     switch (page) {
       case "High Yield Market Opportunity":
-        navigate("/highyield/capital-markets");
+        navigate("/opportunity/high-yield");
         break;
       case "Monashee Performance & Efficiency":
-        navigate("/highyield/monashee-deals");
+        navigate("/machine_learning/high-yield");
         break;
       case "Portfolio Attribution":
         navigate("/highyield/portfolio-attribution");
@@ -30,20 +30,20 @@ const HighYieldNavbar: React.FC = () => {
 
   const getTabIndex = () => {
     switch (location.pathname) {
-       case "/highyield/capital-markets":
-       case "/highyield/capital-markets/":
-       case "/highyield/capital-markets/deal-stats":
-       case "/highyield/capital-markets/skew-table":
-       case "/highyield/capital-markets/deal-filter":
+       case "/opportunity/high-yield":
+       case "/opportunity/high-yield/":
+       case "/opportunity/high-yield/deal-stats":
+       case "/opportunity/high-yield/skew-table":
+       case "/opportunity/high-yield/deal-filter":
         return 0;
-       case "/highyield/monashee-deals":
-       case "/highyield/monashee-deals/":
-       case "/highyield/monashee-deals/deal-stats":
-       case "/highyield/monashee-deals/screener":
-       case "/highyield/monashee-deals/by-bank":
-       case "/highyield/monashee-deals/weekly-tracking":
-       case "/highyield/monashee-deals/follow-on-discount":
-       case "/highyield/monashee-deals/gap-analysis":
+       case "/machine_learning/high-yield":
+       case "/machine_learning/high-yield/":
+       case "/machine_learning/high-yield/deal-stats":
+       case "/machine_learning/high-yield/screener":
+       case "/machine_learning/high-yield/by-bank":
+       case "/machine_learning/high-yield/weekly-tracking":
+       case "/machine_learning/high-yield/follow-on-discount":
+       case "/machine_learning/high-yield/gap-analysis":
         return 1;
        case "/highyield/portfolio-attribution":
         return 2;

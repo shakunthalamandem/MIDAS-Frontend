@@ -11,7 +11,7 @@ const SectionOne: React.FC = () => {
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
-  const handleNavigate = () => navigate("/equity/dashboard");
+  const handleNavigate = () => navigate("/opportunity/summary");
 
   return (
     <Box className="section-one">

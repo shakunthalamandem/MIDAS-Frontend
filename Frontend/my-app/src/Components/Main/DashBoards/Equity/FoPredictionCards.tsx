@@ -92,7 +92,7 @@ const FoPredictionCards: React.FC = () => {
   const handleCardClick = (item: PredictedForm) => {
     sessionStorage.setItem("selected_form_data", JSON.stringify(item));
     sessionStorage.setItem("auto_predict", "true");
-    window.open("/equity/ml_equity", "_blank");
+    window.open("/machine_learning/equity", "_blank");
   };
 
   const renderPredictionChip = (prediction: string) => {

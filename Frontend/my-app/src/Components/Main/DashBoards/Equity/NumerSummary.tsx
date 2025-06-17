@@ -36,7 +36,7 @@ const NumerSummary: React.FC = () => {
   };
 
   const handleCardClick = () => {
-    window.open("/equity/capital-markets/deal-stats", "_blank");
+    window.open("/opportunity/equity/deal-stats", "_blank");
   };
 
   useEffect(() => {

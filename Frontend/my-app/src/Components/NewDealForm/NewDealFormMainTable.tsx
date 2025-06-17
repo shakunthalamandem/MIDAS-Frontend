@@ -231,7 +231,7 @@ const NewDealFormMainTable: React.FC<NewDealFormMainTableProps> = ({
   ];
 
   const handleCancel = () => {
-    window.location.href = "/equity/issue_market";
+    window.location.href = "/deals/new_deal_form";
   };
 
   useEffect(() => {

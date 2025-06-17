@@ -428,7 +428,7 @@ const BasicInfo: React.FC = () => {
     setFormData(defaultData);
   };
     const handleCancel = () => {
-          navigate("/equity/issue_market");
+          navigate("/deals/new_deal_form");
 
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
