@@ -146,7 +146,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate }) => {
           },
         }}
       >
-        {isCreate ? "Create Deal" : "Save Changes"}
+        {isCreate ? "Save" : "Save Changes"}
       </Button>
 
       <Button
