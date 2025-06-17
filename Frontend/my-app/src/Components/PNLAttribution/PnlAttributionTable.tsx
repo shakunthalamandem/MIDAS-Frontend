@@ -31,18 +31,12 @@ interface TableRowData {
 
 const formatCurrency = (value: number): string => {
   const absValue = Math.abs(value);
-  const suffix =
-    absValue >= 1_000_000 ? "M" :
-    absValue >= 1_000 ? "K" :
-    "";
-  const divisor = suffix === "M" ? 1_000_000 :
-                  suffix === "K" ? 1_000 :
-                  1;
+  const suffix = absValue >= 1_000_000 ? "M" : absValue >= 1_000 ? "K" : "";
+  const divisor = suffix === "M" ? 1_000_000 : suffix === "K" ? 1_000 : 1;
 
   const formatted = (absValue / divisor).toFixed(2);
   return `${value < 0 ? "-" : ""}$${formatted}${suffix}`;
 };
-
 
 const PnlAttributionTable: React.FC = () => {
   const [data, setData] = useState<TableRowData[]>([]);
@@ -51,6 +45,10 @@ const PnlAttributionTable: React.FC = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const handleAssetClick = (assetType: string) => {
+    const url = `/portfolio-attribution/details/${encodeURIComponent(assetType)}`;
+    window.open(url, "_blank");
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -82,9 +80,19 @@ const PnlAttributionTable: React.FC = () => {
 
         const sortedMonths = Array.from(monthSet).sort((a, b) => {
           const order = [
-            "January", "February", "March", "April",
-            "May", "June", "July", "August",
-            "September", "October", "November", "December", "YTD"
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+            "YTD",
           ];
           return order.indexOf(a) - order.indexOf(b);
         });
@@ -103,87 +111,108 @@ const PnlAttributionTable: React.FC = () => {
 
   return (
     <Container>
-    <TableContainer component={Paper} sx={{ mt: 4 }}>
-      <Typography variant="h6" sx={{ p: 2 }}>
-        PnL Attribution (Dynamic Months with Totals)
-      </Typography>
+      <TableContainer component={Paper} sx={{ mt: 4 ,mb: 4, borderRadius: 2, boxShadow: 3 }}>
+        <Typography variant="h6" sx={{ p: 2 }} align="center" color="#002060">
+Fund-Level Performance Breakdown
+        </Typography>
 
-      {loading ? (
-        <CircularProgress sx={{ m: 2 }} />
-      ) : (
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell><b>Asset Type</b></TableCell>
-              <TableCell><b>Fund Name</b></TableCell>
-              {months.map((month) => (
-                <TableCell key={month} align="right">
-                  <b>{month}</b>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(() => {
-              const groupedData = data.reduce<Record<string, TableRowData[]>>(
-                (acc, row) => {
-                  if (!acc[row.assetType]) acc[row.assetType] = [];
-                  acc[row.assetType].push(row);
-                  return acc;
-                },
-                {}
-              );
+        {loading ? (
+          <CircularProgress sx={{ m: 2 }} />
+        ) : (
+          <Table size="small">
+       <TableHead>
+  <TableRow sx={{ backgroundColor: '#002060' }}>
+    <TableCell sx={{ color: '#ffffff' }}><b>Asset Type</b></TableCell>
+    <TableCell sx={{ color: '#ffffff' }}><b>Fund Name</b></TableCell>
+    {months.map((month) => (
+      <TableCell key={month} align="right" sx={{ color: '#ffffff' }}>
+        <b>{month}</b>
+      </TableCell>
+    ))}
+  </TableRow>
+</TableHead>
 
-              const rows: JSX.Element[] = [];
+            <TableBody>
+              {(() => {
+                const groupedData = data.reduce<Record<string, TableRowData[]>>(
+                  (acc, row) => {
+                    if (!acc[row.assetType]) acc[row.assetType] = [];
+                    acc[row.assetType].push(row);
+                    return acc;
+                  },
+                  {}
+                );
 
-              Object.entries(groupedData).forEach(
-                ([assetType, fundRows], assetIdx) => {
-                  fundRows.forEach((row, idx) => {
+                const rows: JSX.Element[] = [];
+
+                Object.entries(groupedData).forEach(
+                  ([assetType, fundRows], assetIdx) => {
+                    fundRows.forEach((row, idx) => {
+                      rows.push(
+                        <TableRow key={`${assetType}-${idx}`}>
+                          {idx === 0 && (
+                            <TableCell
+                              rowSpan={fundRows.length + 1}
+                              sx={{
+                                cursor: "pointer",
+                                fontWeight: "bold",
+                                textDecoration: "underline",
+                                bgcolor: "#e3f2fd",
+                                color: "#d10b02",
+                                "&:hover": {
+                                  textDecoration: "underline",
+                                  opacity: 0.8,
+                                },
+                              }}
+                              onClick={() => handleAssetClick(assetType)}
+                            >
+                              {assetType}
+                            </TableCell>
+                          )}
+
+                          <TableCell>{row.fundName}</TableCell>
+                          {months.map((month) => (
+                            <TableCell key={month} align="right">
+                              {formatCurrency(row.values[month] ?? 0)}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    });
+
+                    // Add Total row for the assetType
+                    const totals: { [month: string]: number } = {};
+                    months.forEach((month) => {
+                      totals[month] = fundRows.reduce(
+                        (sum, row) => sum + (row.values[month] ?? 0),
+                        0
+                      );
+                    });
+
                     rows.push(
-                      <TableRow key={`${assetType}-${idx}`} >
-                        {idx === 0 && (
-                          <TableCell rowSpan={fundRows.length + 1}>
-                            <b>{assetType}</b>
-                          </TableCell>
-                        )}
-                        <TableCell>{row.fundName}</TableCell>
+                      <TableRow
+                        key={`${assetType}-total`}
+                        sx={{ backgroundColor: "#c8e6c9" }}
+                      >
+                        <TableCell colSpan={1}>
+                          <b>Total</b>
+                        </TableCell>
                         {months.map((month) => (
                           <TableCell key={month} align="right">
-                            {formatCurrency(row.values[month] ?? 0)}
+                            <b>{formatCurrency(totals[month])}</b>
                           </TableCell>
                         ))}
                       </TableRow>
                     );
-                  });
+                  }
+                );
 
-                  // Add Total row for the assetType
-                  const totals: { [month: string]: number } = {};
-                  months.forEach((month) => {
-                    totals[month] = fundRows.reduce(
-                      (sum, row) => sum + (row.values[month] ?? 0),
-                      0
-                    );
-                  });
-
-                  rows.push(
-                    <TableRow key={`${assetType}-total`} sx={{backgroundColor:'#c8e6c9'}}>
-                      <TableCell colSpan={1}><b>Total</b></TableCell>
-                      {months.map((month) => (
-                        <TableCell key={month} align="right">
-                          <b>{formatCurrency(totals[month])}</b>
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  );
-                }
-              );
-
-              return rows;
-            })()}
-          </TableBody>
-        </Table>
-      )}
-    </TableContainer>
+                return rows;
+              })()}
+            </TableBody>
+          </Table>
+        )}
+      </TableContainer>
     </Container>
   );
 };
