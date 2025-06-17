@@ -6,6 +6,7 @@ import DealAllocations from '../DealFormDataTabs/DealAllocations';
 import MarketData from '../DealFormDataTabs/MarketData';
 import TechnicalMarketData from '../DealFormDataTabs/TechnicalMarketData';
 import DealColor from '../DealFormDataTabs/DealColor';
+import axios from 'axios';
 
 interface FormData {
   deal_information: Record<string, any>;
@@ -33,19 +34,37 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate }) => {
   const handleSave = async () => {
     try {
       console.log('Saving data:', localData);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setEditable(false);
-      setSnackbar({
-        open: true,
-        message: isCreate ? 'Deal created successfully!' : 'Deal updated successfully!',
-        severity: 'success'
+
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const url = isCreate
+        ? `${apiUrl}/api/create_deal_form/`
+        : `${apiUrl}/api/update_data/`;
+
+      const response = await axios.post(url, localData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
+
+      if (response.status === 200 || response.status === 201) {
+        setEditable(false);
+        setSnackbar({
+          open: true,
+          message: isCreate ? 'Deal created successfully!' : 'Deal updated successfully!',
+          severity: 'success',
+        });
+      } else {
+        throw new Error('Unexpected response');
+      }
     } catch (error) {
+      console.error('Save failed:', error);
       setSnackbar({
         open: true,
         message: 'Failed to save deal. Please try again.',
-        severity: 'error'
+        severity: 'error',
       });
     }
   };
