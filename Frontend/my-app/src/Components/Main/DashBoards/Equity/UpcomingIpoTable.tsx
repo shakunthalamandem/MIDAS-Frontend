@@ -212,7 +212,6 @@ const UpcomingIpoTable: React.FC = () => {
         </TableContainer>
       </Box>
     </Container>
-    <MddIpoOpportunityChart />
 
     </>
   );

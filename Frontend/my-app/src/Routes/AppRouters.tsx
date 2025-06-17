@@ -58,6 +58,7 @@ import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 import PnlAttributionMain from "../Components/PNLAttribution/PnlAttributionMain";
 import PnLSummary from "../Components/PNLAttribution/PnLSummary";
 import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
+import PnlAttributionTable from "../Components/PNLAttribution/PnlAttributionTable";
 
 
 

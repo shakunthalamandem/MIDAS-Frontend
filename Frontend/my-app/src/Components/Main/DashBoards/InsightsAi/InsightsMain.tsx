@@ -78,7 +78,7 @@ const InsightsMain = () => {
   const insights: InsightCardProps[] = [
     {
       title: "Deal Count (May’24 vs May’25)",
-      metric: "+50 IPOs / +20 FOs",
+      metric: "+9 IPOs / +6 FOs",
       change: "+40% YoY",
       status: "up",
       comment:

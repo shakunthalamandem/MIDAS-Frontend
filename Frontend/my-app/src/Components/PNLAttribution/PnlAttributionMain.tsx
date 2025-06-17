@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import AssestTypePnlAttribution from "./AssestTypePnlAttribution";
 import PnLSummary from "./PnLSummary";
+import PnlAttributionTable from "./PnlAttributionTable";
 
 const PnlAttributionMain = () => {
   return (
@@ -29,13 +30,13 @@ const PnlAttributionMain = () => {
           },
         }}
       >
-        Welcome to P&L's for the monashee transactions
+        Welcome to Monashee's latest P&L performance overview.
       </Typography>
 
       {/* Components section */}
       <>
         <PnLSummary />
-        <AssestTypePnlAttribution />
+        <PnlAttributionTable />
       </>
     </Box>
   );

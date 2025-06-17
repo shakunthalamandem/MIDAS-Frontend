@@ -76,11 +76,10 @@ const AssestTypePnlAttribution: React.FC = () => {
     return monthsArray;
   }, [data]);
 
-const handleAssetClick = (assetType: string) => {
-  const url = `/portfolio-attribution/details/${encodeURIComponent(assetType)}`;
-  window.open(url, "_blank");
-};
-
+  const handleAssetClick = (assetType: string) => {
+    const url = `/portfolio-attribution/details/${encodeURIComponent(assetType)}`;
+    window.open(url, "_blank");
+  };
 
   const sortedAssetTypes = assetOrder.filter((key) => data.hasOwnProperty(key));
 
@@ -89,13 +88,19 @@ const handleAssetClick = (assetType: string) => {
     return <Typography>No data available</Typography>;
 
   return (
-    <Container maxWidth="lg" sx={{ mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mb: 4, mt: 2 }}>
       <Typography
         variant="h3"
-        align="center"
+        align="left"
         sx={{ color: "#005166", fontSize: "1.75rem", mb: 3 }}
       >
-        Portfolio Attribution
+        Fund-Level Performance Breakdown
+      </Typography>
+      <Typography variant="body1" align="left" sx={{ color: "#666", mb: 2 }}>
+        Dive deeper into the performance drivers by analyzing how each
+        individual fund has contributed to overall P&L. This breakdown allows
+        for a granular view of asset-specific returns, strategy effectiveness,
+        and risk-adjusted performance across the Monashee platform.
       </Typography>
 
       <TableContainer>
@@ -110,6 +115,8 @@ const handleAssetClick = (assetType: string) => {
                   border: "1px solid black",
                   fontSize: "0.75rem",
                   padding: "4px 8px",
+                  textAlign: "center",
+                  // textDecoration: "underline", // Underlining the asset type header
                 }}
               >
                 Asset Type
@@ -124,6 +131,7 @@ const handleAssetClick = (assetType: string) => {
                   padding: "4px 8px",
                   minWidth: "80px",
                   maxWidth: "120px",
+                  textAlign: "center",
                 }}
               >
                 Fund Name
@@ -138,7 +146,7 @@ const handleAssetClick = (assetType: string) => {
                     border: "1px solid black",
                     fontSize: "0.75rem",
                     padding: "4px 8px",
-                    textAlign: "right",
+                    textAlign: "center",
                   }}
                 >
                   {month}
@@ -150,11 +158,12 @@ const handleAssetClick = (assetType: string) => {
           <TableBody>
             {sortedAssetTypes.map((assetType) => {
               const funds = data[assetType];
-              const fundNames = Object.keys(funds);
+              const fundNames = Object.keys(funds).sort(); // Sort fund names alphabetically
 
               // Calculate totals per month
               const totals = allMonths.reduce<Record<string, number>>((acc, month) => {
                 acc[month] = 0;
+
                 return acc;
               }, {});
 
@@ -176,24 +185,17 @@ const handleAssetClick = (assetType: string) => {
                       sx={{
                         border: "1px solid black",
                         fontWeight: "bold",
-                        fontSize: "0.75rem",
+                        fontSize: "0.85rem",
                         padding: "4px 8px",
+                        color: "#f52a0a",
+                        textAlign: "center",
+                        cursor: "pointer", // Indicating clickability
+                        textDecoration: "underline", // Underline asset type column
                       }}
+                      onClick={() => handleAssetClick(assetType)}
                     >
-                      <span
-                        onClick={() => handleAssetClick(assetType)}
-                        style={{ cursor: "pointer", fontWeight: "bold" }}
-                        role="button"
-                        tabIndex={0}
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            handleAssetClick(assetType);
-                          }
-                        }}
-                      >
-                        {assetType}
-                      </span>
-                    </TableCell>
+                      {assetType}
+                    </TableCell>  
                     <TableCell
                       onClick={() =>
                         setExpanded((prev) => ({
@@ -211,16 +213,7 @@ const handleAssetClick = (assetType: string) => {
                         paddingRight: "32px",
                         minWidth: "80px",
                         maxWidth: "120px",
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          setExpanded((prev) => ({
-                            ...prev,
-                            [assetType]: true,
-                          }));
-                        }
+                        textAlign: "center",
                       }}
                     >
                       Total
@@ -250,7 +243,7 @@ const handleAssetClick = (assetType: string) => {
                         key={month}
                         sx={{
                           border: "1px solid black",
-                          textAlign: "right",
+                          textAlign: "center",
                           padding: "4px 8px",
                           fontSize: "0.75rem",
                         }}
@@ -266,6 +259,7 @@ const handleAssetClick = (assetType: string) => {
                 <React.Fragment key={assetType}>
                   {fundNames.map((fundName, idx) => {
                     const fund = funds[fundName];
+                    console.log("fund",fund)
                     return (
                       <TableRow key={fundName}>
                         {idx === 0 && (
@@ -274,24 +268,17 @@ const handleAssetClick = (assetType: string) => {
                             sx={{
                               border: "1px solid black",
                               fontWeight: "bold",
-                              fontSize: "0.75rem",
+                              fontSize: "0.85rem",
                               padding: "4px 8px",
+                              color: "#f52a0a",
                               verticalAlign: "middle",
+                              textAlign: "center",
+                              cursor: "pointer", // Indicating clickability
+                              textDecoration: "underline", // Underline asset type column
                             }}
+                            onClick={() => handleAssetClick(assetType)}
                           >
-                            <span
-                              onClick={() => handleAssetClick(assetType)}
-                              style={{ cursor: "pointer" }}
-                              role="button"
-                              tabIndex={0}
-                              onKeyPress={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                  handleAssetClick(assetType);
-                                }
-                              }}
-                            >
-                              {assetType}
-                            </span>
+                            {assetType}
                           </TableCell>
                         )}
                         <TableCell
@@ -301,6 +288,7 @@ const handleAssetClick = (assetType: string) => {
                             padding: "4px 8px",
                             minWidth: "80px",
                             maxWidth: "120px",
+                            textAlign: "center",
                           }}
                         >
                           {fundName}
@@ -310,7 +298,7 @@ const handleAssetClick = (assetType: string) => {
                             key={month}
                             sx={{
                               border: "1px solid black",
-                              textAlign: "right",
+                              textAlign: "center",
                               padding: "4px 8px",
                               fontSize: "0.75rem",
                             }}
@@ -331,74 +319,59 @@ const handleAssetClick = (assetType: string) => {
                       fontSize: "0.75rem",
                     }}
                   >
-                   <TableCell
-  colSpan={1}
-  onClick={() => {
-    if (!alwaysExpandedAssets.includes(assetType)) {
-      setExpanded((prev) => ({
-        ...prev,
-        [assetType]: false,
-      }));
-    }
-  }}
-  sx={{
-    border: "1px solid black",
-    padding: "4px 8px",
-    position: "relative",
-    paddingRight: alwaysExpandedAssets.includes(assetType)
-      ? "8px"
-      : "32px",
-    cursor: alwaysExpandedAssets.includes(assetType)
-      ? "default"
-      : "pointer",
-  }}
-  role={!alwaysExpandedAssets.includes(assetType) ? "button" : undefined}
-  tabIndex={!alwaysExpandedAssets.includes(assetType) ? 0 : undefined}
-  onKeyPress={(e) => {
-    if (
-      !alwaysExpandedAssets.includes(assetType) &&
-      (e.key === "Enter" || e.key === " ")
-    ) {
-      setExpanded((prev) => ({
-        ...prev,
-        [assetType]: false,
-      }));
-    }
-  }}
->
-  <Typography sx={{ fontWeight: "bold" }}>
-    Total
-  </Typography>
-  {!alwaysExpandedAssets.includes(assetType) && (
-    <IconButton
-      size="small"
-      sx={{
-        position: "absolute",
-        right: 4,
-        top: "50%",
-        transform: "translateY(-50%)",
-        padding: "2px",
-      }}
-      aria-label={`Collapse ${assetType}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        setExpanded((prev) => ({
-          ...prev,
-          [assetType]: false,
-        }));
-      }}
-    >
-      <Remove fontSize="small" />
-    </IconButton>
-  )}
-</TableCell>
-
+                    <TableCell
+                      colSpan={1}
+                      onClick={() => {
+                        if (!alwaysExpandedAssets.includes(assetType)) {
+                          setExpanded((prev) => ({
+                            ...prev,
+                            [assetType]: false,
+                          }));
+                        }
+                      }}
+                      sx={{
+                        border: "1px solid black",
+                        padding: "4px 8px",
+                        position: "relative",
+                        paddingRight: alwaysExpandedAssets.includes(assetType)
+                          ? "8px"
+                          : "32px",
+                        cursor: alwaysExpandedAssets.includes(assetType)
+                          ? "default"
+                          : "pointer",
+                        textAlign: "center",
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: "bold" }}>Total</Typography>
+                      {!alwaysExpandedAssets.includes(assetType) && (
+                        <IconButton
+                          size="small"
+                          sx={{
+                            position: "absolute",
+                            right: 4,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            padding: "2px",
+                          }}
+                          aria-label={`Collapse ${assetType}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpanded((prev) => ({
+                              ...prev,
+                              [assetType]: false,
+                            }));
+                          }}
+                        >
+                          <Remove fontSize="small" />
+                        </IconButton>
+                      )}
+                    </TableCell>
                     {allMonths.map((month) => (
                       <TableCell
                         key={month}
                         sx={{
                           border: "1px solid black",
-                          textAlign: "right",
+                          textAlign: "center",
                           padding: "4px 8px",
                           fontSize: "0.75rem",
                         }}
