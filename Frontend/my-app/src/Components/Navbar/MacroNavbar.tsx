@@ -25,7 +25,7 @@ const MacroNavbar: React.FC = () => {
         navigate("/macro/sector");
         break;
       case "News":
-        navigate("/macro/news");
+        navigate("/macro/news-summary");
         break;
       case "Monashee Performance & Efficiency":
         navigate("/macro/monashee-deals");
@@ -44,7 +44,7 @@ const MacroNavbar: React.FC = () => {
       case "/macro/capital-markets/skew-table":
       case "/macro/capital-markets/deal-filter":
         return 0;
-      case "/macro/news":
+      case "/macro/news-summary":
           return 1;
       case "/macro/monashee-deals":
       case "/macro/monashee-deals/":

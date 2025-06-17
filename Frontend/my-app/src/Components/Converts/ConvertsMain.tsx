@@ -49,7 +49,7 @@ useEffect(() => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     const tabPaths = ["", "deal-stats", "skew-table"];
-    navigate(`/converts/capital-markets/${tabPaths[newValue]}`);
+    navigate(`/opportunity/converts/${tabPaths[newValue]}`);
   };
   interface HighYieldResult {
     ticker_symbol: string;

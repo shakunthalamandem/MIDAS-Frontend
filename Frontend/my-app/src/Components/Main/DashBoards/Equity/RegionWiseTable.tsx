@@ -59,7 +59,7 @@ const RegionWiseTable = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleCardClick = () => {
-    window.open("/equity/capital-markets/skew-table", "_blank");
+    window.open("/opportunity/equity/skew-table", "_blank");
   };
 
 useEffect(() => {

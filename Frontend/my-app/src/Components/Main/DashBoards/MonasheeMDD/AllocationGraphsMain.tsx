@@ -94,7 +94,7 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
     }
   };
   const handleCardClick = () => {
-    window.open("/equity/capital-markets/deal-stats", "_blank");
+    window.open("/opportunity/equity/deal-stats", "_blank");
   };
   const formatChartData = (data: ApiResponse) => {
     const dealSize: ChartData[] = [];

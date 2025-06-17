@@ -59,7 +59,7 @@ const MarketOpportnuityMain: React.FC = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     const tabPaths = ["", "deal-stats", "skew-table", "mdd_deal_stats", "gap-analysis", "weekly-tracking"];
-    navigate(`/equity/capital-markets/${tabPaths[newValue]}`);
+    navigate(`/opportunity/equity/${tabPaths[newValue]}`);
   };
   interface CombinedDataResult {
     ticker_symbol: string;

@@ -51,7 +51,7 @@ const CapitalMarkets: React.FC = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     const tabPaths = ["", "deal-stats", "skew-table", "deal-filter"];
-    navigate(`/equity/capital-markets/${tabPaths[newValue]}`);
+    navigate(`/opportunity/equity/${tabPaths[newValue]}`);
   };
   interface CombinedDataResult {
     ticker_symbol: string;

@@ -36,31 +36,31 @@ const EquityNavbar: React.FC = () => {
     const path = location.pathname;
 
     if (
-      path.startsWith("/equity/capital-markets") ||
-      path.startsWith("/equity/dashboard") ||
+      path.startsWith("/opportunity/equity") ||
+      path.startsWith("/opportunity/summary") ||
       path.startsWith("/equity/monashee-deals") ||
       path.startsWith("/equity/detailed_gap_analysis")
     )
       return 0;
 
     if (
-      path === "/equity/issue_market" ||
+      path === "/deals/new_deal_form" ||
       path === "/equity/create_form" ||
       path === "/equity/ipo_dashboard" ||
-      path === "/equity/intelligence-dashboard"
+      path === "/deals/dashboard"
     )
       return 1;
 
-    if (path === "/equity/ml_equity") return 2;
+    if (path === "/machine_learning/equity") return 2;
 
     if (
-      path === "/equity/strategies" ||
-      path === "/macro/news" ||
+      path === "/macro/prime" ||
+      path === "/macro/news-summary" ||
       path === "/macro/sector"
     )
       return 3;
 
-    if (path === "/equity/writeupsdashboard") return 4;
+    if (path === "/data-analytics/writeups") return 4;
 
     return false;
   };
@@ -138,7 +138,7 @@ const EquityNavbar: React.FC = () => {
           onClick={() => {
             sessionStorage.removeItem("selected_form_data");
             sessionStorage.removeItem("auto_predict");
-            handleNavigate("/equity/ml_equity");
+            handleNavigate("/machine_learning/equity");
           }}
         />
 
@@ -158,7 +158,7 @@ const EquityNavbar: React.FC = () => {
         {/* NEW TAB: Writeups & Analytics */}
         <Tab
           label="Writeups & Analytics"
-          onClick={() => handleNavigate("/equity/writeupsdashboard")}
+          onClick={() => handleNavigate("/data-analytics/writeups")}
         />
       </Tabs>
 
@@ -173,10 +173,10 @@ const EquityNavbar: React.FC = () => {
         }}
       >
         <MenuItem
-          onClick={() => handleNavigate("/equity/dashboard")}
-          selected={isActivePath("/equity/dashboard")}
+          onClick={() => handleNavigate("/opportunity/summary")}
+          selected={isActivePath("/opportunity/summary")}
           sx={
-            isActivePath("/equity/dashboard")
+            isActivePath("/opportunity/summary")
               ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
               : {}
           }
@@ -184,10 +184,10 @@ const EquityNavbar: React.FC = () => {
           Summary Dashboard
         </MenuItem>
         <MenuItem
-          onClick={() => handleNavigate("/equity/capital-markets")}
-          selected={isActivePath("/equity/capital-markets")}
+          onClick={() => handleNavigate("/opportunity/equity")}
+          selected={isActivePath("/opportunity/equity")}
           sx={
-            isActivePath("/equity/capital-markets")
+            isActivePath("/opportunity/equity")
               ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
               : {}
           }
@@ -218,10 +218,10 @@ const EquityNavbar: React.FC = () => {
         }}
       >
          <MenuItem
-          onClick={() => handleNavigate("/equity/intelligence-dashboard")}
-          selected={isActivePath("/equity/intelligence-dashboard")}
+          onClick={() => handleNavigate("/deals/dashboard")}
+          selected={isActivePath("/deals/dashboard")}
           sx={
-            isActivePath("/equity/intelligence-dashboard")
+            isActivePath("/deals/dashboard")
               ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
               : {}
           }
@@ -229,10 +229,10 @@ const EquityNavbar: React.FC = () => {
           Dashboard
         </MenuItem>
         <MenuItem
-          onClick={() => handleNavigate("/equity/issue_market")}
-          selected={isActivePath("/equity/issue_market")}
+          onClick={() => handleNavigate("/deals/new_deal_form")}
+          selected={isActivePath("/deals/new_deal_form")}
           sx={
-            isActivePath("/equity/issue_market")
+            isActivePath("/deals/new_deal_form")
               ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
               : {}
           }
@@ -263,10 +263,10 @@ const EquityNavbar: React.FC = () => {
         }}
       >
         <MenuItem
-          onClick={() => handleNavigate("/equity/strategies")}
-          selected={isActivePath("/equity/strategies")}
+          onClick={() => handleNavigate("/macro/prime")}
+          selected={isActivePath("/macro/prime")}
           sx={
-            isActivePath("/equity/strategies")
+            isActivePath("/macro/prime")
               ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
               : {}
           }
@@ -274,10 +274,10 @@ const EquityNavbar: React.FC = () => {
           PRIME Investment Strategies
         </MenuItem>
         <MenuItem
-          onClick={() => handleNavigate("/macro/news")}
-          selected={isActivePath("/macro/news")}
+          onClick={() => handleNavigate("/macro/news-summary")}
+          selected={isActivePath("/macro/news-summary")}
           sx={
-            isActivePath("/macro/news")
+            isActivePath("/macro/news-summary")
               ? { fontWeight: "bold", backgroundColor: "#e3f2fd" }
               : {}
           }
