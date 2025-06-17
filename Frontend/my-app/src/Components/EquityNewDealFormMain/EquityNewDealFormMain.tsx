@@ -9,8 +9,10 @@ import {
   Alert,
   CircularProgress,
   Typography,
+  Fade,
 } from "@mui/material";
-import { Search, Plus } from "lucide-react";
+import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
 import { SelectedOption, TickerOption } from "../../types/NewDealFormData";
 import DealFormSectionMainTable from "./DealFormSections/DealFormSectionMainTable";
 
@@ -37,7 +39,6 @@ const EquityNewDealFormMain: React.FC = () => {
   const handleSearchClick = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const response = await axios.get(`${apiUrl}/api/new_deal_ticker_list/`, {
         headers: {
@@ -47,7 +48,7 @@ const EquityNewDealFormMain: React.FC = () => {
       });
       setOptions(response.data as TickerOption[]);
     } catch (err) {
-      console.error("API call failed, using mock data:", err);
+      console.error("API call failed:", err);
       setError("API call failed, showing demo data");
     } finally {
       setLoading(false);
@@ -61,7 +62,7 @@ const EquityNewDealFormMain: React.FC = () => {
     }
   };
 
-  const handleAutocompleteChange = (event: any, value: TickerOption | null) => {
+  const handleAutocompleteChange = (_event: any, value: TickerOption | null) => {
     if (value) {
       setSelectedOption({ ...value, create: false });
     } else {
@@ -70,85 +71,134 @@ const EquityNewDealFormMain: React.FC = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        flexWrap="wrap"
-        mb={3}
+    <Fade in timeout={500}>
+      <Paper
+        elevation={4}
+        sx={{
+          p: 4,
+          borderRadius: 4,
+          background: "linear-gradient(145deg, #f4f8ff, #ffffff)",
+        }}
       >
-        <Box>
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: 600, color: "#002060", mb: 0.5 }}
-          >
-            Equity New Deal Form
-          </Typography>
-          <Typography variant="body1" color="#002060">
-            Create or search for an equity deal by ticker and pricing date to get the complete deal form.
-          </Typography>
-        </Box>
-        <Box display="flex" alignItems="center" gap={2} mt={{ xs: 2, sm: 0 }}>
-          <Button
-            variant="contained"
-            startIcon={<Plus size={18} />}
-            onClick={handleCreateClick}
-            sx={{ minWidth: 130, textTransform: "none" }}
-          >
-            Create New
-          </Button>
-
-          <Autocomplete
-            options={options}
-            getOptionLabel={(option) =>
-              `${option.ticker} - ${formatDateSimple(option.pricing_date)}`
-            }
-            onChange={handleAutocompleteChange}
-            onOpen={handleSearchClick}
-            loading={loading}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Search Ticker"
-                variant="outlined"
-                size="small"
-                inputRef={autoCompleteRef}
-                InputProps={{
-                  ...params.InputProps,
-                  startAdornment: <Search size={18} style={{ marginRight: 8, color: '#666' }} />,
-                  endAdornment: (
-                    <>
-                      {loading && <CircularProgress color="inherit" size={20} />}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-                sx={{ minWidth: 300 }}
-              />
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          flexWrap="wrap"
+          mb={3}
+        >
+          <Box>
+            <Typography
+              variant="h5"
+              sx={{ fontWeight: 600, color: "#002060", mb: 0.5 }}
+            >
+              Equity New Deal Form
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Create or search for an equity deal by ticker and pricing date to get the complete deal form.
+            </Typography>
+            {selectedOption && selectedOption.ticker && (
+              <Typography
+                variant="subtitle2"
+                color="primary"
+                mt={1}
+                fontWeight={500}
+              >
+                Selected Deal: {selectedOption.ticker}
+              </Typography>
             )}
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                <Box>
-                  <Box fontWeight="bold">{option.ticker}</Box>
-                  <Box fontSize="0.875rem" color="text.secondary">
-                    {formatDateSimple(option.pricing_date)}
+          </Box>
+
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={2}
+            mt={{ xs: 2, sm: 0 }}
+            flexWrap="wrap"
+            justifyContent="flex-end"
+          >
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreateClick}
+              sx={{
+                minWidth: 100,
+                textTransform: "none",
+                background: "linear-gradient(to right, #002060, #004aad)",
+                color: "#fff",
+                fontWeight: 500,
+                px: 2,
+                boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
+                "&:hover": {
+                  background: "linear-gradient(to right, #003080, #0055cc)",
+                },
+              }}
+            >
+              Create New
+            </Button>
+
+            <Autocomplete
+              options={options}
+              getOptionLabel={(option) =>
+                `${option.ticker} - ${formatDateSimple(option.pricing_date)}`
+              }
+              onChange={handleAutocompleteChange}
+              onOpen={handleSearchClick}
+              loading={loading}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Search Ticker"
+                  variant="outlined"
+                  size="small"
+                  inputRef={autoCompleteRef}
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <>
+                        <SearchIcon sx={{ color: "#666", mr: 1 }} />
+                        {params.InputProps.startAdornment}
+                      </>
+                    ),
+                    endAdornment: (
+                      <>
+                        {loading && (
+                          <CircularProgress color="inherit" size={20} sx={{ mr: 1 }} />
+                        )}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                  sx={{
+                    minWidth: 300,
+                    backgroundColor: "#fff",
+                    borderRadius: 1,
+                  }}
+                />
+              )}
+              renderOption={(props, option) => (
+                <Box component="li" {...props}>
+                  <Box>
+                    <Typography fontWeight="bold">{option.ticker}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {formatDateSimple(option.pricing_date)}
+                    </Typography>
                   </Box>
                 </Box>
-              </Box>
-            )}
-          />
+              )}
+            />
+          </Box>
         </Box>
-      </Box>
 
-      {error && (
-        <Alert severity="warning" onClose={() => setError(null)} sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
+        {error && (
+          <Alert severity="warning" onClose={() => setError(null)} sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
-      <DealFormSectionMainTable selectedOption={selectedOption} />
-    </Paper>
+        <DealFormSectionMainTable selectedOption={selectedOption} />
+      </Paper>
+    </Fade>
   );
 };
 
