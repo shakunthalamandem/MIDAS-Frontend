@@ -59,6 +59,7 @@ import PnlAttributionMain from "../Components/PNLAttribution/PnlAttributionMain"
 import PnLSummary from "../Components/PNLAttribution/PnLSummary";
 import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
 import PnlAttributionTable from "../Components/PNLAttribution/PnlAttributionTable";
+import EquityNewDealFormMain from "../Components/EquityNewDealFormMain/EquityNewDealFormMain";
 
 
 
@@ -81,6 +82,7 @@ const AppRouters: React.FC = () => {
         <Route path="/user_log" element={<Logs />} />
         <Route path="/equity/issue_markets" element={<AuthGuard><DealFormMain /></AuthGuard>} />
         <Route path="/equity/create_form" element={<AuthGuard><  DealCreateForm /></AuthGuard>} />
+        <Route path="/form" element={<AuthGuard><  EquityNewDealFormMain /></AuthGuard>} />
 
 
         <Route path="/equity/ml_equity" element={<AuthGuard><MlEquityMain /></AuthGuard>} />

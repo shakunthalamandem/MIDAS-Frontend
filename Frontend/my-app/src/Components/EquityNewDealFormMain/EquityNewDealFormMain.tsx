@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Autocomplete } from '@mui/material';
 import DealFormSectionMain from './DealFormSections/DealFormSectionMain';
+import axios from 'axios';
 
 interface TickerOption {
   ticker: string;
@@ -10,11 +11,18 @@ interface TickerOption {
 const EquityNewDealFormMain = () => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [options, setOptions] = useState<TickerOption[]>([]);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('access_token');
 
   const handleSearchClick = async () => {
-    const response = await fetch('/api/ticker-options');
-    const data = await response.json();
-    setOptions(data);
+    const response = await axios.get(`${apiUrl}/api/new_deal_search_all/`, {
+      headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+    });
+    const data = await response.data;
+    setOptions(data as TickerOption[]);
   };
 
   const handleCreateClick = () => {
