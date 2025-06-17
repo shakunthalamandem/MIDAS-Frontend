@@ -111,26 +111,37 @@ const PnlAttributionTable: React.FC = () => {
 
   return (
     <Container>
-      <TableContainer component={Paper} sx={{ mt: 4 ,mb: 4, borderRadius: 2, boxShadow: 3 }}>
+      <TableContainer
+        component={Paper}
+        sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: 3 }}
+      >
         <Typography variant="h6" sx={{ p: 2 }} align="center" color="#002060">
-Fund-Level Performance Breakdown
+          Fund-Level Performance Breakdown
         </Typography>
 
         {loading ? (
           <CircularProgress sx={{ m: 2 }} />
         ) : (
           <Table size="small">
-       <TableHead>
-  <TableRow sx={{ backgroundColor: '#002060' }}>
-    <TableCell sx={{ color: '#ffffff' }}><b>Asset Type</b></TableCell>
-    <TableCell sx={{ color: '#ffffff' }}><b>Fund Name</b></TableCell>
-    {months.map((month) => (
-      <TableCell key={month} align="right" sx={{ color: '#ffffff' }}>
-        <b>{month}</b>
-      </TableCell>
-    ))}
-  </TableRow>
-</TableHead>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "#002060" }}>
+                <TableCell sx={{ color: "#ffffff" }}>
+                  <b>Asset Type</b>
+                </TableCell>
+                <TableCell sx={{ color: "#ffffff" }}>
+                  <b>Fund Name</b>
+                </TableCell>
+                {months.map((month) => (
+                  <TableCell
+                    key={month}
+                    align="right"
+                    sx={{ color: "#ffffff" }}
+                  >
+                    <b>{month}</b>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
 
             <TableBody>
               {(() => {
@@ -145,7 +156,20 @@ Fund-Level Performance Breakdown
 
                 const rows: JSX.Element[] = [];
 
-                Object.entries(groupedData).forEach(
+                const assetOrder = [
+                  "Equities",
+                  "Convertible Bond",
+                  "Corporate Bond",
+                  "Cash",
+                  "Warrants",
+                  "Futures",
+                ];
+
+                const sortedGroupedEntries = Object.entries(groupedData).sort(
+                  ([a], [b]) => assetOrder.indexOf(a) - assetOrder.indexOf(b)
+                );
+
+                sortedGroupedEntries.forEach(
                   ([assetType, fundRows], assetIdx) => {
                     fundRows.forEach((row, idx) => {
                       rows.push(
