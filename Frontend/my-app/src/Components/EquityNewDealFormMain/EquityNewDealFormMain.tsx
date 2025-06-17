@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { Search, Plus } from "lucide-react";
 import { SelectedOption, TickerOption } from "../../types/NewDealFormData";
-import DealFormSectionMain from "./DealFormSections/DealFormSectionMain";
+import DealFormSectionMainTable from "./DealFormSections/DealFormSectionMainTable";
 
 function formatDateSimple(dateString: string): string {
   if (!dateString) return "";
@@ -126,7 +126,7 @@ const EquityNewDealFormMain: React.FC = () => {
           />
         </Box>
 
-        <DealFormSectionMain selectedOption={selectedOption} />
+        <DealFormSectionMainTable selectedOption={selectedOption} />
       </Box>
     </Paper>
   );

@@ -16,8 +16,8 @@ interface Props {
   selectedOption: SelectedOption | null;
 }
 
-const DealFormSectionMain: React.FC<Props> = ({ selectedOption }) => {
-  const [formData, setFormData] = useState<FormData | null>(null);
+const DealFormSectionMainTable: React.FC<Props> = ({ selectedOption }) => {
+  const [formData, setFormData] = useState<any>(null);
   const [isCreate, setIsCreate] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -162,4 +162,4 @@ const DealFormSectionMain: React.FC<Props> = ({ selectedOption }) => {
   );
 };
 
-export default DealFormSectionMain;
+export default DealFormSectionMainTable;
