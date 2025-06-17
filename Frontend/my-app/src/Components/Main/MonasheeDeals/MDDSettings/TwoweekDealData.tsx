@@ -39,7 +39,7 @@ const TwoWeekDealData: React.FC<TwoWeekDealDataProps> = ({ filters }) => {
         broad_region: filters.broad_region.length > 0 ? filters.broad_region : undefined,
         deal_type: filters.deal_type.length > 0 ? filters.deal_type : undefined,
         week: filters.week.length > 0 ? filters.week : undefined,
-        // Optionally include fo_type if needed by backend
+        fo_type: filters.fo_type.length > 0 ? filters.fo_type : undefined,
       };
 
       const response = await fetch(`${apiUrl}/api/weekly_dealstat/`, {
