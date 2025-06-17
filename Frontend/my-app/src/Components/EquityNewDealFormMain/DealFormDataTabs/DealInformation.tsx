@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Grid, TextField, Typography, MenuItem } from '@mui/material';
+import { Card, CardContent, Grid, TextField, Typography, MenuItem, Box } from '@mui/material';
 import { Info } from 'lucide-react';
 import { FormSectionProps } from '../../../types/NewDealFormData';
 
@@ -13,10 +13,15 @@ const DealInformation: React.FC<FormSectionProps> = ({ data, editable, onChange 
   const regions = ['APAC', 'EMEA', 'Americas'];
   const sectors = ['Industrials', 'Technology', 'Healthcare', 'Financials', 'Energy', 'Consumer'];
 
+const gradientBackground = {
+  background: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #fbc2eb 100%)',
+  padding: 2,
+  borderRadius: 4,
+  boxShadow: 3,
+};
   return (
-    <Card elevation={1}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+    <>
+        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }} align='center'>
           <Info size={20} />
           Deal Information
         </Typography>
@@ -148,8 +153,7 @@ const DealInformation: React.FC<FormSectionProps> = ({ data, editable, onChange 
             />
           </Grid>
         </Grid>
-      </CardContent>
-    </Card>
+        </>
   );
 };
 
