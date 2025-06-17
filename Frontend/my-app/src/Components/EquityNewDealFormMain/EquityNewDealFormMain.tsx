@@ -8,6 +8,7 @@ import {
   Paper,
   Alert,
   CircularProgress,
+  Typography,
 } from "@mui/material";
 import { Search, Plus } from "lucide-react";
 import { SelectedOption, TickerOption } from "../../types/NewDealFormData";
@@ -17,7 +18,11 @@ function formatDateSimple(dateString: string): string {
   if (!dateString) return "";
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return dateString;
-  return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 const EquityNewDealFormMain: React.FC = () => {
@@ -32,9 +37,8 @@ const EquityNewDealFormMain: React.FC = () => {
   const handleSearchClick = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Mock API call - replace with actual endpoint
       const response = await axios.get(`${apiUrl}/api/new_deal_ticker_list/`, {
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +56,6 @@ const EquityNewDealFormMain: React.FC = () => {
 
   const handleCreateClick = () => {
     setSelectedOption({ ticker: "", pricing_date: "", create: true });
-    
     if (autoCompleteRef.current) {
       autoCompleteRef.current.value = "";
     }
@@ -67,20 +70,31 @@ const EquityNewDealFormMain: React.FC = () => {
   };
 
   return (
-    <Paper elevation={2} sx={{ p: 3 }}>
-      <Box display="flex" flexDirection="column" gap={3}>
-        {error && (
-          <Alert severity="warning" onClose={() => setError(null)}>
-            {error}
-          </Alert>
-        )}
-        
-        <Box display="flex" justifyContent="flex-end" alignItems="center" gap={2}>
+    <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        flexWrap="wrap"
+        mb={3}
+      >
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 600, color: "#002060", mb: 0.5 }}
+          >
+            Equity New Deal Form
+          </Typography>
+          <Typography variant="body1" color="#002060">
+            Create or search for an equity deal by ticker and pricing date to get the complete deal form.
+          </Typography>
+        </Box>
+        <Box display="flex" alignItems="center" gap={2} mt={{ xs: 2, sm: 0 }}>
           <Button
             variant="contained"
             startIcon={<Plus size={18} />}
             onClick={handleCreateClick}
-            sx={{ minWidth: 120 }}
+            sx={{ minWidth: 130, textTransform: "none" }}
           >
             Create New
           </Button>
@@ -105,7 +119,7 @@ const EquityNewDealFormMain: React.FC = () => {
                   startAdornment: <Search size={18} style={{ marginRight: 8, color: '#666' }} />,
                   endAdornment: (
                     <>
-                      {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                      {loading && <CircularProgress color="inherit" size={20} />}
                       {params.InputProps.endAdornment}
                     </>
                   ),
@@ -125,9 +139,15 @@ const EquityNewDealFormMain: React.FC = () => {
             )}
           />
         </Box>
-
-        <DealFormSectionMainTable selectedOption={selectedOption} />
       </Box>
+
+      {error && (
+        <Alert severity="warning" onClose={() => setError(null)} sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      <DealFormSectionMainTable selectedOption={selectedOption} />
     </Paper>
   );
 };
