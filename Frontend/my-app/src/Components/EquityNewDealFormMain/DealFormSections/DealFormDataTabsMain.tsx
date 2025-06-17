@@ -48,8 +48,8 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate }) => {
       const token = localStorage.getItem("access_token");
 
       const url = isCreate
-        ? `${apiUrl}/api/create_deal_form/`
-        : `${apiUrl}/api/update_data/`;
+        ? `${apiUrl}/api/create_new_deal_form/`
+        : `${apiUrl}/api/update_new_deal_form/`;
 
       const response = await axios.post(url, localData, {
         headers: {
