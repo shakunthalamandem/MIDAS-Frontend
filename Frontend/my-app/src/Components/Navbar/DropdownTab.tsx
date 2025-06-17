@@ -38,6 +38,7 @@ const DropdownTab: React.FC<DropdownTabProps> = ({ label, menuItems, selectedTab
         sx={{
           color: "#005166",
           fontWeight: "bold",
+          fontSize: "0.725rem",
           mx: 1,
           borderBottom: selectedTab === label ? "3px solid #005166" : "3px solid transparent",
           borderRadius: 0,
@@ -51,7 +52,7 @@ const DropdownTab: React.FC<DropdownTabProps> = ({ label, menuItems, selectedTab
       </Button>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {menuItems.map((item) => (
-          <MenuItem key={item.label} onClick={() => handleMenuItemClick(item.path)} sx={{ color: "#005166" }}>
+          <MenuItem key={item.label} onClick={() => handleMenuItemClick(item.path)} sx={{ color: "#005166",fontSize:'0.85rem' }}>
             {item.label}
           </MenuItem>
         ))}
