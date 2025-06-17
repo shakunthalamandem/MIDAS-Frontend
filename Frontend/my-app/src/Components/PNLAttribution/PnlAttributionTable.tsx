@@ -53,9 +53,7 @@ const PnlAttributionTable: React.FC = () => {
   const collapsedOnlyAssets = ["Cash", "Warrants", "Futures"];
 
   const handleAssetClick = (assetType: string) => {
-    const url = `/portfolio-attribution/details/${encodeURIComponent(
-      assetType
-    )}`;
+    const url = `/portfolio-attribution/details/${encodeURIComponent(assetType)}`;
     window.open(url, "_blank");
   };
 
@@ -73,7 +71,7 @@ const PnlAttributionTable: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      setLoading(false);
       try {
         const res = await fetch(`${apiUrl}/api/pnls_summary/`, {
           headers: {
@@ -97,9 +95,7 @@ const PnlAttributionTable: React.FC = () => {
             );
 
             if (!isAllZero) {
-              Object.keys(monthValues).forEach((month) =>
-                monthSet.add(month)
-              );
+              Object.keys(monthValues).forEach((month) => monthSet.add(month));
               rows.push({
                 assetType,
                 fundName,
@@ -140,39 +136,58 @@ const PnlAttributionTable: React.FC = () => {
     fetchData();
   }, [apiUrl, token]);
 
+  const cellBorder = { border: "1px solid black", textAlign: "center" };
+  const totalRowBgColor = "rgb(145, 206, 137)";
+
   return (
     <Container>
-      <TableContainer
-        component={Paper}
-        sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: 3 }}
-      >
-        <Typography variant="h6" sx={{ p: 2 }} align="center" color="#002060">
-          Fund-Level Performance Breakdown
-        </Typography>
-            <Typography variant="body1" align="left" sx={{ color: "#666", mb: 2 ,p: 2}}>
-                Dive deeper into the performance drivers by analyzing how each
-                individual fund has contributed to overall P&L. This breakdown allows
-                for a granular view of asset-specific returns, strategy effectiveness,
-                and risk-adjusted performance across the Monashee platform.
-              </Typography>
+      
+        <Typography
+  variant="h6"
+  sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}
+>
+  Fund-Level Performance Breakdown
+</Typography>
 
+        <Typography
+          variant="body1"
+          align="left"
+          sx={{ color: "#666", mb: 2, p: 2 }}
+        >
+          Dive deeper into the performance drivers by analyzing how each
+          individual fund has contributed to overall P&L. This breakdown allows
+          for a granular view of asset-specific returns, strategy effectiveness,
+          and risk-adjusted performance across the Monashee platform.
+        </Typography>
+<TableContainer
+          component={Paper}
+          sx={{
+            mt: 4,
+            mb: 4,
+            borderRadius: 2,
+            boxShadow: 3,
+            // maxHeight: 500,
+            overflow: "auto",
+            border: "1px solid #000",
+          }}
+        >
         {loading ? (
           <CircularProgress sx={{ m: 2 }} />
         ) : (
-          <Table size="small">
+          <Table size="small" sx={{ borderCollapse: "collapse" }}>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
-                <TableCell sx={{ color: "#ffffff" }}>
+                <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
                   <b>Asset Type</b>
                 </TableCell>
-                <TableCell sx={{ color: "#ffffff" }}>
+                <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
                   <b>Fund Name</b>
                 </TableCell>
                 {months.map((month) => (
                   <TableCell
                     key={month}
-                    align="right"
-                    sx={{ color: "#ffffff" }}
+                    align="center"
+                    sx={{ color: "#ffffff", ...cellBorder }}
                   >
                     <b>{month}</b>
                   </TableCell>
@@ -210,9 +225,13 @@ const PnlAttributionTable: React.FC = () => {
                   const showCollapsed = collapsedOnlyAssets.includes(assetType);
                   const isExpanded = expandedAssets.has(assetType);
 
+                  const sortedFundRows = [...fundRows].sort((a, b) =>
+                    a.fundName.localeCompare(b.fundName)
+                  );
+
                   const totals: { [month: string]: number } = {};
                   months.forEach((month) => {
-                    totals[month] = fundRows.reduce(
+                    totals[month] = sortedFundRows.reduce(
                       (sum, row) => sum + (row.values[month] ?? 0),
                       0
                     );
@@ -220,69 +239,77 @@ const PnlAttributionTable: React.FC = () => {
 
                   if (showCollapsed && !isExpanded) {
                     rows.push(
-                      <TableRow
-                        key={`${assetType}-total`}
-                        sx={{ backgroundColor: "#c8e6c9" }}
-                      >
+                      <TableRow key={`${assetType}-total`}>
                         <TableCell
                           sx={{
                             fontWeight: "bold",
                             textDecoration: "underline",
                             color: "#f40b00",
                             cursor: "pointer",
+                            ...cellBorder,
+                            backgroundColor: "inherit", 
                           }}
                           onClick={() => handleAssetClick(assetType)}
                         >
                           {assetType}
                         </TableCell>
-                        <TableCell>
-                          <b>
-                           
-                            Total
-                             <IconButton
-                              size="small"
-                              onClick={() => toggleExpand(assetType)}
-                            >
-                              <AddIcon fontSize="small" />
-                            </IconButton>
-                          </b>
+                        <TableCell
+                          sx={{
+                            ...cellBorder,
+                            backgroundColor: totalRowBgColor, // only totals have bg color
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Total{" "}
+                          <IconButton size="small" onClick={() => toggleExpand(assetType)}>
+                            <AddIcon fontSize="small" />
+                          </IconButton>
                         </TableCell>
                         {months.map((month) => (
-                          <TableCell key={month} align="right">
-                            <b>{formatCurrency(totals[month])}</b>
+                          <TableCell
+                            key={month}
+                            align="center"
+                            sx={{
+                              ...cellBorder,
+                              backgroundColor: totalRowBgColor, // totals background color here too
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {formatCurrency(totals[month])}
                           </TableCell>
                         ))}
                       </TableRow>
+
                     );
                     return;
                   }
 
-                  fundRows.forEach((row, idx) => {
+                  sortedFundRows.forEach((row, idx) => {
                     rows.push(
                       <TableRow key={`${assetType}-${idx}`}>
                         {idx === 0 && (
                           <TableCell
-                            rowSpan={fundRows.length + 1}
+                            rowSpan={sortedFundRows.length + 1}
                             sx={{
                               cursor: "pointer",
                               fontWeight: "bold",
                               textDecoration: "underline",
-                              bgcolor: "#e3f2fd",
+                              // bgcolor: "#e3f2fd",
                               color: "#f40b00",
                               "&:hover": {
                                 textDecoration: "underline",
                                 opacity: 0.8,
                               },
+                              ...cellBorder,
                             }}
                             onClick={() => handleAssetClick(assetType)}
                           >
                             {assetType}
                           </TableCell>
                         )}
-
-                        <TableCell>{row.fundName}</TableCell>
+                        <TableCell sx={cellBorder}>{row.fundName}</TableCell>
                         {months.map((month) => (
-                          <TableCell key={month} align="right">
+                          <TableCell key={month} align="center" sx={cellBorder}>
                             {formatCurrency(row.values[month] ?? 0)}
                           </TableCell>
                         ))}
@@ -293,13 +320,12 @@ const PnlAttributionTable: React.FC = () => {
                   rows.push(
                     <TableRow
                       key={`${assetType}-total`}
-                      sx={{ backgroundColor: "#c8e6c9" }}
+                      sx={{ backgroundColor: totalRowBgColor }}
                     >
-                      <TableCell colSpan={1}>
+                      <TableCell colSpan={1} sx={cellBorder}>
                         {collapsedOnlyAssets.includes(assetType) ? (
                           <b>
-                            
-                            Total
+                            Total{" "}
                             <IconButton
                               size="small"
                               onClick={() => toggleExpand(assetType)}
@@ -312,7 +338,7 @@ const PnlAttributionTable: React.FC = () => {
                         )}
                       </TableCell>
                       {months.map((month) => (
-                        <TableCell key={month} align="right">
+                        <TableCell key={month} align="center" sx={cellBorder}>
                           <b>{formatCurrency(totals[month])}</b>
                         </TableCell>
                       ))}

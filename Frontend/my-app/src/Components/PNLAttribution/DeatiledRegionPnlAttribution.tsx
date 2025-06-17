@@ -64,7 +64,6 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
         const jsonData: Record<string, Record<string, BaseData>> = await response.json();
         setData(jsonData);
 
-        // Extract dynamic month columns by excluding known keys
         const firstRegion = Object.values(jsonData)[0];
         const firstFund = firstRegion ? Object.values(firstRegion)[0] : null;
 
@@ -96,6 +95,9 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
     );
   }
 
+  // Define the desired region order
+  const regionOrder = ["US", "EMEA", "APAC", "Non-US America"];
+
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
       <Typography
@@ -103,7 +105,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
         gutterBottom
         sx={{ fontWeight: "bold", color: "#002060", mb: 2, textAlign: "center" }}
       >
-        Detailed Region-wise PnL for  {assetType}
+        Detailed Region-wise PnL for {assetType}
       </Typography>
       <TableContainer component={Paper} sx={{ border: "1px solid #000" }}>
         <Table aria-label="Detailed Region PnL Attribution" sx={{ borderCollapse: "collapse" }}>
@@ -120,7 +122,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                   width: "120px",
                 }}
               >
-                Broad Region
+                Region
               </TableCell>
               <TableCell
                 sx={{
@@ -134,14 +136,13 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
               >
                 Fund
               </TableCell>
-
               {monthColumns.map((month) => (
                 <TableCell
                   key={month}
                   sx={{
                     color: "#fff",
                     border: "1px solid #000",
-                    textAlign: "center", // Ensures the month columns are also center-aligned
+                    textAlign: "center",
                     fontWeight: "bold",
                     padding: "4px 8px",
                     fontSize: "0.875rem",
@@ -150,12 +151,11 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                   {month}
                 </TableCell>
               ))}
-
               <TableCell
                 sx={{
                   color: "#fff",
                   border: "1px solid #000",
-                  textAlign: "center", // Ensures YTD column is center-aligned
+                  textAlign: "center",
                   fontWeight: "bold",
                   padding: "4px 8px",
                   fontSize: "0.875rem",
@@ -165,149 +165,137 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
               </TableCell>
             </TableRow>
           </TableHead>
-
           <TableBody>
-            {Object.entries(data).map(([region, keys]) => {
-              const fundEntries = Object.entries(keys).sort(([fundA], [fundB]) =>
-                fundA.localeCompare(fundB)
-              ); // Sort the funds alphabetically
-              const regionSpan = fundEntries.length;
+            {regionOrder
+              .filter((region) => data[region]) // Only regions present in data
+              .map((region) => {
+                const funds = data[region];
+                const fundEntries = Object.entries(funds).sort(([a], [b]) => a.localeCompare(b));
+                const regionSpan = fundEntries.length;
 
-              // Calculate totals for the region
-              const totals = fundEntries.reduce(
-                (acc, [, row]) => {
-                  monthColumns.forEach((month) => {
-                    const val = Number(row[month]) || 0;
-                    acc[month] = (acc[month] || 0) + val;
-                  });
-                  acc.YTD = (acc.YTD || 0) + (Number(row.YTD) || 0);
-                  return acc;
-                },
-                {} as Record<string, number>
-              );
+                // Calculate totals for the region
+                const totals = fundEntries.reduce(
+                  (acc, [, row]) => {
+                    monthColumns.forEach((month) => {
+                      const val = Number(row[month]) || 0;
+                      acc[month] = (acc[month] || 0) + val;
+                    });
+                    acc.YTD = (acc.YTD || 0) + (Number(row.YTD) || 0);
+                    return acc;
+                  },
+                  {} as Record<string, number>
+                );
 
-              return (
-                <React.Fragment key={region}>
-                  {fundEntries.map(([key, row], idx) => {
-                    const isLastInRegion = idx === fundEntries.length - 1;
-                    return (
-                      <TableRow
-                        key={`${region}-${key}`}
-                        sx={{
-                          borderBottom: isLastInRegion ? "2px solid #000" : undefined,
-                        }}
-                      >
-                        {/* Render broad_region cell once per region with rowSpan */}
-                        {idx === 0 && (
-                          <TableCell
-                            rowSpan={regionSpan + 1} // +1 for total row
-                            sx={{
-                              border: "none",
-                              borderRight: "1px solid #000",
-                              borderBottom: isLastInRegion ? "2px solid #000" : "none",
-                              textAlign: "center", // Center-align broad region column
-                              verticalAlign: "middle",
-                              fontWeight: "bold",
-                            //   backgroundColor: "#f5f5f5",
-                              width: "120px",
-                              padding: "4px 8px",
-                              fontSize: "0.875rem",
-                            }}
-                          >
-                            {region}
-                          </TableCell>
-                        )}
-
-                        <TableCell
-                          sx={{
-                            border: "1px solid #000",
-                            textAlign: "center", // Center-align fund column
-                            padding: "4px 8px",
-                            fontSize: "0.875rem",
-                          }}
+                return (
+                  <React.Fragment key={region}>
+                    {fundEntries.map(([fundName, row], idx) => {
+                      const isLast = idx === fundEntries.length - 1;
+                      return (
+                        <TableRow
+                          key={`${region}-${fundName}`}
+                          sx={{ borderBottom: isLast ? "2px solid #000" : undefined }}
                         >
-                          {key}
-                        </TableCell>
-
-                        {monthColumns.map((month) => (
+                          {idx === 0 && (
+                            <TableCell
+                              rowSpan={regionSpan + 1}
+                              sx={{
+                                border: "none",
+                                borderRight: "1px solid #000",
+                                borderBottom: isLast ? "2px solid #000" : "none",
+                                textAlign: "center",
+                                verticalAlign: "middle",
+                                fontWeight: "bold",
+                                width: "120px",
+                                padding: "4px 8px",
+                                fontSize: "0.875rem",
+                              }}
+                            >
+                              {region}
+                            </TableCell>
+                          )}
                           <TableCell
-                            key={`${region}-${key}-${month}`}
                             sx={{
                               border: "1px solid #000",
-                              textAlign: "center", // Center-align month columns
+                              textAlign: "center",
                               padding: "4px 8px",
                               fontSize: "0.875rem",
                             }}
                           >
-                            {formatNumber(row[month] as number)}
+                            {fundName}
                           </TableCell>
-                        ))}
-
-                        <TableCell
-                          sx={{
-                            border: "1px solid #000",
-                            textAlign: "center", // Center-align YTD column
-                            padding: "4px 8px",
-                            fontSize: "0.875rem",
-                          }}
-                        >
-                          {formatNumber(row.YTD as number)}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-
-                  {/* Total Row for region */}
-                  <TableRow
-                    sx={{
-                      backgroundColor: "rgb(145, 206, 137)", // Apply background color for the entire row
-                      fontWeight: "bold",
-                      borderTop: "2px solid #000",
-                      borderBottom: "2px solid #000",
-                    }}
-                  >
-                    {/* Broad Region & Fund combined cell with colspan=2 */}
-                    <TableCell
-                      colSpan={1}
+                          {monthColumns.map((month) => (
+                            <TableCell
+                              key={`${region}-${fundName}-${month}`}
+                              sx={{
+                                border: "1px solid #000",
+                                textAlign: "center",
+                                padding: "4px 8px",
+                                fontSize: "0.875rem",
+                              }}
+                            >
+                              {formatNumber(row[month] as number)}
+                            </TableCell>
+                          ))}
+                          <TableCell
+                            sx={{
+                              border: "1px solid #000",
+                              textAlign: "center",
+                              padding: "4px 8px",
+                              fontSize: "0.875rem",
+                            }}
+                          >
+                            {formatNumber(row.YTD)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                    <TableRow
                       sx={{
-                        border: "1px solid #000",
+                        backgroundColor: "rgb(145, 206, 137)",
                         fontWeight: "bold",
-                        textAlign: "center", // Center-align the text in this cell
-                        padding: "4px 8px",
-                        fontSize: "0.875rem",
+                        borderTop: "2px solid #000",
+                        borderBottom: "2px solid #000",
                       }}
                     >
-                      Total for {region}
-                    </TableCell>
-
-                    {monthColumns.map((month) => (
                       <TableCell
-                        key={`${region}-total-${month}`}
+                        colSpan={1}
                         sx={{
                           border: "1px solid #000",
-                          textAlign: "center", // Center-align month totals
+                          fontWeight: "bold",
+                          textAlign: "center",
                           padding: "4px 8px",
                           fontSize: "0.875rem",
                         }}
                       >
-                        {formatNumber(totals[month])}
+                        Total for {region}
                       </TableCell>
-                    ))}
-
-                    <TableCell
-                      sx={{
-                        border: "1px solid #000",
-                        textAlign: "center", // Center-align total YTD
-                        padding: "4px 8px",
-                        fontSize: "0.875rem",
-                      }}
-                    >
-                      {formatNumber(totals.YTD)}
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
-              );
-            })}
+                      {monthColumns.map((month) => (
+                        <TableCell
+                          key={`${region}-total-${month}`}
+                          sx={{
+                            border: "1px solid #000",
+                            textAlign: "center",
+                            padding: "4px 8px",
+                            fontSize: "0.875rem",
+                          }}
+                        >
+                          {formatNumber(totals[month])}
+                        </TableCell>
+                      ))}
+                      <TableCell
+                        sx={{
+                          border: "1px solid #000",
+                          textAlign: "center",
+                          padding: "4px 8px",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        {formatNumber(totals.YTD)}
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                );
+              })}
           </TableBody>
         </Table>
       </TableContainer>
