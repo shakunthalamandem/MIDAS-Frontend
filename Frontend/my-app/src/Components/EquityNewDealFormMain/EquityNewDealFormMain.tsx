@@ -7,7 +7,7 @@ import {
   Autocomplete,
   Typography,
 } from "@mui/material";
-import DealFormSectionMain from "./DealFormSections/DealFormSectionMain";
+import DealFormSectionMainTable from "./DealFormSections/DealFormSectionMainTable";
 
 const formatDateSimple = (dateString: string) => {
   const date = new Date(dateString);
@@ -94,7 +94,7 @@ const EquityNewDealFormMain = () => {
         />
       </Box>
 
-      <DealFormSectionMain selectedOption={selectedOption} />
+      <DealFormSectionMainTable selectedOption={selectedOption} />
     </Box>
   );
 };

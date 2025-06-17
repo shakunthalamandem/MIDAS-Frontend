@@ -5,7 +5,7 @@ interface Props {
   selectedOption: any;
 }
 
-const DealFormSectionMain: React.FC<Props> = ({ selectedOption }) => {
+const DealFormSectionMainTable: React.FC<Props> = ({ selectedOption }) => {
   const [formData, setFormData] = useState<any>(null);
   const [isCreate, setIsCreate] = useState<boolean>(false);
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -48,4 +48,4 @@ const DealFormSectionMain: React.FC<Props> = ({ selectedOption }) => {
   return <DealFormDataTabsMain formData={formData} isCreate={isCreate} />;
 };
 
-export default DealFormSectionMain;
+export default DealFormSectionMainTable;
