@@ -89,7 +89,7 @@ const CombinedSelectedTicker: React.FC<SelectedTickerProps> = ({ ticker }) => {
       sx={{
         width: "100%",
         minHeight: "100vh",
-        padding: 3,
+        paddingTop: 3,
         bgcolor: "#fafafa",
         overflowX: "hidden",
       }}

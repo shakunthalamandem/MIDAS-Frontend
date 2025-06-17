@@ -100,7 +100,7 @@ const AllocationCaptureReturn = () => {
           position: "relative",
           backgroundColor: "#f4f6fa",
           minHeight: "100vh",
-          p: 2,
+          paddingTop: 2
         }}
       >
         <MddMain apiName="gap_analysis" />
