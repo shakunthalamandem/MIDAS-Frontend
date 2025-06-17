@@ -32,13 +32,7 @@ const DealInformation: React.FC<FormSectionProps> = ({
     "Consumer",
   ];
 
-  const gradientBackground = {
-    background:
-      "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #fbc2eb 100%)",
-    padding: 2,
-    borderRadius: 4,
-    boxShadow: 3,
-  };
+
   return (
     <>
       <Typography variant="h6" gutterBottom align="center" color="#002060">
