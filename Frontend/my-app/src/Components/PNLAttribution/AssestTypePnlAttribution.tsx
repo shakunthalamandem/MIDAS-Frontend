@@ -195,7 +195,7 @@ const AssestTypePnlAttribution: React.FC = () => {
                       onClick={() => handleAssetClick(assetType)}
                     >
                       {assetType}
-                    </TableCell>
+                    </TableCell>  
                     <TableCell
                       onClick={() =>
                         setExpanded((prev) => ({

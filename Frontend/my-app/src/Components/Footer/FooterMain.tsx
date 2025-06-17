@@ -87,7 +87,6 @@ const FooterMain: React.FC = () => {
           width: '100%',
         }}
       >
-        <ArrowUpwardIcon sx={{ color: '#FFFFFF', cursor: 'pointer' }} />
       </Box>
       <Typography
         variant={isMobile ? 'body1' : 'h6'}
