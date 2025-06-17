@@ -6,7 +6,6 @@ import DealAllocations from '../DealFormDataTabs/DealAllocations';
 import MarketData from '../DealFormDataTabs/MarketData';
 import TechnicalMarketData from '../DealFormDataTabs/TechnicalMarketData';
 import DealColor from '../DealFormDataTabs/DealColor';
-import { FormSectionProps } from '../../../types/NewDealFormData';
 
 interface FormData {
   deal_information: Record<string, any>;
