@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Stack, Alert, Snackbar } from '@mui/material';
+import { Box, Button, Stack, Alert, Snackbar, Card, CardContent,Grid } from '@mui/material';
 import { Save, Edit, Ambulance as Cancel, RotateCcw, Plus } from 'lucide-react';
 import DealInformation from '../DealFormDataTabs/DealInformation';
 import DealAllocations from '../DealFormDataTabs/DealAllocations';
@@ -77,6 +77,12 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate }) => {
     }));
   };
 
+const gradientBackground = {
+  background: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #fbc2eb 100%)',
+  padding: 2,
+  borderRadius: 4,
+  boxShadow: 3,
+};
   return (
     <Box display="flex" flexDirection="column" gap={3}>
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
@@ -117,35 +123,57 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate }) => {
           </Button>
         )}
       </Stack>
-      <DealInformation 
-        data={localData?.deal_information || {}} 
-        editable={editable} 
-        onChange={(data: Record<string, any>) => updateSection('deal_information', data)} 
-      />
-      
-      <DealAllocations 
-        data={localData?.deal_allocations || {}} 
-        editable={editable} 
-        onChange={(data: Record<string, any>) => updateSection('deal_allocations', data)} 
-      />
-      
-      <MarketData 
-        data={localData?.market_data || {}} 
-        editable={editable} 
-        onChange={(data: Record<string, any>) => updateSection('market_data', data)} 
-      />
-      
-      <TechnicalMarketData 
-        data={localData?.technical_market_data || {}} 
-        editable={editable} 
-        onChange={(data: Record<string, any>) => updateSection('technical_market_data', data)} 
-      />
-      
-      <DealColor 
-        data={localData?.deal_color || {}} 
-        editable={editable} 
-        onChange={(data: Record<string, any>) => updateSection('deal_color', data)} 
-      />
+ <Grid container spacing={2}>
+      <Grid item xs={12} md={6}>
+        <Box sx={gradientBackground}>
+          <DealInformation
+            data={localData?.deal_information || {}}
+            editable={editable}
+            onChange={(data) => updateSection('deal_information', data)}
+          />
+        </Box>
+      </Grid>
+
+      <Grid item xs={12} md={6}>
+        <Box sx={gradientBackground}>
+          <DealAllocations
+            data={localData?.deal_allocations || {}}
+            editable={editable}
+            onChange={(data) => updateSection('deal_allocations', data)}
+          />
+        </Box>
+      </Grid>
+
+      <Grid item xs={12} md={6}>
+        <Box sx={gradientBackground}>
+          <MarketData
+            data={localData?.market_data || {}}
+            editable={editable}
+            onChange={(data) => updateSection('market_data', data)}
+          />
+        </Box>
+      </Grid>
+
+      <Grid item xs={12} md={6}>
+        <Box sx={gradientBackground}>
+          <TechnicalMarketData
+            data={localData?.technical_market_data || {}}
+            editable={editable}
+            onChange={(data) => updateSection('technical_market_data', data)}
+          />
+        </Box>
+      </Grid>
+
+      <Grid item xs={12} >
+        <Box sx={gradientBackground}>
+          <DealColor
+            data={localData?.deal_color || {}}
+            editable={editable}
+            onChange={(data) => updateSection('deal_color', data)}
+          />
+        </Box>
+      </Grid>
+    </Grid>
 
       <Snackbar
         open={snackbar.open}
