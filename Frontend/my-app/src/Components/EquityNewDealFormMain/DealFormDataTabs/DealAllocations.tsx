@@ -5,6 +5,7 @@ import {
   Typography,
   InputAdornment,
   Box,
+  MenuItem,
 } from "@mui/material";
 import { PieChart } from "lucide-react";
 import { FormSectionProps } from "../../../types/NewDealFormData";
@@ -17,6 +18,38 @@ const DealAllocations: React.FC<FormSectionProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...data, [e.target.name]: e.target.value });
   };
+  const sponsors = ["Y", "N"];
+  const renderSelectField = (
+    label: string,
+    name: string,
+    options: string[]
+  ) => (
+    <Grid item xs={12} sm={6} md={4}>
+      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+        {label}
+      </Typography>
+      <TextField
+        select
+        name={name}
+        value={data[name] || ""}
+        onChange={handleChange}
+        fullWidth
+        size="small"
+        variant="standard"
+        disabled={!editable}
+        InputProps={{
+          disableUnderline: !editable,
+          style: { color: "#002060" },
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
+          </MenuItem>
+        ))}
+      </TextField>
+    </Grid>
+  );
 
   const renderField = (
     label: string,
@@ -56,7 +89,7 @@ const DealAllocations: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
-        {renderField("Sponsor", "sponsor")}
+        {renderSelectField("Sponsor", "sponsor",sponsors)}
         {renderField("Percentage Primary", "percentage_primary", "%")}
         {renderField("Price (Local Currency)", "price_local_currency")}
         {renderField("Discount Percentage", "discount_percentage")}

@@ -18,16 +18,61 @@ const DealInformation: React.FC<FormSectionProps> = ({
     onChange({ ...data, [e.target.name]: e.target.value });
   };
 
-  const dealTypes = ["FO", "IPO", "Rights Issue", "Convertible"];
-  const foTypes = ["Block", "Accelerated Bookbuild", "Overnight"];
-  const regions = ["APAC", "EMEA", "Americas"];
+  // Correct options from your config
+  const regions = ["US", "EMEA", "APAC", "Non-US America"];
+  const dealTypes = ["IPO", "FO"];
+  const foTypes = ["Marketed", "Overnight", "Block"];
   const sectors = [
-    "Industrials",
-    "Technology",
-    "Healthcare",
+    "Health Care",
+    "Information Technology",
     "Financials",
+    "Consumer Staples",
+    "Real Estate",
+    "Materials",
+    "Industrials",
     "Energy",
-    "Consumer",
+    "Utilities",
+    "Consumer Discretionary",
+    "Communication Services",
+  ];
+  const dealCaptains = ["Robin", "Tom", "Block", "HC", "Jay", "Others"];
+  const invitationBanks = [
+    "ABN AMRO Bank",
+    "Bank of America",
+    "Barclays",
+    "BMO Capital Markets",
+    "BNP Paribas",
+    "Canaccord Genuity",
+    "CIBC World Markets",
+    "Citigroup Global Markets Inc",
+    "Commerzbank Group",
+    "Cowen & Company LLC",
+    "Credit Suisse",
+    "Deutsche Bank",
+    "Evercore Inc",
+    "Goldman Sachs",
+    "HSBC",
+    "Jefferies LLC",
+    "JMP Securities LLC",
+    "JPMorgan",
+    "Keefe Bruyette & Woods",
+    "Lazard Capital Markets",
+    "Leerink Partners LLC",
+    "Morgan Stanley",
+    "Needham & Co LLC",
+    "Nomura Securities Co Ltd",
+    "Oppenheimer & Co Inc",
+    "Raymond James & Associates Inc",
+    "RBC Capital Markets",
+    "Robert W Baird & Co",
+    "SG Corporate & Investment Banking",
+    "Stifel",
+    "SunTrust Robinson Humphrey Inc",
+    "SVB Securities LLC",
+    "TD Securities Inc",
+    "UBS",
+    "William Blair & Co LLC",
+    "Others",
   ];
 
   const renderSelectField = (
@@ -91,7 +136,13 @@ const DealInformation: React.FC<FormSectionProps> = ({
 
   return (
     <>
-      <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600}>
+      <Typography
+        variant="h6"
+        gutterBottom
+        align="center"
+        color="#002060"
+        fontWeight={600}
+      >
         <Box display="inline-flex" alignItems="center" gap={1}>
           <Info size={20} />
           Deal Information
@@ -106,9 +157,8 @@ const DealInformation: React.FC<FormSectionProps> = ({
         {renderSelectField("Deal Type", "deal_type", dealTypes)}
         {renderSelectField("FO Type", "fo_type", foTypes)}
         {renderSelectField("Sector", "sector", sectors)}
-        {renderTextField("Deal Captain", "deal_captain")}
-        {renderTextField("Invitation Bank", "invitation_bank")}
-      
+        {renderSelectField("Deal Captain", "deal_captain", dealCaptains)}
+        {renderSelectField("Lead Bank", "invitation_bank", invitationBanks)}
       </Grid>
     </>
   );
