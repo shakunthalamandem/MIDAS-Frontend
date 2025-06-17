@@ -138,39 +138,39 @@ const PnlAttributionTable: React.FC = () => {
 
   const cellBorder = { border: "1px solid black", textAlign: "center" };
   const totalRowBgColor = "rgb(145, 206, 137)";
+  const overallRowBgColor = "#fde8b7";
 
   return (
     <Container>
-      
-        <Typography
-  variant="h6"
-  sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}
->
-  Fund-Level Performance Breakdown
-</Typography>
+      <Typography
+        variant="h6"
+        sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}
+      >
+        Fund-Level Performance Breakdown
+      </Typography>
 
-        <Typography
-          variant="body1"
-          align="left"
-          sx={{ color: "#666", mb: 2, p: 2 }}
-        >
-          Dive deeper into the performance drivers by analyzing how each
-          individual fund has contributed to overall P&L. This breakdown allows
-          for a granular view of asset-specific returns, strategy effectiveness,
-          and risk-adjusted performance across the Monashee platform.
-        </Typography>
-<TableContainer
-          component={Paper}
-          sx={{
-            mt: 4,
-            mb: 4,
-            borderRadius: 2,
-            boxShadow: 3,
-            // maxHeight: 500,
-            overflow: "auto",
-            border: "1px solid #000",
-          }}
-        >
+      <Typography
+        variant="body1"
+        align="left"
+        sx={{ color: "#666", mb: 2, p: 2 }}
+      >
+        Dive deeper into the performance drivers by analyzing how each
+        individual fund has contributed to overall P&L. This breakdown allows
+        for a granular view of asset-specific returns, strategy effectiveness,
+        and risk-adjusted performance across the Monashee platform.
+      </Typography>
+
+      <TableContainer
+        component={Paper}
+        sx={{
+          mt: 4,
+          mb: 4,
+          borderRadius: 2,
+          boxShadow: 3,
+          overflow: "auto",
+          border: "1px solid #000",
+        }}
+      >
         {loading ? (
           <CircularProgress sx={{ m: 2 }} />
         ) : (
@@ -207,6 +207,8 @@ const PnlAttributionTable: React.FC = () => {
                 );
 
                 const rows: JSX.Element[] = [];
+                const overallTotals: { [month: string]: number } = {};
+                months.forEach((m) => (overallTotals[m] = 0));
 
                 const assetOrder = [
                   "Equities",
@@ -235,6 +237,7 @@ const PnlAttributionTable: React.FC = () => {
                       (sum, row) => sum + (row.values[month] ?? 0),
                       0
                     );
+                    overallTotals[month] += totals[month]; // accumulate for overall
                   });
 
                   if (showCollapsed && !isExpanded) {
@@ -247,7 +250,7 @@ const PnlAttributionTable: React.FC = () => {
                             color: "#f40b00",
                             cursor: "pointer",
                             ...cellBorder,
-                            backgroundColor: "inherit", 
+                            backgroundColor: "inherit",
                           }}
                           onClick={() => handleAssetClick(assetType)}
                         >
@@ -256,11 +259,11 @@ const PnlAttributionTable: React.FC = () => {
                         <TableCell
                           sx={{
                             ...cellBorder,
-                            backgroundColor: totalRowBgColor, // only totals have bg color
+                            backgroundColor: totalRowBgColor,
                             fontWeight: "bold",
                           }}
                         >
-                          Total{" "}
+                          Sum{" "}
                           <IconButton size="small" onClick={() => toggleExpand(assetType)}>
                             <AddIcon fontSize="small" />
                           </IconButton>
@@ -271,7 +274,7 @@ const PnlAttributionTable: React.FC = () => {
                             align="center"
                             sx={{
                               ...cellBorder,
-                              backgroundColor: totalRowBgColor, // totals background color here too
+                              backgroundColor: totalRowBgColor,
                               fontWeight: "bold",
                             }}
                           >
@@ -279,7 +282,6 @@ const PnlAttributionTable: React.FC = () => {
                           </TableCell>
                         ))}
                       </TableRow>
-
                     );
                     return;
                   }
@@ -294,7 +296,6 @@ const PnlAttributionTable: React.FC = () => {
                               cursor: "pointer",
                               fontWeight: "bold",
                               textDecoration: "underline",
-                              // bgcolor: "#e3f2fd",
                               color: "#f40b00",
                               "&:hover": {
                                 textDecoration: "underline",
@@ -325,7 +326,7 @@ const PnlAttributionTable: React.FC = () => {
                       <TableCell colSpan={1} sx={cellBorder}>
                         {collapsedOnlyAssets.includes(assetType) ? (
                           <b>
-                            Total{" "}
+                            Sum{" "}
                             <IconButton
                               size="small"
                               onClick={() => toggleExpand(assetType)}
@@ -334,7 +335,7 @@ const PnlAttributionTable: React.FC = () => {
                             </IconButton>
                           </b>
                         ) : (
-                          <b>Total</b>
+                          <b>Sum </b>
                         )}
                       </TableCell>
                       {months.map((month) => (
@@ -345,6 +346,23 @@ const PnlAttributionTable: React.FC = () => {
                     </TableRow>
                   );
                 });
+
+                // Add Overall Total row
+                rows.push(
+                  <TableRow
+                    key="overall-total"
+                    sx={{ backgroundColor: overallRowBgColor }}
+                  >
+                    <TableCell colSpan={2} sx={{ ...cellBorder, fontWeight: "bold" }}>
+                      Overall Total
+                    </TableCell>
+                    {months.map((month) => (
+                      <TableCell key={month} align="center" sx={cellBorder}>
+                        <b>{formatCurrency(overallTotals[month])}</b>
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
 
                 return rows;
               })()}
