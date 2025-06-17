@@ -29,7 +29,6 @@ const assetOrder = [
   "Cash",
   "Warrants",
   "Futures",
-  // "Total", // Uncomment if your data contains total row
 ];
 
 const formatValue = (value?: number | null): string => {
@@ -91,6 +90,27 @@ const PnLSummary: React.FC = () => {
     }
   }, [token, apiUrl]);
 
+  const calculateTotals = (): { [range: string]: number } => {
+    const totals: { [range: string]: number } = {
+      DTD: 0,
+      MTD: 0,
+      QTD: 0,
+      YTD: 0,
+    };
+
+    assetOrder.forEach((assetType) => {
+      const assetData = data?.[assetType];
+      timeRanges.forEach((range) => {
+        const value = assetData?.[range];
+        if (typeof value === "number") {
+          totals[range] += value;
+        }
+      });
+    });
+
+    return totals;
+  };
+
   return (
     <Container>
       <Typography
@@ -141,9 +161,8 @@ const PnLSummary: React.FC = () => {
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                textAlign: "center", // <-- changed to center for all cells including first column
+                textAlign: "center",
               },
-              // Removed textAlign left on first column so all are centered
               "& thead th": {
                 backgroundColor: "#002060",
                 color: "#fff",
@@ -169,25 +188,14 @@ const PnLSummary: React.FC = () => {
               {assetOrder.map((assetType) => {
                 const values = data[assetType];
                 return (
-                  <TableRow
-                    key={assetType}
-                    className={assetType === "Total" ? "total-row" : undefined}
-                  >
-                    <TableCell
-                      sx={{ fontWeight: assetType === "Total" ? "bold" : 500 }}
-                    >
+                  <TableRow key={assetType}>
+                    <TableCell sx={{ fontWeight: 500 }}>
                       {assetType}
                     </TableCell>
                     {timeRanges.map((range) => {
                       const val = values?.[range];
                       return (
-                        <TableCell
-                          key={range}
-                          sx={{
-                            ...getCellStyle(val),
-                            fontWeight: assetType === "Total" ? "bold" : undefined,
-                          }}
-                        >
+                        <TableCell key={range} sx={getCellStyle(val)}>
                           {val !== null && val !== undefined ? formatValue(val) : "-"}
                         </TableCell>
                       );
@@ -195,6 +203,19 @@ const PnLSummary: React.FC = () => {
                   </TableRow>
                 );
               })}
+
+              {/* Total Row */}
+              <TableRow className="total-row">
+                <TableCell sx={{ fontWeight: "bold" }}>Total</TableCell>
+                {timeRanges.map((range) => {
+                  const totalValue = calculateTotals()[range];
+                  return (
+                    <TableCell key={range} sx={{ fontWeight: "bold" }}>
+                      {formatValue(totalValue)}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>

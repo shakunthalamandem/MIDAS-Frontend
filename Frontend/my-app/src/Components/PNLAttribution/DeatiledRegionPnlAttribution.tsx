@@ -95,8 +95,18 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
     );
   }
 
-  // Define the desired region order
   const regionOrder = ["US", "EMEA", "APAC", "Non-US America"];
+
+  // Overall total calculation
+  const overallTotals: Record<string, number> = {};
+  Object.values(data).forEach((regionData) => {
+    Object.values(regionData).forEach((fund) => {
+      monthColumns.forEach((month) => {
+        overallTotals[month] = (overallTotals[month] || 0) + (Number(fund[month]) || 0);
+      });
+      overallTotals.YTD = (overallTotals.YTD || 0) + (Number(fund.YTD) || 0);
+    });
+  });
 
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
@@ -167,13 +177,12 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
           </TableHead>
           <TableBody>
             {regionOrder
-              .filter((region) => data[region]) // Only regions present in data
+              .filter((region) => data[region])
               .map((region) => {
                 const funds = data[region];
                 const fundEntries = Object.entries(funds).sort(([a], [b]) => a.localeCompare(b));
                 const regionSpan = fundEntries.length;
 
-                // Calculate totals for the region
                 const totals = fundEntries.reduce(
                   (acc, [, row]) => {
                     monthColumns.forEach((month) => {
@@ -267,7 +276,7 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                           fontSize: "0.875rem",
                         }}
                       >
-                        Total for {region}
+                        Sum
                       </TableCell>
                       {monthColumns.map((month) => (
                         <TableCell
@@ -296,6 +305,51 @@ const DeatiledRegionPnlAttribution: React.FC = () => {
                   </React.Fragment>
                 );
               })}
+            {/* Overall Total Row */}
+            <TableRow
+              sx={{
+                backgroundColor: "#fde8b7",
+                fontWeight: "bold",
+                borderTop: "3px solid #000",
+                borderBottom: "3px solid #000",
+              }}
+            >
+              <TableCell
+                colSpan={2}
+                sx={{
+                  border: "1px solid #000",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  padding: "4px 8px",
+                  fontSize: "0.875rem",
+                }}
+              >
+                Overall Total
+              </TableCell>
+              {monthColumns.map((month) => (
+                <TableCell
+                  key={`overall-${month}`}
+                  sx={{
+                    border: "1px solid #000",
+                    textAlign: "center",
+                    padding: "4px 8px",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  {formatNumber(overallTotals[month])}
+                </TableCell>
+              ))}
+              <TableCell
+                sx={{
+                  border: "1px solid #000",
+                  textAlign: "center",
+                  padding: "4px 8px",
+                  fontSize: "0.875rem",
+                }}
+              >
+                {formatNumber(overallTotals.YTD)}
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
