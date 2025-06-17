@@ -1,134 +1,158 @@
 import React from "react";
 import {
-  Card,
-  CardContent,
   Grid,
   TextField,
   Typography,
-  InputAdornment,
   Box,
+  Slider,
+  styled,
 } from "@mui/material";
 import { Palette } from "lucide-react";
 import { FormSectionProps } from "../../../types/NewDealFormData";
 
-const DealColor: React.FC<FormSectionProps> = ({
-  data,
-  editable,
-  onChange,
-}) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+// Styled Slider
+const BlueSlider = styled(Slider)({
+  color: "#002060",
+  height: 6,
+  '& .MuiSlider-thumb': {
+    height: 16,
+    width: 16,
+    backgroundColor: "#002060",
+    border: "2px solid white",
+    transition: "0.3s ease-in-out",
+    '&:hover': {
+      boxShadow: "0 0 0 6px rgba(0, 32, 96, 0.2)",
+    },
+  },
+  '& .MuiSlider-track': {
+    border: "none",
+    backgroundColor: "#002060",
+  },
+  '& .MuiSlider-rail': {
+    opacity: 0.3,
+    backgroundColor: "#002060",
+  },
+});
+
+const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onChange({ ...data, [e.target.name]: e.target.value });
+  };
+
+  const handleSliderChange = (name: string, value: number) => {
+    onChange({ ...data, [name]: value });
   };
 
   return (
     <>
-      <Typography variant="h6" gutterBottom align="center" color="#002060">
+      <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600} mb={2}>
         <Box display="inline-flex" alignItems="center" gap={1}>
           <Palette size={20} />
           Deal Color & Additional Allocations
         </Box>
       </Typography>
+
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={4}>
+        {/* LEFT: Sliders */}
+        <Grid item xs={12} md={6}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <Typography gutterBottom color="#002060">
+                Long Only Allocation
+              </Typography>
+              <BlueSlider
+                value={Number(data.long_only_allocation_percent) || 0}
+                onChange={(_, value) =>
+                  handleSliderChange("long_only_allocation_percent", value as number)
+                }
+                valueLabelDisplay="auto"
+                step={1}
+                min={0}
+                max={100}
+                disabled={!editable}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Typography gutterBottom color="#002060">
+                Hedge Funds Allocation
+              </Typography>
+              <BlueSlider
+                value={Number(data.hedge_funds_allocation_percent) || 0}
+                onChange={(_, value) =>
+                  handleSliderChange("hedge_funds_allocation_percent", value as number)
+                }
+                valueLabelDisplay="auto"
+                step={1}
+                min={0}
+                max={100}
+                disabled={!editable}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Typography gutterBottom color="#002060">
+                Allocation Concentration %
+              </Typography>
+              <BlueSlider
+                value={Number(data.top_10_allocation_concentration_percent) || 0}
+                onChange={(_, value) =>
+                  handleSliderChange("top_10_allocation_concentration_percent", value as number)
+                }
+                valueLabelDisplay="auto"
+                step={1}
+                min={0}
+                max={100}
+                disabled={!editable}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Typography gutterBottom color="#002060">
+                Institutional vs Retail Allocation
+              </Typography>
+              <BlueSlider
+                value={Number(data.institutional_allocation_percent) || 0}
+                onChange={(_, value) =>
+                  onChange({
+                    ...data,
+                    institutional_allocation_percent: value,
+                    retail_allocation_percent: 100 - Number(value),
+                  })
+                }
+                valueLabelDisplay="auto"
+                step={1}
+                min={0}
+                max={100}
+                disabled={!editable}
+              />
+              <Box display="flex" justifyContent="space-between">
+                <Typography variant="body2" color="#002060">
+                  Institutional: {data.institutional_allocation_percent || 0}%
+                </Typography>
+                <Typography variant="body2" color="#002060">
+                  Retail: {data.retail_allocation_percent || 0}%
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        {/* RIGHT: Deal Color Text Area */}
+        <Grid item xs={12} md={6}>
           <TextField
             label="Deal Colour"
             name="deal_colour"
             value={data.deal_colour || ""}
             onChange={handleChange}
             fullWidth
+            multiline
+            minRows={10}
             size="small"
             disabled={!editable}
             variant={editable ? "outlined" : "filled"}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Institutional Allocation %"
-            name="institutional_allocation_percent"
-            value={data.institutional_allocation_percent || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Retail Allocation %"
-            name="retail_allocation_percent"
-            value={data.retail_allocation_percent || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Long Only Allocation %"
-            name="long_only_allocation_percent"
-            value={data.long_only_allocation_percent || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Hedge Funds Allocation %"
-            name="hedge_funds_allocation_percent"
-            value={data.hedge_funds_allocation_percent || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="International Allocation %"
-            name="international_allocation_percent"
-            value={data.international_allocation_percent || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Top 10 Allocation Concentration %"
-            name="top_10_allocation_concentration_percent"
-            value={data.top_10_allocation_concentration_percent || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>,
-            }}
+            InputLabelProps={{ style: { color: "#002060" } }}
+            InputProps={{ style: { color: "#002060" } }}
           />
         </Grid>
       </Grid>

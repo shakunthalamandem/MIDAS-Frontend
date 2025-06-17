@@ -1,7 +1,5 @@
 import React from "react";
 import {
-  Card,
-  CardContent,
   Grid,
   TextField,
   Typography,
@@ -32,142 +30,85 @@ const DealInformation: React.FC<FormSectionProps> = ({
     "Consumer",
   ];
 
+  const renderSelectField = (
+    label: string,
+    name: string,
+    options: string[]
+  ) => (
+    <Grid item xs={12} sm={6} md={4}>
+      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+        {label}
+      </Typography>
+      <TextField
+        select
+        name={name}
+        value={data[name] || ""}
+        onChange={handleChange}
+        fullWidth
+        size="small"
+        variant="standard"
+        disabled={!editable}
+        InputProps={{
+          disableUnderline: !editable,
+          style: { color: "#002060" },
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
+          </MenuItem>
+        ))}
+      </TextField>
+    </Grid>
+  );
+
+  const renderTextField = (
+    label: string,
+    name: string,
+    type: string = "text"
+  ) => (
+    <Grid item xs={12} sm={6} md={4}>
+      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+        {label}
+      </Typography>
+      <TextField
+        name={name}
+        type={type}
+        value={data[name] || ""}
+        onChange={handleChange}
+        fullWidth
+        size="small"
+        variant="standard"
+        disabled={!editable}
+        InputProps={{
+          disableUnderline: !editable,
+          style: { color: "#002060" },
+        }}
+        InputLabelProps={type === "date" ? { shrink: true } : undefined}
+      />
+    </Grid>
+  );
 
   return (
     <>
-      <Typography variant="h6" gutterBottom align="center" color="#002060">
+      <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600}>
         <Box display="inline-flex" alignItems="center" gap={1}>
           <Info size={20} />
           Deal Information
         </Box>
       </Typography>
+
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Ticker"
-            name="ticker"
-            value={data.ticker || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Pricing Date"
-            name="pricing_date"
-            type="date"
-            value={data.pricing_date || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Vendor/Issuer"
-            name="vendor_issuer"
-            value={data.vendor_issuer || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Region"
-            name="region"
-            select
-            value={data.region || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-          >
-            {regions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Deal Type"
-            name="deal_type"
-            select
-            value={data.deal_type || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-          >
-            {dealTypes.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="FO Type"
-            name="fo_type"
-            select
-            value={data.fo_type || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-          >
-            {foTypes.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Sector"
-            name="sector"
-            select
-            value={data.sector || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-          >
-            {sectors.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Deal Captain"
-            name="deal_captain"
-            value={data.deal_captain || ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-          />
-        </Grid>
+        {renderTextField("Ticker", "ticker")}
+        {renderTextField("Pricing Date", "pricing_date", "date")}
+        {renderTextField("Vendor/Issuer", "vendor_issuer")}
+        {renderSelectField("Region", "region", regions)}
+        {renderSelectField("Deal Type", "deal_type", dealTypes)}
+        {renderSelectField("FO Type", "fo_type", foTypes)}
+        {renderSelectField("Sector", "sector", sectors)}
+        {renderTextField("Deal Captain", "deal_captain")}
+        {renderTextField("Invitation Bank", "invitation_bank")}
+      
       </Grid>
     </>
   );
