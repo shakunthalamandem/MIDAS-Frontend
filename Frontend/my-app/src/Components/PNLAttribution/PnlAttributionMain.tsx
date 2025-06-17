@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import AssestTypePnlAttribution from "./AssestTypePnlAttribution";
 import PnLSummary from "./PnLSummary";
+import PnlAttributionTable from "./PnlAttributionTable";
 
 const PnlAttributionMain = () => {
   return (
@@ -35,7 +36,7 @@ const PnlAttributionMain = () => {
       {/* Components section */}
       <>
         <PnLSummary />
-        <AssestTypePnlAttribution />
+        <PnlAttributionTable />
       </>
     </Box>
   );
