@@ -149,6 +149,12 @@ const PnlAttributionTable: React.FC = () => {
         <Typography variant="h6" sx={{ p: 2 }} align="center" color="#002060">
           Fund-Level Performance Breakdown
         </Typography>
+            <Typography variant="body1" align="left" sx={{ color: "#666", mb: 2 ,p: 2}}>
+                Dive deeper into the performance drivers by analyzing how each
+                individual fund has contributed to overall P&L. This breakdown allows
+                for a granular view of asset-specific returns, strategy effectiveness,
+                and risk-adjusted performance across the Monashee platform.
+              </Typography>
 
         {loading ? (
           <CircularProgress sx={{ m: 2 }} />
