@@ -10,7 +10,7 @@ const MotionPaper = motion(Paper);
 
 const IntelligenceDashboard: React.FC = () => {
   return (
-    <Box display="flex" width="100%" p={2} bgcolor="#f5f9fc">
+    <Box display="flex" width="100%" pt={2} bgcolor="#f5f9fc">
       <Box display="flex" flexDirection="column" gap={4} width="100%">
 
         {/* First Section: Equity Intelligence */}
