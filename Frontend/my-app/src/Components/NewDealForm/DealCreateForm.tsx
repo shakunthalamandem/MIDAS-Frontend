@@ -79,7 +79,7 @@ const DealCreateForm = () => {
     setSelectedTicker({ ticker: ticker.toUpperCase() });
     setSearchTerm('');
     setResults([]);
-    navigate('/equity/issue_market', {
+    navigate('/deals/new_deal_form', {
       state: { ticker: ticker.toUpperCase() },
     });
     

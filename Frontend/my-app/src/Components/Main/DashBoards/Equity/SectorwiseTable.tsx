@@ -88,7 +88,7 @@ const SectorwiseTable: React.FC = () => {
   );
 
   const handleCardClick = () => {
-    window.open("/equity/capital-markets/skew-table", "_blank");
+    window.open("/opportunity/equity/skew-table", "_blank");
   };
 
   useEffect(() => {

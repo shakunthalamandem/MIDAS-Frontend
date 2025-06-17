@@ -10,25 +10,19 @@ import {
   MenuItem,
   Avatar,
   Tooltip,
-  Container,
 } from "@mui/material";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
 import Logs from "../Main/HomePage/Authentication/Logs";
 import Logout from "../Main/HomePage/Authentication/Logout";
-import EquityNavbar from "./EquityNavbar";
-import ConvertsNavbar from "./ConvertsNavbar";
-import HighYieldNavbar from "./HighYieldNavbar";
-// import MacroNavbar from "./MacroNavbar";
+import DropdownTab from "./DropdownTab";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [selectedTab, setSelectedTab] = useState<string>(() => {
-    return localStorage.getItem("selectedTab") || "Equity";
-  });
+  const [selectedTab, setSelectedTab] = useState<string>(() => localStorage.getItem("selectedTab") || "");
 
   const isSuperUser = localStorage.getItem("is_superuser") === "true";
   const [showLogs, setShowLogs] = useState(false);
@@ -44,25 +38,28 @@ const NavbarMain: React.FC = () => {
   const user = localStorage.getItem("user");
 
   useEffect(() => {
-    localStorage.setItem("selectedTab", selectedTab);
+    if (selectedTab) {
+      localStorage.setItem("selectedTab", selectedTab);
+    }
   }, [selectedTab]);
+
+  useEffect(() => {
+  if (location.pathname === "/") {
+    setSelectedTab("");
+    localStorage.removeItem("selectedTab");
+  }
+}, [location.pathname]);
 
   const handleTabSelect = (tabName: string) => {
     setSelectedTab(tabName);
     localStorage.setItem("selectedTab", tabName);
 
     switch (tabName) {
-      case "Equity":
-        navigate("/equity/dashboard");
-        break;
-      case "Converts":
-        navigate("/converts/capital-markets");
-        break;
-      case "High Yield":
-        navigate("/highyield/capital-markets");
-        break;
-      case "P&L":
+      case "P&L Attribution":
         navigate("/portfolio-attribution");
+        break;
+      case "Data & Analytics":
+        navigate("/data-analytics/writeups");
         break;
       default:
         break;
@@ -70,7 +67,7 @@ const NavbarMain: React.FC = () => {
   };
 
   const handleLogoutClick = () => {
-    setShowLogout(true); 
+    setShowLogout(true);
   };
 
   const handleConfirmLogout = async () => {
@@ -87,7 +84,7 @@ const NavbarMain: React.FC = () => {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
-      localStorage.removeItem("selectedTab"); // Clear tab on logout
+      localStorage.removeItem("selectedTab");
 
       setLoading(false);
       navigate("/login");
@@ -99,12 +96,10 @@ const NavbarMain: React.FC = () => {
   };
 
   const handleCancelLogout = () => {
-    setShowLogout(false); // Cancel logout confirmation
+    setShowLogout(false);
   };
 
   const isLoggedIn = !!localStorage.getItem("access_token");
-
-  
 
   const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -117,11 +112,10 @@ const NavbarMain: React.FC = () => {
     handleMenuClose();
   };
 
-
   return (
     <>
       <AppBar position="sticky" sx={{ backgroundColor: "#FFFFFF", zIndex: 1200 }}>
-        {(location.pathname === "/equity/strategies" ||
+        {(location.pathname === "/macro/prime" ||
           location.pathname.startsWith("/equity/technical/")) && (
           <Box sx={{ marginBottom: "50px" }}>
             <TradingViewTickerTape />
@@ -174,7 +168,6 @@ const NavbarMain: React.FC = () => {
             flexWrap: "wrap",
           }}
         >
-          {/* Logo */}
           <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
             <img
               src={logo}
@@ -183,34 +176,95 @@ const NavbarMain: React.FC = () => {
             />
           </Link>
 
-          {/* Tabs Centered */}
           <Box sx={{ flexGrow: 1, textAlign: "center" }}>
-            {["Equity", "Converts", "High Yield", "P&L"].map((tab) => (
-           <Button
-  key={tab}
-  onClick={() => handleTabSelect(tab)}
-  sx={{
-    color: selectedTab === tab ? "#005166" : "#005166",
-    fontWeight: "bold",
-    mx: 1,
-    borderBottom: selectedTab === tab ? "3px solid #005166" : "3px solid transparent",
-    borderRadius: 0,
-    "&:hover": {
-      borderBottom: "3px solid #005166",
-      backgroundColor: "transparent",
-    },
-  }}
->
-  {tab}
-</Button>
+            <Button
+              onClick={() => handleTabSelect("P&L Attribution")}
+              sx={{
+                color: "#005166",
+                fontWeight: "bold",
+                fontSize: "0.725rem",
+                mx: 1,
+                borderBottom:
+                  selectedTab === "P&L Attribution" ? "3px solid #005166" : "3px solid transparent",
+                borderRadius: 0,
+                "&:hover": {
+                  borderBottom: "3px solid #005166",
+                  backgroundColor: "transparent",
+                },
+              }}
+            >
+              P&L Attribution
+            </Button>
 
-            ))}
+            <DropdownTab
+              label="New Deals (IPO)"
+              menuItems={[
+                { label: "Dashboard", path: "/deals/dashboard" },
+                { label: "New Deal Form", path: "/deals/new_deal_form" },
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+
+            <DropdownTab
+              label="Machine Learning (AI)"
+              menuItems={[
+                { label: "Equity", path: "/machine_learning/equity" },
+                { label: "High Yields", path: "/machine_learning/high-yield" },
+                { label: "Converts", path: "/machine_learning/converts" },
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+
+            <DropdownTab
+              label="Opportunity & Performance"
+              menuItems={[
+                { label: "Summary Dashboard", path: "/opportunity/summary" },
+                { label: "Equity Market Opportunity", path: "/opportunity/equity" },
+                { label: "High Yields Market Opportunity", path: "/opportunity/high-yield" },
+                { label: "Converts Market Opportunity", path: "/opportunity/converts" },
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+
+            <DropdownTab
+              label="Macro (Prime)"
+              menuItems={[
+                { label: "Prime", path: "/macro/prime" },
+                { label: "News Summary", path: "/macro/news-summary" },
+                { label: "Sector", path: "/macro/sector" },
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+
+            <Button
+              onClick={() => handleTabSelect("Data & Analytics")}
+              sx={{
+                color: "#005166",
+                fontWeight: "bold",
+                fontSize: "0.725rem",
+                mx: 1,
+                borderBottom:
+                  selectedTab === "Data & Analytics"
+                    ? "3px solid #005166"
+                    : "3px solid transparent",
+                borderRadius: 0,
+                "&:hover": {
+                  borderBottom: "3px solid #005166",
+                  backgroundColor: "transparent",
+                },
+              }}
+            >
+              Data & Analytics
+            </Button>
           </Box>
 
-          {/* Profile + Logs */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginRight: "10px" }}>
             {isLoggedIn && isSuperUser && (
-              <Button sx={{ color: "#000", fontWeight: "bold", marginRight: "20px"}} onClick={() => setShowLogs(true)}>
+              <Button sx={{ color: "#000", fontWeight: "bold", marginRight: "20px" }} onClick={() => setShowLogs(true)}>
                 <Logs />
               </Button>
             )}
@@ -233,43 +287,37 @@ const NavbarMain: React.FC = () => {
                   anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                   transformOrigin={{ vertical: "top", horizontal: "right" }}
                 >
-                 <MenuItem disableRipple>
-                  <Box
-                    onClick={handleLogout}
-                    sx={{
-                      width: "100%",
-                      color: "#002060",
-                      padding: "4px 0px",
-                      borderRadius: "3px",
-                      textAlign: "center",
-                      '&:hover': {
-                        backgroundColor: "#005166",
-                        color: "#FFFFFF",
-                      }
-                    }}
-                  >
-                    Logout
-                  </Box>
-                </MenuItem>
+                  <MenuItem disableRipple>
+                    <Box
+                      onClick={handleLogout}
+                      sx={{
+                        width: "100%",
+                        color: "#002060",
+                        padding: "4px 0px",
+                        borderRadius: "3px",
+                        textAlign: "center",
+                        '&:hover': {
+                          backgroundColor: "#005166",
+                          color: "#FFFFFF",
+                        }
+                      }}
+                    >
+                      Logout
+                    </Box>
+                  </MenuItem>
                 </Menu>
               </>
             ) : (
-           <Button sx={{ color: "#FFFFFF", backgroundColor: "#002060", fontWeight: "bold", paddingX: "18px" }} onClick={() => navigate("/login")}>
-              Login
-            </Button>
+              <Button sx={{ color: "#FFFFFF", backgroundColor: "#002060", fontWeight: "bold", paddingX: "18px" }} onClick={() => navigate("/login")}>
+                Login
+              </Button>
             )}
-              {showLogout && <Logout onConfirm={handleConfirmLogout} onCancel={handleCancelLogout} />}
+            {showLogout && <Logout onConfirm={handleConfirmLogout} onCancel={handleCancelLogout} />}
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Subnavbar BELOW AppBar */}
-      <Box sx={{ width: "100%", backgroundColor: "#f3f3f3", padding: "5px 0" }}>
-        {selectedTab === "Equity" && <EquityNavbar />}
-        {selectedTab === "Converts" && <ConvertsNavbar />}
-        {selectedTab === "High Yield" && <HighYieldNavbar />}
-        {/* {selectedTab === "Portfolio Attribution" && <MacroNavbar />} */}
-      </Box>
+      {/* Subnavbar could be conditionally rendered here if needed */}
 
       {/* Logout Confirmation Dialog */}
       {showLogout && <Logout onConfirm={handleConfirmLogout} onCancel={handleCancelLogout} />}
