@@ -222,7 +222,7 @@ const PnlAttributionTable: React.FC = () => {
                           sx={{
                             fontWeight: "bold",
                             textDecoration: "underline",
-                            color: "#9b1c02",
+                            color: "#f40b00",
                             cursor: "pointer",
                           }}
                           onClick={() => handleAssetClick(assetType)}
@@ -231,13 +231,14 @@ const PnlAttributionTable: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           <b>
-                            <IconButton
+                           
+                            Total
+                             <IconButton
                               size="small"
                               onClick={() => toggleExpand(assetType)}
                             >
                               <AddIcon fontSize="small" />
                             </IconButton>
-                            Total
                           </b>
                         </TableCell>
                         {months.map((month) => (
@@ -261,7 +262,7 @@ const PnlAttributionTable: React.FC = () => {
                               fontWeight: "bold",
                               textDecoration: "underline",
                               bgcolor: "#e3f2fd",
-                              color: "#9b1c02",
+                              color: "#f40b00",
                               "&:hover": {
                                 textDecoration: "underline",
                                 opacity: 0.8,
@@ -291,13 +292,14 @@ const PnlAttributionTable: React.FC = () => {
                       <TableCell colSpan={1}>
                         {collapsedOnlyAssets.includes(assetType) ? (
                           <b>
+                            
+                            Total
                             <IconButton
                               size="small"
                               onClick={() => toggleExpand(assetType)}
                             >
                               <RemoveIcon fontSize="small" />
                             </IconButton>
-                            Total
                           </b>
                         ) : (
                           <b>Total</b>
