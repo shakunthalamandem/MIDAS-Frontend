@@ -111,8 +111,9 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate }) => {
   };
 
   const gradientBackground = {
-    background:
-      "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 25%, #fad0c4 50%, #ffdde1 75%, #c2ffd8 100%)",
+    background: "linear-gradient(135deg, #A3B5E7 0%, #B9D7F4 25%, #CFF2FA 50%, #E3FAFF 75%, #F5FCFF 100%)",
+
+
     padding: 2,
     borderRadius: 4,
     boxShadow: 3,
