@@ -22,9 +22,8 @@ const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [selectedTab, setSelectedTab] = useState<string>(() => {
-    return localStorage.getItem("selectedTab") || "P&L Attribution";
-  });
+
+  const [selectedTab, setSelectedTab] = useState<string>("");
 
   const isSuperUser = localStorage.getItem("is_superuser") === "true";
   const [showLogs, setShowLogs] = useState(false);
@@ -40,7 +39,9 @@ const NavbarMain: React.FC = () => {
   const user = localStorage.getItem("user");
 
   useEffect(() => {
-    localStorage.setItem("selectedTab", selectedTab);
+    if (selectedTab) {
+      localStorage.setItem("selectedTab", selectedTab);
+    }
   }, [selectedTab]);
 
   const handleTabSelect = (tabName: string) => {
