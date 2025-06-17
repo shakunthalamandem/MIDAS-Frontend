@@ -107,6 +107,8 @@ const DealInformation: React.FC<FormSectionProps> = ({
         {renderSelectField("FO Type", "fo_type", foTypes)}
         {renderSelectField("Sector", "sector", sectors)}
         {renderTextField("Deal Captain", "deal_captain")}
+        {renderTextField("Invitation Bank", "invitation_bank")}
+      
       </Grid>
     </>
   );

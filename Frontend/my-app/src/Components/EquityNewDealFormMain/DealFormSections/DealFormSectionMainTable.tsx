@@ -41,6 +41,7 @@ const DealFormSectionMainTable: React.FC<Props> = ({ selectedOption }) => {
           fo_type: '',
           sector: '',
           deal_captain: '',
+           invitation_bank: '',
         },
         deal_allocations: {
           sponsor: '',
@@ -52,7 +53,7 @@ const DealFormSectionMainTable: React.FC<Props> = ({ selectedOption }) => {
           allocation_amount_usd: '',
           allocation_deal_size_percentage: '',
           allocation_percentage: '',
-          invitation_bank: '',
+         
         },
         market_data: {
           ltm_dividend_yield: '',

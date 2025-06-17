@@ -65,7 +65,6 @@ const DealAllocations: React.FC<FormSectionProps> = ({
         {renderField("Allocation Amount (USD)", "allocation_amount_usd")}
         {renderField("Allocation Deal Size Percentage", "allocation_deal_size_percentage")}
         {renderField("Allocation Percentage", "allocation_percentage")}
-        {renderField("Invitation Bank", "invitation_bank")}
       </Grid>
     </>
   );
