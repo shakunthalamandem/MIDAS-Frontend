@@ -134,7 +134,6 @@ const AppRouters: React.FC = () => {
           <Route path="/basic" element={ <PnlAttributionMain /> }/>
         </Route> */}
         <Route path="/portfolio-attribution" element={<AuthGuard><PnlAttributionMain /></AuthGuard>} />
-                <Route path="/pnldata" element={<AuthGuard><PnlAttributionTable /></AuthGuard>} />
         <Route path="/portfolio-attribution/details/:assetType" element={<AuthGuard><DeatiledRegionPnlAttribution /></AuthGuard>}/>
     
 
