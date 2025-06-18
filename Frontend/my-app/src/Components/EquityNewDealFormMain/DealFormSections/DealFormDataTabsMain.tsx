@@ -137,13 +137,14 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate }) => {
         onClick={handleSave}
         startIcon={isCreate ? <AddIcon /> : <SaveIcon />}
         sx={{
-          background: "linear-gradient(to right, #002060, #004aad)",
-          color: "#fff",
+          background: "linear-gradient(to right, #00b894, #55efc4)",
+          color: "#002060",
           fontWeight: 500,
           px: 3,
           boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
           "&:hover": {
-            background: "linear-gradient(to right, #003080, #0055cc)",
+            background: "linear-gradient(to right,rgb(0, 70, 56), #0055cc)",
+            color: "#fff",
           },
         }}
       >
