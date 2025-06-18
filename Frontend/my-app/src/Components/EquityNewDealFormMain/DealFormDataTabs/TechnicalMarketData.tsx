@@ -32,8 +32,17 @@ const TechnicalMarketData: React.FC<FormSectionProps> = ({
         disabled={!editable}
         InputProps={{
           disableUnderline: !editable, // No underline if not editable
-          style: { color: "#002060" },
-        }}
+    sx: {
+            "&.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& input.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& .MuiSelect-select.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+          },        }}
         InputLabelProps={{
           style: { color: "#002060" },
         }}
@@ -51,7 +60,7 @@ const TechnicalMarketData: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
-        {renderField("3-Month ADTV ($ M)", "three_month_adtv_local_usd")}
+        {renderField("3-Month ADTV ($ Million)", "three_month_adtv_local_usd")}
         {renderField("3-Month ADTV Shares", "three_month_adtv_local_shares")}
         {renderField("Beta (S&P500)", "beta_sx5e")}
         {renderField("3-Month Volatility", "three_month_volatility")}

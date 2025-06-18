@@ -47,7 +47,17 @@ const MarketData: React.FC<FormSectionProps> = ({
         disabled={!editable}
         InputProps={{
           disableUnderline: !editable,
-          style: { color: "#002060" },
+           sx: {
+            "&.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& input.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& .MuiSelect-select.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+          },
         }}
         InputLabelProps={{
           shrink,
@@ -76,7 +86,7 @@ const MarketData: React.FC<FormSectionProps> = ({
       <Grid container spacing={2}>
         {renderField("Launch Date", "launch_date", "date", true)}
         {renderField("Trade Date", "trade_date", "date", true)}
-        {renderField("Market Cap($ M)", "market_cap_pre_deal_usd")}
+        {renderField("Market Cap($ Million)", "market_cap_pre_deal_usd")}
         {renderField("52 Week High", "week_52_high")}
         {renderField("% Below 52 Week High", "percent_below_52_week_high")}
         {renderField("% Change Last 7 Days", "percent_change_last_7_days")}
@@ -86,7 +96,7 @@ const MarketData: React.FC<FormSectionProps> = ({
         {renderField("Shares Outstanding", "shares_outstanding_pre_deal")}
 
         {renderField("% of Free Float", "percent_of_free_float_current_float")}
-        {renderField("Short Interest ($ M)", "short_interest_dollar_amount")}
+        {renderField("Short Interest ($ Million)", "short_interest_dollar_amount")}
         {renderField(
           "Short Interest % of Deal",
           "short_interest_percentage_of_deal"
