@@ -32,6 +32,13 @@ const BlueSlider = styled(Slider)({
     opacity: 0.3,
     backgroundColor: "#002060",
   },
+    '& .MuiSlider-valueLabel': {
+    backgroundColor: '#c35305', 
+    color: '#fff',              
+    borderRadius: 4,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
 });
 
 // Utility to parse percentage string like "51.0%" into number
@@ -80,7 +87,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
                 onChange={(_, value) =>
                   handleSliderChange("long_only_allocation_percent", value as number)
                 }
-                valueLabelDisplay="auto"
+                valueLabelDisplay="on"
                 step={1}
                 min={0}
                 max={100}
@@ -97,7 +104,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
                 onChange={(_, value) =>
                   handleSliderChange("hedge_funds_allocation_percent", value as number)
                 }
-                valueLabelDisplay="auto"
+                valueLabelDisplay="on"
                 step={1}
                 min={0}
                 max={100}
@@ -114,7 +121,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
                 onChange={(_, value) =>
                   handleSliderChange("top_10_allocation_concentration_percent", value as number)
                 }
-                valueLabelDisplay="auto"
+                valueLabelDisplay="on"
                 step={1}
                 min={0}
                 max={100}
@@ -135,7 +142,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
                     retail_allocation_percent: 100 - Number(value),
                   })
                 }
-                valueLabelDisplay="auto"
+                valueLabelDisplay="on"
                 step={1}
                 min={0}
                 max={100}
