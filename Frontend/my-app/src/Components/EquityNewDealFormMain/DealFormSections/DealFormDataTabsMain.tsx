@@ -143,18 +143,21 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
   };
   return (
     <Box display="flex" flexDirection="column" gap={3}>
+
       <Stack
         direction="row"
         alignItems="center"
         justifyContent="space-between"
         spacing={2}
-        sx={{ mb: 2 }}
       >
         <Typography variant="h6" color="#002060" sx={{ whiteSpace: "nowrap" }}>
           {isCreate
             ? "Creating a new deal – Please fill in the form below."
             : `Selected ticker: ${selectedTicker || "N/A"} – view or edit deal details below.`}
+       
         </Typography>
+        
+
         <Stack
           direction="row"
           spacing={2}
@@ -238,6 +241,17 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
           )}
         </Stack>
       </Stack>
+      <Typography
+  variant="caption"
+  color="#002060"
+  sx={{
+    fontSize: "0.95rem", // adjust as needed (e.g., "1rem" or "14px")
+    fontStyle: "italic",
+  }}
+>
+  Note: Some of the data fields are empty due to delayed data from Dealogic.
+</Typography>
+
 <Grid container spacing={2} alignItems="stretch">
   <Grid item xs={12} md={6} mb={4}>
     <Box sx={{ ...gradientBackground, height: "100%" }}>
@@ -289,8 +303,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
     </Box>
   </Grid>
 </Grid>
-<Typography align="center" variant="caption" color="#002060">Note:Some of the data fields are empty due to delayed data from Dealogic.
-</Typography>
+
 
 
       <Snackbar
