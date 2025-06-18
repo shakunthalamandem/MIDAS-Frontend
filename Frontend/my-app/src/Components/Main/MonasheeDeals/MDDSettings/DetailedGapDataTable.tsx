@@ -87,7 +87,7 @@ const formatDealSize = (dealSize: any) => {
         >
 
           <Link
-            to={`/equity/monasheeperformance/${params.value}`}
+            to={`/opportunity/equity/${params.value}`}
             style={{ color: "brown", fontWeight: "bold",paddingLeft:15,textDecoration: "none" }}
             target="_blank"
           >

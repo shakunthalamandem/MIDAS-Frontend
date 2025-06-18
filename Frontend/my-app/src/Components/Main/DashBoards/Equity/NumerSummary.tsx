@@ -154,7 +154,7 @@ const NumerSummary: React.FC = () => {
           variant="h6"
           sx={{ fontWeight: "bold", color: "#002060", textAlign: "center" }}
         >
-          Deal Flow & Participation – IPO and FO (2023 to 2025) by H1(Half Yearly)
+          Deal Flow & Participation – IPO and FO (2023 to 2025) by (Yearly)
         </Typography>
 
       </Grid>
