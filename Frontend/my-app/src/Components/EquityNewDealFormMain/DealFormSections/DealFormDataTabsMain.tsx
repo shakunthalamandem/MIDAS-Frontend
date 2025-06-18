@@ -41,17 +41,6 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
     severity: "success",
   });
 
-  
-  const setTopAllocation = (value: string) => {
-    setLocalData((prev) => ({
-      ...prev,
-      deal_color: {
-        ...prev.deal_color,
-        top_allocation: value,
-      },
-    }));
-  };
-
   const handleSave = async () => {
     try {
       console.log("Saving data:", localData);
@@ -106,7 +95,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
       market_data: {},
       technical_market_data: {},
       deal_color: {
-        top_allocation: "top 10", 
+        top_allocation: "top 10",
       },
     };
     setLocalData(emptyData);
@@ -277,8 +266,6 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
               data={localData?.deal_color || {}}
               editable={editable}
               onChange={(data) => updateSection("deal_color", data)}
-              topAllocation={localData.deal_color?.top_allocation || "top 10"}
-              setTopAllocation={setTopAllocation}
             />
           </Box>
         </Grid>
