@@ -77,104 +77,75 @@ const InsightCard = ({
 const InsightsMain = () => {
   const insights: InsightCardProps[] = [
     {
-      title: "Deal Count (May’24 vs May’25)",
-      metric: "+9 IPOs / +6 FOs",
-      change: "+40% YoY",
-      status: "up",
-      comment:
-        "Increase driven by stronger FO issuance and U.S. pipeline recovery.",
+      "title": "FOs Sustain Larger Volumes Even in 2025 H1",
+      "metric": "FO Volume: ~$153B vs IPO: ~$40B (H1 2025)",
+      "change": "",
+      "status": "neutral",
+      "comment": "FO volume remains elevated relative to IPOs, consistent with trends seen in 2023 and 2024."
     },
     {
-      title: "Deal Volume (Q2’25 vs Q1’25)",
-      metric: "$12.7 B",
-      change: "–12% QoQ",
-      status: "down",
-      comment:
-        "Seasonal slowdown and absence of mega-deals in Q2 weighed on volumes.",
+      "title": "IPO Deal Activity Holds Steady in 2025 H1",
+      "metric": "121 Deals | $39.9B Volume",
+      "change": "",
+      "status": "neutral",
+      "comment": "IPO deal count remained strong in H1 2025, slightly higher than H1 2024, though opportunity value declined to $4.3B."
     },
     {
-      title: "Opportunity Value (May’24 vs May’25)",
-      metric: "$1.4 B",
-      change: "+75% YoY",
-      status: "up",
-      comment: "Surge driven by large-cap Tech & Healthcare offerings.",
+      "title": "Shift in Relative Attractiveness: IPOs Match FOs in Returns",
+      "metric": "IPO Excess Return: 10.8% vs FO: 3.0%",
+      "change": "",
+      "status": "up",
+      "comment": "IPOs outperformed FOs in expected return excess by a wide margin, reversing the FO-driven strength seen in H1 2024."
     },
     {
-      title: "% Positively Performing Deals (YTD ’24 vs ’25)",
-      metric: "+3 pts",
-      change: "+3% YoY",
-      status: "up",
-      comment:
-        "Improved IRR returns thanks to selective pricing and strong demand.",
+      "title": "EMEA IPOs Lead in Performance and Return Quality",
+      "metric": "66.7% Pos. Deals | 13.3% Return Excess",
+      "change": "",
+      "status": "up",
+      "comment": "EMEA IPOs topped all regions in both return quality and success rate, making it the most attractive IPO market in H1 2025."
     },
     {
-      title: "Region Performance – US vs EMEA",
-      metric: "US: $9.7 M Gap / EMEA: $10.2 M Gap",
-      change: "mixed",
-      status: "up",
-      comment: "US deals outperformed model; EMEA FO returns lagged behind.",
+      "title": "APAC FOs Show Balanced Risk-Reward",
+      "metric": "64.6% Pos. Deals | 4.6% Return Excess",
+      "change": "",
+      "status": "neutral",
+      "comment": "APAC FOs provided a steady middle-ground—stronger return excess than US, but slightly lower win rate than EMEA."
     },
     {
-      title: "Sector Strength – Tech & Healthcare",
-      metric: "Tech: $3.1 B / Healthcare: $2.9 B",
-      change: "+15% / +12%",
-      status: "up",
-      comment:
-        "High premium returns in both sectors driven by robust pipelines.",
+      "title": "Health Care Shows High Activity and Solid Returns",
+      "metric": "75 Deals | $2.1B Opportunity | 6.7% Excess Return",
+      "change": "",
+      "status": "up",
+      "comment": "Health Care remains a high-volume, high-quality sector with strong deal count and one of the top return profiles."
     },
     {
-      title: "Allocation Trends",
-      metric: "IPO vs FO",
-      change: "-0.1% / -0.2%",
-      status: "down",
-      comment: "Allocations are down in both segments",
+      "title": "Consumer Discretionary Tops in Opportunity and Returns",
+      "metric": "$2.2B Opportunity | 9.0% Excess Return",
+      "change": "",
+      "status": "up",
+      "comment": "With a strong 75.7% hit rate, Consumer Discretionary leads all sectors in both return potential and deal quality."
     },
     {
-      title: "APAC Region (2025 YTD)",
-      metric: "–$13.5 M Gap",
-      change: "down",
-      status: "down",
-      comment:
-        "Underperformance despite strong IPO volume; exits remain muted.",
+      "title": "Energy Sector Faces Sharp Underperformance",
+      "metric": "-$813M Opportunity | -8.3% Excess Return",
+      "change": "",
+      "status": "down",
+      "comment": "Energy stands out as the only sector with negative return excess and opportunity value, reflecting broad investor caution."
     },
     {
-      title: "EMEA Region (2025 YTD)",
-      metric: "–$16.4 M Gap",
-      change: "down",
-      status: "down",
-      comment: "Weak FO returns in EMEA offset otherwise healthy allocations.",
+      "title": "FO Activity Recovers as IPOs Continue to Slow (2025 Q2)",
+      "metric": "FO: 40 vs IPO: 22",
+      "change": "",
+      "status": "up",
+      "comment": "FO deal count rebounded slightly after a sharp Q1 dip, while IPO activity remained subdued."
     },
     {
-      title: "US Region (2025 YTD)",
-      metric: "–$14.3 M Gap",
-      change: "down",
-      status: "down",
-      comment:
-        "FO segment underperformance in US despite highest capital allocated.",
-    },
-    {
-      title: "Overall 2025 YTD GAP",
-      metric: "–$44.2 M Total Gap",
-      change: "down",
-      status: "down",
-      comment: "All regions missed modeled returns, especially in FO deals.",
-    },
-    {
-      title: "IPO Deals (2025 YTD)",
-      metric: "–$21.1 M Gap",
-      change: "down",
-      status: "down",
-      comment:
-        "Actual IPO PnL trailed model due to later‐than‐expected exit timing.",
-    },
-    {
-      title: "FO Deals (2025 YTD)",
-      metric: "–$23.1 M Gap",
-      change: "down",
-      status: "down",
-      comment:
-        "FO PnL underperformed model forecasts, driven by mix and timing.",
-    },
+      "title": "Deal Size Allocation Stays Skewed Towards FOs (2025 Q2)",
+      "metric": "FO: 0.37%, IPO: 0.11%",
+      "change": "",
+      "status": "neutral",
+      "comment": "FOs continue to secure a higher allocation share of deal size, though both segments show low absolute values."
+    }
   ];
 
   return (
