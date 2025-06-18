@@ -1,13 +1,7 @@
 import React from "react";
-import {
-  Grid,
-  TextField,
-  Typography,
-  MenuItem,
-  Box,
-} from "@mui/material";
+import { Grid, TextField, Typography, MenuItem, Box } from "@mui/material";
 import { FormSectionProps } from "../../../types/NewDealFormData";
-import DatasetIcon from '@mui/icons-material/Dataset';
+import DatasetIcon from "@mui/icons-material/Dataset";
 
 const DealInformation: React.FC<FormSectionProps> = ({
   data,
@@ -15,10 +9,10 @@ const DealInformation: React.FC<FormSectionProps> = ({
   onChange,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value, type } = e.target;
-  const newValue = type === "text" ? value.toUpperCase() : value;
-  onChange({ ...data, [name]: newValue });
-};
+    const { name, value, type } = e.target;
+    const newValue = type === "text" ? value.toUpperCase() : value;
+    onChange({ ...data, [name]: newValue });
+  };
 
   // Correct options from your config
   const regions = ["US", "EMEA", "APAC", "Non-US America"];
@@ -77,46 +71,56 @@ const DealInformation: React.FC<FormSectionProps> = ({
     "Others",
   ];
 
-const renderSelectField = (
-  label: string,
-  name: string,
-  options: string[]
-) => (
-  <Grid item xs={12} sm={6} md={4}>
-    <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-      {label}
-    </Typography>
-    <TextField
-      select
-      name={name}
-      value={data[name] || ""}
-      onChange={handleChange}
-      fullWidth
-      size="small"
-      variant="standard"
-      disabled={!editable}
-      InputProps={{
-        disableUnderline: !editable,
-        style: { color: "#002060" },
-      }}
-      SelectProps={{
-        MenuProps: {
-          PaperProps: {
-            style: {
-              maxHeight: 400,
+  const renderSelectField = (
+    label: string,
+    name: string,
+    options: string[]
+  ) => (
+    <Grid item xs={12} sm={6} md={4}>
+      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+        {label}
+      </Typography>
+      <TextField
+        select
+        name={name}
+        value={data[name] || ""}
+        onChange={handleChange}
+        fullWidth
+        size="small"
+        variant="standard"
+        disabled={!editable}
+        InputProps={{
+          disableUnderline: !editable,
+          sx: {
+            "&.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& input.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& .MuiSelect-select.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
             },
           },
-        },
-      }}
-    >
-      {options.map((option) => (
-        <MenuItem key={option} value={option}>
-          {option}
-        </MenuItem>
-      ))}
-    </TextField>
-  </Grid>
-);
+        }}
+        SelectProps={{
+          MenuProps: {
+            PaperProps: {
+              style: {
+                maxHeight: 400,
+              },
+            },
+          },
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
+          </MenuItem>
+        ))}
+      </TextField>
+    </Grid>
+  );
 
   const renderTextField = (
     label: string,
@@ -138,7 +142,14 @@ const renderSelectField = (
         disabled={!editable}
         InputProps={{
           disableUnderline: !editable,
-          style: { color: "#002060" },
+          sx: {
+            "&.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& input.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+          },
         }}
         InputLabelProps={type === "date" ? { shrink: true } : undefined}
       />
@@ -155,7 +166,7 @@ const renderSelectField = (
         fontWeight={600}
       >
         <Box display="inline-flex" alignItems="center" gap={1}>
-          <DatasetIcon  />
+          <DatasetIcon />
           Deal Information
         </Box>
       </Typography>
@@ -170,8 +181,7 @@ const renderSelectField = (
         {renderSelectField("Sector", "sector", sectors)}
         {renderSelectField("Deal Captain", "deal_captain", dealCaptains)}
         {renderSelectField("Lead Bank", "invitation_bank", invitationBanks)}
-                {renderTextField("Deal Size ", "deal_size_amount_usd")}
-
+        {renderTextField("Deal Size ($ Million)", "deal_size_amount_usd")}
       </Grid>
     </>
   );

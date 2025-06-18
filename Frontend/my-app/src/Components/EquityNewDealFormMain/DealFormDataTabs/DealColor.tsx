@@ -162,20 +162,31 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
 
         {/* RIGHT: Deal Color Text Area */}
         <Grid item xs={12} md={6}>
-          <TextField
-            label="Deal Colour"
-            name="deal_colour"
-            value={data.deal_colour || ""}
-            onChange={handleChange}
-            fullWidth
-            multiline
-            minRows={10}
-            size="small"
-            disabled={!editable}
-            variant={editable ? "outlined" : "filled"}
-            InputLabelProps={{ style: { color: "#002060" } }}
-            InputProps={{ style: { color: "#002060" } }}
-          />
+         <TextField
+  label="Deal Colour"
+  name="deal_colour"
+  value={data.deal_colour || ""}
+  onChange={handleChange}
+  fullWidth
+  multiline
+  minRows={10}
+  size="small"
+  disabled={!editable}
+  variant={editable ? "outlined" : "filled"}
+  InputLabelProps={{ style: { color: "#002060" } }}
+  InputProps={{
+    sx: {
+      "&.Mui-disabled": {
+        WebkitTextFillColor: "#b1062e",
+      },
+      "& textarea.Mui-disabled": {
+        WebkitTextFillColor: "#b1062e",
+        color: "#b1062e", // for fallback
+      },
+    },
+  }}
+/>
+
         </Grid>
       </Grid>
     </>

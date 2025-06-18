@@ -53,8 +53,18 @@ const DealAllocations: React.FC<FormSectionProps> = ({
         disabled={!editable}
         InputProps={{
           disableUnderline: !editable,
-          style: { color: "#002060" },
-        }}
+  sx: {
+            "&.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& input.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& .MuiSelect-select.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+          },
+        }}        
       >
         {options.map((option) => (
           <MenuItem key={option} value={option}>
@@ -84,6 +94,14 @@ const DealAllocations: React.FC<FormSectionProps> = ({
         disabled={!editable}
         InputProps={{
           disableUnderline: !editable,
+          sx: {
+            "&.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& input.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+          },
           endAdornment: adornment ? (
             <InputAdornment position="end">{adornment}</InputAdornment>
           ) : undefined,
