@@ -34,6 +34,14 @@ const BlueSlider = styled(Slider)({
   },
 });
 
+// Utility to parse percentage string like "51.0%" into number
+const parsePercent = (value: string | number | undefined): number =>
+  typeof value === "string"
+    ? parseFloat(value.replace("%", "")) || 0
+    : typeof value === "number"
+    ? value
+    : 0;
+
 const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onChange({ ...data, [e.target.name]: e.target.value });
@@ -42,6 +50,13 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
   const handleSliderChange = (name: string, value: number) => {
     onChange({ ...data, [name]: value });
   };
+
+  // Normalize values
+  const longOnly = parsePercent(data.long_only_allocation_percent);
+  const hedgeFunds = parsePercent(data.hedge_funds_allocation_percent);
+  const top10 = parsePercent(data.top_10_allocation_concentration_percent);
+  const institutional = parsePercent(data.institutional_allocation_percent);
+  const retail = 100 - institutional;
 
   return (
     <>
@@ -61,7 +76,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
                 Long Only Allocation
               </Typography>
               <BlueSlider
-                value={Number(data.long_only_allocation_percent) || 0}
+                value={longOnly}
                 onChange={(_, value) =>
                   handleSliderChange("long_only_allocation_percent", value as number)
                 }
@@ -78,7 +93,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
                 Hedge Funds Allocation
               </Typography>
               <BlueSlider
-                value={Number(data.hedge_funds_allocation_percent) || 0}
+                value={hedgeFunds}
                 onChange={(_, value) =>
                   handleSliderChange("hedge_funds_allocation_percent", value as number)
                 }
@@ -95,7 +110,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
                 Allocation Concentration %
               </Typography>
               <BlueSlider
-                value={Number(data.top_10_allocation_concentration_percent) || 0}
+                value={top10}
                 onChange={(_, value) =>
                   handleSliderChange("top_10_allocation_concentration_percent", value as number)
                 }
@@ -112,7 +127,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
                 Institutional vs Retail Allocation
               </Typography>
               <BlueSlider
-                value={Number(data.institutional_allocation_percent) || 0}
+                value={institutional}
                 onChange={(_, value) =>
                   onChange({
                     ...data,
@@ -128,10 +143,10 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
               />
               <Box display="flex" justifyContent="space-between">
                 <Typography variant="body2" color="#002060">
-                  Institutional: {data.institutional_allocation_percent || 0}%
+                  Institutional: {institutional}%
                 </Typography>
                 <Typography variant="body2" color="#002060">
-                  Retail: {data.retail_allocation_percent || 0}%
+                  Retail: {retail}%
                 </Typography>
               </Box>
             </Grid>
