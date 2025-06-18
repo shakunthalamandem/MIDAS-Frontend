@@ -14,8 +14,6 @@ import ColorLensIcon from '@mui/icons-material/ColorLens';
 import { FormSectionProps } from "../../../types/NewDealFormData";
 import type { SelectChangeEvent } from "@mui/material";
 
-
-// Styled Slider
 const BlueSlider = styled(Slider)({
   color: "#002060",
   height: 6,
@@ -54,7 +52,18 @@ const parsePercent = (value: string | number | undefined): number =>
       ? value
       : 0;
 
-const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => {
+interface DealColorProps extends FormSectionProps {
+  topAllocation: string;
+  setTopAllocation: (value: string) => void;
+}
+
+const DealColor: React.FC<DealColorProps> = ({
+  data,
+  editable,
+  onChange,
+  topAllocation,
+  setTopAllocation,
+}) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onChange({ ...data, [e.target.name]: e.target.value });
   };
@@ -63,14 +72,10 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
     onChange({ ...data, [name]: value });
   };
 
-  
-  const [topN, setTopN] = React.useState("top 10");
-
   const handleTopNChange = (event: SelectChangeEvent<string>) => {
-  setTopN(event.target.value as string);
-};
+    setTopAllocation(event.target.value as string);
+  };
 
-  // Normalize values
   const longOnly = parsePercent(data.long_only_allocation_percent);
   const hedgeFunds = parsePercent(data.hedge_funds_allocation_percent);
   const top10 = parsePercent(data.top_10_allocation_concentration_percent);
@@ -135,7 +140,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
                 </Typography>
                 <FormControl size="small" sx={{ minWidth: 70 }}>
                   <Select
-                    value={topN}
+                    value={topAllocation}
                     onChange={handleTopNChange}
                     size="small"
                     sx={{ fontSize: 13, height: 30 }}

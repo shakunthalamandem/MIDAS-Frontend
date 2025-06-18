@@ -41,6 +41,17 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
     severity: "success",
   });
 
+  
+  const setTopAllocation = (value: string) => {
+    setLocalData((prev) => ({
+      ...prev,
+      deal_color: {
+        ...prev.deal_color,
+        top_allocation: value,
+      },
+    }));
+  };
+
   const handleSave = async () => {
     try {
       console.log("Saving data:", localData);
@@ -52,7 +63,9 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
         ? `${apiUrl}/api/create_new_deal_form/`
         : `${apiUrl}/api/update_new_deal_form/`;
 
-      const response = await axios.post(url, localData, {
+      const payload = { ...localData };
+
+      const response = await axios.post(url, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -92,7 +105,9 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
       deal_allocations: {},
       market_data: {},
       technical_market_data: {},
-      deal_color: {},
+      deal_color: {
+        top_allocation: "top 10", 
+      },
     };
     setLocalData(emptyData);
   };
@@ -262,6 +277,8 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
               data={localData?.deal_color || {}}
               editable={editable}
               onChange={(data) => updateSection("deal_color", data)}
+              topAllocation={localData.deal_color?.top_allocation || "top 10"}
+              setTopAllocation={setTopAllocation}
             />
           </Box>
         </Grid>
