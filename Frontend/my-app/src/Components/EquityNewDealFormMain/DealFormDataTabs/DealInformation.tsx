@@ -15,8 +15,10 @@ const DealInformation: React.FC<FormSectionProps> = ({
   onChange,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...data, [e.target.name]: e.target.value });
-  };
+  const { name, value, type } = e.target;
+  const newValue = type === "text" ? value.toUpperCase() : value;
+  onChange({ ...data, [name]: newValue });
+};
 
   // Correct options from your config
   const regions = ["US", "EMEA", "APAC", "Non-US America"];
