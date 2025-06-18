@@ -21,7 +21,7 @@ interface PnLData {
   };
 }
 
-const timeRanges = ["DTD", "MTD", "QTD", "YTD"];
+const timeRanges = ["1D", "MTD", "QTD", "YTD"];
 const assetOrder = [
   "Equities",
   "Convertible Bond",
@@ -92,7 +92,7 @@ const PnLSummary: React.FC = () => {
 
   const calculateTotals = (): { [range: string]: number } => {
     const totals: { [range: string]: number } = {
-      DTD: 0,
+      "1D": 0,
       MTD: 0,
       QTD: 0,
       YTD: 0,
@@ -225,3 +225,4 @@ const PnLSummary: React.FC = () => {
 };
 
 export default PnLSummary;
+ 
