@@ -26,7 +26,7 @@ const MarketData: React.FC<FormSectionProps> = ({
     const { name, value } = e.target;
     let newValue = value;
     if (percentFields.includes(name)) {
-      newValue = newValue.replace(/[^0-9.%]/g, "");
+      newValue = newValue.replace(/[^0-9.%$]/g, "");
     }
     onChange({ ...data, [name]: newValue });
   };

@@ -28,7 +28,7 @@ const DealAllocations: React.FC<FormSectionProps> = ({
     let newValue = value;
 
     if (percentageFields.includes(name)) {
-      newValue = newValue.replace(/[^0-9.%]/g, "");
+      newValue = newValue.replace(/[^0-9.%$]/g, "");
     }
     onChange({ ...data, [name]: newValue });
   };
