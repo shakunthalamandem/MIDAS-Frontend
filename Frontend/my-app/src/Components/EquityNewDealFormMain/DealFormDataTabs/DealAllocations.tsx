@@ -10,13 +10,27 @@ import {
 import { FormSectionProps } from "../../../types/NewDealFormData";
 import InfoIcon from '@mui/icons-material/Info';
 
+const percentageFields = [
+  "percentage_primary",
+  "discount_percentage",
+  "final_indication_deal_percentage",
+  "allocation_deal_size_percentage",
+  "allocation_percentage"
+];
+
 const DealAllocations: React.FC<FormSectionProps> = ({
   data,
   editable,
   onChange,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...data, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let newValue = value;
+
+    if (percentageFields.includes(name)) {
+      newValue = newValue.replace(/[^0-9.%]/g, "");
+    }
+    onChange({ ...data, [name]: newValue });
   };
   const sponsors = ["Y", "N"];
   const renderSelectField = (
@@ -89,8 +103,8 @@ const DealAllocations: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
-        {renderSelectField("Sponsor", "sponsor",sponsors)}
-        {renderField("Percentage Primary", "percentage_primary", "%")}
+        {renderSelectField("Sponsor", "sponsor", sponsors)}
+        {renderField("Percentage Primary", "percentage_primary")}
         {renderField("Price (Local Currency)", "price_local_currency")}
         {renderField("Discount Percentage", "discount_percentage")}
         {renderField("Final Indication Amount (USD)", "final_indication_amount_usd")}
