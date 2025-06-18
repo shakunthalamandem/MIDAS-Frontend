@@ -55,15 +55,13 @@ const EquityNewDealFormMain: React.FC = () => {
       const { tickers, default_ticker } = response.data;
 
       setOptions(tickers);
+if (!selectedOption) {
+  const defaultDeal = tickers.find((item) => item.ticker === "CTRI");
+  if (defaultDeal) {
+    setSelectedOption({ ...defaultDeal, create: false });
+  }
+}
 
-      if (!selectedOption && default_ticker) {
-        const defaultDeal = tickers.find(
-          (item) => item.ticker === default_ticker
-        );
-        if (defaultDeal) {
-          setSelectedOption({ ...defaultDeal, create: false });
-        }
-      }
 
     } catch (err) {
       console.error("API call failed:", err);
@@ -117,7 +115,16 @@ useEffect(() => {
             <Typography variant="body1" color="text.secondary">
               Create or search for an equity deal by ticker and pricing date to get the complete deal form.
             </Typography>
-            
+            {selectedOption?.ticker && (
+              <Typography
+                variant="subtitle2"
+                color="primary"
+                mt={1}
+                fontWeight={500}
+              >
+                Selected Deal: {selectedOption.ticker}
+              </Typography>
+            )}
           </Box>
 
           <Box
