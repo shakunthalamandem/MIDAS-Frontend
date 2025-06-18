@@ -1,12 +1,7 @@
 import React from "react";
-import {
-  Box,
-  Grid,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Grid, TextField, Typography } from "@mui/material";
 import { FormSectionProps } from "../../../types/NewDealFormData";
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
 const percentFields = [
   "ltm_dividend_yield",
@@ -14,7 +9,7 @@ const percentFields = [
   "percent_of_free_float_current_float",
   "short_interest_percentage_of_deal",
   "percent_change_last_7_days",
-  "percent_below_52_week_high"
+  "percent_below_52_week_high",
 ];
 
 const MarketData: React.FC<FormSectionProps> = ({
@@ -26,7 +21,7 @@ const MarketData: React.FC<FormSectionProps> = ({
     const { name, value } = e.target;
     let newValue = value;
     if (percentFields.includes(name)) {
-      newValue = newValue.replace(/[^0-9.%$]/g, "");
+      newValue = newValue.replace(/[^0-9.%$-]/g, "");
     }
     onChange({ ...data, [name]: newValue });
   };
@@ -64,7 +59,14 @@ const MarketData: React.FC<FormSectionProps> = ({
 
   return (
     <>
-      <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600} mb={2}>
+      <Typography
+        variant="h6"
+        gutterBottom
+        align="center"
+        color="#002060"
+        fontWeight={600}
+        mb={2}
+      >
         <Box display="inline-flex" alignItems="center" gap={1}>
           <TrendingUpIcon />
           Market Data
@@ -72,18 +74,23 @@ const MarketData: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
-        {renderField("LTM Dividend Yield", "ltm_dividend_yield")}
-        {renderField("LTM FCF Yield", "ltm_fcf_yield")}
-        {renderField("% of Free Float (Current Float)", "percent_of_free_float_current_float")}
-        {renderField("Short Interest Dollar Amount", "short_interest_dollar_amount")}
-        {renderField("Short Interest % of Deal", "short_interest_percentage_of_deal")}
-        {renderField("Shares Outstanding Pre-Deal", "shares_outstanding_pre_deal")}
-        {renderField("Market Cap Pre-Deal (USD)", "market_cap_pre_deal_usd")}
         {renderField("Launch Date", "launch_date", "date", true)}
         {renderField("Trade Date", "trade_date", "date", true)}
-        {renderField("% Change Last 7 Days", "percent_change_last_7_days")}
+        {renderField("Market Cap($ M)", "market_cap_pre_deal_usd")}
         {renderField("52 Week High", "week_52_high")}
         {renderField("% Below 52 Week High", "percent_below_52_week_high")}
+        {renderField("% Change Last 7 Days", "percent_change_last_7_days")}
+        {renderField("LTM FCF Yield", "ltm_fcf_yield")}
+
+        {renderField("LTM Dividend Yield", "ltm_dividend_yield")}
+        {renderField("Shares Outstanding", "shares_outstanding_pre_deal")}
+
+        {renderField("% of Free Float", "percent_of_free_float_current_float")}
+        {renderField("Short Interest ($ M)", "short_interest_dollar_amount")}
+        {renderField(
+          "Short Interest % of Deal",
+          "short_interest_percentage_of_deal"
+        )}
       </Grid>
     </>
   );

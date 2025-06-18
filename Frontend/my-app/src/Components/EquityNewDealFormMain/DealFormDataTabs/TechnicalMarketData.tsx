@@ -51,16 +51,16 @@ const TechnicalMarketData: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
-        {renderField("3-Month ADTV Local (USD)", "three_month_adtv_local_usd")}
-        {renderField("3-Month ADTV Local (Shares)", "three_month_adtv_local_shares")}
-        {renderField("Beta", "beta_sx5e")}
+        {renderField("3-Month ADTV ($ M)", "three_month_adtv_local_usd")}
+        {renderField("3-Month ADTV Shares", "three_month_adtv_local_shares")}
+        {renderField("Beta (S&P500)", "beta_sx5e")}
         {renderField("3-Month Volatility", "three_month_volatility")}
         {renderField("RSI 14D", "rsi_14d")}
         {renderField("RSI 30D", "rsi_30d")}
         {renderField("DMI 14D", "dmi_14d")}
         {renderField("MACD 9D", "macd_9d")}
-        {renderField("Stock Relative to MA 50D", "stock_relative_to_ma_50d")}
-        {renderField("Stock Relative to MA 100D", "stock_relative_to_ma_100d")}
+        {renderField("DMA 50", "stock_relative_to_ma_50d")}
+        {renderField("DMA 100", "stock_relative_to_ma_100d")}
       </Grid>
     </>
   );
