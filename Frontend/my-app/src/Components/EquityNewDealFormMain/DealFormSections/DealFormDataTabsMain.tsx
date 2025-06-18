@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Stack, Alert, Snackbar, Grid } from "@mui/material";
+import { Box, Button, Stack, Alert, Snackbar, Grid, Typography } from "@mui/material";
 import DealInformation from "../DealFormDataTabs/DealInformation";
 import DealAllocations from "../DealFormDataTabs/DealAllocations";
 import MarketData from "../DealFormDataTabs/MarketData";
@@ -24,9 +24,10 @@ interface FormData {
 interface Props {
   formData: FormData;
   isCreate: boolean;
+  selectedTicker: string; 
 }
 
-const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate }) => {
+const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTicker }) => {
   const [editable, setEditable] = useState<boolean>(isCreate);
   const [localData, setLocalData] = useState<FormData>(formData);
   const [originalData] = useState<FormData>(formData);
@@ -120,91 +121,99 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate }) => {
   };
   return (
     <Box display="flex" flexDirection="column" gap={3}>
-
-<Stack
-  direction="row"
-  spacing={2}
-  sx={{
-    mb: 2,
-    justifyContent: "flex-end",
-    flexWrap: "wrap",
-  }}
->
-  {editable ? (
-    <>
-      <Button
-        variant="contained"
-        onClick={handleSave}
-        startIcon={isCreate ? <AddIcon /> : <SaveIcon />}
-        sx={{
-          background: "linear-gradient(to right, #00b894, #55efc4)",
-          color: "#002060",
-          fontWeight: 500,
-          px: 3,
-          boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
-          "&:hover": {
-            background: "linear-gradient(to right,rgb(0, 70, 56), #0055cc)",
-            color: "#fff",
-          },
-        }}
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        spacing={2}
+        sx={{ mb: 2 }}
       >
-        {isCreate ? "Save" : "Save Changes"}
-      </Button>
+        <Typography variant="h6" color="#002060" sx={{ whiteSpace: "nowrap" }}>
+          Selected ticker is {selectedTicker || "N/A"} – view deal details below.
+        </Typography>
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            justifyContent: "flex-end",
+            flexWrap: "wrap",
+          }}
+        >
+          {editable ? (
+            <>
+              <Button
+                variant="contained"
+                onClick={handleSave}
+                startIcon={isCreate ? <AddIcon /> : <SaveIcon />}
+                sx={{
+                  background: "linear-gradient(to right, #00b894, #55efc4)",
+                  color: "#002060",
+                  fontWeight: 500,
+                  px: 3,
+                  boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
+                  "&:hover": {
+                    background: "linear-gradient(to right,rgb(0, 70, 56), #0055cc)",
+                    color: "#fff",
+                  },
+                }}
+              >
+                {isCreate ? "Save" : "Save Changes"}
+              </Button>
 
-      <Button
-        variant="outlined"
-        onClick={handleCancel}
-        startIcon={<CancelIcon />}
-        sx={{
-          borderColor: "#002060",
-          color: "#002060",
-          fontWeight: 500,
-          px: 3,
-          "&:hover": {
-            borderColor: "#003080",
-            backgroundColor: "#f0f4ff",
-          },
-        }}
-      >
-        Cancel
-      </Button>
+              <Button
+                variant="outlined"
+                onClick={handleCancel}
+                startIcon={<CancelIcon />}
+                sx={{
+                  borderColor: "#002060",
+                  color: "#002060",
+                  fontWeight: 500,
+                  px: 3,
+                  "&:hover": {
+                    borderColor: "#003080",
+                    backgroundColor: "#f0f4ff",
+                  },
+                }}
+              >
+                Cancel
+              </Button>
 
-      <Button
-        variant="outlined"
-        color="warning"
-        onClick={handleReset}
-        startIcon={<RestartAltIcon />}
-        sx={{
-          fontWeight: 500,
-          px: 3,
-          "&:hover": {
-            backgroundColor: "#fff3e0",
-          },
-        }}
-      >
-        Reset
-      </Button>
-    </>
-  ) : (
-    <Button
-      variant="contained"
-      color="secondary"
-      startIcon={<EditIcon />}
-      onClick={handleEdit}
-      sx={{
-        px: 3,
-        fontWeight: 500,
-        background: "#6a1b9a",
-        "&:hover": {
-          background: "#7b1fa2",
-        },
-      }}
-    >
-      Edit
-    </Button>
-  )}
-</Stack>
-
+              <Button
+                variant="outlined"
+                color="warning"
+                onClick={handleReset}
+                startIcon={<RestartAltIcon />}
+                sx={{
+                  fontWeight: 500,
+                  px: 3,
+                  "&:hover": {
+                    backgroundColor: "#fff3e0",
+                  },
+                }}
+              >
+                Reset
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<EditIcon />}
+              onClick={handleEdit}
+              sx={{
+                px: 3,
+                fontWeight: 500,
+                background: "#6a1b9a",
+                "&:hover": {
+                  background: "#7b1fa2",
+                },
+              }}
+            >
+              Edit
+            </Button>
+          )}
+        </Stack>
+      </Stack>
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
