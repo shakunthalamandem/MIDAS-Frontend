@@ -285,6 +285,8 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
     </Box>
   </Grid>
 </Grid>
+<Typography align="center" variant="caption" color="#002060">Note:Some of the data fields are empty due to delayed data from Dealogic.
+</Typography>
 
 
       <Snackbar
