@@ -43,8 +43,9 @@ const formatValue = (value?: number | null): string => {
 
 const getCellStyle = (value: number | null | undefined) => {
   if (value === undefined || value === null) return {};
-  if (value > 0) return { color: green[600], fontWeight: 500 };
-  if (value < 0) return { color: red[500], fontWeight: 500 };
+  if (value > 0) return { color: green[600],  fontWeight: "bold"  };
+  if (value < 0) return { color: red[500], fontWeight: "bold" };
+  if (value === 0) return { color:'#000', fontWeight: "bold" };
   return { color: "#666" };
 };
 
