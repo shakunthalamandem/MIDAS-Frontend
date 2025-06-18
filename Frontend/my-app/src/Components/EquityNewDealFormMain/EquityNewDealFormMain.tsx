@@ -27,7 +27,6 @@ function formatDateSimple(dateString: string): string {
   });
 }
 
-// Define the expected shape of the API response
 type ApiResponse = {
   tickers: TickerOption[];
   default_ticker: string;
@@ -57,7 +56,6 @@ const EquityNewDealFormMain: React.FC = () => {
 
       setOptions(tickers);
 
-      // Set the default selected ticker only if none is selected
       if (!selectedOption && default_ticker) {
         const defaultDeal = tickers.find(
           (item) => item.ticker === default_ticker
