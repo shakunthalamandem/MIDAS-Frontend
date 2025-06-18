@@ -103,7 +103,7 @@ const DealAllocations: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
-        {renderField("Deal Size ", "deal_size")}
+        {renderField("Deal Size ", "deal_size_amount_usd")}
         {renderSelectField("Sponsor", "sponsor", sponsors)}
         {renderField("Percentage Primary", "percentage_primary")}
         {renderField("Issue Price ", "price_local_currency")}
