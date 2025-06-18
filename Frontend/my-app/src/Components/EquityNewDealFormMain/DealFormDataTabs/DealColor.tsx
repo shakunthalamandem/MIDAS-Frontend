@@ -7,7 +7,7 @@ import {
   Slider,
   styled,
 } from "@mui/material";
-import { Palette } from "lucide-react";
+import ColorLensIcon from '@mui/icons-material/ColorLens';
 import { FormSectionProps } from "../../../types/NewDealFormData";
 
 // Styled Slider
@@ -69,7 +69,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
     <>
       <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600} mb={2}>
         <Box display="inline-flex" alignItems="center" gap={1}>
-          <Palette size={20} />
+          <ColorLensIcon  />
           Deal Color & Additional Allocations
         </Box>
       </Typography>

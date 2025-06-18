@@ -5,7 +5,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { BarChart3 } from "lucide-react";
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import { FormSectionProps } from "../../../types/NewDealFormData";
 
 const TechnicalMarketData: React.FC<FormSectionProps> = ({
@@ -45,7 +45,7 @@ const TechnicalMarketData: React.FC<FormSectionProps> = ({
     <>
       <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600} mb={2}>
         <Box display="inline-flex" alignItems="center" gap={1}>
-          <BarChart3 size={20} />
+          <AssessmentIcon  />
           Technical Market Data
         </Box>
       </Typography>

@@ -6,8 +6,8 @@ import {
   MenuItem,
   Box,
 } from "@mui/material";
-import { Info } from "lucide-react";
 import { FormSectionProps } from "../../../types/NewDealFormData";
+import DatasetIcon from '@mui/icons-material/Dataset';
 
 const DealInformation: React.FC<FormSectionProps> = ({
   data,
@@ -153,7 +153,7 @@ const renderSelectField = (
         fontWeight={600}
       >
         <Box display="inline-flex" alignItems="center" gap={1}>
-          <Info size={20} />
+          <DatasetIcon  />
           Deal Information
         </Box>
       </Typography>

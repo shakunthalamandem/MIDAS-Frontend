@@ -7,8 +7,8 @@ import {
   Box,
   MenuItem,
 } from "@mui/material";
-import { PieChart } from "lucide-react";
 import { FormSectionProps } from "../../../types/NewDealFormData";
+import InfoIcon from '@mui/icons-material/Info';
 
 const DealAllocations: React.FC<FormSectionProps> = ({
   data,
@@ -83,7 +83,7 @@ const DealAllocations: React.FC<FormSectionProps> = ({
     <>
       <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600}>
         <Box display="inline-flex" alignItems="center" gap={1}>
-          <PieChart size={20} />
+          <InfoIcon />
           Deal Allocations
         </Box>
       </Typography>

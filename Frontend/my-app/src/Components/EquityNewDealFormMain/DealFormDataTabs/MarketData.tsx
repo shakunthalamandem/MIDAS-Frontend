@@ -5,8 +5,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { TrendingUp } from "lucide-react";
 import { FormSectionProps } from "../../../types/NewDealFormData";
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 const MarketData: React.FC<FormSectionProps> = ({
   data,
@@ -52,7 +52,7 @@ const MarketData: React.FC<FormSectionProps> = ({
     <>
       <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600} mb={2}>
         <Box display="inline-flex" alignItems="center" gap={1}>
-          <TrendingUp size={20} />
+          <TrendingUpIcon />
           Market Data
         </Box>
       </Typography>
