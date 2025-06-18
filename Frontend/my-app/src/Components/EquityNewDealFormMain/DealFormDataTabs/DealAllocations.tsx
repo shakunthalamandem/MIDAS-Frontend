@@ -103,16 +103,15 @@ const DealAllocations: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
-        {renderField("Deal Size ", "deal_size_amount_usd")}
         {renderSelectField("Sponsor", "sponsor", sponsors)}
         {renderField("Percentage Primary", "percentage_primary")}
         {renderField("Issue Price ", "price_local_currency")}
-        {renderField("Discount Percentage", "discount_percentage")}
-        {renderField("Final Indication Amount (USD)", "final_indication_amount_usd")}
-        {renderField("Final Indication Deal Percentage", "final_indication_deal_percentage")}
+        {renderField("Discount From Announcement Price", "discount_percentage")}
+        {renderField("IOI Amount (USD)", "final_indication_amount_usd")}
+        {renderField("IOI as % of Deal Size", "final_indication_deal_percentage")}
         {renderField("Allocation Amount (USD)", "allocation_amount_usd")}
-        {renderField("Allocation Deal Size Percentage", "allocation_deal_size_percentage")}
-        {renderField("Allocation Percentage", "allocation_percentage")}
+        {renderField("Allocation as % of Deal Size ", "allocation_deal_size_percentage")}
+        {renderField("Allocation as % of IOI", "allocation_percentage")}
       </Grid>
     </>
   );
