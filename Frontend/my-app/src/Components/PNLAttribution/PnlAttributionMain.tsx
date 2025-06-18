@@ -3,6 +3,7 @@ import { Box, Typography } from "@mui/material";
 import AssestTypePnlAttribution from "./AssestTypePnlAttribution";
 import PnLSummary from "./PnLSummary";
 import PnlAttributionTable from "./PnlAttributionTable";
+import RegionWisePnlAttribution from "./RegionWisePnlAttribution";
 
 const PnlAttributionMain = () => {
   return (
@@ -37,6 +38,7 @@ const PnlAttributionMain = () => {
       <>
         <PnLSummary />
         <PnlAttributionTable />
+        <RegionWisePnlAttribution />
       </>
     </Box>
   );

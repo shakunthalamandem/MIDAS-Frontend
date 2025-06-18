@@ -28,7 +28,7 @@ const DealAllocations: React.FC<FormSectionProps> = ({
     let newValue = value;
 
     if (percentageFields.includes(name)) {
-      newValue = newValue.replace(/[^0-9.%$]/g, "");
+      newValue = newValue.replace(/[^0-9.%$-]/g, "");
     }
     onChange({ ...data, [name]: newValue });
   };
@@ -99,19 +99,20 @@ const DealAllocations: React.FC<FormSectionProps> = ({
         <Box display="inline-flex" alignItems="center" gap={1}>
           <InfoIcon />
           Deal Allocations
+          
         </Box>
       </Typography>
 
       <Grid container spacing={2}>
         {renderSelectField("Sponsor", "sponsor", sponsors)}
         {renderField("Percentage Primary", "percentage_primary")}
-        {renderField("Price (Local Currency)", "price_local_currency")}
-        {renderField("Discount Percentage", "discount_percentage")}
-        {renderField("Final Indication Amount (USD)", "final_indication_amount_usd")}
-        {renderField("Final Indication Deal Percentage", "final_indication_deal_percentage")}
+        {renderField("Issue Price ", "price_local_currency")}
+        {renderField("Discount From Announcement Price", "discount_percentage")}
+        {renderField("IOI Amount (USD)", "final_indication_amount_usd")}
+        {renderField("IOI as % of Deal Size", "final_indication_deal_percentage")}
         {renderField("Allocation Amount (USD)", "allocation_amount_usd")}
-        {renderField("Allocation Deal Size Percentage", "allocation_deal_size_percentage")}
-        {renderField("Allocation Percentage", "allocation_percentage")}
+        {renderField("Allocation as % of Deal Size ", "allocation_deal_size_percentage")}
+        {renderField("Allocation as % of IOI", "allocation_percentage")}
       </Grid>
     </>
   );
