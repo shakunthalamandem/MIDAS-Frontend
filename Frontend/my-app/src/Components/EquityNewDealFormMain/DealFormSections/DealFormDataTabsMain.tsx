@@ -214,58 +214,58 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
           )}
         </Stack>
       </Stack>
+<Grid container spacing={2} alignItems="stretch">
+  <Grid item xs={12} md={6} mb={4}>
+    <Box sx={{ ...gradientBackground, height: "100%" }}>
+      <DealInformation
+        data={localData?.deal_information || {}}
+        editable={editable}
+        onChange={(data) => updateSection("deal_information", data)}
+      />
+    </Box>
+  </Grid>
 
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <Box sx={gradientBackground}>
-            <DealInformation
-              data={localData?.deal_information || {}}
-              editable={editable}
-              onChange={(data) => updateSection("deal_information", data)}
-            />
-          </Box>
-        </Grid>
+  <Grid item xs={12} md={6} mb={4}>
+    <Box sx={{ ...gradientBackground, height: "100%" }}>
+      <DealAllocations
+        data={localData?.deal_allocations || {}}
+        editable={editable}
+        onChange={(data) => updateSection("deal_allocations", data)}
+      />
+    </Box>
+  </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Box sx={gradientBackground}>
-            <DealAllocations
-              data={localData?.deal_allocations || {}}
-              editable={editable}
-              onChange={(data) => updateSection("deal_allocations", data)}
-            />
-          </Box>
-        </Grid>
+  <Grid item xs={12} md={6} mb={4}>
+    <Box sx={{ ...gradientBackground, height: "100%" }}>
+      <MarketData
+        data={localData?.market_data || {}}
+        editable={editable}
+        onChange={(data) => updateSection("market_data", data)}
+      />
+    </Box>
+  </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Box sx={gradientBackground}>
-            <MarketData
-              data={localData?.market_data || {}}
-              editable={editable}
-              onChange={(data) => updateSection("market_data", data)}
-            />
-          </Box>
-        </Grid>
+  <Grid item xs={12} md={6} mb={4}>
+    <Box sx={{ ...gradientBackground, height: "100%" }}>
+      <TechnicalMarketData
+        data={localData?.technical_market_data || {}}
+        editable={editable}
+        onChange={(data) => updateSection("technical_market_data", data)}
+      />
+    </Box>
+  </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Box sx={gradientBackground}>
-            <TechnicalMarketData
-              data={localData?.technical_market_data || {}}
-              editable={editable}
-              onChange={(data) => updateSection("technical_market_data", data)}
-            />
-          </Box>
-        </Grid>
+  <Grid item xs={12} mb={4}>
+    <Box sx={gradientBackground}>
+      <DealColor
+        data={localData?.deal_color || {}}
+        editable={editable}
+        onChange={(data) => updateSection("deal_color", data)}
+      />
+    </Box>
+  </Grid>
+</Grid>
 
-        <Grid item xs={12}>
-          <Box sx={gradientBackground}>
-            <DealColor
-              data={localData?.deal_color || {}}
-              editable={editable}
-              onChange={(data) => updateSection("deal_color", data)}
-            />
-          </Box>
-        </Grid>
-      </Grid>
 
       <Snackbar
         open={snackbar.open}

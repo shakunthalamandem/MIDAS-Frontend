@@ -99,6 +99,7 @@ const DealAllocations: React.FC<FormSectionProps> = ({
         <Box display="inline-flex" alignItems="center" gap={1}>
           <InfoIcon />
           Deal Allocations
+          
         </Box>
       </Typography>
 
