@@ -28,7 +28,7 @@ const DealAllocations: React.FC<FormSectionProps> = ({
     let newValue = value;
 
     if (percentageFields.includes(name)) {
-      newValue = newValue.replace(/[^0-9.%$]/g, "");
+      newValue = newValue.replace(/[^0-9.%$-]/g, "");
     }
     onChange({ ...data, [name]: newValue });
   };
@@ -103,9 +103,10 @@ const DealAllocations: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
+        {renderField("Deal Size ", "deal_size")}
         {renderSelectField("Sponsor", "sponsor", sponsors)}
         {renderField("Percentage Primary", "percentage_primary")}
-        {renderField("Price (Local Currency)", "price_local_currency")}
+        {renderField("Issue Price ", "price_local_currency")}
         {renderField("Discount Percentage", "discount_percentage")}
         {renderField("Final Indication Amount (USD)", "final_indication_amount_usd")}
         {renderField("Final Indication Deal Percentage", "final_indication_deal_percentage")}
