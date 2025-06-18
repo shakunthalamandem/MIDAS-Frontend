@@ -117,16 +117,7 @@ useEffect(() => {
             <Typography variant="body1" color="text.secondary">
               Create or search for an equity deal by ticker and pricing date to get the complete deal form.
             </Typography>
-            {selectedOption?.ticker && (
-              <Typography
-                variant="subtitle2"
-                color="primary"
-                mt={1}
-                fontWeight={500}
-              >
-                Selected Deal: {selectedOption.ticker}
-              </Typography>
-            )}
+            
           </Box>
 
           <Box

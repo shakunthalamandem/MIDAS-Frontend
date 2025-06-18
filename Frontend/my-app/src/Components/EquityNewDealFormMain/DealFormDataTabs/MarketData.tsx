@@ -8,13 +8,27 @@ import {
 import { FormSectionProps } from "../../../types/NewDealFormData";
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
+const percentFields = [
+  "ltm_dividend_yield",
+  "ltm_fcf_yield",
+  "percent_of_free_float_current_float",
+  "short_interest_percentage_of_deal",
+  "percent_change_last_7_days",
+  "percent_below_52_week_high"
+];
+
 const MarketData: React.FC<FormSectionProps> = ({
   data,
   editable,
   onChange,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...data, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let newValue = value;
+    if (percentFields.includes(name)) {
+      newValue = newValue.replace(/[^0-9.%$]/g, "");
+    }
+    onChange({ ...data, [name]: newValue });
   };
 
   const renderField = (
