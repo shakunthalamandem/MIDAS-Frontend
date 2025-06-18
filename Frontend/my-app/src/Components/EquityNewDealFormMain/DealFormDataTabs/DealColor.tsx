@@ -13,7 +13,7 @@ import {
   RadioGroup,
   FormLabel,
 } from "@mui/material";
-import ColorLensIcon from '@mui/icons-material/ColorLens';
+import ColorLensIcon from "@mui/icons-material/ColorLens";
 import { FormSectionProps } from "../../../types/NewDealFormData";
 import type { SelectChangeEvent } from "@mui/material";
 
@@ -21,30 +21,30 @@ const BlueSlider = styled(Slider)({
   color: "#002060",
   height: 6,
   padding: "35px 0",
-  '& .MuiSlider-thumb': {
+  "& .MuiSlider-thumb": {
     height: 16,
     width: 16,
     backgroundColor: "#002060",
     border: "2px solid white",
     transition: "0.3s ease-in-out",
-    '&:hover': {
+    "&:hover": {
       boxShadow: "0 0 0 6px rgba(0, 32, 96, 0.2)",
     },
   },
-  '& .MuiSlider-track': {
+  "& .MuiSlider-track": {
     border: "none",
     backgroundColor: "#002060",
   },
-  '& .MuiSlider-rail': {
+  "& .MuiSlider-rail": {
     opacity: 0.3,
     backgroundColor: "#002060",
   },
-  '& .MuiSlider-valueLabel': {
-    backgroundColor: '#c35305',
-    color: '#fff',
+  "& .MuiSlider-valueLabel": {
+    backgroundColor: "#c35305",
+    color: "#fff",
     borderRadius: 4,
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 
@@ -55,13 +55,9 @@ const parsePercent = (value: string | number | undefined): number =>
       ? value
       : 0;
 
-interface DealColorProps extends FormSectionProps { }
+interface DealColorProps extends FormSectionProps {}
 
-const DealColor: React.FC<DealColorProps> = ({
-  data,
-  editable,
-  onChange,
-}) => {
+const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
   const [timesCovered, setTimesCovered] = React.useState(
     data.times_covered || ""
   );
@@ -69,7 +65,9 @@ const DealColor: React.FC<DealColorProps> = ({
     data.top_allocation || "top 10"
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     onChange({ ...data, [e.target.name]: e.target.value });
   };
 
@@ -82,7 +80,9 @@ const DealColor: React.FC<DealColorProps> = ({
     onChange({ ...data, top_allocation: event.target.value });
   };
 
-  const handleTimesCoveredChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTimesCoveredChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTimesCovered(event.target.value);
     onChange({ ...data, times_covered: event.target.value });
   };
@@ -95,7 +95,14 @@ const DealColor: React.FC<DealColorProps> = ({
 
   return (
     <>
-      <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600} mb={2}>
+      <Typography
+        variant="h6"
+        gutterBottom
+        align="center"
+        color="#002060"
+        fontWeight={600}
+        mb={2}
+      >
         <Box display="inline-flex" alignItems="center" gap={1}>
           <ColorLensIcon />
           Deal Color & Additional Allocations
@@ -105,7 +112,10 @@ const DealColor: React.FC<DealColorProps> = ({
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <FormControl component="fieldset" sx={{ mb: 2 }}>
-            <FormLabel component="legend" sx={{ color: "#002060", fontWeight: 600 }}>
+            <FormLabel
+              component="legend"
+              sx={{ color: "#002060", fontWeight: 600 }}
+            >
               Times Covered:
             </FormLabel>
             <RadioGroup
@@ -115,16 +125,84 @@ const DealColor: React.FC<DealColorProps> = ({
               onChange={handleTimesCoveredChange}
             >
               <Box display="flex" alignItems="center" mr={2}>
-                <Radio value="1x-5x" size="small" disabled={!editable} />
-                <Typography variant="body2" component="span" color="#002060">1x to 5x</Typography>
+                <Radio
+                  value="1x-5x"
+                  size="small"
+                  disabled={!editable}
+                  sx={{
+                    color: "#002060", // unselected state
+                    "&.Mui-checked": {
+                      color: "#002060", // selected state
+                    },
+                    "&.Mui-disabled": {
+                      color: "#002060", // disabled color
+                    },
+                  }}
+                />
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{
+                    color: "#002060",
+                    WebkitTextFillColor: "#002060",
+                  }}
+                >
+                  1x to 5x
+                </Typography>
               </Box>
+
               <Box display="flex" alignItems="center" mr={2}>
-                <Radio value="5x-10x" size="small" disabled={!editable} />
-                <Typography variant="body2" component="span" color="#002060">5x to 10x</Typography>
+                <Radio
+                  value="5x-10x"
+                  size="small"
+                  disabled={!editable}
+                  sx={{
+                    color: "#002060",
+                    "&.Mui-checked": {
+                      color: "#002060",
+                    },
+                    "&.Mui-disabled": {
+                      color: "#002060",
+                    },
+                  }}
+                />
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{
+                    color: "#002060",
+                    WebkitTextFillColor: "#002060",
+                  }}
+                >
+                  5x to 10x
+                </Typography>
               </Box>
+
               <Box display="flex" alignItems="center">
-                <Radio value="greater than 10x" size="small" disabled={!editable} />
-                <Typography variant="body2" component="span" color="#002060">Greater than 10x</Typography>
+                <Radio
+                  value="greater than 10x"
+                  size="small"
+                  disabled={!editable}
+                  sx={{
+                    color: "#002060",
+                    "&.Mui-checked": {
+                      color: "#002060",
+                    },
+                    "&.Mui-disabled": {
+                      color: "#002060",
+                    },
+                  }}
+                />
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{
+                    color: "#002060",
+                    WebkitTextFillColor: "#002060",
+                  }}
+                >
+                  Greater than 10x
+                </Typography>
               </Box>
             </RadioGroup>
           </FormControl>
@@ -137,7 +215,10 @@ const DealColor: React.FC<DealColorProps> = ({
                 <BlueSlider
                   value={longOnly}
                   onChange={(_, value) =>
-                    handleSliderChange("long_only_allocation_percent", value as number)
+                    handleSliderChange(
+                      "long_only_allocation_percent",
+                      value as number
+                    )
                   }
                   valueLabelDisplay="on"
                   step={1}
@@ -156,7 +237,10 @@ const DealColor: React.FC<DealColorProps> = ({
                 <BlueSlider
                   value={hedgeFunds}
                   onChange={(_, value) =>
-                    handleSliderChange("hedge_funds_allocation_percent", value as number)
+                    handleSliderChange(
+                      "hedge_funds_allocation_percent",
+                      value as number
+                    )
                   }
                   valueLabelDisplay="on"
                   step={1}
@@ -190,7 +274,10 @@ const DealColor: React.FC<DealColorProps> = ({
                 <BlueSlider
                   value={top10}
                   onChange={(_, value) =>
-                    handleSliderChange("top_10_allocation_concentration_percent", value as number)
+                    handleSliderChange(
+                      "top_10_allocation_concentration_percent",
+                      value as number
+                    )
                   }
                   valueLabelDisplay="on"
                   step={1}
@@ -236,31 +323,30 @@ const DealColor: React.FC<DealColorProps> = ({
 
         {/* RIGHT: Deal Color Text Area */}
         <Grid item xs={12} md={6}>
-         <TextField
-  label="Deal Colour"
-  name="deal_colour"
-  value={data.deal_colour || ""}
-  onChange={handleChange}
-  fullWidth
-  multiline
-  minRows={10}
-  size="small"
-  disabled={!editable}
-  variant={editable ? "outlined" : "filled"}
-  InputLabelProps={{ style: { color: "#002060" } }}
-  InputProps={{
-    sx: {
-      "&.Mui-disabled": {
-        WebkitTextFillColor: "#b1062e",
-      },
-      "& textarea.Mui-disabled": {
-        WebkitTextFillColor: "#b1062e",
-        color: "#b1062e", // for fallback
-      },
-    },
-  }}
-/>
-
+          <TextField
+            label="Deal Colour"
+            name="deal_colour"
+            value={data.deal_colour || ""}
+            onChange={handleChange}
+            fullWidth
+            multiline
+            minRows={10}
+            size="small"
+            disabled={!editable}
+            variant={editable ? "outlined" : "filled"}
+            InputLabelProps={{ style: { color: "#002060" } }}
+            InputProps={{
+              sx: {
+                "&.Mui-disabled": {
+                  WebkitTextFillColor: "#b1062e",
+                },
+                "& textarea.Mui-disabled": {
+                  WebkitTextFillColor: "#b1062e",
+                  color: "#b1062e", // for fallback
+                },
+              },
+            }}
+          />
         </Grid>
       </Grid>
     </>
