@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, Stack, Alert, Snackbar, Grid, Typography } from "@mui/material";
 import DealInformation from "../DealFormDataTabs/DealInformation";
 import DealAllocations from "../DealFormDataTabs/DealAllocations";
@@ -28,6 +28,7 @@ interface Props {
 }
 
 const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTicker }) => {
+  console.log("DealFormDataTabsMain rendered with formData:", formData, "isCreate:", isCreate, "selectedTicker:", selectedTicker);
   const [editable, setEditable] = useState<boolean>(isCreate);
   const [localData, setLocalData] = useState<FormData>(formData);
   const [originalData] = useState<FormData>(formData);
@@ -40,6 +41,23 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
     message: "",
     severity: "success",
   });
+
+  useEffect(() => {
+    if (isCreate) {
+      const emptyData: FormData = {
+        deal_information: {},
+        deal_allocations: {},
+        market_data: {},
+        technical_market_data: {},
+        deal_color: {},
+      };
+      setLocalData(emptyData);
+      setEditable(true);
+    } else {
+      setLocalData(formData);
+      setEditable(false);
+    }
+  }, [isCreate, formData]);
 
   const handleSave = async () => {
     try {
@@ -129,7 +147,9 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
         sx={{ mb: 2 }}
       >
         <Typography variant="h6" color="#002060" sx={{ whiteSpace: "nowrap" }}>
-          Selected ticker is {selectedTicker || "N/A"} – view deal details below.
+          {isCreate
+            ? "Creating a new deal – Please fill in the form below."
+            : `Selected ticker: ${selectedTicker || "N/A"} – view or edit deal details below.`}
         </Typography>
         <Stack
           direction="row"

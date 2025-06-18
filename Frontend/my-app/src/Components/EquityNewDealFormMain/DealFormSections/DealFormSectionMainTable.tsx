@@ -3,7 +3,6 @@ import { Alert, CircularProgress, Box } from '@mui/material';
 import { SelectedOption } from '../../../types/NewDealFormData';
 import DealFormDataTabsMain from './DealFormDataTabsMain';
 
-// Define the FormData type to match the expected structure
 interface FormData {
   deal_information: any;
   deal_allocations: any;
