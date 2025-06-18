@@ -50,7 +50,7 @@ const MarketData: React.FC<FormSectionProps> = ({
 
   return (
     <>
-      <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600}>
+      <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600} mb={2}>
         <Box display="inline-flex" alignItems="center" gap={1}>
           <TrendingUp size={20} />
           Market Data

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import {
   Box,
@@ -27,6 +27,12 @@ function formatDateSimple(dateString: string): string {
   });
 }
 
+// Define the expected shape of the API response
+type ApiResponse = {
+  tickers: TickerOption[];
+  default_ticker: string;
+};
+
 const EquityNewDealFormMain: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<SelectedOption | null>(null);
   const [options, setOptions] = useState<TickerOption[]>([]);
@@ -40,13 +46,27 @@ const EquityNewDealFormMain: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${apiUrl}/api/new_deal_ticker_list/`, {
+      const response = await axios.get<ApiResponse>(`${apiUrl}/api/new_deal_ticker_list/`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-      setOptions(response.data as TickerOption[]);
+
+      const { tickers, default_ticker } = response.data;
+
+      setOptions(tickers);
+
+      // Set the default selected ticker only if none is selected
+      if (!selectedOption && default_ticker) {
+        const defaultDeal = tickers.find(
+          (item) => item.ticker === default_ticker
+        );
+        if (defaultDeal) {
+          setSelectedOption({ ...defaultDeal, create: false });
+        }
+      }
+
     } catch (err) {
       console.error("API call failed:", err);
       setError("API call failed, showing demo data");
@@ -54,7 +74,9 @@ const EquityNewDealFormMain: React.FC = () => {
       setLoading(false);
     }
   };
-
+useEffect(() => {
+  handleSearchClick();
+}, []);
   const handleCreateClick = () => {
     setSelectedOption({ ticker: "", pricing_date: "", create: true });
     if (autoCompleteRef.current) {
@@ -97,7 +119,7 @@ const EquityNewDealFormMain: React.FC = () => {
             <Typography variant="body1" color="text.secondary">
               Create or search for an equity deal by ticker and pricing date to get the complete deal form.
             </Typography>
-            {selectedOption && selectedOption.ticker && (
+            {selectedOption?.ticker && (
               <Typography
                 variant="subtitle2"
                 color="primary"
@@ -145,6 +167,15 @@ const EquityNewDealFormMain: React.FC = () => {
               onChange={handleAutocompleteChange}
               onOpen={handleSearchClick}
               loading={loading}
+              value={
+                selectedOption?.ticker
+                  ? options.find(
+                      (opt) =>
+                        opt.ticker === selectedOption.ticker &&
+                        opt.pricing_date === selectedOption.pricing_date
+                    ) || null
+                  : null
+              }
               renderInput={(params) => (
                 <TextField
                   {...params}
