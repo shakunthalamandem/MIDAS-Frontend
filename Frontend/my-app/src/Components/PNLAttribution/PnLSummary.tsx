@@ -21,7 +21,7 @@ interface PnLData {
   };
 }
 
-const timeRanges = ["1D", "MTD", "QTD", "YTD"];
+const timeRanges = ["DTD", "MTD", "QTD", "YTD"];
 const assetOrder = [
   "Equities",
   "Convertible Bond",
@@ -92,7 +92,7 @@ const PnLSummary: React.FC = () => {
 
   const calculateTotals = (): { [range: string]: number } => {
     const totals: { [range: string]: number } = {
-      "1D": 0,
+      "DTD": 0,
       MTD: 0,
       QTD: 0,
       YTD: 0,
@@ -123,7 +123,7 @@ const PnLSummary: React.FC = () => {
       <Typography variant="body1" align="left" sx={{ color: "#666", mb: 2 }}>
         Gain a quick snapshot of Monashee’s profit and loss across major asset
         types including Cash, Equities, Bonds, and Derivatives, measured over
-        multiple timeframes: 1 Day (1D), Month-to-Date (MTD), Quarter-to-Date
+        multiple timeframes: 1 Day (DTD), Month-to-Date (MTD), Quarter-to-Date
         (QTD), and Year-to-Date (YTD). This summary highlights where gains or
         losses are concentrated at a portfolio-wide level.
       </Typography>
