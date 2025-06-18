@@ -14,6 +14,7 @@ import { FormSectionProps } from "../../../types/NewDealFormData";
 const BlueSlider = styled(Slider)({
   color: "#002060",
   height: 6,
+  padding: "35px 0",
   '& .MuiSlider-thumb': {
     height: 16,
     width: 16,
@@ -41,7 +42,6 @@ const BlueSlider = styled(Slider)({
   },
 });
 
-// Utility to parse percentage string like "51.0%" into number
 const parsePercent = (value: string | number | undefined): number =>
   typeof value === "string"
     ? parseFloat(value.replace("%", "")) || 0
@@ -80,7 +80,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <Typography gutterBottom color="#002060">
-                Long Only Allocation
+                Long Only Allocation (%)
               </Typography>
               <BlueSlider
                 value={longOnly}
@@ -97,7 +97,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
 
             <Grid item xs={12} sm={6}>
               <Typography gutterBottom color="#002060">
-                Hedge Funds Allocation
+                Hedge Funds Allocation (%)
               </Typography>
               <BlueSlider
                 value={hedgeFunds}
@@ -114,7 +114,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
 
             <Grid item xs={12} sm={6}>
               <Typography gutterBottom color="#002060">
-                Allocation Concentration %
+                Allocation Concentration (%)
               </Typography>
               <BlueSlider
                 value={top10}
@@ -131,7 +131,7 @@ const DealColor: React.FC<FormSectionProps> = ({ data, editable, onChange }) => 
 
             <Grid item xs={12} sm={6}>
               <Typography gutterBottom color="#002060">
-                Institutional vs Retail Allocation
+                Institutional vs Retail Allocation (%)
               </Typography>
               <BlueSlider
                 value={institutional}
