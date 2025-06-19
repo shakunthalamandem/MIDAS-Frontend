@@ -52,7 +52,7 @@ const IPODashboardMain: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [allIpoTickers, setAllIpoTickers] = useState<string[]>([]);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(
-    ticker || "CRWV"
+    ticker || ""
   );
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const IPODashboardMain: React.FC = () => {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
         const savedTicker = localStorage.getItem("selected_ticker");
-        setSelectedTicker(savedTicker || "CRWV");
+        setSelectedTicker(savedTicker || "");
         if (!apiUrl) throw new Error("API URL not defined");
 
         const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
@@ -97,7 +97,7 @@ const IPODashboardMain: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker: selectedTicker || "CRWV" }),
+          body: JSON.stringify({ ticker: selectedTicker || "" }),
         });
 
         if (!response.ok) {
@@ -239,13 +239,13 @@ const IPODashboardMain: React.FC = () => {
                   <Grid item xs={12}>
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <FinancialForecastTable
-                        defaultTicker={selectedTicker || "CRWV"}
+                        defaultTicker={selectedTicker || ""}
                       />
                     </Box>
                   </Grid>
                   <Grid item xs={12}>
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                      <IPODashboardMainTable ticker={selectedTicker || "CRWV"} />
+                      <IPODashboardMainTable ticker={selectedTicker || ""} />
                     </Box>
                   </Grid>
                 </Grid>
