@@ -55,6 +55,7 @@ import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 import PnlAttributionMain from "../Components/PNLAttribution/PnlAttributionMain";
 import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
 import EquityNewDealFormMain from "../Components/EquityNewDealFormMain/EquityNewDealFormMain";
+import LkFileUpload from "../Components/Uploads/LkFileUpload";
 
 
 
@@ -159,6 +160,8 @@ const AppRouters: React.FC = () => {
         <Route path="/uploads" element={<AuthGuard><MainUpload /></AuthGuard>} />
         <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
+        <Route path="/lkfile_upload" element={<AuthGuard><LkFileUpload/></AuthGuard>}/>
+  
 
 
 <Route
