@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import {
   Box,
   Typography,
@@ -11,6 +13,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Button
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
@@ -20,7 +23,6 @@ import IPODashboardCardRatings from "./IPODashboardCardRatings";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
-
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -125,6 +127,33 @@ const IPODashboardMain: React.FC = () => {
     if (selectedTicker) fetchData();
   }, [selectedTicker]);
 
+  const handleExportPDF = async () => {
+    const cardsElement = document.getElementById("ipo-dashboard-cards");
+    const tablesElement = document.getElementById("ipo-dashboard-tables");
+    if (cardsElement && tablesElement) {
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4"
+      });
+
+      const cardsCanvas = await html2canvas(cardsElement, { scale: 2 });
+      const cardsImgData = cardsCanvas.toDataURL("image/png");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const cardsProps = pdf.getImageProperties(cardsImgData);
+      const cardsHeight = (cardsProps.height * pdfWidth) / cardsProps.width;
+      pdf.addImage(cardsImgData, "PNG", 0, 0, pdfWidth, cardsHeight);
+
+      pdf.addPage();
+      const tablesCanvas = await html2canvas(tablesElement, { scale: 2 });
+      const tablesImgData = tablesCanvas.toDataURL("image/png");
+      const tablesProps = pdf.getImageProperties(tablesImgData);
+      const tablesHeight = (tablesProps.height * pdfWidth) / tablesProps.width;
+      pdf.addImage(tablesImgData, "PNG", 0, 0, pdfWidth, tablesHeight);
+
+      pdf.save(`IPO-Dashboard-${selectedTicker}.pdf`);
+    }
+  };
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
@@ -132,75 +161,97 @@ const IPODashboardMain: React.FC = () => {
     <Box sx={{ px: 2 }}>
       {ipoData && (
         <>
-          <IPODashboardHeader
-            ipoData={ipoData}
-            allIpoTickers={allIpoTickers}
-            selectedTicker={selectedTicker}
-            searchText={searchText}
-            setSelectedTicker={setSelectedTicker}
-            setSearchText={setSearchText}
-          />
+          <Box sx={{ position: "relative", height: "60px" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleExportPDF}
+              sx={{
+                position: "absolute",
+                right: 0,
+                top: "85px",
+              }}
+            >
+              Export to PDF
+            </Button>
+          </Box>
 
-          <IPODashboardCardRatings ipodata={ipoData} />
+          <div>
+            <div id="ipo-dashboard-cards">
+              <IPODashboardHeader
+                ipoData={ipoData}
+                allIpoTickers={allIpoTickers}
+                selectedTicker={selectedTicker}
+                searchText={searchText}
+                setSelectedTicker={setSelectedTicker}
+                setSearchText={setSearchText}
+              />
 
-          <Container maxWidth="xl" sx={{ mb: 3 }}>
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-              {cardSections.map((section, index) => {
-                const content = ipoData[section.key];
 
-                return (
-                  <Grid item xs={12} md={6} key={section.key}>
-                    <Card
-                      sx={{
-                        backgroundColor: cardColors[index % cardColors.length],
-                        borderRadius: 2,
-                        boxShadow: 3,
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-                        <Typography
-                          variant="h6"
-                          sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
-                          align="center"
+              <IPODashboardCardRatings ipodata={ipoData} />
+              <Container maxWidth="xl" sx={{ mb: 3 }}>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  {cardSections.map((section, index) => {
+                    const content = ipoData[section.key];
+                    return (
+                      <Grid item xs={12} md={6} key={section.key}>
+                        <Card
+                          sx={{
+                            backgroundColor: cardColors[index % cardColors.length],
+                            borderRadius: 2,
+                            boxShadow: 3,
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
                         >
-                          {section.title}
-                        </Typography>
-                        <List dense>
-                          {content?.map((item: string, idx: number) => (
-                            <ListItem key={idx} sx={{ pl: 0 }}>
-                              <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                                <FiberManualRecordIcon
-                                  sx={{ fontSize: 8, color: "#002060" }}
-                                />
-                              </ListItemIcon>
-                              <ListItemText primary={item} />
-                            </ListItem>
-                          ))}
-                        </List>
-                      </CardContent>
-                    </Card>
+                          <CardContent sx={{ overflowY: "auto", flex: 1 }}>
+                            <Typography
+                              variant="h6"
+                              sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
+                              align="center"
+                            >
+                              {section.title}
+                            </Typography>
+                            <List dense>
+                              {content?.map((item: string, idx: number) => (
+                                <ListItem key={idx} sx={{ pl: 0 }}>
+                                  <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
+                                    <FiberManualRecordIcon
+                                      sx={{ fontSize: 8, color: "#002060" }}
+                                    />
+                                  </ListItemIcon>
+                                  <ListItemText primary={item} />
+                                </ListItem>
+                              ))}
+                            </List>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              </Container>
+            </div>
+            <div id="ipo-dashboard-tables">
+              <Container maxWidth="xl" sx={{ mb: 3 }}>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid item xs={12}>
+                    <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                      <FinancialForecastTable
+                        defaultTicker={selectedTicker || "CRWV"}
+                      />
+                    </Box>
                   </Grid>
-                );
-              })}
-
-              <Grid item xs={12}>
-                <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                  <FinancialForecastTable
-                    defaultTicker={selectedTicker || "CRWV"}
-                  />
-                </Box>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                  <IPODashboardMainTable ticker={selectedTicker || "CRWV"}/>
-                </Box>
-              </Grid>
-            </Grid>
-          </Container>
+                  <Grid item xs={12}>
+                    <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                      <IPODashboardMainTable ticker={selectedTicker || "CRWV"} />
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Container>
+            </div>
+          </div>
         </>
       )}
     </Box>
