@@ -7,7 +7,9 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Box,
 } from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 interface TableData {
   Total_Deal_Count: number;
@@ -98,34 +100,47 @@ const LeadBankTableData: React.FC<LeadBankTableDataProps> = ({ data, onRowClick 
           {Object.keys(yearwiseData).map((year) => {
             const row = yearwiseData[year];
             return (
-              <TableRow
-                key={year}
-                hover
-                sx={{ cursor: onRowClick ? "pointer" : "default" }}
-                onClick={() => onRowClick?.(year)}
-              >
-                <TableCell sx={{ padding: "4px 8px" }}>{year}</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{row.Total_Deal_Count}</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Total_Deal_Volume)}</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{row.Positively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{row.Negatively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{row.Average_T1M_Abs_Return_of_Positively.toFixed(1)}%</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{row.Average_T1M_Abs_Return_of_Negatively.toFixed(1)}%</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{row.Expected_Returns_Excess.toFixed(1)}%</TableCell>
-                <TableCell sx={{ padding: "4px 8px" }}>{formatNumber(row.Long_Opportunity_Value)}</TableCell>
+              <TableRow key={year} hover>
+                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>{year}</TableCell>
+                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>{row.Total_Deal_Count}</TableCell>
+                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>{formatNumber(row.Total_Deal_Volume)}</TableCell>
+                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>{row.Positively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
+                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>{row.Negatively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
+                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>{row.Average_T1M_Abs_Return_of_Positively.toFixed(1)}%</TableCell>
+                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>{row.Average_T1M_Abs_Return_of_Negatively.toFixed(1)}%</TableCell>
+                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>{row.Expected_Returns_Excess.toFixed(1)}%</TableCell>
+                <TableCell sx={{ padding: '4px 8px', fontSize: '0.875rem' }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                    }}
+                  >
+                    <span>{formatNumber(row.Long_Opportunity_Value)}</span>
+                    <Box
+                      onClick={() => onRowClick?.(year)}
+                      sx={{ cursor: 'pointer', pl: 1 }}
+                    >
+                      <MoreHorizIcon fontSize="small" />
+                    </Box>
+                  </Box>
+                </TableCell>
+
               </TableRow>
             );
           })}
           <TableRow key="total">
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", textAlign: "center" }}>Total</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{yearwiseTotal.Total_Deal_Count_Sum}</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{formatNumber(yearwiseTotal.Total_Deal_Volume_Sum)}</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{yearwiseTotal.Total_Postively_Performing_Deals.toFixed(0)}%</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{yearwiseTotal.Total_Negatively_Performing_Deals.toFixed(0)}%</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{yearwiseTotal.Total_Returns_positively.toFixed(1)}%</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{yearwiseTotal.Total_Returns_negatively.toFixed(1)}%</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{yearwiseTotal.Total_Expected_returns_excess.toFixed(1)}%</TableCell>
-            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{formatNumber(yearwiseTotal.Total_Long_Opportunity_Value)}</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem", textAlign: "center" }}>Total</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem" }}>{yearwiseTotal.Total_Deal_Count_Sum}</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem" }}>{formatNumber(yearwiseTotal.Total_Deal_Volume_Sum)}</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem" }}>{yearwiseTotal.Total_Postively_Performing_Deals.toFixed(0)}%</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem" }}>{yearwiseTotal.Total_Negatively_Performing_Deals.toFixed(0)}%</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem" }}>{yearwiseTotal.Total_Returns_positively.toFixed(1)}%</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem" }}>{yearwiseTotal.Total_Returns_negatively.toFixed(1)}%</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem" }}>{yearwiseTotal.Total_Expected_returns_excess.toFixed(1)}%</TableCell>
+            <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem" }}>{formatNumber(yearwiseTotal.Total_Long_Opportunity_Value)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
