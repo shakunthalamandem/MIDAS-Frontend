@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogActions,
   CardContent,
-  Card
+  Card,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import IPOdashboardLine from "./IPOdashboardLine";
@@ -116,14 +116,19 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
           elevation={0}
           sx={{
             borderRadius: 4,
-            background: "linear-gradient(to right, #fff3e0, #fce4ec)",
+            background: "linear-gradient(to right, #e0f7fa, #e1f5fe)",
             p: 3,
-            maxWidth: 600,
+            maxWidth: 900,
             width: "100%",
             mx: "auto",
           }}
         >
-          <CardContent>
+          <CardContent
+            sx={{
+              maxHeight: "400px",
+              overflowY: "auto",
+            }}
+          >
             <Typography
               variant="h6"
               sx={{ mb: 2, fontWeight: 700, color: "#6a1b9a" }}
@@ -131,7 +136,8 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
             >
               Valuation Information
             </Typography>
-            {Array.isArray(ipoData.valuation) && ipoData.valuation.length > 0 ? (
+            {Array.isArray(ipoData.valuation) &&
+            ipoData.valuation.length > 0 ? (
               <Box component="ul" sx={{ pl: 2, color: "#333" }}>
                 {ipoData.valuation.map((item: string, index: number) => (
                   <li key={index} style={{ marginBottom: 8, lineHeight: 1.6 }}>
@@ -153,14 +159,17 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
               </Typography>
             )}
           </CardContent>
+
           <Box textAlign="center" mt={2}>
-            <Button onClick={() => setOpenValuationDialog(false)} variant="outlined">
+            <Button
+              onClick={() => setOpenValuationDialog(false)}
+              variant="outlined"
+            >
               Close
             </Button>
           </Box>
         </Card>
       </Dialog>
-
     </Container>
   );
 };
