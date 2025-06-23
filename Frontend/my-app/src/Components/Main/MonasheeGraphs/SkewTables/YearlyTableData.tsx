@@ -1,7 +1,9 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import {
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper
+} from '@mui/material';
 
-// Type definition for the table data
 interface TableData {
   Total_Deal_Count: number;
   Total_Deal_Volume: number;
@@ -27,7 +29,9 @@ interface SectorTableDataProps {
       Total_Long_Opportunity_Value: number;
     };
   };
+  onRowClick?: (sector: string) => void;
 }
+
 const formatNumber = (value: number): string => {
   const absValue = Math.abs(value); // Get the absolute value for formatting
   let formattedValue: string;
@@ -45,25 +49,18 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`; // Ensure dollar sign is correctly placed
 };
 
-const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
+const YearlyTableData: React.FC<SectorTableDataProps> = ({ data, onRowClick }) => {
   const sectorwiseData = data?.Sectorwise;
   const sectorwiseTotal = data?.sectorwise_total;
 
-  if (!sectorwiseData || !sectorwiseTotal) {
-    return <div>No data available</div>;
-  }
+  if (!sectorwiseData || !sectorwiseTotal) return <div>No data available</div>;
 
-  // Columns for the table
   const columns = [
-    'Sector',
-    'Total Deal Count',
-    'Total Deal Volume ($)',
-    '% of Positively Performing Deals ',
-    '% of Negatively Performing Deals ',
+    'Sector', 'Total Deal Count', 'Total Deal Volume ($)',
+    '% of Positively Performing Deals ', '% of Negatively Performing Deals ',
     'Weighted Avg T+1M Excess Return (Positive Deals)',
     'Weighted Avg T+1M Excess Return (Negative Deals)',
-    'Expected Returns Excess',
-    'Opportunity Value (T + 1M Excess)',
+    'Expected Returns Excess', 'Opportunity Value (T + 1M Excess)'
   ];
 
   // Extract totals from sectorwiseTotal
@@ -81,29 +78,25 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
       <Table>
         <TableHead>
           <TableRow>
-            {columns.map((column) => (
-              <TableCell
-                key={column}
-                sx={{
-                  fontWeight: 'bold',
-                  textAlign: 'left',
-                  padding: '4px 8px',
-                  fontSize: '0.875rem',
-                  bgcolor: '#002060',
-                  color: '#FFFFFF',
-                }}
-              >
-                {column}
+            {columns.map((col) => (
+              <TableCell key={col} sx={{
+                fontWeight: 'bold', textAlign: 'left',
+                padding: '4px 8px', fontSize: '0.875rem',
+                bgcolor: '#002060', color: '#FFFFFF'
+              }}>
+                {col}
               </TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {/* Render data rows */}
-          {Object.keys(sectorwiseData).map((sector) => {
-            const row = sectorwiseData[sector];
-            return (
-              <TableRow key={sector}>
+          {Object.entries(sectorwiseData).map(([sector, row]) => (
+            <TableRow
+              key={sector}
+              hover
+              sx={{ cursor: 'pointer' }}
+              onClick={() => onRowClick?.(sector)}
+            >
                 <TableCell sx={{ padding: '4px 8px', width: '200px' }}>{sector}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Total_Deal_Count}</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{formatNumber(row.Total_Deal_Volume)}</TableCell>
@@ -113,11 +106,9 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data }) => {
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Average_T1M_Abs_Return_of_Negatively.toFixed(1)}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{row.Expected_Returns_Excess.toFixed(1)}%</TableCell>
                 <TableCell sx={{ padding: '4px 8px' }}>{formatNumber(row.Long_Opportunity_Value)}</TableCell>
-              </TableRow>
-            );
-          })}
-
-          {/* Last row with sum and averages */}
+            </TableRow>
+          ))}
+          {/* Total row */}
           <TableRow key="total">
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', textAlign: 'center' }}>Total</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold' }}>{totalDealCount}</TableCell>
