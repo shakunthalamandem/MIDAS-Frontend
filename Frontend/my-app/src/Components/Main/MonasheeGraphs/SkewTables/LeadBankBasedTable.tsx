@@ -17,6 +17,7 @@ import LeadBankTableData from './LeadBankTableData';
 import NoDataPopup from '../../../../Pages/NoDataPopup';
 import { useNavigate } from 'react-router-dom';
 
+
 // Define the expected structure of the API response
 interface SkewTableOptions {
   'start year': number[];
@@ -29,11 +30,11 @@ interface SkewTableOptions {
 const LeadBankBasedTable: React.FC = () => {
   // State for form values
   const [startYear, setStartYear] = useState<number>(2001);
-  const [endYear, setEndYear] = useState<number | string>(2025); 
+  const [endYear, setEndYear] = useState<number | string>(2025);
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
@@ -99,7 +100,7 @@ const LeadBankBasedTable: React.FC = () => {
 
         const response = await axios.post(
           `${apiUrl}/api/skewtable/calculations/`,
-          requestData, 
+          requestData,
           {
             headers: {
               "Content-Type": "application/json",
@@ -145,7 +146,25 @@ const LeadBankBasedTable: React.FC = () => {
     setSector(event.target.value);
   };
 
-  const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear );
+  const handleRowClick = (bankName: string) => {
+  const filters = {
+    year_range: [startYear, endYear],
+    deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
+    region: region === 'All' ? regionOptions : [region],
+    sector: sector === 'All' ? sectorOptions : [sector],
+  };
+
+  sessionStorage.setItem(
+    'detailedLeadBankState',
+    JSON.stringify({ filters, bankName })
+  );
+
+  window.open('/detailed-banks', '_blank');
+
+};
+
+
+  const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear);
 
   const handleClosePopup = () => {
     setNoDataPopupOpen(false);
@@ -277,7 +296,10 @@ const LeadBankBasedTable: React.FC = () => {
             </Grid>
           </Box>
 
-          {responseData && <LeadBankTableData data={responseData} />}
+          {responseData && (
+            <LeadBankTableData data={responseData} onRowClick={handleRowClick} />
+          )}
+
         </CardContent>
       </Card>
 
