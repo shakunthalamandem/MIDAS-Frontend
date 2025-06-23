@@ -11,6 +11,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  TextField,
+  Button,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
@@ -52,6 +54,8 @@ const IPODashboardMain: React.FC = () => {
   const [selectedTicker, setSelectedTicker] = useState<string | null>(
     ticker || "CRWV"
   );
+  const [comparativeNotes, setComparativeNotes] = useState<string>("");
+  const [notesSaved, setNotesSaved] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchAllIpoTickers = async () => {
@@ -128,6 +132,13 @@ const IPODashboardMain: React.FC = () => {
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
+  const handleSaveNotes = () => {
+    // Save to localStorage (replace with API call if needed)
+    localStorage.setItem(`comparativeNotes_${selectedTicker}`, comparativeNotes);
+    setNotesSaved(true);
+    setTimeout(() => setNotesSaved(false), 1500);
+  };
+
   return (
     <Box sx={{ px: 2 }}>
       {ipoData && (
@@ -199,6 +210,61 @@ const IPODashboardMain: React.FC = () => {
                   <IPODashboardMainTable ticker={selectedTicker || "CRWV"}/>
                 </Box>
               </Grid>
+<Grid item xs={12}>
+  <Box
+    sx={{
+      p: 3,
+      backgroundColor: "#e3f0ff",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      alignItems: "center",
+      borderRadius: 2,
+      boxShadow: 3,
+    }}
+  >
+
+
+   <TextField
+  multiline
+  minRows={6}
+  maxRows={12}
+  value={comparativeNotes}
+  onChange={(e) => setComparativeNotes(e.target.value)}
+  placeholder="Add your points here.."
+  variant="outlined"
+  sx={{ mt: 2, width: "80%" }} // Adjust width here, e.g., 80% or 500px
+/>
+
+    <Box
+      sx={{
+        mt: "auto",
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 1,
+        pt: 2,
+      }}
+    >
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSaveNotes}
+        sx={{ minWidth: 100 }}
+      >
+        Save
+      </Button>
+      {notesSaved && (
+        <Typography color="success.main" sx={{ textAlign: "center" }}>
+          Saved!
+        </Typography>
+      )}
+    </Box>
+  </Box>
+</Grid>
+
             </Grid>
           </Container>
         </>
@@ -206,5 +272,4 @@ const IPODashboardMain: React.FC = () => {
     </Box>
   );
 };
-
 export default IPODashboardMain;
