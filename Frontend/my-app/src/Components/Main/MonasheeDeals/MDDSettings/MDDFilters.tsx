@@ -419,5 +419,4 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
 export const resetFilters = (handleCancel: () => void) => {
   handleCancel();
 };
-
 export default MDDFilters;
