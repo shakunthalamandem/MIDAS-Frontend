@@ -56,6 +56,8 @@ import PnlAttributionMain from "../Components/PNLAttribution/PnlAttributionMain"
 import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
 import EquityNewDealFormMain from "../Components/EquityNewDealFormMain/EquityNewDealFormMain";
 import LkFileUpload from "../Components/Uploads/LkFileUpload";
+import DetailedDealsView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedDealsView";
+import DetailedLeadBankView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedLeadBankView";
 
 
 
@@ -201,8 +203,8 @@ const AppRouters: React.FC = () => {
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
-
-
+        <Route path="/detailed-deals" element={<AuthGuard><DetailedDealsView /></AuthGuard>} />
+        <Route path="/detailed-banks" element={<AuthGuard><DetailedLeadBankView /></AuthGuard>} />
 
       </Routes>
     </ErrorBoundary>

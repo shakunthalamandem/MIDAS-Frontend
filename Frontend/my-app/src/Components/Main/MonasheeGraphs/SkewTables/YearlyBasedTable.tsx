@@ -40,64 +40,51 @@ const YearlyBasedTable: React.FC = () => {
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
   const [sectorwiseData, setSectorwiseData] = useState<any>(null);
-  const navigate = useNavigate(); 
-
-
   const [openNoDataPopup, setOpenNoDataPopup] = useState(false);
 
+  const navigate = useNavigate();
+
+
   useEffect(() => {
-    const fetchFilterOptions = async () => {
+    (async () => {
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
-
-        if (!apiUrl) {
-          throw new Error('API URL is not defined in environment variables');
-        }
-        const response = await axios.get(`${apiUrl}/api/skew_table_filters/`, 
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            }});
-        const data = response.data as SkewTableOptions;
-
+        if (!apiUrl) throw new Error('API URL not defined');
+        const res = await axios.get(`${apiUrl}/api/skew_table_filters/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          }
+        });
+        const data = res.data as SkewTableOptions;
         setStartYearOptions(data['start year']);
         setEndYearOptions(data['end year']);
         setDealTypeOptions(data['dealType']);
         setRegionOptions(data['region']);
         setSectorOptions(data['sector']);
-      } catch (error) {
-        console.error('Error fetching filter options:', error);
-        // navigate("/error");  
-
+      } catch (e) {
+        console.error('Error fetching filters', e);
       }
-    };
-
-    fetchFilterOptions();
+    })();
   }, []);
 
+  // Fetch data whenever filters change
   useEffect(() => {
-    const fetchData = async () => {
-      const requestData = {
-        filters: {
+    if (!(dealType && region && endYear && startYear)) return;
+    (async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
+        const filters = {
           year_range: [startYear, endYear],
           deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
           region: region === 'All' ? regionOptions : [region],
           sector: sector.length > 0 ? sector : sectorOptions,
-        },
-      };
-
-      try {
-        const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem("access_token");
-
-        if (!apiUrl) {
-          throw new Error('API URL is not defined in environment variables');
-        }
-        const response = await axios.post(
+        };
+        const res = await axios.post(
           `${apiUrl}/api/skewtable/calculations/`,
-          requestData, 
+          { filters },
           {
             headers: {
               "Content-Type": "application/json",
@@ -105,63 +92,64 @@ const YearlyBasedTable: React.FC = () => {
             }
           }
         );
-
-        if (response.data === "No data found matching the specified filters.") {
-          setOpenNoDataPopup(true); // Show No Data popup if API returns error
+        if (res.data === "No data found matching the specified filters.") {
+          setSectorwiseData(null);
+          setOpenNoDataPopup(true);
         } else {
-          setSectorwiseData(response.data); // Store data if available
+          setSectorwiseData(res.data);
         }
-      }catch (error) {
-  
-        setOpenNoDataPopup(true); // Open the popup in case of error
-      }  
-    };
-
-    if (dealType && region && endYear && startYear) {
-      fetchData();
-    }
+      } catch {
+        setOpenNoDataPopup(true);
+      }
+    })();
   }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
 
-  const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
-    const newStartYear = Number(event.target.value);
-    setStartYear(newStartYear);
-    setEndYear(newStartYear + 1);
+  const handleStartYearChange = (e: SelectChangeEvent<number | string>) => {
+    const val = Number(e.target.value);
+    setStartYear(val);
+    setEndYear(val + 1);
   };
+  const handleEndYearChange = (e: SelectChangeEvent<number | string>) => setEndYear(Number(e.target.value));
+  const handleDealTypeChange = (e: SelectChangeEvent<string>) => setDealType(e.target.value);
+  const handleRegionChange = (e: SelectChangeEvent<string>) => setRegion(e.target.value);
 
-  const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
-    setEndYear(Number(event.target.value));
-  };
-
-  const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
-    setDealType(event.target.value);
-  };
-
-  const handleRegionChange = (event: SelectChangeEvent<string>) => {
-    setRegion(event.target.value);
-  };
-
-  const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear);
+  const filteredEndYearOptions = endYearOptions.filter(y => y >= startYear);
 
   const handleCloseNoDataPopup = () => {
     setOpenNoDataPopup(false);
-    // Reset filters to default values when the popup is closed
+    // Reset filters
     setStartYear(2001);
     setEndYear(2002);
     setDealType("All");
     setRegion("All");
     setSector([]);
   };
- 
+
+
+  const handleSectorRowClick = (clickedSector: string) => {
+    const filters = {
+      year_range: [startYear, endYear],
+      deal_type: dealType === 'All' ? [] : [dealType],
+      broad_region: region === 'All' ? [] : [region],
+      sector: [clickedSector],
+    };
+
+    const url = '/detailed-deals';
+    const data = { filters, sector: clickedSector };
+    sessionStorage.setItem('detailedDealsState', JSON.stringify(data));
+    window.open(url, '_blank');
+  };
+
   return (
     <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
       <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
         <CardContent>
           <Box p={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
-              Sector Based Filtered Data 
+              Sector Based Filtered Data
             </Typography>
             <Grid container spacing={2}>
-              {/* Start Year Selector */}
+              {/* Start Year */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Start Year</InputLabel>
@@ -187,8 +175,7 @@ const YearlyBasedTable: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-
-              {/* End Year Selector */}
+              {/* End Year */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>End Year</InputLabel>
@@ -215,43 +202,23 @@ const YearlyBasedTable: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-
-              {/* Deal Type Selector */}
+              {/* Deal Type */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Deal Type</InputLabel>
-                  <Select
-                    value={dealType}
-                    onChange={handleDealTypeChange}
-                    label="Deal Type"
-                    sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
-                  >
+                  <Select value={dealType} onChange={handleDealTypeChange} label="Deal Type" sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}>
                     <MenuItem value="All">All</MenuItem>
-                    {dealTypeOptions.map((type) => (
-                      <MenuItem key={type} value={type}>
-                        {type}
-                      </MenuItem>
-                    ))}
+                    {dealTypeOptions.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
                   </Select>
                 </FormControl>
               </Grid>
-
-              {/* Region Selector */}
+              {/* Region */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
-                  <Select
-                    value={region}
-                    onChange={handleRegionChange}
-                    label="Region"
-                    sx={{ backgroundColor: '#ffe0b2', color: '#e65100' }}
-                  >
+                  <Select value={region} onChange={handleRegionChange} label="Region" sx={{ backgroundColor: '#ffe0b2', color: '#e65100' }}>
                     <MenuItem value="All">All</MenuItem>
-                    {regionOptions.map((region) => (
-                      <MenuItem key={region} value={region}>
-                        {region}
-                      </MenuItem>
-                    ))}
+                    {regionOptions.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
                   </Select>
                 </FormControl>
               </Grid>
@@ -260,14 +227,16 @@ const YearlyBasedTable: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Data Table */}
+      {sectorwiseData && (
+        <YearlyTableData
+          data={sectorwiseData}
+          onRowClick={handleSectorRowClick}
+        />
+      )}
 
-      {sectorwiseData && <YearlyTableData data={sectorwiseData} />}
-
-      {/* Use the NoDataPopup component */}
-      <NoDataPopup 
-        open={openNoDataPopup} 
-        onClose={handleCloseNoDataPopup}
-      />
+      {/* No data popup */}
+      <NoDataPopup open={openNoDataPopup} onClose={handleCloseNoDataPopup} />
     </Container>
   );
 };
