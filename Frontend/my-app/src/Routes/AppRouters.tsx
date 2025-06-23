@@ -204,7 +204,7 @@ const AppRouters: React.FC = () => {
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
         <Route path="/detailed-deals" element={<AuthGuard><DetailedDealsView /></AuthGuard>} />
-        <Route path="/deatiled-bank" element={<AuthGuard><DetailedLeadBankView /></AuthGuard>} />
+        <Route path="/detailed-banks" element={<AuthGuard><DetailedLeadBankView /></AuthGuard>} />
 
       </Routes>
     </ErrorBoundary>
