@@ -14,10 +14,9 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import SectorTableData from './SectorTableData';
-import NoDataPopup from '../../../../Pages/NoDataPopup'; // Assuming this is where NoDataPopup is located
+import NoDataPopup from '../../../../Pages/NoDataPopup';
 import { useNavigate } from 'react-router-dom';
 
-// Define the expected structure of the API response
 interface SkewTableOptions {
   'start year': number[];
   'end year': number[];
@@ -28,28 +27,37 @@ interface SkewTableOptions {
 }
 
 const SectorBasedTable: React.FC = () => {
-  // State for form values
   const [startYear, setStartYear] = useState<number>(2001);
-  const [endYear, setEndYear] = useState<number | string>(2025); 
+  const [endYear, setEndYear] = useState<number>(2025);
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
-  const [year_period, setYearPeriod] = useState<string>('Yearly');
+  const [yearPeriod, setYearPeriod] = useState<string>('Yearly');
 
-  // State for the filter options
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
-  const [endYearOptions, setEndYearOptions] = useState<number[]>([2025]); 
+  const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
-  const [year_periodOptions, setYearPeriodOptions] = useState<string[]>([]);
-  const navigate = useNavigate(); 
+  const [yearperiodOptions, setYearPeriodOptions] = useState<string[]>([]);
 
-  // State to store the response data and the no data popup visibility
+
   const [responseData, setResponseData] = useState<any>(null);
   const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  // Fetch the filter options on component mount
+  const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
+    const newStartYear = Number(event.target.value);
+    setStartYear(newStartYear);
+    setEndYear(newStartYear + 1);
+  };
+
+  const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
+    setEndYear(Number(event.target.value));
+  };
+
+  const filteredEndYearOptions = endYearOptions.filter((year) => year >= startYear);
+
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
@@ -68,7 +76,7 @@ const SectorBasedTable: React.FC = () => {
         const data = response.data as SkewTableOptions;
 
         setStartYearOptions(data['start year']);
-        setEndYearOptions([2025]); 
+        setEndYearOptions(data['end year']);
         setDealTypeOptions(data['dealType']);
         setRegionOptions(data['region']);
         setSectorOptions(data['sector']);
@@ -87,11 +95,11 @@ const SectorBasedTable: React.FC = () => {
     const fetchData = async () => {
       const requestData = {
         filters: {
-          year_range: [startYear, 2025], 
+          year_range: [startYear, endYear],
           deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
           region: region === 'All' ? regionOptions : [region],
           sector: sector === 'All' ? sectorOptions : [sector],
-          year_period: year_period,
+          year_period: yearPeriod,
         },
       };
 
@@ -126,10 +134,10 @@ const SectorBasedTable: React.FC = () => {
       }  
     };
 
-    if (dealType && region && sector) {
+    if (dealType && region && sector && startYear && endYear) {
       fetchData();
     }
-  }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions, year_period]);
+  }, [startYear, endYear, dealType, region, sector, yearPeriod, dealTypeOptions, regionOptions, sectorOptions]);
 
   const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
     setDealType(event.target.value);
@@ -165,8 +173,63 @@ const SectorBasedTable: React.FC = () => {
               Yearly Based Filtered Data
             </Typography>
             <Grid container spacing={2}>
-              {/* Deal Type Selector */}
-              <Grid item xs={12} sm={6} md={3}>
+              {/* Start Year */}
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Start Year</InputLabel>
+                  <Select
+                    value={startYear}
+                    onChange={handleStartYearChange}
+                    label="Start Year"
+                    sx={{ backgroundColor: '#e0f7fa', color: '#006064' }}
+                     MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200, // Adjust the height as needed
+                          overflow: 'auto',
+                        },
+                      },
+                    }}
+                  >
+                    {startYearOptions.map((year) => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* End Year */}
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>End Year</InputLabel>
+                  <Select
+                    value={endYear}
+                    onChange={handleEndYearChange}
+                    label="End Year"
+                    sx={{ backgroundColor: '#e8eaf6', color: '#1a237e' }}
+                     MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200, // Adjust the height as needed
+                          overflow: 'auto',
+                        },
+                      },
+                    }}
+                    disabled={filteredEndYearOptions.length === 0}
+                  >
+                    {filteredEndYearOptions.map((year) => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Deal Type */}
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Deal Type</InputLabel>
                   <Select
@@ -186,7 +249,7 @@ const SectorBasedTable: React.FC = () => {
               </Grid>
 
               {/* Region Selector */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
                   <Select
@@ -206,7 +269,7 @@ const SectorBasedTable: React.FC = () => {
               </Grid>
 
               {/* Sector Selector */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Sector</InputLabel>
                   <Select
@@ -226,16 +289,16 @@ const SectorBasedTable: React.FC = () => {
               </Grid>
 
               {/* Year Period Selector */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Period</InputLabel>
                   <Select
-                    value={year_period}
+                    value={yearPeriod}
                     onChange={handleYearPeriodChange}
                     label="Period"
                     sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
                   >
-                    {year_periodOptions.map((period) => (
+                    {yearperiodOptions.map((period: string) => (
                       <MenuItem key={period} value={period}>
                         {period}
                       </MenuItem>

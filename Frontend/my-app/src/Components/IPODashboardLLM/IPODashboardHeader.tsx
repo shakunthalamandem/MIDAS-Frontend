@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -6,6 +6,13 @@ import {
   TextField,
   InputAdornment,
   Autocomplete,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CardContent,
+  Card,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import IPOdashboardLine from "./IPOdashboardLine";
@@ -27,6 +34,8 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   setSelectedTicker,
   setSearchText,
 }) => {
+  const [openValuationDialog, setOpenValuationDialog] = useState(false);
+
   return (
     <Container maxWidth="xl" sx={{ mb: 2 }}>
       <Box
@@ -40,13 +49,22 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
           gap: 2,
         }}
       >
-        <Typography
-          variant="h5"
-          color="#002060"
-          sx={{ fontWeight: 600, mt: 2, mb: 2 }}
-        >
-          {ipoData.company_name} ({ipoData.ticker_name} | {ipoData.exchange})
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography
+            variant="h5"
+            color="#002060"
+            sx={{ fontWeight: 600, mt: 2, mb: 2, mr: 2 }}
+          >
+            {ipoData.company_name} ({ipoData.ticker_name} | {ipoData.exchange})
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => setOpenValuationDialog(true)}
+          >
+            View Valuation
+          </Button>
+        </Box>
 
         <Autocomplete
           size="small"
@@ -78,6 +96,80 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
       </Box>
 
       <IPOdashboardLine ipodata={ipoData} />
+
+      <Dialog
+        open={openValuationDialog}
+        onClose={() => setOpenValuationDialog(false)}
+        fullWidth
+        maxWidth="md"
+        PaperProps={{
+          sx: {
+            borderRadius: 0,
+            boxShadow: "none",
+            backgroundColor: "transparent",
+            overflow: "visible",
+            p: 0,
+          },
+        }}
+      >
+        <Card
+          elevation={0}
+          sx={{
+            borderRadius: 4,
+            background: "linear-gradient(to right, #e0f7fa, #e1f5fe)",
+            p: 3,
+            maxWidth: 900,
+            width: "100%",
+            mx: "auto",
+          }}
+        >
+          <CardContent
+            sx={{
+              maxHeight: "400px",
+              overflowY: "auto",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{ mb: 2, fontWeight: 700, color: "#6a1b9a" }}
+              align="center"
+            >
+              Valuation Information
+            </Typography>
+            {Array.isArray(ipoData.valuation) &&
+            ipoData.valuation.length > 0 ? (
+              <Box component="ul" sx={{ pl: 2, color: "#333" }}>
+                {ipoData.valuation.map((item: string, index: number) => (
+                  <li key={index} style={{ marginBottom: 8, lineHeight: 1.6 }}>
+                    {item}
+                  </li>
+                ))}
+              </Box>
+            ) : (
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "#333",
+                  fontSize: "1rem",
+                  textAlign: "center",
+                  wordBreak: "break-word",
+                }}
+              >
+                No valuation data available.
+              </Typography>
+            )}
+          </CardContent>
+
+          <Box textAlign="center" mt={2}>
+            <Button
+              onClick={() => setOpenValuationDialog(false)}
+              variant="outlined"
+            >
+              Close
+            </Button>
+          </Box>
+        </Card>
+      </Dialog>
     </Container>
   );
 };
