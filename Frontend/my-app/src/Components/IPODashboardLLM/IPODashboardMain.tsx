@@ -131,7 +131,6 @@ const IPODashboardMain: React.FC = () => {
     const elements = [
       document.getElementById("ipo-dashboard-page1"),
       document.getElementById("ipo-dashboard-page2"),
-      document.getElementById("ipo-dashboard-page3")
     ];
 
     if (!elements.every(el => el !== null)) return;
@@ -299,12 +298,12 @@ const IPODashboardMain: React.FC = () => {
           </div>
 
           <div id="ipo-dashboard-page2">
-            <Container maxWidth="xl" sx={{ mb: 3 }}>
+            <Container maxWidth="xl" sx={{ mb: 3, px: 2 }}>
               <Grid container spacing={2} sx={{ mb: 3 }}>
                 {cardSections.slice(2).map((section, index) => {
                   const content = ipoData[section.key];
                   return (
-                    <Grid item xs={12} md={6} key={section.key}>
+                    <Grid item xs={12} md={6} key={section.key} sx={{ minWidth: 0 }}>
                       <Card
                         sx={{
                           backgroundColor: cardColors[(index + 2) % cardColors.length],
@@ -313,6 +312,7 @@ const IPODashboardMain: React.FC = () => {
                           height: "100%",
                           display: "flex",
                           flexDirection: "column",
+                          minWidth: 0,
                         }}
                       >
                         <CardContent sx={{ overflowY: "auto", flex: 1 }}>
@@ -327,9 +327,7 @@ const IPODashboardMain: React.FC = () => {
                             {content?.map((item: string, idx: number) => (
                               <ListItem key={idx} sx={{ pl: 0 }}>
                                 <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                                  <FiberManualRecordIcon
-                                    sx={{ fontSize: 8, color: "#002060" }}
-                                  />
+                                  <FiberManualRecordIcon sx={{ fontSize: 8, color: "#002060" }} />
                                 </ListItemIcon>
                                 <ListItemText primary={item} />
                               </ListItem>
@@ -342,24 +340,24 @@ const IPODashboardMain: React.FC = () => {
                 })}
               </Grid>
             </Container>
-          </div>
 
-          <div id="ipo-dashboard-page3">
-            <Container maxWidth="xl" sx={{ mb: 3 }}>
+            <Container maxWidth="xl" sx={{ mb: 3, px: 2 }}>
               <Grid container spacing={2} sx={{ mb: 3 }}>
                 <Grid item xs={12}>
-                  <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                  <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7", width: "100%", overflowX: "auto" }}>
                     <FinancialForecastTable defaultTicker={selectedTicker || ""} />
                   </Box>
                 </Grid>
                 <Grid item xs={12}>
-                  <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
+                  <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7", width: "100%", overflowX: "auto" }}>
                     <IPODashboardMainTable ticker={selectedTicker || ""} />
                   </Box>
                 </Grid>
               </Grid>
             </Container>
           </div>
+
+
         </>
       )}
     </Box>
