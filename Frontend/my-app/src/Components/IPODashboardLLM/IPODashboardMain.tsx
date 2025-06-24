@@ -128,95 +128,114 @@ const IPODashboardMain: React.FC = () => {
   }, [selectedTicker]);
 
   const handleExportPDF = async () => {
-    const elements = [
-      document.getElementById("ipo-dashboard-page1"),
-      document.getElementById("ipo-dashboard-page2"),
-    ];
+  const elements = [
+    document.getElementById("ipo-dashboard-page1"),
+    document.getElementById("ipo-dashboard-page2"),
+  ];
 
-    if (!elements.every(el => el !== null)) return;
+  if (!elements.every(el => el !== null)) return;
 
-    const pdf = new jsPDF("p", "pt", "a4");
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 10;
+  const pdf = new jsPDF("p", "pt", "a4");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 10;
 
-    for (let i = 0; i < elements.length; i++) {
-      const element = elements[i];
-      if (!element) continue;
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+    if (!element) continue;
 
-      // Clone element to avoid layout issues
-      const clone = element.cloneNode(true) as HTMLElement;
-      clone.style.padding = "0";
-      clone.style.margin = "0";
-      clone.style.width = "100%";
-      clone.style.maxWidth = "100%";
-      clone.style.background = "#fff";
+    const clone = element.cloneNode(true) as HTMLElement;
+    clone.style.padding = "0";
+    clone.style.margin = "0";
+    clone.style.width = "100%";
+    clone.style.maxWidth = "100%";
+    clone.style.background = "#fff";
 
-      const wrapper = document.createElement("div");
-      wrapper.style.position = "fixed";
-      wrapper.style.top = "-10000px";
-      wrapper.style.left = "0";
-      wrapper.style.width = "1200px";
-      wrapper.appendChild(clone);
-      document.body.appendChild(wrapper);
 
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        useCORS: true,
-        scrollX: 0,
-        scrollY: 0,
-        backgroundColor: "#fff"
+    const tables = clone.querySelectorAll('table');
+    tables.forEach(table => {
+      const tableElement = table as HTMLElement;
+      tableElement.style.fontSize = '10px';
+      tableElement.style.width = '100%';
+      tableElement.style.tableLayout = 'fixed';
+      
+
+      const cells = tableElement.querySelectorAll('th, td');
+      cells.forEach(cell => {
+        const cellElement = cell as HTMLElement;
+        cellElement.style.fontSize = '8px';
+        cellElement.style.padding = '2px';
+        cellElement.style.wordWrap = 'break-word';
+        cellElement.style.overflow = 'hidden';
       });
+    });
 
-      document.body.removeChild(wrapper);
+    const wrapper = document.createElement("div");
+    wrapper.style.position = "fixed";
+    wrapper.style.top = "-10000px";
+    wrapper.style.left = "0";
+    wrapper.style.width = "1200px";
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
 
-      const imgHeight = canvas.height;
-      const imgWidth = canvas.width;
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      scrollX: 0,
+      scrollY: 0,
+      backgroundColor: "#fff"
+    });
 
-      const ratio = pageWidth / imgWidth;
-      const scaledHeight = imgHeight * ratio;
+    document.body.removeChild(wrapper);
 
-      let position = 0;
-      let pageCount = 0;
+    const imgHeight = canvas.height;
+    const imgWidth = canvas.width;
 
-      while (position < scaledHeight) {
-        const canvasSlice = document.createElement("canvas");
-        const context = canvasSlice.getContext("2d")!;
-        const sliceHeight = Math.min(imgHeight - pageCount * (pageHeight / ratio), pageHeight / ratio);
-        canvasSlice.width = imgWidth;
-        canvasSlice.height = sliceHeight;
+    const ratio = pageWidth / imgWidth;
+    const scaledHeight = imgHeight * ratio;
 
-        context.drawImage(
-          canvas,
-          0,
-          pageCount * (pageHeight / ratio),
-          imgWidth,
-          sliceHeight,
-          0,
-          0,
-          imgWidth,
-          sliceHeight
-        );
+    let position = 0;
+    let pageCount = 0;
 
-        const imgData = canvasSlice.toDataURL("image/png");
-        if (i > 0 || pageCount > 0) pdf.addPage();
+    while (position < scaledHeight) {
+      const canvasSlice = document.createElement("canvas");
+      const context = canvasSlice.getContext("2d")!;
+      const sliceHeight = Math.min(imgHeight - pageCount * (pageHeight / ratio), pageHeight / ratio);
+      canvasSlice.width = imgWidth;
+      canvasSlice.height = sliceHeight;
 
-        pdf.addImage(
-          imgData,
-          "PNG",
-          margin,
-          margin,
-          pageWidth - margin * 2,
-          (sliceHeight * ratio) - 2 // remove bottom margin pixels
-        );
+      context.drawImage(
+        canvas,
+        0,
+        pageCount * (pageHeight / ratio),
+        imgWidth,
+        sliceHeight,
+        0,
+        0,
+        imgWidth,
+        sliceHeight
+      );
 
-        position += pageHeight;
-        pageCount++;
-      }
+      const imgData = canvasSlice.toDataURL("image/png");
+      if (i > 0 || pageCount > 0) pdf.addPage();
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        margin,
+        margin,
+        pageWidth - margin * 2,
+        (sliceHeight * ratio) - 2 
+      );
+
+      position += pageHeight;
+      pageCount++;
     }
+  }
 
-    pdf.save(`IPO-Dashboard-${selectedTicker}.pdf`);
-  };
+  pdf.save(`IPO-Dashboard-${selectedTicker}.pdf`);
+};
+
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
