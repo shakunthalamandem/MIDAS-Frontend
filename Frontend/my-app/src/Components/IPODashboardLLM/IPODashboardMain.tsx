@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import {
   Box,
   Typography,
@@ -11,8 +13,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  TextField,
-  Button,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
@@ -22,7 +22,6 @@ import IPODashboardCardRatings from "./IPODashboardCardRatings";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
-
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -52,7 +51,7 @@ const IPODashboardMain: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [allIpoTickers, setAllIpoTickers] = useState<string[]>([]);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(
-    ticker || "CRWV"
+    ticker || ""
   );
   const [comparativeNotes, setComparativeNotes] = useState<string>("");
   const [notesSaved, setNotesSaved] = useState<boolean>(false);
@@ -63,7 +62,7 @@ const IPODashboardMain: React.FC = () => {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
         const savedTicker = localStorage.getItem("selected_ticker");
-        setSelectedTicker(savedTicker || "CRWV");
+        setSelectedTicker(savedTicker || "");
         if (!apiUrl) throw new Error("API URL not defined");
 
         const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
@@ -99,7 +98,7 @@ const IPODashboardMain: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker: selectedTicker || "CRWV" }),
+          body: JSON.stringify({ ticker: selectedTicker || "" }),
         });
 
         if (!response.ok) {
@@ -129,6 +128,33 @@ const IPODashboardMain: React.FC = () => {
     if (selectedTicker) fetchData();
   }, [selectedTicker]);
 
+  const handleExportPDF = async () => {
+    const cardsElement = document.getElementById("ipo-dashboard-cards");
+    const tablesElement = document.getElementById("ipo-dashboard-tables");
+    if (cardsElement && tablesElement) {
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4"
+      });
+
+      const cardsCanvas = await html2canvas(cardsElement, { scale: 2 });
+      const cardsImgData = cardsCanvas.toDataURL("image/png");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const cardsProps = pdf.getImageProperties(cardsImgData);
+      const cardsHeight = (cardsProps.height * pdfWidth) / cardsProps.width;
+      pdf.addImage(cardsImgData, "PNG", 0, 0, pdfWidth, cardsHeight);
+
+      pdf.addPage();
+      const tablesCanvas = await html2canvas(tablesElement, { scale: 2 });
+      const tablesImgData = tablesCanvas.toDataURL("image/png");
+      const tablesProps = pdf.getImageProperties(tablesImgData);
+      const tablesHeight = (tablesProps.height * pdfWidth) / tablesProps.width;
+      pdf.addImage(tablesImgData, "PNG", 0, 0, pdfWidth, tablesHeight);
+
+      pdf.save(`IPO-Dashboard-${selectedTicker}.pdf`);
+    }
+  };
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
@@ -143,14 +169,32 @@ const IPODashboardMain: React.FC = () => {
     <Box sx={{ px: 2 }}>
       {ipoData && (
         <>
-          <IPODashboardHeader
-            ipoData={ipoData}
-            allIpoTickers={allIpoTickers}
-            selectedTicker={selectedTicker}
-            searchText={searchText}
-            setSelectedTicker={setSelectedTicker}
-            setSearchText={setSearchText}
-          />
+          <Box sx={{ position: "relative", height: "60px" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleExportPDF}
+              sx={{
+                position: "absolute",
+                right: 0,
+                top: "85px",
+              }}
+            >
+              Export to PDF
+            </Button>
+          </Box>
+
+          <div>
+            <div id="ipo-dashboard-cards">
+              <IPODashboardHeader
+                ipoData={ipoData}
+                allIpoTickers={allIpoTickers}
+                selectedTicker={selectedTicker}
+                searchText={searchText}
+                setSelectedTicker={setSelectedTicker}
+                setSearchText={setSearchText}
+              />
+
 
           <IPODashboardCardRatings ipodata={ipoData} />
 
@@ -210,61 +254,6 @@ const IPODashboardMain: React.FC = () => {
                   <IPODashboardMainTable ticker={selectedTicker || "CRWV"}/>
                 </Box>
               </Grid>
-<Grid item xs={12}>
-  <Box
-    sx={{
-      p: 3,
-      backgroundColor: "#e3f0ff",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-between",
-      alignItems: "center",
-      borderRadius: 2,
-      boxShadow: 3,
-    }}
-  >
-
-
-   <TextField
-  multiline
-  minRows={6}
-  maxRows={12}
-  value={comparativeNotes}
-  onChange={(e) => setComparativeNotes(e.target.value)}
-  placeholder="Add your points here.."
-  variant="outlined"
-  sx={{ mt: 2, width: "80%" }} // Adjust width here, e.g., 80% or 500px
-/>
-
-    <Box
-      sx={{
-        mt: "auto",
-        display: "flex",
-        justifyContent: "center",
-        width: "100%",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 1,
-        pt: 2,
-      }}
-    >
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSaveNotes}
-        sx={{ minWidth: 100 }}
-      >
-        Save
-      </Button>
-      {notesSaved && (
-        <Typography color="success.main" sx={{ textAlign: "center" }}>
-          Saved!
-        </Typography>
-      )}
-    </Box>
-  </Box>
-</Grid>
-
             </Grid>
           </Container>
         </>
