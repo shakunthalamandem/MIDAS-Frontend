@@ -22,7 +22,7 @@ import IPODashboardHeader from "./IPODashboardHeader";
 import IPODashboardCardRatings from "./IPODashboardCardRatings";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
-import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
+import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard"; 
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -164,12 +164,13 @@ const IPODashboardMain: React.FC = () => {
           <Box sx={{ position: "relative", height: "60px" }}>
             <Button
               variant="contained"
-              color="primary"
               onClick={handleExportPDF}
               sx={{
                 position: "absolute",
                 right: 0,
                 top: "85px",
+                backgroundColor: "#002060",
+                color: "#ffffff",
               }}
             >
               Export to PDF
