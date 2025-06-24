@@ -164,12 +164,13 @@ const IPODashboardMain: React.FC = () => {
           <Box sx={{ position: "relative", height: "60px" }}>
             <Button
               variant="contained"
-              color="primary"
               onClick={handleExportPDF}
               sx={{
                 position: "absolute",
                 right: 0,
                 top: "85px",
+                backgroundColor: "#002060",
+                color: "#ffffff",
               }}
             >
               Export to PDF

@@ -6,12 +6,6 @@ import {
   TextField,
   InputAdornment,
   Autocomplete,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  CardContent,
   Card,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -34,7 +28,6 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   setSelectedTicker,
   setSearchText,
 }) => {
-  const [openValuationDialog, setOpenValuationDialog] = useState(false);
 
   return (
     <Container maxWidth="xl" sx={{ mb: 2 }}>
@@ -50,7 +43,16 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
         }}
       >
 
-
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography
+            variant="h5"
+            color="#002060"
+            sx={{ fontWeight: 600, mt: 2, mb: 2, mr: 2 }}
+          >
+            {ipoData.company_name} ({ipoData.ticker_name} | {ipoData.exchange})
+          </Typography>
+         
+        </Box>
         <Autocomplete
           size="small"
           options={allIpoTickers}
