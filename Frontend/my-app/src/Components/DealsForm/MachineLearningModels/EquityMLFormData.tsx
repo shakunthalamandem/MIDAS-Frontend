@@ -12,16 +12,20 @@ import {
   Box,
 } from "@mui/material";
 import { Alert } from "@mui/material";
-import PredictionResults from "./PredictionResults"; // Assuming this component is defined elsewhere
-import T1DPriceCategory from "./T1DPriceCategory";
 
 interface EquityMLFormDataProps {
-  snackbar: { open: boolean; severity: "success" | "info" | "warning" | "error"; message: string };
+  snackbar: {
+    open: boolean;
+    severity: "success" | "info" | "warning" | "error";
+    message: string;
+  };
   handleSnackbarClose: () => void;
   formData: any;
   setFormData: React.Dispatch<React.SetStateAction<any>>;
   formErrors: { [key: string]: string };
-  handleChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   handleReset: () => void;
   handlePredict: () => void;
   loading: boolean;
@@ -34,7 +38,7 @@ interface EquityMLFormDataProps {
     inflation: string[];
     treasury_rates: string[];
   };
-  sectorLabels: { [key: string]: string };
+  sectorLabels: Record<string, string>;
   inputWidth: number | string;
   menuProps: object;
 }
@@ -47,7 +51,7 @@ const inputFields: {
   adornment?: string;
   disabled?: boolean;
   selectOptions?: string[];
-  labelMap?: { [key: string]: string };
+  labelMap?: Record<string, string>; // ✅ typed for safe indexing
 }[] = [
   { label: "Ticker Symbol", name: "ticker", type: "string", placeholder: "e.g., AAPL" },
   { label: "Pricing Date", name: "pricing_date", type: "date" },
@@ -83,114 +87,182 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
 }) => {
   return (
     <>
-      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
-        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: "100%" }}>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
 
-      <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, borderRadius: 3, backgroundColor: "#ffffff", boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.06)", border: "1px solid #e0e0e0" }}>
-        <Grid container spacing={2}>
-          {inputFields.map(({ label, name, type = "string", placeholder = "", adornment, disabled = false, selectOptions, labelMap }) => {
-            const value = formData[name] ?? (name === "deal_type" ? "FO" : name === "region" ? "US" : name === "target_variable" ? "T+1 Day Return(close)" : "");
+      <Paper
+        sx={{
+          p: { xs: 2, sm: 3, md: 4 },
+          borderRadius: 3,
+          backgroundColor: "#fff",
+          border: "1px solid #e0e0e0",
+          boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.06)",
+        }}
+      >
+        <Grid container spacing={1.5}> {/* ⬅️ Slightly reduced spacing */}
+          {inputFields.map(
+            ({
+              label,
+              name,
+              type = "string",
+              placeholder = "",
+              adornment,
+              disabled = false,
+              selectOptions,
+              labelMap,
+            }) => {
+              const value =
+                formData[name] ??
+                (name === "deal_type"
+                  ? "FO"
+                  : name === "region"
+                  ? "US"
+                  : name === "target_variable"
+                  ? "T+1 Day Return(close)"
+                  : "");
 
-            const finalSelectOptions =
-              name === "sponsor_yn_category" ? options.sponsor :
-              name === "sector_category" ? options.sector :
-              name === "selected_bank_category" ? options.selected_bank :
-              name === "GDP" ? options.gdp :
-              name === "Inflation" ? options.inflation :
-              name === "Treasury" ? options.treasury_rates :
-              selectOptions;
+              const finalSelectOptions =
+                name === "sponsor_yn_category"
+                  ? options.sponsor
+                  : name === "sector_category"
+                  ? options.sector
+                  : name === "selected_bank_category"
+                  ? options.selected_bank
+                  : name === "GDP"
+                  ? options.gdp
+                  : name === "Inflation"
+                  ? options.inflation
+                  : name === "Treasury"
+                  ? options.treasury_rates
+                  : selectOptions;
 
-            return (
-              <Grid item xs={12} sm={6} key={name}>
-                <Box sx={{ 
-                  display: "flex", 
-                  alignItems: "center", 
-                  gap: 2,
-                  minHeight: "56px" // Ensures consistent row height
-                }}>
-                  <Typography sx={{ 
-                    width: "200px", // Fixed width for all labels
-                    minWidth: "200px",
-                    flexShrink: 0,
-                    fontSize: "0.875rem",
-                    textAlign: "left"
-                  }}>
-                    {label}
-                  </Typography>
-                  {finalSelectOptions ? (
-                    <TextField
-                      select
-                      size="small"
-                      name={name}
-                      value={value}
-                      onChange={handleChange}
-                      error={!!formErrors[name]}
-                      helperText={formErrors[name]}
-                      sx={{ 
-                        width: "220px", // Fixed width for all inputs
-                        minWidth: "220px",
-                        flexShrink: 0
+              const finalLabelMap = name === "sector_category" ? sectorLabels : labelMap;
+
+              return (
+                <Grid item xs={12} sm={6} key={name}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      alignItems: { sm: "center" },
+                      gap: 1,
+                      minHeight: { sm: "48px" }, // ⬅️ reduced height
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        width: { xs: "100%", sm: "180px", md: "200px" },
+                        minWidth: { sm: "180px", md: "200px" },
+                        fontSize: { xs: "0.875rem", sm: "0.875rem", md: "1rem" },
+                        fontWeight: 500,
                       }}
-                      SelectProps={{ MenuProps: menuProps }}
                     >
-                      {finalSelectOptions.map((opt) => (
-                        <MenuItem key={opt} value={opt}>
-                          {(labelMap && labelMap[opt]) || opt}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  ) : (
-                    <TextField
-                      size="small"
-                      name={name}
-                      type={type}
-                      value={
-                        type === "date" && value
-                          ? new Date(value).toISOString().split("T")[0]
-                          : value
-                      }
-                      onChange={
-                        name === "pricing_date"
-                          ? (e) =>
-                              setFormData((prev: typeof formData) => ({
-                                ...prev,
-                                pricing_date: e.target.value ? new Date(e.target.value) : null,
-                              }))
-                          : handleChange
-                      }
-                      placeholder={placeholder}
-                      error={!!formErrors[name]}
-                      helperText={formErrors[name]}
-                      disabled={disabled}
-                      sx={{ 
-                        width: "220px", // Fixed width for all inputs
-                        minWidth: "220px",
-                        flexShrink: 0
-                      }}
-                      InputProps={{
-                        startAdornment:
-                          typeof adornment === "string" && adornment.startsWith("$") ? (
-                            <InputAdornment position="start">$</InputAdornment>
-                          ) : undefined,
-                        endAdornment:
-                          typeof adornment === "string" &&
-                          (adornment.endsWith("%") || adornment.endsWith("M")) ? (
-                            <InputAdornment position="end">{adornment.replace("$", "")}</InputAdornment>
-                          ) : undefined,
-                      }}
-                    />
-                  )}
-                </Box>
-              </Grid>
-            );
-          })}
+                      {label}
+                    </Typography>
+
+                    {finalSelectOptions ? (
+                      <TextField
+                        select
+                        size="small"
+                        name={name}
+                        value={value}
+                        onChange={handleChange}
+                        error={!!formErrors[name]}
+                        helperText={formErrors[name]}
+                        fullWidth
+                        sx={{
+                          maxWidth: { xs: "100%", sm: "200px", md: "220px" },
+                          minWidth: { sm: "200px", md: "220px" },
+                        }}
+                        SelectProps={{ MenuProps: menuProps }}
+                      >
+                        {finalSelectOptions.map((opt) => (
+                          <MenuItem key={opt} value={opt}>
+                            {finalLabelMap?.[opt] ?? opt}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    ) : (
+                      <TextField
+                        size="small"
+                        name={name}
+                        type={type}
+                        value={
+                          type === "date" && value
+                            ? new Date(value).toISOString().split("T")[0]
+                            : value
+                        }
+                        onChange={
+                          name === "pricing_date"
+                            ? (e) =>
+                                setFormData((prev: typeof formData) => ({
+                                  ...prev,
+                                  pricing_date: e.target.value
+                                    ? new Date(e.target.value)
+                                    : null,
+                                }))
+                            : handleChange
+                        }
+                        placeholder={placeholder}
+                        error={!!formErrors[name]}
+                        helperText={formErrors[name]}
+                        disabled={disabled}
+                        fullWidth
+                        sx={{
+                          maxWidth: { xs: "100%", sm: "200px", md: "220px" },
+                          minWidth: { sm: "200px", md: "220px" },
+                        }}
+                        InputProps={{
+                          startAdornment:
+                            typeof adornment === "string" &&
+                            adornment.startsWith("$") ? (
+                              <InputAdornment position="start">$</InputAdornment>
+                            ) : undefined,
+                          endAdornment:
+                            typeof adornment === "string" &&
+                            (adornment.endsWith("%") || adornment.endsWith("M")) ? (
+                              <InputAdornment position="end">
+                                {adornment.replace("$", "")}
+                              </InputAdornment>
+                            ) : undefined,
+                        }}
+                      />
+                    )}
+                  </Box>
+                </Grid>
+              );
+            }
+          )}
 
           <Grid item xs={12}>
-            <Box sx={{ display: "flex", justifyContent: { xs: "center", sm: "flex-end" }, gap: 2, mt: 2, flexWrap: "wrap" }}>
-              <Button variant="outlined" color="secondary" onClick={handleReset} disabled={loading} sx={{ minWidth: "100px" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: { xs: "center", sm: "flex-end" },
+                gap: 2,
+                mt: 2,
+                flexWrap: "wrap",
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleReset}
+                disabled={loading}
+                sx={{ minWidth: "100px" }}
+              >
                 Reset
               </Button>
               <Button
