@@ -184,7 +184,7 @@ const IPODashboardMain: React.FC = () => {
                       },
                     }}
                   >
-                    Welcome to Monashee's latest P&L performance overview.
+                    Welcome to detailed Insights on IPO
                   </Typography>
 
           <div>
