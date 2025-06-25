@@ -10,6 +10,7 @@ import {
   Typography,
   Button,
   Stack,
+  Container,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -19,6 +20,7 @@ const IntelligenceDashboard: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<"IPO" | "FO">("IPO");
 
   return (
+    <Container maxWidth="xl">
     <Box display="flex" width="100%" pt={2} bgcolor="#f5f9fc">
       <Box display="flex" flexDirection="column" gap={4} width="100%">
 
@@ -56,7 +58,7 @@ const IntelligenceDashboard: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <Typography variant="h5" sx={{ color: "#002060", mb: 2, fontWeight: 600 }}>
+              <Typography variant="h5" sx={{ color: "#002060", mb: 2, fontWeight: 600 }} align="center">
                 IPO Deal Intelligence
               </Typography>
               <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.6 }}>
@@ -106,7 +108,7 @@ const IntelligenceDashboard: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <Typography variant="h5" sx={{ color: "#002060", mb: 2, fontWeight: 600 }}>
+              <Typography variant="h5" sx={{ color: "#002060", mb: 2, fontWeight: 600 }} align="center">
                 FO Deal Intelligence
               </Typography>
               <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.6 }}>
@@ -142,6 +144,7 @@ const IntelligenceDashboard: React.FC = () => {
         )}
       </Box>
     </Box>
+    </Container>
   );
 };
 
