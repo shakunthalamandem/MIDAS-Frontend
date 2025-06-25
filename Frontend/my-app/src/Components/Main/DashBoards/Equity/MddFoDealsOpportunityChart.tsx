@@ -101,7 +101,7 @@ const MddFoDealsOpportunityChart: React.FC = () => {
 
 
   return (
-    <Paper sx={{ p: 3, mt: 4, mb: 2 }}>
+    <>
       {fullPayload && <FODashboardTable payload={fullPayload} />}
 
 
@@ -153,7 +153,7 @@ const MddFoDealsOpportunityChart: React.FC = () => {
           </BarChart>
         </ResponsiveContainer>
       )}
-    </Paper>
+    </>
   );
 };
 
