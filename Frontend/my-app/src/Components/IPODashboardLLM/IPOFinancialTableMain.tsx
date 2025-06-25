@@ -48,12 +48,25 @@ function formatFinancialValue(value: number | string): string {
   const num = Number(value);
   if (isNaN(num)) return String(value);
 
-  const rounded = Math.round(num); // ✅ Round to 0 decimal places
+  const rounded = Math.round(num);
   const absValue = Math.abs(rounded).toLocaleString("en-US");
 
   return rounded < 0 ? `(${absValue})` : absValue;
 }
+function formatFinancialMargin(value: number | string): string {
+  if (value === null || value === undefined || value === "N/A") return "N/A";
 
+  const num = Number(value);
+  if (isNaN(num)) return String(value);
+
+  const fixed = num.toFixed(2); // Round to 2 decimal places
+  const absValue = Math.abs(Number(fixed)).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  return num < 0 ? `(${absValue})` : absValue;
+}
 
 const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
   defaultTicker = "",
@@ -155,24 +168,51 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
               <TableBody>
                 {Object.entries(
                   forecasts[forecastsTicker.toUpperCase()] || {}
-                ).map(([metricName, years]: [string, any]) => (
-                  <TableRow key={metricName}>
-                    <TableCell
-                      sx={{ border: "1px solid #000000", fontWeight: "bold" }}
-                    >
-                      {metricName}
-                    </TableCell>
-                    {forecastYearKeys.map((yearKey) => (
+                ).map(([metricName, years]: [string, any], rowIndex) => {
+                  const isEvenRow = rowIndex % 2 === 0;
+
+                  return (
+                    <TableRow key={metricName}>
                       <TableCell
-                        key={yearKey}
-                        align="center"
-                        sx={{ border: "1px solid #000000" }}
+                        sx={{
+                          border: "1px solid #000000",
+                          fontWeight: "bold",
+                          fontStyle: isEvenRow ? "normal" : "italic",
+                          fontSize: isEvenRow ? "0.875rem" : "0.725rem",
+                          backgroundColor: isEvenRow ? "" : "#ebebeb",
+                        }}
                       >
-                        {formatFinancialValue(years[yearKey])}
+                        {metricName}
                       </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
+                      {forecastYearKeys.map((yearKey) => {
+                        const formattedValue = formatFinancialValue(
+                          years[yearKey]
+                        );
+                        const MarginformattedValue = formatFinancialMargin(
+                          years[yearKey]
+                        );
+                        const displayValue = isEvenRow
+                          ? formattedValue
+                          : `${MarginformattedValue}%`;
+
+                        return (
+                          <TableCell
+                            key={yearKey}
+                            align="center"
+                            sx={{
+                              border: "1px solid #000000",
+                              fontStyle: isEvenRow ? "normal" : "italic",
+                              fontSize: isEvenRow ? "0.875rem" : "0.725rem",
+                              backgroundColor: isEvenRow ? "" : "#ebebeb",
+                            }}
+                          >
+                            {displayValue}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
