@@ -158,25 +158,35 @@ const IPODashboardMain: React.FC = () => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
+    <>
+    <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 500,
+                      color: "#FFFFFF",
+                      fontSize: { xs: "1rem", sm: "1.2rem" },
+                      backgroundColor: "#002060",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: "4vh",
+                      padding: "8px 16px",
+                      borderRadius: "8px",
+                      textAlign: "center",
+                      marginBottom: "40px",
+                      boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                      animation: "fadeIn 1.5s ease-in-out",
+                      "@keyframes fadeIn": {
+                        "0%": { opacity: 0 },
+                        "100%": { opacity: 1 },
+                      },
+                    }}
+                  >
+                    Welcome to detailed Insights on IPO - {selectedTicker}
+                  </Typography>
     <Box sx={{ px: 2 }}>
       {ipoData && (
         <>
-          <Box sx={{ position: "relative", height: "60px" }}>
-            <Button
-              variant="contained"
-              onClick={handleExportPDF}
-              sx={{
-                position: "absolute",
-                right: 0,
-                top: "85px",
-                backgroundColor: "#002060",
-                color: "#ffffff",
-              }}
-            >
-              Export to PDF
-            </Button>
-          </Box>
-
           <div>
             <div id="ipo-dashboard-cards">
               <IPODashboardHeader
@@ -186,6 +196,7 @@ const IPODashboardMain: React.FC = () => {
                 searchText={searchText}
                 setSelectedTicker={setSelectedTicker}
                 setSearchText={setSearchText}
+                onExportPDF={handleExportPDF}
               />
 
 
@@ -256,6 +267,7 @@ const IPODashboardMain: React.FC = () => {
         </>
       )}
     </Box>
+    </>
   );
 };
 
