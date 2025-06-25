@@ -158,10 +158,8 @@ const IPODashboardMain: React.FC = () => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Box sx={{ px: 2 }}>
-      {ipoData && (
-        <>
-            <Typography
+    <>
+    <Typography
                     variant="body2"
                     sx={{
                       fontWeight: 500,
@@ -184,9 +182,11 @@ const IPODashboardMain: React.FC = () => {
                       },
                     }}
                   >
-                    Welcome to detailed Insights on IPO
+                    Welcome to detailed Insights on IPO - {selectedTicker}
                   </Typography>
-
+    <Box sx={{ px: 2 }}>
+      {ipoData && (
+        <>
           <div>
             <div id="ipo-dashboard-cards">
               <IPODashboardHeader
@@ -267,6 +267,7 @@ const IPODashboardMain: React.FC = () => {
         </>
       )}
     </Box>
+    </>
   );
 };
 
