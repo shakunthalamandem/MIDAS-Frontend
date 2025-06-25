@@ -52,12 +52,12 @@ import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSe
 import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketOpportnuityMain";
 import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
 import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
-import PnlAttributionMain from "../Components/PNLAttribution/PnlAttributionMain";
 import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
 import EquityNewDealFormMain from "../Components/EquityNewDealFormMain/EquityNewDealFormMain";
 import LkFileUpload from "../Components/Uploads/LkFileUpload";
 import DetailedDealsView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedDealsView";
 import DetailedLeadBankView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedLeadBankView";
+import PNLTabMain from "../Components/PNLAttribution/PNLTabMain";
 
 
 
@@ -126,11 +126,7 @@ const AppRouters: React.FC = () => {
 
 
 
-        {/* <Route path="/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} /> */}
-        {/* <Route path="/pnl/portfolio-attribution" element={<AuthGuard><PortfolioAttribution /></AuthGuard>} >
-          <Route path="/basic" element={ <PnlAttributionMain /> }/>
-        </Route> */}
-        <Route path="/portfolio-attribution" element={<AuthGuard><PnlAttributionMain /></AuthGuard>} />
+        <Route path="/portfolio-attribution" element={<AuthGuard><PNLTabMain /></AuthGuard>} />
         <Route path="/portfolio-attribution/details/:assetType" element={<AuthGuard><DeatiledRegionPnlAttribution /></AuthGuard>}/>
     
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, Container, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import NoDataPopup from "../../../../Pages/NoDataPopup";
@@ -152,7 +152,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData ,h
           }}
         >
           <Link
-            to={`/equity/tickerperformance/${params.value}`}
+            to={`/opportunity/equity/${params.value}`}
             style={{ color: "#1E88E5", textDecoration: "none" }}
             target="_blank"
           >
@@ -216,7 +216,8 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData ,h
   ];
 
   return (
-    <Box mb={10} sx={{ height: 600, width: "100%" }}>
+    <Container>
+    <Box mb={10} mt={10} sx={{ height: 600, width: "100%" }}>
           {error && <p style={{ color: "red" }}>{error}</p>}
           {loading && <p>Loading...</p>}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -271,6 +272,7 @@ const ScreenerDataTable: React.FC<ScreenerDataTableProps> = ({ sectorwiseData ,h
 
       <NoDataPopup open={noDataPopupOpen} onClose={handleCloseNoDataPopup} />
     </Box>
+    </Container>
   );
 };
 
