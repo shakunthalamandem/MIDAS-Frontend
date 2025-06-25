@@ -21,7 +21,7 @@ const IntelligenceDashboard: React.FC = () => {
 
   return (
     <Container maxWidth="xl">
-    <Box display="flex" width="100%" pt={2} bgcolor="#f5f9fc">
+    <Box display="flex" width="100%" pt={2} >
       <Box display="flex" flexDirection="column" gap={4} width="100%">
 
         <Box display="flex" justifyContent="center">
@@ -80,6 +80,7 @@ const IntelligenceDashboard: React.FC = () => {
                 background: "linear-gradient(to right, #f3e5f5, #ffffff)",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
                 borderRadius: 4,
+                mb:2
               }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -129,6 +130,7 @@ const IntelligenceDashboard: React.FC = () => {
                 background: "linear-gradient(to right, #f3e5f5, #ffffff)", 
                 boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
                 borderRadius: 4,
+                mb:2
               }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
