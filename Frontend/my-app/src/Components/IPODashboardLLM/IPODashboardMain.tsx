@@ -12,8 +12,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText,
-  Button
+  ListItemText
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
@@ -22,7 +21,7 @@ import IPODashboardHeader from "./IPODashboardHeader";
 import IPODashboardCardRatings from "./IPODashboardCardRatings";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
-import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard"; 
+import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -51,9 +50,8 @@ const IPODashboardMain: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [allIpoTickers, setAllIpoTickers] = useState<string[]>([]);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(
-    ticker || ""
-  );
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(ticker || "");
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   useEffect(() => {
     const fetchAllIpoTickers = async () => {
@@ -128,67 +126,158 @@ const IPODashboardMain: React.FC = () => {
   }, [selectedTicker]);
 
   const handleExportPDF = async () => {
-    const cardsElement = document.getElementById("ipo-dashboard-cards");
-    const tablesElement = document.getElementById("ipo-dashboard-tables");
-    if (cardsElement && tablesElement) {
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "pt",
-        format: "a4"
-      });
+    setPdfLoading(true);
+    try {
+      const pageElements = [
+        document.getElementById("ipo-dashboard-page1"),
+        document.getElementById("ipo-dashboard-page2"),
+        document.getElementById("ipo-dashboard-page3"),
+      ];
 
-      const cardsCanvas = await html2canvas(cardsElement, { scale: 2 });
-      const cardsImgData = cardsCanvas.toDataURL("image/png");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const cardsProps = pdf.getImageProperties(cardsImgData);
-      const cardsHeight = (cardsProps.height * pdfWidth) / cardsProps.width;
-      pdf.addImage(cardsImgData, "PNG", 0, 0, pdfWidth, cardsHeight);
+      if (!pageElements.every(el => el !== null)) {
+        setPdfLoading(false);
+        return;
+      }
 
-      pdf.addPage();
-      const tablesCanvas = await html2canvas(tablesElement, { scale: 2 });
-      const tablesImgData = tablesCanvas.toDataURL("image/png");
-      const tablesProps = pdf.getImageProperties(tablesImgData);
-      const tablesHeight = (tablesProps.height * pdfWidth) / tablesProps.width;
-      pdf.addImage(tablesImgData, "PNG", 0, 0, pdfWidth, tablesHeight);
+      const pdf = new jsPDF("p", "pt", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+
+      for (let i = 0; i < pageElements.length; i++) {
+        const element = pageElements[i];
+        if (!element) continue;
+
+        const clone = element.cloneNode(true) as HTMLElement;
+        clone.style.padding = "0";
+        clone.style.margin = "0";
+        clone.style.width = "100%";
+        clone.style.maxWidth = "100%";
+        clone.style.background = "#fff";
+
+        const tables = clone.querySelectorAll("table");
+        tables.forEach(table => {
+          const tableElement = table as HTMLElement;
+          tableElement.style.fontSize = "10px";
+          tableElement.style.width = "100%";
+          tableElement.style.tableLayout = "fixed";
+          const cells = tableElement.querySelectorAll("th, td");
+          cells.forEach(cell => {
+            const cellElement = cell as HTMLElement;
+            cellElement.style.fontSize = "8px";
+            cellElement.style.padding = "2px";
+            cellElement.style.wordWrap = "break-word";
+            cellElement.style.overflow = "hidden";
+          });
+        });
+
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "fixed";
+        wrapper.style.top = "-10000px";
+        wrapper.style.left = "0";
+        wrapper.style.width = "1200px";
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
+
+        const canvas = await html2canvas(clone, {
+          scale: 2,
+          useCORS: true,
+          scrollX: 0,
+          scrollY: 0,
+          backgroundColor: "#fff",
+        });
+
+        document.body.removeChild(wrapper);
+
+        const imgHeight = canvas.height;
+        const imgWidth = canvas.width;
+
+        const ratio = pageWidth / imgWidth;
+        const scaledHeight = imgHeight * ratio;
+
+        let position = 0;
+        let pageCount = 0;
+
+        while (position < scaledHeight) {
+          const canvasSlice = document.createElement("canvas");
+          const context = canvasSlice.getContext("2d")!;
+          const sliceHeight = Math.min(imgHeight - pageCount * (pageHeight / ratio), pageHeight / ratio);
+          canvasSlice.width = imgWidth;
+          canvasSlice.height = sliceHeight;
+
+          context.drawImage(
+            canvas,
+            0,
+            pageCount * (pageHeight / ratio),
+            imgWidth,
+            sliceHeight,
+            0,
+            0,
+            imgWidth,
+            sliceHeight
+          );
+
+          const imgData = canvasSlice.toDataURL("image/png");
+          if (i > 0 || pageCount > 0) pdf.addPage();
+
+          pdf.addImage(
+            imgData,
+            "PNG",
+            margin,
+            margin,
+            pageWidth - margin * 2,
+            sliceHeight * ratio - 2
+          );
+
+          position += pageHeight;
+          pageCount++;
+        }
+      }
 
       pdf.save(`IPO-Dashboard-${selectedTicker}.pdf`);
+    } catch (error) {
+      console.error("PDF generation failed", error);
+    } finally {
+      setPdfLoading(false);
     }
   };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <>
-    <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 500,
-                      color: "#FFFFFF",
-                      fontSize: { xs: "1rem", sm: "1.2rem" },
-                      backgroundColor: "#002060",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: "4vh",
-                      padding: "8px 16px",
-                      borderRadius: "8px",
-                      textAlign: "center",
-                      marginBottom: "40px",
-                      boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                      animation: "fadeIn 1.5s ease-in-out",
-                      "@keyframes fadeIn": {
-                        "0%": { opacity: 0 },
-                        "100%": { opacity: 1 },
-                      },
-                    }}
-                  >
-                    Welcome to detailed Insights on IPO - {selectedTicker}
-                  </Typography>
-    <Box sx={{ px: 2 }}>
-      {ipoData && (
-        <>
-          <div>
-            <div id="ipo-dashboard-cards">
+      <Typography
+        variant="body2"
+        sx={{
+          fontWeight: 500,
+          color: "#FFFFFF",
+          fontSize: { xs: "1rem", sm: "1.2rem" },
+          backgroundColor: "#002060",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "4vh",
+          padding: "8px 16px",
+          borderRadius: "8px",
+          textAlign: "center",
+          marginBottom: "40px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          animation: "fadeIn 1.5s ease-in-out",
+          "@keyframes fadeIn": {
+            "0%": { opacity: 0 },
+            "100%": { opacity: 1 },
+          },
+        }}
+      >
+        Welcome to detailed Insights on IPO - {selectedTicker}
+      </Typography>
+
+      <Box sx={{ px: 2 }}>
+        {ipoData && (
+          <>
+     
+            <div id="ipo-dashboard-page1">
               <IPODashboardHeader
                 ipoData={ipoData}
                 allIpoTickers={allIpoTickers}
@@ -197,41 +286,35 @@ const IPODashboardMain: React.FC = () => {
                 setSelectedTicker={setSelectedTicker}
                 setSearchText={setSearchText}
                 onExportPDF={handleExportPDF}
+                pdfLoading={pdfLoading}
               />
-
-
               <IPODashboardCardRatings ipodata={ipoData} />
+            </div>
+
+            <div id="ipo-dashboard-page2">
               <Container maxWidth="xl" sx={{ mb: 3 }}>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.map((section, index) => {
+                  {cardSections.slice(0, 4).map((section, index) => {
                     const content = ipoData[section.key];
                     return (
                       <Grid item xs={12} md={6} key={section.key}>
-                        <Card
-                          sx={{
-                            backgroundColor: cardColors[index % cardColors.length],
-                            borderRadius: 2,
-                            boxShadow: 3,
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
+                        <Card sx={{
+                          backgroundColor: cardColors[index % cardColors.length],
+                          borderRadius: 2,
+                          boxShadow: 3,
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                        }}>
                           <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-                            <Typography
-                              variant="h6"
-                              sx={{ color: "#002060", mb: 1, fontWeight: "bold" }}
-                              align="center"
-                            >
+                            <Typography variant="h6" sx={{ color: "#002060", mb: 1, fontWeight: "bold" }} align="center">
                               {section.title}
                             </Typography>
                             <List dense>
                               {content?.map((item: string, idx: number) => (
                                 <ListItem key={idx} sx={{ pl: 0 }}>
                                   <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                                    <FiberManualRecordIcon
-                                      sx={{ fontSize: 8, color: "#002060" }}
-                                    />
+                                    <FiberManualRecordIcon sx={{ fontSize: 8, color: "#002060" }} />
                                   </ListItemIcon>
                                   <ListItemText primary={item} />
                                 </ListItem>
@@ -245,14 +328,44 @@ const IPODashboardMain: React.FC = () => {
                 </Grid>
               </Container>
             </div>
-            <div id="ipo-dashboard-tables">
+
+            <div id="ipo-dashboard-page3">
               <Container maxWidth="xl" sx={{ mb: 3 }}>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
+                  {cardSections.slice(4, 6).map((section, index) => {
+                    const content = ipoData[section.key];
+                    return (
+                      <Grid item xs={12} md={6} key={section.key}>
+                        <Card sx={{
+                          backgroundColor: cardColors[(index + 4) % cardColors.length],
+                          borderRadius: 2,
+                          boxShadow: 3,
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                        }}>
+                          <CardContent sx={{ overflowY: "auto", flex: 1 }}>
+                            <Typography variant="h6" sx={{ color: "#002060", mb: 1, fontWeight: "bold" }} align="center">
+                              {section.title}
+                            </Typography>
+                            <List dense>
+                              {content?.map((item: string, idx: number) => (
+                                <ListItem key={idx} sx={{ pl: 0 }}>
+                                  <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
+                                    <FiberManualRecordIcon sx={{ fontSize: 8, color: "#002060" }} />
+                                  </ListItemIcon>
+                                  <ListItemText primary={item} />
+                                </ListItem>
+                              ))}
+                            </List>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    );
+                  })}
                   <Grid item xs={12}>
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                      <FinancialForecastTable
-                        defaultTicker={selectedTicker || ""}
-                      />
+                      <FinancialForecastTable defaultTicker={selectedTicker || ""} />
                     </Box>
                   </Grid>
                   <Grid item xs={12}>
@@ -263,10 +376,9 @@ const IPODashboardMain: React.FC = () => {
                 </Grid>
               </Container>
             </div>
-          </div>
-        </>
-      )}
-    </Box>
+          </>
+        )}
+      </Box>
     </>
   );
 };

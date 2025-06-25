@@ -8,6 +8,7 @@ import {
   Autocomplete,
   Card,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import IPOdashboardLine from "./IPOdashboardLine";
@@ -20,6 +21,7 @@ interface IPODashboardHeaderProps {
   setSelectedTicker: (ticker: string | null) => void;
   setSearchText: (text: string) => void;
   onExportPDF: () => void;
+  pdfLoading: boolean;
 }
 
 const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
@@ -30,6 +32,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   setSelectedTicker,
   setSearchText,
   onExportPDF,
+  pdfLoading,
 }) => {
   return (
     <Container maxWidth="xl" sx={{ mb: 2 }}>
@@ -44,12 +47,8 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
           gap: 2,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography
-            variant="h5"
-            color="#002060"
-            sx={{ fontWeight: 600 }}
-          >
+        <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
+          <Typography variant="h5" color="#002060" sx={{ fontWeight: 600 }}>
             {ipoData.company_name} ({ipoData.ticker_name} | {ipoData.exchange})
           </Typography>
 
@@ -60,9 +59,18 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
               backgroundColor: "#002060",
               color: "#ffffff",
               textTransform: "none",
+              px: 3,
+              py: 1,
+              minWidth: "130px",
             }}
+            disabled={pdfLoading}
+            startIcon={
+              pdfLoading ? (
+                <CircularProgress color="inherit" size={18} />
+              ) : null
+            }
           >
-            Export to PDF
+            {pdfLoading ? "Generating..." : "Export to PDF"}
           </Button>
         </Box>
 
@@ -101,8 +109,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
         elevation={0}
         sx={{
           borderRadius: 4,
-          background:
-            "linear-gradient(to right,rgb(172, 229, 236),rgb(234, 245, 176))",
+          background: "linear-gradient(to right,rgb(172, 229, 236),rgb(234, 245, 176))",
           mb: 2,
           mt: 4,
           width: "100%",
@@ -116,6 +123,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
         >
           Valuation Information
         </Typography>
+
         {Array.isArray(ipoData.valuation) && ipoData.valuation.length > 0 ? (
           <Box component="ul" sx={{ pl: 4, color: "#333" }}>
             {ipoData.valuation.map((item: string, index: number) => (
