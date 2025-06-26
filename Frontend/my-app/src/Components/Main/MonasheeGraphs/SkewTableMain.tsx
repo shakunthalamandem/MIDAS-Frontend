@@ -13,6 +13,7 @@ import YearlyBasedTable from "./SkewTables/YearlyBasedTable";
 import SectorBasedTable from "./SkewTables/SectorBasedTable";
 import LeadBankTable from "./SkewTables/LeadBankBasedTable";
 import RegionBasedTable from "./SkewTables/RegionBasedTable";
+import CountryBasedTable from "./SkewTables/CountryBasedTable";
 
 const SkewTableMain: React.FC = () => {
   const [selectedView, setSelectedView] = useState<string>("sector");
@@ -31,6 +32,8 @@ const SkewTableMain: React.FC = () => {
         return <RegionBasedTable />;
       case "leadBank":
         return <LeadBankTable />;
+        case "Top 10 Countries By Deal Volume":
+          return <CountryBasedTable />
       default:
         return null;
     }
@@ -69,6 +72,7 @@ const SkewTableMain: React.FC = () => {
                 { value: "yearly", label: "Sector Based" },
                 { value: "region", label: "Region Based" },
                 { value: "leadBank", label: "Lead Bank Based" },
+                { value: "Top 10 Countries By Deal Volume", label: "Top 10 Countries By Deal Volume"}
               ].map((option) => (
                 <FormControlLabel
                   key={option.value}
