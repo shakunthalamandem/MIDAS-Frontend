@@ -70,7 +70,29 @@ const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
       points[0].date
     );
   };
+  const getOrdinalSuffix = (day: number): string => {
+    if (day > 3 && day < 21) return "th";
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
 
+  const formatDate = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const day = date.getDate();
+    const suffix = getOrdinalSuffix(day);
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}${suffix} ${month} ${year}`;
+  };
   useEffect(() => {
     const fetchPnLData = async () => {
       try {
@@ -176,38 +198,23 @@ const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
   };
 
   return (
-    <Container
-      maxWidth="xl"
-      sx={{ mt: 4, mb: 4, backgroundColor: "#f6e9c6", borderRadius: 2 }}
-    >
+    <Container maxWidth="xl" sx={{ borderRadius: 2 }}>
       <Box
         sx={{
           width: "100%",
           px: { xs: 2, sm: 4, md: 6 },
-          py: 4,
           boxSizing: "border-box",
           overflowX: "hidden",
-          backgroundColor: "#f6e9c6",
         }}
       >
-        <Typography
-          variant="h5"
-          align="center"
-          color="#016676"
-          fontWeight="bold"
-          gutterBottom
-        >
-          PNL Summary Graphs by Period
-        </Typography>
-
         <Typography
           variant="subtitle1"
           align="right"
           color="#6f1178"
           fontWeight="bold"
-          sx={{ mb: 3 }}
+          sx={{ mb: 3, mt: 2 }}
         >
-          Data As of: {getMaxDate(data?.wtd)}
+          Data As of: {formatDate(getMaxDate(data?.wtd))}
         </Typography>
 
         {loading ? (

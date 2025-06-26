@@ -139,132 +139,120 @@ const PNLFilters: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ py: 3 }}>
-        <Fade in timeout={600}>
+    <Container maxWidth="xl">
+        <Box
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            boxShadow: 3,
+            bgcolor: "#f6e9c6",
+          }}
+        >
+          <Typography
+            variant="h5"
+            align="center"
+            color="#016676"
+            fontWeight="bold"
+            gutterBottom
+          >
+            PNL Summary Graphs{" "}
+          </Typography>
+
           <Box
             sx={{
-              p: 2,
-              borderRadius: 2,
-              boxShadow: 3,
-              background: "linear-gradient(to right, #f5f7fa, #c3cfe2)",
-              mb: 3,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 2,
+              justifyContent: "center",
             }}
           >
-            <Typography
-              variant="subtitle1"
+            {filterOptions.map(({ label, key }) => (
+              <Autocomplete
+                key={key}
+                multiple
+                disableCloseOnSelect
+                options={filters[key] || []}
+                value={selectedFilters[key]}
+                onChange={handleChange(key)}
+                getOptionLabel={(option) => option}
+                size="small"
+                sx={{ width: 220 }}
+                renderTags={(selected, getTagProps) => {
+                  if (selected.length === 0) return [];
+
+                  const first = selected[0];
+                  const extraCount = selected.length - 1;
+                  const label =
+                    extraCount > 0 ? `${first} +${extraCount}` : first;
+
+                  return [
+                    <span
+                      key={label}
+                      style={{
+                        padding: "4px 8px",
+                        backgroundColor: "#e0e0e0",
+                        borderRadius: 4,
+                        fontSize: "0.8rem",
+                        display: "inline-block",
+                      }}
+                    >
+                      {label}
+                    </span>,
+                  ];
+                }}
+                renderOption={(props, option, { selected }) => (
+                  <li {...props}>
+                    <Checkbox
+                      icon={icon}
+                      checkedIcon={checkedIcon}
+                      style={{ marginRight: 8 }}
+                      checked={selected}
+                    />
+                    {option}
+                  </li>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label={label}
+                    placeholder={`Select ${label}`}
+                  />
+                )}
+              />
+            ))}
+
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleReset}
               sx={{
-                mb: 2,
-                fontWeight: 600,
+                borderColor: "#002060",
                 color: "#002060",
-                textAlign: "center",
-              }}
-            >
-              Filter PNL Attribution
-            </Typography>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 2,
-                justifyContent: "center",
-              }}
-            >
-              {filterOptions.map(({ label, key }) => (
-         <Autocomplete
-  key={key}
-  multiple
-  disableCloseOnSelect
-  options={filters[key] || []}
-  value={selectedFilters[key]}
-  onChange={handleChange(key)}
-  getOptionLabel={(option) => option}
-  size="small"
-  sx={{ width: 220 }}
-  renderTags={(selected, getTagProps) => {
-    if (selected.length === 0) return [];
-
-    const first = selected[0];
-    const extraCount = selected.length - 1;
-    const label = extraCount > 0 ? `${first} +${extraCount}` : first;
-
-    return [
-      <span
-        key={label}
-        style={{
-          padding: "4px 8px",
-          backgroundColor: "#e0e0e0",
-          borderRadius: 4,
-          fontSize: "0.8rem",
-          marginRight: 4,
-          display: "inline-block",
-        }}
-      >
-        {label}
-      </span>,
-    ];
-  }}
-  renderOption={(props, option, { selected }) => (
-    <li {...props}>
-      <Checkbox
-        icon={icon}
-        checkedIcon={checkedIcon}
-        style={{ marginRight: 8 }}
-        checked={selected}
-      />
-      {option}
-    </li>
-  )}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      variant="outlined"
-      label={label}
-      placeholder={`Select ${label}`}
-    />
-  )}
-/>
-
-              ))}
-
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleReset}
-                sx={{
-                  borderColor: "#002060",
-                  color: "#002060",
-                  "&:hover": {
-                    backgroundColor: "#002060",
-                    color: "#fff",
-                  },
-                }}
-              >
-                Reset
-              </Button>
-
-              <Button
-                variant="contained"
-                onClick={handleApply}
-                sx={{
+                "&:hover": {
                   backgroundColor: "#002060",
-                  "&:hover": {
-                    backgroundColor: "#003080",
-                  },
-                }}
-              >
-                Apply
-              </Button>
-            </Box>
-          </Box>
-        </Fade>
+                  color: "#fff",
+                },
+              }}
+            >
+              Reset
+            </Button>
 
-        <Fade in timeout={500}>
-          <Box>
-            <GraphicalRepresent appliedFilters={appliedFilters} />
+            <Button
+              variant="contained"
+              onClick={handleApply}
+              sx={{
+                backgroundColor: "#002060",
+                "&:hover": {
+                  backgroundColor: "#003080",
+                },
+              }}
+            >
+              Apply
+            </Button>
           </Box>
-        </Fade>
+
+        <GraphicalRepresent appliedFilters={appliedFilters} />
       </Box>
     </Container>
   );
