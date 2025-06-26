@@ -197,13 +197,14 @@ const UpcomingIpoTable: React.FC = () => {
                     {formatDate(row.expected_date)}
                   </TableCell>
                   <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
-                    {row.price !== null ? `$${row.price}` : "—"}
+                    {row.price !== null ? `${row.price}` : "—"}
                   </TableCell>
                   <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
                     {row.exchange}
                   </TableCell>
                   <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
-                    {row.deal_size !== null ? formatNumber(row.deal_size) : "—"}
+                    {/* {row.deal_size !== null ? formatNumber(row.deal_size) : "—"} */}
+                                        {row.deal_size !== null ? `${row.deal_size}` : "—"}
                   </TableCell>
                 </TableRow>
               ))}
