@@ -1,11 +1,11 @@
 import React from 'react'
-import GraphicalRepresent from './GraphicalRepresent'
 import RegionsPnls from './RegionsPnls'
+import PNLFilters from '../PNLFilters'
 
 const PNLGraphsMain = () => {
   return (
     <>
-    <GraphicalRepresent />
+    <PNLFilters />
     <RegionsPnls />
     </>
   )
