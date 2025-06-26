@@ -39,7 +39,7 @@ const IpoDashboardCalendar: React.FC = () => {
     "minimun price": lowprice || null,   // Note: backend has typo 'minimun'
       "maximum price": highprice || null,
       "exchange": exchange,
-    "offer amount": offerAmount ? parseFloat(offerAmount) : null
+    "offer amount": offerAmount  || null,  // maps to "offer amount"
     };
 
     try {

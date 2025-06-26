@@ -8,7 +8,14 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Box, Typography, CircularProgress, Grid, Paper, Container } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Grid,
+  Paper,
+  Container,
+} from "@mui/material";
 
 // Types
 type ChartPoint = {
@@ -33,7 +40,13 @@ type PnLData = {
   totals: Totals;
 };
 
-const GraphicalRepresent = () => {
+type GraphicalRepresentProps = {
+  appliedFilters: Record<string, any>; // update this type based on your filter shape
+};
+
+const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
+  appliedFilters,
+}) => {
   const [data, setData] = useState<PnLData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +70,29 @@ const GraphicalRepresent = () => {
       points[0].date
     );
   };
+  const getOrdinalSuffix = (day: number): string => {
+    if (day > 3 && day < 21) return "th";
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
 
+  const formatDate = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const day = date.getDate();
+    const suffix = getOrdinalSuffix(day);
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}${suffix} ${month} ${year}`;
+  };
   useEffect(() => {
     const fetchPnLData = async () => {
       try {
@@ -70,6 +105,7 @@ const GraphicalRepresent = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify(appliedFilters),
         });
 
         if (!response.ok) {
@@ -91,7 +127,9 @@ const GraphicalRepresent = () => {
       setError("No access token found.");
       setLoading(false);
     }
-  }, [token, apiUrl]);
+  }, [token, apiUrl, appliedFilters]);
+
+
 
   const chartKeys = ["wtd", "mtd", "qtd", "ytd"] as const;
 
@@ -162,63 +200,45 @@ const GraphicalRepresent = () => {
   };
 
   return (
-   <Container
-      maxWidth="xl"
-      sx={{ mt: 4, mb: 4, backgroundColor: "#f6e9c6", borderRadius: 2 }}
-    >
-
-
-    <Box
-      sx={{
-        width: "100%",
-        px: { xs: 2, sm: 4, md: 6 },
-        py: 4,
-        boxSizing: "border-box",
-        overflowX: "hidden",
-        backgroundColor: "#f6e9c6",
-      }}
-    >
-      <Typography
-        variant="h5"
-        align="center"
-        color="#016676"
-        fontWeight="bold"
-        gutterBottom
+    <Container maxWidth="xl" sx={{ borderRadius: 2 }}>
+      <Box
+        sx={{
+          width: "100%",
+          px: { xs: 2, sm: 4, md: 6 },
+          boxSizing: "border-box",
+          overflowX: "hidden",
+        }}
       >
-        PNL Summary Graphs by Period
-      </Typography>
-
-      <Typography
-        variant="subtitle1"
-        align="right"
-        color="#6f1178"
-        fontWeight="bold"
-        sx={{ mb: 3 }}
-      >
-        Data As of: {getMaxDate(data?.wtd)}
-      </Typography>
-
-      {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : error ? (
-        <Typography color="error" align="center">
-          {error}
+        <Typography
+          variant="subtitle1"
+          align="right"
+          color="#6f1178"
+          fontWeight="bold"
+          sx={{ mb: 3, mt: 2 }}
+        >
+          Data As of: {formatDate(getMaxDate(data?.wtd))}
         </Typography>
-      ) : (
-        <Grid container spacing={4}>
-          {chartKeys.map(
-            (key) =>
-              data?.[key] &&
-              data[key].length > 0 &&
-              renderLineChart(key, data[key])
-          )}
-        </Grid>
-      )}
-    </Box>
+
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error" align="center">
+            {error}
+          </Typography>
+        ) : (
+          <Grid container spacing={4}>
+            {chartKeys.map(
+              (key) =>
+                data?.[key] &&
+                data[key].length > 0 &&
+                renderLineChart(key, data[key])
+            )}
+          </Grid>
+        )}
+      </Box>
     </Container>
-    
   );
 };
 

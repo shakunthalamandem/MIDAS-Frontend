@@ -28,7 +28,7 @@ interface SkewTableOptions {
 
 const YearlyBasedTable: React.FC = () => {
   const [startYear, setStartYear] = useState<number>(2001);
-  const [endYear, setEndYear] = useState<number>(2002);
+  const [endYear, setEndYear] = useState<number>(2025);
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string[]>([]);
