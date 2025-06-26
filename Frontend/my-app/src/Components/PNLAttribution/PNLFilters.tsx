@@ -9,6 +9,7 @@ import {
   Typography,
   Fade,
   Container,
+  Chip,
 } from "@mui/material";
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -158,7 +159,7 @@ const PNLFilters: React.FC = () => {
             PNL Summary Graphs{" "}
           </Typography>
 
-        <Box
+<Box
   sx={{
     display: "flex",
     flexWrap: "wrap",
@@ -167,66 +168,68 @@ const PNLFilters: React.FC = () => {
   }}
 >
   {filterOptions.map(({ label, key }) => (
-    <Box key={key} sx={{ flex: "1 1 320px", maxWidth: 320 }}>
-      <Autocomplete
-        multiple
-        disableCloseOnSelect
-        options={filters[key] || []}
-        value={selectedFilters[key]}
-        onChange={handleChange(key)}
-        getOptionLabel={(option) => option}
-        size="small"
-        renderTags={(selected, getTagProps) => {
-          if (selected.length === 0) return [];
-          const first = selected[0];
-          const extraCount = selected.length - 1;
-          const label = extraCount > 0 ? `${first} +${extraCount}` : first;
+    <Autocomplete
+      key={key}
+      multiple
+      disableCloseOnSelect
+      options={filters[key] || []}
+      value={selectedFilters[key]}
+      onChange={handleChange(key)}
+      getOptionLabel={(option) => option}
+      size="small"
+      sx={{ width: "100%", maxWidth: 320 }}
+      renderTags={(selected, getTagProps) => {
+        if (selected.length === 0) return [];
 
-          return [
-            <span
-              key={label}
-              style={{
-                padding: "4px 8px",
-                backgroundColor: "#e0e0e0",
-                borderRadius: 4,
-                fontSize: "0.8rem",
-                color:'#002060',
-                display: "inline-block",
-              }}
-            >
-              {label}
-            </span>,
-          ];
-        }}
-        renderOption={(props, option, { selected }) => (
-          <li {...props}>
-            <Checkbox
-              icon={icon}
-              checkedIcon={checkedIcon}
-              style={{ marginRight: 8 }}
-              checked={selected}
-            />
-            {option}
-          </li>
-        )}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="outlined"
+        const first = selected[0];
+        const extraCount = selected.length - 1;
+        const label =
+          extraCount > 0 ? `${first} +${extraCount}` : first;
+
+        return [
+          <Chip
+            key={label}
             label={label}
-            placeholder={`Select ${label}`}
+            size="small"
+            sx={{ fontSize: "0.8rem" }}
+          />,
+        ];
+      }}
+      renderOption={(props, option, { selected }) => (
+        <Box component="li" {...props} sx={{ display: "flex", alignItems: "center" }}>
+          <Checkbox
+            icon={icon}
+            checkedIcon={checkedIcon}
+            checked={selected}
+            sx={{ mr: 1 }}
           />
-        )}
-      />
-    </Box>
+          <Typography variant="body2">{option}</Typography>
+        </Box>
+      )}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          variant="outlined"
+          label={label}
+          placeholder={`Select ${label}`}
+        />
+      )}
+    />
   ))}
 
-  <Box sx={{ flex: "1 1 220px", maxWidth: 220, display: "flex", gap: 1 }}>
+  <Box
+    sx={{
+      display: "flex",
+      gap: 1,
+      width: 220,
+      justifyContent: "space-between",
+    }}
+  >
     <Button
       variant="outlined"
       color="secondary"
-      onClick={handleReset}
       fullWidth
+      onClick={handleReset}
       sx={{
         borderColor: "#002060",
         color: "#002060",
@@ -238,10 +241,11 @@ const PNLFilters: React.FC = () => {
     >
       Reset
     </Button>
+
     <Button
       variant="contained"
-      onClick={handleApply}
       fullWidth
+      onClick={handleApply}
       sx={{
         backgroundColor: "#002060",
         "&:hover": {
