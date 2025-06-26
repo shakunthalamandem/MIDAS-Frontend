@@ -1,4 +1,4 @@
-// 1. RegionBasedTable.tsx
+// RegionBasedTable.tsx
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -39,6 +39,14 @@ const RegionBasedTable: React.FC = () => {
 
     const [data, setData] = useState<any>(null);
     const [totals, setTotals] = useState<any>(null);
+
+    const menuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: 200,
+            },
+        },
+    };
 
     useEffect(() => {
         const fetchFilters = async () => {
@@ -140,7 +148,6 @@ const RegionBasedTable: React.FC = () => {
             JSON.stringify({ filters, broad_region: [regionName] })
         );
 
-
         window.open('/detailed-region', '_blank');
     };
 
@@ -155,13 +162,14 @@ const RegionBasedTable: React.FC = () => {
                             Region Based Filtered Data
                         </Typography>
                         <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6} md={2}>
+                            <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth variant="outlined" size="small">
                                     <InputLabel>Start Year</InputLabel>
                                     <Select
                                         value={startYear}
                                         onChange={handleStartYearChange}
                                         label="Start Year"
+                                        MenuProps={menuProps}
                                         sx={{ backgroundColor: '#e0f7fa', color: '#006064' }}
                                     >
                                         {startYearOptions.map((year) => (
@@ -170,13 +178,14 @@ const RegionBasedTable: React.FC = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} sm={6} md={2}>
+                            <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth variant="outlined" size="small">
                                     <InputLabel>End Year</InputLabel>
                                     <Select
                                         value={endYear}
                                         onChange={handleEndYearChange}
                                         label="End Year"
+                                        MenuProps={menuProps}
                                         sx={{ backgroundColor: '#e8eaf6', color: '#1a237e' }}
                                         disabled={filteredEndYearOptions.length === 0}
                                     >
@@ -186,13 +195,14 @@ const RegionBasedTable: React.FC = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} sm={6} md={2}>
+                            <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth variant="outlined" size="small">
                                     <InputLabel>Deal Type</InputLabel>
                                     <Select
                                         value={dealType}
                                         onChange={handleDealTypeChange}
                                         label="Deal Type"
+                                        MenuProps={menuProps}
                                         sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
                                     >
                                         <MenuItem value="All">All</MenuItem>
@@ -209,6 +219,7 @@ const RegionBasedTable: React.FC = () => {
                                         value={sector}
                                         onChange={handleSectorChange}
                                         label="Sector"
+                                        MenuProps={menuProps}
                                         sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
                                     >
                                         <MenuItem value="All">All</MenuItem>
