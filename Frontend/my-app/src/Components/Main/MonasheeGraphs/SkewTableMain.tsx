@@ -12,6 +12,7 @@ import {
 import YearlyBasedTable from "./SkewTables/YearlyBasedTable";
 import SectorBasedTable from "./SkewTables/SectorBasedTable";
 import LeadBankTable from "./SkewTables/LeadBankBasedTable";
+import RegionBasedTable from "./SkewTables/RegionBasedTable";
 
 const SkewTableMain: React.FC = () => {
   const [selectedView, setSelectedView] = useState<string>("sector");
@@ -27,7 +28,7 @@ const SkewTableMain: React.FC = () => {
       case "yearly":
         return <YearlyBasedTable />;
       case "region":
-        return <YearlyBasedTable />;
+        return <RegionBasedTable />;
       case "leadBank":
         return <LeadBankTable />;
       default:
