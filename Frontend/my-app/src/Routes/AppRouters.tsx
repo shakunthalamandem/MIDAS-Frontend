@@ -58,6 +58,7 @@ import LkFileUpload from "../Components/Uploads/LkFileUpload";
 import DetailedDealsView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedDealsView";
 import DetailedLeadBankView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedLeadBankView";
 import PNLTabMain from "../Components/PNLAttribution/PNLTabMain";
+import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedRegionView";
 
 
 
@@ -201,6 +202,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/detailed-deals" element={<AuthGuard><DetailedDealsView /></AuthGuard>} />
         <Route path="/detailed-banks" element={<AuthGuard><DetailedLeadBankView /></AuthGuard>} />
+        <Route path="/detailed-region" element={<AuthGuard><DetailedRegionView /></AuthGuard>} />
 
       </Routes>
     </ErrorBoundary>

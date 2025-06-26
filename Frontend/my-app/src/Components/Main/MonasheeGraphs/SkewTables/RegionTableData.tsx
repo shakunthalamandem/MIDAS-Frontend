@@ -7,7 +7,9 @@ import {
     TableHead,
     TableRow,
     Paper,
+    Box,
 } from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 interface TableData {
     Total_Deal_Count: number;
@@ -34,26 +36,22 @@ interface Totals {
 interface RegionTableProps {
     data: { [region: string]: TableData } | null;
     totals: Totals | null;
+    onRowClick?: (region: string) => void;
 }
 
 const formatNumber = (value: number): string => {
     const absValue = Math.abs(value);
     let formattedValue: string;
 
-    if (absValue >= 1e9) {
-        formattedValue = `${(absValue / 1e9).toFixed(0)}B`;
-    } else if (absValue >= 1e6) {
-        formattedValue = `${(absValue / 1e6).toFixed(0)}M`;
-    } else if (absValue >= 1e3) {
-        formattedValue = `${(absValue / 1e3).toFixed(0)}K`;
-    } else {
-        formattedValue = absValue.toString();
-    }
+    if (absValue >= 1e9) formattedValue = `${(absValue / 1e9).toFixed(0)}B`;
+    else if (absValue >= 1e6) formattedValue = `${(absValue / 1e6).toFixed(0)}M`;
+    else if (absValue >= 1e3) formattedValue = `${(absValue / 1e3).toFixed(0)}K`;
+    else formattedValue = absValue.toString();
 
     return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
 };
 
-const RegionTableData: React.FC<RegionTableProps> = ({ data, totals }) => {
+const RegionTableData: React.FC<RegionTableProps> = ({ data, totals, onRowClick }) => {
     if (!data || !totals) {
         return <div>Loading or No Data Available</div>;
     }
@@ -82,7 +80,7 @@ const RegionTableData: React.FC<RegionTableProps> = ({ data, totals }) => {
                                 key={column}
                                 sx={{
                                     fontWeight: "bold",
-                                    textAlign: "center",
+                                    textAlign: "left",
                                     padding: "4px 8px",
                                     fontSize: "0.875rem",
                                     bgcolor: "#002060",
@@ -100,29 +98,58 @@ const RegionTableData: React.FC<RegionTableProps> = ({ data, totals }) => {
                         if (!row) return null;
 
                         return (
-                            <TableRow key={region}>
-                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem",textAlign: "center" }}>{region}</TableCell>
-                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", textAlign: "center" }}>{row.Total_Deal_Count}</TableCell>
-                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", textAlign: "center" }}>{formatNumber(row.Total_Deal_Volume)}</TableCell>
-                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", textAlign: "center" }}>{row.Positively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
-                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", textAlign: "center" }}>{row.Negatively_Performing_Deals_Percentage.toFixed(0)}%</TableCell>
-                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", textAlign: "center" }}>{row.Average_T1M_Abs_Return_of_Positively.toFixed(1)}%</TableCell>
-                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", textAlign: "center" }}>{row.Average_T1M_Abs_Return_of_Negatively.toFixed(1)}%</TableCell>
-                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", textAlign: "center" }}>{row.Expected_Returns_Excess.toFixed(1)}%</TableCell>
-                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", textAlign: "center" }}>{formatNumber(row.Long_Opportunity_Value)}</TableCell>
+                            <TableRow key={region} hover>
+                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", }}>
+                                    {region}
+                                </TableCell>
+                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", }}>
+                                    {row.Total_Deal_Count}
+                                </TableCell>
+                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", }}>
+                                    {formatNumber(row.Total_Deal_Volume)}
+                                </TableCell>
+                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", }}>
+                                    {row.Positively_Performing_Deals_Percentage.toFixed(0)}%
+                                </TableCell>
+                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", }}>
+                                    {row.Negatively_Performing_Deals_Percentage.toFixed(0)}%
+                                </TableCell>
+                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", }}>
+                                    {row.Average_T1M_Abs_Return_of_Positively.toFixed(1)}%
+                                </TableCell>
+                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", }}>
+                                    {row.Average_T1M_Abs_Return_of_Negatively.toFixed(1)}%
+                                </TableCell>
+                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem", }}>
+                                    {row.Expected_Returns_Excess.toFixed(1)}%
+                                </TableCell>
+                                <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <span>{formatNumber(row.Long_Opportunity_Value)}</span>
+                                        <Box sx={{ cursor: "pointer", pl: 1 }} onClick={() => onRowClick?.(region)}>
+                                            <MoreHorizIcon fontSize="small" />
+                                        </Box>
+                                    </Box>
+                                </TableCell>
                             </TableRow>
                         );
                     })}
                     <TableRow>
-                        <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem", textAlign: "center" }}>Total</TableCell>
-                        <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem", textAlign: "center" }}>{totals.Total_Deal_Count_Sum}</TableCell>
-                        <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem", textAlign: "center" }}>{formatNumber(totals.Total_Deal_Volume_Sum)}</TableCell>
-                        <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem", textAlign: "center" }}>{totals.Total_Postively_Performing_Deals.toFixed(0)}%</TableCell>
-                        <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem", textAlign: "center" }}>{totals.Total_Negatively_Performing_Deals.toFixed(0)}%</TableCell>
-                        <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem", textAlign: "center" }}>{totals.Total_Returns_positively.toFixed(1)}%</TableCell>
-                        <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem", textAlign: "center" }}>{totals.Total_Returns_negatively.toFixed(1)}%</TableCell>
-                        <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem", textAlign: "center" }}>{totals.Total_Expected_returns_excess.toFixed(1)}%</TableCell>
-                        <TableCell sx={{ padding: "4px 8px", fontWeight: "bold", fontSize: "0.875rem" }}>{formatNumber(totals.Total_Long_Opportunity_Value)}</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>Total</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>{totals.Total_Deal_Count_Sum}</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>{formatNumber(totals.Total_Deal_Volume_Sum)}</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>{totals.Total_Postively_Performing_Deals.toFixed(0)}%</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>{totals.Total_Negatively_Performing_Deals.toFixed(0)}%</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>{totals.Total_Returns_positively.toFixed(1)}%</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>{totals.Total_Returns_negatively.toFixed(1)}%</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>{totals.Total_Expected_returns_excess.toFixed(1)}%</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>{formatNumber(totals.Total_Long_Opportunity_Value)}</TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
