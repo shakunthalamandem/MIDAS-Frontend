@@ -126,7 +126,7 @@ const PNLFilters: React.FC = () => {
     { label: "Funds", key: "funds" },
     { label: "Asset Type", key: "asset_type" },
     { label: "Deal Type", key: "deal_type" },
-    { label: "Broad Region", key: "broad_region" },
+    // { label: "Broad Region", key: "broad_region" },
   ] as const;
 
   // Loading spinner for initial filter fetch
