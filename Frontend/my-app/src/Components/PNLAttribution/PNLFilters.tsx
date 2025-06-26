@@ -125,8 +125,8 @@ const PNLFilters: React.FC = () => {
   const filterOptions = [
     { label: "Funds", key: "funds" },
     { label: "Asset Type", key: "asset_type" },
-    { label: "Deal Type", key: "deal_type" },
-    // { label: "Broad Region", key: "broad_region" },
+    // { label: "Deal Type", key: "deal_type" },
+    { label: "Broad Region", key: "broad_region" },
   ] as const;
 
   // Loading spinner for initial filter fetch
@@ -158,99 +158,101 @@ const PNLFilters: React.FC = () => {
             PNL Summary Graphs{" "}
           </Typography>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 2,
-              justifyContent: "center",
-            }}
-          >
-            {filterOptions.map(({ label, key }) => (
-              <Autocomplete
-                key={key}
-                multiple
-                disableCloseOnSelect
-                options={filters[key] || []}
-                value={selectedFilters[key]}
-                onChange={handleChange(key)}
-                getOptionLabel={(option) => option}
-                size="small"
-                sx={{ width: 220 }}
-                renderTags={(selected, getTagProps) => {
-                  if (selected.length === 0) return [];
+        <Box
+  sx={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 2,
+    justifyContent: "center",
+  }}
+>
+  {filterOptions.map(({ label, key }) => (
+    <Box key={key} sx={{ flex: "1 1 320px", maxWidth: 320 }}>
+      <Autocomplete
+        multiple
+        disableCloseOnSelect
+        options={filters[key] || []}
+        value={selectedFilters[key]}
+        onChange={handleChange(key)}
+        getOptionLabel={(option) => option}
+        size="small"
+        renderTags={(selected, getTagProps) => {
+          if (selected.length === 0) return [];
+          const first = selected[0];
+          const extraCount = selected.length - 1;
+          const label = extraCount > 0 ? `${first} +${extraCount}` : first;
 
-                  const first = selected[0];
-                  const extraCount = selected.length - 1;
-                  const label =
-                    extraCount > 0 ? `${first} +${extraCount}` : first;
-
-                  return [
-                    <span
-                      key={label}
-                      style={{
-                        padding: "4px 8px",
-                        backgroundColor: "#e0e0e0",
-                        borderRadius: 4,
-                        fontSize: "0.8rem",
-                        display: "inline-block",
-                      }}
-                    >
-                      {label}
-                    </span>,
-                  ];
-                }}
-                renderOption={(props, option, { selected }) => (
-                  <li {...props}>
-                    <Checkbox
-                      icon={icon}
-                      checkedIcon={checkedIcon}
-                      style={{ marginRight: 8 }}
-                      checked={selected}
-                    />
-                    {option}
-                  </li>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    variant="outlined"
-                    label={label}
-                    placeholder={`Select ${label}`}
-                  />
-                )}
-              />
-            ))}
-
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={handleReset}
-              sx={{
-                borderColor: "#002060",
-                color: "#002060",
-                "&:hover": {
-                  backgroundColor: "#002060",
-                  color: "#fff",
-                },
+          return [
+            <span
+              key={label}
+              style={{
+                padding: "4px 8px",
+                backgroundColor: "#e0e0e0",
+                borderRadius: 4,
+                fontSize: "0.8rem",
+                display: "inline-block",
               }}
             >
-              Reset
-            </Button>
+              {label}
+            </span>,
+          ];
+        }}
+        renderOption={(props, option, { selected }) => (
+          <li {...props}>
+            <Checkbox
+              icon={icon}
+              checkedIcon={checkedIcon}
+              style={{ marginRight: 8 }}
+              checked={selected}
+            />
+            {option}
+          </li>
+        )}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="outlined"
+            label={label}
+            placeholder={`Select ${label}`}
+          />
+        )}
+      />
+    </Box>
+  ))}
 
-            <Button
-              variant="contained"
-              onClick={handleApply}
-              sx={{
-                backgroundColor: "#002060",
-                "&:hover": {
-                  backgroundColor: "#003080",
-                },
-              }}
-            >
-              Apply
-            </Button>
-          </Box>
+  <Box sx={{ flex: "1 1 220px", maxWidth: 220, display: "flex", gap: 1 }}>
+    <Button
+      variant="outlined"
+      color="secondary"
+      onClick={handleReset}
+      fullWidth
+      sx={{
+        borderColor: "#002060",
+        color: "#002060",
+        "&:hover": {
+          backgroundColor: "#002060",
+          color: "#fff",
+        },
+      }}
+    >
+      Reset
+    </Button>
+    <Button
+      variant="contained"
+      onClick={handleApply}
+      fullWidth
+      sx={{
+        backgroundColor: "#002060",
+        "&:hover": {
+          backgroundColor: "#003080",
+        },
+      }}
+    >
+      Apply
+    </Button>
+  </Box>
+</Box>
+
 
         <GraphicalRepresent appliedFilters={appliedFilters} />
       </Box>
