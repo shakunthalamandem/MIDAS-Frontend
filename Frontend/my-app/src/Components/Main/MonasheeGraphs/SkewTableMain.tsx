@@ -62,8 +62,8 @@ const SkewTableMain: React.FC = () => {
               }}
             >
               {[
-                { value: "sector", label: "Sector Based" },
-                { value: "yearly", label: "Yearly Based" },
+                { value: "sector", label: "Yearly Based" },
+                { value: "yearly", label: "Sector Based" },
                 { value: "leadBank", label: "Lead Bank Based" },
               ].map((option) => (
                 <FormControlLabel
