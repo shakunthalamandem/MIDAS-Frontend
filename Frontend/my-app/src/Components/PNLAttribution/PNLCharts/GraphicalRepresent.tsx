@@ -8,7 +8,14 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Box, Typography, CircularProgress, Grid, Paper, Container } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Grid,
+  Paper,
+  Container,
+} from "@mui/material";
 
 // Types
 type ChartPoint = {
@@ -33,7 +40,13 @@ type PnLData = {
   totals: Totals;
 };
 
-const GraphicalRepresent = () => {
+type GraphicalRepresentProps = {
+  appliedFilters: Record<string, any>; // update this type based on your filter shape
+};
+
+const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
+  appliedFilters,
+}) => {
   const [data, setData] = useState<PnLData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +83,7 @@ const GraphicalRepresent = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify(appliedFilters),
         });
 
         if (!response.ok) {
@@ -91,7 +105,7 @@ const GraphicalRepresent = () => {
       setError("No access token found.");
       setLoading(false);
     }
-  }, [token, apiUrl]);
+  }, [token, apiUrl, appliedFilters]);
 
   const chartKeys = ["wtd", "mtd", "qtd", "ytd"] as const;
 
@@ -162,63 +176,60 @@ const GraphicalRepresent = () => {
   };
 
   return (
-   <Container
+    <Container
       maxWidth="xl"
       sx={{ mt: 4, mb: 4, backgroundColor: "#f6e9c6", borderRadius: 2 }}
     >
-
-
-    <Box
-      sx={{
-        width: "100%",
-        px: { xs: 2, sm: 4, md: 6 },
-        py: 4,
-        boxSizing: "border-box",
-        overflowX: "hidden",
-        backgroundColor: "#f6e9c6",
-      }}
-    >
-      <Typography
-        variant="h5"
-        align="center"
-        color="#016676"
-        fontWeight="bold"
-        gutterBottom
+      <Box
+        sx={{
+          width: "100%",
+          px: { xs: 2, sm: 4, md: 6 },
+          py: 4,
+          boxSizing: "border-box",
+          overflowX: "hidden",
+          backgroundColor: "#f6e9c6",
+        }}
       >
-        PNL Summary Graphs by Period
-      </Typography>
-
-      <Typography
-        variant="subtitle1"
-        align="right"
-        color="#6f1178"
-        fontWeight="bold"
-        sx={{ mb: 3 }}
-      >
-        Data As of: {getMaxDate(data?.wtd)}
-      </Typography>
-
-      {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : error ? (
-        <Typography color="error" align="center">
-          {error}
+        <Typography
+          variant="h5"
+          align="center"
+          color="#016676"
+          fontWeight="bold"
+          gutterBottom
+        >
+          PNL Summary Graphs by Period
         </Typography>
-      ) : (
-        <Grid container spacing={4}>
-          {chartKeys.map(
-            (key) =>
-              data?.[key] &&
-              data[key].length > 0 &&
-              renderLineChart(key, data[key])
-          )}
-        </Grid>
-      )}
-    </Box>
+
+        <Typography
+          variant="subtitle1"
+          align="right"
+          color="#6f1178"
+          fontWeight="bold"
+          sx={{ mb: 3 }}
+        >
+          Data As of: {getMaxDate(data?.wtd)}
+        </Typography>
+
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error" align="center">
+            {error}
+          </Typography>
+        ) : (
+          <Grid container spacing={4}>
+            {chartKeys.map(
+              (key) =>
+                data?.[key] &&
+                data[key].length > 0 &&
+                renderLineChart(key, data[key])
+            )}
+          </Grid>
+        )}
+      </Box>
     </Container>
-    
   );
 };
 

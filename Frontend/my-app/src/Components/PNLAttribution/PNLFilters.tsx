@@ -1,0 +1,273 @@
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Autocomplete,
+  Checkbox,
+  TextField,
+  Button,
+  CircularProgress,
+  Typography,
+  Fade,
+  Container,
+} from "@mui/material";
+import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import GraphicalRepresent from "./PNLCharts/GraphicalRepresent";
+
+// Filter type
+type Filters = {
+  funds: string[];
+  asset_type: string[];
+  deal_type: string[];
+  broad_region: string[];
+};
+
+const icon = <CheckBoxOutlineBlank fontSize="small" />;
+const checkedIcon = <CheckBox fontSize="small" />;
+
+const PNLFilters: React.FC = () => {
+  const [filters, setFilters] = useState<Filters | null>(null);
+
+  // Selected filter values by user
+  const [selectedFilters, setSelectedFilters] = useState<Filters>({
+    funds: [],
+    asset_type: [],
+    deal_type: [],
+    broad_region: [],
+  });
+
+  // Applied filters (used by GraphicalRepresent)
+  const [appliedFilters, setAppliedFilters] = useState<Filters>({
+    funds: [],
+    asset_type: [],
+    deal_type: [],
+    broad_region: [],
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+  const navigate = useNavigate();
+
+  // Fetch filter options from API
+  useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/daily_trades_filters/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch filters: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Insert "All" at the top of each filter list
+        const withAll = Object.fromEntries(
+          Object.entries(data).map(([key, values]) => [
+            key,
+            ["All", ...(values as string[])],
+          ])
+        );
+        setFilters(withAll as Filters);
+      } catch (error) {
+        console.error("Error loading filters:", error);
+        // Optionally redirect to error page:
+        // navigate("/error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFilters();
+  }, [apiUrl, token, navigate]);
+
+  // Handle filter selection
+  const handleChange = (key: keyof Filters) => (_: any, value: string[]) => {
+    const allOptions = filters?.[key] ?? [];
+
+    if (value.includes("All")) {
+      setSelectedFilters((prev) => ({
+        ...prev,
+        [key]: allOptions.filter((v) => v !== "All"),
+      }));
+    } else {
+      setSelectedFilters((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
+    }
+  };
+
+  // Apply filters
+  const handleApply = () => {
+    setAppliedFilters({ ...selectedFilters });
+  };
+
+  // Reset filters to default (show all)
+  const handleReset = () => {
+    const empty: Filters = {
+      funds: [],
+      asset_type: [],
+      deal_type: [],
+      broad_region: [],
+    };
+    setSelectedFilters(empty);
+    setAppliedFilters(empty);
+  };
+
+  const filterOptions = [
+    { label: "Funds", key: "funds" },
+    { label: "Asset Type", key: "asset_type" },
+    { label: "Deal Type", key: "deal_type" },
+    { label: "Broad Region", key: "broad_region" },
+  ] as const;
+
+  // Loading spinner for initial filter fetch
+  if (loading || !filters) {
+    return (
+      <Box sx={{ textAlign: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Container maxWidth="lg">
+      <Box sx={{ py: 3 }}>
+        <Fade in timeout={600}>
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              boxShadow: 3,
+              background: "linear-gradient(to right, #f5f7fa, #c3cfe2)",
+              mb: 3,
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                mb: 2,
+                fontWeight: 600,
+                color: "#002060",
+                textAlign: "center",
+              }}
+            >
+              Filter PNL Attribution
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 2,
+                justifyContent: "center",
+              }}
+            >
+              {filterOptions.map(({ label, key }) => (
+         <Autocomplete
+  key={key}
+  multiple
+  disableCloseOnSelect
+  options={filters[key] || []}
+  value={selectedFilters[key]}
+  onChange={handleChange(key)}
+  getOptionLabel={(option) => option}
+  size="small"
+  sx={{ width: 220 }}
+  renderTags={(selected, getTagProps) => {
+    if (selected.length === 0) return [];
+
+    const first = selected[0];
+    const extraCount = selected.length - 1;
+    const label = extraCount > 0 ? `${first} +${extraCount}` : first;
+
+    return [
+      <span
+        key={label}
+        style={{
+          padding: "4px 8px",
+          backgroundColor: "#e0e0e0",
+          borderRadius: 4,
+          fontSize: "0.8rem",
+          marginRight: 4,
+          display: "inline-block",
+        }}
+      >
+        {label}
+      </span>,
+    ];
+  }}
+  renderOption={(props, option, { selected }) => (
+    <li {...props}>
+      <Checkbox
+        icon={icon}
+        checkedIcon={checkedIcon}
+        style={{ marginRight: 8 }}
+        checked={selected}
+      />
+      {option}
+    </li>
+  )}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      variant="outlined"
+      label={label}
+      placeholder={`Select ${label}`}
+    />
+  )}
+/>
+
+              ))}
+
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleReset}
+                sx={{
+                  borderColor: "#002060",
+                  color: "#002060",
+                  "&:hover": {
+                    backgroundColor: "#002060",
+                    color: "#fff",
+                  },
+                }}
+              >
+                Reset
+              </Button>
+
+              <Button
+                variant="contained"
+                onClick={handleApply}
+                sx={{
+                  backgroundColor: "#002060",
+                  "&:hover": {
+                    backgroundColor: "#003080",
+                  },
+                }}
+              >
+                Apply
+              </Button>
+            </Box>
+          </Box>
+        </Fade>
+
+        <Fade in timeout={500}>
+          <Box>
+            <GraphicalRepresent appliedFilters={appliedFilters} />
+          </Box>
+        </Fade>
+      </Box>
+    </Container>
+  );
+};
+
+export default PNLFilters;
