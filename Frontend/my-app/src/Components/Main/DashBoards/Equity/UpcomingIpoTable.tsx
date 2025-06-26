@@ -82,7 +82,7 @@ const UpcomingIpoTable: React.FC = () => {
     if (abs >= 1e9) return `$${(abs / 1e9).toFixed(1)}B`;
     if (abs >= 1e6) return `$${(abs / 1e6).toFixed(1)}M`;
     if (abs >= 1e3) return `$${(abs / 1e3).toFixed(1)}K`;
-    return `$${abs.toFixed(2)}`;
+    return `${abs.toFixed(2)}`;
   };
 
   const getOrdinalSuffix = (day: number): string => {
@@ -197,13 +197,14 @@ const UpcomingIpoTable: React.FC = () => {
                     {formatDate(row.expected_date)}
                   </TableCell>
                   <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
-                    {row.price !== null ? `$${row.price}` : "—"}
+                    {row.price !== null ? `${row.price}` : "—"}
                   </TableCell>
                   <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
                     {row.exchange}
                   </TableCell>
                   <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
-                    {row.deal_size !== null ? formatNumber(row.deal_size) : "—"}
+                    {/* {row.deal_size !== null ? formatNumber(row.deal_size) : "—"} */}
+                    {row.deal_size !== null ? `${row.deal_size}` : "—"}
                   </TableCell>
                 </TableRow>
               ))}
