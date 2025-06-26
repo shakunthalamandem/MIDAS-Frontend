@@ -69,7 +69,6 @@ const PNLFilters: React.FC = () => {
 
         const data = await response.json();
 
-        // Insert "All" at the top of each filter list
         const withAll = Object.fromEntries(
           Object.entries(data).map(([key, values]) => [
             key,
@@ -79,8 +78,7 @@ const PNLFilters: React.FC = () => {
         setFilters(withAll as Filters);
       } catch (error) {
         console.error("Error loading filters:", error);
-        // Optionally redirect to error page:
-        // navigate("/error");
+
       } finally {
         setLoading(false);
       }
@@ -106,12 +104,10 @@ const PNLFilters: React.FC = () => {
     }
   };
 
-  // Apply filters
   const handleApply = () => {
     setAppliedFilters({ ...selectedFilters });
   };
 
-  // Reset filters to default (show all)
   const handleReset = () => {
     const empty: Filters = {
       funds: [],

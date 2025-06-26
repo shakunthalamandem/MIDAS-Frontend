@@ -129,6 +129,8 @@ const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
     }
   }, [token, apiUrl, appliedFilters]);
 
+
+
   const chartKeys = ["wtd", "mtd", "qtd", "ytd"] as const;
 
   const renderLineChart = (
