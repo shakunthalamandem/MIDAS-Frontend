@@ -26,6 +26,8 @@ const SkewTableMain: React.FC = () => {
         return <SectorBasedTable />;
       case "yearly":
         return <YearlyBasedTable />;
+      case "region":
+        return <YearlyBasedTable />;
       case "leadBank":
         return <LeadBankTable />;
       default:
@@ -64,6 +66,7 @@ const SkewTableMain: React.FC = () => {
               {[
                 { value: "sector", label: "Yearly Based" },
                 { value: "yearly", label: "Sector Based" },
+                { value: "region", label: "Region Based" },
                 { value: "leadBank", label: "Lead Bank Based" },
               ].map((option) => (
                 <FormControlLabel
