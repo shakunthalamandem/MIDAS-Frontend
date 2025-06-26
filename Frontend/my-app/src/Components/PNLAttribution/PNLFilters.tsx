@@ -190,6 +190,7 @@ const PNLFilters: React.FC = () => {
                 backgroundColor: "#e0e0e0",
                 borderRadius: 4,
                 fontSize: "0.8rem",
+                color:'#002060',
                 display: "inline-block",
               }}
             >
