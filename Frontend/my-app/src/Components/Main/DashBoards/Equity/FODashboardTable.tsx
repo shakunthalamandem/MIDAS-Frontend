@@ -30,6 +30,7 @@ interface RegionwiseMonthwise {
         Total_Deal_Volume: number;
         Positively_Performing_Deals_Percentage: number;
         Expected_Returns_Excess: number;
+        Long_Opportunity_Value: number;
       };
     };
   };
@@ -56,6 +57,8 @@ const monthOrder = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
+
+const MotionTableRow = motion(TableRow);
 
 const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload, regionwiseMonthwise }) => {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -127,7 +130,7 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload, regionwise
           <TableBody>
             {rows.map((row, idx) => (
               <React.Fragment key={row.key}>
-                <motion.tr
+                <MotionTableRow
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 + idx * 0.1 }}
@@ -149,23 +152,23 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload, regionwise
                       </TableCell>
                     );
                   })}
-                </motion.tr>
+                </MotionTableRow>
 
-                {expandedRows.has(row.key) && Object.entries(regionwiseMonthwise).map(([region, data]) => (
-                  <TableRow key={`${row.key}-${region}`} sx={{ backgroundColor: "#fff" }}>
-                    <TableCell sx={{ pl: 4 }}>{region}</TableCell>
-                    {availableMonthYears.map((monthYear) => {
-                      const [month, year] = monthYear.split(" ");
-                      const value = (data?.[year]?.[month] as any)?.[row.regionKey];
-
-                      return (
-                        <TableCell key={monthYear} align="center">
-                          {row.formatter(value)}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
+                {expandedRows.has(row.key) &&
+                  Object.entries(regionwiseMonthwise).map(([region, data]) => (
+                    <TableRow key={`${row.key}-${region}`} sx={{ backgroundColor: "#fff" }}>
+                      <TableCell sx={{ pl: 4 }}>{region}</TableCell>
+                      {availableMonthYears.map((monthYear) => {
+                        const [month, year] = monthYear.split(" ");
+                        const value = (data?.[year]?.[month] as any)?.[row.regionKey];
+                        return (
+                          <TableCell key={monthYear} align="center">
+                            {row.formatter(value)}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
               </React.Fragment>
             ))}
           </TableBody>

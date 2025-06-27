@@ -13,9 +13,24 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Legend,
   ReferenceLine,
 } from "recharts";
 import IPODashboardTable from "./IPODashboardTable";
+
+interface RegionwiseMonthwise {
+  [region: string]: {
+    [year: string]: {
+      [month: string]: {
+        Long_Opportunity_Value: number;
+        Total_Deal_Count: number;
+        Total_Deal_Volume: number;
+        Positively_Performing_Deals_Percentage: number;
+        Expected_Returns_Excess: number;
+      };
+    };
+  };
+}
 
 interface RegionMonthwiseMetric {
   Total_Deal_Count_Sum: number;
@@ -25,21 +40,31 @@ interface RegionMonthwiseMetric {
   Total_Long_Opportunity_Value: number;
 }
 
-interface RegionwiseMonthwiseTotal {
-  [year: string]: {
-    [month: string]: RegionMonthwiseMetric;
-  };
-}
-
 interface MddApiResponse {
-  RegionwiseMonthwiseTotal: RegionwiseMonthwiseTotal;
-  RegionwiseMonthwise: any; // Optionally type this later
+  RegionwiseMonthwise: RegionwiseMonthwise;
+  RegionwiseMonthwiseTotal: {
+    [year: string]: {
+      [month: string]: RegionMonthwiseMetric;
+    };
+  };
 }
 
 interface MddIpoOpportunityChartProps {
   selectedYears: number[];
   selectedTab: "IPO" | "FO";
 }
+
+const monthOrder = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+
+const regionColors: { [region: string]: string } = {
+  "US": "#1f77b4",
+  "EMEA": "#ff7f0e",
+  "APAC": "#2ca02c",
+  "Non-US America": "#d62728"
+};
 
 const formatValue = (value: number): string => {
   if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
@@ -51,19 +76,17 @@ const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
   selectedYears,
   selectedTab,
 }) => {
-  const [chartData, setChartData] = useState<{ month: string; opportunity_value_ex: number }[]>([]);
-  const [fullPayload, setFullPayload] = useState<MddApiResponse>({
-    RegionwiseMonthwiseTotal: {},
-    RegionwiseMonthwise: {},
-  });
-  const [loading, setLoading] = useState<boolean>(false);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [regionwiseMonthwise, setRegionwiseMonthwise] = useState<RegionwiseMonthwise>({});
+  const [regionwiseMonthwiseTotal, setRegionwiseMonthwiseTotal] = useState<MddApiResponse["RegionwiseMonthwiseTotal"]>({});
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    const fetchGraphData = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
         const year_range =
@@ -87,38 +110,46 @@ const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
           }
         );
 
-        const regionData = response.data.RegionwiseMonthwiseTotal || {};
-        const regionwiseMonthwise = response.data.RegionwiseMonthwise || {};
+        const regionData = response.data.RegionwiseMonthwise || {};
+        const totalData = response.data.RegionwiseMonthwiseTotal || {};
+        setRegionwiseMonthwise(regionData);
+        setRegionwiseMonthwiseTotal(totalData);
 
-        setFullPayload({
-          RegionwiseMonthwiseTotal: regionData,
-          RegionwiseMonthwise: regionwiseMonthwise,
-        });
+        const chartMap: { [monthYear: string]: any } = {};
+        const allMonthsSet = new Set<string>();
 
-        const chartArray: { month: string; opportunity_value_ex: number }[] = [];
-        selectedYears.forEach((year) => {
-          const yearData = regionData[year];
-          if (yearData) {
-            Object.entries(yearData).forEach(([month, metrics]) => {
-              chartArray.push({
-                month: `${month} ${year}`,
-                opportunity_value_ex: metrics.Total_Long_Opportunity_Value,
-              });
+        Object.entries(regionData).forEach(([region, yearData]) => {
+          Object.entries(yearData).forEach(([year, monthData]) => {
+            Object.entries(monthData).forEach(([month, values]) => {
+              const monthYear = `${month} ${year}`;
+              allMonthsSet.add(monthYear);
+              if (!chartMap[monthYear]) chartMap[monthYear] = { month: monthYear };
+              chartMap[monthYear][region] = values.Long_Opportunity_Value;
             });
-          }
+          });
         });
 
-        setChartData(chartArray);
+        const orderedMonths = Array.from(allMonthsSet).sort((a, b) => {
+          const [monthA, yearA] = a.split(" ");
+          const [monthB, yearB] = b.split(" ");
+          const yDiff = parseInt(yearA) - parseInt(yearB);
+          return yDiff !== 0
+            ? yDiff
+            : monthOrder.indexOf(monthA) - monthOrder.indexOf(monthB);
+        });
+
+        const finalData = orderedMonths.map((month) => chartMap[month]);
+        setChartData(finalData);
         setError(null);
       } catch (err) {
         console.error(err);
-        setError("Failed to load data");
+        setError("Failed to fetch chart data");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchGraphData();
+    fetchData();
   }, [selectedYears, selectedTab]);
 
   const yearLabel =
@@ -129,12 +160,12 @@ const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
   return (
     <>
       <IPODashboardTable
-        payload={fullPayload.RegionwiseMonthwiseTotal}
-        regionwiseMonthwise={fullPayload.RegionwiseMonthwise}
+        payload={regionwiseMonthwiseTotal}
+        regionwiseMonthwise={regionwiseMonthwise}
       />
 
-      <Typography variant="h6" gutterBottom align="center" color="#002060" mt={2}>
-        Opportunity Value Trends in {selectedTab}'s in {yearLabel}
+      <Typography variant="h6" gutterBottom align="center" color="#002060" mt={3}>
+        Region-wise Opportunity Value in {selectedTab}s ({yearLabel})
       </Typography>
 
       {loading ? (
@@ -156,13 +187,16 @@ const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
               formatter={(value: number) => formatValue(value)}
               labelFormatter={(label) => `Month: ${label}`}
             />
-            <ReferenceLine y={0} stroke="#999" strokeWidth={2} />
-            <Bar
-              dataKey="opportunity_value_ex"
-              fill="#F97316"
-              barSize={24}
-              animationDuration={800}
-            />
+            <Legend />
+            <ReferenceLine y={0} stroke="#aaa" />
+            {Object.keys(regionColors).map((region) => (
+              <Bar
+                key={region}
+                dataKey={region}
+                fill={regionColors[region]}
+                barSize={20}
+              />
+            ))}
           </BarChart>
         </ResponsiveContainer>
       )}
