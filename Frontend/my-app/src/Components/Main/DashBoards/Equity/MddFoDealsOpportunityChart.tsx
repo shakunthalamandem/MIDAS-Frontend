@@ -25,8 +25,22 @@ interface RegionMonthwiseMetric {
   Total_Long_Opportunity_Value: number;
 }
 
+interface RegionwiseMonthwise {
+  [region: string]: {
+    [year: string]: {
+      [month: string]: {
+        Total_Deal_Count: number;
+        Total_Deal_Volume: number;
+        Positively_Performing_Deals_Percentage: number;
+        Expected_Returns_Excess: number;
+      };
+    };
+  };
+}
+
 interface RegionwiseMonthwiseResponse {
   RegionwiseMonthwiseTotal: Record<string, Record<string, RegionMonthwiseMetric>>;
+  RegionwiseMonthwise: RegionwiseMonthwise;
 }
 
 interface MddFoDealsOpportunityChartProps {
@@ -45,7 +59,10 @@ const MddFoDealsOpportunityChart: React.FC<MddFoDealsOpportunityChartProps> = ({
   selectedTab,
 }) => {
   const [chartData, setChartData] = useState<any[]>([]);
-  const [fullPayload, setFullPayload] = useState<Record<string, Record<string, RegionMonthwiseMetric>>>({});
+  const [fullPayload, setFullPayload] = useState<RegionwiseMonthwiseResponse>({
+    RegionwiseMonthwiseTotal: {},
+    RegionwiseMonthwise: {},
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +94,12 @@ const MddFoDealsOpportunityChart: React.FC<MddFoDealsOpportunityChartProps> = ({
         );
 
         const regionData = response.data.RegionwiseMonthwiseTotal || {};
-        setFullPayload(regionData);
+        const regionwiseMonthwise = response.data.RegionwiseMonthwise || {};
+
+        setFullPayload({
+          RegionwiseMonthwiseTotal: regionData,
+          RegionwiseMonthwise: regionwiseMonthwise,
+        });
 
         const chartArray: any[] = [];
         selectedYears.forEach((year) => {
@@ -111,7 +133,10 @@ const MddFoDealsOpportunityChart: React.FC<MddFoDealsOpportunityChartProps> = ({
 
   return (
     <>
-      {fullPayload && <FODashboardTable payload={fullPayload} />}
+      <FODashboardTable
+        payload={fullPayload.RegionwiseMonthwiseTotal}
+        regionwiseMonthwise={fullPayload.RegionwiseMonthwise}
+      />
 
       <Typography variant="h6" gutterBottom align="center" color="#002060" mt={2}>
         Opportunity Value Trends in FO's in {yearLabel}

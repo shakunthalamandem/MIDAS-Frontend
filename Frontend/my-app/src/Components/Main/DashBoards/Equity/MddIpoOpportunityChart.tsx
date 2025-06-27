@@ -25,8 +25,15 @@ interface RegionMonthwiseMetric {
   Total_Long_Opportunity_Value: number;
 }
 
-interface RegionwiseMonthwiseResponse {
-  RegionwiseMonthwiseTotal: Record<string, Record<string, RegionMonthwiseMetric>>;
+interface RegionwiseMonthwiseTotal {
+  [year: string]: {
+    [month: string]: RegionMonthwiseMetric;
+  };
+}
+
+interface MddApiResponse {
+  RegionwiseMonthwiseTotal: RegionwiseMonthwiseTotal;
+  RegionwiseMonthwise: any; // Optionally type this later
 }
 
 interface MddIpoOpportunityChartProps {
@@ -45,7 +52,10 @@ const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
   selectedTab,
 }) => {
   const [chartData, setChartData] = useState<{ month: string; opportunity_value_ex: number }[]>([]);
-  const [fullPayload, setFullPayload] = useState<Record<string, Record<string, RegionMonthwiseMetric>>>({});
+  const [fullPayload, setFullPayload] = useState<MddApiResponse>({
+    RegionwiseMonthwiseTotal: {},
+    RegionwiseMonthwise: {},
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,11 +66,12 @@ const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
     const fetchGraphData = async () => {
       setLoading(true);
       try {
-        const year_range = selectedYears.length === 1
-          ? [selectedYears[0], selectedYears[0]]
-          : [Math.min(...selectedYears), Math.max(...selectedYears)];
+        const year_range =
+          selectedYears.length === 1
+            ? [selectedYears[0], selectedYears[0]]
+            : [Math.min(...selectedYears), Math.max(...selectedYears)];
 
-        const response = await axios.post<RegionwiseMonthwiseResponse>(
+        const response = await axios.post<MddApiResponse>(
           `${apiUrl}/api/skewtable/calculations/`,
           {
             filters: {
@@ -77,7 +88,12 @@ const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
         );
 
         const regionData = response.data.RegionwiseMonthwiseTotal || {};
-        setFullPayload(regionData);
+        const regionwiseMonthwise = response.data.RegionwiseMonthwise || {};
+
+        setFullPayload({
+          RegionwiseMonthwiseTotal: regionData,
+          RegionwiseMonthwise: regionwiseMonthwise,
+        });
 
         const chartArray: { month: string; opportunity_value_ex: number }[] = [];
         selectedYears.forEach((year) => {
@@ -105,13 +121,17 @@ const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
     fetchGraphData();
   }, [selectedYears, selectedTab]);
 
-  const yearLabel = selectedYears.length === 1
-    ? selectedYears[0].toString()
-    : `${Math.min(...selectedYears)} - ${Math.max(...selectedYears)}`;
+  const yearLabel =
+    selectedYears.length === 1
+      ? selectedYears[0].toString()
+      : `${Math.min(...selectedYears)} - ${Math.max(...selectedYears)}`;
 
   return (
     <>
-      {fullPayload && <IPODashboardTable payload={fullPayload} />}
+      <IPODashboardTable
+        payload={fullPayload.RegionwiseMonthwiseTotal}
+        regionwiseMonthwise={fullPayload.RegionwiseMonthwise}
+      />
 
       <Typography variant="h6" gutterBottom align="center" color="#002060" mt={2}>
         Opportunity Value Trends in {selectedTab}'s in {yearLabel}

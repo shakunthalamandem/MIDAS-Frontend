@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Box,
   Paper,
   Table,
   TableBody,
@@ -8,9 +9,12 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Zoom,
+  IconButton,
+  Collapse,
 } from "@mui/material";
+import { Zoom } from "@mui/material";
 import { motion } from "framer-motion";
+import { Add, Remove } from "@mui/icons-material";
 
 interface RegionMonthwiseMetric {
   Total_Deal_Count_Sum: number;
@@ -19,10 +23,24 @@ interface RegionMonthwiseMetric {
   Total_Expected_returns_excess: number;
 }
 
+interface RegionwiseMonthwise {
+  [region: string]: {
+    [year: string]: {
+      [month: string]: {
+        Total_Deal_Count: number;
+        Total_Deal_Volume: number;
+        Positively_Performing_Deals_Percentage: number;
+        Expected_Returns_Excess: number;
+      };
+    };
+  };
+}
+
 type MetricKey = keyof RegionMonthwiseMetric;
 
 interface IPODashboardTableProps {
   payload: Record<string, Record<string, RegionMonthwiseMetric>>; // year -> month -> metrics
+  regionwiseMonthwise: RegionwiseMonthwise;
 }
 
 const formatCurrency = (value?: number): string => {
@@ -42,7 +60,12 @@ const monthOrder = [
 
 const MotionTableRow = motion(TableRow);
 
-const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
+const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
+  payload,
+  regionwiseMonthwise,
+}) => {
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
   const allMonthYearKeys = Object.entries(payload).flatMap(([year, months]) =>
     Object.keys(months)
       .filter((month) => monthOrder.includes(month))
@@ -58,60 +81,52 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
       : monthOrder.indexOf(monthA) - monthOrder.indexOf(monthB);
   });
 
-  const rows: {
-    label: string;
-    key: MetricKey;
-    formatter: (val?: number) => string;
-  }[] = [
-    { label: "Deal Count", key: "Total_Deal_Count_Sum", formatter: (v) => v?.toString() ?? "-" },
-    { label: "Deal Volume", key: "Total_Deal_Volume_Sum", formatter: formatCurrency },
-    { label: "% Positive", key: "Total_Postively_Performing_Deals", formatter: formatPercentage },
-    { label: "Excess Returns", key: "Total_Expected_returns_excess", formatter: formatPercentage },
+  const rows = [
+    {
+      label: "Deal Count",
+      key: "Total_Deal_Count_Sum" as MetricKey,
+      regionKey: "Total_Deal_Count",
+      formatter: (v?: number) => v?.toString() ?? "-",
+    },
+    {
+      label: "Deal Volume",
+      key: "Total_Deal_Volume_Sum" as MetricKey,
+      regionKey: "Total_Deal_Volume",
+      formatter: formatCurrency,
+    },
+    {
+      label: "% Positive",
+      key: "Total_Postively_Performing_Deals" as MetricKey,
+      regionKey: "Positively_Performing_Deals_Percentage",
+      formatter: formatPercentage,
+    },
+    {
+      label: "Excess Returns",
+      key: "Total_Expected_returns_excess" as MetricKey,
+      regionKey: "Expected_Returns_Excess",
+      formatter: formatPercentage,
+    },
   ];
+
+  const toggleRow = (key: string) => {
+    const newSet = new Set(expandedRows);
+    newSet.has(key) ? newSet.delete(key) : newSet.add(key);
+    setExpandedRows(newSet);
+  };
 
   return (
     <Zoom in>
-      <TableContainer
-        component={Paper}
-        sx={{
-          backgroundColor: "#fcfcdc",
-          borderRadius: 2,
-          boxShadow: 3,
-          paddingTop: 2,
-          mt: 3,
-          overflowX: "auto",
-        }}
-      >
-        <Typography
-          variant="h6"
-          gutterBottom
-          align="center"
-          sx={{ color: "#002060", fontWeight: 600 }}
-        >
+      <TableContainer component={Paper} sx={{ backgroundColor: "#fcfcdc", borderRadius: 2, boxShadow: 3, mt: 3 }}>
+        <Typography variant="h6" gutterBottom align="center" sx={{ color: "#002060", fontWeight: 600 }}>
           IPO Deal Summary
         </Typography>
 
-        <Table
-          size="small"
-          sx={{
-            tableLayout: "fixed",
-            width: "100%",
-            '& td, & th': {
-              padding: "8px 10px",
-              fontSize: "0.85rem",
-              wordWrap: "break-word",
-            },
-          }}
-        >
+        <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>Metric</TableCell>
-              {availableMonthYears.map((monthYear) => (
-                <TableCell
-                  key={monthYear}
-                  align="center"
-                  sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}
-                >
+              {availableMonthYears.map(monthYear => (
+                <TableCell key={monthYear} align="center" sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>
                   {monthYear}
                 </TableCell>
               ))}
@@ -119,23 +134,46 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({ payload }) => {
           </TableHead>
           <TableBody>
             {rows.map((row, idx) => (
-              <MotionTableRow
-                key={row.key}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 + idx * 0.1 }}
-              >
-                <TableCell>{row.label}</TableCell>
-                {availableMonthYears.map((monthYear) => {
-                  const [month, year] = monthYear.split(" ");
-                  const val = payload[year]?.[month]?.[row.key];
-                  return (
-                    <TableCell key={monthYear} align="center">
-                      {row.formatter(val)}
-                    </TableCell>
-                  );
-                })}
-              </MotionTableRow>
+              <React.Fragment key={row.key}>
+                <MotionTableRow
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 + idx * 0.1 }}
+                >
+                  <TableCell>
+                    <Box display="flex" alignItems="center">
+                      <IconButton size="small" onClick={() => toggleRow(row.key)}>
+                        {expandedRows.has(row.key) ? <Remove fontSize="small" /> : <Add fontSize="small" />}
+                      </IconButton>
+                      {row.label}
+                    </Box>
+                  </TableCell>
+                  {availableMonthYears.map(monthYear => {
+                    const [month, year] = monthYear.split(" ");
+                    const val = payload[year]?.[month]?.[row.key];
+                    return (
+                      <TableCell key={monthYear} align="center">
+                        {row.formatter(val)}
+                      </TableCell>
+                    );
+                  })}
+                </MotionTableRow>
+
+                {expandedRows.has(row.key) && Object.entries(regionwiseMonthwise).map(([region, data]) => (
+                  <TableRow key={`${row.key}-${region}`} sx={{ backgroundColor: "#fff" }}>
+                    <TableCell sx={{ pl: 4 }}>{region}</TableCell>
+                    {availableMonthYears.map(monthYear => {
+                      const [month, year] = monthYear.split(" ");
+                      const value = data?.[year]?.[month] ? (data[year][month] as any)[row.regionKey] : undefined;
+                      return (
+                        <TableCell key={monthYear} align="center">
+                          {row.formatter(value)}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>
