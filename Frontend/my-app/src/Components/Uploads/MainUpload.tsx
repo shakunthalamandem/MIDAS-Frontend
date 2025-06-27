@@ -253,6 +253,14 @@ const MainUpload: React.FC = () => {
             </Grid>
           </Grid>
 
+            <Grid container spacing={4} sx={{ mt: 6 }}>
+            <Grid item xs={12} md={6}>
+                <LkFileUpload />
+
+              
+            </Grid>
+          </Grid>
+
           {/* Bottom Section */}
           <Grid container spacing={4} sx={{ mt: 6 }}>
             <Grid item xs={12} md={6}>
@@ -266,13 +274,7 @@ const MainUpload: React.FC = () => {
               </Card>
             </Grid>
           </Grid>
-                    <Grid container spacing={4} sx={{ mt: 6 }}>
-            <Grid item xs={12} md={6}>
-                <LkFileUpload />
-
-              
-            </Grid>
-          </Grid>
+                  
 
           <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
             <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
