@@ -3,7 +3,6 @@ import axios from "axios";
 import {
   Box,
   Typography,
-  Paper,
   CircularProgress,
   Alert,
 } from "@mui/material";
@@ -14,58 +13,60 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
   ReferenceLine,
 } from "recharts";
 import FODashboardTable from "./FODashboardTable";
 
-interface ApiResponse {
-  [month: string]: {
-    [dealType: string]: {
-      opportunity_value_ex: number;
-      deal_size?: number;
-      count?: number;
-    };
-  };
+interface RegionMonthwiseMetric {
+  Total_Deal_Count_Sum: number;
+  Total_Deal_Volume_Sum: number;
+  Total_Postively_Performing_Deals: number;
+  Total_Expected_returns_excess: number;
+  Total_Long_Opportunity_Value: number;
 }
 
-
-interface OpportunityData {
-  month: string;
-  opportunity_value_ex: number;
+interface RegionwiseMonthwiseResponse {
+  RegionwiseMonthwiseTotal: Record<string, Record<string, RegionMonthwiseMetric>>;
 }
+
+interface MddFoDealsOpportunityChartProps {
+  selectedYears: number[];
+  selectedTab: "IPO" | "FO";
+}
+
 const formatValue = (value: number): string => {
-  if (Math.abs(value) >= 1_000_000_000) {
-    return `${(value / 1_000_000_000).toFixed(2)}B`;
-  } else if (Math.abs(value) >= 1_000_000) {
-    return `${(value / 1_000_000).toFixed(2)}M`;
-  } else {
-    return value.toFixed(2);
-  }
+  if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
+  if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
+  return value.toFixed(2);
 };
 
-const MddFoDealsOpportunityChart: React.FC = () => {
-  const [data, setData] = useState<OpportunityData[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+const MddFoDealsOpportunityChart: React.FC<MddFoDealsOpportunityChartProps> = ({
+  selectedYears,
+  selectedTab,
+}) => {
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [fullPayload, setFullPayload] = useState<Record<string, Record<string, RegionMonthwiseMetric>>>({});
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  const [fullPayload, setFullPayload] = useState<ApiResponse | null>(null);
-
-
-
 
   useEffect(() => {
-    const fetchGraphData = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.post<ApiResponse>(
-          `${apiUrl}/api/mdd_deals_graph/`,
+        const year_range = selectedYears.length === 1
+          ? [selectedYears[0], selectedYears[0]]
+          : [Math.min(...selectedYears), Math.max(...selectedYears)];
+
+        const response = await axios.post<RegionwiseMonthwiseResponse>(
+          `${apiUrl}/api/skewtable/calculations/`,
           {
-            fo_type: ["Marketed", "Overnight", "Block"],
-            years: [2025],
-            period: ["Monthly"],
-            deal_type: ["FO"],
+            filters: {
+              year_range,
+              deal_type: [selectedTab],
+            },
           },
           {
             headers: {
@@ -75,17 +76,23 @@ const MddFoDealsOpportunityChart: React.FC = () => {
           }
         );
 
-      setFullPayload(response.data);
+        const regionData = response.data.RegionwiseMonthwiseTotal || {};
+        setFullPayload(regionData);
 
-        // Prepare chart data
-        const transformedData: OpportunityData[] = Object.entries(response.data).map(
-          ([month, value]) => ({
-            month,
-            opportunity_value_ex: value["FO"].opportunity_value_ex,
-          })
-        );
+        const chartArray: any[] = [];
+        selectedYears.forEach((year) => {
+          const yearData = regionData[year];
+          if (yearData) {
+            Object.entries(yearData).forEach(([month, metrics]) => {
+              chartArray.push({
+                month: `${month} ${year}`,
+                opportunity_value_ex: metrics.Total_Long_Opportunity_Value,
+              });
+            });
+          }
+        });
 
-        setData(transformedData);
+        setChartData(chartArray);
         setError(null);
       } catch (err) {
         console.error(err);
@@ -95,18 +102,19 @@ const MddFoDealsOpportunityChart: React.FC = () => {
       }
     };
 
-    fetchGraphData();
-  }, []);
+    fetchData();
+  }, [selectedYears, selectedTab]);
 
-
+  const yearLabel = selectedYears.length === 1
+    ? selectedYears[0].toString()
+    : `${Math.min(...selectedYears)} - ${Math.max(...selectedYears)}`;
 
   return (
     <>
       {fullPayload && <FODashboardTable payload={fullPayload} />}
 
-
       <Typography variant="h6" gutterBottom align="center" color="#002060" mt={2}>
-        Opportunity Value Trends in Follow-on's in 2025
+        Opportunity Value Trends in FO's in {yearLabel}
       </Typography>
 
       {loading ? (
@@ -118,37 +126,22 @@ const MddFoDealsOpportunityChart: React.FC = () => {
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
-            data={data}
+            data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
             style={{ backgroundColor: "#f9fafb", borderRadius: 8 }}
           >
-            <XAxis
-              dataKey="month"
-              tickFormatter={(month) => {
-                const parts = month.split(" ");
-                const monthNumber = parseInt(parts[1], 10);
-                const monthNames = [
-                  "January", "February", "March", "April", "May", "June",
-                  "July", "August", "September", "October", "November", "December"
-                ];
-                return monthNames[monthNumber - 1] ?? month;
-              }}
-            />
-            <YAxis tickFormatter={formatValue} width={100} />
-
-            {/* ✅ Zero axis line */}
-            <ReferenceLine y={0} stroke="#999" strokeWidth={2} />
-
+            <XAxis dataKey="month" />
+            <YAxis tickFormatter={formatValue} />
             <Tooltip
               formatter={(value: number) => formatValue(value)}
               labelFormatter={(label) => `Month: ${label}`}
             />
+            <ReferenceLine y={0} stroke="#999" strokeWidth={2} />
             <Bar
               dataKey="opportunity_value_ex"
               fill="#60A5FA"
               barSize={24}
               animationDuration={800}
-              isAnimationActive
             />
           </BarChart>
         </ResponsiveContainer>

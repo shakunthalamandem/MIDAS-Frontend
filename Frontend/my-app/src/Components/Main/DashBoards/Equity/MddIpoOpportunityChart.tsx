@@ -3,7 +3,6 @@ import axios from "axios";
 import {
   Box,
   Typography,
-  Paper,
   CircularProgress,
   Alert,
 } from "@mui/material";
@@ -16,36 +15,37 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import IPODashboardTable from "./IPODashboardTable"; // import your table component
-interface ApiResponse {
-  [month: string]: {
-    [dealType: string]: {
-      opportunity_value_ex: number;
-      deal_size?: number;
-      count?: number;
-    };
-  };
+import IPODashboardTable from "./IPODashboardTable";
+
+interface RegionMonthwiseMetric {
+  Total_Deal_Count_Sum: number;
+  Total_Deal_Volume_Sum: number;
+  Total_Postively_Performing_Deals: number;
+  Total_Expected_returns_excess: number;
+  Total_Long_Opportunity_Value: number;
 }
 
+interface RegionwiseMonthwiseResponse {
+  RegionwiseMonthwiseTotal: Record<string, Record<string, RegionMonthwiseMetric>>;
+}
 
-interface OpportunityData {
-  month: string;
-  opportunity_value_ex: number;
+interface MddIpoOpportunityChartProps {
+  selectedYears: number[];
+  selectedTab: "IPO" | "FO";
 }
 
 const formatValue = (value: number): string => {
-  if (Math.abs(value) >= 1_000_000_000) {
-    return `${(value / 1_000_000_000).toFixed(2)}B`;
-  } else if (Math.abs(value) >= 1_000_000) {
-    return `${(value / 1_000_000).toFixed(2)}M`;
-  } else {
-    return value.toFixed(2);
-  }
+  if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
+  if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
+  return value.toFixed(2);
 };
 
-const MddIpoOpportunityChart: React.FC = () => {
-  const [data, setData] = useState<OpportunityData[]>([]);
-  const [fullPayload, setFullPayload] = useState<ApiResponse | null>(null);
+const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
+  selectedYears,
+  selectedTab,
+}) => {
+  const [chartData, setChartData] = useState<{ month: string; opportunity_value_ex: number }[]>([]);
+  const [fullPayload, setFullPayload] = useState<Record<string, Record<string, RegionMonthwiseMetric>>>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,13 +56,17 @@ const MddIpoOpportunityChart: React.FC = () => {
     const fetchGraphData = async () => {
       setLoading(true);
       try {
-        const response = await axios.post<ApiResponse>(
-          `${apiUrl}/api/mdd_deals_graph/`,
+        const year_range = selectedYears.length === 1
+          ? [selectedYears[0], selectedYears[0]]
+          : [Math.min(...selectedYears), Math.max(...selectedYears)];
+
+        const response = await axios.post<RegionwiseMonthwiseResponse>(
+          `${apiUrl}/api/skewtable/calculations/`,
           {
-            fo_type: ["Marketed", "Overnight"],
-            years: [2025],
-            period: ["Monthly"],
-            deal_type: ["IPO"],
+            filters: {
+              year_range,
+              deal_type: [selectedTab],
+            },
           },
           {
             headers: {
@@ -72,19 +76,23 @@ const MddIpoOpportunityChart: React.FC = () => {
           }
         );
 
-        // Save full API response
-        setFullPayload(response.data);
+        const regionData = response.data.RegionwiseMonthwiseTotal || {};
+        setFullPayload(regionData);
 
-        // Prepare chart data
-    const transformedData: OpportunityData[] = Object.entries(response.data).map(
-  ([month, value]) => ({
-    month,
-    opportunity_value_ex: value["IPO"].opportunity_value_ex,
-  })
-);
+        const chartArray: { month: string; opportunity_value_ex: number }[] = [];
+        selectedYears.forEach((year) => {
+          const yearData = regionData[year];
+          if (yearData) {
+            Object.entries(yearData).forEach(([month, metrics]) => {
+              chartArray.push({
+                month: `${month} ${year}`,
+                opportunity_value_ex: metrics.Total_Long_Opportunity_Value,
+              });
+            });
+          }
+        });
 
-
-        setData(transformedData);
+        setChartData(chartArray);
         setError(null);
       } catch (err) {
         console.error(err);
@@ -95,14 +103,18 @@ const MddIpoOpportunityChart: React.FC = () => {
     };
 
     fetchGraphData();
-  }, []);
+  }, [selectedYears, selectedTab]);
+
+  const yearLabel = selectedYears.length === 1
+    ? selectedYears[0].toString()
+    : `${Math.min(...selectedYears)} - ${Math.max(...selectedYears)}`;
 
   return (
     <>
-{fullPayload && <IPODashboardTable payload={fullPayload} />}
+      {fullPayload && <IPODashboardTable payload={fullPayload} />}
 
       <Typography variant="h6" gutterBottom align="center" color="#002060" mt={2}>
-        Opportunity Value Trends in IPO's in 2025
+        Opportunity Value Trends in {selectedTab}'s in {yearLabel}
       </Typography>
 
       {loading ? (
@@ -112,42 +124,27 @@ const MddIpoOpportunityChart: React.FC = () => {
       ) : error ? (
         <Alert severity="error">{error}</Alert>
       ) : (
-        <>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart
-              data={data}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              style={{ backgroundColor: "#f9fafb", borderRadius: 8 }}
-            >
-              <XAxis
-                dataKey="month"
-                tickFormatter={(month) => {
-                  const parts = month.split(" ");
-                  const monthNumber = parseInt(parts[1], 10);
-                  const monthNames = [
-                    "January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"
-                  ];
-                  return monthNames[monthNumber - 1] ?? month;
-                }}
-              />
-              <YAxis tickFormatter={formatValue} width={90} />
-              <ReferenceLine y={0} stroke="#999" strokeWidth={2} />
-              <Tooltip
-                formatter={(value: number) => formatValue(value)}
-                labelFormatter={(label) => `Month: ${label}`}
-              />
-              <Bar
-                dataKey="opportunity_value_ex"
-                fill="#F97316"
-                barSize={24}
-                animationDuration={800}
-                isAnimationActive
-              />
-            </BarChart>
-          </ResponsiveContainer>
-
-        </>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            style={{ backgroundColor: "#f9fafb", borderRadius: 8 }}
+          >
+            <XAxis dataKey="month" />
+            <YAxis tickFormatter={formatValue} />
+            <Tooltip
+              formatter={(value: number) => formatValue(value)}
+              labelFormatter={(label) => `Month: ${label}`}
+            />
+            <ReferenceLine y={0} stroke="#999" strokeWidth={2} />
+            <Bar
+              dataKey="opportunity_value_ex"
+              fill="#F97316"
+              barSize={24}
+              animationDuration={800}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       )}
     </>
   );
