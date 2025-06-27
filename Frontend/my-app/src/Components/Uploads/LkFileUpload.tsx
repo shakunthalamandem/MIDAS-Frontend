@@ -117,7 +117,7 @@ const LkFileUpload = () => {
                 variant="h6"
                 gutterBottom
                 align="center"
-                sx={{ color: 'primary.main', fontWeight: 600 }}
+                sx={{ color: '#002060', fontWeight: 600 }}
             >
                 LK File Data Upload
             </Typography>

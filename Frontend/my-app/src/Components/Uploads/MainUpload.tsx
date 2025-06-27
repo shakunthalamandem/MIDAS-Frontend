@@ -24,6 +24,8 @@ import AiInsightsInputForm from '../Main/DashBoards/InsightsAi/UploadsInsights/A
 import IpoDashboardCalendar from '../Main/DashBoards/InsightsAi/UploadsInsights/IpoDashboardCalender';
 import Ipos1Download from '../IPOwriteUp/Ipos1Download';
 import FileUpload from '../IPOwriteUp/FileUpload';
+import LkFileUpload from "../Uploads/LkFileUpload";
+
 
 const uploadConfigs = [
   {
@@ -262,6 +264,13 @@ const MainUpload: React.FC = () => {
               <Card elevation={3} sx={{ borderRadius: 3, pt: 6 , height:"591px"}}>
                 <IpoDashboardCalendar />
               </Card>
+            </Grid>
+          </Grid>
+                    <Grid container spacing={4} sx={{ mt: 6 }}>
+            <Grid item xs={12} md={6}>
+                <LkFileUpload />
+
+              
             </Grid>
           </Grid>
 
