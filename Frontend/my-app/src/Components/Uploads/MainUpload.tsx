@@ -253,13 +253,6 @@ const MainUpload: React.FC = () => {
             </Grid>
           </Grid>
 
-            <Grid container spacing={4} sx={{ mt: 6 }}>
-            <Grid item xs={12} md={6}>
-                <LkFileUpload />
-
-              
-            </Grid>
-          </Grid>
 
           {/* Bottom Section */}
           <Grid container spacing={4} sx={{ mt: 6 }}>

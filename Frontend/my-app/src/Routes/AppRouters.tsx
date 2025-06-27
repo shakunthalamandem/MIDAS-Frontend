@@ -157,8 +157,10 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/uploads" element={<AuthGuard><MainUpload /></AuthGuard>} />
+        <Route path="/lk_upload" element={<AuthGuard><LkFileUpload /></AuthGuard>} />
         <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} />
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
+
   
 
 
