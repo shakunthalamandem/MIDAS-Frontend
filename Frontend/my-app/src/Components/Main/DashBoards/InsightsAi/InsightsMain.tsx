@@ -19,14 +19,14 @@ interface InsightCardProps {
   title: string;
   metric: string;
   change: string;
-  status: "up" | "down" | "flat";
+  status: "up" | "down" | "neutral";
   comment: string;
 }
 
 const statusIcon = {
   up: <ArrowUpward sx={{ color: "green" }} />,
   down: <ArrowDownward sx={{ color: "red" }} />,
-  flat: <TrendingFlat sx={{ color: "grey.600" }} />,
+  neutral: <TrendingFlat sx={{ color: "grey.600" }} />,
 };
 
 const InsightCard = ({
@@ -123,13 +123,13 @@ const InsightsMain = () => {
   }, []);
 
   return (
-    <Box sx={{ px: 2, py: 2 }}>
+    <Box sx={{ px: 2, py: 1 }}>
       <Typography
         variant="h5"
         fontWeight="bold"
-        align="center"
         gutterBottom
-        sx={{ color: "#002060", mb: 3 }}
+        color="#002060"
+        align="center"
       >
         AI Market Insights Overview 2025
       </Typography>
@@ -149,7 +149,7 @@ const InsightsMain = () => {
       ) : (
         <Grid container spacing={2}>
           {insights.map((insight, idx) => (
-            <Grid item xs={12} md={6} key={idx}>
+            <Grid item xs={12} key={idx}>
               <InsightCard {...insight} />
             </Grid>
           ))}
