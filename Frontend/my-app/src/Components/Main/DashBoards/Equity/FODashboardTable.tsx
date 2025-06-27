@@ -22,7 +22,7 @@ interface RegionMonthwiseMetric {
   Total_Expected_returns_excess: number;
 }
 
-interface RegionwiseMonthwise {
+interface RegionwiseMonthwises {
   [region: string]: {
     [year: string]: {
       [month: string]: {
@@ -40,7 +40,7 @@ type MetricKey = keyof RegionMonthwiseMetric;
 
 interface FODashboardTableProps {
   payload: Record<string, Record<string, RegionMonthwiseMetric>>;
-  regionwiseMonthwise: RegionwiseMonthwise;
+  regionwiseMonthwise: RegionwiseMonthwises;
 }
 
 const formatCurrency = (value?: number): string => {
