@@ -19,14 +19,14 @@ interface InsightCardProps {
   title: string;
   metric: string;
   change: string;
-  status: "up" | "down" | "neutral";
+  status: "up" | "down" | "flat";
   comment: string;
 }
 
 const statusIcon = {
   up: <ArrowUpward sx={{ color: "green" }} />,
   down: <ArrowDownward sx={{ color: "red" }} />,
-  neutral: <TrendingFlat sx={{ color: "grey.600" }} />,
+  flat: <TrendingFlat sx={{ color: "grey.600" }} />,
 };
 
 const InsightCard = ({

@@ -17,7 +17,7 @@ import GraphicalRepresent from "./PNLCharts/GraphicalRepresent";
 
 // Filter type
 type Filters = {
-  funds: string[];
+  fund: string[];
   asset_type: string[];
   deal_type: string[];
   broad_region: string[];
@@ -31,7 +31,7 @@ const PNLFilters: React.FC = () => {
 
   // Selected filter values by user
   const [selectedFilters, setSelectedFilters] = useState<Filters>({
-    funds: [],
+    fund: [],
     asset_type: [],
     deal_type: [],
     broad_region: [],
@@ -39,7 +39,7 @@ const PNLFilters: React.FC = () => {
 
   // Applied filters (used by GraphicalRepresent)
   const [appliedFilters, setAppliedFilters] = useState<Filters>({
-    funds: [],
+    fund: [],
     asset_type: [],
     deal_type: [],
     broad_region: [],
@@ -110,7 +110,7 @@ const PNLFilters: React.FC = () => {
 
   const handleReset = () => {
     const empty: Filters = {
-      funds: [],
+      fund: [],
       asset_type: [],
       deal_type: [],
       broad_region: [],
@@ -120,7 +120,7 @@ const PNLFilters: React.FC = () => {
   };
 
   const filterOptions = [
-    { label: "Funds", key: "funds" },
+    { label: "Funds", key: "fund" },
     { label: "Asset Type", key: "asset_type" },
     // { label: "Deal Type", key: "deal_type" },
     { label: "Broad Region", key: "broad_region" },

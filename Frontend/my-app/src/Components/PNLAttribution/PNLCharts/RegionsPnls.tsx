@@ -7,11 +7,11 @@ import {
   Container,
 } from "@mui/material";
 
-type PnlKey = "DTD" | "1W" | "1M" | "3M" | "MTD" | "QTD" | "YTD";
+type PnlKey = "DTD" | "WTD" | "1M" | "3M" | "MTD" | "QTD" | "YTD";
 type RegionPnls = Partial<Record<PnlKey, number>>;
 
 const displayKeys: { key: PnlKey; label: string }[] = [
-  { key: "1W", label: "WTD" },
+  { key: "WTD", label: "WTD" },
   { key: "MTD", label: "MTD" },
   { key: "QTD", label: "QTD" },
   { key: "YTD", label: "YTD" },
@@ -30,8 +30,18 @@ const regionOrder = [
   "Futures",
 ];
 
+// Mapping of region name to index key(s)
+const regionToIndexMap: Record<string, string | string[]> = {
+  "Corporate Bond": "hyg_equity_index",
+  "Convertible Bond": "cwb_equity_index",
+  "US Equities": "spy_equity_index",
+  "EMEA Equities": ["iefa_equity_index", "ewh_equity_index"],
+  "APAC Equities": ["iefa_equity_index", "ewh_equity_index"],
+  "Non-US America Equities": ["iefa_equity_index", "ewh_equity_index"],
+};
 const RegionsPnls = () => {
   const [data, setData] = useState<Record<string, RegionPnls>>({});
+  const [indexReturns, setIndexReturns] = useState<Record<string, RegionPnls>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,7 +77,8 @@ const RegionsPnls = () => {
         }
 
         const result = await response.json();
-        setData(result);
+        setData(result || {});
+        setIndexReturns(result?.IndexReturns || {});
       } catch (err: any) {
         setError(err.message || "Failed to load data");
       } finally {
@@ -83,133 +94,179 @@ const RegionsPnls = () => {
     }
   }, [token, apiUrl]);
 
-  // Filter and order data based on regionOrder, exclude "Total"
   const filteredOrderedRegions = regionOrder.filter((region) =>
     data.hasOwnProperty(region)
   );
 
   return (
-<Container
-  maxWidth="xl"
-  sx={{ mt: 4, mb: 4, backgroundColor: "#d4e4f3", borderRadius: 2 ,pb:2}}
->
-  <Box sx={{ width: "100%" }}>
-    <Typography
-      variant="h5"
-      align="center"
-      gutterBottom
-      sx={{ color: "#016676", fontWeight: "bold", padding: 2,mb: 2 }}
+    <Container
+      maxWidth="xl"
+      sx={{ mt: 4, mb: 4, backgroundColor: "#d4e4f3", borderRadius: 2, pb: 2 }}
     >
-      Regions P&L Summary
-    </Typography>
-
-    {loading ? (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
-        <CircularProgress />
-      </Box>
-    ) : error ? (
-      <Typography color="error">{error}</Typography>
-    ) : (
-      <Box sx={{ px: 1 }}>  {/* Adjust px (padding-x) based on spacing */}
-
-      <Grid container spacing={3}>
-        {filteredOrderedRegions.map((region, index) => {
-          const pnlValues = data[region];
-          return (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              key={region}
-              sx={{
-                animation: `fadeIn 0.5s ease ${index * 0.1}s both`,
-                '@keyframes fadeIn': {
-                  from: { opacity: 0, transform: 'translateY(10px)' },
-                  to: { opacity: 1, transform: 'translateY(0)' },
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  backgroundColor: "#ffffff",
-                  borderRadius: 3,
-                  boxShadow: 3,
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  transition: "transform 0.3s, box-shadow 0.3s",
-                  '&:hover': {
-                    transform: "translateY(-5px)",
-                    boxShadow: 6,
-                    backgroundColor: "#f0faff",
-                  },
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  textAlign="center"
-                  color="#002060"
-                  sx={{ mb: 2, mt:2, fontWeight: "bold" }}
-                >
-                  {region} P&L
-                </Typography>
-
-                <Box sx={{ width: "100%", overflow: "hidden" }}> {/* fixes spacing overflow */}
-  <Grid container spacing={1}>
-    {displayKeys.map(({ key, label }) => (
-      <Grid
-        item
-        xs={6}
-        key={key}
-        sx={{
-          border: "1px solid #ddd",
-          borderRadius: 1,
-          textAlign: "center",
-          backgroundColor: "#f9f9f9",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 1,
-          minHeight: "80px",
-          transition: "background-color 0.2s",
-          '&:hover': {
-            backgroundColor: "#e0f7fa",
-          },
-        }}
-      >
+      <Box sx={{ width: "100%" }}>
         <Typography
-          variant="subtitle2"
-          color="#070030"
+          variant="h5"
+          align="center"
           gutterBottom
-          sx={{ fontSize: "0.75rem", textAlign: "center" }}
+          sx={{ color: "#016676", fontWeight: "bold", padding: 2, mb: 2 }}
         >
-          {label}
+          Regions P&L Summary
         </Typography>
-        <Typography
-          variant="subtitle1"
-          sx={{
-            fontWeight: "bold",
-            fontSize: "0.9rem",
-            color: "#016676",
-          }}
-        >
-          {formatValue(pnlValues[key as PnlKey])}
-        </Typography>
-      </Grid>
-    ))}
-  </Grid>
-</Box>
 
-              </Box>
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : (
+          <Box sx={{ px: 1 }}>
+            <Grid container spacing={3}>
+              {filteredOrderedRegions.map((region, index) => {
+                const pnlValues = data[region];
+
+                return (
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    key={region}
+                    sx={{
+                      animation: `fadeIn 0.5s ease ${index * 0.1}s both`,
+                      '@keyframes fadeIn': {
+                        from: { opacity: 0, transform: 'translateY(10px)' },
+                        to: { opacity: 1, transform: 'translateY(0)' },
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        backgroundColor: "#ffffff",
+                        borderRadius: 3,
+                        boxShadow: 3,
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        transition: "transform 0.3s, box-shadow 0.3s",
+                        '&:hover': {
+                          transform: "translateY(-5px)",
+                          boxShadow: 6,
+                          backgroundColor: "#f0faff",
+                        },
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        textAlign="center"
+                        color="#002060"
+                        sx={{ mb: 2, mt: 2, fontWeight: "bold" }}
+                      >
+                        {region} P&L
+                      </Typography>
+
+                      <Box sx={{ width: "100%", overflow: "hidden" }}>
+                        <Grid container spacing={1}>
+                          {displayKeys.map(({ key, label }) => {
+                            const pnlVal = pnlValues[key as PnlKey];
+                            const indexMapping = regionToIndexMap[region];
+                            let indexVal: number | null = null;
+
+                            if (Array.isArray(indexMapping)) {
+                              const validReturns = indexMapping
+                                .map((idx) => indexReturns[idx]?.[key])
+                                .filter((val) => typeof val === "number") as number[];
+
+                              indexVal =
+                                validReturns.length > 0
+                                  ? validReturns.reduce((sum, val) => sum + val, 0) /
+                                  validReturns.length
+                                  : null;
+                            } else if (typeof indexMapping === "string") {
+                              indexVal = indexReturns[indexMapping]?.[key] ?? null;
+                            }
+
+                            return (
+                              <Grid
+                                item
+                                xs={6}
+                                key={key}
+                                sx={{
+                                  border: "1px solid #ddd",
+                                  borderRadius: 1,
+                                  textAlign: "center",
+                                  backgroundColor: "#f9f9f9",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  padding: 1,
+                                  minHeight: "100px",
+                                  transition: "background-color 0.2s",
+                                  '&:hover': {
+                                    backgroundColor: "#e0f7fa",
+                                  },
+                                }}
+                              >
+                                <Typography
+                                  variant="subtitle2"
+                                  color="#070030"
+                                  gutterBottom
+                                  sx={{ fontSize: "0.75rem", textAlign: "center" }}
+                                >
+                                  {label}
+                                </Typography>
+                                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                  <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                      fontWeight: "bold",
+                                      fontSize: "0.9rem",
+                                      color: "#016676",
+                                    }}
+                                  >
+                                    {formatValue(pnlVal)}
+                                  </Typography>
+
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      fontSize: "0.7rem",
+                                      color: "black",
+                                      fontStyle: "italic", // italic style
+                                      mt: 0.3,
+                                    }}
+                                  >
+                                    {Array.isArray(indexMapping)
+                                      ? indexMapping
+                                        .map((idxKey) => {
+                                          const val = indexReturns[idxKey]?.[key];
+                                          return typeof val === "number"
+                                            ? `${idxKey.replace("_equity_index", "").toUpperCase()}: ${val.toFixed(2)}%`
+                                            : null;
+                                        })
+                                        .filter(Boolean)
+                                        .join(" | ")
+                                      : typeof indexVal === "number"
+                                        ? `${indexMapping.replace("_equity_index", "").toUpperCase()}: ${indexVal.toFixed(2)}%`
+                                        : "-"}
+                                  </Typography>
+                                </Box>
+
+
+                              </Grid>
+                            );
+                          })}
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Grid>
+                );
+              })}
             </Grid>
-          );
-        })}
-      </Grid>
+          </Box>
+        )}
       </Box>
-    )}
-  </Box>
-</Container>
+    </Container>
   );
 };
 
