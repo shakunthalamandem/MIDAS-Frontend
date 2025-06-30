@@ -117,18 +117,42 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
 
   return (
     <Zoom in>
-      <TableContainer component={Paper} sx={{ backgroundColor: "#fcfcdc", borderRadius: 2, boxShadow: 3, mt: 3 }}>
-        <Typography variant="h6" gutterBottom align="center" sx={{ color: "#002060", fontWeight: 600 }}>
+      <TableContainer
+        component={Paper}
+        sx={{
+          backgroundColor: "#fcfcdc",
+          borderRadius: 2,
+          boxShadow: 3,
+          mt: 3,
+        }}
+      >
+        <Typography
+          variant="h6"
+          gutterBottom
+          align="center"
+          sx={{ color: "#002060", fontWeight: 600 }}
+        >
           IPO Deal Summary
         </Typography>
 
         <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>Metric</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>Sum</TableCell>
+              <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>
+                Metric
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}
+              >
+                Region
+              </TableCell>
               {availableMonthYears.map((monthYear) => (
-                <TableCell key={monthYear} align="center" sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>
+                <TableCell
+                  key={monthYear}
+                  align="center"
+                  sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}
+                >
                   {monthYear}
                 </TableCell>
               ))}
@@ -139,25 +163,33 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
             {rows.map((row, idx) => {
               const regionRows = expandedRows.has(row.key)
                 ? REGION_ORDER.map((region) => {
-                  const data = regionwiseMonthwise[region];
-                  return (
-                    <TableRow key={`${row.key}-${region}`} sx={{ backgroundColor: "#fff" }}>
-                      <TableCell sx={{ pl: 4 }}>{region}</TableCell>
-                      <TableCell />
-                      {availableMonthYears.map((monthYear) => {
-                        const [month, year] = monthYear.split(" ");
-                        const value = data?.[year]?.[month]?.[
-                          row.regionKey as "Total_Deal_Count" | "Total_Deal_Volume" | "Positively_Performing_Deals_Percentage" | "Expected_Returns_Excess"
-                        ];
-                        return (
-                          <TableCell key={monthYear} align="center">
-                            {row.formatter(value)}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })
+                    const data = regionwiseMonthwise[region];
+                    return (
+                      <TableRow
+                        key={`${row.key}-${region}`}
+                        sx={{ backgroundColor: "#fff" }}
+                      >
+                        <TableCell>{row.label}</TableCell>
+                        <TableCell>{region}</TableCell>
+                        {availableMonthYears.map((monthYear) => {
+                          const [month, year] = monthYear.split(" ");
+                          const value =
+                            data?.[year]?.[month]?.[
+                              row.regionKey as
+                                | "Total_Deal_Count"
+                                | "Total_Deal_Volume"
+                                | "Positively_Performing_Deals_Percentage"
+                                | "Expected_Returns_Excess"
+                            ];
+                          return (
+                            <TableCell key={monthYear} align="center">
+                              {row.formatter(value)}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                  })
                 : null;
 
               return (
@@ -170,9 +202,25 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                   >
                     <TableCell>{row.label}</TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" onClick={() => toggleRow(row.key)}>
-                        {expandedRows.has(row.key) ? <Remove fontSize="small" /> : <Add fontSize="small" />}
-                      </IconButton>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Typography variant="body2" sx={{ pr: 0.5 }}>
+                          Sum
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={() => toggleRow(row.key)}
+                        >
+                          {expandedRows.has(row.key) ? (
+                            <Remove fontSize="small" />
+                          ) : (
+                            <Add fontSize="small" />
+                          )}
+                        </IconButton>
+                      </Box>
                     </TableCell>
                     {availableMonthYears.map((monthYear) => {
                       const [month, year] = monthYear.split(" ");
