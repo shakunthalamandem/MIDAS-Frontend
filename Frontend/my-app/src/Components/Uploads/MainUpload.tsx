@@ -24,6 +24,8 @@ import AiInsightsInputForm from '../Main/DashBoards/InsightsAi/UploadsInsights/A
 import IpoDashboardCalendar from '../Main/DashBoards/InsightsAi/UploadsInsights/IpoDashboardCalender';
 import Ipos1Download from '../IPOwriteUp/Ipos1Download';
 import FileUpload from '../IPOwriteUp/FileUpload';
+import LkFileUpload from "../Uploads/LkFileUpload";
+
 
 const uploadConfigs = [
   {
@@ -251,6 +253,7 @@ const MainUpload: React.FC = () => {
             </Grid>
           </Grid>
 
+
           {/* Bottom Section */}
           <Grid container spacing={4} sx={{ mt: 6 }}>
             <Grid item xs={12} md={6}>
@@ -264,6 +267,7 @@ const MainUpload: React.FC = () => {
               </Card>
             </Grid>
           </Grid>
+                  
 
           <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
             <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
