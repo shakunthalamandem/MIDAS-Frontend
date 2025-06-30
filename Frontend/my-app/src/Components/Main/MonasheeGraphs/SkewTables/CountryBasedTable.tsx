@@ -29,8 +29,20 @@ interface CountryData {
   Long_Opportunity_Value: number;
 }
 
+interface CountryTotalData {
+  Total_Deal_Count_Sum: number;
+  Total_Deal_Volume_Sum: number;
+  Total_Postively_Performing_Deals: number;
+  Total_Negatively_Performing_Deals: number;
+  Total_Returns_positively: number;
+  Total_Returns_negatively: number;
+  Total_Expected_returns_excess: number;
+  Total_Long_Opportunity_Value: number;
+}
+
 interface CountryApiResponse {
   Top_Countries: CountryData[];
+  Top_Countries_Total : CountryTotalData;
 }
 
 interface SkewTableOptions {
@@ -43,6 +55,7 @@ interface SkewTableOptions {
 
 const CountryBasedTable: React.FC = () => {
   const [countryData, setCountryData] = useState<CountryData[] | null>(null);
+  const [countryTotalData, setCountryTotalData] = useState<CountryTotalData>();
   const [loading, setLoading] = useState<boolean>(true);
   const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
 
@@ -115,6 +128,7 @@ const CountryBasedTable: React.FC = () => {
 
         if (result?.Top_Countries?.length > 0) {
           setCountryData(result.Top_Countries);
+          setCountryTotalData(result.Top_Countries_Total);
         } else {
           setNoDataPopupOpen(true);
           setCountryData(null);
@@ -265,8 +279,11 @@ const CountryBasedTable: React.FC = () => {
 
           {loading ? (
             <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
-          ) : (
-            countryData && <CountryTableData data={countryData} />
+          ) : countryData && (
+            <CountryTableData
+              data={countryData}
+              total={countryTotalData}
+            />
           )}
         </CardContent>
       </Card>
