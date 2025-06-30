@@ -43,6 +43,8 @@ interface FODashboardTableProps {
   regionwiseMonthwise: RegionwiseMonthwises;
 }
 
+const REGION_ORDER = ["US", "EMEA", "APAC", "Non-US America"];
+
 const formatCurrency = (value?: number): string => {
   if (!value || isNaN(value)) return "-";
   if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
@@ -60,7 +62,10 @@ const monthOrder = [
 
 const MotionTableRow = motion(TableRow);
 
-const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload, regionwiseMonthwise }) => {
+const FODashboardTable: React.FC<FODashboardTableProps> = ({
+  payload,
+  regionwiseMonthwise,
+}) => {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const toggleRow = (key: string) => {
@@ -120,6 +125,7 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload, regionwise
           <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>Metric</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>Sum</TableCell>
               {availableMonthYears.map((monthYear) => (
                 <TableCell key={monthYear} align="center" sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>
                   {monthYear}
@@ -127,50 +133,59 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({ payload, regionwise
               ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {rows.map((row, idx) => (
-              <React.Fragment key={row.key}>
-                <MotionTableRow
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 + idx * 0.1 }}
-                >
-                  <TableCell>
-                    <Box display="flex" alignItems="center">
+            {rows.map((row, idx) => {
+              const regionRows = expandedRows.has(row.key)
+                ? REGION_ORDER.map((region) => {
+                    const data = regionwiseMonthwise[region];
+                    return (
+                      <TableRow key={`${row.key}-${region}`} sx={{ backgroundColor: "#fff" }}>
+                        <TableCell sx={{ pl: 4 }}>{region}</TableCell>
+                        <TableCell />
+                        {availableMonthYears.map((monthYear) => {
+                          const [month, year] = monthYear.split(" ");
+                          const value = data?.[year]?.[month]?.[
+                            row.regionKey as "Total_Deal_Count" | "Total_Deal_Volume" | "Positively_Performing_Deals_Percentage" | "Expected_Returns_Excess"
+                          ];
+                          return (
+                            <TableCell key={monthYear} align="center">
+                              {row.formatter(value)}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                  })
+                : null;
+
+              return (
+                <React.Fragment key={row.key}>
+                  {regionRows}
+                  <MotionTableRow
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 + idx * 0.1 }}
+                  >
+                    <TableCell>{row.label}</TableCell>
+                    <TableCell align="center">
                       <IconButton size="small" onClick={() => toggleRow(row.key)}>
                         {expandedRows.has(row.key) ? <Remove fontSize="small" /> : <Add fontSize="small" />}
                       </IconButton>
-                      {row.label}
-                    </Box>
-                  </TableCell>
-                  {availableMonthYears.map((monthYear) => {
-                    const [month, year] = monthYear.split(" ");
-                    const val = payload[year]?.[month]?.[row.key];
-                    return (
-                      <TableCell key={monthYear} align="center">
-                        {row.formatter(val)}
-                      </TableCell>
-                    );
-                  })}
-                </MotionTableRow>
-
-                {expandedRows.has(row.key) &&
-                  Object.entries(regionwiseMonthwise).map(([region, data]) => (
-                    <TableRow key={`${row.key}-${region}`} sx={{ backgroundColor: "#fff" }}>
-                      <TableCell sx={{ pl: 4 }}>{region}</TableCell>
-                      {availableMonthYears.map((monthYear) => {
-                        const [month, year] = monthYear.split(" ");
-                        const value = (data?.[year]?.[month] as any)?.[row.regionKey];
-                        return (
-                          <TableCell key={monthYear} align="center">
-                            {row.formatter(value)}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-              </React.Fragment>
-            ))}
+                    </TableCell>
+                    {availableMonthYears.map((monthYear) => {
+                      const [month, year] = monthYear.split(" ");
+                      const val = payload[year]?.[month]?.[row.key];
+                      return (
+                        <TableCell key={monthYear} align="center">
+                          {row.formatter(val)}
+                        </TableCell>
+                      );
+                    })}
+                  </MotionTableRow>
+                </React.Fragment>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
