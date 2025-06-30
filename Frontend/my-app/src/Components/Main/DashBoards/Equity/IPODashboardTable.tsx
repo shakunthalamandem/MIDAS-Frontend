@@ -161,46 +161,17 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
 
           <TableBody>
             {rows.map((row, idx) => {
-              const regionRows = expandedRows.has(row.key)
-                ? REGION_ORDER.map((region) => {
-                    const data = regionwiseMonthwise[region];
-                    return (
-                      <TableRow
-                        key={`${row.key}-${region}`}
-                        sx={{ backgroundColor: "#fff" }}
-                      >
-                        <TableCell>{row.label}</TableCell>
-                        <TableCell>{region}</TableCell>
-                        {availableMonthYears.map((monthYear) => {
-                          const [month, year] = monthYear.split(" ");
-                          const value =
-                            data?.[year]?.[month]?.[
-                              row.regionKey as
-                                | "Total_Deal_Count"
-                                | "Total_Deal_Volume"
-                                | "Positively_Performing_Deals_Percentage"
-                                | "Expected_Returns_Excess"
-                            ];
-                          return (
-                            <TableCell key={monthYear} align="center">
-                              {row.formatter(value)}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })
-                : null;
+              const isExpanded = expandedRows.has(row.key);
+              const totalRowSpan = isExpanded ? REGION_ORDER.length + 1 : 1;
 
               return (
                 <React.Fragment key={row.key}>
-                  {regionRows}
                   <MotionTableRow
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 + idx * 0.1 }}
                   >
-                    <TableCell>{row.label}</TableCell>
+                    <TableCell rowSpan={totalRowSpan}>{row.label}</TableCell>
                     <TableCell align="center">
                       <Box
                         display="flex"
@@ -214,7 +185,7 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                           size="small"
                           onClick={() => toggleRow(row.key)}
                         >
-                          {expandedRows.has(row.key) ? (
+                          {isExpanded ? (
                             <Remove fontSize="small" />
                           ) : (
                             <Add fontSize="small" />
@@ -232,6 +203,33 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                       );
                     })}
                   </MotionTableRow>
+
+                  {isExpanded &&
+                    REGION_ORDER.map((region) => {
+                      const data = regionwiseMonthwise[region];
+                      return (
+                        <TableRow key={`${row.key}-${region}`}>
+                          {/* empty cell for Metric column because of rowSpan above */}
+                          <TableCell align="center">{region}</TableCell>
+                          {availableMonthYears.map((monthYear) => {
+                            const [month, year] = monthYear.split(" ");
+                            const value =
+                              data?.[year]?.[month]?.[
+                                row.regionKey as
+                                  | "Total_Deal_Count"
+                                  | "Total_Deal_Volume"
+                                  | "Positively_Performing_Deals_Percentage"
+                                  | "Expected_Returns_Excess"
+                              ];
+                            return (
+                              <TableCell key={monthYear} align="center">
+                                {row.formatter(value)}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    })}
                 </React.Fragment>
               );
             })}
