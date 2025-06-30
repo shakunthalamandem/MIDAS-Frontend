@@ -192,14 +192,14 @@ const PNLFilters: React.FC = () => {
         ];
       }}
 renderOption={(props, option, { selected }) => {
-  const keySelected = selectedFilters[key as keyof Filters]; // Current selected values
+  const keySelected = selectedFilters[key as keyof Filters]; 
   const allOptions = filters?.[key as keyof Filters] ?? [];
   const isAllOption = option === "All";
 
   const isAllSelected =
     isAllOption &&
     keySelected.length > 0 &&
-    keySelected.length === allOptions.length - 1; // all except "All"
+    keySelected.length === allOptions.length - 1; 
 
   return (
     <Box component="li" {...props} sx={{ display: "flex", alignItems: "center" }}>
