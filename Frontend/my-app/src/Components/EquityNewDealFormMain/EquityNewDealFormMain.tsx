@@ -27,9 +27,12 @@ function formatDateSimple(dateString: string): string {
   });
 }
 
+
 type ApiResponse = {
   tickers: TickerOption[];
   default_ticker: string;
+  total_deal_colour_yes: number;
+  total_deal_colour_no: number;
 };
 
 const EquityNewDealFormMain: React.FC = () => {
@@ -40,6 +43,8 @@ const EquityNewDealFormMain: React.FC = () => {
   const autoCompleteRef = useRef<HTMLInputElement>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const [totalDealColourNo, setTotalDealColourNo] = useState<number>(0);
+
 
   const handleSearchClick = async () => {
     setLoading(true);
@@ -52,7 +57,21 @@ const EquityNewDealFormMain: React.FC = () => {
         },
       });
 
-      const { tickers, default_ticker } = response.data;
+      const { tickers, default_ticker, total_deal_colour_no } = response.data;
+
+setOptions(tickers);
+setTotalDealColourNo(total_deal_colour_no);
+
+
+
+if (!selectedOption) {
+  const defaultDeal = tickers.find((item) => item.ticker === default_ticker);
+  if (defaultDeal) {
+    setSelectedOption({ ...defaultDeal, create: false });
+  }
+}
+
+
 
       setOptions(tickers);
 if (!selectedOption) {
@@ -197,17 +216,21 @@ useEffect(() => {
               renderOption={(props, option) => (
                 <Box component="li" {...props}>
                   <Box>
-                    <Typography fontWeight="bold">{option.ticker}</Typography>
+                    <Typography  fontWeight="bold">{option.ticker}</Typography>
                     <Typography variant="body2" color="text.secondary">
                       {formatDateSimple(option.pricing_date)}
                     </Typography>
                   </Box>
+
                 </Box>
               )}
             />
-                      <Typography variant="body1" sx={{ display: "flex", alignItems: "center", color: "red" }}>
-                  🔴  deal colours is missing
-                </Typography>
+                     {totalDealColourNo > 0 && (
+  <Typography variant="body1" sx={{ display: "flex", alignItems: "center", color: "red" }}>
+    🔴 {totalDealColourNo} deal colour{totalDealColourNo > 1 ? "s" : ""} are missing
+  </Typography>
+)}
+
           </Box>
         </Box>
 
