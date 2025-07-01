@@ -267,17 +267,19 @@ const EquityNewDealFormMain: React.FC = () => {
                 </Box>
               )}
             />
-            {totalDealColourNo > 0 && (
-              <Typography
-                variant="body1"
-                sx={{ display: "flex", alignItems: "center", color: "red" }}
-              >
-                🔴 {totalDealColourNo} deal colour
-                {totalDealColourNo > 1 ? "s" : ""} are missing
-              </Typography>
-            )}
+                <Box width="100%" display="flex" justifyContent="flex-end">
+  <Typography variant="caption" color="red">
+    🔴 {totalDealColourNo} deal colour
+    {totalDealColourNo > 1 ? "s" : ""} are missing
+  </Typography>
+</Box>
+           
           </Box>
-        </Box>
+   
+                  </Box>
+
+
+
 
         {error && (
           <Alert
