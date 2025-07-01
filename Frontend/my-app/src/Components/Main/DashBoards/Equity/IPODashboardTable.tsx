@@ -138,7 +138,12 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
         <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  backgroundColor: "#f0f0f0",
+                }}
+              >
                 Metric
               </TableCell>
               <TableCell
@@ -171,9 +176,11 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                       const data = regionwiseMonthwise[region];
                       return (
                         <TableRow key={`${row.key}-${region}`}>
-                          {/* Show metric name only in the first region row */}
                           {regionIdx === 0 && (
-                            <TableCell rowSpan={totalRowSpan}>
+                            <TableCell
+                              rowSpan={totalRowSpan}
+                              sx={{ borderRight: "1px solid #ccc" }}
+                            >
                               {row.label}
                             </TableCell>
                           )}
@@ -182,11 +189,11 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                             const [month, year] = monthYear.split(" ");
                             const value =
                               data?.[year]?.[month]?.[
-                              row.regionKey as
-                              | "Total_Deal_Count"
-                              | "Total_Deal_Volume"
-                              | "Positively_Performing_Deals_Percentage"
-                              | "Expected_Returns_Excess"
+                                row.regionKey as
+                                  | "Total_Deal_Count"
+                                  | "Total_Deal_Volume"
+                                  | "Positively_Performing_Deals_Percentage"
+                                  | "Expected_Returns_Excess"
                               ];
                             return (
                               <TableCell key={monthYear} align="center">
@@ -198,19 +205,24 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                       );
                     })}
 
-                    {/* Sum row after region rows */}
                     <MotionTableRow
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 + idx * 0.1 }}
                     >
-                      {/* Metric cell skipped, already row-spanned above */}
                       <TableCell align="center">
-                        <Box display="flex" alignItems="center" justifyContent="center">
+                        <Box
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
                           <Typography variant="body2" sx={{ pr: 0.5 }}>
                             Sum
                           </Typography>
-                          <IconButton size="small" onClick={() => toggleRow(row.key)}>
+                          <IconButton
+                            size="small"
+                            onClick={() => toggleRow(row.key)}
+                          >
                             <Remove fontSize="small" />
                           </IconButton>
                         </Box>
@@ -229,7 +241,6 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                 );
               }
 
-              // Not expanded — render a single row with Metric + Sum only
               return (
                 <MotionTableRow
                   key={row.key}
@@ -237,13 +248,22 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 + idx * 0.1 }}
                 >
-                  <TableCell>{row.label}</TableCell>
+                  <TableCell sx={{ borderRight: "1px solid #ccc" }}>
+                    {row.label}
+                  </TableCell>
                   <TableCell align="center">
-                    <Box display="flex" alignItems="center" justifyContent="center">
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
                       <Typography variant="body2" sx={{ pr: 0.5 }}>
                         Sum
                       </Typography>
-                      <IconButton size="small" onClick={() => toggleRow(row.key)}>
+                      <IconButton
+                        size="small"
+                        onClick={() => toggleRow(row.key)}
+                      >
                         <Add fontSize="small" />
                       </IconButton>
                     </Box>
@@ -261,7 +281,6 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
               );
             })}
           </TableBody>
-
         </Table>
       </TableContainer>
     </Zoom>

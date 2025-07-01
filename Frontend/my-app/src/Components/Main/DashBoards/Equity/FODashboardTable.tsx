@@ -139,7 +139,12 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
         <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  backgroundColor: "#f0f0f0",
+                }}
+              >
                 Metric
               </TableCell>
               <TableCell
@@ -175,7 +180,7 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                           {regionIdx === 0 && (
                             <TableCell
                               rowSpan={totalRowSpan}
-                              sx={{ verticalAlign: "middle", fontWeight: 600 }}
+                              sx={{ borderRight: "1px solid #ccc", fontWeight: 600 }}
                             >
                               {row.label}
                             </TableCell>
@@ -231,7 +236,6 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                 );
               }
 
-              // Collapsed view
               return (
                 <MotionTableRow
                   key={row.key}
@@ -239,7 +243,9 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 + idx * 0.1 }}
                 >
-                  <TableCell>{row.label}</TableCell>
+                  <TableCell sx={{ borderRight: "1px solid #ccc" }}>
+                    {row.label}
+                  </TableCell>
                   <TableCell align="center">
                     <Box display="flex" alignItems="center" justifyContent="center">
                       <Typography variant="body2" sx={{ pr: 0.5 }}>
