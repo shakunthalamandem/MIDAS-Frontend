@@ -1,7 +1,9 @@
 export interface TickerOption {
   ticker: string;
   pricing_date: string;
+  deal_colour_present: string
 }
+
 
 export interface SelectedOption extends TickerOption {
   create?: boolean;
