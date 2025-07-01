@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
-import { SelectedOption, TickerOption } from "../../types/NewDealFormData";
+import { SelectedOption } from "../../types/NewDealFormData";
 import DealFormSectionMainTable from "./DealFormSections/DealFormSectionMainTable";
 
 function formatDateSimple(dateString: string): string {
@@ -30,39 +30,63 @@ function formatDateSimple(dateString: string): string {
 type ApiResponse = {
   tickers: TickerOption[];
   default_ticker: string;
+  total_deal_colour_yes: number;
+  total_deal_colour_no: number;
+};
+type TickerOption = {
+  ticker: string;
+  pricing_date: string;
+  deal_colour_present: "Yes" | "No";
 };
 
+
 const EquityNewDealFormMain: React.FC = () => {
-  const [selectedOption, setSelectedOption] = useState<SelectedOption | null>(null);
+  const [selectedOption, setSelectedOption] = useState<SelectedOption | null>(
+    null
+  );
   const [options, setOptions] = useState<TickerOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const autoCompleteRef = useRef<HTMLInputElement>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const [totalDealColourNo, setTotalDealColourNo] = useState<number>(0);
 
   const handleSearchClick = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get<ApiResponse>(`${apiUrl}/api/new_deal_ticker_list/`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get<ApiResponse>(
+        `${apiUrl}/api/new_deal_ticker_list/`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const { tickers, default_ticker } = response.data;
+      const { tickers, default_ticker, total_deal_colour_no } = response.data;
 
       setOptions(tickers);
-if (!selectedOption) {
-  const defaultDeal = tickers.find((item) => item.ticker === "CTRI");
-  if (defaultDeal) {
-    setSelectedOption({ ...defaultDeal, create: false });
-  }
-}
+      setTotalDealColourNo(total_deal_colour_no);
 
+      if (!selectedOption) {
+        const defaultDeal = tickers.find(
+          (item) => item.ticker === default_ticker
+        );
+        if (defaultDeal) {
+          setSelectedOption({ ...defaultDeal, create: false });
+        }
+      }
 
+      setOptions(tickers);
+      if (!selectedOption) {
+        const defaultDeal = tickers.find((item) => item.ticker === "CTRI");
+        if (defaultDeal) {
+          setSelectedOption({ ...defaultDeal, create: false });
+        }
+      }
     } catch (err) {
       console.error("API call failed:", err);
       setError("API call failed, showing demo data");
@@ -70,17 +94,20 @@ if (!selectedOption) {
       setLoading(false);
     }
   };
-useEffect(() => {
-  handleSearchClick();
-}, []);
+  useEffect(() => {
+    handleSearchClick();
+  }, []);
   const handleCreateClick = () => {
-    setSelectedOption({ ticker: "", pricing_date: "", create: true });
+    setSelectedOption({ ticker: "", pricing_date: "", create: true, deal_colour_present: "" });
     if (autoCompleteRef.current) {
       autoCompleteRef.current.value = "";
     }
   };
 
-  const handleAutocompleteChange = (_event: any, value: TickerOption | null) => {
+  const handleAutocompleteChange = (
+    _event: any,
+    value: TickerOption | null
+  ) => {
     if (value) {
       setSelectedOption({ ...value, create: false });
     } else {
@@ -113,18 +140,9 @@ useEffect(() => {
               Equity New Deal Form
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Create or search for an equity deal by ticker and pricing date to get the complete deal form.
+              Create or search for an equity deal by ticker and pricing date to
+              get the complete deal form.
             </Typography>
-            {/* {selectedOption?.ticker && (
-              <Typography
-                variant="subtitle2"
-                color="primary"
-                mt={1}
-                fontWeight={500}
-              >
-                Selected Deal: {selectedOption.ticker}
-              </Typography>
-            )} */}
           </Box>
 
           <Box
@@ -190,7 +208,11 @@ useEffect(() => {
                     endAdornment: (
                       <>
                         {loading && (
-                          <CircularProgress color="inherit" size={20} sx={{ mr: 1 }} />
+                          <CircularProgress
+                            color="inherit"
+                            size={20}
+                            sx={{ mr: 1 }}
+                          />
                         )}
                         {params.InputProps.endAdornment}
                       </>
@@ -204,21 +226,67 @@ useEffect(() => {
                 />
               )}
               renderOption={(props, option) => (
-                <Box component="li" {...props}>
-                  <Box>
+                <Box
+                  component="li"
+                  {...props}
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="flex-start"
+                  gap={0.5}
+                >
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="flex-start"
+                    gap={1}
+                    width="100%"
+                  >
                     <Typography fontWeight="bold">{option.ticker}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDateSimple(option.pricing_date)}
-                    </Typography>
+
+                    <Box
+                      sx={{
+                        width: 5,
+                        height: 5,
+                        borderRadius: "50%",
+                        backgroundColor:
+                          option.deal_colour_present === "Yes"
+                            ? "green"
+                            : "red",
+                        mt: "2px",
+                      }}
+                    />
                   </Box>
+
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ textAlign: "left", width: "100%" }} // key to ensuring left alignment
+                  >
+                    {formatDateSimple(option.pricing_date)}
+                  </Typography>
                 </Box>
               )}
             />
+                <Box width="100%" display="flex" justifyContent="flex-end">
+  <Typography variant="caption" color="red">
+    🔴 {totalDealColourNo} deal colour
+    {totalDealColourNo > 1 ? "s" : ""} are missing
+  </Typography>
+</Box>
+           
           </Box>
-        </Box>
+   
+                  </Box>
+
+
+
 
         {error && (
-          <Alert severity="warning" onClose={() => setError(null)} sx={{ mb: 2 }}>
+          <Alert
+            severity="warning"
+            onClose={() => setError(null)}
+            sx={{ mb: 2 }}
+          >
             {error}
           </Alert>
         )}
