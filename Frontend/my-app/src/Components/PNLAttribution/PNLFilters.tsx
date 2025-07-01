@@ -120,8 +120,9 @@ const PNLFilters: React.FC = () => {
   };
 
   const filterOptions = [
-    { label: "Funds", key: "fund" },
     { label: "Asset Type", key: "asset_type" },
+        { label: "Funds", key: "fund" },
+
     // { label: "Deal Type", key: "deal_type" },
     { label: "Broad Region", key: "broad_region" },
   ] as const;
