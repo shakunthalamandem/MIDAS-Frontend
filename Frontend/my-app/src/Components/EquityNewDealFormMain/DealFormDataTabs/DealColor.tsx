@@ -48,7 +48,7 @@ const BlueSlider = styled(Slider)({
   },
 });
 
-const parsePercent = (value: string | number | undefined): number =>
+const parsePercent = (value: string | number | undefined | null): number =>
   typeof value === "string"
     ? parseFloat(value.replace("%", "")) || 0
     : typeof value === "number"
@@ -58,21 +58,17 @@ const parsePercent = (value: string | number | undefined): number =>
 interface DealColorProps extends FormSectionProps {}
 
 const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
-  const [timesCovered, setTimesCovered] = React.useState(
-    data.times_covered || ""
-  );
-  const [topAllocation, setTopAllocation] = React.useState(
-    data.top_allocation || "top 10"
-  );
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    onChange({ ...data, [e.target.name]: e.target.value });
-  };
+  const [topAllocation, setTopAllocation] = React.useState(data.top_allocation || "top 10");
 
   const handleSliderChange = (name: string, value: number) => {
     onChange({ ...data, [name]: value });
+  };
+
+  const handleInputChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(event.target.value);
+    if (!isNaN(value) && value >= 0 && value <= 100) {
+      onChange({ ...data, [name]: value });
+    }
   };
 
   const handleTopNChange = (event: SelectChangeEvent<string>) => {
@@ -80,10 +76,7 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
     onChange({ ...data, top_allocation: event.target.value });
   };
 
-  const handleTimesCoveredChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setTimesCovered(event.target.value);
+  const handleTimesCoveredChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...data, times_covered: event.target.value });
   };
 
@@ -112,113 +105,46 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <FormControl component="fieldset" sx={{ mb: 2 }}>
-            <FormLabel
-              component="legend"
-              sx={{ color: "#002060", fontWeight: 600 }}
-            >
+            <FormLabel component="legend" sx={{ color: "#002060", fontWeight: 600 }}>
               Times Covered:
             </FormLabel>
             <RadioGroup
               row
               name="times_covered"
-              value={timesCovered}
+              value={data.times_covered || ""}
               onChange={handleTimesCoveredChange}
             >
-              <Box display="flex" alignItems="center" mr={2}>
-                <Radio
-                  value="1x-5x"
-                  size="small"
-                  disabled={!editable}
-                  sx={{
-                    color: "#002060", // unselected state
-                    "&.Mui-checked": {
-                      color: "#002060", // selected state
-                    },
-                    "&.Mui-disabled": {
-                      color: "#002060", // disabled color
-                    },
-                  }}
-                />
-                <Typography
-                  variant="body2"
-                  component="span"
-                  sx={{
-                    color: "#002060",
-                    WebkitTextFillColor: "#002060",
-                  }}
-                >
-                  1x to 5x
-                </Typography>
-              </Box>
-
-              <Box display="flex" alignItems="center" mr={2}>
-                <Radio
-                  value="5x-10x"
-                  size="small"
-                  disabled={!editable}
-                  sx={{
-                    color: "#002060",
-                    "&.Mui-checked": {
+              {["1x-5x", "5x-10x", "greater than 10x"].map((val) => (
+                <Box display="flex" alignItems="center" mr={2} key={val}>
+                  <Radio
+                    value={val}
+                    size="small"
+                    disabled={!editable}
+                    sx={{
                       color: "#002060",
-                    },
-                    "&.Mui-disabled": {
-                      color: "#002060",
-                    },
-                  }}
-                />
-                <Typography
-                  variant="body2"
-                  component="span"
-                  sx={{
-                    color: "#002060",
-                    WebkitTextFillColor: "#002060",
-                  }}
-                >
-                  5x to 10x
-                </Typography>
-              </Box>
-
-              <Box display="flex" alignItems="center">
-                <Radio
-                  value="greater than 10x"
-                  size="small"
-                  disabled={!editable}
-                  sx={{
-                    color: "#002060",
-                    "&.Mui-checked": {
-                      color: "#002060",
-                    },
-                    "&.Mui-disabled": {
-                      color: "#002060",
-                    },
-                  }}
-                />
-                <Typography
-                  variant="body2"
-                  component="span"
-                  sx={{
-                    color: "#002060",
-                    WebkitTextFillColor: "#002060",
-                  }}
-                >
-                  Greater than 10x
-                </Typography>
-              </Box>
+                      "&.Mui-checked": { color: "#002060" },
+                      "&.Mui-disabled": { color: "#002060" },
+                    }}
+                  />
+                  <Typography variant="body2" sx={{ color: "#002060" }}>
+                    {val}
+                  </Typography>
+                </Box>
+              ))}
             </RadioGroup>
           </FormControl>
+
           <Grid container spacing={2}>
+            {/* Slider with Input: Long Only */}
             <Grid item xs={12} sm={6}>
               <Typography gutterBottom color="#002060">
                 Long Only Allocation (%)
               </Typography>
-              <Box sx={{ width: 200, textAlign: "left", marginLeft: "8px" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginLeft: "8px" }}>
                 <BlueSlider
                   value={longOnly}
                   onChange={(_, value) =>
-                    handleSliderChange(
-                      "long_only_allocation_percent",
-                      value as number
-                    )
+                    handleSliderChange("long_only_allocation_percent", value as number)
                   }
                   valueLabelDisplay="on"
                   step={1}
@@ -226,21 +152,28 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                   max={100}
                   disabled={!editable}
                 />
+                <TextField
+                  type="number"
+                  value={longOnly}
+                  onChange={handleInputChange("long_only_allocation_percent")}
+                  inputProps={{ min: 0, max: 100 }}
+                  size="small"
+                  sx={{ width: 80 }}
+                  disabled={!editable}
+                />
               </Box>
             </Grid>
 
+            {/* Slider with Input: Hedge Funds */}
             <Grid item xs={12} sm={6}>
               <Typography gutterBottom color="#002060">
                 Hedge Funds Allocation (%)
               </Typography>
-              <Box sx={{ width: 200, textAlign: "left" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <BlueSlider
                   value={hedgeFunds}
                   onChange={(_, value) =>
-                    handleSliderChange(
-                      "hedge_funds_allocation_percent",
-                      value as number
-                    )
+                    handleSliderChange("hedge_funds_allocation_percent", value as number)
                   }
                   valueLabelDisplay="on"
                   step={1}
@@ -248,9 +181,19 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                   max={100}
                   disabled={!editable}
                 />
+                <TextField
+                  type="number"
+                  value={hedgeFunds}
+                  onChange={handleInputChange("hedge_funds_allocation_percent")}
+                  inputProps={{ min: 0, max: 100 }}
+                  size="small"
+                  sx={{ width: 80 }}
+                  disabled={!editable}
+                />
               </Box>
             </Grid>
 
+            {/* Slider with Input: Allocation Concentration */}
             <Grid item xs={12} sm={6}>
               <Box display="flex" alignItems="center" gap={1}>
                 <Typography gutterBottom color="#002060" sx={{ mb: 0 }}>
@@ -270,14 +213,11 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                   </Select>
                 </FormControl>
               </Box>
-              <Box sx={{ width: 200, textAlign: "left", marginLeft: "8px" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginLeft: "8px" }}>
                 <BlueSlider
                   value={top10}
                   onChange={(_, value) =>
-                    handleSliderChange(
-                      "top_10_allocation_concentration_percent",
-                      value as number
-                    )
+                    handleSliderChange("top_10_allocation_concentration_percent", value as number)
                   }
                   valueLabelDisplay="on"
                   step={1}
@@ -285,14 +225,24 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                   max={100}
                   disabled={!editable}
                 />
+                <TextField
+                  type="number"
+                  value={top10}
+                  onChange={handleInputChange("top_10_allocation_concentration_percent")}
+                  inputProps={{ min: 0, max: 100 }}
+                  size="small"
+                  sx={{ width: 80 }}
+                  disabled={!editable}
+                />
               </Box>
             </Grid>
 
+            {/* Institutional vs Retail */}
             <Grid item xs={12} sm={6}>
               <Typography gutterBottom color="#002060">
                 Institutional vs Retail Allocation (%)
               </Typography>
-              <Box sx={{ width: 200, textAlign: "left" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <BlueSlider
                   value={institutional}
                   onChange={(_, value) =>
@@ -308,6 +258,24 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                   max={100}
                   disabled={!editable}
                 />
+                <TextField
+                  type="number"
+                  value={institutional}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    if (!isNaN(value) && value >= 0 && value <= 100) {
+                      onChange({
+                        ...data,
+                        institutional_allocation_percent: value,
+                        retail_allocation_percent: 100 - value,
+                      });
+                    }
+                  }}
+                  inputProps={{ min: 0, max: 100 }}
+                  size="small"
+                  sx={{ width: 80 }}
+                  disabled={!editable}
+                />
               </Box>
               <Box display="flex" gap={3}>
                 <Typography variant="body2" color="#002060">
@@ -321,13 +289,13 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
           </Grid>
         </Grid>
 
-        {/* RIGHT: Deal Color Text Area */}
+        {/* Right Side: Deal Colour TextArea */}
         <Grid item xs={12} md={6}>
           <TextField
             label="Deal Colour"
             name="deal_colour"
             value={data.deal_colour || ""}
-            onChange={handleChange}
+            onChange={(e) => onChange({ ...data, deal_colour: e.target.value })}
             fullWidth
             multiline
             minRows={10}
@@ -342,7 +310,7 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                 },
                 "& textarea.Mui-disabled": {
                   WebkitTextFillColor: "#b1062e",
-                  color: "#b1062e", // for fallback
+                  color: "#b1062e",
                 },
               },
             }}

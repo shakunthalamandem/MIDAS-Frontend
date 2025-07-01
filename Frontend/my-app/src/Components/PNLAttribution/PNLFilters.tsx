@@ -120,8 +120,9 @@ const PNLFilters: React.FC = () => {
   };
 
   const filterOptions = [
-    { label: "Funds", key: "fund" },
     { label: "Asset Type", key: "asset_type" },
+        { label: "Funds", key: "fund" },
+
     // { label: "Deal Type", key: "deal_type" },
     { label: "Broad Region", key: "broad_region" },
   ] as const;
@@ -191,17 +192,30 @@ const PNLFilters: React.FC = () => {
           />,
         ];
       }}
-      renderOption={(props, option, { selected }) => (
-        <Box component="li" {...props} sx={{ display: "flex", alignItems: "center" }}>
-          <Checkbox
-            icon={icon}
-            checkedIcon={checkedIcon}
-            checked={selected}
-            sx={{ mr: 1 }}
-          />
-          <Typography variant="body2">{option}</Typography>
-        </Box>
-      )}
+renderOption={(props, option, { selected }) => {
+  const keySelected = selectedFilters[key as keyof Filters]; 
+  const allOptions = filters?.[key as keyof Filters] ?? [];
+  const isAllOption = option === "All";
+
+  const isAllSelected =
+    isAllOption &&
+    keySelected.length > 0 &&
+    keySelected.length === allOptions.length - 1; 
+
+  return (
+    <Box component="li" {...props} sx={{ display: "flex", alignItems: "center" }}>
+      <Checkbox
+        icon={icon}
+        checkedIcon={checkedIcon}
+        checked={isAllSelected || (selected && !isAllOption)}
+        sx={{ mr: 1 }}
+      />
+      <Typography variant="body2">{option}</Typography>
+    </Box>
+  );
+}}
+
+
       renderInput={(params) => (
         <TextField
           {...params}
