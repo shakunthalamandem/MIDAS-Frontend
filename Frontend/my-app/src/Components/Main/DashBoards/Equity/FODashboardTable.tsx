@@ -84,7 +84,9 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
     const [monthA, yearA] = a.split(" ");
     const [monthB, yearB] = b.split(" ");
     const yearDiff = parseInt(yearA) - parseInt(yearB);
-    return yearDiff !== 0 ? yearDiff : monthOrder.indexOf(monthA) - monthOrder.indexOf(monthB);
+    return yearDiff !== 0
+      ? yearDiff
+      : monthOrder.indexOf(monthA) - monthOrder.indexOf(monthB);
   });
 
   const rows = [
@@ -116,18 +118,42 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
 
   return (
     <Zoom in>
-      <TableContainer component={Paper} sx={{ backgroundColor: "#fcfcdc", borderRadius: 2, boxShadow: 3, mt: 3 }}>
-        <Typography variant="h6" gutterBottom align="center" sx={{ color: "#002060", fontWeight: 600 }}>
+      <TableContainer
+        component={Paper}
+        sx={{
+          backgroundColor: "#fcfcdc",
+          borderRadius: 2,
+          boxShadow: 3,
+          mt: 3,
+        }}
+      >
+        <Typography
+          variant="h6"
+          gutterBottom
+          align="center"
+          sx={{ color: "#002060", fontWeight: 600 }}
+        >
           FO Deal Summary
         </Typography>
 
         <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>Metric</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>Sum</TableCell>
+              <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>
+                Metric
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}
+              >
+                Region
+              </TableCell>
               {availableMonthYears.map((monthYear) => (
-                <TableCell key={monthYear} align="center" sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>
+                <TableCell
+                  key={monthYear}
+                  align="center"
+                  sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}
+                >
                   {monthYear}
                 </TableCell>
               ))}
@@ -136,54 +162,104 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
 
           <TableBody>
             {rows.map((row, idx) => {
-              const regionRows = expandedRows.has(row.key)
-                ? REGION_ORDER.map((region) => {
-                    const data = regionwiseMonthwise[region];
-                    return (
-                      <TableRow key={`${row.key}-${region}`} sx={{ backgroundColor: "#fff" }}>
-                        <TableCell sx={{ pl: 4 }}>{region}</TableCell>
-                        <TableCell />
-                        {availableMonthYears.map((monthYear) => {
-                          const [month, year] = monthYear.split(" ");
-                          const value = data?.[year]?.[month]?.[
-                            row.regionKey as "Total_Deal_Count" | "Total_Deal_Volume" | "Positively_Performing_Deals_Percentage" | "Expected_Returns_Excess"
-                          ];
-                          return (
-                            <TableCell key={monthYear} align="center">
-                              {row.formatter(value)}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })
-                : null;
+              const isExpanded = expandedRows.has(row.key);
+              const totalRowSpan = REGION_ORDER.length + 1;
 
-              return (
-                <React.Fragment key={row.key}>
-                  {regionRows}
-                  <MotionTableRow
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 + idx * 0.1 }}
-                  >
-                    <TableCell>{row.label}</TableCell>
-                    <TableCell align="center">
-                      <IconButton size="small" onClick={() => toggleRow(row.key)}>
-                        {expandedRows.has(row.key) ? <Remove fontSize="small" /> : <Add fontSize="small" />}
-                      </IconButton>
-                    </TableCell>
-                    {availableMonthYears.map((monthYear) => {
-                      const [month, year] = monthYear.split(" ");
-                      const val = payload[year]?.[month]?.[row.key];
+              if (isExpanded) {
+                return (
+                  <React.Fragment key={row.key}>
+                    {REGION_ORDER.map((region, regionIdx) => {
+                      const data = regionwiseMonthwise[region];
                       return (
-                        <TableCell key={monthYear} align="center">
-                          {row.formatter(val)}
-                        </TableCell>
+                        <TableRow key={`${row.key}-${region}`}>
+                          {regionIdx === 0 && (
+                            <TableCell
+                              rowSpan={totalRowSpan}
+                              sx={{ verticalAlign: "middle", fontWeight: 600 }}
+                            >
+                              {row.label}
+                            </TableCell>
+                          )}
+                          <TableCell align="center">{region}</TableCell>
+                          {availableMonthYears.map((monthYear) => {
+                            const [month, year] = monthYear.split(" ");
+                            const value =
+                              data?.[year]?.[month]?.[
+                                row.regionKey as
+                                  | "Total_Deal_Count"
+                                  | "Total_Deal_Volume"
+                                  | "Positively_Performing_Deals_Percentage"
+                                  | "Expected_Returns_Excess"
+                              ];
+                            return (
+                              <TableCell key={monthYear} align="center">
+                                {row.formatter(value)}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
                       );
                     })}
-                  </MotionTableRow>
-                </React.Fragment>
+
+                    <MotionTableRow
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 + idx * 0.1 }}
+                    >
+                      {/* Skip metric cell; already row-spanned above */}
+                      <TableCell align="center">
+                        <Box display="flex" alignItems="center" justifyContent="center">
+                          <Typography variant="body2" sx={{ pr: 0.5 }}>
+                            Sum
+                          </Typography>
+                          <IconButton size="small" onClick={() => toggleRow(row.key)}>
+                            <Remove fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                      {availableMonthYears.map((monthYear) => {
+                        const [month, year] = monthYear.split(" ");
+                        const val = payload[year]?.[month]?.[row.key];
+                        return (
+                          <TableCell key={monthYear} align="center">
+                            {row.formatter(val)}
+                          </TableCell>
+                        );
+                      })}
+                    </MotionTableRow>
+                  </React.Fragment>
+                );
+              }
+
+              // Collapsed view
+              return (
+                <MotionTableRow
+                  key={row.key}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 + idx * 0.1 }}
+                >
+                  <TableCell>{row.label}</TableCell>
+                  <TableCell align="center">
+                    <Box display="flex" alignItems="center" justifyContent="center">
+                      <Typography variant="body2" sx={{ pr: 0.5 }}>
+                        Sum
+                      </Typography>
+                      <IconButton size="small" onClick={() => toggleRow(row.key)}>
+                        <Add fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                  {availableMonthYears.map((monthYear) => {
+                    const [month, year] = monthYear.split(" ");
+                    const val = payload[year]?.[month]?.[row.key];
+                    return (
+                      <TableCell key={monthYear} align="center">
+                        {row.formatter(val)}
+                      </TableCell>
+                    );
+                  })}
+                </MotionTableRow>
               );
             })}
           </TableBody>

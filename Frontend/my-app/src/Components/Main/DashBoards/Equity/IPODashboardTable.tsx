@@ -162,64 +162,31 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
           <TableBody>
             {rows.map((row, idx) => {
               const isExpanded = expandedRows.has(row.key);
-              const totalRowSpan = isExpanded ? REGION_ORDER.length + 1 : 1;
+              const totalRowSpan = REGION_ORDER.length + 1;
 
-              return (
-                <React.Fragment key={row.key}>
-                  <MotionTableRow
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 + idx * 0.1 }}
-                  >
-                    <TableCell rowSpan={totalRowSpan}>{row.label}</TableCell>
-                    <TableCell align="center">
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        <Typography variant="body2" sx={{ pr: 0.5 }}>
-                          Sum
-                        </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => toggleRow(row.key)}
-                        >
-                          {isExpanded ? (
-                            <Remove fontSize="small" />
-                          ) : (
-                            <Add fontSize="small" />
-                          )}
-                        </IconButton>
-                      </Box>
-                    </TableCell>
-                    {availableMonthYears.map((monthYear) => {
-                      const [month, year] = monthYear.split(" ");
-                      const val = payload[year]?.[month]?.[row.key];
-                      return (
-                        <TableCell key={monthYear} align="center">
-                          {row.formatter(val)}
-                        </TableCell>
-                      );
-                    })}
-                  </MotionTableRow>
-
-                  {isExpanded &&
-                    REGION_ORDER.map((region) => {
+              if (isExpanded) {
+                return (
+                  <React.Fragment key={row.key}>
+                    {REGION_ORDER.map((region, regionIdx) => {
                       const data = regionwiseMonthwise[region];
                       return (
                         <TableRow key={`${row.key}-${region}`}>
-                          {/* empty cell for Metric column because of rowSpan above */}
+                          {/* Show metric name only in the first region row */}
+                          {regionIdx === 0 && (
+                            <TableCell rowSpan={totalRowSpan}>
+                              {row.label}
+                            </TableCell>
+                          )}
                           <TableCell align="center">{region}</TableCell>
                           {availableMonthYears.map((monthYear) => {
                             const [month, year] = monthYear.split(" ");
                             const value =
                               data?.[year]?.[month]?.[
-                                row.regionKey as
-                                  | "Total_Deal_Count"
-                                  | "Total_Deal_Volume"
-                                  | "Positively_Performing_Deals_Percentage"
-                                  | "Expected_Returns_Excess"
+                              row.regionKey as
+                              | "Total_Deal_Count"
+                              | "Total_Deal_Volume"
+                              | "Positively_Performing_Deals_Percentage"
+                              | "Expected_Returns_Excess"
                               ];
                             return (
                               <TableCell key={monthYear} align="center">
@@ -230,10 +197,71 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                         </TableRow>
                       );
                     })}
-                </React.Fragment>
+
+                    {/* Sum row after region rows */}
+                    <MotionTableRow
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 + idx * 0.1 }}
+                    >
+                      {/* Metric cell skipped, already row-spanned above */}
+                      <TableCell align="center">
+                        <Box display="flex" alignItems="center" justifyContent="center">
+                          <Typography variant="body2" sx={{ pr: 0.5 }}>
+                            Sum
+                          </Typography>
+                          <IconButton size="small" onClick={() => toggleRow(row.key)}>
+                            <Remove fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                      {availableMonthYears.map((monthYear) => {
+                        const [month, year] = monthYear.split(" ");
+                        const val = payload[year]?.[month]?.[row.key];
+                        return (
+                          <TableCell key={monthYear} align="center">
+                            {row.formatter(val)}
+                          </TableCell>
+                        );
+                      })}
+                    </MotionTableRow>
+                  </React.Fragment>
+                );
+              }
+
+              // Not expanded — render a single row with Metric + Sum only
+              return (
+                <MotionTableRow
+                  key={row.key}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 + idx * 0.1 }}
+                >
+                  <TableCell>{row.label}</TableCell>
+                  <TableCell align="center">
+                    <Box display="flex" alignItems="center" justifyContent="center">
+                      <Typography variant="body2" sx={{ pr: 0.5 }}>
+                        Sum
+                      </Typography>
+                      <IconButton size="small" onClick={() => toggleRow(row.key)}>
+                        <Add fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                  {availableMonthYears.map((monthYear) => {
+                    const [month, year] = monthYear.split(" ");
+                    const val = payload[year]?.[month]?.[row.key];
+                    return (
+                      <TableCell key={monthYear} align="center">
+                        {row.formatter(val)}
+                      </TableCell>
+                    );
+                  })}
+                </MotionTableRow>
               );
             })}
           </TableBody>
+
         </Table>
       </TableContainer>
     </Zoom>
