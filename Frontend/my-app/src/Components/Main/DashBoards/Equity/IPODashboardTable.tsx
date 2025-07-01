@@ -189,11 +189,11 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                             const [month, year] = monthYear.split(" ");
                             const value =
                               data?.[year]?.[month]?.[
-                                row.regionKey as
-                                  | "Total_Deal_Count"
-                                  | "Total_Deal_Volume"
-                                  | "Positively_Performing_Deals_Percentage"
-                                  | "Expected_Returns_Excess"
+                              row.regionKey as
+                              | "Total_Deal_Count"
+                              | "Total_Deal_Volume"
+                              | "Positively_Performing_Deals_Percentage"
+                              | "Expected_Returns_Excess"
                               ];
                             return (
                               <TableCell key={monthYear} align="center">
@@ -210,28 +210,24 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 + idx * 0.1 }}
                     >
-                      <TableCell align="center">
-                        <Box
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                        >
-                          <Typography variant="body2" sx={{ pr: 0.5 }}>
+                      {/* Sum Label + Collapse Button */}
+                      <TableCell align="center" sx={{ fontWeight: 600 }}>
+                        <Box display="flex" alignItems="center" justifyContent="center">
+                          <Typography variant="body2" sx={{ pr: 0.5, fontWeight: 600 }}>
                             Sum
                           </Typography>
-                          <IconButton
-                            size="small"
-                            onClick={() => toggleRow(row.key)}
-                          >
+                          <IconButton size="small" onClick={() => toggleRow(row.key)}>
                             <Remove fontSize="small" />
                           </IconButton>
                         </Box>
                       </TableCell>
+
+                      {/* Bolded values for the Sum row */}
                       {availableMonthYears.map((monthYear) => {
                         const [month, year] = monthYear.split(" ");
                         const val = payload[year]?.[month]?.[row.key];
                         return (
-                          <TableCell key={monthYear} align="center">
+                          <TableCell key={monthYear} align="center" sx={{ fontWeight: 600 }}>
                             {row.formatter(val)}
                           </TableCell>
                         );

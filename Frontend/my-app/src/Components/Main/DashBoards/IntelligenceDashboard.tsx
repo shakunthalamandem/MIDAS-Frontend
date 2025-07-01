@@ -111,16 +111,29 @@ const handleFoYearToggle = (year: number) => {
                     </Grid>
                   </Grid>
                 </MotionPaper>
+                
 
-                {/* IPO Year Filter */}
-                <Box
+                <MotionPaper
+                  elevation={3}
+                  sx={{
+                    p: 3,
+                    background: "linear-gradient(to right, #f3e5f5, #ffffff)",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                    borderRadius: 4,
+                    mb: 2,
+                  }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                >
+
+                  <Box
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
                   pt={2}
                   pb={4}
                   gap={2}
-                  sx={{ backgroundColor: "#f8f9fa" }}
                 >
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                     Select Year(s):
@@ -144,20 +157,6 @@ const handleFoYearToggle = (year: number) => {
                     label="2025"
                   />
                 </Box>
-
-                <MotionPaper
-                  elevation={3}
-                  sx={{
-                    p: 3,
-                    background: "linear-gradient(to right, #f3e5f5, #ffffff)",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                    borderRadius: 4,
-                    mb: 2,
-                  }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.6 }}
-                >
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <MddIpoOpportunityChart
@@ -199,16 +198,28 @@ const handleFoYearToggle = (year: number) => {
                     </Grid>
                   </Grid>
                 </MotionPaper>
+                
 
-                {/* FO Year Filter */}
-                <Box
+                <MotionPaper
+                  elevation={3}
+                  sx={{
+                    p: 3,
+                    background: "linear-gradient(to right, #f3e5f5, #ffffff)",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                    borderRadius: 4,
+                    mb: 2,
+                  }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                >
+                  <Box
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
                   pt={2}
                   pb={4}
                   gap={2}
-                  sx={{ backgroundColor: "#f8f9fa" }}
                 >
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                     Select Year(s):
@@ -232,20 +243,6 @@ const handleFoYearToggle = (year: number) => {
                     label="2025"
                   />
                 </Box>
-
-                <MotionPaper
-                  elevation={3}
-                  sx={{
-                    p: 3,
-                    background: "linear-gradient(to right, #f3e5f5, #ffffff)",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                    borderRadius: 4,
-                    mb: 2,
-                  }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.6 }}
-                >
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <MddFoDealsOpportunityChart 

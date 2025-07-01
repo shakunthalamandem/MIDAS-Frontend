@@ -190,11 +190,11 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                             const [month, year] = monthYear.split(" ");
                             const value =
                               data?.[year]?.[month]?.[
-                                row.regionKey as
-                                  | "Total_Deal_Count"
-                                  | "Total_Deal_Volume"
-                                  | "Positively_Performing_Deals_Percentage"
-                                  | "Expected_Returns_Excess"
+                              row.regionKey as
+                              | "Total_Deal_Count"
+                              | "Total_Deal_Volume"
+                              | "Positively_Performing_Deals_Percentage"
+                              | "Expected_Returns_Excess"
                               ];
                             return (
                               <TableCell key={monthYear} align="center">
@@ -211,10 +211,9 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 + idx * 0.1 }}
                     >
-                      {/* Skip metric cell; already row-spanned above */}
-                      <TableCell align="center">
+                      <TableCell align="center" sx={{ fontWeight: 600 }}>
                         <Box display="flex" alignItems="center" justifyContent="center">
-                          <Typography variant="body2" sx={{ pr: 0.5 }}>
+                          <Typography variant="body2" sx={{ pr: 0.5, fontWeight: 600 }}>
                             Sum
                           </Typography>
                           <IconButton size="small" onClick={() => toggleRow(row.key)}>
@@ -222,16 +221,18 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                           </IconButton>
                         </Box>
                       </TableCell>
+
                       {availableMonthYears.map((monthYear) => {
                         const [month, year] = monthYear.split(" ");
                         const val = payload[year]?.[month]?.[row.key];
                         return (
-                          <TableCell key={monthYear} align="center">
+                          <TableCell key={monthYear} align="center" sx={{ fontWeight: 600 }}>
                             {row.formatter(val)}
                           </TableCell>
                         );
                       })}
                     </MotionTableRow>
+
                   </React.Fragment>
                 );
               }
