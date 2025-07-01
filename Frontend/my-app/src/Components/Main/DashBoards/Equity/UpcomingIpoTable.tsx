@@ -129,7 +129,7 @@ const UpcomingIpoTable: React.FC = () => {
           color="#002060"
           mb={2}
         >
-          📈 Upcoming IPOs – June 2025
+          📈 Upcoming & Recent IPOs : Past Week to Next Two Weeks
         </Typography>
 
         <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
