@@ -150,10 +150,10 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
         justifyContent="space-between"
         spacing={2}
       >
-        <Typography variant="h6" color="#002060" sx={{ whiteSpace: "nowrap" }}>
+        <Typography variant="h6" color="#3b0090" sx={{ whiteSpace: "nowrap" }}>
           {isCreate
             ? "Creating a new deal – Please fill in the form below."
-            : `Selected ticker: ${selectedTicker || "N/A"} – view or edit deal details below.`}
+            : ` ${selectedTicker || "N/A"} – the following data is available for viewing or editing: Deal Information, Deal Allocation, Market Data, Technical Data, and Deal Colour`}
        
         </Typography>
         
