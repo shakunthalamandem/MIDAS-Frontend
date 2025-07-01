@@ -7,7 +7,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Box,
+  Typography,
+  Box
 } from '@mui/material';
 
 interface CountryData {
@@ -22,8 +23,20 @@ interface CountryData {
   Long_Opportunity_Value: number;
 }
 
+interface CountryTotalData {
+  Total_Deal_Count_Sum: number;
+  Total_Deal_Volume_Sum: number;
+  Total_Postively_Performing_Deals: number;
+  Total_Negatively_Performing_Deals: number;
+  Total_Returns_positively: number;
+  Total_Returns_negatively: number;
+  Total_Expected_returns_excess: number;
+  Total_Long_Opportunity_Value: number;
+}
+
 interface Props {
   data: CountryData[] | null;
+  total?: CountryTotalData;
 }
 
 const formatNumber = (value: number): string => {
@@ -38,9 +51,9 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
 };
 
-const CountryTableData: React.FC<Props> = ({ data }) => {
+const CountryTableData: React.FC<Props> = ({ data, total }) => {
   if (!data || data.length === 0) {
-    return <div>No data available</div>;
+    return <Box p={2}><Typography>No data available</Typography></Box>;
   }
 
   const columns = [
@@ -56,7 +69,7 @@ const CountryTableData: React.FC<Props> = ({ data }) => {
   ];
 
   return (
-    <TableContainer component={Paper} sx={{ marginTop: 2, marginBottom: 4 }}>
+    <TableContainer component={Paper} sx={{ mt: 2, mb: 4 }}>
       <Table>
         <TableHead>
           <TableRow>
@@ -91,6 +104,20 @@ const CountryTableData: React.FC<Props> = ({ data }) => {
               <TableCell sx={{ padding: "4px 8px", fontSize: "0.875rem" }}>{formatNumber(row.Long_Opportunity_Value)}</TableCell>
             </TableRow>
           ))}
+
+          {total && (
+            <TableRow sx={{ bgcolor: "#f3f3f3", fontWeight: "bold" }}>
+              <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>Total</TableCell>
+              <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{total.Total_Deal_Count_Sum}</TableCell>
+              <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{formatNumber(total.Total_Deal_Volume_Sum)}</TableCell>
+              <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{total.Total_Postively_Performing_Deals.toFixed(0)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{total.Total_Negatively_Performing_Deals.toFixed(0)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{total.Total_Returns_positively.toFixed(1)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{total.Total_Returns_negatively.toFixed(1)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{total.Total_Expected_returns_excess.toFixed(1)}%</TableCell>
+              <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>{formatNumber(total.Total_Long_Opportunity_Value)}</TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>
