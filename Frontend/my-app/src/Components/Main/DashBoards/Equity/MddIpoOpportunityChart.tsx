@@ -159,10 +159,12 @@ const MddIpoOpportunityChart: React.FC<MddIpoOpportunityChartProps> = ({
 
   return (
     <>
-      <IPODashboardTable
-        payload={regionwiseMonthwiseTotal}
-        regionwiseMonthwise={regionwiseMonthwise}
-      />
+      <div id="ipo-table-section">
+        <IPODashboardTable
+          payload={regionwiseMonthwiseTotal}
+          regionwiseMonthwise={regionwiseMonthwise}
+        />
+      </div>
 
       <Typography variant="h6" gutterBottom align="center" color="#002060" mt={3}>
         Region-wise Opportunity Value in {selectedTab}s ({yearLabel})
