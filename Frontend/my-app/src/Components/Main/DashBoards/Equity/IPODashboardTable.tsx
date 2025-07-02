@@ -115,13 +115,13 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
       formatter: formatPercentage,
     },
     {
-      label: "Excess Returns",
+      label: "Excess Returns (T + 1M)",
       key: "Total_Expected_returns_excess" as MetricKey,
       regionKey: "Expected_Returns_Excess",
       formatter: formatPercentage,
     },
     {
-      label: "Opportunity Value",
+      label: "Opportunity Value (T + 1M Excess)",
       key: "Total_Long_Opportunity_Value" as MetricKey,
       regionKey: "Long_Opportunity_Value",
       formatter: formatCurrency,

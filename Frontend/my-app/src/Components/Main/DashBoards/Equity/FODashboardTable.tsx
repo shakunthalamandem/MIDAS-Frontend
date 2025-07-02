@@ -50,13 +50,13 @@ const formatCurrency = (value?: number): string => {
   if (value === undefined || isNaN(value)) return "-";
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-  if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(2)}B`;
-  if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(2)}M`;
-  return `${sign}$${absValue.toFixed(2)}`;
+  if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
+  if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
+  return `${sign}$${absValue.toFixed(1)}`;
 };
 
 const formatPercentage = (value?: number): string =>
-  value !== undefined && !isNaN(value) ? `${value.toFixed(2)}%` : "-";
+  value !== undefined && !isNaN(value) ? `${value.toFixed(1)}%` : "-";
 
 const monthOrder = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -112,13 +112,13 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
       formatter: formatPercentage,
     },
     {
-      label: "Excess Returns",
+      label: "Excess Returns (T + 1M)",
       key: "Total_Expected_returns_excess" as MetricKey,
       regionKey: "Expected_Returns_Excess",
       formatter: formatPercentage,
     },
     {
-      label: "Opportunity Value",
+      label: "Opportunity Value (T + 1M Excess)",
       key: "Total_Long_Opportunity_Value" as MetricKey,
       regionKey: "Long_Opportunity_Value",
       formatter: formatCurrency,
