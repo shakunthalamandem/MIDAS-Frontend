@@ -60,6 +60,7 @@ import DetailedLeadBankView from "../Components/Main/MonasheeGraphs/ScreenerTabl
 import PNLTabMain from "../Components/PNLAttribution/PNLTabMain";
 import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedRegionView";
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
+import PNLPagesMain from "../Components/PNLAttribution/PNLPages/PNLPagesMain";
 
 
 
@@ -206,6 +207,7 @@ const AppRouters: React.FC = () => {
         <Route path="/detailed-deals" element={<AuthGuard><DetailedDealsView /></AuthGuard>} />
         <Route path="/detailed-banks" element={<AuthGuard><DetailedLeadBankView /></AuthGuard>} />
         <Route path="/detailed-region" element={<AuthGuard><DetailedRegionView /></AuthGuard>} />
+        <Route path="/pnl" element={<AuthGuard><PNLPagesMain /></AuthGuard>} />
       </Routes>
     </ErrorBoundary>
     
