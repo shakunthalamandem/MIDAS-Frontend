@@ -69,7 +69,7 @@ const PnlTables: React.FC<{ selectedFilters: any }> = ({ selectedFilters }) => {
   return (
     <Container maxWidth="xl">
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} >
           <DataTable
             title="P&L by Strategy"
             {...data["p&L_by_strategy"]}
