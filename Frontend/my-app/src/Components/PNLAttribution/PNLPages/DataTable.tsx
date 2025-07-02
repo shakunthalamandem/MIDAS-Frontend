@@ -13,6 +13,7 @@ import {
   Paper,
   Box,
   Chip,
+  Container,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -88,6 +89,7 @@ const DataTable: React.FC<DataTableProps> = ({
   total_sum,
 }) => (
   <>
+  <Container >
     <Typography
       variant="h6"
       align="center"
@@ -148,6 +150,7 @@ const DataTable: React.FC<DataTableProps> = ({
         </TableContainer>
       </Grid>
     </Grid>
+    </Container>
   </>
 );
 
