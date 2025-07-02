@@ -55,18 +55,18 @@ const PNLPagesMain = () => {
 
         if (!response.ok) throw new Error('Failed to fetch filter options');
 
-        const data = await response.json();
-        setOptions(data);
 
-        const defaultFunds = data.funds || [];
-        const defaultFilters = {
-          funds: defaultFunds,
-          from_date: data.from_date || '2025-01-01',
-          to_date: data.to_date || '',
-        };
+const data = await response.json();
+setOptions(data);
 
-        setTempFilters(defaultFilters);
-        setFilters(defaultFilters); // apply filters by default
+const defaultFilters = {
+  funds: [],  // Empty funds by default
+  from_date: data.from_date || '2025-01-01',
+  to_date: data.to_date || '',
+};
+
+setTempFilters(defaultFilters);
+setFilters(defaultFilters); //
 
       } catch (err: any) {
         setError(err.message || 'Something went wrong');
