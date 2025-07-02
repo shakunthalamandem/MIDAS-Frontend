@@ -152,6 +152,7 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                 sx={{
                   fontWeight: 600,
                   backgroundColor: "#f0f0f0",
+                  width: "200px",
                 }}
               >
                 Metric
@@ -189,7 +190,7 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                           {regionIdx === 0 && (
                             <TableCell
                               rowSpan={totalRowSpan}
-                              sx={{ borderRight: "1px solid #ccc", fontWeight: 600 }}
+                              sx={{ borderRight: "1px solid #ccc", fontWeight: 600, width: "200px" }}
                             >
                               {row.label}
                             </TableCell>

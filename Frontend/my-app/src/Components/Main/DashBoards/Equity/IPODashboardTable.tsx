@@ -151,7 +151,7 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
         <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}>
+              <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0", width: "200px" }}>
                 Metric
               </TableCell>
               <TableCell
@@ -246,7 +246,7 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 + idx * 0.1 }}
                 >
-                  <TableCell sx={{ borderRight: "1px solid #ccc" }}>
+                  <TableCell sx={{ borderRight: "1px solid #ccc",width: "200px" }}>
                     {row.label}
                   </TableCell>
                   <TableCell align="center">
