@@ -58,11 +58,16 @@ const PNLPagesMain = () => {
         const data = await response.json();
         setOptions(data);
 
-        setTempFilters({
-          funds: [],
+        const defaultFunds = data.funds || [];
+        const defaultFilters = {
+          funds: defaultFunds,
           from_date: data.from_date || '2025-01-01',
           to_date: data.to_date || '',
-        });
+        };
+
+        setTempFilters(defaultFilters);
+        setFilters(defaultFilters); // apply filters by default
+
       } catch (err: any) {
         setError(err.message || 'Something went wrong');
       } finally {
@@ -73,39 +78,52 @@ const PNLPagesMain = () => {
     fetchFilterOptions();
   }, []);
 
+  const handleMultiSelectChange = (event: SelectChangeEvent<string[]>) => {
+    const {
+      target: { value },
+    } = event;
 
+    const selected = typeof value === 'string' ? value.split(',') : value;
 
-const handleMultiSelectChange = (event: SelectChangeEvent<string[]>) => {
-  const {
-    target: { value },
-  } = event;
-  setTempFilters((prev) => ({
-    ...prev,
-    funds: typeof value === 'string' ? value.split(',') : value,
-  }));
-};
+    if (selected.includes('All')) {
+      if (tempFilters.funds.length === options?.funds.length) {
+        // Unselect all
+        setTempFilters((prev) => ({ ...prev, funds: [] }));
+      } else {
+        // Select all
+        setTempFilters((prev) => ({ ...prev, funds: options?.funds || [] }));
+      }
+    } else {
+      // Regular selection
+      const allSelected = options?.funds.every((fund) => selected.includes(fund));
+      setTempFilters((prev) => ({
+        ...prev,
+        funds: allSelected ? options?.funds || [] : selected,
+      }));
+    }
+  };
 
   const handleApply = () => {
     setFilters(tempFilters);
   };
 
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value } = e.target;
-  setTempFilters((prev) => ({
-    ...prev,
-    [name]: value,
-  }));
-};
-
+    const { name, value } = e.target;
+    setTempFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleCancel = () => {
-    setTempFilters({
-      funds: [],
-      from_date: options?.from_date || '2025-01-01',
-      to_date: options?.to_date || '',
-    });
-    setFilters(null);
+    if (!options) return;
+    const defaultFilters = {
+      funds: options.funds,
+      from_date: options.from_date || '2025-01-01',
+      to_date: options.to_date || '',
+    };
+    setTempFilters(defaultFilters);
+    setFilters(defaultFilters);
   };
 
   if (loading) {
@@ -128,26 +146,67 @@ const handleMultiSelectChange = (event: SelectChangeEvent<string[]>) => {
   return (
     <Container maxWidth="lg">
       <Box p={3} bgcolor="#fafafa" borderRadius={2} boxShadow={2}>
-        <Typography variant="h5" gutterBottom color='#002060'>
+        <Typography variant="h5" gutterBottom color="#002060">
           P&L & Risk
         </Typography>
 
-        <Grid container spacing={2} mb={2}>
-          <Grid item xs={12} sm={6} md={4}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={3}>
             <FormControl fullWidth size="small">
               <InputLabel id="funds-label">Funds</InputLabel>
               <Select
                 labelId="funds-label"
                 name="funds"
                 multiple
-                value={tempFilters.funds}
+                value={
+                  options?.funds &&
+                  tempFilters.funds.length === options.funds.length
+                    ? ['All']
+                    : tempFilters.funds
+                }
                 onChange={handleMultiSelectChange}
                 input={<OutlinedInput label="Funds" />}
-                renderValue={(selected) => selected.join(', ')}
+                renderValue={(selected) => {
+  const selectedItems =
+    selected.includes('All') && options?.funds
+      ? options.funds
+      : selected;
+
+  if (selectedItems.length <= 1) {
+    return selectedItems.join(', ');
+  } else {
+    const visible = selectedItems.slice(0, 1).join(', ');
+    const remainingCount = selectedItems.length - 1;
+    return `${visible}, +${remainingCount} more`;
+  }
+}}
+
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 300,
+                    },
+                  },
+                }}
               >
+                <MenuItem value="All">
+                  <Checkbox
+  checked={
+    !!options?.funds &&
+    tempFilters.funds.length === options.funds.length
+  }
+  indeterminate={
+    !!options?.funds &&
+    tempFilters.funds.length > 0 &&
+    tempFilters.funds.length < options.funds.length
+  }
+/>
+
+                  <ListItemText primary="All" />
+                </MenuItem>
                 {options?.funds.map((fund) => (
                   <MenuItem key={fund} value={fund}>
-                    <Checkbox checked={tempFilters.funds.indexOf(fund) > -1} />
+                    <Checkbox checked={tempFilters.funds.includes(fund)} />
                     <ListItemText primary={fund} />
                   </MenuItem>
                 ))}
@@ -155,35 +214,45 @@ const handleMultiSelectChange = (event: SelectChangeEvent<string[]>) => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={4}>
-     <TextField
-  fullWidth
-  size="small"
-  label="From Date"
-  type="date"
-  name="from_date"
-  value={tempFilters.from_date}
-  onChange={handleInputChange}  // ✅ FIXED
-  InputLabelProps={{ shrink: true }}
-/>
+          <Grid item xs={12} md={2}>
+            <TextField
+              fullWidth
+              size="small"
+              label="From Date"
+              type="date"
+              name="from_date"
+              value={tempFilters.from_date}
+              onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
+            />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={4}>
-<TextField
-  fullWidth
-  size="small"
-  label="To Date"
-  type="date"
-  name="to_date"
-  value={tempFilters.to_date}
-  onChange={handleInputChange}  // ✅ FIXED
-  InputLabelProps={{ shrink: true }}
-/>
+          <Grid item xs={12} md={2}>
+            <TextField
+              fullWidth
+              size="small"
+              label="To Date"
+              type="date"
+              name="to_date"
+              value={tempFilters.to_date}
+              onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
 
-            <Button variant="contained" onClick={handleApply} sx={{ mr: 2,bgcolor: '#002060',color: '#fff' }}>
+          <Grid item xs={12} md={2}>
+            <Button
+              variant="contained"
+              onClick={handleApply}
+              fullWidth
+              sx={{ bgcolor: '#002060', color: '#fff' }}
+            >
               Apply
             </Button>
-            <Button variant="outlined" onClick={handleCancel}>
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <Button variant="outlined" fullWidth onClick={handleCancel}>
               Cancel
             </Button>
           </Grid>

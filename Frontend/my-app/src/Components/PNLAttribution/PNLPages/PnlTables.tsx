@@ -45,7 +45,8 @@ const PnlTables: React.FC<{ selectedFilters: any }> = ({ selectedFilters }) => {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify(selectedFilters),
+          body: JSON.stringify({ filters: selectedFilters }),
+
         });
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
