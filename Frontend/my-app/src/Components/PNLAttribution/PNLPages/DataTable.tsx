@@ -80,8 +80,8 @@ const DataTable: React.FC<DataTableProps> = ({
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
   >
-    <Card sx={{ mb: 4 }}>
-      <CardContent>
+    {/* <Card sx={{ mb: 4 }}>
+      <CardContent> */}
         <Typography
           variant="h6"
           align="center"
@@ -143,8 +143,8 @@ const DataTable: React.FC<DataTableProps> = ({
             </TableContainer>
           </Grid>
         </Grid>
-      </CardContent>
-    </Card>
+      {/* </CardContent>
+    </Card> */}
   </motion.div>
 );
 

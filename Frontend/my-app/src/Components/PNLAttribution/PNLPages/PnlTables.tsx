@@ -3,6 +3,7 @@ import {
   Typography,
   CircularProgress,
   Container,
+  Grid,
 } from "@mui/material";
 import DataTable from "../PNLPages/DataTable";
 
@@ -66,13 +67,56 @@ const PnlTables: React.FC<{ selectedFilters: any }> = ({ selectedFilters }) => {
   if (!data) return null;
 
   return (
-    <Container>
-      <DataTable title="P&L by Strategy" {...data["p&L_by_strategy"]} groupKey="custom_group1" />
-      <DataTable title="Exposure by Strategy" {...data.exposure_by_strategy} groupKey="custom_group1" />
-      <DataTable title="P&L by Sector" {...data["P&L_by_sector"]} groupKey="custom_group2" />
-      <DataTable title="Exposure by Sector" {...data.exposure_by_sector} groupKey="custom_group2" />
-      <DataTable title="P&L by International" {...data["P&L_by_international"]} groupKey="broad_region" />
-      <DataTable title="Exposure by International" {...data.exposure_by_international} groupKey="broad_region" />
+    <Container maxWidth="xl">
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <DataTable
+            title="P&L by Strategy"
+            {...data["p&L_by_strategy"]}
+            groupKey="custom_group1"
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <DataTable
+            title="Exposure by Strategy"
+            {...data.exposure_by_strategy}
+            groupKey="custom_group1"
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <DataTable
+            title="P&L by Sector"
+            {...data["P&L_by_sector"]}
+            groupKey="custom_group2"
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <DataTable
+            title="Exposure by Sector"
+            {...data.exposure_by_sector}
+            groupKey="custom_group2"
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <DataTable
+            title="P&L by International"
+            {...data["P&L_by_international"]}
+            groupKey="broad_region"
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <DataTable
+            title="Exposure by International"
+            {...data.exposure_by_international}
+            groupKey="broad_region"
+          />
+        </Grid>
+      </Grid>
     </Container>
   );
 };
