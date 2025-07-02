@@ -45,8 +45,9 @@ const handleFoYearToggle = (year: number) => {
 };
 
   return (
-    <>
-        <Box display="flex" width="100%" pt={2}>
+    <>  
+      <Box width={1800} sx={{ mx: "auto" }}>
+        <Box display="flex" width="100%" pt={2} >
           <Box display="flex" flexDirection="column" gap={4} width="100%">
 
             {/* Toggle Buttons */}
@@ -255,6 +256,7 @@ const handleFoYearToggle = (year: number) => {
             )}
           </Box>
         </Box>
+      </Box>
     </>
   );
 };
