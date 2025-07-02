@@ -118,7 +118,7 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
       formatter: formatPercentage,
     },
     {
-      label: "Long Opportunity Value",
+      label: "Opportunity Value",
       key: "Total_Long_Opportunity_Value" as MetricKey,
       regionKey: "Long_Opportunity_Value",
       formatter: formatCurrency,
