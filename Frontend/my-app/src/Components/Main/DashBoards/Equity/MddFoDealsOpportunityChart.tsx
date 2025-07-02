@@ -159,10 +159,12 @@ const MddFoOpportunityChart: React.FC<MddFoOpportunityChartProps> = ({
 
   return (
     <>
-      <FODashboardTable
-        payload={regionwiseMonthwiseTotal}
-        regionwiseMonthwise={regionwiseMonthwise}
-      />
+      <div id="fo-table-section">
+        <FODashboardTable
+          payload={regionwiseMonthwiseTotal}
+          regionwiseMonthwise={regionwiseMonthwise}
+        />
+      </div>
 
       <Typography variant="h6" gutterBottom align="center" color="#002060" mt={3}>
         Region-wise Opportunity Value in {selectedTab}s ({yearLabel})
