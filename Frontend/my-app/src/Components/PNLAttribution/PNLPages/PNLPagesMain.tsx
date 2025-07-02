@@ -179,10 +179,8 @@ const handleMultiSelectChange = (event: SelectChangeEvent<string[]>) => {
   onChange={handleInputChange}  // ✅ FIXED
   InputLabelProps={{ shrink: true }}
 />
-          </Grid>
 
-          <Grid item xs={12} sm={12} md={12} display="flex" justifyContent="flex-end">
-            <Button variant="contained" color="primary" onClick={handleApply} sx={{ mr: 2 }}>
+            <Button variant="contained" onClick={handleApply} sx={{ mr: 2,bgcolor: '#002060',color: '#fff' }}>
               Apply
             </Button>
             <Button variant="outlined" onClick={handleCancel}>
