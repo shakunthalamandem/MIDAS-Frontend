@@ -20,6 +20,7 @@ interface RegionMonthwiseMetric {
   Total_Deal_Volume_Sum: number;
   Total_Postively_Performing_Deals: number;
   Total_Expected_returns_excess: number;
+  Total_Long_Opportunity_Value: number;
 }
 
 interface RegionwiseMonthwises {
@@ -46,10 +47,12 @@ interface FODashboardTableProps {
 const REGION_ORDER = ["US", "EMEA", "APAC", "Non-US America"];
 
 const formatCurrency = (value?: number): string => {
-  if (!value || isNaN(value)) return "-";
-  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
-  return `$${value.toFixed(2)}`;
+  if (value === undefined || isNaN(value)) return "-";
+  const absValue = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+  if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(2)}B`;
+  if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(2)}M`;
+  return `${sign}$${absValue.toFixed(2)}`;
 };
 
 const formatPercentage = (value?: number): string =>
@@ -113,6 +116,12 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
       key: "Total_Expected_returns_excess" as MetricKey,
       regionKey: "Expected_Returns_Excess",
       formatter: formatPercentage,
+    },
+    {
+      label: "Long Opportunity Value",
+      key: "Total_Long_Opportunity_Value" as MetricKey,
+      regionKey: "Long_Opportunity_Value",
+      formatter: formatCurrency,
     },
   ];
 
@@ -189,13 +198,7 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                           {availableMonthYears.map((monthYear) => {
                             const [month, year] = monthYear.split(" ");
                             const value =
-                              data?.[year]?.[month]?.[
-                              row.regionKey as
-                              | "Total_Deal_Count"
-                              | "Total_Deal_Volume"
-                              | "Positively_Performing_Deals_Percentage"
-                              | "Expected_Returns_Excess"
-                              ];
+                              data?.[year]?.[month]?.[row.regionKey as keyof typeof data[string][string]];
                             return (
                               <TableCell key={monthYear} align="center">
                                 {row.formatter(value)}
@@ -232,7 +235,6 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
                         );
                       })}
                     </MotionTableRow>
-
                   </React.Fragment>
                 );
               }
