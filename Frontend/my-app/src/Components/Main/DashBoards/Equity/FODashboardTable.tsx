@@ -103,7 +103,7 @@ const FODashboardTable: React.FC<FODashboardTableProps> = ({
       formatter: formatCurrency,
     },
     {
-      label: "% Positive",
+      label: "% of Positively Performing Deals",
       key: "Total_Postively_Performing_Deals" as MetricKey,
       regionKey: "Positively_Performing_Deals_Percentage",
       formatter: formatPercentage,
