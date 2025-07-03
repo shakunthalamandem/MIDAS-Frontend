@@ -134,91 +134,93 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
   }
 
   return (
-  <Box>
-    <Typography variant="h5" gutterBottom align="center">
-      Equity Funds By Strategy
-    </Typography>
-    <TableContainer component={Paper}>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell
-              align="left"
-              sx={{
-                width: '33.33%',
-                borderRight: '1px solid #e0e0e0'
-              }}
-              sortDirection={orderBy === 'deal_type' ? order : false}
-            >
-              <TableSortLabel
-                active={orderBy === 'deal_type'}
-                direction={orderBy === 'deal_type' ? order : 'asc'}
-                onClick={() => handleSort('deal_type')}
+    <Box>
+      <Typography variant="h5" gutterBottom align="center">
+        Equity Funds By Strategy
+      </Typography>
+      <TableContainer component={Paper}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell
+                align="left"
+                sx={{
+                  width: '33.33%',
+                  borderRight: '1px solid #e0e0e0'
+                }}
+                sortDirection={orderBy === 'deal_type' ? order : false}
               >
-                <b>Deal Type</b>
-              </TableSortLabel>
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                width: '33.33%',
-                borderRight: '1px solid #e0e0e0'
-              }}
-              sortDirection={orderBy === 'total_pnl' ? order : false}
-            >
-              <TableSortLabel
-                active={orderBy === 'total_pnl'}
-                direction={orderBy === 'total_pnl' ? order : 'asc'}
-                onClick={() => handleSort('total_pnl')}
-              >
-                <b>PnL</b>
-              </TableSortLabel>
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{ width: '33.33%' }}
-              sortDirection={orderBy === 'total_exposure' ? order : false}
-            >
-              <TableSortLabel
-                active={orderBy === 'total_exposure'}
-                direction={orderBy === 'total_exposure' ? order : 'asc'}
-                onClick={() => handleSort('total_exposure')}
-              >
-                <b>Exposure</b>
-              </TableSortLabel>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {sortedData.map((row) => (
-            <TableRow key={row.deal_type}>
-              <TableCell align="left" sx={{ width: '33.33%', borderRight: '1px solid #e0e0e0' }}>
-                {row.deal_type}
+                <TableSortLabel
+                  active={orderBy === 'deal_type'}
+                  direction={orderBy === 'deal_type' ? order : 'asc'}
+                  onClick={() => handleSort('deal_type')}
+                >
+                  <b>Deal Type</b>
+                </TableSortLabel>
               </TableCell>
-              <TableCell align="center" sx={{ width: '33.33%', borderRight: '1px solid #e0e0e0' }}>
-                {formatNumber(row.total_pnl)}
+              <TableCell
+                align="center"
+                sx={{
+                  width: '33.33%',
+                  borderRight: '1px solid #e0e0e0'
+                }}
+                sortDirection={orderBy === 'total_pnl' ? order : false}
+              >
+                <TableSortLabel
+                  active={orderBy === 'total_pnl'}
+                  direction={orderBy === 'total_pnl' ? order : 'asc'}
+                  onClick={() => handleSort('total_pnl')}
+                >
+                  <b>PnL</b>
+                </TableSortLabel>
               </TableCell>
-              <TableCell align="center" sx={{ width: '33.33%' }}>
-                {formatNumber(row.total_exposure)}
+              <TableCell
+                align="center"
+                sx={{ width: '33.33%' }}
+                sortDirection={orderBy === 'total_exposure' ? order : false}
+              >
+                <TableSortLabel
+                  active={orderBy === 'total_exposure'}
+                  direction={orderBy === 'total_exposure' ? order : 'asc'}
+                  onClick={() => handleSort('total_exposure')}
+                >
+                  <b>Exposure</b>
+                </TableSortLabel>
               </TableCell>
             </TableRow>
-          ))}
-          <TableRow>
-            <TableCell align="left" sx={{ width: '33.33%', borderRight: '1px solid #e0e0e0' }}>
-              <b>Total</b>
-            </TableCell>
-            <TableCell align="center" sx={{ width: '33.33%', borderRight: '1px solid #e0e0e0' }}>
-              <b>{formatNumber(totalPnl)}</b>
-            </TableCell>
-            <TableCell align="center" sx={{ width: '33.33%' }}>
-              <b>{formatNumber(totalExposure)}</b>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </Box>
-);
+          </TableHead>
+          <TableBody>
+            {sortedData.map((row, idx) => (
+              <TableRow key={row.deal_type} sx={{
+                backgroundColor: idx % 2 === 0 ? '#fff' : '#f5f5f5'
+              }}>
+                <TableCell align="left" sx={{ width: '33.33%', borderRight: '1px solid #e0e0e0' }}>
+                  {row.deal_type}
+                </TableCell>
+                <TableCell align="center" sx={{ width: '33.33%', borderRight: '1px solid #e0e0e0' }}>
+                  {formatNumber(row.total_pnl)}
+                </TableCell>
+                <TableCell align="center" sx={{ width: '33.33%' }}>
+                  {formatNumber(row.total_exposure)}
+                </TableCell>
+              </TableRow>
+            ))}
+            <TableRow>
+              <TableCell align="left" sx={{ width: '33.33%', borderRight: '1px solid #e0e0e0' }}>
+                <b>Total</b>
+              </TableCell>
+              <TableCell align="center" sx={{ width: '33.33%', borderRight: '1px solid #e0e0e0' }}>
+                <b>{formatNumber(totalPnl)}</b>
+              </TableCell>
+              <TableCell align="center" sx={{ width: '33.33%' }}>
+                <b>{formatNumber(totalExposure)}</b>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
+  );
 };
 
 export default EFStrategywise;
