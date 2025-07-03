@@ -28,7 +28,6 @@ interface Props {
 }
 
 const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTicker }) => {
-  console.log("DealFormDataTabsMain rendered with formData:", formData, "isCreate:", isCreate, "selectedTicker:", selectedTicker);
   const [editable, setEditable] = useState<boolean>(isCreate);
   const [localData, setLocalData] = useState<FormData>(formData);
   const [originalData] = useState<FormData>(formData);
