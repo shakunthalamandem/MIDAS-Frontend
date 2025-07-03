@@ -372,6 +372,9 @@ const IPODashboardMain: React.FC = () => {
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <IPODashboardMainTable ticker={selectedTicker || ""} />
                     </Box>
+                          <Typography sx={{ fontStyle: 'italic', fontSize: '0.875rem', color: 'gray' }}>
+  Source: Factset
+</Typography>
                   </Grid>
                 </Grid>
               </Container>

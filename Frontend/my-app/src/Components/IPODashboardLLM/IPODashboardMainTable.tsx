@@ -375,7 +375,10 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
           </Table>
         </TableContainer>
       )}
+
+
     </Box>
+    
   );
 };
 

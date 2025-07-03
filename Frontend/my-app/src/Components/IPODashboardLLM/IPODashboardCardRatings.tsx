@@ -29,7 +29,7 @@ const ratingFields = [
 const infoFields: { label: string; key: string }[] = [
   { label: "Pricing Date", key: "pricing_date" },
   { label: "Price Range", key: "price_range" },
-  { label: "Deal Size", key: "deal_size" },
+  { label: "Deal Size ($ Million)", key: "deal_size" },
   { label: "Industry", key: "industry" },
   { label: "Shares Offered", key: "shares_offered" },
   { label: "No of Shares Outstanding", key: "nosh" },
