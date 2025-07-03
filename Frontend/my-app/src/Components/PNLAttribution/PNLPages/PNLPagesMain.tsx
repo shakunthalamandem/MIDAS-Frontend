@@ -259,7 +259,7 @@ funds: [],      from_date: options.from_date || '2025-01-01',
 
         {filters && (
           <Box mt={3}>
-            <PnlTables selectedFilters={filters} />
+            {/* <PnlTables selectedFilters={filters} /> */}
           </Box>
         )}
       </Box>
