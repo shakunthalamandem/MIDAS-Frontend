@@ -128,7 +128,7 @@ const PNLTabMain = () => {
               label={
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
                   <BarChartIcon fontSize="small" />
-                  <Typography variant="h6">Data Grid</Typography>
+                  <Typography variant="h6">Equity Distribution</Typography>
                 </Box>
               }
             />

@@ -11,6 +11,7 @@ import {
   Typography,
   Container,
   IconButton,
+  Box,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -71,7 +72,7 @@ const PnlAttributionTable: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(false);
+      setLoading(true);
       try {
         const res = await fetch(`${apiUrl}/api/pnls_summary/`, {
           headers: {
@@ -171,10 +172,13 @@ const PnlAttributionTable: React.FC = () => {
           border: "1px solid #000",
         }}
       >
-        {loading ? (
-          <CircularProgress sx={{ m: 2 }} />
-        ) : (
-          <Table size="small" sx={{ borderCollapse: "collapse" }}>
+  {loading ? (
+  <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 300 }}>
+    <CircularProgress />
+  </Box>
+) : (
+  <Table size="small" sx={{ borderCollapse: "collapse" }}>
+
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
                 <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
