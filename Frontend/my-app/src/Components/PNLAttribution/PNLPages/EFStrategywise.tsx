@@ -140,13 +140,14 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
       </Typography>
       <TableContainer component={Paper}>
         <Table size="small">
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "#002060", color: '#fff' }}>
             <TableRow>
               <TableCell
                 align="left"
                 sx={{
                   width: '33.33%',
-                  borderRight: '1px solid #e0e0e0'
+                  borderRight: '1px solid #e0e0e0',
+                  color: '#fff',
                 }}
                 sortDirection={orderBy === 'deal_type' ? order : false}
               >
@@ -154,6 +155,15 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                   active={orderBy === 'deal_type'}
                   direction={orderBy === 'deal_type' ? order : 'asc'}
                   onClick={() => handleSort('deal_type')}
+                  sx={{
+                    color: '#fff !important', // Label color
+                    '& .MuiTableSortLabel-icon': {
+                      color: '#fff !important', // Arrow color
+                    },
+                    '& .MuiTableSortLabel-label': {
+                      color: '#fff !important', // Label text color
+                    },
+                  }}
                 >
                   <b>Deal Type</b>
                 </TableSortLabel>
@@ -162,7 +172,8 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                 align="center"
                 sx={{
                   width: '33.33%',
-                  borderRight: '1px solid #e0e0e0'
+                  borderRight: '1px solid #e0e0e0',
+                  color: '#fff',
                 }}
                 sortDirection={orderBy === 'total_pnl' ? order : false}
               >
@@ -170,19 +181,39 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                   active={orderBy === 'total_pnl'}
                   direction={orderBy === 'total_pnl' ? order : 'asc'}
                   onClick={() => handleSort('total_pnl')}
+                  sx={{
+                    color: '#fff !important', // Label color
+                    '& .MuiTableSortLabel-icon': {
+                      color: '#fff !important', // Arrow color
+                    },
+                    '& .MuiTableSortLabel-label': {
+                      color: '#fff !important', // Label text color
+                    },
+                  }}
                 >
                   <b>PnL</b>
                 </TableSortLabel>
               </TableCell>
               <TableCell
                 align="center"
-                sx={{ width: '33.33%' }}
+                sx={{ width: '33.33%', color: '#fff', }}
                 sortDirection={orderBy === 'total_exposure' ? order : false}
+
               >
                 <TableSortLabel
                   active={orderBy === 'total_exposure'}
                   direction={orderBy === 'total_exposure' ? order : 'asc'}
                   onClick={() => handleSort('total_exposure')}
+                  sx={{
+                    color: '#fff !important', // Label color
+                    '& .MuiTableSortLabel-icon': {
+                      color: '#fff !important', // Arrow color
+                    },
+                    '& .MuiTableSortLabel-label': {
+                      color: '#fff !important', // Label text color
+                    },
+                  }}
+
                 >
                   <b>Exposure</b>
                 </TableSortLabel>
