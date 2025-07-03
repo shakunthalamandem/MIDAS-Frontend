@@ -38,7 +38,7 @@ const formatNumber = (value: number): string => {
   } else if (absValue >= 1e3) {
     formattedValue = `${(absValue / 1e3).toFixed(1)}K`; // Thousand
   } else {
-    formattedValue = absValue.toString(); // No formatting for values < 1000
+    formattedValue = absValue.toFixed(1); // No formatting for values < 1000
   }
 
   return value < 0 ? `-${formattedValue}` : formattedValue;
