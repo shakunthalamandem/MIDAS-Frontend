@@ -118,8 +118,7 @@ setFilters(defaultFilters); //
   const handleCancel = () => {
     if (!options) return;
     const defaultFilters = {
-      funds: options.funds,
-      from_date: options.from_date || '2025-01-01',
+funds: [],      from_date: options.from_date || '2025-01-01',
       to_date: options.to_date || '',
     };
     setTempFilters(defaultFilters);
