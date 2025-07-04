@@ -86,7 +86,7 @@ const LkFileUpload = () => {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
-      const res = await fetch(`${apiUrl}/api/upload/lk_file/`, {
+      const res = await fetch(`${apiUrl}/api/lk_file_upload/`, {
         method: "POST",
         body: formData,
         headers: {

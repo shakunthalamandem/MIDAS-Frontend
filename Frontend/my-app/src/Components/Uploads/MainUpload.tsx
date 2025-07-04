@@ -62,14 +62,14 @@ const monasheeUploadConfigs = [
   },
   {
     key: "deal_logic",
-    label: "Deal Logic Data",
+    label: "Dealogic Data",
     apiEndpoint: "dealogic_data_upload",
     buttonColor: "secondary",
   },
   {
     key: "lk_file",
-    label: "LK File",
-    apiEndpoint: "upload/lk_file",
+    label: "LK File", 
+    apiEndpoint: "lk_file_upload",
     buttonColor: "warning",
   },
   {
