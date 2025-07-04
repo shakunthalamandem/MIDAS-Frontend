@@ -86,7 +86,7 @@ const LkFileUpload = () => {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
-      const res = await fetch(`${apiUrl}/api/upload/lk_file/`, {
+      const res = await fetch(`${apiUrl}/api/lk_file_upload/`, {
         method: "POST",
         body: formData,
         headers: {
@@ -159,7 +159,7 @@ const LkFileUpload = () => {
               border: "2px dashed #ccc",
               borderRadius: 2,
               p: 3,
-              backgroundColor: "#f9f9f9",
+               background: "linear-gradient(to right, #ffecd2, #fcb69f)",
             }}
           >
             <CloudUploadIcon sx={{ fontSize: 40, color: "#1976d2" }} />
