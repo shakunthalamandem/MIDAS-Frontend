@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
-const FileUpload: React.FC = () => {
+const IPOS1FileUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string>('');
   const [severity, setSeverity] = useState<'success' | 'error' | 'info'>('info');
@@ -75,10 +75,10 @@ const FileUpload: React.FC = () => {
   };
 
   return (
-    <Box sx={{  width: '100%', margin: 'auto', mt: 8, px: 2,ml:4 }}>
-      <Card elevation={3} sx={{ mb: 3, p: 2, backgroundColor: '#f5f1f9',width: '300px',}}>
+    <Box sx={{  width: '100%', margin: 'auto',}}>
+      <Card elevation={3} sx={{ mb: 3, p: 2, backgroundColor: '#f5f1f9'}}>
         <CardContent sx={{ textAlign: 'center' }}>
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h6" gutterBottom color="#002060">
             Upload IPO S1 PDF
           </Typography>
 
@@ -135,4 +135,4 @@ const FileUpload: React.FC = () => {
   );
 };
 
-export default FileUpload;
+export default IPOS1FileUpload;

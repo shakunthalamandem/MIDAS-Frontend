@@ -1,32 +1,28 @@
 import React, { useState, ChangeEvent } from "react";
 import {
   Box,
-  Button,
   Typography,
   Snackbar,
   Alert,
   Container,
   Card,
-  LinearProgress,
-  Grid,
+
   Divider,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
+
   Tabs,
   Tab,
 } from "@mui/material";
 import { RadioGroup, Radio, FormControlLabel } from "@mui/material";
 
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import axios from "axios";
 import { motion } from "framer-motion";
 
 import NewDealDownloadWithFilter from "./NewDealDownloadWithFilter";
 import IpoDashboardCalendar from "../Main/DashBoards/InsightsAi/UploadsInsights/IpoDashboardCalender";
 import Ipos1Download from "../IPOwriteUp/Ipos1Download";
-import FileUpload from "../IPOwriteUp/FileUpload";
+import IPOS1FileUpload from "../IPOwriteUp/IPOS1FileUpload";
+import UploadDataCard from "./UploadDataCard";
+
 
 const uploadConfigs = [
   {
@@ -155,135 +151,29 @@ const MainUpload: React.FC = () => {
 
         {/* Tab Panels */}
         <Box>
-          {selectedTab === 0 && (
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Card
-                elevation={3}
-                sx={{
-                  borderRadius: 3,
-                  p: 3,
-                  background: "linear-gradient(to bottom, #e0eafc, #cfdef3)",
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  color="primary"
-                  align="center"
-                  sx={{ fontWeight: 600 }}
-                >
-                  Upload Data
-                </Typography>
-
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                  <InputLabel id="upload-type-label">
-                    Select Upload Type
-                  </InputLabel>
-                  <Select
-                    labelId="upload-type-label"
-                    id="upload-type"
-                    value={activeUpload}
-                    label="Select Upload Type"
-                    onChange={(e) => {
-                      setActiveUpload(e.target.value);
-                      setFile(null);
-                      setUploadedFileName("");
-                      setError("");
-                    }}
-                  >
-                    {uploadConfigs.map((config) => (
-                      <MenuItem key={config.key} value={config.key}>
-                        {config.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                {activeUpload && (
-                  <Box sx={{ mt: 4 }}>
-                    <Typography
-                      variant="subtitle1"
-                      align="center"
-                      color="textSecondary"
-                      gutterBottom
-                    >
-                      {
-                        uploadConfigs.find((cfg) => cfg.key === activeUpload)
-                          ?.label
-                      }
-                    </Typography>
-
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="center"
-                      justifyContent="center"
-                      gap={2}
-                      sx={{
-                        border: "2px dashed #ccc",
-                        borderRadius: 2,
-                        p: 3,
-                        mt: 2,
-                        backgroundColor: "#fdfdfd",
-                      }}
-                    >
-                      <CloudUploadIcon
-                        sx={{ fontSize: 40, color: "#1976d2" }}
-                      />
-                      <input
-                        accept=".xlsx, .xls"
-                        style={{ display: "none" }}
-                        id="file-upload"
-                        type="file"
-                        onChange={handleFileChange}
-                      />
-                      <label htmlFor="file-upload">
-                        <Button variant="contained" component="span">
-                          Choose File
-                        </Button>
-                      </label>
-
-                      {uploadedFileName && (
-                        <Typography sx={{ mt: 1 }} color="text.secondary">
-                          <strong>Selected:</strong> {uploadedFileName}
-                        </Typography>
-                      )}
-                    </Box>
-
-                    {error && (
-                      <Typography color="error" align="center" sx={{ mt: 2 }}>
-                        {error}
-                      </Typography>
-                    )}
-
-                    <Button
-                      onClick={handleUpload}
-                      fullWidth
-                      variant="contained"
-                      color="success"
-                      sx={{ mt: 3 }}
-                      disabled={uploading}
-                    >
-                      {uploading ? "Uploading..." : "Submit"}
-                    </Button>
-
-                    {uploading && (
-                      <Box sx={{ mt: 2 }}>
-                        <LinearProgress
-                          variant="determinate"
-                          value={uploadProgress}
-                        />
-                      </Box>
-                    )}
-                  </Box>
-                )}
-              </Card>
-            </motion.div>
-          )}
+     {selectedTab === 0 && (
+  <motion.div
+    initial={{ opacity: 0, x: -50 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    <UploadDataCard
+      activeUpload={activeUpload}
+      setActiveUpload={setActiveUpload}
+      file={file}
+      setFile={setFile}
+      uploadedFileName={uploadedFileName}
+      setUploadedFileName={setUploadedFileName}
+      error={error}
+      setError={setError}
+      uploadConfigs={uploadConfigs}
+      handleFileChange={handleFileChange}
+      handleUpload={handleUpload}
+      uploading={uploading}
+      uploadProgress={uploadProgress}
+    />
+  </motion.div>
+)}
 
           {selectedTab === 1 && (
             <motion.div
@@ -308,7 +198,7 @@ const MainUpload: React.FC = () => {
                   Upload IPO Files
                 </Typography>
                 <Divider sx={{ my: 2 }} />
-                <FileUpload />
+                <IPOS1FileUpload />
               </Card>
             </motion.div>
           )}
