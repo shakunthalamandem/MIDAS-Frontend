@@ -130,7 +130,7 @@ const EFRegionwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom align="center">
+      <Typography variant="h5" gutterBottom align="center" color='#025f73'>
         Equity Funds By Region
       </Typography>
       <TableContainer component={Paper}>

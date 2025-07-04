@@ -135,7 +135,7 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom align="center">
+      <Typography variant="h5" gutterBottom align="center" color='#025f73'>
         Equity Funds By Strategy
       </Typography>
       <TableContainer component={Paper}>
