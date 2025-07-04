@@ -46,7 +46,7 @@ const UploadAiInsights: React.FC = () => {
       setErrorMsg(null);
       setSuccessMsg(null);
 
-      const response = await fetch(`${apiUrl}/upload-ai-insights/`, {
+      const response = await fetch(`${apiUrl}/api/upload-ai-insights/`, {
         method: "POST",
         headers: {
           Authorization: token ? `Bearer ${token}` : "",

@@ -32,9 +32,9 @@ const uploadConfigs = [
     buttonColor: "primary",
   },
   {
-    key: "monashee_deals",
-    label: "Upload Monashee Deal Data",
-    apiEndpoint: "monashee_deals_data_upload",
+    key: "ai_insights",
+    label: "Upload AI Insights Data",
+    apiEndpoint: "upload_ai_insights",
     buttonColor: "secondary",
   },
   {
