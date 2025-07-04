@@ -1,8 +1,7 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import AssestTypePnlAttribution from "./AssestTypePnlAttribution";
+import { Box } from "@mui/material";
 import PnLSummary from "./PnLSummary";
-import PnlAttributionTable from "./PnlAttributionTable";
+import FundLevelPNLTable from "./FundLevelPNLTable";
 import RegionWisePnlAttribution from "./RegionWisePnlAttribution";
 
 const PnlAttributionMain = () => {
@@ -13,7 +12,7 @@ const PnlAttributionMain = () => {
       {/* Components section */}
       <>
         <PnLSummary />
-        <PnlAttributionTable />
+        <FundLevelPNLTable />
         <RegionWisePnlAttribution />
       </>
     </Box>

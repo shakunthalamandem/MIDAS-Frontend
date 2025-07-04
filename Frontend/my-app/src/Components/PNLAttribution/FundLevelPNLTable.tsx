@@ -42,7 +42,7 @@ const formatCurrency = (value: number): string => {
   return `${value < 0 ? "-" : ""}$${formatted}${suffix}`;
 };
 
-const PnlAttributionTable: React.FC = () => {
+const FundLevelPNLTable: React.FC = () => {
   const [data, setData] = useState<TableRowData[]>([]);
   const [months, setMonths] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -74,7 +74,7 @@ const PnlAttributionTable: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${apiUrl}/api/pnls_summary/`, {
+        const res = await fetch(`${apiUrl}/api/fund_level_pnl/`, {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
             "Content-Type": "application/json",
@@ -378,4 +378,4 @@ const PnlAttributionTable: React.FC = () => {
   );
 };
 
-export default PnlAttributionTable;
+export default FundLevelPNLTable;
