@@ -180,6 +180,7 @@ const MainUpload: React.FC = () => {
             background: "linear-gradient(to right, #4b6cb7, #182848)",
             borderRadius: 2,
             mb: 4,
+                          fontWeight:600,
             color: "white",
             ".Mui-selected": {
               color: "#ffd700 !important",

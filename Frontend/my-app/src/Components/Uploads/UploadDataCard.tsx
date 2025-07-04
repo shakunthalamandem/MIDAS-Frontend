@@ -51,12 +51,17 @@ const UploadDataCard: React.FC<Props> = ({
   uploadProgress,
 }) => {
   return (
-    <Card
+    <>
+        <Box
+          maxWidth={600}
+          sx={{ mx: "auto", mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}
+        >
+                <Card
       elevation={3}
       sx={{
         borderRadius: 3,
         p: 3,
-        background: "linear-gradient(to bottom, #e0eafc, #cfdef3)",
+        background: "linear-gradient(to bottom,rgb(243, 235, 191),rgb(240, 169, 230))",
       }}
     >
       <Typography
@@ -111,11 +116,11 @@ const UploadDataCard: React.FC<Props> = ({
             justifyContent="center"
             gap={2}
             sx={{
-              border: "2px dashed #ccc",
+                border:'1px solid',
               borderRadius: 2,
               p: 3,
               mt: 2,
-              backgroundColor: "#fdfdfd",
+        background: "linear-gradient(to bottom,rgb(243, 235, 191),rgb(240, 169, 230))",
             }}
           >
             <CloudUploadIcon sx={{ fontSize: 40, color: "#1976d2" }} />
@@ -164,6 +169,10 @@ const UploadDataCard: React.FC<Props> = ({
         </Box>
       )}
     </Card>
+    
+    </Box>
+    </>
+    
   );
 };
 
