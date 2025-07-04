@@ -19,6 +19,7 @@ import IpoDashboardCalendar from "../Main/DashBoards/InsightsAi/UploadsInsights/
 import Ipos1Download from "../IPOwriteUp/Ipos1Download";
 import IPOS1FileUpload from "../IPOwriteUp/IPOS1FileUpload";
 import UploadDataCard from "./UploadDataCard";
+import LkFileUpload from "./LkFileUpload";
 
 const uploadConfigs = [
   {
@@ -65,12 +66,6 @@ const monasheeUploadConfigs = [
     label: "Dealogic Data",
     apiEndpoint: "dealogic_data_upload",
     buttonColor: "secondary",
-  },
-  {
-    key: "lk_file",
-    label: "LK File", 
-    apiEndpoint: "lk_file_upload",
-    buttonColor: "warning",
   },
   {
     key: "market_indices",
@@ -196,6 +191,7 @@ const MainUpload: React.FC = () => {
           <Tab label="IPO Files" />
           <Tab label="Downloads" />
           <Tab label="Calendar" />
+          <Tab label="LK File" />
           
         </Tabs>
 
@@ -284,6 +280,14 @@ const MainUpload: React.FC = () => {
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
               <Card elevation={3} sx={{ borderRadius: 3, pt: 6, p: 2, background: "linear-gradient(to top, #dfe9f3, #ffffff)" }}>
                 <IpoDashboardCalendar />
+              </Card>
+            </motion.div>
+          )}
+
+          {selectedTab === 5 && (
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+              <Card elevation={3} sx={{ borderRadius: 3, pt: 6, p: 2,  background: "linear-gradient(to right, #ffecd2, #fcb69f)" }}>
+                <LkFileUpload />
               </Card>
             </motion.div>
           )}
