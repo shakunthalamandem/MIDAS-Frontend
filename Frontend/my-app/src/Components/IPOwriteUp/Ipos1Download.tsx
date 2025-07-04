@@ -11,13 +11,13 @@ import {
   OutlinedInput,
   Checkbox,
   ListItemText,
-  TextField,
   Typography,
   Snackbar,
   Alert,
   Card,
   CardContent,
   Container,
+  Chip,
 } from "@mui/material";
 
 const ITEM_HEIGHT = 48;
@@ -35,7 +35,6 @@ const MenuProps = {
 const Ipos1Download: React.FC = () => {
   const [tickers, setTickers] = useState<string[]>([]);
   const [selectedDealId, setselectedDealId] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -82,8 +81,8 @@ const Ipos1Download: React.FC = () => {
       deal_id: selectedDealId,
     };
 
-    if (!payload.deal_id.length ) {
-      setError("Please select at least one ticker and a date.");
+    if (!payload.deal_id.length) {
+      setError("Please select at least one ticker.");
       setOpenSnackbar(true);
       return;
     }
@@ -142,17 +141,41 @@ const Ipos1Download: React.FC = () => {
             <CircularProgress />
           ) : (
             <>
+              {/* Dropdown */}
               <FormControl fullWidth margin="normal">
                 <InputLabel id="ticker-label">Tickers</InputLabel>
                 <Select
                   labelId="ticker-label"
                   multiple
                   value={selectedDealId}
-                  onChange={(e) => setselectedDealId(e.target.value as string[])}
+                  onChange={(e) => {
+                    const value = e.target.value as string[];
+                    if (value.includes("all")) {
+                      setselectedDealId(
+                        selectedDealId.length === tickers.length ? [] : tickers
+                      );
+                    } else {
+                      setselectedDealId(value);
+                    }
+                  }}
                   input={<OutlinedInput label="Tickers" />}
-                  renderValue={(selected) => selected.join(", ")}
+                  renderValue={(selected) => {
+                    if (selected.length === 0) return "";
+                    if (selected.length === 1) return selected[0];
+                    return `${selected[0]} +${selected.length - 1}`;
+                  }}
                   MenuProps={MenuProps}
                 >
+                  <MenuItem value="all">
+                    <Checkbox
+                      checked={selectedDealId.length === tickers.length}
+                      indeterminate={
+                        selectedDealId.length > 0 &&
+                        selectedDealId.length < tickers.length
+                      }
+                    />
+                    <ListItemText primary="Select All" />
+                  </MenuItem>
                   {tickers.map((ticker) => (
                     <MenuItem key={ticker} value={ticker}>
                       <Checkbox checked={selectedDealId.includes(ticker)} />
@@ -162,24 +185,42 @@ const Ipos1Download: React.FC = () => {
                 </Select>
               </FormControl>
 
-              {/* <TextField
-                fullWidth
-                variant="outlined"
-                size="small"
-                label="As Of Date"
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                margin="normal"
-              /> */}
+              {/* Chips */}
+              {selectedDealId.length > 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 1,
+                    mt: 2,
+                    p: 1,
+                    borderRadius: 1,
+                    backgroundColor: "#f5f5f5",
+                  }}
+                >
+                  {selectedDealId.map((ticker) => (
+                    <Chip
+                      key={ticker}
+                      label={ticker}
+                      onDelete={() =>
+                        setselectedDealId((prev) =>
+                          prev.filter((t) => t !== ticker)
+                        )
+                      }
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
+                </Box>
+              )}
 
+              {/* Download */}
               <Button
                 variant="contained"
                 color="primary"
                 fullWidth
                 onClick={downloadExcelFile}
-                sx={{ mt: 2 }}
+                sx={{ mt: 3 }}
               >
                 Download
               </Button>
@@ -188,7 +229,11 @@ const Ipos1Download: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+      >
         <Alert
           onClose={() => setOpenSnackbar(false)}
           severity={error ? "error" : "success"}

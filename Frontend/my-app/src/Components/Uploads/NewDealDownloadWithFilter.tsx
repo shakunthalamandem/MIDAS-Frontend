@@ -11,13 +11,13 @@ import {
   OutlinedInput,
   Checkbox,
   ListItemText,
-  TextField,
   Typography,
   Snackbar,
   Alert,
   Card,
   CardContent,
   Container,
+  Chip,
 } from "@mui/material";
 
 const ITEM_HEIGHT = 48;
@@ -35,7 +35,6 @@ const MenuProps = {
 const NewDealDownloadWithFilter: React.FC = () => {
   const [tickers, setTickers] = useState<string[]>([]);
   const [selectedDealId, setselectedDealId] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -83,7 +82,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
     };
 
     if (!payload.deal_id.length) {
-      setError("Please select at least one ticker and a date.");
+      setError("Please select at least one ticker.");
       setOpenSnackbar(true);
       return;
     }
@@ -142,6 +141,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
             <CircularProgress />
           ) : (
             <>
+              {/* Select Dropdown */}
               <FormControl fullWidth margin="normal">
                 <InputLabel id="ticker-label">Tickers</InputLabel>
                 <Select
@@ -152,7 +152,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
                     const value = e.target.value as string[];
 
                     if (value.includes("all")) {
-                      // If all is selected, either select all or clear all
+                      // If all is selected, toggle between select all / clear all
                       setselectedDealId(
                         selectedDealId.length === tickers.length ? [] : tickers
                       );
@@ -161,7 +161,11 @@ const NewDealDownloadWithFilter: React.FC = () => {
                     }
                   }}
                   input={<OutlinedInput label="Tickers" />}
-                  renderValue={(selected) => selected.join(", ")}
+                  renderValue={(selected) => {
+                    if (selected.length === 0) return "";
+                    if (selected.length === 1) return selected[0];
+                    return `${selected[0]} +${selected.length - 1}`;
+                  }}
                   MenuProps={MenuProps}
                 >
                   <MenuItem value="all">
@@ -183,24 +187,42 @@ const NewDealDownloadWithFilter: React.FC = () => {
                 </Select>
               </FormControl>
 
-              {/* <TextField
-                fullWidth
-                variant="outlined"
-                size="small"
-                label="As Of Date"
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                margin="normal"
-              /> */}
+              {/* Selected Items as Chips */}
+              {selectedDealId.length > 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 1,
+                    mt: 2,
+                    p: 1,
+                    borderRadius: 1,
+                    backgroundColor: "#f5f5f5",
+                  }}
+                >
+                  {selectedDealId.map((ticker) => (
+                    <Chip
+                      key={ticker}
+                      label={ticker}
+                      onDelete={() =>
+                        setselectedDealId((prev) =>
+                          prev.filter((t) => t !== ticker)
+                        )
+                      }
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
+                </Box>
+              )}
 
+              {/* Download Button */}
               <Button
                 variant="contained"
                 color="primary"
                 fullWidth
                 onClick={downloadExcelFile}
-                sx={{ mt: 2 }}
+                sx={{ mt: 3 }}
               >
                 Download
               </Button>
@@ -209,6 +231,7 @@ const NewDealDownloadWithFilter: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Snackbar for feedback */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
