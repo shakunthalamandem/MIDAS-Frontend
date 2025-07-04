@@ -17,6 +17,9 @@ import {
   ListItemText,
 } from '@mui/material';
 import PnlTables from '../PNLPages/PnlTables';
+import EFStrategywise from './EFStrategywise';
+import EFSectorwise from './EFSectorwise';
+import EFRegionwise from './EFRegionwise';
 
 interface FilterOptions {
   funds: string[];
@@ -56,17 +59,17 @@ const PNLPagesMain = () => {
         if (!response.ok) throw new Error('Failed to fetch filter options');
 
 
-const data = await response.json();
-setOptions(data);
+        const data = await response.json();
+        setOptions(data);
 
-const defaultFilters = {
-  funds: [],  // Empty funds by default
-  from_date: data.from_date || '2025-01-01',
-  to_date: data.to_date || '',
-};
+        const defaultFilters = {
+          funds: [],  // Empty funds by default
+          from_date: data.from_date || '2025-01-01',
+          to_date: data.to_date || '',
+        };
 
-setTempFilters(defaultFilters);
-setFilters(defaultFilters); //
+        setTempFilters(defaultFilters);
+        setFilters(defaultFilters); //
 
       } catch (err: any) {
         setError(err.message || 'Something went wrong');
@@ -118,7 +121,7 @@ setFilters(defaultFilters); //
   const handleCancel = () => {
     if (!options) return;
     const defaultFilters = {
-funds: [],      from_date: options.from_date || '2025-01-01',
+      funds: [], from_date: options.from_date || '2025-01-01',
       to_date: options.to_date || '',
     };
     setTempFilters(defaultFilters);
@@ -143,7 +146,7 @@ funds: [],      from_date: options.from_date || '2025-01-01',
   }
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <Box p={3} bgcolor="#fafafa" borderRadius={2} boxShadow={2}>
         <Typography variant="h5" gutterBottom color="#002060">
           P&L & Risk
@@ -159,26 +162,26 @@ funds: [],      from_date: options.from_date || '2025-01-01',
                 multiple
                 value={
                   options?.funds &&
-                  tempFilters.funds.length === options.funds.length
+                    tempFilters.funds.length === options.funds.length
                     ? ['All']
                     : tempFilters.funds
                 }
                 onChange={handleMultiSelectChange}
                 input={<OutlinedInput label="Funds" />}
                 renderValue={(selected) => {
-  const selectedItems =
-    selected.includes('All') && options?.funds
-      ? options.funds
-      : selected;
+                  const selectedItems =
+                    selected.includes('All') && options?.funds
+                      ? options.funds
+                      : selected;
 
-  if (selectedItems.length <= 1) {
-    return selectedItems.join(', ');
-  } else {
-    const visible = selectedItems.slice(0, 1).join(', ');
-    const remainingCount = selectedItems.length - 1;
-    return `${visible}, +${remainingCount} more`;
-  }
-}}
+                  if (selectedItems.length <= 1) {
+                    return selectedItems.join(', ');
+                  } else {
+                    const visible = selectedItems.slice(0, 1).join(', ');
+                    const remainingCount = selectedItems.length - 1;
+                    return `${visible}, +${remainingCount} more`;
+                  }
+                }}
 
                 MenuProps={{
                   PaperProps: {
@@ -190,16 +193,16 @@ funds: [],      from_date: options.from_date || '2025-01-01',
               >
                 <MenuItem value="All">
                   <Checkbox
-  checked={
-    !!options?.funds &&
-    tempFilters.funds.length === options.funds.length
-  }
-  indeterminate={
-    !!options?.funds &&
-    tempFilters.funds.length > 0 &&
-    tempFilters.funds.length < options.funds.length
-  }
-/>
+                    checked={
+                      !!options?.funds &&
+                      tempFilters.funds.length === options.funds.length
+                    }
+                    indeterminate={
+                      !!options?.funds &&
+                      tempFilters.funds.length > 0 &&
+                      tempFilters.funds.length < options.funds.length
+                    }
+                  />
 
                   <ListItemText primary="All" />
                 </MenuItem>
@@ -258,8 +261,22 @@ funds: [],      from_date: options.from_date || '2025-01-01',
         </Grid>
 
         {filters && (
-          <Box mt={3}>
-            {/* <PnlTables selectedFilters={filters} /> */}
+          <Box mt={5}>
+            <Grid container spacing={2}>
+              {/* Uncomment and add your tables here */}
+              {/* <Grid item xs={12} md={4}>
+                <PnlTables selectedFilters={filters} />
+                  </Grid> */}
+              <Grid item xs={12} md={4}>
+                <EFStrategywise selectedFilters={filters} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <EFSectorwise selectedFilters={filters} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <EFRegionwise selectedFilters={filters} />
+              </Grid>
+            </Grid>
           </Box>
         )}
       </Box>
