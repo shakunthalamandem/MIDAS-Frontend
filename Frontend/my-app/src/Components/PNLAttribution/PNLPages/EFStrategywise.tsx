@@ -191,7 +191,7 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                     },
                   }}
                 >
-                  <b>PnL</b>
+                  <b>P&L</b>
                 </TableSortLabel>
               </TableCell>
               <TableCell
