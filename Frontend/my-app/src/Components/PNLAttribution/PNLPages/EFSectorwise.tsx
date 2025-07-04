@@ -130,7 +130,7 @@ const EFSectorwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom align="center" color='#025f73'>
+      <Typography variant="h6" gutterBottom align="center" color='#025f73' fontWeight={600}>
         Equity Funds By Sector
       </Typography>
       <TableContainer component={Paper}>

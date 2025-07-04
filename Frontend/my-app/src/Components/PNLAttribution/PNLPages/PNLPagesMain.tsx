@@ -147,7 +147,10 @@ const PNLPagesMain = () => {
 
   return (
     <Container maxWidth="xl">
-      <Box p={3} bgcolor="#fafafa" borderRadius={2} boxShadow={2}>
+      <Box p={2}  mb={2} sx={{   background: 'linear-gradient(to right, #c9ffbf,rgb(253, 210, 217))' 
+
+
+}} borderRadius={2} boxShadow={2}>
         <Typography variant="h5" gutterBottom color="#002060" align='center' fontWeight="bold" mb={2}>
     Equity Distribution        </Typography>
 
