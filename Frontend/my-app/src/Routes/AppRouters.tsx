@@ -61,6 +61,7 @@ import PNLTabMain from "../Components/PNLAttribution/PNLTabMain";
 import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedRegionView";
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
+import PNLPagesMain from "../Components/PNLAttribution/PNLTabMain";
 
 
 
@@ -203,6 +204,11 @@ const AppRouters: React.FC = () => {
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
+
+        <Route path="/pnldata" element={<AuthGuard><PNLPagesMain/></AuthGuard>} />
+
+
+        
 
         <Route path="/detailed-deals" element={<AuthGuard><DetailedDealsView /></AuthGuard>} />
         <Route path="/detailed-banks" element={<AuthGuard><DetailedLeadBankView /></AuthGuard>} />

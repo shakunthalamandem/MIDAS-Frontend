@@ -113,7 +113,7 @@ const PNLTabMain = () => {
                 </Box>
               }
             />
-                    <FormControlLabel
+                    {/* <FormControlLabel
               value="datagrid"
               control={
                 <Radio
@@ -131,7 +131,7 @@ const PNLTabMain = () => {
                   <Typography variant="h6">Equity Distribution</Typography>
                 </Box>
               }
-            />
+            /> */}
           </RadioGroup>
         </FormControl>
       </Box>
@@ -143,9 +143,9 @@ const PNLTabMain = () => {
       <Fade in={selectedView === "tables"} timeout={400} mountOnEnter unmountOnExit>
         <Box>{selectedView === "tables" && <PnlAttributionMain />}</Box>
       </Fade>
-      <Fade in={selectedView === "datagrid"} timeout={400} mountOnEnter unmountOnExit>
+      {/* <Fade in={selectedView === "datagrid"} timeout={400} mountOnEnter unmountOnExit>
         <Box>{selectedView === "datagrid" && <PNLPagesMain />}</Box>
-      </Fade>
+      </Fade> */}
     </Box>
   );
 };
