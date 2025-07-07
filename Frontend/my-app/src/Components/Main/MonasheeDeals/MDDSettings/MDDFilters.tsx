@@ -14,6 +14,8 @@ import {
   RadioGroup,
   Radio,
   TextField,
+  MenuItem,
+  Select,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { LoadingButton } from "@mui/lab";
@@ -47,7 +49,6 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     [key: string]: (string | number)[];
   }>({});
 
-  const [expanded, setExpanded] = useState<string | false>(false);
   const [payload, setPayload] = useState<{
     [key: string]: (string | number)[];
   }>({});
@@ -171,189 +172,283 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     handleSubmit(resetSelectedValues);
   };
 
+const renderFilter = (filter: Filter) => {
+  const key = Object.keys(filter)[0];
+  const { options, label } = filter[key];
+
+  const filteredOptions =
+    label === "Lead Bank" && searchKey === key
+      ? options.filter((option) =>
+          option.toString().toLowerCase().includes(searchValue)
+        )
+      : options;
+
+    // Special case for Lead Bank (with search)
+    if (label === "Lead Bank") {
+      return (
+        <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
+          <Typography variant="subtitle2" color="#002060" mb={1} sx={{ fontWeight: 600 }}>
+            {label}
+          </Typography>
+          <Select
+            multiple
+            value={selectedValues[key] || []}
+            onChange={(e) => {
+              const value = e.target.value;
+              handleSelectionChange(key, typeof value === "string" ? [value] : value);
+            }}
+            displayEmpty
+            size="small"
+            sx={{ width: "100%", background: "#e6ebf5" }}
+            renderValue={(selected) => {
+              if (!selected || (Array.isArray(selected) && selected.length === 0)) {
+                return <span style={{ color: "#888" }}>Select {label}</span>;
+              }
+              if (Array.isArray(selected)) {
+                return selected.length > 1
+                  ? `${selected[0]} +${selected.length - 1}`
+                  : selected[0];
+              }
+              return selected;
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: { maxHeight: 300, minWidth: 100 },
+              },
+            }}
+          >
+            <MenuItem disableRipple disableTouchRipple disableGutters>
+              <TextField
+                size="small"
+                placeholder="Search"
+                autoFocus
+                value={searchKey === key ? searchValue : ""}
+                onChange={(e) => handleSearchChange(e.target.value, key)}
+                sx={{ mb: 1, width: "100%" }}
+                onClick={e => e.stopPropagation()}
+              />
+            </MenuItem>
+            {filteredOptions.map((option) => (
+              <MenuItem key={option} value={option} sx={{   width :30,}}>
+                <Checkbox
+                  checked={selectedValues[key]?.includes(option) || false}
+                  sx={{
+                    color: "#002060",
+                    "&.Mui-checked": { color: "#FF8C00" },
+                  }}
+                />
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      );
+    }
+
+    if (key === "period") {
+      return (
+        <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
+          <Typography variant="subtitle2" color="#002060" mb={1} sx={{ fontWeight: 600 }}>
+            {label}
+          </Typography>
+          <Select
+            value={selectedValues[key]?.[0] || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              handleSelectionChange(key, [value]);
+            }}
+            displayEmpty
+            size="small"
+            sx={{ width: "100%", background: "#e6ebf5" }}
+            renderValue={(selected) => {
+              if (!selected || selected === "") {
+                return <span style={{ color: "#888" }}>Select {label}</span>;
+              }
+              return selected;
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: { maxHeight: 300, minWidth: 150 },
+              },
+            }}
+          >
+            {options.map((option) => (
+              <MenuItem key={option} value={option}>
+                <Radio
+                  checked={selectedValues[key]?.[0] === option}
+                  sx={{ color: "#FF8C00" }}
+                />
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      );
+    }
+
+    if (key === "year") {
+      return (
+        <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
+          <Typography variant="subtitle2" color="#002060" mb={1} sx={{ fontWeight: 600 }}>
+            {label}
+          </Typography>
+          <Select
+            multiple
+            value={selectedValues[key] || []}
+            onChange={(e) => {
+              const value = e.target.value;
+              handleSelectionChange(key, typeof value === "string" ? [value] : value);
+            }}
+            displayEmpty
+            size="small"
+            sx={{ width: "100%", background: "#e6ebf5" }}
+            renderValue={(selected) => {
+              if (!selected || (Array.isArray(selected) && selected.length === 0)) {
+                return <span style={{ color: "#888" }}>Select {label}</span>;
+              }
+              if (Array.isArray(selected)) {
+                return selected.length > 1
+                  ? `${selected[0]} +${selected.length - 1}`
+                  : selected[0];
+              }
+              return selected;
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: { maxHeight: 200, minWidth: 150, background: "#f5f5f5" }, // scroll and bg color
+              },
+            }}
+          >
+            {options.map((option) => (
+              <MenuItem key={option} value={option}>
+                <Checkbox
+                  checked={selectedValues[key]?.includes(option) || false}
+                  sx={{
+                    color: "#002060",
+                    "&.Mui-checked": { color: "#FF8C00" },
+                  }}
+                />
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      );
+    }
+
+    return (
+      <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
+        <Typography variant="subtitle2" color="#002060" mb={1} sx={{ fontWeight: 600 }}>
+          {label}
+        </Typography>
+        <Select
+          multiple
+          value={selectedValues[key] || []}
+          onChange={(e) => {
+            const value = e.target.value;
+            handleSelectionChange(key, typeof value === "string" ? [value] : value);
+          }}
+          displayEmpty
+          size="small"
+          sx={{ width: "100%", background: "#e6ebf5" }}
+          renderValue={(selected) => {
+            if (!selected || (Array.isArray(selected) && selected.length === 0)) {
+              return <span style={{ color: "#888" }}>Select {label}</span>;
+            }
+            if (Array.isArray(selected)) {
+              return selected.length > 1
+                ? `${selected[0]} +${selected.length - 1}`
+                : selected[0];
+            }
+            return selected;
+          }}
+          MenuProps={{
+            PaperProps: {
+              style: { maxHeight: 180, minWidth: 150 },
+            },
+          }}
+        >
+          {options.map((option) => (
+            <MenuItem key={option} value={option}>
+              <Checkbox
+                checked={selectedValues[key]?.includes(option) || false}
+                sx={{
+                  color: "#002060",
+                  "&.Mui-checked": { color: "#FF8C00" },
+                }}
+              />
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+    );
+  };
   return (
     <Box
       sx={{
         padding: 0,
         marginBottom: 20,
         display: "flex",
-        marginLeft: 0,
-        marginTop: 0,
+        flexDirection: "column",
         width: "100%",
-        flexWrap: "wrap"
       }}
     >
-      <Box width="320px" sx={{ marginRight: 5, marginLeft: 5 }}>
-        <Card
-          sx={{ borderRadius: 2, boxShadow: 3, backgroundColor: "#e6ebf5" }}
-        >
+      
+      {/* Filters inside a Card */}
+      <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+        <Card sx={{ width: "80%", mb: 2 }}>
           <CardContent>
-            <Box width="250px" sx={{ p: 2 }}>
-              <Typography variant="h5" color="#002060" mb={4}>
-                Monashee Deals Filters
-              </Typography>
-              {filtersData
-                .filter((filter) => {
-                  const key = Object.keys(filter)[0];
-                  return !(
-                    (apiName === "fo_discount" &&
-                      (key === "deal_type" || key === "period")) ||
-                    (apiName === "gap_analysis" && key === "period") ||
-                    (apiName === "by_bank" &&
-                      (key === "period" ||
-                        key === "selected_bank" ||
-                        key === "deal_captain"))
-                  );
-                })
-                .map((filter) => {
-                  const key = Object.keys(filter)[0];
-                  const { options, label } = filter[key];
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                width: "100%",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 2,
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                  alignItems: "flex-end",
+                  maxHeight: 100,
+                  overflowY: "auto", 
+                }}
+              >
+                {filtersData
+                  .filter((filter) => {
+                    const key = Object.keys(filter)[0];
+                    return !(
+                      (apiName === "fo_discount" && (key === "deal_type" || key === "period")) ||
+                      (apiName === "gap_analysis" && key === "period") ||
+                      (apiName === "by_bank" &&
+                        (key === "period" || key === "selected_bank" || key === "deal_captain"))
+                    );
+                  })
+                  .map(renderFilter)}
+              </Box>
 
-                  const filteredOptions =
-                    label === "Lead Bank" && searchKey === key
-                      ? options.filter((option) =>
-                          option.toString().toLowerCase().includes(searchValue)
-                        )
-                      : options;
 
-                  const isPeriodFilter = key === "period";
-
-                  return (
-                    <Accordion
-                      key={key}
-                      expanded={expanded === key}
-                      onChange={() =>
-                        setExpanded(expanded === key ? false : key)
-                      }
-                      sx={{
-                        marginBottom: "10px",
-                        "&:before": {
-                          display: "none",
-                        },
-                      }}
-                    >
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
-                        aria-controls={`${key}-content`}
-                        id={`${key}-header`}
-                        sx={{
-                          backgroundColor: "#002060",
-                          color: "white",
-                          "& .MuiAccordionSummary-content": {
-                            color: "white",
-                          },
-                          transition: "background-color 0.3s ease",
-                          "&:hover": {
-                            backgroundColor: "#004080",
-                          },
-                        }}
-                      >
-                        <Typography sx={{ fontWeight: "bold" }}>
-                          {label}
-                        </Typography>
-                      </AccordionSummary>
-                      {label === "Lead Bank" && (
-                        <div
-                          style={{
-                            backgroundColor: "#f1f1f1",
-                            padding: "10px 20px",
-                            borderRadius: "5px",
-                            textAlign: "left",
-                            maxHeight: "200px",
-                          }}
-                        >
-                          <TextField
-                            size="small"
-                            placeholder="Search"
-                            value={searchKey === key ? searchValue : ""}
-                            onChange={(e) =>
-                              handleSearchChange(e.target.value, key)
-                            }
-                            sx={{ mb: 2 }}
-                          />
-                        </div>
-                      )}
-                      <AccordionDetails
-                        sx={{
-                          backgroundColor: "#f1f1f1",
-                          padding: "10px 20px",
-                          borderRadius: "5px",
-                          textAlign: "left",
-                          maxHeight: "200px",
-                          overflowY: "scroll",
-                        }}
-                      >
-                        {isPeriodFilter ? (
-                          <RadioGroup
-                            value={selectedValues[key]?.[0] || ""}
-                            onChange={(e) =>
-                              handleSingleSelectionChange(key, e.target.value)
-                            }
-                          >
-                            {options.map((option) => (
-                              <FormControlLabel
-                                key={option}
-                                value={option}
-                                control={<Radio sx={{ color: "#FF8C00" }} />}
-                                label={option}
-                              />
-                            ))}
-                          </RadioGroup>
-                        ) : (
-                          filteredOptions.map((option) => (
-                            <FormControlLabel
-                              key={option}
-                              control={
-                                <Checkbox
-                                  key={`${key}-${option}-${selectedValues[key]?.includes(option)}`}
-                                  checked={selectedValues[key]?.includes(
-                                    option
-                                  )}
-                                  onChange={() => {
-                                    const newValues = selectedValues[
-                                      key
-                                    ]?.includes(option)
-                                      ? selectedValues[key].filter(
-                                          (item) => item !== option
-                                        )
-                                      : [
-                                          ...(selectedValues[key] || []),
-                                          option,
-                                        ];
-                                    handleSelectionChange(key, newValues);
-                                  }}
-                                  sx={{
-                                    "&.Mui-checked": {
-                                      color: "#FF8C00",
-                                    },
-                                    transition: "all 0.3s ease",
-                                    paddingLeft: 0,
-                                  }}
-                                />
-                              }
-                              label={option}
-                              sx={{
-                                display: "flex",
-                                justifyContent: "flex-start",
-                              }}
-                            />
-                          ))
-                        )}
-                      </AccordionDetails>
-                    </Accordion>
-                  );
-                })}
-
-              <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 2,
+                  mt: 1,
+                }}
+              >
                 <LoadingButton
                   variant="contained"
                   onClick={() => handleSubmit()}
                   sx={{
-                    mr: 2,
                     bgcolor: "#002060",
-                    "&:hover": {
-                      backgroundColor: "#004080",
-                    },
+                    "&:hover": { backgroundColor: "#004080" },
+                    width: "100px",
                   }}
                 >
                   Apply
@@ -363,9 +458,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                   color="secondary"
                   onClick={() => resetFilters(handleCancel)}
                   sx={{
-                    "&:hover": {
-                      backgroundColor: "#FF8C00",
-                    },
+                    "&:hover": { backgroundColor: "#FF8C00" },
+                    width: "100px",
                   }}
                 >
                   Reset
@@ -375,15 +469,10 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </CardContent>
         </Card>
       </Box>
+
       <Box width="100%" mt={1} flex={1}>
         {loading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress color="primary" />
             <Typography sx={{ mt: 2, color: "#555", fontSize: "1.2rem" }}>
               Loading... Please Wait
@@ -391,12 +480,8 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
           </Box>
         ) : (
           <>
-           
             {apiName === "gap_analysis" ? (
-              <Gap
-                selectedFilters={appliedFilters}
-                handleCancel={handleCancel}
-              />
+              <Gap selectedFilters={appliedFilters} handleCancel={handleCancel} />
             ) : apiName === "fo_discount" ? (
               <AvgFoDiscountChart data={apiData} handleCancel={handleCancel} />
             ) : apiName === "by_bank" ? (
@@ -404,10 +489,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
             ) : (
               <>
                 <DealStatsGraph selectedFilters={appliedFilters} />
-                <MDDScreenergrid
-                  sectorwiseData={payload}
-                  handleCancel={handleCancel}
-                />
+                <MDDScreenergrid sectorwiseData={payload} handleCancel={handleCancel} />
               </>
             )}
           </>
@@ -415,7 +497,9 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
       </Box>
     </Box>
   );
+
 };
+
 export const resetFilters = (handleCancel: () => void) => {
   handleCancel();
 };
