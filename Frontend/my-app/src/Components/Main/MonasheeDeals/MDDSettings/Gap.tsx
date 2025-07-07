@@ -5,6 +5,7 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  Container,
   CircularProgress,
 } from "@mui/material";
 import DealTypeComponent from "./DealTypeComponent";
@@ -97,7 +98,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters, handleCancel }) => {
     resetFilters(handleCancel); // Reset filters when closing popup
   };
   return (
-    <Box>
+    <Container maxWidth="xl">
       <Box
         sx={{
           background: "linear-gradient(to right, #190250, #6DD5ED)",
@@ -189,7 +190,7 @@ const Gap: React.FC<GapProps> = ({ selectedFilters, handleCancel }) => {
         open={noDataPopupOpen}
         onClose={handleClosePopup}
       />
-    </Box>
+    </Container>
   );
 };
 

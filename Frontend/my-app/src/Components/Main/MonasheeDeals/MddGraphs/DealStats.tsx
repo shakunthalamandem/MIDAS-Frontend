@@ -9,8 +9,8 @@ const DealStats = () => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      marginTop={10}
       textAlign="center"
+      bgcolor={'#002060'}
     >
 
       <MddMain apiName="mdd_deals_graph" />
