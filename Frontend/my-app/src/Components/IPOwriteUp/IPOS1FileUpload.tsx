@@ -8,17 +8,20 @@ import {
   CardContent,
   Snackbar,
   Alert,
+  TextField,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const IPOS1FileUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [market, setMarket] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [severity, setSeverity] = useState<'success' | 'error' | 'info'>('info');
   const [loading, setLoading] = useState<boolean>(false);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
-    const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
     if (selectedFile?.type !== 'application/pdf') {
@@ -33,6 +36,10 @@ const IPOS1FileUpload: React.FC = () => {
     setMessage('');
   };
 
+  const handleMarketChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setMarket(e.target.value);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -43,14 +50,22 @@ const IPOS1FileUpload: React.FC = () => {
       return;
     }
 
+    if (!market.trim()) {
+      setMessage('Please enter a market (e.g., US or HK).');
+      setSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('market', market.trim());
 
     setLoading(true);
     setSnackbarOpen(false);
 
     try {
-    const response = await fetch(`${apiUrl}/api/upload_s1/`, {
+      const response = await fetch(`${apiUrl}/api/upload_s1/`, {
         method: 'POST',
         body: formData,
       });
@@ -75,12 +90,14 @@ const IPOS1FileUpload: React.FC = () => {
   };
 
   return (
-    <Box sx={{  width: '100%', margin: 'auto',}}>
-      <Card elevation={3} sx={{ mb: 3, p: 2, backgroundColor: '#f5f1f9'}}>
+    <Box sx={{ width: '100%', margin: 'auto' }}>
+      <Card elevation={3} sx={{ mb: 3, p: 2, backgroundColor: '#f5f1f9' }}>
         <CardContent sx={{ textAlign: 'center' }}>
           <Typography variant="h6" gutterBottom color="#002060">
             Upload IPO S1 PDF
           </Typography>
+
+          
 
           <Button
             variant="outlined"
@@ -97,6 +114,15 @@ const IPOS1FileUpload: React.FC = () => {
             />
           </Button>
 
+          <TextField
+            label="Market (e.g., US or HK)"
+            value={market}
+            onChange={handleMarketChange}
+            variant="outlined"
+            fullWidth
+            sx={{ mt: 2 }}
+          />
+
           {file && (
             <Typography variant="body2" sx={{ mt: 2 }}>
               Selected: {file.name}
@@ -108,7 +134,7 @@ const IPOS1FileUpload: React.FC = () => {
               type="submit"
               variant="contained"
               color="primary"
-              disabled={loading || !file}
+              disabled={loading || !file || !market.trim()}
               fullWidth
             >
               {loading ? <CircularProgress size={24} color="inherit" /> : 'Upload'}
