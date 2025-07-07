@@ -10,7 +10,7 @@ const DealStats = () => {
       justifyContent="center"
       alignItems="center"
       textAlign="center"
-      bgcolor={'#002060'}
+      bgcolor={'#f4f6fa'}
     >
 
       <MddMain apiName="mdd_deals_graph" />
