@@ -45,7 +45,6 @@ const DealDetailedGapAnalysis: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const apiName = "deal_detailed_gap_analysis";
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
@@ -59,7 +58,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({}), // Add any necessary payload
+        body: JSON.stringify({}), 
       });
 
       const json = await response.json();
@@ -98,7 +97,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom color="primary">
+      <Typography variant="h5" gutterBottom color="#002060" align="center">
         Deal Detailed Gap Analysis
       </Typography>
       {loading ? (
@@ -107,17 +106,38 @@ const DealDetailedGapAnalysis: React.FC = () => {
         </Grid>
       ) : (
         <Paper elevation={3} sx={{ borderRadius: 4, p: 2, bgcolor: "background.paper" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            autoHeight
-            disableRowSelectionOnClick
-            sx={{
-              "& .MuiDataGrid-columnHeaders": { bgcolor: "#f0f4f8", color: "#333" },
-              "& .MuiDataGrid-row:nth-of-type(odd)": { bgcolor: "#fafafa" },
-              "& .MuiDataGrid-cell": { color: "#555" },
-            }}
-          />
+ <DataGrid
+  rows={rows}
+  columns={columns}
+  autoHeight
+  disableRowSelectionOnClick
+  sx={{
+    fontSize: "0.75rem", // Reduce overall font size
+    "& .MuiDataGrid-columnHeaders": {
+      bgcolor: "#f0f0f0",
+      color: "#002060",
+      minHeight: "32px",
+      maxHeight: "32px",
+      fontSize: "0.75rem",
+    },
+    "& .MuiDataGrid-columnHeaderTitle": {
+      fontWeight: "bold",
+    },
+    "& .MuiDataGrid-row": {
+      minHeight: "32px !important",
+      maxHeight: "32px !important",
+    },
+    "& .MuiDataGrid-cell": {
+      color: "#555",
+      lineHeight: "1.2",
+      padding: "4px 4px",
+    },
+    "& .MuiDataGrid-row:nth-of-type(odd)": {
+      bgcolor: "#fafafa",
+    },
+  }}
+/>
+
         </Paper>
       )}
     </Box>

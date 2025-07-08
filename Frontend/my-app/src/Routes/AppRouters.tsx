@@ -208,7 +208,7 @@ const AppRouters: React.FC = () => {
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
         <Route path="/pnldata" element={<AuthGuard><PNLPagesMain/></AuthGuard>} />
-        <Route path="/deatiled_gapanalysis" element={<AuthGuard><DealDetailedGapAnalysis /></AuthGuard>} />
+        <Route path="/gap_report" element={<AuthGuard><DealDetailedGapAnalysis /></AuthGuard>} />
 
 
         
