@@ -7,17 +7,12 @@ import {
   Card,
   CardContent,
   CircularProgress,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  FormControlLabel,
-  RadioGroup,
+  Container,
   Radio,
   TextField,
   MenuItem,
   Select,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { LoadingButton } from "@mui/lab";
 import AvgFoDiscountChart from "./AvgFoDiscountChart";
 import MDDScreenergrid from "./MDDScreenergrid";
@@ -183,163 +178,41 @@ const renderFilter = (filter: Filter) => {
         )
       : options;
 
-    // Special case for Lead Bank (with search)
-    if (label === "Lead Bank") {
-      return (
-        <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
-          <Typography variant="subtitle2" color="#002060" mb={1} sx={{ fontWeight: 600 }}>
-            {label}
-          </Typography>
-          <Select
-            multiple
-            value={selectedValues[key] || []}
-            onChange={(e) => {
-              const value = e.target.value;
-              handleSelectionChange(key, typeof value === "string" ? [value] : value);
-            }}
-            displayEmpty
-            size="small"
-            sx={{ width: "100%", background: "#e6ebf5" }}
-            renderValue={(selected) => {
-              if (!selected || (Array.isArray(selected) && selected.length === 0)) {
-                return <span style={{ color: "#888" }}>Select {label}</span>;
-              }
-              if (Array.isArray(selected)) {
-                return selected.length > 1
-                  ? `${selected[0]} +${selected.length - 1}`
-                  : selected[0];
-              }
-              return selected;
-            }}
-            MenuProps={{
-              PaperProps: {
-                style: { maxHeight: 300, minWidth: 100 },
-              },
-            }}
-          >
-            <MenuItem disableRipple disableTouchRipple disableGutters>
-              <TextField
-                size="small"
-                placeholder="Search"
-                autoFocus
-                value={searchKey === key ? searchValue : ""}
-                onChange={(e) => handleSearchChange(e.target.value, key)}
-                sx={{ mb: 1, width: "100%" }}
-                onClick={e => e.stopPropagation()}
-              />
-            </MenuItem>
-            {filteredOptions.map((option) => (
-              <MenuItem key={option} value={option} sx={{   width :30,}}>
-                <Checkbox
-                  checked={selectedValues[key]?.includes(option) || false}
-                  sx={{
-                    color: "#002060",
-                    "&.Mui-checked": { color: "#FF8C00" },
-                  }}
-                />
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-      );
-    }
+  const commonSelectStyles = {
+    width: "100%",
+    fontSize: "0.8rem",
+    "& .MuiSelect-select": {
+      fontSize: "0.8rem",
+      padding: "0.3rem 0.5rem",
+    },
+  };
 
-    if (key === "period") {
-      return (
-        <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
-          <Typography variant="subtitle2" color="#002060" mb={1} sx={{ fontWeight: 600 }}>
-            {label}
-          </Typography>
-          <Select
-            value={selectedValues[key]?.[0] || ""}
-            onChange={(e) => {
-              const value = e.target.value;
-              handleSelectionChange(key, [value]);
-            }}
-            displayEmpty
-            size="small"
-            sx={{ width: "100%", background: "#e6ebf5" }}
-            renderValue={(selected) => {
-              if (!selected || selected === "") {
-                return <span style={{ color: "#888" }}>Select {label}</span>;
-              }
-              return selected;
-            }}
-            MenuProps={{
-              PaperProps: {
-                style: { maxHeight: 300, minWidth: 150 },
-              },
-            }}
-          >
-            {options.map((option) => (
-              <MenuItem key={option} value={option}>
-                <Radio
-                  checked={selectedValues[key]?.[0] === option}
-                  sx={{ color: "#FF8C00" }}
-                />
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-      );
-    }
+  const commonMenuItemStyles = {
+    fontSize: "0.8rem",
+    pl: 1,
+    pr: 1,
+    py: 0.5,
+    alignItems: "center",
+  };
 
-    if (key === "year") {
-      return (
-        <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
-          <Typography variant="subtitle2" color="#002060" mb={1} sx={{ fontWeight: 600 }}>
-            {label}
-          </Typography>
-          <Select
-            multiple
-            value={selectedValues[key] || []}
-            onChange={(e) => {
-              const value = e.target.value;
-              handleSelectionChange(key, typeof value === "string" ? [value] : value);
-            }}
-            displayEmpty
-            size="small"
-            sx={{ width: "100%", background: "#e6ebf5" }}
-            renderValue={(selected) => {
-              if (!selected || (Array.isArray(selected) && selected.length === 0)) {
-                return <span style={{ color: "#888" }}>Select {label}</span>;
-              }
-              if (Array.isArray(selected)) {
-                return selected.length > 1
-                  ? `${selected[0]} +${selected.length - 1}`
-                  : selected[0];
-              }
-              return selected;
-            }}
-            MenuProps={{
-              PaperProps: {
-                style: { maxHeight: 200, minWidth: 150, background: "#f5f5f5" }, // scroll and bg color
-              },
-            }}
-          >
-            {options.map((option) => (
-              <MenuItem key={option} value={option}>
-                <Checkbox
-                  checked={selectedValues[key]?.includes(option) || false}
-                  sx={{
-                    color: "#002060",
-                    "&.Mui-checked": { color: "#FF8C00" },
-                  }}
-                />
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-      );
-    }
+  const commonCheckboxStyles = {
+    color: "#002060",
+    "&.Mui-checked": { color: "#FF8C00" },
+    p: 0.5,
+    mr: 1,
+  };
 
+  const labelStyle = {
+    // fontWeight: 600,
+    fontSize: "0.8rem",
+    textAlign: "left",
+  };
+
+  if (label === "Lead Bank") {
     return (
       <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
-        <Typography variant="subtitle2" color="#002060" mb={1} sx={{ fontWeight: 600 }}>
-          {label}
+        <Typography variant="subtitle2" color="#002060" mb={1} sx={labelStyle}>
+          {label}:
         </Typography>
         <Select
           multiple
@@ -350,7 +223,7 @@ const renderFilter = (filter: Filter) => {
           }}
           displayEmpty
           size="small"
-          sx={{ width: "100%", background: "#e6ebf5" }}
+          sx={commonSelectStyles}
           renderValue={(selected) => {
             if (!selected || (Array.isArray(selected) && selected.length === 0)) {
               return <span style={{ color: "#888" }}>Select {label}</span>;
@@ -364,18 +237,36 @@ const renderFilter = (filter: Filter) => {
           }}
           MenuProps={{
             PaperProps: {
-              style: { maxHeight: 180, minWidth: 150 },
+              style: { maxHeight: 400, minWidth: 100 },
             },
           }}
         >
-          {options.map((option) => (
-            <MenuItem key={option} value={option}>
+          <MenuItem disableRipple disableTouchRipple disableGutters>
+            <TextField
+              size="small"
+              placeholder="Search"
+              autoFocus
+              value={searchKey === key ? searchValue : ""}
+              onChange={(e) => handleSearchChange(e.target.value, key)}
+              sx={{
+                mb: 1,
+                width: "100%",
+                fontSize: "0.8rem",
+                "& input": {
+                  fontSize: "0.8rem",
+                  height: "1.5rem",
+                  padding: "0.4rem",
+                },
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </MenuItem>
+          {filteredOptions.map((option) => (
+            <MenuItem key={option} value={option} sx={commonMenuItemStyles}>
               <Checkbox
+                size="small"
                 checked={selectedValues[key]?.includes(option) || false}
-                sx={{
-                  color: "#002060",
-                  "&.Mui-checked": { color: "#FF8C00" },
-                }}
+                sx={commonCheckboxStyles}
               />
               {option}
             </MenuItem>
@@ -383,21 +274,162 @@ const renderFilter = (filter: Filter) => {
         </Select>
       </Box>
     );
-  };
+  }
+
+  if (key === "period") {
+    return (
+      <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
+        <Typography variant="subtitle2" color="#002060" mb={1} sx={labelStyle}>
+          {label}:
+        </Typography>
+        <Select
+          value={selectedValues[key]?.[0] || ""}
+          onChange={(e) => {
+            const value = e.target.value;
+            handleSelectionChange(key, [value]);
+          }}
+          displayEmpty
+          size="small"
+          sx={commonSelectStyles}
+          renderValue={(selected) => {
+            if (!selected || selected === "") {
+              return <span style={{ color: "#888" }}>Select {label}</span>;
+            }
+            return selected;
+          }}
+          MenuProps={{
+            PaperProps: {
+              style: { maxHeight: 400, minWidth: 150 },
+            },
+          }}
+        >
+          {options.map((option) => (
+            <MenuItem key={option} value={option} sx={commonMenuItemStyles}>
+              <Radio
+                size="small"
+                checked={selectedValues[key]?.[0] === option}
+                sx={{ color: "#FF8C00", p: 0.5, mr: 1 }}
+              />
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+    );
+  }
+
+  if (key === "year") {
+    return (
+      <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
+        <Typography variant="subtitle2" color="#002060" mb={1} sx={labelStyle}>
+          {label}:
+        </Typography>
+        <Select
+          multiple
+          value={selectedValues[key] || []}
+          onChange={(e) => {
+            const value = e.target.value;
+            handleSelectionChange(key, typeof value === "string" ? [value] : value);
+          }}
+          displayEmpty
+          size="small"
+          sx={commonSelectStyles}
+          renderValue={(selected) => {
+            if (!selected || (Array.isArray(selected) && selected.length === 0)) {
+              return <span style={{ color: "#888" }}>Select {label}</span>;
+            }
+            if (Array.isArray(selected)) {
+              return selected.length > 1
+                ? `${selected[0]} +${selected.length - 1}`
+                : selected[0];
+            }
+            return selected;
+          }}
+          MenuProps={{
+            PaperProps: {
+              style: { maxHeight: 400, minWidth: 150, background: "#f5f5f5" },
+            },
+          }}
+        >
+          {options.map((option) => (
+            <MenuItem key={option} value={option} sx={commonMenuItemStyles}>
+              <Checkbox
+                size="small"
+                checked={selectedValues[key]?.includes(option) || false}
+                sx={commonCheckboxStyles}
+              />
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+    );
+  }
+
+  return (
+    <Box key={key} sx={{ minWidth: 150, maxWidth: 180, flex: "0 0 auto" }}>
+      <Typography variant="subtitle2" color="#002060" mb={1} sx={labelStyle}>
+        {label}:
+      </Typography>
+      <Select
+        multiple
+        value={selectedValues[key] || []}
+        onChange={(e) => {
+          const value = e.target.value;
+          handleSelectionChange(key, typeof value === "string" ? [value] : value);
+        }}
+        displayEmpty
+        size="small"
+        sx={commonSelectStyles}
+        renderValue={(selected) => {
+          if (!selected || (Array.isArray(selected) && selected.length === 0)) {
+            return <span style={{ color: "#888" }}>Select {label}</span>;
+          }
+          if (Array.isArray(selected)) {
+            return selected.length > 1
+              ? `${selected[0]} +${selected.length - 1}`
+              : selected[0];
+          }
+          return selected;
+        }}
+        MenuProps={{
+          PaperProps: {
+            style: { maxHeight: 400, minWidth: 150 },
+          },
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={option} value={option} sx={commonMenuItemStyles}>
+            <Checkbox
+              size="small"
+              checked={selectedValues[key]?.includes(option) || false}
+              sx={commonCheckboxStyles}
+            />
+            {option}
+          </MenuItem>
+        ))}
+      </Select>
+    </Box>
+  );
+};
+
   return (
     <Box
       sx={{
         padding: 0,
-        marginBottom: 20,
+        // marginBottom: 20,
         display: "flex",
         flexDirection: "column",
         width: "100%",
+        bgcolor:'#fofofo'
       }}
     >
       
       {/* Filters inside a Card */}
+          <Container maxWidth="xl">
+
       <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-        <Card sx={{ width: "80%", mb: 2 }}>
+        <Card elevation={6} sx={{  mb: 2 ,bgcolor:'#fofofo'}}>
           <CardContent>
             <Box
               sx={{
@@ -407,6 +439,9 @@ const renderFilter = (filter: Filter) => {
                 width: "100%",
               }}
             >
+            <Typography variant="h6" color="#005166" mb={1} sx={{ fontWeight: 600 }}>
+          Monashee Deals Filters
+          </Typography>
               <Box
                 sx={{
                   display: "flex",
@@ -419,6 +454,7 @@ const renderFilter = (filter: Filter) => {
                   overflowY: "auto", 
                 }}
               >
+   
                 {filtersData
                   .filter((filter) => {
                     const key = Object.keys(filter)[0];
@@ -439,7 +475,7 @@ const renderFilter = (filter: Filter) => {
                   justifyContent: "center",
                   alignItems: "center",
                   gap: 2,
-                  mt: 1,
+                 
                 }}
               >
                 <LoadingButton
@@ -469,8 +505,10 @@ const renderFilter = (filter: Filter) => {
           </CardContent>
         </Card>
       </Box>
+          </Container>
 
-      <Box width="100%" mt={1} flex={1}>
+
+      <Box width="100%"  flex={1}>
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress color="primary" />

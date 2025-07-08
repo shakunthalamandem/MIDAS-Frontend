@@ -231,7 +231,7 @@ const MarketOpportnuityMain: React.FC = () => {
             sx={{ marginBottom: "20px", display: "flex", marginLeft: "600px" }}
           >
             <Paper
-              elevation={3}
+              elevation={6}
               style={{
                 padding: "10px",
                 maxWidth: "280px",
