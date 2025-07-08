@@ -13,6 +13,7 @@ interface DealData {
   "Issuer Name": string;
   Ticker: string;
   "Deal Type": string;
+  "FO Type": string;
   "Broad Region": string;
   Year: number;
   "T + 1 Month Return": number;
@@ -58,7 +59,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({}), 
+        body: JSON.stringify({}),
       });
 
       const json = await response.json();
@@ -79,6 +80,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
     { field: "Issuer Name", headerName: "Issuer Name", width: 200 },
     { field: "Ticker", headerName: "Ticker", width: 120 },
     { field: "Deal Type", headerName: "Deal Type", width: 120 },
+    { field: "FO Type", headerName: "FO Type", width: 120 },
     { field: "Broad Region", headerName: "Region", width: 120 },
     { field: "Year", headerName: "Year", width: 100 },
     { field: "T + 1 Month Return", headerName: "+1M Return %", width: 130 },
@@ -87,13 +89,29 @@ const DealDetailedGapAnalysis: React.FC = () => {
     { field: "Allocated Capital", headerName: "Allocated Capital", width: 150 },
     { field: "Am Capital Committed", headerName: "AM Capital", width: 150 },
     { field: "Total Committed Capital", headerName: "Total Capital", width: 150 },
+    { field: "Model Allocation Capital", headerName: "Model Allocation Capital", width: 170 },
+    { field: "Model AM Capital", headerName: "Model AM Capital", width: 150 },
+    { field: "Total Model Capital", headerName: "Total Model Capital", width: 150 },
     { field: "Allocation Exposure Gap", headerName: "Allocation Gap", width: 150 },
     { field: "AM Exposure Gap", headerName: "AM Gap", width: 130 },
     { field: "Total Exposure Gap", headerName: "Total Gap", width: 130 },
+    { field: "Allocated Shares", headerName: "Allocated Shares", width: 150 },
+    { field: "Am Buy Shares", headerName: "AM Buy Shares", width: 130 },
+    { field: "Total Buy Shares", headerName: "Total Buy Shares", width: 130 },
+    { field: "Model Allocation Shares", headerName: "Model Allocation Shares", width: 170 },
+    { field: "Model Am Shares", headerName: "Model AM Shares", width: 150 },
+    { field: "Total Model Shares", headerName: "Total Model Shares", width: 150 },
+    { field: "Allocation Gap Shares", headerName: "Allocation Gap Shares", width: 170 },
+    { field: "Am Gap Shares", headerName: "AM Gap Shares", width: 130 },
+    { field: "Total Gap Shares", headerName: "Total Gap Shares", width: 130 },
     { field: "Days Held", headerName: "Days Held", width: 100 },
   ];
 
-  const rows = data.map((row, index) => ({ id: index, ...row }));
+  const rows = data.map((row, index) => ({
+    id: index,
+    ...row,
+    "FO Type": row["Deal Type"] === "IPO" ? "-" : row["FO Type"],
+  }));
 
   return (
     <Box sx={{ p: 4 }}>
@@ -106,37 +124,37 @@ const DealDetailedGapAnalysis: React.FC = () => {
         </Grid>
       ) : (
         <Paper elevation={3} sx={{ borderRadius: 4, p: 2, bgcolor: "background.paper" }}>
- <DataGrid
-  rows={rows}
-  columns={columns}
-  autoHeight
-  disableRowSelectionOnClick
-  sx={{
-    fontSize: "0.75rem", // Reduce overall font size
-    "& .MuiDataGrid-columnHeaders": {
-      bgcolor: "#f0f0f0",
-      color: "#002060",
-      minHeight: "32px",
-      maxHeight: "32px",
-      fontSize: "0.75rem",
-    },
-    "& .MuiDataGrid-columnHeaderTitle": {
-      fontWeight: "bold",
-    },
-    "& .MuiDataGrid-row": {
-      minHeight: "32px !important",
-      maxHeight: "32px !important",
-    },
-    "& .MuiDataGrid-cell": {
-      color: "#555",
-      lineHeight: "1.2",
-      padding: "4px 4px",
-    },
-    "& .MuiDataGrid-row:nth-of-type(odd)": {
-      bgcolor: "#fafafa",
-    },
-  }}
-/>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            autoHeight
+            disableRowSelectionOnClick
+            sx={{
+              fontSize: "0.75rem", // Reduce overall font size
+              "& .MuiDataGrid-columnHeaders": {
+                bgcolor: "#f0f0f0",
+                color: "#002060",
+                minHeight: "32px",
+                maxHeight: "32px",
+                fontSize: "0.75rem",
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-row": {
+                minHeight: "32px !important",
+                maxHeight: "32px !important",
+              },
+              "& .MuiDataGrid-cell": {
+                color: "#555",
+                lineHeight: "1.2",
+                padding: "4px 4px",
+              },
+              "& .MuiDataGrid-row:nth-of-type(odd)": {
+                bgcolor: "#fafafa",
+              },
+            }}
+          />
 
         </Paper>
       )}
