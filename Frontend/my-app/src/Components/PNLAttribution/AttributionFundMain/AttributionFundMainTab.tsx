@@ -81,7 +81,7 @@ const AttributionFundMainTab = () => {
         <Paper
           elevation={3}
           sx={{
-            backgroundColor: '#002060',
+            backgroundColor: '#005360',
             color: 'white',
             p: 2,
             mb: 4,
