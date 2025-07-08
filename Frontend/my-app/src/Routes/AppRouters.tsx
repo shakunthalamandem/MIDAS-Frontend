@@ -62,6 +62,8 @@ import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
 import PNLPagesMain from "../Components/PNLAttribution/PNLPages/PNLPagesMain";
+import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
+
 
 
 
@@ -206,6 +208,7 @@ const AppRouters: React.FC = () => {
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
         <Route path="/pnldata" element={<AuthGuard><PNLPagesMain/></AuthGuard>} />
+        <Route path="/deatiled_gapanalysis" element={<AuthGuard><DealDetailedGapAnalysis /></AuthGuard>} />
 
 
         
