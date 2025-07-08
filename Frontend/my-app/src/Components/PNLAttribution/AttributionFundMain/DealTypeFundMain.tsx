@@ -117,7 +117,6 @@ const renderTable = (rows: Deal[], title: string, id: string) => (
     >
       <Box
         sx={{
-          height: 450,
           borderRadius: 2,
           overflow: 'hidden',
           boxShadow: 3,
