@@ -46,6 +46,11 @@ const formatCurrency = (val: number | null | undefined) => {
   return "$" + val.toLocaleString("en-US", { maximumFractionDigits: 0 });
 };
 
+const formatComma = (val: number | null | undefined) => {
+  if (val == null || isNaN(val)) return "";
+  return val.toLocaleString("en-US", { maximumFractionDigits: 0 });
+};
+
 const formatPercentage = (val: number | null | undefined) => {
   if (val == null || isNaN(val)) return "";
   const absVal = Math.abs(val);
@@ -180,23 +185,24 @@ const DealDetailedGapAnalysis: React.FC = () => {
       width: 110,
       renderCell: (params) => formatCurrency(params.value),
     },
-    { field: "Allocated Shares", headerName: "Allocated Shares", width: 140 },
-    { field: "Am Buy Shares", headerName: "AM Buy Shares", width: 120 },
-    { field: "Total Buy Shares", headerName: "Total Buy Shares", width: 130 },
+    { field: "Allocated Shares", headerName: "Allocated Shares", width: 140,renderCell: (params) => formatComma(params.value), },
+    { field: "Am Buy Shares", headerName: "AM Buy Shares", width: 120,renderCell: (params) => formatComma(params.value) },
+    { field: "Total Buy Shares", headerName: "Total Buy Shares", width: 130,renderCell: (params) => formatComma(params.value) },
     {
       field: "Model Allocation Shares",
       headerName: "Model Allocation Shares",
       width: 170,
+      renderCell: (params) => formatComma(params.value)
     },
-    { field: "Model Am Shares", headerName: "Model AM Shares", width: 130 },
-    { field: "Total Model Shares", headerName: "Total Model Shares", width: 130 },
+    { field: "Model Am Shares", headerName: "Model AM Shares", width: 130,renderCell: (params) => formatComma(params.value) },
+    { field: "Total Model Shares", headerName: "Total Model Shares", width: 130,renderCell: (params) => formatComma(params.value) },
     {
       field: "Allocation Gap Shares",
       headerName: "Allocation Gap Shares",
       width: 160,
       renderCell: (params) => (
         <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
-          {params.value}
+          {formatComma(params.value)}
         </span>
       ),
     },
@@ -206,7 +212,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
       width: 120,
       renderCell: (params) => (
         <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
-          {params.value}
+          {formatComma(params.value)}
         </span>
       ),
     },
@@ -216,7 +222,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
       width: 120,
       renderCell: (params) => (
         <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
-          {params.value}
+          {formatComma(params.value)}
         </span>
       ),
     },
