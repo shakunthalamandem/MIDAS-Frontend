@@ -4,6 +4,7 @@ import PnLSummary from "./PnLSummary";
 import FundLevelPNLTable from "./FundLevelPNLTable";
 import RegionWisePnlAttribution from "./RegionWisePnlAttribution";
 import DetailedFundTable from "./DetailedFundTable";
+import DealTypeTable from "./DealTypeTable";
 
 const PnlAttributionMain = () => {
   return (
@@ -16,6 +17,7 @@ const PnlAttributionMain = () => {
         <FundLevelPNLTable />
         <RegionWisePnlAttribution />
         <DetailedFundTable />
+        <DealTypeTable />
       </>
     </Box>
   );
