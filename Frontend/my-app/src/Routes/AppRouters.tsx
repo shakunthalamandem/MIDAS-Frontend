@@ -61,7 +61,7 @@ import PNLTabMain from "../Components/PNLAttribution/PNLTabMain";
 import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedRegionView";
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
-import PNLPagesMain from "../Components/PNLAttribution/PNLTabMain";
+import PNLPagesMain from "../Components/PNLAttribution/PNLPages/PNLPagesMain";
 
 
 
