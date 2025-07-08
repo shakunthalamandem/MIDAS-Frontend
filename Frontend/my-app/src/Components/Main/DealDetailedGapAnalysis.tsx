@@ -189,9 +189,37 @@ const DealDetailedGapAnalysis: React.FC = () => {
     },
     { field: "Model Am Shares", headerName: "Model AM Shares", width: 130 },
     { field: "Total Model Shares", headerName: "Total Model Shares", width: 130 },
-    { field: "Allocation Gap Shares", headerName: "Allocation Gap Shares", width: 160 },
-    { field: "Am Gap Shares", headerName: "AM Gap Shares", width: 120 },
-    { field: "Total Gap Shares", headerName: "Total Gap Shares", width: 120 },
+    {
+      field: "Allocation Gap Shares",
+      headerName: "Allocation Gap Shares",
+      width: 160,
+      renderCell: (params) => (
+        <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
+          {params.value}
+        </span>
+      ),
+    },
+    {
+      field: "Am Gap Shares",
+      headerName: "AM Gap Shares",
+      width: 120,
+      renderCell: (params) => (
+        <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
+          {params.value}
+        </span>
+      ),
+    },
+    {
+      field: "Total Gap Shares",
+      headerName: "Total Gap Shares",
+      width: 120,
+      renderCell: (params) => (
+        <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
+          {params.value}
+        </span>
+      ),
+    },
+
     { field: "Days Held", headerName: "Days Held", width: 100 },
   ];
 
