@@ -189,11 +189,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
     },
     { field: "Model Am Shares", headerName: "Model AM Shares", width: 130 },
     { field: "Total Model Shares", headerName: "Total Model Shares", width: 130 },
-    {
-      field: "Allocation Gap Shares",
-      headerName: "Allocation Gap Shares",
-      width: 160,
-    },
+    { field: "Allocation Gap Shares", headerName: "Allocation Gap Shares", width: 160 },
     { field: "Am Gap Shares", headerName: "AM Gap Shares", width: 120 },
     { field: "Total Gap Shares", headerName: "Total Gap Shares", width: 120 },
     { field: "Days Held", headerName: "Days Held", width: 100 },
