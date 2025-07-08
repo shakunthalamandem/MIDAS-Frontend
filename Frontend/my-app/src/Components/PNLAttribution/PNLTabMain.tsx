@@ -14,6 +14,7 @@ import TableRowsIcon from "@mui/icons-material/TableRows";
 import PnlAttributionMain from "./PnlAttributionMain";
 import PNLGraphsMain from "./PNLCharts/PNLGraphsMain";
 import PNLPagesMain from "./PNLPages/PNLPagesMain";
+import AttributionFundMainTab from "./AttributionFundMain/AttributionFundMainTab";
 
 const PNLTabMain = () => {
   const [selectedView, setSelectedView] = useState("graphs");
@@ -132,6 +133,26 @@ const PNLTabMain = () => {
                 </Box>
               }
             />
+
+              <FormControlLabel
+              value="pnlfunddeatils"
+              control={
+                <Radio
+                  sx={{
+                    color: "#00796b",
+                    "&.Mui-checked": {
+                      color: "#00796b",
+                    },
+                  }}
+                />
+              }
+              label={
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
+                  <BarChartIcon fontSize="small" />
+                  <Typography variant="h6">Fund Details</Typography>
+                </Box>
+              }
+            />
           </RadioGroup>
         </FormControl>
       </Box>
@@ -145,6 +166,9 @@ const PNLTabMain = () => {
       </Fade>
       <Fade in={selectedView === "datagrid"} timeout={400} mountOnEnter unmountOnExit>
         <Box>{selectedView === "datagrid" && <PNLPagesMain />}</Box>
+      </Fade>
+       <Fade in={selectedView === "pnlfunddeatils"} timeout={400} mountOnEnter unmountOnExit>
+        <Box>{selectedView === "pnlfunddeatils" && <AttributionFundMainTab />}</Box>
       </Fade>
     </Box>
   );
