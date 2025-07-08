@@ -12,11 +12,11 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 interface DealData {
   "Pricing Date": string;
   "Issuer Name": string;
-  Ticker: string;
+  "Ticker": string;
   "Deal Type": string;
   "FO Type": string;
   "Broad Region": string;
-  Year: number;
+  "Year": number;
   "T + 1 Month Return": number;
   "T + 1 Day Return": number;
   "AM Return Percentage": number;
@@ -95,9 +95,10 @@ const DealDetailedGapAnalysis: React.FC = () => {
         "FO Type": row["Deal Type"] === "IPO" ? "-" : row["FO Type"],
       }))
       .filter((row) =>
-        row.Ticker?.toLowerCase().includes(searchQuery.toLowerCase())
+        row["Ticker"]?.toLowerCase().includes(searchQuery.toLowerCase())
       );
   }, [data, searchQuery]);
+
 
   const columns: GridColDef[] = [
     { field: "Pricing Date", headerName: "Pricing Date", width: 120 },
@@ -225,20 +226,39 @@ const DealDetailedGapAnalysis: React.FC = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant="h5" gutterBottom color="#002060" align="center">
-        Deal Detailed Gap Analysis
-      </Typography>
-
-      <Box display="flex" justifyContent="flex-end" mb={2}>
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+        <Typography variant="h5" color="#002060" align="center" sx={{ flex: 1 }}>
+          Deal Detailed Gap Analysis
+        </Typography>
         <TextField
           size="small"
           variant="outlined"
           placeholder="Search Ticker"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ width: 300 }}
+          sx={{ width: 300, ml: 2 }}
         />
       </Box>
+
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        align="left"
+        sx={{ mb: 1 }}
+      >
+        <b>Note :</b> The table below includes all IPO and FO deals from 2025, positions are still held in the portfolio (i.e., current quantity &gt; 0), and the holding period is less than 30 days.
+      </Typography>
+
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        align="left"
+        sx={{ mb: 2 }}
+      >
+        <b>Assumptions :</b> As for the below GAP Analysis, we have assumed that 0.5% IPO Allocation, 1% for FO Allocation, and 0.5% AM for both IPOs and FOs. There is a Position limit of $30M. Also note that, for each year deals issued in that year are considered, and the EXIT date for actual PnL could be in future years. For Model, the EXIT date is always T+1Month. This analysis excludes SPACs and PIPEs.
+      </Typography>
+
+
 
       {loading ? (
         <Grid container justifyContent="center" alignItems="center" style={{ height: 400 }}>
