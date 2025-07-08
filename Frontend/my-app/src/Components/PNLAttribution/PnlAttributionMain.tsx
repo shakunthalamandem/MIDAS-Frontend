@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import PnLSummary from "./PnLSummary";
 import FundLevelPNLTable from "./FundLevelPNLTable";
 import RegionWisePnlAttribution from "./RegionWisePnlAttribution";
+import DetailedFundTable from "./DetailedFundTable";
 
 const PnlAttributionMain = () => {
   return (
@@ -14,6 +15,7 @@ const PnlAttributionMain = () => {
         <PnLSummary />
         <FundLevelPNLTable />
         <RegionWisePnlAttribution />
+        <DetailedFundTable />
       </>
     </Box>
   );
