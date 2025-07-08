@@ -33,6 +33,12 @@ const DealTypeTable: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
+  // Desired custom order for strategy names
+  const strategyOrder = [
+    "IPO", "FO", "STRATEGIC", "DEC", "Other", "Overlay", "PRIVATE",
+    "Hedging_Converts", "Hedging_HY", "Hedging_Other", "Hedging"
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -94,7 +100,7 @@ const DealTypeTable: React.FC = () => {
           <Table size="small" sx={{ borderCollapse: "collapse" }}>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
-                <TableCell sx={{ color: "#ffffff", ...cellBorder }}><b>Strategy Name</b></TableCell>
+                <TableCell sx={{ color: "#ffffff", ...cellBorder }}><b>Strategy (Equities)</b></TableCell>
                 {months.map((month) => (
                   <TableCell key={month} align="center" sx={{ color: "#ffffff", ...cellBorder }}>
                     <b>{month}</b>
@@ -103,18 +109,21 @@ const DealTypeTable: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data
-                .sort((a, b) => a.strategyName.localeCompare(b.strategyName))
-                .map((row) => (
-                  <TableRow key={row.strategyName}>
-                    <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>{row.strategyName}</TableCell>
+              {strategyOrder.map((strategy) => {
+                const row = data.find((d) => d.strategyName === strategy);
+                if (!row) return null;
+
+                return (
+                  <TableRow key={strategy}>
+                    <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>{strategy}</TableCell>
                     {months.map((m) => (
                       <TableCell key={m} sx={cellBorder}>
                         {formatCurrency(row.values[m] ?? 0)}
                       </TableCell>
                     ))}
                   </TableRow>
-                ))}
+                );
+              })}
 
               {/* Overall total row */}
               <TableRow key="overall-total" sx={{ backgroundColor: totalRowBgColor }}>
