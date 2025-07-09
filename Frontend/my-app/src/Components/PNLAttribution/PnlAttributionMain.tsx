@@ -12,6 +12,7 @@ import PnLSummary from "./PnLSummary";
 import FundLevelPNLTable from "./FundLevelPNLTable";
 import RegionWisePnlAttribution from "./RegionWisePnlAttribution";
 import DetailedFundTable from "./DetailedFundTable";
+import { Padding } from "@mui/icons-material";
 
 type ViewOption = "byAsset" | "byFund" | "byRegion";
 
@@ -69,16 +70,15 @@ const PnlAttributionMain: React.FC = () => {
           boxShadow: 3,
           borderRadius: 2,
           background: "linear-gradient(to right, rgb(147, 192, 228), rgb(236, 229, 163))",
-          padding:0
         }}
       >
-        <CardContent>
+<CardContent sx={{ p: 0}}>
           <Box
             display="flex"
             justifyContent="center"
             gap={2}
             flexWrap="wrap"
-            padding={0}
+            
           >
             {tabConfig.map((tab) => (
               <Button
