@@ -154,8 +154,7 @@ const PNLPagesMain = () => {
 
 
 }} borderRadius={2} boxShadow={2}>
-        <Typography variant="h5" gutterBottom color="#002060" align='center' fontWeight="bold" mb={2}>
-    Equity Distribution        </Typography>
+
 
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={3}>
