@@ -30,23 +30,23 @@ interface Deal {
   pnl: number;
 }
 
-  const formatNumber = (value: number): string => {
+const formatNumber = (value: number): string => {
 
-    const absValue = Math.abs(value);
-    let formattedValue: string;
+  const absValue = Math.abs(value);
+  let formattedValue: string;
 
-    if (absValue >= 1e9) {
-      formattedValue = `${(absValue / 1e9).toFixed(0)}B`; // Billion
-    } else if (absValue >= 1e6) {
-      formattedValue = `${(absValue / 1e6).toFixed(0)}M`; // Million
-    } else if (absValue >= 1e3) {
-      formattedValue = `${(absValue / 1e3).toFixed(0)}K`; // Thousand
-    } else {
-      formattedValue = absValue.toString(); // No formatting for values < 1000
-    }
+  if (absValue >= 1e9) {
+    formattedValue = `${(absValue / 1e9).toFixed(0)}B`; // Billion
+  } else if (absValue >= 1e6) {
+    formattedValue = `${(absValue / 1e6).toFixed(0)}M`; // Million
+  } else if (absValue >= 1e3) {
+    formattedValue = `${(absValue / 1e3).toFixed(0)}K`; // Thousand
+  } else {
+    formattedValue = absValue.toString(); // No formatting for values < 1000
+  }
 
-    return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
-  };
+  return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
+};
 
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -190,97 +190,101 @@ const DealTypeFundMain: React.FC<{ fund: string }> = ({ fund }) => {
   }, [fund]);
 
 
-const renderTable = (rows: Deal[], title: string, id: string) => (
-  <Box my={4} id={id}>
-    {/* Title Animation */}
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      <Typography
-        variant="h6"
-        sx={{
-          color: '#002060',
-          fontWeight: 600,
-          mb: 1,
-        }}
+  const renderTable = (rows: Deal[], title: string, id: string) => (
+    <Box my={4} id={id}>
+      {/* Title Animation */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        {title}
-      </Typography>
-    </motion.div>
-
-    <Divider sx={{ mb: 2 }} />
-
-    {/* DataGrid Box with animation */}
-    <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-    >
-      <Box
-        sx={{
-          borderRadius: 2,
-          overflow: 'hidden',
-          boxShadow: 3,
-          backgroundColor: '#ffffff',
-          '& .MuiDataGrid-root': {
-            border: 'none',
-            fontSize: '0.8rem',
-          },
-          '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: '#77B0FC',
+        <Typography
+          variant="h6"
+          sx={{
             color: '#002060',
-            fontWeight: 'bold',
-            fontSize: '0.85rem',
-          },
-          '& .MuiDataGrid-row:nth-of-type(even)': {
-            backgroundColor: '#f5f8fc',
-          },
-          '& .MuiDataGrid-row:nth-of-type(odd)': {
-            backgroundColor: '#ffffff',
-          },
-          '& .MuiDataGrid-cell': {
-            borderBottom: '1px solid #e0e0e0',
-          },
-          '& .MuiDataGrid-row:hover': {
-            backgroundColor: '#dee7f7',
-            transition: 'background-color 0.3s ease',
-          },
-        }}
+            fontWeight: 600,
+            mb: 1,
+          }}
+        >
+          {title}
+        </Typography>
+      </motion.div>
+
+      <Divider sx={{ mb: 2 }} />
+
+      {/* DataGrid Box with animation */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
       >
-        <DataGrid
-          rows={rows.map((row, index) => ({ id: index, ...row }))}
-          columns={columns}
-          autoHeight
-          disableRowSelectionOnClick
-          disableColumnMenu
-          hideFooterPagination
-        />
-      </Box>
-    </motion.div>
-  </Box>
-);
+        <Box
+          sx={{
+            borderRadius: 2,
+            overflow: 'hidden',
+            boxShadow: 3,
+            backgroundColor: '#ffffff',
+            '& .MuiDataGrid-root': {
+              border: 'none',
+              fontSize: '0.8rem',
+            },
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: '#77B0FC',
+              color: '#000000',
+              fontWeight: 'bold',
+              fontSize: '0.85rem',
+            },
+            '& .MuiDataGrid-columnHeader': {
+              backgroundColor: '#77B0FC',
+              color: '#000000',
+            },
+            '& .MuiDataGrid-row:nth-of-type(even)': {
+              backgroundColor: '#f5f8fc',
+            },
+            '& .MuiDataGrid-row:nth-of-type(odd)': {
+              backgroundColor: '#ffffff',
+            },
+            '& .MuiDataGrid-cell': {
+              borderBottom: '1px solid #e0e0e0',
+            },
+            '& .MuiDataGrid-row:hover': {
+              backgroundColor: '#dee7f7',
+              transition: 'background-color 0.3s ease',
+            },
+          }}
+        >
+          <DataGrid
+            rows={rows.map((row, index) => ({ id: index, ...row }))}
+            columns={columns}
+            autoHeight
+            disableRowSelectionOnClick
+            disableColumnMenu
+            hideFooterPagination
+          />
+        </Box>
+      </motion.div>
+    </Box>
+  );
 
   return (
     <>
-    <Box>
-      {loading ? (
-        <Box textAlign="center" mt={4}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <>
-          {ipoDeals.length > 0 && renderTable(ipoDeals, "IPOs (New Issues or Incremental AM Participation Deals)", "ipo")}
-          {foDeals.length > 0 && renderTable(foDeals, "FOs (New Issues or Incremental AM Participation Deals)", "fo")}
-          {ipoDeals.length === 0 && foDeals.length === 0 && (
-            <Typography align="center" color="textSecondary" mt={4}>
-              No deal data available for this fund.
-            </Typography>
-          )}
-        </>
-      )}
-    </Box>
+      <Box>
+        {loading ? (
+          <Box textAlign="center" mt={4}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            {ipoDeals.length > 0 && renderTable(ipoDeals, "IPOs (New Issues or Incremental AM Participation Deals)", "ipo")}
+            {foDeals.length > 0 && renderTable(foDeals, "FOs (New Issues or Incremental AM Participation Deals)", "fo")}
+            {ipoDeals.length === 0 && foDeals.length === 0 && (
+              <Typography align="center" color="textSecondary" mt={4}>
+                No deal data available for this fund.
+              </Typography>
+            )}
+          </>
+        )}
+      </Box>
     </>
   );
 };
