@@ -20,6 +20,8 @@ import PnlTables from '../PNLPages/PnlTables';
 import EFStrategywise from './EFStrategywise';
 import EFSectorwise from './EFSectorwise';
 import EFRegionwise from './EFRegionwise';
+import DealTypeTable from '../DealTypeTable';
+import EquityPNLSectorWiseTable from '../EquityPNLSectorWiseTable';
 
 interface FilterOptions {
   funds: string[];
@@ -146,6 +148,7 @@ const PNLPagesMain = () => {
   }
 
   return (
+    <>
     <Container maxWidth="xl">
       <Box p={2}  mb={2} sx={{   background: 'linear-gradient(to right, #c9ffbf,rgb(253, 210, 217))' 
 
@@ -280,6 +283,8 @@ const PNLPagesMain = () => {
               </Grid>
             </Grid>
           </Box>
+
+
         )}
 <Typography
   color="textSecondary"
@@ -290,8 +295,12 @@ const PNLPagesMain = () => {
   Note: Hedging includes Hedging, Hedging_Converts, Hedging_HY, Hedging_Other
 </Typography>
 
+      
       </Box>
     </Container>
+      <DealTypeTable />
+        <EquityPNLSectorWiseTable />
+    </>
   );
 };
 

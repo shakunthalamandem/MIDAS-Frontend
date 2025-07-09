@@ -33,10 +33,8 @@ const DealTypeTable: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // Desired custom order for strategy names
   const strategyOrder = [
-    "IPO", "FO", "STRATEGIC", "DEC", "Other", "Overlay", "PRIVATE",
-    "Hedging_Converts", "Hedging_HY", "Hedging_Other", "Hedging"
+    "IPO", "FO", "STRATEGIC", "DEC", "Other", "Overlay", "PRIVATE", "Hedging"
   ];
 
   useEffect(() => {
@@ -54,12 +52,27 @@ const DealTypeTable: React.FC = () => {
         const rows: TableRowData[] = [];
         const monthSet: Set<string> = new Set();
 
+        const hedgingKeys = ["Hedging_Converts", "Hedging_HY", "Hedging_Other", "Hedging"];
+        const hedgingCombined: { [month: string]: number } = {};
+
         for (const [strategyName, monthValues] of Object.entries(result)) {
           const isAllZero = Object.values(monthValues).every((val) => !val || val === 0);
-          if (!isAllZero) {
-            Object.keys(monthValues).forEach((m) => monthSet.add(m));
+          if (isAllZero) continue;
+
+          Object.keys(monthValues).forEach((m) => monthSet.add(m));
+
+          if (hedgingKeys.includes(strategyName)) {
+            for (const [month, value] of Object.entries(monthValues)) {
+              hedgingCombined[month] = (hedgingCombined[month] || 0) + value;
+            }
+          } else {
             rows.push({ strategyName, values: monthValues });
           }
+        }
+
+        const isHedgingNonZero = Object.values(hedgingCombined).some((val) => val !== 0);
+        if (isHedgingNonZero) {
+          rows.push({ strategyName: "Hedging", values: hedgingCombined });
         }
 
         const orderedMonths = Array.from(monthSet).sort((a, b) => {
@@ -84,14 +97,27 @@ const DealTypeTable: React.FC = () => {
 
   const cellBorder = { border: "1px solid black", textAlign: "center" };
   const totalRowBgColor = "#fde8b7";
+  const hedgingRowBgColor = "rgb(145, 206, 137)";
 
   return (
     <Container>
-      <Typography variant="h6" sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}>
-       Equities  Detailed Strategy-wise (Gross PNL)
+      <Typography
+        variant="h6"
+        sx={{
+          mt: 4, mb: 1, fontWeight: "bold",
+          color: "#002060", textAlign: "center"
+        }}
+      >
+        Equities Detailed Strategy-wise (Gross PNL)
       </Typography>
 
-      <TableContainer component={Paper} sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: 3, overflow: "auto", border: "1px solid #000" }}>
+      <TableContainer
+        component={Paper}
+        sx={{
+          mt: 4, mb: 4, borderRadius: 2, boxShadow: 3,
+          overflow: "auto", border: "1px solid #000"
+        }}
+      >
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 300 }}>
             <CircularProgress />
@@ -100,7 +126,9 @@ const DealTypeTable: React.FC = () => {
           <Table size="small" sx={{ borderCollapse: "collapse" }}>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
-                <TableCell sx={{ color: "#ffffff", ...cellBorder }}><b>Strategy (Equities)</b></TableCell>
+                <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
+                  <b>Strategy (Equities)</b>
+                </TableCell>
                 {months.map((month) => (
                   <TableCell key={month} align="center" sx={{ color: "#ffffff", ...cellBorder }}>
                     <b>{month}</b>
@@ -113,8 +141,9 @@ const DealTypeTable: React.FC = () => {
                 const row = data.find((d) => d.strategyName === strategy);
                 if (!row) return null;
 
+                const isHedgingRow = strategy === "Hedging";
                 return (
-                  <TableRow key={strategy}>
+                  <TableRow key={strategy} sx={isHedgingRow ? { backgroundColor: hedgingRowBgColor } : undefined}>
                     <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>{strategy}</TableCell>
                     {months.map((m) => (
                       <TableCell key={m} sx={cellBorder}>
