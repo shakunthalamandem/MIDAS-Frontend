@@ -28,6 +28,7 @@ interface Deal {
   t1d_return_from_bloomberg: number;
   daily_long_exposure: number;
   pnl: number;
+  subscription_bid_shares: number;
 }
 
 const formatNumber = (value: number): string => {
@@ -87,6 +88,12 @@ const columns: GridColDef[] = [
     valueFormatter: (params) => `${numberFormatter.format(params)}%`,
   },
   {
+    field: "subscription_bid_shares",
+    headerName: "IOI",
+    flex: 1,
+    valueFormatter: (params) => numberFormatter1.format(params),
+  },
+  {
     field: "allocated_shares",
     headerName: "Allocated Shares",
     flex: 1,
@@ -135,7 +142,7 @@ const columns: GridColDef[] = [
     valueFormatter: (params) => currencyFormatter.format(params),
   },
   {
-    field: "t1d_return_from_bloomberg",
+    field: "last_price_t1",
     headerName: "T+1 Close",
     flex: 1,
     valueFormatter: (params) => currencyFormatter.format(params),
