@@ -136,7 +136,7 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
   return (
     <Box>
       <Typography variant="h6" gutterBottom align="center" color='#025f73' fontWeight={600}>
-        Equity Funds By Strategy
+        Equities P&L By Strategy
       </Typography>
       <TableContainer component={Paper}>
         <Table size="small">
@@ -215,7 +215,7 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                   }}
 
                 >
-                  <b>Exposure</b>
+                  <b>Exposure (Avg)</b>
                 </TableSortLabel>
               </TableCell>
             </TableRow>
