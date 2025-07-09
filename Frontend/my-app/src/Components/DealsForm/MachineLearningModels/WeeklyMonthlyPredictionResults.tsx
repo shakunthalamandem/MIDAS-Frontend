@@ -394,8 +394,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
                           const modelData = predictionResult?.[apiKey];
                           const cellBgColor =
                             index === 0
-                              ? "rgba(227, 242, 253, 0.4)"
-                              : "rgba(237, 231, 246, 0.4)";
+                              ? "#e3f2fd"
+                              : "#ede7f6";
+                              
 
                           if (!modelData) {
                             return (
