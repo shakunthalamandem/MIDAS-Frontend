@@ -25,7 +25,7 @@ const formatCurrency = (value: number): string => {
   return `${value < 0 ? "-" : ""}$${formatted}${suffix}`;
 };
 
-const SectorWiseTable: React.FC = () => {
+const EquityPNLSectorWiseTable: React.FC = () => {
   const [data, setData] = useState<TableRowData[]>([]);
   const [months, setMonths] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -89,7 +89,7 @@ const SectorWiseTable: React.FC = () => {
   return (
     <Container>
       <Typography variant="h6" sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}>
-        Equities Detailed Sector-wise (Gross PNL)
+        Equities Detailed Sector-wise 
       </Typography>
 
       <TableContainer component={Paper} sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: 3, overflow: "auto", border: "1px solid #000" }}>
@@ -146,4 +146,4 @@ const SectorWiseTable: React.FC = () => {
   );
 };
 
-export default SectorWiseTable;
+export default EquityPNLSectorWiseTable;

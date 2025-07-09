@@ -106,7 +106,7 @@ const DetailedFundTable: React.FC = () => {
     return (
         <Container>
             <Typography variant="h6" sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}>
-                Detailed Fundwise(Gross PNL)
+                 Fund-Wise P&L Attribution
             </Typography>
 
             <TableContainer component={Paper} sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: 3, overflow: "auto", border: "1px solid #000" }}>
