@@ -109,16 +109,16 @@ const RegionWisePnlAttribution: React.FC = () => {
         <Container>
             <Typography
                 variant="h6"
-                sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}
+                sx={{ mt: 1, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}
             >
-                P&L by Region wise
+              Region-Wise P&L Attribution
             </Typography>
 
 
             <TableContainer
                 component={Paper}
                 sx={{
-                    mt: 4,
+                    mt: 1,
                     mb: 4,
                     borderRadius: 2,
                     boxShadow: 3,
