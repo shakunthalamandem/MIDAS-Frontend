@@ -30,27 +30,107 @@ interface Deal {
   pnl: number;
 }
 
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 2,
+});
+
+const numberFormatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 2,
+});
+
 const columns: GridColDef[] = [
   { field: "first_trade_date", headerName: "TradeDt", flex: 1 },
   { field: "client_symbol", headerName: "Ticker", flex: 1 },
   { field: "custom_group_2", headerName: "Sector", flex: 1 },
   { field: "fo_type", headerName: "Deal Type", flex: 1 },
-  { field: "deal_size", headerName: "Deal Size", flex: 1 },
-  { field: "issue_offer_price", headerName: "Issue Price", flex: 1 },
-  { field: "discount_from_announcement_price", headerName: "%Discount", flex: 1 },
-  { field: "allocated_shares", headerName: "IOI ", flex: 1 },
-  { field: "allocation_deal_size_percentage", headerName: "Allocation % of deal size", flex: 1 },
-  { field: "am_buy_shares", headerName: "AM shares", flex: 1 },
-  { field: "average_am_px", headerName: "Avg AM Cost Price", flex: 1 },
-  { field: "last_price_t1", headerName: "T-1 Close", flex: 1 },
-  { field: "t1d_open", headerName: "T+1 Open", flex: 1 },
-  { field: "t1d_high", headerName: "T+1 High", flex: 1 },
-  { field: "t1d_low", headerName: "T+1 Low", flex: 1 },
-  { field: "t1d_return_from_bloomberg", headerName: "T+1 Close", flex: 1 },
-  { field: "last_price_t1", headerName: "Last Close", flex: 1 },
-  { field: "daily_long_exposure", headerName: "Exposureas % of LMV", flex: 1 },
-  { field: "pnl", headerName: "P&L", flex: 1 },
+  {
+    field: "deal_size",
+    headerName: "Deal Size",
+    flex: 1,
+    valueFormatter: (params) => currencyFormatter.format(params),
+  },
+  {
+    field: "issue_offer_price",
+    headerName: "Issue Price",
+    flex: 1,
+    valueFormatter: (params) => currencyFormatter.format(params),
+  },
+  {
+    field: "discount_from_announcement_price",
+    headerName: "% Discount",
+    flex: 1,
+    valueFormatter: (params) => `${numberFormatter.format(params)}%`,
+  },
+  {
+    field: "allocated_shares",
+    headerName: "IOI",
+    flex: 1,
+    valueFormatter: (params) => numberFormatter.format(params),
+  },
+  {
+    field: "allocation_deal_size_percentage",
+    headerName: "Allocation % of deal size",
+    flex: 1,
+    valueFormatter: (params) => `${numberFormatter.format(params)}%`,
+  },
+  {
+    field: "am_buy_shares",
+    headerName: "AM Shares",
+    flex: 1,
+    valueFormatter: (params) => numberFormatter.format(params),
+  },
+  {
+    field: "average_am_px",
+    headerName: "Avg AM Cost Price",
+    flex: 1,
+    valueFormatter: (params) => currencyFormatter.format(params),
+  },
+  {
+    field: "last_price_t1",
+    headerName: "T-1 Close",
+    flex: 1,
+    valueFormatter: (params) => currencyFormatter.format(params),
+  },
+  {
+    field: "t1d_open",
+    headerName: "T+1 Open",
+    flex: 1,
+    valueFormatter: (params) => currencyFormatter.format(params),
+  },
+  {
+    field: "t1d_high",
+    headerName: "T+1 High",
+    flex: 1,
+    valueFormatter: (params) => currencyFormatter.format(params),
+  },
+  {
+    field: "t1d_low",
+    headerName: "T+1 Low",
+    flex: 1,
+    valueFormatter: (params) => currencyFormatter.format(params),
+  },
+  {
+    field: "t1d_return_from_bloomberg",
+    headerName: "T+1 Close",
+    flex: 1,
+    valueFormatter: (params) => currencyFormatter.format(params),
+  },
+  {
+    field: "daily_long_exposure",
+    headerName: "Exposure as % of LMV",
+    flex: 1,
+    valueFormatter: (params) => `${numberFormatter.format(params)}%`,
+  },
+  {
+    field: "pnl",
+    headerName: "P&L",
+    flex: 1,
+    valueFormatter: (params) => currencyFormatter.format(params),
+  },
 ];
+
 
 const DealTypeFundMain: React.FC<{ fund: string }> = ({ fund }) => {
   const [ipoDeals, setIpoDeals] = useState<Deal[]>([]);
