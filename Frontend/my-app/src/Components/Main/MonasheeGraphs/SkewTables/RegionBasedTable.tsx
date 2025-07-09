@@ -13,6 +13,7 @@ import {
     Card,
     CardContent,
     Typography,
+    CircularProgress,
 } from '@mui/material';
 import axios from 'axios';
 import RegionTableData from './RegionTableData';
@@ -39,6 +40,7 @@ const RegionBasedTable: React.FC = () => {
 
     const [data, setData] = useState<any>(null);
     const [totals, setTotals] = useState<any>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const menuProps = {
         PaperProps: {
@@ -83,6 +85,7 @@ const RegionBasedTable: React.FC = () => {
             };
 
             try {
+                setLoading(true);
                 const apiUrl = process.env.REACT_APP_API_URL;
                 const token = localStorage.getItem("access_token");
 
@@ -104,6 +107,8 @@ const RegionBasedTable: React.FC = () => {
             } catch (err) {
                 setNoDataPopupOpen(true);
                 setData(null);
+            }finally {
+                setLoading(false); // <-- Set loading false after request
             }
         };
 
@@ -231,7 +236,11 @@ const RegionBasedTable: React.FC = () => {
                             </Grid>
                         </Grid>
                     </Box>
-                    {data && <RegionTableData data={data} totals={totals} onRowClick={handleRowClick} />}
+                    {loading ? (
+                         <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
+                    ) : (
+                        data && <RegionTableData data={data} totals={totals} onRowClick={handleRowClick} />
+                    )}
                 </CardContent>
             </Card>
             <NoDataPopup open={noDataPopupOpen} onClose={handleClosePopup} />

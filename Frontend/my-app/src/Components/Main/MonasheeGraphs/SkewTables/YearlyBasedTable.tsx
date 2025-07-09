@@ -11,6 +11,7 @@ import {
   Card,
   CardContent,
   Typography,
+  CircularProgress
 } from '@mui/material';
 import axios from 'axios';
 import YearlyTableData from './YearlyTableData'; // Import YearlyTableData component
@@ -40,6 +41,7 @@ const YearlyBasedTable: React.FC = () => {
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
   const [sectorwiseData, setSectorwiseData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
   const [openNoDataPopup, setOpenNoDataPopup] = useState(false);
 
   const navigate = useNavigate();
@@ -74,6 +76,7 @@ const YearlyBasedTable: React.FC = () => {
     if (!(dealType && region && endYear && startYear)) return;
     (async () => {
       try {
+        setLoading(true);
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
         const filters = {
@@ -100,6 +103,8 @@ const YearlyBasedTable: React.FC = () => {
         }
       } catch {
         setOpenNoDataPopup(true);
+      }finally {
+        setLoading(false); // <-- Set loading false after request
       }
     })();
   }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
@@ -228,13 +233,16 @@ const YearlyBasedTable: React.FC = () => {
       </Card>
 
       {/* Data Table */}
-      {sectorwiseData && (
-        <YearlyTableData
-          data={sectorwiseData}
-          onRowClick={handleSectorRowClick}
-        />
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
+      ) : (
+        sectorwiseData && (
+          <YearlyTableData
+            data={sectorwiseData}
+            onRowClick={handleSectorRowClick}
+          />
+        )
       )}
-
       {/* No data popup */}
       <NoDataPopup open={openNoDataPopup} onClose={handleCloseNoDataPopup} />
     </Container>
