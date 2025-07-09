@@ -229,10 +229,7 @@ const YearlyBasedTable: React.FC = () => {
               </Grid>
             </Grid>
           </Box>
-        </CardContent>
-      </Card>
-
-      {/* Data Table */}
+          {/* Data Table */}
       {loading ? (
         <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
       ) : (
@@ -243,6 +240,10 @@ const YearlyBasedTable: React.FC = () => {
           />
         )
       )}
+        </CardContent>
+      </Card>
+
+      
       {/* No data popup */}
       <NoDataPopup open={openNoDataPopup} onClose={handleCloseNoDataPopup} />
     </Container>
