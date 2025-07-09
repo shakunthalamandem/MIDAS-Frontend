@@ -21,7 +21,6 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import WeeklyMonthlyPredictionResults from "./WeeklyMonthlyPredictionResults";
 
 interface PredictionModel {
   prediction: string | null;
@@ -276,15 +275,20 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
         >
           <Box display="flex" alignItems="center">
             <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
-            <Typography variant="h6" color="primary">
-              📊 Model Prediction Results – T+1 Close Return
+            <Typography
+              variant="h6"
+              component="h2"
+              color="primary.main"
+              fontWeight="bold"
+            >
+              T+1D Close - Model Predictions
             </Typography>
           </Box>
 
           {onRepredict && (
             <Box display="flex" alignItems="center">
               <TextField
-                label="T+1 Day Open Return (%)"
+                label="T+1D Open Return (%)"
                 variant="outlined"
                 value={price}
                 onChange={handlePriceChange}

@@ -236,8 +236,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
     {
       key: "main",
       label: "Outcome Classification",
-      explanation:
-        "Predicts whether the return is likely Positive or Negative.",
+      explanation: `Classifies the expected return into categories:
+📉 Negative: Return <= 0%
+📈 Positive: Return > 0%`,
     },
     {
       key: "positive",
@@ -281,12 +282,12 @@ const WeeklyMonthlyPredictionResults: React.FC<
               color="primary.main"
               fontWeight="bold"
             >
-              Weekly & Monthly Prediction Results
+              T+1W & T+1M - Model Predictions
             </Typography>
           </Box>
           <Box display="flex" alignItems="flex-end" gap={2}>
             <TextField
-              label="T + 1 Day Close Return (%)"
+              label="T+1D Close Return (%)"
               variant="outlined"
               size="small"
               type="number"
@@ -380,11 +381,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                     >
                       {row.label}
                     </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="text.secondary">
-                        {row.explanation}
-                      </Typography>
-                    </TableCell>
+                    <TableCell>{row.explanation}</TableCell>
                     {timeFrames.map((frame, index) => {
                       const apiKey =
                         frame.toLowerCase() === "weekly"
@@ -436,6 +433,30 @@ const WeeklyMonthlyPredictionResults: React.FC<
             </TableBody>
           </Table>
         </TableContainer>
+        <Box mt={4} textAlign="left">
+          <Typography
+            variant="body2"
+            sx={{ whiteSpace: "pre-line", mt: 2, lineHeight: 1.6 }}
+          >
+            <Box component="span" sx={{ color: "error.main", fontWeight: 600 }}>
+              Note:
+            </Box>{" "}
+            The model automatically incorporates the following key factors based
+            on the deal's <strong>Pricing Date</strong> and{" "}
+            <strong>Sector</strong>
+            {"\n"}📈 <strong>Market context:</strong> Average sector index
+            returns and S&amp;P 500 performance over
+            <em> T+1 Week</em>, <em> T+1 Month</em>, and <em> T+3 Months</em>.
+            {"\n"}💧 <strong>Liquidity indicator:</strong> Compares NYSE trading
+            volume on the previous day with the average volume over the past
+            month.
+            {"\n"}These factors are automatically calculated and used by the
+            model to improve prediction accuracy.
+            {"\n"}The model is trained on{" "}
+            <strong>over 4,000 historical deals</strong>, ensuring a robust and
+            reliable forecast.
+          </Typography>
+        </Box>
       </Paper>
     </Container>
   );
