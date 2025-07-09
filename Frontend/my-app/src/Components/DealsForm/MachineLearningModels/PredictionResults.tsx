@@ -21,7 +21,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import PredictionResults2 from "./PredictionResults2";
+import WeeklyMonthlyPredictionResults from "./WeeklyMonthlyPredictionResults";
 
 interface PredictionModel {
   prediction: string | null;
@@ -343,7 +343,7 @@ Threshold: Return < -2%`,
         </TableContainer>
 
       </Paper>
-      <PredictionResults2 result={{}} modelVersions={[]} />
+      
     </Container>
   );
 };

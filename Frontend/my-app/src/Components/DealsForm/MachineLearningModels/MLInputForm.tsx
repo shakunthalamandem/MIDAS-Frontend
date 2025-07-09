@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Typography, MenuProps } from "@mui/material";
 import EquityMLFormData from "./EquityMLFormData";
-import T1DPriceCategory from "./T1DPriceCategory";
 import PredictionResults from "./PredictionResults";
+import WeeklyMonthlyPredictionResults from "./WeeklyMonthlyPredictionResults";
+
+interface PredictionModel {
+  prediction: string | null;
+  Accuracy: number;
+}
 
 const menuProps: Partial<MenuProps> = {
   PaperProps: {
@@ -101,6 +106,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     message: "",
     severity: "error" as "error" | "success",
   });
+
+  const [newWeeklyMonthlyPredictionData, setnewWeeklyMonthlyPredictionData] = useState<Record<string, PredictionModel> | null>(null);
 
   const inputWidth = 250;
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -272,6 +279,52 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     }
   };
 
+const handleWeeklyMonthlyRepredictionRequest = async (t1dCloseReturn: number): Promise<Record<string, PredictionModel>> => {
+  console.log(`Repredicting with T+1 Day Close Return: ${t1dCloseReturn}%`);
+
+  const weeklyMonthlyPayload = {
+      ...formData,
+      t1d_return_from_bloomberg_category: t1dCloseReturn,
+    };
+
+  try {
+    const response = await fetch(`${apiUrl}/api/ml_weekly_monthly/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(weeklyMonthlyPayload),
+    });
+
+    if (!response.ok) {
+      throw new Error("Reprediction failed");
+    }
+
+    const fullResponse = await response.json();
+
+    // Extract only prediction and Accuracy from each key
+    const simplifiedResponse: Record<string, PredictionModel> = {};
+    for (const key in fullResponse) {
+      const { prediction, Accuracy } = fullResponse[key];
+      simplifiedResponse[key] = { prediction, Accuracy };
+    }
+
+    setnewWeeklyMonthlyPredictionData(simplifiedResponse);
+    console.log("Received new prediction data:", simplifiedResponse);
+    return simplifiedResponse;
+  } catch (error) {
+    console.error("Weekly/Monthly reprediction error:", error);
+    setSnackbar({
+      open: true,
+      message: "Failed to repredict weekly/monthly. Please try again.",
+      severity: "error",
+    });
+    return {};
+  }
+};
+
+
   const handleReset = () => {
     setFormData(defaultFormData);
     setFormErrors({});
@@ -306,6 +359,11 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
       {prediction && (
        <PredictionResults result={prediction}  onRepredict={handleRepredictWithPrice}/>
       )}
+      <WeeklyMonthlyPredictionResults
+          result={newWeeklyMonthlyPredictionData}
+          onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredictionRequest}
+        />
+ 
     </>
   );
 };
