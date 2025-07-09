@@ -215,7 +215,7 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                   }}
 
                 >
-                  <b>Exposure</b>
+                  <b>Exposure (Avg)</b>
                 </TableSortLabel>
               </TableCell>
             </TableRow>

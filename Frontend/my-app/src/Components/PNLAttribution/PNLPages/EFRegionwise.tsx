@@ -188,7 +188,7 @@ const EFRegionwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                     '& .MuiTableSortLabel-label': { color: '#fff !important' },
                   }}
                 >
-                  <b>Exposure</b>
+                  <b>Exposure (Avg)</b>
                 </TableSortLabel>
               </TableCell>
             </TableRow>
