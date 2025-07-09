@@ -322,20 +322,19 @@ const WeeklyMonthlyPredictionResults: React.FC<
                     sx={{
                       "& .MuiTableCell-head": {
                         fontWeight: "bold",
-                        bgcolor: "grey.100",
                       },
                     }}
                   >
-                    <TableCell  sx={{ minWidth: 180 }}>Model</TableCell>
-                    <TableCell sx={{ minWidth: 250 }}>Explanation</TableCell>
+                    <TableCell  sx={{ minWidth: 180 ,bgcolor:'#F0F0f0'}}>Model</TableCell>
+                    <TableCell sx={{ minWidth: 250 ,bgcolor:'#F0F0f0'}}>Explanation</TableCell>
                     {timeFrames.map((frame, index) => (
                       <React.Fragment key={frame}>
                         <TableCell
                           sx={{
                             bgcolor:
                               index === 0
-                                ? "rgba(227, 242, 253, 0.7)"
-                                : "rgba(237, 231, 246, 0.7)",
+                                ? "#e3f2fd"
+                                : "#ede7f6",
                           }}
                         >
                           T + 1 {frame} (AM) Result
@@ -344,8 +343,8 @@ const WeeklyMonthlyPredictionResults: React.FC<
                           sx={{
                             bgcolor:
                               index === 0
-                                ? "rgba(227, 242, 253, 0.7)"
-                                : "rgba(237, 231, 246, 0.7)",
+                                ? "#e3f2fd"
+                                : "#ede7f6",
                             minWidth: 90,
                           }}
                         >
