@@ -93,41 +93,48 @@ const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
     const year = date.getFullYear();
     return `${day}${suffix} ${month} ${year}`;
   };
-  useEffect(() => {
-    const fetchPnLData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+useEffect(() => {
+  const fetchPnLData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const response = await fetch(`${apiUrl}/api/pnls_graphs/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(appliedFilters),
-        });
+      const response = await fetch(`${apiUrl}/api/pnls_graphs/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(appliedFilters),
+      });
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
 
-        const result = await response.json();
+      const result = await response.json();
+
+      if (result.Response === "No trade data available.") {
+        setError("No data found for these filters.");
+        setData(null);
+      } else {
         setData(result);
-      } catch (err: any) {
-        setError(err.message || "Failed to load data");
-      } finally {
-        setLoading(false);
       }
-    };
-
-    if (token) {
-      fetchPnLData();
-    } else {
-      setError("No access token found.");
+    } catch (err: any) {
+      setError(err.message || "Failed to load data");
+      setData(null);
+    } finally {
       setLoading(false);
     }
-  }, [token, apiUrl, appliedFilters]);
+  };
+
+  if (token) {
+    fetchPnLData();
+  } else {
+    setError("No access token found.");
+    setLoading(false);
+    setData(null);
+  }
+}, [token, apiUrl, appliedFilters]);
+
+
 
 
 
