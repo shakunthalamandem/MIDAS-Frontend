@@ -64,7 +64,7 @@ const EFSectorwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
         const token = localStorage.getItem('access_token');
         if (!apiUrl) throw new Error('API URL is not defined');
 
-        const response = await fetch(`${apiUrl}/api/pnl_by_sector/`, {
+        const response = await fetch(`${apiUrl}/api/pnl_by_sector_data/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

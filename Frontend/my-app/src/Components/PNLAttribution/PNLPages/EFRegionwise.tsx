@@ -64,7 +64,7 @@ const EFRegionwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
         const token = localStorage.getItem('access_token');
         if (!apiUrl) throw new Error('API URL is not defined');
 
-        const response = await fetch(`${apiUrl}/api/pnl_by_region/`, {
+        const response = await fetch(`${apiUrl}/api/pnl_by_region_data/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
