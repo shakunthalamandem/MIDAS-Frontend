@@ -94,22 +94,21 @@ const EFRegionwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
     setOrderBy(property);
   };
 
-  function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-    if (b[orderBy] < a[orderBy]) return -1;
-    if (b[orderBy] > a[orderBy]) return 1;
-    return 0;
-  }
+  const dealTypeOrder = ['US', 'EMEA', 'APAC', 'Non-US America'];
+  const sortedData = [...data].sort((a, b) => {
+  if (orderBy === 'region') {
+    const indexA = dealTypeOrder.indexOf(a.region);
+    const indexB = dealTypeOrder.indexOf(b.region);
 
-  function getComparator<Key extends keyof any>(
-    order: Order,
-    orderBy: Key
-  ): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
-    return order === 'desc'
-      ? (a, b) => descendingComparator(a, b, orderBy)
-      : (a, b) => -descendingComparator(a, b, orderBy);
-  }
+    const sortValue = (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
 
-  const sortedData = [...data].sort(getComparator(order, orderBy));
+    return order === 'asc' ? sortValue : -sortValue;
+  }
+  const valA = a[orderBy];
+  const valB = b[orderBy];
+  return order === 'asc' ? valA - valB : valB - valA;
+});
+
 
   if (loading) {
     return (

@@ -290,7 +290,7 @@ const PNLPagesMain = () => {
   color="textSecondary"
   align="center"
   mt={2}
-  sx={{ fontStyle: 'italic' }}
+  sx={{ fontStyle: 'italic',fontSize: '0.875rem' }}
 >
   Note: Hedging includes Hedging, Hedging_Converts, Hedging_HY, Hedging_Other
 </Typography>
