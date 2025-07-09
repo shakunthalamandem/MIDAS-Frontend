@@ -78,7 +78,7 @@ const PnlAttributionMain: React.FC = () => {
             justifyContent="center"
             gap={2}
             flexWrap="wrap"
-            
+            height={20.5}
           >
             {tabConfig.map((tab) => (
               <Button

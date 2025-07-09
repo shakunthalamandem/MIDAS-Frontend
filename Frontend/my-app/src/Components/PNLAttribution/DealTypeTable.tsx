@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, CircularProgress, Typography, Container, Box,
-  Card
+  Paper, CircularProgress, Typography, Container, Box, Card
 } from "@mui/material";
 
 type StrategyData = {
@@ -96,82 +95,99 @@ const DealTypeTable: React.FC = () => {
     fetchData();
   }, [apiUrl, token]);
 
-  const cellBorder = { border: "1px solid black", textAlign: "center" };
+  const cellBorder = { border: "1px solid #ccc", textAlign: "center" };
   const totalRowBgColor = "#fde8b7";
   const hedgingRowBgColor = "rgb(145, 206, 137)";
 
   return (
-    <Container maxWidth="xl" sx={{mb:2}} >
-      <Card elevation={5}>
-      <Typography
-        variant="h6"
+    <Container maxWidth="xl" sx={{ mb: 4 }}>
+      <Card
+        elevation={4}
         sx={{
-          mt: 4, mb: 1, fontWeight: "bold",
-          color: "#002060", textAlign: "center"
+          background: "linear-gradient(to right, #e0f7fa, #f1f8e9)",
+          borderRadius: 3,
+          p: 3,
         }}
       >
-        Equities Detailed Strategy-wise
-      </Typography>
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 3,
+            fontWeight: "bold",
+            color: "#002060",
+            textAlign: "center",
+          }}
+        >
+          Equities Detailed Strategy-wise
+        </Typography>
 
-      <TableContainer
-        component={Paper}
-        sx={{
-           borderRadius: 2, boxShadow: 3,
-          overflow: "auto", 
-        }}
-      >
-        {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 300 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Table size="small" sx={{ borderCollapse: "collapse" }}>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#002060" }}>
-                <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
-                  <b>Strategy (Equities)</b>
-                </TableCell>
-                {months.map((month) => (
-                  <TableCell key={month} align="center" sx={{ color: "#ffffff", ...cellBorder }}>
-                    <b>{month}</b>
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: 2,
+            overflowX: "auto",
+            maxHeight: 600,
+            boxShadow: 2,
+          }}
+        >
+          {loading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 300 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Table size="small" sx={{ borderCollapse: "collapse", minWidth: 900 }}>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#002060" }}>
+                  <TableCell sx={{ color: "#ffffff", ...cellBorder, fontWeight: "bold" }}>
+                    Strategy
                   </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {strategyOrder.map((strategy) => {
-                const row = data.find((d) => d.strategyName === strategy);
-                if (!row) return null;
-
-                const isHedgingRow = strategy === "Hedging";
-                return (
-                  <TableRow key={strategy} sx={isHedgingRow ? { backgroundColor: hedgingRowBgColor } : undefined}>
-                    <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>{strategy}</TableCell>
-                    {months.map((m) => (
-                      <TableCell key={m} sx={cellBorder}>
-                        {formatCurrency(row.values[m] ?? 0)}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })}
-
-              {/* Overall total row */}
-              <TableRow key="overall-total" sx={{ backgroundColor: totalRowBgColor }}>
-                <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>Overall Total</TableCell>
-                {months.map((m) => {
-                  const total = data.reduce((sum, row) => sum + (row.values[m] ?? 0), 0);
-                  return (
-                    <TableCell key={m} sx={cellBorder}>
-                      <b>{formatCurrency(total)}</b>
+                  {months.map((month) => (
+                    <TableCell key={month} align="center" sx={{ color: "#ffffff", ...cellBorder, fontWeight: "bold" }}>
+                      {month}
                     </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {strategyOrder.map((strategy) => {
+                  const row = data.find((d) => d.strategyName === strategy);
+                  if (!row) return null;
+
+                  const isHedgingRow = strategy === "Hedging";
+                  return (
+                    <TableRow
+                      key={strategy}
+                      sx={{
+                        backgroundColor: isHedgingRow ? hedgingRowBgColor : undefined,
+                        "&:hover": { backgroundColor: "#f5f5f5" },
+                      }}
+                    >
+                      <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>{strategy}</TableCell>
+                      {months.map((m) => (
+                        <TableCell key={m} sx={cellBorder}>
+                          {formatCurrency(row.values[m] ?? 0)}
+                        </TableCell>
+                      ))}
+                    </TableRow>
                   );
                 })}
-              </TableRow>
-            </TableBody>
-          </Table>
-        )}
-      </TableContainer>
+
+                {/* Overall total row */}
+                <TableRow key="overall-total" sx={{ backgroundColor: totalRowBgColor }}>
+                  <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>Overall Total</TableCell>
+                  {months.map((m) => {
+                    const total = data.reduce((sum, row) => sum + (row.values[m] ?? 0), 0);
+                    return (
+                      <TableCell key={m} sx={cellBorder}>
+                        <b>{formatCurrency(total)}</b>
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              </TableBody>
+            </Table>
+          )}
+        </TableContainer>
       </Card>
     </Container>
   );
