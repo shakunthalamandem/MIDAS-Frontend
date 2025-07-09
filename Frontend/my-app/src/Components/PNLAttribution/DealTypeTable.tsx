@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, CircularProgress, Typography, Container, Box
+  Paper, CircularProgress, Typography, Container, Box,
+  Card
 } from "@mui/material";
 
 type StrategyData = {
@@ -100,7 +101,8 @@ const DealTypeTable: React.FC = () => {
   const hedgingRowBgColor = "rgb(145, 206, 137)";
 
   return (
-    <Container>
+    <Container maxWidth="xl" sx={{mb:2}} >
+      <Card elevation={5}>
       <Typography
         variant="h6"
         sx={{
@@ -108,14 +110,14 @@ const DealTypeTable: React.FC = () => {
           color: "#002060", textAlign: "center"
         }}
       >
-        Equities Detailed Strategy-wise (Gross PNL)
+        Equities Detailed Strategy-wise
       </Typography>
 
       <TableContainer
         component={Paper}
         sx={{
-          mt: 4, mb: 4, borderRadius: 2, boxShadow: 3,
-          overflow: "auto", border: "1px solid #000"
+           borderRadius: 2, boxShadow: 3,
+          overflow: "auto", 
         }}
       >
         {loading ? (
@@ -170,6 +172,7 @@ const DealTypeTable: React.FC = () => {
           </Table>
         )}
       </TableContainer>
+      </Card>
     </Container>
   );
 };

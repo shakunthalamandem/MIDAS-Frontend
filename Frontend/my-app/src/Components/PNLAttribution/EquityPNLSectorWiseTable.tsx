@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, CircularProgress, Typography, Container, Box
+  Paper, CircularProgress, Typography, Container, Box,
+  Card
 } from "@mui/material";
 
 type SectorData = {
@@ -87,12 +88,13 @@ const EquityPNLSectorWiseTable: React.FC = () => {
   ];
 
   return (
-    <Container>
+    <Container maxWidth="xl" >
+      <Card elevation={4}>
       <Typography variant="h6" sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}>
         Equities Detailed Sector-wise 
       </Typography>
 
-      <TableContainer component={Paper} sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: 3, overflow: "auto", border: "1px solid #000" }}>
+      <TableContainer component={Paper} sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: 3, overflow: "auto" }}>
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 300 }}>
             <CircularProgress />
@@ -142,6 +144,7 @@ const EquityPNLSectorWiseTable: React.FC = () => {
           </Table>
         )}
       </TableContainer>
+      </Card>
     </Container>
   );
 };
