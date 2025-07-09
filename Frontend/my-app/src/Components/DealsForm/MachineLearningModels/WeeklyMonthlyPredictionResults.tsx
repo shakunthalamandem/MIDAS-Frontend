@@ -256,6 +256,8 @@ const WeeklyMonthlyPredictionResults: React.FC<
 
   const timeFrames = ["Weekly", "Monthly"];
 
+  const showTable = predictionResult && Object.keys(predictionResult).length > 0;
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
       <Paper
@@ -312,151 +314,162 @@ const WeeklyMonthlyPredictionResults: React.FC<
 
         <Divider sx={{ my: 3 }} />
 
-        <TableContainer>
-          <Table sx={{ minWidth: 800 }}>
-            <TableHead>
-              <TableRow
-                sx={{
-                  "& .MuiTableCell-head": {
-                    fontWeight: "bold",
-                    bgcolor: "grey.100",
-                  },
-                }}
-              >
-                <TableCell>Model</TableCell>
-                <TableCell sx={{ minWidth: 250 }}>Explanation</TableCell>
-                {timeFrames.map((frame, index) => (
-                  <React.Fragment key={frame}>
-                    <TableCell
-                      sx={{
-                        bgcolor:
-                          index === 0
-                            ? "rgba(227, 242, 253, 0.7)"
-                            : "rgba(237, 231, 246, 0.7)",
-                      }}
-                    >
-                      T + 1 {frame} (AM) Result
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        bgcolor:
-                          index === 0
-                            ? "rgba(227, 242, 253, 0.7)"
-                            : "rgba(237, 231, 246, 0.7)",
-                        minWidth: 180,
-                      }}
-                    >
-                      Accuracy & Confidence
-                    </TableCell>
-                  </React.Fragment>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rowConfig.map((row) => {
-                const modelKeys = {
-                  weekly: `t1w_${row.key}`,
-                  monthly: `t1m_${row.key}`,
-                };
-
-                const isWeeklyNull =
-                  !predictionResult?.[modelKeys.weekly]?.prediction &&
-                  predictionResult?.[modelKeys.weekly]?.Accuracy == null;
-
-                const isMonthlyNull =
-                  !predictionResult?.[modelKeys.monthly]?.prediction &&
-                  predictionResult?.[modelKeys.monthly]?.Accuracy == null;
-
-                if (isWeeklyNull && isMonthlyNull) return null;
-
-                return (
+        {showTable ? (
+          <>
+            <TableContainer>
+              <Table sx={{ minWidth: 800 }}>
+                <TableHead>
                   <TableRow
-                    key={row.key}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    sx={{
+                      "& .MuiTableCell-head": {
+                        fontWeight: "bold",
+                        bgcolor: "grey.100",
+                      },
+                    }}
                   >
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{ fontWeight: "medium" }}
-                    >
-                      {row.label}
-                    </TableCell>
-                    <TableCell>{row.explanation}</TableCell>
-                    {timeFrames.map((frame, index) => {
-                      const apiKey =
-                        frame.toLowerCase() === "weekly"
-                          ? modelKeys.weekly
-                          : modelKeys.monthly;
-                      const modelData = predictionResult?.[apiKey];
-                      const cellBgColor =
-                        index === 0
-                          ? "rgba(227, 242, 253, 0.4)"
-                          : "rgba(237, 231, 246, 0.4)";
-
-                      if (!modelData) {
-                        return (
-                          <React.Fragment key={apiKey}>
-                            <TableCell sx={{ bgcolor: cellBgColor }}>
-                              <Box color="text.disabled">N/A</Box>
-                            </TableCell>
-                            <TableCell sx={{ bgcolor: cellBgColor }}>
-                              <Box color="text.disabled">N/A</Box>
-                            </TableCell>
-                          </React.Fragment>
-                        );
-                      }
-
-                      const renderResult =
-                        row.key === "main"
-                          ? renderOutcome(modelData.prediction)
-                          : renderBinaryResult(modelData.prediction);
-
-                      return (
-                        <React.Fragment key={apiKey}>
-                          <TableCell
-                            sx={{ bgcolor: cellBgColor, fontWeight: "medium" }}
-                          >
-                            {renderResult}
-                          </TableCell>
-                          <TableCell sx={{ bgcolor: cellBgColor }}>
-                            <Box display="flex" flexDirection="column" gap={1}>
-                              {renderAccuracyLevel(modelData.Accuracy)}
-                              {renderConfidenceLevel(modelData.Confidence)}
-                            </Box>
-                          </TableCell>
-                        </React.Fragment>
-                      );
-                    })}
+                    <TableCell>Model</TableCell>
+                    <TableCell sx={{ minWidth: 250 }}>Explanation</TableCell>
+                    {timeFrames.map((frame, index) => (
+                      <React.Fragment key={frame}>
+                        <TableCell
+                          sx={{
+                            bgcolor:
+                              index === 0
+                                ? "rgba(227, 242, 253, 0.7)"
+                                : "rgba(237, 231, 246, 0.7)",
+                          }}
+                        >
+                          T + 1 {frame} (AM) Result
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            bgcolor:
+                              index === 0
+                                ? "rgba(227, 242, 253, 0.7)"
+                                : "rgba(237, 231, 246, 0.7)",
+                            minWidth: 180,
+                          }}
+                        >
+                          Accuracy & Confidence
+                        </TableCell>
+                      </React.Fragment>
+                    ))}
                   </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Box mt={4} textAlign="left">
-          <Typography
-            variant="body2"
-            sx={{ whiteSpace: "pre-line", mt: 2, lineHeight: 1.6 }}
-          >
-            <Box component="span" sx={{ color: "error.main", fontWeight: 600 }}>
-              Note:
-            </Box>{" "}
-            The model automatically incorporates the following key factors based
-            on the deal's <strong>Pricing Date</strong> and{" "}
-            <strong>Sector</strong>
-            {"\n"}📈 <strong>Market context:</strong> Average sector index
-            returns and S&amp;P 500 performance over
-            <em> T+1 Week</em>, <em> T+1 Month</em>, and <em> T+3 Months</em>.
-            {"\n"}💧 <strong>Liquidity indicator:</strong> Compares NYSE trading
-            volume on the previous day with the average volume over the past
-            month.
-            {"\n"}These factors are automatically calculated and used by the
-            model to improve prediction accuracy.
-            {"\n"}The model is trained on{" "}
-            <strong>over 4,000 historical deals</strong>, ensuring a robust and
-            reliable forecast.
-          </Typography>
-        </Box>
+                </TableHead>
+                <TableBody>
+                  {rowConfig.map((row) => {
+                    const modelKeys = {
+                      weekly: `t1w_${row.key}`,
+                      monthly: `t1m_${row.key}`,
+                    };
+
+                    const isWeeklyNull =
+                      !predictionResult?.[modelKeys.weekly]?.prediction &&
+                      predictionResult?.[modelKeys.weekly]?.Accuracy == null;
+
+                    const isMonthlyNull =
+                      !predictionResult?.[modelKeys.monthly]?.prediction &&
+                      predictionResult?.[modelKeys.monthly]?.Accuracy == null;
+
+                    if (isWeeklyNull && isMonthlyNull) return null;
+
+                    return (
+                      <TableRow
+                        key={row.key}
+                        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      >
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ fontWeight: "medium" }}
+                        >
+                          {row.label}
+                        </TableCell>
+                        <TableCell>{row.explanation}</TableCell>
+                        {timeFrames.map((frame, index) => {
+                          const apiKey =
+                            frame.toLowerCase() === "weekly"
+                              ? modelKeys.weekly
+                              : modelKeys.monthly;
+                          const modelData = predictionResult?.[apiKey];
+                          const cellBgColor =
+                            index === 0
+                              ? "rgba(227, 242, 253, 0.4)"
+                              : "rgba(237, 231, 246, 0.4)";
+
+                          if (!modelData) {
+                            return (
+                              <React.Fragment key={apiKey}>
+                                <TableCell sx={{ bgcolor: cellBgColor }}>
+                                  <Box color="text.disabled">N/A</Box>
+                                </TableCell>
+                                <TableCell sx={{ bgcolor: cellBgColor }}>
+                                  <Box color="text.disabled">N/A</Box>
+                                </TableCell>
+                              </React.Fragment>
+                            );
+                          }
+
+                          const renderResult =
+                            row.key === "main"
+                              ? renderOutcome(modelData.prediction)
+                              : renderBinaryResult(modelData.prediction);
+
+                          return (
+                            <React.Fragment key={apiKey}>
+                              <TableCell
+                                sx={{ bgcolor: cellBgColor, fontWeight: "medium" }}
+                              >
+                                {renderResult}
+                              </TableCell>
+                              <TableCell sx={{ bgcolor: cellBgColor }}>
+                                <Box display="flex" flexDirection="column" gap={1}>
+                                  {renderAccuracyLevel(modelData.Accuracy)}
+                                  {renderConfidenceLevel(modelData.Confidence)}
+                                </Box>
+                              </TableCell>
+                            </React.Fragment>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Box mt={4} textAlign="left">
+              <Typography
+                variant="body2"
+                sx={{ whiteSpace: "pre-line", mt: 2, lineHeight: 1.6 }}
+              >
+                <Box component="span" sx={{ color: "error.main", fontWeight: 600 }}>
+                  Note:
+                </Box>{" "}
+                The model automatically incorporates the following key factors based
+                on the deal's <strong>Pricing Date</strong> and{" "}
+                <strong>Sector</strong>
+                {"\n"}📈 <strong>Market context:</strong> Average sector index
+                returns and S&amp;P 500 performance over
+                <em> T+1 Week</em>, <em> T+1 Month</em>, and <em> T+3 Months</em>.
+                {"\n"}💧 <strong>Liquidity indicator:</strong> Compares NYSE trading
+                volume on the previous day with the average volume over the past
+                month.
+                {"\n"}These factors are automatically calculated and used by the
+                model to improve prediction accuracy.
+                {"\n"}The model is trained on{" "}
+                <strong>over 4,000 historical deals</strong>, ensuring a robust and
+                reliable forecast.
+              </Typography>
+            </Box>
+          </>
+        ) : (
+          <Box sx={{ textAlign: "center", py: 4 }}>
+            <Typography variant="h6" color="text.secondary">
+              Enter the **T+1D Close Return (%)** to predict the T+1W and T+1M
+              outcomes.
+            </Typography>
+          </Box>
+        )}
       </Paper>
     </Container>
   );
