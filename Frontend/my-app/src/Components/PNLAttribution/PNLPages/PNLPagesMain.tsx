@@ -16,7 +16,6 @@ import {
   Checkbox,
   ListItemText,
 } from '@mui/material';
-import PnlTables from '../PNLPages/PnlTables';
 import EFStrategywise from './EFStrategywise';
 import EFSectorwise from './EFSectorwise';
 import EFRegionwise from './EFRegionwise';
