@@ -270,10 +270,10 @@ const PNLPagesMain = () => {
                 <PnlTables selectedFilters={filters} />
                   </Grid> */}
               <Grid item xs={12} md={4}>
-                <EFStrategywise selectedFilters={filters} />
+                <EFSectorwise selectedFilters={filters} />
               </Grid>
               <Grid item xs={12} md={4}>
-                <EFSectorwise selectedFilters={filters} />
+                <EFStrategywise selectedFilters={filters} />
               </Grid>
               <Grid item xs={12} md={4}>
                 <EFRegionwise selectedFilters={filters} />
@@ -281,6 +281,15 @@ const PNLPagesMain = () => {
             </Grid>
           </Box>
         )}
+<Typography
+  color="textSecondary"
+  align="center"
+  mt={2}
+  sx={{ fontStyle: 'italic' }}
+>
+  Note: Hedging includes Hedging, Hedging_Converts, Hedging_HY, Hedging_Other
+</Typography>
+
       </Box>
     </Container>
   );
