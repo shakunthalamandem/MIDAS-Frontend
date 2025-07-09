@@ -326,7 +326,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                       },
                     }}
                   >
-                    <TableCell  sx={{ minWidth: 150 }}>Model</TableCell>
+                    <TableCell  sx={{ minWidth: 180 }}>Model</TableCell>
                     <TableCell sx={{ minWidth: 250 }}>Explanation</TableCell>
                     {timeFrames.map((frame, index) => (
                       <React.Fragment key={frame}>
@@ -346,7 +346,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                               index === 0
                                 ? "rgba(227, 242, 253, 0.7)"
                                 : "rgba(237, 231, 246, 0.7)",
-                            minWidth: 180,
+                            minWidth: 90,
                           }}
                         >
                           Accuracy & Confidence
