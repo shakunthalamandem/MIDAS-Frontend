@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Typography,
   Paper,
   CircularProgress,
   Grid,
+  TextField,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 interface DealData {
   "Pricing Date": string;
   "Issuer Name": string;
-  Ticker: string;
+  "Ticker": string;
   "Deal Type": string;
+  "FO Type": string;
   "Broad Region": string;
-  Year: number;
+  "Year": number;
   "T + 1 Month Return": number;
   "T + 1 Day Return": number;
   "AM Return Percentage": number;
@@ -39,18 +41,34 @@ interface DealData {
   "Days Held": number;
 }
 
+const formatCurrency = (val: number | null | undefined) => {
+  if (val == null || isNaN(val)) return "";
+  return "$" + val.toLocaleString("en-US", { maximumFractionDigits: 0 });
+};
+
+const formatComma = (val: number | null | undefined) => {
+  if (val == null || isNaN(val)) return "";
+  return val.toLocaleString("en-US", { maximumFractionDigits: 0 });
+};
+
+const formatPercentage = (val: number | null | undefined) => {
+  if (val == null || isNaN(val)) return "";
+  const absVal = Math.abs(val);
+  if (absVal < 0.005) return "0.00%";
+  return `${val.toFixed(2)}%`;
+};
+
 const DealDetailedGapAnalysis: React.FC = () => {
   const [data, setData] = useState<DealData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const fetchData = async () => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
-      if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables");
-      }
+      if (!apiUrl) throw new Error("API URL is not defined");
 
       const response = await fetch(`${apiUrl}/api/deal_detailed_gap_analysis/`, {
         method: "POST",
@@ -58,11 +76,11 @@ const DealDetailedGapAnalysis: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({}), 
+        body: JSON.stringify({}),
       });
 
       const json = await response.json();
-      setData(json.data);
+      setData(json.data || []);
     } catch (error) {
       console.error("Error fetching deal data:", error);
     } finally {
@@ -74,70 +92,217 @@ const DealDetailedGapAnalysis: React.FC = () => {
     fetchData();
   }, []);
 
+  const rows = useMemo(() => {
+    return data
+      .map((row, index) => ({
+        id: index,
+        ...row,
+        "FO Type": row["Deal Type"] === "IPO" ? "-" : row["FO Type"],
+      }))
+      .filter((row) =>
+        row["Ticker"]?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+  }, [data, searchQuery]);
+
+
   const columns: GridColDef[] = [
-    { field: "Pricing Date", headerName: "Pricing Date", width: 130 },
-    { field: "Issuer Name", headerName: "Issuer Name", width: 200 },
-    { field: "Ticker", headerName: "Ticker", width: 120 },
-    { field: "Deal Type", headerName: "Deal Type", width: 120 },
-    { field: "Broad Region", headerName: "Region", width: 120 },
-    { field: "Year", headerName: "Year", width: 100 },
-    { field: "T + 1 Month Return", headerName: "+1M Return %", width: 130 },
-    { field: "T + 1 Day Return", headerName: "+1D Return %", width: 130 },
-    { field: "AM Return Percentage", headerName: "AM Return %", width: 130 },
-    { field: "Allocated Capital", headerName: "Allocated Capital", width: 150 },
-    { field: "Am Capital Committed", headerName: "AM Capital", width: 150 },
-    { field: "Total Committed Capital", headerName: "Total Capital", width: 150 },
-    { field: "Allocation Exposure Gap", headerName: "Allocation Gap", width: 150 },
-    { field: "AM Exposure Gap", headerName: "AM Gap", width: 130 },
-    { field: "Total Exposure Gap", headerName: "Total Gap", width: 130 },
+    { field: "Pricing Date", headerName: "Pricing Date", width: 120 },
+    { field: "Issuer Name", headerName: "Issuer Name", width: 180 },
+    { field: "Ticker", headerName: "Ticker", width: 100 },
+    { field: "Deal Type", headerName: "Deal Type", width: 100 },
+    { field: "FO Type", headerName: "FO Type", width: 100 },
+    { field: "Broad Region", headerName: "Region", width: 100 },
+    { field: "Year", headerName: "Year", width: 80 },
+    {
+      field: "T + 1 Month Return",
+      headerName: "T + 1 Month Return",
+      width: 120,
+      renderCell: (params) => formatPercentage(params.value),
+    },
+    {
+      field: "T + 1 Day Return",
+      headerName: "T + 1 Day Return",
+      width: 120,
+      renderCell: (params) => formatPercentage(params.value),
+    },
+    {
+      field: "AM Return Percentage",
+      headerName: "AM Return Percentage",
+      width: 120,
+      renderCell: (params) => formatPercentage(params.value),
+    },
+    {
+      field: "Allocated Capital",
+      headerName: "Allocated Capital",
+      width: 140,
+      renderCell: (params) => formatCurrency(params.value),
+    },
+    {
+      field: "Am Capital Committed",
+      headerName: "Am Capital Committed",
+      width: 130,
+      renderCell: (params) => formatCurrency(params.value),
+    },
+    {
+      field: "Total Committed Capital",
+      headerName: "Total Committed Capital",
+      width: 130,
+      renderCell: (params) => formatCurrency(params.value),
+    },
+    {
+      field: "Model Allocation Capital",
+      headerName: "Model Allocation Capital",
+      width: 170,
+      renderCell: (params) => formatCurrency(params.value),
+    },
+    {
+      field: "Model AM Capital",
+      headerName: "Model AM Capital",
+      width: 150,
+      renderCell: (params) => formatCurrency(params.value),
+    },
+    {
+      field: "Total Model Capital",
+      headerName: "Total Model Capital",
+      width: 150,
+      renderCell: (params) => formatCurrency(params.value),
+    },
+    {
+      field: "Allocation Exposure Gap",
+      headerName: "Allocation Exposure Gap",
+      width: 140,
+      renderCell: (params) => formatCurrency(params.value),
+    },
+    {
+      field: "AM Exposure Gap",
+      headerName: "AM Exposure Gap",
+      width: 100,
+      renderCell: (params) => formatCurrency(params.value),
+    },
+    {
+      field: "Total Exposure Gap",
+      headerName: "Total Exposure Gap",
+      width: 110,
+      renderCell: (params) => formatCurrency(params.value),
+    },
+    { field: "Allocated Shares", headerName: "Allocated Shares", width: 140,renderCell: (params) => formatComma(params.value), },
+    { field: "Am Buy Shares", headerName: "AM Buy Shares", width: 120,renderCell: (params) => formatComma(params.value) },
+    { field: "Total Buy Shares", headerName: "Total Buy Shares", width: 130,renderCell: (params) => formatComma(params.value) },
+    {
+      field: "Model Allocation Shares",
+      headerName: "Model Allocation Shares",
+      width: 170,
+      renderCell: (params) => formatComma(params.value)
+    },
+    { field: "Model Am Shares", headerName: "Model AM Shares", width: 130,renderCell: (params) => formatComma(params.value) },
+    { field: "Total Model Shares", headerName: "Total Model Shares", width: 130,renderCell: (params) => formatComma(params.value) },
+    {
+      field: "Allocation Gap Shares",
+      headerName: "Allocation Gap Shares",
+      width: 160,
+      renderCell: (params) => (
+        <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
+          {formatComma(params.value)}
+        </span>
+      ),
+    },
+    {
+      field: "Am Gap Shares",
+      headerName: "AM Gap Shares",
+      width: 120,
+      renderCell: (params) => (
+        <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
+          {formatComma(params.value)}
+        </span>
+      ),
+    },
+    {
+      field: "Total Gap Shares",
+      headerName: "Total Gap Shares",
+      width: 120,
+      renderCell: (params) => (
+        <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
+          {formatComma(params.value)}
+        </span>
+      ),
+    },
+
     { field: "Days Held", headerName: "Days Held", width: 100 },
   ];
 
-  const rows = data.map((row, index) => ({ id: index, ...row }));
-
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant="h5" gutterBottom color="#002060" align="center">
-        Deal Detailed Gap Analysis
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+        <Typography variant="h5" color="#002060" align="center" sx={{ flex: 1 }}>
+          Deal Detailed Gap Analysis
+        </Typography>
+        <TextField
+          size="small"
+          variant="outlined"
+          placeholder="Search Ticker"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{ width: 300, ml: 2 }}
+        />
+      </Box>
+
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        align="left"
+        sx={{ mb: 1 }}
+      >
+        <b>Note :</b> The table below includes all IPO and FO deals from 2025, positions are still held in the portfolio (i.e., current quantity &gt; 0), and the holding period is less than 30 days.
       </Typography>
+
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        align="left"
+        sx={{ mb: 2 }}
+      >
+        <b>Assumptions :</b> As for the below GAP Analysis, we have assumed that 0.5% IPO Allocation, 1% for FO Allocation, and 0.5% AM for both IPOs and FOs. There is a Position limit of $30M. Also note that, for each year deals issued in that year are considered, and the EXIT date for actual PnL could be in future years. For Model, the EXIT date is always T+1Month. This analysis excludes SPACs and PIPEs.
+      </Typography>
+
+
+
       {loading ? (
         <Grid container justifyContent="center" alignItems="center" style={{ height: 400 }}>
           <CircularProgress />
         </Grid>
       ) : (
         <Paper elevation={3} sx={{ borderRadius: 4, p: 2, bgcolor: "background.paper" }}>
- <DataGrid
-  rows={rows}
-  columns={columns}
-  autoHeight
-  disableRowSelectionOnClick
-  sx={{
-    fontSize: "0.75rem", // Reduce overall font size
-    "& .MuiDataGrid-columnHeaders": {
-      bgcolor: "#f0f0f0",
-      color: "#002060",
-      minHeight: "32px",
-      maxHeight: "32px",
-      fontSize: "0.75rem",
-    },
-    "& .MuiDataGrid-columnHeaderTitle": {
-      fontWeight: "bold",
-    },
-    "& .MuiDataGrid-row": {
-      minHeight: "32px !important",
-      maxHeight: "32px !important",
-    },
-    "& .MuiDataGrid-cell": {
-      color: "#555",
-      lineHeight: "1.2",
-      padding: "4px 4px",
-    },
-    "& .MuiDataGrid-row:nth-of-type(odd)": {
-      bgcolor: "#fafafa",
-    },
-  }}
-/>
-
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            autoHeight
+            disableRowSelectionOnClick
+            sx={{
+              fontSize: "0.75rem",
+              "& .MuiDataGrid-columnHeaders": {
+                bgcolor: "#f0f0f0",
+                color: "#002060",
+                minHeight: "32px",
+                maxHeight: "32px",
+                fontSize: "0.75rem",
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-row": {
+                minHeight: "32px !important",
+                maxHeight: "32px !important",
+              },
+              "& .MuiDataGrid-cell": {
+                color: "#555",
+                lineHeight: "1.2",
+                padding: "4px 4px",
+              },
+              "& .MuiDataGrid-row:nth-of-type(odd)": {
+                bgcolor: "#fafafa",
+              },
+            }}
+          />
         </Paper>
       )}
     </Box>
