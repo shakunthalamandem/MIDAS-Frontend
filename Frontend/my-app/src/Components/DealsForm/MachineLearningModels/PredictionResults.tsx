@@ -26,6 +26,7 @@ import WeeklyMonthlyPredictionResults from "./WeeklyMonthlyPredictionResults";
 interface PredictionModel {
   prediction: string | null;
   Accuracy: number;
+  Confidence: number;
   model: string;
   range: string;
 }
@@ -150,6 +151,50 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
     );
   };
 
+  const renderAccuracyLevel = (accuracy: number | null | undefined) => {
+    if (accuracy == null || isNaN(accuracy)) {
+      return (
+        <Box display="flex" alignItems="center" color="text.disabled">
+          N/A
+        </Box>
+      );
+    }
+
+    let color = "#f44336";
+    if (accuracy >= 70) color = "#4caf50";
+    else if (accuracy >= 50) color = "#ff9800";
+
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <LinearProgress
+          variant="determinate"
+          value={accuracy}
+          sx={{
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: "rgba(0,0,0,0.05)",
+            "& .MuiLinearProgress-bar": {
+              backgroundColor: color,
+            },
+          }}
+        />
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontStyle: "italic",
+              ml: 1,
+              color: "text.secondary",
+              fontWeight: "bold",
+            }}
+          >
+            Accuracy - {accuracy.toFixed(1)}%
+          </Typography>
+        </Box>
+      </Box>
+    );
+  };
+
   const renderConfidenceLevel = (confidence: number | null | undefined) => {
     if (confidence == null || isNaN(confidence)) {
       return (
@@ -160,16 +205,11 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
     }
 
     let color = "#f44336";
-    if (confidence >= 70) color = "#4caf50";
-    else if (confidence >= 50) color = "#ff9800";
+    if (confidence >= 60) color = "#4caf50";
+    else if (confidence >= 40) color = "#ff9800";
 
     return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-          <Typography variant="body2" color="text.secondary">
-            {confidence.toFixed(1)}%
-          </Typography>
-        </Box>
         <LinearProgress
           variant="determinate"
           value={confidence}
@@ -182,25 +222,39 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
             },
           }}
         />
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontStyle: "italic",
+              ml: 1,
+              color: "text.secondary",
+            }}
+          >
+            Confidence - {confidence.toFixed(1)}%
+          </Typography>
+        </Box>
       </Box>
     );
   };
 
   const rowLabels: Record<string, string> = {
-    main: "General Deal Outcome Classification",
-    positive: "High Positive Return Likelihood",
+    main: "Overall Return Category",
+    positive: "High Positive Return Probability",
     negative: "High Negative Return Risk",
   };
 
   const rowExplanations: Record<string, string> = {
-    main: `Categorizes the deal into:
+    main: `Classifies the expected return into categories:
 📉 Negative: Return < -1%
-⚖️ Neutral: -1% ≤ Return ≤ 1%
+⚖️ Neutral: -1% to 1%
 📈 Positive: Return > 1%`,
-    positive: `Binary classifier predicting strong gain.
-Threshold: Return > 3%`,
-    negative: `Binary classifier estimating significant loss risk.
-Threshold: Return < -2%`,
+
+    positive: `Predicts the likelihood of a strong positive return.
+📈 Threshold: Return > 3%`,
+
+    negative: `Estimates the risk of a significant negative return.
+📉 Threshold: Return < -2%`,
   };
 
   return (
@@ -223,19 +277,26 @@ Threshold: Return < -2%`,
           <Box display="flex" alignItems="center">
             <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
             <Typography variant="h6" color="primary">
-              📊 Model Prediction Results
+              📊 Model Prediction Results – T+1 Close Return
             </Typography>
           </Box>
 
           {onRepredict && (
             <Box display="flex" alignItems="center">
               <TextField
-                label="T+1 Day Open Return"
+                label="T+1 Day Open Return (%)"
                 variant="outlined"
                 value={price}
                 onChange={handlePriceChange}
                 size="small"
-                sx={{ mr: 2, width: "194px", position: "relative", top: "18px",backgroundColor: "#ede7f6", borderRadius: "4px" }}
+                sx={{
+                  mr: 2,
+                  width: "194px",
+                  position: "relative",
+                  top: "18px",
+                  backgroundColor: "#ede7f6",
+                  borderRadius: "4px",
+                }}
                 type="number"
               />
               <Button
@@ -243,7 +304,7 @@ Threshold: Return < -2%`,
                 onClick={handleRepredict}
                 disabled={isLoading}
                 sx={{
-                  position: "relative", 
+                  position: "relative",
                   top: "18px",
                   backgroundColor: "#ede7f6",
                   color: "#002060",
@@ -259,11 +320,7 @@ Threshold: Return < -2%`,
               </Button>
             </Box>
           )}
-
-
         </Box>
-
-
 
         <Divider sx={{ my: 3 }} />
 
@@ -281,7 +338,7 @@ Threshold: Return < -2%`,
                         bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
                       }}
                     >
-                      {`T + 1D Closing Result`}
+                      {`T+1D Close Result`}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -289,7 +346,7 @@ Threshold: Return < -2%`,
                         bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
                       }}
                     >
-                      {`T + 1D Closing Accuracy`}
+                      {`Accuracy & Confidence`}
                     </TableCell>
                   </React.Fragment>
                 ))}
@@ -297,8 +354,8 @@ Threshold: Return < -2%`,
 
               {modelTypes.map((type) => (
                 <TableRow key={type}>
-                  <TableCell >{rowLabels[type]}</TableCell>
-                  <TableCell >
+                  <TableCell>{rowLabels[type]}</TableCell>
+                  <TableCell>
                     <Typography variant="body2" whiteSpace="pre-line">
                       {rowExplanations[type]}
                     </Typography>
@@ -329,9 +386,14 @@ Threshold: Return < -2%`,
 
                     return (
                       <React.Fragment key={version}>
-                        <TableCell sx={{ bgcolor: cellColor }}>{renderResult}</TableCell>
                         <TableCell sx={{ bgcolor: cellColor }}>
-                          {renderConfidenceLevel(modelData.Accuracy)}
+                          {renderResult}
+                        </TableCell>
+                        <TableCell sx={{ bgcolor: cellColor }}>
+                          <Box display="flex" flexDirection="column" gap={1}>
+                            {renderAccuracyLevel(modelData.Accuracy)}
+                            {renderConfidenceLevel(modelData.Confidence)}
+                          </Box>
                         </TableCell>
                       </React.Fragment>
                     );
@@ -341,9 +403,7 @@ Threshold: Return < -2%`,
             </TableBody>
           </Table>
         </TableContainer>
-
       </Paper>
-      
     </Container>
   );
 };

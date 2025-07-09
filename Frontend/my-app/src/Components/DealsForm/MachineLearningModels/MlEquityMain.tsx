@@ -138,8 +138,7 @@ const MlEquityMain: React.FC = () => {
                 textAlign="center"
                 color="#002060"
               >
-                Indicative Deal Performance - 🧠 Machine Learning Equity Deal
-                Predictor
+                🧠 Machine Learning Equity Deal Predictor - US Follow-on's
               </Typography>
 
               <Typography
@@ -148,7 +147,7 @@ const MlEquityMain: React.FC = () => {
                 sx={{ ml: 2, mt: 2, mb: 2 }}
               >
                 Welcome to the ML-powered equity deal predictor for{" "}
-                <strong>US follow-on offerings</strong>. Input key market and
+                <strong>US follow-on's (Marketed & Overnight)</strong>. Input key market and
                 macroeconomic parameters to forecast deal outcomes using
                 advanced machine learning models trained on over 4000 historical
                 deal records.

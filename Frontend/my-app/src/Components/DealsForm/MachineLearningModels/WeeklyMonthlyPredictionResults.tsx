@@ -27,6 +27,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 interface PredictionModel {
   prediction: string | null;
   Accuracy: number;
+  Confidence: number;
   range?: string | null;
   model?: string | null;
 }
@@ -144,6 +145,50 @@ const WeeklyMonthlyPredictionResults: React.FC<
     );
   };
 
+  const renderAccuracyLevel = (accuracy: number | null | undefined) => {
+    if (accuracy == null || isNaN(accuracy)) {
+      return (
+        <Box display="flex" alignItems="center" color="text.disabled">
+          N/A
+        </Box>
+      );
+    }
+
+    let color = "#f44336";
+    if (accuracy >= 70) color = "#4caf50";
+    else if (accuracy >= 50) color = "#ff9800";
+
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <LinearProgress
+          variant="determinate"
+          value={accuracy}
+          sx={{
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: "rgba(0,0,0,0.05)",
+            "& .MuiLinearProgress-bar": {
+              backgroundColor: color,
+            },
+          }}
+        />
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontStyle: "italic",
+              ml: 1,
+              color: "text.secondary",
+              fontWeight: "bold",
+            }}
+          >
+            Accuracy - {accuracy.toFixed(1)}%
+          </Typography>
+        </Box>
+      </Box>
+    );
+  };
+
   const renderConfidenceLevel = (confidence: number | null | undefined) => {
     if (confidence == null || isNaN(confidence)) {
       return (
@@ -153,24 +198,35 @@ const WeeklyMonthlyPredictionResults: React.FC<
       );
     }
 
-    let color: "success" | "warning" | "error" = "error";
-    if (confidence >= 70) color = "success";
-    else if (confidence >= 50) color = "warning";
+    let color = "#f44336";
+    if (confidence >= 60) color = "#4caf50";
+    else if (confidence >= 40) color = "#ff9800";
 
     return (
-      <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-        <Box sx={{ width: "100%", mr: 1 }}>
-          <LinearProgress
-            variant="determinate"
-            value={confidence}
-            color={color}
-          />
-        </Box>
-        <Box sx={{ minWidth: 35 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <LinearProgress
+          variant="determinate"
+          value={confidence}
+          sx={{
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: "rgba(0,0,0,0.05)",
+            "& .MuiLinearProgress-bar": {
+              backgroundColor: color,
+            },
+          }}
+        />
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
           <Typography
-            variant="body2"
-            color="text.secondary"
-          >{`${confidence.toFixed(1)}%`}</Typography>
+            variant="caption"
+            sx={{
+              fontStyle: "italic",
+              ml: 1,
+              color: "text.secondary",
+            }}
+          >
+            Confidence - {confidence.toFixed(1)}%
+          </Typography>
         </Box>
       </Box>
     );
@@ -179,9 +235,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
   const rowConfig = [
     {
       key: "main",
-      label: "General Deal Outcome Classification",
+      label: "Outcome Classification",
       explanation:
-        "Categorizes the deal into: Negative or Positive return ranges.",
+        "Predicts whether the return is likely Positive or Negative.",
     },
     {
       key: "positive",
@@ -278,7 +334,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                             : "rgba(237, 231, 246, 0.7)",
                       }}
                     >
-                      AM T + 1 {frame} Result
+                      T + 1 {frame} (AM) Result
                     </TableCell>
                     <TableCell
                       sx={{
@@ -289,7 +345,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                         minWidth: 180,
                       }}
                     >
-                      {frame} Accuracy
+                      Accuracy & Confidence
                     </TableCell>
                   </React.Fragment>
                 ))}
@@ -366,7 +422,10 @@ const WeeklyMonthlyPredictionResults: React.FC<
                             {renderResult}
                           </TableCell>
                           <TableCell sx={{ bgcolor: cellBgColor }}>
-                            {renderConfidenceLevel(modelData.Accuracy)}
+                            <Box display="flex" flexDirection="column" gap={1}>
+                              {renderAccuracyLevel(modelData.Accuracy)}
+                              {renderConfidenceLevel(modelData.Confidence)}
+                            </Box>
                           </TableCell>
                         </React.Fragment>
                       );

@@ -7,6 +7,8 @@ import WeeklyMonthlyPredictionResults from "./WeeklyMonthlyPredictionResults";
 interface PredictionModel {
   prediction: string | null;
   Accuracy: number;
+  Confidence: number;
+  range?: string | null;
 }
 
 const menuProps: Partial<MenuProps> = {
@@ -306,8 +308,8 @@ const handleWeeklyMonthlyRepredictionRequest = async (t1dCloseReturn: number): P
     // Extract only prediction and Accuracy from each key
     const simplifiedResponse: Record<string, PredictionModel> = {};
     for (const key in fullResponse) {
-      const { prediction, Accuracy } = fullResponse[key];
-      simplifiedResponse[key] = { prediction, Accuracy };
+      const { prediction, Accuracy, Confidence, range } = fullResponse[key];
+      simplifiedResponse[key] = { prediction, Accuracy, Confidence, range };
     }
 
     setnewWeeklyMonthlyPredictionData(simplifiedResponse);
