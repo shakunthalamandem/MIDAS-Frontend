@@ -233,13 +233,12 @@ const WeeklyMonthlyPredictionResults: React.FC<
   };
 
   const rowConfig = [
-    {
-      key: "main",
-      label: "Outcome Classification",
-      explanation: `Classifies the expected return into categories:
-📉 Negative: Return <= 0%
-📈 Positive: Return > 0%`,
-    },
+{
+  key: "main",
+  label: "Outcome Classification",
+  explanation: `Classifies the expected return into categories:\n📉 Negative: Return ≤ 0%\n📈 Positive: Return > 0%`,
+},
+
     {
       key: "positive",
       label: "High Positive Return Likelihood",
@@ -327,7 +326,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                       },
                     }}
                   >
-                    <TableCell>Model</TableCell>
+                    <TableCell  sx={{ minWidth: 150 }}>Model</TableCell>
                     <TableCell sx={{ minWidth: 250 }}>Explanation</TableCell>
                     {timeFrames.map((frame, index) => (
                       <React.Fragment key={frame}>
@@ -385,7 +384,11 @@ const WeeklyMonthlyPredictionResults: React.FC<
                         >
                           {row.label}
                         </TableCell>
-                        <TableCell>{row.explanation}</TableCell>
+<TableCell>
+  <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+    {row.explanation}
+  </Typography>
+</TableCell>
                         {timeFrames.map((frame, index) => {
                           const apiKey =
                             frame.toLowerCase() === "weekly"
