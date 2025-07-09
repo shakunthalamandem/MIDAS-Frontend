@@ -30,6 +30,25 @@ interface Deal {
   pnl: number;
 }
 
+  const formatNumber = (value: number): string => {
+
+    const absValue = Math.abs(value);
+    let formattedValue: string;
+
+    if (absValue >= 1e9) {
+      formattedValue = `${(absValue / 1e9).toFixed(0)}B`; // Billion
+    } else if (absValue >= 1e6) {
+      formattedValue = `${(absValue / 1e6).toFixed(0)}M`; // Million
+    } else if (absValue >= 1e3) {
+      formattedValue = `${(absValue / 1e3).toFixed(0)}K`; // Thousand
+    } else {
+      formattedValue = absValue.toString(); // No formatting for values < 1000
+    }
+
+    return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
+  };
+
+
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
@@ -38,6 +57,10 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 
 const numberFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
+});
+
+const numberFormatter1 = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 0,
 });
 
 const columns: GridColDef[] = [
@@ -49,7 +72,7 @@ const columns: GridColDef[] = [
     field: "deal_size",
     headerName: "Deal Size",
     flex: 1,
-    valueFormatter: (params) => currencyFormatter.format(params),
+    valueFormatter: (params) => formatNumber(params),
   },
   {
     field: "issue_offer_price",
@@ -65,7 +88,7 @@ const columns: GridColDef[] = [
   },
   {
     field: "allocated_shares",
-    headerName: "IOI",
+    headerName: "Allocated Shares",
     flex: 1,
     valueFormatter: (params) => numberFormatter.format(params),
   },
@@ -121,13 +144,13 @@ const columns: GridColDef[] = [
     field: "daily_long_exposure",
     headerName: "Exposure as % of LMV",
     flex: 1,
-    valueFormatter: (params) => `${numberFormatter.format(params)}%`,
+    valueFormatter: (params) => formatNumber(params),
   },
   {
     field: "pnl",
     headerName: "P&L",
     flex: 1,
-    valueFormatter: (params) => currencyFormatter.format(params),
+    valueFormatter: (params) => `${numberFormatter1.format(params)}`,
   },
 ];
 
@@ -206,15 +229,15 @@ const renderTable = (rows: Deal[], title: string, id: string) => (
             fontSize: '0.8rem',
           },
           '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: '#e3eaf5',
+            backgroundColor: '#77B0FC',
             color: '#002060',
             fontWeight: 'bold',
             fontSize: '0.85rem',
           },
-          '& .MuiDataGrid-row:nth-of-type(odd)': {
+          '& .MuiDataGrid-row:nth-of-type(even)': {
             backgroundColor: '#f5f8fc',
           },
-          '& .MuiDataGrid-row:nth-of-type(even)': {
+          '& .MuiDataGrid-row:nth-of-type(odd)': {
             backgroundColor: '#ffffff',
           },
           '& .MuiDataGrid-cell': {
