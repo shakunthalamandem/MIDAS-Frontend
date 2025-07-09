@@ -5,7 +5,7 @@ import FundLevelPNLTable from "./FundLevelPNLTable";
 import RegionWisePnlAttribution from "./RegionWisePnlAttribution";
 import DetailedFundTable from "./DetailedFundTable";
 import DealTypeTable from "./DealTypeTable";
-import SectorWiseTable from "./SectorWiseTable";
+import SectorWiseTable from "./EquityPNLSectorWiseTable";
 
 const PnlAttributionMain = () => {
   return (
