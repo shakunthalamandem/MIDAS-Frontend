@@ -123,7 +123,7 @@ const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
                     layout="vertical"
                     margin={{ top: 20, right: 30, left: 120, bottom: 20 }}
                 >
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                     <XAxis type="number" tickFormatter={formatNumber} />
                     <YAxis
                         type="category"
