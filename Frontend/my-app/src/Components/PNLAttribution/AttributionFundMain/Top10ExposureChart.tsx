@@ -112,7 +112,7 @@ const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
                 }}
                 align="center"
             >
-                Top 10 Tickers by Net View for {fund}
+                Top 10 Stocks by Exposure for {fund}
             </Typography>
             {/* <Typography variant="h6" gutterBottom align="center">
                 
