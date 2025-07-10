@@ -12,6 +12,7 @@ import DealTypeFundMain from './DealTypeFundMain';
 import Top10ExposureChart from './Top10ExposureChart';
 import BottomPnlTable from './BottomPnlTable';
 import MostAgedStocksTable from './MostAgedStocksTable';
+import SectorPnLChart from './SectorPnLChart';
 
 const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
@@ -108,6 +109,7 @@ const AttributionFundMainTab = () => {
           </Box>
           <BottomPnlTable fund={selectedFund} />
           <MostAgedStocksTable fund={selectedFund} />
+          <SectorPnLChart fund={selectedFund} />
         </Box>
       </Box>
     </>
