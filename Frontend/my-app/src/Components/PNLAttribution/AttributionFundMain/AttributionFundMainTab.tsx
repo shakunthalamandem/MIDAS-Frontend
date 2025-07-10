@@ -101,10 +101,8 @@ const AttributionFundMainTab = () => {
       {/* Main Deal Component */}
       <Box>
         <DealTypeFundMain fund={selectedFund} />
+        <Top10ExposureChart fund={selectedFund} />
       </Box>
-    </Box>
-    <Box>
-      <Top10ExposureChart fund={selectedFund} />
     </Box>
     </>
   );
