@@ -114,37 +114,36 @@ const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
             >
                 Top 10 Stocks by Exposure for {fund}
             </Typography>
-            {/* <Typography variant="h6" gutterBottom align="center">
-                
-            </Typography> */}
-            <ResponsiveContainer width="100%" height={400}>
-                <BarChart
-                    data={data}
-                    layout="vertical"
-                    margin={{ top: 20, right: 30, left: 120, bottom: 20 }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                    <XAxis type="number" tickFormatter={formatNumber} />
-                    <YAxis
-                        type="category"
-                        dataKey="ticker"
-                        tickMargin={15}
-                        interval={0}
-                        width={120}
-                        tick={{
-                            width: 100,
-                            overflow: "hidden",
-                        }}
-                        style={{ whiteSpace: "nowrap" }}
-                    />
-                    <Tooltip
-                        formatter={(value: number) => formatNumber(value)}
-                        labelStyle={{ fontWeight: "bold" }}
-                    />
-                    <Bar dataKey="value" fill="#1976d2" barSize={20} />
-                </BarChart>
-            </ResponsiveContainer>
-
+    
+            <Box display="flex" justifyContent="flex-start" >
+                <ResponsiveContainer width="100%" height={400}>
+                    <BarChart
+                        data={data}
+                        layout="vertical"
+                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                        <XAxis type="number" tickFormatter={formatNumber} />
+                        <YAxis
+                            type="category"
+                            dataKey="ticker"
+                            tickMargin={15}
+                            interval={0}
+                            width={120}
+                            tick={{
+                                width: 100,
+                                overflow: "hidden",
+                            }}
+                            style={{ whiteSpace: "nowrap" }}
+                        />
+                        <Tooltip
+                            formatter={(value: number) => formatNumber(value)}
+                            labelStyle={{ fontWeight: "bold" }}
+                        />
+                        <Bar dataKey="value" fill="#1976d2" barSize={20} />
+                    </BarChart>
+                </ResponsiveContainer>
+            </Box>
         </Box>
     );
 };
