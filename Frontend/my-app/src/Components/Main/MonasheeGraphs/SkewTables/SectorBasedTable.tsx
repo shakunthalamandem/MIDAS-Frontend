@@ -11,6 +11,7 @@ import {
   Card,
   CardContent,
   Typography,
+  CircularProgress
 } from '@mui/material';
 import axios from 'axios';
 import SectorTableData from './SectorTableData';
@@ -33,6 +34,7 @@ const SectorBasedTable: React.FC = () => {
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
   const [yearPeriod, setYearPeriod] = useState<string>('Yearly');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
@@ -104,6 +106,7 @@ const SectorBasedTable: React.FC = () => {
       };
 
       try {
+        setLoading(true);
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
@@ -131,6 +134,8 @@ const SectorBasedTable: React.FC = () => {
         }
       } catch (error) {
         // navigate("/error");  
+      } finally {
+        setLoading(false); // <-- Set loading false after request
       }  
     };
 
@@ -309,7 +314,11 @@ const SectorBasedTable: React.FC = () => {
             </Grid>
           </Box>
 
-          {responseData && <SectorTableData data={responseData} />}
+          {loading ? (
+            <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
+          ) : (
+            responseData && <SectorTableData data={responseData} />
+          )}
         </CardContent>
       </Card>
 

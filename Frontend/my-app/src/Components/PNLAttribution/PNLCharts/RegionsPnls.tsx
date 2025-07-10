@@ -110,7 +110,7 @@ const RegionsPnls = () => {
           gutterBottom
           sx={{ color: "#016676", fontWeight: "bold", padding: 2, mb: 2 }}
         >
-          Regions P&L Summary
+          Region P&L Summary
         </Typography>
 
         {loading ? (

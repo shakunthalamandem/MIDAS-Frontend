@@ -17,7 +17,7 @@ import PNLPagesMain from "./PNLPages/PNLPagesMain";
 import AttributionFundMainTab from "./AttributionFundMain/AttributionFundMainTab";
 
 const PNLTabMain = () => {
-  const [selectedView, setSelectedView] = useState("graphs");
+  const [selectedView, setSelectedView] = useState("summary_pnl");
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedView((event.target as HTMLInputElement).value);
@@ -77,7 +77,7 @@ const PNLTabMain = () => {
             }}
           >
             <FormControlLabel
-              value="graphs"
+              value="summary_pnl"
               control={
                 <Radio
                   sx={{
@@ -91,12 +91,12 @@ const PNLTabMain = () => {
               label={
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
                   <BarChartIcon fontSize="small" />
-                  <Typography variant="h6">Graphs</Typography>
+                  <Typography variant="h6">Summary P&L</Typography>
                 </Box>
               }
             />
             <FormControlLabel
-              value="tables"
+              value="total_pnl_attribution"
               control={
                 <Radio
                   sx={{
@@ -110,12 +110,12 @@ const PNLTabMain = () => {
               label={
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
                   <TableRowsIcon fontSize="small" />
-                  <Typography variant="h6">Tables</Typography>
+                  <Typography variant="h6">Total P&L Attribution</Typography>
                 </Box>
               }
             />
                     <FormControlLabel
-              value="datagrid"
+              value="equities__pnl_attribution"
               control={
                 <Radio
                   sx={{
@@ -129,7 +129,7 @@ const PNLTabMain = () => {
               label={
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
                   <BarChartIcon fontSize="small" />
-                  <Typography variant="h6">Equity Distribution</Typography>
+                  <Typography variant="h6">Equities	 P&L Attribution</Typography>
                 </Box>
               }
             />
@@ -158,14 +158,14 @@ const PNLTabMain = () => {
       </Box>
 
       {/* Animated Content Switch */}
-      <Fade in={selectedView === "graphs"} timeout={400} mountOnEnter unmountOnExit>
-        <Box>{selectedView === "graphs" && <PNLGraphsMain />}</Box>
+      <Fade in={selectedView === "summary_pnl"} timeout={400} mountOnEnter unmountOnExit>
+        <Box>{selectedView === "summary_pnl" && <PNLGraphsMain />}</Box>
       </Fade>
-      <Fade in={selectedView === "tables"} timeout={400} mountOnEnter unmountOnExit>
-        <Box>{selectedView === "tables" && <PnlAttributionMain />}</Box>
+      <Fade in={selectedView === "total_pnl_attribution"} timeout={400} mountOnEnter unmountOnExit>
+        <Box>{selectedView === "total_pnl_attribution" && <PnlAttributionMain />}</Box>
       </Fade>
-      <Fade in={selectedView === "datagrid"} timeout={400} mountOnEnter unmountOnExit>
-        <Box>{selectedView === "datagrid" && <PNLPagesMain />}</Box>
+      <Fade in={selectedView === "equities__pnl_attribution"} timeout={400} mountOnEnter unmountOnExit>
+        <Box>{selectedView === "equities__pnl_attribution" && <PNLPagesMain />}</Box>
       </Fade>
        <Fade in={selectedView === "pnlfunddeatils"} timeout={400} mountOnEnter unmountOnExit>
         <Box>{selectedView === "pnlfunddeatils" && <AttributionFundMainTab />}</Box>
