@@ -11,6 +11,7 @@ import {
   Card,
   CardContent,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import axios from 'axios';
 import LeadBankTableData from './LeadBankTableData';
@@ -42,6 +43,7 @@ const LeadBankBasedTable: React.FC = () => {
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
 
   // State to store the response data
@@ -91,6 +93,7 @@ const LeadBankBasedTable: React.FC = () => {
       };
 
       try {
+         setLoading(true);
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
@@ -118,6 +121,8 @@ const LeadBankBasedTable: React.FC = () => {
         }
       } catch (error) {
         setNoDataPopupOpen(true);
+      } finally {
+         setLoading(false);
       }
     };
 
@@ -296,8 +301,12 @@ const LeadBankBasedTable: React.FC = () => {
             </Grid>
           </Box>
 
-          {responseData && (
-            <LeadBankTableData data={responseData} onRowClick={handleRowClick} />
+         {loading ? (
+            <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
+          ) : (
+            responseData && (
+              <LeadBankTableData data={responseData} onRowClick={handleRowClick} />
+            )
           )}
 
         </CardContent>

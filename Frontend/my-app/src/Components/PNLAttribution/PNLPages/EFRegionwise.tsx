@@ -64,7 +64,7 @@ const EFRegionwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
         const token = localStorage.getItem('access_token');
         if (!apiUrl) throw new Error('API URL is not defined');
 
-        const response = await fetch(`${apiUrl}/api/pnl_by_region/`, {
+        const response = await fetch(`${apiUrl}/api/pnl_by_region_data/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -94,22 +94,21 @@ const EFRegionwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
     setOrderBy(property);
   };
 
-  function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-    if (b[orderBy] < a[orderBy]) return -1;
-    if (b[orderBy] > a[orderBy]) return 1;
-    return 0;
-  }
+  const dealTypeOrder = ['US', 'EMEA', 'APAC', 'Non-US America'];
+  const sortedData = [...data].sort((a, b) => {
+  if (orderBy === 'region') {
+    const indexA = dealTypeOrder.indexOf(a.region);
+    const indexB = dealTypeOrder.indexOf(b.region);
 
-  function getComparator<Key extends keyof any>(
-    order: Order,
-    orderBy: Key
-  ): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
-    return order === 'desc'
-      ? (a, b) => descendingComparator(a, b, orderBy)
-      : (a, b) => -descendingComparator(a, b, orderBy);
-  }
+    const sortValue = (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
 
-  const sortedData = [...data].sort(getComparator(order, orderBy));
+    return order === 'asc' ? sortValue : -sortValue;
+  }
+  const valA = a[orderBy];
+  const valB = b[orderBy];
+  return order === 'asc' ? valA - valB : valB - valA;
+});
+
 
   if (loading) {
     return (
@@ -131,7 +130,7 @@ const EFRegionwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
   return (
     <Box>
       <Typography variant="h6" gutterBottom align="center" color='#025f73' fontWeight={600}>
-        Equity Funds By Region
+        Equities P&L By Region
       </Typography>
       <TableContainer component={Paper}>
         <Table size="small">
@@ -188,7 +187,7 @@ const EFRegionwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                     '& .MuiTableSortLabel-label': { color: '#fff !important' },
                   }}
                 >
-                  <b>Exposure</b>
+                  <b>Exposure (Avg)</b>
                 </TableSortLabel>
               </TableCell>
             </TableRow>

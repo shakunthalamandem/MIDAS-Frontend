@@ -21,6 +21,7 @@ import DealStats from "../../MonasheeDeals/MddGraphs/DealStats";
 import AllocationCaptureReturn from "../../MonasheeDeals/MddGraphs/AllocationCaptureReturn";
 import WeeklyStatsChart from "../../MonasheeDeals/MDDSettings/WeeklyStatsChart";
 import WeeklyMain from "../../MonasheeDeals/MDDSettings/WeeklyMain";
+import DealDetailedGapAnalysis from "../../DealDetailedGapAnalysis";
 
 const MarketOpportnuityMain: React.FC = () => {
   const [value, setValue] = useState<number>(0);
@@ -50,6 +51,9 @@ const MarketOpportnuityMain: React.FC = () => {
       case "weekly-tracking":
         setValue(5);
         break;
+      case "gap_report":
+        setValue(6);
+        break;
       default:
         setValue(0);
         break;
@@ -58,7 +62,7 @@ const MarketOpportnuityMain: React.FC = () => {
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
-    const tabPaths = ["", "deal-stats", "skew-table", "mdd_deal_stats", "gap-analysis", "weekly-tracking"];
+    const tabPaths = ["", "deal-stats", "skew-table", "mdd_deal_stats", "gap-analysis", "weekly-tracking","gap_report"];
     navigate(`/opportunity/equity/${tabPaths[newValue]}`);
   };
   interface CombinedDataResult {
@@ -220,6 +224,7 @@ const MarketOpportnuityMain: React.FC = () => {
         <Tab label="Monashee Transactions" />
         <Tab label="GAP Analysis" />
         <Tab label="Weekly Tracking" />
+        <Tab label="30 Days Gap Report" />
 
       </Tabs>
 
@@ -289,6 +294,7 @@ const MarketOpportnuityMain: React.FC = () => {
       {value === 3 && <DealStats />}
       {value === 4 && <AllocationCaptureReturn />}
       {value === 5 && <WeeklyMain />}
+      {value === 6 && <DealDetailedGapAnalysis />}
       
     </Box>
   );

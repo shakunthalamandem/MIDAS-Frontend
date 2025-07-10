@@ -64,7 +64,7 @@ const EFSectorwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
         const token = localStorage.getItem('access_token');
         if (!apiUrl) throw new Error('API URL is not defined');
 
-        const response = await fetch(`${apiUrl}/api/pnl_by_sector/`, {
+        const response = await fetch(`${apiUrl}/api/pnl_by_sector_data/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const EFSectorwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
   return (
     <Box>
       <Typography variant="h6" gutterBottom align="center" color='#025f73' fontWeight={600}>
-        Equity Funds By Sector
+        Equities P&L By Sector
       </Typography>
       <TableContainer component={Paper}>
         <Table size="small">
@@ -188,7 +188,7 @@ const EFSectorwise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                     '& .MuiTableSortLabel-label': { color: '#fff !important' },
                   }}
                 >
-                  <b>Exposure</b>
+                  <b>Exposure (Avg)</b>
                 </TableSortLabel>
               </TableCell>
             </TableRow>

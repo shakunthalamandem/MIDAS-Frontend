@@ -64,7 +64,7 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
         const token = localStorage.getItem('access_token');
         if (!apiUrl) throw new Error('API URL is not defined');
 
-        const response = await fetch(`${apiUrl}/api/pnl_by_dealtype/`, {
+        const response = await fetch(`${apiUrl}/api/pnl_by_dealtype_data/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,34 +87,26 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
 
     fetchData();
   }, [selectedFilters]);
-
-  // Sorting logic
+  
   const handleSort = (property: keyof DealTypeRow) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
+  const dealTypeOrder = ['IPO', 'FO', 'STRATEGIC', 'DEC', 'Hedging', 'Other'];
+  const sortedData = [...data].sort((a, b) => {
+  if (orderBy === 'deal_type') {
+    const indexA = dealTypeOrder.indexOf(a.deal_type);
+    const indexB = dealTypeOrder.indexOf(b.deal_type);
 
-  function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-    if (b[orderBy] < a[orderBy]) {
-      return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-      return 1;
-    }
-    return 0;
+    const sortValue = (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
+
+    return order === 'asc' ? sortValue : -sortValue;
   }
-
-  function getComparator<Key extends keyof any>(
-    order: Order,
-    orderBy: Key
-  ): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
-    return order === 'desc'
-      ? (a, b) => descendingComparator(a, b, orderBy)
-      : (a, b) => -descendingComparator(a, b, orderBy);
-  }
-
-  const sortedData = [...data].sort(getComparator(order, orderBy));
+  const valA = a[orderBy];
+  const valB = b[orderBy];
+  return order === 'asc' ? valA - valB : valB - valA;
+});
 
   if (loading) {
     return (
@@ -136,7 +128,7 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
   return (
     <Box>
       <Typography variant="h6" gutterBottom align="center" color='#025f73' fontWeight={600}>
-        Equity Funds By Strategy
+        Equities P&L By Strategy
       </Typography>
       <TableContainer component={Paper}>
         <Table size="small">
@@ -215,7 +207,7 @@ const EFStrategywise: React.FC<PnlTablesProps> = ({ selectedFilters }) => {
                   }}
 
                 >
-                  <b>Exposure</b>
+                  <b>Exposure (Avg)</b>
                 </TableSortLabel>
               </TableCell>
             </TableRow>

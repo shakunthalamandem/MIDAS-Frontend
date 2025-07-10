@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, CircularProgress, Typography, Container, IconButton, Box
+    Paper, CircularProgress, Typography, Container, Box
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+
 
 type AssetData = {
     asset_type: string;
@@ -35,21 +34,12 @@ const DetailedFundTable: React.FC = () => {
     const [data, setData] = useState<TableRowData[]>([]);
     const [months, setMonths] = useState<string[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
 
     const apiUrl = process.env.REACT_APP_API_URL;
     const token = localStorage.getItem("access_token");
 
-    const collapsedOnlyAssets = ["Cash", "Warrants", "Futures"];
 
-    const toggleExpand = (assetType: string) => {
-        setExpandedAssets((prev) => {
-            const updated = new Set(prev);
-            if (updated.has(assetType)) updated.delete(assetType);
-            else updated.add(assetType);
-            return updated;
-        });
-    };
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -100,16 +90,15 @@ const DetailedFundTable: React.FC = () => {
     }, [apiUrl, token]);
 
     const cellBorder = { border: "1px solid black", textAlign: "center" };
-    const totalRowBgColor = "rgb(145, 206, 137)";
     const overallRowBgColor = "#fde8b7";
 
     return (
         <Container>
-            <Typography variant="h6" sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}>
-                Detailed Fundwise(Gross PNL)
+            <Typography variant="h6" sx={{ mt: 1, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}>
+                 Fund-Wise P&L Attribution
             </Typography>
 
-            <TableContainer component={Paper} sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: 3, overflow: "auto", border: "1px solid #000" }}>
+            <TableContainer component={Paper} sx={{ mt: 1, mb: 4, borderRadius: 2, boxShadow: 3, overflow: "auto", border: "1px solid #000" }}>
                 {loading ? (
                     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 300 }}>
                         <CircularProgress />
