@@ -9,6 +9,7 @@ import {
   Paper,
 } from '@mui/material';
 import DealTypeFundMain from './DealTypeFundMain';
+import Top10ExposureChart from './Top10ExposureChart';
 
 const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
@@ -28,6 +29,7 @@ const AttributionFundMainTab = () => {
   ];
 
   return (
+    <>
     <Box
       sx={{
         p: 4,
@@ -101,6 +103,10 @@ const AttributionFundMainTab = () => {
         <DealTypeFundMain fund={selectedFund} />
       </Box>
     </Box>
+    <Box>
+      <Top10ExposureChart fund={selectedFund} />
+    </Box>
+    </>
   );
 };
 
