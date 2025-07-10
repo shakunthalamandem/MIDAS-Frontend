@@ -6,8 +6,11 @@ import {
   CircularProgress,
   Grid,
   TextField,
+  Button,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 interface DealData {
   "Pricing Date": string;
@@ -104,6 +107,20 @@ const DealDetailedGapAnalysis: React.FC = () => {
       );
   }, [data, searchQuery]);
 
+  const exportToExcel = () => {
+    const exportData = rows.map(({ id, ...row }) => row);
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Deals");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const dataBlob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(dataBlob, "Deal_Detailed_Gap_Analysis.xlsx");
+  };
 
   const columns: GridColDef[] = [
     { field: "Pricing Date", headerName: "Pricing Date", width: 120 },
@@ -185,17 +202,42 @@ const DealDetailedGapAnalysis: React.FC = () => {
       width: 110,
       renderCell: (params) => formatCurrency(params.value),
     },
-    { field: "Allocated Shares", headerName: "Allocated Shares", width: 140,renderCell: (params) => formatComma(params.value), },
-    { field: "Am Buy Shares", headerName: "AM Buy Shares", width: 120,renderCell: (params) => formatComma(params.value) },
-    { field: "Total Buy Shares", headerName: "Total Buy Shares", width: 130,renderCell: (params) => formatComma(params.value) },
+    {
+      field: "Allocated Shares",
+      headerName: "Allocated Shares",
+      width: 140,
+      renderCell: (params) => formatComma(params.value),
+    },
+    {
+      field: "Am Buy Shares",
+      headerName: "AM Buy Shares",
+      width: 120,
+      renderCell: (params) => formatComma(params.value),
+    },
+    {
+      field: "Total Buy Shares",
+      headerName: "Total Buy Shares",
+      width: 130,
+      renderCell: (params) => formatComma(params.value),
+    },
     {
       field: "Model Allocation Shares",
       headerName: "Model Allocation Shares",
       width: 170,
-      renderCell: (params) => formatComma(params.value)
+      renderCell: (params) => formatComma(params.value),
     },
-    { field: "Model Am Shares", headerName: "Model AM Shares", width: 130,renderCell: (params) => formatComma(params.value) },
-    { field: "Total Model Shares", headerName: "Total Model Shares", width: 130,renderCell: (params) => formatComma(params.value) },
+    {
+      field: "Model Am Shares",
+      headerName: "Model AM Shares",
+      width: 130,
+      renderCell: (params) => formatComma(params.value),
+    },
+    {
+      field: "Total Model Shares",
+      headerName: "Total Model Shares",
+      width: 130,
+      renderCell: (params) => formatComma(params.value),
+    },
     {
       field: "Allocation Gap Shares",
       headerName: "Allocation Gap Shares",
@@ -226,7 +268,6 @@ const DealDetailedGapAnalysis: React.FC = () => {
         </span>
       ),
     },
-
     { field: "Days Held", headerName: "Days Held", width: 100 },
   ];
 
@@ -236,35 +277,28 @@ const DealDetailedGapAnalysis: React.FC = () => {
         <Typography variant="h5" color="#002060" align="center" sx={{ flex: 1 }}>
           Deal Detailed Gap Analysis
         </Typography>
-        <TextField
-          size="small"
-          variant="outlined"
-          placeholder="Search Ticker"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ width: 300, ml: 2 }}
-        />
+        <Box display="flex" gap={2}>
+          <TextField
+            size="small"
+            variant="outlined"
+            placeholder="Search Ticker"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ width: 300 }}
+          />
+          <Button variant="outlined" onClick={exportToExcel} sx={{backgroundColor: "#002060", color: "#fff"}}>
+            Export to Excel
+          </Button>
+        </Box>
       </Box>
 
-      <Typography
-        variant="body2"
-        color="textSecondary"
-        align="left"
-        sx={{ mb: 1 }}
-      >
+      <Typography variant="body2" color="textSecondary" align="left" sx={{ mb: 1 }}>
         <b>Note :</b> The table below includes all IPO and FO deals from 2025, positions are still held in the portfolio (i.e., current quantity &gt; 0), and the holding period is less than 30 days.
       </Typography>
 
-      <Typography
-        variant="body2"
-        color="textSecondary"
-        align="left"
-        sx={{ mb: 2 }}
-      >
+      <Typography variant="body2" color="textSecondary" align="left" sx={{ mb: 2 }}>
         <b>Assumptions :</b> As for the below GAP Analysis, we have assumed that 0.5% IPO Allocation, 1% for FO Allocation, and 0.5% AM for both IPOs and FOs. There is a Position limit of $30M. Also note that, for each year deals issued in that year are considered, and the EXIT date for actual PnL could be in future years. For Model, the EXIT date is always T+1Month. This analysis excludes SPACs and PIPEs.
       </Typography>
-
-
 
       {loading ? (
         <Grid container justifyContent="center" alignItems="center" style={{ height: 400 }}>

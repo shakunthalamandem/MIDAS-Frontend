@@ -100,8 +100,7 @@ const AppRouters: React.FC = () => {
           <Route path="mdd_deal_stats" element={<DealStats />} />
           <Route path="weekly-tracking" element={<WeeklyMain />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
-
-
+          <Route path="gap_report" element={<DealDetailedGapAnalysis />} />
         </Route>
 
         <Route path="/opportunity/high-yield" element={<AuthGuard><HighYieldsMain /></AuthGuard>} >
@@ -208,7 +207,7 @@ const AppRouters: React.FC = () => {
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
         <Route path="/pnldata" element={<AuthGuard><PNLPagesMain/></AuthGuard>} />
-        <Route path="/gap_report" element={<AuthGuard><DealDetailedGapAnalysis /></AuthGuard>} />
+        
 
 
         
