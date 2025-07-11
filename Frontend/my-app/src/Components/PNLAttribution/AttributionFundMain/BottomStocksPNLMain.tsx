@@ -36,7 +36,7 @@ const BottomStocksPNLMain: React.FC<BottomStocksPNLMainProps> = ({ fund }) => {
       setError(null);
 
       try {
-        const res = await fetch(`${apiUrl}/api/bottom_pnl/`, {
+        const res = await fetch(`${apiUrl}/api/high_loss_pnl/`, {
           method: "POST",
           headers: {
             Authorization: token ? `Bearer ${token}` : "",

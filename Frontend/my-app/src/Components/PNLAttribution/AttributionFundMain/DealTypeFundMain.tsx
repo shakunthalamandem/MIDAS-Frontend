@@ -25,7 +25,7 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${apiUrl}/api/fund-trades-deals/`, {
+        const res = await fetch(`${apiUrl}/api/fundwise_deal_types/`, {
           method: "POST",
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
