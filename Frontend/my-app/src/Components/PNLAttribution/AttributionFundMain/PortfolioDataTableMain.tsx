@@ -13,9 +13,9 @@ interface PortfolioRow {
   id_3: string;
   client_symbol: string;
   first_trade_date: string;
-  quantity: number;
-  pnl: number;
-  days_hld: number;
+  total_quantity: number;
+  total_pnl: number;
+  total_days_held: number;
   cumulative_pnl: number;
 }
 
@@ -72,17 +72,17 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
       flex: 1,
     },
     {
-      field: "quantity",
+      field: "total_quantity",
       headerName: "Quantity",
       flex: 1,
     },
         {
-      field: "days_hld",
+      field: "total_days_held",
       headerName: "Days Held",
       flex: 1,
     },
     {
-      field: "pnl",
+      field: "total_pnl",
       headerName: "Daily PnL",
       flex: 1,
       renderCell: ({ value }) => (
