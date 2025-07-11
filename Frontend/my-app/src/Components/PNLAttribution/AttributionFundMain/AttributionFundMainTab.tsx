@@ -10,9 +10,9 @@ import {
 } from '@mui/material';
 import DealTypeFundMain from './DealTypeFundMain';
 import Top10ExposureChart from './Top10ExposureChart';
-import BottomPnlTable from './BottomPnlTable';
+import BottomStocksPNLMain from './BottomStocksPNLMain';
 import MostAgedStocksTable from './MostAgedStocksTable';
-import SectorPnLChart from './SectorPnLChart';
+import SectorWisePNLMain from './SectorWisePNLMain';
 
 const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
@@ -107,9 +107,9 @@ const AttributionFundMainTab = () => {
           <Box width={{ xs: "100%", md: "50%" }} mt={2}>
             <Top10ExposureChart fund={selectedFund} />
           </Box>
-          <BottomPnlTable fund={selectedFund} />
+          <BottomStocksPNLMain fund={selectedFund} />
           <MostAgedStocksTable fund={selectedFund} />
-          <SectorPnLChart fund={selectedFund} />
+          <SectorWisePNLMain fund={selectedFund} />
         </Box>
       </Box>
     </>
