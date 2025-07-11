@@ -87,7 +87,6 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
             backgroundColor: "#ffffff",
             borderRadius: 2,
             boxShadow: 3,
-            px: 1,
             "& .MuiDataGrid-root": {
               border: "none",
               fontSize: "0.72rem",
@@ -101,6 +100,11 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
               minHeight: "36px !important",
               maxHeight: "none !important", // ✅ allow full height
             },
+
+            "& .MuiDataGrid-columnHeader": {
+                background:  "#77B0FC",
+                color: "#002060",
+              },
             "& .MuiDataGrid-columnHeaderTitle": {
               whiteSpace: "normal",
               lineHeight: "1.1rem",
