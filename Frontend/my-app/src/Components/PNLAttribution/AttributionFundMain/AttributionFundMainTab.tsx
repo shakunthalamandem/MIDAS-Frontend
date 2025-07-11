@@ -13,6 +13,7 @@ import Top10ExposureChart from './Top10ExposureChart';
 import BottomStocksPNLMain from './BottomStocksPNLMain';
 import MostAgedStocksTable from './MostAgedStocksTable';
 import SectorWisePNLMain from './SectorWisePNLMain';
+import PortfolioDataTableMain from './PortfolioDataTableMain';
 
 const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
@@ -118,9 +119,17 @@ const AttributionFundMainTab = () => {
                 <MostAgedStocksTable fund={selectedFund} />
               </Box>
             </Grid>
+
+             <Grid item xs={12}>
+              <Box  overflow="auto">
+          <PortfolioDataTableMain fund={selectedFund} />
+              </Box>
+            </Grid>
           </Grid>
 
           <SectorWisePNLMain fund={selectedFund} />
+
+
         </Box>
       </Box>
     </>
