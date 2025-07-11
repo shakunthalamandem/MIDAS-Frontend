@@ -113,13 +113,13 @@ const AttributionFundMainTab = () => {
 
           <Grid container spacing={2} mt={2}>
             <Grid item xs={12} md={6}>
-              <Box >
-          <PortfolioDataTableMain fund={selectedFund} />
+              <Box  >
+                <Top10ExposureChart fund={selectedFund} />
               </Box>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Box>
-                <BottomStocksPNLMain fund={selectedFund} />
+              <Box >
+          <PortfolioDataTableMain fund={selectedFund} />
               </Box>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -127,12 +127,13 @@ const AttributionFundMainTab = () => {
                 <MostAgedStocksTable fund={selectedFund} />
               </Box>
             </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Box  >
-                <Top10ExposureChart fund={selectedFund} />
+             <Grid item xs={12} md={6}>
+              <Box>
+                <BottomStocksPNLMain fund={selectedFund} />
               </Box>
             </Grid>
+
+            
           </Grid>
 
 
