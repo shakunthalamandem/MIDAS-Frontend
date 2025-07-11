@@ -7,8 +7,17 @@ import {
     Tooltip,
     ResponsiveContainer,
     CartesianGrid,
+    Cell,
 } from "recharts";
-import { Box, Typography, CircularProgress } from "@mui/material";
+import {
+    Box,
+    Typography,
+    CircularProgress,
+    Container,
+    Card,
+    CardContent,
+} from "@mui/material";
+import { motion } from "framer-motion";
 
 interface Top10ExposureChartProps {
     fund: string;
@@ -35,6 +44,11 @@ const formatNumber = (value: number): string => {
 
     return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
 };
+
+// Add more colors for variety
+const COLORS = [
+    "#00acc1"
+];
 
 const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
     const [data, setData] = useState<ExposureData[]>([]);
@@ -102,49 +116,76 @@ const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
     }
 
     return (
-        <Box p={2}>
-            <Typography
-                variant="h6"
-                sx={{
-                    color: '#002060',
-                    fontWeight: 600,
-                    mb: 1,
-                }}
-                align="center"
+        <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
+            <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
             >
-                Top 10 Stocks by Exposure for {fund}
-            </Typography>
-    
-            <Box display="flex" justifyContent="flex-start" >
-                <ResponsiveContainer width="100%" height={400}>
-                    <BarChart
-                        data={data}
-                        layout="vertical"
-                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                        <XAxis type="number" tickFormatter={formatNumber} />
-                        <YAxis
-                            type="category"
-                            dataKey="ticker"
-                            tickMargin={15}
-                            interval={0}
-                            width={120}
-                            tick={{
-                                width: 100,
-                                overflow: "hidden",
+                <Card
+                    sx={{
+                        background: "linear-gradient(135deg,rgb(201, 214, 248), #e3f2fd)",
+                        boxShadow: 4,
+                        borderRadius: 4,
+                        p: 2,
+                    }}
+                >
+                    <CardContent>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: "#002060",
+                                fontWeight: 600,
+                                mb: 2,
                             }}
-                            style={{ whiteSpace: "nowrap" }}
-                        />
-                        <Tooltip
-                            formatter={(value: number) => formatNumber(value)}
-                            labelStyle={{ fontWeight: "bold" }}
-                        />
-                        <Bar dataKey="value" fill="#1976d2" barSize={20} />
-                    </BarChart>
-                </ResponsiveContainer>
-            </Box>
-        </Box>
+                            align="center"
+                        >
+                            Top 10 Stocks by Exposure for {fund}
+                        </Typography>
+
+                        <Box display="flex" justifyContent="flex-start">
+                            <ResponsiveContainer width="100%" height={400}>
+                                <BarChart
+                                    data={data}
+                                    layout="vertical"
+                                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                                  <XAxis
+  type="number"
+  tickFormatter={formatNumber}
+  tick={{ fill: "#002060", fontWeight: 400 }}  // Set X-axis tick color
+/>
+<YAxis
+  type="category"
+  dataKey="ticker"
+  tickMargin={15}
+  interval={0}
+  width={120}
+  tick={{ fill: "#e30000", fontWeight: 400 }}  // Set Y-axis tick color
+  style={{ whiteSpace: "nowrap" }}
+/>
+<Tooltip
+  formatter={(value: number) => formatNumber(value)}
+  labelStyle={{ color: "#e91e63", fontWeight: 400 }}   // Tooltip label color
+  itemStyle={{ color: "#4caf50", fontWeight: 400 }}    // Tooltip value color
+/>
+
+                                    <Bar dataKey="value" barSize={20} isAnimationActive>
+                                        {data.map((_, index) => (
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={COLORS[index % COLORS.length]}
+                                            />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Box>
+                    </CardContent>
+                </Card>
+            </motion.div>
+        </Container>
     );
 };
 
