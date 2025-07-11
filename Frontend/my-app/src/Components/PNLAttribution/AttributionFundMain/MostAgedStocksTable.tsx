@@ -3,7 +3,8 @@ import {
   Box,
   CircularProgress,
   Typography,
-  Paper,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
@@ -17,6 +18,12 @@ interface MostAgedStockData {
 interface MostAgedStocksTableProps {
   fund: string;
 }
+
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0,
+});
 
 const MostAgedStocksTable: React.FC<MostAgedStocksTableProps> = ({ fund }) => {
   const [data, setData] = useState<MostAgedStockData[]>([]);
@@ -63,97 +70,85 @@ const MostAgedStocksTable: React.FC<MostAgedStocksTableProps> = ({ fund }) => {
   const columns: GridColDef[] = [
     { field: "ticker", headerName: "Ticker", flex: 1 },
     { field: "first_trade_date", headerName: "First Trade Date", flex: 1 },
-    { field: "cumulative_pnl", headerName: "Cumulative PnL", flex: 1 },
+    {
+      field: "cumulative_pnl",
+      headerName: "Cumulative PnL",
+      flex: 1,
+      renderCell: ({ value }) => (
+        <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
+          {typeof value === "number" && !isNaN(value)
+            ? currencyFormatter.format(value)
+            : "$0"}
+        </span>
+      ),
+    },
     { field: "days_held", headerName: "Days Held", flex: 1 },
   ];
 
   return (
-    <Box py={3}>
-      <Typography
-        variant="h6"
-        align="center"
-        gutterBottom
-        sx={{ color: "#002060", fontWeight: 600 }}
+    <Box >
+      <Card
+        sx={{
+          borderRadius: "16px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+          background: "linear-gradient(to bottom right, #f0f4ff, #ffffff)",
+        }}
       >
-        Most Aged Stocks for {fund}
-      </Typography>
-
-      <Paper elevation={3} sx={{ borderRadius: 2 }}>
-        {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" height={200}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Typography color="error">{error}</Typography>
-        ) : (
-          <Box
+        <CardContent sx={{ padding: 0 }}>
+          <Typography
+            variant="h6"
+            align="center"
             sx={{
-              overflowX: "auto",
-              backgroundColor: "#ffffff",
-              borderRadius: 2,
-              boxShadow: 3,
-              "& .MuiDataGrid-root": {
-                border: "none",
-                fontSize: "0.75rem",
-              },
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#77B0FC",
-                color: "#002060",
-                fontWeight: 600,
-                fontSize: "0.75rem",
-                lineHeight: 1.2,
-                minHeight: "36px !important",
-                maxHeight: "none !important",
-              },
-              "& .MuiDataGrid-columnHeader": {
-                background:  "#77B0FC",
-                color: "#002060",
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                whiteSpace: "normal",
-                lineHeight: "1.1rem",
-                fontSize: "0.75rem",
-                textAlign: "center",
-                padding: "0 4px",
-              },
-              "& .MuiDataGrid-cell": {
-                whiteSpace: "normal",
-                wordWrap: "break-word",
-                lineHeight: 1.4,
-                fontSize: "0.75rem",
-                padding: "6px 8px",
-                display: "flex",
-                alignItems: "center",
-              },
-              "& .MuiDataGrid-row": {
-                minHeight: "42px !important",
-              },
-              "& .MuiDataGrid-row:nth-of-type(even)": {
-                backgroundColor: "#f5f8fc",
-              },
-              "& .MuiDataGrid-row:hover": {
-                backgroundColor: "#dee7f7",
-                transition: "background-color 0.3s ease",
-              },
+              px: 2,
+              py: 2,
+              fontWeight: 600,
+              color: "#fff",
+              background: "#002060",
+              borderTopLeftRadius: "16px",
+              borderTopRightRadius: "16px",
             }}
           >
-            <DataGrid
-              rows={data.map((row, index) => ({ id: index, ...row }))}
-              columns={columns}
-              autoHeight
-              pagination
-              pageSizeOptions={[25]}
-              initialState={{
-                pagination: { paginationModel: { pageSize: 25, page: 0 } },
-              }}
-              disableRowSelectionOnClick
-              disableColumnMenu
-              hideFooterSelectedRowCount
-              getRowHeight={() => "auto"}
-            />
-          </Box>
-        )}
-      </Paper>
+            Most Aged Stocks for {fund}
+          </Typography>
+
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" height={200}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Typography color="error" sx={{ p: 2 }}>
+              {error}
+            </Typography>
+          ) : (
+            <div style={{ height: 500, width: "100%" }}>
+              <DataGrid
+                rows={data.map((row, index) => ({ id: index, ...row }))}
+                columns={columns}
+                rowHeight={35}
+            sx={{
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "transparent",
+              fontWeight: "bold",
+              color: "#002060",
+            },
+            "& .MuiDataGrid-columnHeaderTitle": {
+              fontWeight: "bold",
+              fontSize: "12px",
+            },
+            "& .MuiDataGrid-cell": {
+              color: "#000000",
+              fontSize: "12px",
+              padding: "4px",
+            },
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "#F5F5F5",
+            },
+          }}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </Box>
   );
 };

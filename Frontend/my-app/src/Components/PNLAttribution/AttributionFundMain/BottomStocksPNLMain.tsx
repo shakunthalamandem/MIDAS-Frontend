@@ -68,15 +68,16 @@ const BottomStocksPNLMain: React.FC<BottomStocksPNLMainProps> = ({ fund }) => {
   ];
 
   return (
-    <Box px={2} py={3}>
-      <Typography
-        variant="h6"
-        align="center"
-        gutterBottom
-        sx={{ color: "#002060", fontWeight: 600 }}
-      >
-        Bottom PnL Positions for {fund}
-      </Typography>
+    <Box px={2} py={3} >
+<Typography
+  variant="h6"
+  align="center"
+  gutterBottom
+  sx={{ color: "#002060", fontWeight: 600 }}
+>
+  High Loss Positions (PnL &lt; -$1M) — {fund}
+</Typography>
+
 
      
         {loading ? (

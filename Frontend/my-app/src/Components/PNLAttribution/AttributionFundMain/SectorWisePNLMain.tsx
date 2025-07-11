@@ -1,5 +1,10 @@
-import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import {
+  Typography,
+  CircularProgress,
+  Box,
+  Paper,
+} from '@mui/material';
 import {
   BarChart,
   Bar,
@@ -22,15 +27,17 @@ interface ApiResponse {
 }
 
 interface SectorWisePNLMainProps {
-  fund: string; // fund name or similar
+  fund: string;
 }
 
 const formatNumber = (value: number): string => {
   const absValue = Math.abs(value);
-  if (absValue >= 1_000_000_000) return (value / 1_000_000_000).toFixed(2) + 'B';
-  if (absValue >= 1_000_000) return (value / 1_000_000).toFixed(2) + 'M';
-  if (absValue >= 1_000) return (value / 1_000).toFixed(2) + 'K';
-  return value.toFixed(2);
+  const sign = value < 0 ? "-" : "";
+  
+  if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(2)}B`;
+  if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(2)}M`;
+  if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(2)}K`;
+  return `${sign}$${absValue.toFixed(0)}`;
 };
 
 const SectorWisePNLMain: React.FC<SectorWisePNLMainProps> = ({ fund }) => {
@@ -53,7 +60,7 @@ const SectorWisePNLMain: React.FC<SectorWisePNLMainProps> = ({ fund }) => {
             Authorization: token ? `Bearer ${token}` : '',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ fund: fund }),
+          body: JSON.stringify({ fund }),
         });
 
         if (!response.ok) throw new Error('Failed to fetch sector-wise PnL data');
@@ -70,9 +77,26 @@ const SectorWisePNLMain: React.FC<SectorWisePNLMainProps> = ({ fund }) => {
     fetchData();
   }, [fund]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!data) return <p>No data found.</p>;
+  if (loading)
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height={300}>
+        <CircularProgress />
+      </Box>
+    );
+
+  if (error)
+    return (
+      <Typography color="error" align="center" mt={3}>
+        {error}
+      </Typography>
+    );
+
+  if (!data)
+    return (
+      <Typography align="center" mt={3}>
+        No data found.
+      </Typography>
+    );
 
   const sectors = Array.from(new Set([...Object.keys(data.dtd), ...Object.keys(data.mtd)]));
 
@@ -83,43 +107,102 @@ const SectorWisePNLMain: React.FC<SectorWisePNLMainProps> = ({ fund }) => {
   }));
 
   return (
-    <div style={{ width: '85%', height: 500, alignContent: 'center', margin: 'auto' }}>
-      <Typography
-        variant="h6"
+      <Paper
+        elevation={4}
         sx={{
-          color: "#002060",
-          textAlign: "center",
-          fontWeight: "bold",
-          mt:4,
-          mb: 2,
-          fontSize: "1.25rem", 
+          borderRadius: 4,
+          p: 3,
+          background: "linear-gradient(to right,rgb(250, 247, 229),rgb(250, 225, 225))",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
         }}
       >
-        Sector-wise DTD & MTD PnL ({data.trade_date})
-      </Typography>
-
-      <ResponsiveContainer>
-        <BarChart
-          data={chartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
-          barCategoryGap="20%"
-          barGap={2}
+        <Typography
+          variant="h6"
+          sx={{
+            color: '#002060',
+            textAlign: 'center',
+            fontWeight: 700,
+            mb: 3,
+            fontSize: '1.25rem',
+          }}
         >
-          <XAxis
-            dataKey="sector"
-            interval={0}
-            height={80}
-            tick={{ fontSize: 11, fontWeight: 500 }}
-          />
-          <YAxis tickFormatter={(value) => formatNumber(Number(value))} />
-          <Tooltip formatter={(value) => formatNumber(Number(value))} />
-          <Legend />
-          <ReferenceLine y={0} stroke="#808080" strokeWidth={0.5} />
-          <Bar dataKey="DTD" fill="#8884d8" barSize={20} />
-          <Bar dataKey="MTD" fill="#82ca9d" barSize={20} />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+          Sector-wise DTD & MTD PnL ({data.trade_date})
+        </Typography>
+
+        <Box height={500}>
+          <ResponsiveContainer>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+              barCategoryGap="25%"
+              barGap={6}
+            >
+              <XAxis
+                dataKey="sector"
+                interval={0}
+                angle={-30}
+                textAnchor="end"
+                height={80}
+                tick={{ fill: '#0f3460', fontSize: 12, fontWeight: 600 }}
+                label={{
+                  value: "Sectors",
+                  position: "insideBottom",
+                  dy: 60,
+                  fill: "#002060",
+                  fontWeight: 700,
+                }}
+              />
+              <YAxis
+                tick={{ fill: '#34495e', fontSize: 12 }}
+                tickFormatter={formatNumber}
+                label={{
+                  value: "P&L",
+                  angle: -90,
+                  position: "insideLeft",
+                  dx: -10,
+                  fill: "#002060",
+                  fontWeight: 700,
+                }}
+              />
+              <Tooltip
+                formatter={(value) => formatNumber(Number(value))}
+                labelStyle={{ fontWeight: 600,color: "#2c3e50" }}
+                contentStyle={{ backgroundColor: "#f9fbff", borderRadius: 4 }}
+              />
+              <Legend
+                wrapperStyle={{
+                  paddingTop: 12,
+                  fontWeight: 600,
+                  color: "#2c3e50",
+                }}
+              />
+              <ReferenceLine y={0} stroke="#888" strokeWidth={1} />
+
+              <Bar
+                dataKey="DTD"
+                fill="url(#colorDtd)"
+                radius={[6, 6, 0, 0]}
+              />
+              <Bar
+                dataKey="MTD"
+                fill="url(#colorMtd)"
+                radius={[6, 6, 0, 0]}
+              />
+
+              <defs>
+                <linearGradient id="colorDtd" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3f51b5" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#3f51b5" stopOpacity={0.4} />
+                </linearGradient>
+                <linearGradient id="colorMtd" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#4caf50" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#4caf50" stopOpacity={0.4} />
+                </linearGradient>
+              </defs>
+            </BarChart>
+          </ResponsiveContainer>
+        </Box>
+      </Paper>
   );
 };
 

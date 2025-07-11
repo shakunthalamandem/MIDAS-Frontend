@@ -106,37 +106,31 @@ const AttributionFundMainTab = () => {
         <Box>
           <DealTypeFundMain fund={selectedFund} />
           <Box sx={{ mt: 6 }}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                backgroundColor: "#ffffff", // optional for clarity
-              }}
-            >
+
               <SectorWisePNLMain fund={selectedFund} />
-            </Paper>
           </Box>
 
 
-          <Box width={{ xs: "100%", md: "50%" }} mt={6}>
-            <Top10ExposureChart fund={selectedFund} />
-          </Box>
           <Grid container spacing={2} mt={2}>
             <Grid item xs={12} md={6}>
-              <Box height="400px" overflow="auto">
+              <Box >
+          <PortfolioDataTableMain fund={selectedFund} />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box>
                 <BottomStocksPNLMain fund={selectedFund} />
               </Box>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Box height="400px" overflow="auto">
+              <Box >
                 <MostAgedStocksTable fund={selectedFund} />
               </Box>
             </Grid>
 
-             <Grid item xs={12}>
-              <Box  overflow="auto">
-          <PortfolioDataTableMain fund={selectedFund} />
+            <Grid item xs={12} md={6}>
+              <Box  >
+                <Top10ExposureChart fund={selectedFund} />
               </Box>
             </Grid>
           </Grid>

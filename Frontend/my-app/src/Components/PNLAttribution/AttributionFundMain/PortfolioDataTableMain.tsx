@@ -117,7 +117,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mb: 4 }}>
       <Card
         sx={{
           borderRadius: "16px",
@@ -152,7 +152,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
               <CircularProgress />
             </Box>
           ) : (
-            <div style={{ height: 600, width: "100%" }}>
+            <div style={{ height: 500, width: "100%" }}>
               <DataGrid
                 rows={data.map((row, index) => ({ ...row, id: index }))}
                 columns={columns}
