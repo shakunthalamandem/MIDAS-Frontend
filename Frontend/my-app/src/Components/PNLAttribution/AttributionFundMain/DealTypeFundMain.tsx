@@ -54,22 +54,25 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <Typography
-          variant="subtitle2"
-          sx={{
-            background: "linear-gradient(to right, #cfd9ff, #a1c4fd)",
-            px: 2,
-            py: 0.5,
-            color: "#002060",
-            borderRadius: 1,
-            fontWeight: 500,
-            fontSize: "0.85rem",
-            display: "inline-block",
-            mb: 1,
-          }}
-        >
-          {title}
-        </Typography>
+        <Box textAlign="center" mb={2}>
+          <Typography
+            variant="h6"
+            sx={{
+              background: "linear-gradient(to right, #cfd9ff, #a1c4fd)",
+              px: 3,
+              py: 1,
+              color: "#002060",
+              borderRadius: 2,
+              fontWeight: 600,
+              fontSize: "1rem",
+              display: "inline-block",
+            }}
+          >
+            {title}
+          </Typography>
+        </Box>
+
+
       </motion.div>
 
       <Divider sx={{ mb: 2 }} />
@@ -102,9 +105,9 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
             },
 
             "& .MuiDataGrid-columnHeader": {
-                background:  "#77B0FC",
-                color: "#002060",
-              },
+              background: "#77B0FC",
+              color: "#002060",
+            },
             "& .MuiDataGrid-columnHeaderTitle": {
               whiteSpace: "normal",
               lineHeight: "1.1rem",
