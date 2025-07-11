@@ -4,6 +4,8 @@ import {
   CircularProgress,
   Typography,
   Paper,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
@@ -68,90 +70,69 @@ const BottomStocksPNLMain: React.FC<BottomStocksPNLMainProps> = ({ fund }) => {
   ];
 
   return (
-    <Box px={2} py={3} >
-<Typography
-  variant="h6"
-  align="center"
-  gutterBottom
-  sx={{ color: "#002060", fontWeight: 600 }}
->
-  High Loss Positions (PnL &lt; -$1M) — {fund}
-</Typography>
-
-
-     
-        {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" height={200}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Typography color="error">{error}</Typography>
-        ) : (
-          <Box
+   <Box >
+      <Card
+        sx={{
+          borderRadius: "16px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+          background: "linear-gradient(to bottom right, #f0f4ff, #ffffff)",
+        }}
+      >
+        <CardContent sx={{ padding: 0 }}>
+          <Typography
+            variant="h6"
+            align="center"
             sx={{
-              overflowX: "auto",
-              backgroundColor: "#ffffff",
-              borderRadius: 2,
-              boxShadow: 3,
-              "& .MuiDataGrid-root": {
-                border: "none",
-                fontSize: "0.75rem",
-              },
-              "& .MuiDataGrid-columnHeaders": {
-                fontWeight: 600,
-                fontSize: "0.75rem",
-                lineHeight: 1.2,
-                minHeight: "36px !important",
-                maxHeight: "none !important",
-              },
-              "& .MuiDataGrid-columnHeader": {
-                background:  "#77B0FC",
-                color: "#002060",
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                whiteSpace: "normal",
-                lineHeight: "1.1rem",
-                fontSize: "0.75rem",
-                textAlign: "center",
-                padding: "0 4px",
-              },
-              "& .MuiDataGrid-cell": {
-                whiteSpace: "normal",
-                wordWrap: "break-word",
-                lineHeight: 1.4,
-                fontSize: "0.75rem",
-                padding: "6px 8px",
-                display: "flex",
-                alignItems: "center",
-              },
-              "& .MuiDataGrid-row": {
-                minHeight: "42px !important",
-              },
-              "& .MuiDataGrid-row:nth-of-type(even)": {
-                backgroundColor: "#f5f8fc",
-              },
-              "& .MuiDataGrid-row:hover": {
-                backgroundColor: "#dee7f7",
-                transition: "background-color 0.3s ease",
-              },
+              px: 2,
+              py: 2,
+              fontWeight: 600,
+              color: "#fff",
+              background: "#002060",
+              borderTopLeftRadius: "16px",
+              borderTopRightRadius: "16px",
             }}
           >
-            <DataGrid
-              rows={data.map((row, index) => ({ id: index, ...row }))}
-              columns={columns}
-              autoHeight
-              pagination
-              pageSizeOptions={[25]}
-              initialState={{
-                pagination: { paginationModel: { pageSize: 25, page: 0 } },
-              }}
-              disableRowSelectionOnClick
-              disableColumnMenu
-              hideFooterSelectedRowCount
-              getRowHeight={() => "auto"}
-            />
-          </Box>
-        )}
+  High Loss Positions (PnL &lt; -$1M) — {fund}
+          </Typography>
+
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" height={200}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Typography color="error" sx={{ p: 2 }}>
+              {error}
+            </Typography>
+          ) : (
+            <div style={{ height: 500, width: "100%" }}>
+              <DataGrid
+                rows={data.map((row, index) => ({ id: index, ...row }))}
+                columns={columns}
+                rowHeight={35}
+            sx={{
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "transparent",
+              fontWeight: "bold",
+              color: "#002060",
+            },
+            "& .MuiDataGrid-columnHeaderTitle": {
+              fontWeight: "bold",
+              fontSize: "12px",
+            },
+            "& .MuiDataGrid-cell": {
+              color: "#000000",
+              fontSize: "12px",
+              padding: "4px",
+            },
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "#F5F5F5",
+            },
+          }}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </Box>
   );
 };
