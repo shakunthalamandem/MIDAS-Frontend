@@ -139,7 +139,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
               borderTopRightRadius: "16px",
             }}
           >
-            Portfolio PnL Overview
+            Portfolio P&L Overview
           </Typography>
 
           {loading ? (
