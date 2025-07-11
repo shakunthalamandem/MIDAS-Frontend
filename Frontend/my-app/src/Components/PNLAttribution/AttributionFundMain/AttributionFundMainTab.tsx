@@ -104,7 +104,21 @@ const AttributionFundMainTab = () => {
         {/* Main Deal Component */}
         <Box>
           <DealTypeFundMain fund={selectedFund} />
-          <Box width={{ xs: "100%", md: "50%" }} mt={2}>
+          <Box sx={{ mt: 6 }}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                backgroundColor: "#ffffff", // optional for clarity
+              }}
+            >
+              <SectorWisePNLMain fund={selectedFund} />
+            </Paper>
+          </Box>
+
+
+          <Box width={{ xs: "100%", md: "50%" }} mt={6}>
             <Top10ExposureChart fund={selectedFund} />
           </Box>
           <Grid container spacing={2} mt={2}>
@@ -120,7 +134,7 @@ const AttributionFundMainTab = () => {
             </Grid>
           </Grid>
 
-          <SectorWisePNLMain fund={selectedFund} />
+
         </Box>
       </Box>
     </>

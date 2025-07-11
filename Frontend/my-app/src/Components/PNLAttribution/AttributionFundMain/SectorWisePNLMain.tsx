@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import {
   BarChart,
@@ -83,13 +84,24 @@ const SectorWisePNLMain: React.FC<SectorWisePNLMainProps> = ({ fund }) => {
 
   return (
     <div style={{ width: '85%', height: 500, alignContent: 'center', margin: 'auto' }}>
-      <h2 className="text-xl font-bold mb-4" style={{ textAlign: 'center' }}>
+      <Typography
+        variant="h6"
+        sx={{
+          color: "#002060",
+          textAlign: "center",
+          fontWeight: "bold",
+          mt:4,
+          mb: 2,
+          fontSize: "1.25rem", 
+        }}
+      >
         Sector-wise DTD & MTD PnL ({data.trade_date})
-      </h2>
+      </Typography>
+
       <ResponsiveContainer>
         <BarChart
           data={chartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+          margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
           barCategoryGap="20%"
           barGap={2}
         >
