@@ -69,7 +69,7 @@ const MostAgedStocksTable: React.FC<MostAgedStocksTableProps> = ({ fund }) => {
 
   const columns: GridColDef[] = [
     { field: "ticker", headerName: "Ticker", flex: 1 },
-    { field: "first_trade_date", headerName: "First Trade Date", flex: 1 },
+    { field: "first_trade_date", headerName: "Issue Date", flex: 1 },
     {
       field: "cumulative_pnl",
       headerName: "Cumulative PnL",

@@ -68,7 +68,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
     },
     {
       field: "first_trade_date",
-      headerName: "Trade Date",
+      headerName: "Issue Date",
       flex: 1,
     },
     {
