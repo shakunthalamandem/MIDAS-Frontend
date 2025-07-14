@@ -286,7 +286,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             sx={{ width: 300 }}
           />
-          <Button variant="outlined" onClick={exportToExcel} sx={{backgroundColor: "#002060", color: "#fff"}}>
+          <Button variant="outlined" onClick={exportToExcel} sx={{ backgroundColor: "#002060", color: "#fff" }}>
             Export to Excel
           </Button>
         </Box>
@@ -310,22 +310,28 @@ const DealDetailedGapAnalysis: React.FC = () => {
             rows={rows}
             columns={columns}
             autoHeight
+            rowHeight={32}
             disableRowSelectionOnClick
             sx={{
               fontSize: "0.75rem",
               "& .MuiDataGrid-columnHeaders": {
+                height: 32,
+                minHeight: "32px !important",
+                maxHeight: "32px !important",
+                lineHeight: "32px",
                 bgcolor: "#f0f0f0",
                 color: "#002060",
-                minHeight: "32px",
-                maxHeight: "32px",
                 fontSize: "0.75rem",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                maxHeight: "32px !important",
               },
               "& .MuiDataGrid-columnHeaderTitle": {
                 fontWeight: "bold",
-              },
-              "& .MuiDataGrid-row": {
-                minHeight: "32px !important",
-                maxHeight: "32px !important",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                lineHeight: "32px",
               },
               "& .MuiDataGrid-cell": {
                 color: "#555",
