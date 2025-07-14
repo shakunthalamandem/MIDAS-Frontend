@@ -142,9 +142,6 @@ const SectorWisePNLMain: React.FC<SectorWisePNLMainProps> = ({ fund }) => {
   <Typography >DTD Total: {formatNumber((data as any).total_dtd || 0)}</Typography>
   <Typography>MTD Total: {formatNumber((data as any).total_mtd || 0)}</Typography>
 </Box>
-
-
-
         <Box height={500}>
           <ResponsiveContainer>
             <BarChart
