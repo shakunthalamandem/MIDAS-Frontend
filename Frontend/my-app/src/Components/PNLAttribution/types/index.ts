@@ -45,7 +45,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 2,
+  maximumFractionDigits: 1,
 });
 
 const numberFormatter1 = new Intl.NumberFormat("en-US", {
