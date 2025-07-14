@@ -95,21 +95,22 @@ const MostAgedStocksTable: React.FC<MostAgedStocksTableProps> = ({ fund }) => {
         }}
       >
         <CardContent sx={{ padding: 0 }}>
-          <Typography
-            variant="h6"
-            align="center"
-            sx={{
-              px: 2,
-              py: 2,
-              fontWeight: 600,
-              color: "#fff",
-              background: "#002060",
-              borderTopLeftRadius: "16px",
-              borderTopRightRadius: "16px",
-            }}
-          >
-            Most Aged Stocks for {fund}
-          </Typography>
+         <Typography
+  variant="h6"
+  align="center"
+  sx={{
+    px: 2,
+    py: 2,
+    fontWeight: 600,
+    color: "#fff",
+    backgroundColor: "#002060",
+    borderTopLeftRadius: "16px",
+    borderTopRightRadius: "16px",
+  }}
+>
+  Most Aged Stocks (&gt; 45 Days) for {fund}
+</Typography>
+
 
           {loading ? (
             <Box display="flex" justifyContent="center" alignItems="center" height={200}>
