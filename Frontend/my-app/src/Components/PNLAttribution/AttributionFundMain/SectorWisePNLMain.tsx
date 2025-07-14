@@ -128,6 +128,22 @@ const SectorWisePNLMain: React.FC<SectorWisePNLMainProps> = ({ fund }) => {
         >
           Sector-wise DTD & MTD PnL ({data.trade_date}) for {fund}
         </Typography>
+<Box
+  sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    color: '#002060',        
+    textAlign: 'right',      
+    mt: 2,                
+    mr: 2                 
+  }}
+>
+  <Typography >DTD Total: {formatNumber((data as any).total_dtd || 0)}</Typography>
+  <Typography>MTD Total: {formatNumber((data as any).total_mtd || 0)}</Typography>
+</Box>
+
+
 
         <Box height={500}>
           <ResponsiveContainer>
@@ -202,6 +218,8 @@ const SectorWisePNLMain: React.FC<SectorWisePNLMainProps> = ({ fund }) => {
             </BarChart>
           </ResponsiveContainer>
         </Box>
+        
+
       </Paper>
   );
 };
