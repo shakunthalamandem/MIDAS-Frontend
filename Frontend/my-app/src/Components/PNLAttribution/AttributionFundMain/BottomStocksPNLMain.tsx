@@ -16,6 +16,11 @@ interface BottomPnlData {
   days_held: number;
 }
 
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0,
+});
 interface BottomStocksPNLMainProps {
   fund: string;
 }
@@ -63,9 +68,15 @@ const BottomStocksPNLMain: React.FC<BottomStocksPNLMainProps> = ({ fund }) => {
   }, [fund, apiUrl, token]);
 
   const columns: GridColDef[] = [
-    { field: "ticker", headerName: "Ticker", flex: 1 },
+    { field: "ticker", headerName: "Ticker", flex: 1 ,},
     { field: "first_trade_date", headerName: "Issue Date", flex: 1 },
-    { field: "cumulative_pnl", headerName: "Cumulative PnL", flex: 1 },
+    { field: "cumulative_pnl", headerName: "Cumulative PnL", flex: 1, renderCell: ({ value }) => (
+        <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
+          {typeof value === "number" && !isNaN(value)
+            ? currencyFormatter.format(value)
+            : "$0"}
+        </span>
+      ), },
     { field: "days_held", headerName: "Days Held", flex: 1 },
   ];
 
