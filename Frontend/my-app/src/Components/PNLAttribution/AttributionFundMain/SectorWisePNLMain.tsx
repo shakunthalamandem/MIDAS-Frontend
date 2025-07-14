@@ -126,7 +126,7 @@ const SectorWisePNLMain: React.FC<SectorWisePNLMainProps> = ({ fund }) => {
             fontSize: '1.25rem',
           }}
         >
-          Sector-wise DTD & MTD PnL ({data.trade_date})
+          Sector-wise DTD & MTD PnL ({data.trade_date}) for {fund}
         </Typography>
 
         <Box height={500}>

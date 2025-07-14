@@ -19,17 +19,17 @@ const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
 
   const fundOptions = [
-    "BEMAP",
+    // "BEMAP",
     "BEMAP2",
-    "Bespoke Alpha MAC MIM LP",
-    "DS Liquid Div RVA MON LLC",
+    // "Bespoke Alpha MAC MIM LP",
+    // "DS Liquid Div RVA MON LLC",
     "FMAP",
     "Mission Pure Alpha LP",
-    "Monashee Managed Account SP",
+    // "Monashee Managed Account SP",
     "Monashee Pure Alpha SPV I LP",
-    "Monashee Solitario Fund LP",
+    // "Monashee Solitario Fund LP",
     "MPAM",
-    "WAF",
+    // "WAF",
   ];
 
   return (
