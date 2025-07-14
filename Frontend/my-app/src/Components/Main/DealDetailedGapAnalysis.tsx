@@ -274,7 +274,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
   return (
     <Box sx={{ p: 4 }}>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-        <Typography variant="h5" color="#002060" align="center" sx={{ flex: 1 }}>
+        <Typography variant="h5" color="#002060" align="center" sx={{ flex: 1, ml: 45 }}>
           Deal Detailed Gap Analysis
         </Typography>
         <Box display="flex" gap={2}>
