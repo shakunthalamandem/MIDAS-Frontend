@@ -14,6 +14,7 @@ import BottomStocksPNLMain from './BottomStocksPNLMain';
 import MostAgedStocksTable from './MostAgedStocksTable';
 import SectorWisePNLMain from './SectorWisePNLMain';
 import PortfolioDataTableMain from './PortfolioDataTableMain';
+import PnlAndDaysHeldGraph from './PnlAndDaysHeldGraph';
 
 const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
@@ -132,7 +133,11 @@ const AttributionFundMainTab = () => {
                 <BottomStocksPNLMain fund={selectedFund} />
               </Box>
             </Grid>
-
+            <Grid item xs={12} md={6}>
+              <Box>
+                <PnlAndDaysHeldGraph fund={selectedFund} />
+              </Box>
+            </Grid>
             
           </Grid>
 
