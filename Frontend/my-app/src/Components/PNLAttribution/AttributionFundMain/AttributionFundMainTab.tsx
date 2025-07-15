@@ -105,7 +105,7 @@ const AttributionFundMainTab = () => {
 
         {/* Main Deal Component */}
         <Box>
-          <DealTypeFundMain fund={selectedFund} />
+          {/* <DealTypeFundMain fund={selectedFund} /> */}
           {/* <Box sx={{ mt: 6 }}>
 
               <SectorWisePNLMain fund={selectedFund} />
