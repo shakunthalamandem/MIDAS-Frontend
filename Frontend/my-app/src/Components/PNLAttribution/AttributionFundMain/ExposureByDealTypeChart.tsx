@@ -44,12 +44,12 @@ const formatNumber = (value: number): string => {
   const abs = Math.abs(value);
   let result =
     abs >= 1e9
-      ? `${(abs / 1e9).toFixed(2)}B`
+      ? `${(abs / 1e9).toFixed(1)}B`
       : abs >= 1e6
-      ? `${(abs / 1e6).toFixed(2)}M`
+      ? `${(abs / 1e6).toFixed(1)}M`
       : abs >= 1e3
-      ? `${(abs / 1e3).toFixed(2)}K`
-      : abs.toFixed(2);
+      ? `${(abs / 1e3).toFixed(1)}K`
+      : abs.toFixed(1);
   return value < 0 ? `-$${result}` : `$${result}`;
 };
 
