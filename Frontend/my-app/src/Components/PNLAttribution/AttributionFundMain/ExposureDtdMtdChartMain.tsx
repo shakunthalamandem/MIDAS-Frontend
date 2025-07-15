@@ -29,19 +29,12 @@ interface RegionData {
   value: number;
 }
 
-const REGIONS_ORDER = ["us", "emea", "apac", "non-us america"];
-const REGION_LABELS: Record<string, string> = {
-  us: "US",
-  emea: "EMEA",
-  apac: "APAC",
-  "non-us america": "Non-US America",
-};
+const REGION_ORDER = ["US", "EMEA", "APAC", "Non-US America"];
 
-// Each region gets a fixed color
 const COLORS_BY_REGION: Record<string, string> = {
-  US: "#00acc1",
-  EMEA: "#e91e63",
-  APAC: "#43a047",
+  "US": "#00acc1",
+  "EMEA": "#e91e63",
+  "APAC": "#43a047",
   "Non-US America": "#fb8c00",
 };
 
@@ -86,22 +79,16 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
         const result = await res.json();
 
         if (result?.exposure && result?.dtd_pnl && result?.mtd_pnl) {
-          const exposure = REGIONS_ORDER.map((key) => ({
-            region: REGION_LABELS[key],
-            value: result.exposure[key] ?? 0,
-          }));
-          const dtd = REGIONS_ORDER.map((key) => ({
-            region: REGION_LABELS[key],
-            value: result.dtd_pnl[key] ?? 0,
-          }));
-          const mtd = REGIONS_ORDER.map((key) => ({
-            region: REGION_LABELS[key],
-            value: result.mtd_pnl[key] ?? 0,
-          }));
+          const formatRegionData = (raw: Record<string, number>): RegionData[] => {
+            return REGION_ORDER.map((region) => ({
+              region,
+              value: raw[region] ?? 0,
+            }));
+          };
 
-          setExposureData(exposure);
-          setDtdData(dtd);
-          setMtdData(mtd);
+          setExposureData(formatRegionData(result.exposure));
+          setDtdData(formatRegionData(result.dtd_pnl));
+          setMtdData(formatRegionData(result.mtd_pnl));
         } else {
           setError("Invalid response format.");
         }
@@ -155,15 +142,16 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
             tickFormatter={formatNumber}
             tick={{ fill: "#002060", fontWeight: 400 }}
           />
-          {showYAxis && (
+          {showYAxis ? (
             <YAxis
               type="category"
               dataKey="region"
               tick={{ fill: "#e30000", fontWeight: 400 }}
               width={140}
             />
+          ) : (
+            <YAxis type="category" dataKey="region" hide />
           )}
-          {!showYAxis && <YAxis type="category" dataKey="region" hide />}
           <Tooltip formatter={(val: number) => formatNumber(val)} />
           <ReferenceLine x={0} stroke="#888" />
           <Bar dataKey="value" barSize={18}>
