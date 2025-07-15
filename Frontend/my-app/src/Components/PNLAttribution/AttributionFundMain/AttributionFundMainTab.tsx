@@ -16,6 +16,7 @@ import SectorWisePNLMain from './SectorWisePNLMain';
 import PortfolioDataTableMain from './PortfolioDataTableMain';
 import PnlAndDaysHeldGraph from './PnlAndDaysHeldGraph';
 import ExposureDtdMtdChartMain from './ExposureDtdMtdChartMain';
+import ExposureByDealTypeChart from './ExposureByDealTypeChart';
 
 const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
@@ -140,13 +141,16 @@ const AttributionFundMainTab = () => {
               </Box>
             </Grid> */}
 
-            <ExposureDtdMtdChartMain fund={selectedFund} />
+            
             
           </Grid>
+          
 
-
+          <ExposureDtdMtdChartMain fund={selectedFund} />
+          <ExposureByDealTypeChart fund={selectedFund} />
         </Box>
       </Box>
+      
     </>
   );
 };
