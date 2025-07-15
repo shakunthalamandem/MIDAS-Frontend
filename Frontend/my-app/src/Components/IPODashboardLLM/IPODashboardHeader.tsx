@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -9,9 +9,14 @@ import {
   Card,
   Button,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
+import EditIcon from "@mui/icons-material/Edit";
 import IPOdashboardLine from "./IPOdashboardLine";
+import axios from "axios";
 
 interface IPODashboardHeaderProps {
   ipoData: any;
@@ -34,6 +39,35 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   onExportPDF,
   pdfLoading,
 }) => {
+  const [editValuationMode, setEditValuationMode] = useState(false);
+  const [editedValuation, setEditedValuation] = useState<string[]>(ipoData.valuation || []);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
+  const getAuthHeaders = () => ({
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  });
+
+  const handleSaveValuation = async () => {
+    try {
+      if (!apiUrl) throw new Error("API URL not defined");
+      await axios.patch(
+        `${apiUrl}/api/writeup_data/`,
+        {
+          ticker_name: ipoData.ticker_name,
+          valuation: editedValuation,
+        },
+        { headers: getAuthHeaders() }
+      );
+      ipoData.valuation = editedValuation;
+      setEditValuationMode(false);
+    } catch (err) {
+      console.error("Failed to save valuation:", err);
+    }
+  };
+
+
   return (
     <Container maxWidth="xl" sx={{ mb: 2 }}>
       <Box
@@ -104,28 +138,89 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
       </Box>
 
       <IPOdashboardLine ipodata={ipoData} />
+<Card
+  elevation={0}
+  sx={{
+    borderRadius: 4,
+    background: "linear-gradient(to right,rgb(172, 229, 236),rgb(234, 245, 176))",
+    mb: 2,
+    mt: 4,
+    width: "100%",
+    mx: "auto",
+  }}
+>
+  <Box display="flex" justifyContent="space-between" alignItems="center" px={3} pt={2}>
+    <Typography variant="h6" sx={{ fontWeight: 700, color: "#6a1b9a" }}>
+      Valuation Information
+    </Typography>
+    <Box>
+      {editValuationMode ? (
+        <>
+          <IconButton color="primary" onClick={() => {
+            ipoData.valuation = editedValuation;
+            setEditValuationMode(false);
+          }}>
+            <SaveIcon />
+          </IconButton>
+          <IconButton color="secondary" onClick={() => {
+            setEditedValuation(ipoData.valuation || []);
+            setEditValuationMode(false);
+          }}>
+            <CancelIcon />
+          </IconButton>
+        </>
+      ) : (
+        <IconButton onClick={() => setEditValuationMode(true)}>
+          <EditIcon />
+        </IconButton>
+      )}
+    </Box>
+  </Box>
 
-      <Card
-        elevation={0}
-        sx={{
-          borderRadius: 4,
-          background: "linear-gradient(to right,rgb(172, 229, 236),rgb(234, 245, 176))",
-          mb: 2,
-          mt: 4,
-          width: "100%",
-          mx: "auto",
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{ mb: 2, mt: 2, fontWeight: 700, color: "#6a1b9a" }}
-          align="center"
-        >
-          Valuation Information
-        </Typography>
-
+  <Box px={3} pb={3}>
+    {editValuationMode ? (
+      <>
+        {editedValuation.map((item, index) => (
+          <TextField
+            key={index}
+            value={item}
+            onChange={(e) => {
+              const updated = [...editedValuation];
+              updated[index] = e.target.value;
+              setEditedValuation(updated);
+            }}
+            fullWidth
+            margin="dense"
+            multiline
+            InputProps={{
+              style: { backgroundColor: "#fff" },
+            }}
+          />
+        ))}
+        <Box display="flex" gap={2} mt={2}>
+          <Button
+            variant="outlined"
+            onClick={() => setEditedValuation((prev) => [...prev, ""])}
+          >
+            Add Point
+          </Button>
+          {editedValuation.length > 0 && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() =>
+                setEditedValuation((prev) => prev.slice(0, prev.length - 1))
+              }
+            >
+              Remove Last
+            </Button>
+          )}
+        </Box>
+      </>
+    ) : (
+      <>
         {Array.isArray(ipoData.valuation) && ipoData.valuation.length > 0 ? (
-          <Box component="ul" sx={{ pl: 4, color: "#333" }}>
+          <Box component="ul" sx={{ pl: 3, color: "#333", mt: 1 }}>
             {ipoData.valuation.map((item: string, index: number) => (
               <li key={index} style={{ marginBottom: 8, lineHeight: 1.6 }}>
                 {item}
@@ -139,13 +234,17 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
               color: "#333",
               fontSize: "1rem",
               textAlign: "center",
-              wordBreak: "break-word",
+              mt: 2,
             }}
           >
             No valuation data available.
           </Typography>
         )}
-      </Card>
+      </>
+    )}
+  </Box>
+</Card>
+
     </Container>
   );
 };
