@@ -158,7 +158,7 @@ const PNLTabMain = () => {
       </Box>
 
       {/* Animated Content Switch */}
-      {/* <Fade in={selectedView === "summary_pnl"} timeout={400} mountOnEnter unmountOnExit>
+      <Fade in={selectedView === "summary_pnl"} timeout={400} mountOnEnter unmountOnExit>
         <Box>{selectedView === "summary_pnl" && <PNLGraphsMain />}</Box>
       </Fade>
       <Fade in={selectedView === "total_pnl_attribution"} timeout={400} mountOnEnter unmountOnExit>
@@ -169,7 +169,7 @@ const PNLTabMain = () => {
       </Fade>
        <Fade in={selectedView === "pnlfunddeatils"} timeout={400} mountOnEnter unmountOnExit>
         <Box>{selectedView === "pnlfunddeatils" && <AttributionFundMainTab />}</Box>
-      </Fade> */}
+      </Fade>
     </Box>
   );
 };

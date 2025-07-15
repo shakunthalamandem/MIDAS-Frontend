@@ -106,10 +106,10 @@ const AttributionFundMainTab = () => {
         {/* Main Deal Component */}
         <Box>
           <DealTypeFundMain fund={selectedFund} />
-          <Box sx={{ mt: 6 }}>
+          {/* <Box sx={{ mt: 6 }}>
 
               <SectorWisePNLMain fund={selectedFund} />
-          </Box>
+          </Box> */}
 
 
           <Grid container spacing={2} mt={2}>
@@ -118,7 +118,7 @@ const AttributionFundMainTab = () => {
                 <Top10ExposureChart fund={selectedFund} />
               </Box>
             </Grid>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <Box >
           <PortfolioDataTableMain fund={selectedFund} />
               </Box>
@@ -137,7 +137,7 @@ const AttributionFundMainTab = () => {
               <Box>
                 <PnlAndDaysHeldGraph fund={selectedFund} />
               </Box>
-            </Grid>
+            </Grid> */}
             
           </Grid>
 
