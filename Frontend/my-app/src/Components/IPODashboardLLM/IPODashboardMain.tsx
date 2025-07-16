@@ -12,10 +12,19 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  IconButton,
+  TextField,
+  Button,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import axios from "axios";
 
 import IPODashboardHeader from "./IPODashboardHeader";
 import IPODashboardCardRatings from "./IPODashboardCardRatings";
@@ -53,22 +62,25 @@ const IPODashboardMain: React.FC = () => {
   const [selectedTicker, setSelectedTicker] = useState<string | null>(ticker || "");
   const [pdfLoading, setPdfLoading] = useState(false);
 
+  const [editMode, setEditMode] = useState<Record<string, boolean>>({});
+  const [editedContent, setEditedContent] = useState<Record<string, string[]>>({});
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
+  const getAuthHeaders = () => ({
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  });
+
   useEffect(() => {
     const fetchAllIpoTickers = async () => {
       try {
-        const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem("access_token");
         const savedTicker = localStorage.getItem("selected_ticker");
         setSelectedTicker(savedTicker || "");
-        if (!apiUrl) throw new Error("API URL not defined");
-
         const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
+          headers: getAuthHeaders(),
         });
-
         if (!response.ok) throw new Error("Failed to fetch IPO tickers");
         const data = await response.json();
         setAllIpoTickers(data.distinct_tickers || []);
@@ -76,7 +88,6 @@ const IPODashboardMain: React.FC = () => {
         console.error("Ticker fetch failed", err);
       }
     };
-
     fetchAllIpoTickers();
   }, []);
 
@@ -85,36 +96,51 @@ const IPODashboardMain: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem("access_token");
-        if (!apiUrl) throw new Error("API URL not defined");
-
         const response = await fetch(`${apiUrl}/api/writeup_data/`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ ticker: selectedTicker || "" }),
         });
 
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.error || `HTTP error!`);
-        }
-
+        if (!response.ok) throw new Error("Failed to fetch IPO data");
         const jsonData = await response.json();
 
         const dateFields = ["pricing_date", "filed_date", "term_date", "trade_date"];
         const formattedData = { ...jsonData };
-        dateFields.forEach(field => {
+        dateFields.forEach((field) => {
           if (formattedData[field]) {
             formattedData[field] = formatDate(formattedData[field]);
           }
         });
 
+        const keys = [
+          "business_overview",
+          "key_highlights",
+          "strengths",
+          "concerns",
+          "principal_stockholders_preipo",
+          "key_management_personnel"
+        ];
+
+        const editModes: Record<string, boolean> = {};
+        const contents: Record<string, string[]> = {};
+        keys.forEach((key) => {
+          editModes[key] = false;
+          const fieldValue = formattedData[key];
+          if (typeof fieldValue === "string") {
+            contents[key] = fieldValue
+              .split("\n")
+              .map((line: string) => line.replace(/^•\s*/, "").trim())
+              .filter(Boolean);
+          } else {
+            contents[key] = Array.isArray(fieldValue) ? fieldValue : [];
+          }
+        });
+
+        setEditMode(editModes);
+        setEditedContent(contents);
         setIpoData(formattedData);
-      } catch (err: any) {
+      } catch (err) {
         console.error("IPO data fetch failed", err);
         setError("Failed to fetch IPO data");
       } finally {
@@ -125,7 +151,22 @@ const IPODashboardMain: React.FC = () => {
     if (selectedTicker) fetchData();
   }, [selectedTicker]);
 
-  const handleExportPDF = async () => {
+
+  const handleSaveCard = async (key: string) => {
+    try {
+      const cleaned = editedContent[key].filter((item) => item.trim() !== "");
+      const formatted = cleaned.map((item) => `• ${item}`).join("\n");
+      const payload = { ticker_name: selectedTicker, [key]: formatted };
+      await axios.patch(`${apiUrl}/api/writeup_data/`, payload, { headers: getAuthHeaders() });
+
+      setIpoData((prev: any) => ({ ...prev, [key]: cleaned }));
+      setEditMode((prev) => ({ ...prev, [key]: false }));
+    } catch (error) {
+      console.error(`Failed to save ${key}:`, error);
+    }
+  };
+
+   const handleExportPDF = async () => {
     setPdfLoading(true);
     try {
       const pageElements = [
@@ -242,6 +283,118 @@ const IPODashboardMain: React.FC = () => {
     }
   };
 
+
+
+  const handleCancelCard = (key: string) => {
+    setEditedContent((prev) => ({
+      ...prev,
+      [key]: ipoData[key] || [],
+    }));
+    setEditMode((prev) => ({ ...prev, [key]: false }));
+  };
+
+  const handleAddItem = (key: string) => {
+    setEditedContent((prev) => ({
+      ...prev,
+      [key]: [...prev[key], ""],
+    }));
+  };
+
+  const handleDeleteItem = (key: string, index: number) => {
+    setEditedContent((prev) => ({
+      ...prev,
+      [key]: prev[key].filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleItemChange = (key: string, index: number, value: string) => {
+    const updated = [...editedContent[key]];
+    updated[index] = value;
+    setEditedContent((prev) => ({ ...prev, [key]: updated }));
+  };
+
+  const renderEditableCard = (section: any, index: number) => {
+    const key = section.key;
+    const content = ipoData[key];
+    const isEditing = editMode[key];
+
+    return (
+      <Grid item xs={12} md={6} key={key}>
+        <Card sx={{
+          backgroundColor: cardColors[index % cardColors.length],
+          borderRadius: 2,
+          boxShadow: 3,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}>
+          <CardContent sx={{ overflowY: "auto", flex: 1 }}>
+<Box position="relative" mb={1} display="flex" justifyContent="center" alignItems="center">
+  <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
+    {section.title}
+  </Typography>
+
+  <Box position="absolute" right={0}>
+    {isEditing ? (
+      <>
+        <IconButton color="primary" onClick={() => handleSaveCard(key)} size="small">
+          <SaveIcon />
+        </IconButton>
+        <IconButton color="secondary" onClick={() => handleCancelCard(key)} size="small">
+          <CancelIcon />
+        </IconButton>
+      </>
+    ) : (
+      <IconButton onClick={() => setEditMode((prev) => ({ ...prev, [key]: true }))} size="small">
+        <EditIcon />
+      </IconButton>
+    )}
+  </Box>
+</Box>
+
+            {isEditing ? (
+              <Box>
+                {editedContent[key]?.map((item, idx) => (
+                  <Box key={idx} display="flex" alignItems="flex-start" mb={1}>
+                    <Box sx={{ mr: 1, mt: 1 }}>
+                      <FiberManualRecordIcon sx={{ fontSize: 8, color: "#002060" }} />
+                    </Box>
+                    <TextField
+                      fullWidth
+                      multiline
+                      size="small"
+                      value={item}
+                      onChange={(e) => handleItemChange(key, idx, e.target.value)}
+                      placeholder="Enter text..."
+                      sx={{ mr: 1 }}
+                    />
+                    <IconButton color="error" onClick={() => handleDeleteItem(key, idx)} size="small">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                ))}
+                <Button startIcon={<AddIcon />} onClick={() => handleAddItem(key)} variant="outlined" size="small" sx={{ mt: 1 }}>
+                  Add Item
+                </Button>
+              </Box>
+            ) : (
+              <List dense>
+                {content?.map((item: string, idx: number) => (
+                  <ListItem key={idx} sx={{ pl: 0 }}>
+                    <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
+                      <FiberManualRecordIcon sx={{ fontSize: 8, color: "#002060" }} />
+                    </ListItemIcon>
+                    <ListItemText primary={item} />
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </CardContent>
+        </Card>
+      </Grid>
+    );
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
@@ -276,7 +429,6 @@ const IPODashboardMain: React.FC = () => {
       <Box sx={{ px: 2 }}>
         {ipoData && (
           <>
-     
             <div id="ipo-dashboard-page1">
               <IPODashboardHeader
                 ipoData={ipoData}
@@ -288,43 +440,17 @@ const IPODashboardMain: React.FC = () => {
                 onExportPDF={handleExportPDF}
                 pdfLoading={pdfLoading}
               />
-              <IPODashboardCardRatings ipodata={ipoData} />
+<IPODashboardCardRatings
+  ipodata={ipoData}
+  selectedTicker={selectedTicker || ""}
+  setIpoData={setIpoData}
+/>
             </div>
 
             <div id="ipo-dashboard-page2">
               <Container maxWidth="xl" sx={{ mb: 3 }}>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(0, 4).map((section, index) => {
-                    const content = ipoData[section.key];
-                    return (
-                      <Grid item xs={12} md={6} key={section.key}>
-                        <Card sx={{
-                          backgroundColor: cardColors[index % cardColors.length],
-                          borderRadius: 2,
-                          boxShadow: 3,
-                          height: "100%",
-                          display: "flex",
-                          flexDirection: "column",
-                        }}>
-                          <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-                            <Typography variant="h6" sx={{ color: "#002060", mb: 1, fontWeight: "bold" }} align="center">
-                              {section.title}
-                            </Typography>
-                            <List dense>
-                              {content?.map((item: string, idx: number) => (
-                                <ListItem key={idx} sx={{ pl: 0 }}>
-                                  <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                                    <FiberManualRecordIcon sx={{ fontSize: 8, color: "#002060" }} />
-                                  </ListItemIcon>
-                                  <ListItemText primary={item} />
-                                </ListItem>
-                              ))}
-                            </List>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    );
-                  })}
+                  {cardSections.slice(0, 4).map((section, index) => renderEditableCard(section, index))}
                 </Grid>
               </Container>
             </div>
@@ -332,37 +458,7 @@ const IPODashboardMain: React.FC = () => {
             <div id="ipo-dashboard-page3">
               <Container maxWidth="xl" sx={{ mb: 3 }}>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(4, 6).map((section, index) => {
-                    const content = ipoData[section.key];
-                    return (
-                      <Grid item xs={12} md={6} key={section.key}>
-                        <Card sx={{
-                          backgroundColor: cardColors[(index + 4) % cardColors.length],
-                          borderRadius: 2,
-                          boxShadow: 3,
-                          height: "100%",
-                          display: "flex",
-                          flexDirection: "column",
-                        }}>
-                          <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-                            <Typography variant="h6" sx={{ color: "#002060", mb: 1, fontWeight: "bold" }} align="center">
-                              {section.title}
-                            </Typography>
-                            <List dense>
-                              {content?.map((item: string, idx: number) => (
-                                <ListItem key={idx} sx={{ pl: 0 }}>
-                                  <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                                    <FiberManualRecordIcon sx={{ fontSize: 8, color: "#002060" }} />
-                                  </ListItemIcon>
-                                  <ListItemText primary={item} />
-                                </ListItem>
-                              ))}
-                            </List>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    );
-                  })}
+                  {cardSections.slice(4, 6).map((section, index) => renderEditableCard(section, index + 4))}
                   <Grid item xs={12}>
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <FinancialForecastTable defaultTicker={selectedTicker || ""} />
@@ -372,9 +468,9 @@ const IPODashboardMain: React.FC = () => {
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <IPODashboardMainTable ticker={selectedTicker || ""} />
                     </Box>
-                          <Typography sx={{ fontStyle: 'italic', fontSize: '0.875rem', color: 'gray' }}>
-  Source: Factset
-</Typography>
+                    <Typography sx={{ fontStyle: 'italic', fontSize: '0.875rem', color: 'gray' }}>
+                      Source: Factset
+                    </Typography>
                   </Grid>
                 </Grid>
               </Container>
