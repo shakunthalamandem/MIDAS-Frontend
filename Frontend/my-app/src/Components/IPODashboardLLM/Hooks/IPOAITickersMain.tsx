@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 interface SelectedDataProps {
   selectedData: {
@@ -13,7 +12,6 @@ interface SelectedDataProps {
 
 const IPOAITickersMain: React.FC<SelectedDataProps> = ({ selectedData }) => {
   const [comparativeTickers, setComparativeTickers] = useState<string[]>([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchComparativeTickers = async () => {
@@ -27,7 +25,7 @@ const IPOAITickersMain: React.FC<SelectedDataProps> = ({ selectedData }) => {
 
       try {
         const response = await axios.post(
-          `${apiUrl}/api/ai_comparative_tickers/`,
+          `${apiUrl}/api/ipo_ai_compititors/`,
           {
             ticker: selectedData.ticker,
             company_name: selectedData.company_name,
@@ -44,10 +42,7 @@ const IPOAITickersMain: React.FC<SelectedDataProps> = ({ selectedData }) => {
       } catch (error: any) {
         console.error('Failed to fetch comparative tickers:', error);
 
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem('access_token');
-          window.location.href = '/login'; // refresh and redirect
-        }
+       
       }
     };
 
