@@ -18,25 +18,19 @@ import {
 
 // Forecasts table columns
 const forecastYearKeys = [
+  "three_years_before",
   "two_years_before",
   "one_year_before",
   "current_year",
   "one_year_later",
-  "two_years_later",
-  "three_years_later",
-  "four_years_later",
-  "five_years_later",
 ];
 
 const forecastYearLabels = [
+  "2022 A",
   "2023 A",
   "2024 A",
   "2025 E",
   "2026 E",
-  "2027 E",
-  "2028 E",
-  "2029 E",
-  "2030 E",
 ];
 
 interface FinancialForecastTableProps {
