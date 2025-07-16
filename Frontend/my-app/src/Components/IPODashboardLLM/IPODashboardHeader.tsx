@@ -172,33 +172,34 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
           mx: "auto",
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" px={3} pt={2}>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#6a1b9a" }}>
-            Valuation Information
-          </Typography>
-          <Box>
-            {editValuationMode ? (
-              <>
-                <IconButton color="primary" onClick={handleSaveValuation}>
-                  <SaveIcon />
-                </IconButton>
-                <IconButton
-                  color="secondary"
-                  onClick={() => {
-                    setEditedValuation(ipoData.valuation || []);
-                    setEditValuationMode(false);
-                  }}
-                >
-                  <CancelIcon />
-                </IconButton>
-              </>
-            ) : (
-              <IconButton onClick={() => setEditValuationMode(true)}>
-                <EditIcon />
-              </IconButton>
-            )}
-          </Box>
-        </Box>
+        <Box position="relative" px={3} pt={2} display="flex" justifyContent="center" alignItems="center">
+  <Typography variant="h6" sx={{ fontWeight: 700, color: "#6a1b9a" }}>
+    Valuation Information
+  </Typography>
+
+  <Box position="absolute" right={24}> {/* px=3 = 24px, aligns with outer padding */}
+    {editValuationMode ? (
+      <>
+        <IconButton color="primary" onClick={handleSaveValuation}>
+          <SaveIcon />
+        </IconButton>
+        <IconButton
+          color="secondary"
+          onClick={() => {
+            setEditedValuation(ipoData.valuation || []);
+            setEditValuationMode(false);
+          }}
+        >
+          <CancelIcon />
+        </IconButton>
+      </>
+    ) : (
+      <IconButton onClick={() => setEditValuationMode(true)}>
+        <EditIcon />
+      </IconButton>
+    )}
+  </Box>
+</Box>
 
         <Box px={3} pb={3}>
           {editValuationMode ? (

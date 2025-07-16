@@ -329,27 +329,29 @@ const IPODashboardMain: React.FC = () => {
           flexDirection: "column",
         }}>
           <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-            <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
-              <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold",  }}>
-                {section.title}
-              </Typography>
-              <Box>
-                {isEditing ? (
-                  <>
-                    <IconButton color="primary" onClick={() => handleSaveCard(key)} size="small">
-                      <SaveIcon />
-                    </IconButton>
-                    <IconButton color="secondary" onClick={() => handleCancelCard(key)} size="small">
-                      <CancelIcon />
-                    </IconButton>
-                  </>
-                ) : (
-                  <IconButton onClick={() => setEditMode((prev) => ({ ...prev, [key]: true }))} size="small">
-                    <EditIcon />
-                  </IconButton>
-                )}
-              </Box>
-            </Box>
+<Box position="relative" mb={1} display="flex" justifyContent="center" alignItems="center">
+  <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
+    {section.title}
+  </Typography>
+
+  <Box position="absolute" right={0}>
+    {isEditing ? (
+      <>
+        <IconButton color="primary" onClick={() => handleSaveCard(key)} size="small">
+          <SaveIcon />
+        </IconButton>
+        <IconButton color="secondary" onClick={() => handleCancelCard(key)} size="small">
+          <CancelIcon />
+        </IconButton>
+      </>
+    ) : (
+      <IconButton onClick={() => setEditMode((prev) => ({ ...prev, [key]: true }))} size="small">
+        <EditIcon />
+      </IconButton>
+    )}
+  </Box>
+</Box>
+
             {isEditing ? (
               <Box>
                 {editedContent[key]?.map((item, idx) => (

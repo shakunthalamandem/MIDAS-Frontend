@@ -166,27 +166,31 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
           >
             <Card sx={{ borderRadius: 4, background: "linear-gradient(to right, #e3f2fd, #fce4ec)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
               <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: "#6a1b9a" }}>
-                    IPO Summary
-                  </Typography>
-                  <Box>
-                    {summaryEditMode ? (
-                      <>
-                        <IconButton color="primary" onClick={handleSaveSummary}>
-                          <SaveIcon />
-                        </IconButton>
-                        <IconButton color="secondary" onClick={handleCancelSummary}>
-                          <CancelIcon />
-                        </IconButton>
-                      </>
-                    ) : (
-                      <IconButton onClick={() => setSummaryEditMode(true)}>
-                        <EditIcon />
-                      </IconButton>
-                    )}
-                  </Box>
-                </Box>
+ <Box position="relative" mb={2} display="flex" justifyContent="center" alignItems="center">
+  {/* Centered title */}
+  <Typography variant="h6" sx={{ fontWeight: 700, color: "#6a1b9a" }}>
+    IPO Summary
+  </Typography>
+
+  {/* Right-aligned icons */}
+  <Box position="absolute" right={0}>
+    {summaryEditMode ? (
+      <>
+        <IconButton color="primary" onClick={handleSaveSummary}>
+          <SaveIcon />
+        </IconButton>
+        <IconButton color="secondary" onClick={handleCancelSummary}>
+          <CancelIcon />
+        </IconButton>
+      </>
+    ) : (
+      <IconButton onClick={() => setSummaryEditMode(true)}>
+        <EditIcon />
+      </IconButton>
+    )}
+  </Box>
+</Box>
+
 
                 <Grid container spacing={3}>
                   {infoFields.map((field, idx) => (
@@ -265,27 +269,40 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
           >
             <Card sx={{ borderRadius: 4, background: "linear-gradient(to right, #fff3e0, #fce4ec)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
               <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: "#6a1b9a" }}>
-                    Ratings Overview
-                  </Typography>
-                  <Box>
-                    {ratingsEditMode ? (
-                      <>
-                        <IconButton color="primary" onClick={handleSaveRatings}>
-                          <SaveIcon />
-                        </IconButton>
-                        <IconButton color="secondary" onClick={handleCancelRatings}>
-                          <CancelIcon />
-                        </IconButton>
-                      </>
-                    ) : (
-                      <IconButton onClick={() => setRatingsEditMode(true)}>
-                        <EditIcon />
-                      </IconButton>
-                    )}
-                  </Box>
-                </Box>
+          <Box position="relative" mb={2}>
+  {/* Centered title */}
+  <Typography
+    variant="h6"
+    align="center"
+    sx={{ fontWeight: 700, color: "#6a1b9a" }}
+  >
+    Ratings Overview
+  </Typography>
+
+  {/* Icons aligned right, vertically centered */}
+  <Box
+    position="absolute"
+    right={0}
+    top="50%"
+    sx={{ transform: "translateY(-50%)" }}
+  >
+    {ratingsEditMode ? (
+      <>
+        <IconButton color="primary" onClick={handleSaveRatings}>
+          <SaveIcon />
+        </IconButton>
+        <IconButton color="secondary" onClick={handleCancelRatings}>
+          <CancelIcon />
+        </IconButton>
+      </>
+    ) : (
+      <IconButton onClick={() => setRatingsEditMode(true)}>
+        <EditIcon />
+      </IconButton>
+    )}
+  </Box>
+</Box>
+
 
                 <Grid container spacing={3}>
                   {ratingFields.map((field, idx) => {
