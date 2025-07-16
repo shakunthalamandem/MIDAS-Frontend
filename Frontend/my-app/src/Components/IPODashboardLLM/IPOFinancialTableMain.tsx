@@ -115,15 +115,17 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
 
   return (
     <Container sx={{ maxWidth: "xl", b: 4 }}>
-      <Typography
-        variant="h6"
-        sx={{ mb: 2, mt: 4 }}
-        color="#002060"
-        fontWeight={600}
-        align="center"
-      >
-        Financial Forecasts (FYE Dec 31, Internal Estimates)
-      </Typography>
+     <Typography
+  variant="h6"
+  sx={{ mb: 2, mt: 4 }}
+  color="#002060"
+  fontWeight={600}
+  align="center"
+>
+  Financial Forecasts (FYE{" "}
+  {forecastsTicker?.toUpperCase() === "MH" ? "Mar 31" : "Dec 31"}, Internal
+  Estimates)
+</Typography>
 
       {forecastsLoading && <CircularProgress />}
       {forecastsError && <Alert severity="error">{forecastsError}</Alert>}
