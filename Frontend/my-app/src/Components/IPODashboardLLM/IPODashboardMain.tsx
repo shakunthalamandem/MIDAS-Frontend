@@ -31,6 +31,7 @@ import IPODashboardCardRatings from "./IPODashboardCardRatings";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
+import IPOAITickersMain from "./Hooks/IPOAITickersMain";
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -463,6 +464,12 @@ const IPODashboardMain: React.FC = () => {
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <FinancialForecastTable defaultTicker={selectedTicker || ""} />
                     </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Box sx={{ backgroundColor: "#f4f5f7" }}>
+                      <IPOAITickersMain selectedData={ipoData} />
+                    </Box>
+                  
                   </Grid>
                   <Grid item xs={12}>
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
