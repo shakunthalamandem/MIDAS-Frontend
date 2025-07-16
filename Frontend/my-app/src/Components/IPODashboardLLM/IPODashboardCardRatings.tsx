@@ -16,9 +16,10 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
-
 interface IPODashboardCardRatingsProps {
   ipodata: Record<string, any>;
+  selectedTicker: string;
+  setIpoData: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const ratingFields = [
@@ -65,7 +66,7 @@ const formatValue = (key: string, value: any, ipodata: Record<string, any>) => {
   return value || "N/A";
 };
 
-const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({ ipodata }) => {
+const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({ ipodata, selectedTicker, setIpoData }) => {
   const [summaryEditMode, setSummaryEditMode] = useState(false);
   const [ratingsEditMode, setRatingsEditMode] = useState(false);
   const [editedSummaryData, setEditedSummaryData] = useState<Record<string, any>>({});
@@ -80,28 +81,40 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({ ipoda
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   });
+const handleSaveSummary = async () => {
+  try {
+    if (!apiUrl) throw new Error("API URL not defined");
 
-  const handleSaveSummary = async () => {
-    try {
-      if (!apiUrl) throw new Error("API URL not defined");
-      const payload = { ticker_name: ipodata.ticker_name, ...editedSummaryData };
-      await axios.patch(`${apiUrl}/api/writeup_data/`, payload, { headers: getAuthHeaders() });
-      setSummaryEditMode(false);
-    } catch (error) {
-      console.error("Failed to save summary:", error);
-    }
-  };
+    const payload = { ticker_name: selectedTicker, ...editedSummaryData };
+    await axios.patch(`${apiUrl}/api/writeup_data/`, payload, { headers: getAuthHeaders() });
 
-  const handleSaveRatings = async () => {
-    try {
-      if (!apiUrl) throw new Error("API URL not defined");
-      const payload = { ticker_name: ipodata.ticker_name, ...editedRatingsData };
-      await axios.patch(`${apiUrl}/api/writeup_data/`, payload, { headers: getAuthHeaders() });
-      setRatingsEditMode(false);
-    } catch (error) {
-      console.error("Failed to save ratings:", error);
-    }
-  };
+    // Update local state to reflect saved summary
+    setIpoData((prev: any) => ({ ...prev, ...editedSummaryData }));
+
+    setSummaryEditMode(false);
+    setEditedSummaryData({});
+  } catch (error) {
+    console.error("Failed to save summary:", error);
+  }
+};
+
+const handleSaveRatings = async () => {
+  try {
+    if (!apiUrl) throw new Error("API URL not defined");
+
+    const payload = { ticker_name: selectedTicker, ...editedRatingsData };
+    await axios.patch(`${apiUrl}/api/writeup_data/`, payload, { headers: getAuthHeaders() });
+
+    // Update local state to reflect saved ratings
+    setIpoData((prev: any) => ({ ...prev, ...editedRatingsData }));
+
+    setRatingsEditMode(false);
+    setEditedRatingsData({});
+  } catch (error) {
+    console.error("Failed to save ratings:", error);
+  }
+};
+
 
   const handleCancelSummary = () => {
     setEditedSummaryData({});

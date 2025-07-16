@@ -438,7 +438,11 @@ const IPODashboardMain: React.FC = () => {
                 onExportPDF={handleExportPDF}
                 pdfLoading={pdfLoading}
               />
-              <IPODashboardCardRatings ipodata={ipoData} />
+<IPODashboardCardRatings
+  ipodata={ipoData}
+  selectedTicker={selectedTicker || ""}
+  setIpoData={setIpoData}
+/>
             </div>
 
             <div id="ipo-dashboard-page2">
