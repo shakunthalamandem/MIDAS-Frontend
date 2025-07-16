@@ -159,6 +159,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
           <IconButton color="primary" onClick={() => {
             ipoData.valuation = editedValuation;
             setEditValuationMode(false);
+            
           }}>
             <SaveIcon />
           </IconButton>
