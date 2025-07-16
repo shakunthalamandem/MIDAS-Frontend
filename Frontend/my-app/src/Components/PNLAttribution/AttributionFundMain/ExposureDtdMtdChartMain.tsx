@@ -51,6 +51,13 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-$${result}` : `$${result}`;
 };
 
+const formatHoverValue = (value: number): string => {
+  const abs = Math.abs(value);
+  if (abs >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
+  if (abs >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
+  return value.toFixed(1);
+};
+
 const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -121,10 +128,19 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
     );
   }
 
+  const getSymmetricMax = (data: RegionData[]) => {
+    const maxAbs = Math.max(...data.map((d) => Math.abs(d.value)), 1);
+    return Math.ceil(maxAbs / 1e6) * 1e6;
+  };
+
+  const dtdMax = getSymmetricMax(dtdData);
+  const mtdMax = getSymmetricMax(mtdData);
+
   const renderChart = (
     title: string,
     data: RegionData[],
-    showYAxis: boolean
+    showYAxis: boolean,
+    symmetricMax?: number
   ) => (
     <Box flex={1}>
       <Typography variant="subtitle2" align="center" sx={{ mb: 1, fontWeight: 600 }}>
@@ -139,7 +155,12 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             type="number"
-            tickFormatter={formatNumber}
+            domain={
+              title === "Exposure" ? undefined : [-symmetricMax!, symmetricMax!]
+            }
+            tickFormatter={(value) =>
+              title === "Exposure" ? formatNumber(value) : `${(value / 1e6).toFixed(0)}M`
+            }
             tick={{ fill: "#002060", fontWeight: 400 }}
           />
           {showYAxis ? (
@@ -152,7 +173,11 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
           ) : (
             <YAxis type="category" dataKey="region" hide />
           )}
-          <Tooltip formatter={(val: number) => formatNumber(val)} />
+          <Tooltip
+            formatter={(val: number) =>
+              title === "Exposure" ? formatNumber(val) : formatHoverValue(val)
+            }
+          />
           <ReferenceLine x={0} stroke="#888" />
           <Bar dataKey="value" barSize={18}>
             {data.map((entry, index) => (
@@ -193,8 +218,8 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
 
             <Box display="flex" gap={3}>
               {renderChart("Exposure", exposureData, true)}
-              {renderChart("DTD PnL", dtdData, false)}
-              {renderChart("MTD PnL", mtdData, false)}
+              {renderChart("DTD PnL", dtdData, false, dtdMax)}
+              {renderChart("MTD PnL", mtdData, false, mtdMax)}
             </Box>
           </CardContent>
         </Card>
