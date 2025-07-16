@@ -6,6 +6,8 @@ interface SelectedDataProps {
   selectedData: {
     ticker: string;
     company_name: string;
+    exchange:string;
+    
   };
 }
 
@@ -25,10 +27,11 @@ const IPOAITickersMain: React.FC<SelectedDataProps> = ({ selectedData }) => {
 
       try {
         const response = await axios.post(
-          `${apiUrl}/api/converts/distinct/`,
+          `${apiUrl}/api/ai_comparative_tickers/`,
           {
             ticker: selectedData.ticker,
             company_name: selectedData.company_name,
+            exchange:selectedData.exchange,
           },
           {
             headers: {
@@ -48,7 +51,7 @@ const IPOAITickersMain: React.FC<SelectedDataProps> = ({ selectedData }) => {
       }
     };
 
-    if (selectedData?.ticker && selectedData?.company_name) {
+    if (selectedData?.ticker && selectedData?.company_name  && selectedData?.exchange) {
       fetchComparativeTickers();
     }
   }, [selectedData]);
