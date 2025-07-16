@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; // Added useEffect
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -15,8 +15,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // New icon for adding a line
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline"; // New icon for removing a line
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import IPOdashboardLine from "./IPOdashboardLine";
 import axios from "axios";
 
@@ -42,11 +42,10 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   pdfLoading,
 }) => {
   const [editValuationMode, setEditValuationMode] = useState(false);
-  const [editedValuation, setEditedValuation] = useState<string[]>([]); // Initialize as empty array
+  const [editedValuation, setEditedValuation] = useState<string[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // Synchronize editedValuation with ipoData.valuation when ipoData changes or when entering edit mode
   useEffect(() => {
     setEditedValuation(ipoData.valuation || []);
   }, [ipoData.valuation]);
@@ -56,55 +55,41 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
     Authorization: token ? `Bearer ${token}` : "",
   });
 
-  /**
-   * Handles saving the edited valuation data to the backend.
-   */
   const handleSaveValuation = async () => {
     try {
       if (!apiUrl) {
-        console.error("API URL not defined. Cannot save valuation.");
+        console.error("API URL not defined.");
         return;
       }
 
-      // Filter out any empty strings if you don't want to save blank lines
-      const valuationToSave = editedValuation.filter(item => item.trim() !== '');
+      const cleaned = editedValuation.filter(item => item.trim() !== "");
+      const formatted = cleaned.map(item => `• ${item}`).join("\n");
 
       await axios.patch(
         `${apiUrl}/api/writeup_data/`,
         {
           ticker_name: ipoData.ticker_name,
-          valuation: valuationToSave, // Use the filtered array
+          valuation: formatted,
         },
         { headers: getAuthHeaders() }
       );
 
-      // Update the parent component's ipoData or trigger a refresh if necessary
-      // For now, we'll directly modify ipoData.valuation (though a state update in parent is better)
-      ipoData.valuation = valuationToSave; // This directly mutates prop, consider prop drilling or context for proper state management
+      ipoData.valuation = cleaned;
       setEditValuationMode(false);
       console.log("Valuation saved successfully!");
     } catch (err) {
       console.error("Failed to save valuation:", err);
-      // Optionally, add user feedback for save failure
     }
   };
 
-  /**
-   * Handles adding a new empty valuation line.
-   * @param index The index after which to add the new line.
-   */
   const handleAddValuationLine = (index: number) => {
     setEditedValuation((prev) => {
       const newArr = [...prev];
-      newArr.splice(index + 1, 0, ""); // Insert an empty string at the specified index + 1
+      newArr.splice(index + 1, 0, "");
       return newArr;
     });
   };
 
-  /**
-   * Handles removing a specific valuation line.
-   * @param index The index of the line to remove.
-   */
   const handleRemoveValuationLine = (index: number) => {
     setEditedValuation((prev) => prev.filter((_, i) => i !== index));
   };
@@ -139,11 +124,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
               minWidth: "130px",
             }}
             disabled={pdfLoading}
-            startIcon={
-              pdfLoading ? (
-                <CircularProgress color="inherit" size={18} />
-              ) : null
-            }
+            startIcon={pdfLoading ? <CircularProgress color="inherit" size={18} /> : null}
           >
             {pdfLoading ? "Generating..." : "Export to PDF"}
           </Button>
@@ -180,8 +161,6 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
 
       <IPOdashboardLine ipodata={ipoData} />
 
-      {/* --- */}
-
       <Card
         elevation={0}
         sx={{
@@ -200,13 +179,16 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
           <Box>
             {editValuationMode ? (
               <>
-                <IconButton color="primary" onClick={handleSaveValuation}> {/* Calls the save handler */}
+                <IconButton color="primary" onClick={handleSaveValuation}>
                   <SaveIcon />
                 </IconButton>
-                <IconButton color="secondary" onClick={() => {
-                  setEditedValuation(ipoData.valuation || []); // Revert to original
-                  setEditValuationMode(false);
-                }}>
+                <IconButton
+                  color="secondary"
+                  onClick={() => {
+                    setEditedValuation(ipoData.valuation || []);
+                    setEditValuationMode(false);
+                  }}
+                >
                   <CancelIcon />
                 </IconButton>
               </>
@@ -231,36 +213,24 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
                       setEditedValuation(updated);
                     }}
                     fullWidth
-                    margin="none" // Use 'none' for better control with flex
                     multiline
+                    size="small"
                     InputProps={{
                       style: { backgroundColor: "#fff" },
                     }}
-                    size="small" // Make text field smaller
                   />
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleAddValuationLine(index)}
-                    size="small"
-                  >
+                  <IconButton color="primary" onClick={() => handleAddValuationLine(index)} size="small">
                     <AddCircleOutlineIcon />
                   </IconButton>
-                  {editedValuation.length > 1 && ( // Only show remove if more than one item
-                    <IconButton
-                      color="error"
-                      onClick={() => handleRemoveValuationLine(index)}
-                      size="small"
-                    >
+                  {editedValuation.length > 1 && (
+                    <IconButton color="error" onClick={() => handleRemoveValuationLine(index)} size="small">
                       <RemoveCircleOutlineIcon />
                     </IconButton>
                   )}
                 </Box>
               ))}
-              {editedValuation.length === 0 && ( // Option to add the first point if list is empty
-                <Button
-                  variant="outlined"
-                  onClick={() => handleAddValuationLine(-1)} // Add at the beginning
-                >
+              {editedValuation.length === 0 && (
+                <Button variant="outlined" onClick={() => handleAddValuationLine(-1)}>
                   Add First Point
                 </Button>
               )}
