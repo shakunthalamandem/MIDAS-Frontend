@@ -66,7 +66,11 @@ const formatValue = (key: string, value: any, ipodata: Record<string, any>) => {
   return value || "N/A";
 };
 
-const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({ ipodata, selectedTicker, setIpoData }) => {
+const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
+  ipodata,
+  selectedTicker,
+  setIpoData,
+}) => {
   const [summaryEditMode, setSummaryEditMode] = useState(false);
   const [ratingsEditMode, setRatingsEditMode] = useState(false);
   const [editedSummaryData, setEditedSummaryData] = useState<Record<string, any>>({});
@@ -81,40 +85,64 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({ ipoda
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   });
-const handleSaveSummary = async () => {
-  try {
-    if (!apiUrl) throw new Error("API URL not defined");
 
-    const payload = { ticker_name: selectedTicker, ...editedSummaryData };
-    await axios.patch(`${apiUrl}/api/writeup_data/`, payload, { headers: getAuthHeaders() });
+  const handleSaveSummary = async () => {
+    try {
+      if (!apiUrl) throw new Error("API URL not defined");
 
-    // Update local state to reflect saved summary
-    setIpoData((prev: any) => ({ ...prev, ...editedSummaryData }));
+      const payload: any = {
+        ticker_name: selectedTicker,
+        ...editedSummaryData,
+      };
 
-    setSummaryEditMode(false);
-    setEditedSummaryData({});
-  } catch (error) {
-    console.error("Failed to save summary:", error);
-  }
-};
+      // Format numbers for lower/upper bound
+      if ("lower_bound" in editedSummaryData && editedSummaryData.lower_bound !== undefined) {
+        payload.lower_bound = parseFloat(editedSummaryData.lower_bound);
+      }
+      if ("upper_bound" in editedSummaryData && editedSummaryData.upper_bound !== undefined) {
+        payload.upper_bound = parseFloat(editedSummaryData.upper_bound);
+      }
 
-const handleSaveRatings = async () => {
-  try {
-    if (!apiUrl) throw new Error("API URL not defined");
+      console.log("Saving summary payload:", payload);
 
-    const payload = { ticker_name: selectedTicker, ...editedRatingsData };
-    await axios.patch(`${apiUrl}/api/writeup_data/`, payload, { headers: getAuthHeaders() });
+      const response = await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
+        headers: getAuthHeaders(),
+      });
 
-    // Update local state to reflect saved ratings
-    setIpoData((prev: any) => ({ ...prev, ...editedRatingsData }));
+      console.log("Summary saved. Response:", response.data);
 
-    setRatingsEditMode(false);
-    setEditedRatingsData({});
-  } catch (error) {
-    console.error("Failed to save ratings:", error);
-  }
-};
+      setIpoData((prev: any) => ({ ...prev, ...editedSummaryData }));
+      setSummaryEditMode(false);
+      setEditedSummaryData({});
+    } catch (error: any) {
+      console.error("Save Summary Error:", error.response?.data || error.message || error);
+    }
+  };
 
+  const handleSaveRatings = async () => {
+    try {
+      if (!apiUrl) throw new Error("API URL not defined");
+
+      const payload = {
+        ticker_name: selectedTicker,
+        ...editedRatingsData,
+      };
+
+      console.log("Saving ratings payload:", payload);
+
+      const response = await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
+        headers: getAuthHeaders(),
+      });
+
+      console.log("Ratings saved. Response:", response.data);
+
+      setIpoData((prev: any) => ({ ...prev, ...editedRatingsData }));
+      setRatingsEditMode(false);
+      setEditedRatingsData({});
+    } catch (error: any) {
+      console.error("Save Ratings Error:", error.response?.data || error.message || error);
+    }
+  };
 
   const handleCancelSummary = () => {
     setEditedSummaryData({});
@@ -131,7 +159,11 @@ const handleSaveRatings = async () => {
       <Grid container spacing={4}>
         {/* IPO Summary */}
         <Grid item xs={12} md={6}>
-          <motion.div initial={{ opacity: 0, scale: 0.95, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.6, ease: "easeOut" }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
             <Card sx={{ borderRadius: 4, background: "linear-gradient(to right, #e3f2fd, #fce4ec)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -166,18 +198,49 @@ const handleSaveRatings = async () => {
                           </Typography>
 
                           {summaryEditMode ? (
-                            <TextField
-                              fullWidth
-                              multiline
-                              size="small"
-                              value={editedSummaryData[field.key] ?? ipodata[field.key] ?? ""}
-                              onChange={(e) =>
-                                setEditedSummaryData((prev) => ({
-                                  ...prev,
-                                  [field.key]: e.target.value,
-                                }))
-                              }
-                            />
+                            field.key === "price_range" ? (
+                              <Box display="flex" gap={1}>
+                                <TextField
+                                  label="Lower Bound"
+                                  type="number"
+                                  size="small"
+                                  fullWidth
+                                  value={editedSummaryData.lower_bound ?? ipodata.lower_bound ?? ""}
+                                  onChange={(e) =>
+                                    setEditedSummaryData((prev) => ({
+                                      ...prev,
+                                      lower_bound: e.target.value,
+                                    }))
+                                  }
+                                />
+                                <TextField
+                                  label="Upper Bound"
+                                  type="number"
+                                  size="small"
+                                  fullWidth
+                                  value={editedSummaryData.upper_bound ?? ipodata.upper_bound ?? ""}
+                                  onChange={(e) =>
+                                    setEditedSummaryData((prev) => ({
+                                      ...prev,
+                                      upper_bound: e.target.value,
+                                    }))
+                                  }
+                                />
+                              </Box>
+                            ) : (
+                              <TextField
+                                fullWidth
+                                multiline
+                                size="small"
+                                value={editedSummaryData[field.key] ?? ipodata[field.key] ?? ""}
+                                onChange={(e) =>
+                                  setEditedSummaryData((prev) => ({
+                                    ...prev,
+                                    [field.key]: e.target.value,
+                                  }))
+                                }
+                              />
+                            )
                           ) : (
                             <Typography variant="body2" sx={{ color: "#333" }}>
                               {formatValue(field.key, ipodata[field.key], ipodata)}
@@ -195,7 +258,11 @@ const handleSaveRatings = async () => {
 
         {/* Ratings Overview */}
         <Grid item xs={12} md={6}>
-          <motion.div initial={{ opacity: 0, scale: 0.95, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+          >
             <Card sx={{ borderRadius: 4, background: "linear-gradient(to right, #fff3e0, #fce4ec)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
