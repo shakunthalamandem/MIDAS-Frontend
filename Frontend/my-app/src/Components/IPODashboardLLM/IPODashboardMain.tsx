@@ -329,8 +329,8 @@ const IPODashboardMain: React.FC = () => {
           flexDirection: "column",
         }}>
           <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-              <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
+            <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
+              <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold",  }}>
                 {section.title}
               </Typography>
               <Box>
