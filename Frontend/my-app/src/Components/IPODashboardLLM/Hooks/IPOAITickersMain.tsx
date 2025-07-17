@@ -43,9 +43,9 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
         );
 
         // Fix TypeScript error by casting response type
-        const data = response.data as { comps: { Comp_Ticker: string }[] };
+        const data = response.data as { comps: { comp_ticker: string }[] };
         const comps = data.comps || [];
-        const tickers = comps.map((item) => item.Comp_Ticker);
+        const tickers = comps.map((item) => item.comp_ticker);
         setComparativeTickers(tickers);
       } catch (err: any) {
         console.error("Error fetching comparative tickers:", err);
