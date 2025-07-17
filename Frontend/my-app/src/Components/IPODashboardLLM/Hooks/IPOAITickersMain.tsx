@@ -5,9 +5,18 @@ interface SelectedDataProps {
   selectedData: {
     ticker: string;
     company_name: string;
-    exchange:string;
-    
+    exchange: string;
   };
+}
+
+// Define type for each competitor entry
+interface Comp {
+  Comp_Ticker: string;
+}
+
+// Define the expected API response type
+interface APIResponse {
+  comps: Comp[];
 }
 
 const IPOAITickersMain: React.FC<SelectedDataProps> = ({ selectedData }) => {
@@ -29,7 +38,7 @@ const IPOAITickersMain: React.FC<SelectedDataProps> = ({ selectedData }) => {
           {
             ticker: selectedData.ticker,
             company_name: selectedData.company_name,
-            exchange:selectedData.exchange,
+            exchange: selectedData.exchange,
           },
           {
             headers: {
@@ -38,21 +47,36 @@ const IPOAITickersMain: React.FC<SelectedDataProps> = ({ selectedData }) => {
             },
           }
         );
-        // setComparativeTickers(response.data || []);
+
+        // Cast the response to the expected type
+        const data = response.data as APIResponse;
+        console.log('Comparative tickers fetched:', data);
+        const comps = data.comps || [];
+        const tickers = comps.map((item) => item.Comp_Ticker);
+        setComparativeTickers(tickers);
       } catch (error: any) {
         console.error('Failed to fetch comparative tickers:', error);
-
-       
       }
     };
 
-    if (selectedData?.ticker && selectedData?.company_name  && selectedData?.exchange) {
+    if (
+      selectedData?.ticker &&
+      selectedData?.company_name &&
+      selectedData?.exchange
+    ) {
       fetchComparativeTickers();
     }
   }, [selectedData]);
 
   return (
-    <div style={{ display: 'flex', gap: '1rem', padding: '1rem', flexWrap: 'wrap' }}>
+    <div
+      style={{
+        display: 'flex',
+        gap: '1rem',
+        padding: '1rem',
+        flexWrap: 'wrap',
+      }}
+    >
       {comparativeTickers.length > 0 ? (
         comparativeTickers.map((ticker, index) => (
           <span key={index} style={{ fontWeight: 'bold', color: '#6a1b9a' }}>
