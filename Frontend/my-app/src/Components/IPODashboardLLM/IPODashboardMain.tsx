@@ -480,6 +480,9 @@ const IPODashboardMain: React.FC = () => {
         >
           AI Comparison
         </Button>
+        <Typography variant="body1" gutterBottom color="#02517e">
+        AI Suggested Comparable Tickers
+      </Typography>
 
         {showAIComparison && (
           <IPOAITickersMain selectedData={ipoData} />

@@ -62,9 +62,7 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
 
   return (
     <Box mt={2}>
-      <Typography variant="h6" gutterBottom>
-        AI Suggested Comparable Tickers
-      </Typography>
+    
 
       {loading ? (
         <CircularProgress size={24} />
