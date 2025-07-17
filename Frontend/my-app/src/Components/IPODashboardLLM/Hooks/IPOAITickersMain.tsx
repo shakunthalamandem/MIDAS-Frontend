@@ -6,6 +6,8 @@ import {
   Chip,
   CircularProgress,
   Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 
 interface Props {
@@ -19,7 +21,14 @@ interface Props {
 const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
   const [comparativeTickers, setComparativeTickers] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [updating, setUpdating] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -28,6 +37,17 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   });
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "error" = "success"
+  ) => {
+    setSnackbar({ open: true, message, severity });
+  };
 
   // Fetch data from /api/ipo_ai_compititors/
   const fetchComparativeTickers = async () => {
@@ -51,9 +71,11 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
       const comps = data.comps || [];
       const tickers = comps.map((item) => item.comp_ticker);
       setComparativeTickers(tickers);
+      showSnackbar("Comparative tickers loaded successfully.");
     } catch (err: any) {
       console.error("Error fetching comparative tickers:", err);
       setError("Failed to load comparative tickers.");
+      showSnackbar("Failed to load comparative tickers.", "error");
     } finally {
       setLoading(false);
     }
@@ -61,13 +83,12 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
 
   // POST to update data
   const handleUpdate = async () => {
+    setUpdating(true);
     try {
       const payload = {
         ticker: selectedData?.ticker_name,
         company_name: selectedData?.company_name,
-        updated_data: {
-          note: "Updated by user", // Replace with your actual update fields
-        },
+       
       };
 
       await axios.post(
@@ -76,14 +97,19 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
         { headers: getAuthHeaders() }
       );
 
+      showSnackbar("Comparative tickers updated.");
       fetchComparativeTickers(); // Refresh list
     } catch (err) {
       console.error("Error updating comparative tickers:", err);
+      showSnackbar("Failed to update.", "error");
+    } finally {
+      setUpdating(false);
     }
   };
 
   // POST to delete data
   const handleDelete = async () => {
+    setDeleting(true);
     try {
       const payload = {
         ticker: selectedData?.ticker_name,
@@ -95,9 +121,13 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
         { headers: getAuthHeaders() }
       );
 
-      setComparativeTickers([]); // Clear list after delete
+      setComparativeTickers([]);
+      showSnackbar("Comparative tickers deleted.");
     } catch (err) {
       console.error("Error deleting comparative tickers:", err);
+      showSnackbar("Failed to delete.", "error");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -109,17 +139,23 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
 
   return (
     <Box mt={2}>
-      <Box mb={2}>
+      <Box mb={2} display="flex" gap={2}>
         <Button
           variant="contained"
           color="primary"
           onClick={handleUpdate}
-          sx={{ mr: 2 }}
+          disabled={updating}
         >
-          Update
+          {updating ? <CircularProgress size={20} /> : "Update"}
         </Button>
-        <Button variant="outlined" color="error" onClick={handleDelete}>
-          Delete
+
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleDelete}
+          disabled={deleting}
+        >
+          {deleting ? <CircularProgress size={20} /> : "Delete"}
         </Button>
       </Box>
 
@@ -136,6 +172,23 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
       ) : (
         <Typography>No comparable tickers found.</Typography>
       )}
+
+      {/* Snackbar Notification */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
