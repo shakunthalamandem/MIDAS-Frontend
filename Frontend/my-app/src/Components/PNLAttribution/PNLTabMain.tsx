@@ -134,7 +134,7 @@ const PNLTabMain = () => {
               }
             />
 
-              {/* <FormControlLabel
+              <FormControlLabel
               value="pnlfunddeatils"
               control={
                 <Radio
@@ -152,7 +152,7 @@ const PNLTabMain = () => {
                   <Typography variant="h6">Fund Details</Typography>
                 </Box>
               }
-            /> */}
+            />
           </RadioGroup>
         </FormControl>
       </Box>
@@ -167,9 +167,9 @@ const PNLTabMain = () => {
       <Fade in={selectedView === "equities__pnl_attribution"} timeout={400} mountOnEnter unmountOnExit>
         <Box>{selectedView === "equities__pnl_attribution" && <PNLPagesMain />}</Box>
       </Fade>
-       {/* <Fade in={selectedView === "pnlfunddeatils"} timeout={400} mountOnEnter unmountOnExit>
+       <Fade in={selectedView === "pnlfunddeatils"} timeout={400} mountOnEnter unmountOnExit>
         <Box>{selectedView === "pnlfunddeatils" && <AttributionFundMainTab />}</Box>
-      </Fade> */}
+      </Fade>
     </Box>
   );
 };
