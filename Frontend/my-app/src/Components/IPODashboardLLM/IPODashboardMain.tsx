@@ -31,6 +31,7 @@ import IPODashboardCardRatings from "./IPODashboardCardRatings";
 import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
+import IPOAITickersMain from "./Hooks/IPOAITickersMain";
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -64,6 +65,9 @@ const IPODashboardMain: React.FC = () => {
 
   const [editMode, setEditMode] = useState<Record<string, boolean>>({});
   const [editedContent, setEditedContent] = useState<Record<string, string[]>>({});
+    const [showAIComparison, setShowAIComparison] = useState(false);
+
+ 
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -90,7 +94,9 @@ const IPODashboardMain: React.FC = () => {
     };
     fetchAllIpoTickers();
   }, []);
-
+ const handleAIComparisonClick = () => {
+    setShowAIComparison(true);
+  };
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -464,6 +470,25 @@ const IPODashboardMain: React.FC = () => {
                       <FinancialForecastTable defaultTicker={selectedTicker || ""} />
                     </Box>
                   </Grid>
+                   <Grid item xs={12}>
+      <Box sx={{ backgroundColor: "#f4f5f7", p: 2 }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleAIComparisonClick}
+          sx={{ mb: 2 }}
+        >
+          AI Comparison
+        </Button>
+        <Typography variant="body1" gutterBottom color="#02517e">
+        AI Suggested Comparable Tickers
+      </Typography>
+
+        {showAIComparison && (
+          <IPOAITickersMain selectedData={ipoData} />
+        )}
+      </Box>
+    </Grid>
                   <Grid item xs={12}>
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <IPODashboardMainTable ticker={selectedTicker || ""} />
