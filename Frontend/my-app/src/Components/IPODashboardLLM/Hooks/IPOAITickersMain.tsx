@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Typography, Chip, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Chip,
+  CircularProgress,
+  Button,
+} from "@mui/material";
 
 interface Props {
   selectedData: {
@@ -15,7 +21,6 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -24,37 +29,79 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
     Authorization: token ? `Bearer ${token}` : "",
   });
 
+  // Fetch data from /api/ipo_ai_compititors/
+  const fetchComparativeTickers = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const payload = {
+        ticker: selectedData?.ticker_name,
+        company_name: selectedData?.company_name,
+        exchange: selectedData?.exchange,
+      };
+
+      const response = await axios.post(
+        `${apiUrl}/api/ipo_ai_compititors/`,
+        payload,
+        { headers: getAuthHeaders() }
+      );
+
+      const data = response.data as { comps: { comp_ticker: string }[] };
+      const comps = data.comps || [];
+      const tickers = comps.map((item) => item.comp_ticker);
+      setComparativeTickers(tickers);
+    } catch (err: any) {
+      console.error("Error fetching comparative tickers:", err);
+      setError("Failed to load comparative tickers.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // POST to update data
+  const handleUpdate = async () => {
+    try {
+      const payload = {
+        ticker: selectedData?.ticker_name,
+        company_name: selectedData?.company_name,
+        updated_data: {
+          note: "Updated by user", // Replace with your actual update fields
+        },
+      };
+
+      await axios.post(
+        `${apiUrl}/api/ipo_ai_compititors_update/`,
+        payload,
+        { headers: getAuthHeaders() }
+      );
+
+      fetchComparativeTickers(); // Refresh list
+    } catch (err) {
+      console.error("Error updating comparative tickers:", err);
+    }
+  };
+
+  // POST to delete data
+  const handleDelete = async () => {
+    try {
+      const payload = {
+        ticker: selectedData?.ticker_name,
+      };
+
+      await axios.post(
+        `${apiUrl}/api/ipo_ai_compititors_delete/`,
+        payload,
+        { headers: getAuthHeaders() }
+      );
+
+      setComparativeTickers([]); // Clear list after delete
+    } catch (err) {
+      console.error("Error deleting comparative tickers:", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchComparativeTickers = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const payload = {
-          ticker: selectedData?.ticker_name ,
-          company_name: selectedData?.company_name ,
-          exchange: selectedData?.exchange ,
-        };
-
-        const response = await axios.post(
-          `${apiUrl}/api/ipo_ai_compititors/`,
-          payload,
-          { headers: getAuthHeaders() }
-        );
-
-        // Fix TypeScript error by casting response type
-        const data = response.data as { comps: { Comp_Ticker: string }[] };
-        const comps = data.comps || [];
-        const tickers = comps.map((item) => item.Comp_Ticker);
-        setComparativeTickers(tickers);
-      } catch (err: any) {
-        console.error("Error fetching comparative tickers:", err);
-        setError("Failed to load comparative tickers.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (selectedData?.ticker_name) {
       fetchComparativeTickers();
     }
@@ -62,7 +109,19 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
 
   return (
     <Box mt={2}>
-    
+      <Box mb={2}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleUpdate}
+          sx={{ mr: 2 }}
+        >
+          Update
+        </Button>
+        <Button variant="outlined" color="error" onClick={handleDelete}>
+          Delete
+        </Button>
+      </Box>
 
       {loading ? (
         <CircularProgress size={24} />
