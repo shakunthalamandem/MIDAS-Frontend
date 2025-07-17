@@ -7,6 +7,8 @@ import {
   CircularProgress,
   Button,
   Stack,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 
 interface Props {
@@ -22,6 +24,13 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Snackbar state
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "info"
+  >("info");
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -33,7 +42,6 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
   const fetchComparativeTickers = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const payload = {
         ticker: selectedData?.ticker_name,
@@ -59,65 +67,85 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
     }
   };
 
-  const regenerateTickers = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const payload = {
-        ticker: selectedData?.ticker_name,
-        company_name: selectedData?.company_name,
-        exchange: selectedData?.exchange,
-      };
-
-      await axios.put(`${apiUrl}/api/ipo_ai_compititors/`, payload, {
-        headers: getAuthHeaders(),
-      });
-
-      await fetchComparativeTickers(); // Refresh tickers after update
-    } catch (err: any) {
-      console.error("Error regenerating tickers:", err);
-      setError("Failed to regenerate comparative tickers.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteTickers = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-     await axios.delete(`${apiUrl}/api/ipo_ai_compititors/`, {
-  headers: getAuthHeaders(),
-  data: {
-    ticker: selectedData?.ticker_name,
-  },
-} as any);
-
-
-      setComparativeTickers([]); // Clear state
-    } catch (err: any) {
-      console.error("Error deleting tickers:", err);
-      setError("Failed to delete comparative tickers.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (selectedData?.ticker_name) {
       fetchComparativeTickers();
     }
   }, [selectedData]);
 
+  const handleRegenerate = async () => {
+    try {
+      setLoading(true);
+      await axios.put(
+        `${apiUrl}/api/ipo_ai_compititors/`,
+        {
+          ticker: selectedData?.ticker_name,
+          company_name: selectedData?.company_name,
+          exchange: selectedData?.exchange,
+        },
+        { headers: getAuthHeaders() }
+      );
+      await fetchComparativeTickers();
+      showSnackbar("Comparative tickers regenerated successfully.", "success");
+    } catch (err) {
+      console.error("Error regenerating tickers:", err);
+      showSnackbar("Failed to regenerate comparative tickers.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await axios.request({
+        url: `${apiUrl}/api/ipo_ai_compititors/`,
+        method: "DELETE",
+        headers: getAuthHeaders(),
+        data: {
+          ticker: selectedData?.ticker_name,
+        },
+      });
+      setComparativeTickers([]);
+      showSnackbar("Comparative tickers deleted successfully.", "success");
+    } catch (err) {
+      console.error("Error deleting tickers:", err);
+      showSnackbar("Failed to delete comparative tickers.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "error" | "info"
+  ) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   return (
     <Box mt={2}>
       <Stack direction="row" spacing={2} mb={2}>
-        <Button variant="contained" onClick={regenerateTickers} disabled={loading}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleRegenerate}
+          disabled={loading}
+        >
           Regenerate
         </Button>
-        <Button variant="outlined" color="error" onClick={deleteTickers} disabled={loading}>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleDelete}
+          disabled={loading}
+        >
           Delete
         </Button>
       </Stack>
@@ -135,6 +163,17 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
       ) : (
         <Typography>No comparable tickers found.</Typography>
       )}
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: "100%" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
