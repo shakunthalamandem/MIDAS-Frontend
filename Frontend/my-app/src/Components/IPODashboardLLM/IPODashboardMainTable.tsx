@@ -45,26 +45,6 @@ type ApiResponse = {
   };
 };
 
-const columns: {
-  key: keyof ComparableMetric;
-  label: string;
-  isCurrency?: boolean;
-  isPercentage?: boolean;
-}[] = [
-  { key: "competitor", label: "Ticker" },
-  { key: "price_usd", label: "Price (USD)", isCurrency: true },
-  { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
-  { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
-  { key: "present_year_ev_sales", label: "2025 EV/Sales" },
-  { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
-  { key: "present_year_price_earning", label: "2025 P/E" },
-  { key: "one_year_later_price_earning", label: "2026 P/E" },
-  { key: "present_year_ev_fcf", label: "2025 EV/FCF" },
-  { key: "one_year_later_ev_fcf", label: "2026 EV/FCF" },
-  { key: "sales_growth", label: "Sales Growth (25-26)", isPercentage: true },
-  { key: "eps_growth", label: "EPS Growth (25-26)", isPercentage: true },
-];
-
 const columnsWithX = new Set([
   "present_year_ev_sales",
   "one_year_later_ev_sales",
@@ -99,6 +79,31 @@ const formatNumber = (
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
+const getColumns = (ticker: string): {
+  key: keyof ComparableMetric;
+  label: string;
+  isCurrency?: boolean;
+  isPercentage?: boolean;
+}[] => [
+  { key: "competitor", label: "Ticker" },
+  { key: "price_usd", label: "Price (USD)", isCurrency: true },
+  { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
+  { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
+  { key: "present_year_ev_sales", label: "2025 EV/Sales" },
+  { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
+  { key: "present_year_price_earning", label: "2025 P/E" },
+  { key: "one_year_later_price_earning", label: "2026 P/E" },
+  {
+    key: "present_year_ev_fcf",
+    label: ticker === "CARL" ? "2025 EV/EBITDA" : "2025 EV/FCF",
+  },
+  {
+    key: "one_year_later_ev_fcf",
+    label: ticker === "CARL" ? "2026 EV/EBITDA" : "2026 EV/FCF",
+  },
+  { key: "sales_growth", label: "Sales Growth (25–26)", isPercentage: true },
+  { key: "eps_growth", label: "EPS Growth (25–26)", isPercentage: true },
+];
 
 interface IPODashboardMainTableProps {
   ticker: string;
@@ -137,7 +142,6 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
     }
   };
 
-  // Fetch data when ticker prop changes
   useEffect(() => {
     handleFetch(ticker);
     // eslint-disable-next-line
@@ -149,9 +153,10 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
       (metrics) => !metrics.data || metrics.data.length === 0
     );
 
+  const columns = getColumns(ticker);
+
   return (
     <Box sx={{ p: 0, width: "100%" }}>
-      {/* Comparable Company Metrics Table */}
       <Typography
         variant="h6"
         sx={{ mb: 2 }}
@@ -165,6 +170,7 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
       {noData && <Alert severity="info">No data found for this ticker.</Alert>}
+
       {!loading && !error && data && !noData && (
         <TableContainer
           component={Paper}
@@ -222,7 +228,6 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                         >
                           {columns.map((col) => {
                             const value = metric[col.key];
-
                             const displayValue =
                               value === null ||
                               value === undefined ||
@@ -253,8 +258,7 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                                   fontWeight: metric.competitor === tickerKey ? "bold" : "normal",
                                 }}
                               >
-                                {columnsWithX.has(col.key) &&
-                                typeof value === "number"
+                                {columnsWithX.has(col.key) && typeof value === "number"
                                   ? `${displayValue}x`
                                   : displayValue}
                               </TableCell>
@@ -299,7 +303,8 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                                   whiteSpace: "nowrap",
                                 }}
                               >
-                                {averages[col.key] && averages[col.key].average !== undefined
+                                {averages[col.key] &&
+                                averages[col.key].average !== undefined
                                   ? columnsWithX.has(col.key)
                                     ? `${formatNumber(
                                         averages[col.key].average!,
@@ -349,7 +354,8 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                                   whiteSpace: "nowrap",
                                 }}
                               >
-                                {averages[col.key] && averages[col.key].median !== undefined
+                                {averages[col.key] &&
+                                averages[col.key].median !== undefined
                                   ? columnsWithX.has(col.key)
                                     ? `${formatNumber(
                                         averages[col.key].median!,
@@ -375,10 +381,7 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
           </Table>
         </TableContainer>
       )}
-
-
     </Box>
-    
   );
 };
 
