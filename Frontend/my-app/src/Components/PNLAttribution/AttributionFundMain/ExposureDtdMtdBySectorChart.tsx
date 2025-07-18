@@ -71,10 +71,10 @@ const formatNumber = (value: number): string => {
     abs >= 1e9
       ? `${(abs / 1e9).toFixed(2)}B`
       : abs >= 1e6
-      ? `${(abs / 1e6).toFixed(2)}M`
-      : abs >= 1e3
-      ? `${(abs / 1e3).toFixed(2)}K`
-      : abs.toFixed(2);
+        ? `${(abs / 1e6).toFixed(2)}M`
+        : abs >= 1e3
+          ? `${(abs / 1e3).toFixed(2)}K`
+          : abs.toFixed(2);
   return value < 0 ? `-$${result}` : `$${result}`;
 };
 
@@ -84,10 +84,10 @@ const formatTotalNumber = (value: number): string => {
     abs >= 1e9
       ? `${(abs / 1e9).toFixed(1)}B`
       : abs >= 1e6
-      ? `${(abs / 1e6).toFixed(1)}M`
-      : abs >= 1e3
-      ? `${(abs / 1e3).toFixed(1)}K`
-      : abs.toFixed(1);
+        ? `${(abs / 1e6).toFixed(1)}M`
+        : abs >= 1e3
+          ? `${(abs / 1e3).toFixed(1)}K`
+          : abs.toFixed(1);
   return value < 0 ? `$(${result})` : `$${result}`;
 };
 
@@ -126,7 +126,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
 
         const result = await res.json();
 
-        if (result?.exposure && result?.dtd_pnl && result?.mtd_pnl  && result?.totals) {
+        if (result?.exposure && result?.dtd_pnl && result?.mtd_pnl && result?.totals) {
           const formatData = (raw: Record<string, number>): SectorData[] => {
             return SECTOR_ORDER.map((sector) => ({
               sector,
@@ -182,12 +182,14 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
     title: string,
     data: SectorData[],
     showYAxis: boolean,
-    symmetricMax?: number
+    symmetricMax?: number,
+    totalValue?: number
   ) => (
     <Box flex={1}>
       <Typography variant="subtitle2" align="center" sx={{ mb: 1, fontWeight: 600 }}>
         {title}
       </Typography>
+
       <ResponsiveContainer width="100%" height={600}>
         <BarChart
           data={data}
@@ -231,6 +233,23 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+
+      {totalValue !== undefined && (
+        <Typography
+          variant="body2"
+          align="center"
+          fontStyle="italic"
+          fontWeight="bold"
+          color="#000000"
+          sx={{
+            mt: 1,
+            ...(title === "Exposure" && { ml: 20 }), 
+          }}
+        >
+
+          Total {title}: {formatTotalNumber(totalValue)}
+        </Typography>
+      )}
     </Box>
   );
 
@@ -259,26 +278,10 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
             </Typography>
 
             <Box display="flex" gap={3}>
-              {renderChart("Exposure", exposureData, true)}
-              {renderChart("DTD PnL", dtdData, false, dtdMax)}
-              {renderChart("MTD PnL", mtdData, false, mtdMax)}
+              {renderChart("Exposure", exposureData, true, undefined, totals?.exposure)}
+              {renderChart("DTD PnL", dtdData, false, dtdMax, totals?.dtd_pnl)}
+              {renderChart("MTD PnL", mtdData, false, mtdMax, totals?.mtd_pnl)}
             </Box>
-
-            {totals && (
-                          <Box mt={4}>
-                            <Typography
-                              variant="body2"
-                              align="center"
-                              fontStyle="italic"
-                              fontWeight="bold"
-                              color="#000000"
-                            >
-                              Total Exposure: {formatTotalNumber(totals.exposure)} &nbsp;&nbsp;|&nbsp;&nbsp;
-                              Total DTD PnL: {formatTotalNumber(totals.dtd_pnl)} &nbsp;&nbsp;|&nbsp;&nbsp;
-                              Total MTD PnL: {formatTotalNumber(totals.mtd_pnl)}
-                            </Typography>
-                          </Box>
-                        )}
           </CardContent>
         </Card>
       </motion.div>
