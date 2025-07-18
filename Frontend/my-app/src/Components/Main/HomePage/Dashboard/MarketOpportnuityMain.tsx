@@ -51,9 +51,9 @@ const MarketOpportnuityMain: React.FC = () => {
       case "weekly-tracking":
         setValue(5);
         break;
-      case "gap_report":
-        setValue(6);
-        break;
+      // case "gap_report":
+      //   setValue(6);
+      //   break;
       default:
         setValue(0);
         break;
@@ -224,7 +224,7 @@ const MarketOpportnuityMain: React.FC = () => {
         <Tab label="Monashee Transactions" />
         <Tab label="GAP Analysis" />
         <Tab label="Weekly Tracking" />
-        <Tab label="30 Days Gap Report" />
+        {/* <Tab label="30 Days Gap Report" /> */}
 
       </Tabs>
 
@@ -294,7 +294,7 @@ const MarketOpportnuityMain: React.FC = () => {
       {value === 3 && <DealStats />}
       {value === 4 && <AllocationCaptureReturn />}
       {value === 5 && <WeeklyMain />}
-      {value === 6 && <DealDetailedGapAnalysis />}
+      {/* {value === 6 && <DealDetailedGapAnalysis />} */}
       
     </Box>
   );
