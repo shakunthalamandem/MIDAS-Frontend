@@ -29,6 +29,12 @@ interface RegionData {
   value: number;
 }
 
+interface TotalsData {
+  exposure: number;
+  dtd_pnl: number;
+  mtd_pnl: number;
+}
+
 const REGION_ORDER = ["US", "EMEA", "APAC", "Non-US America"];
 
 const COLORS_BY_REGION: Record<string, string> = {
@@ -51,6 +57,19 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-$${result}` : `$${result}`;
 };
 
+const formatTotalNumber = (value: number): string => {
+  const abs = Math.abs(value);
+  let result =
+    abs >= 1e9
+      ? `${(abs / 1e9).toFixed(1)}B`
+      : abs >= 1e6
+      ? `${(abs / 1e6).toFixed(1)}M`
+      : abs >= 1e3
+      ? `${(abs / 1e3).toFixed(1)}K`
+      : abs.toFixed(1);
+  return value < 0 ? `$(${result})` : `$${result}`;
+};
+
 const formatHoverValue = (value: number): string => {
   const abs = Math.abs(value);
   if (abs >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
@@ -64,6 +83,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
   const [exposureData, setExposureData] = useState<RegionData[]>([]);
   const [dtdData, setDtdData] = useState<RegionData[]>([]);
   const [mtdData, setMtdData] = useState<RegionData[]>([]);
+  const [totals, setTotals] = useState<TotalsData | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -85,17 +105,17 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
 
         const result = await res.json();
 
-        if (result?.exposure && result?.dtd_pnl && result?.mtd_pnl) {
-          const formatRegionData = (raw: Record<string, number>): RegionData[] => {
-            return REGION_ORDER.map((region) => ({
+        if (result?.exposure && result?.dtd_pnl && result?.mtd_pnl && result?.totals) {
+          const formatRegionData = (raw: Record<string, number>): RegionData[] =>
+            REGION_ORDER.map((region) => ({
               region,
               value: raw[region] ?? 0,
             }));
-          };
 
           setExposureData(formatRegionData(result.exposure));
           setDtdData(formatRegionData(result.dtd_pnl));
           setMtdData(formatRegionData(result.mtd_pnl));
+          setTotals(result.totals);
         } else {
           setError("Invalid response format.");
         }
@@ -221,6 +241,22 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
               {renderChart("DTD PnL", dtdData, false, dtdMax)}
               {renderChart("MTD PnL", mtdData, false, mtdMax)}
             </Box>
+
+            {totals && (
+              <Box mt={4}>
+                <Typography
+                  variant="body2"
+                  align="center"
+                  fontStyle="italic"
+                  fontWeight="bold"
+                  color="text.secondary"
+                >
+                  Total Exposure: {formatTotalNumber(totals.exposure)} &nbsp;&nbsp;|&nbsp;&nbsp;
+                  Total DTD PnL: {formatTotalNumber(totals.dtd_pnl)} &nbsp;&nbsp;|&nbsp;&nbsp;
+                  Total MTD PnL: {formatTotalNumber(totals.mtd_pnl)}
+                </Typography>
+              </Box>
+            )}
           </CardContent>
         </Card>
       </motion.div>
