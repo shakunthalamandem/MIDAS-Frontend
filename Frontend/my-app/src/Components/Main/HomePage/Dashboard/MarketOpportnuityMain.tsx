@@ -233,7 +233,7 @@ const MarketOpportnuityMain: React.FC = () => {
       ) : (
         searchTerm.length > 0 && (
           <Box
-            sx={{ marginBottom: "20px", display: "flex", marginLeft: "600px" }}
+            sx={{ marginBottom: "20px", display: "flex", marginLeft: "240px" }}
           >
             <Paper
               elevation={6}

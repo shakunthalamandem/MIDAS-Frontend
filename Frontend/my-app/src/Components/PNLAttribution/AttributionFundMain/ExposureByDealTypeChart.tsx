@@ -29,6 +29,12 @@ interface DealTypeData {
   value: number;
 }
 
+interface TotalsData {
+  exposure: number;
+  dtd_pnl: number;
+  mtd_pnl: number;
+}
+
 const DEAL_TYPE_ORDER = ["IPO", "FO", "STRATEGIC", "Cash", "Hedging", "Other"];
 
 const COLORS_BY_DEAL_TYPE: Record<string, string> = {
@@ -53,6 +59,19 @@ const formatNumber = (value: number): string => {
   return value < 0 ? `-$${result}` : `$${result}`;
 };
 
+const formatTotalNumber = (value: number): string => {
+  const abs = Math.abs(value);
+  let result =
+    abs >= 1e9
+      ? `${(abs / 1e9).toFixed(1)}B`
+      : abs >= 1e6
+      ? `${(abs / 1e6).toFixed(1)}M`
+      : abs >= 1e3
+      ? `${(abs / 1e3).toFixed(1)}K`
+      : abs.toFixed(1);
+  return value < 0 ? `$(${result})` : `$${result}`;
+};
+
 const formatHoverValue = (value: number): string => {
   const abs = Math.abs(value);
   if (abs >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
@@ -66,6 +85,7 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
   const [exposureData, setExposureData] = useState<DealTypeData[]>([]);
   const [dtdData, setDtdData] = useState<DealTypeData[]>([]);
   const [mtdData, setMtdData] = useState<DealTypeData[]>([]);
+  const [totals, setTotals] = useState<TotalsData | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -87,17 +107,17 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
 
         const result = await res.json();
 
-        if (result?.exposure && result?.dtd_pnl && result?.mtd_pnl) {
-          const formatData = (raw: Record<string, number>): DealTypeData[] => {
-            return DEAL_TYPE_ORDER.map((dealType) => ({
+        if (result?.exposure && result?.dtd_pnl && result?.mtd_pnl && result?.totals) {
+          const formatData = (raw: Record<string, number>): DealTypeData[] =>
+            DEAL_TYPE_ORDER.map((dealType) => ({
               dealType,
               value: raw[dealType] ?? 0,
             }));
-          };
 
           setExposureData(formatData(result.exposure));
           setDtdData(formatData(result.dtd_pnl));
           setMtdData(formatData(result.mtd_pnl));
+          setTotals(result.totals);
         } else {
           setError("Invalid response format.");
         }
@@ -126,7 +146,8 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
     title: string,
     data: DealTypeData[],
     showYAxis: boolean,
-    symmetricMax?: number
+    symmetricMax?: number,
+    total?: number
   ) => (
     <Box flex={1}>
       <Typography variant="subtitle2" align="center" sx={{ mb: 1, fontWeight: 600 }}>
@@ -141,9 +162,7 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             type="number"
-            domain={
-              title === "Exposure" ? undefined : [-symmetricMax!, symmetricMax!]
-            }
+            domain={title === "Exposure" ? undefined : [-symmetricMax!, symmetricMax!]}
             tickFormatter={(value) =>
               title === "Exposure" ? formatNumber(value) : `${(value / 1e6).toFixed(0)}M`
             }
@@ -175,6 +194,23 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+
+      {/* Show total below chart */}
+      {total !== undefined && (
+              <Typography
+                        variant="body2"
+                        align="center"
+                        fontStyle="italic"
+                        fontWeight="bold"
+                        color="#000000"
+                        sx={{
+                          mt: 1,
+                          ...(title === "Exposure" && { ml: 20 }), 
+                        }}
+                      >
+                Total {title}: {formatTotalNumber(total)}
+              </Typography>
+            )}
     </Box>
   );
 
@@ -219,9 +255,9 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
             </Typography>
 
             <Box display="flex" gap={3}>
-              {renderChart("Exposure", exposureData, true)}
-              {renderChart("DTD PnL", dtdData, false, dtdMax)}
-              {renderChart("MTD PnL", mtdData, false, mtdMax)}
+              {renderChart("Exposure", exposureData, true, undefined, totals?.exposure)}
+              {renderChart("DTD PnL", dtdData, false, dtdMax, totals?.dtd_pnl)}
+              {renderChart("MTD PnL", mtdData, false, mtdMax, totals?.mtd_pnl)}
             </Box>
           </CardContent>
         </Card>
