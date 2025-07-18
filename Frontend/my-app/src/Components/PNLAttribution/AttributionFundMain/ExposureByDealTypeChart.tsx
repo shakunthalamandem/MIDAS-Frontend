@@ -252,7 +252,7 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
                   align="center"
                   fontStyle="italic"
                   fontWeight="bold"
-                  color="text.secondary"
+                  color="#000000"
                 >
                   Total Exposure: {formatTotalNumber(totals.exposure)} &nbsp;&nbsp;|&nbsp;&nbsp;
                   Total DTD PnL: {formatTotalNumber(totals.dtd_pnl)} &nbsp;&nbsp;|&nbsp;&nbsp;
