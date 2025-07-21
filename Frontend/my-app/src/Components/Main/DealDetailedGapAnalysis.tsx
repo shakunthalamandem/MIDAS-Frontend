@@ -20,6 +20,7 @@ interface DealData {
   "FO Type": string;
   "Broad Region": string;
   "Year": number;
+  "Issue Offer Price": number;
   "T + 1 Month Return": number;
   "T + 1 Day Return": number;
   "AM Return Percentage": number;
@@ -130,6 +131,10 @@ const DealDetailedGapAnalysis: React.FC = () => {
     { field: "FO Type", headerName: "FO Type", width: 100 },
     { field: "Broad Region", headerName: "Region", width: 100 },
     { field: "Year", headerName: "Year", width: 80 },
+    { field: "Issue Offer Price", headerName: "Issue Price", width: 80 ,
+            renderCell: (params) => formatCurrency(params.value),
+
+    },
     {
       field: "T + 1 Month Return",
       headerName: "T + 1 Month Return",
