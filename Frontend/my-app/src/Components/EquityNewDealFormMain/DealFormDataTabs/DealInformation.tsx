@@ -31,7 +31,7 @@ const DealInformation: React.FC<FormSectionProps> = ({
     "Consumer Discretionary",
     "Communication Services",
   ];
-  const dealCaptains = ["Robin", "Tom", "Block", "HC", "Jay", "Others"];
+  const dealCaptains = ["Robin", "Tom", "Block", "HC", "Jay","Mike", "Others"];
   const invitationBanks = [
     "ABN AMRO Bank",
     "Bank of America",

@@ -168,7 +168,7 @@ const dropdownOptions: Record<string, string[]> = {
     "Consumer Discretionary",
     "Communication Services",
   ],
-  deal_captain: ["Robin", "Tom", "Block", "HC", "Jay", "Others"],
+  deal_captain: ["Robin", "Tom", "Block", "HC", "Jay","Mike", "Others"],
   sponsor: ["Y", "N"],
   invitation_bank: [
     "ABN AMRO Bank",
