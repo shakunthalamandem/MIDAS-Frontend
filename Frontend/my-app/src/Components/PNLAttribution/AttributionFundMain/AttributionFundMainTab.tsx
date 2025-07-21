@@ -121,7 +121,7 @@ const AttributionFundMainTab = () => {
                 <Top10ExposureChart fund={selectedFund} />
               </Box>
             </Grid>
-            {/* <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={6}>
               <Box >
           <PortfolioDataTableMain fund={selectedFund} />
               </Box>
@@ -140,7 +140,7 @@ const AttributionFundMainTab = () => {
               <Box>
                 <PnlAndDaysHeldGraph fund={selectedFund} />
               </Box>
-            </Grid> */}
+            </Grid>
 
             
             
