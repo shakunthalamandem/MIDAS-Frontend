@@ -87,28 +87,11 @@ const AttributionFundMainTab = () => {
         </Grid>
 
         {/* Selected Fund Heading */}
-        <Fade in timeout={500}>
-          <Paper
-            elevation={3}
-            sx={{
-              backgroundColor: '#005360',
-              color: 'white',
-              p: 2,
-              mb: 4,
-              borderRadius: 2,
-              transition: 'all 0.3s ease',
-            }}
-          >
-            <Typography variant="subtitle1">
-              The selected fund details are:&nbsp;
-              <strong>{selectedFund}</strong>
-            </Typography>
-          </Paper>
-        </Fade>
+
 
         {/* Main Deal Component */}
         <Box>
-          {/* <DealTypeFundMain fund={selectedFund} /> */}
+          <DealTypeFundMain fund={selectedFund} />
           {/* <Box sx={{ mt: 6 }}>
 
               <SectorWisePNLMain fund={selectedFund} />
