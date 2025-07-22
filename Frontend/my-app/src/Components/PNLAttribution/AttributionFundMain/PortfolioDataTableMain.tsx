@@ -10,13 +10,12 @@ import {
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 interface PortfolioRow {
-  id_3: string;
   client_symbol: string;
   first_trade_date: string;
   total_quantity: number;
   total_pnl: number;
   total_days_held: number;
-  cumulative_pnl: number;
+  ytd_pnl: number;
 }
 
 interface Props {
@@ -49,7 +48,19 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
           body: JSON.stringify({ fund }),
         });
         const json = await res.json();
-        setData(json.results || []);
+
+        const mappedResults: PortfolioRow[] = (json.results || []).map(
+          (item: any) => ({
+            client_symbol: item.client_symbol,
+            first_trade_date: item.first_trade_date,
+            total_quantity: item.qty,
+            total_days_held: item.days_hld,
+            total_pnl: item.daily_pnl,
+            ytd_pnl: item.ytd_pnl,
+          })
+        );
+
+        setData(mappedResults);
       } catch (error) {
         console.error("Failed to fetch portfolio data", error);
       } finally {
@@ -61,36 +72,16 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
   }, [fund]);
 
   const columns: GridColDef[] = [
-    {
-      field: "client_symbol",
-      headerName: "Client Symbol",
-      flex: 1,
-    },
-    {
-      field: "first_trade_date",
-      headerName: "Issue Date",
-      flex: 1,
-    },
-    {
-      field: "total_quantity",
-      headerName: "Quantity",
-      flex: 1,
-    },
-        {
-      field: "total_days_held",
-      headerName: "Days Held",
-      flex: 1,
-    },
+    { field: "client_symbol", headerName: "Client Symbol", flex: 1 },
+    { field: "first_trade_date", headerName: "Issue Date", flex: 1 },
+    { field: "total_quantity", headerName: "Quantity", flex: 1 },
+    { field: "total_days_held", headerName: "Days Held", flex: 1 },
     {
       field: "total_pnl",
       headerName: "Daily PnL",
       flex: 1,
       renderCell: ({ value }) => (
-        <span
-          style={{
-            color: value > 0 ? "green" : value < 0 ? "red" : "black",
-          }}
-        >
+        <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
           {typeof value === "number" && !isNaN(value)
             ? currencyFormatter.format(value)
             : "$0"}
@@ -98,22 +89,17 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
       ),
     },
     {
-      field: "cumulative_pnl",
-      headerName: "Cumulative PnL",
+      field: "ytd_pnl",
+      headerName: "YTD PnL",
       flex: 1,
       renderCell: ({ value }) => (
-        <span
-          style={{
-            color: value > 0 ? "green" : value < 0 ? "red" : "black",
-          }}
-        >
+        <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
           {typeof value === "number" && !isNaN(value)
             ? currencyFormatter.format(value)
             : "$0"}
         </span>
       ),
     },
-
   ];
 
   return (
@@ -143,39 +129,35 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
           </Typography>
 
           {loading ? (
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              height={300}
-            >
+            <Box display="flex" justifyContent="center" alignItems="center" height={300}>
               <CircularProgress />
             </Box>
           ) : (
             <div style={{ height: 450, width: "100%" }}>
               <DataGrid
-                rows={data.map((row, index) => ({ ...row, id: index }))}
+                rows={data}
                 columns={columns}
+                getRowId={(row) => row.client_symbol + "_" + row.first_trade_date} // Unique ID composed of these two fields
                 rowHeight={35}
-          sx={{
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "transparent",
-              fontWeight: "bold",
-              color: "#002060",
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              fontWeight: "bold",
-              fontSize: "12px",
-            },
-            "& .MuiDataGrid-cell": {
-              color: "#000000",
-              fontSize: "12px",
-              padding: "4px",
-            },
-            "& .MuiDataGrid-row:nth-of-type(odd)": {
-              backgroundColor: "#F5F5F5",
-            },
-          }}
+                sx={{
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: "transparent",
+                    fontWeight: "bold",
+                    color: "#002060",
+                  },
+                  "& .MuiDataGrid-columnHeaderTitle": {
+                    fontWeight: "bold",
+                    fontSize: "12px",
+                  },
+                  "& .MuiDataGrid-cell": {
+                    color: "#000000",
+                    fontSize: "12px",
+                    padding: "4px",
+                  },
+                  "& .MuiDataGrid-row:nth-of-type(odd)": {
+                    backgroundColor: "#F5F5F5",
+                  },
+                }}
               />
             </div>
           )}
