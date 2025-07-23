@@ -49,16 +49,23 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
         });
         const json = await res.json();
 
-        const mappedResults: PortfolioRow[] = (json.results || []).map(
-          (item: any) => ({
-            client_symbol: item.client_symbol,
-            first_trade_date: item.first_trade_date,
-            total_quantity: item.qty,
-            total_days_held: item.days_hld,
-            total_pnl: item.daily_pnl,
-            ytd_pnl: item.ytd_pnl,
-          })
-        );
+        const mappedResults: PortfolioRow[] = [];
+
+        const seenKeys = new Set(); // Prevent duplicates
+        (json.results || []).forEach((item: any) => {
+          const key = `${item.client_symbol}_${item.first_trade_date}`;
+          if (!seenKeys.has(key)) {
+            seenKeys.add(key);
+            mappedResults.push({
+              client_symbol: item.client_symbol,
+              first_trade_date: item.first_trade_date,
+              total_quantity: item.qty,
+              total_days_held: item.days_hld,
+              total_pnl: item.daily_pnl,
+              ytd_pnl: item.ytd_pnl,
+            });
+          }
+        });
 
         setData(mappedResults);
       } catch (error) {
@@ -137,7 +144,9 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
               <DataGrid
                 rows={data}
                 columns={columns}
-                getRowId={(row) => row.client_symbol + "_" + row.first_trade_date} // Unique ID composed of these two fields
+                getRowId={(row) =>
+                  `${row.client_symbol}_${row.first_trade_date}`
+                }
                 rowHeight={35}
                 sx={{
                   "& .MuiDataGrid-columnHeaders": {
