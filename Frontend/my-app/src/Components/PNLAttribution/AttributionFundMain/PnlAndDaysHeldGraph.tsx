@@ -17,14 +17,15 @@ import {
   Paper,
 } from "@mui/material";
 
+interface PnlItem {
+  client_symbol: string;
+  pnl: number;
+  days_held: number;
+}
+
 interface PnlApiResponse {
-  [key: string]: {
-    "<5": number;
-    "5-10": number;
-    "10-30": number;
-    "30-60": number;
-    ">60": number;
-  };
+  trade_date: string;
+  [key: string]: string | { [daysHeld: string]: PnlItem[] };
 }
 
 type Props = {
@@ -37,6 +38,24 @@ const OPTIONS = [
   { key: "non_us", label: "Non US" },
 ];
 
+const BUCKET_LABELS = [
+  "<5", "5-10", "10-15", "15-20", "20-25", "25-30",
+  "30-35", "35-40", "40-45", "45-50", "50-55", "55-60", ">60"
+];
+
+const getBucketLabel = (daysHeld: number): string => {
+  if (daysHeld < 5) return "<5";
+  if (daysHeld > 60) return ">60";
+
+  for (let i = 5; i < 60; i += 5) {
+    if (daysHeld >= i && daysHeld < i + 5) {
+      return `${i}-${i + 5}`;
+    }
+  }
+
+  return ">60";
+};
+
 const formatNumber = (value: number): string => {
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
@@ -47,7 +66,31 @@ const formatNumber = (value: number): string => {
   return `${sign}$${absValue.toFixed(0)}`;
 };
 
-const DAYS_HELD_LABELS = ["<5", "5-10", "10-30", "30-60", ">60"];
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length && payload[0].payload.trades) {
+    const trades = payload[0].payload.trades;
+
+    return (
+      <Paper sx={{ p: 2, border: "1px solid #ccc" }}>
+        <Typography fontWeight="bold" gutterBottom>
+          Days Held Bucket: {label}
+        </Typography>
+        {trades.map((trade: PnlItem, idx: number) => (
+          <Box key={idx} mb={1}>
+            <Typography variant="body2">
+              <strong>{trade.client_symbol}</strong>
+            </Typography>
+            <Typography variant="body2">
+              PnL: {formatNumber(trade.pnl)} | Days Held: {trade.days_held}
+            </Typography>
+          </Box>
+        ))}
+      </Paper>
+    );
+  }
+
+  return null;
+};
 
 const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
   const [data, setData] = useState<PnlApiResponse | null>(null);
@@ -89,11 +132,32 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
   const getChartData = () => {
     if (!data || !data[selectedOption]) return [];
 
-    const record = data[selectedOption] as Record<string, number>;
+    const selectedData = data[selectedOption];
 
-    return DAYS_HELD_LABELS.map((label) => ({
+    if (typeof selectedData !== "object" || selectedData === null) {
+      return [];
+    }
+
+    const allTrades: PnlItem[] = Object.values(selectedData)
+      .flat()
+      .filter((item): item is PnlItem => item && typeof item === "object" && "pnl" in item);
+
+    const buckets: { [label: string]: { pnl: number; trades: PnlItem[] } } = {};
+
+    for (const label of BUCKET_LABELS) {
+      buckets[label] = { pnl: 0, trades: [] };
+    }
+
+    for (const trade of allTrades) {
+      const label = getBucketLabel(trade.days_held);
+      buckets[label].pnl += trade.pnl;
+      buckets[label].trades.push(trade);
+    }
+
+    return BUCKET_LABELS.map((label) => ({
       daysHeld: label,
-      pnl: record[label] ?? 0, // Keep as number for charting
+      pnl: buckets[label].pnl,
+      trades: buckets[label].trades,
     }));
   };
 
@@ -112,8 +176,7 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
               onClick={() => setSelectedOption(opt.key)}
               sx={{
                 textTransform: "none",
-                backgroundColor:
-                  selectedOption === opt.key ? "#002060" : "transparent",
+                backgroundColor: selectedOption === opt.key ? "#002060" : "transparent",
                 color: selectedOption === opt.key ? "#fff" : "#002060",
                 borderColor: "#002060",
               }}
@@ -135,8 +198,8 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
           <LineChart data={getChartData()}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="daysHeld" />
-            <YAxis tickFormatter={formatNumber} />
-            <Tooltip formatter={(value: number) => formatNumber(value)} />
+            <YAxis tickFormatter={formatNumber} domain={["auto", "auto"]} />
+            <Tooltip content={<CustomTooltip />} />
             <Legend />
             <Line
               type="monotone"
