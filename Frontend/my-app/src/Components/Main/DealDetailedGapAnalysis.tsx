@@ -43,12 +43,15 @@ interface DealData {
   "Am Gap Shares": number;
   "Total Gap Shares": number;
   "Days Held": number;
+  "Current Quantity": number;
 }
 
 const formatCurrency = (val: number | null | undefined) => {
   if (val == null || isNaN(val)) return "";
-  return "$" + val.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  const absVal = Math.abs(val).toLocaleString("en-US", { maximumFractionDigits: 0 });
+  return val < 0 ? `-$${absVal}` : `$${absVal}`;
 };
+
 
 const formatComma = (val: number | null | undefined) => {
   if (val == null || isNaN(val)) return "";
@@ -225,6 +228,12 @@ const DealDetailedGapAnalysis: React.FC = () => {
       width: 130,
       renderCell: (params) => formatComma(params.value),
     },
+       {
+      field: "Current Quantity",
+      headerName: "Current Quantity",
+      width: 130,
+      renderCell: (params) => formatComma(params.value),
+    },
     {
       field: "Model Allocation Shares",
       headerName: "Model Allocation Shares",
@@ -310,44 +319,46 @@ const DealDetailedGapAnalysis: React.FC = () => {
           <CircularProgress />
         </Grid>
       ) : (
-        <Paper elevation={3} sx={{ borderRadius: 4, p: 2, bgcolor: "background.paper" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            autoHeight
-            rowHeight={32}
-            disableRowSelectionOnClick
-            sx={{
-              fontSize: "0.75rem",
-              "& .MuiDataGrid-columnHeaders": {
-                height: 32,
-                minHeight: "32px !important",
-                maxHeight: "32px !important",
-                lineHeight: "32px",
-                bgcolor: "#f0f0f0",
-                color: "#002060",
-                fontSize: "0.75rem",
-              },
-              "& .MuiDataGrid-columnHeader": {
-                maxHeight: "32px !important",
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                fontWeight: "bold",
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                lineHeight: "32px",
-              },
-              "& .MuiDataGrid-cell": {
-                color: "#555",
-                lineHeight: "1.2",
-                padding: "4px 4px",
-              },
-              "& .MuiDataGrid-row:nth-of-type(odd)": {
-                bgcolor: "#fafafa",
-              },
-            }}
-          />
+        <Paper elevation={3} sx={{ borderRadius: 4, p: 2, bgcolor: "background.paper" ,}}>
+<div style={{ height: 600, width: "100%" }}>
+  <DataGrid
+    rows={rows}
+    columns={columns}
+    rowHeight={32}
+    disableRowSelectionOnClick
+    sx={{
+      fontSize: "0.75rem",
+      "& .MuiDataGrid-columnHeaders": {
+        height: 32,
+        minHeight: "32px !important",
+        maxHeight: "32px !important",
+        lineHeight: "32px",
+        bgcolor: "#f0f0f0",
+        color: "#002060",
+        fontSize: "0.75rem",
+      },
+      "& .MuiDataGrid-columnHeader": {
+        maxHeight: "32px !important",
+      },
+      "& .MuiDataGrid-columnHeaderTitle": {
+        fontWeight: "bold",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        lineHeight: "32px",
+      },
+      "& .MuiDataGrid-cell": {
+        color: "#555",
+        lineHeight: "1.2",
+        padding: "4px 4px",
+      },
+      "& .MuiDataGrid-row:nth-of-type(odd)": {
+        bgcolor: "#fafafa",
+      },
+    }}
+  />
+</div>
+
         </Paper>
       )}
     </Box>
