@@ -22,11 +22,12 @@ interface Props {
   fund: string;
 }
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
+// Format with -$123 style
+const formatCurrency = (val: number | null | undefined) => {
+  if (val == null || isNaN(val)) return "";
+  const abs = Math.abs(val).toLocaleString("en-US", { maximumFractionDigits: 0 });
+  return val < 0 ? `-$${abs}` : `$${abs}`;
+};
 
 const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
   const [data, setData] = useState<PortfolioRow[]>([]);
@@ -51,18 +52,18 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
 
         const mappedResults: PortfolioRow[] = [];
 
-        const seenKeys = new Set(); // Prevent duplicates
-        (json.results || []).forEach((item: any) => {
-          const key = `${item.client_symbol}_${item.first_trade_date}`;
+        const seenKeys = new Set();
+        (json.data || []).forEach((item: any) => {
+          const key = `${item.client_symbol}_${item.first_trade_date || ""}`;
           if (!seenKeys.has(key)) {
             seenKeys.add(key);
             mappedResults.push({
               client_symbol: item.client_symbol,
-              first_trade_date: item.first_trade_date,
-              total_quantity: item.qty,
-              total_days_held: item.days_hld,
-              total_pnl: item.daily_pnl,
-              ytd_pnl: item.ytd_pnl,
+              first_trade_date: item.first_trade_date || "",
+              total_quantity: item.total_quantity ?? 0,
+              total_days_held: item.days_hld ?? 0,
+              total_pnl: item.total_pnl ?? 0,
+              ytd_pnl: item.ytd_pnl ?? 0,
             });
           }
         });
@@ -89,9 +90,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
       flex: 1,
       renderCell: ({ value }) => (
         <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
-          {typeof value === "number" && !isNaN(value)
-            ? currencyFormatter.format(value)
-            : "$0"}
+          {formatCurrency(value)}
         </span>
       ),
     },
@@ -101,9 +100,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
       flex: 1,
       renderCell: ({ value }) => (
         <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
-          {typeof value === "number" && !isNaN(value)
-            ? currencyFormatter.format(value)
-            : "$0"}
+          {formatCurrency(value)}
         </span>
       ),
     },
@@ -145,7 +142,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
                 rows={data}
                 columns={columns}
                 getRowId={(row) =>
-                  `${row.client_symbol}_${row.first_trade_date}`
+                  `${row.client_symbol}_${row.first_trade_date || ""}`
                 }
                 rowHeight={35}
                 sx={{
