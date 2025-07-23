@@ -115,12 +115,12 @@ export const dealGridColumns: GridColDef[] = [
     flex: 1,
     valueFormatter: (params) => currencyFormatter.format(params),
   },
-  {
-    field: "last_price_t1",
-    headerName: "T-1 Close",
-    flex: 1,
-    valueFormatter: (params) => currencyFormatter.format(params),
-  },
+  // {
+  //   field: "last_price_t1",
+  //   headerName: "T-1 Close",
+  //   flex: 1,
+  //   valueFormatter: (params) => currencyFormatter.format(params),
+  // },
   {
     field: "t1d_open",
     headerName: "T+1 Open",
