@@ -172,11 +172,25 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
               "FOs (New Issues or Incremental AM Participation Deals)",
               "fo"
             )}
-          {ipoDeals.length === 0 && foDeals.length === 0 && (
-            <Typography align="center" color="textSecondary" mt={4}>
-              No deal data available for this fund.
-            </Typography>
-          )}
+          {ipoDeals.length === 0 && foDeals.length === 0 ? (
+  <Typography align="center" color="textSecondary" mt={4}>
+    No IPO or FO deals available for this fund.
+  </Typography>
+) : (
+  <>
+    {ipoDeals.length === 0 && (
+      <Typography align="center" color="textSecondary" mt={2}>
+        No IPO deals available for this fund.
+      </Typography>
+    )}
+    {foDeals.length === 0 && (
+      <Typography align="center" color="textSecondary" mt={2}>
+        No FO deals available for this fund.
+      </Typography>
+    )}
+  </>
+)}
+
         </>
       )}
     </Box>
