@@ -5,14 +5,12 @@ import {
   MenuItem,
   Typography,
   Grid,
-  Fade,
-  Paper,
+
 } from '@mui/material';
 import DealTypeFundMain from './DealTypeFundMain';
 import Top10ExposureChart from './Top10ExposureChart';
 import BottomStocksPNLMain from './BottomStocksPNLMain';
 import MostAgedStocksTable from './MostAgedStocksTable';
-import SectorWisePNLMain from './SectorWisePNLMain';
 import PortfolioDataTableMain from './PortfolioDataTableMain';
 import PnlAndDaysHeldGraph from './PnlAndDaysHeldGraph';
 import ExposureDtdMtdChartMain from './ExposureDtdMtdChartMain';
@@ -109,17 +107,12 @@ const AttributionFundMainTab = () => {
         {/* Main Deal Component */}
         <Box>
           <DealTypeFundMain fund={selectedFund} />
-          {/* <Box sx={{ mt: 6 }}>
+          <RegionWiseChartPnl fund={selectedFund} />
 
-              <SectorWisePNLMain fund={selectedFund} />
-          </Box> */}
+
 
           <Grid container spacing={2} mt={2}>
-            <Grid item xs={12} md={6}>
-              <Box  >
-                <RegionWiseChartPnl fund={selectedFund} />
-              </Box>
-            </Grid>
+            
             <Grid item xs={12} md={6}>
               <Box>
                 <Top10ExposureChart fund={selectedFund} />
@@ -140,12 +133,9 @@ const AttributionFundMainTab = () => {
                 <BottomStocksPNLMain fund={selectedFund} />
               </Box>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <Box>
-                <PnlAndDaysHeldGraph fund={selectedFund} />
-              </Box>
-            </Grid>
+      
           </Grid>
+                <PnlAndDaysHeldGraph fund={selectedFund} />
 
           <ExposureDtdMtdChartMain fund={selectedFund} />
           <ExposureByDealTypeChart fund={selectedFund} />

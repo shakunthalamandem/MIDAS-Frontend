@@ -61,9 +61,9 @@ export const formatNumber = (value: number): string => {
 };
 
 export const dealGridColumns: GridColDef[] = [
-  { field: "first_trade_date", headerName: "TradeDt", flex: 1 },
+  { field: "first_trade_date", headerName: "Trade Date", flex: 1 },
   { field: "client_symbol", headerName: "Ticker", flex: 1 },
-  // { field: "custom_group_2", headerName: "Sector", flex: 1 },
+  { field: "custom_group_2", headerName: "Sector", flex: 1 },
   { field: "fo_type", headerName: "Deal Type", flex: 1 ,  renderCell: (params) => params.value != null ? params.value : "-"
 },
 
@@ -145,12 +145,12 @@ export const dealGridColumns: GridColDef[] = [
     flex: 1,
     valueFormatter: (params) => currencyFormatter.format(params),
   },
-  // {
-  //   field: "daily_long_exposure",
-  //   headerName: "Exposure as % of LMV",
-  //   flex: 1,
-  //   valueFormatter: (params) => formatNumber(params),
-  // },
+  {
+    field: "daily_long_exposure",
+    headerName: "Exposure as % of LMV",
+    flex: 1,
+    valueFormatter: (params) => formatNumber(params),
+  },
   {
     field: "pnl",
     headerName: "P&L",

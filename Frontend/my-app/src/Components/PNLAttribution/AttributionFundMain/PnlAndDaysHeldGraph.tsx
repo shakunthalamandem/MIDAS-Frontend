@@ -15,6 +15,8 @@ import {
   Typography,
   Button,
   Paper,
+  Container,
+  Card,
 } from "@mui/material";
 
 interface PnlItem {
@@ -162,7 +164,8 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
   };
 
   return (
-    <Paper elevation={4} sx={{ p: 3, mt: 4, borderRadius: 2 }}>
+    <Container maxWidth="xl" sx={{ mt: 2, mb: 4,p:4 }}>
+      <Card elevation={3} sx={{ p: 3, mb: 4 }}>
       <Typography variant="h6" color="#002060" mb={2} align="center">
         Cumulative PnL by Days Held
       </Typography>
@@ -211,7 +214,8 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
           </LineChart>
         </ResponsiveContainer>
       )}
-    </Paper>
+      </Card>
+    </Container>
   );
 };
 
