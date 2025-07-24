@@ -33,6 +33,7 @@ interface TotalsData {
   exposure: number;
   dtd_pnl: number;
   mtd_pnl: number;
+  ytd_pnl: number;
 }
 
 const SECTOR_ORDER = [
@@ -104,6 +105,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
   const [exposureData, setExposureData] = useState<SectorData[]>([]);
   const [dtdData, setDtdData] = useState<SectorData[]>([]);
   const [mtdData, setMtdData] = useState<SectorData[]>([]);
+  const [ytdData, setYtdData] = useState<SectorData[]>([]);
   const [totals, setTotals] = useState<TotalsData | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -137,6 +139,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
           setExposureData(formatData(result.exposure));
           setDtdData(formatData(result.dtd_pnl));
           setMtdData(formatData(result.mtd_pnl));
+          setYtdData(formatData(result.ytd_pnl));
           setTotals(result.totals);
         } else {
           setError("Invalid response format.");
@@ -177,6 +180,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
 
   const dtdMax = getSymmetricMax(dtdData);
   const mtdMax = getSymmetricMax(mtdData);
+  const ytdMax = getSymmetricMax(ytdData);
 
   const renderChart = (
     title: string,
@@ -281,6 +285,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
               {renderChart("Exposure", exposureData, true, undefined, totals?.exposure)}
               {renderChart("DTD PnL", dtdData, false, dtdMax, totals?.dtd_pnl)}
               {renderChart("MTD PnL", mtdData, false, mtdMax, totals?.mtd_pnl)}
+              {renderChart("YTD PnL", ytdData, false, ytdMax, totals?.ytd_pnl)}
             </Box>
           </CardContent>
         </Card>

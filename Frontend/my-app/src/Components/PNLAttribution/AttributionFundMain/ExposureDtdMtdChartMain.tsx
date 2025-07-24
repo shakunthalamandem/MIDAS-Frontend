@@ -33,6 +33,7 @@ interface TotalsData {
   exposure: number;
   dtd_pnl: number;
   mtd_pnl: number;
+  ytd_pnl: number;
 }
 
 const REGION_ORDER = ["US", "EMEA", "APAC", "Non-US America"];
@@ -83,6 +84,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
   const [exposureData, setExposureData] = useState<RegionData[]>([]);
   const [dtdData, setDtdData] = useState<RegionData[]>([]);
   const [mtdData, setMtdData] = useState<RegionData[]>([]);
+  const [ytdData, setYtdData] = useState<RegionData[]>([]);
   const [totals, setTotals] = useState<TotalsData | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -115,6 +117,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
           setExposureData(formatRegionData(result.exposure));
           setDtdData(formatRegionData(result.dtd_pnl));
           setMtdData(formatRegionData(result.mtd_pnl));
+          setYtdData(formatRegionData(result.ytd_pnl));
           setTotals(result.totals);
         } else {
           setError("Invalid response format.");
@@ -155,6 +158,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
 
   const dtdMax = getSymmetricMax(dtdData);
   const mtdMax = getSymmetricMax(mtdData);
+  const ytdMax = getSymmetricMax(ytdData);
 
   const renderChart = (
     title: string,
@@ -256,6 +260,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
               {renderChart("Exposure", exposureData, true, undefined, totals?.exposure)}
               {renderChart("DTD PnL", dtdData, false, dtdMax, totals?.dtd_pnl)}
               {renderChart("MTD PnL", mtdData, false, mtdMax, totals?.mtd_pnl)}
+              {renderChart("YTD PnL", ytdData, false, ytdMax, totals?.ytd_pnl)}
             </Box>
           </CardContent>
         </Card>
