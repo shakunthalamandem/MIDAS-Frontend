@@ -40,9 +40,9 @@ const DEAL_TYPE_ORDER = ["IPO", "FO", "STRATEGIC", "Cash", "Hedging", "Other"];
 
 const COLORS_BY_DEAL_TYPE: Record<string, string> = {
   Cash: "#c0be2cff",
-  IPO: "#50f1aeff",
-  FO: "#07720cff",
-  STRATEGIC: "#fb8c00",
+  IPO: "#256148ff",
+  FO: "#e97619ff",
+  STRATEGIC: "#006d75ff",
   Hedging: "#751c85ff",
   Other: "#607d8b",
 };
