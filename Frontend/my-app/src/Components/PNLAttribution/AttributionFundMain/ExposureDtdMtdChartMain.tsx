@@ -40,7 +40,7 @@ const REGION_ORDER = ["US", "EMEA", "APAC", "Non-US America"];
 
 const COLORS_BY_REGION: Record<string, string> = {
   "US": "#00acc1",
-  "EMEA": "#e91e63",
+  "EMEA": "#fddc48ff",
   "APAC": "#43a047",
   "Non-US America": "#fb8c00",
 };

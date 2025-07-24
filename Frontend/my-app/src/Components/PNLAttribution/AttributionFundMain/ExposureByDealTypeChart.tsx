@@ -39,11 +39,11 @@ interface TotalsData {
 const DEAL_TYPE_ORDER = ["IPO", "FO", "STRATEGIC", "Cash", "Hedging", "Other"];
 
 const COLORS_BY_DEAL_TYPE: Record<string, string> = {
-  Cash: "#00acc1",
-  IPO: "#e91e63",
-  FO: "#43a047",
+  Cash: "#c0be2cff",
+  IPO: "#50f1aeff",
+  FO: "#07720cff",
   STRATEGIC: "#fb8c00",
-  Hedging: "#9c27b0",
+  Hedging: "#751c85ff",
   Other: "#607d8b",
 };
 
