@@ -103,7 +103,7 @@ const BottomStocksPNLMain: React.FC<BottomStocksPNLMainProps> = ({ fund }) => {
               borderTopRightRadius: "16px",
             }}
           >
-  High Loss Positions (P&L &lt; -$1M) for {fund}
+ Equities  High Loss Positions (P&L &lt; -$500K) for {fund}
           </Typography>
 
           {loading ? (
