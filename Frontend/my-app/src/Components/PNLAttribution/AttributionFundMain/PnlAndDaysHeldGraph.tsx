@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react";
 import {
-  LineChart,
-  Line,
+  ScatterChart,
+  Scatter,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 import {
   Box,
-  CircularProgress,
-  Typography,
   Button,
-  Paper,
-  Container,
   Card,
+  CircularProgress,
+  Container,
+  Typography,
+  Paper,
 } from "@mui/material";
 
 interface PnlItem {
@@ -40,53 +39,30 @@ const OPTIONS = [
   { key: "non_us", label: "Non US" },
 ];
 
-const BUCKET_LABELS = [
-  "<5", "5-10", "10-15", "15-20", "20-25", "25-30",
-  "30-35", "35-40", "40-45", "45-50", "50-55", "55-60", ">60"
-];
-
-const getBucketLabel = (daysHeld: number): string => {
-  if (daysHeld < 5) return "<5";
-  if (daysHeld > 60) return ">60";
-
-  for (let i = 5; i < 60; i += 5) {
-    if (daysHeld >= i && daysHeld < i + 5) {
-      return `${i}-${i + 5}`;
-    }
-  }
-
-  return ">60";
-};
-
 const formatNumber = (value: number): string => {
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-
   if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(2)}B`;
   if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(2)}M`;
   if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(2)}K`;
   return `${sign}$${absValue.toFixed(0)}`;
 };
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length && payload[0].payload.trades) {
-    const trades = payload[0].payload.trades;
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const trade: PnlItem = payload[0].payload;
 
     return (
       <Paper sx={{ p: 2, border: "1px solid #ccc" }}>
-        <Typography fontWeight="bold" gutterBottom>
-          Days Held Bucket: {label}
+        <Typography variant="subtitle2" color="#002060" gutterBottom>
+          <b>{trade.client_symbol}</b>
         </Typography>
-        {trades.map((trade: PnlItem, idx: number) => (
-          <Box key={idx} mb={1}>
-            <Typography variant="body2">
-              <strong>{trade.client_symbol}</strong>
-            </Typography>
-            <Typography variant="body2">
-              PnL: {formatNumber(trade.pnl)} | Days Held: {trade.days_held}
-            </Typography>
-          </Box>
-        ))}
+        <Typography variant="body2" color="#00695c">
+          Days Held: <b>{trade.days_held}</b>
+        </Typography>
+        <Typography variant="body2" color={trade.pnl >= 0 ? "#2e7d32" : "#c62828"}>
+          P&L: <b>{formatNumber(trade.pnl)}</b>
+        </Typography>
       </Paper>
     );
   }
@@ -96,9 +72,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
   const [data, setData] = useState<PnlApiResponse | null>(null);
-  const [selectedOption, setSelectedOption] = useState<string>("us_ipo");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const [selectedOption, setSelectedOption] = useState("us_ipo");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -112,8 +88,8 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
     fetch(`${apiUrl}/api/cummulative_pnl/`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : "",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ fund }),
     })
@@ -131,89 +107,93 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
       });
   }, [fund, apiUrl, token]);
 
-  const getChartData = () => {
+  const getChartData = (): PnlItem[] => {
     if (!data || !data[selectedOption]) return [];
+    const raw = data[selectedOption];
 
-    const selectedData = data[selectedOption];
+    if (typeof raw !== "object") return [];
 
-    if (typeof selectedData !== "object" || selectedData === null) {
-      return [];
-    }
-
-    const allTrades: PnlItem[] = Object.values(selectedData)
+    return Object.values(raw)
       .flat()
-      .filter((item): item is PnlItem => item && typeof item === "object" && "pnl" in item);
-
-    const buckets: { [label: string]: { pnl: number; trades: PnlItem[] } } = {};
-
-    for (const label of BUCKET_LABELS) {
-      buckets[label] = { pnl: 0, trades: [] };
-    }
-
-    for (const trade of allTrades) {
-      const label = getBucketLabel(trade.days_held);
-      buckets[label].pnl += trade.pnl;
-      buckets[label].trades.push(trade);
-    }
-
-    return BUCKET_LABELS.map((label) => ({
-      daysHeld: label,
-      pnl: buckets[label].pnl,
-      trades: buckets[label].trades,
-    }));
+      .filter((item): item is PnlItem => item && "client_symbol" in item && "days_held" in item);
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 2, mb: 4,p:4 }}>
-      <Card elevation={3} sx={{ p: 3, mb: 4 }}>
-      <Typography variant="h6" color="#002060" mb={2} align="center">
-        Cumulative PnL by Days Held
-      </Typography>
+    <Container maxWidth="xl" sx={{ mt: 3, mb: 4 }}>
+      <Card elevation={4} sx={{ p: 4, background: "linear-gradient(to bottom right, #e0f7fa, #fce4ec)" }}>
+        <Typography
+          variant="h5"
+          align="center"
+          sx={{
+            mb: 2,
+            fontWeight: 700,
+            background: "linear-gradient(to right, #006060ff, #024e61ff)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+           Days Held vs P&L — {fund}
+        </Typography>
 
-      <Box display="flex" gap={2} mb={2} width="100%">
-        {OPTIONS.map((opt) => (
-          <Box key={opt.key} flex={1}>
+        <Box display="flex" gap={2} mb={3} >
+          {OPTIONS.map((opt) => (
             <Button
-              fullWidth
+              key={opt.key}
               variant={selectedOption === opt.key ? "contained" : "outlined"}
               onClick={() => setSelectedOption(opt.key)}
               sx={{
+                flex: 1,
                 textTransform: "none",
+                borderColor: "#002060",
                 backgroundColor: selectedOption === opt.key ? "#002060" : "transparent",
                 color: selectedOption === opt.key ? "#fff" : "#002060",
-                borderColor: "#002060",
               }}
             >
               {opt.label}
             </Button>
-          </Box>
-        ))}
-      </Box>
-
-      {loading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" height={300}>
-          <CircularProgress />
+          ))}
         </Box>
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : (
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart data={getChartData()}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="daysHeld" />
-            <YAxis tickFormatter={formatNumber} domain={["auto", "auto"]} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="pnl"
-              stroke="#1976d2"
-              activeDot={{ r: 6 }}
-              name="Cumulative PnL"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      )}
+
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height={300}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : (
+          <ResponsiveContainer width="100%" height={420}>
+            <ScatterChart>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                type="number"
+                dataKey="days_held"
+                domain={[0, 70]}
+                tickCount={8}
+                tick={{ fill: "#002060", fontSize: 12 }}
+                label={{ value: "Days Held", fill: "#002060", offset: -1, position: "insideBottom" }}
+              />
+              <YAxis
+                type="number"
+                dataKey="pnl"
+                tickFormatter={formatNumber}
+                tick={{ fill: "#002060", fontSize: 12 }}
+                label={{
+                  value: "P&L",
+                  angle: -90,
+                  position: "insideLeft",
+                  fill: "#002060",
+                }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Scatter
+                name="Tickers"
+                data={getChartData()}
+                fill="#2979ff"
+                shape="circle"
+              />
+            </ScatterChart>
+          </ResponsiveContainer>
+        )}
       </Card>
     </Container>
   );
