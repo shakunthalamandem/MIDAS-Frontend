@@ -148,10 +148,6 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
   return (
     <Container
       maxWidth="xl"
-      sx={{
-        minHeight: "100vh",
-        paddingTop: 4,
-      }}
     >
       <motion.div
         initial={{ opacity: 0, y: 30 }}

@@ -80,7 +80,7 @@ const FundSummaryTable: React.FC<Props> = ({ fund }) => {
         const rows: TableRowData[] = [];
         const monthSet: Set<string> = new Set();
 
-        for (const [fundName, assetMap] of Object.entries(result)) {
+        for (const [, assetMap] of Object.entries(result)) {
           for (const [assetType, assetData] of Object.entries(assetMap)) {
             const { asset_type, ...rest } = assetData;
             const monthValues = rest as { [month: string]: number };
@@ -90,7 +90,7 @@ const FundSummaryTable: React.FC<Props> = ({ fund }) => {
             );
             if (!isAllZero) {
               Object.keys(monthValues).forEach((m) => monthSet.add(m));
-              rows.push({ fundName, assetType, values: monthValues });
+              rows.push({ fundName: "", assetType, values: monthValues });
             }
           }
         }
@@ -170,9 +170,7 @@ const FundSummaryTable: React.FC<Props> = ({ fund }) => {
           <Table size="small" sx={{ borderCollapse: "collapse" }}>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
-                <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
-                  <b>Fund</b>
-                </TableCell>
+                {/* Removed Fund column */}
                 <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
                   <b>Asset Type</b>
                 </TableCell>
@@ -189,11 +187,12 @@ const FundSummaryTable: React.FC<Props> = ({ fund }) => {
             </TableHead>
             <TableBody>
               {(() => {
-                const groupedByFund: Record<string, TableRowData[]> = {};
+                // Group data by assetType across funds (fundName is ignored)
+                const groupedByAsset: Record<string, TableRowData[]> = {};
                 data.forEach((row) => {
-                  if (!groupedByFund[row.fundName])
-                    groupedByFund[row.fundName] = [];
-                  groupedByFund[row.fundName].push(row);
+                  if (!groupedByAsset[row.assetType])
+                    groupedByAsset[row.assetType] = [];
+                  groupedByAsset[row.assetType].push(row);
                 });
 
                 const overallTotals: { [month: string]: number } = {};
@@ -201,61 +200,34 @@ const FundSummaryTable: React.FC<Props> = ({ fund }) => {
 
                 const tableRows: JSX.Element[] = [];
 
-                const sortedFundNames = Object.keys(groupedByFund).sort((a, b) =>
-                  a.localeCompare(b)
-                );
+                // Sort asset types by defined order
+                const sortedAssetTypes = Object.keys(groupedByAsset).sort((a, b) => {
+                  const indexA = assetOrder.indexOf(a);
+                  const indexB = assetOrder.indexOf(b);
+                  const orderA = indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA;
+                  const orderB = indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB;
+                  return orderA - orderB;
+                });
 
-                sortedFundNames.forEach((fundName) => {
-                  const fundRows = groupedByFund[fundName];
-
-                  const sortedFundRows = fundRows.sort((a, b) => {
-                    const indexA = assetOrder.indexOf(a.assetType);
-                    const indexB = assetOrder.indexOf(b.assetType);
-                    const orderA = indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA;
-                    const orderB = indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB;
-                    return orderA - orderB;
-                  });
-
+                sortedAssetTypes.forEach((assetType) => {
+                  // Sum values for this asset type across all funds (since fund is ignored)
+                  const rows = groupedByAsset[assetType];
                   const assetTotals: { [month: string]: number } = {};
                   months.forEach((m) => (assetTotals[m] = 0));
 
-                  sortedFundRows.forEach((row, idx) => {
+                  rows.forEach((row) => {
                     months.forEach((m) => {
                       assetTotals[m] += row.values[m] ?? 0;
                       overallTotals[m] += row.values[m] ?? 0;
                     });
-
-                    tableRows.push(
-                      <TableRow key={`${fundName}-${row.assetType}`}>
-                        {idx === 0 && (
-                          <TableCell
-                            sx={{ ...cellBorder, fontWeight: "bold" }}
-                            rowSpan={sortedFundRows.length + 1}
-                          >
-                            {fundName}
-                          </TableCell>
-                        )}
-                        <TableCell sx={cellBorder}>{row.assetType}</TableCell>
-                        {months.map((m) => (
-                          <TableCell key={m} sx={cellBorder}>
-                            {formatCurrency(row.values[m] ?? 0)}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    );
                   });
 
                   tableRows.push(
-                    <TableRow
-                      key={`${fundName}-sum`}
-                      sx={{ backgroundColor: "rgb(145, 206, 137)" }}
-                    >
-                      <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>
-                        Sum
-                      </TableCell>
+                    <TableRow key={assetType}>
+                      <TableCell sx={cellBorder}>{assetType}</TableCell>
                       {months.map((m) => (
                         <TableCell key={m} sx={cellBorder}>
-                          <b>{formatCurrency(assetTotals[m])}</b>
+                          {formatCurrency(assetTotals[m])}
                         </TableCell>
                       ))}
                     </TableRow>
@@ -264,7 +236,7 @@ const FundSummaryTable: React.FC<Props> = ({ fund }) => {
 
                 tableRows.push(
                   <TableRow key="overall-total" sx={{ backgroundColor: overallRowBgColor }}>
-                    <TableCell colSpan={2} sx={{ ...cellBorder, fontWeight: "bold" }}>
+                    <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>
                       Overall Total
                     </TableCell>
                     {months.map((m) => (
