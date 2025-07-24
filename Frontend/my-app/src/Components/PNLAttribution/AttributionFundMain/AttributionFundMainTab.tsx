@@ -18,6 +18,7 @@ import PnlAndDaysHeldGraph from './PnlAndDaysHeldGraph';
 import ExposureDtdMtdChartMain from './ExposureDtdMtdChartMain';
 import ExposureByDealTypeChart from './ExposureByDealTypeChart';
 import ExposureDtdMtdBySectorChart from './ExposureDtdMtdBySectorChart';
+import RegionWiseChartPnl from './RegionWiseChartPnl';
 
 const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
@@ -99,6 +100,11 @@ const AttributionFundMainTab = () => {
 
 
           <Grid container spacing={2} mt={2}>
+            <Grid item xs={12} md={6}>
+              <Box  >
+                <RegionWiseChartPnl fund={selectedFund} />
+              </Box>
+            </Grid>
             <Grid item xs={12} md={6}>
               <Box  >
                 <Top10ExposureChart fund={selectedFund} />
