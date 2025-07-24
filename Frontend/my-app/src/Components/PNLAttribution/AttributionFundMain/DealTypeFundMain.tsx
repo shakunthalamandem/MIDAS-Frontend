@@ -13,6 +13,22 @@ interface DealTypeFundMainProps {
   fund: string;
 }
 
+const CustomNoRowsOverlay: React.FC<{ message: string }> = ({ message }) => (
+  <Box
+    sx={{
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      py: 3,
+      color: "text.secondary",
+      fontSize: "0.85rem",
+    }}
+  >
+    {message}
+  </Box>
+);
+
 const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
   const [ipoDeals, setIpoDeals] = useState<Deal[]>([]);
   const [foDeals, setFoDeals] = useState<Deal[]>([]);
@@ -47,7 +63,7 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
     fetchData();
   }, [fund]);
 
-  const renderTable = (rows: Deal[], title: string, id: string) => (
+  const renderTable = (rows: Deal[], title: string, id: string, emptyMessage: string) => (
     <Box my={4} id={id}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -71,8 +87,6 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
             {title}
           </Typography>
         </Box>
-
-
       </motion.div>
 
       <Divider sx={{ mb: 2 }} />
@@ -86,7 +100,7 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
           sx={{
             width: "100%",
             overflowX: "auto",
-            overflowY: "visible", // ✅ allow vertical growth
+            overflowY: "visible",
             backgroundColor: "#ffffff",
             borderRadius: 2,
             boxShadow: 3,
@@ -145,7 +159,34 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
             disableColumnMenu
             hideFooterPagination
             hideFooter
-            getRowHeight={() => "auto"} // ✅ dynamically adjust
+            getRowHeight={() => "auto"}
+            slots={{
+              noRowsOverlay: () => <CustomNoRowsOverlay message={emptyMessage} />,
+            }}
+            sx={{
+              border: "none",
+              fontSize: "0.72rem",
+              "& .MuiDataGrid-columnHeaders": {
+                background: "linear-gradient(to right, #77B0FC, #dbe9ff)",
+                color: "#002060",
+                fontWeight: 600,
+                fontSize: "0.72rem",
+                minHeight: "36px !important",
+              },
+              "& .MuiDataGrid-cell": {
+                whiteSpace: "normal",
+                wordWrap: "break-word",
+                lineHeight: 1.4,
+                fontSize: "0.75rem",
+                padding: "6px 8px",
+              },
+              "& .MuiDataGrid-row:nth-of-type(even)": {
+                backgroundColor: "#f5f8fc",
+              },
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "#dee7f7",
+              },
+            }}
           />
         </Box>
       </motion.div>
@@ -160,37 +201,18 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
         </Box>
       ) : (
         <>
-          {ipoDeals.length > 0 &&
-            renderTable(
-              ipoDeals,
-              "IPOs (New Issues or Incremental AM Participation Deals)",
-              "ipo"
-            )}
-          {foDeals.length > 0 &&
-            renderTable(
-              foDeals,
-              "FOs (New Issues or Incremental AM Participation Deals)",
-              "fo"
-            )}
-          {ipoDeals.length === 0 && foDeals.length === 0 ? (
-  <Typography align="center" color="textSecondary" mt={4}>
-    No IPO or FO deals available for this fund.
-  </Typography>
-) : (
-  <>
-    {ipoDeals.length === 0 && (
-      <Typography align="center" color="textSecondary" mt={2}>
-        No IPO deals available for this fund.
-      </Typography>
-    )}
-    {foDeals.length === 0 && (
-      <Typography align="center" color="textSecondary" mt={2}>
-        No FO deals available for this fund.
-      </Typography>
-    )}
-  </>
-)}
-
+          {renderTable(
+            ipoDeals,
+            "IPOs (New Issues or Incremental AM Participation Deals)",
+            "ipo",
+            "No IPO deals available for this fund."
+          )}
+          {renderTable(
+            foDeals,
+            "FOs (New Issues or Incremental AM Participation Deals)",
+            "fo",
+            "No FO deals available for this fund."
+          )}
         </>
       )}
     </Box>
