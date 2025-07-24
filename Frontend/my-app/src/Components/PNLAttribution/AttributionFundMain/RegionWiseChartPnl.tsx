@@ -154,7 +154,7 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
           textAlign="center"
           sx={{ fontWeight: "bold" }}
         >
-          Region-wise Cumulative P&L
+          2025 {fund} Region-wise Cumulative P&L 
         </Typography>
 
         {loading ? (
