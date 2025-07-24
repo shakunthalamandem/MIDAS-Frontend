@@ -42,8 +42,10 @@ const OPTIONS = [
 const formatNumber = (value: number): string => {
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-  if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(2)}B`;
-  if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(2)}M`;
+  if (absValue >= 1_000_000_000)
+    return `${sign}$${(absValue / 1_000_000_000).toFixed(2)}B`;
+  if (absValue >= 1_000_000)
+    return `${sign}$${(absValue / 1_000_000).toFixed(2)}M`;
   if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(2)}K`;
   return `${sign}$${absValue.toFixed(0)}`;
 };
@@ -60,7 +62,10 @@ const CustomTooltip = ({ active, payload }: any) => {
         <Typography variant="body2" color="#00695c">
           Days Held: <b>{trade.days_held}</b>
         </Typography>
-        <Typography variant="body2" color={trade.pnl >= 0 ? "#2e7d32" : "#c62828"}>
+        <Typography
+          variant="body2"
+          color={trade.pnl >= 0 ? "#2e7d32" : "#c62828"}
+        >
           P&L: <b>{formatNumber(trade.pnl)}</b>
         </Typography>
       </Paper>
@@ -115,14 +120,23 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
 
     return Object.values(raw)
       .flat()
-      .filter((item): item is PnlItem => item && "client_symbol" in item && "days_held" in item);
+      .filter(
+        (item): item is PnlItem =>
+          item && "client_symbol" in item && "days_held" in item
+      );
   };
 
   return (
     <Container maxWidth="xl" sx={{ mt: 3, mb: 4 }}>
-      <Card elevation={4} sx={{ p: 4, background: "linear-gradient(to bottom right, #e0f7fa, #fce4ec)" }}>
+      <Card
+        elevation={4}
+        sx={{
+          p: 4,
+          background: "linear-gradient(to bottom right, #e0f7fa, #fce4ec)",
+        }}
+      >
         <Typography
-          variant="h5"
+          variant="h6"
           align="center"
           sx={{
             mb: 2,
@@ -132,10 +146,12 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
             WebkitTextFillColor: "transparent",
           }}
         >
-           Days Held vs P&L — {fund}
+          Equities Cummulative P&L by Days Held in— {fund} Portfolio -{" "}
+          {selectedOption.replace(/_/g, " ").toUpperCase()} As on{" "}
+          {data?.trade_date || "N/A"}
         </Typography>
 
-        <Box display="flex" gap={2} mb={3} >
+        <Box display="flex" gap={2} mb={3}>
           {OPTIONS.map((opt) => (
             <Button
               key={opt.key}
@@ -145,7 +161,8 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
                 flex: 1,
                 textTransform: "none",
                 borderColor: "#002060",
-                backgroundColor: selectedOption === opt.key ? "#002060" : "transparent",
+                backgroundColor:
+                  selectedOption === opt.key ? "#002060" : "transparent",
                 color: selectedOption === opt.key ? "#fff" : "#002060",
               }}
             >
@@ -155,7 +172,12 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
         </Box>
 
         {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" height={300}>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height={300}
+          >
             <CircularProgress />
           </Box>
         ) : error ? (
@@ -170,7 +192,12 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
                 domain={[0, 70]}
                 tickCount={8}
                 tick={{ fill: "#002060", fontSize: 12 }}
-                label={{ value: "Days Held", fill: "#002060", offset: -1, position: "insideBottom" }}
+                label={{
+                  value: "Days Held",
+                  fill: "#002060",
+                  offset: -1,
+                  position: "insideBottom",
+                }}
               />
               <YAxis
                 type="number"
