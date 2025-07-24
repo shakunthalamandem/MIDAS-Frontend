@@ -101,7 +101,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
       field: "total_days_held",
       headerName: "Days Held",
       flex: 1,
-      renderCell: ({ value }) => (value === null || value === undefined ? "-" : value),
+      renderCell: ({ value }) => value || "-",
     },
     {
       field: "total_pnl",
