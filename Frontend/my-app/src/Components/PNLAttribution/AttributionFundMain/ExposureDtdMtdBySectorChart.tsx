@@ -48,7 +48,7 @@ const SECTOR_ORDER = [
   "Materials",
   "Real Estate",
   "Utilities",
-  "Other",
+  // "Other",
 ];
 
 const COLORS_BY_SECTOR: Record<string, string> = {
@@ -63,7 +63,7 @@ const COLORS_BY_SECTOR: Record<string, string> = {
   "Materials": "#7cb342",
   "Real Estate": "#c0ca33",
   "Utilities": "#fbc02d",
-  "Other": "#fb8c00",
+  // "Other": "#fb8c00",
 };
 
 const formatNumber = (value: number): string => {
