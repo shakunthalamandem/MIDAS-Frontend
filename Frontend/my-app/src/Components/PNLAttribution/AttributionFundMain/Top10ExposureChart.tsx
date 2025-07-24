@@ -46,7 +46,7 @@ const formatNumber = (value: number): string => {
 };
 
 // Add more colors for variety
-const COLORS = ["#00acc1"];
+const COLORS = ["#015368ff"];
 
 const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
   const [data, setData] = useState<ExposureData[]>([]);
@@ -160,13 +160,13 @@ const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
                     tickMargin={15}
                     interval={0}
                     width={120}
-                    tick={{ fill: "#99000c", fontWeight: 400 }} // Set Y-axis tick color
+                    tick={{ fill: "#ff7300ff", fontWeight: 400 }} // Set Y-axis tick color
                     style={{ whiteSpace: "nowrap" }}
                   />
                   <Tooltip
                     formatter={(value: number) => formatNumber(value)}
-                    labelStyle={{ color: "#e91e63", fontWeight: 400 }} // Tooltip label color
-                    itemStyle={{ color: "#4caf50", fontWeight: 400 }} // Tooltip value color
+                    labelStyle={{ color: "#003674ff", fontWeight: 400 }} // Tooltip label color
+                    itemStyle={{ color: "#4c93afff", fontWeight: 400 }} // Tooltip value color
                   />
 
                   <Bar dataKey="value" barSize={20} isAnimationActive>
