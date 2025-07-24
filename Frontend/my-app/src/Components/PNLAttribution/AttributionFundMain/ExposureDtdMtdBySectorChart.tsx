@@ -53,19 +53,20 @@ const SECTOR_ORDER = [
 ];
 
 const COLORS_BY_SECTOR: Record<string, string> = {
-  "Consumer Discretionary": "#8e24aa",
-  "Consumer Staples": "#6a1b9a",
-  "Communication Services": "#3949ab",
-  Energy: "#1e88e5",
-  Financials: "#039be5",
-  "Health Care": "#00acc1",
-  Industrials: "#00897b",
-  "Information Technology": "#7c2e1aff",
-  Materials: "#195c1cff",
-  "Real Estate": "#c0ca33",
-  Utilities: "#fbc02d",
-  // "Other": "#fb8c00",
+  "Consumer Discretionary": "#5E35B1",    // Deep Purple
+  "Consumer Staples": "#00897B",          // Teal
+  "Communication Services": "#3949AB",    // Indigo
+  Energy: "#F4511E",                      // Orange Red
+  Financials: "#1E88E5",                  // Blue
+  "Health Care": "#43A047",              // Green
+  Industrials: "#6D4C41",                 // Brown
+  "Information Technology": "#3949AB",    // Indigo
+  Materials: "#8D6E63",                   // Taupe/Brown Grey
+  "Real Estate": "#8E24AA",               // Purple
+  Utilities: "#FBC02D",                   // Yellow
+  // "Other": "#B0BEC5",                  // Optional muted blue-grey
 };
+
 
 const formatNumber = (value: number): string => {
   const abs = Math.abs(value);
@@ -227,7 +228,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
             <YAxis
               type="category"
               dataKey="sector"
-              tick={{ fill: "#e30000", fontWeight: 400 }}
+              tick={{ fill: "#99000c", fontWeight: 400 }}
               width={160}
             />
           ) : (

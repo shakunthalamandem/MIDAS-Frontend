@@ -190,7 +190,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
             <YAxis
               type="category"
               dataKey="region"
-              tick={{ fill: "#e30000", fontWeight: 400 }}
+              tick={{ fill: "#99000c", fontWeight: 400 }}
               width={140}
             />
           ) : (

@@ -159,7 +159,7 @@ const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
                     tickMargin={15}
                     interval={0}
                     width={120}
-                    tick={{ fill: "#e30000", fontWeight: 400 }} // Set Y-axis tick color
+                    tick={{ fill: "#99000c", fontWeight: 400 }} // Set Y-axis tick color
                     style={{ whiteSpace: "nowrap" }}
                   />
                   <Tooltip
