@@ -5,14 +5,12 @@ import {
   MenuItem,
   Typography,
   Grid,
-  Fade,
-  Paper,
+
 } from '@mui/material';
 import DealTypeFundMain from './DealTypeFundMain';
 import Top10ExposureChart from './Top10ExposureChart';
 import BottomStocksPNLMain from './BottomStocksPNLMain';
 import MostAgedStocksTable from './MostAgedStocksTable';
-import SectorWisePNLMain from './SectorWisePNLMain';
 import PortfolioDataTableMain from './PortfolioDataTableMain';
 import PnlAndDaysHeldGraph from './PnlAndDaysHeldGraph';
 import ExposureDtdMtdChartMain from './ExposureDtdMtdChartMain';
@@ -109,10 +107,7 @@ const AttributionFundMainTab = () => {
         {/* Main Deal Component */}
         <Box>
           <DealTypeFundMain fund={selectedFund} />
-          {/* <Box sx={{ mt: 6 }}>
 
-              <SectorWisePNLMain fund={selectedFund} />
-          </Box> */}
 
           <Grid container spacing={2} mt={2}>
             <Grid item xs={12} md={6}>
