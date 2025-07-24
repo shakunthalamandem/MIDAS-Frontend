@@ -19,6 +19,7 @@ import {
   CardContent,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import InfoIcon from "@mui/icons-material/Info";
 
 interface ChartProps {
   fund: string;
@@ -33,6 +34,7 @@ interface TotalsData {
   exposure: number;
   dtd_pnl: number;
   mtd_pnl: number;
+  ytd_pnl: number;
 }
 
 const SECTOR_ORDER = [
@@ -47,23 +49,24 @@ const SECTOR_ORDER = [
   "Materials",
   "Real Estate",
   "Utilities",
-  "Other",
+  // "Other",
 ];
 
 const COLORS_BY_SECTOR: Record<string, string> = {
-  "Consumer Discretionary": "#8e24aa",
-  "Consumer Staples": "#6a1b9a",
-  "Communication Services": "#3949ab",
-  "Energy": "#1e88e5",
-  "Financials": "#039be5",
-  "Health Care": "#00acc1",
-  "Industrials": "#00897b",
-  "Information Technology": "#43a047",
-  "Materials": "#7cb342",
-  "Real Estate": "#c0ca33",
-  "Utilities": "#fbc02d",
-  "Other": "#fb8c00",
+  "Consumer Discretionary": "#5E35B1",    // Deep Purple
+  "Consumer Staples": "#00897B",          // Teal
+  "Communication Services": "#3949AB",    // Indigo
+  Energy: "#F4511E",                      // Orange Red
+  Financials: "#1E88E5",                  // Blue
+  "Health Care": "#43A047",              // Green
+  Industrials: "#6D4C41",                 // Brown
+  "Information Technology": "#3949AB",    // Indigo
+  Materials: "#8D6E63",                   // Taupe/Brown Grey
+  "Real Estate": "#8E24AA",               // Purple
+  Utilities: "#FBC02D",                   // Yellow
+  // "Other": "#B0BEC5",                  // Optional muted blue-grey
 };
+
 
 const formatNumber = (value: number): string => {
   const abs = Math.abs(value);
@@ -104,6 +107,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
   const [exposureData, setExposureData] = useState<SectorData[]>([]);
   const [dtdData, setDtdData] = useState<SectorData[]>([]);
   const [mtdData, setMtdData] = useState<SectorData[]>([]);
+  const [ytdData, setYtdData] = useState<SectorData[]>([]);
   const [totals, setTotals] = useState<TotalsData | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -126,7 +130,12 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
 
         const result = await res.json();
 
-        if (result?.exposure && result?.dtd_pnl && result?.mtd_pnl && result?.totals) {
+        if (
+          result?.exposure &&
+          result?.dtd_pnl &&
+          result?.mtd_pnl &&
+          result?.totals
+        ) {
           const formatData = (raw: Record<string, number>): SectorData[] => {
             return SECTOR_ORDER.map((sector) => ({
               sector,
@@ -137,6 +146,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
           setExposureData(formatData(result.exposure));
           setDtdData(formatData(result.dtd_pnl));
           setMtdData(formatData(result.mtd_pnl));
+          setYtdData(formatData(result.ytd_pnl));
           setTotals(result.totals);
         } else {
           setError("Invalid response format.");
@@ -177,6 +187,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
 
   const dtdMax = getSymmetricMax(dtdData);
   const mtdMax = getSymmetricMax(mtdData);
+  const ytdMax = getSymmetricMax(ytdData);
 
   const renderChart = (
     title: string,
@@ -186,7 +197,11 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
     totalValue?: number
   ) => (
     <Box flex={1}>
-      <Typography variant="subtitle2" align="center" sx={{ mb: 1, fontWeight: 600 }}>
+      <Typography
+        variant="subtitle2"
+        align="center"
+        sx={{ mb: 1, fontWeight: 600 }}
+      >
         {title}
       </Typography>
 
@@ -203,7 +218,9 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
               title === "Exposure" ? undefined : [-symmetricMax!, symmetricMax!]
             }
             tickFormatter={(value) =>
-              title === "Exposure" ? formatNumber(value) : `${(value / 1e6).toFixed(0)}M`
+              title === "Exposure"
+                ? formatNumber(value)
+                : `${(value / 1e6).toFixed(0)}M`
             }
             tick={{ fill: "#002060", fontWeight: 400 }}
           />
@@ -211,7 +228,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
             <YAxis
               type="category"
               dataKey="sector"
-              tick={{ fill: "#e30000", fontWeight: 400 }}
+              tick={{ fill: "#99000c", fontWeight: 400 }}
               width={160}
             />
           ) : (
@@ -243,10 +260,9 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
           color="#000000"
           sx={{
             mt: 1,
-            ...(title === "Exposure" && { ml: 20 }), 
+            ...(title === "Exposure" && { ml: 20 }),
           }}
         >
-
           Total {title}: {formatTotalNumber(totalValue)}
         </Typography>
       )}
@@ -278,9 +294,33 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
             </Typography>
 
             <Box display="flex" gap={3}>
-              {renderChart("Exposure", exposureData, true, undefined, totals?.exposure)}
+              {renderChart(
+                "Exposure",
+                exposureData,
+                true,
+                undefined,
+                totals?.exposure
+              )}
               {renderChart("DTD PnL", dtdData, false, dtdMax, totals?.dtd_pnl)}
               {renderChart("MTD PnL", mtdData, false, mtdMax, totals?.mtd_pnl)}
+              {renderChart("YTD PnL", ytdData, false, ytdMax, totals?.ytd_pnl)}
+            </Box>
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              mt={2}
+            >
+              <InfoIcon sx={{ color: "gray", mr: 1, fontSize: "1rem" }} />
+              <Typography
+                sx={{
+                  fontStyle: "italic",
+                  color: "gray",
+                  fontSize: "0.9rem",
+                }}
+              >
+                Others are excluded because it contains hedging.
+              </Typography>
             </Box>
           </CardContent>
         </Card>

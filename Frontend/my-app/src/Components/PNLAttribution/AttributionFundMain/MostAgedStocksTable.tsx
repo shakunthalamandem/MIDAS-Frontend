@@ -108,7 +108,7 @@ const MostAgedStocksTable: React.FC<MostAgedStocksTableProps> = ({ fund }) => {
     borderTopRightRadius: "16px",
   }}
 >
-  Most Aged Stocks (&gt; 45 Days) for {fund}
+ Equities   Most Aged Stocks (&gt; 45 Days) for {fund}
 </Typography>
 
 
