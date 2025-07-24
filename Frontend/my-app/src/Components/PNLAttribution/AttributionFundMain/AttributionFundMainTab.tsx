@@ -17,6 +17,7 @@ import ExposureDtdMtdChartMain from './ExposureDtdMtdChartMain';
 import ExposureByDealTypeChart from './ExposureByDealTypeChart';
 import ExposureDtdMtdBySectorChart from './ExposureDtdMtdBySectorChart';
 import RegionWiseChartPnl from "./RegionWiseChartPnl";
+import FundSummaryTable from "./FundSummaryTable";
 
 const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
@@ -108,6 +109,7 @@ const AttributionFundMainTab = () => {
         <Box>
           <DealTypeFundMain fund={selectedFund} />
           <RegionWiseChartPnl fund={selectedFund} />
+          <FundSummaryTable fund={selectedFund} />
 
 
 
