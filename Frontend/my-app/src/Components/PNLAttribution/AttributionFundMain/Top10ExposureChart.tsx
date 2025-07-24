@@ -114,7 +114,7 @@ const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
+    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}

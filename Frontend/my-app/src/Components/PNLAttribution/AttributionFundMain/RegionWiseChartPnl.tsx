@@ -145,7 +145,7 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
   }, [fund]);
 
   return (
-    <Container>
+    <Container maxWidth="xl">
       <Card elevation={3} sx={{ mt: 4, p: 3 }}>
         <Typography
           variant="h6"
