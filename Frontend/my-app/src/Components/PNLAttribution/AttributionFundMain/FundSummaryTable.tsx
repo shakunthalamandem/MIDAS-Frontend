@@ -11,7 +11,10 @@ import {
   Typography,
   Container,
   Box,
+  Card,
+  CardContent,
 } from "@mui/material";
+import { motion } from "framer-motion";
 
 type AssetData = {
   asset_type: string;
@@ -34,7 +37,6 @@ interface Props {
   fund: string;
 }
 
-// Custom asset display order
 const assetOrder = [
   "Equities",
   "Convertible Bond",
@@ -126,133 +128,199 @@ const FundSummaryTable: React.FC<Props> = ({ fund }) => {
     fetchData();
   }, [fund, apiUrl, token]);
 
-  const cellBorder = { border: "1px solid black", textAlign: "center" };
-  const overallRowBgColor = "#fde8b7";
+  const cellBorder = {
+    border: "1px solid #ddd",
+    textAlign: "center",
+    fontSize: 13,
+    padding: "8px",
+  };
+  const overallRowBgColor = "#fff3e0";
 
   return (
-    <Container maxWidth="xl">
-      <Typography
-        variant="h6"
-        sx={{
-          mt: 1,
-          mb: 1,
-          fontWeight: "bold",
-          color: "#002060",
-          textAlign: "center",
-        }}
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
       >
-        Fund-Wise P&L Attribution
-      </Typography>
+        <Card
+          elevation={4}
+          sx={{
+            borderRadius: 4,
+            background: "linear-gradient(to bottom, #deecc6ff, #e7bfbfff)",
+            boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
+            p: 3,
+          }}
+        >
+          <CardContent>
+            <Typography
+              variant="h5"
+              sx={{
+                mb: 2,
+                fontWeight: 700,
+                textAlign: "center",
+                background: "linear-gradient(to right, #004e92, #000428)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Fund-Wise P&L Attribution – {fund}
+            </Typography>
 
-      <TableContainer
-        component={Paper}
-        sx={{
-          mt: 1,
-          mb: 4,
-          borderRadius: 2,
-          boxShadow: 3,
-          overflow: "auto",
-          border: "1px solid #000",
-        }}
-      >
-        {loading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: 300,
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Table size="small" sx={{ borderCollapse: "collapse" }}>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#002060" }}>
-                {/* Removed Fund column */}
-                <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
-                  <b>Asset Type</b>
-                </TableCell>
-                {months.map((month) => (
-                  <TableCell
-                    key={month}
-                    align="center"
-                    sx={{ color: "#ffffff", ...cellBorder }}
-                  >
-                    <b>{month}</b>
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {(() => {
-                // Group data by assetType across funds (fundName is ignored)
-                const groupedByAsset: Record<string, TableRowData[]> = {};
-                data.forEach((row) => {
-                  if (!groupedByAsset[row.assetType])
-                    groupedByAsset[row.assetType] = [];
-                  groupedByAsset[row.assetType].push(row);
-                });
-
-                const overallTotals: { [month: string]: number } = {};
-                months.forEach((m) => (overallTotals[m] = 0));
-
-                const tableRows: JSX.Element[] = [];
-
-                // Sort asset types by defined order
-                const sortedAssetTypes = Object.keys(groupedByAsset).sort((a, b) => {
-                  const indexA = assetOrder.indexOf(a);
-                  const indexB = assetOrder.indexOf(b);
-                  const orderA = indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA;
-                  const orderB = indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB;
-                  return orderA - orderB;
-                });
-
-                sortedAssetTypes.forEach((assetType) => {
-                  // Sum values for this asset type across all funds (since fund is ignored)
-                  const rows = groupedByAsset[assetType];
-                  const assetTotals: { [month: string]: number } = {};
-                  months.forEach((m) => (assetTotals[m] = 0));
-
-                  rows.forEach((row) => {
-                    months.forEach((m) => {
-                      assetTotals[m] += row.values[m] ?? 0;
-                      overallTotals[m] += row.values[m] ?? 0;
-                    });
-                  });
-
-                  tableRows.push(
-                    <TableRow key={assetType}>
-                      <TableCell sx={cellBorder}>{assetType}</TableCell>
-                      {months.map((m) => (
-                        <TableCell key={m} sx={cellBorder}>
-                          {formatCurrency(assetTotals[m])}
+            <TableContainer
+              component={Paper}
+              sx={{
+                borderRadius: 2,
+                overflowX: "auto",
+                border: "1px solid #ccc",
+              }}
+            >
+              {loading ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: 300,
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <Table size="small" sx={{ borderCollapse: "collapse" }}>
+                  <TableHead>
+                    <TableRow
+                      sx={{
+                        background:
+                          "linear-gradient(to bottom, #7a4fccff, #d46c75ff)",
+                      }}
+                    >
+                      <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
+                        <b>Asset Type</b>
+                      </TableCell>
+                      {months.map((month) => (
+                        <TableCell
+                          key={month}
+                          align="center"
+                          sx={{ color: "#ffffff", ...cellBorder }}
+                        >
+                          <b>{month}</b>
                         </TableCell>
                       ))}
                     </TableRow>
-                  );
-                });
+                  </TableHead>
+                  <TableBody>
+                    {(() => {
+                      const groupedByAsset: Record<string, TableRowData[]> = {};
+                      data.forEach((row) => {
+                        if (!groupedByAsset[row.assetType])
+                          groupedByAsset[row.assetType] = [];
+                        groupedByAsset[row.assetType].push(row);
+                      });
 
-                tableRows.push(
-                  <TableRow key="overall-total" sx={{ backgroundColor: overallRowBgColor }}>
-                    <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>
-                      Overall Total
-                    </TableCell>
-                    {months.map((m) => (
-                      <TableCell key={m} sx={cellBorder}>
-                        <b>{formatCurrency(overallTotals[m])}</b>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
+                      const overallTotals: { [month: string]: number } = {};
+                      months.forEach((m) => (overallTotals[m] = 0));
 
-                return tableRows;
-              })()}
-            </TableBody>
-          </Table>
-        )}
-      </TableContainer>
+                      const tableRows: JSX.Element[] = [];
+
+                      const sortedAssetTypes = Object.keys(groupedByAsset).sort(
+                        (a, b) => {
+                          const indexA = assetOrder.indexOf(a);
+                          const indexB = assetOrder.indexOf(b);
+                          const orderA =
+                            indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA;
+                          const orderB =
+                            indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB;
+                          return orderA - orderB;
+                        }
+                      );
+
+                      sortedAssetTypes.forEach((assetType) => {
+                        const rows = groupedByAsset[assetType];
+                        const assetTotals: { [month: string]: number } = {};
+                        months.forEach((m) => (assetTotals[m] = 0));
+
+                        rows.forEach((row) => {
+                          months.forEach((m) => {
+                            assetTotals[m] += row.values[m] ?? 0;
+                            overallTotals[m] += row.values[m] ?? 0;
+                          });
+                        });
+
+                        tableRows.push(
+                          <TableRow
+                            key={assetType}
+                            sx={{
+                              transition: "all 0.2s ease",
+                              "&:hover": { backgroundColor: "#f4f4f4" },
+                            }}
+                          >
+                            <TableCell sx={cellBorder}>{assetType}</TableCell>
+                            {months.map((m) => (
+                              <TableCell
+                                key={m}
+                                sx={{
+                                  ...cellBorder,
+                                  color:
+                                    m === "YTD"
+                                      ? assetTotals[m] > 0
+                                        ? "green"
+                                        : assetTotals[m] < 0
+                                          ? "red"
+                                          : "inherit"
+                                      : "inherit",
+                                }}
+                              >
+                                {formatCurrency(assetTotals[m])}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        );
+                      });
+
+                      tableRows.push(
+                        <TableRow
+                          key="overall-total"
+                          sx={{
+                            backgroundColor: overallRowBgColor,
+                            fontWeight: "bold",
+                            borderTop: "2px solid #333",
+                          }}
+                        >
+                          <TableCell sx={{ ...cellBorder, fontWeight: "bold" }}>
+                            Overall Total
+                          </TableCell>
+                          {months.map((m) => (
+                            <TableCell
+                              key={m}
+                              sx={{
+                                ...cellBorder,
+                                fontWeight: "bold",
+                                color:
+                                  m === "YTD"
+                                    ? overallTotals[m] > 0
+                                      ? "green"
+                                      : overallTotals[m] < 0
+                                        ? "red"
+                                        : "inherit"
+                                    : "inherit",
+                              }}
+                            >
+                              {formatCurrency(overallTotals[m])}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+
+                      return tableRows;
+                    })()}
+                  </TableBody>
+                </Table>
+              )}
+            </TableContainer>
+          </CardContent>
+        </Card>
+      </motion.div>
     </Container>
   );
 };
