@@ -54,21 +54,7 @@ const AttributionFundMainTab = () => {
           mb={3}
         >
           <Grid item>
-            <Typography
-              variant="h5"
-              sx={{
-                background:
-                  "linear-gradient(to right, rgba(8, 85, 70, 1), #9e3f00ff)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontWeight: 600,
-                textAlign: "center",
-                mt: 2,
-              }}
-            >
-              {" "}
-              {selectedFund} Fund Performance & Attribution Dashboard
-            </Typography>
+           
           </Grid>
           <Grid item>
             <Select

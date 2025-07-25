@@ -29,9 +29,26 @@ const CustomNoRowsOverlay: React.FC<{ message: string }> = ({ message }) => (
   </Box>
 );
 
+// Helper function to format maxTradeDate
+const formatDate = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const month = date.toLocaleString("default", { month: "short" });
+  const year = date.getFullYear();
+
+  const getOrdinal = (n: number) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
+
+  return `${day}${getOrdinal(day)} ${month} ${year}`;
+};
+
 const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
   const [ipoDeals, setIpoDeals] = useState<Deal[]>([]);
   const [foDeals, setFoDeals] = useState<Deal[]>([]);
+  const [maxTradeDate, setMaxTradeDate] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -53,6 +70,7 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
         const data = await res.json();
         setIpoDeals(data.IPODeals || []);
         setFoDeals(data.FODeals || []);
+        setMaxTradeDate(data.max_trade_date || null);
       } catch (err) {
         console.error("Failed to fetch deals", err);
       } finally {
@@ -63,7 +81,12 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
     fetchData();
   }, [fund]);
 
-  const renderTable = (rows: Deal[], title: string, id: string, emptyMessage: string) => (
+  const renderTable = (
+    rows: Deal[],
+    title: string,
+    id: string,
+    emptyMessage: string
+  ) => (
     <Box my={4} id={id}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -115,12 +138,7 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
               fontSize: "0.72rem",
               lineHeight: 1.2,
               minHeight: "36px !important",
-              maxHeight: "none !important", // ✅ allow full height
-            },
-
-            "& .MuiDataGrid-columnHeader": {
-              background: "#77B0FC",
-              color: "#002060",
+              maxHeight: "none !important",
             },
             "& .MuiDataGrid-columnHeaderTitle": {
               whiteSpace: "normal",
@@ -141,7 +159,6 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
             "& .MuiDataGrid-row": {
               minHeight: "42px !important",
             },
-
             "& .MuiDataGrid-row:nth-of-type(even)": {
               backgroundColor: "#f5f8fc",
             },
@@ -161,7 +178,9 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
             hideFooter
             getRowHeight={() => "auto"}
             slots={{
-              noRowsOverlay: () => <CustomNoRowsOverlay message={emptyMessage} />,
+              noRowsOverlay: () => (
+                <CustomNoRowsOverlay message={emptyMessage} />
+              ),
             }}
             sx={{
               border: "none",
@@ -201,18 +220,53 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund }) => {
         </Box>
       ) : (
         <>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            flexWrap="wrap"
+            gap={1}
+            mt={2}
+            mb={1}
+            textAlign="center"
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                background:
+                  "linear-gradient(to right, rgba(8, 85, 70, 1), #9e3f00ff)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: 600,
+              }}
+            >
+              Fund Performance & Attribution Dashboard
+            </Typography>
+            {maxTradeDate && (
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 500, color: "text.secondary" }}
+              >
+                (Data as of: {formatDate(maxTradeDate)})
+              </Typography>
+            )}
+          </Box>
+
           {renderTable(
-            ipoDeals,
-            "IPOs (New Issues or Incremental AM Participation Deals)",
-            "ipo",
-            "No IPO deals available for this fund."
-          )}
-          {renderTable(
-            foDeals,
-            "FOs (New Issues or Incremental AM Participation Deals)",
-            "fo",
-            "No FO deals available for this fund."
-          )}
+  ipoDeals,
+  "IPOs (New Issues or Incremental AM Participation Deals)",
+  "ipo",
+  `No IPO deals available for this fund on ${formatDate(maxTradeDate!)}.`
+)}
+
+{renderTable(
+  foDeals,
+  "FOs (New Issues or Incremental AM Participation Deals)",
+  "fo",
+  `No FO deals available for this fund on ${formatDate(maxTradeDate!)}.`
+)}
+
+
         </>
       )}
     </Box>
