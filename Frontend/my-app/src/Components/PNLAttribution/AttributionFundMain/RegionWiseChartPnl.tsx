@@ -32,10 +32,10 @@ interface Props {
 
 // Custom colors for each region
 const REGION_COLORS: Record<string, string> = {
-  US: "#FF6F61",
-  APAC: "#6A5ACD",
-  EMEA: "#20B2AA",
-  "Non-US America": "#FFB74D",
+  US: "#da7c12",
+  APAC: "#b3ca18",
+  EMEA: "#1ab1e6",
+  "Non-US America": "#000000",
 };
 
 // Format PnL values as currency
