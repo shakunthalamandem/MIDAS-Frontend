@@ -146,7 +146,7 @@ export const dealGridColumns: GridColDef[] = [
     valueFormatter: (params) => currencyFormatter.format(params),
   },
   {
-    field: "daily_long_exposure",
+    field: "exposure_percentage_lmv",
     headerName: "Exposure as % of LMV",
     flex: 1,
     valueFormatter: (params) => formatNumber(params),
