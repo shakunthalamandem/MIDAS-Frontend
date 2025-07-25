@@ -10,11 +10,13 @@ import {
   Button,
   Fade,
   useTheme,
+  useMediaQuery,
 } from "@mui/material";
 
-const AllocationCaptureReturn = () => {
+const AllocationCaptureReturn: React.FC = () => {
   const [open, setOpen] = useState(true);
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleClose = () => {
     setOpen(false);
@@ -22,67 +24,78 @@ const AllocationCaptureReturn = () => {
 
   return (
     <>
-      {/* Mirror Glass Style Dialog */}
       <Dialog
         open={open}
         onClose={handleClose}
         TransitionComponent={Fade}
-        maxWidth="md"
+        maxWidth="sm"
         fullWidth
         PaperProps={{
           sx: {
-            backdropFilter: "blur(50px)",
-            backgroundColor: "rgba(255, 255, 255, 0.15)",
-            border: "1px solid rgba(255, 255, 255, 0.3)",
-            boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-            borderRadius: 4,
-            color: "#fff",
+            backgroundColor: theme.palette.background.paper,
+            borderRadius: 3,
+            boxShadow: theme.shadows[4],
             p: 2,
+            maxHeight: "90vh",
           },
         }}
       >
         <DialogTitle
           sx={{
-            fontWeight: "bold",
+            fontWeight: 600,
             fontSize: "1.25rem",
-            color: "#8b037f",
+            color: theme.palette.primary.main,
             textAlign: "center",
+            pb: 0,
           }}
         >
-          GAP Analysis Info
+          GAP Analysis - Model Assumptions
         </DialogTitle>
+
         <DialogContent>
           <Typography
+            variant="body2"
             sx={{
-              fontSize: "1rem",
-              textAlign: "justify",
-              color: "#FFF",
-              padding: "8px 0",
+              color: theme.palette.text.primary,
               lineHeight: 1.6,
+              textAlign: "justify",
+              mt: 1,
             }}
           >
-            As for the below GAP Analysis, we have assumed that 0.5% IPO
-            Allocation, 1% for FO Allocation, and 0.5% AM for both IPOs and
-            FOs. There is a Position limit of $30M. Also note that, for each
-            year deals issued in that year are considered, and the EXIT date
-            for actual PnL could be in future years. For Model, the EXIT date
-            is always T+1Month. This analysis excludes SPACs and PIPEs.
+            The following assumptions are used for this GAP Analysis:
+          </Typography>
+          <ul style={{ paddingLeft: "1.25rem", margin: "0.5rem 0" }}>
+            <li><strong>IPO Allocation:</strong> 0.5%</li>
+            <li><strong>FO (Follow-On) Allocation:</strong> 1%</li>
+            <li><strong>After Market (AM):</strong> 0.5% for both IPOs and FOs</li>
+            <li><strong>Position Limit:</strong> $30M</li>
+            <li><strong>Stop Loss:</strong> -10% for IPO and FO trades</li>
+          </ul>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            For Model Assumptions, <strong>After Market Allocation is not applicable</strong> for IPOs of type
+            <strong> Moonshot</strong> or <strong>Deathstar</strong>.
+            <br /><br />
+            Only deals issued within the year are considered. While actual PnL exits may happen in later years,
+            the model assumes an exit at <strong>T+1 month</strong> from issuance.
+            <br /><br />
+            <strong>Note:</strong> SPACs and PIPEs are excluded.
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "center" }}>
+
+        <DialogActions sx={{ justifyContent: "center", mt: 1 }}>
           <Button
             onClick={handleClose}
             variant="contained"
             sx={{
               borderRadius: 2,
               textTransform: "none",
-              fontWeight: "bold",
-              color: "#fff",
-              backgroundColor: "#002060",
-              px: 3,
+              fontWeight: 500,
+              px: 4,
+              py: 0.75,
+              fontSize: "0.95rem",
             }}
           >
-           Okay
+            Okay
           </Button>
         </DialogActions>
       </Dialog>
@@ -91,16 +104,13 @@ const AllocationCaptureReturn = () => {
       <Box
         display="flex"
         flexDirection="column"
-        justifyContent="center"
         alignItems="center"
-        textAlign="center"
         sx={{
           width: "100%",
-          overflow: "hidden",
-          position: "relative",
-          backgroundColor: "#f4f6fa",
           minHeight: "100vh",
-          paddingTop: 2
+          backgroundColor: theme.palette.background.default,
+          py: 3,
+          px: isMobile ? 2 : 4,
         }}
       >
         <MddMain apiName="gap_analysis" />
