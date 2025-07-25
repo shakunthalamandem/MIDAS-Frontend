@@ -94,12 +94,10 @@ const getColumns = (ticker: string): {
   { key: "present_year_price_earning", label: "2025 P/E" },
   { key: "one_year_later_price_earning", label: "2026 P/E" },
   {
-    key: "present_year_ev_fcf",
-    label: ticker === "CARL" ? "2025 EV/EBITDA" : "2025 EV/FCF",
+    key: "present_year_ev_fcf", label: "2025 EV/EBITDA",
   },
   {
-    key: "one_year_later_ev_fcf",
-    label: ticker === "CARL" ? "2026 EV/EBITDA" : "2026 EV/FCF",
+    key: "one_year_later_ev_fcf",label: "2026 EV/EBITDA",
   },
   { key: "sales_growth", label: "Sales Growth (25–26)", isPercentage: true },
   { key: "eps_growth", label: "EPS Growth (25–26)", isPercentage: true },
