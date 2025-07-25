@@ -195,11 +195,9 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
                 margin={{ top: 20, right: 40, bottom: 20, left: 60 }}
               >
                 <XAxis
-  dataKey="date"
-  tick={{ fill: "#002060", fontWeight: 400 }}
-  padding={{ left: 2 }}
-/>
-
+                  dataKey="date"
+                  tick={{ fill: "#002060", fontWeight: 400 }}
+                />
                 <YAxis
                   tickFormatter={formatCurrency}
                   tick={{ fill: "#002060", fontWeight: 400 }}
