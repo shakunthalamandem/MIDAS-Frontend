@@ -149,7 +149,7 @@ export const dealGridColumns: GridColDef[] = [
     field: "exposure_percentage_lmv",
     headerName: "Exposure as % of LMV",
     flex: 1,
-    valueFormatter: (params) => formatNumber(params),
+valueFormatter: (params) => `${formatNumber(params)}%`,
   },
   {
     field: "pnl",
