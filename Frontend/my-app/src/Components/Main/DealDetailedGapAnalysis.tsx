@@ -7,6 +7,9 @@ import {
   Grid,
   TextField,
   Button,
+  useTheme,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import * as XLSX from "xlsx";
@@ -15,11 +18,12 @@ import { saveAs } from "file-saver";
 interface DealData {
   "Pricing Date": string;
   "Issuer Name": string;
-  "Ticker": string;
+  Ticker: string;
   "Deal Type": string;
+  "IPO Type": string;
   "FO Type": string;
   "Broad Region": string;
-  "Year": number;
+  Year: number;
   "Issue Offer Price": number;
   "T + 1 Month Return": number;
   "T + 1 Day Return": number;
@@ -48,10 +52,11 @@ interface DealData {
 
 const formatCurrency = (val: number | null | undefined) => {
   if (val == null || isNaN(val)) return "";
-  const absVal = Math.abs(val).toLocaleString("en-US", { maximumFractionDigits: 0 });
+  const absVal = Math.abs(val).toLocaleString("en-US", {
+    maximumFractionDigits: 0,
+  });
   return val < 0 ? `-$${absVal}` : `$${absVal}`;
 };
-
 
 const formatComma = (val: number | null | undefined) => {
   if (val == null || isNaN(val)) return "";
@@ -69,6 +74,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
   const [data, setData] = useState<DealData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const theme = useTheme();
 
   const fetchData = async () => {
     try {
@@ -77,14 +83,17 @@ const DealDetailedGapAnalysis: React.FC = () => {
 
       if (!apiUrl) throw new Error("API URL is not defined");
 
-      const response = await fetch(`${apiUrl}/api/deal_detailed_gap_analysis/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({}),
-      });
+      const response = await fetch(
+        `${apiUrl}/api/deal_detailed_gap_analysis/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({}),
+        }
+      );
 
       const json = await response.json();
       setData(json.data || []);
@@ -105,6 +114,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
         id: index,
         ...row,
         "FO Type": row["Deal Type"] === "IPO" ? "-" : row["FO Type"],
+        "IPO Type": row["Deal Type"] === "IPO" ? row["IPO Type"] : "-",
       }))
       .filter((row) =>
         row["Ticker"]?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -132,11 +142,14 @@ const DealDetailedGapAnalysis: React.FC = () => {
     { field: "Ticker", headerName: "Ticker", width: 100 },
     { field: "Deal Type", headerName: "Deal Type", width: 100 },
     { field: "FO Type", headerName: "FO Type", width: 100 },
+    { field: "IPO Type", headerName: "IPO Type", width: 100 },
     { field: "Broad Region", headerName: "Region", width: 100 },
     { field: "Year", headerName: "Year", width: 80 },
-    { field: "Issue Offer Price", headerName: "Issue Price", width: 80 ,
-            renderCell: (params) => formatCurrency(params.value),
-
+    {
+      field: "Issue Offer Price",
+      headerName: "Issue Price",
+      width: 80,
+      renderCell: (params) => formatCurrency(params.value),
     },
     {
       field: "T + 1 Month Return",
@@ -228,7 +241,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
       width: 130,
       renderCell: (params) => formatComma(params.value),
     },
-       {
+    {
       field: "Current Quantity",
       headerName: "Current Quantity",
       width: 130,
@@ -257,7 +270,12 @@ const DealDetailedGapAnalysis: React.FC = () => {
       headerName: "Allocation Gap Shares",
       width: 160,
       renderCell: (params) => (
-        <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
+        <span
+          style={{
+            color:
+              params.value < 0 ? "green" : params.value > 0 ? "red" : "black",
+          }}
+        >
           {formatComma(params.value)}
         </span>
       ),
@@ -267,7 +285,12 @@ const DealDetailedGapAnalysis: React.FC = () => {
       headerName: "AM Gap Shares",
       width: 120,
       renderCell: (params) => (
-        <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
+        <span
+          style={{
+            color:
+              params.value < 0 ? "green" : params.value > 0 ? "red" : "black",
+          }}
+        >
           {formatComma(params.value)}
         </span>
       ),
@@ -277,7 +300,12 @@ const DealDetailedGapAnalysis: React.FC = () => {
       headerName: "Total Gap Shares",
       width: 120,
       renderCell: (params) => (
-        <span style={{ color: params.value < 0 ? "green" : params.value > 0 ? "red" : "black" }}>
+        <span
+          style={{
+            color:
+              params.value < 0 ? "green" : params.value > 0 ? "red" : "black",
+          }}
+        >
           {formatComma(params.value)}
         </span>
       ),
@@ -286,79 +314,138 @@ const DealDetailedGapAnalysis: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-        <Typography variant="h5" color="#002060" align="center" sx={{ flex: 1, ml: 45 }}>
+    <Box sx={{ p: 3, backgroundColor: theme.palette.background.default }}>
+      {/* Header */}
+      <Box
+        display="flex"
+        flexDirection={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+        gap={2}
+      >
+        <Typography variant="h6" fontWeight={600} color="primary">
           Deal Detailed Gap Analysis
         </Typography>
-        <Box display="flex" gap={2}>
+
+        <Box display="flex" gap={2} flexWrap="wrap">
           <TextField
             size="small"
             variant="outlined"
             placeholder="Search Ticker"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{ width: 300 }}
+            sx={{ width: 240 }}
           />
-          <Button variant="outlined" onClick={exportToExcel} sx={{ backgroundColor: "#002060", color: "#fff" }}>
+          <Button
+            variant="contained"
+            onClick={exportToExcel}
+            sx={{
+              backgroundColor: "#002060",
+              color: "#fff",
+              textTransform: "none",
+            }}
+          >
             Export to Excel
           </Button>
         </Box>
       </Box>
 
-      <Typography variant="body2" color="textSecondary" align="left" sx={{ mb: 1 }}>
-        <b>Note :</b> The table below includes all IPO and FO deals from 2025, positions are still held in the portfolio (i.e., current quantity &gt; 0), and the holding period is less than 30 days.
-      </Typography>
+      {/* Note + Assumptions */}
+      <Card variant="outlined" sx={{ backgroundColor: "#f9fafa", mb: 3 }}>
+        <CardContent sx={{ p: 2 }}>
+          <Typography
+            variant="subtitle2"
+            gutterBottom
+            sx={{ fontWeight: 600, color: "#374151" }}
+          >
+            Note
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            The table below includes all IPO and FO deals from 2025 with
+            positions still held in the portfolio (i.e., current quantity &gt;
+            0), and a holding period less than 30 days.
+          </Typography>
 
-      <Typography variant="body2" color="textSecondary" align="left" sx={{ mb: 2 }}>
-        <b>Assumptions :</b> As for the below GAP Analysis, we have assumed that 0.5% IPO Allocation, 1% for FO Allocation, and 0.5% AM for both IPOs and FOs. There is a Position limit of $30M. Also note that, for each year deals issued in that year are considered, and the EXIT date for actual PnL could be in future years. For Model, the EXIT date is always T+1Month. This analysis excludes SPACs and PIPEs.
-      </Typography>
+          <Typography
+            variant="subtitle2"
+            gutterBottom
+            sx={{ fontWeight: 600, color: "#374151" }}
+          >
+            Assumptions
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            • 0.5% allocation for IPOs
+            <br />
+            • 1% allocation for FOs
+            <br />
+            • 0.5% aftermarket participation (AM) for both IPOs and FOs
+            <br />
+            • $30M position limit applied
+            <br />
+            • Only deals issued in the same year are included (even if actual
+            PnL exits later)
+            <br />• Model assumes exit at <strong>T+1 month</strong>
+            <br />
+            • SPACs and PIPEs are excluded
+            <br />• <strong>
+              After Market Allocation is not applicable
+            </strong>{" "}
+            for IPOs classified as “Moonshot” or “Deathstar”
+            <br />• <strong>Stop-loss of -10%</strong> is applied on all
+            positions
+          </Typography>
+        </CardContent>
+      </Card>
 
+      {/* Data Table */}
       {loading ? (
-        <Grid container justifyContent="center" alignItems="center" style={{ height: 400 }}>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          sx={{ height: 300 }}
+        >
           <CircularProgress />
         </Grid>
       ) : (
-        <Paper elevation={3} sx={{ borderRadius: 4, p: 2, bgcolor: "background.paper" ,}}>
-<div style={{ height: 600, width: "100%" }}>
-  <DataGrid
-    rows={rows}
-    columns={columns}
-    rowHeight={32}
-    disableRowSelectionOnClick
-    sx={{
-      fontSize: "0.75rem",
-      "& .MuiDataGrid-columnHeaders": {
-        height: 32,
-        minHeight: "32px !important",
-        maxHeight: "32px !important",
-        lineHeight: "32px",
-        bgcolor: "#f0f0f0",
-        color: "#002060",
-        fontSize: "0.75rem",
-      },
-      "& .MuiDataGrid-columnHeader": {
-        maxHeight: "32px !important",
-      },
-      "& .MuiDataGrid-columnHeaderTitle": {
-        fontWeight: "bold",
-        overflow: "hidden",
-        whiteSpace: "nowrap",
-        textOverflow: "ellipsis",
-        lineHeight: "32px",
-      },
-      "& .MuiDataGrid-cell": {
-        color: "#555",
-        lineHeight: "1.2",
-        padding: "4px 4px",
-      },
-      "& .MuiDataGrid-row:nth-of-type(odd)": {
-        bgcolor: "#fafafa",
-      },
-    }}
-  />
-</div>
-
+        <Paper elevation={2} sx={{ borderRadius: 2, p: 1 }}>
+          <div style={{ height: 450, width: "100%" }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              rowHeight={32}
+              disableRowSelectionOnClick
+              sx={{
+                fontSize: "0.75rem",
+                "& .MuiDataGrid-columnHeaders": {
+                  height: 32,
+                  minHeight: "32px !important",
+                  maxHeight: "32px !important",
+                  lineHeight: "32px",
+                  bgcolor: "#f3f4f6",
+                  color: "#1e293b",
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  fontWeight: "bold",
+                  fontSize: "0.8rem",
+                  lineHeight: "32px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                },
+                "& .MuiDataGrid-cell": {
+                  color: "#374151",
+                  paddingTop: "4px",
+                  paddingBottom: "4px",
+                  lineHeight: "1.2",
+                },
+                "& .MuiDataGrid-row:nth-of-type(odd)": {
+                  backgroundColor: "#fcfcfc",
+                },
+              }}
+            />
+          </div>
         </Paper>
       )}
     </Box>
