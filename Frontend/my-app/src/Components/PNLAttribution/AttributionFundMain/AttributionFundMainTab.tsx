@@ -3,10 +3,12 @@ import {
   Box,
   Select,
   MenuItem,
-  Typography,
   Grid,
-
+  Button
 } from '@mui/material';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
 import DealTypeFundMain from './DealTypeFundMain';
 import Top10ExposureChart from './Top10ExposureChart';
 import BottomStocksPNLMain from './BottomStocksPNLMain';
@@ -23,22 +25,47 @@ const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
 
   const fundOptions = [
-    // "BEMAP",
     "BEMAP2",
-    // "Bespoke Alpha MAC MIM LP",
-    // "DS Liquid Div RVA MON LLC",
     "FMAP",
     "Mission Pure Alpha LP",
-    // "Monashee Managed Account SP",
     "Monashee Pure Alpha SPV I LP",
-    // "Monashee Solitario Fund LP",
     "MPAM",
-    // "WAF",
   ];
+
+  const handleExportIpoPDF = async () => {
+    const input = document.getElementById("pdf-export-area");
+    if (!input) return;
+
+    const canvas = await html2canvas(input, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pdfWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pdfHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+    }
+
+    pdf.save(`Fund_Attribution_${selectedFund}.pdf`);
+  };
 
   return (
     <>
       <Box
+        id="pdf-export-area"
         sx={{
           p: 4,
           background: "#f5f7fa",
@@ -54,7 +81,7 @@ const AttributionFundMainTab = () => {
           mb={3}
         >
           <Grid item>
-           
+            {/* Optional heading */}
           </Grid>
           <Grid item>
             <Select
@@ -86,21 +113,33 @@ const AttributionFundMainTab = () => {
                 </MenuItem>
               ))}
             </Select>
+
+            {/* Export to PDF Button */}
+            <Button
+              variant="contained"
+              onClick={handleExportIpoPDF}
+              sx={{
+                ml: 2,
+                backgroundColor: "#002060",
+                color: "#ffffff",
+                textTransform: "none",
+                px: 3,
+                py: 1,
+                minWidth: "130px",
+              }}
+            >
+              Export to PDF
+            </Button>
           </Grid>
         </Grid>
 
-        {/* Selected Fund Heading */}
-
-        {/* Main Deal Component */}
+        {/* Main Content */}
         <Box>
           <DealTypeFundMain fund={selectedFund} />
           <RegionWiseChartPnl fund={selectedFund} />
           <FundSummaryTable fund={selectedFund} />
 
-
-
           <Grid container spacing={2} mt={2}>
-            
             <Grid item xs={12} md={6}>
               <Box>
                 <Top10ExposureChart fund={selectedFund} />
@@ -121,10 +160,9 @@ const AttributionFundMainTab = () => {
                 <BottomStocksPNLMain fund={selectedFund} />
               </Box>
             </Grid>
-      
           </Grid>
-                <PnlAndDaysHeldGraph fund={selectedFund} />
 
+          <PnlAndDaysHeldGraph fund={selectedFund} />
           <ExposureDtdMtdChartMain fund={selectedFund} />
           <ExposureByDealTypeChart fund={selectedFund} />
           <ExposureDtdMtdBySectorChart fund={selectedFund} />
