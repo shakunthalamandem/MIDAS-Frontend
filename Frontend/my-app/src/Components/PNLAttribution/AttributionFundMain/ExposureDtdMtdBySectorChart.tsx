@@ -290,7 +290,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
               sx={{ color: "#002060", fontWeight: 600, mb: 3 }}
               align="center"
             >
-              Sector-wise Exposure, DTD and MTD PnL for {fund}
+              Sector-wise Exposure, DTD and MTD P&L for {fund}
             </Typography>
 
             <Box display="flex" gap={3}>
@@ -301,9 +301,9 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
                 undefined,
                 totals?.exposure
               )}
-              {renderChart("DTD PnL", dtdData, false, dtdMax, totals?.dtd_pnl)}
-              {renderChart("MTD PnL", mtdData, false, mtdMax, totals?.mtd_pnl)}
-              {renderChart("YTD PnL", ytdData, false, ytdMax, totals?.ytd_pnl)}
+              {renderChart("DTD P&L", dtdData, false, dtdMax, totals?.dtd_pnl)}
+              {renderChart("MTD P&L", mtdData, false, mtdMax, totals?.mtd_pnl)}
+              {renderChart("YTD P&L", ytdData, false, ytdMax, totals?.ytd_pnl)}
             </Box>
             <Box
               display="flex"
