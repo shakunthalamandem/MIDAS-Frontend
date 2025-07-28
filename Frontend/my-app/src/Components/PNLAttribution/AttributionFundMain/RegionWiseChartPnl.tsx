@@ -16,7 +16,7 @@ import {
   ResponsiveContainer,
   Label,
 } from "recharts";
-import { motion } from "framer-motion"; // ✅ Framer Motion
+import { motion } from "framer-motion";
 
 // Define the API response shape
 type RegionPnlResponse = {
@@ -38,15 +38,30 @@ const REGION_COLORS: Record<string, string> = {
   "Non-US America": "#000000",
 };
 
-// Format PnL values as currency
+// Simplified formatter for Y-axis (e.g. 3M instead of $3.00M)
+const formatShortCurrency = (value: number): string => {
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000_000) return `${(abs / 1_000_000_000).toFixed(0)}B`;
+  if (abs >= 1_000_000) return `${(abs / 1_000_000).toFixed(0)}M`;
+  if (abs >= 1_000) return `${(abs / 1_000).toFixed(0)}K`;
+  return abs.toFixed(0);
+};
+
+// Tooltip currency formatter (still detailed)
 const formatCurrency = (value: number): string => {
   const abs = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-  if (abs >= 1_000_000_000)
-    return `${sign}$${(abs / 1_000_000_000).toFixed(2)}B`;
+  if (abs >= 1_000_000_000) return `${sign}$${(abs / 1_000_000_000).toFixed(2)}B`;
   if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(2)}M`;
   if (abs >= 1_000) return `${sign}$${(abs / 1_000).toFixed(2)}K`;
   return `${sign}$${abs.toFixed(0)}`;
+};
+
+// Format date string to "Jan 9"
+const formatShortDate = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  const month = date.toLocaleString("default", { month: "short" });
+  return `${month} ${date.getDate()}`;
 };
 
 // Custom tooltip renderer
@@ -146,9 +161,7 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
   }, [fund]);
 
   return (
-    <Container
-      maxWidth="xl"
-    >
+    <Container maxWidth="xl">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -196,10 +209,11 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
               >
                 <XAxis
                   dataKey="date"
+                  tickFormatter={formatShortDate}
                   tick={{ fill: "#002060", fontWeight: 400 }}
                 />
                 <YAxis
-                  tickFormatter={formatCurrency}
+                  tickFormatter={formatShortCurrency}
                   tick={{ fill: "#002060", fontWeight: 400 }}
                 >
                   <Label
