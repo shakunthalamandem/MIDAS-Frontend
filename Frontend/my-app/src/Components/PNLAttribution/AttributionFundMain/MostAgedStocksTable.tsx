@@ -72,7 +72,7 @@ const MostAgedStocksTable: React.FC<MostAgedStocksTableProps> = ({ fund }) => {
     { field: "first_trade_date", headerName: "Issue Date", flex: 1 },
     {
       field: "cumulative_pnl",
-      headerName: "YTD PnL",
+      headerName: "YTD P&L",
       flex: 1,
       renderCell: ({ value }) => (
         <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>

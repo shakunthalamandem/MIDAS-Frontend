@@ -105,7 +105,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
     },
     {
       field: "total_pnl",
-      headerName: "Daily PnL",
+      headerName: "Daily P&L",
       flex: 1,
       renderCell: ({ value }) => (
         <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
@@ -115,7 +115,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
     },
     {
       field: "ytd_pnl",
-      headerName: "YTD PnL",
+      headerName: "YTD P&L",
       flex: 1,
       renderCell: ({ value }) => (
         <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
