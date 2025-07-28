@@ -34,7 +34,6 @@ import News from "../Components/Macro/News";
 import ConvertsMain from "../Components/Converts/ConvertsMain";
 import ConvertsDealStatsMain from "../Components/Converts/Tabs/ConvertsDealStatsMain";
 import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
-import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 
 
 
@@ -62,7 +61,6 @@ import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
-import PerplexityChat from "../Components/GhcAi/PerplexityChat";
 import GHCAIMain from "../Components/GhcAi/GHCAIMain";
 
 
@@ -205,7 +203,6 @@ const AppRouters: React.FC = () => {
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
-        <Route path="/ghcAI" element={<AuthGuard><PerplexityChat /></AuthGuard>} />
 
         <Route path="/genai" element={<AuthGuard><GHCAIMain /></AuthGuard>} />
 
