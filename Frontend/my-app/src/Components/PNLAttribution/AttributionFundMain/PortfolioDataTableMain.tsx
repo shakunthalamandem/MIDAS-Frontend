@@ -95,7 +95,9 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
       field: "total_quantity",
       headerName: "Quantity",
       flex: 1,
-      renderCell: ({ value }) => (value === null || value === undefined ? "-" : value),
+      renderCell: ({ value }) =>
+        value === null || value === undefined ? "-" :value.toLocaleString("en-IN")
+,
     },
     {
       field: "total_days_held",
@@ -184,7 +186,6 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
                       fontWeight: "bold",
                       fontSize: "13px",
                     },
-           
                     "& .MuiDataGrid-cell": {
                       fontSize: "13px",
                     },
