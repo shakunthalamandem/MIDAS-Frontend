@@ -49,24 +49,21 @@ const SECTOR_ORDER = [
   "Materials",
   "Real Estate",
   "Utilities",
-  // "Other",
 ];
 
 const COLORS_BY_SECTOR: Record<string, string> = {
-  "Consumer Discretionary": "#5E35B1",    // Deep Purple
-  "Consumer Staples": "#00897B",          // Teal
-  "Communication Services": "#3949AB",    // Indigo
-  Energy: "#F4511E",                      // Orange Red
-  Financials: "#1E88E5",                  // Blue
-  "Health Care": "#43A047",              // Green
-  Industrials: "#6D4C41",                 // Brown
-  "Information Technology": "#3949AB",    // Indigo
-  Materials: "#8D6E63",                   // Taupe/Brown Grey
-  "Real Estate": "#8E24AA",               // Purple
-  Utilities: "#FBC02D",                   // Yellow
-  // "Other": "#B0BEC5",                  // Optional muted blue-grey
+  "Consumer Discretionary": "#5E35B1",
+  "Consumer Staples": "#00897B",
+  "Communication Services": "#3949AB",
+  Energy: "#F4511E",
+  Financials: "#1E88E5",
+  "Health Care": "#43A047",
+  Industrials: "#6D4C41",
+  "Information Technology": "#3949AB",
+  Materials: "#8D6E63",
+  "Real Estate": "#8E24AA",
+  Utilities: "#FBC02D",
 };
-
 
 const formatNumber = (value: number): string => {
   const abs = Math.abs(value);
@@ -74,10 +71,10 @@ const formatNumber = (value: number): string => {
     abs >= 1e9
       ? `${(abs / 1e9).toFixed(2)}B`
       : abs >= 1e6
-        ? `${(abs / 1e6).toFixed(2)}M`
-        : abs >= 1e3
-          ? `${(abs / 1e3).toFixed(2)}K`
-          : abs.toFixed(2);
+      ? `${(abs / 1e6).toFixed(2)}M`
+      : abs >= 1e3
+      ? `${(abs / 1e3).toFixed(2)}K`
+      : abs.toFixed(2);
   return value < 0 ? `-$${result}` : `$${result}`;
 };
 
@@ -87,10 +84,10 @@ const formatTotalNumber = (value: number): string => {
     abs >= 1e9
       ? `${(abs / 1e9).toFixed(1)}B`
       : abs >= 1e6
-        ? `${(abs / 1e6).toFixed(1)}M`
-        : abs >= 1e3
-          ? `${(abs / 1e3).toFixed(1)}K`
-          : abs.toFixed(1);
+      ? `${(abs / 1e6).toFixed(1)}M`
+      : abs >= 1e3
+      ? `${(abs / 1e3).toFixed(1)}K`
+      : abs.toFixed(1);
   return value < 0 ? `$(${result})` : `$${result}`;
 };
 
@@ -109,6 +106,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
   const [mtdData, setMtdData] = useState<SectorData[]>([]);
   const [ytdData, setYtdData] = useState<SectorData[]>([]);
   const [totals, setTotals] = useState<TotalsData | null>(null);
+  const [otherValues, setOtherValues] = useState<Record<string, number>>({});
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -136,17 +134,19 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
           result?.mtd_pnl &&
           result?.totals
         ) {
-          const formatData = (raw: Record<string, number>): SectorData[] => {
+          const formatData = (raw: Record<string, number>, key: string) => {
+            const other = raw["Other"] ?? 0;
+            setOtherValues((prev) => ({ ...prev, [key]: other }));
             return SECTOR_ORDER.map((sector) => ({
               sector,
               value: raw[sector] ?? 0,
             }));
           };
 
-          setExposureData(formatData(result.exposure));
-          setDtdData(formatData(result.dtd_pnl));
-          setMtdData(formatData(result.mtd_pnl));
-          setYtdData(formatData(result.ytd_pnl));
+          setExposureData(formatData(result.exposure, "exposure"));
+          setDtdData(formatData(result.dtd_pnl, "dtd"));
+          setMtdData(formatData(result.mtd_pnl, "mtd"));
+          setYtdData(formatData(result.ytd_pnl, "ytd"));
           setTotals(result.totals);
         } else {
           setError("Invalid response format.");
@@ -194,7 +194,8 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
     data: SectorData[],
     showYAxis: boolean,
     symmetricMax?: number,
-    totalValue?: number
+    totalValue?: number,
+    otherKey?: string
   ) => (
     <Box flex={1}>
       <Typography
@@ -266,6 +267,23 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
           Total {title}: {formatTotalNumber(totalValue)}
         </Typography>
       )}
+
+      {otherKey && otherValues[otherKey] !== undefined && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          sx={{ mt: 0.5 }}
+        >
+          <InfoIcon sx={{ color: "gray", mr: 1, fontSize: "1rem" }} />
+          <Typography
+            variant="body2"
+            sx={{ color: "gray", fontSize: "1rem" }}
+          >
+            Hedging: {formatNumber(otherValues[otherKey])}
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 
@@ -290,7 +308,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
               sx={{ color: "#002060", fontWeight: 600, mb: 3 }}
               align="center"
             >
-              Sector-wise Exposure, DTD and MTD P&L for {fund}
+              Sector-wise Exposure, DTD, MTD, and YTD P&L for {fund}
             </Typography>
 
             <Box display="flex" gap={3}>
@@ -299,28 +317,41 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
                 exposureData,
                 true,
                 undefined,
-                totals?.exposure
+                totals?.exposure,
+                "exposure"
               )}
-              {renderChart("DTD P&L", dtdData, false, dtdMax, totals?.dtd_pnl)}
-              {renderChart("MTD P&L", mtdData, false, mtdMax, totals?.mtd_pnl)}
-              {renderChart("YTD P&L", ytdData, false, ytdMax, totals?.ytd_pnl)}
+              {renderChart(
+                "DTD P&L",
+                dtdData,
+                false,
+                dtdMax,
+                totals?.dtd_pnl,
+                "dtd"
+              )}
+              {renderChart(
+                "MTD P&L",
+                mtdData,
+                false,
+                mtdMax,
+                totals?.mtd_pnl,
+                "mtd"
+              )}
+              {renderChart(
+                "YTD P&L",
+                ytdData,
+                false,
+                ytdMax,
+                totals?.ytd_pnl,
+                "ytd"
+              )}
             </Box>
+
             <Box
               display="flex"
               justifyContent="center"
               alignItems="center"
               mt={2}
             >
-              <InfoIcon sx={{ color: "gray", mr: 1, fontSize: "1rem" }} />
-              <Typography
-                sx={{
-                  fontStyle: "italic",
-                  color: "gray",
-                  fontSize: "0.9rem",
-                }}
-              >
-                Others are excluded because it contains hedging.
-              </Typography>
             </Box>
           </CardContent>
         </Card>
