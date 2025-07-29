@@ -77,7 +77,7 @@ const monasheeUploadConfigs = [
   {
     key: "DailyNoteUpload",
     label: "Daily Note Upload",
-    apiEndpoint: "daily_note_upload",
+    apiEndpoint: "daily_note_deals_upload",
     buttonColor: "success",
   },
 ];
