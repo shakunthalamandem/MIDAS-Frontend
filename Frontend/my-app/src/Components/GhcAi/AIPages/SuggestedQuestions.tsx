@@ -7,7 +7,7 @@ import {
   Paper,
   Fade,
 } from "@mui/material";
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 interface SuggestedQuestionsProps {
   questions: string[];
@@ -18,6 +18,8 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
   questions,
   onSelect,
 }) => {
+  if (!questions || questions.length === 0) return null;
+
   return (
     <Fade in timeout={600}>
       <Paper
@@ -36,26 +38,31 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={1} flexWrap="wrap">
-          {questions.map((q, idx) => (
-            <Chip
-              key={idx}
-              label={q}
-              onClick={() => onSelect?.(q)}
-              sx={{
-                m: 0.5,
-                cursor: "pointer",
-                background: "linear-gradient(45deg, #e3f2fd, #bbdefb)",
-                "&:hover": {
-                  background: "linear-gradient(45deg, #90caf9, #64b5f6)",
-                  color: "#fff",
-                },
-                fontSize: "0.875rem",
-              }}
-              variant="outlined"
-            />
-          ))}
-        </Stack>
+        <Box>
+          <Stack direction="row" spacing={1} flexWrap="wrap">
+            {questions.map((q, idx) => (
+              <Chip
+                key={idx}
+                label={q}
+                title={q}
+                onClick={() => onSelect?.(q)}
+                sx={{
+                  m: 0.5,
+                  cursor: "pointer",
+                  background: "linear-gradient(45deg, #e3f2fd, #bbdefb)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background: "linear-gradient(45deg, #90caf9, #64b5f6)",
+                    color: "#fff",
+                    boxShadow: 2,
+                  },
+                  fontSize: "0.875rem",
+                }}
+                variant="outlined"
+              />
+            ))}
+          </Stack>
+        </Box>
       </Paper>
     </Fade>
   );

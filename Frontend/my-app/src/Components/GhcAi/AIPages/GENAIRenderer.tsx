@@ -8,8 +8,13 @@ import GENAILinkBlock from "./GENAILinkBlock";
 import GENAITableBlock from "./GENAITableBlock";
 import SuggestedQuestions from "./SuggestedQuestions";
 
-// Add to the BlockType union
-type BlockType = "text" | "table" | "card" | "link" | "chart" | "suggested_questions";
+type BlockType =
+  | "text"
+  | "table"
+  | "card"
+  | "link"
+  | "chart"
+  | "suggested_questions";
 
 interface BaseBlock {
   type: BlockType;
@@ -52,10 +57,9 @@ interface ChartBlock extends BaseBlock {
 
 interface SuggestedQuestionsBlock extends BaseBlock {
   type: "suggested_questions";
-  questions: string[]; // ✅ This was missing
+  questions: string[];
 }
 
-// ✅ Add SuggestedQuestionsBlock to the union
 type Block =
   | TextBlock
   | TableBlock
@@ -64,61 +68,83 @@ type Block =
   | ChartBlock
   | SuggestedQuestionsBlock;
 
-const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => (
-  <Grid container spacing={2}>
-    {blocks.map((block, idx) => {
-      let content: React.ReactNode;
+const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
+  return (
+    <Grid container spacing={2}>
+      {blocks.map((block, idx) => {
+        let content: React.ReactNode;
 
-      switch (block.type) {
-        case "text":
-          content = <GENAITextBlock content={block.content} />;
-          break;
-        case "table":
-          content = <GENAITableBlock headers={block.headers} rows={block.rows} />;
-          break;
-        case "card":
-          content = (
-            <GENAICardBlock
-              title={block.title}
-              subtitle={block.subtitle}
-              description={block.description}
-              icon={block.icon}
-            />
-          );
-          break;
-        case "link":
-          content = <GENAILinkBlock text={block.text} url={block.url} />;
-          break;
-        case "chart":
-          content = (
-            <GENAIChartBlock
-              chartType={block.chartType}
-              data={block.data}
-              title={block.title}
-            />
-          );
-          break;
-        case "suggested_questions":
-          content = <SuggestedQuestions questions={block.questions} />;
-          break;
-        default:
-          content = <div>Unsupported type: {(block as any).type}</div>;
-      }
+        switch (block.type) {
+          case "text":
+            content = <GENAITextBlock content={block.content} />;
+            break;
+          case "table":
+            content = (
+              <GENAITableBlock
+                headers={block.headers}
+                rows={block.rows}
+              />
+            );
+            break;
+          case "card":
+            content = (
+              <GENAICardBlock
+                title={block.title}
+                subtitle={block.subtitle}
+                description={block.description}
+                icon={block.icon}
+              />
+            );
+            break;
+          case "link":
+            content = (
+              <GENAILinkBlock
+                text={block.text}
+                url={block.url}
+              />
+            );
+            break;
+          case "chart":
+            content = (
+              <GENAIChartBlock
+                chartType={block.chartType}
+                title={block.title}
+                data={block.data}
+              />
+            );
+            break;
+          case "suggested_questions":
+            content = (
+              <SuggestedQuestions questions={block.questions} />
+            );
+            break;
+          default:
+            content = (
+              <div>
+                Unsupported block type:{" "}
+                {(block as any).type ?? "unknown"}
+              </div>
+            );
+        }
 
-      return (
-        <Grid
-          item
-          xs={12}
-          sm={12}
-          md={6}
-          lg={block.total_columns === 4 ? 12 : 6}
-          key={idx}
-        >
-          {content}
-        </Grid>
-      );
-    })}
-  </Grid>
-);
+        // Responsive column logic
+        const gridColumns = block.total_columns === 4 ? 12 : 6;
+
+        return (
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={gridColumns}
+            lg={gridColumns}
+            key={idx}
+          >
+            {content}
+          </Grid>
+        );
+      })}
+    </Grid>
+  );
+};
 
 export default GENAIRenderer;
