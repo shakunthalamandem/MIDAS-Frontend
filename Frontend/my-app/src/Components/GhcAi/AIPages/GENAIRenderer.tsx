@@ -8,14 +8,13 @@ import GENAILinkBlock from "./GENAILinkBlock";
 import GENAITableBlock from "./GENAITableBlock";
 import SuggestedQuestions from "./SuggestedQuestions";
 
-// Block types
 type BlockType =
   | "text"
   | "table"
   | "card"
   | "link"
   | "chart"
-  | "suggested_questions";
+  // | "suggested_questions";
 
 interface BaseBlock {
   type: BlockType;
@@ -24,16 +23,17 @@ interface BaseBlock {
   column?: number;
 }
 
-// Block interfaces
 interface TextBlock extends BaseBlock {
   type: "text";
   content: string;
 }
+
 interface TableBlock extends BaseBlock {
   type: "table";
   headers: string[];
   rows: string[][];
 }
+
 interface CardBlock extends BaseBlock {
   type: "card";
   title: string;
@@ -41,21 +41,24 @@ interface CardBlock extends BaseBlock {
   description: string;
   icon?: string;
 }
+
 interface LinkBlock extends BaseBlock {
   type: "link";
   text: string;
   url: string;
 }
+
 interface ChartBlock extends BaseBlock {
   type: "chart";
   chartType: string;
   title: string;
   data: any;
 }
-interface SuggestedQuestionsBlock extends BaseBlock {
-  type: "suggested_questions";
-  questions: string[];
-}
+
+// interface SuggestedQuestionsBlock extends BaseBlock {
+//   type: "suggested_questions";
+//   questions: string[];
+// }
 
 type Block =
   | TextBlock
@@ -63,9 +66,8 @@ type Block =
   | CardBlock
   | LinkBlock
   | ChartBlock
-  | SuggestedQuestionsBlock;
+  // | SuggestedQuestionsBlock;
 
-// Renderer map
 const BLOCK_RENDERERS: Record<
   BlockType,
   (block: any) => JSX.Element
@@ -74,10 +76,7 @@ const BLOCK_RENDERERS: Record<
     <GENAITextBlock content={block.content} />
   ),
   table: (block: TableBlock) => (
-    <GENAITableBlock
-      headers={block.headers}
-      rows={block.rows}
-    />
+    <GENAITableBlock headers={block.headers} rows={block.rows} />
   ),
   card: (block: CardBlock) => (
     <GENAICardBlock
@@ -97,31 +96,58 @@ const BLOCK_RENDERERS: Record<
       data={block.data}
     />
   ),
-  suggested_questions: (block: SuggestedQuestionsBlock) => (
-    <SuggestedQuestions questions={block.questions} />
-  ),
+  // suggested_questions: (block: SuggestedQuestionsBlock) => (
+  //   <SuggestedQuestions questions={block.questions} />
+  // ),
 };
 
-const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => (
-  <Grid container spacing={2}>
-    {blocks.map((block, idx) => {
-      const Renderer = BLOCK_RENDERERS[block.type];
-      const gridColumns = block.total_columns === 4 ? 12 : 6;
+const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
+  // 1. Group by row
+  const groupedByRow: Record<number, Block[]> = {};
+  blocks.forEach((block) => {
+    const row = block.row ?? 0;
+    if (!groupedByRow[row]) groupedByRow[row] = [];
+    groupedByRow[row].push(block);
+  });
 
-      return (
-        <Grid
-          item
-          xs={12}
-          sm={12}
-          md={gridColumns}
-          lg={gridColumns}
-          key={idx}
-        >
-          {Renderer ? Renderer(block) : <div>Unsupported block type: {block.type}</div>}
-        </Grid>
-      );
-    })}
-  </Grid>
-);
+  // 2. Sort rows by row number
+  const sortedRows = Object.entries(groupedByRow).sort(
+    ([a], [b]) => Number(a) - Number(b)
+  );
+
+  return (
+    <>
+      {sortedRows.map(([rowKey, rowBlocks]) => {
+        // 3. Sort blocks in the row by column
+        const sortedBlocks = rowBlocks.sort(
+          (a, b) => (a.column ?? 0) - (b.column ?? 0)
+        );
+
+        return (
+          <Grid container spacing={2} key={`row-${rowKey}`}>
+            {sortedBlocks.map((block, idx) => {
+              const Renderer = BLOCK_RENDERERS[block.type];
+              const totalCols = block.total_columns || 1;
+              const gridSize = Math.floor(12 / totalCols); // 12 columns total in MUI
+
+              return (
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={gridSize}
+                  lg={gridSize}
+                  key={idx}
+                >
+                  {Renderer ? Renderer(block) : <div>Unknown type: {block.type}</div>}
+                </Grid>
+              );
+            })}
+          </Grid>
+        );
+      })}
+    </>
+  );
+};
 
 export default GENAIRenderer;

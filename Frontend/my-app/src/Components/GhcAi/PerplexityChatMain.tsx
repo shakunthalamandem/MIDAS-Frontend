@@ -6,9 +6,9 @@ import {
   Typography,
   Paper,
   CircularProgress,
-  Fade,
 } from "@mui/material";
-import GHCAIMain from "./GHCAIMain"; // Import the renderer
+import GHCAIMain from "./GHCAIMain";
+import SuggestedQuestions from "./AIPages/SuggestedQuestions";
 
 const PerplexityChatMain: React.FC = () => {
   const [question, setQuestion] = useState("");
@@ -19,8 +19,9 @@ const PerplexityChatMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent | Event) => {
+    if (e?.preventDefault) e.preventDefault();
+
     if (!question.trim()) return;
 
     setLoading(true);
@@ -48,7 +49,7 @@ const PerplexityChatMain: React.FC = () => {
       }
 
       if (Array.isArray(result.answer)) {
-        setData(result.answer); 
+        setData(result.answer);
       } else {
         throw new Error("Invalid response format");
       }
@@ -138,6 +139,16 @@ const PerplexityChatMain: React.FC = () => {
       </Paper>
 
       <GHCAIMain data={data} loading={loading} error={error} />
+
+      <Box mt={4} maxWidth={700} width="100%" px={2}>
+        <SuggestedQuestions
+          questions={data.find((block) => block.type === "suggested_questions")?.questions || []}
+          onSelect={(selected) => {
+            setQuestion(selected);
+            handleSubmit();
+          }}
+        />
+      </Box>
     </Box>
   );
 };
