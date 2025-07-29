@@ -6,75 +6,22 @@ import GENAICardBlock from "./GENAICardBlock";
 import GENAIChartBlock from "./GENAIChartBlock";
 import GENAILinkBlock from "./GENAILinkBlock";
 import GENAITableBlock from "./GENAITableBlock";
-import SuggestedQuestions from "./SuggestedQuestions";
+import GENAIImageCard from "./GENAIImageCard";
+import GENAIVideoCard from "./GENAIVideoCard";
 
-type BlockType =
-  | "text"
-  | "table"
-  | "card"
-  | "link"
-  | "chart"
-  // | "suggested_questions";
-
-interface BaseBlock {
-  type: BlockType;
-  total_columns?: number;
-  row?: number;
-  column?: number;
-}
-
-interface TextBlock extends BaseBlock {
-  type: "text";
-  content: string;
-}
-
-interface TableBlock extends BaseBlock {
-  type: "table";
-  headers: string[];
-  rows: string[][];
-}
-
-interface CardBlock extends BaseBlock {
-  type: "card";
-  title: string;
-  subtitle: string;
-  description: string;
-  icon?: string;
-}
-
-interface LinkBlock extends BaseBlock {
-  type: "link";
-  text: string;
-  url: string;
-}
-
-interface ChartBlock extends BaseBlock {
-  type: "chart";
-  chartType: string;
-  title: string;
-  data: any;
-}
-
-// interface SuggestedQuestionsBlock extends BaseBlock {
-//   type: "suggested_questions";
-//   questions: string[];
-// }
-
-type Block =
-  | TextBlock
-  | TableBlock
-  | CardBlock
-  | LinkBlock
-  | ChartBlock
-  // | SuggestedQuestionsBlock;
-
-const BLOCK_RENDERERS: Record<
+import {
+  Block,
   BlockType,
-  (block: any) => JSX.Element
-> = {
-  text: (block: TextBlock) => (
-    <GENAITextBlock content={block.content} />
-  ),
+  TextBlock,
+  TableBlock,
+  CardBlock,
+  LinkBlock,
+  ChartBlock,
+  ImageBlock,
+  VideoBlock,
+} from "../Utils/ComponentsUtils";
+const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
+  text: (block: TextBlock) => <GENAITextBlock content={block.content} />,
   table: (block: TableBlock) => (
     <GENAITableBlock headers={block.headers} rows={block.rows} />
   ),
@@ -96,13 +43,26 @@ const BLOCK_RENDERERS: Record<
       data={block.data}
     />
   ),
-  // suggested_questions: (block: SuggestedQuestionsBlock) => (
-  //   <SuggestedQuestions questions={block.questions} />
-  // ),
+  image: (block: ImageBlock) => (
+    <GENAIImageCard
+      title={block.title}
+      description={block.description}
+      url={block.url}
+      alt={block.alt}
+    />
+  ),
+  video: (block: VideoBlock) => (
+    <GENAIVideoCard
+      title={block.title}
+      description={block.description}
+      url={block.url}
+      thumbnail={block.thumbnail}
+    />
+  ),
 };
 
 const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
-  // 1. Group by row
+  // Group blocks by row
   const groupedByRow: Record<number, Block[]> = {};
   blocks.forEach((block) => {
     const row = block.row ?? 0;
@@ -110,7 +70,6 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
     groupedByRow[row].push(block);
   });
 
-  // 2. Sort rows by row number
   const sortedRows = Object.entries(groupedByRow).sort(
     ([a], [b]) => Number(a) - Number(b)
   );
@@ -118,7 +77,6 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
   return (
     <>
       {sortedRows.map(([rowKey, rowBlocks]) => {
-        // 3. Sort blocks in the row by column
         const sortedBlocks = rowBlocks.sort(
           (a, b) => (a.column ?? 0) - (b.column ?? 0)
         );
@@ -128,7 +86,7 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
             {sortedBlocks.map((block, idx) => {
               const Renderer = BLOCK_RENDERERS[block.type];
               const totalCols = block.total_columns || 1;
-              const gridSize = Math.floor(12 / totalCols); // 12 columns total in MUI
+              const gridSize = Math.floor(12 / totalCols);
 
               return (
                 <Grid

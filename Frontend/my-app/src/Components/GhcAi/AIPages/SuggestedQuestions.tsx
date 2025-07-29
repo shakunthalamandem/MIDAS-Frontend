@@ -39,7 +39,7 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
         </Box>
 
         <Box>
-          <Stack direction="row" spacing={1} flexWrap="wrap">
+          <Stack direction="row" spacing={0} flexWrap="wrap">
             {questions.map((q, idx) => (
               <Chip
                 key={idx}
@@ -47,9 +47,9 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
                 title={q}
                 onClick={() => onSelect?.(q)}
                 sx={{
-                  m: 0.5,
+                  m: 1,
                   cursor: "pointer",
-                  background: "linear-gradient(45deg, #e3f2fd, #bbdefb)",
+                  background: "linear-gradient(45deg, #eee8d3ff, #d0dce6ff)",
                   transition: "all 0.3s ease",
                   "&:hover": {
                     background: "linear-gradient(45deg, #90caf9, #64b5f6)",
