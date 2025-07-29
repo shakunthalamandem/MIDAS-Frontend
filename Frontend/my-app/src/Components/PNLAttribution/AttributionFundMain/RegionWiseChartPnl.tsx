@@ -243,7 +243,7 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ height: 450 }}>
+    <Container maxWidth="xl" sx={{ height: 450 ,mb:8}} >
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}

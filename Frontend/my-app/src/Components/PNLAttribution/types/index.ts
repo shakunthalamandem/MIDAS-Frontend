@@ -71,7 +71,7 @@ export const dealGridColumns: GridColDef[] = [
     field: "deal_size",
     headerName: "Deal Size",
     flex: 1,
-    valueFormatter: (params) => formatNumber(params),
+    valueFormatter: (params) => currencyFormatter.format(params),
   },
   {
     field: "issue_offer_price",
@@ -145,16 +145,17 @@ export const dealGridColumns: GridColDef[] = [
     flex: 1,
     valueFormatter: (params) => currencyFormatter.format(params),
   },
+    {
+    field: "pnl",
+    headerName: "P&L",
+    flex: 1,
+    valueFormatter: (params) => `${numberFormatter1.format(params)}`,
+  },
   {
     field: "exposure_percentage_lmv",
     headerName: "Exposure as % of LMV",
     flex: 1,
 valueFormatter: (params) => `${formatNumber(params)}%`,
   },
-  {
-    field: "pnl",
-    headerName: "P&L",
-    flex: 1,
-    valueFormatter: (params) => `${numberFormatter1.format(params)}`,
-  },
+
 ];
