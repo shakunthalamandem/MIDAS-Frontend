@@ -83,24 +83,27 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
 
         return (
           <Grid container spacing={2} key={`row-${rowKey}`}>
-            {sortedBlocks.map((block, idx) => {
-              const Renderer = BLOCK_RENDERERS[block.type];
-              const totalCols = block.total_columns || 1;
-              const gridSize = Math.floor(12 / totalCols);
+ {sortedBlocks.map((block, idx) => {
+  const Renderer = BLOCK_RENDERERS[block.type];
+  if (!Renderer) return null; 
 
-              return (
-                <Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={gridSize}
-                  lg={gridSize}
-                  key={idx}
-                >
-                  {Renderer ? Renderer(block) : <div>Unknown type: {block.type}</div>}
-                </Grid>
-              );
-            })}
+  const totalCols = block.total_columns || 1;
+  const gridSize = Math.floor(12 / totalCols);
+
+  return (
+    <Grid
+      item
+      xs={12}
+      sm={12}
+      md={gridSize}
+      lg={gridSize}
+      key={idx}
+    >
+      {Renderer(block)}
+    </Grid>
+  );
+})}
+
           </Grid>
         );
       })}
