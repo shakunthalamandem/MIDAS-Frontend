@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardContent, CardHeader, Typography } from "@mui/material";
-import { getRandomBgColor } from "../Utils/colorUtils";
 import ReactMarkdown from "react-markdown";
 
 const GENAICardBlock: React.FC<{
@@ -11,15 +10,31 @@ const GENAICardBlock: React.FC<{
 }> = ({ title, subtitle, description }) => (
   <Card
     sx={{
-      bgcolor: getRandomBgColor(),
+      bgcolor: "#6A1B9A", // Deep Purple
+      color: "#fff",
       m: 2,
-      transition: "transform 0.3s",
-      "&:hover": { transform: "scale(1.03)" },
+      borderRadius: 3,
+      boxShadow: 4,
+      height: "100%", // <== Crucial
+      display: "flex",
+      flexDirection: "column",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+      "&:hover": {
+        transform: "scale(1.03)",
+        boxShadow: 6,
+      },
     }}
   >
-    <CardHeader title={title} subheader={subtitle} />
-    <CardContent>
-      <Typography variant="body2" component="div">
+    <CardHeader
+      title={title}
+      subheader={subtitle}
+      sx={{
+        color: "#fff",
+        pb: 0,
+      }}
+    />
+    <CardContent sx={{ flexGrow: 1 }}>
+      <Typography variant="body2" component="div" sx={{ color: "#fff" }}>
         <ReactMarkdown>{description}</ReactMarkdown>
       </Typography>
     </CardContent>

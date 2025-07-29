@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid } from "@mui/material";
+import { Grid, Box } from "@mui/material";
 
 import GENAITextBlock from "./GENAITextBlock";
 import GENAICardBlock from "./GENAICardBlock";
@@ -20,6 +20,7 @@ import {
   ImageBlock,
   VideoBlock,
 } from "../Utils/ComponentsUtils";
+
 const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
   text: (block: TextBlock) => <GENAITextBlock content={block.content} />,
   table: (block: TableBlock) => (
@@ -82,28 +83,39 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
         );
 
         return (
-          <Grid container spacing={2} key={`row-${rowKey}`}>
- {sortedBlocks.map((block, idx) => {
-  const Renderer = BLOCK_RENDERERS[block.type];
-  if (!Renderer) return null; 
+          <Grid
+            container
+            spacing={3}
+            key={`row-${rowKey}`}
+            sx={{ mb: 2, alignItems: "stretch" }}
+          >
+            {sortedBlocks.map((block, idx) => {
+              const Renderer = BLOCK_RENDERERS[block.type];
+              if (!Renderer) return null;
 
-  const totalCols = block.total_columns || 1;
-  const gridSize = Math.floor(12 / totalCols);
+              const totalCols = block.total_columns || 1;
+              const gridSize =
+                totalCols >= 1 && totalCols <= 12
+                  ? Math.floor(12 / totalCols)
+                  : 12;
 
-  return (
-    <Grid
-      item
-      xs={12}
-      sm={12}
-      md={gridSize}
-      lg={gridSize}
-      key={idx}
-    >
-      {Renderer(block)}
-    </Grid>
-  );
-})}
-
+              return (
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={gridSize}
+                  lg={gridSize}
+                  key={idx}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Box sx={{ flexGrow: 1 }}>{Renderer(block)}</Box>
+                </Grid>
+              );
+            })}
           </Grid>
         );
       })}
