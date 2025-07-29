@@ -6,19 +6,40 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
+
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  Label,
-} from "recharts";
+  CategoryScale,
+  TimeScale,
+  ChartOptions,
+  ChartData,
+} from "chart.js";
+
+import zoomPlugin from "chartjs-plugin-zoom";
+import "chartjs-adapter-date-fns";
+
+import { Line } from "react-chartjs-2";
 import { motion } from "framer-motion";
 
-// Define the API response shape
+// Register necessary chart.js components & plugins
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  TimeScale,
+  Title,
+  Tooltip,
+  Legend,
+  zoomPlugin
+);
+
 type RegionPnlResponse = {
   [region: string]: {
     date: string;
@@ -30,7 +51,6 @@ interface Props {
   fund: string;
 }
 
-// Custom colors for each region
 const REGION_COLORS: Record<string, string> = {
   US: "#da7c12",
   APAC: "#b3ca18",
@@ -38,7 +58,7 @@ const REGION_COLORS: Record<string, string> = {
   "Non-US America": "#000000",
 };
 
-// Simplified formatter for Y-axis (e.g. 3M instead of $3.00M)
+// Formatters
 const formatShortCurrency = (value: number): string => {
   const abs = Math.abs(value);
   if (abs >= 1_000_000_000) return `${(abs / 1_000_000_000).toFixed(0)}B`;
@@ -47,7 +67,6 @@ const formatShortCurrency = (value: number): string => {
   return abs.toFixed(0);
 };
 
-// Tooltip currency formatter (still detailed)
 const formatCurrency = (value: number): string => {
   const abs = Math.abs(value);
   const sign = value < 0 ? "-" : "";
@@ -57,59 +76,14 @@ const formatCurrency = (value: number): string => {
   return `${sign}$${abs.toFixed(0)}`;
 };
 
-// Format date string to "Jan 9"
 const formatShortDate = (dateStr: string): string => {
   const date = new Date(dateStr);
   const month = date.toLocaleString("default", { month: "short" });
   return `${month} ${date.getDate()}`;
 };
 
-// Custom tooltip renderer
-const CustomTooltip = ({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean;
-  payload?: any[];
-  label?: string;
-}) => {
-  if (active && payload && payload.length > 0) {
-    return (
-      <Box
-        sx={{
-          backgroundColor: "#ffffff",
-          border: "1px solid #ccc",
-          borderRadius: 2,
-          padding: 1.5,
-          boxShadow: 3,
-        }}
-      >
-        <Typography variant="subtitle2" fontWeight="bold">
-          📌 {label}
-        </Typography>
-        {payload.map((entry, index) => (
-          <Box key={index} display="flex" justifyContent="space-between">
-            <Typography
-              variant="body2"
-              sx={{ color: entry.color, fontWeight: 500 }}
-            >
-              {entry.name}
-            </Typography>
-            <Typography variant="body2">
-              {formatCurrency(entry.value)}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
-    );
-  }
-  return null;
-};
-
 const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
-  const [chartData, setChartData] = useState<any[]>([]);
-  const [regions, setRegions] = useState<string[]>([]);
+  const [chartData, setChartData] = useState<ChartData<"line"> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -137,35 +111,145 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
 
         const responseData: RegionPnlResponse = await res.json();
         const regionNames = Object.keys(responseData);
+        if (regionNames.length === 0) {
+          setChartData(null);
+          setLoading(false);
+          return;
+        }
 
+        // Extract dates
         const dates = responseData[regionNames[0]].map((entry) => entry.date);
-        const normalizedData = dates.map((date, index) => {
-          const point: any = { date };
-          regionNames.forEach((region) => {
-            point[region] = responseData[region][index]?.pnl ?? 0;
-          });
-          return point;
-        });
 
-        setChartData(normalizedData);
-        setRegions(regionNames);
+        // Prepare datasets for chart.js
+        const datasets = regionNames.map((region) => ({
+          label: region,
+          data: responseData[region].map((entry) => ({
+  x: new Date(entry.date).getTime(), // number timestamp
+  y: entry.pnl,
+})),
+
+          borderColor: REGION_COLORS[region] || "#888888",
+          backgroundColor: REGION_COLORS[region] || "#888888",
+          fill: false,
+          tension: 0.1,
+          pointRadius: 0,
+          borderWidth: 2.5,
+        }));
+
+        setChartData({
+          datasets,
+        });
       } catch (err) {
         console.error("Failed to fetch region PnL data:", err);
         setError("Failed to fetch data.");
+        setChartData(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [fund]);
+  }, [fund, apiUrl, token]);
+
+  const options: ChartOptions<"line"> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: "nearest",
+      axis: "x",
+      intersect: false,
+    },
+    scales: {
+      x: {
+        type: "time",
+        time: {
+          tooltipFormat: "MMM dd yyyy",
+          unit: "day",
+          displayFormats: {
+            day: "MMM dd",
+          },
+        },
+        ticks: {
+          color: "#002060",
+          maxRotation: 0,
+          autoSkip: true,
+          maxTicksLimit: 10,
+        },
+        title: {
+          display: true,
+          text: "Date",
+          color: "#002060",
+          font: {
+            weight: "bold",
+          },
+        },
+      },
+      y: {
+        ticks: {
+          callback: (val) => formatShortCurrency(Number(val)),
+          color: "#002060",
+        },
+        title: {
+          display: true,
+          text: "P&L",
+          color: "#002060",
+          font: {
+            weight: "bold",
+          },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          font: {
+            weight: "bold",
+          },
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) =>
+            `${context.dataset.label}: ${formatCurrency(Number(context.parsed.y))}`,
+          title: (context) => {
+            if (context.length > 0) {
+              const date = context[0].parsed.x;
+              return new Date(date).toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              });
+            }
+            return "";
+          },
+        },
+      },
+      zoom: {
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: "x",
+        },
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
+      },
+    },
+  };
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" sx={{ height: 450 }}>
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
+        style={{ height: "100%" }}
       >
         <Card
           elevation={6}
@@ -174,6 +258,9 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
             borderRadius: 4,
             background: "linear-gradient(to bottom, #ffffff, #f1f8e9)",
             boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Typography
@@ -192,57 +279,21 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
           </Typography>
 
           {loading ? (
-            <Box display="flex" justifyContent="center" py={4}>
+            <Box display="flex" justifyContent="center" py={4} flexGrow={1}>
               <CircularProgress />
             </Box>
           ) : error ? (
-            <Typography color="error" align="center">
+            <Typography color="error" align="center" flexGrow={1}>
               {error}
             </Typography>
-          ) : chartData.length === 0 ? (
-            <Typography align="center">No data available</Typography>
+          ) : !chartData ? (
+            <Typography align="center" flexGrow={1}>
+              No data available
+            </Typography>
           ) : (
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart
-                data={chartData}
-                margin={{ top: 20, right: 40, bottom: 20, left: 60 }}
-              >
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={formatShortDate}
-                  tick={{ fill: "#002060", fontWeight: 400 }}
-                />
-                <YAxis
-                  tickFormatter={formatShortCurrency}
-                  tick={{ fill: "#002060", fontWeight: 400 }}
-                >
-                  <Label
-                    value="P&L"
-                    angle={-90}
-                    position="insideLeft"
-                    offset={-20}
-                    style={{
-                      textAnchor: "middle",
-                      fontWeight: "bold",
-                      fill: "#002060",
-                    }}
-                  />
-                </YAxis>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                {regions.map((region) => (
-                  <Line
-                    key={region}
-                    type="linear"
-                    dataKey={region}
-                    stroke={REGION_COLORS[region] || "#888888"}
-                    strokeWidth={2.5}
-                    dot={false}
-                    isAnimationActive
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
+            <Box sx={{ flexGrow: 1 }}>
+              <Line options={options} data={chartData} />
+            </Box>
           )}
         </Card>
       </motion.div>

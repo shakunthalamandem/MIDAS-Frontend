@@ -264,7 +264,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
             ...(title === "Exposure" && { ml: 20 }),
           }}
         >
-          Total {title}: {formatTotalNumber(totalValue)}
+          Total {title} (including Hedging): {formatTotalNumber(totalValue)}
         </Typography>
       )}
 
