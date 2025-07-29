@@ -1,5 +1,6 @@
 // StockHeatmapTreemap.tsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import ReactApexChart from "react-apexcharts";
 import { Box, Typography } from "@mui/material";
 
@@ -17,20 +18,21 @@ type Props = {
 };
 
 const getColorBySentiment = (score: number) => {
-  if (score > 60) return "#006b17ff"; // strong green
-  if (score > 30) return "#4bc06bff"; // mild green
-  if (score > 0) return "#bae6b2ff"; // very light green
-  if (score > -30) return "#e27d7dff"; // light red
-  if (score > -60) return "#ce2b2bff"; // mild red
-  return "#fa1818ff"; // deep red
+  if (score > 60) return "#006b17ff";
+  if (score > 30) return "#4bc06bff";
+  if (score > 0) return "#bae6b2ff";
+  if (score > -30) return "#e27d7dff";
+  if (score > -60) return "#ce2b2bff";
+  return "#fa1818ff";
 };
 
 const StockHeatmapTreemap: React.FC<Props> = ({ data }) => {
+  const navigate = useNavigate();
+
   const sectorMap: { [key: string]: { x: string; y: number; fillColor: string }[] } = {};
 
   data.forEach((stock) => {
     const { sector, stock_name, confidence, news_positivity } = stock;
-
     if (!sectorMap[sector]) sectorMap[sector] = [];
 
     sectorMap[sector].push({
@@ -49,8 +51,16 @@ const StockHeatmapTreemap: React.FC<Props> = ({ data }) => {
     chart: {
       type: "treemap",
       height: 500,
+      events: {
+        dataPointSelection: (event, chartContext, config) => {
+          const stockName = series[config.seriesIndex].data[config.dataPointIndex].x;
+          const fullStock = data.find((d) => d.stock_name === stockName);
+          if (fullStock) {
+            navigate("/aidemo", { state: { stock: fullStock } });
+          }
+        },
+      },
     },
-    legend: { show: true },
     title: {
       text: "Stock News Sentiment Treemap",
       style: { fontSize: "18px", fontWeight: "bold" },
@@ -59,9 +69,7 @@ const StockHeatmapTreemap: React.FC<Props> = ({ data }) => {
       treemap: {
         distributed: false,
         enableShades: false,
-        colorScale: {
-          ranges: [],
-        },
+        colorScale: { ranges: [] },
       },
     },
     tooltip: {
@@ -75,10 +83,7 @@ const StockHeatmapTreemap: React.FC<Props> = ({ data }) => {
         const { seriesIndex, dataPointIndex } = op;
         return series[seriesIndex].data[dataPointIndex].x;
       },
-      style: {
-        fontSize: "12px",
-        fontWeight: 500,
-      },
+      style: { fontSize: "12px", fontWeight: 500 },
     },
     colors: data.map((d) => getColorBySentiment(d.news_positivity)),
   };

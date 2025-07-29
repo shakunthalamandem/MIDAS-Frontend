@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// PerplexityChatMain.tsx
+import React, { useEffect, useState } from "react";
 import {
   Box,
   TextField,
@@ -7,12 +8,22 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import GHCAIMain from "./GHCAIMain";
 import SuggestedQuestions from "./AIPages/SuggestedQuestions";
 
 const PerplexityChatMain: React.FC = () => {
-  const [question, setQuestion] = useState("");
+  const location = useLocation();
+  const stockData = location.state?.stock;
+
+  const formatStockAsQuestion = (stock: any) => {
+    return `Give me insights on ${stock.stock_name} in the ${stock.sector} sector (${stock.region}, ${stock.country}). News Sentiment: ${stock.news_positivity}, Confidence: ${stock.confidence}%.`;
+  };
+
+  const [question, setQuestion] = useState<string>(
+    stockData ? formatStockAsQuestion(stockData) : ""
+  );
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +33,6 @@ const PerplexityChatMain: React.FC = () => {
 
   const handleSubmit = async (e?: React.FormEvent | Event) => {
     if (e?.preventDefault) e.preventDefault();
-
     if (!question.trim()) return;
 
     setLoading(true);
@@ -43,23 +53,23 @@ const PerplexityChatMain: React.FC = () => {
       });
 
       const result = await response.json();
-      console.log("API Response:", result);
-
-      if (!response.ok) {
-        throw new Error(result.error || "Something went wrong");
-      }
-
-      if (Array.isArray(result.answer)) {
-        setData(result.answer);
-      } else {
-        throw new Error("Invalid response format");
-      }
+      if (!response.ok) throw new Error(result.error || "Something went wrong");
+      if (Array.isArray(result.answer)) setData(result.answer);
+      else throw new Error("Invalid response format");
     } catch (err: any) {
       setError(err.message || "Failed to fetch answer");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (stockData) {
+      const formatted = formatStockAsQuestion(stockData);
+      setQuestion(formatted);
+      handleSubmit();
+    }
+  }, [stockData]);
 
   return (
     <Box
@@ -69,7 +79,6 @@ const PerplexityChatMain: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "start",
         py: 4,
         px: 2,
       }}
@@ -108,9 +117,7 @@ const PerplexityChatMain: React.FC = () => {
             sx={{
               background: "#ffffff",
               borderRadius: 2,
-              input: {
-                color: "#333",
-              },
+              input: { color: "#333" },
             }}
           />
           <Button
