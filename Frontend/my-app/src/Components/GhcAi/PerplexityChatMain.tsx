@@ -7,6 +7,7 @@ import {
   Typography,
   Paper,
   CircularProgress,
+  Container,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
@@ -144,15 +145,15 @@ const PerplexityChatMain: React.FC = () => {
 
       <GHCAIMain data={data} loading={loading} error={error} />
 
-      <Box mt={4} maxWidth={700} width="100%" px={2}>
-        <SuggestedQuestions
-          questions={data.find((block) => block.type === "suggested_questions")?.questions || []}
-          onSelect={(selected) => {
-            setQuestion(selected);
-            handleSubmit();
-          }}
-        />
-      </Box>
+      <Container sx={{ mt: 4 }}>
+  <SuggestedQuestions
+    questions={data.find((block) => block.type === "suggested_questions")?.questions || []}
+    onSelect={(selected) => {
+      setQuestion(selected);
+      handleSubmit();
+    }}
+  />
+</Container>
     </Box>
   );
 };
