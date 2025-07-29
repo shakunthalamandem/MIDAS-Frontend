@@ -100,20 +100,22 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
                   : 12;
 
               return (
-                <Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={gridSize}
-                  lg={gridSize}
-                  key={idx}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Box sx={{ flexGrow: 1 }}>{Renderer(block)}</Box>
-                </Grid>
+          <Grid
+  item
+  xs={12}
+  sm={12}
+  md={gridSize}
+  lg={gridSize}
+  key={idx}
+  sx={{
+    display: "flex",
+    flexDirection: "column",
+  }}
+>
+  <Box sx={{ flexGrow: 1, display: "flex" }}>
+    {Renderer(block)}
+  </Box>
+</Grid>
               );
             })}
           </Grid>

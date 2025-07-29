@@ -10,12 +10,12 @@ const GENAICardBlock: React.FC<{
 }> = ({ title, subtitle, description }) => (
   <Card
     sx={{
-      bgcolor: "#6A1B9A", // Deep Purple
-      color: "#fff",
+      bgcolor: "#ffffff",
+      color: "#6A1B9A",
       m: 2,
       borderRadius: 3,
       boxShadow: 4,
-      height: "100%", // <== Crucial
+      height: "100%",
       display: "flex",
       flexDirection: "column",
       transition: "transform 0.3s ease, box-shadow 0.3s ease",
@@ -26,15 +26,18 @@ const GENAICardBlock: React.FC<{
     }}
   >
     <CardHeader
+      titleTypographyProps={{ variant: "h6", sx: { color: "#6A1B9A" } }}
+      subheaderTypographyProps={{ sx: { color: "#6A1B9A" } }}
       title={title}
       subheader={subtitle}
-      sx={{
-        color: "#fff",
-        pb: 0,
-      }}
+      sx={{ pb: 0 }}
     />
-    <CardContent sx={{ flexGrow: 1 }}>
-      <Typography variant="body2" component="div" sx={{ color: "#fff" }}>
+    <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+      <Typography
+        variant="body2"
+        component="div"
+        sx={{ color: "#6A1B9A", flexGrow: 1 }}
+      >
         <ReactMarkdown>{description}</ReactMarkdown>
       </Typography>
     </CardContent>
