@@ -6,8 +6,10 @@ import GENAICardBlock from "./GENAICardBlock";
 import GENAIChartBlock from "./GENAIChartBlock";
 import GENAILinkBlock from "./GENAILinkBlock";
 import GENAITableBlock from "./GENAITableBlock";
+import SuggestedQuestions from "./SuggestedQuestions";
 
-type BlockType = "text" | "table" | "card" | "link" | "chart";
+// Add to the BlockType union
+type BlockType = "text" | "table" | "card" | "link" | "chart" | "suggested_questions";
 
 interface BaseBlock {
   type: BlockType;
@@ -48,7 +50,19 @@ interface ChartBlock extends BaseBlock {
   data: any;
 }
 
-type Block = TextBlock | TableBlock | CardBlock | LinkBlock | ChartBlock;
+interface SuggestedQuestionsBlock extends BaseBlock {
+  type: "suggested_questions";
+  questions: string[]; // ✅ This was missing
+}
+
+// ✅ Add SuggestedQuestionsBlock to the union
+type Block =
+  | TextBlock
+  | TableBlock
+  | CardBlock
+  | LinkBlock
+  | ChartBlock
+  | SuggestedQuestionsBlock;
 
 const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => (
   <Grid container spacing={2}>
@@ -83,6 +97,9 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => (
               title={block.title}
             />
           );
+          break;
+        case "suggested_questions":
+          content = <SuggestedQuestions questions={block.questions} />;
           break;
         default:
           content = <div>Unsupported type: {(block as any).type}</div>;
