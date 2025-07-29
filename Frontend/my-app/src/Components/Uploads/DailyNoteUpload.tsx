@@ -86,7 +86,7 @@ const DailyNoteUpload = () => {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
-      const res = await fetch(`${apiUrl}/api/daily_note_upload/`, {
+      const res = await fetch(`${apiUrl}/api/daily_note_deals_upload/`, {
         method: "POST",
         body: formData,
         headers: {
