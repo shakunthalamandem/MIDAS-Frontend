@@ -8,10 +8,11 @@ import {
   CircularProgress,
   Fade,
 } from "@mui/material";
+import GHCAIMain from "./GHCAIMain"; // Import the renderer
 
 const PerplexityChatMain: React.FC = () => {
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState<string | null>(null);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +24,7 @@ const PerplexityChatMain: React.FC = () => {
     if (!question.trim()) return;
 
     setLoading(true);
-    setAnswer(null);
+    setData([]);
     setError(null);
 
     try {
@@ -39,13 +40,18 @@ const PerplexityChatMain: React.FC = () => {
         }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
+      console.log("API Response:", result);
 
       if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
+        throw new Error(result.error || "Something went wrong");
       }
 
-      setAnswer(data.answer);
+      if (Array.isArray(result.answer)) {
+        setData(result.answer); 
+      } else {
+        throw new Error("Invalid response format");
+      }
     } catch (err: any) {
       setError(err.message || "Failed to fetch answer");
     } finally {
@@ -59,9 +65,11 @@ const PerplexityChatMain: React.FC = () => {
         minHeight: "100vh",
         background: "linear-gradient(135deg, #0a6952ff, #013842ff, #012533ff)",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        p: 2,
+        justifyContent: "start",
+        py: 4,
+        px: 2,
       }}
     >
       <Paper
@@ -75,6 +83,7 @@ const PerplexityChatMain: React.FC = () => {
           backdropFilter: "blur(14px)",
           border: "1px solid rgba(255, 255, 255, 0.2)",
           boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
+          mb: 4,
         }}
       >
         <Typography
@@ -126,45 +135,9 @@ const PerplexityChatMain: React.FC = () => {
             {loading ? <CircularProgress size={22} color="inherit" /> : "Ask"}
           </Button>
         </Box>
-
-        <Fade in={!!answer || !!error} timeout={600}>
-          <Box mt={4}>
-            {answer && (
-              <Box
-                sx={{
-                  p: 3,
-                  borderRadius: 3,
-                  background: "linear-gradient(to right, #43e97b, #38f9d7)",
-                  color: "#0b2e13",
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
-                }}
-              >
-                <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-                  AI Answer:
-                </Typography>
-                <Typography variant="body1">{answer}</Typography>
-              </Box>
-            )}
-
-            {error && (
-              <Box
-                sx={{
-                  mt: 2,
-                  p: 2,
-                  borderRadius: 2,
-                  backgroundColor: "#ff5252",
-                  color: "#fff",
-                  textAlign: "center",
-                }}
-              >
-                <Typography variant="body1" fontWeight="bold">
-                  {error}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-        </Fade>
       </Paper>
+
+      <GHCAIMain data={data} loading={loading} error={error} />
     </Box>
   );
 };

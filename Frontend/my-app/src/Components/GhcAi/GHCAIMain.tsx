@@ -1,28 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Container, Typography, CircularProgress } from "@mui/material";
+import React from "react";
+import { Container, Typography, CircularProgress, Alert } from "@mui/material";
 import GENAIRenderer from "./AIPages/GENAIRenderer";
 
-const GHCAIMain: React.FC = () => {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+interface GHCAIMainProps {
+  data: any[];
+  loading: boolean;
+  error?: string | null;
+}
 
-  useEffect(() => {
-    fetch("/GHC_AI.json")
-      .then((res) => res.json())
-      .then(json => {
-        setData(json);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("JSON load error:", err);
-        setLoading(false);
-      });
-  }, []);
-
+const GHCAIMain: React.FC<GHCAIMainProps> = ({ data, loading, error }) => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>📊 Golden Hills Capital Dashboard</Typography>
-      {loading ? <CircularProgress /> : <GENAIRenderer blocks={data} />}
+     
+      {loading && <CircularProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
+      {!loading && !error && <GENAIRenderer blocks={data} />}
     </Container>
   );
 };

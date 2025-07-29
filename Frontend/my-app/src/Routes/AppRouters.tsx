@@ -205,7 +205,7 @@ const AppRouters: React.FC = () => {
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
-        <Route path="/genai" element={<AuthGuard><GHCAIMain /></AuthGuard>} />
+        {/* <Route path="/genai" element={<AuthGuard><GHCAIMain /></AuthGuard>} /> */}
         <Route path="/aidemo" element={<AuthGuard><PerplexityChatMain /></AuthGuard>} />
 
         <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis/></AuthGuard>} />
