@@ -62,6 +62,7 @@ import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsIn
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
 import GHCAIMain from "../Components/GhcAi/GHCAIMain";
+import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 
 
 
@@ -205,8 +206,10 @@ const AppRouters: React.FC = () => {
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
         <Route path="/genai" element={<AuthGuard><GHCAIMain /></AuthGuard>} />
+        <Route path="/aidemo" element={<AuthGuard><PerplexityChatMain /></AuthGuard>} />
 
         <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis/></AuthGuard>} />
+
         
 
 
