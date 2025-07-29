@@ -7,6 +7,7 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
 import GHCAIMain from "./GHCAIMain";
 import SuggestedQuestions from "./AIPages/SuggestedQuestions";
 
@@ -64,7 +65,7 @@ const PerplexityChatMain: React.FC = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #0a6952ff, #013842ff, #012533ff)",
+        background: "linear-gradient(to bottom, rgba(210, 222, 231, 1), rgba(203, 220, 223, 1))",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -88,23 +89,18 @@ const PerplexityChatMain: React.FC = () => {
         }}
       >
         <Typography
-          variant="h4"
+          variant="h6"
           gutterBottom
-          sx={{
-            background: "linear-gradient(90deg, #aa0d02ff, #b8020bff)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            fontWeight: 700,
-            textAlign: "center",
-            mb: 4,
-          }}
+          align="center"
+          sx={{ fontWeight: 600, color: "#002060", mb: 2 }}
         >
-          Ask Perplexity AI
+          Ask Me Anything !!!!! 
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} display="flex" gap={2}>
           <TextField
             fullWidth
+            size="small"
             label="Type your question..."
             variant="outlined"
             value={question}
@@ -124,16 +120,17 @@ const PerplexityChatMain: React.FC = () => {
             sx={{
               background: "linear-gradient(45deg, #bbbbc5ff, #c1f7ddff)",
               color: "#002060",
-              px: 4,
+              px: 3,
               borderRadius: 2,
               transition: "transform 0.2s",
+              minWidth: 50,
               "&:hover": {
                 transform: "scale(1.05)",
                 background: "linear-gradient(45deg, #c7dddbff, #f0efd1ff)",
               },
             }}
           >
-            {loading ? <CircularProgress size={22} color="inherit" /> : "Ask"}
+            {loading ? <CircularProgress size={22} color="inherit" /> : <SendIcon />}
           </Button>
         </Box>
       </Paper>
