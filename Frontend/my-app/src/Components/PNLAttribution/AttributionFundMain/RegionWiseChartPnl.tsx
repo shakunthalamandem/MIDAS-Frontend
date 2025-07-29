@@ -23,11 +23,9 @@ import {
 
 import zoomPlugin from "chartjs-plugin-zoom";
 import "chartjs-adapter-date-fns";
-
 import { Line } from "react-chartjs-2";
 import { motion } from "framer-motion";
 
-// Register necessary chart.js components & plugins
 ChartJS.register(
   LineElement,
   PointElement,
@@ -58,13 +56,14 @@ const REGION_COLORS: Record<string, string> = {
   "Non-US America": "#000000",
 };
 
-// Formatters
+// ✅ Format currency with sign (for Y-axis labels)
 const formatShortCurrency = (value: number): string => {
   const abs = Math.abs(value);
-  if (abs >= 1_000_000_000) return `${(abs / 1_000_000_000).toFixed(0)}B`;
-  if (abs >= 1_000_000) return `${(abs / 1_000_000).toFixed(0)}M`;
-  if (abs >= 1_000) return `${(abs / 1_000).toFixed(0)}K`;
-  return abs.toFixed(0);
+  const sign = value < 0 ? "-" : "";
+  if (abs >= 1_000_000_000) return `${sign}${(abs / 1_000_000_000).toFixed(0)}B`;
+  if (abs >= 1_000_000) return `${sign}${(abs / 1_000_000).toFixed(0)}M`;
+  if (abs >= 1_000) return `${sign}${(abs / 1_000).toFixed(0)}K`;
+  return `${sign}${abs.toFixed(0)}`;
 };
 
 const formatCurrency = (value: number): string => {
@@ -76,16 +75,11 @@ const formatCurrency = (value: number): string => {
   return `${sign}$${abs.toFixed(0)}`;
 };
 
-const formatShortDate = (dateStr: string): string => {
-  const date = new Date(dateStr);
-  const month = date.toLocaleString("default", { month: "short" });
-  return `${month} ${date.getDate()}`;
-};
-
 const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
   const [chartData, setChartData] = useState<ChartData<"line"> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [xMin, setXMin] = useState<number | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -117,17 +111,18 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
           return;
         }
 
-        // Extract dates
-        const dates = responseData[regionNames[0]].map((entry) => entry.date);
+        const dates = responseData[regionNames[0]].map((entry) =>
+          new Date(entry.date).getTime()
+        );
+        const minDate = Math.min(...dates);
+        setXMin(minDate);
 
-        // Prepare datasets for chart.js
         const datasets = regionNames.map((region) => ({
           label: region,
           data: responseData[region].map((entry) => ({
-  x: new Date(entry.date).getTime(), // number timestamp
-  y: entry.pnl,
-})),
-
+            x: new Date(entry.date).getTime(),
+            y: entry.pnl,
+          })),
           borderColor: REGION_COLORS[region] || "#888888",
           backgroundColor: REGION_COLORS[region] || "#888888",
           fill: false,
@@ -136,9 +131,7 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
           borderWidth: 2.5,
         }));
 
-        setChartData({
-          datasets,
-        });
+        setChartData({ datasets });
       } catch (err) {
         console.error("Failed to fetch region PnL data:", err);
         setError("Failed to fetch data.");
@@ -169,11 +162,15 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
             day: "MMM dd",
           },
         },
+        min: xMin ?? undefined,
         ticks: {
           color: "#002060",
           maxRotation: 0,
           autoSkip: true,
           maxTicksLimit: 10,
+        },
+        grid: {
+          display: false, // ✅ remove vertical grid lines
         },
         title: {
           display: true,
@@ -188,6 +185,9 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
         ticks: {
           callback: (val) => formatShortCurrency(Number(val)),
           color: "#002060",
+        },
+        grid: {
+          display: false, // ✅ remove horizontal grid lines
         },
         title: {
           display: true,
@@ -226,13 +226,12 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
         },
       },
       zoom: {
+        limits: {
+          x: { min: xMin ?? undefined },
+        },
         zoom: {
-          wheel: {
-            enabled: true,
-          },
-          pinch: {
-            enabled: true,
-          },
+          wheel: { enabled: true },
+          pinch: { enabled: true },
           mode: "x",
         },
         pan: {
