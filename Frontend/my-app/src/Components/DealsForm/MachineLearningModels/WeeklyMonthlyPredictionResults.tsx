@@ -23,6 +23,7 @@ import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import MethodologyAccordion1w1m from "./MethodologyAccordion1w1m";
 
 interface PredictionModel {
   prediction: string | null;
@@ -312,6 +313,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
         </Box>
 
         <Divider sx={{ my: 3 }} />
+        <Box mb={2}>
+          <MethodologyAccordion1w1m />
+        </Box>
 
         {showTable ? (
           <>
@@ -440,30 +444,6 @@ const WeeklyMonthlyPredictionResults: React.FC<
                 </TableBody>
               </Table>
             </TableContainer>
-            <Box mt={4} textAlign="left">
-              <Typography
-                variant="body2"
-                sx={{ whiteSpace: "pre-line", mt: 2, lineHeight: 1.6 }}
-              >
-                <Box component="span" sx={{ color: "error.main", fontWeight: 600 }}>
-                  Note:
-                </Box>{" "}
-                The model automatically incorporates the following key factors based
-                on the deal's <strong>Pricing Date</strong> and{" "}
-                <strong>Sector</strong>
-                {"\n"}📈 <strong>Market context:</strong> Average sector index
-                returns and S&amp;P 500 performance over
-                <em> T+1 Week</em>, <em> T+1 Month</em>, and <em> T+3 Months</em>.
-                {"\n"}💧 <strong>Liquidity indicator:</strong> Compares NYSE trading
-                volume on the previous day with the average volume over the past
-                month.
-                {"\n"}These factors are automatically calculated and used by the
-                model to improve prediction accuracy.
-                {"\n"}The model is trained on{" "}
-                <strong>over 4,000 historical deals</strong>, ensuring a robust and
-                reliable forecast.
-              </Typography>
-            </Box>
           </>
         ) : (
           <Box sx={{ textAlign: "center", py: 4 }}>
