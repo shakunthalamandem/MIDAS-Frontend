@@ -20,6 +20,7 @@ import Ipos1Download from "../IPOwriteUp/Ipos1Download";
 import IPOS1FileUpload from "../IPOwriteUp/IPOS1FileUpload";
 import UploadDataCard from "./UploadDataCard";
 import LkFileUpload from "./LkFileUpload";
+import DailyNoteUpload from "./DailyNoteUpload";
 
 const uploadConfigs = [
   {
@@ -71,6 +72,12 @@ const monasheeUploadConfigs = [
     key: "market_indices",
     label: "Market Indices",
     apiEndpoint: "upload_market_index",
+    buttonColor: "success",
+  },
+  {
+    key: "DailyNoteUpload",
+    label: "Daily Note Upload",
+    apiEndpoint: "daily_note_upload",
     buttonColor: "success",
   },
 ];
@@ -180,7 +187,7 @@ const MainUpload: React.FC = () => {
             background: "linear-gradient(to right, #4b6cb7, #182848)",
             borderRadius: 2,
             mb: 4,
-                          fontWeight:600,
+            fontWeight: 600,
             color: "white",
             ".Mui-selected": {
               color: "#ffd700 !important",
@@ -193,31 +200,40 @@ const MainUpload: React.FC = () => {
           <Tab label="Downloads" />
           <Tab label="Calendar" />
           <Tab label="LK File" />
-          
+
         </Tabs>
 
         <Box>
 
 
           {selectedTab === 0 && (
-            <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-              <UploadDataCard
-                activeUpload={monasheeActiveUpload}
-                setActiveUpload={setMonasheeActiveUpload}
-                file={monasheeFile}
-                setFile={setMonasheeFile}
-                uploadedFileName={monasheeUploadedFileName}
-                setUploadedFileName={setMonasheeUploadedFileName}
-                error={monasheeError}
-                setError={setMonasheeError}
-                uploadConfigs={monasheeUploadConfigs}
-                handleFileChange={(e) => handleFileChange(e, true)}
-                handleUpload={() => handleUpload(true)}
-                uploading={monasheeUploading}
-                uploadProgress={monasheeUploadProgress}
-              />
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              {monasheeActiveUpload === "daily_note_upload" ? (
+                <DailyNoteUpload />
+              ) : (
+                <UploadDataCard
+                  activeUpload={monasheeActiveUpload}
+                  setActiveUpload={setMonasheeActiveUpload}
+                  file={monasheeFile}
+                  setFile={setMonasheeFile}
+                  uploadedFileName={monasheeUploadedFileName}
+                  setUploadedFileName={setMonasheeUploadedFileName}
+                  error={monasheeError}
+                  setError={setMonasheeError}
+                  uploadConfigs={monasheeUploadConfigs}
+                  handleFileChange={(e) => handleFileChange(e, true)}
+                  handleUpload={() => handleUpload(true)}
+                  uploading={monasheeUploading}
+                  uploadProgress={monasheeUploadProgress}
+                />
+              )}
             </motion.div>
           )}
+
 
 
           {selectedTab === 1 && (
@@ -287,13 +303,13 @@ const MainUpload: React.FC = () => {
 
           {selectedTab === 5 && (
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <Card elevation={3} sx={{ borderRadius: 3, pt: 6, p: 2,  background: "linear-gradient(to right, #ffecd2, #fcb69f)" }}>
+              <Card elevation={3} sx={{ borderRadius: 3, pt: 6, p: 2, background: "linear-gradient(to right, #ffecd2, #fcb69f)" }}>
                 <LkFileUpload />
               </Card>
             </motion.div>
           )}
 
-          
+
         </Box>
 
         <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
