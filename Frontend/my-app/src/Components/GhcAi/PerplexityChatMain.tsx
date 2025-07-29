@@ -1,4 +1,3 @@
-// PerplexityChatMain.tsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -8,11 +7,14 @@ import {
   Paper,
   CircularProgress,
   Container,
+  Drawer,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import GHCAIMain from "./GHCAIMain";
 import SuggestedQuestions from "./AIPages/SuggestedQuestions";
+import HeatMapMain from "./AIPages/HeatMap/HeatMapMain"; // <== Import your heatmap component
+import ShowChartIcon from "@mui/icons-material/ShowChart"; // icon for the button
 
 const PerplexityChatMain: React.FC = () => {
   const location = useLocation();
@@ -28,6 +30,7 @@ const PerplexityChatMain: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [heatmapOpen, setHeatmapOpen] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -72,6 +75,13 @@ const PerplexityChatMain: React.FC = () => {
     }
   }, [stockData]);
 
+  const handleTickerClick = (stock: any) => {
+    const formatted = formatStockAsQuestion(stock);
+    setQuestion(formatted);
+    handleSubmit();
+    setHeatmapOpen(false); // Close drawer
+  };
+
   return (
     <Box
       sx={{
@@ -84,6 +94,29 @@ const PerplexityChatMain: React.FC = () => {
         px: 2,
       }}
     >
+      {/* Open Heatmap Button */}
+      <Button
+        variant="outlined"
+        startIcon={<ShowChartIcon />}
+        onClick={() => setHeatmapOpen(true)}
+        sx={{
+          position: "fixed",
+          right: 20,
+          top: 20,
+          zIndex: 1200,
+          background: "linear-gradient(to right, #94e9f9, #bee7cb)",
+          color: "#003366",
+          fontWeight: 600,
+          boxShadow: 2,
+          "&:hover": {
+            background: "linear-gradient(to right, #d4f1f9, #d6f2e4)",
+          },
+        }}
+      >
+        Open Heatmap
+      </Button>
+
+      {/* Chat Section */}
       <Paper
         elevation={6}
         sx={{
@@ -146,14 +179,29 @@ const PerplexityChatMain: React.FC = () => {
       <GHCAIMain data={data} loading={loading} error={error} />
 
       <Container sx={{ mt: 4 }}>
-  <SuggestedQuestions
-    questions={data.find((block) => block.type === "suggested_questions")?.questions || []}
-    onSelect={(selected) => {
-      setQuestion(selected);
-      handleSubmit();
-    }}
-  />
-</Container>
+        <SuggestedQuestions
+          questions={data.find((block) => block.type === "suggested_questions")?.questions || []}
+          onSelect={(selected) => {
+            setQuestion(selected);
+            handleSubmit();
+          }}
+        />
+      </Container>
+
+      {/* Right Drawer for Heatmap */}
+      <Drawer
+        anchor="right"
+        open={heatmapOpen}
+        onClose={() => setHeatmapOpen(false)}
+        PaperProps={{ sx: { width: { xs: '100%', sm: 500 } } }}
+      >
+        <Box sx={{ p: 2 }}>
+          <Typography variant="h6" sx={{ mb: 2, color: "#002060" }}>
+            Stock Heatmap
+          </Typography>
+          <HeatMapMain  />
+        </Box>
+      </Drawer>
     </Box>
   );
 };

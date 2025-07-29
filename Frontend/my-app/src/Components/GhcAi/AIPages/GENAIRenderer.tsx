@@ -1,5 +1,6 @@
 import React from "react";
 import { Grid, Box } from "@mui/material";
+import { motion } from "framer-motion";
 
 import GENAITextBlock from "./GENAITextBlock";
 import GENAICardBlock from "./GENAICardBlock";
@@ -100,22 +101,33 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
                   : 12;
 
               return (
-          <Grid
-  item
-  xs={12}
-  sm={12}
-  md={gridSize}
-  lg={gridSize}
-  key={idx}
-  sx={{
-    display: "flex",
-    flexDirection: "column",
-  }}
->
-  <Box sx={{ flexGrow: 1, display: "flex" }}>
-    {Renderer(block)}
-  </Box>
-</Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={gridSize}
+                  lg={gridSize}
+                  key={idx}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: idx * 0.15,
+                      duration: 0.5,
+                      ease: "easeOut",
+                    }}
+                    style={{ flexGrow: 1, display: "flex" }}
+                  >
+                    <Box sx={{ flexGrow: 1, display: "flex" }}>
+                      {Renderer(block)}
+                    </Box>
+                  </motion.div>
+                </Grid>
               );
             })}
           </Grid>
