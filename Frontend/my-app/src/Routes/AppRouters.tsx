@@ -63,6 +63,7 @@ import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/Versio
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
 import GHCAIMain from "../Components/GhcAi/GHCAIMain";
 import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
+import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
 
 
 
@@ -205,7 +206,7 @@ const AppRouters: React.FC = () => {
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
-        {/* <Route path="/genai" element={<AuthGuard><GHCAIMain /></AuthGuard>} /> */}
+        <Route path="/heatmap" element={<AuthGuard><HeatMapMain /></AuthGuard>} />
         <Route path="/aidemo" element={<AuthGuard><PerplexityChatMain /></AuthGuard>} />
 
         <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis/></AuthGuard>} />
