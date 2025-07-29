@@ -75,12 +75,7 @@ const PerplexityChatMain: React.FC = () => {
     }
   }, [stockData]);
 
-  const handleTickerClick = (stock: any) => {
-    const formatted = formatStockAsQuestion(stock);
-    setQuestion(formatted);
-    handleSubmit();
-    setHeatmapOpen(false); // Close drawer
-  };
+
 
   return (
     <Box
@@ -102,7 +97,7 @@ const PerplexityChatMain: React.FC = () => {
         sx={{
           position: "fixed",
           right: 20,
-          top: 20,
+          top: 100,
           zIndex: 1200,
           background: "linear-gradient(to right, #94e9f9, #bee7cb)",
           color: "#003366",
@@ -121,7 +116,7 @@ const PerplexityChatMain: React.FC = () => {
         elevation={6}
         sx={{
           width: "100%",
-          maxWidth: 700,
+          maxWidth: 1000,
           p: 4,
           borderRadius: 4,
           background: "rgba(255, 255, 255, 0.58)",
