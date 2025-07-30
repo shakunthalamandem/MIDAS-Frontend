@@ -210,6 +210,8 @@ const AppRouters: React.FC = () => {
         <Route path="/gen_ai_tool" element={<AuthGuard><PerplexityChatMain /></AuthGuard>} />
 
         <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis/></AuthGuard>} />
+        <Route path="/genai_data_set" element={<AuthGuard><HeatMapMain/></AuthGuard>} />
+
 
         
 
