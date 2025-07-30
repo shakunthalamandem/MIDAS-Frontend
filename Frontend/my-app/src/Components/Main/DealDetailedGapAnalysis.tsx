@@ -48,6 +48,7 @@ interface DealData {
   "Total Gap Shares": number;
   "Days Held": number;
   "Current Quantity": number;
+  "Current Position Value": number;
 }
 
 const formatCurrency = (val: number | null | undefined) => {
@@ -311,6 +312,12 @@ const DealDetailedGapAnalysis: React.FC = () => {
       ),
     },
     { field: "Days Held", headerName: "Days Held", width: 100 },
+    {
+      field: "Current Position Value",
+      headerName: "Current Position Value",
+      width: 120,
+      renderCell: (params) => formatCurrency(params.value),
+    },
   ];
 
   return (
