@@ -213,14 +213,14 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({
     border: "none",
     fontSize: "0.72rem",
     "& .MuiDataGrid-columnHeaders": {
-      backgroundColor: "#002060",   // ✅ Header background
-      color: "#ffffff",             // ✅ Header text color
+      backgroundColor: "#002060",   
+      color: "#ffffff",             
     },
     "& .MuiDataGrid-columnHeaderTitle": {
-      color: "#ffffff",             // ✅ Ensure header title is white
+      color: "#000000",            
     },
     "& .MuiDataGrid-columnHeader": {
-      backgroundColor: "#002060",   // ✅ Header cell background
+      backgroundColor: "#b1c7f1ff",   
     },
     "& .MuiDataGrid-cell": {
       whiteSpace: "normal",
