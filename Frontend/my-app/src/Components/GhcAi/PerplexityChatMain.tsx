@@ -20,7 +20,7 @@ const PerplexityChatMain: React.FC = () => {
   const stockData = location.state?.stock;
 
   const formatStockAsQuestion = (stock: any) => {
-    return `Give me insights on ${stock.stock_name} in the ${stock.sector} sector (${stock.region}, ${stock.country}). News Sentiment: ${stock.news_positivity}, Confidence: ${stock.confidence}%.`;
+    return `Give me insights on ${stock.stock_name} in the ${stock.sector} sector (${stock.region}, ${stock.country}). `;
   };
 
   const [question, setQuestion] = useState<string>(
