@@ -236,18 +236,21 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
                     isAnimationActive
                   />
                 ))}
-                {/* ✅ Built-in Zoom with Brush */}
+                                {/* ✅ Built-in Zoom with Brush */}
                 <Brush
                   dataKey="date"
-                  height={30}
+                  height={3}
                   stroke="#0d47a1"
-                  travellerWidth={10}
+                  travellerWidth={20}
                   tickFormatter={formatShortDate}
                 />
+
               </LineChart>
+              
             </ResponsiveContainer>
           )}
         </Card>
+        
       </motion.div>
     </Container>
   );
