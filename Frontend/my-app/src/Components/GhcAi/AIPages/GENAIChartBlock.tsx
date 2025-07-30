@@ -1,11 +1,11 @@
 import React from "react";
-import { Paper, Typography } from "@mui/material";
+import { Paper, Typography, Box, Divider } from "@mui/material";
 import {
   Pie,
   Bar,
   Line,
   Scatter,
-  Bubble
+  Bubble,
 } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -16,7 +16,7 @@ import {
   LineElement,
   ArcElement,
   Tooltip,
-  Legend
+  Legend,
 } from "chart.js";
 import ReactMarkdown from "react-markdown";
 
@@ -35,7 +35,7 @@ type GENAIChartBlockProps = {
   chartType: string;
   data: any;
   title: string;
-  width?: string | number; // Accept width prop, e.g. "50%", "300px", or number (interpreted as px)
+  width?: string | number;
 };
 
 const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
@@ -61,20 +61,19 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
         sx={{
           p: 2,
           m: 2,
-          bgcolor: "#ffffff",
+          bgcolor: "#fff",
           width,
           borderRadius: 2,
-          boxShadow: 3,
+          boxShadow: 2,
         }}
       >
-        <Typography variant="body2" sx={{ color: "#002060" }}>
+        <Typography variant="body2" sx={{ color: "#d32f2f" }}>
           Unsupported chart type: <strong>{chartType}</strong>
         </Typography>
       </Paper>
     );
   }
 
-  // Format scatter/bubble data
   let formattedData = data;
   if (["scatter", "bubble"].includes(type)) {
     formattedData = {
@@ -94,15 +93,14 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
         sx={{
           p: 2,
           m: 2,
-          bgcolor: "#ffffff",
+          bgcolor: "#fff",
           width,
           borderRadius: 2,
-          boxShadow: 3,
+          boxShadow: 2,
         }}
       >
-        <Typography sx={{ color: "#002060" }}>
-          Custom chart type <strong>{chartType}</strong> is not supported in this
-          renderer.
+        <Typography sx={{ color: "#d32f2f" }}>
+          Custom chart type <strong>{chartType}</strong> is not supported in this renderer.
         </Typography>
       </Paper>
     );
@@ -110,22 +108,47 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
 
   return (
     <Paper
-      elevation={3}
+      elevation={2}
       sx={{
         p: 2,
         m: 2,
-        bgcolor: "#ffffff",
         width,
-        borderRadius: 2, // default theme spacing, can also be '8px' or numeric
-        boxShadow: 3, // material-ui shadow
-        display: "flex",
-        flexDirection: "column",
+        borderRadius: 3,
+        background: "linear-gradient(135deg, #f5f7fa, #e4ecf7)",
+        boxShadow: 3,
       }}
     >
-      <Typography variant="h6" gutterBottom sx={{ color: "#002060" }} component="div">
-        <ReactMarkdown>{title}</ReactMarkdown>
-      </Typography>
-      <ChartComponent data={formattedData} />
+      <Box mb={1}>
+        <Typography
+          variant="subtitle1"
+          fontWeight={600}
+          sx={{ color: "#2c387e" }}
+          component="div"
+        >
+          <ReactMarkdown>{title}</ReactMarkdown>
+        </Typography>
+        <Divider sx={{ mt: 0.5, mb: 1 }} />
+      </Box>
+
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: 500,
+          height: 300,
+          mx: "auto",
+        }}
+      >
+        <ChartComponent
+          data={formattedData}
+          options={{
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+              legend: { display: true, position: "bottom" },
+            },
+          }}
+        />
+      </Box>
     </Paper>
   );
 };

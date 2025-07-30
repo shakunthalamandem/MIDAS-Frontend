@@ -64,7 +64,6 @@ const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
 };
 
 const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
-  // Group blocks by row
   const groupedByRow: Record<number, Block[]> = {};
   blocks.forEach((block) => {
     const row = block.row ?? 0;
@@ -83,55 +82,51 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
           (a, b) => (a.column ?? 0) - (b.column ?? 0)
         );
 
-        return (
-          <Grid
-            container
-            spacing={3}
-            key={`row-${rowKey}`}
-            sx={{ mb: 2, alignItems: "stretch" }}
+return (
+  <Grid
+    container
+    spacing={1.8} // ← reduced from 3 to 1 (8px)
+    key={`row-${rowKey}`}
+    sx={{ mb: 1, alignItems: "stretch" }} // ← reduced from mb: 3 to mb: 1
+  >
+    {sortedBlocks.map((block, idx) => {
+      const Renderer = BLOCK_RENDERERS[block.type];
+      if (!Renderer) return null;
+
+      const totalCols = block.total_columns || 1;
+      const gridSize =
+        totalCols >= 1 && totalCols <= 12
+          ? Math.floor(12 / totalCols)
+          : 12;
+
+      return (
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={gridSize}
+          lg={gridSize}
+          key={idx}
+          sx={{ display: "flex", flexDirection: "column" }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: idx * 0.12,
+              duration: 0.5,
+              ease: "easeOut",
+            }}
+            style={{ flexGrow: 1, display: "flex" }}
           >
-            {sortedBlocks.map((block, idx) => {
-              const Renderer = BLOCK_RENDERERS[block.type];
-              if (!Renderer) return null;
+            {Renderer(block)}
+          </motion.div>
+        </Grid>
+      );
+    })}
+  </Grid>
+);
 
-              const totalCols = block.total_columns || 1;
-              const gridSize =
-                totalCols >= 1 && totalCols <= 12
-                  ? Math.floor(12 / totalCols)
-                  : 12;
-
-              return (
-                <Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={gridSize}
-                  lg={gridSize}
-                  key={idx}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: idx * 0.15,
-                      duration: 0.5,
-                      ease: "easeOut",
-                    }}
-                    style={{ flexGrow: 1, display: "flex" }}
-                  >
-                    <Box sx={{ flexGrow: 1, display: "flex" }}>
-                      {Renderer(block)}
-                    </Box>
-                  </motion.div>
-                </Grid>
-              );
-            })}
-          </Grid>
-        );
       })}
     </>
   );

@@ -43,20 +43,26 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
             {questions.map((q, idx) => (
               <Chip
                 key={idx}
+                icon={<HelpOutlineIcon fontSize="small" color="action" />}
                 label={q}
                 title={q}
                 onClick={() => onSelect?.(q)}
                 sx={{
                   m: 1,
                   cursor: "pointer",
-                  background: "linear-gradient(45deg, #eee8d3ff, #d0dce6ff)",
+                  background: "linear-gradient(120deg, #fefefe, #e0ecf9)",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    background: "linear-gradient(45deg, #90caf9, #64b5f6)",
+                    background: "linear-gradient(120deg, #64b5f6, #42a5f5)",
                     color: "#fff",
-                    boxShadow: 2,
+                    "& .MuiSvgIcon-root": {
+                      color: "#fff",
+                    },
+                    boxShadow: 3,
+                    transform: "scale(1.05)",
                   },
                   fontSize: "0.875rem",
+                  borderColor: "#90caf9",
                 }}
                 variant="outlined"
               />
