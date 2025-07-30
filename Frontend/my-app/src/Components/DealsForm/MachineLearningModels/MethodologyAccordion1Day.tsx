@@ -125,7 +125,7 @@ const MethodologyAccordion1Day: React.FC = () => {
         {/* Key Input Parameters in two columns */}
         <Box mb={3}>
           <Typography variant="subtitle1" fontWeight="600" gutterBottom color={theme.palette.text.primary}>
-            Key Input Parameters:
+            Deal Specific Parameters
           </Typography>
           <Grid container spacing={1}>
             {[keyInputsLeft, keyInputsRight].map((column, idx) => (
@@ -155,7 +155,7 @@ const MethodologyAccordion1Day: React.FC = () => {
         {/* Economic & Market Indicators in two columns */}
         <Box>
           <Typography variant="subtitle1" fontWeight="600" gutterBottom color={theme.palette.text.primary}>
-            Economic & Market Indicators:
+            Economic & Macro Indicators:
           </Typography>
           <Grid container spacing={1}>
             {[marketLeft, marketRight].map((column, idx) => (
