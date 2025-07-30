@@ -10,44 +10,79 @@ import {
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
 
-// Optional: You can extend this palette as needed
+// Define soft pastel color palettes with matching accent colors
+// const COLOR_PALETTES = [
+//   {
+//     // background: "#FDEDEC",
+//     titleColor: "#C0392B",
+//     textColor: "#070707ff",
+//   },
+//   {
+//     // background: "#E8F8F5",
+//     titleColor: "#117864",
+//     textColor: "#070707ff",
+//   },
+//   {
+//     // background: "#FEF9E7",
+//     titleColor: "#B7950B",
+//     textColor: "#070707ff",
+//   },
+//   {
+//     // background: "#EBF5FB",
+//     titleColor: "#1A5276",
+//     textColor: "#070707ff",
+//   },
+//   {
+//     // background: "#F4ECF7",
+//     titleColor: "#6C3483",
+//     textColor: "#070707ff",
+//   },
+// ];
 const COLOR_PALETTES = [
   {
-    background: "#FDEDEC",
-    titleColor: "#C0392B",
-    textColor: "#7B241C",
+    titleColor: "#C0392B",       // bold red
+    textColor: "#2C2C2C",        // dark neutral
+    subtitleColor: "#7F8C8D",    // cool gray
   },
   {
-    background: "#E8F8F5",
-    titleColor: "#117864",
-    textColor: "#0B5345",
+    titleColor: "#117864",       // dark teal
+    textColor: "#212121",        // charcoal
+    subtitleColor: "#5D6D7E",    // steel blue-gray
   },
   {
-    background: "#FEF9E7",
-    titleColor: "#B7950B",
-    textColor: "#7D6608",
+    titleColor: "#B7950B",       // gold
+    textColor: "#333333",        // near black
+    subtitleColor: "#7D6608",    // soft brownish-gold
   },
   {
-    background: "#EBF5FB",
-    titleColor: "#1A5276",
-    textColor: "#154360",
+    titleColor: "#1A5276",       // navy
+    textColor: "#1C2833",        // very dark slate
+    subtitleColor: "#5DADE2",    // lighter blue
   },
   {
-    background: "#F4ECF7",
-    titleColor: "#6C3483",
-    textColor: "#512E5F",
+    titleColor: "#6C3483",       // violet
+    textColor: "#2E2E2E",        // rich gray
+    subtitleColor: "#A569BD",    // lavender
   },
 ];
 
+// Utility to randomly pick one color palette
 const getRandomPalette = () =>
   COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
 
-const GENAICardBlock: React.FC<{
+interface GENAICardBlockProps {
   title: string;
   subtitle: string;
   description: string; // supports markdown
-  icon?: string;
-}> = ({ title, subtitle, description, icon }) => {
+  icon?: string; // Optional: emoji or icon name
+}
+
+const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
+  title,
+  subtitle,
+  description,
+  icon,
+}) => {
   const palette = React.useMemo(() => getRandomPalette(), []);
 
   return (
@@ -61,10 +96,11 @@ const GENAICardBlock: React.FC<{
       <Card
         sx={{
           flexGrow: 1,
-          bgcolor: palette.background,
+          // bgcolor: palette.background,
           color: palette.textColor,
           borderRadius: 3,
           boxShadow: 3,
+          borderLeft: `5px solid ${palette.titleColor}`, // 👉 highlight border
           transition: "all 0.3s ease",
           display: "flex",
           flexDirection: "column",
@@ -73,17 +109,18 @@ const GENAICardBlock: React.FC<{
           },
         }}
       >
-        <CardHeader
-        
-          titleTypographyProps={{
-            variant: "h6",
-            sx: { color: palette.titleColor },
-          }}
-          subheaderTypographyProps={{ sx: { color: palette.titleColor } }}
-          title={title}
-          subheader={subtitle}
-          sx={{ pb: 0 }}
-        />
+<CardHeader
+  titleTypographyProps={{
+    variant: "h6",
+    sx: { color: palette.titleColor },
+  }}
+  subheaderTypographyProps={{
+    sx: { color: palette.subtitleColor },
+  }}
+  title={title}
+  subheader={subtitle}
+  sx={{ pb: 0 }}
+/>
 
         <CardContent sx={{ flexGrow: 1 }}>
           <Typography

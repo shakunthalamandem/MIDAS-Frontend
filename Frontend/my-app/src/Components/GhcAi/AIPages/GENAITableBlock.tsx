@@ -3,38 +3,33 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Paper,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  TableContainer,
   Typography,
+  Box,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
 
 const COLOR_THEMES = [
   {
-    bg: "#F3F9F9",
-    headerColor: "#0E6251",
-    rowHover: "rgba(14, 98, 81, 0.08)",
+    headerColor: "#1E3A8A",
+    rowHover: "rgba(30, 58, 138, 0.08)",
   },
   {
-    bg: "#FEF9E7",
-    headerColor: "#9A7D0A",
-    rowHover: "rgba(154, 125, 10, 0.08)",
+    headerColor: "#B91C1C",
+    rowHover: "rgba(185, 28, 28, 0.08)",
   },
   {
-    bg: "#FDEDEC",
-    headerColor: "#922B21",
-    rowHover: "rgba(146, 43, 33, 0.08)",
+    headerColor: "#0F766E",
+    rowHover: "rgba(15, 118, 110, 0.08)",
   },
   {
-    bg: "#F4ECF7",
-    headerColor: "#76448A",
-    rowHover: "rgba(118, 68, 138, 0.08)",
+    headerColor: "#6D28D9",
+    rowHover: "rgba(109, 40, 217, 0.08)",
   },
 ];
 
@@ -59,24 +54,27 @@ const GENATableBlock: React.FC<{
         sx={{
           my: 3,
           borderRadius: 3,
-          bgcolor: theme.bg,
+          bgcolor: "#f9fafa",
           maxWidth: "100%",
           mx: "auto",
-          overflowX: "auto",
         }}
       >
         {title && (
           <CardHeader
-            title={<Typography variant="h6" sx={{ color: theme.headerColor }}>{title}</Typography>}
+            title={
+              <Typography variant="h6" sx={{ color: theme.headerColor }}>
+                {title}
+              </Typography>
+            }
             sx={{ pb: 0 }}
           />
         )}
         <CardContent sx={{ pt: title ? 1 : 2 }}>
-          <TableContainer>
+          <Box sx={{ overflowX: "auto" }}>
             <Table
               size="small"
               sx={{
-                width: "100%",
+                minWidth: "100%",
                 tableLayout: "auto",
                 wordBreak: "break-word",
               }}
@@ -90,6 +88,7 @@ const GENATableBlock: React.FC<{
                         fontWeight: "bold",
                         color: theme.headerColor,
                         fontSize: "0.95rem",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       <ReactMarkdown>{h}</ReactMarkdown>
@@ -125,7 +124,7 @@ const GENATableBlock: React.FC<{
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </Box>
         </CardContent>
       </Card>
     </motion.div>
