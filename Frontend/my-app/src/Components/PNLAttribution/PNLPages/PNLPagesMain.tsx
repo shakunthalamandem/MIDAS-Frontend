@@ -149,7 +149,8 @@ const PNLPagesMain = () => {
   return (
     <>
     <Container maxWidth="xl">
-      <Box p={2}  mb={2} sx={{   background: 'linear-gradient(to right, #c9ffbf,rgb(253, 210, 217))' 
+      <Box p={2}  mb={2} sx={{             background: "linear-gradient(to bottom, #f9fbe7, #e8f5e9)",
+
 
 
 }} borderRadius={2} boxShadow={2}>

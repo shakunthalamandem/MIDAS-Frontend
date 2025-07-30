@@ -1,108 +1,138 @@
-import React from "react";
-import StockHeatmapTreemap from "./StockHeatmapTreemap";
+// HeatMapMain.tsx
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ReactApexChart from "react-apexcharts";
+import { Box, Typography, CircularProgress, Alert } from "@mui/material";
 
-const sampleData = {
-  heat_value: [
-    // Technology
-    {
-      stock_name: "Apple Inc.",
-      sector: "Technology",
-      region: "North America",
-      country: "USA",
-      news_positivity: 65,
-      confidence: 91.2,
-    },
-    {
-      stock_name: "Microsoft Corp",
-      sector: "Technology",
-      region: "North America",
-      country: "USA",
-      news_positivity: 40,
-      confidence: 87.6,
-    },
-    {
-      stock_name: "Meta Platforms",
-      sector: "Technology",
-      region: "North America",
-      country: "USA",
-      news_positivity: 30,
-      confidence: 82.1,
-    },
-
-    // Consumer Discretionary
-    {
-      stock_name: "Amazon.com Inc.",
-      sector: "Consumer Discretionary",
-      region: "North America",
-      country: "USA",
-      news_positivity: 12,
-      confidence: 79.1,
-    },
-    {
-      stock_name: "Nike Inc.",
-      sector: "Consumer Discretionary",
-      region: "North America",
-      country: "USA",
-      news_positivity: -10,
-      confidence: 68.5,
-    },
-
-    // Automobiles
-    {
-      stock_name: "Tesla Inc.",
-      sector: "Automobiles",
-      region: "North America",
-      country: "USA",
-      news_positivity: -55,
-      confidence: 93.3,
-    },
-    {
-      stock_name: "Ford Motor Co.",
-      sector: "Automobiles",
-      region: "North America",
-      country: "USA",
-      news_positivity: -25,
-      confidence: 70.8,
-    },
-
-    // Semiconductors
-    {
-      stock_name: "Nvidia Corp",
-      sector: "Semiconductors",
-      region: "North America",
-      country: "USA",
-      news_positivity: 88,
-      confidence: 96.1,
-    },
-    {
-      stock_name: "Intel Corp",
-      sector: "Semiconductors",
-      region: "North America",
-      country: "USA",
-      news_positivity: 45,
-      confidence: 84.9,
-    },
-
-    // Financials
-    {
-      stock_name: "JPMorgan Chase",
-      sector: "Financials",
-      region: "North America",
-      country: "USA",
-      news_positivity: 22,
-      confidence: 81.3,
-    },
-    {
-      stock_name: "Goldman Sachs",
-      sector: "Financials",
-      region: "North America",
-      country: "USA",
-      news_positivity: 5,
-      confidence: 77.4,
-    },
-  ],
+type StockHeatValue = {
+  stock_name: string;
+  sector: string;
+  region: string;
+  country: string;
+  news_positivity: number;
+  confidence: number;
 };
 
-export default function HeatMapMain() {
-  return <StockHeatmapTreemap data={sampleData.heat_value} />;
-}
+const getColorBySentiment = (score: number) => {
+  if (score > 60) return "#006b17ff";
+  if (score > 30) return "#4bc06bff";
+  if (score > 0) return "#bae6b2ff";
+  if (score > -30) return "#e27d7dff";
+  if (score > -60) return "#ce2b2bff";
+  return "#fa1818ff";
+};
+
+const HeatMapMain: React.FC = () => {
+  const navigate = useNavigate();
+  const [data, setData] = useState<StockHeatValue[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
+  useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/portfolio_heatmap_ai/`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+
+      const result = await response.json();
+      console.log("Heatmap API Response:", result);
+
+      const stocks = Array.isArray(result.heat_value) ? result.heat_value : null;
+
+      if (!stocks) throw new Error("Unexpected response format");
+
+      setData(stocks);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [apiUrl, token]);
+
+
+
+  const sectorMap: { [key: string]: { x: string; y: number; fillColor: string }[] } = {};
+  data.forEach((stock) => {
+    const { sector, stock_name, confidence, news_positivity } = stock;
+    if (!sectorMap[sector]) sectorMap[sector] = [];
+    sectorMap[sector].push({
+      x: stock_name,
+      y: confidence,
+      fillColor: getColorBySentiment(news_positivity),
+    });
+  });
+
+  const series = Object.entries(sectorMap).map(([sector, stocks]) => ({
+    name: sector,
+    data: stocks,
+  }));
+
+  const options: ApexCharts.ApexOptions = {
+    chart: {
+      type: "treemap",
+      height: 500,
+      events: {
+        dataPointSelection: (event, chartContext, config) => {
+          const stockName = series[config.seriesIndex].data[config.dataPointIndex].x;
+          const fullStock = data.find((d) => d.stock_name === stockName);
+          if (fullStock) {
+            navigate("/aidemo", { state: { stock: fullStock } });
+          }
+        },
+      },
+    },
+    title: {
+      text: "Stock News Sentiment Treemap",
+      style: { fontSize: "18px", fontWeight: "bold" },
+    },
+    plotOptions: {
+      treemap: {
+        distributed: false,
+        enableShades: false,
+        colorScale: { ranges: [] },
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: (val: number) => `Confidence: ${val.toFixed(1)}%`,
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: (text: string, op: any) => {
+        const { seriesIndex, dataPointIndex } = op;
+        return series[seriesIndex].data[dataPointIndex].x;
+      },
+      style: { fontSize: "12px", fontWeight: 500 },
+    },
+    colors: data.map((d) => getColorBySentiment(d.news_positivity)),
+  };
+
+  return (
+    <Box p={2} sx={{ background: "linear-gradient(135deg, #0a6952ff, #012533ff)" }}>
+      <Typography variant="h5" mb={2} color="white">
+        Stock Heatmap by Sector (Confidence & News Sentiment)
+      </Typography>
+
+      {loading ? (
+        <CircularProgress sx={{ color: "white" }} />
+      ) : error ? (
+        <Alert severity="error">{error}</Alert>
+      ) : (
+        <ReactApexChart options={options} series={series} type="treemap" height={600} />
+      )}
+    </Box>
+  );
+};
+
+export default HeatMapMain;

@@ -33,6 +33,7 @@ interface TotalsData {
   exposure: number;
   dtd_pnl: number;
   mtd_pnl: number;
+  ytd_pnl: number;
 }
 
 const SECTOR_ORDER = [
@@ -47,22 +48,20 @@ const SECTOR_ORDER = [
   "Materials",
   "Real Estate",
   "Utilities",
-  "Other",
 ];
 
 const COLORS_BY_SECTOR: Record<string, string> = {
-  "Consumer Discretionary": "#8e24aa",
-  "Consumer Staples": "#6a1b9a",
-  "Communication Services": "#3949ab",
-  "Energy": "#1e88e5",
-  "Financials": "#039be5",
-  "Health Care": "#00acc1",
-  "Industrials": "#00897b",
-  "Information Technology": "#43a047",
-  "Materials": "#7cb342",
-  "Real Estate": "#c0ca33",
-  "Utilities": "#fbc02d",
-  "Other": "#fb8c00",
+  "Consumer Discretionary": "#5E35B1",
+  "Consumer Staples": "#00897B",
+  "Communication Services": "#3949AB",
+  Energy: "#F4511E",
+  Financials: "#1E88E5",
+  "Health Care": "#43A047",
+  Industrials: "#6D4C41",
+  "Information Technology": "#3949AB",
+  Materials: "#8D6E63",
+  "Real Estate": "#8E24AA",
+  Utilities: "#FBC02D",
 };
 
 const formatNumber = (value: number): string => {
@@ -71,10 +70,10 @@ const formatNumber = (value: number): string => {
     abs >= 1e9
       ? `${(abs / 1e9).toFixed(2)}B`
       : abs >= 1e6
-        ? `${(abs / 1e6).toFixed(2)}M`
-        : abs >= 1e3
-          ? `${(abs / 1e3).toFixed(2)}K`
-          : abs.toFixed(2);
+      ? `${(abs / 1e6).toFixed(2)}M`
+      : abs >= 1e3
+      ? `${(abs / 1e3).toFixed(2)}K`
+      : abs.toFixed(2);
   return value < 0 ? `-$${result}` : `$${result}`;
 };
 
@@ -84,10 +83,10 @@ const formatTotalNumber = (value: number): string => {
     abs >= 1e9
       ? `${(abs / 1e9).toFixed(1)}B`
       : abs >= 1e6
-        ? `${(abs / 1e6).toFixed(1)}M`
-        : abs >= 1e3
-          ? `${(abs / 1e3).toFixed(1)}K`
-          : abs.toFixed(1);
+      ? `${(abs / 1e6).toFixed(1)}M`
+      : abs >= 1e3
+      ? `${(abs / 1e3).toFixed(1)}K`
+      : abs.toFixed(1);
   return value < 0 ? `$(${result})` : `$${result}`;
 };
 
@@ -104,7 +103,9 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
   const [exposureData, setExposureData] = useState<SectorData[]>([]);
   const [dtdData, setDtdData] = useState<SectorData[]>([]);
   const [mtdData, setMtdData] = useState<SectorData[]>([]);
+  const [ytdData, setYtdData] = useState<SectorData[]>([]);
   const [totals, setTotals] = useState<TotalsData | null>(null);
+  const [hedgingValues, setHedgingValues] = useState<Record<string, number>>({});
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -126,17 +127,26 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
 
         const result = await res.json();
 
-        if (result?.exposure && result?.dtd_pnl && result?.mtd_pnl && result?.totals) {
-          const formatData = (raw: Record<string, number>): SectorData[] => {
+        if (
+          result?.exposure &&
+          result?.dtd_pnl &&
+          result?.mtd_pnl &&
+          result?.ytd_pnl &&
+          result?.totals
+        ) {
+          const formatData = (raw: Record<string, number>, key: string) => {
+            const hedging = raw["Other"] ?? 0;
+            setHedgingValues((prev) => ({ ...prev, [key]: hedging }));
             return SECTOR_ORDER.map((sector) => ({
               sector,
               value: raw[sector] ?? 0,
             }));
           };
 
-          setExposureData(formatData(result.exposure));
-          setDtdData(formatData(result.dtd_pnl));
-          setMtdData(formatData(result.mtd_pnl));
+          setExposureData(formatData(result.exposure, "exposure"));
+          setDtdData(formatData(result.dtd_pnl, "dtd_pnl"));
+          setMtdData(formatData(result.mtd_pnl, "mtd_pnl"));
+          setYtdData(formatData(result.ytd_pnl, "ytd_pnl"));
           setTotals(result.totals);
         } else {
           setError("Invalid response format.");
@@ -177,81 +187,107 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
 
   const dtdMax = getSymmetricMax(dtdData);
   const mtdMax = getSymmetricMax(mtdData);
+  const ytdMax = getSymmetricMax(ytdData);
 
   const renderChart = (
     title: string,
     data: SectorData[],
     showYAxis: boolean,
     symmetricMax?: number,
-    totalValue?: number
-  ) => (
-    <Box flex={1}>
-      <Typography variant="subtitle2" align="center" sx={{ mb: 1, fontWeight: 600 }}>
-        {title}
-      </Typography>
+    totalValue?: number,
+    hedgingKey?: string
+  ) => {
+    const hedgingValue = hedgingValues[hedgingKey ?? ""] ?? 0;
+    const netTotal = (totalValue ?? 0) - hedgingValue;
 
-      <ResponsiveContainer width="100%" height={600}>
-        <BarChart
-          data={data}
-          layout="vertical"
-          margin={{ top: 10, right: 20, left: showYAxis ? 100 : 0, bottom: 10 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            type="number"
-            domain={
-              title === "Exposure" ? undefined : [-symmetricMax!, symmetricMax!]
-            }
-            tickFormatter={(value) =>
-              title === "Exposure" ? formatNumber(value) : `${(value / 1e6).toFixed(0)}M`
-            }
-            tick={{ fill: "#002060", fontWeight: 400 }}
-          />
-          {showYAxis ? (
-            <YAxis
-              type="category"
-              dataKey="sector"
-              tick={{ fill: "#e30000", fontWeight: 400 }}
-              width={160}
-            />
-          ) : (
-            <YAxis type="category" dataKey="sector" hide />
-          )}
-          <Tooltip
-            formatter={(val: number) =>
-              title === "Exposure" ? formatNumber(val) : formatHoverValue(val)
-            }
-          />
-          <ReferenceLine x={0} stroke="#888" />
-          <Bar dataKey="value" barSize={18}>
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS_BY_SECTOR[entry.sector] || "#8884d8"}
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-
-      {totalValue !== undefined && (
+    return (
+      <Box flex={1}>
         <Typography
-          variant="body2"
+          variant="subtitle2"
           align="center"
-          fontStyle="italic"
-          fontWeight="bold"
-          color="#000000"
-          sx={{
-            mt: 1,
-            ...(title === "Exposure" && { ml: 20 }), 
-          }}
+          sx={{ mb: 1, fontWeight: 600 }}
         >
-
-          Total {title}: {formatTotalNumber(totalValue)}
+          {title}
         </Typography>
-      )}
-    </Box>
-  );
+
+        <ResponsiveContainer width="100%" height={600}>
+          <BarChart
+            data={data}
+            layout="vertical"
+            margin={{ top: 10, right: 20, left: showYAxis ? 100 : 0, bottom: 10 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              type="number"
+              domain={
+                title === "Exposure" ? undefined : [-symmetricMax!, symmetricMax!]
+              }
+              tickFormatter={(value) =>
+                title === "Exposure"
+                  ? formatNumber(value)
+                  : `${(value / 1e6).toFixed(0)}M`
+              }
+              tick={{ fill: "#002060", fontWeight: 400 }}
+            />
+            {showYAxis ? (
+              <YAxis
+                type="category"
+                dataKey="sector"
+                tick={{ fill: "#99000c", fontWeight: 400 }}
+              />
+            ) : (
+              <YAxis type="category" dataKey="sector" hide />
+            )}
+            <Tooltip
+              formatter={(val: number) =>
+                title === "Exposure" ? formatNumber(val) : formatHoverValue(val)
+              }
+            />
+            <ReferenceLine x={0} stroke="#888" />
+            <Bar dataKey="value" barSize={18}>
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS_BY_SECTOR[entry.sector] || "#8884d8"}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+
+        {totalValue !== undefined && (
+          <>
+            <Typography
+              variant="body2"
+              align="center"
+              fontStyle="italic"
+              fontWeight="bold"
+              mt={1}
+            >
+              {title}: {formatTotalNumber(netTotal)}
+            </Typography>
+
+            <Typography
+              variant="body2"
+              align="center"
+              sx={{ color: "#505766" }}
+            >
+              Hedging: {formatTotalNumber(hedgingValue)}  
+            </Typography>
+
+            <Typography
+              variant="body2"
+              align="center"
+              fontWeight="bold"
+              color="#002060"
+            >
+              Total ({title}): {formatTotalNumber(totalValue)}
+            </Typography>
+          </>
+        )}
+      </Box>
+    );
+  };
 
   return (
     <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
@@ -262,7 +298,7 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
       >
         <Card
           sx={{
-            background: "linear-gradient(135deg, rgb(201, 214, 248), #e3f2fd)",
+            background: "linear-gradient(135deg, rgba(214, 222, 241, 1), #e3f2fd)",
             boxShadow: 4,
             borderRadius: 4,
             p: 2,
@@ -274,13 +310,14 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
               sx={{ color: "#002060", fontWeight: 600, mb: 3 }}
               align="center"
             >
-              Sector-wise Exposure, DTD and MTD PnL for {fund}
+              Sector-wise Exposure, DTD, MTD, and YTD P&L for {fund}
             </Typography>
 
             <Box display="flex" gap={3}>
-              {renderChart("Exposure", exposureData, true, undefined, totals?.exposure)}
-              {renderChart("DTD PnL", dtdData, false, dtdMax, totals?.dtd_pnl)}
-              {renderChart("MTD PnL", mtdData, false, mtdMax, totals?.mtd_pnl)}
+              {renderChart("Exposure", exposureData, true, undefined, totals?.exposure, "exposure")}
+              {renderChart("DTD P&L", dtdData, false, dtdMax, totals?.dtd_pnl, "dtd_pnl")}
+              {renderChart("MTD P&L", mtdData, false, mtdMax, totals?.mtd_pnl, "mtd_pnl")}
+              {renderChart("YTD P&L", ytdData, false, ytdMax, totals?.ytd_pnl, "ytd_pnl")}
             </Box>
           </CardContent>
         </Card>

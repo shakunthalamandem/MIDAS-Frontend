@@ -72,7 +72,7 @@ const MostAgedStocksTable: React.FC<MostAgedStocksTableProps> = ({ fund }) => {
     { field: "first_trade_date", headerName: "Issue Date", flex: 1 },
     {
       field: "cumulative_pnl",
-      headerName: "Cumulative PnL",
+      headerName: "YTD P&L",
       flex: 1,
       renderCell: ({ value }) => (
         <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
@@ -108,7 +108,7 @@ const MostAgedStocksTable: React.FC<MostAgedStocksTableProps> = ({ fund }) => {
     borderTopRightRadius: "16px",
   }}
 >
-  Most Aged Stocks (&gt; 45 Days) for {fund}
+ Equities   Most Aged Stocks (&gt; 45 Days) for {fund}
 </Typography>
 
 
