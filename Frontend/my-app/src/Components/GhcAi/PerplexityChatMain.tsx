@@ -42,7 +42,7 @@ const PerplexityChatMain: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch(`${apiUrl}/api/dummy_assistant/`, {
+      const response = await fetch(`${apiUrl}/api/perplexity_chat/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -79,6 +79,7 @@ const PerplexityChatMain: React.FC = () => {
         background: "linear-gradient(to bottom, rgba(210, 222, 231, 1), rgba(203, 220, 223, 1))",
         py: 4,
         px: 2,
+        minHeight:'400vh'
       }}
     >
       {/* Main Layout: Paper left (85%) and Button right (15%) */}
