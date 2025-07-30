@@ -30,7 +30,7 @@ interface GHCAIMainProps {
             justifyContent: "center",
             minHeight: "40vh",
             gap: 2,
-            background: "linear-gradient(135deg, #f3e5f5, #ede7f6)",
+            // background: "linear-gradient(135deg, #f3e5f5, #ede7f6)",
             animation: "pulse 2s infinite",
             "@keyframes pulse": {
               "0%": { transform: "scale(1)", boxShadow: "0 0 0 0 rgba(106, 27, 154, 0.4)" },

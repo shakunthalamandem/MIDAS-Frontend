@@ -1,5 +1,5 @@
-import React from "react";
-import { Grid, Box } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Grid, Card, CardContent } from "@mui/material";
 import { motion } from "framer-motion";
 
 import GENAITextBlock from "./GENAITextBlock";
@@ -64,71 +64,104 @@ const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
 };
 
 const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
-  const groupedByRow: Record<number, Block[]> = {};
-  blocks.forEach((block) => {
-    const row = block.row ?? 0;
-    if (!groupedByRow[row]) groupedByRow[row] = [];
-    groupedByRow[row].push(block);
+  const [visibleBlocks, setVisibleBlocks] = useState<Block[]>([]);
+
+  useEffect(() => {
+    let idx = 0;
+    const interval = setInterval(() => {
+      if (idx >= blocks.length) {
+        clearInterval(interval);
+        return;
+      }
+      const nextBlock = blocks[idx];
+      if (nextBlock) {
+        setVisibleBlocks((prev) => [...prev, nextBlock]);
+      }
+      idx++;
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [blocks]);
+
+  const sortedVisibleBlocks = [...visibleBlocks].sort((a, b) => {
+    const rowA = a?.row ?? 0;
+    const rowB = b?.row ?? 0;
+    if (rowA !== rowB) return rowA - rowB;
+    const colA = a?.column ?? 0;
+    const colB = b?.column ?? 0;
+    return colA - colB;
   });
 
-  const sortedRows = Object.entries(groupedByRow).sort(
+  const grouped: Record<number, Block[]> = {};
+  sortedVisibleBlocks.forEach((block) => {
+    if (!block) return;
+    const row = block.row ?? 0;
+    if (!grouped[row]) grouped[row] = [];
+    grouped[row].push(block);
+  });
+
+  const sortedRows = Object.entries(grouped).sort(
     ([a], [b]) => Number(a) - Number(b)
   );
 
   return (
-    <>
-      {sortedRows.map(([rowKey, rowBlocks]) => {
-        const sortedBlocks = rowBlocks.sort(
-          (a, b) => (a.column ?? 0) - (b.column ?? 0)
-        );
-
-return (
-  <Grid
-    container
-    spacing={1.8} // ← reduced from 3 to 1 (8px)
-    key={`row-${rowKey}`}
-    sx={{ mb: 1, alignItems: "stretch" }} // ← reduced from mb: 3 to mb: 1
-  >
-    {sortedBlocks.map((block, idx) => {
-      const Renderer = BLOCK_RENDERERS[block.type];
-      if (!Renderer) return null;
-
-      const totalCols = block.total_columns || 1;
-      const gridSize =
-        totalCols >= 1 && totalCols <= 12
-          ? Math.floor(12 / totalCols)
-          : 12;
-
-      return (
-        <Grid
-          item
-          xs={12}
-          sm={12}
-          md={gridSize}
-          lg={gridSize}
-          key={idx}
-          sx={{ display: "flex", flexDirection: "column" }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: idx * 0.12,
-              duration: 0.5,
-              ease: "easeOut",
-            }}
-            style={{ flexGrow: 1, display: "flex" }}
+    <Card
+      elevation={3}
+      sx={{
+        backgroundColor: "rgba(226, 236, 245, 1)",
+        borderRadius: 3,
+        padding: 2,
+        boxShadow: 10,
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      <CardContent sx={{ paddingBottom: "0 !important" }}>
+        {sortedRows.map(([rowKey, rowBlocks]) => (
+          <Grid
+            container
+            spacing={1.8}
+            key={`row-${rowKey}`}
+            sx={{ mb: 1, alignItems: "stretch" }}
           >
-            {Renderer(block)}
-          </motion.div>
-        </Grid>
-      );
-    })}
-  </Grid>
-);
+            {rowBlocks.map((block, idx) => {
+              const Renderer = BLOCK_RENDERERS[block.type];
+              if (!Renderer) return null;
 
-      })}
-    </>
+              const totalCols = block.total_columns || 1;
+              const gridSize =
+                totalCols >= 1 && totalCols <= 12
+                  ? Math.floor(12 / totalCols)
+                  : 12;
+
+              return (
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={gridSize}
+                  lg={gridSize}
+                  key={idx}
+                  sx={{ display: "flex", flexDirection: "column" }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: idx * 0.05,
+                      duration: 0.4,
+                      ease: "easeOut",
+                    }}
+                    style={{ flexGrow: 1, display: "flex" }}
+                  >
+                    {Renderer(block)}
+                  </motion.div>
+                </Grid>
+              );
+            })}
+          </Grid>
+        ))}
+      </CardContent>
+    </Card>
   );
 };
 
