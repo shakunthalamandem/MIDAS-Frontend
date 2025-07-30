@@ -97,12 +97,12 @@ export const dealGridColumns: GridColDef[] = [
     flex: 1,
     valueFormatter: (params) => currencyFormatter.format(params),
   },
-  {
-    field: "discount_from_announcement_price",
-    headerName: "% Discount",
-    flex: 1,
-    valueFormatter: (params) => `${numberFormatter.format(params)}%`,
-  },
+{
+  field: "discount_from_announcement_price",
+  headerName: "% Discount",
+  flex: 1,
+  valueFormatter: (params) => `${parseFloat(params).toFixed(2)}%`,
+},
   {
     field: "subscription_bid_shares",
     headerName: "IOI",
@@ -119,7 +119,7 @@ export const dealGridColumns: GridColDef[] = [
     field: "allocation_deal_size_percentage",
     headerName: "Allocation % of deal size",
     flex: 1,
-    valueFormatter: (params) => `${numberFormatter.format(params)}%`,
+  valueFormatter: (params) => `${parseFloat(params).toFixed(2)}%`,
   },
   {
     field: "am_buy_shares",
