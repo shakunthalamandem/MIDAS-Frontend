@@ -59,19 +59,26 @@ export const formatNumber = (value: number): string => {
   if (absValue >= 1e3) return `${(absValue / 1e3).toFixed(0)}K`;
   return absValue.toString();
 };
-
+export const formatvalueNumber = (value: number): string => {
+  const absValue = Math.abs(value);
+  if (absValue >= 1e9) return `$${(absValue / 1e9).toFixed(0)}B`;
+  if (absValue >= 1e6) return `$${(absValue / 1e6).toFixed(0)}M`;
+  if (absValue >= 1e3) return `#${(absValue / 1e3).toFixed(0)}K`;
+  return absValue.toString();
+};
 export const dealGridColumns: GridColDef[] = [
   { field: "first_trade_date", headerName: "Trade Date", flex: 1 },
   { field: "client_symbol", headerName: "Ticker", flex: 1 },
   { field: "sector", headerName: "Sector", flex: 1 },
   { field: "fo_type", headerName: "Deal Type", flex: 1 ,  renderCell: (params) => params.value != null ? params.value : "-"
 },
+{field:'initial_pricing_range', headerName: 'Initial Pricing Range', flex: 1, renderCell: (params) => params.value != null ? params.value : '-'},
 
   {
     field: "deal_size",
     headerName: "Deal Size",
     flex: 1,
-    valueFormatter: (params) => currencyFormatter.format(params),
+    valueFormatter: (params) => formatvalueNumber(params),
   },
   {
     field: "issue_offer_price",

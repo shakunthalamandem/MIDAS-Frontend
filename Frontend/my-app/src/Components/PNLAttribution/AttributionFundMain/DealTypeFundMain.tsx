@@ -5,7 +5,7 @@ import {
   CircularProgress,
   Divider,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { motion } from "framer-motion";
 import { Deal, dealGridColumns } from "../types";
 
@@ -43,7 +43,25 @@ const formatDate = (dateStr: string): string => {
   return `${day}${getOrdinal(day)} ${month} ${year}`;
 };
 
-const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund, onMaxTradeDateChange }) => {
+// 🔧 Filter columns based on deal type
+const getFilteredColumns = (type: "IPO" | "FO"): GridColDef[] => {
+  if (type === "IPO") {
+    return dealGridColumns.filter(
+      (col) =>
+        col.field !== "fo_type" &&
+        col.field !== "discount_from_announcement_price"
+    );
+  } else {
+    return dealGridColumns.filter(
+      (col) => col.field !== "initial_pricing_range"
+    );
+  }
+};
+
+const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({
+  fund,
+  onMaxTradeDateChange,
+}) => {
   const [ipoDeals, setIpoDeals] = useState<Deal[]>([]);
   const [foDeals, setFoDeals] = useState<Deal[]>([]);
   const [maxTradeDate, setMaxTradeDate] = useState<string | null>(null);
@@ -70,7 +88,6 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund, onMaxTradeDat
         setFoDeals(data.FODeals || []);
         setMaxTradeDate(data.max_trade_date || null);
 
-        // Notify parent of the max trade date
         if (onMaxTradeDateChange) {
           onMaxTradeDateChange(data.max_trade_date || null);
         }
@@ -88,7 +105,8 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund, onMaxTradeDat
     rows: Deal[],
     title: string,
     id: string,
-    emptyMessage: string
+    emptyMessage: string,
+    type: "IPO" | "FO"
   ) => (
     <Box my={4} id={id}>
       <motion.div
@@ -122,93 +140,110 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund, onMaxTradeDat
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
       >
-        <Box
-          sx={{
-            width: "100%",
-            overflowX: "auto",
-            overflowY: "visible",
-            backgroundColor: "#ffffff",
-            borderRadius: 2,
-            boxShadow: 3,
-            "& .MuiDataGrid-root": {
-              border: "none",
-              fontSize: "0.72rem",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              background: "linear-gradient(to right, #77B0FC, #dbe9ff)",
-              color: "#002060",
-              fontWeight: 600,
-              fontSize: "0.72rem",
-              lineHeight: 1.2,
-              minHeight: "36px !important",
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              whiteSpace: "normal",
-              lineHeight: "1.1rem",
-              fontSize: "0.72rem",
-              textAlign: "center",
-              padding: "0 4px",
-            },
-            "& .MuiDataGrid-cell": {
-              whiteSpace: "normal",
-              wordWrap: "break-word",
-              lineHeight: 1.4,
-              fontSize: "0.75rem",
-              padding: "6px 8px",
-              display: "flex",
-              alignItems: "center",
-            },
-            "& .MuiDataGrid-row": {
-              minHeight: "42px !important",
-            },
-            "& .MuiDataGrid-row:nth-of-type(even)": {
-              backgroundColor: "#f5f8fc",
-            },
-            "& .MuiDataGrid-row:hover": {
-              backgroundColor: "#dee7f7",
-              transition: "background-color 0.3s ease",
-            },
-          }}
-        >
-          <DataGrid
-            rows={rows.map((row, index) => ({ id: index, ...row }))}
-            columns={dealGridColumns}
-            autoHeight
-            disableRowSelectionOnClick
-            disableColumnMenu
-            hideFooterPagination
-            hideFooter
-            getRowHeight={() => "auto"}
-            slots={{
-              noRowsOverlay: () => (
-                <CustomNoRowsOverlay message={emptyMessage} />
-              ),
-            }}
-            sx={{
-              border: "none",
-              fontSize: "0.72rem",
-              "& .MuiDataGrid-columnHeaders": {
-                background: "linear-gradient(to right, #77B0FC, #dbe9ff)",
-                color: "#002060",
-                fontWeight: 600,
-                fontSize: "0.72rem",
-                minHeight: "36px !important",
-              },
-              "& .MuiDataGrid-cell": {
-                whiteSpace: "normal",
-                wordWrap: "break-word",
-                lineHeight: 1.4,
-                fontSize: "0.75rem",
-                padding: "6px 8px",
-              },
-              "& .MuiDataGrid-row:nth-of-type(even)": {
-                backgroundColor: "#f5f8fc",
-              },
-              "& .MuiDataGrid-row:hover": {
-                backgroundColor: "#dee7f7",
-              },
-            }}
-          />
+      <Box
+  sx={{
+    width: "100%",
+    overflowX: "auto",
+    backgroundColor: "#ffffff",
+    borderRadius: 2,
+    boxShadow: 3,
+    "& .MuiDataGrid-root": {
+      border: "none",
+      fontSize: "0.72rem",
+    },
+    "& .MuiDataGrid-container--top": {
+      backgroundColor: "#002060",
+      color: "#940000ff",
+      fontWeight: 600,
+    },
+    "& .MuiDataGrid-columnHeaders": {
+      background: "#002060",
+      color: "#ffffff",
+      fontWeight: 600,
+      fontSize: "0.72rem",
+      lineHeight: 1.2,
+      minHeight: "36px !important",
+    },
+    "& .MuiDataGrid-columnHeaderTitle": {
+      color: "#ffffff",
+      whiteSpace: "normal",
+      lineHeight: "1.1rem",
+      fontSize: "0.72rem",
+      textAlign: "center",
+      padding: "0 4px",
+    },
+    "& .MuiDataGrid-cell": {
+      whiteSpace: "normal",
+      wordWrap: "break-word",
+      lineHeight: 1.4,
+      fontSize: "0.75rem",
+      padding: "6px 8px",
+      display: "flex",
+      alignItems: "center",
+    },
+    "& .MuiDataGrid-row": {
+      minHeight: "42px !important",
+    },
+    "& .MuiDataGrid-row:nth-of-type(even)": {
+      backgroundColor: "#f5f8fc",
+    },
+    "& .MuiDataGrid-row:hover": {
+      backgroundColor: "#dee7f7",
+      transition: "background-color 0.3s ease",
+    },
+  }}
+>
+
+
+<DataGrid
+  rows={rows.map((row, index) => ({ id: index, ...row }))}
+  columns={getFilteredColumns(type)}
+  autoHeight
+  disableRowSelectionOnClick
+  disableColumnMenu
+  hideFooterPagination
+  hideFooter
+  getRowHeight={() => "auto"}
+  slots={{
+    noRowsOverlay: () => (
+      <CustomNoRowsOverlay message={emptyMessage} />
+    ),
+  }}
+  sx={{
+    border: "none",
+    fontSize: "0.72rem",
+    "& .MuiDataGrid-columnHeaders": {
+      backgroundColor: "#002060",   // ✅ Header background
+      color: "#ffffff",             // ✅ Header text color
+    },
+    "& .MuiDataGrid-columnHeaderTitle": {
+      color: "#ffffff",             // ✅ Ensure header title is white
+    },
+    "& .MuiDataGrid-columnHeader": {
+      backgroundColor: "#002060",   // ✅ Header cell background
+    },
+    "& .MuiDataGrid-cell": {
+      whiteSpace: "normal",
+      wordWrap: "break-word",
+      lineHeight: 1.4,
+      fontSize: "0.75rem",
+      padding: "6px 8px",
+      display: "flex",
+      alignItems: "center",
+    },
+    "& .MuiDataGrid-row": {
+      minHeight: "42px !important",
+    },
+    "& .MuiDataGrid-row:nth-of-type(even)": {
+      backgroundColor: "#f5f8fc",
+    },
+    "& .MuiDataGrid-row:hover": {
+      backgroundColor: "#dee7f7",
+      transition: "background-color 0.3s ease",
+    },
+  }}
+/>
+
         </Box>
       </motion.div>
     </Box>
@@ -228,7 +263,8 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund, onMaxTradeDat
             "ipo",
             maxTradeDate
               ? `No IPO deals available for this fund on ${formatDate(maxTradeDate)}.`
-              : "No IPO deals available."
+              : "No IPO deals available.",
+            "IPO"
           )}
 
           {renderTable(
@@ -237,7 +273,8 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({ fund, onMaxTradeDat
             "fo",
             maxTradeDate
               ? `No FO deals available for this fund on ${formatDate(maxTradeDate)}.`
-              : "No FO deals available."
+              : "No FO deals available.",
+            "FO"
           )}
         </>
       )}
