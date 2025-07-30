@@ -105,16 +105,7 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
   );
 
   return (
-    <Card
-      elevation={3}
-      sx={{
-        backgroundColor: "rgba(226, 236, 245, 1)",
-        borderRadius: 3,
-        padding: 2,
-        boxShadow: 10,
-        border: "1px solid rgba(255,255,255,0.08)",
-      }}
-    >
+
       <CardContent sx={{ paddingBottom: "0 !important" }}>
         {sortedRows.map(([rowKey, rowBlocks]) => (
           <Grid
@@ -161,7 +152,6 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
           </Grid>
         ))}
       </CardContent>
-    </Card>
   );
 };
 
