@@ -34,7 +34,6 @@ import News from "../Components/Macro/News";
 import ConvertsMain from "../Components/Converts/ConvertsMain";
 import ConvertsDealStatsMain from "../Components/Converts/Tabs/ConvertsDealStatsMain";
 import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
-import UploadMarketIndices from "../Components/Macro/UploadMarketindeces";
 
 
 
@@ -61,8 +60,9 @@ import PNLTabMain from "../Components/PNLAttribution/PNLTabMain";
 import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedRegionView";
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
-import PNLPagesMain from "../Components/PNLAttribution/PNLPages/PNLPagesMain";
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
+import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
+import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
 
 
 
@@ -206,7 +206,13 @@ const AppRouters: React.FC = () => {
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
         <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
 
+        <Route path="/heatmap" element={<AuthGuard><HeatMapMain /></AuthGuard>} />
+        <Route path="/gen_ai_tool" element={<AuthGuard><PerplexityChatMain /></AuthGuard>} />
+
         <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis/></AuthGuard>} />
+        <Route path="/genai_data_set" element={<AuthGuard><HeatMapMain/></AuthGuard>} />
+
+
         
 
 
