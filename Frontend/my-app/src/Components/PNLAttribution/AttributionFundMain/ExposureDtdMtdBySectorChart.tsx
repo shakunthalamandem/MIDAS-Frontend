@@ -230,7 +230,6 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
               type="category"
               dataKey="sector"
               tick={{ fill: "#99000c", fontWeight: 400 }}
-              width={160}
             />
           ) : (
             <YAxis type="category" dataKey="sector" hide />
@@ -252,38 +251,51 @@ const ExposureDtdMtdBySectorChart: React.FC<ChartProps> = ({ fund }) => {
         </BarChart>
       </ResponsiveContainer>
 
-      {totalValue !== undefined && (
-        <Typography
-          variant="body2"
-          align="center"
-          fontStyle="italic"
-          fontWeight="bold"
-          color="#000000"
-          sx={{
-            mt: 1,
-            ...(title === "Exposure" && { ml: 20 }),
-          }}
-        >
-          Total {title} (including Hedging): {formatTotalNumber(totalValue)}
-        </Typography>
-      )}
+{totalValue !== undefined && (
+  <>
+    <Typography
+      variant="body2"
+      align="center"
+      fontStyle="italic"
+      fontWeight="bold"
+      color="#000000"
+      sx={{
+        mt: 1,
+        ...(title === "Exposure" && { ml: 20 }),
+      }}
+    >
+      {title}: {formatTotalNumber(totalValue)}
+    </Typography>
 
-      {otherKey && otherValues[otherKey] !== undefined && (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          sx={{ mt: 0.5 }}
-        >
-          <InfoIcon sx={{ color: "gray", mr: 1, fontSize: "1rem" }} />
-          <Typography
-            variant="body2"
-            sx={{ color: "gray", fontSize: "1rem" }}
-          >
-            Hedging: {formatNumber(otherValues[otherKey])}
-          </Typography>
-        </Box>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      sx={{ mt: 0.5 }}
+    >
+      <Typography
+        variant="body2"
+        sx={{ color: "#505766ff"}}
+      >
+        Hedging: {formatNumber(otherValues[otherKey ?? ""] ?? 0)}
+      </Typography>
+    </Box>
+
+    <Typography
+      variant="body2"
+      align="center"
+      fontWeight="bold"
+      color="#002060"
+      sx={{ mt: 1 }}
+    >
+      Total {title}:{" "}
+      {formatNumber(
+        (totalValue ?? 0) + (otherValues[otherKey ?? ""] ?? 0)
       )}
+    </Typography>
+  </>
+)}
+
     </Box>
   );
 
