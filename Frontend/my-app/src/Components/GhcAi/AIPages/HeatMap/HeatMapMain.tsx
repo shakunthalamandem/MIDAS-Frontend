@@ -1,8 +1,14 @@
-// HeatMapMain.tsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactApexChart from "react-apexcharts";
-import { Box, Typography, CircularProgress, Alert, Container } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Alert,
+  Container,
+} from "@mui/material";
+import HeatmapMetadata from "./HeatmapMetadata";
 
 type StockHeatValue = {
   stock_name: string;
@@ -27,41 +33,52 @@ const HeatMapMain: React.FC = () => {
   const [data, setData] = useState<StockHeatValue[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [meta, setMeta] = useState<any | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/api/portfolio_heatmap_ai/`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/portfolio_heatmap_ai/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
 
-      const result = await response.json();
-      console.log("Heatmap API Response:", result);
+        const result = await response.json();
+        console.log("Heatmap API Response:", result);
 
-      const stocks = Array.isArray(result.heat_value) ? result.heat_value : null;
+        const stocks = Array.isArray(result.heat_value)
+          ? result.heat_value
+          : null;
+        if (!stocks) throw new Error("Unexpected response format");
 
-      if (!stocks) throw new Error("Unexpected response format");
+        setData(stocks);
 
-      setData(stocks);
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+        setMeta({
+          updated_ist_time: result.updated_ist_time,
+          updated_us_time: result.updated_us_time,
+          news_from_date: result.news_from_date,
+          news_to_date: result.news_to_date,
+          us_news_from_date: result.us_news_from_date,
+          us_news_to_date: result.us_news_to_date,
+        });
+      } catch (err: any) {
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchData();
-}, [apiUrl, token]);
+    fetchData();
+  }, [apiUrl, token]);
 
-
-
-  const sectorMap: { [key: string]: { x: string; y: number; fillColor: string }[] } = {};
+  const sectorMap: {
+    [key: string]: { x: string; y: number; fillColor: string }[];
+  } = {};
   data.forEach((stock) => {
     const { sector, stock_name, confidence, news_positivity } = stock;
     if (!sectorMap[sector]) sectorMap[sector] = [];
@@ -83,7 +100,8 @@ const HeatMapMain: React.FC = () => {
       height: 500,
       events: {
         dataPointSelection: (event, chartContext, config) => {
-          const stockName = series[config.seriesIndex].data[config.dataPointIndex].x;
+          const stockName =
+            series[config.seriesIndex].data[config.dataPointIndex].x;
           const fullStock = data.find((d) => d.stock_name === stockName);
           if (fullStock) {
             navigate("/gen_ai_tool", { state: { stock: fullStock } });
@@ -91,7 +109,6 @@ const HeatMapMain: React.FC = () => {
         },
       },
     },
-
     plotOptions: {
       treemap: {
         distributed: false,
@@ -117,19 +134,39 @@ const HeatMapMain: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-    <Box p={2} sx={{ background: "#ebe9d4ff" ,borderRadius:2}}>
-      <Typography variant="h5" mb={2} color="#002060">
-        Stock Heatmap by Sector (Confidence & News Sentiment)
-      </Typography>
+      <Box p={2} sx={{ background: "#ebe9d4ff", borderRadius: 2 }}>
+        <Typography variant="h5" mb={2} color="#002060">
+          Stock Heatmap by Sector (Confidence & News Sentiment)
+        </Typography>
 
-      {loading ? (
-        <CircularProgress sx={{ color: "white" }} />
-      ) : error ? (
-        <Alert severity="error">{error}</Alert>
-      ) : (
-        <ReactApexChart options={options} series={series} type="treemap" height={600} />
-      )}
-    </Box>
+        {meta && (
+          <HeatmapMetadata
+            updated_ist_time={meta.updated_ist_time}
+            updated_us_time={meta.updated_us_time}
+            news_from_date={meta.news_from_date}
+            news_to_date={meta.news_to_date}
+            us_news_from_date={meta.us_news_from_date}
+            us_news_to_date={meta.us_news_to_date}
+          />
+        )}
+
+        {loading ? (
+          <Box mt={3}>
+            <CircularProgress sx={{ color: "#002060" }} />
+          </Box>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : (
+          <Box mt={3}>
+            <ReactApexChart
+              options={options}
+              series={series}
+              type="treemap"
+              height={600}
+            />
+          </Box>
+        )}
+      </Box>
     </Container>
   );
 };
