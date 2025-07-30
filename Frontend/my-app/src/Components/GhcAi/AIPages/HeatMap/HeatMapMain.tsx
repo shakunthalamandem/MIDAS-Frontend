@@ -91,10 +91,7 @@ const HeatMapMain: React.FC = () => {
         },
       },
     },
-    title: {
-      text: "Stock News Sentiment Treemap",
-      style: { fontSize: "18px", fontWeight: "bold" },
-    },
+
     plotOptions: {
       treemap: {
         distributed: false,
@@ -119,9 +116,9 @@ const HeatMapMain: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-    <Box p={2} sx={{ background: "linear-gradient(135deg, #0a6952ff, #012533ff)" }}>
-      <Typography variant="h5" mb={2} color="white">
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+    <Box p={2} sx={{ background: "#ebe9d4ff" ,borderRadius:2}}>
+      <Typography variant="h5" mb={2} color="#002060">
         Stock Heatmap by Sector (Confidence & News Sentiment)
       </Typography>
 
