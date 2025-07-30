@@ -15,7 +15,7 @@ interface GHCAIMainProps {
   error?: string | null;
 }
 
-const GHCAIMain: React.FC<GHCAIMainProps> = ({ data, loading, error }) => {
+ const GHCAIMain: React.FC<GHCAIMainProps> = ({ data, loading, error }) => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       {loading && (
@@ -72,5 +72,4 @@ const GHCAIMain: React.FC<GHCAIMainProps> = ({ data, loading, error }) => {
     </Container>
   );
 };
-
 export default GHCAIMain;

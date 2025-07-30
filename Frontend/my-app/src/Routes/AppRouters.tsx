@@ -61,7 +61,6 @@ import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
-import GHCAIMain from "../Components/GhcAi/GHCAIMain";
 import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
 

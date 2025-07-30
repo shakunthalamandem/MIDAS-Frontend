@@ -11,10 +11,10 @@ import {
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
-import GHCAIMain from "./GHCAIMain";
 import SuggestedQuestions from "./AIPages/SuggestedQuestions";
 import HeatMapMain from "./AIPages/HeatMap/HeatMapMain";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
+import  GHCAIMain  from "./GHCAIMain";
 
 const PerplexityChatMain: React.FC = () => {
   const location = useLocation();
