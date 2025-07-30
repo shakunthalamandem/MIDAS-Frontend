@@ -104,7 +104,8 @@ const DealTypeTable: React.FC = () => {
       <Card
         elevation={4}
         sx={{
-          background: "linear-gradient(to right, #e0f7fa, #f1f8e9)",
+                  background: "linear-gradient(to bottom, #f9fbe7, #e8f5e9)",
+
           borderRadius: 3,
           p: 3,
         }}
