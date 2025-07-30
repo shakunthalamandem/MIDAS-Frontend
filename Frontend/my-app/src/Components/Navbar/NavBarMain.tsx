@@ -177,6 +177,19 @@ const NavbarMain: React.FC = () => {
           </Link>
 
           <Box sx={{ flexGrow: 1, textAlign: "center" }}>
+                  <DropdownTab
+              label="AI-ML"
+              menuItems={[
+                { label: "Gen AI Tool", path: "/gen_ai_tool" },
+                { label: "US FO ML Model", path: "/machine_learning/equity" },
+                { label: "IPO Write-up", path: "/equity/ipo_dashboard" },
+                {label: "News", path: "/macro/news-summary" },
+                // { label: "High Yields", path: "/machine_learning/high-yield" },
+                // { label: "Converts", path: "/machine_learning/converts" },
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
             <Button
               onClick={() => handleTabSelect("P&L Attribution")}
               sx={{
@@ -206,16 +219,7 @@ const NavbarMain: React.FC = () => {
               setSelectedTab={setSelectedTab}
             />
 
-            <DropdownTab
-              label="Machine Learning (AI)"
-              menuItems={[
-                { label: "Equity", path: "/machine_learning/equity" },
-                { label: "High Yields", path: "/machine_learning/high-yield" },
-                { label: "Converts", path: "/machine_learning/converts" },
-              ]}
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-            />
+      
 
             <DropdownTab
               label="Opportunity & Performance"
