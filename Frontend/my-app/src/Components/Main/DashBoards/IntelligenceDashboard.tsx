@@ -196,7 +196,7 @@ const IntelligenceDashboard: React.FC = () => {
                 elevation={3}
                 sx={{
                   p: 3,
-                  background: "linear-gradient(to right, #f3e5f5, #ffffff)",
+                  background: "linear-gradient(#f0f5ff)",
                   borderRadius: 4,
                   mb: 2,
                 }}
