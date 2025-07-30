@@ -59,19 +59,37 @@ export const formatNumber = (value: number): string => {
   if (absValue >= 1e3) return `${(absValue / 1e3).toFixed(0)}K`;
   return absValue.toString();
 };
-
+export const formatvalueNumber = (value: number): string => {
+  const absValue = Math.abs(value);
+  if (absValue >= 1e9) return `$${(absValue / 1e9).toFixed(0)}B`;
+  if (absValue >= 1e6) return `$${(absValue / 1e6).toFixed(0)}M`;
+  if (absValue >= 1e3) return `#${(absValue / 1e3).toFixed(0)}K`;
+  return absValue.toString();
+};
 export const dealGridColumns: GridColDef[] = [
-  { field: "first_trade_date", headerName: "TradeDt", flex: 1 },
+{
+  field: "first_trade_date",
+  headerName: "Trade Date",
+  flex: 1,
+  valueFormatter: (params) => {
+    const date = new Date(params);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  },
+},
   { field: "client_symbol", headerName: "Ticker", flex: 1 },
-  { field: "custom_group_2", headerName: "Sector", flex: 1 },
+  { field: "sector", headerName: "Sector", flex: 1 },
   { field: "fo_type", headerName: "Deal Type", flex: 1 ,  renderCell: (params) => params.value != null ? params.value : "-"
 },
+{field:'initial_pricing_range', headerName: 'Initial Pricing Range', flex: 1, renderCell: (params) => params.value != null ? params.value : '-'},
 
   {
     field: "deal_size",
     headerName: "Deal Size",
     flex: 1,
-    valueFormatter: (params) => formatNumber(params),
+    valueFormatter: (params) => formatvalueNumber(params),
   },
   {
     field: "issue_offer_price",
@@ -79,12 +97,12 @@ export const dealGridColumns: GridColDef[] = [
     flex: 1,
     valueFormatter: (params) => currencyFormatter.format(params),
   },
-  {
-    field: "discount_from_announcement_price",
-    headerName: "% Discount",
-    flex: 1,
-    valueFormatter: (params) => `${numberFormatter.format(params)}%`,
-  },
+{
+  field: "discount_from_announcement_price",
+  headerName: "% Discount",
+  flex: 1,
+  valueFormatter: (params) => `${parseFloat(params).toFixed(2)}%`,
+},
   {
     field: "subscription_bid_shares",
     headerName: "IOI",
@@ -101,7 +119,7 @@ export const dealGridColumns: GridColDef[] = [
     field: "allocation_deal_size_percentage",
     headerName: "Allocation % of deal size",
     flex: 1,
-    valueFormatter: (params) => `${numberFormatter.format(params)}%`,
+  valueFormatter: (params) => `${parseFloat(params).toFixed(2)}%`,
   },
   {
     field: "am_buy_shares",
@@ -115,12 +133,12 @@ export const dealGridColumns: GridColDef[] = [
     flex: 1,
     valueFormatter: (params) => currencyFormatter.format(params),
   },
-  {
-    field: "last_price_t1",
-    headerName: "T-1 Close",
-    flex: 1,
-    valueFormatter: (params) => currencyFormatter.format(params),
-  },
+  // {
+  //   field: "last_price_t1",
+  //   headerName: "T-1 Close",
+  //   flex: 1,
+  //   valueFormatter: (params) => currencyFormatter.format(params),
+  // },
   {
     field: "t1d_open",
     headerName: "T+1 Open",
@@ -145,16 +163,17 @@ export const dealGridColumns: GridColDef[] = [
     flex: 1,
     valueFormatter: (params) => currencyFormatter.format(params),
   },
-  // {
-  //   field: "daily_long_exposure",
-  //   headerName: "Exposure as % of LMV",
-  //   flex: 1,
-  //   valueFormatter: (params) => formatNumber(params),
-  // },
-  {
+    {
     field: "pnl",
     headerName: "P&L",
     flex: 1,
     valueFormatter: (params) => `${numberFormatter1.format(params)}`,
   },
+  {
+    field: "exposure_percentage_lmv",
+    headerName: "Exposure as % of LMV",
+    flex: 1,
+valueFormatter: (params) => `${formatNumber(params)}%`,
+  },
+
 ];

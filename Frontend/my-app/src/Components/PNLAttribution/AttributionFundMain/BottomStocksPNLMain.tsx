@@ -70,7 +70,7 @@ const BottomStocksPNLMain: React.FC<BottomStocksPNLMainProps> = ({ fund }) => {
   const columns: GridColDef[] = [
     { field: "ticker", headerName: "Ticker", flex: 1 ,},
     { field: "first_trade_date", headerName: "Issue Date", flex: 1 },
-    { field: "cumulative_pnl", headerName: "Cumulative PnL", flex: 1, renderCell: ({ value }) => (
+    { field: "cumulative_pnl", headerName: "YTD P&L", flex: 1, renderCell: ({ value }) => (
         <span style={{ color: value > 0 ? "green" : value < 0 ? "red" : "black" }}>
           {typeof value === "number" && !isNaN(value)
             ? currencyFormatter.format(value)
@@ -103,7 +103,7 @@ const BottomStocksPNLMain: React.FC<BottomStocksPNLMainProps> = ({ fund }) => {
               borderTopRightRadius: "16px",
             }}
           >
-  High Loss Positions (PnL &lt; -$1M) for {fund}
+ Equities  High Loss Positions (P&L &lt; -$500K) for {fund}
           </Typography>
 
           {loading ? (

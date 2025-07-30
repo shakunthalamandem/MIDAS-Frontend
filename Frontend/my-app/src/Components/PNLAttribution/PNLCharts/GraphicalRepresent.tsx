@@ -41,7 +41,7 @@ type PnLData = {
 };
 
 type GraphicalRepresentProps = {
-  appliedFilters: Record<string, any>; // update this type based on your filter shape
+  appliedFilters: Record<string, any>; // Update this type based on your filter shape
 };
 
 const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
@@ -70,6 +70,7 @@ const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
       points[0].date
     );
   };
+
   const getOrdinalSuffix = (day: number): string => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
@@ -93,50 +94,54 @@ const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
     const year = date.getFullYear();
     return `${day}${suffix} ${month} ${year}`;
   };
-useEffect(() => {
-  const fetchPnLData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
 
-      const response = await fetch(`${apiUrl}/api/pnls_graphs/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(appliedFilters),
-      });
-
-
-      const result = await response.json();
-
-      if (result.Response === "No trade data available.") {
-        setError("No data found for these filters.");
-        setData(null);
-      } else {
-        setData(result);
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to load data");
-      setData(null);
-    } finally {
-      setLoading(false);
-    }
+  const formatXAxisDate = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const day = date.getDate();
+    const month = date.toLocaleString("default", { month: "short" });
+    return `${month}${day}`;
   };
 
-  if (token) {
-    fetchPnLData();
-  } else {
-    setError("No access token found.");
-    setLoading(false);
-    setData(null);
-  }
-}, [token, apiUrl, appliedFilters]);
+  useEffect(() => {
+    const fetchPnLData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
+        const response = await fetch(`${apiUrl}/api/pnls_graphs/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(appliedFilters),
+        });
 
+        const result = await response.json();
 
+        if (result.Response === "No trade data available.") {
+          setError("No data found for these filters.");
+          setData(null);
+        } else {
+          setData(result);
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to load data");
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (token) {
+      fetchPnLData();
+    } else {
+      setError("No access token found.");
+      setLoading(false);
+      setData(null);
+    }
+  }, [token, apiUrl, appliedFilters]);
 
   const chartKeys = ["wtd", "mtd", "qtd", "ytd"] as const;
 
@@ -155,7 +160,7 @@ useEffect(() => {
             sx={{ mb: 1, textAlign: "center", fontWeight: "bold" }}
           >
             Cumulative <span style={{ textTransform: "uppercase" }}>{key}</span>{" "}
-            - P&L
+            - P&amp;L
           </Typography>
 
           <Typography
@@ -180,23 +185,22 @@ useEffect(() => {
                 type="category"
                 interval="preserveStartEnd"
                 padding={{ left: 0, right: 0 }}
-                tickFormatter={(value, index) => (index === 0 ? "" : value)}
+                tickFormatter={formatXAxisDate}
               />
-
               <YAxis
                 tickFormatter={formatValue}
                 padding={{ top: 10, bottom: 10 }}
               />
               <Tooltip
                 formatter={(value: any) => formatValue(value)}
-                labelFormatter={(label) => `Date: ${label}`}
+                labelFormatter={(label) => `Date: ${formatDate(label)}`}
               />
               <Legend />
               <Line
                 dataKey="cumulative_pnl"
                 stroke="#1976d2"
                 strokeWidth={2}
-                name="Cumulative PNL"
+                name="Cumulative P&L"
                 dot={false}
               />
             </LineChart>
