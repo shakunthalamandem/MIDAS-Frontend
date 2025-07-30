@@ -33,16 +33,17 @@ interface TotalsData {
   exposure: number;
   dtd_pnl: number;
   mtd_pnl: number;
+  ytd_pnl: number;
 }
 
 const DEAL_TYPE_ORDER = ["IPO", "FO", "STRATEGIC", "Cash", "Hedging", "Other"];
 
 const COLORS_BY_DEAL_TYPE: Record<string, string> = {
-  Cash: "#00acc1",
-  IPO: "#e91e63",
-  FO: "#43a047",
-  STRATEGIC: "#fb8c00",
-  Hedging: "#9c27b0",
+  Cash: "#c0be2cff",
+  IPO: "#256148ff",
+  FO: "#e97619ff",
+  STRATEGIC: "#006d75ff",
+  Hedging: "#751c85ff",
   Other: "#607d8b",
 };
 
@@ -85,6 +86,7 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
   const [exposureData, setExposureData] = useState<DealTypeData[]>([]);
   const [dtdData, setDtdData] = useState<DealTypeData[]>([]);
   const [mtdData, setMtdData] = useState<DealTypeData[]>([]);
+  const [ytdData, setYtdData] = useState<DealTypeData[]>([]);
   const [totals, setTotals] = useState<TotalsData | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -117,6 +119,7 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
           setExposureData(formatData(result.exposure));
           setDtdData(formatData(result.dtd_pnl));
           setMtdData(formatData(result.mtd_pnl));
+          setYtdData(formatData(result.ytd_pnl));
           setTotals(result.totals);
         } else {
           setError("Invalid response format.");
@@ -141,6 +144,7 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
 
   const dtdMax = getSymmetricMax(dtdData);
   const mtdMax = getSymmetricMax(mtdData);
+  const ytdMax = getSymmetricMax(ytdData);
 
   const renderChart = (
     title: string,
@@ -172,7 +176,7 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
             <YAxis
               type="category"
               dataKey="dealType"
-              tick={{ fill: "#e30000", fontWeight: 400 }}
+              tick={{ fill: "#99000c", fontWeight: 400 }}
               width={140}
             />
           ) : (
@@ -239,7 +243,7 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
       >
         <Card
           sx={{
-            background: "linear-gradient(135deg, rgb(201, 214, 248), #e3f2fd)",
+            background: "linear-gradient(135deg, rgba(214, 222, 241, 1), #e3f2fd)",
             boxShadow: 4,
             borderRadius: 4,
             p: 2,
@@ -251,13 +255,14 @@ const ExposureDtdMtdByDealTypeChart: React.FC<ChartProps> = ({ fund }) => {
               sx={{ color: "#002060", fontWeight: 600, mb: 3 }}
               align="center"
             >
-              Deal Type-wise Exposure, DTD and MTD PnL for {fund}
+              Deal Type-wise Exposure, DTD and MTD P&L for {fund}
             </Typography>
 
             <Box display="flex" gap={3}>
               {renderChart("Exposure", exposureData, true, undefined, totals?.exposure)}
-              {renderChart("DTD PnL", dtdData, false, dtdMax, totals?.dtd_pnl)}
-              {renderChart("MTD PnL", mtdData, false, mtdMax, totals?.mtd_pnl)}
+              {renderChart("DTD P&L", dtdData, false, dtdMax, totals?.dtd_pnl)}
+              {renderChart("MTD P&L", mtdData, false, mtdMax, totals?.mtd_pnl)}
+              {renderChart("YTD P&L", ytdData, false, ytdMax, totals?.ytd_pnl)}
             </Box>
           </CardContent>
         </Card>

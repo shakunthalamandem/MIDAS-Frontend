@@ -33,13 +33,14 @@ interface TotalsData {
   exposure: number;
   dtd_pnl: number;
   mtd_pnl: number;
+  ytd_pnl: number;
 }
 
 const REGION_ORDER = ["US", "EMEA", "APAC", "Non-US America"];
 
 const COLORS_BY_REGION: Record<string, string> = {
   "US": "#00acc1",
-  "EMEA": "#e91e63",
+  "EMEA": "#fddc48ff",
   "APAC": "#43a047",
   "Non-US America": "#fb8c00",
 };
@@ -83,6 +84,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
   const [exposureData, setExposureData] = useState<RegionData[]>([]);
   const [dtdData, setDtdData] = useState<RegionData[]>([]);
   const [mtdData, setMtdData] = useState<RegionData[]>([]);
+  const [ytdData, setYtdData] = useState<RegionData[]>([]);
   const [totals, setTotals] = useState<TotalsData | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -115,6 +117,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
           setExposureData(formatRegionData(result.exposure));
           setDtdData(formatRegionData(result.dtd_pnl));
           setMtdData(formatRegionData(result.mtd_pnl));
+          setYtdData(formatRegionData(result.ytd_pnl));
           setTotals(result.totals);
         } else {
           setError("Invalid response format.");
@@ -155,6 +158,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
 
   const dtdMax = getSymmetricMax(dtdData);
   const mtdMax = getSymmetricMax(mtdData);
+  const ytdMax = getSymmetricMax(ytdData);
 
   const renderChart = (
     title: string,
@@ -186,7 +190,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
             <YAxis
               type="category"
               dataKey="region"
-              tick={{ fill: "#e30000", fontWeight: 400 }}
+              tick={{ fill: "#99000c", fontWeight: 400 }}
               width={140}
             />
           ) : (
@@ -237,7 +241,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
       >
         <Card
           sx={{
-            background: "linear-gradient(135deg, rgb(201, 214, 248), #e3f2fd)",
+            background: "linear-gradient(135deg, rgba(214, 222, 241, 1), #e3f2fd)",
             boxShadow: 4,
             borderRadius: 4,
             p: 2,
@@ -249,13 +253,14 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
               sx={{ color: "#002060", fontWeight: 600, mb: 3 }}
               align="center"
             >
-              Region-wise Exposure, DTD and MTD PnL for {fund}
+              Region-wise Exposure, DTD and MTD P&L for {fund}
             </Typography>
 
             <Box display="flex" gap={3}>
               {renderChart("Exposure", exposureData, true, undefined, totals?.exposure)}
-              {renderChart("DTD PnL", dtdData, false, dtdMax, totals?.dtd_pnl)}
-              {renderChart("MTD PnL", mtdData, false, mtdMax, totals?.mtd_pnl)}
+              {renderChart("DTD P&L", dtdData, false, dtdMax, totals?.dtd_pnl)}
+              {renderChart("MTD P&L", mtdData, false, mtdMax, totals?.mtd_pnl)}
+              {renderChart("YTD P&L", ytdData, false, ytdMax, totals?.ytd_pnl)}
             </Box>
           </CardContent>
         </Card>

@@ -1,30 +1,32 @@
 import React, { useEffect, useState } from "react";
 import {
-  LineChart,
-  Line,
+  ScatterChart,
+  Scatter,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 import {
   Box,
-  CircularProgress,
-  Typography,
   Button,
+  Card,
+  CircularProgress,
+  Container,
+  Typography,
   Paper,
 } from "@mui/material";
 
+interface PnlItem {
+  client_symbol: string;
+  pnl: number;
+  days_held: number;
+}
+
 interface PnlApiResponse {
-  [key: string]: {
-    "<5": number;
-    "5-10": number;
-    "10-30": number;
-    "30-60": number;
-    ">60": number;
-  };
+  trade_date: string;
+  [key: string]: string | { [daysHeld: string]: PnlItem[] };
 }
 
 type Props = {
@@ -40,20 +42,46 @@ const OPTIONS = [
 const formatNumber = (value: number): string => {
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-
-  if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(2)}B`;
-  if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(2)}M`;
-  if (absValue >= 1_000) return `${sign}$${(absValue / 1_000).toFixed(2)}K`;
+  if (absValue >= 1_000_000_000)
+    return `${sign}$${(absValue / 1_000_000_000).toFixed(0)}B`;
+  if (absValue >= 1_000_000)
+    return `${sign}$${(absValue / 1_000_000).toFixed(0)}M`;
+  if (absValue >= 1_000)
+    return `${sign}$${(absValue / 1_000).toFixed(0)}K`;
   return `${sign}$${absValue.toFixed(0)}`;
 };
 
-const DAYS_HELD_LABELS = ["<5", "5-10", "10-30", "30-60", ">60"];
+
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const trade: PnlItem = payload[0].payload;
+
+    return (
+      <Paper sx={{ p: 2, border: "1px solid #ccc" }}>
+        <Typography variant="subtitle2" color="#002060" gutterBottom>
+          <b>{trade.client_symbol}</b>
+        </Typography>
+        <Typography variant="body2" color="#00695c">
+          Days Held: <b>{trade.days_held}</b>
+        </Typography>
+        <Typography
+          variant="body2"
+          color={trade.pnl >= 0 ? "#2e7d32" : "#c62828"}
+        >
+          P&L: <b>{formatNumber(trade.pnl)}</b>
+        </Typography>
+      </Paper>
+    );
+  }
+
+  return null;
+};
 
 const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
   const [data, setData] = useState<PnlApiResponse | null>(null);
-  const [selectedOption, setSelectedOption] = useState<string>("us_ipo");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const [selectedOption, setSelectedOption] = useState("us_ipo");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -67,8 +95,8 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
     fetch(`${apiUrl}/api/cummulative_pnl/`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : "",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ fund }),
     })
@@ -86,69 +114,117 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
       });
   }, [fund, apiUrl, token]);
 
-  const getChartData = () => {
+  const getChartData = (): PnlItem[] => {
     if (!data || !data[selectedOption]) return [];
+    const raw = data[selectedOption];
 
-    const record = data[selectedOption] as Record<string, number>;
+    if (typeof raw !== "object") return [];
 
-    return DAYS_HELD_LABELS.map((label) => ({
-      daysHeld: label,
-      pnl: record[label] ?? 0, // Keep as number for charting
-    }));
+    return Object.values(raw)
+      .flat()
+      .filter(
+        (item): item is PnlItem =>
+          item && "client_symbol" in item && "days_held" in item
+      );
   };
 
   return (
-    <Paper elevation={4} sx={{ p: 3, mt: 4, borderRadius: 2 }}>
-      <Typography variant="h6" color="#002060" mb={2} align="center">
-        Cumulative PnL by Days Held
-      </Typography>
+    <Container maxWidth="xl" sx={{ mt: 3, mb: 4 }}>
+      <Card
+        elevation={4}
+        sx={{
+          p: 4,
+             background: "linear-gradient(to bottom, #e3f2fd, #e4f1e2ff)",
+        }}
+      >
+        <Typography
+          variant="h6"
+          align="center"
+          sx={{
+            mb: 2,
+            fontWeight: 700,
+            background: "linear-gradient(to right, #006060ff, #024e61ff)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          Equities Cummulative P&L by Days Held in— {fund} Portfolio -{" "}
+          {selectedOption.replace(/_/g, " ").toUpperCase()} As on{" "}
+          {data?.trade_date || "N/A"}
+        </Typography>
 
-      <Box display="flex" gap={2} mb={2} width="100%">
-        {OPTIONS.map((opt) => (
-          <Box key={opt.key} flex={1}>
+        <Box display="flex" gap={2} mb={3}>
+          {OPTIONS.map((opt) => (
             <Button
-              fullWidth
+              key={opt.key}
               variant={selectedOption === opt.key ? "contained" : "outlined"}
               onClick={() => setSelectedOption(opt.key)}
               sx={{
+                flex: 1,
                 textTransform: "none",
+                borderColor: "#002060",
                 backgroundColor:
                   selectedOption === opt.key ? "#002060" : "transparent",
                 color: selectedOption === opt.key ? "#fff" : "#002060",
-                borderColor: "#002060",
               }}
             >
               {opt.label}
             </Button>
-          </Box>
-        ))}
-      </Box>
-
-      {loading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" height={300}>
-          <CircularProgress />
+          ))}
         </Box>
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : (
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart data={getChartData()}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="daysHeld" />
-            <YAxis tickFormatter={formatNumber} />
-            <Tooltip formatter={(value: number) => formatNumber(value)} />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="pnl"
-              stroke="#1976d2"
-              activeDot={{ r: 6 }}
-              name="Cumulative PnL"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      )}
-    </Paper>
+
+        {loading ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height={300}
+          >
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : (
+          <ResponsiveContainer width="100%" height={420}>
+            <ScatterChart>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                type="number"
+                dataKey="days_held"
+                domain={[0, 70]}
+                tickCount={8}
+                tick={{ fill: "#002060", fontSize: 12 }}
+                label={{
+                  value: "Days Held",
+                  fill: "#002060",
+                  offset: -1,
+                  position: "insideBottom",
+                }}
+              />
+              <YAxis
+                type="number"
+                dataKey="pnl"
+                tickFormatter={formatNumber}
+                tick={{ fill: "#002060", fontSize: 12 }}
+                label={{
+                  value: "P&L",
+                  angle: -90,
+                  position: "insideLeft",
+                  fill: "#002060",
+                }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Scatter
+                name="Tickers"
+                data={getChartData()}
+                fill="#2979ff"
+                shape="circle"
+              />
+            </ScatterChart>
+          </ResponsiveContainer>
+        )}
+      </Card>
+    </Container>
   );
 };
 

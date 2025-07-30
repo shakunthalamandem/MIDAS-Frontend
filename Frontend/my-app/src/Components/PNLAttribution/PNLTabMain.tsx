@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Radio,
@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import TableRowsIcon from "@mui/icons-material/TableRows";
+import { useNavigate, useParams } from "react-router-dom";
 
 import PnlAttributionMain from "./PnlAttributionMain";
 import PNLGraphsMain from "./PNLCharts/PNLGraphsMain";
@@ -17,15 +18,17 @@ import PNLPagesMain from "./PNLPages/PNLPagesMain";
 import AttributionFundMainTab from "./AttributionFundMain/AttributionFundMainTab";
 
 const PNLTabMain = () => {
-  const [selectedView, setSelectedView] = useState("summary_pnl");
+  const navigate = useNavigate();
+  const { tab = "summary_pnl" } = useParams(); // Get tab from URL or fallback to default
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedView((event.target as HTMLInputElement).value);
+    const newTab = (event.target as HTMLInputElement).value;
+    navigate(`/portfolio-attribution/${newTab}`);
   };
 
   return (
     <Box>
-           <Typography
+      <Typography
         variant="body2"
         sx={{
           fontWeight: 500,
@@ -50,18 +53,12 @@ const PNLTabMain = () => {
       >
         Welcome to Monashee's latest P&L performance overview.
       </Typography>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          mb: 2,
-          mt: 2,
-        }}
-      >
+
+      <Box sx={{ display: "flex", justifyContent: "center", mb: 2, mt: 2 }}>
         <FormControl>
           <RadioGroup
             row
-            value={selectedView}
+            value={tab}
             onChange={handleChange}
             sx={{
               gap: 3,
@@ -82,9 +79,7 @@ const PNLTabMain = () => {
                 <Radio
                   sx={{
                     color: "#00796b",
-                    "&.Mui-checked": {
-                      color: "#00796b",
-                    },
+                    "&.Mui-checked": { color: "#00796b" },
                   }}
                 />
               }
@@ -101,9 +96,7 @@ const PNLTabMain = () => {
                 <Radio
                   sx={{
                     color: "#00796b",
-                    "&.Mui-checked": {
-                      color: "#00796b",
-                    },
+                    "&.Mui-checked": { color: "#00796b" },
                   }}
                 />
               }
@@ -114,62 +107,57 @@ const PNLTabMain = () => {
                 </Box>
               }
             />
-                    <FormControlLabel
+            <FormControlLabel
               value="equities__pnl_attribution"
               control={
                 <Radio
                   sx={{
                     color: "#00796b",
-                    "&.Mui-checked": {
-                      color: "#00796b",
-                    },
+                    "&.Mui-checked": { color: "#00796b" },
                   }}
                 />
               }
               label={
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
                   <BarChartIcon fontSize="small" />
-                  <Typography variant="h6">Equities	 P&L Attribution</Typography>
+                  <Typography variant="h6">Equities P&L Attribution</Typography>
                 </Box>
               }
             />
-
-              {/* <FormControlLabel
+            <FormControlLabel
               value="pnlfunddeatils"
               control={
                 <Radio
                   sx={{
                     color: "#00796b",
-                    "&.Mui-checked": {
-                      color: "#00796b",
-                    },
+                    "&.Mui-checked": { color: "#00796b" },
                   }}
                 />
               }
               label={
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
                   <BarChartIcon fontSize="small" />
-                  <Typography variant="h6">Fund Details</Typography>
+                  <Typography variant="h6">Daily Note to Fund</Typography>
                 </Box>
               }
-            /> */}
+            />
           </RadioGroup>
         </FormControl>
       </Box>
 
       {/* Animated Content Switch */}
-      <Fade in={selectedView === "summary_pnl"} timeout={400} mountOnEnter unmountOnExit>
-        <Box>{selectedView === "summary_pnl" && <PNLGraphsMain />}</Box>
+      <Fade in={tab === "summary_pnl"} timeout={400} mountOnEnter unmountOnExit>
+        <Box>{tab === "summary_pnl" && <PNLGraphsMain />}</Box>
       </Fade>
-      <Fade in={selectedView === "total_pnl_attribution"} timeout={400} mountOnEnter unmountOnExit>
-        <Box>{selectedView === "total_pnl_attribution" && <PnlAttributionMain />}</Box>
+      <Fade in={tab === "total_pnl_attribution"} timeout={400} mountOnEnter unmountOnExit>
+        <Box>{tab === "total_pnl_attribution" && <PnlAttributionMain />}</Box>
       </Fade>
-      <Fade in={selectedView === "equities__pnl_attribution"} timeout={400} mountOnEnter unmountOnExit>
-        <Box>{selectedView === "equities__pnl_attribution" && <PNLPagesMain />}</Box>
+      <Fade in={tab === "equities__pnl_attribution"} timeout={400} mountOnEnter unmountOnExit>
+        <Box>{tab === "equities__pnl_attribution" && <PNLPagesMain />}</Box>
       </Fade>
-       {/* <Fade in={selectedView === "pnlfunddeatils"} timeout={400} mountOnEnter unmountOnExit>
-        <Box>{selectedView === "pnlfunddeatils" && <AttributionFundMainTab />}</Box>
-      </Fade> */}
+      <Fade in={tab === "pnlfunddeatils"} timeout={400} mountOnEnter unmountOnExit>
+        <Box>{tab === "pnlfunddeatils" && <AttributionFundMainTab />}</Box>
+      </Fade>
     </Box>
   );
 };

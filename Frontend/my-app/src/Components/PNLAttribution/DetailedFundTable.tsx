@@ -22,6 +22,11 @@ interface TableRowData {
     values: { [month: string]: number };
 }
 
+// Custom asset order
+const assetOrder = [
+    "Equities", "Convertible Bond", "Corporate Bond", "Cash", "Warrants", "Futures"
+];
+
 const formatCurrency = (value: number): string => {
     const absValue = Math.abs(value);
     const suffix = absValue >= 1_000_000 ? "M" : absValue >= 1_000 ? "K" : "";
@@ -95,7 +100,7 @@ const DetailedFundTable: React.FC = () => {
     return (
         <Container>
             <Typography variant="h6" sx={{ mt: 1, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}>
-                 Fund-Wise P&L Attribution
+                Fund-Wise P&L Attribution
             </Typography>
 
             <TableContainer component={Paper} sx={{ mt: 1, mb: 4, borderRadius: 2, boxShadow: 3, overflow: "auto", border: "1px solid #000" }}>
@@ -135,10 +140,20 @@ const DetailedFundTable: React.FC = () => {
 
                                 sortedFundNames.forEach((fundName) => {
                                     const fundRows = groupedByFund[fundName];
+
+                                    // Sort fundRows by asset order
+                                    const sortedFundRows = fundRows.sort((a, b) => {
+                                        const indexA = assetOrder.indexOf(a.assetType);
+                                        const indexB = assetOrder.indexOf(b.assetType);
+                                        const orderA = indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA;
+                                        const orderB = indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB;
+                                        return orderA - orderB;
+                                    });
+
                                     const assetTotals: { [month: string]: number } = {};
                                     months.forEach((m) => (assetTotals[m] = 0));
 
-                                    fundRows.forEach((row, idx) => {
+                                    sortedFundRows.forEach((row, idx) => {
                                         months.forEach((m) => {
                                             assetTotals[m] += row.values[m] ?? 0;
                                             overallTotals[m] += row.values[m] ?? 0;
@@ -149,7 +164,7 @@ const DetailedFundTable: React.FC = () => {
                                                 {idx === 0 && (
                                                     <TableCell
                                                         sx={{ ...cellBorder, fontWeight: "bold" }}
-                                                        rowSpan={fundRows.length + 1}
+                                                        rowSpan={sortedFundRows.length + 1}
                                                     >
                                                         {fundName}
                                                     </TableCell>

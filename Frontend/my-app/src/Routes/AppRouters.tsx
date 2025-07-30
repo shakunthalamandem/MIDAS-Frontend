@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, } from "react-router-dom";
+import { Routes, Route, Navigate, } from "react-router-dom";
 import CapitalMarketsStatic from "../Components/HomepageStatic/CapitalMarketsStatic";
 import Login from "../Components/Main/HomePage/Authentication/Login";
 import SignUp from "../Components/Main/HomePage/Authentication/SignUp";
@@ -131,7 +131,8 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path="/portfolio-attribution" element={<AuthGuard><PNLTabMain /></AuthGuard>} />
+        <Route path="/portfolio-attribution" element={<Navigate to="/portfolio-attribution/summary_pnl" />} />
+        <Route path="/portfolio-attribution/:tab" element={<AuthGuard><PNLTabMain /></AuthGuard>} />
         <Route path="/portfolio-attribution/details/:assetType" element={<AuthGuard><DeatiledRegionPnlAttribution /></AuthGuard>}/>
     
 
