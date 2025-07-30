@@ -21,6 +21,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import MethodologyAccordion1Day from "./MethodologyAccordion1Day";
 
 interface PredictionModel {
   prediction: string | null;
@@ -327,6 +328,9 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
         </Box>
 
         <Divider sx={{ my: 3 }} />
+        <Box mb={2}>
+          <MethodologyAccordion1Day />
+        </Box>
 
         <TableContainer>
           <Table>
