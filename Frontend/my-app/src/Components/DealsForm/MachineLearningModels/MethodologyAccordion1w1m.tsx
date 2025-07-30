@@ -16,6 +16,7 @@ import {
   Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
@@ -74,40 +75,99 @@ const MethodologyAccordion1w1m: React.FC = () => {
           borderRadius: "12px 12px 0 0",
           px: 3,
           py: 2,
-          justifyContent: "space-between",
           "& .MuiAccordionSummary-content": {
             alignItems: "center",
-            gap: 2,
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
           },
         }}
       >
-        <Typography
-          variant="h6"
-          fontWeight="600"
-          color={theme.palette.primary.main}
-          letterSpacing={0.5}
-        >
-          Model Methodology
-        </Typography>
+        {/* Left: Title + Expand */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography
+            variant="h6"
+            fontWeight="600"
+            color={theme.palette.primary.main}
+            letterSpacing={0.5}
+          >
+            Model Methodology
+          </Typography>
 
-        <Tooltip title={expanded ? "Collapse details" : "Expand details"}>
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggle();
-            }}
-            variant="outlined"
-            size="small"
-            startIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            sx={{
-              textTransform: "none",
-              borderRadius: 2,
-              fontWeight: 600,
+          <Tooltip title={expanded ? "Collapse details" : "Expand details"}>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggle();
+              }}
+              variant="outlined"
+              size="small"
+              startIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+                fontWeight: 600,
+              }}
+            >
+              {expanded ? "Collapse" : "Expand"}
+            </Button>
+          </Tooltip>
+        </Box>
+
+        {/* Right: Model Definitions Tooltip */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Typography
+            variant="body2"
+            fontWeight={500}
+            color={theme.palette.text.secondary}
+          >
+            Model Definitions
+          </Typography>
+          <Tooltip
+            title={
+              <Box sx={{ p: 1, maxWidth: 250 }}>
+                <Typography variant="body2" fontWeight="600" gutterBottom>
+                  Accuracy
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="inherit"
+                  display="block"
+                  gutterBottom
+                >
+                  Indicates the proportion of times the model correctly predicts
+                  the direction of price movement.
+                </Typography>
+                <Typography variant="body2" fontWeight="600" gutterBottom>
+                  Confidence
+                </Typography>
+                <Typography variant="caption" color="inherit">
+                  Represents the model’s level of certainty in its prediction.
+                  Higher confidence implies stronger conviction in the outcome.
+                </Typography>
+              </Box>
+            }
+            arrow
+            placement="top"
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: theme.palette.background.paper,
+                  color: theme.palette.text.primary,
+                  boxShadow: theme.shadows[3],
+                  borderRadius: 2,
+                  maxWidth: 300,
+                  p: 1.5,
+                },
+              },
             }}
           >
-            {expanded ? "Collapse" : "Expand"}
-          </Button>
-        </Tooltip>
+            <InfoOutlinedIcon
+              fontSize="small"
+              sx={{ color: theme.palette.info.main, cursor: "pointer" }}
+            />
+          </Tooltip>
+        </Box>
       </AccordionSummary>
 
       <AccordionDetails
