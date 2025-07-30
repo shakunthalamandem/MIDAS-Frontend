@@ -48,6 +48,7 @@ interface DealData {
   "Total Gap Shares": number;
   "Days Held": number;
   "Current Quantity": number;
+  "Current Position Value": number;
 }
 
 const formatCurrency = (val: number | null | undefined) => {
@@ -311,6 +312,12 @@ const DealDetailedGapAnalysis: React.FC = () => {
       ),
     },
     { field: "Days Held", headerName: "Days Held", width: 100 },
+    {
+      field: "Current Position Value",
+      headerName: "Current Position Value",
+      width: 120,
+      renderCell: (params) => formatCurrency(params.value),
+    },
   ];
 
   return (
@@ -418,27 +425,35 @@ const DealDetailedGapAnalysis: React.FC = () => {
               disableRowSelectionOnClick
               sx={{
                 fontSize: "0.75rem",
+                border: "1px solid #e0e0e0", // outer border
                 "& .MuiDataGrid-columnHeaders": {
-                  height: 32,
-                  minHeight: "32px !important",
-                  maxHeight: "32px !important",
-                  lineHeight: "32px",
+                  minHeight: 48,
+                  maxHeight: 48,
+                  lineHeight: "1.4",
                   bgcolor: "#f3f4f6",
                   color: "#1e293b",
                 },
                 "& .MuiDataGrid-columnHeaderTitle": {
                   fontWeight: "bold",
                   fontSize: "0.8rem",
-                  lineHeight: "32px",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
+                  whiteSpace: "normal", // allow wrapping
+                  lineHeight: "1.2",
+                  textAlign: "center",
                 },
                 "& .MuiDataGrid-cell": {
                   color: "#374151",
                   paddingTop: "4px",
                   paddingBottom: "4px",
                   lineHeight: "1.2",
+                  borderRight: "1px solid #e0e0e0",
+                  borderBottom: "1px solid #e0e0e0",
+                },
+                "& .MuiDataGrid-row": {
+                  borderBottom: "1px solid #e0e0e0",
+                },
+                "& .MuiDataGrid-columnHeader": {
+                  borderRight: "1px solid #e0e0e0",
+                  borderBottom: "1px solid #e0e0e0",
                 },
                 "& .MuiDataGrid-row:nth-of-type(odd)": {
                   backgroundColor: "#fcfcfc",
