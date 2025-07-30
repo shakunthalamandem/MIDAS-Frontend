@@ -56,7 +56,7 @@ const StockHeatmapTreemap: React.FC<Props> = ({ data }) => {
           const stockName = series[config.seriesIndex].data[config.dataPointIndex].x;
           const fullStock = data.find((d) => d.stock_name === stockName);
           if (fullStock) {
-            navigate("/aidemo", { state: { stock: fullStock } });
+            navigate("/gen_ai_tool", { state: { stock: fullStock } });
           }
         },
       },

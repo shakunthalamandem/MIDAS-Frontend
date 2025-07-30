@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactApexChart from "react-apexcharts";
-import { Box, Typography, CircularProgress, Alert } from "@mui/material";
+import { Box, Typography, CircularProgress, Alert, Container } from "@mui/material";
 
 type StockHeatValue = {
   stock_name: string;
@@ -86,7 +86,7 @@ const HeatMapMain: React.FC = () => {
           const stockName = series[config.seriesIndex].data[config.dataPointIndex].x;
           const fullStock = data.find((d) => d.stock_name === stockName);
           if (fullStock) {
-            navigate("/aidemo", { state: { stock: fullStock } });
+            navigate("/gen_ai_tool", { state: { stock: fullStock } });
           }
         },
       },
@@ -119,6 +119,7 @@ const HeatMapMain: React.FC = () => {
   };
 
   return (
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
     <Box p={2} sx={{ background: "linear-gradient(135deg, #0a6952ff, #012533ff)" }}>
       <Typography variant="h5" mb={2} color="white">
         Stock Heatmap by Sector (Confidence & News Sentiment)
@@ -132,6 +133,7 @@ const HeatMapMain: React.FC = () => {
         <ReactApexChart options={options} series={series} type="treemap" height={600} />
       )}
     </Box>
+    </Container>
   );
 };
 
