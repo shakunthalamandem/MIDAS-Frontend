@@ -138,7 +138,7 @@ const PortfolioDataTableMain: React.FC<Props> = ({ fund }) => {
           elevation={5}
           sx={{
             borderRadius: 4,
-            background: "linear-gradient(to bottom, #e3f2fd, #fce4ec)",
+             background: "linear-gradient(to bottom, #e3f2fd, #e3f2fd)",
             boxShadow: "0px 8px 25px rgba(0, 0, 0, 0.1)",
           }}
         >

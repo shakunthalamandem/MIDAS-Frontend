@@ -147,7 +147,7 @@ const FundSummaryTable: React.FC<Props> = ({ fund }) => {
           elevation={4}
           sx={{
             borderRadius: 4,
-            background: "linear-gradient(to bottom, #deecc6ff, #e7bfbfff)",
+            background: "linear-gradient(to bottom, #ffffff, #f1f8e9)",
             boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
             p: 3,
           }}
@@ -191,9 +191,7 @@ const FundSummaryTable: React.FC<Props> = ({ fund }) => {
                   <TableHead>
                     <TableRow
                       sx={{
-                        background:
-                          "linear-gradient(to bottom, #7a4fccff, #d46c75ff)",
-                      }}
+                        background:'#002060'                      }}
                     >
                       <TableCell sx={{ color: "#ffffff", ...cellBorder }}>
                         <b>Asset Type</b>

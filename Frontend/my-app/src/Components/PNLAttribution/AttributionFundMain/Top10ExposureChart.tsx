@@ -122,7 +122,7 @@ const Top10ExposureChart: React.FC<Top10ExposureChartProps> = ({ fund }) => {
       >
         <Card
           sx={{
-             background: "linear-gradient(to bottom, #e3f2fd, #fce4ec)",
+             background: "linear-gradient(to bottom, #e3f2fd, #e3f2fd)",
 
             boxShadow: 4,
             borderRadius: 4,

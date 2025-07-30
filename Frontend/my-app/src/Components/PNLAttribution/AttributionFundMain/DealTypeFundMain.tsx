@@ -217,7 +217,7 @@ const DealTypeFundMain: React.FC<DealTypeFundMainProps> = ({
       color: "#ffffff",             
     },
     "& .MuiDataGrid-columnHeaderTitle": {
-      color: "#000000",            
+      color: "#002060",            
     },
     "& .MuiDataGrid-columnHeader": {
       backgroundColor: "#b1c7f1ff",   

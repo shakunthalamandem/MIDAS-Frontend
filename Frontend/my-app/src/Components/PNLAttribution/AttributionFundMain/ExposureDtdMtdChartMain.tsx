@@ -241,7 +241,7 @@ const ExposureDtdMtdChartMain: React.FC<ChartProps> = ({ fund }) => {
       >
         <Card
           sx={{
-            background: "linear-gradient(135deg, rgb(201, 214, 248), #e3f2fd)",
+            background: "linear-gradient(135deg, rgba(214, 222, 241, 1), #e3f2fd)",
             boxShadow: 4,
             borderRadius: 4,
             p: 2,

@@ -67,7 +67,18 @@ export const formatvalueNumber = (value: number): string => {
   return absValue.toString();
 };
 export const dealGridColumns: GridColDef[] = [
-  { field: "first_trade_date", headerName: "Trade Date", flex: 1 },
+{
+  field: "first_trade_date",
+  headerName: "Trade Date",
+  flex: 1,
+  valueFormatter: (params) => {
+    const date = new Date(params);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  },
+},
   { field: "client_symbol", headerName: "Ticker", flex: 1 },
   { field: "sector", headerName: "Sector", flex: 1 },
   { field: "fo_type", headerName: "Deal Type", flex: 1 ,  renderCell: (params) => params.value != null ? params.value : "-"

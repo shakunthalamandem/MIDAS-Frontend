@@ -134,7 +134,7 @@ const PnlAndDaysHeldGraph: React.FC<Props> = ({ fund }) => {
         elevation={4}
         sx={{
           p: 4,
-          background: "linear-gradient(to bottom right, #e0f7fa, #fce4ec)",
+             background: "linear-gradient(to bottom, #e3f2fd, #e4f1e2ff)",
         }}
       >
         <Typography
