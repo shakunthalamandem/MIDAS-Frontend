@@ -10,34 +10,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
 
-// Define soft pastel color palettes with matching accent colors
-// const COLOR_PALETTES = [
-//   {
-//     // background: "#FDEDEC",
-//     titleColor: "#C0392B",
-//     textColor: "#070707ff",
-//   },
-//   {
-//     // background: "#E8F8F5",
-//     titleColor: "#117864",
-//     textColor: "#070707ff",
-//   },
-//   {
-//     // background: "#FEF9E7",
-//     titleColor: "#B7950B",
-//     textColor: "#070707ff",
-//   },
-//   {
-//     // background: "#EBF5FB",
-//     titleColor: "#1A5276",
-//     textColor: "#070707ff",
-//   },
-//   {
-//     // background: "#F4ECF7",
-//     titleColor: "#6C3483",
-//     textColor: "#070707ff",
-//   },
-// ];
+
 const COLOR_PALETTES = [
   {
     titleColor: "#C0392B",       // bold red
