@@ -40,7 +40,7 @@ const HeatmapMetadata: React.FC<HeatmapMetadataProps> = ({
   return (
 <>
       <Typography variant="h5" fontWeight={600} color="#002060" gutterBottom>
-         Heat Map of Portfolio Social Media Sentiment
+         Heat Map of Portfolio Sentiment by Sector
       </Typography>
       <Typography variant="subtitle1" color="text.secondary" gutterBottom>
         Data updated on: {formatDate(updated_us_time)} 
@@ -50,7 +50,7 @@ const HeatmapMetadata: React.FC<HeatmapMetadataProps> = ({
   This heatmap visualizes the <strong>real-time social media sentiment</strong> for various stocks in your portfolio. 
   Each cell represents a stock, color-coded based on sentiment strength.
   <br />
-  ➤ <strong>Hover</strong> over any cell to view the stock ticker, sentiment score, and confidence level.
+  ➤ <strong>Hover</strong> over any cell to view the stock ticker and  sentiment score.
   <br />
   ➤ <strong>Click</strong> on a stock to open our integrated <strong>GenAI  Tool</strong>, which will auto-search the stock and provide detailed insights and analysis.
 </Typography>

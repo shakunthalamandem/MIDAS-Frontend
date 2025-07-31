@@ -20,8 +20,8 @@ type StockHeatValue = {
 };
 
 const getColorBySentiment = (score: number) => {
-  if (score < -5) return "#ce2b2bff";   
-  if (score <= 5) return "#a0a0a0ff";   
+  if (score < -12) return "#ce2b2bff";   
+  if (score <= 0) return "#a0a0a0ff";   
   return "#006b17ff";                    
 };
 
@@ -82,7 +82,7 @@ const HeatMapMain: React.FC = () => {
     if (!sectorMap[sector]) sectorMap[sector] = [];
     sectorMap[sector].push({
       x: stock_name,
-      y: confidence,
+      y: news_positivity,
       fillColor: getColorBySentiment(news_positivity),
     });
   });
@@ -96,6 +96,9 @@ const HeatMapMain: React.FC = () => {
     chart: {
       type: "treemap",
       height: 500,
+       toolbar: {
+      show: false, // This hides the download and other toolbar options
+    },
       events: {
         dataPointSelection: (event, chartContext, config) => {
           const stockName =
@@ -116,7 +119,7 @@ const HeatMapMain: React.FC = () => {
     },
     tooltip: {
       y: {
-        formatter: (val: number) => `Confidence: ${val.toFixed(1)}%`,
+        formatter: (val: number) => `Sentiment Score: ${val.toFixed(1)}%`,
       },
     },
     dataLabels: {
