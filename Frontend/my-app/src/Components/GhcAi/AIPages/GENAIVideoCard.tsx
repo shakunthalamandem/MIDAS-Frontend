@@ -50,10 +50,10 @@ const GENAIVideoCard: React.FC<Props> = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            color: "#1343eecc",
+            color: "#e2e4e9cc",
             fontSize: 60,
             "&:hover": {
-              color: "#e51111ff",
+              color: "#112ae5ff",
             },
           }}
         >
