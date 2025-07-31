@@ -181,9 +181,10 @@ const NavbarMain: React.FC = () => {
               label="AI-ML"
               menuItems={[
                 { label: "Gen AI Tool", path: "/gen_ai_tool" },
+                { label: "Portfolio Sentiment ", path: "/genai_data_set" },
                 { label: "US FO ML Model", path: "/machine_learning/equity" },
                 { label: "IPO Write-up", path: "/equity/ipo_dashboard" },
-                {label: "News", path: "/macro/news-summary" },
+                {label: "Portfolio  News", path: "/macro/news-summary" },
                 // { label: "High Yields", path: "/machine_learning/high-yield" },
                 // { label: "Converts", path: "/machine_learning/converts" },
               ]}
