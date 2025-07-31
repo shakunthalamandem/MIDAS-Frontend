@@ -75,11 +75,36 @@ const PerplexityChatMain: React.FC = () => {
     <Box
       sx={{
         background: "linear-gradient(to bottom, rgba(210, 222, 231, 1), rgba(203, 220, 223, 1))",
-        py: 4,
-        px: 2,
+      
         minHeight: "200vh",
       }}
     >
+          <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 500,
+                color: "#FFFFFF",
+                fontSize: { xs: "1rem", sm: "1.2rem" },
+                backgroundColor: "#002060",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "4vh",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                textAlign: "center",
+                marginBottom: "20px",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                animation: "fadeIn 1.5s ease-in-out",
+                "@keyframes fadeIn": {
+                  "0%": { opacity: 0 },
+                  "100%": { opacity: 1 },
+                },
+              }}
+            >
+Welcome to AI-Powered Conversations, Seamlessly Integrated
+
+            </Typography>
       <Container maxWidth="xl">
         {/* Flex Layout: Left = Paper, Right = Heatmap Button */}
         <Box
