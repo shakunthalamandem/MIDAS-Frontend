@@ -14,18 +14,38 @@ interface GENAICalendarProps {
 }
 
 const GENAICalendar: React.FC<GENAICalendarProps> = ({ title, data }) => {
+  if (!data.length) {
+    return (
+      <Card>
+        <CardHeader title={title} />
+        <CardContent>No events to display.</CardContent>
+      </Card>
+    );
+  }
+
+  // Derive start and end dates dynamically from data
+  const dates = data.map((d) => new Date(d.date));
+  const startDate = new Date(Math.min(...dates.map((d) => d.getTime())));
+  const endDate = new Date(Math.max(...dates.map((d) => d.getTime())));
+
+  // Map data to heatmap values with label
+  const values = data.map((d) => ({
+    date: d.date,
+    count: 1, // count used to mark presence, can extend for multiple events if needed
+    label: d.label,
+  }));
+
   return (
     <Card>
       <CardHeader title={title} />
       <CardContent>
         <CalendarHeatmap
-          startDate={new Date("2025-01-01")}
-          endDate={new Date("2025-12-31")}
-          values={data.map((d) => ({ date: d.date, count: 1 }))}
+          startDate={startDate}
+          endDate={endDate}
+          values={values}
+          showWeekdayLabels={true}
           titleForValue={(value) =>
-            value && value.date
-              ? data.find((d) => d.date === value.date)?.label || value.date
-              : ""
+            value && value.date ? value.label || value.date : ""
           }
           classForValue={(value) =>
             value && value.count ? "color-scale-4" : "color-empty"
