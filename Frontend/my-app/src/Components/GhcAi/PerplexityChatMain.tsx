@@ -154,13 +154,13 @@ const PerplexityChatMain: React.FC = () => {
         {/* AI Response and Suggestions */}
         <GHCAIMain data={data} loading={loading} error={error} />
 
-        <SuggestedQuestions
+     {/* <SuggestedQuestions
           questions={data.find((block) => block.type === "suggested_questions")?.questions || []}
           onSelect={(selected) => {
             setQuestion(selected);
             handleSubmit();
           }}
-        />
+        />  */}
       </Container>
     </Box>
   );
