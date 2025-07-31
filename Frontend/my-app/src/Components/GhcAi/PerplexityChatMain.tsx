@@ -8,15 +8,13 @@ import {
   CircularProgress,
   Container,
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import SuggestedQuestions from "./AIPages/SuggestedQuestions";
-import ShowChartIcon from "@mui/icons-material/ShowChart";
 import GHCAIMain from "./GHCAIMain";
 
 const PerplexityChatMain: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const stockData = location.state?.stock;
 
   const formatStockAsQuestion = (stock: any) => {
@@ -132,7 +130,7 @@ const PerplexityChatMain: React.FC = () => {
                 variant="contained"
                 disabled={loading || !question.trim()}
                 sx={{
-                  background: "linear-gradient(45deg, #bbbbc5ff, #c1f7ddff)",
+                  background: "#c9c9c9ff",
                   color: "#002060",
                   px: 3,
                   borderRadius: 2,
@@ -150,25 +148,7 @@ const PerplexityChatMain: React.FC = () => {
           </Paper>
 
           {/* Right side - Open Heatmap Button */}
-          <Box sx={{ minWidth: "200px", mt: { xs: 2, md: 0 } }}>
-            <Button
-              variant="outlined"
-              startIcon={<ShowChartIcon />}
-              onClick={() => navigate("/genai_data_set")}
-              fullWidth
-              sx={{
-                background: "linear-gradient(to right, #94e9f9, #bee7cb)",
-                color: "#003366",
-                fontWeight: 600,
-                boxShadow: 2,
-                "&:hover": {
-                  background: "linear-gradient(to right, #d4f1f9, #d6f2e4)",
-                },
-              }}
-            >
-              Open Heatmap
-            </Button>
-          </Box>
+         
         </Box>
 
         {/* AI Response and Suggestions */}
