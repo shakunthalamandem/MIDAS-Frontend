@@ -36,7 +36,8 @@ const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
       title={block.title}
       subtitle={block.subtitle}
       description={block.description}
-      icon={block.icon} />
+      icon={block.icon}
+    />
   ),
   link: (block: LinkBlock) => (
     <GENAILinkBlock text={block.text} url={block.url} />
@@ -45,33 +46,35 @@ const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
     <GENAIChartBlock
       chartType={block.chartType}
       title={block.title}
-      data={block.data} />
+      data={block.data}
+    />
   ),
   image: (block: ImageBlock) => (
     <GENAIImageCard
       title={block.title}
       description={block.description}
       url={block.url}
-      alt={block.alt} />
+      alt={block.alt}
+    />
   ),
   video: (block: VideoBlock) => (
     <GENAIVideoCard
       title={block.title}
       description={block.description}
       url={block.url}
-      thumbnail={block.thumbnail} />
+      thumbnail={block.thumbnail}
+    />
   ),
-
-};
- calendar: (block) => {
-    const { title, data } = block as CalendarBlock;
+  calendar: (block: CalendarBlock) => {
+    const { title, data } = block;
     return <GENAICalendar title={title} data={data} />;
   },
-
-  tree: (block) => {
-    const { title, data } = block as TreeBlock;
+  tree: (block: TreeBlock) => {
+    const { title, data } = block;
     return <GENAITree title={title} data={data} />;
   },
+};
+
 
 const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
   const [visibleBlocks, setVisibleBlocks] = useState<Block[]>([]);
