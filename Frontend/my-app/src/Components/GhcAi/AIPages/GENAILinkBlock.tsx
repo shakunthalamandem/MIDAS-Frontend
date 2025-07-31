@@ -1,33 +1,42 @@
 import React from "react";
-import { Paper, Link, Typography } from "@mui/material";
-import { getRandomBgColor } from "../Utils/colorUtils";
-import ReactMarkdown from "react-markdown";
+import { Box, Link, Typography } from "@mui/material";
+import LinkIcon from "@mui/icons-material/Link";
+import { getRandomBgColor } from "../Utils/colorUtils"; // optional
 
 const GENAILinkBlock: React.FC<{ text: string; url: string }> = ({ text, url }) => (
-  <Paper
-    elevation={2}
+  <Box
     sx={{
-      p: 2,
-      m: 2,
-      bgcolor: getRandomBgColor(),
-      transition: "transform 0.3s",
+      display: "flex",
+      alignItems: "center",
+      gap: 1.5,
+      px: 2,
+      py: 1,
+      my: 1,
+      borderRadius: 2,
+      backgroundColor: getRandomBgColor(), 
+      transition: "background 0.3s, transform 0.2s",
       "&:hover": {
-        transform: "scale(1.02)"
-      }
+        backgroundColor: "#e0e7ff",
+        transform: "scale(1.01)",
+      },
     }}
   >
+    <LinkIcon sx={{ color: "#1d4ed8" }} />
     <Link
       href={url}
       target="_blank"
       rel="noopener noreferrer"
       underline="hover"
-      sx={{ fontWeight: 600, fontSize: "1rem", color: "#1d4ed8" }}
+      sx={{
+        fontSize: "1rem",
+        fontWeight: 400,
+        // color: "#222222ff",
+        wordBreak: "break-word",
+      }}
     >
-      <Typography variant="body1" component="div">
-        <ReactMarkdown>{text}</ReactMarkdown>
-      </Typography>
+      {text || url}
     </Link>
-  </Paper>
+  </Box>
 );
 
 export default GENAILinkBlock;

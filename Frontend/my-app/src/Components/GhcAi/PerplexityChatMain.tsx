@@ -42,7 +42,7 @@ const PerplexityChatMain: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch(`${apiUrl}/api/perplexity_chat/`, {
+      const response = await fetch(`${apiUrl}/api/dummy_assistant/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
