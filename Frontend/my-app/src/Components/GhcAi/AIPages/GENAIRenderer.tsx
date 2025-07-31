@@ -45,6 +45,8 @@ const BLOCK_RENDERERS: Record<BlockType, (block: any, setQuestion?: (q: string) 
         if (setQuestion && handleSubmit) {
           setQuestion(selected);
           handleSubmit();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+
         }
       }}
     />
