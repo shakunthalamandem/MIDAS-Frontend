@@ -133,11 +133,33 @@ const HeatMapMain: React.FC = () => {
   };
 
   return (
+    <Box sx={{ background: "#e0eeecff", borderRadius: 2 }}>
+        <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 500,
+                color: "#FFFFFF",
+                fontSize: { xs: "1rem", sm: "1.2rem" },
+                backgroundColor: "#002060",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "4vh",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                textAlign: "center",
+                marginBottom: "20px",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                animation: "fadeIn 1.5s ease-in-out",
+                "@keyframes fadeIn": {
+                  "0%": { opacity: 0 },
+                  "100%": { opacity: 1 },
+                },
+              }}
+            >
+Welcome to Your Portfolio’s Social Media Sentiment Heatmap            </Typography>
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Box p={2} sx={{ background: "#ebe9d4ff", borderRadius: 2 }}>
-        <Typography variant="h5" mb={2} color="#002060">
-          Stock Heatmap by Sector (Confidence & News Sentiment)
-        </Typography>
+       
 
         {meta && (
           <HeatmapMetadata
@@ -166,8 +188,8 @@ const HeatMapMain: React.FC = () => {
             />
           </Box>
         )}
-      </Box>
     </Container>
+    </Box>
   );
 };
 
