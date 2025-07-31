@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -14,10 +14,11 @@ import {
   useTheme,
   Tooltip,
   Button,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 const MethodologyAccordion1w1m: React.FC = () => {
   const theme = useTheme();
@@ -26,33 +27,32 @@ const MethodologyAccordion1w1m: React.FC = () => {
   const handleToggle = () => setExpanded((prev) => !prev);
 
   const inputFactors = [
-    'Deal Size ($ Million)',
-    'Sponsor Presence (Y/N)',
-    'Discount from Announcement Price (%)',
-    'Sector Classification',
-    'Percentage Primary (%)',
-    'Selected Bookrunner(s)',
-    'Investor Allocation as % of Deal Size & IOI',
+    "Deal Size ($ Million)",
+    "Sponsor Presence (Y/N)",
+    "Discount from Announcement Price (%)",
+    "Sector Classification",
+    "Percentage Primary (%)",
+    "Selected Bookrunner(s)",
+    "Investor Allocation as % of Deal Size & IOI",
   ];
 
-  const marketDrivers = [
-    'GDP Growth & Inflation Trends',
-    'UST Treasury Yield Curve',
-    'Sector & Market Performance (1W, 1M, 3M)',
-    'NYSE Volume vs. 1-Month Average',
-    'Recent Deal Flow Activity (1M vs 2M)',
-    'Total Monthly Opportunity Value',
-    'Monthly Positive Deal Count & Returns',
-    'Monthly Excess Return (All Deals)',
+  const economicIndicators = [
+    "GDP Growth & Inflation Trends",
+    "UST Treasury Yield Curve",
+    "Sector & Market Performance (1W, 1M, 3M)",
+    "NYSE Volume vs. 1-Month Average",
+  ];
+
+  const newIssueFlowIndicators = [
+    "Recent Deal Flow Activity (1M vs 2M)",
+    "Total Monthly Opportunity Value",
+    "Monthly Positive Deal Count & Returns",
+    "Monthly Excess Return (All Deals)",
   ];
 
   const [leftFactors, rightFactors] = [
     inputFactors.slice(0, Math.ceil(inputFactors.length / 2)),
     inputFactors.slice(Math.ceil(inputFactors.length / 2)),
-  ];
-  const [leftMarket, rightMarket] = [
-    marketDrivers.slice(0, Math.ceil(marketDrivers.length / 2)),
-    marketDrivers.slice(Math.ceil(marketDrivers.length / 2)),
   ];
 
   return (
@@ -63,7 +63,7 @@ const MethodologyAccordion1w1m: React.FC = () => {
         mt: 4,
         borderRadius: 3,
         boxShadow: theme.shadows[3],
-        '&:before': { display: 'none' },
+        "&:before": { display: "none" },
       }}
       elevation={3}
     >
@@ -72,56 +72,118 @@ const MethodologyAccordion1w1m: React.FC = () => {
         id="methodology-header"
         sx={{
           bgcolor: theme.palette.grey[100],
-          borderRadius: '12px 12px 0 0',
+          borderRadius: "12px 12px 0 0",
           px: 3,
           py: 2,
-          justifyContent: 'space-between',
-          '& .MuiAccordionSummary-content': {
-            alignItems: 'center',
-            gap: 2,
+          "& .MuiAccordionSummary-content": {
+            alignItems: "center",
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
           },
         }}
       >
-        <Typography
-          variant="h6"
-          fontWeight="600"
-          color={theme.palette.primary.main}
-          letterSpacing={0.5}
-        >
-          Model Methodology
-        </Typography>
+        {/* Left: Title + Expand */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography
+            variant="h6"
+            fontWeight="600"
+            color={theme.palette.primary.main}
+            letterSpacing={0.5}
+          >
+            Model Methodology
+          </Typography>
 
-        <Tooltip title={expanded ? 'Collapse details' : 'Expand details'}>
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggle();
-            }}
-            variant="outlined"
-            size="small"
-            startIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            sx={{
-              textTransform: 'none',
-              borderRadius: 2,
-              fontWeight: 600,
+          <Tooltip title={expanded ? "Collapse details" : "Expand details"}>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggle();
+              }}
+              variant="outlined"
+              size="small"
+              startIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+                fontWeight: 600,
+              }}
+            >
+              {expanded ? "Collapse" : "Expand"}
+            </Button>
+          </Tooltip>
+        </Box>
+
+        {/* Right: Model Definitions Tooltip */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Typography
+            variant="body2"
+            fontWeight={500}
+            color={theme.palette.text.secondary}
+          >
+            Model Definitions
+          </Typography>
+          <Tooltip
+            title={
+              <Box sx={{ p: 1, maxWidth: 250 }}>
+                <Typography variant="body2" fontWeight="600" gutterBottom>
+                  Accuracy
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="inherit"
+                  display="block"
+                  gutterBottom
+                >
+                  Indicates the proportion of times the model correctly predicts
+                  the direction of price movement.
+                </Typography>
+                <Typography variant="body2" fontWeight="600" gutterBottom>
+                  Confidence
+                </Typography>
+                <Typography variant="caption" color="inherit">
+                  Represents the model’s level of certainty in its prediction.
+                  Higher confidence implies stronger conviction in the outcome.
+                </Typography>
+              </Box>
+            }
+            arrow
+            placement="top"
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: theme.palette.background.paper,
+                  color: theme.palette.text.primary,
+                  boxShadow: theme.shadows[3],
+                  borderRadius: 2,
+                  maxWidth: 300,
+                  p: 1.5,
+                },
+              },
             }}
           >
-            {expanded ? 'Collapse' : 'Expand'}
-          </Button>
-        </Tooltip>
+            <InfoOutlinedIcon
+              fontSize="small"
+              sx={{ color: theme.palette.info.main, cursor: "pointer" }}
+            />
+          </Tooltip>
+        </Box>
       </AccordionSummary>
 
-      <AccordionDetails sx={{ bgcolor: theme.palette.background.paper, px: 3, py: 3 }}>
+      <AccordionDetails
+        sx={{ bgcolor: theme.palette.background.paper, px: 3, py: 3 }}
+      >
         <Box mb={3}>
           <Typography
             variant="body1"
             color={theme.palette.text.secondary}
             sx={{ lineHeight: 1.7 }}
           >
-            Our model forecasts the 1-week and 1-month returns based on the T+1D closing price by
-            analyzing a robust set of deal-specific, market, and flow-based indicators. In addition
-            to traditional parameters such as deal size and sponsor status, we incorporate market
-            context and dynamic behavior observed in recent deal flow.
+            Our model forecasts the 1-week and 1-month returns based on the T+1D
+            closing price by analyzing a robust set of deal-specific, market,
+            and flow-based indicators. In addition to traditional parameters
+            such as deal size and sponsor status, we incorporate market context
+            and dynamic behavior observed in recent deal flow.
           </Typography>
         </Box>
 
@@ -134,7 +196,7 @@ const MethodologyAccordion1w1m: React.FC = () => {
             gutterBottom
             color={theme.palette.text.primary}
           >
-            Deal & Issuer-Level Inputs:
+            Deal Specific Parameters
           </Typography>
           <Grid container spacing={1}>
             {[leftFactors, rightFactors].map((col, idx) => (
@@ -143,12 +205,15 @@ const MethodologyAccordion1w1m: React.FC = () => {
                   {col.map((item, i) => (
                     <ListItem key={i} sx={{ py: 0.5 }}>
                       <ListItemIcon>
-                        <CheckCircleOutlineIcon color="primary" fontSize="small" />
+                        <CheckCircleOutlineIcon
+                          color="primary"
+                          fontSize="small"
+                        />
                       </ListItemIcon>
                       <ListItemText
                         primary={item}
                         primaryTypographyProps={{
-                          variant: 'body2',
+                          variant: "body2",
                           fontWeight: 500,
                           color: theme.palette.text.primary,
                         }}
@@ -168,21 +233,66 @@ const MethodologyAccordion1w1m: React.FC = () => {
             gutterBottom
             color={theme.palette.text.primary}
           >
-            Market & Flow-Based Indicators:
+            Economic & Macro Indicators:
           </Typography>
           <Grid container spacing={1}>
-            {[leftMarket, rightMarket].map((col, idx) => (
+            {[economicIndicators.slice(0, 2), economicIndicators.slice(2)].map(
+              (group, idx) => (
+                <Grid item xs={12} sm={6} key={idx}>
+                  <List dense sx={{ pl: 1 }}>
+                    {group.map((item, i) => (
+                      <ListItem key={i} sx={{ py: 0.5 }}>
+                        <ListItemIcon>
+                          <CheckCircleOutlineIcon
+                            color="secondary"
+                            fontSize="small"
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={item}
+                          primaryTypographyProps={{
+                            variant: "body2",
+                            fontWeight: 500,
+                            color: theme.palette.text.primary,
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Grid>
+              )
+            )}
+          </Grid>
+        </Box>
+
+        <Box mt={3}>
+          <Typography
+            variant="subtitle1"
+            fontWeight="600"
+            gutterBottom
+            color={theme.palette.text.primary}
+          >
+            New Issue Flow-Based Indicators:
+          </Typography>
+          <Grid container spacing={1}>
+            {[
+              newIssueFlowIndicators.slice(0, 2),
+              newIssueFlowIndicators.slice(2),
+            ].map((group, idx) => (
               <Grid item xs={12} sm={6} key={idx}>
                 <List dense sx={{ pl: 1 }}>
-                  {col.map((item, i) => (
+                  {group.map((item, i) => (
                     <ListItem key={i} sx={{ py: 0.5 }}>
                       <ListItemIcon>
-                        <CheckCircleOutlineIcon color="secondary" fontSize="small" />
+                        <CheckCircleOutlineIcon
+                          color="secondary"
+                          fontSize="small"
+                        />
                       </ListItemIcon>
                       <ListItemText
                         primary={item}
                         primaryTypographyProps={{
-                          variant: 'body2',
+                          variant: "body2",
                           fontWeight: 500,
                           color: theme.palette.text.primary,
                         }}
@@ -198,13 +308,19 @@ const MethodologyAccordion1w1m: React.FC = () => {
         <Divider sx={{ my: 3 }} />
 
         <Box>
-          <Typography variant="body2" color={theme.palette.text.secondary} sx={{ lineHeight: 1.7 }}>
-            Historical data from 2012 to 2024 is used to build monthly distributions of market and
-            deal activity. Each feature—such as deal volume, opportunity value, and positive deal
-            count—is converted into percentiles and categorized into 5 buckets: 0–20, 20–40, 40–60,
-            60–80, and 80–100. This allows the model to identify relative strength or weakness
-            compared to historical norms. To better understand recent momentum, we compare current
-            30-day performance with trailing 60-day averages across various indicators.
+          <Typography
+            variant="body2"
+            color={theme.palette.text.secondary}
+            sx={{ lineHeight: 1.7 }}
+          >
+            Historical data from 2012 to 2024 is used to build monthly
+            distributions of market and deal activity. Each feature—such as deal
+            volume, opportunity value, and positive deal count—is converted into
+            percentiles and categorized into 5 buckets: 0–20, 20–40, 40–60,
+            60–80, and 80–100. This allows the model to identify relative
+            strength or weakness compared to historical norms. To better
+            understand recent momentum, we compare current 30-day performance
+            with trailing 60-day averages across various indicators.
           </Typography>
         </Box>
       </AccordionDetails>

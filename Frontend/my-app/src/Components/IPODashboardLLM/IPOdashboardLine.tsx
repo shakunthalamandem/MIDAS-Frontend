@@ -26,7 +26,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
       <Card
         sx={{
           borderRadius: 4,
-          background: "linear-gradient(to right, #e3f2fd, #fce4ec)",
+          background: "linear-gradient(#f0f5ff)", 
           boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
           overflowX: "auto",
           p: 2,

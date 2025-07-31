@@ -165,7 +165,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
         elevation={0}
         sx={{
           borderRadius: 4,
-          background: "linear-gradient(to right,rgb(172, 229, 236),rgb(234, 245, 176))",
+          background: "linear-gradient(#f0f5ff, #f0f5ff)",
           mb: 2,
           mt: 4,
           width: "100%",

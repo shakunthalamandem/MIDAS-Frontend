@@ -11,12 +11,12 @@ export const cardStyle = {
 };
 
 export const cardColors = [
-  "#f3f6f9",
-  "#fdf5e6",
-  "#e6f7f1",
-  "#fff0f6",
   "#f0f5ff",
-  "#f9f0ff",
+  "#f0f5ff",
+  "#f0f5ff",
+  "#f0f5ff",
+  "#f0f5ff",
+  "#f0f5ff",
 ];
 
   export const cardSections = [

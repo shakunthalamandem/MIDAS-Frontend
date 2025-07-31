@@ -164,7 +164,7 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <Card sx={{ borderRadius: 4, background: "linear-gradient(to right, #e3f2fd, #fce4ec)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
+            <Card sx={{ borderRadius: 4, background: "linear-gradient(#f0f5ff)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
               <CardContent>
  <Box position="relative" mb={2} display="flex" justifyContent="center" alignItems="center">
   {/* Centered title */}
@@ -267,7 +267,7 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
           >
-            <Card sx={{ borderRadius: 4, background: "linear-gradient(to right, #fff3e0, #fce4ec)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
+            <Card sx={{ borderRadius: 4, background: "linear-gradient(#f0f5ff)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
               <CardContent>
           <Box position="relative" mb={2}>
   {/* Centered title */}

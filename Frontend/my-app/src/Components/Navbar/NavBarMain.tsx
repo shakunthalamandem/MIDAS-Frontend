@@ -61,6 +61,9 @@ const NavbarMain: React.FC = () => {
       case "Data & Analytics":
         navigate("/data-analytics/writeups");
         break;
+      case "New Deal Form":
+        navigate("/deals/new_deal_form");
+        break;
       default:
         break;
     }
@@ -181,16 +184,48 @@ const NavbarMain: React.FC = () => {
               label="AI-ML"
               menuItems={[
                 { label: "Gen AI Tool", path: "/gen_ai_tool" },
+                { label: "Portfolio Sentiment ", path: "/genai_data_set" },
                 { label: "US FO ML Model", path: "/machine_learning/equity" },
                 { label: "IPO Write-up", path: "/equity/ipo_dashboard" },
-                {label: "News", path: "/macro/news-summary" },
+                {label: "Portfolio  News", path: "/macro/news-summary" },
                 // { label: "High Yields", path: "/machine_learning/high-yield" },
                 // { label: "Converts", path: "/machine_learning/converts" },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
             />
-            <Button
+          
+
+            {/* <DropdownTab
+              label="New Deals (IPO)"
+              menuItems={[
+                { label: "Dashboard", path: "/deals/dashboard" },
+                { label: "New Deal Form", path: "/deals/new_deal_form" },
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            /> */}
+
+             <Button
+              onClick={() => handleTabSelect("New Deal Form")}
+              sx={{
+                color: "#005166",
+                fontWeight: "bold",
+                fontSize: "0.725rem",
+                mx: 1,
+                borderBottom:
+                  selectedTab === "New Deal Form" ? "3px solid #005166" : "3px solid transparent",
+                borderRadius: 0,
+                "&:hover": {
+                  borderBottom: "3px solid #005166",
+                  backgroundColor: "transparent",
+                },
+              }}
+            >
+              New Deal Form
+            </Button>
+
+              <Button
               onClick={() => handleTabSelect("P&L Attribution")}
               sx={{
                 color: "#005166",
@@ -208,16 +243,6 @@ const NavbarMain: React.FC = () => {
             >
               P&L Attribution
             </Button>
-
-            <DropdownTab
-              label="New Deals (IPO)"
-              menuItems={[
-                { label: "Dashboard", path: "/deals/dashboard" },
-                { label: "New Deal Form", path: "/deals/new_deal_form" },
-              ]}
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-            />
 
       
 

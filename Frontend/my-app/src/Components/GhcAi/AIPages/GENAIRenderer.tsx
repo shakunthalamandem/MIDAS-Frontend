@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import GENAITextBlock from "./GENAITextBlock";
 import GENAICardBlock from "./GENAICardBlock";
 import GENAIChartBlock from "./GENAIChartBlock";
+import GENAICalendar from "./GENAICalendar";
+import GENAITree from "./GENAITree";
 import GENAILinkBlock from "./GENAILinkBlock";
 import GENAITableBlock from "./GENAITableBlock";
 import GENAIImageCard from "./GENAIImageCard";
@@ -20,6 +22,8 @@ import {
   ChartBlock,
   ImageBlock,
   VideoBlock,
+  CalendarBlock,
+  TreeBlock,
 } from "../Utils/ComponentsUtils";
 
 const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
@@ -61,7 +65,16 @@ const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
       thumbnail={block.thumbnail}
     />
   ),
+  calendar: (block: CalendarBlock) => {
+    const { title, data } = block;
+    return <GENAICalendar title={title} data={data} />;
+  },
+  tree: (block: TreeBlock) => {
+    const { title, data } = block;
+    return <GENAITree title={title} data={data} />;
+  },
 };
+
 
 const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
   const [visibleBlocks, setVisibleBlocks] = useState<Block[]>([]);

@@ -8,15 +8,13 @@ import {
   CircularProgress,
   Container,
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import SuggestedQuestions from "./AIPages/SuggestedQuestions";
-import ShowChartIcon from "@mui/icons-material/ShowChart";
 import GHCAIMain from "./GHCAIMain";
 
 const PerplexityChatMain: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const stockData = location.state?.stock;
 
   const formatStockAsQuestion = (stock: any) => {
@@ -79,66 +77,81 @@ const PerplexityChatMain: React.FC = () => {
         background: "linear-gradient(to bottom, rgba(210, 222, 231, 1), rgba(203, 220, 223, 1))",
         py: 4,
         px: 2,
-        minHeight: '200vh',
+        minHeight: "200vh",
       }}
     >
       <Container maxWidth="xl">
-        <Paper
-          elevation={6}
-          sx={{
-            p: 4,
-            borderRadius: 4,
-            background: "rgba(255, 255, 255, 0.58)",
-            backdropFilter: "blur(14px)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
-          }}
+        {/* Flex Layout: Left = Paper, Right = Heatmap Button */}
+        <Box
+          display="flex"
+          flexDirection={{ xs: "column", md: "row" }}
+          justifyContent="space-between"
+          alignItems="flex-start"
+          gap={4}
         >
-          <Typography
-            variant="h6"
-            gutterBottom
-            align="center"
-            sx={{ fontWeight: 600, color: "#002060", mb: 2 }}
+          {/* Left side - Question Form */}
+          <Paper
+            elevation={6}
+            sx={{
+              flex: 1,
+              p: 4,
+              borderRadius: 4,
+              background: "rgba(255, 255, 255, 0.58)",
+              backdropFilter: "blur(14px)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
+            }}
           >
-            Ask Me Anything !!!
-          </Typography>
-
-          <Box component="form" onSubmit={handleSubmit} display="flex" gap={2}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Type your question..."
-              variant="outlined"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              sx={{
-                background: "#ffffff",
-                borderRadius: 2,
-                input: { color: "#333" },
-              }}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={loading || !question.trim()}
-              sx={{
-                background: "linear-gradient(45deg, #bbbbc5ff, #c1f7ddff)",
-                color: "#002060",
-                px: 3,
-                borderRadius: 2,
-                transition: "transform 0.2s",
-                minWidth: 50,
-                "&:hover": {
-                  transform: "scale(1.05)",
-                  background: "linear-gradient(45deg, #c7dddbff, #f0efd1ff)",
-                },
-              }}
+            <Typography
+              variant="h6"
+              gutterBottom
+              align="center"
+              sx={{ fontWeight: 600, color: "#002060", mb: 2 }}
             >
-              {loading ? <CircularProgress size={22} color="inherit" /> : <SendIcon />}
-            </Button>
-          </Box>
-        </Paper>
+              Ask Me Anything !!!
+            </Typography>
 
+            <Box component="form" onSubmit={handleSubmit} display="flex" gap={2}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Type your question..."
+                variant="outlined"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                sx={{
+                  background: "#ffffff",
+                  borderRadius: 2,
+                  input: { color: "#333" },
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading || !question.trim()}
+                sx={{
+                  background: "#c9c9c9ff",
+                  color: "#002060",
+                  px: 3,
+                  borderRadius: 2,
+                  transition: "transform 0.2s",
+                  minWidth: 50,
+                  "&:hover": {
+                    transform: "scale(1.05)",
+                    background: "linear-gradient(45deg, #c7dddbff, #f0efd1ff)",
+                  },
+                }}
+              >
+                {loading ? <CircularProgress size={22} color="inherit" /> : <SendIcon />}
+              </Button>
+            </Box>
+          </Paper>
+
+          {/* Right side - Open Heatmap Button */}
+         
+        </Box>
+
+        {/* AI Response and Suggestions */}
         <GHCAIMain data={data} loading={loading} error={error} />
 
         <SuggestedQuestions
@@ -148,25 +161,6 @@ const PerplexityChatMain: React.FC = () => {
             handleSubmit();
           }}
         />
-
-        <Box display="flex" justifyContent="center" mt={4}>
-          <Button
-            variant="outlined"
-            startIcon={<ShowChartIcon />}
-            onClick={() => navigate("/genai_data_set")}
-            sx={{
-              background: "linear-gradient(to right, #94e9f9, #bee7cb)",
-              color: "#003366",
-              fontWeight: 600,
-              boxShadow: 2,
-              "&:hover": {
-                background: "linear-gradient(to right, #d4f1f9, #d6f2e4)",
-              },
-            }}
-          >
-            Open Heatmap
-          </Button>
-        </Box>
       </Container>
     </Box>
   );

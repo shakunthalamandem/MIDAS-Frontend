@@ -17,6 +17,7 @@ import {
   ArcElement,
   Tooltip,
   Legend,
+  Filler, // Needed for Area Chart
 } from "chart.js";
 import ReactMarkdown from "react-markdown";
 
@@ -28,7 +29,8 @@ ChartJS.register(
   LineElement,
   ArcElement,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 type GENAIChartBlockProps = {
@@ -44,15 +46,18 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
   title,
   width = "100%",
 }) => {
+  const type = chartType.toLowerCase();
+
   const chartMap: Record<string, any> = {
     pie: Pie,
     bar: Bar,
     line: Line,
+    area: Line,         // Area is a Line chart with `fill: true`
     scatter: Scatter,
     bubble: Bubble,
+    stackedbar: Bar,    // Stacked bar uses Bar with special options
   };
 
-  const type = chartType.toLowerCase();
   const ChartComponent = chartMap[type];
 
   if (!ChartComponent) {
@@ -75,6 +80,7 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
   }
 
   let formattedData = data;
+
   if (["scatter", "bubble"].includes(type)) {
     formattedData = {
       datasets: [
@@ -104,6 +110,40 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
         </Typography>
       </Paper>
     );
+  }
+
+  // Set custom options
+  const chartOptions: any = {
+    maintainAspectRatio: false,
+    responsive: true,
+    plugins: {
+      legend: { display: true, position: "bottom" },
+    },
+  };
+
+  if (type === "area") {
+    // Ensure all datasets in area chart have fill: true
+    formattedData = {
+      ...data,
+      datasets: data.datasets.map((ds: any) => ({
+        ...ds,
+        fill: true,
+        backgroundColor: ds.backgroundColor || "rgba(96,165,250,0.4)",
+        borderColor: ds.borderColor || "#60a5fa",
+        tension: 0.3,
+      })),
+    };
+  }
+
+  if (type === "stackedbar") {
+    chartOptions.scales = {
+      x: {
+        stacked: true,
+      },
+      y: {
+        stacked: true,
+      },
+    };
   }
 
   return (
@@ -138,16 +178,7 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
           mx: "auto",
         }}
       >
-        <ChartComponent
-          data={formattedData}
-          options={{
-            maintainAspectRatio: false,
-            responsive: true,
-            plugins: {
-              legend: { display: true, position: "bottom" },
-            },
-          }}
-        />
+        <ChartComponent data={formattedData} options={chartOptions} />
       </Box>
     </Paper>
   );
