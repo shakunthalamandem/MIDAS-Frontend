@@ -262,7 +262,7 @@ const NavbarMain: React.FC = () => {
               label="Macro (Prime)"
               menuItems={[
                 { label: "Prime", path: "/macro/prime" },
-                { label: "News Summary", path: "/macro/news-summary" },
+                // { label: "News Summary", path: "/macro/news-summary" },
                 { label: "Sector", path: "/macro/sector" },
               ]}
               selectedTab={selectedTab}
