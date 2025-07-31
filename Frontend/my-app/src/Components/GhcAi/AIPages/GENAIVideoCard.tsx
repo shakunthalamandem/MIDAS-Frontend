@@ -21,46 +21,36 @@ const GENAIVideoCard: React.FC<Props> = ({
   thumbnail,
 }) => {
   return (
-    <Card
-      sx={{
-        borderRadius: 3,
-        overflow: "hidden",
-        boxShadow: 4,
-        background: "linear-gradient(135deg, #f8f9fc, #e3f2fd)",
-        transition: "transform 0.3s ease",
-        "&:hover": {
-          transform: "scale(1.015)",
-        },
-      }}
-    >
-      <CardMedia
-        component="video"
-        controls
-        poster={thumbnail}
-        src={url}
-        sx={{
-          height: 220,
-          objectFit: "cover",
-          backgroundColor: "#000",
-        }}
-      />
-      <CardContent>
-        <Typography
-          variant="subtitle1"
-          fontWeight={600}
-          sx={{ color: "#1a237e", mb: 0.5 }}
-        >
-          {title}
-        </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ fontSize: "0.875rem" }}
-        >
-          {description}
-        </Typography>
-      </CardContent>
-    </Card>
+<Card
+  sx={{
+    borderRadius: 3,
+    overflow: "hidden",
+    boxShadow: 4,
+    background: "linear-gradient(135deg, #f8f9fc, #e3f2fd)",
+    transition: "transform 0.3s ease",
+    cursor: "pointer",
+    "&:hover": {
+      transform: "scale(1.015)",
+    },
+  }}
+  onClick={() => window.open(url, "_blank")}
+>
+  <CardMedia
+    component="img"
+    image={thumbnail}
+    alt={title}
+    sx={{ height: 220, objectFit: "cover" }}
+  />
+  <CardContent>
+    <Typography variant="subtitle1" fontWeight={600} sx={{ color: "#1a237e", mb: 0.5 }}>
+      {title}
+    </Typography>
+    <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.875rem" }}>
+      {description}
+    </Typography>
+  </CardContent>
+</Card>
+
   );
 };
 

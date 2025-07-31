@@ -49,16 +49,18 @@ const GENATableBlock: React.FC<{
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <Card
-        elevation={6}
-        sx={{
-          my: 3,
-          borderRadius: 3,
-          bgcolor: "#f9fafa",
-          maxWidth: "100%",
-          mx: "auto",
-        }}
-      >
+  <Card
+  elevation={6}
+  sx={{
+    my: 3,
+    borderRadius: 3,
+    bgcolor: "#f9fafa",
+    width: "100%",      // Ensure it fills the column
+    maxWidth: "100%",   // Prevent overflow
+    mx: "auto",
+  }}
+>
+
         {title && (
           <CardHeader
             title={
@@ -70,7 +72,7 @@ const GENATableBlock: React.FC<{
           />
         )}
         <CardContent sx={{ pt: title ? 1 : 2 }}>
-          <Box sx={{ overflowX: "auto" }}>
+<Box sx={{ overflowX: "auto", width: "100%" }}>
             <Table
               size="small"
               sx={{
