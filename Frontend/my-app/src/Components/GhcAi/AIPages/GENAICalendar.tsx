@@ -1,88 +1,42 @@
 import React from "react";
-import {
-  Paper,
-  Box,
-  Typography,
-  Tooltip,
-  Grid,
-  useTheme,
-} from "@mui/material";
-import ReactMarkdown from "react-markdown";
-import dayjs from "dayjs";
+import CalendarHeatmap from "react-calendar-heatmap";
+import "react-calendar-heatmap/dist/styles.css";
+import { Card, CardHeader, CardContent } from "@mui/material";
+import { Tooltip } from "react-tooltip";
 
-interface CalendarDatum {
+interface CalendarEntry {
   date: string;
-  value: string;
+  label: string;
 }
 
 interface GENAICalendarProps {
-  title?: string;
-  data: CalendarDatum[];
+  title: string;
+  data: CalendarEntry[];
 }
 
 const GENAICalendar: React.FC<GENAICalendarProps> = ({ title, data }) => {
-  const theme = useTheme();
-  const calendarMap = new Map<string, string>();
-  data.forEach(item => calendarMap.set(item.date, item.value));
-
-  // Generate list of all days in a month (assumes same month/year for all entries)
-  const firstDate = dayjs(data[0].date);
-  const daysInMonth = firstDate.daysInMonth();
-  const year = firstDate.year();
-  const month = firstDate.month();
-
-  const allDays = Array.from({ length: daysInMonth }, (_, i) =>
-    dayjs(new Date(year, month, i + 1)).format("YYYY-MM-DD")
-  );
-
   return (
-    <Paper
-      sx={{
-        p: 2,
-        m: 2,
-        borderRadius: 3,
-        background: "linear-gradient(135deg, #f5f7fa, #e4ecf7)",
-        boxShadow: 3,
-      }}
-    >
-      {title && (
-        <Typography
-          variant="subtitle1"
-          fontWeight={600}
-          sx={{ color: "#2c387e", mb: 1 }}
-        >
-          <ReactMarkdown>{title}</ReactMarkdown>
-        </Typography>
-      )}
-
-      <Grid container spacing={1} columns={7}>
-        {allDays.map(date => {
-          const label = calendarMap.get(date);
-          return (
-            <Grid item xs={1} key={date}>
-              <Tooltip title={label || date}>
-                <Box
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    bgcolor: label ? "#60a5fa" : "#e0e0e0",
-                    color: label ? "#fff" : "#000",
-                    borderRadius: 1,
-                    fontSize: "0.75rem",
-                    cursor: label ? "pointer" : "default",
-                  }}
-                >
-                  {dayjs(date).date()}
-                </Box>
-              </Tooltip>
-            </Grid>
-          );
-        })}
-      </Grid>
-    </Paper>
+    <Card>
+      <CardHeader title={title} />
+      <CardContent>
+        <CalendarHeatmap
+          startDate={new Date("2025-01-01")}
+          endDate={new Date("2025-12-31")}
+          values={data.map((d) => ({ date: d.date, count: 1 }))}
+          tooltipDataAttrs={(value) => {
+            const label = value?.date
+              ? data.find((d) => d.date === value.date)?.label || ""
+              : "";
+            return { "data-tip": label } as React.CalendarHeatmap.TooltipDataAttrs;
+          }}
+          classForValue={(value) => {
+            if (!value || !value.count) return "color-empty";
+            return "color-scale-4";
+          }}
+        />
+        <Tooltip />
+      </CardContent>
+    </Card>
   );
 };
 

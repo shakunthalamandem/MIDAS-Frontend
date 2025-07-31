@@ -22,59 +22,81 @@ import {
   ChartBlock,
   ImageBlock,
   VideoBlock,
+  CalendarBlock,
+  TreeBlock,
 } from "../Utils/ComponentsUtils";
 
-const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
-  text: (block: TextBlock) => <GENAITextBlock content={block.content} />,
-  table: (block: TableBlock) => (
-    <GENAITableBlock headers={block.headers} rows={block.rows} />
-  ),
-  card: (block: CardBlock) => (
-    <GENAICardBlock
-      title={block.title}
-      subtitle={block.subtitle}
-      description={block.description}
-      icon={block.icon}
-    />
-  ),
-  link: (block: LinkBlock) => (
-    <GENAILinkBlock text={block.text} url={block.url} />
-  ),
-  chart: (block: ChartBlock) => {
-    const type = block.chartType.toLowerCase();
+const BLOCK_RENDERERS: Record<BlockType, (block: Block) => JSX.Element> = {
+  text: (block) => {
+    const { content } = block as TextBlock;
+    return <GENAITextBlock content={content} />;
+  },
 
-    if (type === "calendar") {
-      return <GENAICalendar title={block.title} data={block.data} />;
-    }
+  table: (block) => {
+    const { headers, rows } = block as TableBlock;
+    return <GENAITableBlock headers={headers} rows={rows} />;
+  },
 
-    if (type === "tree") {
-      return <GENAITree title={block.title} data={block.data} />;
-    }
-
+  card: (block) => {
+    const { title, subtitle, description, icon } = block as CardBlock;
     return (
-      <GENAIChartBlock
-        chartType={block.chartType}
-        title={block.title}
-        data={block.data}
+      <GENAICardBlock
+        title={title}
+        subtitle={subtitle}
+        description={description}
+        icon={icon}
       />
     );
   },
-  image: (block: ImageBlock) => (
-    <GENAIImageCard
-      title={block.title}
-      description={block.description}
-      url={block.url}
-      alt={block.alt}
-    />
-  ),
-  video: (block: VideoBlock) => (
-    <GENAIVideoCard
-      title={block.title}
-      description={block.description}
-      url={block.url}
-      thumbnail={block.thumbnail}
-    />
-  ),
+
+  link: (block) => {
+    const { text, url } = block as LinkBlock;
+    return <GENAILinkBlock text={text} url={url} />;
+  },
+ calendar: (block) => {
+    const { title, data } = block as CalendarBlock;
+    return <GENAICalendar title={title} data={data} />;
+  },
+
+  tree: (block) => {
+    const { title, data } = block as TreeBlock;
+    return <GENAITree title={title} data={data} />;
+  },
+  chart: (block) => {
+    const chartBlock = block as ChartBlock;
+  
+    return (
+      <GENAIChartBlock
+        chartType={chartBlock.chartType}
+        title={chartBlock.title}
+        data={chartBlock.data}
+      />
+    );
+  },
+
+  image: (block) => {
+    const { title, description, url, alt } = block as ImageBlock;
+    return (
+      <GENAIImageCard
+        title={title}
+        description={description}
+        url={url}
+        alt={alt}
+      />
+    );
+  },
+
+  video: (block) => {
+    const { title, description, url, thumbnail } = block as VideoBlock;
+    return (
+      <GENAIVideoCard
+        title={title}
+        description={description}
+        url={url}
+        thumbnail={thumbnail}
+      />
+    );
+  },
 };
 
 const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
@@ -87,10 +109,7 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
         clearInterval(interval);
         return;
       }
-      const nextBlock = blocks[idx];
-      if (nextBlock) {
-        setVisibleBlocks((prev) => [...prev, nextBlock]);
-      }
+      setVisibleBlocks((prev) => [...prev, blocks[idx]]);
       idx++;
     }, 1000);
 
@@ -98,23 +117,23 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
   }, [blocks]);
 
   const sortedVisibleBlocks = [...visibleBlocks].sort((a, b) => {
-    const rowA = a?.row ?? 0;
-    const rowB = b?.row ?? 0;
+    const rowA = a.row ?? 0;
+    const rowB = b.row ?? 0;
     if (rowA !== rowB) return rowA - rowB;
-    const colA = a?.column ?? 0;
-    const colB = b?.column ?? 0;
+
+    const colA = a.column ?? 0;
+    const colB = b.column ?? 0;
     return colA - colB;
   });
 
-  const grouped: Record<number, Block[]> = {};
+  const groupedByRow: Record<number, Block[]> = {};
   sortedVisibleBlocks.forEach((block) => {
-    if (!block) return;
     const row = block.row ?? 0;
-    if (!grouped[row]) grouped[row] = [];
-    grouped[row].push(block);
+    if (!groupedByRow[row]) groupedByRow[row] = [];
+    groupedByRow[row].push(block);
   });
 
-  const sortedRows = Object.entries(grouped).sort(
+  const sortedRows = Object.entries(groupedByRow).sort(
     ([a], [b]) => Number(a) - Number(b)
   );
 
@@ -123,7 +142,7 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
       {sortedRows.map(([rowKey, rowBlocks]) => (
         <Grid
           container
-          spacing={1.8}
+          spacing={2}
           key={`row-${rowKey}`}
           sx={{ mb: 1, alignItems: "stretch" }}
         >

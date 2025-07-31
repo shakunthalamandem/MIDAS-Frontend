@@ -5,7 +5,10 @@ export type BlockType =
   | "link"
   | "chart"
   | "image"
-  | "video";
+  | "video"
+  | "calendar"
+  | "tree";
+
 
 export interface BaseBlock {
   type: BlockType;
@@ -43,13 +46,32 @@ export interface LinkBlock extends BaseBlock {
   url: string;
 }
 
-// Chart block
+// General Chart block fallback (for unknown or other chartTypes)
 export interface ChartBlock extends BaseBlock {
   type: "chart";
-  chartType: string; // e.g. 'bar', 'line', 'calendar', 'tree', etc.
+  chartType: string;
   title: string;
   data: any;
 }
+
+export interface CalendarBlock extends BaseBlock {
+  type: "calendar";
+  title: string;
+  data: {
+    date: string;
+    label: string;
+  }[];
+}
+
+export interface TreeBlock extends BaseBlock {
+  type: "tree";
+  title: string;
+  data: {
+    name: string;
+    children?: TreeBlock["data"][];
+  };
+}
+
 
 // Image block
 export interface ImageBlock extends BaseBlock {
@@ -69,12 +91,14 @@ export interface VideoBlock extends BaseBlock {
   thumbnail: string;
 }
 
-// Union of all blocks
 export type Block =
   | TextBlock
   | TableBlock
   | CardBlock
   | LinkBlock
-  | ChartBlock
   | ImageBlock
-  | VideoBlock;
+  | VideoBlock
+  | CalendarBlock
+  | TreeBlock
+  | ChartBlock;
+
