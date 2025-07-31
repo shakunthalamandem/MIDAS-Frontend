@@ -138,11 +138,11 @@ const GENAIRenderer: React.FC<{
         </Grid>
       ))}
 
-      {suggestedBlock && (
+      {/* {suggestedBlock && (
         <Box mt={2}>
           {BLOCK_RENDERERS.suggested_questions(suggestedBlock, setQuestion, handleSubmit)}
         </Box>
-      )}
+      )} */}
     </CardContent>
   );
 };

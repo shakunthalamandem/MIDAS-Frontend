@@ -178,14 +178,15 @@ Welcome to AI-Powered Conversations, Seamlessly Integrated
 
         {/* AI Response and Suggestions */}
         <GHCAIMain data={data} loading={loading} error={error} />
+<SuggestedQuestions
+  questions={data.find((block) => block.type === "suggested_questions")?.questions || []}
+  onSelect={(selected) => {
+    setQuestion(selected);
+    handleSubmit();
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+  }}
+/>
 
-     {/* <SuggestedQuestions
-          questions={data.find((block) => block.type === "suggested_questions")?.questions || []}
-          onSelect={(selected) => {
-            setQuestion(selected);
-            handleSubmit();
-          }}
-        />  */}
       </Container>
     </Box>
   );
