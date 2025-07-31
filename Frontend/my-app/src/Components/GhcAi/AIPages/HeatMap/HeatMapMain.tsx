@@ -20,13 +20,11 @@ type StockHeatValue = {
 };
 
 const getColorBySentiment = (score: number) => {
-  if (score > 60) return "#006b17ff";
-  if (score > 30) return "#4bc06bff";
-  if (score > 0) return "#bae6b2ff";
-  if (score > -30) return "#e27d7dff";
-  if (score > -60) return "#ce2b2bff";
-  return "#fa1818ff";
+  if (score < -5) return "#ce2b2bff";   
+  if (score <= 5) return "#a0a0a0ff";   
+  return "#006b17ff";                    
 };
+
 
 const HeatMapMain: React.FC = () => {
   const navigate = useNavigate();
