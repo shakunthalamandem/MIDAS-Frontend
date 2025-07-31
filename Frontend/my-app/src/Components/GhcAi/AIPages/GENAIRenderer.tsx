@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Grid, CardContent } from "@mui/material";
+import { Grid, Card, CardContent } from "@mui/material";
 import { motion } from "framer-motion";
 
 import GENAITextBlock from "./GENAITextBlock";
@@ -26,33 +26,43 @@ import {
   TreeBlock,
 } from "../Utils/ComponentsUtils";
 
-const BLOCK_RENDERERS: Record<BlockType, (block: Block) => JSX.Element> = {
-  text: (block) => {
-    const { content } = block as TextBlock;
-    return <GENAITextBlock content={content} />;
-  },
+const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
+  text: (block: TextBlock) => <GENAITextBlock content={block.content} />,
+  table: (block: TableBlock) => (
+    <GENAITableBlock headers={block.headers} rows={block.rows} />
+  ),
+  card: (block: CardBlock) => (
+    <GENAICardBlock
+      title={block.title}
+      subtitle={block.subtitle}
+      description={block.description}
+      icon={block.icon} />
+  ),
+  link: (block: LinkBlock) => (
+    <GENAILinkBlock text={block.text} url={block.url} />
+  ),
+  chart: (block: ChartBlock) => (
+    <GENAIChartBlock
+      chartType={block.chartType}
+      title={block.title}
+      data={block.data} />
+  ),
+  image: (block: ImageBlock) => (
+    <GENAIImageCard
+      title={block.title}
+      description={block.description}
+      url={block.url}
+      alt={block.alt} />
+  ),
+  video: (block: VideoBlock) => (
+    <GENAIVideoCard
+      title={block.title}
+      description={block.description}
+      url={block.url}
+      thumbnail={block.thumbnail} />
+  ),
 
-  table: (block) => {
-    const { headers, rows } = block as TableBlock;
-    return <GENAITableBlock headers={headers} rows={rows} />;
-  },
-
-  card: (block) => {
-    const { title, subtitle, description, icon } = block as CardBlock;
-    return (
-      <GENAICardBlock
-        title={title}
-        subtitle={subtitle}
-        description={description}
-        icon={icon}
-      />
-    );
-  },
-
-  link: (block) => {
-    const { text, url } = block as LinkBlock;
-    return <GENAILinkBlock text={text} url={url} />;
-  },
+};
  calendar: (block) => {
     const { title, data } = block as CalendarBlock;
     return <GENAICalendar title={title} data={data} />;
@@ -62,42 +72,6 @@ const BLOCK_RENDERERS: Record<BlockType, (block: Block) => JSX.Element> = {
     const { title, data } = block as TreeBlock;
     return <GENAITree title={title} data={data} />;
   },
-  chart: (block) => {
-    const chartBlock = block as ChartBlock;
-  
-    return (
-      <GENAIChartBlock
-        chartType={chartBlock.chartType}
-        title={chartBlock.title}
-        data={chartBlock.data}
-      />
-    );
-  },
-
-  image: (block) => {
-    const { title, description, url, alt } = block as ImageBlock;
-    return (
-      <GENAIImageCard
-        title={title}
-        description={description}
-        url={url}
-        alt={alt}
-      />
-    );
-  },
-
-  video: (block) => {
-    const { title, description, url, thumbnail } = block as VideoBlock;
-    return (
-      <GENAIVideoCard
-        title={title}
-        description={description}
-        url={url}
-        thumbnail={thumbnail}
-      />
-    );
-  },
-};
 
 const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
   const [visibleBlocks, setVisibleBlocks] = useState<Block[]>([]);
@@ -109,7 +83,10 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
         clearInterval(interval);
         return;
       }
-      setVisibleBlocks((prev) => [...prev, blocks[idx]]);
+      const nextBlock = blocks[idx];
+      if (nextBlock) {
+        setVisibleBlocks((prev) => [...prev, nextBlock]);
+      }
       idx++;
     }, 1000);
 
@@ -117,73 +94,74 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
   }, [blocks]);
 
   const sortedVisibleBlocks = [...visibleBlocks].sort((a, b) => {
-    const rowA = a.row ?? 0;
-    const rowB = b.row ?? 0;
+    const rowA = a?.row ?? 0;
+    const rowB = b?.row ?? 0;
     if (rowA !== rowB) return rowA - rowB;
-
-    const colA = a.column ?? 0;
-    const colB = b.column ?? 0;
+    const colA = a?.column ?? 0;
+    const colB = b?.column ?? 0;
     return colA - colB;
   });
 
-  const groupedByRow: Record<number, Block[]> = {};
+  const grouped: Record<number, Block[]> = {};
   sortedVisibleBlocks.forEach((block) => {
+    if (!block) return;
     const row = block.row ?? 0;
-    if (!groupedByRow[row]) groupedByRow[row] = [];
-    groupedByRow[row].push(block);
+    if (!grouped[row]) grouped[row] = [];
+    grouped[row].push(block);
   });
 
-  const sortedRows = Object.entries(groupedByRow).sort(
+  const sortedRows = Object.entries(grouped).sort(
     ([a], [b]) => Number(a) - Number(b)
   );
 
   return (
-    <CardContent sx={{ paddingBottom: "0 !important" }}>
-      {sortedRows.map(([rowKey, rowBlocks]) => (
-        <Grid
-          container
-          spacing={2}
-          key={`row-${rowKey}`}
-          sx={{ mb: 1, alignItems: "stretch" }}
-        >
-          {rowBlocks.map((block, idx) => {
-            const Renderer = BLOCK_RENDERERS[block.type];
-            if (!Renderer) return null;
 
-            const totalCols = block.total_columns || 1;
-            const gridSize =
-              totalCols >= 1 && totalCols <= 12
-                ? Math.floor(12 / totalCols)
-                : 12;
+      <CardContent sx={{ paddingBottom: "0 !important" }}>
+        {sortedRows.map(([rowKey, rowBlocks]) => (
+          <Grid
+            container
+            spacing={1.8}
+            key={`row-${rowKey}`}
+            sx={{ mb: 1, alignItems: "stretch" }}
+          >
+            {rowBlocks.map((block, idx) => {
+              const Renderer = BLOCK_RENDERERS[block.type];
+              if (!Renderer) return null;
 
-            return (
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={gridSize}
-                lg={gridSize}
-                key={idx}
-                sx={{ display: "flex", flexDirection: "column" }}
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: idx * 0.05,
-                    duration: 0.4,
-                    ease: "easeOut",
-                  }}
-                  style={{ flexGrow: 1, display: "flex" }}
+              const totalCols = block.total_columns || 1;
+              const gridSize =
+                totalCols >= 1 && totalCols <= 12
+                  ? Math.floor(12 / totalCols)
+                  : 12;
+
+              return (
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={gridSize}
+                  lg={gridSize}
+                  key={idx}
+                  sx={{ display: "flex", flexDirection: "column" }}
                 >
-                  {Renderer(block)}
-                </motion.div>
-              </Grid>
-            );
-          })}
-        </Grid>
-      ))}
-    </CardContent>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: idx * 0.05,
+                      duration: 0.4,
+                      ease: "easeOut",
+                    }}
+                    style={{ flexGrow: 1, display: "flex" }}
+                  >
+                    {Renderer(block)}
+                  </motion.div>
+                </Grid>
+              );
+            })}
+          </Grid>
+        ))}
+      </CardContent>
   );
 };
 
