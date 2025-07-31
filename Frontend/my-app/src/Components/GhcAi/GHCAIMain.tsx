@@ -61,7 +61,7 @@ interface GHCAIMainProps {
               mt: 1,
             }}
           >
-            AI is thinking… please hold on
+            AI is thinking… please hold on for 10 seconds
           </Typography>
         </Paper>
       )}

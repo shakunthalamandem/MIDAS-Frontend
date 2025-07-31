@@ -37,14 +37,14 @@ type GENAIChartBlockProps = {
   chartType: string;
   data: any;
   title: string;
-  width?: string | number;
+  fixedHeight?: number; // height in pixels
 };
 
 const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
   chartType,
   data,
   title,
-  width = "100%",
+  fixedHeight = 380,
 }) => {
   const type = chartType.toLowerCase();
 
@@ -67,7 +67,7 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
           p: 2,
           m: 2,
           bgcolor: "#fff",
-          width,
+          width: "100%",
           borderRadius: 2,
           boxShadow: 2,
         }}
@@ -91,25 +91,6 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
         },
       ],
     };
-  }
-
-  if (["heatmap", "tree", "calendar"].includes(type)) {
-    return (
-      <Paper
-        sx={{
-          p: 2,
-          m: 2,
-          bgcolor: "#fff",
-          width,
-          borderRadius: 2,
-          boxShadow: 2,
-        }}
-      >
-        <Typography sx={{ color: "#d32f2f" }}>
-          Custom chart type <strong>{chartType}</strong> is not supported in this renderer.
-        </Typography>
-      </Paper>
-    );
   }
 
   // Set custom options
@@ -151,31 +132,31 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
       elevation={2}
       sx={{
         p: 2,
-        m: 2,
-        width,
+        width: "100%",
+        height: fixedHeight,
         borderRadius: 3,
         background: "linear-gradient(135deg, #f5f7fa, #e4ecf7)",
         boxShadow: 3,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
       }}
     >
-      <Box mb={1}>
-        <Typography
-          variant="subtitle1"
-          fontWeight={600}
-          sx={{ color: "#2c387e" }}
-          component="div"
-        >
-          <ReactMarkdown>{title}</ReactMarkdown>
-        </Typography>
-        <Divider sx={{ mt: 0.5, mb: 1 }} />
-      </Box>
+      <Typography
+        variant="subtitle1"
+        fontWeight={600}
+        sx={{ color: "#2c387e", mb: 1 }}
+      >
+        <ReactMarkdown>{title}</ReactMarkdown>
+      </Typography>
+
+      <Divider sx={{ mb: 1 }} />
 
       <Box
         sx={{
           width: "100%",
-          maxWidth: 500,
-          height: 300,
-          mx: "auto",
+          height: `calc(${fixedHeight}px - 64px)`, // leave room for title & divider
+          position: "relative",
         }}
       >
         <ChartComponent data={formattedData} options={chartOptions} />

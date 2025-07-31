@@ -48,15 +48,15 @@ const GENATableBlock: React.FC<{
       initial={{ opacity: 0, y: 20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
+      style={{ width: "100%" }}
     >
       <Card
-        elevation={6}
+        elevation={4}
         sx={{
-          my: 3,
           borderRadius: 3,
           bgcolor: "#f9fafa",
-          maxWidth: "100%",
-          mx: "auto",
+          width: "100%",        // ✅ Responsive width
+          boxSizing: "border-box",
         }}
       >
         {title && (
@@ -70,11 +70,11 @@ const GENATableBlock: React.FC<{
           />
         )}
         <CardContent sx={{ pt: title ? 1 : 2 }}>
-          <Box sx={{ overflowX: "auto" }}>
+          <Box sx={{ width: "100%", overflowX: "auto" }}>
             <Table
               size="small"
               sx={{
-                minWidth: "100%",
+                width: "100%",
                 tableLayout: "auto",
                 wordBreak: "break-word",
               }}
@@ -96,7 +96,6 @@ const GENATableBlock: React.FC<{
                   ))}
                 </TableRow>
               </TableHead>
-
               <TableBody>
                 {rows.map((row, i) => (
                   <TableRow
