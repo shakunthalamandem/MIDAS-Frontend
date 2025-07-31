@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Grid, Card, CardContent } from "@mui/material";
+import { Grid, CardContent } from "@mui/material";
 import { motion } from "framer-motion";
 
 import GENAITextBlock from "./GENAITextBlock";
 import GENAICardBlock from "./GENAICardBlock";
 import GENAIChartBlock from "./GENAIChartBlock";
+import GENAICalendar from "./GENAICalendar";
+import GENAITree from "./GENAITree";
 import GENAILinkBlock from "./GENAILinkBlock";
 import GENAITableBlock from "./GENAITableBlock";
 import GENAIImageCard from "./GENAIImageCard";
@@ -38,13 +40,25 @@ const BLOCK_RENDERERS: Record<BlockType, (block: any) => JSX.Element> = {
   link: (block: LinkBlock) => (
     <GENAILinkBlock text={block.text} url={block.url} />
   ),
-  chart: (block: ChartBlock) => (
-    <GENAIChartBlock
-      chartType={block.chartType}
-      title={block.title}
-      data={block.data}
-    />
-  ),
+  chart: (block: ChartBlock) => {
+    const type = block.chartType.toLowerCase();
+
+    if (type === "calendar") {
+      return <GENAICalendar title={block.title} data={block.data} />;
+    }
+
+    if (type === "tree") {
+      return <GENAITree title={block.title} data={block.data} />;
+    }
+
+    return (
+      <GENAIChartBlock
+        chartType={block.chartType}
+        title={block.title}
+        data={block.data}
+      />
+    );
+  },
   image: (block: ImageBlock) => (
     <GENAIImageCard
       title={block.title}
@@ -105,53 +119,52 @@ const GENAIRenderer: React.FC<{ blocks: Block[] }> = ({ blocks }) => {
   );
 
   return (
+    <CardContent sx={{ paddingBottom: "0 !important" }}>
+      {sortedRows.map(([rowKey, rowBlocks]) => (
+        <Grid
+          container
+          spacing={1.8}
+          key={`row-${rowKey}`}
+          sx={{ mb: 1, alignItems: "stretch" }}
+        >
+          {rowBlocks.map((block, idx) => {
+            const Renderer = BLOCK_RENDERERS[block.type];
+            if (!Renderer) return null;
 
-      <CardContent sx={{ paddingBottom: "0 !important" }}>
-        {sortedRows.map(([rowKey, rowBlocks]) => (
-          <Grid
-            container
-            spacing={1.8}
-            key={`row-${rowKey}`}
-            sx={{ mb: 1, alignItems: "stretch" }}
-          >
-            {rowBlocks.map((block, idx) => {
-              const Renderer = BLOCK_RENDERERS[block.type];
-              if (!Renderer) return null;
+            const totalCols = block.total_columns || 1;
+            const gridSize =
+              totalCols >= 1 && totalCols <= 12
+                ? Math.floor(12 / totalCols)
+                : 12;
 
-              const totalCols = block.total_columns || 1;
-              const gridSize =
-                totalCols >= 1 && totalCols <= 12
-                  ? Math.floor(12 / totalCols)
-                  : 12;
-
-              return (
-                <Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={gridSize}
-                  lg={gridSize}
-                  key={idx}
-                  sx={{ display: "flex", flexDirection: "column" }}
+            return (
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={gridSize}
+                lg={gridSize}
+                key={idx}
+                sx={{ display: "flex", flexDirection: "column" }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: idx * 0.05,
+                    duration: 0.4,
+                    ease: "easeOut",
+                  }}
+                  style={{ flexGrow: 1, display: "flex" }}
                 >
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: idx * 0.05,
-                      duration: 0.4,
-                      ease: "easeOut",
-                    }}
-                    style={{ flexGrow: 1, display: "flex" }}
-                  >
-                    {Renderer(block)}
-                  </motion.div>
-                </Grid>
-              );
-            })}
-          </Grid>
-        ))}
-      </CardContent>
+                  {Renderer(block)}
+                </motion.div>
+              </Grid>
+            );
+          })}
+        </Grid>
+      ))}
+    </CardContent>
   );
 };
 

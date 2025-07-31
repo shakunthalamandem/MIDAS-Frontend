@@ -14,18 +14,20 @@ export interface BaseBlock {
   column?: number;
 }
 
-// Block Types
+// Text block
 export interface TextBlock extends BaseBlock {
   type: "text";
   content: string;
 }
 
+// Table block
 export interface TableBlock extends BaseBlock {
   type: "table";
   headers: string[];
   rows: string[][];
 }
 
+// Card block
 export interface CardBlock extends BaseBlock {
   type: "card";
   title: string;
@@ -34,19 +36,22 @@ export interface CardBlock extends BaseBlock {
   icon?: string;
 }
 
+// Link block
 export interface LinkBlock extends BaseBlock {
   type: "link";
   text: string;
   url: string;
 }
 
+// Chart block
 export interface ChartBlock extends BaseBlock {
   type: "chart";
-  chartType: string;
+  chartType: string; // e.g. 'bar', 'line', 'calendar', 'tree', etc.
   title: string;
   data: any;
 }
 
+// Image block
 export interface ImageBlock extends BaseBlock {
   type: "image";
   title: string;
@@ -55,6 +60,7 @@ export interface ImageBlock extends BaseBlock {
   alt: string;
 }
 
+// Video block
 export interface VideoBlock extends BaseBlock {
   type: "video";
   title: string;
@@ -63,7 +69,7 @@ export interface VideoBlock extends BaseBlock {
   thumbnail: string;
 }
 
-// Union
+// Union of all blocks
 export type Block =
   | TextBlock
   | TableBlock
