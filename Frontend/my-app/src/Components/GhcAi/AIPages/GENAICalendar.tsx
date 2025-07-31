@@ -1,7 +1,8 @@
 import React from "react";
-import CalendarHeatmap from "react-calendar-heatmap";
-import "react-calendar-heatmap/dist/styles.css";
-import { Card, CardHeader, CardContent } from "@mui/material";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import { Card, CardHeader, CardContent, Tooltip, Fade, Typography } from "@mui/material";
+import "./GENAICalendar.css"; // CSS file for styles
 
 interface CalendarEntry {
   date: string;
@@ -14,22 +15,56 @@ interface GENAICalendarProps {
 }
 
 const GENAICalendar: React.FC<GENAICalendarProps> = ({ title, data }) => {
+  const eventsMap = data.reduce<Record<string, string[]>>((acc, entry) => {
+    if (!acc[entry.date]) acc[entry.date] = [];
+    acc[entry.date].push(entry.label);
+    return acc;
+  }, {});
+
+  const formatDate = (date: Date) => date.toISOString().slice(0, 10);
+
   return (
-    <Card>
-      <CardHeader title={title} />
+    <Card elevation={4} style={{ borderRadius: 12 }}>
+      <CardHeader
+        title={<Typography variant="h6" style={{ color: "#002060", fontWeight: 600 }}>{title}</Typography>}
+      />
       <CardContent>
-        <CalendarHeatmap
-          startDate={new Date("2025-01-01")}
-          endDate={new Date("2025-12-31")}
-          values={data.map((d) => ({ date: d.date, count: 1 }))}
-          titleForValue={(value) =>
-            value && value.date
-              ? data.find((d) => d.date === value.date)?.label || value.date
-              : ""
-          }
-          classForValue={(value) =>
-            value && value.count ? "color-scale-4" : "color-empty"
-          }
+        <Calendar
+          value={new Date("2025-07-01")}
+          defaultView="month"
+          tileDisabled={() => true}
+          tileContent={({ date, view }) => {
+            if (view === "month") {
+              const dateKey = formatDate(date);
+              const labels = eventsMap[dateKey];
+              if (labels) {
+                return (
+                  <Tooltip
+                    title={
+                      <div>
+                        {labels.map((label, i) => (
+                          <Typography
+                            key={i}
+                            variant="body2"
+                            style={{ fontSize: "0.8em", color: "#444" }}
+                          >
+                            {label}
+                          </Typography>
+                        ))}
+                      </div>
+                    }
+                    placement="top"
+                    arrow
+                    TransitionComponent={Fade}
+                    TransitionProps={{ timeout: 300 }}
+                  >
+                    <div className="event-dot" />
+                  </Tooltip>
+                );
+              }
+            }
+            return null;
+          }}
         />
       </CardContent>
     </Card>

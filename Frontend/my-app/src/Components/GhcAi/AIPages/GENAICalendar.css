@@ -1,0 +1,30 @@
+.react-calendar {
+  border: none;
+  width: 100%;
+  font-family: "Roboto", sans-serif;
+  background-color: white;
+}
+
+.react-calendar__tile {
+  position: relative;
+  padding: 10px 6px;
+  transition: background 0.2s ease-in-out;
+}
+
+.react-calendar__tile:disabled {
+  background-color: white !important;
+  cursor: default;
+}
+
+.event-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #002060;
+  border-radius: 50%;
+  margin: 4px auto 0;
+  transition: transform 0.2s ease;
+}
+
+.event-dot:hover {
+  transform: scale(1.2);
+}
