@@ -187,7 +187,14 @@ const IntelligenceDashboard: React.FC = () => {
                   align="center"
                   sx={{ color: "#002060", fontWeight: 600, mb: 3 }}
                 >
-                  IPO Deal Intelligence
+                  IPO Market Insights
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  align="center"
+                  sx={{ color: "#002060", fontWeight: 400, mb: 3 }}
+                >
+                  Stay updated with the latest IPO trends and insights. Analyze recent trends and prepare for upcoming opportunities in the IPO landscape. 
                 </Typography>
 
                 <Grid container spacing={3}>
