@@ -16,6 +16,7 @@ import {
   Button,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import RecentIpoTable from "./Equity/RecentIpoTable";
 
 const MotionPaper = motion(Paper);
 
@@ -42,16 +43,16 @@ const IntelligenceDashboard: React.FC = () => {
 
     const pdfWidth = 1122;
     const pdfHeight = 793;
-    const margin = 40; 
+    const margin = 40;
 
-  
+
     const canvas = await html2canvas(input, {
       scale: 2,
       useCORS: true,
       backgroundColor: "#fff",
     });
 
-    
+
     const availableWidth = pdfWidth - margin * 2;
     const availableHeight = pdfHeight - margin * 2;
     const aspectRatio = canvas.width / canvas.height;
@@ -85,15 +86,15 @@ const IntelligenceDashboard: React.FC = () => {
     pdf.save(`IPO_Table_Region_Wise for Year(s) ${selectedIpoYears}.pdf`);
   };
 
-  
+
   const handleExportFoPDF = async () => {
     const input = document.getElementById("fo-table-section");
     if (!input) return;
 
-    
+
     const pdfWidth = 1122;
     const pdfHeight = 793;
-    const margin = 40; 
+    const margin = 40;
 
     const canvas = await html2canvas(input, {
       scale: 2,
@@ -181,15 +182,23 @@ const IntelligenceDashboard: React.FC = () => {
                   borderRadius: 4,
                 }}
               >
-                <Typography variant="h5" align="center" sx={{ color: "#002060", fontWeight: 600 }}>
+                <Typography
+                  variant="h5"
+                  align="center"
+                  sx={{ color: "#002060", fontWeight: 600, mb: 3 }}
+                >
                   IPO Deal Intelligence
                 </Typography>
 
                 <Grid container spacing={3}>
-                  <Grid item xs={12}>
+                  <Grid item xs={12} md={6}>
                     <UpcomingIpoTable />
                   </Grid>
+                  <Grid item xs={12} md={6}>
+                    <RecentIpoTable />
+                  </Grid>
                 </Grid>
+
               </MotionPaper>
 
               <MotionPaper
