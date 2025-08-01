@@ -251,6 +251,7 @@ const NavbarMain: React.FC = () => {
               menuItems={[
                 { label: "Summary Dashboard", path: "/opportunity/summary" },
                 { label: "Equity Market Opportunity", path: "/opportunity/equity" },
+                { label: "Past IPOs & FOs", path: "/opportunity/pastdeals" },
                 { label: "High Yields Market Opportunity", path: "/opportunity/high-yield" },
                 { label: "Converts Market Opportunity", path: "/opportunity/converts" },
               ]}
