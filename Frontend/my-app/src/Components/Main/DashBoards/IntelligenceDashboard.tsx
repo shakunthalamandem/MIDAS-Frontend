@@ -22,8 +22,8 @@ const MotionPaper = motion(Paper);
 
 const IntelligenceDashboard: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<"IPO" | "FO">("IPO");
-  const [selectedIpoYears, setSelectedIpoYears] = useState<number[]>([2025]);
-  const [selectedFoYears, setSelectedFoYears] = useState<number[]>([2025]);
+  const [selectedIpoYears, setSelectedIpoYears] = useState<number[]>([2024, 2025]);
+  const [selectedFoYears, setSelectedFoYears] = useState<number[]>([2024, 2025]);
 
   const handleIpoYearToggle = (year: number) => {
     setSelectedIpoYears((prev) =>
