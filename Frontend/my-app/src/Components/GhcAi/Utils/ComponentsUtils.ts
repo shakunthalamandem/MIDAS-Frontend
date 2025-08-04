@@ -7,7 +7,13 @@ export type BlockType =
   | "image"
   | "video"
   | "calendar"
-  | "tree";
+  | "tree"
+  | "suggested_questions";
+
+export interface SuggestedQuestionsBlock extends BaseBlock {
+  type: "suggested_questions";
+  questions: string[];
+}
 
 
 export interface BaseBlock {
@@ -100,5 +106,6 @@ export type Block =
   | VideoBlock
   | CalendarBlock
   | TreeBlock
-  | ChartBlock;
+  | ChartBlock
+  | SuggestedQuestionsBlock;
 

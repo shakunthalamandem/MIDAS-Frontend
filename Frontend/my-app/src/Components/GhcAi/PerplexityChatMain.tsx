@@ -31,9 +31,41 @@ const PerplexityChatMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  const handleSubmit = async (e?: React.FormEvent | Event) => {
+  // const handleSubmit = async (e?: React.FormEvent | Event) => {
+  //   if (e?.preventDefault) e.preventDefault();
+  //   if (!question.trim()) return;
+
+  //   setLoading(true);
+  //   setData([]);
+  //   setError(null);
+
+  //   try {
+  //     const response = await fetch(`${apiUrl}/api/perplexity_chat/`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: token ? `Bearer ${token}` : "",
+  //       },
+  //       body: JSON.stringify({
+  //         question: question.trim(),
+  //         history: [],
+  //       }),
+  //     });
+
+  //     const result = await response.json();
+  //     if (!response.ok) throw new Error(result.error || "Something went wrong");
+  //     if (Array.isArray(result.answer)) setData(result.answer);
+  //     else throw new Error("Invalid response format");
+  //   } catch (err: any) {
+  //     setError(err.message || "Failed to fetch answer");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const handleSubmit = async (e?: React.FormEvent | Event, customQuestion?: string) => {
     if (e?.preventDefault) e.preventDefault();
-    if (!question.trim()) return;
+    const query = customQuestion ?? question;
+    if (!query.trim()) return;
 
     setLoading(true);
     setData([]);
@@ -47,7 +79,7 @@ const PerplexityChatMain: React.FC = () => {
           Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({
-          question: question.trim(),
+          question: query.trim(),
           history: [],
         }),
       });
@@ -67,7 +99,7 @@ const PerplexityChatMain: React.FC = () => {
     if (stockData) {
       const formatted = formatStockAsQuestion(stockData);
       setQuestion(formatted);
-      handleSubmit();
+      handleSubmit(undefined, formatted);
     }
   }, [stockData]);
 
@@ -75,11 +107,36 @@ const PerplexityChatMain: React.FC = () => {
     <Box
       sx={{
         background: "linear-gradient(to bottom, rgba(210, 222, 231, 1), rgba(203, 220, 223, 1))",
-        py: 4,
-        px: 2,
+
         minHeight: "200vh",
       }}
     >
+      <Typography
+        variant="body2"
+        sx={{
+          fontWeight: 500,
+          color: "#FFFFFF",
+          fontSize: { xs: "1rem", sm: "1.2rem" },
+          backgroundColor: "#002060",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "4vh",
+          padding: "8px 16px",
+          borderRadius: "8px",
+          textAlign: "center",
+          marginBottom: "20px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          animation: "fadeIn 1.5s ease-in-out",
+          "@keyframes fadeIn": {
+            "0%": { opacity: 0 },
+            "100%": { opacity: 1 },
+          },
+        }}
+      >
+        Welcome to AI-Powered Conversations, Seamlessly Integrated
+
+      </Typography>
       <Container maxWidth="xl">
         {/* Flex Layout: Left = Paper, Right = Heatmap Button */}
         <Box
@@ -148,19 +205,21 @@ const PerplexityChatMain: React.FC = () => {
           </Paper>
 
           {/* Right side - Open Heatmap Button */}
-         
+
         </Box>
 
         {/* AI Response and Suggestions */}
         <GHCAIMain data={data} loading={loading} error={error} />
-
         <SuggestedQuestions
           questions={data.find((block) => block.type === "suggested_questions")?.questions || []}
           onSelect={(selected) => {
-            setQuestion(selected);
-            handleSubmit();
+            setQuestion(selected); // updates input field
+            handleSubmit(undefined, selected); // uses correct question
+            window.scrollTo({ top: 0, behavior: "smooth" });
           }}
         />
+
+
       </Container>
     </Box>
   );

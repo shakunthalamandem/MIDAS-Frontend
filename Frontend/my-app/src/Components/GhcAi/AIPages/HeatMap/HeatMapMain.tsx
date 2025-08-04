@@ -20,13 +20,11 @@ type StockHeatValue = {
 };
 
 const getColorBySentiment = (score: number) => {
-  if (score > 60) return "#006b17ff";
-  if (score > 30) return "#4bc06bff";
-  if (score > 0) return "#bae6b2ff";
-  if (score > -30) return "#e27d7dff";
-  if (score > -60) return "#ce2b2bff";
-  return "#fa1818ff";
+  if (score < -12) return "#ce2b2bff";   
+  if (score <= 0) return "#a0a0a0ff";   
+  return "#006b17ff";                    
 };
+
 
 const HeatMapMain: React.FC = () => {
   const navigate = useNavigate();
@@ -84,7 +82,7 @@ const HeatMapMain: React.FC = () => {
     if (!sectorMap[sector]) sectorMap[sector] = [];
     sectorMap[sector].push({
       x: stock_name,
-      y: confidence,
+      y: news_positivity,
       fillColor: getColorBySentiment(news_positivity),
     });
   });
@@ -98,6 +96,9 @@ const HeatMapMain: React.FC = () => {
     chart: {
       type: "treemap",
       height: 500,
+       toolbar: {
+      show: false, // This hides the download and other toolbar options
+    },
       events: {
         dataPointSelection: (event, chartContext, config) => {
           const stockName =
@@ -118,7 +119,7 @@ const HeatMapMain: React.FC = () => {
     },
     tooltip: {
       y: {
-        formatter: (val: number) => `Confidence: ${val.toFixed(1)}%`,
+        formatter: (val: number) => `Sentiment Score: ${val.toFixed(1)}%`,
       },
     },
     dataLabels: {
@@ -133,11 +134,33 @@ const HeatMapMain: React.FC = () => {
   };
 
   return (
+    <Box sx={{ background: "#e0eeecff", borderRadius: 2 }}>
+        <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 500,
+                color: "#FFFFFF",
+                fontSize: { xs: "1rem", sm: "1.2rem" },
+                backgroundColor: "#002060",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "4vh",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                textAlign: "center",
+                marginBottom: "20px",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                animation: "fadeIn 1.5s ease-in-out",
+                "@keyframes fadeIn": {
+                  "0%": { opacity: 0 },
+                  "100%": { opacity: 1 },
+                },
+              }}
+            >
+Welcome to Your Portfolio’s Social Media Sentiment Heatmap            </Typography>
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Box p={2} sx={{ background: "#ebe9d4ff", borderRadius: 2 }}>
-        <Typography variant="h5" mb={2} color="#002060">
-          Stock Heatmap by Sector (Confidence & News Sentiment)
-        </Typography>
+       
 
         {meta && (
           <HeatmapMetadata
@@ -166,8 +189,8 @@ const HeatMapMain: React.FC = () => {
             />
           </Box>
         )}
-      </Box>
     </Container>
+    </Box>
   );
 };
 
