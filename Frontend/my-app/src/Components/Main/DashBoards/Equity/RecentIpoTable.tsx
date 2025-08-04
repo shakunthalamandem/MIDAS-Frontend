@@ -134,7 +134,14 @@ const RecentIpoTable: React.FC = () => {
           📈 Recently Listed IPOs : Past Two Weeks
         </Typography>
 
-        <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: 2,
+            maxHeight: "320px",
+
+          }}
+        >
           <Table
             sx={{
               borderCollapse: "collapse",
