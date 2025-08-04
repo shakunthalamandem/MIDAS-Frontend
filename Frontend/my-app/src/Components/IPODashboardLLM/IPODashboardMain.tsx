@@ -67,7 +67,7 @@ const IPODashboardMain: React.FC = () => {
   const [editMode, setEditMode] = useState<Record<string, boolean>>({});
   const [editedContent, setEditedContent] = useState<Record<string, string[]>>({});
   const [showAIComparison, setShowAIComparison] = useState(false);
-  const [expandedPanel, setExpandedPanel] = useState<string | false>(false);
+const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>({});
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -205,13 +205,16 @@ const IPODashboardMain: React.FC = () => {
     const key = section.key;
     const content = ipoData[key];
     const isEditing = editMode[key];
-    const isExpanded = expandedPanel === key;
+    const isExpanded = expandedPanels[key] || false;
 
     return (
       <Grid item xs={12} key={key}>
         <Accordion
           expanded={isExpanded}
-          onChange={() => setExpandedPanel(isExpanded ? false : key)}
+          onChange={() =>
+  setExpandedPanels((prev) => ({ ...prev, [key]: !prev[key] }))
+}
+
           sx={{
             backgroundColor: cardColors[index % cardColors.length],
             borderRadius: 2,
@@ -350,8 +353,12 @@ const IPODashboardMain: React.FC = () => {
             <div id="ipo-dashboard-page3">
               <Container maxWidth="xl" sx={{ mb: 3 }}>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(4, 6).map((section, index) => renderEditableCard(section, index + 4))}
-                  <Grid item xs={12}>
+{cardSections.slice(4, 6).map((section, index) => (
+  <Grid item xs={12} md={6} key={section.key}>
+    {renderEditableCard(section, index + 4)}
+  </Grid>
+))}
+                  <Grid item xs={12} >
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <FinancialForecastTable defaultTicker={selectedTicker || ""} />
                     </Box>
