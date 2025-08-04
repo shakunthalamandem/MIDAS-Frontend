@@ -30,6 +30,7 @@ type ComparableMetric = {
   one_year_later_ev_fcf: number | null;
   sales_growth: number | null;
   eps_growth: number | null;
+  ai_generated:boolean;
 };
 
 type AveragesType = {
@@ -80,13 +81,13 @@ const formatNumber = (
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
-const getColumns = (ticker: string): {
+const getColumns = (ticker: string,ai_generated: boolean): {
   key: keyof ComparableMetric;
   label: string;
   isCurrency?: boolean;
   isPercentage?: boolean;
 }[] => [
-  { key: "competitor", label: "Ticker" },
+  { key: "competitor", label: `Ticker${ai_generated ? " (ai)" : ""}` },
   { key: "price_usd", label: "Price (USD)", isCurrency: true },
   { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
   { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
@@ -150,9 +151,9 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
     Object.values(data).every(
       (metrics) => !metrics.data || metrics.data.length === 0
     );
+const ai_generated = data?.[ticker]?.data?.[0]?.ai_generated || false;
 
-  const columns = getColumns(ticker);
-
+  const columns = getColumns(ticker, ai_generated);
   return (
     <Box sx={{ p: 0, width: "100%" }}>
       <TickerInputComponent
