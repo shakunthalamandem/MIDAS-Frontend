@@ -146,63 +146,75 @@ const PerplexityChatMain: React.FC = () => {
           alignItems="flex-start"
           gap={4}
         >
-          {/* Left side - Question Form */}
-          <Paper
-            elevation={6}
-            sx={{
-              flex: 1,
-              p: 4,
-              borderRadius: 4,
-              background: "rgba(255, 255, 255, 0.58)",
-              backdropFilter: "blur(14px)",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
-            }}
-          >
-            <Typography
-              variant="h6"
-              gutterBottom
-              align="center"
-              sx={{ fontWeight: 600, color: "#002060", mb: 2 }}
-            >
-              Ask Me Anything !!!
-            </Typography>
+<Paper
+  elevation={6}
+  sx={{
+    width: { xs: "100%", sm: "80%", md: "60%", lg: "80%" }, // Responsive width
+    mx: "auto", // Center horizontally
+    p: 4,
+    borderRadius: 4,
+    background: "rgba(255, 255, 255, 0.7)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+  }}
+>
+  <Typography
+    variant="h5"
+    align="center"
+    sx={{ fontWeight: 700, color: "#002060", mb: 2 }}
+  >
+    Ask. Analyze. Act - with AI finance support
+  </Typography>
 
-            <Box component="form" onSubmit={handleSubmit} display="flex" gap={2}>
-              <TextField
-                fullWidth
-                size="small"
-                label="Type your question..."
-                variant="outlined"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                sx={{
-                  background: "#ffffff",
-                  borderRadius: 2,
-                  input: { color: "#333" },
-                }}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={loading || !question.trim()}
-                sx={{
-                  background: "#c9c9c9ff",
-                  color: "#002060",
-                  px: 3,
-                  borderRadius: 2,
-                  transition: "transform 0.2s",
-                  minWidth: 50,
-                  "&:hover": {
-                    transform: "scale(1.05)",
-                    background: "linear-gradient(45deg, #c7dddbff, #f0efd1ff)",
-                  },
-                }}
-              >
-                {loading ? <CircularProgress size={22} color="inherit" /> : <SendIcon />}
-              </Button>
-            </Box>
-          </Paper>
+  <Typography
+    align="center"
+    sx={{ fontSize: "0.95rem", color: "#333", mb: 3 }}
+  >
+    Meet your AI-powered Financial Assistant — here to simplify your financial queries. Whether it's market trends, company analysis, or quick number insights, just ask and get clear, instant answers. Simple, smart finance help — no jargon, just clarity.
+  </Typography>
+
+  <Box
+    component="form"
+    onSubmit={handleSubmit}
+    display="flex"
+    gap={2}
+    flexDirection={{ xs: "column", sm: "row" }}
+  >
+    <TextField
+      fullWidth
+      size="small"
+      label="Type your question..."
+      variant="outlined"
+      value={question}
+      onChange={(e) => setQuestion(e.target.value)}
+      sx={{
+        background: "#ffffff",
+        borderRadius: 2,
+        input: { color: "#333" },
+      }}
+    />
+    <Button
+      type="submit"
+      variant="contained"
+      disabled={loading || !question.trim()}
+      sx={{
+        background: "#c9c9c9ff",
+        color: "#002060",
+        px: 3,
+        borderRadius: 2,
+        transition: "transform 0.2s",
+        minWidth: { xs: "100%", sm: 50 },
+        "&:hover": {
+          transform: "scale(1.05)",
+          background: "linear-gradient(45deg, #c7dddbff, #f0efd1ff)",
+        },
+      }}
+    >
+      {loading ? <CircularProgress size={22} color="inherit" /> : <SendIcon />}
+    </Button>
+  </Box>
+</Paper>
 
           {/* Right side - Open Heatmap Button */}
 
