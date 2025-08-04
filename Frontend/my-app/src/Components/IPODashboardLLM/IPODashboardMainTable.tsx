@@ -159,7 +159,7 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
 
 <TickerInputComponent
   competitor={ticker}
-  // onSubmit={handleFetch}
+  onSubmit={handleFetch}
 />
 
       {loading && <CircularProgress />}

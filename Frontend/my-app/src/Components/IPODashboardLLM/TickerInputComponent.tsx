@@ -9,12 +9,12 @@ import {
 
 type TickerInputProps = {
   competitor: string;
+  onSubmit: (ticker: string) => void;
 };
 
-const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
+const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor, onSubmit }) => {
   const [ticker, setTicker] = useState("");
   const [loading, setLoading] = useState(false);
-  const [responseData, setResponseData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
@@ -25,29 +25,9 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
 
     setLoading(true);
     setError(null);
-    setResponseData(null);
 
     try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
-
-      if (!apiUrl) throw new Error("API URL not set");
-
-      const response = await fetch(`${apiUrl}/api/get_ai_comps_metrics/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({ ticker, competitor }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setResponseData(data);
+      await onSubmit(ticker);
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
@@ -56,8 +36,8 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" gap={2} mb={4} p={2} bgcolor="#f5f5f5" borderRadius={2}>
-      <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
+    <Box display="flex" flexDirection="column" gap={2} >
+      <Box display="flex" alignItems="center" gap={2}  mb ={4} flexWrap="wrap">
         <Typography
           variant="h6"
           color="#002060"
@@ -77,9 +57,10 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
 
         <Button
           variant="contained"
-          color="primary"
+         
           onClick={handleSubmit}
           disabled={loading}
+          sx={{ backgroundColor: "#002060", color: "#fff" }}
         >
           {loading ? <CircularProgress size={20} /> : "Submit"}
         </Button>
@@ -89,13 +70,6 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
         <Typography color="error">
           {error}
         </Typography>
-      )}
-
-      {responseData && (
-        <Box>
-          <Typography variant="subtitle1">API Response:</Typography>
-          <pre>{JSON.stringify(responseData, null, 2)}</pre>
-        </Box>
       )}
     </Box>
   );
