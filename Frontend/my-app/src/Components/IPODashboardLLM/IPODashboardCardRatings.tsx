@@ -185,7 +185,7 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
       </>
     ) : (
       <IconButton onClick={() => setSummaryEditMode(true)}>
-        <EditIcon />
+              <EditIcon fontSize="small" />
       </IconButton>
     )}
   </Box>
@@ -297,7 +297,7 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
       </>
     ) : (
       <IconButton onClick={() => setRatingsEditMode(true)}>
-        <EditIcon />
+              <EditIcon fontSize="small" />
       </IconButton>
     )}
   </Box>

@@ -67,7 +67,7 @@ const IPODashboardMain: React.FC = () => {
   const [editMode, setEditMode] = useState<Record<string, boolean>>({});
   const [editedContent, setEditedContent] = useState<Record<string, string[]>>({});
   const [showAIComparison, setShowAIComparison] = useState(false);
-const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>({});
+  const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>({});
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -212,8 +212,8 @@ const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>({}
         <Accordion
           expanded={isExpanded}
           onChange={() =>
-  setExpandedPanels((prev) => ({ ...prev, [key]: !prev[key] }))
-}
+            setExpandedPanels((prev) => ({ ...prev, [key]: !prev[key] }))
+          }
 
           sx={{
             backgroundColor: cardColors[index % cardColors.length],
@@ -237,7 +237,7 @@ const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>({}
               </>
             ) : (
               <IconButton onClick={() => setEditMode((prev) => ({ ...prev, [key]: true }))} size="small">
-                <EditIcon />
+              <EditIcon fontSize="small" />
               </IconButton>
             )}
           </AccordionSummary>
@@ -328,7 +328,7 @@ const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>({}
                 searchText={searchText}
                 setSelectedTicker={setSelectedTicker}
                 setSearchText={setSearchText}
-                onExportPDF={() => {}}
+                onExportPDF={() => { }}
                 pdfLoading={pdfLoading}
               />
               <IPODashboardCardRatings
@@ -338,26 +338,26 @@ const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>({}
               />
             </div>
 
-<div id="ipo-dashboard-page2">
-  <Container maxWidth="xl" sx={{ mb: 3 }}>
-    <Grid container spacing={2} sx={{ mb: 3 }}>
-      {cardSections.slice(0, 4).map((section, index) => (
-        <Grid item xs={12} md={6} key={section.key}>
-          {renderEditableCard(section, index)}
-        </Grid>
-      ))}
-    </Grid>
-  </Container>
-</div>
+            <div id="ipo-dashboard-page2">
+              <Container maxWidth="xl" sx={{ mb: 3 }}>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  {cardSections.slice(0, 4).map((section, index) => (
+                    <Grid item xs={12} md={6} key={section.key}>
+                      {renderEditableCard(section, index)}
+                    </Grid>
+                  ))}
+                </Grid>
+              </Container>
+            </div>
 
             <div id="ipo-dashboard-page3">
               <Container maxWidth="xl" sx={{ mb: 3 }}>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-{cardSections.slice(4, 6).map((section, index) => (
-  <Grid item xs={12} md={6} key={section.key}>
-    {renderEditableCard(section, index + 4)}
-  </Grid>
-))}
+                  {cardSections.slice(4, 6).map((section, index) => (
+                    <Grid item xs={12} md={6} key={section.key}>
+                      {renderEditableCard(section, index + 4)}
+                    </Grid>
+                  ))}
                   <Grid item xs={12} >
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <FinancialForecastTable defaultTicker={selectedTicker || ""} />
