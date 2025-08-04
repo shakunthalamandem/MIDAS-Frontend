@@ -12,7 +12,6 @@ import {
   TableRow,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import MddIpoOpportunityChart from "./MddIpoOpportunityChart";
 
 interface IpoData {
   ticker: string;
@@ -77,25 +76,13 @@ const UpcomingIpoTable: React.FC = () => {
     fetchDashboardTickers();
   }, [apiUrl, token]);
 
-  const formatNumber = (value: number): string => {
-    const abs = Math.abs(value);
-    if (abs >= 1e9) return `$${(abs / 1e9).toFixed(1)}B`;
-    if (abs >= 1e6) return `$${(abs / 1e6).toFixed(1)}M`;
-    if (abs >= 1e3) return `$${(abs / 1e3).toFixed(1)}K`;
-    return `${abs.toFixed(2)}`;
-  };
-
   const getOrdinalSuffix = (day: number): string => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
     }
   };
 
@@ -110,7 +97,6 @@ const UpcomingIpoTable: React.FC = () => {
   };
 
   return (
-    <>
     <Container maxWidth="lg">
       <Box
         sx={{
@@ -129,11 +115,16 @@ const UpcomingIpoTable: React.FC = () => {
           color="#002060"
           mb={2}
         >
-          📈 Upcoming & Recent IPOs : Past Week to Next Two Weeks
+          📅 Upcoming & Recent IPOs : Past Week to Next Two Weeks
         </Typography>
 
         <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-          <Table>
+          <Table
+            sx={{
+              borderCollapse: "collapse",
+              border: "1px solid black",
+            }}
+          >
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
                 {[
@@ -146,11 +137,14 @@ const UpcomingIpoTable: React.FC = () => {
                 ].map((heading) => (
                   <TableCell
                     key={heading}
+                    align="center"
                     sx={{
                       color: "#fff",
                       fontWeight: 600,
-                      fontSize: "0.85rem",
-                      padding: "10px 12px",
+                      fontSize: "0.78rem",
+                      padding: "6px 8px",
+                      border: "1px solid black",
+                      lineHeight: 1.2,
                     }}
                   >
                     {heading}
@@ -163,9 +157,20 @@ const UpcomingIpoTable: React.FC = () => {
                 <TableRow
                   key={index}
                   hover
-                  sx={{ "&:hover": { backgroundColor: "#f0f8ff" } }}
+                  sx={{
+                    "&:hover": { backgroundColor: "#f0f8ff" },
+                    border: "1px solid black",
+                  }}
                 >
-                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      fontSize: "0.78rem",
+                      padding: "6px 8px",
+                      border: "1px solid black",
+                      lineHeight: 1.2,
+                    }}
+                  >
                     {dashboardTickers.includes(row.ticker) ? (
                       <Box
                         component="span"
@@ -190,20 +195,34 @@ const UpcomingIpoTable: React.FC = () => {
                       row.ticker
                     )}
                   </TableCell>
-                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
+                  <TableCell
+                    align="center"
+                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
+                  >
                     {row.company_name}
                   </TableCell>
-                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
+                  <TableCell
+                    align="center"
+                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
+                  >
                     {formatDate(row.expected_date)}
                   </TableCell>
-                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
+                  <TableCell
+                    align="center"
+                    sx={{ fontSize: "0.78rem", padding: "8px 10px", border: "1px solid black", lineHeight: 1.2 }}
+                  >
                     {row.price !== null ? `${row.price}` : "—"}
                   </TableCell>
-                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
+                  <TableCell
+                    align="center"
+                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
+                  >
                     {row.exchange}
                   </TableCell>
-                  <TableCell sx={{ fontSize: "0.85rem", padding: "10px 12px" }}>
-                    {/* {row.deal_size !== null ? formatNumber(row.deal_size) : "—"} */}
+                  <TableCell
+                    align="center"
+                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
+                  >
                     {row.deal_size !== null ? `${row.deal_size}` : "—"}
                   </TableCell>
                 </TableRow>
@@ -213,8 +232,6 @@ const UpcomingIpoTable: React.FC = () => {
         </TableContainer>
       </Box>
     </Container>
-
-    </>
   );
 };
 

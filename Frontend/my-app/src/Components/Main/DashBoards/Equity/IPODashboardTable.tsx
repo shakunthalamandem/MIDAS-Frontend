@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 interface RegionMonthwiseMetric {
   Total_Deal_Count_Sum: number;
   Total_Deal_Volume_Sum: number;
-  Total_Postively_Performing_Deals: number; 
+  Total_Postively_Performing_Deals: number;
   Total_Expected_returns_excess: number;
   Total_Long_Opportunity_Value: number;
 }
@@ -48,22 +48,31 @@ const REGION_ORDER = ["US", "EMEA", "APAC", "Non-US America"];
 
 const formatCurrency = (value?: number): string => {
   if (value === undefined || isNaN(value)) return "-";
-
   const absValue = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-
-  if (absValue >= 1_000_000_000) return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
-  if (absValue >= 1_000_000) return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
+  if (absValue >= 1_000_000_000)
+    return `${sign}$${(absValue / 1_000_000_000).toFixed(1)}B`;
+  if (absValue >= 1_000_000)
+    return `${sign}$${(absValue / 1_000_000).toFixed(1)}M`;
   return `${sign}$${absValue.toFixed(1)}`;
 };
-
 
 const formatPercentage = (value?: number): string =>
   value !== undefined && !isNaN(value) ? `${value.toFixed(1)}%` : "-";
 
 const monthOrder = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const MotionTableRow = motion(TableRow);
@@ -130,150 +139,197 @@ const IPODashboardTable: React.FC<IPODashboardTableProps> = ({
 
   return (
     <Zoom in>
-      <TableContainer
-        component={Paper}
-        sx={{
-          backgroundColor: "#fcfcdc",
-          borderRadius: 2,
-          boxShadow: 3,
-          mt: 3,
-        }}
-      >
+      <Box>
         <Typography
           variant="h6"
           gutterBottom
-          align="center"
-          sx={{ color: "#002060", fontWeight: 600 }}
+          sx={{ color: "#002060", fontWeight: 600, textAlign: "center" }}
         >
-          IPO Deal Summary
+          IPO Historical Deal Flow
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          gutterBottom
+          sx={{ color: "#555", textAlign: "center", mb: 2 }}
+        >
+          To change the "sector" field in the output to take its value from
+          DailyNoteDeals instead of from custom_group2 in the trade data, you
+          just need to update this part of your function
         </Typography>
 
-        <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 600, backgroundColor: "#f0f0f0", width: "200px" }}>
-                Metric
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}
-              >
-                Region
-              </TableCell>
-              {availableMonthYears.map((monthYear) => (
+        <TableContainer
+          component={Paper}
+          sx={{
+            backgroundColor: "#fcdcdc",
+            borderRadius: 2,
+            boxShadow: 3,
+            mt: 2,
+          }}
+        >
+          <Table
+            size="small"
+            sx={{
+              tableLayout: "fixed",
+              width: "100%",
+              "& td, & th": {
+                border: "1px solid #ccc", // <-- Borders on all cells
+              },
+            }}
+          >
+            <TableHead>
+              <TableRow>
                 <TableCell
-                  key={monthYear}
-                  align="center"
-                  sx={{ fontWeight: 600, backgroundColor: "#f0f0f0" }}
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "#f0f0f0",
+                    width: 200,
+                  }}
                 >
-                  {monthYear}
+                  Metric
                 </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
+                <TableCell
+                  align="center"
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "#f0f0f0",
+                  }}
+                >
+                  Region
+                </TableCell>
+                {availableMonthYears.map((monthYear) => (
+                  <TableCell
+                    key={monthYear}
+                    align="center"
+                    sx={{
+                      fontWeight: 600,
+                      backgroundColor: "#f0f0f0",
+                    }}
+                  >
+                    {monthYear}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
 
-          <TableBody>
-            {rows.map((row, idx) => {
-              const isExpanded = expandedRows.has(row.key);
-              const totalRowSpan = REGION_ORDER.length + 1;
+            <TableBody>
+              {rows.map((row, idx) => {
+                const isExpanded = expandedRows.has(row.key);
+                const totalRowSpan = REGION_ORDER.length + 1;
 
-              if (isExpanded) {
-                return (
-                  <React.Fragment key={row.key}>
-                    {REGION_ORDER.map((region, regionIdx) => {
-                      const data = regionwiseMonthwise[region];
-                      return (
-                        <TableRow key={`${row.key}-${region}`}>
-                          {regionIdx === 0 && (
-                            <TableCell
-                              rowSpan={totalRowSpan}
-                              sx={{ borderRight: "1px solid #ccc" }}
-                            >
-                              {row.label}
-                            </TableCell>
-                          )}
-                          <TableCell align="center">{region}</TableCell>
-                          {availableMonthYears.map((monthYear) => {
-                            const [month, year] = monthYear.split(" ");
-                            const value =
-                              data?.[year]?.[month]?.[
-                                row.regionKey as keyof typeof data[typeof year][typeof month]
-                              ];
-                            return (
-                              <TableCell key={monthYear} align="center">
-                                {row.formatter(value)}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      );
-                    })}
-
-                    <MotionTableRow
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 + idx * 0.1 }}
-                    >
-                      <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        <Box display="flex" alignItems="center" justifyContent="center">
-                          <Typography variant="body2" sx={{ pr: 0.5, fontWeight: 600 }}>
-                            Sum
-                          </Typography>
-                          <IconButton size="small" onClick={() => toggleRow(row.key)}>
-                            <Remove fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </TableCell>
-
-                      {availableMonthYears.map((monthYear) => {
-                        const [month, year] = monthYear.split(" ");
-                        const val = payload[year]?.[month]?.[row.key];
+                if (isExpanded) {
+                  return (
+                    <React.Fragment key={row.key}>
+                      {REGION_ORDER.map((region, regionIdx) => {
+                        const data = regionwiseMonthwise[region];
                         return (
-                          <TableCell key={monthYear} align="center" sx={{ fontWeight: 600 }}>
-                            {row.formatter(val)}
-                          </TableCell>
+                          <TableRow key={`${row.key}-${region}`}>
+                            {regionIdx === 0 && (
+                              <TableCell
+                                rowSpan={totalRowSpan}
+                                sx={{ fontWeight: 500 }}
+                              >
+                                {row.label}
+                              </TableCell>
+                            )}
+                            <TableCell align="center">{region}</TableCell>
+                            {availableMonthYears.map((monthYear) => {
+                              const [month, year] = monthYear.split(" ");
+                              const value =
+                                data?.[year]?.[month]?.[
+                                  row.regionKey as keyof (typeof data)[typeof year][typeof month]
+                                ];
+                              return (
+                                <TableCell key={monthYear} align="center">
+                                  {row.formatter(value)}
+                                </TableCell>
+                              );
+                            })}
+                          </TableRow>
                         );
                       })}
-                    </MotionTableRow>
-                  </React.Fragment>
-                );
-              }
 
-              return (
-                <MotionTableRow
-                  key={row.key}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 + idx * 0.1 }}
-                >
-                  <TableCell sx={{ borderRight: "1px solid #ccc",width: "200px" }}>
-                    {row.label}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Box display="flex" alignItems="center" justifyContent="center">
-                      <Typography variant="body2" sx={{ pr: 0.5 }}>
-                        Sum
-                      </Typography>
-                      <IconButton size="small" onClick={() => toggleRow(row.key)}>
-                        <Add fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                  {availableMonthYears.map((monthYear) => {
-                    const [month, year] = monthYear.split(" ");
-                    const val = payload[year]?.[month]?.[row.key];
-                    return (
-                      <TableCell key={monthYear} align="center">
-                        {row.formatter(val)}
-                      </TableCell>
-                    );
-                  })}
-                </MotionTableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                      <MotionTableRow
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 + idx * 0.1 }}
+                      >
+                        <TableCell align="center" sx={{ fontWeight: 600 }}>
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <Typography variant="body2" sx={{ pr: 0.5 }}>
+                              Sum
+                            </Typography>
+                            <IconButton
+                              size="small"
+                              onClick={() => toggleRow(row.key)}
+                            >
+                              <Remove fontSize="small" />
+                            </IconButton>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="center" />
+                        {availableMonthYears.map((monthYear) => {
+                          const [month, year] = monthYear.split(" ");
+                          const val = payload[year]?.[month]?.[row.key];
+                          return (
+                            <TableCell
+                              key={monthYear}
+                              align="center"
+                              sx={{ fontWeight: 600 }}
+                            >
+                              {row.formatter(val)}
+                            </TableCell>
+                          );
+                        })}
+                      </MotionTableRow>
+                    </React.Fragment>
+                  );
+                }
+
+                return (
+                  <MotionTableRow
+                    key={row.key}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 + idx * 0.1 }}
+                  >
+                    <TableCell sx={{ fontWeight: 500 }}>{row.label}</TableCell>
+                    <TableCell align="center">
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Typography variant="body2" sx={{ pr: 0.5 }}>
+                          Sum
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={() => toggleRow(row.key)}
+                        >
+                          <Add fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                    {availableMonthYears.map((monthYear) => {
+                      const [month, year] = monthYear.split(" ");
+                      const val = payload[year]?.[month]?.[row.key];
+                      return (
+                        <TableCell key={monthYear} align="center">
+                          {row.formatter(val)}
+                        </TableCell>
+                      );
+                    })}
+                  </MotionTableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Zoom>
   );
 };
