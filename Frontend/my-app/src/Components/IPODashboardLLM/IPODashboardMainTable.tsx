@@ -98,7 +98,7 @@ const getColumns = (ticker: string): {
     key: "present_year_ev_fcf", label: "2025 EV/EBITDA",
   },
   {
-    key: "one_year_later_ev_fcf",label: "2026 EV/EBITDA",
+    key: "one_year_later_ev_fcf", label: "2026 EV/EBITDA",
   },
   { key: "sales_growth", label: "Sales Growth (25–26)", isPercentage: true },
   { key: "eps_growth", label: "EPS Growth (25–26)", isPercentage: true },
@@ -143,7 +143,6 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
 
   useEffect(() => {
     handleFetch(ticker);
-    // eslint-disable-next-line
   }, [ticker]);
 
   const noData =
@@ -156,10 +155,10 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
 
   return (
     <Box sx={{ p: 0, width: "100%" }}>
-<TickerInputComponent
-  competitor={ticker}
-  // onSubmit={handleFetch}
-/>
+      <TickerInputComponent
+        ticker={ticker}
+        onSuccess={() => handleFetch(ticker)}  
+      />
 
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}

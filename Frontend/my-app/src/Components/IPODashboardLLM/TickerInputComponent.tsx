@@ -8,13 +8,13 @@ import {
 } from "@mui/material";
 
 type TickerInputProps = {
-  competitor: string;
+  ticker: string;
+  onSuccess: () => void;  // Callback for success
 };
 
-const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
-  const [ticker, setTicker] = useState("");
+const TickerInputComponent: React.FC<TickerInputProps> = ({ ticker, onSuccess }) => {
+  const [competitor, setCompetitor] = useState("");
   const [loading, setLoading] = useState(false);
-  const [responseData, setResponseData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
@@ -25,7 +25,6 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
 
     setLoading(true);
     setError(null);
-    setResponseData(null);
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
@@ -47,7 +46,12 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
       }
 
       const data = await response.json();
-      setResponseData(data);
+
+      if (data.message === "success") {
+        onSuccess();  // Call parent to fetch second API
+      } else {
+        throw new Error("API call was not successful");
+      }
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
@@ -57,7 +61,7 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
-      <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
+      <Box display="flex" alignItems="center" gap={2} flexWrap="wrap" mb={3}>
         <Typography
           variant="h6"
           color="#002060"
@@ -69,8 +73,8 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
 
         <TextField
           label="Ticker"
-          value={ticker}
-          onChange={(e) => setTicker(e.target.value)}
+          value={competitor}
+          onChange={(e) => setCompetitor(e.target.value.toUpperCase())}
           variant="outlined"
           size="small"
         />
@@ -89,13 +93,6 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
         <Typography color="error">
           {error}
         </Typography>
-      )}
-
-      {responseData && (
-        <Box>
-          <Typography variant="subtitle1">API Response:</Typography>
-          <pre>{JSON.stringify(responseData, null, 2)}</pre>
-        </Box>
       )}
     </Box>
   );
