@@ -6,8 +6,6 @@ import {
   Box,
   Grid,
   CircularProgress,
-  IconButton,
-  Collapse,
   Tooltip,
 } from "@mui/material";
 import {
@@ -69,8 +67,10 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
         }
 
         const data = await response.json();
-        if (data && Array.isArray(data) && data.length > 0) {
-          setDealData(data[0]);
+        
+        // Update this part to check if data is an object instead of an array
+        if (data && typeof data === "object" && Object.keys(data).length > 0) {
+          setDealData(data);  // Directly set the object as deal data
         } else {
           setError("No deal data available.");
         }
