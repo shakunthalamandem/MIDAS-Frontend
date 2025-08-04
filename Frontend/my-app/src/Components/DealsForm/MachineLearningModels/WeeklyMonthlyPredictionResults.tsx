@@ -343,7 +343,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                             bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6",
                           }}
                         >
-                          T+1 {frame}(AM) from Issue Price
+                          T+1 {frame}(AM) from T+1D Close
                         </TableCell>
                         <TableCell
                           sx={{
