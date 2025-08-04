@@ -13,6 +13,7 @@ import {
   Alert,
   Fade,
 } from "@mui/material";
+import TickerInputComponent from "./TickerInputComponent";
 
 // Types for API response
 type ComparableMetric = {
@@ -164,6 +165,7 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
       >
         Comparative Trading Multiples & Performance Metrics
       </Typography>
+            <TickerInputComponent competitor="NOD.OL" />
 
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
