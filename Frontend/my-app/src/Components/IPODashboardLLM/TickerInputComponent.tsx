@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import axios from "axios";
 import {
   Box,
   TextField,
   Button,
   Typography,
   CircularProgress,
-  Paper,
 } from "@mui/material";
 
 type TickerInputProps = {
-  competitor: string; // passed from parent
+  competitor: string;
 };
 
 const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
@@ -30,12 +28,26 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
     setResponseData(null);
 
     try {
-      const response = await axios.post("http://192.168.1.36:8000/api/get_ai_comps_metrics/", {
-        ticker,
-        competitor,
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      if (!apiUrl) throw new Error("API URL not set");
+
+      const response = await fetch(`${apiUrl}/api/get_ai_comps_metrics/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker, competitor }),
       });
 
-      setResponseData(response.data);
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setResponseData(data);
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
@@ -44,38 +56,48 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 3, maxWidth: 600, margin: "auto", mt: 4 }}>
-      <Box display="flex" gap={2} flexDirection="column">
+    <Box display="flex" flexDirection="column" gap={2} mb={4} p={2} bgcolor="#f5f5f5" borderRadius={2}>
+      <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
+        <Typography
+          variant="h6"
+          color="#002060"
+          fontWeight={600}
+          sx={{ whiteSpace: "nowrap" }}
+        >
+          Comparative Trading Multiples & Performance Metrics
+        </Typography>
+
         <TextField
           label="Ticker"
           value={ticker}
           onChange={(e) => setTicker(e.target.value)}
           variant="outlined"
-          fullWidth
+          size="small"
         />
+
         <Button
           variant="contained"
           color="primary"
           onClick={handleSubmit}
           disabled={loading}
         >
-          {loading ? <CircularProgress size={24} /> : "Submit"}
+          {loading ? <CircularProgress size={20} /> : "Submit"}
         </Button>
-
-        {error && (
-          <Typography color="error" mt={2}>
-            {error}
-          </Typography>
-        )}
-
-        {responseData && (
-          <Box mt={2}>
-            <Typography variant="subtitle1">API Response:</Typography>
-            <pre>{JSON.stringify(responseData, null, 2)}</pre>
-          </Box>
-        )}
       </Box>
-    </Paper>
+
+      {error && (
+        <Typography color="error">
+          {error}
+        </Typography>
+      )}
+
+      {responseData && (
+        <Box>
+          <Typography variant="subtitle1">API Response:</Typography>
+          <pre>{JSON.stringify(responseData, null, 2)}</pre>
+        </Box>
+      )}
+    </Box>
   );
 };
 

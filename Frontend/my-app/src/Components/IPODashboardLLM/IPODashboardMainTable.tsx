@@ -156,16 +156,11 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
 
   return (
     <Box sx={{ p: 0, width: "100%" }}>
-      <Typography
-        variant="h6"
-        sx={{ mb: 2 }}
-        color="#002060"
-        align="center"
-        fontWeight={600}
-      >
-        Comparative Trading Multiples & Performance Metrics
-      </Typography>
-            <TickerInputComponent competitor="NOD.OL" />
+
+<TickerInputComponent
+  competitor={ticker}
+  // onSubmit={handleFetch}
+/>
 
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
