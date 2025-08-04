@@ -317,6 +317,7 @@ const IPODashboardMain: React.FC = () => {
       >
         Welcome to detailed Insights on IPO - {selectedTicker}
       </Typography>
+
       
 
       <Box sx={{ px: 2 }}>
@@ -333,6 +334,8 @@ const IPODashboardMain: React.FC = () => {
                 onExportPDF={() => { }}
                 pdfLoading={pdfLoading}
               />
+                      <IPODealsS1DealData selectedTicker={selectedTicker || ""} />
+                
               <IPODashboardCardRatings
                 ipodata={ipoData}
                 selectedTicker={selectedTicker || ""}
@@ -391,9 +394,7 @@ const IPODashboardMain: React.FC = () => {
                       Source: Factset
                     </Typography>
 
-                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                      <IPODealsS1DealData selectedTicker={selectedTicker || ""} />
-                    </Box>
+                    
                   </Grid>
                 </Grid>
               </Container>

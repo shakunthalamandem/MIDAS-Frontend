@@ -7,6 +7,7 @@ import {
   Grid,
   CircularProgress,
   Tooltip,
+  Container,
 } from "@mui/material";
 import {
   FaBullseye,
@@ -68,7 +69,6 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
 
         const data = await response.json();
         
-        // Update this part to check if data is an object instead of an array
         if (data && typeof data === "object" && Object.keys(data).length > 0) {
           setDealData(data);  // Directly set the object as deal data
         } else {
@@ -91,109 +91,127 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
   if (!dealData) return <Typography>No deal data found.</Typography>;
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3, maxWidth: 600, margin: "auto" }}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card variant="outlined">
-          <CardContent>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item>
-                <FaBullseye size={24} color="#1976d2" />
-              </Grid>
-              <Grid item xs>
-                <Typography variant="h6">Fair Value Estimate</Typography>
-                <Typography>{dealData.fair_value_estimate}</Typography>
-              </Grid>
+    <Container maxWidth="xl">
+      <Card sx={{ boxShadow: 3, borderRadius: 2, backgroundColor: "#f4f6f9", padding: 3 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3, margin: "auto" }}>
+          <Grid container spacing={3}>
+            {/* First Row of Cards */}
+            <Grid item xs={12} sm={4}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+                  <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item>
+                        <FaBullseye size={24} color="#1976d2" />
+                      </Grid>
+                      <Grid item xs>
+                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>Fair Value Estimate</Typography>
+                        <Typography sx={{ color: "#333" }}>{dealData.fair_value_estimate}</Typography>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
-          </CardContent>
-        </Card>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card variant="outlined">
-          <CardContent>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item>
-                <FaHandshake size={24} color="#1976d2" />
-              </Grid>
-              <Grid item xs>
-                <Typography variant="h6">Indication of Interest (IOI)</Typography>
-                <Typography>Initial interest: {dealData.indication_of_interest}</Typography>
-              </Grid>
+            <Grid item xs={12} sm={4}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+                  <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item>
+                        <FaHandshake size={24} color="#1976d2" />
+                      </Grid>
+                      <Grid item xs>
+                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>Indication of Interest (IOI)</Typography>
+                        <Typography sx={{ color: "#333" }}>Initial interest: {dealData.indication_of_interest}</Typography>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
-          </CardContent>
-        </Card>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card variant="outlined">
-          <CardContent>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item>
-                <FaTruckMoving size={24} color="#1976d2" />
-              </Grid>
-              <Grid item xs>
-                <Typography variant="h6">After Market (AM) Threshold</Typography>
-                <Typography>{dealData.after_market_threshold}</Typography>
-              </Grid>
+            <Grid item xs={12} sm={4}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+                  <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item>
+                        <FaTruckMoving size={24} color="#1976d2" />
+                      </Grid>
+                      <Grid item xs>
+                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>After Market (AM) Threshold</Typography>
+                        <Typography sx={{ color: "#333" }}>{dealData.after_market_threshold}</Typography>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
-          </CardContent>
-        </Card>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card variant="outlined">
-          <CardContent>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item>
-                <FaChartLine size={24} color="#1976d2" />
-              </Grid>
-              <Grid item xs>
-                <Typography variant="h6">Monashee Score</Typography>
-                <Typography>{dealData.monashee_score} / 10 (based on similar IPOs)</Typography>
-              </Grid>
+            {/* Second Row of Cards */}
+            <Grid item xs={12} sm={4}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+                  <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item>
+                        <FaChartLine size={24} color="#1976d2" />
+                      </Grid>
+                      <Grid item xs>
+                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>Monashee Score</Typography>
+                        <Typography sx={{ color: "#333" }}>{dealData.monashee_score} / 10 (based on similar IPOs)</Typography>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
-          </CardContent>
-        </Card>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card variant="outlined">
-          <CardContent>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item>
-                <FaClipboardList size={24} color="#1976d2" />
-              </Grid>
-              <Grid item xs>
-                <Typography variant="h6">Differentiated Summary</Typography>
-                <Tooltip title={dealData.differentiated_summary}>
-                  <Typography noWrap>{dealData.differentiated_summary}</Typography>
-                </Tooltip>
-              </Grid>
+            <Grid item xs={12} sm={4}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+                  <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item>
+                        <FaClipboardList size={24} color="#1976d2" />
+                      </Grid>
+                      <Grid item xs>
+                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>Differentiated Summary</Typography>
+                        <Tooltip title={dealData.differentiated_summary}>
+                          <Typography noWrap sx={{ color: "#333" }}>{dealData.differentiated_summary}</Typography>
+                        </Tooltip>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </Box>
+          </Grid>
+        </Box>
+      </Card>
+    </Container>
   );
 };
 
