@@ -431,6 +431,7 @@ const IPODashboardMain: React.FC = () => {
       >
         Welcome to detailed Insights on IPO - {selectedTicker}
       </Typography>
+      
 
       <Box sx={{ px: 2 }}>
         {ipoData && (
