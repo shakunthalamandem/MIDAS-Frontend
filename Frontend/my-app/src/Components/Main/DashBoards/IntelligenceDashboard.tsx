@@ -16,13 +16,14 @@ import {
   Button,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import RecentIpoTable from "./Equity/RecentIpoTable";
 
 const MotionPaper = motion(Paper);
 
 const IntelligenceDashboard: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<"IPO" | "FO">("IPO");
-  const [selectedIpoYears, setSelectedIpoYears] = useState<number[]>([2025]);
-  const [selectedFoYears, setSelectedFoYears] = useState<number[]>([2025]);
+  const [selectedIpoYears, setSelectedIpoYears] = useState<number[]>([2024, 2025]);
+  const [selectedFoYears, setSelectedFoYears] = useState<number[]>([2024, 2025]);
 
   const handleIpoYearToggle = (year: number) => {
     setSelectedIpoYears((prev) =>
@@ -42,16 +43,16 @@ const IntelligenceDashboard: React.FC = () => {
 
     const pdfWidth = 1122;
     const pdfHeight = 793;
-    const margin = 40; 
+    const margin = 40;
 
-  
+
     const canvas = await html2canvas(input, {
       scale: 2,
       useCORS: true,
       backgroundColor: "#fff",
     });
 
-    
+
     const availableWidth = pdfWidth - margin * 2;
     const availableHeight = pdfHeight - margin * 2;
     const aspectRatio = canvas.width / canvas.height;
@@ -85,15 +86,15 @@ const IntelligenceDashboard: React.FC = () => {
     pdf.save(`IPO_Table_Region_Wise for Year(s) ${selectedIpoYears}.pdf`);
   };
 
-  
+
   const handleExportFoPDF = async () => {
     const input = document.getElementById("fo-table-section");
     if (!input) return;
 
-    
+
     const pdfWidth = 1122;
     const pdfHeight = 793;
-    const margin = 40; 
+    const margin = 40;
 
     const canvas = await html2canvas(input, {
       scale: 2,
@@ -141,7 +142,7 @@ const IntelligenceDashboard: React.FC = () => {
           {/* Toggle Tabs */}
           <Box display="flex" justifyContent="center">
             <Stack direction="row" spacing={2}>
-              <Paper
+              {/* <Paper
                 elevation={selectedTab === "IPO" ? 4 : 1}
                 sx={{
                   px: 3,
@@ -153,8 +154,8 @@ const IntelligenceDashboard: React.FC = () => {
                 onClick={() => setSelectedTab("IPO")}
               >
                 IPO
-              </Paper>
-              <Paper
+              </Paper> */}
+              {/* <Paper
                 elevation={selectedTab === "FO" ? 4 : 1}
                 sx={{
                   px: 3,
@@ -166,7 +167,7 @@ const IntelligenceDashboard: React.FC = () => {
                 onClick={() => setSelectedTab("FO")}
               >
                 FO
-              </Paper>
+              </Paper> */}
             </Stack>
           </Box>
 
@@ -181,15 +182,30 @@ const IntelligenceDashboard: React.FC = () => {
                   borderRadius: 4,
                 }}
               >
-                <Typography variant="h5" align="center" sx={{ color: "#002060", fontWeight: 600 }}>
-                  IPO Deal Intelligence
+                <Typography
+                  variant="h5"
+                  align="center"
+                  sx={{ color: "#002060", fontWeight: 600, mb: 3 }}
+                >
+                  IPO Market Insights
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  align="center"
+                  sx={{ color: "#002060", fontWeight: 400, mb: 3 }}
+                >
+                  Stay updated with the latest IPO trends and insights. Analyze recent trends and prepare for upcoming opportunities in the IPO landscape. 
                 </Typography>
 
                 <Grid container spacing={3}>
-                  <Grid item xs={12}>
+                  <Grid item xs={12} md={6}>
                     <UpcomingIpoTable />
                   </Grid>
+                  <Grid item xs={12} md={6}>
+                    <RecentIpoTable />
+                  </Grid>
                 </Grid>
+
               </MotionPaper>
 
               <MotionPaper

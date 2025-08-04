@@ -63,6 +63,7 @@ import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/Versio
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
 import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
+import EquityDealsIPOFO from "../Components/Main/DashBoards/EquityDealsIPOFO";
 
 
 
@@ -199,6 +200,8 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/opportunity/summary" element={<AuthGuard><LandingPageMain/></AuthGuard>} />
+        <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO/></AuthGuard>} />
+       
         <Route path="/deals/dashboard" element={<AuthGuard><IntelligenceDashboard/></AuthGuard>} />
 
 
