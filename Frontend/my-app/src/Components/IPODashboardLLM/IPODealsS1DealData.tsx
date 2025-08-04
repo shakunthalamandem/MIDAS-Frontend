@@ -91,7 +91,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
   if (!dealData) return <Typography>No deal data found.</Typography>;
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" style={{ marginTop: "20px" }}>
       <Card sx={{ boxShadow: 3, borderRadius: 2, backgroundColor: "#f4f6f9", padding: 3 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3, margin: "auto" }}>
           <Grid container spacing={3}>

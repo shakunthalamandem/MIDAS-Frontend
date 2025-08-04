@@ -334,7 +334,6 @@ const IPODashboardMain: React.FC = () => {
                 onExportPDF={() => { }}
                 pdfLoading={pdfLoading}
               />
-                      <IPODealsS1DealData selectedTicker={selectedTicker || ""} />
                 
               <IPODashboardCardRatings
                 ipodata={ipoData}
