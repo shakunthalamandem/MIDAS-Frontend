@@ -13,7 +13,6 @@ import {
   Fade,
 } from "@mui/material";
 import TickerInputComponent from "./TickerInputComponent";
-import TickerInputComponent from "./TickerInputComponent";
 
 // Types for API response
 type ComparableMetric = {
