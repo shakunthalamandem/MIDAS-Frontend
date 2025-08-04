@@ -368,10 +368,10 @@ const DealDetailedGapAnalysis: React.FC = () => {
           >
             Note
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ mb: 2 }}>
             The table below includes all IPO and FO deals from 2025 with
             positions still held in the portfolio (i.e., current quantity &gt;
-            0), and a holding period less than 30 days.
+            0)
           </Typography>
 
           <Typography
@@ -381,7 +381,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
           >
             Assumptions
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2">
             • 0.5% allocation for IPOs
             <br />
             • 1% allocation for FOs
