@@ -234,11 +234,11 @@ const WeeklyMonthlyPredictionResults: React.FC<
   };
 
   const rowConfig = [
-{
-  key: "main",
-  label: "Outcome Classification",
-  explanation: `Classifies the expected return into categories:\n📉 Negative: Return ≤ 0%\n📈 Positive: Return > 0%`,
-},
+    {
+      key: "main",
+      label: "Outcome Classification",
+      explanation: `Classifies the expected return into categories:\n📉 Negative: Return ≤ 0%\n📈 Positive: Return > 0%`,
+    },
 
     {
       key: "positive",
@@ -256,7 +256,8 @@ const WeeklyMonthlyPredictionResults: React.FC<
 
   const timeFrames = ["Weekly", "Monthly"];
 
-  const showTable = predictionResult && Object.keys(predictionResult).length > 0;
+  const showTable =
+    predictionResult && Object.keys(predictionResult).length > 0;
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
@@ -329,26 +330,24 @@ const WeeklyMonthlyPredictionResults: React.FC<
                       },
                     }}
                   >
-                    <TableCell  sx={{ minWidth: 180 ,bgcolor:'#F0F0f0'}}>Model</TableCell>
-                    <TableCell sx={{ minWidth: 250 ,bgcolor:'#F0F0f0'}}>Explanation</TableCell>
+                    <TableCell sx={{ minWidth: 100, bgcolor: "#F0F0f0" }}>
+                      Model
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 200, bgcolor: "#F0F0f0" }}>
+                      Explanation
+                    </TableCell>
                     {timeFrames.map((frame, index) => (
                       <React.Fragment key={frame}>
                         <TableCell
                           sx={{
-                            bgcolor:
-                              index === 0
-                                ? "#e3f2fd"
-                                : "#ede7f6",
+                            bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6",
                           }}
                         >
-                          T + 1 {frame} (AM) Result
+                          T+1 {frame}(AM) from Issue Price
                         </TableCell>
                         <TableCell
                           sx={{
-                            bgcolor:
-                              index === 0
-                                ? "#e3f2fd"
-                                : "#ede7f6",
+                            bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6",
                             minWidth: 90,
                           }}
                         >
@@ -378,7 +377,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
                     return (
                       <TableRow
                         key={row.key}
-                        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
                       >
                         <TableCell
                           component="th"
@@ -387,11 +388,14 @@ const WeeklyMonthlyPredictionResults: React.FC<
                         >
                           {row.label}
                         </TableCell>
-<TableCell>
-  <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
-    {row.explanation}
-  </Typography>
-</TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{ whiteSpace: "pre-line" }}
+                          >
+                            {row.explanation}
+                          </Typography>
+                        </TableCell>
                         {timeFrames.map((frame, index) => {
                           const apiKey =
                             frame.toLowerCase() === "weekly"
@@ -399,10 +403,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                               : modelKeys.monthly;
                           const modelData = predictionResult?.[apiKey];
                           const cellBgColor =
-                            index === 0
-                              ? "#e3f2fd"
-                              : "#ede7f6";
-                              
+                            index === 0 ? "#e3f2fd" : "#ede7f6";
 
                           if (!modelData) {
                             return (
@@ -425,12 +426,19 @@ const WeeklyMonthlyPredictionResults: React.FC<
                           return (
                             <React.Fragment key={apiKey}>
                               <TableCell
-                                sx={{ bgcolor: cellBgColor, fontWeight: "medium" }}
+                                sx={{
+                                  bgcolor: cellBgColor,
+                                  fontWeight: "medium",
+                                }}
                               >
                                 {renderResult}
                               </TableCell>
                               <TableCell sx={{ bgcolor: cellBgColor }}>
-                                <Box display="flex" flexDirection="column" gap={1}>
+                                <Box
+                                  display="flex"
+                                  flexDirection="column"
+                                  gap={1}
+                                >
                                   {renderAccuracyLevel(modelData.Accuracy)}
                                   {renderConfidenceLevel(modelData.Confidence)}
                                 </Box>

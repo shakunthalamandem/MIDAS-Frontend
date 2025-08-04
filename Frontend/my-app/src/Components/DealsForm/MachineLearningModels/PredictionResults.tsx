@@ -338,26 +338,34 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
               <TableRow sx={{ bgcolor: "#f0f4f8" }}>
                 <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
-                {modelVersions.map((version, idx) => (
-                  <React.Fragment key={version}>
-                    <TableCell
-                      sx={{
-                        fontWeight: 600,
-                        bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
-                      }}
-                    >
-                      {`T+1D Close Result`}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: 600,
-                        bgcolor: idx === 0 ? "#e3f2fd" : "#ede7f6",
-                      }}
-                    >
-                      {`Accuracy & Confidence`}
-                    </TableCell>
-                  </React.Fragment>
-                ))}
+                {modelVersions.map((version, idx) => {
+                  const isV2 = version.toLowerCase().startsWith("v2");
+                  const label = isV2
+                    ? "T+1D Close from T+1D Open"
+                    : "T+1D Close from Issue Price";
+                  const cellBgColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
+
+                  return (
+                    <React.Fragment key={version}>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          bgcolor: cellBgColor,
+                        }}
+                      >
+                        {label}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          bgcolor: cellBgColor,
+                        }}
+                      >
+                        Accuracy & Confidence
+                      </TableCell>
+                    </React.Fragment>
+                  );
+                })}
               </TableRow>
 
               {modelTypes.map((type) => (
