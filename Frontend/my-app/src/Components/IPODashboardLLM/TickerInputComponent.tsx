@@ -45,9 +45,6 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
 
   return (
     <Paper elevation={3} sx={{ p: 3, maxWidth: 600, margin: "auto", mt: 4 }}>
-      <Typography variant="h6" gutterBottom>
-        Enter Ticker Symbol
-      </Typography>
       <Box display="flex" gap={2} flexDirection="column">
         <TextField
           label="Ticker"
