@@ -142,7 +142,7 @@ const IntelligenceDashboard: React.FC = () => {
           {/* Toggle Tabs */}
           <Box display="flex" justifyContent="center">
             <Stack direction="row" spacing={2}>
-              <Paper
+              {/* <Paper
                 elevation={selectedTab === "IPO" ? 4 : 1}
                 sx={{
                   px: 3,
@@ -154,8 +154,8 @@ const IntelligenceDashboard: React.FC = () => {
                 onClick={() => setSelectedTab("IPO")}
               >
                 IPO
-              </Paper>
-              <Paper
+              </Paper> */}
+              {/* <Paper
                 elevation={selectedTab === "FO" ? 4 : 1}
                 sx={{
                   px: 3,
@@ -167,7 +167,7 @@ const IntelligenceDashboard: React.FC = () => {
                 onClick={() => setSelectedTab("FO")}
               >
                 FO
-              </Paper>
+              </Paper> */}
             </Stack>
           </Box>
 
