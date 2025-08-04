@@ -9,12 +9,12 @@ import {
 
 type TickerInputProps = {
   competitor: string;
-  onSubmit: (ticker: string) => void;
 };
 
-const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor, onSubmit }) => {
+const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor }) => {
   const [ticker, setTicker] = useState("");
   const [loading, setLoading] = useState(false);
+  const [responseData, setResponseData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
@@ -25,9 +25,29 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor, onSubmit
 
     setLoading(true);
     setError(null);
+    setResponseData(null);
 
     try {
-      await onSubmit(ticker);
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      if (!apiUrl) throw new Error("API URL not set");
+
+      const response = await fetch(`${apiUrl}/api/get_ai_comps_metrics/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker, competitor }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setResponseData(data);
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
@@ -37,7 +57,7 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor, onSubmit
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
-      <Box display="flex" alignItems="center" gap={2} flexWrap="wrap" mb={4}>
+      <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
         <Typography
           variant="h6"
           color="#002060"
@@ -69,6 +89,13 @@ const TickerInputComponent: React.FC<TickerInputProps> = ({ competitor, onSubmit
         <Typography color="error">
           {error}
         </Typography>
+      )}
+
+      {responseData && (
+        <Box>
+          <Typography variant="subtitle1">API Response:</Typography>
+          <pre>{JSON.stringify(responseData, null, 2)}</pre>
+        </Box>
       )}
     </Box>
   );
