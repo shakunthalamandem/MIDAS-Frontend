@@ -34,6 +34,7 @@ import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
 import IPOAITickersMain from "./Hooks/IPOAITickersMain";
+import IPODealsS1DealData from "./IPODealsS1DealData";
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -317,6 +318,8 @@ const IPODashboardMain: React.FC = () => {
         Welcome to detailed Insights on IPO - {selectedTicker}
       </Typography>
 
+      
+
       <Box sx={{ px: 2 }}>
         {ipoData && (
           <>
@@ -331,6 +334,7 @@ const IPODashboardMain: React.FC = () => {
                 onExportPDF={() => { }}
                 pdfLoading={pdfLoading}
               />
+                
               <IPODashboardCardRatings
                 ipodata={ipoData}
                 selectedTicker={selectedTicker || ""}
@@ -388,6 +392,8 @@ const IPODashboardMain: React.FC = () => {
                     <Typography sx={{ fontStyle: "italic", fontSize: "0.875rem", color: "gray" }}>
                       Source: Factset
                     </Typography>
+
+                    
                   </Grid>
                 </Grid>
               </Container>

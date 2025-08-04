@@ -8,11 +8,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   CircularProgress,
   Alert,
   Fade,
 } from "@mui/material";
+import TickerInputComponent from "./TickerInputComponent";
 import TickerInputComponent from "./TickerInputComponent";
 
 // Types for API response

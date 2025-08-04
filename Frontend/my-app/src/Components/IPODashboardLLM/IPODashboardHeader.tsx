@@ -19,6 +19,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import IPOdashboardLine from "./IPOdashboardLine";
 import axios from "axios";
+import IPODealsS1DealData from "./IPODealsS1DealData";
 
 interface IPODashboardHeaderProps {
   ipoData: any;
@@ -160,6 +161,8 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
       </Box>
 
       <IPOdashboardLine ipodata={ipoData} />
+      <IPODealsS1DealData selectedTicker={selectedTicker || ""} />
+
 
       <Card
         elevation={0}
