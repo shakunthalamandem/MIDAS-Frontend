@@ -2,17 +2,18 @@
   border: none;
   width: 100%;
   font-family: "Roboto", sans-serif;
-  background-color: white;
+  background-color: transparent;
 }
 
 .react-calendar__tile {
   position: relative;
   padding: 10px 6px;
   transition: background 0.2s ease-in-out;
+  font-size: 0.9rem;
 }
 
 .react-calendar__tile:disabled {
-  background-color: white !important;
+  background-color: transparent !important;
   cursor: default;
 }
 
@@ -26,5 +27,5 @@
 }
 
 .event-dot:hover {
-  transform: scale(1.2);
+  transform: scale(1.25);
 }
