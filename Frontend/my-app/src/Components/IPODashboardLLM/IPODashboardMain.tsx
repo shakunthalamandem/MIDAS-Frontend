@@ -7,17 +7,19 @@ import {
   Grid,
   CircularProgress,
   Container,
-  Card,
-  CardContent,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  IconButton,
+  TextField,
+  Button,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  IconButton,
-  TextField,
-  Button,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -62,12 +64,10 @@ const IPODashboardMain: React.FC = () => {
   const [allIpoTickers, setAllIpoTickers] = useState<string[]>([]);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(ticker || "");
   const [pdfLoading, setPdfLoading] = useState(false);
-
   const [editMode, setEditMode] = useState<Record<string, boolean>>({});
   const [editedContent, setEditedContent] = useState<Record<string, string[]>>({});
-    const [showAIComparison, setShowAIComparison] = useState(false);
-
- 
+  const [showAIComparison, setShowAIComparison] = useState(false);
+  const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>({});
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -94,9 +94,11 @@ const IPODashboardMain: React.FC = () => {
     };
     fetchAllIpoTickers();
   }, []);
- const handleAIComparisonClick = () => {
+
+  const handleAIComparisonClick = () => {
     setShowAIComparison(true);
   };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -125,7 +127,7 @@ const IPODashboardMain: React.FC = () => {
           "strengths",
           "concerns",
           "principal_stockholders_preipo",
-          "key_management_personnel"
+          "key_management_personnel",
         ];
 
         const editModes: Record<string, boolean> = {};
@@ -157,7 +159,6 @@ const IPODashboardMain: React.FC = () => {
     if (selectedTicker) fetchData();
   }, [selectedTicker]);
 
-
   const handleSaveCard = async (key: string) => {
     try {
       const cleaned = editedContent[key].filter((item) => item.trim() !== "");
@@ -171,125 +172,6 @@ const IPODashboardMain: React.FC = () => {
       console.error(`Failed to save ${key}:`, error);
     }
   };
-
-   const handleExportPDF = async () => {
-    setPdfLoading(true);
-    try {
-      const pageElements = [
-        document.getElementById("ipo-dashboard-page1"),
-        document.getElementById("ipo-dashboard-page2"),
-        document.getElementById("ipo-dashboard-page3"),
-      ];
-
-      if (!pageElements.every(el => el !== null)) {
-        setPdfLoading(false);
-        return;
-      }
-
-      const pdf = new jsPDF("p", "pt", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10;
-
-      for (let i = 0; i < pageElements.length; i++) {
-        const element = pageElements[i];
-        if (!element) continue;
-
-        const clone = element.cloneNode(true) as HTMLElement;
-        clone.style.padding = "0";
-        clone.style.margin = "0";
-        clone.style.width = "100%";
-        clone.style.maxWidth = "100%";
-        clone.style.background = "#fff";
-
-        const tables = clone.querySelectorAll("table");
-        tables.forEach(table => {
-          const tableElement = table as HTMLElement;
-          tableElement.style.fontSize = "10px";
-          tableElement.style.width = "100%";
-          tableElement.style.tableLayout = "fixed";
-          const cells = tableElement.querySelectorAll("th, td");
-          cells.forEach(cell => {
-            const cellElement = cell as HTMLElement;
-            cellElement.style.fontSize = "8px";
-            cellElement.style.padding = "2px";
-            cellElement.style.wordWrap = "break-word";
-            cellElement.style.overflow = "hidden";
-          });
-        });
-
-        const wrapper = document.createElement("div");
-        wrapper.style.position = "fixed";
-        wrapper.style.top = "-10000px";
-        wrapper.style.left = "0";
-        wrapper.style.width = "1200px";
-        wrapper.appendChild(clone);
-        document.body.appendChild(wrapper);
-
-        const canvas = await html2canvas(clone, {
-          scale: 2,
-          useCORS: true,
-          scrollX: 0,
-          scrollY: 0,
-          backgroundColor: "#fff",
-        });
-
-        document.body.removeChild(wrapper);
-
-        const imgHeight = canvas.height;
-        const imgWidth = canvas.width;
-
-        const ratio = pageWidth / imgWidth;
-        const scaledHeight = imgHeight * ratio;
-
-        let position = 0;
-        let pageCount = 0;
-
-        while (position < scaledHeight) {
-          const canvasSlice = document.createElement("canvas");
-          const context = canvasSlice.getContext("2d")!;
-          const sliceHeight = Math.min(imgHeight - pageCount * (pageHeight / ratio), pageHeight / ratio);
-          canvasSlice.width = imgWidth;
-          canvasSlice.height = sliceHeight;
-
-          context.drawImage(
-            canvas,
-            0,
-            pageCount * (pageHeight / ratio),
-            imgWidth,
-            sliceHeight,
-            0,
-            0,
-            imgWidth,
-            sliceHeight
-          );
-
-          const imgData = canvasSlice.toDataURL("image/png");
-          if (i > 0 || pageCount > 0) pdf.addPage();
-
-          pdf.addImage(
-            imgData,
-            "PNG",
-            margin,
-            margin,
-            pageWidth - margin * 2,
-            sliceHeight * ratio - 2
-          );
-
-          position += pageHeight;
-          pageCount++;
-        }
-      }
-
-      pdf.save(`IPO-Dashboard-${selectedTicker}.pdf`);
-    } catch (error) {
-      console.error("PDF generation failed", error);
-    } finally {
-      setPdfLoading(false);
-    }
-  };
-
-
 
   const handleCancelCard = (key: string) => {
     setEditedContent((prev) => ({
@@ -323,41 +205,44 @@ const IPODashboardMain: React.FC = () => {
     const key = section.key;
     const content = ipoData[key];
     const isEditing = editMode[key];
+    const isExpanded = expandedPanels[key] || false;
 
     return (
-      <Grid item xs={12} md={6} key={key}>
-        <Card sx={{
-          backgroundColor: cardColors[index % cardColors.length],
-          borderRadius: 2,
-          boxShadow: 3,
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}>
-          <CardContent sx={{ overflowY: "auto", flex: 1 }}>
-<Box position="relative" mb={1} display="flex" justifyContent="center" alignItems="center">
-  <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
-    {section.title}
-  </Typography>
+      <Grid item xs={12} key={key}>
+        <Accordion
+          expanded={isExpanded}
+          onChange={() =>
+            setExpandedPanels((prev) => ({ ...prev, [key]: !prev[key] }))
+          }
 
-  <Box position="absolute" right={0}>
-    {isEditing ? (
-      <>
-        <IconButton color="primary" onClick={() => handleSaveCard(key)} size="small">
-          <SaveIcon />
-        </IconButton>
-        <IconButton color="secondary" onClick={() => handleCancelCard(key)} size="small">
-          <CancelIcon />
-        </IconButton>
-      </>
-    ) : (
-      <IconButton onClick={() => setEditMode((prev) => ({ ...prev, [key]: true }))} size="small">
-        <EditIcon />
-      </IconButton>
-    )}
-  </Box>
-</Box>
+          sx={{
+            backgroundColor: cardColors[index % cardColors.length],
+            borderRadius: 2,
+            boxShadow: 3,
+            "&::before": { display: "none" },
+          }}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`${key}-header`}>
+            <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold", flex: 1 }}>
+              {section.title}
+            </Typography>
+            {isEditing ? (
+              <>
+                <IconButton color="primary" onClick={() => handleSaveCard(key)} size="small">
+                  <SaveIcon />
+                </IconButton>
+                <IconButton color="secondary" onClick={() => handleCancelCard(key)} size="small">
+                  <CancelIcon />
+                </IconButton>
+              </>
+            ) : (
+              <IconButton onClick={() => setEditMode((prev) => ({ ...prev, [key]: true }))} size="small">
+              <EditIcon fontSize="small" />
+              </IconButton>
+            )}
+          </AccordionSummary>
 
+          <AccordionDetails>
             {isEditing ? (
               <Box>
                 {editedContent[key]?.map((item, idx) => (
@@ -395,8 +280,8 @@ const IPODashboardMain: React.FC = () => {
                 ))}
               </List>
             )}
-          </CardContent>
-        </Card>
+          </AccordionDetails>
+        </Accordion>
       </Grid>
     );
   };
@@ -444,20 +329,24 @@ const IPODashboardMain: React.FC = () => {
                 searchText={searchText}
                 setSelectedTicker={setSelectedTicker}
                 setSearchText={setSearchText}
-                onExportPDF={handleExportPDF}
+                onExportPDF={() => { }}
                 pdfLoading={pdfLoading}
               />
-<IPODashboardCardRatings
-  ipodata={ipoData}
-  selectedTicker={selectedTicker || ""}
-  setIpoData={setIpoData}
-/>
+              <IPODashboardCardRatings
+                ipodata={ipoData}
+                selectedTicker={selectedTicker || ""}
+                setIpoData={setIpoData}
+              />
             </div>
 
             <div id="ipo-dashboard-page2">
               <Container maxWidth="xl" sx={{ mb: 3 }}>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(0, 4).map((section, index) => renderEditableCard(section, index))}
+                  {cardSections.slice(0, 4).map((section, index) => (
+                    <Grid item xs={12} md={6} key={section.key}>
+                      {renderEditableCard(section, index)}
+                    </Grid>
+                  ))}
                 </Grid>
               </Container>
             </div>
@@ -465,36 +354,39 @@ const IPODashboardMain: React.FC = () => {
             <div id="ipo-dashboard-page3">
               <Container maxWidth="xl" sx={{ mb: 3 }}>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(4, 6).map((section, index) => renderEditableCard(section, index + 4))}
-                  <Grid item xs={12}>
+                  {cardSections.slice(4, 6).map((section, index) => (
+                    <Grid item xs={12} md={6} key={section.key}>
+                      {renderEditableCard(section, index + 4)}
+                    </Grid>
+                  ))}
+                  <Grid item xs={12} >
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <FinancialForecastTable defaultTicker={selectedTicker || ""} />
                     </Box>
                   </Grid>
-                   <Grid item xs={12}>
-      <Box sx={{ backgroundColor: "#f4f5f7", p: 2 }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleAIComparisonClick}
-          sx={{ mb: 2 }}
-        >
-          AI Comparison
-        </Button>
-        <Typography variant="body1" gutterBottom color="#02517e">
-        AI Suggested Comparable Tickers
-      </Typography>
-
-        {showAIComparison && (
-          <IPOAITickersMain selectedData={ipoData} />
-        )}
-      </Box>
-    </Grid>
+                  <Grid item xs={12}>
+                    <Box sx={{ backgroundColor: "#f4f5f7", p: 2 }}>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleAIComparisonClick}
+                        sx={{ mb: 2 }}
+                      >
+                        AI Comparison
+                      </Button>
+                      <Typography variant="body1" gutterBottom color="#02517e">
+                        AI Suggested Comparable Tickers
+                      </Typography>
+                      {showAIComparison && (
+                        <IPOAITickersMain selectedData={ipoData} />
+                      )}
+                    </Box>
+                  </Grid>
                   <Grid item xs={12}>
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <IPODashboardMainTable ticker={selectedTicker || ""} />
                     </Box>
-                    <Typography sx={{ fontStyle: 'italic', fontSize: '0.875rem', color: 'gray' }}>
+                    <Typography sx={{ fontStyle: "italic", fontSize: "0.875rem", color: "gray" }}>
                       Source: Factset
                     </Typography>
                   </Grid>

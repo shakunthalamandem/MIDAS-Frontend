@@ -195,7 +195,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
       </>
     ) : (
       <IconButton onClick={() => setEditValuationMode(true)}>
-        <EditIcon />
+              <EditIcon fontSize="small" />
       </IconButton>
     )}
   </Box>
