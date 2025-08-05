@@ -11,11 +11,13 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  IconButton,
   TextField,
+  Button,
+  IconButton,
   Container,
 } from "@mui/material";
-import { Edit, Save } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
 
 // Forecasts table columns
 const forecastYearKeys = [
@@ -40,22 +42,28 @@ interface FinancialForecastTableProps {
 
 function formatFinancialValue(value: number | string): string {
   if (value === null || value === undefined || value === "N/A") return "N/A";
+
   const num = Number(value);
   if (isNaN(num)) return String(value);
+
   const rounded = Math.round(num);
   const absValue = Math.abs(rounded).toLocaleString("en-US");
+
   return rounded < 0 ? `(${absValue})` : absValue;
 }
 
 function formatFinancialMargin(value: number | string): string {
   if (value === null || value === undefined || value === "N/A") return "N/A";
+
   const num = Number(value);
   if (isNaN(num)) return String(value);
+
   const fixed = num.toFixed(2); // Round to 2 decimal places
   const absValue = Math.abs(Number(fixed)).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+
   return num < 0 ? `(${absValue})` : absValue;
 }
 
@@ -67,7 +75,10 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
   const [forecasts, setForecasts] = useState<any | null>(null);
   const [forecastsLoading, setForecastsLoading] = useState(false);
   const [forecastsError, setForecastsError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState<Record<string, boolean>>({});
+
+  // For editing mode
+  const [editing, setEditing] = useState<boolean>(false);
+  const [editedData, setEditedData] = useState<any>(null);
 
   const handleFetchForecasts = async (customTicker?: string) => {
     setForecastsLoading(true);
@@ -91,7 +102,9 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
       );
       const json = await response.json();
       if (!response.ok) {
-        throw new Error(json.error || json.message || "Failed to fetch forecasts");
+        throw new Error(
+          json.error || json.message || "Failed to fetch forecasts"
+        );
       }
       setForecasts(json);
       setForecastsTicker(tickerToFetch);
@@ -109,17 +122,54 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
     // eslint-disable-next-line
   }, [defaultTicker]);
 
-  const toggleEditing = (metric: string, year: string) => {
-    setIsEditing((prevState) => ({
-      ...prevState,
-      [`${metric}-${year}`]: !prevState[`${metric}-${year}`],
-    }));
+  const handleEdit = () => {
+    setEditing(true);
+    setEditedData({ ...forecasts });
   };
 
-  const handleSave = (metric: string, year: string, value: string) => {
-    // Handle save logic (e.g., send API request to update data)
-    toggleEditing(metric, year); // Toggle edit state
-    console.log(`Saving ${metric} for ${year} with value: ${value}`);
+  const handleSave = async () => {
+    setEditing(false);
+
+    // Save the updated data (send to API)
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("access_token");
+    if (!apiUrl) return;
+
+    try {
+      const response = await fetch(`${apiUrl}/api/save_forecast_data/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          ticker: forecastsTicker,
+          data: editedData,
+        }),
+      });
+
+      const json = await response.json();
+      if (response.ok) {
+        setForecasts(json);
+      } else {
+        setForecastsError(json.error || json.message);
+      }
+    } catch (error) {
+      setForecastsError("Failed to save data.");
+    }
+  };
+
+  const handleValueChange = (rowKey: string, yearKey: string, value: string) => {
+    setEditedData((prevData: any) => ({
+      ...prevData,
+      [forecastsTicker.toUpperCase()]: {
+        ...prevData[forecastsTicker.toUpperCase()],
+        [rowKey]: {
+          ...prevData[forecastsTicker.toUpperCase()][rowKey],
+          [yearKey]: value,
+        },
+      },
+    }));
   };
 
   return (
@@ -138,45 +188,56 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
 
       {forecastsLoading && <CircularProgress />}
       {forecastsError && <Alert severity="error">{forecastsError}</Alert>}
-
-      {!forecastsLoading && forecasts && forecasts[forecastsTicker.toUpperCase()] && (
-        <TableContainer component={Paper} elevation={4}>
-          <Table size="small">
-            <TableHead sx={{ backgroundColor: "#002060" }}>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#FFFFFF",
-                    border: "1px solid #000000",
-                    textAlign: "center",
-                  }}
-                >
-                  ($US M)
-                </TableCell>
-                {forecastYearLabels.map((label, index) => (
+      {!forecastsLoading &&
+        forecasts &&
+        forecasts[forecastsTicker.toUpperCase()] && (
+          <TableContainer component={Paper} elevation={4}>
+            <Table size="small">
+              <TableHead sx={{ backgroundColor: "#002060" }}>
+                <TableRow>
                   <TableCell
-                    key={label}
                     sx={{
                       fontWeight: "bold",
                       color: "#FFFFFF",
                       border: "1px solid #000000",
                       textAlign: "center",
-                      backgroundColor:
-                        label === "2025 E" || label === "2026 E"
-                          ? "#333333"
-                          : "",
                     }}
                   >
-                    {label}
+                    ($US M)
                   </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.entries(forecasts[forecastsTicker.toUpperCase()] || {}).map(
-                ([metricName, years]: [string, any], rowIndex) => {
+                  {forecastYearLabels.map((label, index) => (
+                    <TableCell
+                      key={label}
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#FFFFFF",
+                        border: "1px solid #000000",
+                        textAlign: "center",
+                        backgroundColor:
+                          index === 3 || index === 4 ? "#443600ff" : "",
+                      }}
+                    >
+                      {label}
+                      {(index === 3 || index === 4) && !editing && (
+                        <IconButton onClick={handleEdit}>
+                          <EditIcon sx={{ color: "#FFFFFF" ,fontSize:'16px'}} />
+                        </IconButton>
+                      )}
+                      {editing && (index === 3 || index === 4) && (
+                        <IconButton onClick={handleSave}>
+                          <SaveIcon sx={{ color: "#FFFFFF" }} />
+                        </IconButton>
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Object.entries(
+                  forecasts[forecastsTicker.toUpperCase()] || {}
+                ).map(([metricName, years]: [string, any], rowIndex) => {
                   const isEvenRow = rowIndex % 2 === 0;
+
                   return (
                     <TableRow key={metricName}>
                       <TableCell
@@ -190,16 +251,16 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                       >
                         {metricName}
                       </TableCell>
-                      {forecastYearKeys.map((yearKey, colIndex) => {
-                        const yearLabel = forecastYearLabels[colIndex];
-                        const formattedValue = formatFinancialValue(years[yearKey]);
+                      {forecastYearKeys.map((yearKey, columnIndex) => {
+                        const formattedValue = formatFinancialValue(
+                          years[yearKey]
+                        );
                         const MarginformattedValue = formatFinancialMargin(
                           years[yearKey]
                         );
                         const displayValue = isEvenRow
                           ? formattedValue
                           : `${MarginformattedValue}%`;
-                        const isEditMode = isEditing[`${metricName}-${yearLabel}`];
 
                         return (
                           <TableCell
@@ -210,54 +271,39 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                               fontStyle: isEvenRow ? "normal" : "italic",
                               fontSize: isEvenRow ? "0.875rem" : "0.725rem",
                               backgroundColor:
-                                yearLabel === "2025 E" || yearLabel === "2026 E"
-                                  ? "#333333"
-                                  : isEvenRow
-                                  ? ""
-                                  : "#ebebeb",
-                              color: yearLabel === "2025 E" || yearLabel === "2026 E"
-                                ? "#fff"
-                                : "#000",
+                                columnIndex === 3 || columnIndex === 4
+                                  ? "#ffcc00"
+                                  : "",
                             }}
                           >
-                            {isEditMode ? (
+                            {editing && (columnIndex === 3 || columnIndex === 4) ? (
                               <TextField
-                                variant="standard"
-                                defaultValue={displayValue}
-                                onBlur={(e) =>
-                                  handleSave(metricName, yearLabel, e.target.value)
+                                value={editedData?.[forecastsTicker.toUpperCase()]?.[metricName]?.[yearKey] || ""}
+                                onChange={(e) =>
+                                  handleValueChange(metricName, yearKey, e.target.value)
                                 }
-                                autoFocus
+                                size="small"
+                                variant="outlined"
+                                fullWidth
                               />
                             ) : (
-                              <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <Typography sx={{ fontSize: "0.875rem" }}>
-                                  {displayValue}
-                                </Typography>
-                                {yearLabel === "2025 E" || yearLabel === "2026 E" ? (
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => toggleEditing(metricName, yearLabel)}
-                                  >
-                                    {isEditMode ? <Save /> : <Edit />}
-                                  </IconButton>
-                                ) : null}
-                              </Box>
+                              displayValue
                             )}
                           </TableCell>
                         );
                       })}
                     </TableRow>
                   );
-                }
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-      {!forecastsLoading && forecasts && !forecasts[forecastsTicker.toUpperCase()] && (
-        <Alert severity="info">No forecasts found for this ticker.</Alert>
-      )}
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      {!forecastsLoading &&
+        forecasts &&
+        !forecasts[forecastsTicker.toUpperCase()] && (
+          <Alert severity="info">No forecasts found for this ticker.</Alert>
+        )}
     </Container>
   );
 };
