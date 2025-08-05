@@ -8,6 +8,8 @@ import {
   CircularProgress,
   Tooltip,
   Container,
+  TextField,
+  IconButton,
 } from "@mui/material";
 import {
   FaBullseye,
@@ -17,6 +19,9 @@ import {
   FaClipboardList,
 } from "react-icons/fa";
 import { motion } from "framer-motion"; // For animations
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
+import EditIcon from "@mui/icons-material/Edit";
 
 type DealData = {
   fair_value_estimate: string;
@@ -26,6 +31,8 @@ type DealData = {
   differentiated_summary: string;
 };
 
+type EditableField = keyof DealData; // Extract keys of DealData for dynamic access
+
 interface IPODealsS1DealDataProps {
   selectedTicker: string | null;
 }
@@ -34,6 +41,8 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
   const [dealData, setDealData] = useState<DealData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editedDealData, setEditedDealData] = useState<DealData | null>(null);
 
   useEffect(() => {
     const fetchDeals = async () => {
@@ -70,7 +79,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
         const data = await response.json();
         
         if (data && typeof data === "object" && Object.keys(data).length > 0) {
-          setDealData(data);  // Directly set the object as deal data
+          setDealData(data);
         } else {
           setError("No deal data available.");
         }
@@ -86,89 +95,134 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
     }
   }, [selectedTicker]);
 
+  const handleSaveDealData = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      if (!apiUrl) throw new Error("API URL not defined");
+
+      const response = await fetch(`${apiUrl}/api/ipo_deal_data_fairvalues/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          ticker: selectedTicker,
+          ...editedDealData,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save deal data");
+      }
+
+      setDealData(editedDealData);
+      setEditMode(false);
+      setEditedDealData(null);
+    } catch (err: any) {
+      setError(err.message || "Unknown error occurred");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditedDealData(null);
+    setEditMode(false);
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!dealData) return <Typography>No deal data found.</Typography>;
 
   return (
-    <Container maxWidth="xl" style={{ marginTop: "20px" }}>
-      <Card sx={{ boxShadow: 3, borderRadius: 2, backgroundColor: "#f4f6f9", padding: 3 }}>
+    <Container maxWidth="xl" style={{ marginTop: "20px", position: "relative" }}>
+      {/* Correcting typo: Capitalized Typography */}
+      
+     <Card
+     
+  sx={{
+    position: "relative", // Add this so absolute children are positioned relative to Card
+    boxShadow: 3,
+    borderRadius: 2,
+    backgroundColor: "#f4f6f9",
+    padding: 3,
+  }}
+  
+>
+  <Typography variant="h4" gutterBottom>
+        IPO Deal Data for {selectedTicker}
+      </Typography>
+      
+  {/* Buttons INSIDE the Card, positioned top-right */}
+  <Box
+    sx={{
+      position: "absolute",
+      top: 16,
+      right: 16,
+      display: "flex",
+      gap: 1,
+    }}
+  >
+    {editMode ? (
+      <>
+        <IconButton color="primary" onClick={handleSaveDealData}>
+          <SaveIcon />
+        </IconButton>
+        <IconButton color="secondary" onClick={handleCancelEdit}>
+          <CancelIcon />
+        </IconButton>
+      </>
+    ) : (
+      <IconButton color="default" onClick={() => setEditMode(true)}>
+        <EditIcon />
+      </IconButton>
+    )}
+  </Box>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3, margin: "auto" }}>
           <Grid container spacing={3}>
             {/* First Row of Cards */}
-            <Grid item xs={12} sm={4}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-                  <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item>
-                        <FaBullseye size={24} color="#1976d2" />
+            {[
+              { label: "Fair Value Estimate", key: "fair_value_estimate", icon: <FaBullseye size={24} color="#1976d2" /> },
+              { label: "Indication of Interest", key: "indication_of_interest", icon: <FaHandshake size={24} color="#1976d2" /> },
+              { label: "After Market Threshold", key: "after_market_threshold", icon: <FaTruckMoving size={24} color="#1976d2" /> },
+            ].map((field, idx) => (
+              <Grid item xs={12} sm={4} key={idx}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                  <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+                    <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
+                      <Grid container spacing={2} alignItems="center">
+                        <Grid item>{field.icon}</Grid>
+                        <Grid item xs>
+                          <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
+                            {field.label}
+                          </Typography>
+                          {editMode ? (
+                            <TextField
+                              fullWidth
+                              size="small"
+                              value={editedDealData?.[field.key as EditableField] ?? dealData[field.key as EditableField]}
+                              onChange={(e) =>
+                                setEditedDealData((prev) => ({
+                                  ...prev!,
+                                  [field.key]: e.target.value,
+                                }))
+                              }
+                            />
+                          ) : (
+                            <Typography sx={{ color: "#333" }}>{dealData[field.key as EditableField]}</Typography>
+                          )}
+                        </Grid>
                       </Grid>
-                      <Grid item xs>
-                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>Fair Value Estimate</Typography>
-                        <Typography sx={{ color: "#333" }}>{dealData.fair_value_estimate}</Typography>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-                  <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item>
-                        <FaHandshake size={24} color="#1976d2" />
-                      </Grid>
-                      <Grid item xs>
-                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>Indication of Interest (IOI)</Typography>
-                        <Typography sx={{ color: "#333" }}>Initial interest: {dealData.indication_of_interest}</Typography>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-                  <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item>
-                        <FaTruckMoving size={24} color="#1976d2" />
-                      </Grid>
-                      <Grid item xs>
-                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>After Market (AM) Threshold</Typography>
-                        <Typography sx={{ color: "#333" }}>{dealData.after_market_threshold}</Typography>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </Grid>
+            ))}
 
             {/* Second Row of Cards */}
             <Grid item xs={12} sm={4}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                 <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
                   <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
                     <Grid container spacing={2} alignItems="center">
@@ -176,8 +230,25 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
                         <FaChartLine size={24} color="#1976d2" />
                       </Grid>
                       <Grid item xs>
-                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>Monashee Score</Typography>
-                        <Typography sx={{ color: "#333" }}>{dealData.monashee_score} / 10 (based on similar IPOs)</Typography>
+                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
+                          Monashee Score
+                        </Typography>
+                        {editMode ? (
+                          <TextField
+                            type="number"
+                            size="small"
+                            inputProps={{ min: 0, max: 10 }}
+                            value={editedDealData?.monashee_score ?? dealData.monashee_score}
+                            onChange={(e) =>
+                              setEditedDealData((prev) => ({
+                                ...prev!,
+                                monashee_score: Number(e.target.value),
+                              }))
+                            }
+                          />
+                        ) : (
+                          <Typography sx={{ color: "#333" }}>{dealData.monashee_score} / 10 (based on similar IPOs)</Typography>
+                        )}
                       </Grid>
                     </Grid>
                   </CardContent>
@@ -185,12 +256,9 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
               </motion.div>
             </Grid>
 
+            {/* Differentiated Summary */}
             <Grid item xs={12} sm={4}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                 <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
                   <CardContent sx={{ backgroundColor: "#ffffff", padding: 2 }}>
                     <Grid container spacing={2} alignItems="center">
@@ -198,10 +266,29 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
                         <FaClipboardList size={24} color="#1976d2" />
                       </Grid>
                       <Grid item xs>
-                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>Differentiated Summary</Typography>
-                        <Tooltip title={dealData.differentiated_summary}>
-                          <Typography noWrap sx={{ color: "#333" }}>{dealData.differentiated_summary}</Typography>
-                        </Tooltip>
+                        <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
+                          Differentiated Summary
+                        </Typography>
+                        {editMode ? (
+                          <TextField
+                            fullWidth
+                            size="small"
+                            multiline
+                            value={editedDealData?.differentiated_summary ?? dealData.differentiated_summary}
+                            onChange={(e) =>
+                              setEditedDealData((prev) => ({
+                                ...prev!,
+                                differentiated_summary: e.target.value,
+                              }))
+                            }
+                          />
+                        ) : (
+                          <Tooltip title={dealData.differentiated_summary}>
+                            <Typography noWrap sx={{ color: "#333" }}>
+                              {dealData.differentiated_summary}
+                            </Typography>
+                          </Tooltip>
+                        )}
                       </Grid>
                     </Grid>
                   </CardContent>
