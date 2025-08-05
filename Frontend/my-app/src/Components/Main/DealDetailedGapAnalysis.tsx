@@ -49,6 +49,7 @@ interface DealData {
   "Days Held": number;
   "Current Quantity": number;
   "Current Position Value": number;
+  "Kiski Deals Unique ID": string;
 }
 
 const formatCurrency = (val: number | null | undefined) => {
@@ -141,6 +142,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
     { field: "Pricing Date", headerName: "Pricing Date", width: 120 },
     { field: "Issuer Name", headerName: "Issuer Name", width: 180 },
     { field: "Ticker", headerName: "Ticker", width: 100 },
+    { field: "Kiski Deals Unique ID", headerName: "Kiski Deals Unique ID", width: 100 },
     { field: "Deal Type", headerName: "Deal Type", width: 100 },
     { field: "FO Type", headerName: "FO Type", width: 100 },
     { field: "IPO Type", headerName: "IPO Type", width: 100 },
@@ -369,7 +371,7 @@ const DealDetailedGapAnalysis: React.FC = () => {
             Note
           </Typography>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            The table below includes all IPO and FO deals from 2025 with
+            The table below includes all IPO and FO deals with
             positions still held in the portfolio (i.e., current quantity &gt;
             0)
           </Typography>
