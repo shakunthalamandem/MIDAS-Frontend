@@ -246,7 +246,7 @@ const handleSave = async () => {
                         border: "1px solid #000000",
                         textAlign: "center",
                         backgroundColor:
-                          index === 3 || index === 4 ? "#443600ff" : "",
+                          index === 3 || index === 4 ? "#5f521eff" : "",
                       }}
                     >
                       {label}
