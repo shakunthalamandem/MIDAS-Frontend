@@ -127,37 +127,69 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
     setEditedData({ ...forecasts });
   };
 
-  const handleSave = async () => {
-    setEditing(false);
+const handleSave = async () => {
+  setEditing(false);
+  setForecastsError(null);
 
-    // Save the updated data (send to API)
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem("access_token");
-    if (!apiUrl) return;
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+  if (!apiUrl) return;
 
-    try {
-      const response = await fetch(`${apiUrl}/api/save_forecast_data/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({
-          ticker: forecastsTicker,
-          data: editedData,
-        }),
-      });
+  const updates = [];
 
-      const json = await response.json();
-      if (response.ok) {
-        setForecasts(json);
-      } else {
-        setForecastsError(json.error || json.message);
+  try {
+    const updatedMetrics = editedData?.[forecastsTicker.toUpperCase()];
+    if (!updatedMetrics) throw new Error("No edited data found.");
+
+    for (const metricName in updatedMetrics) {
+      const row = updatedMetrics[metricName];
+      const originalRow = forecasts?.[forecastsTicker.toUpperCase()]?.[metricName];
+
+      // Check only current_year and one_year_later for editing
+      const fieldsToUpdate: any = {};
+      if (
+        row["current_year"] !== originalRow["current_year"]
+      ) {
+        fieldsToUpdate["current_year"] = row["current_year"];
       }
-    } catch (error) {
-      setForecastsError("Failed to save data.");
+      if (
+        row["one_year_later"] !== originalRow["one_year_later"]
+      ) {
+        fieldsToUpdate["one_year_later"] = row["one_year_later"];
+      }
+
+      if (Object.keys(fieldsToUpdate).length > 0) {
+        const payload = {
+          ticker_name: forecastsTicker.toUpperCase(),
+          metric_name: metricName,
+          ...fieldsToUpdate,
+        };
+
+        const response = await fetch(`${apiUrl}/api/financial_forecasts_data_view/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || result.message || `Failed to update ${metricName}`);
+        }
+
+        updates.push(result.message || `Updated ${metricName}`);
+      }
     }
-  };
+
+    await handleFetchForecasts(forecastsTicker);
+  } catch (error: any) {
+    setForecastsError(error.message || "Failed to save data.");
+  }
+};
+
 
   const handleValueChange = (rowKey: string, yearKey: string, value: string) => {
     setEditedData((prevData: any) => ({
