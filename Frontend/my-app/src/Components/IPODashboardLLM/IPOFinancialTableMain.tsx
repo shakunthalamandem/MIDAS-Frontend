@@ -272,7 +272,7 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                               fontSize: isEvenRow ? "0.875rem" : "0.725rem",
                               backgroundColor:
                                 columnIndex === 3 || columnIndex === 4
-                                  ? "#ffcc00"
+                                  ? "#a0a0a0ff"
                                   : "",
                             }}
                           >
