@@ -18,7 +18,7 @@ import {
   FaChartLine,
   FaClipboardList,
 } from "react-icons/fa";
-import { motion } from "framer-motion"; // For animations
+import { motion } from "framer-motion";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
@@ -133,7 +133,6 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
     setEditMode(false);
   };
 
-  // Initialize editedDealData when entering edit mode
   const enterEditMode = () => {
     if (dealData) setEditedDealData(dealData);
     setEditMode(true);
@@ -158,7 +157,6 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
           IPO Deal Data for {selectedTicker}
         </Typography>
 
-        {/* Buttons inside the card */}
         <Box
           sx={{
             position: "absolute",
@@ -184,7 +182,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
           )}
         </Box>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3, margin: "auto" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Grid container spacing={3}>
             {/* First Row */}
             {[
@@ -204,11 +202,14 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
                 icon: <FaTruckMoving size={24} color="#1976d2" />,
               },
             ].map((field, idx) => (
-              <Grid item xs={12} sm={4} key={idx}>
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-                  <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%" }}>
-                    <CardContent sx={{ backgroundColor: "#fff", padding: 2, height: "100%" }}>
-                      <Grid container spacing={2} alignItems="center" sx={{ height: "100%" }}>
+              <Grid item xs={12} sm={4} key={idx} sx={{ display: "flex", flexDirection: "column" }}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} style={{ flex: 1 }}>
+                  <Card
+                    variant="outlined"
+                    sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}
+                  >
+                    <CardContent sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}>
+                      <Grid container spacing={2} alignItems="flex-start" sx={{ height: "100%" }}>
                         <Grid item>{field.icon}</Grid>
                         <Grid item xs>
                           <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
@@ -218,8 +219,12 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
                             <TextField
                               fullWidth
                               size="small"
+                              multiline
+                              minRows={2}
                               value={
-                                editedDealData?.[field.key as EditableField] ?? dealData[field.key as EditableField] ?? ""
+                                editedDealData?.[field.key as EditableField] ??
+                                dealData[field.key as EditableField] ??
+                                ""
                               }
                               onChange={(e) =>
                                 setEditedDealData((prev) => ({
@@ -229,7 +234,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
                               }
                             />
                           ) : (
-                            <Typography sx={{ color: "#333" }}>
+                            <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
                               {dealData[field.key as EditableField] ?? ""}
                             </Typography>
                           )}
@@ -242,11 +247,11 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
             ))}
 
             {/* Monashee Score */}
-            <Grid item xs={12} sm={4}>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%" }}>
-                  <CardContent sx={{ backgroundColor: "#fff", padding: 2, height: "100%" }}>
-                    <Grid container spacing={2} alignItems="center" sx={{ height: "100%" }}>
+            <Grid item xs={12} sm={4} sx={{ display: "flex", flexDirection: "column" }}>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} style={{ flex: 1 }}>
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                  <CardContent sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}>
+                    <Grid container spacing={2} alignItems="flex-start">
                       <Grid item>
                         <FaChartLine size={24} color="#1976d2" />
                       </Grid>
@@ -280,11 +285,11 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
             </Grid>
 
             {/* Differentiated Summary */}
-            <Grid item xs={12} sm={4}>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%" }}>
-                  <CardContent sx={{ backgroundColor: "#fff", padding: 2, height: "100%" }}>
-                    <Grid container spacing={2} alignItems="center" sx={{ height: "100%" }}>
+            <Grid item xs={12} sm={4} sx={{ display: "flex", flexDirection: "column" }}>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} style={{ flex: 1 }}>
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                  <CardContent sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}>
+                    <Grid container spacing={2} alignItems="flex-start">
                       <Grid item>
                         <FaClipboardList size={24} color="#1976d2" />
                       </Grid>
@@ -308,7 +313,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
                           />
                         ) : (
                           <Tooltip title={dealData.differentiated_summary ?? ""}>
-                            <Typography noWrap sx={{ color: "#333" }}>
+                            <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
                               {dealData.differentiated_summary ?? ""}
                             </Typography>
                           </Tooltip>
