@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import {
   Box,
   Button,
@@ -9,80 +9,107 @@ import {
   Snackbar,
   Alert,
   TextField,
-} from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { SelectChangeEvent } from "@mui/material";
 
 const IPOS1FileUpload: React.FC = () => {
+  const [uploadType, setUploadType] = useState<"s1" | "report">("s1");
   const [file, setFile] = useState<File | null>(null);
-  const [market, setMarket] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
-  const [severity, setSeverity] = useState<'success' | 'error' | 'info'>('info');
+  const [market, setMarket] = useState<string>("");
+  const [ticker, setTicker] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [severity, setSeverity] = useState<"success" | "error" | "info">(
+    "info"
+  );
   const [loading, setLoading] = useState<boolean>(false);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
+  const handleUploadTypeChange = (e: SelectChangeEvent) => {
+    const value = e.target.value as "s1" | "report";
+    setUploadType(value);
+    setFile(null);
+    setMarket("");
+    setTicker("");
+    setMessage("");
+  };
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
-    if (selectedFile?.type !== 'application/pdf') {
-      setMessage('Only PDF files are allowed.');
-      setSeverity('error');
+    if (selectedFile?.type !== "application/pdf") {
+      setMessage("Only PDF files are allowed.");
+      setSeverity("error");
       setSnackbarOpen(true);
       setFile(null);
       return;
     }
-
     setFile(selectedFile);
-    setMessage('');
-  };
-
-  const handleMarketChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setMarket(e.target.value);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!file) {
-      setMessage('Please select a PDF file.');
-      setSeverity('error');
+      setMessage("Please select a PDF file.");
+      setSeverity("error");
       setSnackbarOpen(true);
       return;
     }
 
     if (!market.trim()) {
-      setMessage('Please enter a market (e.g., US or HK).');
-      setSeverity('error');
+      setMessage("Please enter a market (e.g., US or HK).");
+      setSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+
+    if (uploadType === "report" && !ticker.trim()) {
+      setMessage("Please enter a ticker.");
+      setSeverity("error");
       setSnackbarOpen(true);
       return;
     }
 
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('market', market.trim());
+    formData.append("file", file);
+    formData.append("market", market.trim());
+    if (uploadType === "report") {
+      formData.append("ticker", ticker.trim());
+    }
+
+    const endpoint =
+      uploadType === "s1"
+        ? `${apiUrl}/api/upload_s1/`
+        : `${apiUrl}/api/upload_ipo_s1_categories/`;
 
     setLoading(true);
     setSnackbarOpen(false);
 
     try {
-      const response = await fetch(`${apiUrl}/api/upload_s1/`, {
-        method: 'POST',
+      const response = await fetch(endpoint, {
+        method: "POST",
         body: formData,
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(data.message || 'File uploaded successfully.');
-        setSeverity('success');
+        setMessage(data.message || "File uploaded successfully.");
+        setSeverity("success");
       } else {
-        setMessage(data.error || 'Upload failed.');
-        setSeverity('error');
+        setMessage(data.error || "Upload failed.");
+        setSeverity("error");
       }
     } catch (error) {
       console.error(error);
-      setMessage('Something went wrong during upload.');
-      setSeverity('error');
+      setMessage("Something went wrong during upload.");
+      setSeverity("error");
     } finally {
       setLoading(false);
       setSnackbarOpen(true);
@@ -90,54 +117,86 @@ const IPOS1FileUpload: React.FC = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', margin: 'auto' }}>
-      <Card elevation={3} sx={{ mb: 3, p: 2, backgroundColor: '#f5f1f9' }}>
-        <CardContent sx={{ textAlign: 'center' }}>
-          <Typography variant="h6" gutterBottom color="#002060">
-            Upload IPO S1 PDF
+    <Box sx={{ width: "100%", maxWidth: 500, mx: "auto", mt: 4 }}>
+      <Card elevation={3} sx={{ p: 3, backgroundColor: "#f9f9f9" }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom align="center" color="primary">
+            Upload IPO Documents
           </Typography>
 
-          
+          <FormControl fullWidth sx={{ mb: 3 }}>
+            <InputLabel id="upload-type-label">Upload Type</InputLabel>
+            <Select
+              labelId="upload-type-label"
+              value={uploadType}
+              label="Upload Type"
+              onChange={handleUploadTypeChange}
+            >
+              <MenuItem value="s1">S1 Upload</MenuItem>
+              <MenuItem value="report">Report Card</MenuItem>
+            </Select>
+          </FormControl>
 
-          <Button
-            variant="outlined"
-            component="label"
-            startIcon={<CloudUploadIcon />}
-            sx={{ mt: 2 }}
-          >
-            Select PDF File
-            <input
-              type="file"
-              hidden
-              accept="application/pdf"
-              onChange={handleFileChange}
-            />
-          </Button>
-
-          <TextField
-            label="Market (e.g., US or HK)"
-            value={market}
-            onChange={handleMarketChange}
-            variant="outlined"
-            fullWidth
-            sx={{ mt: 2 }}
-          />
+          <Box display="flex" justifyContent="center" mb={2}>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<CloudUploadIcon />}
+            >
+              Select PDF File
+              <input
+                type="file"
+                hidden
+                accept="application/pdf"
+                onChange={handleFileChange}
+              />
+            </Button>
+          </Box>
 
           {file && (
-            <Typography variant="body2" sx={{ mt: 2 }}>
+            <Typography variant="body2" align="center" sx={{ mb: 2 }}>
               Selected: {file.name}
             </Typography>
           )}
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <TextField
+            label="Market (e.g., US or HK)"
+            value={market}
+            onChange={(e) => setMarket(e.target.value)}
+            variant="outlined"
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+
+          {uploadType === "report" && (
+            <TextField
+              label="Ticker (e.g., AAPL)"
+              value={ticker}
+              onChange={(e) => setTicker(e.target.value)}
+              variant="outlined"
+              fullWidth
+              sx={{ mb: 2 }}
+            />
+          )}
+
+          <Box component="form" onSubmit={handleSubmit}>
             <Button
               type="submit"
               variant="contained"
               color="primary"
-              disabled={loading || !file || !market.trim()}
+              disabled={
+                loading ||
+                !file ||
+                !market.trim() ||
+                (uploadType === "report" && !ticker.trim())
+              }
               fullWidth
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : 'Upload'}
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Upload"
+              )}
             </Button>
           </Box>
         </CardContent>
@@ -147,12 +206,12 @@ const IPOS1FileUpload: React.FC = () => {
         open={snackbarOpen}
         autoHideDuration={7000}
         onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}
           severity={severity}
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
           {message}
         </Alert>
