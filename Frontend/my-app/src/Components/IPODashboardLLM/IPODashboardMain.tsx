@@ -162,42 +162,48 @@ const IPODashboardMain: React.FC = () => {
   }, [selectedTicker]);
 const handleExportPDF = async () => {
   setPdfLoading(true);
+
   const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3"];
-  const pdf = new jsPDF("p", "mm", "a5");
+
+  // Landscape A4 page, or customize size
+  const pdf = new jsPDF({
+    orientation: "landscape",
+    unit: "mm",
+    format: [297, 210], // A4 Landscape in mm (or try [350, 250] for wider layout)
+  });
+
   const pdfWidth = pdf.internal.pageSize.getWidth();
-const waitForDOMUpdate = (delay = 300) =>
-  new Promise<void>((resolve) => setTimeout(resolve, delay));
+  const pdfHeight = pdf.internal.pageSize.getHeight();
+
+  const waitForDOMUpdate = (delay = 300) =>
+    new Promise<void>((resolve) => setTimeout(resolve, delay));
 
   try {
-    // ➤ Front Page
+    // 1. ➤ Front Page (Full image)
     const introImg = new Image();
     introImg.src = introImage;
     await new Promise<void>((resolve) => {
       introImg.onload = () => {
-        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdf.internal.pageSize.getHeight());
+        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
         resolve();
       };
     });
 
-    // ➤ Save original expanded state
+    // 2. ➤ Expand all Accordions
     const originalPanels = { ...expandedPanels };
-
-    // ➤ Expand all accordions
     const allKeys = Object.keys(editedContent);
     const expandedAll: Record<string, boolean> = {};
     allKeys.forEach((key) => (expandedAll[key] = true));
     setExpandedPanels(expandedAll);
+    await waitForDOMUpdate(500); // Ensure full render
 
-    // ✅ Wait for React to render expanded accordions
-    await waitForDOMUpdate(500); // Give enough time to update DOM
-
-    // ➤ Loop through and render each section
+    // 3. ➤ Loop through and add each dashboard page
     for (let i = 0; i < pages.length; i++) {
       const element = document.getElementById(pages[i]);
       if (!element) continue;
 
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 3, // High resolution
         useCORS: true,
         scrollY: -window.scrollY,
         windowWidth: element.scrollWidth,
@@ -211,21 +217,22 @@ const waitForDOMUpdate = (delay = 300) =>
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
     }
 
-    // ➤ Restore original panel state
+    // 4. ➤ Restore original accordion state
     setExpandedPanels(originalPanels);
-    await waitForDOMUpdate(); // Optional: wait for restoration
+    await waitForDOMUpdate();
 
-    // ➤ Outro Page
+    // 5. ➤ Outro Page
     const outroImg = new Image();
     outroImg.src = outroImage;
     await new Promise<void>((resolve) => {
       outroImg.onload = () => {
         pdf.addPage();
-        pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdf.internal.pageSize.getHeight());
+        pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
         resolve();
       };
     });
 
+    // 6. ➤ Save PDF
     pdf.save(`${selectedTicker}_IPO_Report.pdf`);
   } catch (error) {
     console.error("PDF export failed", error);
