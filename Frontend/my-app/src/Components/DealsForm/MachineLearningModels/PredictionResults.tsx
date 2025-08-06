@@ -166,7 +166,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
 
     return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        <LinearProgress
+        {/* <LinearProgress
           variant="determinate"
           value={accuracy}
           sx={{
@@ -177,7 +177,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
               backgroundColor: color,
             },
           }}
-        />
+        /> */}
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
           <Typography
             variant="caption"
@@ -407,7 +407,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
                         </TableCell>
                         <TableCell sx={{ bgcolor: cellColor }}>
                           <Box display="flex" flexDirection="column" gap={1}>
-                            {renderAccuracyLevel(modelData.Accuracy)}
+                            {/* {renderAccuracyLevel(modelData.Accuracy)} */}
                             {renderConfidenceLevel(modelData.Confidence)}
                           </Box>
                         </TableCell>

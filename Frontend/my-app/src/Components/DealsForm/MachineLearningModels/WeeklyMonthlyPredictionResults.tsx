@@ -161,7 +161,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
 
     return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        <LinearProgress
+        {/* <LinearProgress
           variant="determinate"
           value={accuracy}
           sx={{
@@ -172,7 +172,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
               backgroundColor: color,
             },
           }}
-        />
+        /> */}
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
           <Typography
             variant="caption"
@@ -439,7 +439,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                                   flexDirection="column"
                                   gap={1}
                                 >
-                                  {renderAccuracyLevel(modelData.Accuracy)}
+                                  {/* {renderAccuracyLevel(modelData.Accuracy)} */}
                                   {renderConfidenceLevel(modelData.Confidence)}
                                 </Box>
                               </TableCell>
