@@ -160,51 +160,72 @@ const IPODashboardMain: React.FC = () => {
 
     if (selectedTicker) fetchData();
   }, [selectedTicker]);
-
 const handleExportPDF = async () => {
   setPdfLoading(true);
   const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3"];
   const pdf = new jsPDF("p", "mm", "a5");
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+const waitForDOMUpdate = (delay = 300) =>
+  new Promise<void>((resolve) => setTimeout(resolve, delay));
 
   try {
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-
-    // ➤ Add Front Page with Image
+    // ➤ Front Page
     const introImg = new Image();
     introImg.src = introImage;
     await new Promise<void>((resolve) => {
       introImg.onload = () => {
-        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdf.internal.pageSize.getHeight());
         resolve();
       };
     });
 
-    // ➤ Loop through dashboard content pages
+    // ➤ Save original expanded state
+    const originalPanels = { ...expandedPanels };
+
+    // ➤ Expand all accordions
+    const allKeys = Object.keys(editedContent);
+    const expandedAll: Record<string, boolean> = {};
+    allKeys.forEach((key) => (expandedAll[key] = true));
+    setExpandedPanels(expandedAll);
+
+    // ✅ Wait for React to render expanded accordions
+    await waitForDOMUpdate(500); // Give enough time to update DOM
+
+    // ➤ Loop through and render each section
     for (let i = 0; i < pages.length; i++) {
       const element = document.getElementById(pages[i]);
       if (!element) continue;
 
-      const canvas = await html2canvas(element, { scale: 2 });
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        scrollY: -window.scrollY,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      });
+
       const imgData = canvas.toDataURL("image/png");
       const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addPage(); // Add page before adding content
+      pdf.addPage();
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
     }
 
-    // ➤ Add Outro Page with Image
+    // ➤ Restore original panel state
+    setExpandedPanels(originalPanels);
+    await waitForDOMUpdate(); // Optional: wait for restoration
+
+    // ➤ Outro Page
     const outroImg = new Image();
     outroImg.src = outroImage;
     await new Promise<void>((resolve) => {
       outroImg.onload = () => {
         pdf.addPage();
-        pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdf.internal.pageSize.getHeight());
         resolve();
       };
     });
 
-    // ➤ Save the PDF
     pdf.save(`${selectedTicker}_IPO_Report.pdf`);
   } catch (error) {
     console.error("PDF export failed", error);
@@ -212,6 +233,8 @@ const handleExportPDF = async () => {
     setPdfLoading(false);
   }
 };
+
+
   const handleSaveCard = async (key: string) => {
     try {
       const cleaned = editedContent[key].filter((item) => item.trim() !== "");
