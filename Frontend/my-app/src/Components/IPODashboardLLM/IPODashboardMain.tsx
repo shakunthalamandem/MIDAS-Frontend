@@ -36,6 +36,8 @@ import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
 import IPOAITickersMain from "./Hooks/IPOAITickersMain";
 import introImage from "../../Assets/images/frontend_page.jpg";
 import outroImage from "../../Assets/images/footer_lastpage.jpg";
+import monasheeLogo from "../../Assets/images/monashee_logo.png";
+
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -165,11 +167,10 @@ const handleExportPDF = async () => {
 
   const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3"];
 
-  // Landscape A4 page, or customize size
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "mm",
-    format: [297, 210], // A4 Landscape in mm (or try [350, 250] for wider layout)
+    format: [297, 210], // A4 landscape
   });
 
   const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -179,7 +180,14 @@ const handleExportPDF = async () => {
     new Promise<void>((resolve) => setTimeout(resolve, delay));
 
   try {
-    // 1. ➤ Front Page (Full image)
+    // ✅ Load Logo
+    const logoImg = new Image();
+    logoImg.src = monasheeLogo;
+    await new Promise<void>((resolve) => {
+      logoImg.onload = () => resolve();
+    });
+
+    // ✅ Add Front Page (no logo)
     const introImg = new Image();
     introImg.src = introImage;
     await new Promise<void>((resolve) => {
@@ -189,21 +197,21 @@ const handleExportPDF = async () => {
       };
     });
 
-    // 2. ➤ Expand all Accordions
+    // ✅ Expand all accordions
     const originalPanels = { ...expandedPanels };
     const allKeys = Object.keys(editedContent);
     const expandedAll: Record<string, boolean> = {};
     allKeys.forEach((key) => (expandedAll[key] = true));
     setExpandedPanels(expandedAll);
-    await waitForDOMUpdate(500); // Ensure full render
+    await waitForDOMUpdate(500);
 
-    // 3. ➤ Loop through and add each dashboard page
+    // ✅ Render each page with logo + line + content below
     for (let i = 0; i < pages.length; i++) {
       const element = document.getElementById(pages[i]);
       if (!element) continue;
 
       const canvas = await html2canvas(element, {
-        scale: 3, // High resolution
+        scale: 3,
         useCORS: true,
         scrollY: -window.scrollY,
         windowWidth: element.scrollWidth,
@@ -211,17 +219,39 @@ const handleExportPDF = async () => {
       });
 
       const imgData = canvas.toDataURL("image/png");
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
+      // ➤ Draw on new page
       pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
+
+      // ➤ Add logo top-right
+      const logoWidth = 40;
+      const logoHeight = 12;
+      const logoX = pdfWidth - logoWidth - 10;
+      const logoY = 10;
+
+      pdf.addImage(logoImg, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+      // ➤ Draw blue line under logo
+      const lineY = logoY + logoHeight + 2;
+      pdf.setDrawColor(0, 32, 96); // Monashee blue
+      pdf.setLineWidth(1);
+      pdf.line(10, lineY, pdfWidth - 10, lineY);
+
+      // ➤ Content below the blue line
+      const marginTop = lineY + 5; // give extra space after line
+
+      // Calculate image size
+      const imageWidth = pdfWidth;
+      const imageHeight = (canvas.height * imageWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, marginTop, imageWidth, imageHeight);
     }
 
-    // 4. ➤ Restore original accordion state
+    // ✅ Restore original accordion state
     setExpandedPanels(originalPanels);
     await waitForDOMUpdate();
 
-    // 5. ➤ Outro Page
+    // ✅ Outro Page (no logo)
     const outroImg = new Image();
     outroImg.src = outroImage;
     await new Promise<void>((resolve) => {
@@ -232,7 +262,6 @@ const handleExportPDF = async () => {
       };
     });
 
-    // 6. ➤ Save PDF
     pdf.save(`${selectedTicker}_IPO_Report.pdf`);
   } catch (error) {
     console.error("PDF export failed", error);
@@ -240,7 +269,6 @@ const handleExportPDF = async () => {
     setPdfLoading(false);
   }
 };
-
 
   const handleSaveCard = async (key: string) => {
     try {
