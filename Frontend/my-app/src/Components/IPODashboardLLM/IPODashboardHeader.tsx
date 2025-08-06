@@ -1,3 +1,4 @@
+// IPODashboardHeader.tsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -58,10 +59,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
 
   const handleSaveValuation = async () => {
     try {
-      if (!apiUrl) {
-        console.error("API URL not defined.");
-        return;
-      }
+      if (!apiUrl) return;
 
       const cleaned = editedValuation.filter(item => item.trim() !== "");
       const formatted = cleaned.map(item => `• ${item}`).join("\n");
@@ -77,7 +75,6 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
 
       ipoData.valuation = cleaned;
       setEditValuationMode(false);
-      console.log("Valuation saved successfully!");
     } catch (err) {
       console.error("Failed to save valuation:", err);
     }
@@ -163,7 +160,6 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
       <IPOdashboardLine ipodata={ipoData} />
       <IPODealsS1DealData selectedTicker={selectedTicker || ""} />
 
-
       <Card
         elevation={0}
         sx={{
@@ -176,33 +172,32 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
         }}
       >
         <Box position="relative" px={3} pt={2} display="flex" justifyContent="center" alignItems="center">
-  <Typography variant="h6" sx={{ fontWeight: 700, color: "#6a1b9a" }}>
-    Valuation Information
-  </Typography>
-
-  <Box position="absolute" right={24}> {/* px=3 = 24px, aligns with outer padding */}
-    {editValuationMode ? (
-      <>
-        <IconButton color="primary" onClick={handleSaveValuation}>
-          <SaveIcon />
-        </IconButton>
-        <IconButton
-          color="secondary"
-          onClick={() => {
-            setEditedValuation(ipoData.valuation || []);
-            setEditValuationMode(false);
-          }}
-        >
-          <CancelIcon />
-        </IconButton>
-      </>
-    ) : (
-      <IconButton onClick={() => setEditValuationMode(true)}>
-              <EditIcon fontSize="small" />
-      </IconButton>
-    )}
-  </Box>
-</Box>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#6a1b9a" }}>
+            Valuation Information
+          </Typography>
+          <Box position="absolute" right={24}>
+            {editValuationMode ? (
+              <>
+                <IconButton color="primary" onClick={handleSaveValuation}>
+                  <SaveIcon />
+                </IconButton>
+                <IconButton
+                  color="secondary"
+                  onClick={() => {
+                    setEditedValuation(ipoData.valuation || []);
+                    setEditValuationMode(false);
+                  }}
+                >
+                  <CancelIcon />
+                </IconButton>
+              </>
+            ) : (
+              <IconButton onClick={() => setEditValuationMode(true)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+            )}
+          </Box>
+        </Box>
 
         <Box px={3} pb={3}>
           {editValuationMode ? (
@@ -219,9 +214,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
                     fullWidth
                     multiline
                     size="small"
-                    InputProps={{
-                      style: { backgroundColor: "#fff" },
-                    }}
+                    InputProps={{ style: { backgroundColor: "#fff" } }}
                   />
                   <IconButton color="primary" onClick={() => handleAddValuationLine(index)} size="small">
                     <AddCircleOutlineIcon />
@@ -250,15 +243,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
                   ))}
                 </Box>
               ) : (
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: "#333",
-                    fontSize: "1rem",
-                    textAlign: "center",
-                    mt: 2,
-                  }}
-                >
+                <Typography variant="body1" sx={{ color: "#333", textAlign: "center", mt: 2 }}>
                   No valuation data available.
                 </Typography>
               )}

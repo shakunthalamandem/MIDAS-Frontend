@@ -34,7 +34,8 @@ import FinancialForecastTable from "./IPOFinancialTableMain";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
 import IPOAITickersMain from "./Hooks/IPOAITickersMain";
-import IPODealsS1DealData from "./IPODealsS1DealData";
+import introImage from "../../Assets/images/frontend_page.jpg";
+import outroImage from "../../Assets/images/footer_lastpage.jpg";
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -160,6 +161,57 @@ const IPODashboardMain: React.FC = () => {
     if (selectedTicker) fetchData();
   }, [selectedTicker]);
 
+const handleExportPDF = async () => {
+  setPdfLoading(true);
+  const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3"];
+  const pdf = new jsPDF("p", "mm", "a5");
+
+  try {
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    // ➤ Add Front Page with Image
+    const introImg = new Image();
+    introImg.src = introImage;
+    await new Promise<void>((resolve) => {
+      introImg.onload = () => {
+        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+        resolve();
+      };
+    });
+
+    // ➤ Loop through dashboard content pages
+    for (let i = 0; i < pages.length; i++) {
+      const element = document.getElementById(pages[i]);
+      if (!element) continue;
+
+      const canvas = await html2canvas(element, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addPage(); // Add page before adding content
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
+    }
+
+    // ➤ Add Outro Page with Image
+    const outroImg = new Image();
+    outroImg.src = outroImage;
+    await new Promise<void>((resolve) => {
+      outroImg.onload = () => {
+        pdf.addPage();
+        pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+        resolve();
+      };
+    });
+
+    // ➤ Save the PDF
+    pdf.save(`${selectedTicker}_IPO_Report.pdf`);
+  } catch (error) {
+    console.error("PDF export failed", error);
+  } finally {
+    setPdfLoading(false);
+  }
+};
   const handleSaveCard = async (key: string) => {
     try {
       const cleaned = editedContent[key].filter((item) => item.trim() !== "");
@@ -325,15 +377,15 @@ const IPODashboardMain: React.FC = () => {
           <>
             <div id="ipo-dashboard-page1">
               <IPODashboardHeader
-                ipoData={ipoData}
-                allIpoTickers={allIpoTickers}
-                selectedTicker={selectedTicker}
-                searchText={searchText}
-                setSelectedTicker={setSelectedTicker}
-                setSearchText={setSearchText}
-                onExportPDF={() => { }}
-                pdfLoading={pdfLoading}
-              />
+              ipoData={ipoData}
+              allIpoTickers={allIpoTickers}
+              selectedTicker={selectedTicker}
+              searchText={searchText}
+              setSelectedTicker={setSelectedTicker}
+              setSearchText={setSearchText}
+              onExportPDF={handleExportPDF}
+              pdfLoading={pdfLoading}
+            />
                 
               <IPODashboardCardRatings
                 ipodata={ipoData}
