@@ -274,7 +274,7 @@ const handleExportPDF = async () => {
         const footerY = pdfHeight - 20;
         pdf.setFontSize(8);
         pdf.setTextColor(100);
-        pdf.setFont("helvetica", "normal");  // ✅ fixed for TS
+        pdf.setFont("helvetica", "normal");  
         pdf.text(
           "Data as of  2025. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
           10,
@@ -283,7 +283,7 @@ const handleExportPDF = async () => {
         );
 
         pdf.setFontSize(10);
-        pdf.setFont("helvetica", "bold");  // ✅ fixed for TS
+        pdf.setFont("helvetica", "bold");  
         pdf.setTextColor(128); 
       pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
 
