@@ -1,355 +1,333 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  Grid,
-  Container,
   Card,
   CardContent,
-  TextField,
+  Container,
+  Tooltip,
   IconButton,
+  TextField,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  CircularProgress,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import StarIcon from "@mui/icons-material/Star";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
+import CircleIcon from "@mui/icons-material/Circle";
+import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import EditIcon from "@mui/icons-material/Edit";
-import axios from "axios";
-interface IPODashboardCardRatingsProps {
-  ipodata: Record<string, any>;
-  selectedTicker: string;
-  setIpoData: React.Dispatch<React.SetStateAction<any>>;
+
+// ---------- ✅ Types ----------
+interface RevenueGrowthItem {
+  color?: string;
+  category?: string;
 }
 
-const ratingFields = [
-  "profitability",
-  "leverage",
-  "management_quality",
-  "customer_mix",
-  "barriers_to_entry",
-  "proprietary_solution",
-  "near_term_catalyst",
-  "valuation_attractiveness",
+interface RevenueGrowth {
+  [key: string]: RevenueGrowthItem;
+}
+
+interface IPOData {
+  revenue_growth?: RevenueGrowth;
+}
+
+interface IPORatingCriteriaCardProps {
+  selectedTicker: string;
+  ipodata: IPOData;
+  setIpoData: React.Dispatch<React.SetStateAction<IPOData>>;
+}
+
+// ---------- ✅ Criteria Config ----------
+const criteriaList = [
+  { label: "Regulatory Environment", key: "regulatory_environment" },
+  { label: "Customer Mix", key: "customer_mix" },
+  { label: "Supplier Mix", key: "supplier_mix" },
+  { label: "TAM/SAM & Penetration", key: "tam_sam_penetration" },
+  { label: "Near-Term Catalysts", key: "growth_catalysts" },
+  { label: "Secular Tailwinds/Headwinds", key: "secular_trends" },
+  { label: "Revenue Growth Profile", key: "revenue_growth_profile" },
+  { label: "Margin Profile", key: "margin_profile" },
+  { label: "Leverage Profile", key: "leverage_profile" },
+  { label: "Management Team", key: "management_team" },
+  { label: "Sponsor Track Record", key: "sponsor_track_record" },
+  { label: "ESG Focus", key: "esg_focus" },
+  { label: "M&A Opportunities", key: "ma_opportunities" },
 ];
 
-const infoFields: { label: string; key: string }[] = [
-  { label: "Pricing Date", key: "pricing_date" },
-  { label: "Price Range", key: "price_range" },
-  { label: "Deal Size ($ Million)", key: "deal_size" },
-  { label: "Industry", key: "industry" },
-  { label: "Shares Offered", key: "shares_offered" },
-  { label: "No of Shares Outstanding", key: "nosh" },
-  { label: "Established", key: "established_year" },
-  { label: "Bookrunners", key: "bookrunners" },
-];
-
-const formatValue = (key: string, value: any, ipodata: Record<string, any>) => {
-  if (key === "price_range") {
-    return ipodata.lower_bound && ipodata.upper_bound
-      ? `$${ipodata.lower_bound} - $${ipodata.upper_bound}`
-      : "N/A";
+// ---------- ✅ Helpers ----------
+const getColorHex = (color: string | null | undefined) => {
+  switch (color?.toLowerCase()) {
+    case "green":
+      return "#3ba55d";
+    case "yellow":
+      return "#ffcc00";
+    case "red":
+      return "#ff4d4f";
+    default:
+      return "#d3d3d3";
   }
-
-  if (key === "deal_size" || key === "shares_offered") {
-    return value ? Number(value).toLocaleString() : "N/A";
-  }
-
-  if (key === "nosh") {
-    return value ? `${Number(value).toLocaleString()}M` : "N/A";
-  }
-
-  if (key === "bookrunners") {
-    return Array.isArray(value) && value.length > 0 ? value.join(", ") : "N/A";
-  }
-
-  return value || "N/A";
 };
 
-const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
-  ipodata,
+// ---------- ✅ Component ----------
+const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
   selectedTicker,
+  ipodata,
   setIpoData,
 }) => {
-  const [summaryEditMode, setSummaryEditMode] = useState(false);
-  const [ratingsEditMode, setRatingsEditMode] = useState(false);
-  const [editedSummaryData, setEditedSummaryData] = useState<Record<string, any>>({});
-  const [editedRatingsData, setEditedRatingsData] = useState<Record<string, any>>({});
-
-  if (!ipodata || Object.keys(ipodata).length === 0) return null;
+  const [editMode, setEditMode] = useState(false);
+  const [editedData, setEditedData] = useState<RevenueGrowth>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+
+  const revenueGrowth = ipodata?.revenue_growth || {};
 
   const getAuthHeaders = () => ({
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   });
 
-  const handleSaveSummary = async () => {
-    try {
-      if (!apiUrl) throw new Error("API URL not defined");
-
-      const payload: any = {
-        ticker_name: selectedTicker,
-        ...editedSummaryData,
-      };
-
-      // Format numbers for lower/upper bound
-      if ("lower_bound" in editedSummaryData && editedSummaryData.lower_bound !== undefined) {
-        payload.lower_bound = parseFloat(editedSummaryData.lower_bound);
-      }
-      if ("upper_bound" in editedSummaryData && editedSummaryData.upper_bound !== undefined) {
-        payload.upper_bound = parseFloat(editedSummaryData.upper_bound);
+  useEffect(() => {
+    const fetchRevenueGrowthData = async () => {
+      if (!apiUrl) {
+        setError("API URL not defined");
+        setLoading(false);
+        return;
       }
 
-      console.log("Saving summary payload:", payload);
+      try {
+        const response = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ ticker: selectedTicker }),
+        });
 
-      const response = await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
-        headers: getAuthHeaders(),
-      });
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.message || "Failed to fetch revenue growth data");
+        }
 
-      console.log("Summary saved. Response:", response.data);
+        const data: RevenueGrowth = await response.json();
 
-      setIpoData((prev: any) => ({ ...prev, ...editedSummaryData }));
-      setSummaryEditMode(false);
-      setEditedSummaryData({});
-    } catch (error: any) {
-      console.error("Save Summary Error:", error.response?.data || error.message || error);
+        if (data && typeof data === "object") {
+          setIpoData((prev: IPOData) => ({
+            ...prev,
+            revenue_growth: data,
+          }));
+        } else {
+          setError("No revenue growth data available.");
+        }
+      } catch (err: any) {
+        setError(err.message || "Unknown error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (selectedTicker) {
+      fetchRevenueGrowthData();
     }
-  };
+  }, [selectedTicker, apiUrl, setIpoData]);
 
-  const handleSaveRatings = async () => {
+  const handleSaveRevenueGrowthData = async () => {
     try {
       if (!apiUrl) throw new Error("API URL not defined");
 
       const payload = {
         ticker_name: selectedTicker,
-        ...editedRatingsData,
+        revenue_growth: {
+          ...revenueGrowth,
+          ...editedData,
+        },
       };
 
-      console.log("Saving ratings payload:", payload);
-
-      const response = await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
+      const response = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
+        method: "PATCH",
         headers: getAuthHeaders(),
+        body: JSON.stringify(payload),
       });
 
-      console.log("Ratings saved. Response:", response.data);
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || "Failed to save revenue growth data");
+      }
 
-      setIpoData((prev: any) => ({ ...prev, ...editedRatingsData }));
-      setRatingsEditMode(false);
-      setEditedRatingsData({});
-    } catch (error: any) {
-      console.error("Save Ratings Error:", error.response?.data || error.message || error);
+      setIpoData((prev: IPOData) => ({
+        ...prev,
+        revenue_growth: payload.revenue_growth,
+      }));
+
+      setEditedData({});
+      setEditMode(false);
+    } catch (err: any) {
+      console.error("Save Error:", err);
+      setError(err.message || "Save failed");
     }
   };
 
-  const handleCancelSummary = () => {
-    setEditedSummaryData({});
-    setSummaryEditMode(false);
+  const handleCancel = () => {
+    setEditedData({});
+    setEditMode(false);
   };
 
-  const handleCancelRatings = () => {
-    setEditedRatingsData({});
-    setRatingsEditMode(false);
+  const handleColorChange = (key: string, color: string) => {
+    setEditedData((prev) => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        color,
+        category: prev[key]?.category ?? revenueGrowth[key]?.category ?? "",
+      },
+    }));
   };
+
+  const lightColorMap: { [key: string]: string } = {
+    red: "#ffd6d6",
+    yellow: "#fff7cc",
+    green: "#d9fdd3",
+  };
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Grid container spacing={4}>
-        {/* IPO Summary */}
-        <Grid item xs={12} md={6}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <Card sx={{ borderRadius: 4, background: "linear-gradient(#f0f5ff)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
-              <CardContent>
- <Box position="relative" mb={2} display="flex" justifyContent="center" alignItems="center">
-  {/* Centered title */}
-  <Typography variant="h6" sx={{ fontWeight: 700, color: "#6a1b9a" }}>
-    IPO Summary
-  </Typography>
+    <Container maxWidth="xl" sx={{ mt: 4 }}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <Card
+          sx={{
+            borderRadius: 2,
+            background: "#fff",
+            boxShadow: "0 12px 24px rgba(0,0,0,0.05)",
+            overflowX: "auto",
+          }}
+        >
+          <CardContent>
+            <Box position="relative" mb={2}>
+              <Typography variant="h6" align="center" sx={{ fontWeight: 700, color: "#002060" }}>
+                Revenue Growth Analysis
+              </Typography>
+              <Box position="absolute" right={0} top="50%" sx={{ transform: "translateY(-50%)" }}>
+                {editMode ? (
+                  <>
+                    <IconButton color="primary" onClick={handleSaveRevenueGrowthData}>
+                      <SaveIcon />
+                    </IconButton>
+                    <IconButton color="secondary" onClick={handleCancel}>
+                      <CancelIcon />
+                    </IconButton>
+                  </>
+                ) : (
+                  <IconButton onClick={() => setEditMode(true)}>
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
+            </Box>
 
-  {/* Right-aligned icons */}
-  <Box position="absolute" right={0}>
-    {summaryEditMode ? (
-      <>
-        <IconButton color="primary" onClick={handleSaveSummary}>
-          <SaveIcon />
-        </IconButton>
-        <IconButton color="secondary" onClick={handleCancelSummary}>
-          <CancelIcon />
-        </IconButton>
-      </>
-    ) : (
-      <IconButton onClick={() => setSummaryEditMode(true)}>
-              <EditIcon fontSize="small" />
-      </IconButton>
-    )}
-  </Box>
-</Box>
+            <Table sx={{ border: "2px solid #ccc" }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600, width: "30%", borderRight: "2px solid #ccc" }}>
+                    Criteria
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      width: "15%",
+                      textAlign: "center",
+                      borderRight: "2px solid #ccc",
+                    }}
+                  >
+                    Color
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, width: "55%" }}>Notes</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {criteriaList.map((item) => {
+                  const original = revenueGrowth[item.key] || {};
+                  const edited = editedData[item.key] || {};
+                  const value = editMode ? edited.category ?? original.category : original.category;
+                  const color = editMode ? edited.color ?? original.color : original.color;
 
+                  return (
+                    <TableRow key={item.key} sx={{ verticalAlign: "top" }}>
+                      <TableCell sx={{ borderRight: "2px solid #ccc", fontWeight: 500 }}>
+                        {item.label}
+                      </TableCell>
 
-                <Grid container spacing={3}>
-                  {infoFields.map((field, idx) => (
-                    <Grid item xs={12} sm={6} key={field.key}>
-                      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
-                        <Box>
-                          <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}>
-                            {field.label}
-                          </Typography>
-
-                          {summaryEditMode ? (
-                            field.key === "price_range" ? (
-                              <Box display="flex" gap={1}>
-                                <TextField
-                                  label="Lower Bound"
-                                  type="number"
+                      <TableCell align="center" sx={{ borderRight: "2px solid #ccc" }}>
+                        {editMode ? (
+                          <Box display="flex" justifyContent="center" gap={1}>
+                            {["red", "yellow", "green"].map((c) => {
+                              const isSelected = color === c;
+                              return (
+                                <IconButton
+                                  key={c}
+                                  onClick={() => handleColorChange(item.key, c)}
                                   size="small"
-                                  fullWidth
-                                  value={editedSummaryData.lower_bound ?? ipodata.lower_bound ?? ""}
-                                  onChange={(e) =>
-                                    setEditedSummaryData((prev) => ({
-                                      ...prev,
-                                      lower_bound: e.target.value,
-                                    }))
-                                  }
+                                  sx={{
+                                    backgroundColor: isSelected ? getColorHex(c) : lightColorMap[c],
+                                    border: isSelected ? "2px solid #000" : "1px solid #aaa",
+                                    borderRadius: "50%",
+                                    width: 28,
+                                    height: 28,
+                                  }}
                                 />
-                                <TextField
-                                  label="Upper Bound"
-                                  type="number"
-                                  size="small"
-                                  fullWidth
-                                  value={editedSummaryData.upper_bound ?? ipodata.upper_bound ?? ""}
-                                  onChange={(e) =>
-                                    setEditedSummaryData((prev) => ({
-                                      ...prev,
-                                      upper_bound: e.target.value,
-                                    }))
-                                  }
-                                />
-                              </Box>
-                            ) : (
-                              <TextField
-                                fullWidth
-                                multiline
-                                size="small"
-                                value={editedSummaryData[field.key] ?? ipodata[field.key] ?? ""}
-                                onChange={(e) =>
-                                  setEditedSummaryData((prev) => ({
-                                    ...prev,
-                                    [field.key]: e.target.value,
-                                  }))
-                                }
-                              />
-                            )
-                          ) : (
-                            <Typography variant="body2" sx={{ color: "#333" }}>
-                              {formatValue(field.key, ipodata[field.key], ipodata)}
-                            </Typography>
-                          )}
-                        </Box>
-                      </motion.div>
-                    </Grid>
-                  ))}
-                </Grid>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </Grid>
+                              );
+                            })}
+                          </Box>
+                        ) : (
+                          <Tooltip title={value || "N/A"}>
+                            <CircleIcon fontSize="small" sx={{ color: getColorHex(color) }} />
+                          </Tooltip>
+                        )}
+                      </TableCell>
 
-        {/* Ratings Overview */}
-        <Grid item xs={12} md={6}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-          >
-            <Card sx={{ borderRadius: 4, background: "linear-gradient(#f0f5ff)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
-              <CardContent>
-          <Box position="relative" mb={2}>
-  {/* Centered title */}
-  <Typography
-    variant="h6"
-    align="center"
-    sx={{ fontWeight: 700, color: "#6a1b9a" }}
-  >
-    Ratings Overview
-  </Typography>
-
-  {/* Icons aligned right, vertically centered */}
-  <Box
-    position="absolute"
-    right={0}
-    top="50%"
-    sx={{ transform: "translateY(-50%)" }}
-  >
-    {ratingsEditMode ? (
-      <>
-        <IconButton color="primary" onClick={handleSaveRatings}>
-          <SaveIcon />
-        </IconButton>
-        <IconButton color="secondary" onClick={handleCancelRatings}>
-          <CancelIcon />
-        </IconButton>
-      </>
-    ) : (
-      <IconButton onClick={() => setRatingsEditMode(true)}>
-              <EditIcon fontSize="small" />
-      </IconButton>
-    )}
-  </Box>
-</Box>
-
-
-                <Grid container spacing={3}>
-                  {ratingFields.map((field, idx) => {
-                    const value = Math.round(Math.min(10, ipodata[field]) / 2);
-                    return (
-                      <Grid item xs={12} sm={6} key={field}>
-                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
-                          <Typography variant="body1" sx={{ fontWeight: 600, mb: 1, color: "#002060", textTransform: "capitalize" }}>
-                            {field.replace(/_/g, " ")}
+                      <TableCell>
+                        {editMode ? (
+                          <TextField
+                            fullWidth
+                            size="small"
+                            placeholder="Enter note"
+                            value={value || ""}
+                            onChange={(e) =>
+                              setEditedData((prev) => ({
+                                ...prev,
+                                [item.key]: {
+                                  ...prev[item.key],
+                                  category: e.target.value,
+                                  color: color,
+                                },
+                              }))
+                            }
+                          />
+                        ) : (
+                          <Typography sx={{ color: "#333", fontSize: "0.95rem" }}>
+                            {value || "No data available"}
                           </Typography>
-
-                          {ratingsEditMode ? (
-                            <TextField
-                              type="number"
-                              size="small"
-                              inputProps={{ min: 0, max: 10 }}
-                              value={editedRatingsData[field] ?? ipodata[field] ?? ""}
-                              onChange={(e) =>
-                                setEditedRatingsData((prev) => ({
-                                  ...prev,
-                                  [field]: e.target.value,
-                                }))
-                              }
-                            />
-                          ) : (
-                            <Box display="flex" gap={0.5}>
-                              {[1, 2, 3, 4, 5].map((i) =>
-                                i <= value ? (
-                                  <StarIcon key={i} sx={{ color: "#e54702" }} />
-                                ) : (
-                                  <StarBorderIcon key={i} sx={{ color: "#ccc" }} />
-                                )
-                              )}
-                            </Box>
-                          )}
-                        </motion.div>
-                      </Grid>
-                    );
-                  })}
-                </Grid>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </Grid>
-      </Grid>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </motion.div>
     </Container>
   );
 };
 
-export default IPODashboardCardRatings;
+export default IPORatingCriteriaCard;
