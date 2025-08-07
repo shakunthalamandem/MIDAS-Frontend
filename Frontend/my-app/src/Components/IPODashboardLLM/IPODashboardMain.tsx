@@ -29,7 +29,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { cardColors } from "./UtilsIPODashboard";
 import introImage from "../../Assets/images/frontend_page.jpg";
-import outroImage from "../../Assets/images/footer_lastpage.jpg";
+import outroImage from "../../Assets/images/monashee_pdf_footer.jpg";
 import monasheeLogo from "../../Assets/images/monashee_logo.png";
 import IPODashboardPage1 from "./IPODashboardMain/IPODashboardPage1";
 import IPODashboardPage2 from "./IPODashboardMain/IPODashboardPage2";
@@ -255,7 +255,7 @@ const handleExportPDF = async () => {
       pdf.setFontSize(10);
       pdf.setFont("helvetica", "bold");  // ✅ fixed for TS
       pdf.setTextColor(128); 
-pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
+      pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
     }
 
     // ✅ Restore original accordion states
@@ -284,8 +284,8 @@ pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { alig
 
         pdf.setFontSize(10);
         pdf.setFont("helvetica", "bold");  // ✅ fixed for TS
-        pdf.setTextColor(150, 0, 0);
-        pdf.text("Do not copy. Do not distribute.", 10, pdfHeight - 10);
+        pdf.setTextColor(128); 
+      pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
 
         resolve();
       };
