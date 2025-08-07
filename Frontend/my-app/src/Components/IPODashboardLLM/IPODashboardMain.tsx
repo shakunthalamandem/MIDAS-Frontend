@@ -163,14 +163,13 @@ const IPODashboardMain: React.FC = () => {
 const handleExportPDF = async () => {
   setPdfLoading(true);
 
-  const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3","ipo-dashboard-page4"];
+  const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3", "ipo-dashboard-page4"];
 
-const pdf = new jsPDF({
-  orientation: "portrait",
-  unit: "mm",
-  format: "a4",
-});
-
+  const pdf = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
 
   const pdfWidth = pdf.internal.pageSize.getWidth();
   const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -186,7 +185,7 @@ const pdf = new jsPDF({
       logoImg.onload = () => resolve();
     });
 
-    // ✅ Add Front Page (no logo)
+    // ✅ Add Front Page (Intro image, no logo or footer)
     const introImg = new Image();
     introImg.src = introImage;
     await new Promise<void>((resolve) => {
@@ -196,7 +195,7 @@ const pdf = new jsPDF({
       };
     });
 
-    // ✅ Expand all accordions
+    // ✅ Expand all accordions (optional dynamic content)
     const originalPanels = { ...expandedPanels };
     const allKeys = Object.keys(editedContent);
     const expandedAll: Record<string, boolean> = {};
@@ -204,7 +203,7 @@ const pdf = new jsPDF({
     setExpandedPanels(expandedAll);
     await waitForDOMUpdate(500);
 
-    // ✅ Render each page with logo + line + content below
+    // ✅ Render each dashboard page
     for (let i = 0; i < pages.length; i++) {
       const element = document.getElementById(pages[i]);
       if (!element) continue;
@@ -219,10 +218,9 @@ const pdf = new jsPDF({
 
       const imgData = canvas.toDataURL("image/png");
 
-      // ➤ Draw on new page
       pdf.addPage();
 
-      // ➤ Add logo top-right
+      // ➤ Logo top-right
       const logoWidth = 40;
       const logoHeight = 12;
       const logoX = pdfWidth - logoWidth - 10;
@@ -230,37 +228,70 @@ const pdf = new jsPDF({
 
       pdf.addImage(logoImg, "PNG", logoX, logoY, logoWidth, logoHeight);
 
-      // ➤ Draw blue line under logo
+      // ➤ Blue line below logo
       const lineY = logoY + logoHeight + 2;
       pdf.setDrawColor(0, 32, 96); // Monashee blue
       pdf.setLineWidth(1);
       pdf.line(10, lineY, pdfWidth - 10, lineY);
 
-      // ➤ Content below the blue line
-      const marginTop = lineY + 5; // give extra space after line
-
-      // Calculate image size
+      // ➤ Add canvas image (content)
+      const marginTop = lineY + 5;
       const imageWidth = pdfWidth;
       const imageHeight = (canvas.height * imageWidth) / canvas.width;
-
       pdf.addImage(imgData, "PNG", 0, marginTop, imageWidth, imageHeight);
+
+      // ➤ Add footer
+      const footerY = pdfHeight - 20;
+      pdf.setFontSize(8);
+      pdf.setTextColor(100);
+      pdf.setFont("helvetica", "normal");  // ✅ fixed for TS
+      pdf.text(
+        "Data as of July 2025. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
+        10,
+        footerY,
+        { maxWidth: pdfWidth - 20 }
+      );
+
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "bold");  // ✅ fixed for TS
+      pdf.setTextColor(128); 
+pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
     }
 
-    // ✅ Restore original accordion state
+    // ✅ Restore original accordion states
     setExpandedPanels(originalPanels);
     await waitForDOMUpdate();
 
-    // ✅ Outro Page (no logo)
+    // ✅ Outro Page (with footer)
     const outroImg = new Image();
     outroImg.src = outroImage;
     await new Promise<void>((resolve) => {
       outroImg.onload = () => {
         pdf.addPage();
         pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+
+        // ➤ Add footer
+        const footerY = pdfHeight - 20;
+        pdf.setFontSize(8);
+        pdf.setTextColor(100);
+        pdf.setFont("helvetica", "normal");  // ✅ fixed for TS
+        pdf.text(
+          "Data as of July 2025. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
+          10,
+          footerY,
+          { maxWidth: pdfWidth - 20 }
+        );
+
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "bold");  // ✅ fixed for TS
+        pdf.setTextColor(150, 0, 0);
+        pdf.text("Do not copy. Do not distribute.", 10, pdfHeight - 10);
+
         resolve();
       };
     });
 
+    // ✅ Save the PDF
     pdf.save(`${selectedTicker}_IPO_Report.pdf`);
   } catch (error) {
     console.error("PDF export failed", error);
@@ -268,6 +299,7 @@ const pdf = new jsPDF({
     setPdfLoading(false);
   }
 };
+
 
   const handleSaveCard = async (key: string) => {
     try {
