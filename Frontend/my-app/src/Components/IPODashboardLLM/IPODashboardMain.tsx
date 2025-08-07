@@ -114,6 +114,8 @@ const IPODashboardMain: React.FC = () => {
 
         if (!response.ok) throw new Error("Failed to fetch IPO data");
         const jsonData = await response.json();
+       
+        
 
         const dateFields = ["pricing_date", "filed_date", "term_date", "trade_date"];
         const formattedData = { ...jsonData };
