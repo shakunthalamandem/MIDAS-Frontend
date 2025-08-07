@@ -167,11 +167,12 @@ const handleExportPDF = async () => {
 
   const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3","ipo-dashboard-page4"];
 
-  const pdf = new jsPDF({
-    orientation: "landscape",
-    unit: "mm",
-    format: [297, 240], // A4 landscape
-  });
+const pdf = new jsPDF({
+  orientation: "portrait",
+  unit: "mm",
+  format: "a4",
+});
+
 
   const pdfWidth = pdf.internal.pageSize.getWidth();
   const pdfHeight = pdf.internal.pageSize.getHeight();
