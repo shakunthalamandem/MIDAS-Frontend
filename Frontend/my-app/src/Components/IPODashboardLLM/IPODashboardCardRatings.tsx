@@ -187,6 +187,12 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
     }));
   };
 
+  const lightColorMap: { [key: string]: string } = {
+    red: "#ffd6d6",
+    yellow: "#fff7cc",
+    green: "#d9fdd3",
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
@@ -228,10 +234,10 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
               </Box>
             </Box>
 
-            <Table sx={{ border: "1px solid #ccc" }}>
+            <Table sx={{ border: "2px solid #ccc" }}>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 600, width: "30%", borderRight: "1px solid #ccc" }}>
+                  <TableCell sx={{ fontWeight: 600, width: "30%", borderRight: "2px solid #ccc" }}>
                     Criteria
                   </TableCell>
                   <TableCell
@@ -239,7 +245,7 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
                       fontWeight: 600,
                       width: "15%",
                       textAlign: "center",
-                      borderRight: "1px solid #ccc",
+                      borderRight: "2px solid #ccc",
                     }}
                   >
                     Color
@@ -256,27 +262,30 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
 
                   return (
                     <TableRow key={item.key} sx={{ verticalAlign: "top" }}>
-                      <TableCell sx={{ borderRight: "1px solid #ccc", fontWeight: 500 }}>
+                      <TableCell sx={{ borderRight: "2px solid #ccc", fontWeight: 500 }}>
                         {item.label}
                       </TableCell>
 
-                      <TableCell align="center" sx={{ borderRight: "1px solid #ccc" }}>
+                      <TableCell align="center" sx={{ borderRight: "2px solid #ccc" }}>
                         {editMode ? (
                           <Box display="flex" justifyContent="center" gap={1}>
-                            {["red", "yellow", "green"].map((c) => (
-                              <IconButton
-                                key={c}
-                                onClick={() => handleColorChange(item.key, c)}
-                                size="small"
-                                sx={{
-                                  backgroundColor: getColorHex(c),
-                                  border: color === c ? "2px solid #000" : "1px solid #aaa",
-                                  borderRadius: "50%",
-                                  width: 28,
-                                  height: 28,
-                                }}
-                              />
-                            ))}
+                            {["red", "yellow", "green"].map((c) => {
+                              const isSelected = color === c;
+                              return (
+                                <IconButton
+                                  key={c}
+                                  onClick={() => handleColorChange(item.key, c)}
+                                  size="small"
+                                  sx={{
+                                    backgroundColor: isSelected ? getColorHex(c) : lightColorMap[c],
+                                    border: isSelected ? "2px solid #000" : "1px solid #aaa",
+                                    borderRadius: "50%",
+                                    width: 28,
+                                    height: 28,
+                                  }}
+                                />
+                              );
+                            })}
                           </Box>
                         ) : (
                           <Tooltip title={value || "N/A"}>
