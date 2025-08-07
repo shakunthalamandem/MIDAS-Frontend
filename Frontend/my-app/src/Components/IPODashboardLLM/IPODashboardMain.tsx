@@ -190,9 +190,19 @@ const handleExportPDF = async () => {
     // ✅ Add Front Page (Intro image, no logo or footer)
     const introImg = new Image();
     introImg.src = introImage;
+
     await new Promise<void>((resolve) => {
       introImg.onload = () => {
+        // Add the image
         pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+
+        // Add text on top-right corner (adjust values as needed)
+        const margin = 10; // margin from the right/top edge
+        const fontSize = 12;
+        pdf.setFontSize(fontSize);
+        pdf.setTextColor(0, 0, 0); // black text
+        pdf.text("Sample Text", pdfWidth - margin - pdf.getTextWidth("Sample Text"), margin + fontSize);
+
         resolve();
       };
     });
