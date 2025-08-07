@@ -153,8 +153,8 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
           padding: 3,
         }}
       >
-        <Typography variant="h4" gutterBottom>
-          IPO Deal Data for {selectedTicker}
+        <Typography variant="h6" gutterBottom color="#002060" fontWeight="bold" align="center">
+          Valuation & Market Sentiment {selectedTicker}
         </Typography>
 
         <Box
@@ -247,8 +247,6 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
             ))}
 
 
-{/* Differentiated Summary */}
-{/* Differentiated Summary */}
 <Grid item xs={12} sx={{ display: "flex", flexDirection: "column" }}>
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} style={{ flex: 1 }}>
     <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
