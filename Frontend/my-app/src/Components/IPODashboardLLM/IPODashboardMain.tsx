@@ -37,6 +37,10 @@ import IPOAITickersMain from "./Hooks/IPOAITickersMain";
 import introImage from "../../Assets/images/frontend_page.jpg";
 import outroImage from "../../Assets/images/footer_lastpage.jpg";
 import monasheeLogo from "../../Assets/images/monashee_logo.png";
+import IPODashboardPage1 from "./IPODashboardMain/IPODashboardPage1";
+import IPODashboardPage2 from "./IPODashboardMain/IPODashboardPage2";
+import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
+import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 
 
 const getOrdinalSuffix = (n: number): string => {
@@ -434,96 +438,35 @@ const pdf = new jsPDF({
       <Box sx={{ px: 2 }}>
         {ipoData && (
           <>
-            <div id="ipo-dashboard-page1">
-              <IPODashboardHeader
-              ipoData={ipoData}
-              allIpoTickers={allIpoTickers}
-              selectedTicker={selectedTicker}
-              searchText={searchText}
-              setSelectedTicker={setSelectedTicker}
-              setSearchText={setSearchText}
-              onExportPDF={handleExportPDF}
-              pdfLoading={pdfLoading}
-            />
-                        </div>
+          <IPODashboardPage1
+  ipoData={ipoData}
+  allIpoTickers={allIpoTickers}
+  selectedTicker={selectedTicker || ""}
+  searchText={searchText}
+  setSelectedTicker={setSelectedTicker}
+  setSearchText={setSearchText}
+  handleExportPDF={handleExportPDF}
+  pdfLoading={pdfLoading}
+/>
 
-                            <div id="ipo-dashboard-page2">
+<IPODashboardPage2
+  ipoData={ipoData}
+  selectedTicker={selectedTicker || ""}
+  setIpoData={setIpoData}
+  renderEditableCard={renderEditableCard}
+/>
 
-              <IPODashboardCardRatings
-                ipodata={ipoData}
-                selectedTicker={selectedTicker || ""}
-                setIpoData={setIpoData}
-              />
-                            <Container maxWidth="xl" sx={{ mb: 3 }}>
+<IPODashboardPage3
+  renderEditableCard={renderEditableCard}
+/>
 
-                   <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(0, 2).map((section, index) => (
-                    <Grid item xs={12} md={6} key={section.key}>
-                      {renderEditableCard(section, index)}
-                    </Grid>
-                  ))}
-                </Grid>
-                              </Container>
+<IPODashboardPage4
+  selectedTicker={selectedTicker || ""}
+  ipoData={ipoData}
+  showAIComparison={showAIComparison}
+  handleAIComparisonClick={handleAIComparisonClick}
+/>
 
-            </div>
-
-            <div id="ipo-dashboard-page3">
-              <Container maxWidth="xl" sx={{ mb: 3 }}>
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(2, 6).map((section, index) => (
-                    <Grid item xs={12} md={6} key={section.key}>
-                      {renderEditableCard(section, index)}
-                    </Grid>
-                  ))}
-                </Grid>
-                               {/* {cardSections.slice(4, 6).map((section, index) => (
-                    <Grid item xs={12} md={6} key={section.key}>
-                      {renderEditableCard(section, index + 4)}
-                    </Grid>
-                  ))} */}
-              </Container>
-            </div>
-
-            <div id="ipo-dashboard-page4">
-              <Container maxWidth="xl" sx={{ mb: 3 }}>
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-   
-                  <Grid item xs={12} >
-                    <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                      <FinancialForecastTable defaultTicker={selectedTicker || ""} />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Box sx={{ backgroundColor: "#f4f5f7", p: 2 }}>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleAIComparisonClick}
-                        sx={{ mb: 2 }}
-                      >
-                        AI Comparison
-                      </Button>
-                      <Typography variant="body1" gutterBottom color="#02517e">
-                        AI Suggested Comparable Tickers
-                      </Typography>
-                      {showAIComparison && (
-                        <IPOAITickersMain selectedData={ipoData} />
-                      )}
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                      <IPODashboardMainTable ticker={selectedTicker || ""} />
-                    </Box>
-                    <Typography sx={{ fontStyle: "italic", fontSize: "0.875rem", color: "gray" }}>
-                      Source: Factset
-                    </Typography>
-
-                    
-                  </Grid>
-                </Grid>
-              </Container>
-            </div>
           </>
         )}
       </Box>
