@@ -12,6 +12,8 @@ import {
   TableRow,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
 
 interface IpoData {
   ticker: string;
@@ -231,6 +233,16 @@ const UpcomingIpoTable: React.FC = () => {
           </Table>
         </TableContainer>
       </Box>
+     <Typography
+  variant="body2"
+  textAlign="center"
+  color="textSecondary"
+  sx={{ fontStyle: "italic", mt: 1, display: "flex", justifyContent: "center", alignItems: "center" }}
+>
+  <InfoOutlinedIcon fontSize="small" color="action" />
+  Note: IPO deals above $50M offer size.
+</Typography>
+
     </Container>
   );
 };
