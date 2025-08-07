@@ -85,7 +85,7 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
         },
       };
 
-      await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
+      await axios.patch(`${apiUrl}/api/ipo-revenue-growth/`, payload, {
         headers: getAuthHeaders(),
       });
 
