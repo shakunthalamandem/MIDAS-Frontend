@@ -27,13 +27,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-
-import IPODashboardHeader from "./IPODashboardHeader";
-import IPODashboardCardRatings from "./IPODashboardCardRatings";
-import FinancialForecastTable from "./IPOFinancialTableMain";
-import IPODashboardMainTable from "./IPODashboardMainTable";
-import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
-import IPOAITickersMain from "./Hooks/IPOAITickersMain";
+import { cardColors } from "./UtilsIPODashboard";
 import introImage from "../../Assets/images/frontend_page.jpg";
 import outroImage from "../../Assets/images/footer_lastpage.jpg";
 import monasheeLogo from "../../Assets/images/monashee_logo.png";
