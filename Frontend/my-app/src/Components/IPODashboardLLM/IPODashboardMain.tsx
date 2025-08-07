@@ -170,7 +170,7 @@ const handleExportPDF = async () => {
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "mm",
-    format: [297, 270], // A4 landscape
+    format: [297, 300], // A4 landscape
   });
 
   const pdfWidth = pdf.internal.pageSize.getWidth();
