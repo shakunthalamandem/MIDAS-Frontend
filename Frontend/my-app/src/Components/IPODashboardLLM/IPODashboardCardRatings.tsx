@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -13,20 +13,35 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  CircularProgress,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import axios from "axios";
 
-interface IPORatingCriteriaCardProps {
-  ipodata: Record<string, any>;
-  selectedTicker: string;
-  setIpoData: React.Dispatch<React.SetStateAction<any>>;
+// ---------- ✅ Types ----------
+interface RevenueGrowthItem {
+  color?: string;
+  category?: string;
 }
 
+interface RevenueGrowth {
+  [key: string]: RevenueGrowthItem;
+}
+
+interface IPOData {
+  revenue_growth?: RevenueGrowth;
+}
+
+interface IPORatingCriteriaCardProps {
+  selectedTicker: string;
+  ipodata: IPOData;
+  setIpoData: React.Dispatch<React.SetStateAction<IPOData>>;
+}
+
+// ---------- ✅ Criteria Config ----------
 const criteriaList = [
   { label: "Regulatory Environment", key: "regulatory_environment" },
   { label: "Customer Mix", key: "customer_mix" },
@@ -43,7 +58,8 @@ const criteriaList = [
   { label: "M&A Opportunities", key: "ma_opportunities" },
 ];
 
-const getColorHex = (color: string | null) => {
+// ---------- ✅ Helpers ----------
+const getColorHex = (color: string | null | undefined) => {
   switch (color?.toLowerCase()) {
     case "green":
       return "#3ba55d";
@@ -56,13 +72,17 @@ const getColorHex = (color: string | null) => {
   }
 };
 
+// ---------- ✅ Component ----------
 const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
-  ipodata,
   selectedTicker,
+  ipodata,
   setIpoData,
 }) => {
   const [editMode, setEditMode] = useState(false);
-  const [editedData, setEditedData] = useState<Record<string, any>>({});
+  const [editedData, setEditedData] = useState<RevenueGrowth>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -73,7 +93,49 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
     Authorization: token ? `Bearer ${token}` : "",
   });
 
-  const handleSave = async () => {
+  useEffect(() => {
+    const fetchRevenueGrowthData = async () => {
+      if (!apiUrl) {
+        setError("API URL not defined");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ ticker: selectedTicker }),
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.message || "Failed to fetch revenue growth data");
+        }
+
+        const data: RevenueGrowth = await response.json();
+
+        if (data && typeof data === "object") {
+          setIpoData((prev: IPOData) => ({
+            ...prev,
+            revenue_growth: data,
+          }));
+        } else {
+          setError("No revenue growth data available.");
+        }
+      } catch (err: any) {
+        setError(err.message || "Unknown error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (selectedTicker) {
+      fetchRevenueGrowthData();
+    }
+  }, [selectedTicker, apiUrl, setIpoData]);
+
+  const handleSaveRevenueGrowthData = async () => {
     try {
       if (!apiUrl) throw new Error("API URL not defined");
 
@@ -85,19 +147,27 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
         },
       };
 
-      await axios.patch(`${apiUrl}/api/ipo-revenue-growth/`, payload, {
+      const response = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
+        method: "PATCH",
         headers: getAuthHeaders(),
+        body: JSON.stringify(payload),
       });
 
-      setIpoData((prev: any) => ({
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || "Failed to save revenue growth data");
+      }
+
+      setIpoData((prev: IPOData) => ({
         ...prev,
         revenue_growth: payload.revenue_growth,
       }));
 
       setEditedData({});
       setEditMode(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Save Error:", err);
+      setError(err.message || "Save failed");
     }
   };
 
@@ -116,6 +186,9 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
       },
     }));
   };
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
@@ -140,7 +213,7 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
               <Box position="absolute" right={0} top="50%" sx={{ transform: "translateY(-50%)" }}>
                 {editMode ? (
                   <>
-                    <IconButton color="primary" onClick={handleSave}>
+                    <IconButton color="primary" onClick={handleSaveRevenueGrowthData}>
                       <SaveIcon />
                     </IconButton>
                     <IconButton color="secondary" onClick={handleCancel}>
@@ -202,9 +275,7 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
                                   width: 28,
                                   height: 28,
                                 }}
-                              >
-                                {/* Empty CircleIcon just for shape */}
-                              </IconButton>
+                              />
                             ))}
                           </Box>
                         ) : (
