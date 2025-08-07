@@ -165,12 +165,12 @@ const IPODashboardMain: React.FC = () => {
 const handleExportPDF = async () => {
   setPdfLoading(true);
 
-  const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3"];
+  const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3","ipo-dashboard-page4"];
 
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "mm",
-    format: [297, 300], // A4 landscape
+    format: [297, 240], // A4 landscape
   });
 
   const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -444,34 +444,49 @@ const handleExportPDF = async () => {
               onExportPDF={handleExportPDF}
               pdfLoading={pdfLoading}
             />
-                
+                        </div>
+
+                            <div id="ipo-dashboard-page2">
+
               <IPODashboardCardRatings
                 ipodata={ipoData}
                 selectedTicker={selectedTicker || ""}
                 setIpoData={setIpoData}
               />
-            </div>
+                            <Container maxWidth="xl" sx={{ mb: 3 }}>
 
-            <div id="ipo-dashboard-page2">
-              <Container maxWidth="xl" sx={{ mb: 3 }}>
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(0, 4).map((section, index) => (
+                   <Grid container spacing={2} sx={{ mb: 3 }}>
+                  {cardSections.slice(0, 2).map((section, index) => (
                     <Grid item xs={12} md={6} key={section.key}>
                       {renderEditableCard(section, index)}
                     </Grid>
                   ))}
                 </Grid>
-              </Container>
+                              </Container>
+
             </div>
 
             <div id="ipo-dashboard-page3">
               <Container maxWidth="xl" sx={{ mb: 3 }}>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(4, 6).map((section, index) => (
+                  {cardSections.slice(2, 6).map((section, index) => (
+                    <Grid item xs={12} md={6} key={section.key}>
+                      {renderEditableCard(section, index)}
+                    </Grid>
+                  ))}
+                </Grid>
+                               {/* {cardSections.slice(4, 6).map((section, index) => (
                     <Grid item xs={12} md={6} key={section.key}>
                       {renderEditableCard(section, index + 4)}
                     </Grid>
-                  ))}
+                  ))} */}
+              </Container>
+            </div>
+
+            <div id="ipo-dashboard-page4">
+              <Container maxWidth="xl" sx={{ mb: 3 }}>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+   
                   <Grid item xs={12} >
                     <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
                       <FinancialForecastTable defaultTicker={selectedTicker || ""} />
