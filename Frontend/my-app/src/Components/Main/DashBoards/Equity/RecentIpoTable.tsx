@@ -196,20 +196,20 @@ const RecentIpoTable: React.FC = () => {
                       {dashboardTickers.includes(row.ticker) ? (
                         <Box
                           component="span"
-                          sx={{
-                            color: "#fc1400",
-                            textDecoration: "underline",
-                            cursor: "pointer",
-                            fontWeight: 600,
-                            "&:hover": {
-                              color: "#8f0082",
-                              textDecoration: "none",
-                            },
-                          }}
-                          onClick={() => {
-                            localStorage.setItem("selected_ticker", row.ticker);
-                            window.open("/equity/ipo_dashboard", "_blank");
-                          }}
+                          // sx={{
+                          //   color: "#fc1400",
+                          //   textDecoration: "underline",
+                          //   cursor: "pointer",
+                          //   fontWeight: 600,
+                          //   "&:hover": {
+                          //     color: "#8f0082",
+                          //     textDecoration: "none",
+                          //   },
+                          // }}
+                          // onClick={() => {
+                          //   localStorage.setItem("selected_ticker", row.ticker);
+                          //   window.open("/equity/ipo_dashboard", "_blank");
+                          // }}
                         >
                           {row.ticker}
                         </Box>

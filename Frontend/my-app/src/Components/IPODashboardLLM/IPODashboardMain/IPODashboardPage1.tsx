@@ -1,7 +1,6 @@
 // components/IPODashboardPage1.tsx
 import React from "react";
 import IPODashboardHeader from "../IPODashboardHeader";
-
 interface Props {
   ipoData: any;
   allIpoTickers: string[];
@@ -36,6 +35,8 @@ const IPODashboardPage1: React.FC<Props> = ({
         onExportPDF={handleExportPDF}
         pdfLoading={pdfLoading}
       />
+   
+
     </div>
   );
 };
