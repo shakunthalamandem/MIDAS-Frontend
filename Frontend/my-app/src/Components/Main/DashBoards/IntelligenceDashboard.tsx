@@ -208,7 +208,7 @@ const IntelligenceDashboard: React.FC = () => {
 
               </MotionPaper>
 
-              <MotionPaper
+              {/* <MotionPaper
                 elevation={3}
                 sx={{
                   p: 3,
@@ -253,7 +253,8 @@ const IntelligenceDashboard: React.FC = () => {
                     />
                   </Grid>
                 </Grid>
-              </MotionPaper>
+              </MotionPaper> */}
+              
             </>
           )}
 
