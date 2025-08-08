@@ -361,7 +361,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
                           bgcolor: cellBgColor,
                         }}
                       >
-                        Accuracy & Confidence
+                        Confidence
                       </TableCell>
                     </React.Fragment>
                   );

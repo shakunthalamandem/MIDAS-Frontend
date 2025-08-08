@@ -351,7 +351,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                             minWidth: 90,
                           }}
                         >
-                          Accuracy & Confidence
+                          Confidence
                         </TableCell>
                       </React.Fragment>
                     ))}
