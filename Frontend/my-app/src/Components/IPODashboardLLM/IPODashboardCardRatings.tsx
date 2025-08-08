@@ -214,7 +214,7 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
           <CardContent>
             <Box position="relative" mb={2}>
               <Typography variant="h6" align="center" sx={{ fontWeight: 700, color: "#002060" }}>
-                Revenue Growth Analysis
+                Key Metrics
               </Typography>
               <Box position="absolute" right={0} top="50%" sx={{ transform: "translateY(-50%)" }}>
                 {editMode ? (

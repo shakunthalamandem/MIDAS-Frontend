@@ -337,7 +337,10 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
                   </Typography>
                 </Box>
 
-                {editMode ? (
+
+                {/* Pass selectedTicker directly */}
+                <IPOMonasheeScore ticker={selectedTicker!} />
+                                {editMode ? (
                   <TextField
                     type="number"
                     size="small"
@@ -360,8 +363,6 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
                   </Typography>
                 )}
 
-                {/* Pass selectedTicker directly */}
-                <IPOMonasheeScore ticker={selectedTicker!} />
               </CardContent>
             </Grid>
           </Grid>

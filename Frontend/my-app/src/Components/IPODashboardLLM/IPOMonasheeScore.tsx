@@ -175,7 +175,14 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
       </TableContainer>
 
       {/* 👇 Footnote Section */}
-      <Box mt={2} display="flex" justifyContent="center" alignItems="center" textAlign="center">
+      <Box
+        mt={2}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        textAlign="center"
+        flexDirection="row"
+      >
         <Typography variant="body2" color="text.secondary">
           Based on deal volume and current IPO, the Monashee score is{" "}
           <strong>{monasheeScore} / 10</strong> (based on similar IPOs)
