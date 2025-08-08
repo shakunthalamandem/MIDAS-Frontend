@@ -187,7 +187,7 @@ const handleExportPDF = async () => {
       logoImg.onload = () => resolve();
     });
 
-    // ✅ Add Front Page (Intro image + dynamic text)
+    // ✅ Add Front Page (Intro image + formatted text)
     const introImg = new Image();
     introImg.src = introImage;
 
@@ -195,24 +195,43 @@ const handleExportPDF = async () => {
       introImg.onload = () => {
         pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
-        // ➤ Add dynamic intro text (top-right)
         const margin = 10;
-        const fontSize = 12;
-        console.log("IPO Data:", ipoData);
+        const color = [0, 32, 96]; // #002060
 
-        if (ipoData?.ticker_name) {
-          const introTextLines = [
-            ` ${ipoData.ticker_name}`,
-            ` ${ipoData.company_name}`,
-            `${ipoData.exchange}`,
-          ];
+        if (ipoData?.company_name && ipoData?.exchange && ipoData?.ticker_name) {
+          const companyName = ipoData.company_name;
+          const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
+          const pricingDate = ipoData.pricing_date
+      
 
-          pdf.setFontSize(fontSize);
-          pdf.setTextColor(0, 0, 0);
+          const startY = 20;
 
-          introTextLines.forEach((line, index) => {
-            pdf.text(line, pdfWidth - margin - pdf.getTextWidth(line), margin + fontSize + index * 6);
-          });
+          // Company Name
+          pdf.setFontSize(20);
+          pdf.setTextColor(color[0], color[1], color[2]);
+          pdf.text(
+            companyName,
+            pdfWidth - margin - pdf.getTextWidth(companyName),
+            startY
+          );
+
+          // Exchange and Ticker
+          pdf.setFontSize(20);
+          pdf.text(
+            exchangeTicker,
+            pdfWidth - margin - pdf.getTextWidth(exchangeTicker),
+            startY + 10
+          );
+
+          // Pricing Date
+          if (pricingDate) {
+            pdf.setFontSize(14);
+            pdf.text(
+              pricingDate,
+              pdfWidth - margin - pdf.getTextWidth(pricingDate),
+              startY + 20
+            );
+          }
         }
 
         resolve();
