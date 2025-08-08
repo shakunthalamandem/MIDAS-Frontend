@@ -154,8 +154,8 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
           padding: 3,
         }}
       >
-        <Typography variant="h4" gutterBottom>
-          IPO Deal Data for {selectedTicker}
+        <Typography variant="h6" gutterBottom color="#002060" fontWeight="bold" align="center">
+          Valuation & Market Sentiment {selectedTicker}
         </Typography>
 
         <Box
@@ -276,80 +276,42 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
               </Grid>
             ))}
 
-            {/* Differentiated Summary */}
-            <Grid
-              item
-              xs={12}
-              sx={{ display: "flex", flexDirection: "column" }}
-            >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                style={{ flex: 1 }}
-              >
-                <Card
-                  variant="outlined"
-                  sx={{
-                    boxShadow: 2,
-                    borderRadius: 2,
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <CardContent
-                    sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}
-                  >
-                    <Box
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      mb={2}
-                    >
-                      <FaClipboardList
-                        size={24}
-                        color="#1976d2"
-                        style={{ marginRight: 8 }}
-                      />
-                      <Typography
-                        variant="h6"
-                        sx={{ color: "#002060", fontWeight: "bold" }}
-                      >
-                        Differentiated Summary
-                      </Typography>
-                    </Box>
-                    {editMode ? (
-                      <TextField
-                        fullWidth
-                        size="small"
-                        multiline
-                        minRows={4}
-                        value={
-                          editedDealData?.differentiated_summary ??
-                          dealData.differentiated_summary ??
-                          ""
-                        }
-                        onChange={(e) =>
-                          setEditedDealData((prev) => ({
-                            ...prev!,
-                            differentiated_summary: e.target.value,
-                          }))
-                        }
-                      />
-                    ) : (
-                      <Tooltip title={dealData.differentiated_summary ?? ""}>
-                        <Typography
-                          sx={{ color: "#333", whiteSpace: "pre-line" }}
-                        >
-                          {dealData.differentiated_summary ?? ""}
-                        </Typography>
-                      </Tooltip>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
+
+<Grid item xs={12} sx={{ display: "flex", flexDirection: "column" }}>
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} style={{ flex: 1 }}>
+    <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+      <CardContent sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}>
+        <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
+          <FaClipboardList size={24} color="#1976d2" style={{ marginRight: 8 }} />
+          <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
+            Differentiated Summary
+          </Typography>
+        </Box>
+        {editMode ? (
+          <TextField
+            fullWidth
+            size="small"
+            multiline
+            minRows={4}
+            value={editedDealData?.differentiated_summary ?? dealData.differentiated_summary ?? ""}
+            onChange={(e) =>
+              setEditedDealData((prev) => ({
+                ...prev!,
+                differentiated_summary: e.target.value,
+              }))
+            }
+          />
+        ) : (
+          <Tooltip title={dealData.differentiated_summary ?? ""}>
+            <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
+              {dealData.differentiated_summary ?? ""}
+            </Typography>
+          </Tooltip>
+        )}
+      </CardContent>
+    </Card>
+  </motion.div>
+</Grid>
 
             {/* Monashee Score */}
             <Grid item xs={12}>

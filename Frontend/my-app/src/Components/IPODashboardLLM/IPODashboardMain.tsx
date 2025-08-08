@@ -27,15 +27,15 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-
-import IPODashboardHeader from "./IPODashboardHeader";
-import IPODashboardCardRatings from "./IPODashboardCardRatings";
-import FinancialForecastTable from "./IPOFinancialTableMain";
-import IPODashboardMainTable from "./IPODashboardMainTable";
-import { cardColors, cardSections, cardStyle } from "./UtilsIPODashboard";
-import IPOAITickersMain from "./Hooks/IPOAITickersMain";
+import { cardColors } from "./UtilsIPODashboard";
 import introImage from "../../Assets/images/frontend_page.jpg";
-import outroImage from "../../Assets/images/footer_lastpage.jpg";
+import outroImage from "../../Assets/images/monashee_pdf_footer.jpg";
+import monasheeLogo from "../../Assets/images/monashee_logo.png";
+import IPODashboardPage1 from "./IPODashboardMain/IPODashboardPage1";
+import IPODashboardPage2 from "./IPODashboardMain/IPODashboardPage2";
+import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
+import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
+
 
 const getOrdinalSuffix = (n: number): string => {
   if (n > 3 && n < 21) return "th";
@@ -114,6 +114,8 @@ const IPODashboardMain: React.FC = () => {
 
         if (!response.ok) throw new Error("Failed to fetch IPO data");
         const jsonData = await response.json();
+       
+        
 
         const dateFields = ["pricing_date", "filed_date", "term_date", "trade_date"];
         const formattedData = { ...jsonData };
@@ -160,17 +162,32 @@ const IPODashboardMain: React.FC = () => {
 
     if (selectedTicker) fetchData();
   }, [selectedTicker]);
-
 const handleExportPDF = async () => {
   setPdfLoading(true);
-  const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3"];
-  const pdf = new jsPDF("p", "mm", "a5");
+
+  const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3", "ipo-dashboard-page4"];
+
+  const pdf = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
+
+  const waitForDOMUpdate = (delay = 300) =>
+    new Promise<void>((resolve) => setTimeout(resolve, delay));
 
   try {
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+    // ✅ Load Logo
+    const logoImg = new Image();
+    logoImg.src = monasheeLogo;
+    await new Promise<void>((resolve) => {
+      logoImg.onload = () => resolve();
+    });
 
-    // ➤ Add Front Page with Image
+    // ✅ Add Front Page (Intro image, no logo or footer)
     const introImg = new Image();
     introImg.src = introImage;
     await new Promise<void>((resolve) => {
@@ -180,31 +197,103 @@ const handleExportPDF = async () => {
       };
     });
 
-    // ➤ Loop through dashboard content pages
+    // ✅ Expand all accordions (optional dynamic content)
+    const originalPanels = { ...expandedPanels };
+    const allKeys = Object.keys(editedContent);
+    const expandedAll: Record<string, boolean> = {};
+    allKeys.forEach((key) => (expandedAll[key] = true));
+    setExpandedPanels(expandedAll);
+    await waitForDOMUpdate(500);
+
+    // ✅ Render each dashboard page
     for (let i = 0; i < pages.length; i++) {
       const element = document.getElementById(pages[i]);
       if (!element) continue;
 
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      const canvas = await html2canvas(element, {
+        scale: 3,
+        useCORS: true,
+        scrollY: -window.scrollY,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      });
 
-      pdf.addPage(); // Add page before adding content
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
+      const imgData = canvas.toDataURL("image/png");
+
+      pdf.addPage();
+
+      // ➤ Logo top-right
+      const logoWidth = 40;
+      const logoHeight = 12;
+      const logoX = pdfWidth - logoWidth - 10;
+      const logoY = 10;
+
+      pdf.addImage(logoImg, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+      // ➤ Blue line below logo
+      const lineY = logoY + logoHeight + 2;
+      pdf.setDrawColor(0, 32, 96); // Monashee blue
+      pdf.setLineWidth(1);
+      pdf.line(10, lineY, pdfWidth - 10, lineY);
+
+      // ➤ Add canvas image (content)
+      const marginTop = lineY + 5;
+      const imageWidth = pdfWidth;
+      const imageHeight = (canvas.height * imageWidth) / canvas.width;
+      pdf.addImage(imgData, "PNG", 0, marginTop, imageWidth, imageHeight);
+
+      // ➤ Add footer
+      const footerY = pdfHeight - 20;
+      pdf.setFontSize(8);
+      pdf.setTextColor(100);
+      pdf.setFont("helvetica", "normal");  
+      pdf.text(
+        "Data as of  2025. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
+        10,
+        footerY,
+        { maxWidth: pdfWidth - 20 }
+      );
+
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "bold");  // ✅ fixed for TS
+      pdf.setTextColor(128); 
+      pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
     }
 
-    // ➤ Add Outro Page with Image
+    // ✅ Restore original accordion states
+    setExpandedPanels(originalPanels);
+    await waitForDOMUpdate();
+
+    // ✅ Outro Page (with footer)
     const outroImg = new Image();
     outroImg.src = outroImage;
     await new Promise<void>((resolve) => {
       outroImg.onload = () => {
         pdf.addPage();
         pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+
+        // ➤ Add footer
+        const footerY = pdfHeight - 20;
+        pdf.setFontSize(8);
+        pdf.setTextColor(100);
+        pdf.setFont("helvetica", "normal");  
+        pdf.text(
+          "Data as of  2025. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
+          10,
+          footerY,
+          { maxWidth: pdfWidth - 20 }
+        );
+
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "bold");  
+        pdf.setTextColor(128); 
+      pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
+
         resolve();
       };
     });
 
-    // ➤ Save the PDF
+    // ✅ Save the PDF
     pdf.save(`${selectedTicker}_IPO_Report.pdf`);
   } catch (error) {
     console.error("PDF export failed", error);
@@ -212,6 +301,8 @@ const handleExportPDF = async () => {
     setPdfLoading(false);
   }
 };
+
+
   const handleSaveCard = async (key: string) => {
     try {
       const cleaned = editedContent[key].filter((item) => item.trim() !== "");
@@ -375,81 +466,35 @@ const handleExportPDF = async () => {
       <Box sx={{ px: 2 }}>
         {ipoData && (
           <>
-            <div id="ipo-dashboard-page1">
-              <IPODashboardHeader
-              ipoData={ipoData}
-              allIpoTickers={allIpoTickers}
-              selectedTicker={selectedTicker}
-              searchText={searchText}
-              setSelectedTicker={setSelectedTicker}
-              setSearchText={setSearchText}
-              onExportPDF={handleExportPDF}
-              pdfLoading={pdfLoading}
-            />
-                
-              <IPODashboardCardRatings
-                ipodata={ipoData}
-                selectedTicker={selectedTicker || ""}
-                setIpoData={setIpoData}
-              />
-            </div>
+          <IPODashboardPage1
+  ipoData={ipoData}
+  allIpoTickers={allIpoTickers}
+  selectedTicker={selectedTicker || ""}
+  searchText={searchText}
+  setSelectedTicker={setSelectedTicker}
+  setSearchText={setSearchText}
+  handleExportPDF={handleExportPDF}
+  pdfLoading={pdfLoading}
+/>
 
-            <div id="ipo-dashboard-page2">
-              <Container maxWidth="xl" sx={{ mb: 3 }}>
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(0, 4).map((section, index) => (
-                    <Grid item xs={12} md={6} key={section.key}>
-                      {renderEditableCard(section, index)}
-                    </Grid>
-                  ))}
-                </Grid>
-              </Container>
-            </div>
+<IPODashboardPage2
+  ipoData={ipoData}
+  selectedTicker={selectedTicker || ""}
+  setIpoData={setIpoData}
+  renderEditableCard={renderEditableCard}
+/>
 
-            <div id="ipo-dashboard-page3">
-              <Container maxWidth="xl" sx={{ mb: 3 }}>
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {cardSections.slice(4, 6).map((section, index) => (
-                    <Grid item xs={12} md={6} key={section.key}>
-                      {renderEditableCard(section, index + 4)}
-                    </Grid>
-                  ))}
-                  <Grid item xs={12} >
-                    <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                      <FinancialForecastTable defaultTicker={selectedTicker || ""} />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Box sx={{ backgroundColor: "#f4f5f7", p: 2 }}>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleAIComparisonClick}
-                        sx={{ mb: 2 }}
-                      >
-                        AI Comparison
-                      </Button>
-                      <Typography variant="body1" gutterBottom color="#02517e">
-                        AI Suggested Comparable Tickers
-                      </Typography>
-                      {showAIComparison && (
-                        <IPOAITickersMain selectedData={ipoData} />
-                      )}
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Box sx={{ ...cardStyle, p: 2, backgroundColor: "#f4f5f7" }}>
-                      <IPODashboardMainTable ticker={selectedTicker || ""} />
-                    </Box>
-                    <Typography sx={{ fontStyle: "italic", fontSize: "0.875rem", color: "gray" }}>
-                      Source: Factset
-                    </Typography>
+<IPODashboardPage3
+  renderEditableCard={renderEditableCard}
+/>
 
-                    
-                  </Grid>
-                </Grid>
-              </Container>
-            </div>
+<IPODashboardPage4
+  selectedTicker={selectedTicker || ""}
+  ipoData={ipoData}
+  showAIComparison={showAIComparison}
+  handleAIComparisonClick={handleAIComparisonClick}
+/>
+
           </>
         )}
       </Box>
