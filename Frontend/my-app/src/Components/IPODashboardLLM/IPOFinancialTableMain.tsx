@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import {
-  Box,
-  Paper,
+  Container,
+  Typography,
+  CircularProgress,
+  Alert,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  CircularProgress,
-  Alert,
+  Paper,
   TextField,
   IconButton,
-  Container,
+  Box,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -23,8 +23,8 @@ const forecastYearKeys = [
   "three_years_before",
   "two_years_before",
   "one_year_before",
-  "current_year", // 2025 E
-  "one_year_later", // 2026 E
+  "current_year",
+  "one_year_later",
 ];
 
 const forecastYearLabels = ["2022 A", "2023 A", "2024 A", "2025 E", "2026 E"];
@@ -62,9 +62,8 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
   const [forecasts, setForecasts] = useState<any | null>(null);
   const [forecastsLoading, setForecastsLoading] = useState(false);
   const [forecastsError, setForecastsError] = useState<string | null>(null);
-
-  const [editing, setEditing] = useState<boolean>(false);
-  const [editedData, setEditedData] = useState<any>(null);
+  const [editing, setEditing] = useState(false);
+  const [editedData, setEditedData] = useState<any>({});
 
   const handleFetchForecasts = async (customTicker?: string) => {
     setForecastsLoading(true);
@@ -74,22 +73,22 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
       if (!apiUrl) throw new Error("API URL not set");
+
       const tickerToFetch = customTicker ?? forecastsInput;
-      const response = await fetch(
-        `${apiUrl}/api/financial_forecasts_data_view/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify({ ticker: tickerToFetch }),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/financial_forecasts_data_view/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker: tickerToFetch }),
+      });
+
       const json = await response.json();
       if (!response.ok) {
         throw new Error(json.error || json.message || "Failed to fetch forecasts");
       }
+
       setForecasts(json);
       setForecastsTicker(tickerToFetch);
     } catch (e: any) {
@@ -103,17 +102,36 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
     setForecastsInput(defaultTicker);
     setForecastsTicker(defaultTicker);
     handleFetchForecasts(defaultTicker);
-    // eslint-disable-next-line
   }, [defaultTicker]);
 
   const handleEdit = () => {
     setEditing(true);
-    setEditedData({ ...forecasts });
+    const copied = JSON.parse(
+      JSON.stringify(forecasts[forecastsTicker.toUpperCase()] || {})
+    );
+    setEditedData({ [forecastsTicker.toUpperCase()]: copied });
   };
 
   const handleCancelEdit = () => {
     setEditing(false);
-    setEditedData(null);
+    setEditedData({});
+  };
+
+  const handleEditChange = (
+    metricName: string,
+    yearKey: string,
+    value: string
+  ) => {
+    setEditedData((prev: any) => ({
+      ...prev,
+      [forecastsTicker.toUpperCase()]: {
+        ...prev[forecastsTicker.toUpperCase()],
+        [metricName]: {
+          ...prev[forecastsTicker.toUpperCase()]?.[metricName],
+          [yearKey]: value,
+        },
+      },
+    }));
   };
 
   const handleSave = async () => {
@@ -169,21 +187,8 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
     }
   };
 
-  const handleValueChange = (rowKey: string, yearKey: string, value: string) => {
-    setEditedData((prevData: any) => ({
-      ...prevData,
-      [forecastsTicker.toUpperCase()]: {
-        ...prevData[forecastsTicker.toUpperCase()],
-        [rowKey]: {
-          ...prevData[forecastsTicker.toUpperCase()][rowKey],
-          [yearKey]: value,
-        },
-      },
-    }));
-  };
-
   return (
-    <Container sx={{ maxWidth: "xl", b: 4 }}>
+    <Container sx={{ maxWidth: "xl", mb: 4 }}>
       <Typography
         variant="h6"
         sx={{ mb: 2, mt: 4 }}
@@ -192,8 +197,8 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
         align="center"
       >
         Financial Forecasts (FYE{" "}
-        {forecastsTicker?.toUpperCase() === "MH" ? "Mar 31" : "Dec 31"}, Internal
-        Estimates)
+        {forecastsTicker?.toUpperCase() === "MH" ? "Mar 31" : "Dec 31"},{" "}
+        Internal Estimates)
       </Typography>
 
       {forecastsLoading && <CircularProgress />}
@@ -204,76 +209,74 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
         forecasts[forecastsTicker.toUpperCase()] && (
           <TableContainer component={Paper} elevation={4}>
             <Table size="small">
-              <TableHead sx={{ backgroundColor: "#002060" }}>
+              <TableHead>
                 <TableRow>
                   <TableCell
                     sx={{
                       fontWeight: "bold",
                       color: "#FFFFFF",
+                      backgroundColor: "#002060",
                       border: "1px solid #000000",
                       textAlign: "center",
                     }}
                   >
                     ($US M)
                   </TableCell>
-  {forecastYearLabels.map((label, index) => (
-  <TableCell
-    key={label}
-    sx={{
-      fontWeight: "bold",
-      color: "#FFFFFF",
-      border: "1px solid #000000",
-      textAlign: "center",
-      backgroundColor: index === 3 || index === 4 ? "#5f521eff" : "",
-      position: "relative", // needed for absolute positioning of icons
-    }}
-  >
-    {/* Centered label */}
-    <Typography
-      variant="body2"
-      sx={{
-        color: "#FFFFFF",
-        fontWeight: "bold",
-        textAlign: "center",
-      }}
-    >
-      {label}
-    </Typography>
+                  {forecastYearLabels.map((label, index) => {
+                    const yearKey = forecastYearKeys[index];
+                    const isEditableColumn =
+                      yearKey === "current_year" || yearKey === "one_year_later";
 
-    {/* Buttons aligned to right inside the cell */}
-    {(index === 3 || index === 4) && (
-      <Box
-        sx={{
-          position: "absolute",
-          right: 4,
-          top: "50%",
-          transform: "translateY(-50%)",
-          display: "flex",
-          gap: 0.5,
-        }}
-      >
-        {!editing ? (
-          <IconButton onClick={handleEdit} size="small">
-            <EditIcon sx={{ color: "#FFFFFF", fontSize: 16 }} />
-          </IconButton>
-        ) : (
-          <>
-            <IconButton onClick={handleSave} size="small">
-              <SaveIcon sx={{ color: "#eceef0ff", fontSize: 16 }} />
-            </IconButton>
-            <IconButton onClick={handleCancelEdit} size="small">
-              <CancelIcon sx={{ color: "#f1f1f1ff", fontSize: 16 }} />
-            </IconButton>
-          </>
-        )}
-      </Box>
-    )}
-  </TableCell>
-))}
-
-
+                    return (
+                      <TableCell
+                        key={label}
+                        sx={{
+                          fontWeight: "bold",
+                          color: "#FFFFFF",
+                          border: "1px solid #000000",
+                          textAlign: "center",
+                          backgroundColor: isEditableColumn
+                            ? "rgb(95, 82, 30)"
+                            : "#002060",
+                        }}
+                      >
+                        {label}
+                        {isEditableColumn && (
+                          <Box component="span" sx={{ ml: 1 }}>
+                            {!editing ? (
+                              <IconButton
+                                onClick={handleEdit}
+                                size="small"
+                                sx={{ color: "#fff" }}
+                              >
+                                <EditIcon sx={{ fontSize: 16 }} />
+                              </IconButton>
+                            ) : (
+                              <>
+                                <IconButton
+                                  onClick={handleSave}
+                                  size="small"
+                                  sx={{ color: "#fff" }}
+                                >
+                                  <SaveIcon sx={{ fontSize: 16 }} />
+                                </IconButton>
+                                <IconButton
+                                  onClick={handleCancelEdit}
+                                  size="small"
+                                  sx={{ color: "#fff" }}
+                                >
+                                  <CancelIcon sx={{ fontSize: 16 }} />
+                                </IconButton>
+                              </>
+                            )}
+                          </Box>
+                        )}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {Object.entries(
                   forecasts[forecastsTicker.toUpperCase()] || {}
@@ -281,73 +284,86 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                   const isEvenRow = rowIndex % 2 === 0;
 
                   return (
-                    <TableRow
-                      key={metricName}
-                      sx={{
-                        backgroundColor: isEvenRow ? "#E9EBFA" : "#FFFFFF",
-                      }}
-                    >
+                    <TableRow key={metricName}>
                       <TableCell
                         sx={{
-                          fontWeight: "bold",
                           border: "1px solid #000000",
-                          textAlign: "left",
-                          fontSize: "0.875rem",
+                          fontWeight: "bold",
+                          fontStyle: isEvenRow ? "normal" : "italic",
+                          fontSize: isEvenRow ? "0.875rem" : "0.725rem",
+                          backgroundColor: isEvenRow ? "" : "#ebebeb",
                         }}
                       >
                         {metricName}
                       </TableCell>
-
-                      {forecastYearKeys.map((yearKey, colIndex) => (
-                        <TableCell
-                          key={yearKey}
-                          sx={{
-                            border: "1px solid #000000",
-                            textAlign: "center",
-                            backgroundColor:
-                              yearKey === "current_year" || yearKey === "one_year_later"
-                                ? "#f9f7f1"
-                                : "",
-                            fontSize: isEvenRow ? "0.875rem" : "0.725rem",
-                          }}
-                        >
-                          {editing &&
+                      {forecastYearKeys.map((yearKey) => {
+                        const isEditableCell =
+                          editing &&
                           (yearKey === "current_year" ||
-                            yearKey === "one_year_later") ? (
-                            <TextField
-                              value={
-                                editedData?.[forecastsTicker.toUpperCase()]?.[metricName]?.[
-                                  yearKey
-                                ] || ""
-                              }
-                              onChange={(e) =>
-                                handleValueChange(metricName, yearKey, e.target.value)
-                              }
-                              size="small"
-                              variant="outlined"
-                              inputProps={{
-                                style: {
-                                  textAlign: "center",
-                                  fontSize: isEvenRow ? "0.875rem" : "0.725rem",
-                                  padding: 4,
-                                  width: "80px",
-                                },
-                              }}
-                              sx={{
-                                '& .MuiInputBase-root': {
-                                  padding: "0 !important",
-                                  height: "28px",
-                                  minHeight: "28px",
-                                },
-                              }}
-                            />
-                          ) : metricName.includes("Margin") ? (
-                            formatFinancialMargin(years[yearKey])
-                          ) : (
-                            formatFinancialValue(years[yearKey])
-                          )}
-                        </TableCell>
-                      ))}
+                            yearKey === "one_year_later");
+
+                        const isHighlightColumn =
+                          yearKey === "current_year" ||
+                          yearKey === "one_year_later";
+
+                        const value = editing
+                          ? editedData?.[forecastsTicker.toUpperCase()]?.[metricName]?.[yearKey] ??
+                            years[yearKey]
+                          : years[yearKey];
+
+                        return (
+                          <TableCell
+                            key={yearKey}
+                            align="center"
+                            sx={{
+                              border: "1px solid #000000",
+                              fontStyle: isEvenRow ? "normal" : "italic",
+                              fontSize: isEvenRow ? "0.875rem" : "0.725rem",
+                              backgroundColor: isHighlightColumn
+                                ? "rgba(248, 247, 245, 1)"
+                                : isEvenRow
+                                ? ""
+                                : "#ebebeb",
+                              color: "#000000",
+                            }}
+                          >
+                            {isEditableCell ? (
+                              <TextField
+                                variant="outlined"
+                                value={value ?? ""}
+                                onChange={(e) =>
+                                  handleEditChange(
+                                    metricName,
+                                    yearKey,
+                                    e.target.value
+                                  )
+                                }
+                                inputProps={{
+                                  style: {
+                                    fontSize: isEvenRow ? "0.875rem" : "0.725rem",
+                                    textAlign: "center",
+                                    padding: "6px 8px",
+                                  },
+                                }}
+                                sx={{
+                                  width: "100%",
+                                  borderRadius: 1,
+                                  "& .MuiOutlinedInput-root": {
+                                    padding: 0,
+                                  },
+                                  "& .MuiInputBase-input": {
+                                    height: "1.5rem",
+                                  },
+                                }}
+                              />
+                            ) : metricName.includes("margin") ? (
+                              formatFinancialMargin(value)
+                            ) : (
+                              formatFinancialValue(value)
+                            )}
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
                   );
                 })}
