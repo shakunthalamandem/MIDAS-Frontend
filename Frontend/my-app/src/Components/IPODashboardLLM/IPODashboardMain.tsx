@@ -28,7 +28,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { cardColors } from "./UtilsIPODashboard";
-import introImage from "../../Assets/images/frontend_page.jpg";
+import introImage from "../../Assets/images/monashee_page1.png";
 import outroImage from "../../Assets/images/monashee_pdf_footer.jpg";
 import monasheeLogo from "../../Assets/images/monashee_logo.png";
 import IPODashboardPage1 from "./IPODashboardMain/IPODashboardPage1";
@@ -207,7 +207,7 @@ const handleExportPDF = async () => {
           const startY = 20;
 
           // Company Name
-          pdf.setFontSize(20);
+          pdf.setFontSize(18);
           pdf.setTextColor(color[0], color[1], color[2]);
           pdf.text(
             companyName,
@@ -216,7 +216,7 @@ const handleExportPDF = async () => {
           );
 
           // Exchange and Ticker
-          pdf.setFontSize(20);
+          pdf.setFontSize(18);
           pdf.text(
             exchangeTicker,
             pdfWidth - margin - pdf.getTextWidth(exchangeTicker),
@@ -225,7 +225,7 @@ const handleExportPDF = async () => {
 
           // Pricing Date
           if (pricingDate) {
-            pdf.setFontSize(14);
+            pdf.setFontSize(12);
             pdf.text(
               pricingDate,
               pdfWidth - margin - pdf.getTextWidth(pricingDate),
