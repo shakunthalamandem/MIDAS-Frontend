@@ -26,170 +26,132 @@ interface SectorDataItem {
 interface IPOMonasheeScoreProps {
   ticker: string;
   monasheeScore?: number;
-  selectedMetric?: "count" | "other";
 }
 
 const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
   ticker,
   monasheeScore = 0,
-  selectedMetric = "other",
 }) => {
   const [data, setData] = useState<SectorDataItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const formatNumber = (value: number): string => {
-    if (selectedMetric === "count") return value.toString();
-
-    const absValue = Math.abs(value);
-    let formattedValue: string;
-
-    if (absValue >= 1e9) {
-      formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
-    } else if (absValue >= 1e6) {
-      formattedValue = `${(absValue / 1e6).toFixed(1)}M`;
-    } else if (absValue >= 1e3) {
-      formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
-    } else {
-      formattedValue = absValue.toString();
-    }
-
-    return value < 0 ? `-${formattedValue}` : formattedValue;
+  const formatNumber = (value: number) => {
+    if (Math.abs(value) >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
+    if (Math.abs(value) >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
+    if (Math.abs(value) >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
+    return value.toString();
   };
 
   useEffect(() => {
     if (!ticker) return;
-
-    const fetchMonasheeScoreData = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      setError(null);
-
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
-        if (!apiUrl) throw new Error("API URL not configured");
-
         const token = localStorage.getItem("access_token");
-
-        const response = await fetch(`${apiUrl}/api/ipo_related_sector_data?ticker=${ticker}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-        
-
-        const jsonData = await response.json();
-
-        if (!response.ok) {
-          setError(jsonData.error || "Failed to fetch Monashee scores");
-          setData([]);
-          return;
-        }
-
-        if (!jsonData.sector_data || !Array.isArray(jsonData.sector_data)) {
-          if (jsonData.error === "No sector data found.") {
-            setError("No sector data for this ticker.");
-          } else {
-            setError("Unexpected response format");
+        const res = await fetch(
+          `${apiUrl}/api/ipo_related_sector_data/?ticker=${ticker}`,
+          {
+            headers: { Authorization: token ? `Bearer ${token}` : "" },
           }
-          setData([]);
-          return;
-        }
-
-        setData(jsonData.sector_data);
+        );
+        const json = await res.json();
+        if (!res.ok || !json.sector_data)
+          throw new Error(json.error || "No data");
+        setData(json.sector_data);
       } catch (err: any) {
-        setError(err.message || "Unknown error");
-        setData([]);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchMonasheeScoreData();
+    fetchData();
   }, [ticker]);
 
-  if (loading) return <CircularProgress />;
+  if (loading) return <CircularProgress size={24} />;
   if (error) return <Typography color="error">{error}</Typography>;
   if (data.length === 0)
-    return <Typography>No Monashee score data available for this ticker.</Typography>;
+    return <Typography>No related IPO data found.</Typography>;
 
   return (
-    <Box sx={{ maxWidth: 900, mx: "auto", mt: 2 }}>
-      <TableContainer component={Paper} elevation={1}>
-        <Table
-          size="small"
-          aria-label="Monashee Score Table"
-          sx={{ borderCollapse: "collapse" }}
-        >
+    <Box>
+      <TableContainer
+        component={Paper}
+        sx={{
+          borderRadius: 2,
+          overflow: "hidden",
+          boxShadow: 2,
+        }}
+      >
+        <Table size="small">
           <TableHead>
-            <TableRow>
-              <TableCell align="center" sx={{ fontWeight: "bold", border: "1px solid #ccc" }}>
-                Ticker US
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold", border: "1px solid #ccc" }}>
-                Issuer Name
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold", border: "1px solid #ccc" }}>
-                Deal Size
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold", border: "1px solid #ccc" }}>
-                1 Day Return (%)
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold", border: "1px solid #ccc" }}>
-                1 Month Return (%)
-              </TableCell>
+            <TableRow sx={{ backgroundColor: "#1976d2" }}>
+              {[
+                "Ticker",
+                "Issuer Name",
+                "Deal Size",
+                "1 Day Return (%)",
+                "1 Month Return (%)",
+              ].map((header) => (
+                <TableCell
+                  key={header}
+                  align="center"
+                  sx={{
+                    color: "#fff",
+                    fontWeight: "bold",
+                    fontSize: "0.9rem",
+                    borderRight: "1px solid rgba(255,255,255,0.2)",
+                    "&:last-child": { borderRight: "none" },
+                    py: 1.5,
+                  }}
+                >
+                  {header}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {data.map(
-              ({
-                ticker_us,
-                pricing_date,
-                issuer_name,
-                deal_size,
-                t1d_return_from_bloomberg,
-                t1m_return_from_bloomberg,
-              }) => (
-                <TableRow key={ticker_us + pricing_date}>
-                  <TableCell align="center" sx={{ border: "1px solid #ccc" }}>
-                    {ticker_us}
-                  </TableCell>
-                  <TableCell align="center" sx={{ border: "1px solid #ccc" }}>
-                    {issuer_name}
-                  </TableCell>
-                  <TableCell align="center" sx={{ border: "1px solid #ccc" }}>
-                    {formatNumber(deal_size)}
-                  </TableCell>
-                  <TableCell align="center" sx={{ border: "1px solid #ccc" }}>
-                    {t1d_return_from_bloomberg.toFixed(2)}
-                  </TableCell>
-                  <TableCell align="center" sx={{ border: "1px solid #ccc" }}>
-                    {t1m_return_from_bloomberg.toFixed(2)}
-                  </TableCell>
-                </TableRow>
-              )
-            )}
+            {data.map((row, idx) => (
+              <TableRow
+                key={row.ticker_us + row.pricing_date}
+                sx={{
+                  backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f7f9fc",
+                  "&:hover": { backgroundColor: "#e8f0fe" },
+                  transition: "background-color 0.2s ease-in-out",
+                }}
+              >
+                <TableCell align="center">{row.ticker_us}</TableCell>
+                <TableCell align="center">{row.issuer_name}</TableCell>
+                <TableCell align="center">
+                  {formatNumber(row.deal_size)}
+                </TableCell>
+                <TableCell align="center">
+                  {row.t1d_return_from_bloomberg.toFixed(2)}
+                </TableCell>
+                <TableCell align="center">
+                  {row.t1m_return_from_bloomberg.toFixed(2)}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
 
-      {/* 👇 Footnote Section */}
-      <Box
-        mt={2}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        textAlign="center"
-        flexDirection="row"
-      >
-        <Typography variant="body2" color="text.secondary">
-          Based on deal volume and current IPO, the Monashee score is{" "}
-          <strong>{monasheeScore} / 10</strong> (based on similar IPOs)
+      <Box mt={2} p={2} sx={{ backgroundColor: "#f9fafb", borderRadius: 2 }}>
+        <Typography variant="body2" color="text.secondary" align="center">
+          Based on the current IPO and market data — considering deal count,
+          deal volume, positively performed deals, opportunity value excess, and
+          excess returns from the last 1 month — the Monashee Score for this IPO
+          is
+          <strong> {monasheeScore} / 10</strong>.
         </Typography>
-        <Tooltip title="This score is calculated by comparing key metrics against similar IPOs.">
-          <InfoOutlinedIcon fontSize="small" sx={{ ml: 0.5, color: "gray" }} />
-        </Tooltip>
+        <Box display="flex" justifyContent="center" mt={1}>
+          <Tooltip title="This score is calculated by comparing multiple key performance indicators against similar IPOs in the sector.">
+            <InfoOutlinedIcon fontSize="small" sx={{ color: "gray" }} />
+          </Tooltip>
+        </Box>
       </Box>
     </Box>
   );

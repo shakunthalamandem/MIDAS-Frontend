@@ -4,11 +4,15 @@ import {
   Box,
   Typography,
   Button,
-  Chip,
   Skeleton,
   Snackbar,
   Alert,
   Stack,
+  Paper,
+  Card,
+  CardContent,
+  Fade,
+  Grow,
 } from "@mui/material";
 import { AutoAwesome, Update, Delete } from "@mui/icons-material";
 
@@ -42,8 +46,10 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
   });
 
   const handleSnackbarClose = () => setSnackbar({ ...snackbar, open: false });
-  const showSnackbar = (msg: string, severity: "success" | "error" = "success") =>
-    setSnackbar({ open: true, message: msg, severity });
+  const showSnackbar = (
+    msg: string,
+    severity: "success" | "error" = "success"
+  ) => setSnackbar({ open: true, message: msg, severity });
 
   const fetchComparativeTickers = async () => {
     setLoading(true);
@@ -64,7 +70,7 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
       setGlowTrigger(true);
       setTimeout(() => setGlowTrigger(false), 2000);
       showSnackbar("AI tickers loaded successfully.");
-    } catch (err) {
+    } catch {
       setError("Failed to load AI tickers.");
       showSnackbar("Failed to load AI tickers.", "error");
     } finally {
@@ -80,11 +86,9 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
         company_name: selectedData?.company_name,
         exchange: selectedData?.exchange,
       };
-      await axios.post(
-        `${apiUrl}/api/ipo_ai_compititors_update/`,
-        payload,
-        { headers: getAuthHeaders() }
-      );
+      await axios.post(`${apiUrl}/api/ipo_ai_compititors_update/`, payload, {
+        headers: getAuthHeaders(),
+      });
       showSnackbar("AI tickers updated.");
       fetchComparativeTickers();
     } catch {
@@ -117,73 +121,132 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
 
   return (
     <Box>
-      {/* Action buttons */}
-      <Stack direction="row" spacing={2} mb={2}>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<Update />}
-          onClick={handleUpdate}
-          disabled={updating}
-          sx={{ textTransform: "none", fontWeight: 500 }}
-        >
-          {updating ? "Updating..." : "Update"}
-        </Button>
-        <Button
-          variant="outlined"
-          color="error"
-          startIcon={<Delete />}
-          onClick={handleDelete}
-          disabled={deleting}
-          sx={{ textTransform: "none", fontWeight: 500 }}
-        >
-          {deleting ? "Deleting..." : "Delete"}
-        </Button>
-      </Stack>
+      {/* Header */}
+      <Typography
+        variant="body1"
+        sx={{
+          fontWeight: 200,
+          color: "primary.main",
+          mb: 2,
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <AutoAwesome fontSize="small" /> AI Suggested Tickers
+        {comparativeTickers.length > 0 && (
+          <Typography variant="body2" color="text.secondary">
+            ({comparativeTickers.length})
+          </Typography>
+        )}
+      </Typography>
 
-      {/* Content */}
-      {loading ? (
-        <Stack direction="row" spacing={1} flexWrap="wrap">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} variant="rounded" width={80} height={32} />
-          ))}
+      {/* Ticker list */}
+      <Box mb={2}>
+        {loading ? (
+          <Stack direction="row" spacing={2} flexWrap="wrap">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton
+                key={i}
+                variant="rounded"
+                width={100}
+                height={50}
+                sx={{ borderRadius: "12px" }}
+              />
+            ))}
+          </Stack>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : comparativeTickers.length > 0 ? (
+          <Stack
+            direction="row"
+            flexWrap="wrap"
+            gap={2}
+            sx={{
+              animation: glowTrigger ? "pulseBg 2s ease-out" : "none",
+              "@keyframes pulseBg": {
+                "0%": { backgroundColor: "transparent" },
+                "50%": { backgroundColor: "rgba(25,118,210,0.05)" },
+                "100%": { backgroundColor: "transparent" },
+              },
+              p: 1,
+              borderRadius: 2,
+            }}
+          >
+            {comparativeTickers.map((ticker, idx) => (
+              <Grow in={true} key={idx} timeout={400 + idx * 100}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    borderRadius: "12px",
+                    minWidth: 100,
+                    px: 2,
+                    py: 1,
+                    borderColor: "primary.main",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    "&:hover": {
+                      backgroundColor: "primary.main",
+                      color: "white",
+                      transform: "translateY(-3px)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 0.5, "&:last-child": { pb: 0.5 } }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 600, textAlign: "center" }}
+                    >
+                      {ticker}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grow>
+            ))}
+          </Stack>
+        ) : (
+          <Typography>No AI comparable tickers found.</Typography>
+        )}
+      </Box>
+
+      {/* Action buttons */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2,
+          backgroundColor: "rgba(25,118,210,0.05)",
+          borderRadius: 2,
+          mb: 2,
+        }}
+      >
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Not satisfied? Try fetching recommendations from other AI models for
+          better accuracy.
+        </Typography>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<Update />}
+            onClick={handleUpdate}
+            disabled={updating}
+            sx={{ textTransform: "none", fontWeight: 500 }}
+          >
+            {updating ? "Updating..." : "Get Other AI Recommendations"}
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<Delete />}
+            onClick={handleDelete}
+            disabled={deleting}
+            sx={{ textTransform: "none", fontWeight: 500 }}
+          >
+            {deleting ? "Deleting..." : "Delete AI Suggestions"}
+          </Button>
         </Stack>
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : comparativeTickers.length > 0 ? (
-        <Stack
-          direction="row"
-          flexWrap="wrap"
-          gap={1}
-          sx={{
-            animation: glowTrigger ? "glowPulse 2s ease-out" : "none",
-            "@keyframes glowPulse": {
-              "0%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
-              "50%": { boxShadow: "0 0 20px rgba(0, 150, 255, 0.5)" },
-              "100%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
-            },
-            borderRadius: "8px",
-            p: 1,
-          }}
-        >
-          {comparativeTickers.map((ticker, idx) => (
-            <Chip
-              key={idx}
-              label={ticker}
-              variant="outlined"
-              color="primary"
-              icon={<AutoAwesome fontSize="small" />}
-              sx={{
-                borderRadius: "16px",
-                transition: "all 0.2s",
-                "&:hover": { backgroundColor: "primary.main", color: "white" },
-              }}
-            />
-          ))}
-        </Stack>
-      ) : (
-        <Typography>No AI comparable tickers found.</Typography>
-      )}
+      </Paper>
 
       {/* Snackbar */}
       <Snackbar
