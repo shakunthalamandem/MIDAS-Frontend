@@ -22,6 +22,7 @@ import { motion } from "framer-motion";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
+import IPOMonasheeScore from "./IPOMonasheeScore";
 
 type DealData = {
   fair_value_estimate: string;
@@ -293,6 +294,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
             Monashee Score
           </Typography>
         </Box>
+        <IPOMonasheeScore ticker={selectedTicker ?? ""} monasheeScore={dealData.monashee_score} />
         {editMode ? (
           <TextField
             type="number"
