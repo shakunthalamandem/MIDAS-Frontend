@@ -197,17 +197,17 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
               {
                 label: "Fair Value Estimate",
                 key: "fair_value_estimate",
-                icon: <FaBullseye size={24} color="#1976d2" />,
+                icon: <FaBullseye size={24} color="#002060" />,
               },
               {
                 label: "Indication of Interest",
                 key: "indication_of_interest",
-                icon: <FaHandshake size={24} color="#1976d2" />,
+                icon: <FaHandshake size={24} color="#002060" />,
               },
               {
                 label: "After Market Threshold",
                 key: "after_market_threshold",
-                icon: <FaTruckMoving size={24} color="#1976d2" />,
+                icon: <FaTruckMoving size={24} color="#002060" />,
               },
             ].map((field, idx) => (
               <Grid
@@ -315,7 +315,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                     >
                       <FaClipboardList
                         size={24}
-                        color="#1976d2"
+                        color="#002060"
                         style={{ marginRight: 8 }}
                       />
                       <Typography
@@ -388,7 +388,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                     >
                       <FaChartLine
                         size={24}
-                        color="#1976d2"
+                        color="#002060"
                         style={{ marginRight: 8 }}
                       />
                       <Typography

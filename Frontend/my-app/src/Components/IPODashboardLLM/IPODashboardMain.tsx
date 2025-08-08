@@ -188,55 +188,56 @@ const handleExportPDF = async () => {
     });
 
     // ✅ Add Front Page (Intro image + formatted text)
-    const introImg = new Image();
-    introImg.src = introImage;
+const introImg = new Image();
+introImg.src = introImage;
 
-    await new Promise<void>((resolve) => {
-      introImg.onload = () => {
-        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+await new Promise<void>((resolve) => {
+  introImg.onload = () => {
+    pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
-        const margin = 10;
-        const color = [0, 32, 96]; // #002060
+    const margin = 10;
+    const color = [0, 32, 96]; // #002060
 
-        if (ipoData?.company_name && ipoData?.exchange && ipoData?.ticker_name) {
-          const companyName = ipoData.company_name;
-          const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
-          const pricingDate = ipoData.pricing_date
-      
+    if (ipoData?.company_name && ipoData?.exchange && ipoData?.ticker_name) {
+      const companyName = ipoData.company_name;
+      const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
+      const pricingDate = ipoData.pricing_date;
 
-          const startY = 20;
+      // ✅ Change this value to move all text lower on the page
+      const startY = 40; // Original was 20 — increase to shift text down
 
-          // Company Name
-          pdf.setFontSize(18);
-          pdf.setTextColor(color[0], color[1], color[2]);
-          pdf.text(
-            companyName,
-            pdfWidth - margin - pdf.getTextWidth(companyName),
-            startY
-          );
+      // Company Name
+      pdf.setFontSize(16);
+      pdf.setTextColor(color[0], color[1], color[2]);
+      pdf.text(
+        companyName,
+        pdfWidth - margin - pdf.getTextWidth(companyName),
+        startY
+      );
 
-          // Exchange and Ticker
-          pdf.setFontSize(18);
-          pdf.text(
-            exchangeTicker,
-            pdfWidth - margin - pdf.getTextWidth(exchangeTicker),
-            startY + 10
-          );
+      // Exchange and Ticker
+      pdf.setFontSize(16);
+      pdf.text(
+        exchangeTicker,
+        pdfWidth - margin - pdf.getTextWidth(exchangeTicker),
+        startY + 12 // You can tweak this too
+      );
 
-          // Pricing Date
-          if (pricingDate) {
-            pdf.setFontSize(12);
-            pdf.text(
-              pricingDate,
-              pdfWidth - margin - pdf.getTextWidth(pricingDate),
-              startY + 20
-            );
-          }
-        }
+      // Pricing Date
+      if (pricingDate) {
+        pdf.setFontSize(11);
+        pdf.text(
+          pricingDate,
+          pdfWidth - margin - pdf.getTextWidth(pricingDate),
+          startY + 24
+        );
+      }
+    }
 
-        resolve();
-      };
-    });
+    resolve();
+  };
+});
+
 
     // ✅ Expand all accordions
     const originalPanels = { ...expandedPanels };

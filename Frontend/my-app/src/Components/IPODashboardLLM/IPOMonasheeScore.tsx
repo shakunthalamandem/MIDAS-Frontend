@@ -86,14 +86,14 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
       >
         <Table size="small">
           <TableHead>
-            <TableRow sx={{ backgroundColor: "#1976d2" }}>
+            <TableRow sx={{ backgroundColor: "#002060" }}>
               {[
                 "Ticker",
                 "Issuer Name",
                 "Deal Size",
                 "1 Day Return (%)",
                 "1 Month Return (%)",
-              ].map((header) => (
+              ].map((header, index, arr) => (
                 <TableCell
                   key={header}
                   align="center"
@@ -101,8 +101,8 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
                     color: "#fff",
                     fontWeight: "bold",
                     fontSize: "0.9rem",
-                    borderRight: "1px solid rgba(255,255,255,0.2)",
-                    "&:last-child": { borderRight: "none" },
+                    borderRight:
+                      index !== arr.length - 1 ? "1px solid #ddd" : "none",
                     py: 1.5,
                   }}
                 >
@@ -122,17 +122,24 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
                   transition: "background-color 0.2s ease-in-out",
                 }}
               >
-                <TableCell align="center">{row.ticker_us}</TableCell>
-                <TableCell align="center">{row.issuer_name}</TableCell>
-                <TableCell align="center">
-                  {formatNumber(row.deal_size)}
-                </TableCell>
-                <TableCell align="center">
-                  {row.t1d_return_from_bloomberg.toFixed(2)}
-                </TableCell>
-                <TableCell align="center">
-                  {row.t1m_return_from_bloomberg.toFixed(2)}
-                </TableCell>
+                {[
+                  row.ticker_us,
+                  row.issuer_name,
+                  formatNumber(row.deal_size),
+                  row.t1d_return_from_bloomberg.toFixed(2),
+                  row.t1m_return_from_bloomberg.toFixed(2),
+                ].map((value, index, arr) => (
+                  <TableCell
+                    key={index}
+                    align="center"
+                    sx={{
+                      borderRight:
+                        index !== arr.length - 1 ? "1px solid #ddd" : "none",
+                    }}
+                  >
+                    {value}
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>
