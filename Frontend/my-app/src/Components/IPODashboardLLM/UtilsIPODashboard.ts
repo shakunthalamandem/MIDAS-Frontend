@@ -27,7 +27,7 @@ export const cardColors = [
     // We'll inject FinancialForecastTable dynamically after this
     {
       key: "principal_stockholders_preipo",
-      title: "Principal Stockholders (pre-IPO)",
+      title: "Principal Stockholders (post-IPO)",
     },
     { key: "key_management_personnel", title: "Key Management Personnel" },
   ];

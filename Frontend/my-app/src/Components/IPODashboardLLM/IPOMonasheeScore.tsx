@@ -70,14 +70,14 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
 
         const token = localStorage.getItem("access_token");
 
-        const response = await fetch(`${apiUrl}/api/ipo_related_sector_data/`, {
-          method: "POST",
+        const response = await fetch(`${apiUrl}/api/ipo_related_sector_data?ticker=${ticker}`, {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker }),
         });
+        
 
         const jsonData = await response.json();
 
