@@ -198,6 +198,7 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
+      <Card sx={{ borderRadius: 4, backgroundColor: "#f9fafc", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -326,6 +327,7 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
           </CardContent>
         </Card>
       </motion.div>
+      </Card>
     </Container>
   );
 };
