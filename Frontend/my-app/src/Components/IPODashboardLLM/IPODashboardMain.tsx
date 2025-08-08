@@ -187,27 +187,39 @@ const handleExportPDF = async () => {
       logoImg.onload = () => resolve();
     });
 
-    // ✅ Add Front Page (Intro image, no logo or footer)
+    // ✅ Add Front Page (Intro image + dynamic text)
     const introImg = new Image();
     introImg.src = introImage;
 
     await new Promise<void>((resolve) => {
       introImg.onload = () => {
-        // Add the image
         pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
-        // Add text on top-right corner (adjust values as needed)
-        const margin = 10; // margin from the right/top edge
+        // ➤ Add dynamic intro text (top-right)
+        const margin = 10;
         const fontSize = 12;
-        pdf.setFontSize(fontSize);
-        pdf.setTextColor(0, 0, 0); // black text
-        pdf.text("Sample Text", pdfWidth - margin - pdf.getTextWidth("Sample Text"), margin + fontSize);
+        console.log("IPO Data:", ipoData);
+
+        if (ipoData?.ticker_name) {
+          const introTextLines = [
+            ` ${ipoData.ticker_name}`,
+            ` ${ipoData.company_name}`,
+            `${ipoData.exchange}`,
+          ];
+
+          pdf.setFontSize(fontSize);
+          pdf.setTextColor(0, 0, 0);
+
+          introTextLines.forEach((line, index) => {
+            pdf.text(line, pdfWidth - margin - pdf.getTextWidth(line), margin + fontSize + index * 6);
+          });
+        }
 
         resolve();
       };
     });
 
-    // ✅ Expand all accordions (optional dynamic content)
+    // ✅ Expand all accordions
     const originalPanels = { ...expandedPanels };
     const allKeys = Object.keys(editedContent);
     const expandedAll: Record<string, boolean> = {};
@@ -242,11 +254,11 @@ const handleExportPDF = async () => {
 
       // ➤ Blue line below logo
       const lineY = logoY + logoHeight + 2;
-      pdf.setDrawColor(0, 32, 96); // Monashee blue
+      pdf.setDrawColor(0, 32, 96);
       pdf.setLineWidth(1);
       pdf.line(10, lineY, pdfWidth - 10, lineY);
 
-      // ➤ Add canvas image (content)
+      // ➤ Add canvas image
       const marginTop = lineY + 5;
       const imageWidth = pdfWidth;
       const imageHeight = (canvas.height * imageWidth) / canvas.width;
@@ -256,7 +268,7 @@ const handleExportPDF = async () => {
       const footerY = pdfHeight - 20;
       pdf.setFontSize(8);
       pdf.setTextColor(100);
-      pdf.setFont("helvetica", "normal");  
+      pdf.setFont("helvetica", "normal");
       pdf.text(
         "Data as of  2025. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
         10,
@@ -265,8 +277,8 @@ const handleExportPDF = async () => {
       );
 
       pdf.setFontSize(10);
-      pdf.setFont("helvetica", "bold");  // ✅ fixed for TS
-      pdf.setTextColor(128); 
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(128);
       pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
     }
 
@@ -274,7 +286,7 @@ const handleExportPDF = async () => {
     setExpandedPanels(originalPanels);
     await waitForDOMUpdate();
 
-    // ✅ Outro Page (with footer)
+    // ✅ Outro Page
     const outroImg = new Image();
     outroImg.src = outroImage;
     await new Promise<void>((resolve) => {
@@ -286,7 +298,7 @@ const handleExportPDF = async () => {
         const footerY = pdfHeight - 20;
         pdf.setFontSize(8);
         pdf.setTextColor(100);
-        pdf.setFont("helvetica", "normal");  
+        pdf.setFont("helvetica", "normal");
         pdf.text(
           "Data as of  2025. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
           10,
@@ -295,9 +307,9 @@ const handleExportPDF = async () => {
         );
 
         pdf.setFontSize(10);
-        pdf.setFont("helvetica", "bold");  
-        pdf.setTextColor(128); 
-      pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(128);
+        pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
 
         resolve();
       };
@@ -311,6 +323,7 @@ const handleExportPDF = async () => {
     setPdfLoading(false);
   }
 };
+
 
 
   const handleSaveCard = async (key: string) => {
