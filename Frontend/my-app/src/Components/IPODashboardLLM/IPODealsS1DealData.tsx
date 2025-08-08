@@ -10,6 +10,7 @@ import {
   Container,
   TextField,
   IconButton,
+  Stack,
 } from "@mui/material";
 import {
   FaBullseye,
@@ -242,14 +243,30 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                         alignItems="flex-start"
                         sx={{ height: "100%" }}
                       >
-                        <Grid item>{field.icon}</Grid>
                         <Grid item xs>
-                          <Typography
-                            variant="h6"
-                            sx={{ color: "#002060", fontWeight: "bold" }}
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
                           >
-                            {field.label}
-                          </Typography>
+                            <Typography
+                              variant="h6"
+                              sx={{
+                                color: "#002060",
+                                fontWeight: "bold",
+                                mr: 1,
+                              }} // 'mr' adds space between icon and label
+                            >
+                              {field.icon}
+                            </Typography>
+                            <Typography
+                              variant="h6"
+                              sx={{ color: "#002060", fontWeight: "bold" }}
+                            >
+                              {field.label}
+                            </Typography>
+                          </Box>
+
                           {editMode ? (
                             <TextField
                               fullWidth
@@ -399,35 +416,76 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                       </Typography>
                     </Box>
                     <Box display="flex" justifyContent="center" mb={2}>
-                      <Typography>Recent IPO Performances related to this Sector.</Typography>
+                      <Typography>
+                        Recent IPO Performances related to this Sector.
+                      </Typography>
                     </Box>
                     <IPOMonasheeScore
                       ticker={selectedTicker ?? ""}
                       monasheeScore={dealData.monashee_score}
                     />
-                    {editMode ? (
-                      <TextField
-                        type="number"
-                        size="small"
-                        inputProps={{ min: 0, max: 10 }}
-                        value={
-                          editedDealData?.monashee_score ??
-                          dealData.monashee_score ??
-                          0
-                        }
-                        onChange={(e) =>
-                          setEditedDealData((prev) => ({
-                            ...prev!,
-                            monashee_score: Number(e.target.value),
-                          }))
-                        }
-                      />
-                    ) : (
-                      <Typography sx={{ color: "#333" }}>
-                        {dealData.monashee_score ?? 0} / 10 (based on similar
-                        IPOs)
-                      </Typography>
-                    )}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        minHeight: 100, // Adjust height as needed
+                        textAlign: "center",
+                      }}
+                    >
+                      {editMode ? (
+                        <Stack spacing={1} alignItems="center">
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ color: "#555" }}
+                          >
+                            Enter Monashee Score (0–10)
+                          </Typography>
+
+                          <TextField
+                            type="number"
+                            size="small"
+                            inputProps={{
+                              min: 0,
+                              max: 10,
+                              step: 1,
+                            }}
+                            placeholder="0–10"
+                            value={
+                              editedDealData?.monashee_score !== undefined
+                                ? editedDealData.monashee_score
+                                : (dealData.monashee_score ?? "")
+                            }
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const parsed =
+                                value === "" ? undefined : Number(value);
+                              setEditedDealData((prev) => ({
+                                ...prev!,
+                                monashee_score:
+                                  parsed === undefined ? 0 : parsed,
+                              }));
+                            }}
+                            sx={{
+                              width: 150,
+                              "& input": {
+                                textAlign: "center",
+                              },
+                            }}
+                          />
+                        </Stack>
+                      ) : (
+                        <Typography
+                          sx={{
+                            color: "#333",
+                            fontWeight: 500,
+                            fontSize: "1.1rem",
+                          }}
+                        >
+                          Score is {dealData.monashee_score ?? 0} / 10
+                        </Typography>
+                      )}
+                    </Box>
                   </CardContent>
                 </Card>
               </motion.div>

@@ -89,6 +89,7 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
             <TableRow sx={{ backgroundColor: "#002060" }}>
               {[
                 "Ticker",
+                "Pricing Date",
                 "Issuer Name",
                 "Deal Size",
                 "1 Day Return (%)",
@@ -124,6 +125,7 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
               >
                 {[
                   row.ticker_us,
+                  row.pricing_date,
                   row.issuer_name,
                   formatNumber(row.deal_size),
                   row.t1d_return_from_bloomberg.toFixed(2),
@@ -148,17 +150,10 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
 
       <Box mt={2} p={2} sx={{ backgroundColor: "#f9fafb", borderRadius: 2 }}>
         <Typography variant="body2" color="text.secondary" align="center">
-          Based on the current IPO and market data — considering deal count,
+          Based on the current IPO and market data - considering deal count,
           deal volume, positively performed deals, opportunity value excess, and
-          excess returns from the last 1 month — the Monashee Score for this IPO
-          is
-          <strong> {monasheeScore} / 10</strong>.
+          excess returns.
         </Typography>
-        <Box display="flex" justifyContent="center" mt={1}>
-          <Tooltip title="This score is calculated by comparing multiple key performance indicators against similar IPOs in the sector.">
-            <InfoOutlinedIcon fontSize="small" sx={{ color: "gray" }} />
-          </Tooltip>
-        </Box>
       </Box>
     </Box>
   );

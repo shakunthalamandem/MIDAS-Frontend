@@ -34,7 +34,7 @@ const IPODashboardPage4: React.FC<Props> = ({
           {/* Financial Forecast */}
           <Grid item xs={12}>
             <Card sx={{ ...cardStyle, backgroundColor: "#f9fafc" }}>
-              <CardHeader title="Financial Forecast" sx={{ pb: 0 }} />
+              {/* <CardHeader title="Financial Forecast" sx={{ pb: 0 }} /> */}
               <CardContent>
                 <FinancialForecastTable defaultTicker={selectedTicker} />
               </CardContent>

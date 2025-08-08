@@ -410,7 +410,7 @@ await new Promise<void>((resolve) => {
           }}
         >
           <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`${key}-header`}>
-            <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold", flex: 1 }}>
+            <Typography variant="h6" align="center" sx={{ color: "#002060", fontWeight: "bold", flex: 1 }}>
               {section.title}
             </Typography>
             {isEditing ? (

@@ -165,13 +165,14 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({
   return (
     <Box sx={{ p: 0, width: "100%" }}>
       <Typography
-          variant="h6"
-          color="#002060"
-          fontWeight={600}
-          sx={{ whiteSpace: "nowrap", mb: 2 }}
-        >
-          Comparative Trading Multiples & Performance Metrics
-        </Typography>
+        variant="h6"
+        color="#002060"
+        fontWeight={600}
+        sx={{ whiteSpace: "nowrap", mb: 2, textAlign: "center" }}
+      >
+        Comparative Trading Multiples & Performance Metrics
+      </Typography>
+
       {/* <TickerInputComponent
         ticker={ticker}
         onSuccess={() => handleFetch(ticker)}
