@@ -3,12 +3,14 @@ import axios from "axios";
 import {
   Box,
   Typography,
-  Chip,
-  CircularProgress,
   Button,
+  Chip,
+  Skeleton,
   Snackbar,
   Alert,
+  Stack,
 } from "@mui/material";
+import { AutoAwesome, Update, Delete } from "@mui/icons-material";
 
 interface Props {
   selectedData: {
@@ -20,15 +22,16 @@ interface Props {
 
 const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
   const [comparativeTickers, setComparativeTickers] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [updating, setUpdating] = useState<boolean>(false);
-  const [deleting, setDeleting] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: "success" | "error";
-  }>({ open: false, message: "", severity: "success" });
+  const [glowTrigger, setGlowTrigger] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -38,93 +41,70 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
     Authorization: token ? `Bearer ${token}` : "",
   });
 
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  const handleSnackbarClose = () => setSnackbar({ ...snackbar, open: false });
+  const showSnackbar = (msg: string, severity: "success" | "error" = "success") =>
+    setSnackbar({ open: true, message: msg, severity });
 
-  const showSnackbar = (
-    message: string,
-    severity: "success" | "error" = "success"
-  ) => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  // Fetch data from /api/ipo_ai_compititors/
   const fetchComparativeTickers = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const payload = {
         ticker: selectedData?.ticker_name,
         company_name: selectedData?.company_name,
         exchange: selectedData?.exchange,
       };
-
-      const response = await axios.post(
+      const res = await axios.post<{ comps?: any[] }>(
         `${apiUrl}/api/ipo_ai_compititors/`,
         payload,
         { headers: getAuthHeaders() }
       );
-
-      const data = response.data as { comps: { comp_ticker: string }[] };
-      const comps = data.comps || [];
-      const tickers = comps.map((item) => item.comp_ticker);
-      setComparativeTickers(tickers);
-      showSnackbar("Comparative tickers loaded successfully.");
-    } catch (err: any) {
-      console.error("Error fetching comparative tickers:", err);
-      setError("Failed to load comparative tickers.");
-      showSnackbar("Failed to load comparative tickers.", "error");
+      const comps = res.data?.comps || [];
+      setComparativeTickers(comps.map((c: any) => c.comp_ticker));
+      setGlowTrigger(true);
+      setTimeout(() => setGlowTrigger(false), 2000);
+      showSnackbar("AI tickers loaded successfully.");
+    } catch (err) {
+      setError("Failed to load AI tickers.");
+      showSnackbar("Failed to load AI tickers.", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  // POST to update data
   const handleUpdate = async () => {
     setUpdating(true);
     try {
       const payload = {
         ticker: selectedData?.ticker_name,
         company_name: selectedData?.company_name,
-       
+        exchange: selectedData?.exchange,
       };
-
       await axios.post(
         `${apiUrl}/api/ipo_ai_compititors_update/`,
         payload,
         { headers: getAuthHeaders() }
       );
-
-      showSnackbar("Comparative tickers updated.");
-      fetchComparativeTickers(); // Refresh list
-    } catch (err) {
-      console.error("Error updating comparative tickers:", err);
+      showSnackbar("AI tickers updated.");
+      fetchComparativeTickers();
+    } catch {
       showSnackbar("Failed to update.", "error");
     } finally {
       setUpdating(false);
     }
   };
 
-  // POST to delete data
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      const payload = {
-        ticker: selectedData?.ticker_name,
-      };
-
       await axios.post(
         `${apiUrl}/api/ipo_ai_compititors_delete/`,
-        payload,
+        { ticker: selectedData?.ticker_name },
         { headers: getAuthHeaders() }
       );
-
       setComparativeTickers([]);
-      showSnackbar("Comparative tickers deleted.");
-    } catch (err) {
-      console.error("Error deleting comparative tickers:", err);
+      showSnackbar("AI tickers deleted.");
+    } catch {
       showSnackbar("Failed to delete.", "error");
     } finally {
       setDeleting(false);
@@ -132,48 +112,80 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
   };
 
   useEffect(() => {
-    if (selectedData?.ticker_name) {
-      fetchComparativeTickers();
-    }
+    if (selectedData?.ticker_name) fetchComparativeTickers();
   }, [selectedData]);
 
   return (
-    <Box mt={2}>
-      <Box mb={2} display="flex" gap={2}>
+    <Box>
+      {/* Action buttons */}
+      <Stack direction="row" spacing={2} mb={2}>
         <Button
           variant="contained"
           color="primary"
+          startIcon={<Update />}
           onClick={handleUpdate}
           disabled={updating}
+          sx={{ textTransform: "none", fontWeight: 500 }}
         >
-          {updating ? <CircularProgress size={20} /> : "Update"}
+          {updating ? "Updating..." : "Update"}
         </Button>
-
         <Button
           variant="outlined"
           color="error"
+          startIcon={<Delete />}
           onClick={handleDelete}
           disabled={deleting}
+          sx={{ textTransform: "none", fontWeight: 500 }}
         >
-          {deleting ? <CircularProgress size={20} /> : "Delete"}
+          {deleting ? "Deleting..." : "Delete"}
         </Button>
-      </Box>
+      </Stack>
 
+      {/* Content */}
       {loading ? (
-        <CircularProgress size={24} />
+        <Stack direction="row" spacing={1} flexWrap="wrap">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant="rounded" width={80} height={32} />
+          ))}
+        </Stack>
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : comparativeTickers.length > 0 ? (
-        <Box display="flex" flexWrap="wrap" gap={1}>
+        <Stack
+          direction="row"
+          flexWrap="wrap"
+          gap={1}
+          sx={{
+            animation: glowTrigger ? "glowPulse 2s ease-out" : "none",
+            "@keyframes glowPulse": {
+              "0%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
+              "50%": { boxShadow: "0 0 20px rgba(0, 150, 255, 0.5)" },
+              "100%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
+            },
+            borderRadius: "8px",
+            p: 1,
+          }}
+        >
           {comparativeTickers.map((ticker, idx) => (
-            <Chip key={idx} label={ticker} color="primary" />
+            <Chip
+              key={idx}
+              label={ticker}
+              variant="outlined"
+              color="primary"
+              icon={<AutoAwesome fontSize="small" />}
+              sx={{
+                borderRadius: "16px",
+                transition: "all 0.2s",
+                "&:hover": { backgroundColor: "primary.main", color: "white" },
+              }}
+            />
           ))}
-        </Box>
+        </Stack>
       ) : (
-        <Typography>No comparable tickers found.</Typography>
+        <Typography>No AI comparable tickers found.</Typography>
       )}
 
-      {/* Snackbar Notification */}
+      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}

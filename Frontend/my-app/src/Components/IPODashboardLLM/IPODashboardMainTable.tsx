@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Alert,
   Fade,
+  Typography,
 } from "@mui/material";
 import TickerInputComponent from "./TickerInputComponent";
 
@@ -80,35 +81,42 @@ const formatNumber = (
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
-const getColumns = (ticker: string, ai_generated: boolean): {
+const getColumns = (
+  ticker: string,
+  ai_generated: boolean
+): {
   key: keyof ComparableMetric;
   label: string;
   isCurrency?: boolean;
   isPercentage?: boolean;
 }[] => [
-    { key: "competitor", label: 'Ticker' },
-    { key: "price_usd", label: "Price (USD)", isCurrency: true },
-    { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
-    { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
-    { key: "present_year_ev_sales", label: "2025 EV/Sales" },
-    { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
-    { key: "present_year_price_earning", label: "2025 P/E" },
-    { key: "one_year_later_price_earning", label: "2026 P/E" },
-    {
-      key: "present_year_ev_fcf", label: "2025 EV/EBITDA",
-    },
-    {
-      key: "one_year_later_ev_fcf", label: "2026 EV/EBITDA",
-    },
-    { key: "sales_growth", label: "Sales Growth (25–26)", isPercentage: true },
-    { key: "eps_growth", label: "EPS Growth (25–26)", isPercentage: true },
-  ];
+  { key: "competitor", label: "Ticker" },
+  { key: "price_usd", label: "Price (USD)", isCurrency: true },
+  { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
+  { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
+  { key: "present_year_ev_sales", label: "2025 EV/Sales" },
+  { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
+  { key: "present_year_price_earning", label: "2025 P/E" },
+  { key: "one_year_later_price_earning", label: "2026 P/E" },
+  {
+    key: "present_year_ev_fcf",
+    label: "2025 EV/EBITDA",
+  },
+  {
+    key: "one_year_later_ev_fcf",
+    label: "2026 EV/EBITDA",
+  },
+  { key: "sales_growth", label: "Sales Growth (25–26)", isPercentage: true },
+  { key: "eps_growth", label: "EPS Growth (25–26)", isPercentage: true },
+];
 
 interface IPODashboardMainTableProps {
   ticker: string;
 }
 
-const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker }) => {
+const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({
+  ticker,
+}) => {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -150,16 +158,24 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
     Object.values(data).every(
       (metrics) => !metrics.data || metrics.data.length === 0
     );
-  const ai_generated = data?.[ticker]?.data?.some(item => item.ai_generated) || false;
-
+  const ai_generated =
+    data?.[ticker]?.data?.some((item) => item.ai_generated) || false;
 
   const columns = getColumns(ticker, ai_generated);
   return (
     <Box sx={{ p: 0, width: "100%" }}>
-      <TickerInputComponent
+      <Typography
+          variant="h6"
+          color="#002060"
+          fontWeight={600}
+          sx={{ whiteSpace: "nowrap", mb: 2 }}
+        >
+          Comparative Trading Multiples & Performance Metrics
+        </Typography>
+      {/* <TickerInputComponent
         ticker={ticker}
         onSuccess={() => handleFetch(ticker)}
-      />
+      /> */}
 
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
@@ -200,10 +216,10 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
               {Object.entries(data).map(([tickerKey, metricsObj]) => {
                 const metrics = metricsObj.data
                   ? [...metricsObj.data].sort((a, b) => {
-                    if (a.competitor === tickerKey) return -1;
-                    if (b.competitor === tickerKey) return 1;
-                    return 0;
-                  })
+                      if (a.competitor === tickerKey) return -1;
+                      if (b.competitor === tickerKey) return 1;
+                      return 0;
+                    })
                   : [];
                 const averages = metricsObj.Averages;
 
@@ -213,7 +229,8 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                       <Fade in timeout={500} key={`${tickerKey}-${idx}`}>
                         <TableRow
                           sx={{
-                            backgroundColor: idx % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                            backgroundColor:
+                              idx % 2 === 0 ? "#f9f9f9" : "#ffffff",
                             transition: "background-color 0.3s",
                             "&:hover": {
                               backgroundColor: "#e3f2fd",
@@ -223,50 +240,72 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                           {columns.map((col) => {
                             const value = metric[col.key];
                             let displayValue =
-                              value === null || value === undefined || (typeof value === "number" && isNaN(value))
+                              value === null ||
+                              value === undefined ||
+                              (typeof value === "number" && isNaN(value))
                                 ? "N/A"
                                 : col.key === "price_usd"
                                   ? Number(value).toFixed(1)
-                                  : col.key === "market_cap" || col.key === "ev_usd_million"
+                                  : col.key === "market_cap" ||
+                                      col.key === "ev_usd_million"
                                     ? typeof value === "number"
-                                      ? value.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                                      ? value.toLocaleString(undefined, {
+                                          maximumFractionDigits: 1,
+                                        })
                                       : value
                                     : typeof value === "number"
-                                      ? formatNumber(value, col.isCurrency, col.isPercentage)
+                                      ? formatNumber(
+                                          value,
+                                          col.isCurrency,
+                                          col.isPercentage
+                                        )
                                       : value;
 
-                            if (col.key === "competitor" && metric.ai_generated) {
+                            if (
+                              col.key === "competitor" &&
+                              metric.ai_generated
+                            ) {
                               displayValue = `${displayValue}`;
                             }
 
-                      return (
-  <TableCell
-    key={col.key}
-    align="center"
-    sx={{
-      borderBottom: "none",
-      color: "#333",
-      whiteSpace: "nowrap",
-      fontWeight: metric.competitor === tickerKey ? "bold" : "normal",
-    }}
-  >
-    {columnsWithX.has(col.key) && typeof value === "number" && col.key !== "competitor" ? (
-      `${displayValue}x`
-    ) : (
-      <>
-        {displayValue}
-        {col.key === "competitor" && metric.ai_generated && (
-          <span style={{ color: "#FF5722", fontWeight: "bold", marginLeft: "4px" }}>
-            (AI)
-          </span>
-        )}
-      </>
-    )}
-  </TableCell>
-);
-
+                            return (
+                              <TableCell
+                                key={col.key}
+                                align="center"
+                                sx={{
+                                  borderBottom: "none",
+                                  color: "#333",
+                                  whiteSpace: "nowrap",
+                                  fontWeight:
+                                    metric.competitor === tickerKey
+                                      ? "bold"
+                                      : "normal",
+                                }}
+                              >
+                                {columnsWithX.has(col.key) &&
+                                typeof value === "number" &&
+                                col.key !== "competitor" ? (
+                                  `${displayValue}x`
+                                ) : (
+                                  <>
+                                    {displayValue}
+                                    {col.key === "competitor" &&
+                                      metric.ai_generated && (
+                                        <span
+                                          style={{
+                                            color: "#FF5722",
+                                            fontWeight: "bold",
+                                            marginLeft: "4px",
+                                          }}
+                                        >
+                                          (AI)
+                                        </span>
+                                      )}
+                                  </>
+                                )}
+                              </TableCell>
+                            );
                           })}
-
                         </TableRow>
                       </Fade>
                     ))}
@@ -307,18 +346,18 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                                 }}
                               >
                                 {averages[col.key] &&
-                                  averages[col.key].average !== undefined
+                                averages[col.key].average !== undefined
                                   ? columnsWithX.has(col.key)
                                     ? `${formatNumber(
-                                      averages[col.key].average!,
-                                      col.isCurrency,
-                                      col.isPercentage
-                                    )}x`
+                                        averages[col.key].average!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )}x`
                                     : formatNumber(
-                                      averages[col.key].average!,
-                                      col.isCurrency,
-                                      col.isPercentage
-                                    )
+                                        averages[col.key].average!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )
                                   : ""}
                               </TableCell>
                             );
@@ -358,18 +397,18 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({ ticker })
                                 }}
                               >
                                 {averages[col.key] &&
-                                  averages[col.key].median !== undefined
+                                averages[col.key].median !== undefined
                                   ? columnsWithX.has(col.key)
                                     ? `${formatNumber(
-                                      averages[col.key].median!,
-                                      col.isCurrency,
-                                      col.isPercentage
-                                    )}x`
+                                        averages[col.key].median!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )}x`
                                     : formatNumber(
-                                      averages[col.key].median!,
-                                      col.isCurrency,
-                                      col.isPercentage
-                                    )
+                                        averages[col.key].median!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )
                                   : ""}
                               </TableCell>
                             );
