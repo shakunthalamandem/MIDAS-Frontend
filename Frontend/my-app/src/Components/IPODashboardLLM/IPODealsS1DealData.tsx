@@ -154,9 +154,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedTicker 
           padding: 3,
         }}
       >
-        <Typography variant="h6" gutterBottom color="#002060" fontWeight="bold" align="center">
-          Valuation & Market Sentiment {selectedTicker}
-        </Typography>
+       
 
         <Box
           sx={{
