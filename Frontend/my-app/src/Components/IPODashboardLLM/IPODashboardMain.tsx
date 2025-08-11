@@ -270,7 +270,7 @@ await new Promise<void>((resolve) => {
 
       // ➤ Add footer
       const footerY = pdfHeight - 20;
-      pdf.setFontSize(8);
+      pdf.setFontSize(6);
       pdf.setTextColor(100);
       pdf.setFont("helvetica", "normal");
       pdf.text(
@@ -280,7 +280,7 @@ await new Promise<void>((resolve) => {
         { maxWidth: pdfWidth - 20 }
       );
 
-      pdf.setFontSize(10);
+      pdf.setFontSize(8);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(128);
       pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
