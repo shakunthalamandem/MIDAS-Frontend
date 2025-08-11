@@ -125,7 +125,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
             disabled={pdfLoading}
             startIcon={pdfLoading ? <CircularProgress color="inherit" size={18} /> : null}
           >
-            {pdfLoading ? "Generating..." : "Export to PDF"}
+            {pdfLoading ? "Generating..." : "Generate Monashee PDF"}
           </Button>
         </Box>
 

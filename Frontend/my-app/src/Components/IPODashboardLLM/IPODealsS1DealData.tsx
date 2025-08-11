@@ -6,11 +6,10 @@ import {
   Box,
   Grid,
   CircularProgress,
-  Tooltip,
-  Container,
   TextField,
   IconButton,
   Stack,
+  Container,
 } from "@mui/material";
 import {
   FaBullseye,
@@ -19,12 +18,11 @@ import {
   FaChartLine,
   FaClipboardList,
 } from "react-icons/fa";
-import { motion } from "framer-motion";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import IPOMonasheeScore from "./IPOMonasheeScore";
+import { motion } from "framer-motion";
 
 type DealData = {
   fair_value_estimate: string;
@@ -151,10 +149,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
   if (!dealData) return <Typography>No deal data found.</Typography>;
 
   return (
-    <Container
-      maxWidth="xl"
-      style={{ marginTop: "20px", position: "relative" }}
-    >
+    <Container maxWidth="xl" style={{ marginTop: "20px", position: "relative" }}>
       <Card
         sx={{
           position: "relative",
@@ -164,17 +159,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
           padding: 3,
         }}
       >
-        <Box
-          sx={{
-            // position: "absolute",
-            // top: 16,
-            // right: 16,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            // gap: 1,
-          }}
-        >
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
           {editMode ? (
             <>
               <IconButton color="primary" onClick={handleSaveDealData}>
@@ -194,224 +179,91 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Grid container spacing={3}>
             {/* First Row */}
-            {[
-              {
-                label: "Fair Value Estimate",
-                key: "fair_value_estimate",
-                icon: <FaBullseye size={24} color="#002060" />,
-              },
-              {
-                label: "Indication of Interest",
-                key: "indication_of_interest",
-                icon: <FaHandshake size={24} color="#002060" />,
-              },
-              {
-                label: "After Market Threshold",
-                key: "after_market_threshold",
-                icon: <FaTruckMoving size={24} color="#002060" />,
-              },
-            ].map((field, idx) => (
-              <Grid
-                item
-                xs={12}
-                sm={4}
-                key={idx}
-                sx={{ display: "flex", flexDirection: "column" }}
-              >
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                  style={{ flex: 1 }}
-                >
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      boxShadow: 2,
-                      borderRadius: 2,
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <CardContent
-                      sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}
-                    >
-                      <Grid
-                        container
-                        spacing={2}
-                        alignItems="flex-start"
-                        sx={{ height: "100%" }}
-                      >
-                        <Grid item xs>
-                          <Box
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                          >
-                            <Typography
-                              variant="h6"
-                              sx={{
-                                color: "#002060",
-                                fontWeight: "bold",
-                                mr: 1,
-                              }} // 'mr' adds space between icon and label
-                            >
-                              {field.icon}
-                            </Typography>
-                            <Typography
-                              variant="h6"
-                              sx={{ color: "#002060", fontWeight: "bold" }}
-                            >
-                              {field.label}
-                            </Typography>
-                          </Box>
+            {[{ label: "Fair Value Estimate", key: "fair_value_estimate", icon: <FaBullseye size={24} color="#002060" /> },
+            { label: "Indication of Interest", key: "indication_of_interest", icon: <FaHandshake size={24} color="#002060" /> },
+            { label: "After Market Threshold", key: "after_market_threshold", icon: <FaTruckMoving size={24} color="#002060" /> }]
+            .map((field, idx) => (
+              <Grid item xs={12} sm={4} key={idx} sx={{ display: "flex", flexDirection: "column" }}>
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                  <CardContent sx={{ backgroundColor: field.key === "indication_of_interest" ? "#f3f33173" : "#fff", padding: 2, flexGrow: 1 }}>
+                    <Grid container spacing={2} alignItems="flex-start" sx={{ height: "100%" }}>
+                      <Grid item xs>
+                        <Box display="flex" alignItems="center" justifyContent="center">
+                          <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold", mr: 1 }}>
+                            {field.icon}
+                          </Typography>
+                          <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
+                            {field.label}
+                          </Typography>
+                        </Box>
 
-                          {editMode ? (
-                            <TextField
-                              fullWidth
-                              size="small"
-                              multiline
-                              minRows={2}
-                              value={
-                                editedDealData?.[field.key as EditableField] ??
-                                dealData[field.key as EditableField] ??
-                                ""
-                              }
-                              onChange={(e) =>
-                                setEditedDealData((prev) => ({
-                                  ...prev!,
-                                  [field.key]: e.target.value,
-                                }))
-                              }
-                            />
-                          ) : (
-                            <Typography
-                              sx={{ color: "#333", whiteSpace: "pre-line" }}
-                            >
-                              {dealData[field.key as EditableField] ?? ""}
-                            </Typography>
-                          )}
-                        </Grid>
+                        {editMode ? (
+                          <TextField
+                            fullWidth
+                            size="small"
+                            multiline
+                            minRows={2}
+                            value={editedDealData?.[field.key as EditableField] ?? dealData[field.key as EditableField] ?? ""}
+                            onChange={(e) =>
+                              setEditedDealData((prev) => ({
+                                ...prev!,
+                                [field.key]: e.target.value,
+                              }))
+                            }
+                          />
+                        ) : (
+                          <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
+                            {dealData[field.key as EditableField] ?? ""}
+                          </Typography>
+                        )}
                       </Grid>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                    </Grid>
+                  </CardContent>
+                </Card>
               </Grid>
             ))}
 
-            <Grid
-              item
-              xs={12}
-              sx={{ display: "flex", flexDirection: "column" }}
-            >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                style={{ flex: 1 }}
-              >
-                <Card
-                  variant="outlined"
-                  sx={{
-                    boxShadow: 2,
-                    borderRadius: 2,
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <CardContent
-                    sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}
-                  >
-                    <Box
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      mb={2}
-                    >
-                      <FaClipboardList
-                        size={24}
-                        color="#002060"
-                        style={{ marginRight: 8 }}
-                      />
-                      <Typography
-                        variant="h6"
-                        sx={{ color: "#002060", fontWeight: "bold" }}
-                      >
-                        Differentiated Summary
-                      </Typography>
-                    </Box>
-                    {editMode ? (
-                      <TextField
-                        fullWidth
-                        size="small"
-                        multiline
-                        minRows={4}
-                        value={
-                          editedDealData?.differentiated_summary ??
-                          dealData.differentiated_summary ??
-                          ""
-                        }
-                        onChange={(e) =>
-                          setEditedDealData((prev) => ({
-                            ...prev!,
-                            differentiated_summary: e.target.value,
-                          }))
-                        }
-                      />
-                    ) : (
-                      <Typography
-                        sx={{ color: "#333", whiteSpace: "pre-line" }}
-                      >
-                        {dealData.differentiated_summary ?? ""}
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
+            {/* Differentiated Summary */}
+            <Grid item xs={12} sx={{ display: "flex", flexDirection: "column" }}>
+              <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                <CardContent sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}>
+                  <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
+                    <FaClipboardList size={24} color="#002060" style={{ marginRight: 8 }} />
+                    <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
+                      Differentiated Summary
+                    </Typography>
+                  </Box>
+                  {editMode ? (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      multiline
+                      minRows={4}
+                      value={editedDealData?.differentiated_summary ?? dealData.differentiated_summary ?? ""}
+                      onChange={(e) =>
+                        setEditedDealData((prev) => ({
+                          ...prev!,
+                          differentiated_summary: e.target.value,
+                        }))
+                      }
+                    />
+                  ) : (
+                    <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
+                      {dealData.differentiated_summary ?? ""}
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
             </Grid>
 
             {/* Monashee Score */}
-            <Grid
-              item
-              xs={12}
-              sx={{ display: "flex", flexDirection: "column" }}
-            >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                style={{ flex: 1 }}
-              >
-                <Card
-                  variant="outlined"
-                  sx={{
-                    boxShadow: 2,
-                    borderRadius: 2,
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <CardContent
-                    sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}
-                  >
-                    <Box
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      mb={2}
-                    >
-                      <FaChartLine
-                        size={24}
-                        color="#002060"
-                        style={{ marginRight: 8 }}
-                      />
-                      <Typography
-                        variant="h6"
-                        sx={{ color: "#002060", fontWeight: "bold" }}
-                      >
+            <Grid item xs={12} sx={{ display: "flex", flexDirection: "column" }}>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} style={{ flex: 1 }}>
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                  <CardContent sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}>
+                    <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
+                      <FaChartLine size={24} color="#002060" style={{ marginRight: 8 }} />
+                      <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
                         Monashee Proprietary Score
                       </Typography>
                     </Box>
@@ -420,69 +272,34 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                         Recent IPO Performances related to this Sector.
                       </Typography>
                     </Box>
-                    <IPOMonasheeScore
-                      ticker={selectedTicker ?? ""}
-                      monasheeScore={dealData.monashee_score}
-                    />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        minHeight: 100, // Adjust height as needed
-                        textAlign: "center",
-                      }}
-                    >
+
+                    <IPOMonasheeScore ticker={selectedTicker ?? ""} monasheeScore={dealData.monashee_score} />
+                    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 100, textAlign: "center" }}>
                       {editMode ? (
                         <Stack spacing={1} alignItems="center">
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ color: "#555" }}
-                          >
+                          <Typography variant="subtitle2" sx={{ color: "#555" }}>
                             Enter Monashee Score (0–10)
                           </Typography>
-
                           <TextField
                             type="number"
                             size="small"
-                            inputProps={{
-                              min: 0,
-                              max: 10,
-                              step: 1,
-                            }}
+                            inputProps={{ min: 0, max: 10, step: 1 }}
                             placeholder="0–10"
-                            value={
-                              editedDealData?.monashee_score !== undefined
-                                ? editedDealData.monashee_score
-                                : (dealData.monashee_score ?? "")
-                            }
+                            value={editedDealData?.monashee_score ?? dealData.monashee_score ?? ""}
                             onChange={(e) => {
                               const value = e.target.value;
-                              const parsed =
-                                value === "" ? undefined : Number(value);
+                              const parsed = value === "" ? undefined : Number(value);
                               setEditedDealData((prev) => ({
                                 ...prev!,
-                                monashee_score:
-                                  parsed === undefined ? 0 : parsed,
+                                monashee_score: parsed === undefined ? 0 : parsed,
                               }));
                             }}
-                            sx={{
-                              width: 150,
-                              "& input": {
-                                textAlign: "center",
-                              },
-                            }}
+                            sx={{ width: 150, "& input": { textAlign: "center" } }}
                           />
                         </Stack>
                       ) : (
-                        <Typography
-                          sx={{
-                            color: "#333",
-                            fontWeight: 500,
-                            fontSize: "1.1rem",
-                          }}
-                        >
-                          Score is {dealData.monashee_score ?? 0} / 10
+                        <Typography sx={{ color: "#002060", fontWeight: 500, fontSize: "1.1rem" }}>
+                          Grade is {dealData.monashee_score ?? 0} / 10
                         </Typography>
                       )}
                     </Box>
@@ -491,6 +308,8 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
               </motion.div>
             </Grid>
           </Grid>
+
+          <IPOMonasheeScore ticker={selectedTicker ?? ""} monasheeScore={dealData.monashee_score} />
         </Box>
       </Card>
     </Container>
