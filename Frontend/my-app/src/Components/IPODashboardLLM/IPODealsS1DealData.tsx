@@ -185,7 +185,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
             .map((field, idx) => (
               <Grid item xs={12} sm={4} key={idx} sx={{ display: "flex", flexDirection: "column" }}>
                 <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-                  <CardContent sx={{ backgroundColor: field.key === "indication_of_interest" ? "#f3f33173" : "#fff", padding: 2, flexGrow: 1 }}>
+                  <CardContent sx={{ backgroundColor:"#fff", padding: 2, flexGrow: 1 }}>
                     <Grid container spacing={2} alignItems="flex-start" sx={{ height: "100%" }}>
                       <Grid item xs>
                         <Box display="flex" alignItems="center" justifyContent="center">
@@ -264,7 +264,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                     <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
                       <FaChartLine size={24} color="#002060" style={{ marginRight: 8 }} />
                       <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
-                        Monashee Proprietary Score
+                        Monashee Proprietary Grade
                       </Typography>
                     </Box>
                     <Box display="flex" justifyContent="center" mb={2}>
@@ -278,7 +278,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                       {editMode ? (
                         <Stack spacing={1} alignItems="center">
                           <Typography variant="subtitle2" sx={{ color: "#555" }}>
-                            Enter Monashee Score (0–10)
+                            Enter Monashee Grade (0–10)
                           </Typography>
                           <TextField
                             type="number"
@@ -298,7 +298,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                           />
                         </Stack>
                       ) : (
-                        <Typography sx={{ color: "#002060", fontWeight: 500, fontSize: "1.1rem" }}>
+                        <Typography variant="h5" sx={{ color: "#086000ff", fontWeight: 600}}>
                           Grade is {dealData.monashee_score ?? 0} / 10
                         </Typography>
                       )}
@@ -309,7 +309,6 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
             </Grid>
           </Grid>
 
-          <IPOMonasheeScore ticker={selectedTicker ?? ""} monasheeScore={dealData.monashee_score} />
         </Box>
       </Card>
     </Container>
