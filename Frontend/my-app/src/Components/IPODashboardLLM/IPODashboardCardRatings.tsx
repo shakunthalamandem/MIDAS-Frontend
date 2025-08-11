@@ -198,7 +198,6 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
-      <Card sx={{ borderRadius: 4, backgroundColor: "#f9fafc", boxShadow: "0 12px 24px rgba(0,0,0,0.1)", p: 2 }}>
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 30 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -234,6 +233,20 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
                   )}
                 </Box>
               </Box>
+               <Box mt={2} sx={{ backgroundColor: "#f1f1f1", p: 2, borderRadius: 2 }}>
+  <Typography
+    variant="body2"
+    color="textSecondary"
+    align="center"
+    sx={{ fontSize: "1rem",color:'#002060' }}  // Increase text size here
+  >
+    <strong>Color Key:</strong> 
+ 
+    <span style={{ color: "#ff4d4f" }}>●</span> Red = Negative &nbsp;|&nbsp;
+    <span style={{ color: "#ffcc00" }}>●</span> Yellow = Neutral &nbsp;|&nbsp;
+    <span style={{ color: "#3ba55d" }}>●</span> Green = Positive
+  </Typography>
+</Box>
 
               <Table sx={{ border: "2px solid #ccc" }}>
                 <TableHead>
@@ -326,25 +339,11 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
               </Table>
 
               {/* Footnote section */}
-              <Box mt={2} sx={{ backgroundColor: "#f1f1f1", p: 2, borderRadius: 2 }}>
-  <Typography
-    variant="body2"
-    color="textSecondary"
-    align="center"
-    sx={{ fontSize: "1.05rem" }}  // Increase text size here
-  >
-    <strong>Color Key:</strong> 
-    <br />
-    <span style={{ color: "#ff4d4f" }}>●</span> Red = Negative &nbsp;|&nbsp;
-    <span style={{ color: "#ffcc00" }}>●</span> Yellow = Neutral &nbsp;|&nbsp;
-    <span style={{ color: "#3ba55d" }}>●</span> Green = Positive
-  </Typography>
-</Box>
+             
 
             </CardContent>
           </Card>
         </motion.div>
-      </Card>
     </Container>
   );
 };
