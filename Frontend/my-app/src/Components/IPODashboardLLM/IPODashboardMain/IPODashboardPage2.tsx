@@ -1,9 +1,7 @@
-// components/IPODashboardPage2.tsx
 import React from "react";
 import { Container, Grid } from "@mui/material";
 import IPODashboardCardRatings from "../IPODashboardCardRatings";
 import { cardSections } from "../UtilsIPODashboard";
-
 
 interface Props {
   ipoData: any;
@@ -26,9 +24,22 @@ const IPODashboardPage2: React.FC<Props> = ({
         setIpoData={setIpoData}
       />
       <Container maxWidth="xl" sx={{ mb: 3 }}>
-        <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            mb: 3,
+            alignItems: "stretch", // Make grid items equal height
+          }}
+        >
           {cardSections.slice(0, 2).map((section, index) => (
-            <Grid item xs={12} md={6} key={section.key}>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              key={section.key}
+              sx={{ display: "flex" }} // Allow accordion to stretch
+            >
               {renderEditableCard(section, index)}
             </Grid>
           ))}

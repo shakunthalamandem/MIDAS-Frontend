@@ -3,7 +3,6 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Grid,
   Typography,
   IconButton,
   Box,
@@ -61,118 +60,119 @@ const EditableCard: React.FC<EditableCardProps> = ({
   const isExpanded = expandedPanels[key] || false;
 
   return (
-    <Grid item xs={12} key={key}>
-      <Accordion
-        expanded={isExpanded}
-        onChange={() =>
-          setExpandedPanels((prev) => ({ ...prev, [key]: !prev[key] }))
-        }
-        sx={{
-          backgroundColor: cardColors[index % cardColors.length],
-          borderRadius: 2,
-          boxShadow: 3,
-          "&::before": { display: "none" },
-        }}
-      >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`${key}-header`}>
-          <Typography
-            variant="h6"
-            align="center"
-            sx={{ color: "#002060", fontWeight: "bold", flex: 1 }}
-          >
-            {section.title}
-          </Typography>
-          {isEditing ? (
-            <>
-              <IconButton
-                color="primary"
-                onClick={() => handleSaveCard(key)}
-                size="small"
-              >
-                <SaveIcon />
-              </IconButton>
-              <IconButton
-                color="secondary"
-                onClick={() => handleCancelCard(key)}
-                size="small"
-              >
-                <CancelIcon />
-              </IconButton>
-            </>
-          ) : (
+    <Accordion
+      expanded={isExpanded}
+      onChange={() =>
+        setExpandedPanels((prev) => ({ ...prev, [key]: !prev[key] }))
+      }
+      sx={{
+        backgroundColor: cardColors[index % cardColors.length],
+        borderRadius: 2,
+        boxShadow: 3,
+        "&::before": { display: "none" },
+        display: "flex",
+        flexDirection: "column",
+        flex: 1, // Make accordion fill the height
+      }}
+    >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`${key}-header`}>
+        <Typography
+          variant="h6"
+          align="center"
+          sx={{ color: "#002060", fontWeight: "bold", flex: 1 }}
+        >
+          {section.title}
+        </Typography>
+        {isEditing ? (
+          <>
             <IconButton
-              onClick={() =>
-                setEditMode((prev) => ({ ...prev, [key]: true }))
-              }
+              color="primary"
+              onClick={() => handleSaveCard(key)}
               size="small"
             >
-              <EditIcon fontSize="small" />
+              <SaveIcon />
             </IconButton>
-          )}
-        </AccordionSummary>
+            <IconButton
+              color="secondary"
+              onClick={() => handleCancelCard(key)}
+              size="small"
+            >
+              <CancelIcon />
+            </IconButton>
+          </>
+        ) : (
+          <IconButton
+            onClick={() =>
+              setEditMode((prev) => ({ ...prev, [key]: true }))
+            }
+            size="small"
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        )}
+      </AccordionSummary>
 
-        <AccordionDetails>
-          {isEditing ? (
-            <Box>
-              {editedContent[key]?.map((item, idx) => (
-                <Box
-                  key={idx}
-                  display="flex"
-                  alignItems="flex-start"
-                  mb={1}
-                >
-                  <Box sx={{ mr: 1, mt: 1 }}>
-                    <FiberManualRecordIcon
-                      sx={{ fontSize: 8, color: "#002060" }}
-                    />
-                  </Box>
-                  <TextField
-                    fullWidth
-                    multiline
-                    size="small"
-                    value={item}
-                    onChange={(e) =>
-                      handleItemChange(key, idx, e.target.value)
-                    }
-                    placeholder="Enter text..."
-                    sx={{ mr: 1 }}
-                  />
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDeleteItem(key, idx)}
-                    size="small"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-              ))}
-              <Button
-                startIcon={<AddIcon />}
-                onClick={() => handleAddItem(key)}
-                variant="outlined"
-                size="small"
-                sx={{ mt: 1 }}
+      <AccordionDetails sx={{ flex: 1 }}>
+        {isEditing ? (
+          <Box>
+            {editedContent[key]?.map((item, idx) => (
+              <Box
+                key={idx}
+                display="flex"
+                alignItems="flex-start"
+                mb={1}
               >
-                Add Item
-              </Button>
-            </Box>
-          ) : (
-            <List dense>
-              {content?.map((item: string, idx: number) => (
-                <ListItem key={idx} sx={{ pl: 0 }}>
-                  <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                    <FiberManualRecordIcon
-                      sx={{ fontSize: 8, color: "#002060" }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText primary={item} />
-                </ListItem>
-              ))}
-            </List>
-          )}
-        </AccordionDetails>
-      </Accordion>
-    </Grid>
+                <Box sx={{ mr: 1, mt: 1 }}>
+                  <FiberManualRecordIcon
+                    sx={{ fontSize: 8, color: "#002060" }}
+                  />
+                </Box>
+                <TextField
+                  fullWidth
+                  multiline
+                  size="small"
+                  value={item}
+                  onChange={(e) =>
+                    handleItemChange(key, idx, e.target.value)
+                  }
+                  placeholder="Enter text..."
+                  sx={{ mr: 1 }}
+                />
+                <IconButton
+                  color="error"
+                  onClick={() => handleDeleteItem(key, idx)}
+                  size="small"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            ))}
+            <Button
+              startIcon={<AddIcon />}
+              onClick={() => handleAddItem(key)}
+              variant="outlined"
+              size="small"
+              sx={{ mt: 1 }}
+            >
+              Add Item
+            </Button>
+          </Box>
+        ) : (
+          <List dense>
+            {content?.map((item: string, idx: number) => (
+              <ListItem key={idx} sx={{ pl: 0 }}>
+                <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
+                  <FiberManualRecordIcon
+                    sx={{ fontSize: 8, color: "#002060" }}
+                  />
+                </ListItemIcon>
+                <ListItemText primary={item} />
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
