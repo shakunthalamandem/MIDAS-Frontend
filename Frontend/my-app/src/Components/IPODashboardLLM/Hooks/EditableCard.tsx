@@ -36,6 +36,7 @@ interface EditableCardProps {
   handleAddItem: (key: string) => void;
   handleDeleteItem: (key: string, index: number) => void;
   handleItemChange: (key: string, index: number, value: string) => void;
+  minHeight?: number; // 👈 New prop
 }
 
 const EditableCard: React.FC<EditableCardProps> = ({
@@ -53,6 +54,7 @@ const EditableCard: React.FC<EditableCardProps> = ({
   handleAddItem,
   handleDeleteItem,
   handleItemChange,
+  minHeight,
 }) => {
   const key = section.key;
   const content = ipoData[key];
@@ -72,7 +74,8 @@ const EditableCard: React.FC<EditableCardProps> = ({
         "&::before": { display: "none" },
         display: "flex",
         flexDirection: "column",
-        flex: 1, // Make accordion fill the height
+        flex: 1,
+        minHeight: !isExpanded && minHeight ? `${minHeight}px` : "auto", // ✅ Equal height only when collapsed
       }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`${key}-header`}>
