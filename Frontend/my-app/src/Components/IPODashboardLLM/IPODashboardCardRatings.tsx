@@ -14,12 +14,20 @@ import {
   TableCell,
   TableBody,
   CircularProgress,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+
+
 
 // ---------- ✅ Types ----------
 interface RevenueGrowthItem {
@@ -212,41 +220,81 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
             }}
           >
             <CardContent>
-              <Box position="relative" mb={2}>
-                <Typography variant="h6" align="center" sx={{ fontWeight: 700, color: "#002060" }}>
-                  Key Metrics
-                </Typography>
-                <Box position="absolute" right={0} top="50%" sx={{ transform: "translateY(-50%)" }}>
-                  {editMode ? (
-                    <>
-                      <IconButton color="primary" onClick={handleSaveRevenueGrowthData}>
-                        <SaveIcon />
-                      </IconButton>
-                      <IconButton color="secondary" onClick={handleCancel}>
-                        <CancelIcon />
-                      </IconButton>
-                    </>
-                  ) : (
-                    <IconButton onClick={() => setEditMode(true)}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  )}
-                </Box>
-              </Box>
-               <Box mt={2} sx={{ backgroundColor: "#f1f1f1", p: 2, borderRadius: 2 }}>
+<Box position="relative" mb={2}>
+  <Box display="flex" alignItems="center" justifyContent="center">
+    <Typography
+      variant="h6"
+      align="center"
+      sx={{ fontWeight: 700, color: "#002060", mr: 1 }}
+    >
+      Key Metrics
+    </Typography>
+
+    {/* Info Icon Tooltip */}
+    <Tooltip
+      title={
+       <List dense>
   <Typography
     variant="body2"
-    color="textSecondary"
-    align="center"
-    sx={{ fontSize: "1rem",color:'#002060' }}  // Increase text size here
+    sx={{ fontSize: "1rem", color: "#002060", fontWeight: "bold", mb: 1 }}
   >
-    <strong>Color Key:</strong> 
- 
-    <span style={{ color: "#ff4d4f" }}>●</span> Red = Negative &nbsp;|&nbsp;
-    <span style={{ color: "#ffcc00" }}>●</span> Yellow = Neutral &nbsp;|&nbsp;
-    <span style={{ color: "#3ba55d" }}>●</span> Green = Positive
+    Color Key:
   </Typography>
+
+  <ListItem sx={{ py: 0 }}>
+    <ListItemIcon sx={{ minWidth: 24 }}>
+      <FiberManualRecordIcon sx={{ fontSize: 12, color: "#ff4d4f" }} />
+    </ListItemIcon>
+    <ListItemText primary="Red = Negative" />
+  </ListItem>
+
+  <ListItem sx={{ py: 0 }}>
+    <ListItemIcon sx={{ minWidth: 24 }}>
+      <FiberManualRecordIcon sx={{ fontSize: 12, color: "#ffcc00" }} />
+    </ListItemIcon>
+    <ListItemText primary="Yellow = Neutral" />
+  </ListItem>
+
+  <ListItem sx={{ py: 0 }}>
+    <ListItemIcon sx={{ minWidth: 24 }}>
+      <FiberManualRecordIcon sx={{ fontSize: 12, color: "#3ba55d" }} />
+    </ListItemIcon>
+    <ListItemText primary="Green = Positive" />
+  </ListItem>
+</List>
+      }
+      arrow
+    >
+      <IconButton size="small">
+        <InfoOutlinedIcon sx={{ color: "#7e7e7eff" }} />
+      </IconButton>
+    </Tooltip>
+  </Box>
+
+  {/* Edit / Save / Cancel buttons on the right */}
+  <Box
+    position="absolute"
+    right={0}
+    top="50%"
+    sx={{ transform: "translateY(-50%)" }}
+  >
+    {editMode ? (
+      <>
+        <IconButton color="primary" onClick={handleSaveRevenueGrowthData}>
+          <SaveIcon />
+        </IconButton>
+        <IconButton color="secondary" onClick={handleCancel}>
+          <CancelIcon />
+        </IconButton>
+      </>
+    ) : (
+      <IconButton onClick={() => setEditMode(true)}>
+        <EditIcon fontSize="small" />
+      </IconButton>
+    )}
+  </Box>
 </Box>
+
 
               <Table sx={{ border: "2px solid #ccc" }}>
                 <TableHead>
