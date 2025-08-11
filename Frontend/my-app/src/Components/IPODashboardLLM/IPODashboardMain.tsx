@@ -4,28 +4,11 @@ import html2canvas from "html2canvas";
 import {
   Box,
   Typography,
-  Grid,
   CircularProgress,
-  Container,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  IconButton,
-  TextField,
-  Button,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
+
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Cancel";
-import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
+
 import axios from "axios";
 import { cardColors } from "./UtilsIPODashboard";
 import introImage from "../../Assets/images/monashee_page1.png";
@@ -35,6 +18,7 @@ import IPODashboardPage1 from "./IPODashboardMain/IPODashboardPage1";
 import IPODashboardPage2 from "./IPODashboardMain/IPODashboardPage2";
 import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
 import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
+import EditableCard from "./Hooks/EditableCard";
 
 
 const getOrdinalSuffix = (n: number): string => {
@@ -286,17 +270,17 @@ await new Promise<void>((resolve) => {
 
       // ➤ Add footer
       const footerY = pdfHeight - 20;
-      pdf.setFontSize(8);
+      pdf.setFontSize(6);
       pdf.setTextColor(100);
       pdf.setFont("helvetica", "normal");
       pdf.text(
-        "Data as of  2025. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
+        " Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
         10,
         footerY,
         { maxWidth: pdfWidth - 20 }
       );
 
-      pdf.setFontSize(10);
+      pdf.setFontSize(8);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(128);
       pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
@@ -320,7 +304,7 @@ await new Promise<void>((resolve) => {
         pdf.setTextColor(100);
         pdf.setFont("helvetica", "normal");
         pdf.text(
-          "Data as of  2025. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
+          " Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
           10,
           footerY,
           { maxWidth: pdfWidth - 20 }
@@ -388,90 +372,6 @@ await new Promise<void>((resolve) => {
     setEditedContent((prev) => ({ ...prev, [key]: updated }));
   };
 
-  const renderEditableCard = (section: any, index: number) => {
-    const key = section.key;
-    const content = ipoData[key];
-    const isEditing = editMode[key];
-    const isExpanded = expandedPanels[key] || false;
-
-    return (
-      <Grid item xs={12} key={key}>
-        <Accordion
-          expanded={isExpanded}
-          onChange={() =>
-            setExpandedPanels((prev) => ({ ...prev, [key]: !prev[key] }))
-          }
-
-          sx={{
-            backgroundColor: cardColors[index % cardColors.length],
-            borderRadius: 2,
-            boxShadow: 3,
-            "&::before": { display: "none" },
-          }}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`${key}-header`}>
-            <Typography variant="h6" align="center" sx={{ color: "#002060", fontWeight: "bold", flex: 1 }}>
-              {section.title}
-            </Typography>
-            {isEditing ? (
-              <>
-                <IconButton color="primary" onClick={() => handleSaveCard(key)} size="small">
-                  <SaveIcon />
-                </IconButton>
-                <IconButton color="secondary" onClick={() => handleCancelCard(key)} size="small">
-                  <CancelIcon />
-                </IconButton>
-              </>
-            ) : (
-              <IconButton onClick={() => setEditMode((prev) => ({ ...prev, [key]: true }))} size="small">
-              <EditIcon fontSize="small" />
-              </IconButton>
-            )}
-          </AccordionSummary>
-
-          <AccordionDetails>
-            {isEditing ? (
-              <Box>
-                {editedContent[key]?.map((item, idx) => (
-                  <Box key={idx} display="flex" alignItems="flex-start" mb={1}>
-                    <Box sx={{ mr: 1, mt: 1 }}>
-                      <FiberManualRecordIcon sx={{ fontSize: 8, color: "#002060" }} />
-                    </Box>
-                    <TextField
-                      fullWidth
-                      multiline
-                      size="small"
-                      value={item}
-                      onChange={(e) => handleItemChange(key, idx, e.target.value)}
-                      placeholder="Enter text..."
-                      sx={{ mr: 1 }}
-                    />
-                    <IconButton color="error" onClick={() => handleDeleteItem(key, idx)} size="small">
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                ))}
-                <Button startIcon={<AddIcon />} onClick={() => handleAddItem(key)} variant="outlined" size="small" sx={{ mt: 1 }}>
-                  Add Item
-                </Button>
-              </Box>
-            ) : (
-              <List dense>
-                {content?.map((item: string, idx: number) => (
-                  <ListItem key={idx} sx={{ pl: 0 }}>
-                    <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                      <FiberManualRecordIcon sx={{ fontSize: 8, color: "#002060" }} />
-                    </ListItemIcon>
-                    <ListItemText primary={item} />
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </AccordionDetails>
-        </Accordion>
-      </Grid>
-    );
-  };
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
@@ -524,12 +424,46 @@ await new Promise<void>((resolve) => {
   ipoData={ipoData}
   selectedTicker={selectedTicker || ""}
   setIpoData={setIpoData}
-  renderEditableCard={renderEditableCard}
+  renderEditableCard={(section, index) => (
+    <EditableCard
+      section={section}
+      index={index}
+      cardColors={cardColors}
+      ipoData={ipoData}
+      editMode={editMode}
+      editedContent={editedContent}
+      expandedPanels={expandedPanels}
+      setExpandedPanels={setExpandedPanels}
+      setEditMode={setEditMode}
+      handleSaveCard={handleSaveCard}
+      handleCancelCard={handleCancelCard}
+      handleAddItem={handleAddItem}
+      handleDeleteItem={handleDeleteItem}
+      handleItemChange={handleItemChange}
+    />
+  )}
+/>
+<IPODashboardPage3
+  renderEditableCard={(section, index) => (
+    <EditableCard
+      section={section}
+      index={index}
+      cardColors={cardColors}
+      ipoData={ipoData}
+      editMode={editMode}
+      editedContent={editedContent}
+      expandedPanels={expandedPanels}
+      setExpandedPanels={setExpandedPanels}
+      setEditMode={setEditMode}
+      handleSaveCard={handleSaveCard}
+      handleCancelCard={handleCancelCard}
+      handleAddItem={handleAddItem}
+      handleDeleteItem={handleDeleteItem}
+      handleItemChange={handleItemChange}
+    />
+  )}
 />
 
-<IPODashboardPage3
-  renderEditableCard={renderEditableCard}
-/>
 
 <IPODashboardPage4
   selectedTicker={selectedTicker || ""}

@@ -116,13 +116,9 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
     setEditing(false);
     setEditedData({});
   };
-
-  const handleEditChange = (
-    metricName: string,
-    yearKey: string,
-    value: string
-  ) => {
-    setEditedData((prev: any) => ({
+const handleEditChange = (metricName: string, yearKey: string, value: string) => {
+  setEditedData((prev: any) => {
+    const updated = {
       ...prev,
       [forecastsTicker.toUpperCase()]: {
         ...prev[forecastsTicker.toUpperCase()],
@@ -131,8 +127,99 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
           [yearKey]: value,
         },
       },
-    }));
-  };
+    };
+
+    const data = updated[forecastsTicker.toUpperCase()];
+    const numValue = Number(value) || 0;
+
+    // ==== SALES ↔ SALES GROWTH ====
+    if (metricName === "Sales") {
+      const salesPrev = Number(data["Sales"]?.["one_year_before"]) || 0;
+      const salesCurr = Number(data["Sales"]?.["current_year"]) || 0;
+      const salesNext = Number(data["Sales"]?.["one_year_later"]) || 0;
+
+      if (yearKey === "current_year" && salesPrev) {
+        data["Sales Growth"] = {
+          ...data["Sales Growth"],
+          current_year: ((salesCurr - salesPrev) / salesPrev) * 100,
+        };
+      }
+      if (yearKey === "one_year_later" && salesCurr) {
+        data["Sales Growth"] = {
+          ...data["Sales Growth"],
+          one_year_later: ((salesNext - salesCurr) / salesCurr) * 100,
+        };
+      }
+    }
+    if (metricName === "Sales Growth") {
+      if (yearKey === "current_year") {
+        const salesPrev = Number(data["Sales"]?.["one_year_before"]) || 0;
+        if (salesPrev) {
+          data["Sales"] = {
+            ...data["Sales"],
+            current_year: salesPrev * (1 + numValue / 100),
+          };
+        }
+      }
+      if (yearKey === "one_year_later") {
+        const salesCurr = Number(data["Sales"]?.["current_year"]) || 0;
+        if (salesCurr) {
+          data["Sales"] = {
+            ...data["Sales"],
+            one_year_later: salesCurr * (1 + numValue / 100),
+          };
+        }
+      }
+    }
+
+    // ==== GROSS PROFIT ↔ GROSS PROFIT MARGIN ====
+    if (metricName === "Gross Profit" || metricName === "Sales") {
+      const gp = Number(data["Gross Profit"]?.[yearKey]) || 0;
+      const sales = Number(data["Sales"]?.[yearKey]) || 0;
+      if (sales) {
+        data["Gross Profit Margin"] = {
+          ...data["Gross Profit Margin"],
+          [yearKey]: (gp / sales) * 100,
+        };
+      }
+    }
+    if (metricName === "Gross Profit Margin") {
+      const sales = Number(data["Sales"]?.[yearKey]) || 0;
+      if (sales) {
+        data["Gross Profit"] = {
+          ...data["Gross Profit"],
+          [yearKey]: sales * (numValue / 100),
+        };
+      }
+    }
+
+    // ==== NET INCOME ↔ NET INCOME MARGIN ====
+    if (metricName === "Net Income" || metricName === "Sales") {
+      const ni = Number(data["Net Income"]?.[yearKey]) || 0;
+      const sales = Number(data["Sales"]?.[yearKey]) || 0;
+      if (sales) {
+        data["Net Income Margin"] = {
+          ...data["Net Income Margin"],
+          [yearKey]: (ni / sales) * 100,
+        };
+      }
+    }
+    if (metricName === "Net Income Margin") {
+      const sales = Number(data["Sales"]?.[yearKey]) || 0;
+      if (sales) {
+        data["Net Income"] = {
+          ...data["Net Income"],
+          [yearKey]: sales * (numValue / 100),
+        };
+      }
+    }
+
+    updated[forecastsTicker.toUpperCase()] = data;
+    return updated;
+  });
+};
+
+
 
   const handleSave = async () => {
     setEditing(false);
