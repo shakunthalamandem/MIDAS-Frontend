@@ -34,12 +34,21 @@ type ApiResponse = {
   total_deal_colour_yes: number;
   total_deal_colour_no: number;
 };
+
 type TickerOption = {
   ticker: string;
   pricing_date: string;
   deal_colour_present: "Yes" | "No";
 };
 
+type TickerData = {
+  ticker: string;
+  pricing_date: string;
+  deal_colour_present: string; // note: string here, could be "Yes" or "No" or other string
+  deal_captain: string;
+  deal_type: string;
+  allocation_deal_size_percentage: number | null;
+};
 
 const EquityNewDealFormMain: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<SelectedOption | null>(
@@ -53,6 +62,7 @@ const EquityNewDealFormMain: React.FC = () => {
   const token = localStorage.getItem("access_token");
   const [totalDealColourNo, setTotalDealColourNo] = useState<number>(0);
 
+  // Fetch data from API and set options
   const handleSearchClick = async () => {
     setLoading(true);
     setError(null);
@@ -72,20 +82,19 @@ const EquityNewDealFormMain: React.FC = () => {
       setOptions(tickers);
       setTotalDealColourNo(total_deal_colour_no);
 
+      // Set default selected option only if no selection exists
       if (!selectedOption) {
         const defaultDeal = tickers.find(
           (item) => item.ticker === default_ticker
         );
         if (defaultDeal) {
           setSelectedOption({ ...defaultDeal, create: false });
+          return; // exit early so we don't override with CTRI below
         }
-      }
-
-      setOptions(tickers);
-      if (!selectedOption) {
-        const defaultDeal = tickers.find((item) => item.ticker === "CTRI");
-        if (defaultDeal) {
-          setSelectedOption({ ...defaultDeal, create: false });
+        // If no default ticker found, fallback to CTRI
+        const fallbackDeal = tickers.find((item) => item.ticker === "CTRI");
+        if (fallbackDeal) {
+          setSelectedOption({ ...fallbackDeal, create: false });
         }
       }
     } catch (err) {
@@ -95,11 +104,18 @@ const EquityNewDealFormMain: React.FC = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     handleSearchClick();
   }, []);
+
   const handleCreateClick = () => {
-    setSelectedOption({ ticker: "", pricing_date: "", create: true, deal_colour_present: "" });
+    setSelectedOption({
+      ticker: "",
+      pricing_date: "",
+      create: true,
+      deal_colour_present: "",
+    });
     if (autoCompleteRef.current) {
       autoCompleteRef.current.value = "";
     }
@@ -114,6 +130,17 @@ const EquityNewDealFormMain: React.FC = () => {
     } else {
       setSelectedOption(null);
     }
+  };
+
+  // NEW: handle click on row in DealFormAllTickersTable
+  const handleTickerRowClick = (row: TickerData) => {
+    // Convert TickerData to TickerOption shape (deal_colour_present must be "Yes" | "No")
+    const option: TickerOption = {
+      ticker: row.ticker,
+      pricing_date: row.pricing_date,
+      deal_colour_present: row.deal_colour_present === "Yes" ? "Yes" : "No",
+    };
+    setSelectedOption({ ...option, create: false });
   };
 
   return (
@@ -140,8 +167,11 @@ const EquityNewDealFormMain: React.FC = () => {
             >
               Equity New Deal Form
             </Typography>
-            <DealFormAllTickersTable />
-            <Typography variant="body1" color="text.secondary">
+
+            {/* Pass the onRowClick handler here */}
+            
+
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
               Create or search for an equity deal by ticker and pricing date to
               get the complete deal form.
             </Typography>
@@ -262,37 +292,28 @@ const EquityNewDealFormMain: React.FC = () => {
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    sx={{ textAlign: "left", width: "100%" }} // key to ensuring left alignment
+                    sx={{ textAlign: "left", width: "100%" }}
                   >
                     {formatDateSimple(option.pricing_date)}
                   </Typography>
                 </Box>
               )}
             />
-                <Box width="100%" display="flex" justifyContent="flex-end">
-  <Typography variant="caption" color="red">
-    🔴 {totalDealColourNo} deal colour
-    {totalDealColourNo > 1 ? "s" : ""} are missing
-  </Typography>
-</Box>
-           
+            <Box width="100%" display="flex" justifyContent="flex-end" mt={1}>
+              <Typography variant="caption" color="red">
+                🔴 {totalDealColourNo} deal colour
+                {totalDealColourNo > 1 ? "s" : ""} are missing
+              </Typography>
+            </Box>
           </Box>
-   
-                  </Box>
-
-
-
+        </Box>
 
         {error && (
-          <Alert
-            severity="warning"
-            onClose={() => setError(null)}
-            sx={{ mb: 2 }}
-          >
+          <Alert severity="warning" onClose={() => setError(null)} sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
-
+<DealFormAllTickersTable onRowClick={handleTickerRowClick} />
         <DealFormSectionMainTable selectedOption={selectedOption} />
       </Paper>
     </Fade>
