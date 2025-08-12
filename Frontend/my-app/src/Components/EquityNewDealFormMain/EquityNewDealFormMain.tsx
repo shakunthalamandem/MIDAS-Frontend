@@ -15,6 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import { SelectedOption } from "../../types/NewDealFormData";
 import DealFormSectionMainTable from "./DealFormSections/DealFormSectionMainTable";
+import DealFormAllTickersTable from "./DealFormSections/DealFormAllTickersTable";
 
 function formatDateSimple(dateString: string): string {
   if (!dateString) return "";
@@ -139,6 +140,7 @@ const EquityNewDealFormMain: React.FC = () => {
             >
               Equity New Deal Form
             </Typography>
+            <DealFormAllTickersTable />
             <Typography variant="body1" color="text.secondary">
               Create or search for an equity deal by ticker and pricing date to
               get the complete deal form.
