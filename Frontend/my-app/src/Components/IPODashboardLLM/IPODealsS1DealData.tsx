@@ -185,10 +185,10 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
             .map((field, idx) => (
               <Grid item xs={12} sm={4} key={idx} sx={{ display: "flex", flexDirection: "column" }}>
                 <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-                  <CardContent sx={{ backgroundColor:"#fff", padding: 2, flexGrow: 1 }}>
+                  <CardContent sx={{ backgroundColor:"#fff", padding: 2, flexGrow: 1 ,border:'2px solid #002060',borderRadius: 2}}>
                     <Grid container spacing={2} alignItems="flex-start" sx={{ height: "100%" }}>
                       <Grid item xs>
-                        <Box display="flex" alignItems="center" justifyContent="center">
+                        <Box display="flex" >
                           <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold", mr: 1 }}>
                             {field.icon}
                           </Typography>

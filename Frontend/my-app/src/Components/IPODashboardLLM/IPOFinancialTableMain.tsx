@@ -377,7 +377,7 @@ const handleEditChange = (metricName: string, yearKey: string, value: string) =>
                           border: "1px solid #000000",
                           fontWeight: "bold",
                           fontStyle: isEvenRow ? "normal" : "italic",
-                          fontSize: isEvenRow ? "0.875rem" : "0.725rem",
+                          fontSize: isEvenRow ? "1.3rem" : "1.3rem",
                           backgroundColor: isEvenRow ? "" : "#ebebeb",
                         }}
                       >
@@ -405,7 +405,7 @@ const handleEditChange = (metricName: string, yearKey: string, value: string) =>
                             sx={{
                               border: "1px solid #000000",
                               fontStyle: isEvenRow ? "normal" : "italic",
-                              fontSize: isEvenRow ? "0.875rem" : "0.725rem",
+                              fontSize: isEvenRow ? "1.3rem" : "1.3rem",
                               backgroundColor: isHighlightColumn
                                 ? "rgba(248, 247, 245, 1)"
                                 : isEvenRow
@@ -427,7 +427,7 @@ const handleEditChange = (metricName: string, yearKey: string, value: string) =>
                                 }
                                 inputProps={{
                                   style: {
-                                    fontSize: isEvenRow ? "0.875rem" : "0.725rem",
+                                    fontSize: isEvenRow ? "1rem" : "1rem",
                                     textAlign: "center",
                                     padding: "6px 8px",
                                   },

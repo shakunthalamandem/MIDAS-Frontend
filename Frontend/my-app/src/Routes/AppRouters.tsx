@@ -64,6 +64,7 @@ import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis"
 import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
 import EquityDealsIPOFO from "../Components/Main/DashBoards/EquityDealsIPOFO";
+import ChatboxMain from "../Components/ChatboxGroup/ChatboxMain";
 
 
 
@@ -214,6 +215,8 @@ const AppRouters: React.FC = () => {
 
         <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis/></AuthGuard>} />
         <Route path="/genai_data_set" element={<AuthGuard><HeatMapMain/></AuthGuard>} />
+        <Route path="/chatbot" element={<AuthGuard><ChatboxMain /></AuthGuard>} />
+
 
 
         

@@ -129,9 +129,9 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
+                  {/* <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
                     IPO Summary
-                  </Typography>
+                  </Typography> */}
                   <Box position="absolute" right={0}>
                     {summaryEditMode ? (
                       <>
@@ -160,7 +160,7 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
                       >
                         <Box>
                           <Typography
-                            variant="body1"
+                            variant="h6"
                             sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}
                           >
                             {field.label}
@@ -217,7 +217,7 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
                               />
                             )
                           ) : (
-                            <Typography variant="body2" sx={{ color: "#333" }}>
+                            <Typography variant="h6" sx={{ color: "#333" }}>
                               {formatValue(field.key, ipodata[field.key], ipodata)}
                             </Typography>
                           )}
