@@ -60,7 +60,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
                     transition={{ delay: index * 0.2 }}
                   >
                     <Typography
-                      variant="subtitle2"
+                      variant="body1"
                       sx={{ color: "#002060", fontWeight: 600, mb: 1 }}
                     >
                       {item.label}
@@ -89,7 +89,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
                     transition={{ delay: index * 0.2 }}
                   >
                     <Typography
-                      variant="caption"
+                      variant="body1"
                       sx={{
                         mt: 1,
                         display: "block",

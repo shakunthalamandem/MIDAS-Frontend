@@ -37,9 +37,9 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const formatNumber = (value: number) => {
-    if (Math.abs(value) >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
-    if (Math.abs(value) >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
-    if (Math.abs(value) >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
+    if (Math.abs(value) >= 1e9) return `${(value / 1e9).toFixed(0)}B`;
+    if (Math.abs(value) >= 1e6) return `${(value / 1e6).toFixed(0)}M`;
+    if (Math.abs(value) >= 1e3) return `${(value / 1e3).toFixed(0)}K`;
     return value.toString();
   };
 
@@ -128,8 +128,8 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
                   row.pricing_date,
                   row.issuer_name,
                   formatNumber(row.deal_size),
-                  row.t1d_return_from_bloomberg.toFixed(2),
-                  row.t1m_return_from_bloomberg.toFixed(2),
+                  row.t1d_return_from_bloomberg.toFixed(1),
+                  row.t1m_return_from_bloomberg.toFixed(1),
                 ].map((value, index, arr) => (
                   <TableCell
                     key={index}

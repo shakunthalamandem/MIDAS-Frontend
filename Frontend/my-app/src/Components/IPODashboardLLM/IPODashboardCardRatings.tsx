@@ -297,24 +297,41 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
 
 
               <Table sx={{ border: "2px solid #ccc" }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 600, width: "30%", borderRight: "2px solid #ccc" }}>
-                      Criteria
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: 600,
-                        width: "15%",
-                        textAlign: "center",
-                        borderRight: "2px solid #ccc",
-                      }}
-                    >
-                      Color
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 600, width: "55%" }}>Notes</TableCell>
-                  </TableRow>
-                </TableHead>
+<TableHead>
+  <TableRow sx={{ backgroundColor: "#002060" }} >
+    <TableCell
+      sx={{
+        fontWeight: 600,
+        borderRight: "2px solid #ccc",
+        width: "250px", // Fixed width for Criteria
+        color: "#fff",
+      }}
+    >
+      Criteria
+    </TableCell>
+    <TableCell
+      sx={{
+        fontWeight: 600,
+        width: "100px", // Fixed width for Color
+        textAlign: "center",
+        borderRight: "2px solid #ccc",
+        color: "#fff",
+      }}
+    >
+      Color
+    </TableCell>
+    <TableCell
+      sx={{
+        fontWeight: 600,
+        width: "auto", // Remaining space for Notes
+        color: "#fff",
+      }}
+    >
+      Notes
+    </TableCell>
+  </TableRow>
+</TableHead>
+
                 <TableBody>
                   {criteriaList.map((item) => {
                     const original = revenueGrowth[item.key] || {};
@@ -324,7 +341,7 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
 
                     return (
                       <TableRow key={item.key} sx={{ verticalAlign: "top" }}>
-                        <TableCell sx={{ borderRight: "2px solid #ccc", fontWeight: 500 }}>
+                        <TableCell sx={{ borderRight: "2px solid #ccc", fontWeight: 500,fontSize:'1rem' }}>
                           {item.label}
                         </TableCell>
 
@@ -375,7 +392,7 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
                               }
                             />
                           ) : (
-                            <Typography sx={{ color: "#333", fontSize: "0.95rem" }}>
+                            <Typography sx={{ color: "#333", fontSize: "1rem" }}>
                               {value || "No data available"}
                             </Typography>
                           )}
