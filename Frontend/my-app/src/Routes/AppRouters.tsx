@@ -215,9 +215,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis/></AuthGuard>} />
         <Route path="/genai_data_set" element={<AuthGuard><HeatMapMain/></AuthGuard>} />
-
-
-                <Route path="/chatbot" element={<AuthGuard><ChatboxMain /></AuthGuard>} />
+        <Route path="/chatbot" element={<AuthGuard><ChatboxMain /></AuthGuard>} />
 
 
 
