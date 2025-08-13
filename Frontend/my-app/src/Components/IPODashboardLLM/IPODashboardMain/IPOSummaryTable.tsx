@@ -132,7 +132,7 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
                   {/* <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
                     IPO Summary
                   </Typography> */}
-                  <Box position="absolute" right={0}>
+                  {/* <Box position="absolute" right={0}>
                     {summaryEditMode ? (
                       <>
                         <IconButton color="primary" onClick={handleSaveSummary}>
@@ -147,7 +147,7 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
                         <EditIcon />
                       </IconButton>
                     )}
-                  </Box>
+                  </Box> */}
                 </Box>
 
                 <Grid container spacing={3}>
