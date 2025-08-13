@@ -82,7 +82,7 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
         </span>
       ),
     },
-    { field: "pricing_date", headerName: "Pricing Date", width: 200 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 180 },
     { field: "deal_type", headerName: "Deal Type", width: 150 },
     { field: "deal_captain", headerName: "Deal Captain", width: 180 },
     {
@@ -136,6 +136,7 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
         onRowClick={(params) => {
           if (onRowClick) onRowClick(params.row as TickerData);
         }}
+      
       />
     </Box>
     </Container>
