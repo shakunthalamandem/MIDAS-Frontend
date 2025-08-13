@@ -82,7 +82,7 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
         </span>
       ),
     },
-    { field: "pricing_date", headerName: "Pricing Date", width: 200 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 180 },
     { field: "deal_type", headerName: "Deal Type", width: 150 },
     { field: "deal_captain", headerName: "Deal Captain", width: 180 },
     {
@@ -124,19 +124,26 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 2 }}>
+    <Container maxWidth="lg" sx={{ mt: 2,mb: 4 }}>
        <Box sx={{ height: 400, width: "100%" }}>
    
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        loading={loading}
-        autoHeight={false}
-        rowHeight={35}
-        onRowClick={(params) => {
-          if (onRowClick) onRowClick(params.row as TickerData);
-        }}
-      />
+  <DataGrid
+  rows={rows}
+  columns={columns}
+  loading={loading}
+  autoHeight={false}
+  rowHeight={35}
+  onRowClick={(params) => {
+    if (onRowClick) onRowClick(params.row as TickerData);
+  }}
+  sx={{
+    "& .MuiDataGrid-container--top [role='row']": {
+      backgroundColor: "#002060",
+      color: "#FFFFFF", // optional for white text
+    },
+  }}
+/>
+
     </Box>
     </Container>
   );
