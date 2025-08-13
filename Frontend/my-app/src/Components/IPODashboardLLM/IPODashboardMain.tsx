@@ -166,12 +166,17 @@ const handleExportPDF = async () => {
   try {
     // ✅ Prepare dynamic "Data as of" text
     let dataAsOfText = "";
-    if (ipoData?.pricing_date) {
-      const dateObj = new Date(ipoData.pricing_date);
-      const month = dateObj.toLocaleString("default", { month: "short" }); // "Aug"
-      const year = dateObj.getFullYear(); // 2025
-      dataAsOfText = `${month} ${year}`;
-    }
+  if (ipoData?.pricing_date) {
+  const cleanDateStr = ipoData.pricing_date.replace(/(\d+)(st|nd|rd|th)/, "$1");
+  const dateObj = new Date(cleanDateStr);
+
+  const month = dateObj.toLocaleString("default", { month: "short" });
+  const year = dateObj.getFullYear();
+
+  dataAsOfText = `${month} ${year}`;
+
+
+}
 
     // ✅ Load Logo
     const logoImg = new Image();

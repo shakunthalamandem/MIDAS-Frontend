@@ -139,7 +139,7 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
   sx={{
     "& .MuiDataGrid-container--top [role='row']": {
       backgroundColor: "#002060",
-      color: "#FFFFFF", // optional for white text
+      color: "#FFFFFF", 
     },
   }}
 />
