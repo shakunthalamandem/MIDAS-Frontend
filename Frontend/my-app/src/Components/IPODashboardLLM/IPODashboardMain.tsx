@@ -185,23 +185,24 @@ const handleExportPDF = async () => {
       logoImg.onload = () => resolve();
     });
 
-    // ✅ Add Front Page
-    const introImg = new Image();
-    introImg.src = introImage;
+    // ✅ Add Front Page (Intro image + formatted text)
+const introImg = new Image();
+introImg.src = introImage;
 
-    await new Promise<void>((resolve) => {
-      introImg.onload = () => {
-        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+await new Promise<void>((resolve) => {
+  introImg.onload = () => {
+    pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
-        const margin = 10;
-        const color = [0, 32, 96];
+    const margin = 10;
+    const color = [0, 32, 96]; // #002060
 
-        if (ipoData?.company_name && ipoData?.exchange && ipoData?.ticker_name) {
-          const companyName = ipoData.company_name;
-          const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
-          const pricingDate = ipoData.pricing_date;
+    if (ipoData?.company_name && ipoData?.exchange && ipoData?.ticker_name) {
+      const companyName = ipoData.company_name;
+      const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
+      const pricingDate = ipoData.pricing_date;
 
-          const startY = 40;
+      // ✅ Change this value to move all text lower on the page
+      const startY = 40; // Original was 20 — increase to shift text down
 
       // Company Name
       pdf.setFontSize(16);
@@ -261,6 +262,7 @@ const handleExportPDF = async () => {
 
       pdf.addPage();
 
+      // ➤ Logo top-right
       const logoWidth = 40;
       const logoHeight = 12;
       const logoX = pdfWidth - logoWidth - 10;
@@ -268,17 +270,19 @@ const handleExportPDF = async () => {
 
       pdf.addImage(logoImg, "PNG", logoX, logoY, logoWidth, logoHeight);
 
+      // ➤ Blue line below logo
       const lineY = logoY + logoHeight + 2;
       pdf.setDrawColor(0, 32, 96);
       pdf.setLineWidth(1);
       pdf.line(10, lineY, pdfWidth - 10, lineY);
 
+      // ➤ Add canvas image
       const marginTop = lineY + 5;
       const imageWidth = pdfWidth;
       const imageHeight = (canvas.height * imageWidth) / canvas.width;
       pdf.addImage(imgData, "PNG", 0, marginTop, imageWidth, imageHeight);
 
-      // ✅ Footer with dynamic date
+      // ➤ Add footer
       const footerY = pdfHeight - 20;
       pdf.setFontSize(6);
       pdf.setTextColor(100);
@@ -300,7 +304,7 @@ const handleExportPDF = async () => {
     setExpandedPanels(originalPanels);
     await waitForDOMUpdate();
 
-    // ✅ Outro Page with same footer
+    // ✅ Outro Page
     const outroImg = new Image();
     outroImg.src = outroImage;
     await new Promise<void>((resolve) => {
@@ -308,6 +312,7 @@ const handleExportPDF = async () => {
         pdf.addPage();
         pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
+        // ➤ Add footer
         const footerY = pdfHeight - 20;
         pdf.setFontSize(8);
         pdf.setTextColor(100);
@@ -328,6 +333,7 @@ const handleExportPDF = async () => {
       };
     });
 
+    // ✅ Save the PDF
     pdf.save(`${selectedTicker}_IPO_Report.pdf`);
   } catch (error) {
     console.error("PDF export failed", error);
@@ -335,7 +341,6 @@ const handleExportPDF = async () => {
     setPdfLoading(false);
   }
 };
-
 
 
 
