@@ -164,6 +164,15 @@ const handleExportPDF = async () => {
     new Promise<void>((resolve) => setTimeout(resolve, delay));
 
   try {
+    // ✅ Prepare dynamic "Data as of" text
+    let dataAsOfText = "";
+    if (ipoData?.pricing_date) {
+      const dateObj = new Date(ipoData.pricing_date);
+      const month = dateObj.toLocaleString("default", { month: "short" }); // "Aug"
+      const year = dateObj.getFullYear(); // 2025
+      dataAsOfText = `${month} ${year}`;
+    }
+
     // ✅ Load Logo
     const logoImg = new Image();
     logoImg.src = monasheeLogo;
@@ -171,24 +180,23 @@ const handleExportPDF = async () => {
       logoImg.onload = () => resolve();
     });
 
-    // ✅ Add Front Page (Intro image + formatted text)
-const introImg = new Image();
-introImg.src = introImage;
+    // ✅ Add Front Page
+    const introImg = new Image();
+    introImg.src = introImage;
 
-await new Promise<void>((resolve) => {
-  introImg.onload = () => {
-    pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+    await new Promise<void>((resolve) => {
+      introImg.onload = () => {
+        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
-    const margin = 10;
-    const color = [0, 32, 96]; // #002060
+        const margin = 10;
+        const color = [0, 32, 96];
 
-    if (ipoData?.company_name && ipoData?.exchange && ipoData?.ticker_name) {
-      const companyName = ipoData.company_name;
-      const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
-      const pricingDate = ipoData.pricing_date;
+        if (ipoData?.company_name && ipoData?.exchange && ipoData?.ticker_name) {
+          const companyName = ipoData.company_name;
+          const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
+          const pricingDate = ipoData.pricing_date;
 
-      // ✅ Change this value to move all text lower on the page
-      const startY = 40; // Original was 20 — increase to shift text down
+          const startY = 40;
 
       // Company Name
       pdf.setFontSize(16);
@@ -248,7 +256,6 @@ await new Promise<void>((resolve) => {
 
       pdf.addPage();
 
-      // ➤ Logo top-right
       const logoWidth = 40;
       const logoHeight = 12;
       const logoX = pdfWidth - logoWidth - 10;
@@ -256,25 +263,23 @@ await new Promise<void>((resolve) => {
 
       pdf.addImage(logoImg, "PNG", logoX, logoY, logoWidth, logoHeight);
 
-      // ➤ Blue line below logo
       const lineY = logoY + logoHeight + 2;
       pdf.setDrawColor(0, 32, 96);
       pdf.setLineWidth(1);
       pdf.line(10, lineY, pdfWidth - 10, lineY);
 
-      // ➤ Add canvas image
       const marginTop = lineY + 5;
       const imageWidth = pdfWidth;
       const imageHeight = (canvas.height * imageWidth) / canvas.width;
       pdf.addImage(imgData, "PNG", 0, marginTop, imageWidth, imageHeight);
 
-      // ➤ Add footer
+      // ✅ Footer with dynamic date
       const footerY = pdfHeight - 20;
       pdf.setFontSize(6);
       pdf.setTextColor(100);
       pdf.setFont("helvetica", "normal");
       pdf.text(
-        " Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
+        ` Data as of ${dataAsOfText} Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
         10,
         footerY,
         { maxWidth: pdfWidth - 20 }
@@ -290,7 +295,7 @@ await new Promise<void>((resolve) => {
     setExpandedPanels(originalPanels);
     await waitForDOMUpdate();
 
-    // ✅ Outro Page
+    // ✅ Outro Page with same footer
     const outroImg = new Image();
     outroImg.src = outroImage;
     await new Promise<void>((resolve) => {
@@ -298,13 +303,12 @@ await new Promise<void>((resolve) => {
         pdf.addPage();
         pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
-        // ➤ Add footer
         const footerY = pdfHeight - 20;
         pdf.setFontSize(8);
         pdf.setTextColor(100);
         pdf.setFont("helvetica", "normal");
         pdf.text(
-          " Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.",
+          ` Data as of ${dataAsOfText} Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
           10,
           footerY,
           { maxWidth: pdfWidth - 20 }
@@ -319,7 +323,6 @@ await new Promise<void>((resolve) => {
       };
     });
 
-    // ✅ Save the PDF
     pdf.save(`${selectedTicker}_IPO_Report.pdf`);
   } catch (error) {
     console.error("PDF export failed", error);
@@ -327,6 +330,7 @@ await new Promise<void>((resolve) => {
     setPdfLoading(false);
   }
 };
+
 
 
 
