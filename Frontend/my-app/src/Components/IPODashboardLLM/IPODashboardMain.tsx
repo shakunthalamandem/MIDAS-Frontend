@@ -438,24 +438,6 @@ await new Promise<void>((resolve) => {
   ipoData={ipoData}
   selectedTicker={selectedTicker || ""}
   setIpoData={setIpoData}
-  renderEditableCard={(section, index) => (
-    <EditableCard
-      section={section}
-      index={index}
-      cardColors={cardColors}
-      ipoData={ipoData}
-      editMode={editMode}
-      editedContent={editedContent}
-      expandedPanels={expandedPanels}
-      setExpandedPanels={setExpandedPanels}
-      setEditMode={setEditMode}
-      handleSaveCard={handleSaveCard}
-      handleCancelCard={handleCancelCard}
-      handleAddItem={handleAddItem}
-      handleDeleteItem={handleDeleteItem}
-      handleItemChange={handleItemChange}
-    />
-  )}
 />
 <IPODashboardPage3
   renderEditableCard={(section, index) => (

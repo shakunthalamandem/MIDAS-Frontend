@@ -5,20 +5,13 @@ interface Props {
   ipoData: any;
   selectedTicker: string;
   setIpoData: (data: any) => void;
-  renderEditableCard: (
-    section: any,
-    index: number,
-    minHeight?: number,
-    isExpanded?: boolean,
-    onToggle?: () => void
-  ) => React.ReactNode;
+ 
 }
 
 const IPODashboardPage2: React.FC<Props> = ({
   ipoData,
   selectedTicker,
   setIpoData,
-  renderEditableCard,
 }) => {
   const [rowHeights, setRowHeights] = useState<number[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
