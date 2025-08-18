@@ -1,7 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Container, Grid } from "@mui/material";
 import IPODashboardCardRatings from "../IPODashboardCardRatings";
-import { cardSections } from "../UtilsIPODashboard";
 
 interface Props {
   ipoData: any;
@@ -23,7 +21,6 @@ const IPODashboardPage2: React.FC<Props> = ({
   renderEditableCard,
 }) => {
   const [rowHeights, setRowHeights] = useState<number[]>([]);
-  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -44,12 +41,7 @@ const IPODashboardPage2: React.FC<Props> = ({
     setRowHeights(heights);
   }, [ipoData]);
 
-  const toggleRow = (rowIndex: number) => {
-    setExpandedRows((prev) => ({
-      ...prev,
-      [rowIndex]: !prev[rowIndex],
-    }));
-  };
+
 
   return (
     <div id="ipo-dashboard-page2">
@@ -58,31 +50,7 @@ const IPODashboardPage2: React.FC<Props> = ({
         selectedTicker={selectedTicker}
         setIpoData={setIpoData}
       />
-      <Container maxWidth="xl" sx={{ mb: 3 }}>
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          {cardSections.slice(0, 2).map((section, index) => {
-            const rowIndex = Math.floor(index / 2);
-            return (
-              <Grid
-                item
-                xs={12}
-                md={6}
-                key={section.key}
-                sx={{ display: "flex" }}
-                ref={(el) => (cardRefs.current[index] = el)}
-              >
-                {renderEditableCard(
-                  section,
-                  index,
-                  rowHeights[rowIndex],
-                  expandedRows[rowIndex] || false,
-                  () => toggleRow(rowIndex) // shared toggle
-                )}
-              </Grid>
-            );
-          })}
-        </Grid>
-      </Container>
+
     </div>
   );
 };

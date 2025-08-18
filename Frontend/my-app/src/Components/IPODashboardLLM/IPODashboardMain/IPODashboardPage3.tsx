@@ -19,7 +19,7 @@ const IPODashboardPage3: React.FC<Props> = ({ renderEditableCard }) => {
             alignItems: "stretch", // ✅ Make all items in each row equal height
           }}
         >
-          {cardSections.slice(2, 6).map((section, index) => (
+          {cardSections.slice(0, 6).map((section, index) => (
             <Grid
               item
               xs={12}
