@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { cardColors } from "./UtilsIPODashboard";
 import introImage from "../../Assets/images/monashee_page1.png";
-import outroImage from "../../Assets/images/monashee_pdf_footer.jpg";
+import outroImage from "../../Assets/images/Disclaimer.jpg";
 import monasheeLogo from "../../Assets/images/monashee_logo.png";
 import IPODashboardPage1 from "./IPODashboardMain/IPODashboardPage1";
 import IPODashboardPage2 from "./IPODashboardMain/IPODashboardPage2";
