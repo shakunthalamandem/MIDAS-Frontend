@@ -52,7 +52,6 @@ const ExportUnifiedDealData: React.FC = () => {
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
 
-
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = blobUrl;
@@ -73,24 +72,50 @@ const ExportUnifiedDealData: React.FC = () => {
   };
 
   return (
-    <Container>
-      <Card sx={{ p: 2, boxShadow: 3, borderRadius: 3 }}>
+    <Container maxWidth="sm" sx={{ mt: 5 }}>
+      <Card
+        sx={{
+          p: 3,
+          borderRadius: 4,
+          boxShadow: 6,
+          background: "linear-gradient(135deg, #f0f4ff 0%, #e3eeff 100%)",
+        }}
+      >
         <CardContent>
-          <Typography variant="h6" gutterBottom>
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{
+              fontWeight: "bold",
+              color: "#1a237e",
+              textAlign: "center",
+              mb: 2,
+            }}
+          >
             Export Unified Deal Data
           </Typography>
 
           <UnifiedDealSelector selected={selected} setSelected={setSelected} />
 
-          <Box mt={2}>
+          <Box mt={3} display="flex" justifyContent="center">
             <Button
               variant="contained"
-              color="primary"
-              startIcon={<Download />}
+              startIcon={loading ? <CircularProgress size={20} /> : <Download />}
               onClick={handleDownload}
               disabled={loading || !selected.length}
+              sx={{
+                px: 3,
+                py: 1,
+                fontWeight: "bold",
+                borderRadius: 3,
+                background: "linear-gradient(135deg, #211c6eff 0%, #1a701aff 100%)",
+                color: "#fff",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #a1abbeff 0%, #b8dbb7ff 100%)",
+                },
+              }}
             >
-              {loading ? <CircularProgress size={20} /> : "Download Excel"}
+              {loading ? "Downloading..." : "Download Excel"}
             </Button>
           </Box>
         </CardContent>
