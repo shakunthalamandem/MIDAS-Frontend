@@ -65,6 +65,7 @@ import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
 import EquityDealsIPOFO from "../Components/Main/DashBoards/EquityDealsIPOFO";
 import ChatboxMain from "../Components/ChatboxGroup/ChatboxMain";
+import ExportUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/ExportUnifiedDealData";
 
 
 
@@ -228,6 +229,14 @@ const AppRouters: React.FC = () => {
         <Route path="/detailed-banks" element={<AuthGuard><DetailedLeadBankView /></AuthGuard>} />
         <Route path="/detailed-region" element={<AuthGuard><DetailedRegionView /></AuthGuard>} />
         <Route path="/version" element={<AuthGuard><VersionUploadForm /></AuthGuard>} />
+
+
+
+
+
+
+        <Route path="/download_data" element={<AuthGuard><ExportUnifiedDealData /></AuthGuard>} />
+
       </Routes>
     </ErrorBoundary>
     
