@@ -174,14 +174,14 @@ const DealInformation: React.FC<FormSectionProps> = ({
       <Grid container spacing={2}>
         {renderTextField("Ticker", "ticker")}
         {renderTextField("Pricing Date", "pricing_date", "date")}
-        {renderTextField("Vendor/Issuer", "vendor_issuer")}
+        {renderTextField("Vendor/Issuer", "issuer_name")}
         {renderSelectField("Region", "region", regions)}
         {renderSelectField("Deal Type", "deal_type", dealTypes)}
         {renderSelectField("FO Type", "fo_type", foTypes)}
         {renderSelectField("Sector", "sector", sectors)}
         {renderSelectField("Deal Captain", "deal_captain", dealCaptains)}
-        {renderSelectField("Lead Bank", "invitation_bank", invitationBanks)}
-        {renderTextField("Deal Size ($ Million)", "deal_size_amount_usd")}
+        {renderSelectField("Lead Bank", "lead_bank", invitationBanks)}
+        {renderTextField("Deal Size ($ Million)", "deal_size")}
       </Grid>
     </>
   );

@@ -66,7 +66,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
       const token = localStorage.getItem("access_token");
 
       const url = isCreate
-        ? `${apiUrl}/api/create_new_deal_form/`
+        ? `${apiUrl}/api/create_newdeal_form/`
         : `${apiUrl}/api/update_new_deal_form/`;
 
       const payload = { ...localData };
