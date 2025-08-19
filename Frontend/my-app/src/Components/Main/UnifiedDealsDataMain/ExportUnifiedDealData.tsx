@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Container,
   Typography,
+  Alert,
 } from "@mui/material";
 import axios from "axios";
 import { Download } from "@mui/icons-material";
@@ -15,20 +16,23 @@ import UnifiedDealSelector from "./UnifiedDealSelector";
 const ExportUnifiedDealData: React.FC = () => {
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
   const handleDownload = async () => {
     if (!selected.length) {
-      alert("Please select at least one deal");
+      setError("Please select at least one deal.");
       return;
     }
-
+    setError(null);
     setLoading(true);
+    setSuccess(false);
 
     try {
-      // Build payload as array of {ticker, pricing_date}
+      // Prepare payload for API
       const payload = {
         selections: selected.map((val) => {
           const [ticker, pricing_date] = val.split("|");
@@ -45,7 +49,7 @@ const ExportUnifiedDealData: React.FC = () => {
         }
       );
 
-      // Trigger browser download (single Excel file for all selections)
+      // Create blob and trigger download
       const blob = new Blob([resp.data as BlobPart], {
         type:
           resp.headers["content-type"] ||
@@ -63,9 +67,12 @@ const ExportUnifiedDealData: React.FC = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(blobUrl);
+
+      // If download was successful, show success message
+      setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert("Failed to download Excel file");
+      setError("Failed to download Excel file. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -96,6 +103,20 @@ const ExportUnifiedDealData: React.FC = () => {
           </Typography>
 
           <UnifiedDealSelector selected={selected} setSelected={setSelected} />
+
+          {/* Show error message if any */}
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          {/* Show success message if download is successful */}
+          {success && (
+            <Alert severity="success" sx={{ mt: 2 }}>
+              Download successful!
+            </Alert>
+          )}
 
           <Box mt={3} display="flex" justifyContent="center">
             <Button
