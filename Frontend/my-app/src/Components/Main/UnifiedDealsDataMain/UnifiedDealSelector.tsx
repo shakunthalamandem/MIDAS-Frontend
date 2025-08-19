@@ -11,6 +11,7 @@ import {
   Container,
   Checkbox,
   ListItemText,
+  Chip,
 } from "@mui/material";
 import axios from "axios";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -69,6 +70,11 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
   // Handle dropdown change
   const handleChange = (event: any) => {
     setSelected(event.target.value);
+  };
+
+  // Remove a chip
+  const handleDelete = (value: string) => {
+    setSelected(selected.filter((item) => item !== value));
   };
 
   // Get the label for the selected items in the dropdown
@@ -142,6 +148,24 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
               )}
             </Select>
           </FormControl>
+
+          {/* Chips for selected items */}
+          {selected.length > 0 && (
+            <Box display="flex" flexWrap="wrap" gap={1}>
+              {selected.map((val) => {
+                const [ticker, date] = val.split("|");
+                return (
+                  <Chip
+                    key={val}
+                    label={`${ticker} (${new Date(date).toLocaleDateString()})`}
+                    onDelete={() => handleDelete(val)}
+                    color="primary"
+                    variant="outlined"
+                  />
+                );
+              })}
+            </Box>
+          )}
         </Box>
       </Container>
     </ThemeProvider>
