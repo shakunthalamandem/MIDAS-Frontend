@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Card, CardContent, TextField } from "@mui/material";
+import { Box, Button, Card, CardContent, TextField } from "@mui/material";
 import { Link } from "react-router-dom";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 interface DetailedGapDataTableProps {
   data: any[];
@@ -24,7 +26,20 @@ const formatDealSize = (dealSize: any) => {
   const formattedValue = absoluteValue.toLocaleString("en-US");
   return (isNegative ? "-$" : "$") + formattedValue;
 };
-
+  const exportToExcel = () => {
+    const exportData = rows.map(({ id, ...row }) => row);
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Deals");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const dataBlob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(dataBlob, "Deal_Detailed_Gap_Analysis.xlsx");
+  };
 
   const preprocessRows = (rows: any[]) =>
     rows.map((row, index) => ({
@@ -96,6 +111,7 @@ const formatDealSize = (dealSize: any) => {
         </div>
       ),
     },    { field: "pricing_date", headerName: "Pricing Date", width: 100 },
+     { field: "first_trade_date", headerName: "First Trade Date", width: 100 },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "deal_type", headerName: "Deal Type", width: 80 },
     { field: "fo_type", headerName: "FO Type", width: 80 },
@@ -317,6 +333,17 @@ return (
           sx={{ width: "200px" }}
         />
       </Box>
+        <Button
+            variant="contained"
+            onClick={exportToExcel}
+            sx={{
+              backgroundColor: "#002060",
+              color: "#fff",
+              textTransform: "none",
+            }}
+          >
+            Export to Excel
+          </Button>
       <Box sx={{ height: 600, width: "100%", marginTop: 3 }}>
         <DataGrid
           rows={filteredRows}
