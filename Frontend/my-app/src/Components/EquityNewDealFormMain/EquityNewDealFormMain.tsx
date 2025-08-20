@@ -305,9 +305,10 @@ const EquityNewDealFormMain: React.FC = () => {
             />
              <Typography
       onClick={() => navigate("/download_deals_data")}
-      sx={{ cursor: "pointer", color: "primary.main" }}
+      sx={{ cursor: "pointer", color: "#002060" ,    textDecoration: "underline" 
+}}
     >
-      Download the Deals
+      Download  Deals
     </Typography> 
             <Box width="100%" display="flex" justifyContent="flex-end" mt={1}>
               <Typography variant="caption" color="red">
