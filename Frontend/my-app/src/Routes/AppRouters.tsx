@@ -235,7 +235,7 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path="/download_data" element={<AuthGuard><ExportUnifiedDealData /></AuthGuard>} />
+        <Route path="/download_deals_data" element={<AuthGuard><ExportUnifiedDealData /></AuthGuard>} />
 
       </Routes>
     </ErrorBoundary>
