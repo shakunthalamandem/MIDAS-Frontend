@@ -30,14 +30,19 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
 
         if (!apiUrl) throw new Error("API URL is not defined");
 
-        const response = await fetch(`${apiUrl}/api/new_deal_ticker_list/`, {
-          method: "GET",
+        const response = await fetch(`${apiUrl}/api/unified_new_deal_data/`, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
+          body: JSON.stringify({
+            type: "ticker_list", 
+          }),
         });
+
         const data = await response.json();
+
 
         if (data.tickers) {
           const formattedRows = data.tickers.map(

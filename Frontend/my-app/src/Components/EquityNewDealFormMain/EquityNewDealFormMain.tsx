@@ -72,15 +72,18 @@ const EquityNewDealFormMain: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get<ApiResponse>(
-        `${apiUrl}/api/new_deal_ticker_list/`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+ const response = await axios.post<ApiResponse>(
+  `${apiUrl}/api/unified_new_deal_data/`,
+  {
+    type: "ticker_list",
+  },
+  {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
       const { tickers, default_ticker, total_deal_colour_no } = response.data;
 

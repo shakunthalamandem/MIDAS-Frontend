@@ -97,13 +97,14 @@ const DealFormSectionMainTable: React.FC<Props> = ({ selectedOption }) => {
       setLoading(true);
       setError(null);
       
-      fetch(`${apiUrl}/api/equity_get_deal_form/`, {
+      fetch(`${apiUrl}/api/unified_new_deal_data/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
+          type: 'deal_information',
           ticker: selectedOption.ticker,
           pricing_date: selectedOption.pricing_date,
         }),
