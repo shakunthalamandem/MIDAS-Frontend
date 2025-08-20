@@ -80,10 +80,10 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
     onChange({ ...data, times_covered: event.target.value });
   };
 
-  const longOnly = parsePercent(data.long_only_allocation_percent);
-  const hedgeFunds = parsePercent(data.hedge_funds_allocation_percent);
-  const top10 = parsePercent(data.top_10_allocation_concentration_percent);
-  const institutional = parsePercent(data.institutional_allocation_percent);
+  const longOnly = parsePercent(data.long_only_allocation_percentage);
+  const hedgeFunds = parsePercent(data.hedge_allocation_percentage);
+  const top10 = parsePercent(data.allocation_concentration_percentage);
+  const institutional = parsePercent(data.institutional_allocation_percentage);
   const retail = 100 - institutional;
 
   return (
@@ -138,13 +138,13 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
             {/* Slider with Input: Long Only */}
             <Grid item xs={12} sm={6}>
               <Typography gutterBottom color="#002060">
-                Long Only Allocation (%)
+                Long Only Aldddlocation (%)
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginLeft: "8px" }}>
                 <BlueSlider
                   value={longOnly}
                   onChange={(_, value) =>
-                    handleSliderChange("long_only_allocation_percent", value as number)
+                    handleSliderChange("long_only_allocation_percentage", value as number)
                   }
                   valueLabelDisplay="on"
                   step={1}
@@ -155,7 +155,7 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                 <TextField
                   type="number"
                   value={longOnly}
-                  onChange={handleInputChange("long_only_allocation_percent")}
+                  onChange={handleInputChange("long_only_allocation_percentage")}
                   inputProps={{ min: 0, max: 100 }}
                   size="small"
                   sx={{ width: 80 }}
@@ -173,7 +173,7 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                 <BlueSlider
                   value={hedgeFunds}
                   onChange={(_, value) =>
-                    handleSliderChange("hedge_funds_allocation_percent", value as number)
+                    handleSliderChange("hedge_allocation_percentage", value as number)
                   }
                   valueLabelDisplay="on"
                   step={1}
@@ -184,7 +184,7 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                 <TextField
                   type="number"
                   value={hedgeFunds}
-                  onChange={handleInputChange("hedge_funds_allocation_percent")}
+                  onChange={handleInputChange("hedge_allocation_percentage")}
                   inputProps={{ min: 0, max: 100 }}
                   size="small"
                   sx={{ width: 80 }}
@@ -217,7 +217,7 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                 <BlueSlider
                   value={top10}
                   onChange={(_, value) =>
-                    handleSliderChange("top_10_allocation_concentration_percent", value as number)
+                    handleSliderChange("allocation_concentration_percentage", value as number)
                   }
                   valueLabelDisplay="on"
                   step={1}
@@ -228,7 +228,7 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                 <TextField
                   type="number"
                   value={top10}
-                  onChange={handleInputChange("top_10_allocation_concentration_percent")}
+                  onChange={handleInputChange("allocation_concentration_percentage")}
                   inputProps={{ min: 0, max: 100 }}
                   size="small"
                   sx={{ width: 80 }}
@@ -248,8 +248,8 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                   onChange={(_, value) =>
                     onChange({
                       ...data,
-                      institutional_allocation_percent: value,
-                      retail_allocation_percent: 100 - Number(value),
+                      institutional_allocation_percentage: value,
+                      retail_allocation_percentage: 100 - Number(value),
                     })
                   }
                   valueLabelDisplay="on"
@@ -266,8 +266,8 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
                     if (!isNaN(value) && value >= 0 && value <= 100) {
                       onChange({
                         ...data,
-                        institutional_allocation_percent: value,
-                        retail_allocation_percent: 100 - value,
+                        institutional_allocation_percentage: value,
+                        retail_allocation_percentage: 100 - value,
                       });
                     }
                   }}
@@ -292,10 +292,10 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
         {/* Right Side: Deal Colour TextArea */}
         <Grid item xs={12} md={6}>
           <TextField
-            label="Deal Colour"
-            name="deal_colour"
-            value={data.deal_colour || ""}
-            onChange={(e) => onChange({ ...data, deal_colour: e.target.value })}
+            label="Deal Color"
+            name="deal_color"
+            value={data.deal_color || ""}
+            onChange={(e) => onChange({ ...data, deal_color: e.target.value })}
             fullWidth
             multiline
             minRows={10}
