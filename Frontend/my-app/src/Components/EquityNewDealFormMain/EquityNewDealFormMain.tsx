@@ -16,6 +16,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import { SelectedOption } from "../../types/NewDealFormData";
 import DealFormSectionMainTable from "./DealFormSections/DealFormSectionMainTable";
 import DealFormAllTickersTable from "./DealFormSections/DealFormAllTickersTable";
+import { useNavigate } from "react-router-dom";
+import DealsDropdown from "../Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
+
 
 function formatDateSimple(dateString: string): string {
   if (!dateString) return "";
@@ -61,6 +64,8 @@ const EquityNewDealFormMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const [totalDealColourNo, setTotalDealColourNo] = useState<number>(0);
+    const navigate = useNavigate();
+
 
   // Fetch data from API and set options
   const handleSearchClick = async () => {
@@ -185,6 +190,7 @@ const EquityNewDealFormMain: React.FC = () => {
             flexWrap="wrap"
             justifyContent="flex-end"
           >
+            
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -299,12 +305,15 @@ const EquityNewDealFormMain: React.FC = () => {
                 </Box>
               )}
             />
+            <DealsDropdown />
+          
             <Box width="100%" display="flex" justifyContent="flex-end" mt={1}>
               <Typography variant="caption" color="red">
                 🔴 {totalDealColourNo} deal colour
                 {totalDealColourNo > 1 ? "s" : ""} are missing
               </Typography>
-            </Box>
+
+           </Box>
           </Box>
         </Box>
 
