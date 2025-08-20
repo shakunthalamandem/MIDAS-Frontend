@@ -11,11 +11,11 @@ import { FormSectionProps } from "../../../types/NewDealFormData";
 import InfoIcon from '@mui/icons-material/Info';
 
 const percentageFields = [
-  "percentage_primary",
-  "discount_percentage",
-  "final_indication_deal_percentage",
-  "allocation_deal_size_percentage",
-  "allocation_percentage"
+  "primary_percentage",
+  "discount_from_announcement_price",
+  "ioi_as_percentage_of_deal_size",
+  "allocation_as_percentage_of_deal_size",
+  "allocation_as_percentage_of_ioi"
 ];
 
 const DealAllocations: React.FC<FormSectionProps> = ({
@@ -123,14 +123,14 @@ const DealAllocations: React.FC<FormSectionProps> = ({
 
       <Grid container spacing={2}>
         {renderSelectField("Sponsor", "sponsor", sponsors)}
-        {renderField("Percentage Primary", "percentage_primary")}
-        {renderField("Issue Price($) ", "price_local_currency")}
-        {renderField("Discount From Announcement Price", "discount_percentage")}
-        {renderField("IOI Amount ($ Million)", "final_indication_amount_usd")}
-        {renderField("IOI as % of Deal Size", "final_indication_deal_percentage")}
-        {renderField("Allocation Amount ($ Million)", "allocation_amount_usd")}
-        {renderField("Allocation as % of Deal Size ", "allocation_deal_size_percentage")}
-        {renderField("Allocation as % of IOI", "allocation_percentage")}
+        {renderField("Percentage Primary", "primary_percentage")}
+        {renderField("Issue Price($) ", "issue_price")}
+        {renderField("Discount From Announcement Price", "discount_from_announcement_price")}
+        {renderField("IOI Amount ($ Million)", "ioi_amount")}
+        {renderField("IOI as % of Deal Size", "ioi_as_percentage_of_deal_size")}
+        {renderField("Allocation Amount ($ Million)", "allocation_amount")}
+        {renderField("Allocation as % of Deal Size ", "allocation_as_percentage_of_deal_size")}
+        {renderField("Allocation as % of IOI", "allocation_as_percentage_of_ioi")}
       </Grid>
     </>
   );
