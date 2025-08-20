@@ -17,6 +17,7 @@ import { SelectedOption } from "../../types/NewDealFormData";
 import DealFormSectionMainTable from "./DealFormSections/DealFormSectionMainTable";
 import DealFormAllTickersTable from "./DealFormSections/DealFormAllTickersTable";
 import { useNavigate } from "react-router-dom";
+import DealsDropdown from "../Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
 
 
 function formatDateSimple(dateString: string): string {
@@ -189,6 +190,7 @@ const EquityNewDealFormMain: React.FC = () => {
             flexWrap="wrap"
             justifyContent="flex-end"
           >
+            
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -303,13 +305,8 @@ const EquityNewDealFormMain: React.FC = () => {
                 </Box>
               )}
             />
-             <Typography
-      onClick={() => navigate("/download_deals_data")}
-      sx={{ cursor: "pointer", color: "#002060" ,    textDecoration: "underline" 
-}}
-    >
-      Download  Deals
-    </Typography> 
+            <DealsDropdown />
+          
             <Box width="100%" display="flex" justifyContent="flex-end" mt={1}>
               <Typography variant="caption" color="red">
                 🔴 {totalDealColourNo} deal colour

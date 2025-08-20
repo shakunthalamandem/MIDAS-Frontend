@@ -66,6 +66,7 @@ import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
 import EquityDealsIPOFO from "../Components/Main/DashBoards/EquityDealsIPOFO";
 import ChatboxMain from "../Components/ChatboxGroup/ChatboxMain";
 import ExportUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/ExportUnifiedDealData";
+import UnifiedDealDataUpload from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/UnifiedDealDataUpload";
 
 
 
@@ -236,6 +237,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/download_deals_data" element={<AuthGuard><ExportUnifiedDealData /></AuthGuard>} />
+        <Route path="/deal_data_upload" element={<AuthGuard><UnifiedDealDataUpload /></AuthGuard>} />
 
       </Routes>
     </ErrorBoundary>
