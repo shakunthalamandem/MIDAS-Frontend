@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Stack, Alert, Snackbar, Grid, Typography } from "@mui/material";
+import { Box, Button, Stack, Alert, Snackbar, Grid, Typography, CircularProgress } from "@mui/material";
 import DealInformation from "../DealFormDataTabs/DealInformation";
 import DealAllocations from "../DealFormDataTabs/DealAllocations";
 import MarketData from "../DealFormDataTabs/MarketData";
@@ -31,6 +31,8 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
   const [editable, setEditable] = useState<boolean>(isCreate);
   const [localData, setLocalData] = useState<FormData>(formData);
   const [originalData] = useState<FormData>(formData);
+  const [loading, setLoading] = useState(false);
+
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -171,24 +173,34 @@ const handleSave = async () => {
         >
           {editable ? (
             <>
-              <Button
-                variant="contained"
-                onClick={handleSave}
-                startIcon={isCreate ? <AddIcon /> : <SaveIcon />}
-                sx={{
-                  background: "linear-gradient(to right, #00b894, #55efc4)",
-                  color: "#002060",
-                  fontWeight: 500,
-                  px: 3,
-                  boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
-                  "&:hover": {
-                    background: "linear-gradient(to right,rgb(0, 70, 56), #0055cc)",
-                    color: "#fff",
-                  },
-                }}
-              >
-                {isCreate ? "Save" : "Save Changes"}
-              </Button>
+<Button
+  variant="contained"
+  onClick={handleSave}
+  startIcon={
+    loading ? (
+      <CircularProgress size={20} sx={{ color: "#fff" }} />
+    ) : isCreate ? (
+      <AddIcon />
+    ) : (
+      <SaveIcon />
+    )
+  }
+  disabled={loading}
+  sx={{
+    background: "linear-gradient(to right, #00b894, #55efc4)",
+    color: "#002060",
+    fontWeight: 500,
+    px: 3,
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
+    "&:hover": {
+      background: "linear-gradient(to right,rgb(0, 70, 56), #0055cc)",
+      color: "#fff",
+    },
+  }}
+>
+  {loading ? "Saving..." : isCreate ? "Save" : "Save Changes"}
+</Button>
+
 
               <Button
                 variant="outlined"
