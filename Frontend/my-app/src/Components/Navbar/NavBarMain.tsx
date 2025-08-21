@@ -10,8 +10,10 @@ import {
   MenuItem,
   Avatar,
   Tooltip,
+  Badge
 } from "@mui/material";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import NotificationMenu from "./NotificationMenu"; 
 import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
 import Logs from "../Main/HomePage/Authentication/Logs";
@@ -28,6 +30,7 @@ const NavbarMain: React.FC = () => {
   const [showLogs, setShowLogs] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
+
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -292,7 +295,15 @@ const NavbarMain: React.FC = () => {
             </Button>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginRight: "10px" }}>
+          {/* Right Side */}
+ <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginRight: "10px" }}>
+  {isLoggedIn && (
+    <>
+      {/* 🔔 Notifications */}
+      <NotificationMenu apiUrl={apiUrl!} token={token} />
+    </>
+  )}
+
             {isLoggedIn && isSuperUser && (
               <Button sx={{ color: "#000", fontWeight: "bold", marginRight: "20px" }} onClick={() => setShowLogs(true)}>
                 <Logs />
@@ -338,18 +349,14 @@ const NavbarMain: React.FC = () => {
                 </Menu>
               </>
             ) : (
-              <Button sx={{ color: "#FFFFFF", backgroundColor: "#002060", fontWeight: "bold", paddingX: "18px" }} onClick={() => navigate("/login")}>
+              <Button sx={{ color: "#FFFFFF", backgroundColor: "#002060", fontWeight: "bold", px: "18px" }} onClick={() => navigate("/login")}>
                 Login
               </Button>
             )}
-            {showLogout && <Logout onConfirm={handleConfirmLogout} onCancel={handleCancelLogout} />}
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Subnavbar could be conditionally rendered here if needed */}
-
-      {/* Logout Confirmation Dialog */}
       {showLogout && <Logout onConfirm={handleConfirmLogout} onCancel={handleCancelLogout} />}
     </>
   );

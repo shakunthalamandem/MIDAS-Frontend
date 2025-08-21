@@ -12,13 +12,12 @@ import {
   TableRow,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 interface IpoData {
   ticker: string;
   company_name: string;
-  expected_date: string;
+  expected_listing_date: string;
   price: string | number | null;
   exchange: string;
   deal_size: number | null;
@@ -34,19 +33,22 @@ const UpcomingIpoTable: React.FC = () => {
   useEffect(() => {
     const fetchIpoData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/ipo_dashboard_data/`, {
+        const response = await fetch(`${apiUrl}/api/unified_new_deal_data/`, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
+          body: JSON.stringify({ type: "upcoming_ipo" }),
         });
 
         if (!response.ok) throw new Error("Failed to fetch IPO data");
 
         const data: IpoData[] = await response.json();
+
         const uniqueRows = Array.from(
           new Map(
-            data.map((item) => [`${item.ticker}_${item.expected_date}`, item])
+            data.map((item) => [`${item.ticker}_${item.expected_listing_date}`, item])
           ).values()
         );
 
@@ -117,7 +119,7 @@ const UpcomingIpoTable: React.FC = () => {
           color="#002060"
           mb={2}
         >
-          📅 Upcoming & Recent IPOs : Past Week to Next Two Weeks
+          📅 Upcoming IPOs: Past Week to Next Two Weeks
         </Typography>
 
         <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
@@ -197,34 +199,19 @@ const UpcomingIpoTable: React.FC = () => {
                       row.ticker
                     )}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
-                  >
+                  <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
                     {row.company_name}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
-                  >
-                    {formatDate(row.expected_date)}
+                  <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
+                    {formatDate(row.expected_listing_date)}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ fontSize: "0.78rem", padding: "8px 10px", border: "1px solid black", lineHeight: 1.2 }}
-                  >
+                  <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "8px 10px", border: "1px solid black", lineHeight: 1.2 }}>
                     {row.price !== null ? `${row.price}` : "—"}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
-                  >
-                    {row.exchange}
+                  <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
+                    {row.exchange || "—"}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
-                  >
+                  <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
                     {row.deal_size !== null ? `${row.deal_size}` : "—"}
                   </TableCell>
                 </TableRow>
@@ -233,16 +220,22 @@ const UpcomingIpoTable: React.FC = () => {
           </Table>
         </TableContainer>
       </Box>
-     <Typography
-  variant="body2"
-  textAlign="center"
-  color="textSecondary"
-  sx={{ fontStyle: "italic", mt: 1, display: "flex", justifyContent: "center", alignItems: "center" }}
->
-  <InfoOutlinedIcon fontSize="small" color="action" />
-  Note: IPO deals above $50M offer size.
-</Typography>
 
+      <Typography
+        variant="body2"
+        textAlign="center"
+        color="textSecondary"
+        sx={{
+          fontStyle: "italic",
+          mt: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <InfoOutlinedIcon fontSize="small" color="action" />
+        &nbsp;Note: IPO deals above $50M offer size.
+      </Typography>
     </Container>
   );
 };

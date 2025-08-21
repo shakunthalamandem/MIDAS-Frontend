@@ -60,20 +60,21 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
     }
   }, [isCreate, formData]);
 
-
 const handleSave = async () => {
   try {
-    setLoading(true); // start loading
     console.log("Saving data:", localData);
 
     const apiUrl = process.env.REACT_APP_API_URL;
     const token = localStorage.getItem("access_token");
 
     const url = isCreate
-      ? `${apiUrl}/api/create_new_deal_form/`
-      : `${apiUrl}/api/update_new_deal_form/`;
+      ? `${apiUrl}/api/create_newdeal_form/`
+      : `${apiUrl}/api/update_deal_unified_data/`;
 
-    const payload = { ...localData };
+    const payload = {
+      operation: isCreate ? "create" : "new_deal_update",
+      data: localData,  
+    };
 
     const response = await axios.post(url, payload, {
       headers: {
@@ -101,10 +102,9 @@ const handleSave = async () => {
       message: "Failed to save deal. Please try again.",
       severity: "error",
     });
-  } finally {
-    setLoading(false); // stop loading
   }
 };
+
 
   const handleCancel = () => {
     setLocalData(originalData);
