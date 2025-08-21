@@ -10,25 +10,47 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Checkbox,
+  Alert,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 interface IpoData {
   ticker: string;
   company_name: string;
   pricing_date: string;
-  price: string | null;
+  price_min: number | null;
+  price_max: number | null;
   deal_size: string | null;
+  deal_type?: string | null;
   t1d_actual?: number | string | null;
   total_committed_capital?: number | null;
 }
 
+const headerStyle = {
+  color: "#fff",
+  fontWeight: 600,
+  fontSize: "0.78rem",
+  padding: "6px 8px",
+  border: "1px solid black",
+  lineHeight: 1.2,
+  backgroundColor: "#002060",
+};
+
+const cellStyle = {
+  fontSize: "0.78rem",
+  padding: "2px 8px",
+  border: "1px solid black",
+  lineHeight: 1.2,
+};
+
 const RecentIpoTable: React.FC = () => {
   const [ipoData, setIpoData] = useState<IpoData[]>([]);
   const [dashboardTickers, setDashboardTickers] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchIpoData = async () => {
@@ -82,10 +104,14 @@ const RecentIpoTable: React.FC = () => {
   const getOrdinalSuffix = (day: number): string => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
-      case 1: return "st";
-      case 2: return "nd";
-      case 3: return "rd";
-      default: return "th";
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
     }
   };
 
@@ -113,8 +139,31 @@ const RecentIpoTable: React.FC = () => {
     return `$${abs.toFixed(2)}`;
   };
 
+  const formatPriceRange = (
+    min: number | null,
+    max: number | null
+  ): string => {
+    if (min === null && max === null) return "—";
+    if (min !== null && max !== null) return `${min.toFixed(2)} - ${max.toFixed(2)}`;
+    return min !== null ? `${min.toFixed(2)}` : `${max?.toFixed(2)}`;
+  };
+
+  const handleCheckboxChange = (rowId: string) => {
+    const isSelected = selectedRows.includes(rowId);
+
+    if (!isSelected && selectedRows.length >= 3) {
+      setError("You can select a maximum of 3 IPOs.");
+      return;
+    }
+
+    setSelectedRows((prev) =>
+      isSelected ? prev.filter((id) => id !== rowId) : [...prev, rowId]
+    );
+    setError(null);
+  };
+
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <Box
         sx={{
           backgroundColor: "#f9f9f9",
@@ -135,50 +184,61 @@ const RecentIpoTable: React.FC = () => {
           📈 Recently Listed IPOs : Past Two Weeks
         </Typography>
 
-        <TableContainer component={Paper} sx={{ borderRadius: 2, maxHeight: "320px" }}>
+        {error && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <TableContainer
+          component={Paper}
+          sx={{ borderRadius: 2, maxHeight: "320px" }}
+        >
           <Table sx={{ borderCollapse: "collapse", border: "1px solid black" }}>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
+                <TableCell sx={headerStyle}></TableCell>
                 {[
                   "Symbol",
                   "Company",
+                  "Deal Type",
                   "Pricing Date",
                   "Offer Price",
                   "Deal Size",
                   "T+1D Return",
                   "Total Committed Capital",
                 ].map((heading) => (
-                  <TableCell
-                    key={heading}
-                    align="center"
-                    sx={{
-                      color: "#fff",
-                      fontWeight: 600,
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      lineHeight: 1.2,
-                    }}
-                  >
+                  <TableCell key={heading} align="center" sx={headerStyle}>
                     {heading}
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {ipoData.map((row, index) => {
+              {ipoData.map((row) => {
+                const rowId = `${row.ticker}_${row.pricing_date}`;
                 const returnValue = parseFloat(row.t1d_actual as any);
+                const isChecked = selectedRows.includes(rowId);
 
                 return (
                   <TableRow
-                    key={index}
+                    key={rowId}
                     hover
                     sx={{
                       "&:hover": { backgroundColor: "#f0f8ff" },
                       border: "1px solid black",
                     }}
                   >
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black" }}>
+                    <TableCell align="center" sx={cellStyle}>
+                      <Checkbox
+                        checked={isChecked}
+                        onChange={() => handleCheckboxChange(rowId)}
+                        disabled={!isChecked && selectedRows.length >= 3}
+                        size="small"
+                      />
+                    </TableCell>
+
+                    <TableCell align="center" sx={cellStyle}>
                       {dashboardTickers.includes(row.ticker) ? (
                         <Box
                           component="span"
@@ -203,24 +263,33 @@ const RecentIpoTable: React.FC = () => {
                         row.ticker
                       )}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black" }}>
-                      {row.company_name}
+
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.company_name || "—"}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black" }}>
+
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.deal_type || "—"}
+                    </TableCell>
+
+                    <TableCell align="center" sx={cellStyle}>
                       {formatDate(row.pricing_date)}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black" }}>
-                      {row.price ?? "—"}
+
+                    <TableCell align="center" sx={cellStyle}>
+                      {formatPriceRange(row.price_min, row.price_max)}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black" }}>
-                      {row.deal_size ?? "—"}
+
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.deal_size && !isNaN(Number(row.deal_size))
+                        ? formatCapital(Number(row.deal_size))
+                        : row.deal_size ?? "—"}
                     </TableCell>
+
                     <TableCell
                       align="center"
                       sx={{
-                        fontSize: "0.78rem",
-                        padding: "6px 8px",
-                        border: "1px solid black",
+                        ...cellStyle,
                         color: isNaN(returnValue)
                           ? "inherit"
                           : returnValue > 0
@@ -233,7 +302,8 @@ const RecentIpoTable: React.FC = () => {
                     >
                       {formatReturn(row.t1d_actual)}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black" }}>
+
+                    <TableCell align="center" sx={cellStyle}>
                       {formatCapital(row.total_committed_capital)}
                     </TableCell>
                   </TableRow>
