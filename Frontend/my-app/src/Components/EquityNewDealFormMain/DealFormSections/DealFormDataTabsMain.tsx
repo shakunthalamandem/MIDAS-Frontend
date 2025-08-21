@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Stack, Alert, Snackbar, Grid, Typography } from "@mui/material";
+import { Box, Button, Stack, Alert, Snackbar, Grid, Typography, CircularProgress } from "@mui/material";
 import DealInformation from "../DealFormDataTabs/DealInformation";
 import DealAllocations from "../DealFormDataTabs/DealAllocations";
 import MarketData from "../DealFormDataTabs/MarketData";
@@ -31,6 +31,8 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
   const [editable, setEditable] = useState<boolean>(isCreate);
   const [localData, setLocalData] = useState<FormData>(formData);
   const [originalData] = useState<FormData>(formData);
+  const [loading, setLoading] = useState(false);
+
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -58,47 +60,51 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
     }
   }, [isCreate, formData]);
 
-  const handleSave = async () => {
-    try {
-      console.log("Saving data:", localData);
 
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
+const handleSave = async () => {
+  try {
+    setLoading(true); // start loading
+    console.log("Saving data:", localData);
 
-      const url = isCreate
-        ? `${apiUrl}/api/create_new_deal_form/`
-        : `${apiUrl}/api/update_new_deal_form/`;
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("access_token");
 
-      const payload = { ...localData };
+    const url = isCreate
+      ? `${apiUrl}/api/create_new_deal_form/`
+      : `${apiUrl}/api/update_new_deal_form/`;
 
-      const response = await axios.post(url, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+    const payload = { ...localData };
 
-      if (response.status === 200 || response.status === 201) {
-        setEditable(false);
-        setSnackbar({
-          open: true,
-          message: isCreate
-            ? "Deal created successfully!"
-            : "Deal updated successfully!",
-          severity: "success",
-        });
-      } else {
-        throw new Error("Unexpected response");
-      }
-    } catch (error) {
-      console.error("Save failed:", error);
+    const response = await axios.post(url, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.status === 200 || response.status === 201) {
+      setEditable(false);
       setSnackbar({
         open: true,
-        message: "Failed to save deal. Please try again.",
-        severity: "error",
+        message: isCreate
+          ? "Deal created successfully!"
+          : "Deal updated successfully!",
+        severity: "success",
       });
+    } else {
+      throw new Error("Unexpected response");
     }
-  };
+  } catch (error) {
+    console.error("Save failed:", error);
+    setSnackbar({
+      open: true,
+      message: "Failed to save deal. Please try again.",
+      severity: "error",
+    });
+  } finally {
+    setLoading(false); // stop loading
+  }
+};
 
   const handleCancel = () => {
     setLocalData(originalData);
@@ -167,24 +173,34 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
         >
           {editable ? (
             <>
-              <Button
-                variant="contained"
-                onClick={handleSave}
-                startIcon={isCreate ? <AddIcon /> : <SaveIcon />}
-                sx={{
-                  background: "linear-gradient(to right, #00b894, #55efc4)",
-                  color: "#002060",
-                  fontWeight: 500,
-                  px: 3,
-                  boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
-                  "&:hover": {
-                    background: "linear-gradient(to right,rgb(0, 70, 56), #0055cc)",
-                    color: "#fff",
-                  },
-                }}
-              >
-                {isCreate ? "Save" : "Save Changes"}
-              </Button>
+<Button
+  variant="contained"
+  onClick={handleSave}
+  startIcon={
+    loading ? (
+      <CircularProgress size={20} sx={{ color: "#fff" }} />
+    ) : isCreate ? (
+      <AddIcon />
+    ) : (
+      <SaveIcon />
+    )
+  }
+  disabled={loading}
+  sx={{
+    background: "linear-gradient(to right, #00b894, #55efc4)",
+    color: "#002060",
+    fontWeight: 500,
+    px: 3,
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
+    "&:hover": {
+      background: "linear-gradient(to right,rgb(0, 70, 56), #0055cc)",
+      color: "#fff",
+    },
+  }}
+>
+  {loading ? "Saving..." : isCreate ? "Save" : "Save Changes"}
+</Button>
+
 
               <Button
                 variant="outlined"
