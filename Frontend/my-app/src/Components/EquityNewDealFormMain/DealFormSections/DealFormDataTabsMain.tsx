@@ -60,12 +60,12 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
     }
   }, [isCreate, formData]);
 
-  const handleSave = async () => {
-    try {
-      console.log("Saving data:", localData);
+const handleSave = async () => {
+  try {
+    console.log("Saving data:", localData);
 
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("access_token");
 
       const url = isCreate
         ? `${apiUrl}/api/create_newdeal_form/`
@@ -79,34 +79,35 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
           data: localData
         };
 
-      const response = await axios.post(url, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+    const response = await axios.post(url, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-      if (response.status === 200 || response.status === 201) {
-        setEditable(false);
-        setSnackbar({
-          open: true,
-          message: isCreate
-            ? "Deal created successfully!"
-            : "Deal updated successfully!",
-          severity: "success",
-        });
-      } else {
-        throw new Error("Unexpected response");
-      }
-    } catch (error) {
-      console.error("Save failed:", error);
+    if (response.status === 200 || response.status === 201) {
+      setEditable(false);
       setSnackbar({
         open: true,
-        message: "Failed to save deal. Please try again.",
-        severity: "error",
+        message: isCreate
+          ? "Deal created successfully!"
+          : "Deal updated successfully!",
+        severity: "success",
       });
+    } else {
+      throw new Error("Unexpected response");
     }
-  };
+  } catch (error) {
+    console.error("Save failed:", error);
+    setSnackbar({
+      open: true,
+      message: "Failed to save deal. Please try again.",
+      severity: "error",
+    });
+  }
+};
+
 
 
   const handleCancel = () => {

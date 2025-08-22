@@ -9,7 +9,7 @@ export interface TickerData {
   deal_colour_present: string;
   deal_captain: string;
   deal_type: string;
-  allocation_deal_size_percentage: number | null;
+  allocation_as_percentage_of_deal_size: number | null;
 }
 
 interface DealFormAllTickersTableProps {
@@ -30,14 +30,19 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
 
         if (!apiUrl) throw new Error("API URL is not defined");
 
-        const response = await fetch(`${apiUrl}/api/new_deal_ticker_list/`, {
-          method: "GET",
+        const response = await fetch(`${apiUrl}/api/unified_new_deal_data/`, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
+          body: JSON.stringify({
+            type: "ticker_list", 
+          }),
         });
+
         const data = await response.json();
+
 
         if (data.tickers) {
           const formattedRows = data.tickers.map(
@@ -47,8 +52,8 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
               pricing_date: item.pricing_date,
               deal_type: item.deal_type,
               deal_captain: item.deal_captain,
-              allocation_deal_size_percentage:
-                item.allocation_deal_size_percentage || "-",
+              allocation_as_percentage_of_deal_size:
+                item.allocation_as_percentage_of_deal_size || "-",
               deal_colour_present: item.deal_colour_present,
             })
           );
@@ -86,7 +91,7 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
     { field: "deal_type", headerName: "Deal Type", width: 150 },
     { field: "deal_captain", headerName: "Deal Captain", width: 180 },
     {
-      field: "allocation_deal_size_percentage",
+      field: "allocation_as_percentage_of_deal_size",
       headerName: "Allocation Deal Size %",
       width: 220,
       renderCell: (params) => (

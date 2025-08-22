@@ -337,27 +337,34 @@ const DealDetailedGapAnalysis: React.FC = () => {
           Deal Detailed Gap Analysis
         </Typography>
 
-        <Box display="flex" gap={2} flexWrap="wrap">
-          <TextField
-            size="small"
-            variant="outlined"
-            placeholder="Search Ticker"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{ width: 240 }}
-          />
-          <Button
-            variant="contained"
-            onClick={exportToExcel}
-            sx={{
-              backgroundColor: "#002060",
-              color: "#fff",
-              textTransform: "none",
-            }}
-          >
-            Export to Excel
-          </Button>
-        </Box>
+       <Box
+  display="flex"
+  gap={2}
+  justifyContent="flex-end"
+  alignItems="center"   
+  flexWrap="nowrap"     
+>
+  <TextField
+    size="small"
+    variant="outlined"
+    placeholder="Search Ticker"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    sx={{ width: 240 }}
+  />
+  <Button
+    variant="contained"
+    onClick={exportToExcel}
+    sx={{
+      backgroundColor: "#002060",
+      color: "#fff",
+      textTransform: "none",
+    }}
+  >
+    Export to Excel
+  </Button>
+</Box>
+
       </Box>
 
       {/* Note + Assumptions */}

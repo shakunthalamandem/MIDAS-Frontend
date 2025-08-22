@@ -16,6 +16,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import { SelectedOption } from "../../types/NewDealFormData";
 import DealFormSectionMainTable from "./DealFormSections/DealFormSectionMainTable";
 import DealFormAllTickersTable from "./DealFormSections/DealFormAllTickersTable";
+import { useNavigate } from "react-router-dom";
+import DealsDropdown from "../Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
+
 
 function formatDateSimple(dateString: string): string {
   if (!dateString) return "";
@@ -47,7 +50,7 @@ type TickerData = {
   deal_colour_present: string; // note: string here, could be "Yes" or "No" or other string
   deal_captain: string;
   deal_type: string;
-  allocation_deal_size_percentage: number | null;
+  allocation_as_percentage_of_deal_size: number | null;
 };
 
 const EquityNewDealFormMain: React.FC = () => {
@@ -61,21 +64,26 @@ const EquityNewDealFormMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const [totalDealColourNo, setTotalDealColourNo] = useState<number>(0);
+    const navigate = useNavigate();
+
 
   // Fetch data from API and set options
   const handleSearchClick = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get<ApiResponse>(
-        `${apiUrl}/api/new_deal_ticker_list/`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+ const response = await axios.post<ApiResponse>(
+  `${apiUrl}/api/unified_new_deal_data/`,
+  {
+    type: "ticker_list",
+  },
+  {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
       const { tickers, default_ticker, total_deal_colour_no } = response.data;
 
@@ -185,6 +193,7 @@ const EquityNewDealFormMain: React.FC = () => {
             flexWrap="wrap"
             justifyContent="flex-end"
           >
+            
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -299,12 +308,15 @@ const EquityNewDealFormMain: React.FC = () => {
                 </Box>
               )}
             />
+            <DealsDropdown />
+          
             <Box width="100%" display="flex" justifyContent="flex-end" mt={1}>
               <Typography variant="caption" color="red">
                 🔴 {totalDealColourNo} deal colour
                 {totalDealColourNo > 1 ? "s" : ""} are missing
               </Typography>
-            </Box>
+
+           </Box>
           </Box>
         </Box>
 
