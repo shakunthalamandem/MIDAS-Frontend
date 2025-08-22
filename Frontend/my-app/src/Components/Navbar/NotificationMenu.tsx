@@ -21,16 +21,19 @@ interface Notification {
   created_at?: string;
 }
 
-interface Props {
-  apiUrl: string;
-  token: string | null;
-}
+// interface Props {
+//   apiUrl: string;
+//   token: string | null;
+// }
 
-const NotificationMenu: React.FC<Props> = ({ apiUrl, token }) => {
+const NotificationMenu: React.FC= () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
 
   // Fetch notifications from API
   const fetchNotifications = async () => {
@@ -44,7 +47,7 @@ const NotificationMenu: React.FC<Props> = ({ apiUrl, token }) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          // Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!res.ok)

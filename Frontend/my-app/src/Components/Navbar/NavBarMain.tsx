@@ -300,7 +300,7 @@ const NavbarMain: React.FC = () => {
   {isLoggedIn && (
     <>
       {/* 🔔 Notifications */}
-      <NotificationMenu apiUrl={apiUrl!} token={token} />
+      <NotificationMenu />
     </>
   )}
 
