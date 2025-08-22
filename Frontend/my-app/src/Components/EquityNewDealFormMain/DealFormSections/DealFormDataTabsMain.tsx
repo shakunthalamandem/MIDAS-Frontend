@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Stack, Alert, Snackbar, Grid, Typography } from "@mui/material";
+import { Box, Button, Stack, Alert, Snackbar, Grid, Typography, CircularProgress } from "@mui/material";
 import DealInformation from "../DealFormDataTabs/DealInformation";
 import DealAllocations from "../DealFormDataTabs/DealAllocations";
 import MarketData from "../DealFormDataTabs/MarketData";
@@ -24,13 +24,15 @@ interface FormData {
 interface Props {
   formData: FormData;
   isCreate: boolean;
-  selectedTicker: string; 
+  selectedTicker: string;
 }
 
 const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTicker }) => {
   const [editable, setEditable] = useState<boolean>(isCreate);
   const [localData, setLocalData] = useState<FormData>(formData);
   const [originalData] = useState<FormData>(formData);
+
+  const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -67,9 +69,15 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
 
       const url = isCreate
         ? `${apiUrl}/api/create_newdeal_form/`
-        : `${apiUrl}/api/update_new_deal_form/`;
+        : `${apiUrl}/api/update_deal_unified_data/`;
 
-      const payload = { ...localData };
+      // Build payload conditionally
+      const payload = isCreate
+        ? { ...localData } // for create, just send the data
+        : {
+          operation: "new_deal_update",
+          data: localData
+        };
 
       const response = await axios.post(url, payload, {
         headers: {
@@ -99,6 +107,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
       });
     }
   };
+
 
   const handleCancel = () => {
     setLocalData(originalData);
@@ -153,9 +162,9 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
           {isCreate
             ? "Creating a new deal – Please fill in the form below."
             : ` ${selectedTicker || "N/A"} – the following data is available for viewing or editing: Deal Information, Deal Allocation, Market Data, Technical Data, and Deal Colour`}
-       
+
         </Typography>
-        
+
 
         <Stack
           direction="row"
@@ -167,23 +176,59 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
         >
           {editable ? (
             <>
+
               <Button
+
                 variant="contained"
+
                 onClick={handleSave}
-                startIcon={isCreate ? <AddIcon /> : <SaveIcon />}
+
+                startIcon={
+
+                  loading ? (
+
+                    <CircularProgress size={20} sx={{ color: "#fff" }} />
+
+                  ) : isCreate ? (
+
+                    <AddIcon />
+
+                  ) : (
+
+                    <SaveIcon />
+
+                  )
+
+                }
+
+                disabled={loading}
+
                 sx={{
+
                   background: "linear-gradient(to right, #00b894, #55efc4)",
+
                   color: "#002060",
+
                   fontWeight: 500,
+
                   px: 3,
+
                   boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
+
                   "&:hover": {
+
                     background: "linear-gradient(to right,rgb(0, 70, 56), #0055cc)",
+
                     color: "#fff",
+
                   },
+
                 }}
+
               >
-                {isCreate ? "Save" : "Save Changes"}
+
+                {loading ? "Saving..." : isCreate ? "Save" : "Save Changes"}
+
               </Button>
 
               <Button
@@ -241,67 +286,67 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
         </Stack>
       </Stack>
       <Typography
-  variant="caption"
-  color="#002060"
-  sx={{
-    fontSize: "0.95rem", // adjust as needed (e.g., "1rem" or "14px")
-    fontStyle: "italic",
-  }}
->
-  Note: Some of the data fields are empty due to delayed data from Dealogic.
-</Typography>
+        variant="caption"
+        color="#002060"
+        sx={{
+          fontSize: "0.95rem", // adjust as needed (e.g., "1rem" or "14px")
+          fontStyle: "italic",
+        }}
+      >
+        Note: Some of the data fields are empty due to delayed data from Dealogic.
+      </Typography>
 
-<Grid container spacing={2} alignItems="stretch">
-  <Grid item xs={12} md={6} mb={4}>
-    <Box sx={{ ...gradientBackground, height: "100%" }}>
-      <DealInformation
-        data={localData?.deal_information || {}}
-        editable={editable}
-        onChange={(data) => updateSection("deal_information", data)}
-      />
-    </Box>
-  </Grid>
+      <Grid container spacing={2} alignItems="stretch">
+        <Grid item xs={12} md={6} mb={4}>
+          <Box sx={{ ...gradientBackground, height: "100%" }}>
+            <DealInformation
+              data={localData?.deal_information || {}}
+              editable={editable}
+              onChange={(data) => updateSection("deal_information", data)}
+            />
+          </Box>
+        </Grid>
 
-  <Grid item xs={12} md={6} mb={4}>
-    <Box sx={{ ...gradientBackground, height: "100%" }}>
-      <DealAllocations
-        data={localData?.deal_allocations || {}}
-        editable={editable}
-        onChange={(data) => updateSection("deal_allocations", data)}
-      />
-    </Box>
-  </Grid>
+        <Grid item xs={12} md={6} mb={4}>
+          <Box sx={{ ...gradientBackground, height: "100%" }}>
+            <DealAllocations
+              data={localData?.deal_allocations || {}}
+              editable={editable}
+              onChange={(data) => updateSection("deal_allocations", data)}
+            />
+          </Box>
+        </Grid>
 
-  <Grid item xs={12} md={6} mb={4}>
-    <Box sx={{ ...gradientBackground, height: "100%" }}>
-      <MarketData
-        data={localData?.market_data || {}}
-        editable={editable}
-        onChange={(data) => updateSection("market_data", data)}
-      />
-    </Box>
-  </Grid>
+        <Grid item xs={12} md={6} mb={4}>
+          <Box sx={{ ...gradientBackground, height: "100%" }}>
+            <MarketData
+              data={localData?.market_data || {}}
+              editable={editable}
+              onChange={(data) => updateSection("market_data", data)}
+            />
+          </Box>
+        </Grid>
 
-  <Grid item xs={12} md={6} mb={4}>
-    <Box sx={{ ...gradientBackground, height: "100%" }}>
-      <TechnicalMarketData
-        data={localData?.technical_market_data || {}}
-        editable={editable}
-        onChange={(data) => updateSection("technical_market_data", data)}
-      />
-    </Box>
-  </Grid>
+        <Grid item xs={12} md={6} mb={4}>
+          <Box sx={{ ...gradientBackground, height: "100%" }}>
+            <TechnicalMarketData
+              data={localData?.technical_market_data || {}}
+              editable={editable}
+              onChange={(data) => updateSection("technical_market_data", data)}
+            />
+          </Box>
+        </Grid>
 
-  <Grid item xs={12} mb={4}>
-    <Box sx={gradientBackground}>
-      <DealColor
-        data={localData?.deal_color || {}}
-        editable={editable}
-        onChange={(data) => updateSection("deal_color", data)}
-      />
-    </Box>
-  </Grid>
-</Grid>
+        <Grid item xs={12} mb={4}>
+          <Box sx={gradientBackground}>
+            <DealColor
+              data={localData?.deal_color || {}}
+              editable={editable}
+              onChange={(data) => updateSection("deal_color", data)}
+            />
+          </Box>
+        </Grid>
+      </Grid>
 
 
 
