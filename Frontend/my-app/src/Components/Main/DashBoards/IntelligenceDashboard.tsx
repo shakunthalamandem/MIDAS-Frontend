@@ -162,13 +162,13 @@ const IntelligenceDashboard: React.FC = () => {
                   </Grid>
 
                   {/* Selected IPO deal info cards */}
-                  {selectedTickers.map((deal) => (
-                    <Grid item xs={12} md={6} key={deal.ticker}>
-                      <DealInfoTables
-                        ticker={deal.ticker}
-                      />
-                    </Grid>
-                  ))}
+                 {selectedTickers.map((tickerObj) => (
+  <Grid item xs={12} key={tickerObj.ticker}>
+    <DealInfoTables tickers={[tickerObj.ticker]} />
+  </Grid>
+))}
+
+
                 </Grid>
               </MotionPaper>
             </>

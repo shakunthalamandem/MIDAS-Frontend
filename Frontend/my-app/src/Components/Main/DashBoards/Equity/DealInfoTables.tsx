@@ -3,13 +3,15 @@ import {
   Container,
   Typography,
   Paper,
-  Box,
   Grid,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
+
 interface Props {
-  ticker: string;
+  tickers: string[];
 }
 
 interface DealData {
@@ -22,15 +24,13 @@ interface DealData {
   t1d_prediction_exist: "yes" | "no";
 }
 
-const DealInfoTables: React.FC<Props> = ({ ticker }) => {
-  const [dealData, setDealData] = useState<DealData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+const DealInfoTables: React.FC<Props> = ({ tickers }) => {
+  const [dealDataMap, setDealDataMap] = useState<Record<string, DealData>>({});
+  const [errorMap, setErrorMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const fetchDealStatus = async () => {
+    const fetchDealStatus = async (ticker: string) => {
       try {
-        if (!ticker ) return;
-
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
@@ -49,65 +49,175 @@ const DealInfoTables: React.FC<Props> = ({ ticker }) => {
         const data = await response.json();
 
         if (data.error) {
-          setError(data.error);
+          setErrorMap((prev) => ({ ...prev, [ticker]: data.error }));
         } else {
-          setDealData(data);
+          setDealDataMap((prev) => ({ ...prev, [ticker]: data }));
         }
       } catch (err) {
-        setError("Failed to fetch deal status");
+        setErrorMap((prev) => ({
+          ...prev,
+          [ticker]: "Failed to fetch deal status",
+        }));
       }
     };
 
-    fetchDealStatus();
-  }, [ticker]);
+    tickers.forEach((ticker) => {
+      if (!dealDataMap[ticker] && !errorMap[ticker]) {
+        fetchDealStatus(ticker);
+      }
+    });
+  }, [tickers, dealDataMap, errorMap]);
 
-
-  const renderStatus = (label: string, exists: string) => (
-    <Box display="flex" alignItems="center" mb={1}>
-      <Typography sx={{ minWidth: 130 }}>{label}:</Typography>
-      {exists === "yes" ? (
-        <CheckCircleOutlineIcon color="success" />
-      ) : (
-        <CancelIcon color="error" />
-      )}
-    </Box>
-  );
+  const renderStatusIcon = (exists: string) =>
+    exists === "yes" ? (
+      <CheckCircleOutlineIcon color="success" />
+    ) : (
+      <CancelIcon color="error" />
+    );
 
   return (
-    <Container maxWidth="md">
-      <Grid container spacing={3} mt={1}>
-        <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 3 }}>
-            {ticker && (
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                {ticker} – Deal Info
-              </Typography>
-            )}
+    <Container maxWidth="lg">
+      <Grid container direction="column" spacing={3} mt={1}>
+        {tickers.map((ticker) => {
+          const dealData = dealDataMap[ticker];
+          const error = errorMap[ticker];
 
-            {error ? (
-              <Typography color="error">{error}</Typography>
-            ) : dealData ? (
-              <>
-                {renderStatus("Deal Color", dealData.deal_color_exist)}
-                {dealData.deal_color_exist === "yes" && (
-                  <Typography mt={1} sx={{ whiteSpace: "pre-line" }}>
-                    {dealData.deal_color}
+          return (
+            <Grid item key={ticker}>
+              <Paper elevation={4} sx={{ p: 3, borderRadius: 2 }}>
+                <Box mb={3} textAlign="center">
+                  <Typography variant="h5" fontWeight="bold">
+                    {ticker} Deal Overview
                   </Typography>
-                )}
+                </Box>
 
-                {renderStatus("Valuation", dealData.valuation)}
-                {renderStatus("T+1 Prediction", dealData.t1d_prediction_exist)}
-                {dealData.t1d_prediction_exist === "yes" && (
-                  <Typography mt={1}>
-                    Prediction: {dealData.t1d_prediction}
-                  </Typography>
-                )}
-              </>
-            ) : (
-              <Typography>Loading...</Typography>
-            )}
-          </Paper>
-        </Grid>
+                <Grid container spacing={3}>
+                  {/* Deal Color */}
+                  <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+                    <Paper
+                      elevation={2}
+                      sx={{
+                        p: 2,
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                        minHeight: 150,
+                      }}
+                    >
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        mb={1}
+                      >
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Deal Color
+                        </Typography>
+                        {error ? null : dealData ? (
+                          renderStatusIcon(dealData.deal_color_exist)
+                        ) : (
+                          <CircularProgress size={20} />
+                        )}
+                      </Box>
+
+                      {error ? (
+                        <Typography color="error">{error}</Typography>
+                      ) : dealData?.deal_color_exist === "yes" ? (
+                        <Typography sx={{ whiteSpace: "pre-line" }}>
+                          {dealData.deal_color}
+                        </Typography>
+                      ) : null}
+                    </Paper>
+                  </Grid>
+
+                  {/* Valuation */}
+                  <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+                    <Paper
+                      elevation={2}
+                      sx={{
+                        p: 2,
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                        minHeight: 150,
+                      }}
+                    >
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        mb={1}
+                      >
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight="bold"
+                          sx={{ mx: "auto" }}
+                        >
+                          Valuation
+                        </Typography>
+
+                        <Box ml="auto">
+                          {error ? null : dealData ? (
+                            renderStatusIcon(dealData.valuation)
+                          ) : (
+                            <CircularProgress size={20} />
+                          )}
+                        </Box>
+                      </Box>
+
+                      {error && (
+                        <Typography color="error" textAlign="center">
+                          {error}
+                        </Typography>
+                      )}
+                    </Paper>
+                  </Grid>
+
+                  {/* T+1 Prediction */}
+                  <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+                    <Paper
+                      elevation={2}
+                      sx={{
+                        p: 2,
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                        minHeight: 150,
+                      }}
+                    >
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        mb={1}
+                      >
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          T+1 Prediction
+                        </Typography>
+                        {error ? null : dealData ? (
+                          renderStatusIcon(dealData.t1d_prediction_exist)
+                        ) : (
+                          <CircularProgress size={20} />
+                        )}
+                      </Box>
+
+                      {error ? (
+                        <Typography color="error">{error}</Typography>
+                      ) : dealData?.t1d_prediction_exist === "yes" ? (
+                        <Typography>
+                          Prediction: {dealData.t1d_prediction}
+                        </Typography>
+                      ) : null}
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Grid>
+          );
+        })}
       </Grid>
     </Container>
   );

@@ -39,6 +39,11 @@ const UpcomingIpoTable: React.FC<Props> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
+  // Reset selected tickers on mount (page refresh)
+  useEffect(() => {
+    setSelectedTickers([]);
+  }, [setSelectedTickers]);
+
   useEffect(() => {
     const fetchIpoData = async () => {
       try {
@@ -108,7 +113,7 @@ const UpcomingIpoTable: React.FC<Props> = ({
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <Box
         sx={{
           backgroundColor: "#f9f9f9",
@@ -126,7 +131,7 @@ const UpcomingIpoTable: React.FC<Props> = ({
           color="#002060"
           mb={2}
         >
-          📅 Upcoming IPO's and FO's
+          📈 Upcoming IPO's and FO's
         </Typography>
 
         {error && (
@@ -135,8 +140,11 @@ const UpcomingIpoTable: React.FC<Props> = ({
           </Alert>
         )}
 
-        <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-          <Table>
+        <TableContainer
+          component={Paper}
+          sx={{ borderRadius: 2, maxHeight: "320px" }}
+        >
+          <Table sx={{ borderCollapse: "collapse", border: "1px solid black" }}>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
                 <TableCell sx={headerStyle}></TableCell>
