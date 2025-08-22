@@ -64,10 +64,10 @@ const inputFields: {
   { label: "Percentage Primary (%)", name: "percentage_primary_category", type: "number", adornment: "%", placeholder: "e.g., 100" },
   { label: "Selected Bank", name: "selected_bank_category", selectOptions: [] },
   { label: "Allocation as % of Deal Size", name: "allocation_deal_size_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 0.5" },
-  { label: "GDP Growth", name: "GDP", selectOptions: [] },
+  // { label: "GDP Growth", name: "GDP", selectOptions: [] },
   { label: "Allocation as % of IOI", name: "allocation_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 30" },
-  { label: "Inflation Rate", name: "Inflation", selectOptions: [] },
-  { label: "Treasury Rates", name: "Treasury", selectOptions: [] },
+  // { label: "Inflation Rate", name: "Inflation", selectOptions: [] },
+  // { label: "Treasury Rates", name: "Treasury", selectOptions: [] },
   { label: "Target Variable", name: "target_variable", disabled: true },
 ];
 
