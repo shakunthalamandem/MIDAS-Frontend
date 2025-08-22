@@ -26,9 +26,8 @@ const IntelligenceDashboard: React.FC = () => {
   const [selectedIpoYears, setSelectedIpoYears] = useState<number[]>([2024, 2025]);
   const [selectedFoYears, setSelectedFoYears] = useState<number[]>([2024, 2025]);
 
-  const [selectedTickers, setSelectedTickers] = useState<
-    { ticker: string; pricing_date: string }[]
-  >([]);
+  // ✅ Only ticker now (no expected_listing_date)
+  const [selectedTickers, setSelectedTickers] = useState<{ ticker: string }[]>([]);
 
   const handleIpoYearToggle = (year: number) => {
     setSelectedIpoYears((prev) =>
@@ -124,6 +123,7 @@ const IntelligenceDashboard: React.FC = () => {
     <Box width={1800} sx={{ mx: "auto" }}>
       <Box display="flex" width="100%" pt={2}>
         <Box display="flex" flexDirection="column" gap={4} width="100%">
+
           {/* IPO SECTION */}
           {selectedTab === "IPO" && (
             <>
@@ -161,11 +161,11 @@ const IntelligenceDashboard: React.FC = () => {
                     <RecentIpoTable />
                   </Grid>
 
+                  {/* Selected IPO deal info cards */}
                   {selectedTickers.map((deal) => (
-                    <Grid item xs={12} md={6} key={`${deal.ticker}_${deal.pricing_date}`}>
+                    <Grid item xs={12} md={6} key={deal.ticker}>
                       <DealInfoTables
                         ticker={deal.ticker}
-                        pricing_date={deal.pricing_date}
                       />
                     </Grid>
                   ))}
@@ -228,7 +228,7 @@ const IntelligenceDashboard: React.FC = () => {
                       minWidth: "130px",
                     }}
                   >
-                    Export to pdf
+                    Export to PDF
                   </Button>
                 </Box>
 

@@ -166,7 +166,7 @@ const EquityDealsIPOFO: React.FC = () => {
             </Typography>
             <Grid container spacing={3} id="ipo-table-section">
               <Grid item xs={12} md={6}>
-                <UpcomingIpoTable />
+                {/* <UpcomingIpoTable /> */}
               </Grid>
               <Grid item xs={12} md={6}>
                 <RecentIpoTable />

@@ -8,15 +8,13 @@ import {
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
-
 interface Props {
-  ticker?: string;
-  pricing_date?: string;
+  ticker: string;
 }
 
 interface DealData {
   ticker: string;
-  pricing_date: string;
+  expected_listing_date: string;
   deal_color: string | null;
   deal_color_exist: "yes" | "no";
   valuation: "yes" | "no";
@@ -24,14 +22,14 @@ interface DealData {
   t1d_prediction_exist: "yes" | "no";
 }
 
-const DealInfoTables: React.FC<Props> = ({ ticker, pricing_date }) => {
+const DealInfoTables: React.FC<Props> = ({ ticker }) => {
   const [dealData, setDealData] = useState<DealData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDealStatus = async () => {
       try {
-        if (!ticker || !pricing_date) return;
+        if (!ticker ) return;
 
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
@@ -45,7 +43,6 @@ const DealInfoTables: React.FC<Props> = ({ ticker, pricing_date }) => {
           body: JSON.stringify({
             type: "ticker_status",
             ticker,
-            pricing_date,
           }),
         });
 
@@ -62,7 +59,8 @@ const DealInfoTables: React.FC<Props> = ({ ticker, pricing_date }) => {
     };
 
     fetchDealStatus();
-  }, [ticker, pricing_date]);
+  }, [ticker]);
+
 
   const renderStatus = (label: string, exists: string) => (
     <Box display="flex" alignItems="center" mb={1}>

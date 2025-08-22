@@ -25,10 +25,8 @@ interface IpoData {
 }
 
 interface Props {
-  selectedTickers: { ticker: string; pricing_date: string }[];
-  setSelectedTickers: React.Dispatch<
-    React.SetStateAction<{ ticker: string; pricing_date: string }[]>
-  >;
+  selectedTickers: { ticker: string }[];
+  setSelectedTickers: React.Dispatch<React.SetStateAction<{ ticker: string }[]>>;
 }
 
 const UpcomingIpoTable: React.FC<Props> = ({
@@ -58,9 +56,7 @@ const UpcomingIpoTable: React.FC<Props> = ({
         const data: IpoData[] = await response.json();
 
         const uniqueRows = Array.from(
-          new Map(
-            data.map((item) => [`${item.ticker}_${item.expected_listing_date}`, item])
-          ).values()
+          new Map(data.map((item) => [item.ticker, item])).values()
         );
 
         setIpoData(uniqueRows);
@@ -72,11 +68,8 @@ const UpcomingIpoTable: React.FC<Props> = ({
     fetchIpoData();
   }, [apiUrl, token]);
 
-  const handleCheckboxChange = (ticker: string, pricing_date: string) => {
-    const id = `${ticker}_${pricing_date}`;
-    const isSelected = selectedTickers.some(
-      (item) => item.ticker === ticker && item.pricing_date === pricing_date
-    );
+  const handleCheckboxChange = async (ticker: string) => {
+    const isSelected = selectedTickers.some((item) => item.ticker === ticker);
 
     if (!isSelected && selectedTickers.length >= 3) {
       setError("You can select a maximum of 3 IPOs.");
@@ -84,28 +77,78 @@ const UpcomingIpoTable: React.FC<Props> = ({
     }
 
     const updatedSelection = isSelected
-      ? selectedTickers.filter((item) => item.ticker !== ticker || item.pricing_date !== pricing_date)
-      : [...selectedTickers, { ticker, pricing_date }];
+      ? selectedTickers.filter((item) => item.ticker !== ticker)
+      : [...selectedTickers, { ticker }];
 
     setSelectedTickers(updatedSelection);
     setError(null);
+
+    try {
+      const response = await fetch(`${apiUrl}/api/unified_new_deal_data/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          type: "ticker_status",
+          ticker,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update ticker status");
+      }
+
+      const result = await response.json();
+      console.log("API success:", result);
+    } catch (err) {
+      console.error("Error posting ticker status:", err);
+    }
   };
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ backgroundColor: "#f9f9f9", borderRadius: 3, boxShadow: 2, p: 3, mt: 2, mb: 4 }}>
-        <Typography variant="h6" fontWeight="bold" textAlign="center" color="#002060" mb={2}>
+      <Box
+        sx={{
+          backgroundColor: "#f9f9f9",
+          borderRadius: 3,
+          boxShadow: 2,
+          p: 3,
+          mt: 2,
+          mb: 4,
+        }}
+      >
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          textAlign="center"
+          color="#002060"
+          mb={2}
+        >
           📅 Upcoming IPO's and FO's
         </Typography>
 
-        {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
+        {error && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
                 <TableCell sx={headerStyle}></TableCell>
-                {["Symbol", "Company", "Deal Type", "Expected Date", "Offer Price", "Exchange", "Deal Size"].map((heading) => (
+                {[
+                  "Symbol",
+                  "Company",
+                  "Deal Type",
+                  "Expected Date",
+                  "Offer Price",
+                  "Exchange",
+                  "Deal Size",
+                ].map((heading) => (
                   <TableCell key={heading} align="center" sx={headerStyle}>
                     {heading}
                   </TableCell>
@@ -115,28 +158,38 @@ const UpcomingIpoTable: React.FC<Props> = ({
             <TableBody>
               {ipoData.map((row) => {
                 const isChecked = selectedTickers.some(
-                  (item) =>
-                    item.ticker === row.ticker &&
-                    item.pricing_date === row.expected_listing_date
+                  (item) => item.ticker === row.ticker
                 );
 
                 return (
-                  <TableRow key={`${row.ticker}_${row.expected_listing_date}`}>
+                  <TableRow key={row.ticker}>
                     <TableCell align="center" sx={cellStyle}>
                       <Checkbox
                         checked={isChecked}
-                        onChange={() =>
-                          handleCheckboxChange(row.ticker, row.expected_listing_date)
-                        }
+                        onChange={() => handleCheckboxChange(row.ticker)}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={cellStyle}>{row.ticker}</TableCell>
-                    <TableCell align="center" sx={cellStyle}>{row.company_name}</TableCell>
-                    <TableCell align="center" sx={cellStyle}>{row.deal_type || "—"}</TableCell>
-                    <TableCell align="center" sx={cellStyle}>{row.expected_listing_date}</TableCell>
-                    <TableCell align="center" sx={cellStyle}>{row.price || "—"}</TableCell>
-                    <TableCell align="center" sx={cellStyle}>{row.exchange || "—"}</TableCell>
-                    <TableCell align="center" sx={cellStyle}>{row.deal_size || "—"}</TableCell>
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.ticker}
+                    </TableCell>
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.company_name}
+                    </TableCell>
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.deal_type || "—"}
+                    </TableCell>
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.expected_listing_date}
+                    </TableCell>
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.price || "—"}
+                    </TableCell>
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.exchange || "—"}
+                    </TableCell>
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.deal_size || "—"}
+                    </TableCell>
                   </TableRow>
                 );
               })}
