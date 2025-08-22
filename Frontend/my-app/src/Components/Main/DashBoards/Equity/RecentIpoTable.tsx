@@ -181,7 +181,7 @@ const RecentIpoTable: React.FC = () => {
           color="#002060"
           mb={2}
         >
-          📈 Recently Listed IPOs : Past Two Weeks
+          📈 Recently Listed Deals : Past Two Weeks
         </Typography>
 
         {error && (
