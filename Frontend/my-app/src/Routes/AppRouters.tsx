@@ -147,8 +147,8 @@ const AppRouters: React.FC = () => {
         <Route path="/converts/dealperformance/:deal" element={<AuthGuard><ConvertsMain /></AuthGuard>} />
 
 
-        {/* <Route path="/deals/new_deal_form" element={<AuthGuard><EquityNewDealFormMain /></AuthGuard>} /> */}
-        <Route path="/deals/new_deal_form" element={<AuthGuard><TickerDashboard /></AuthGuard>} />
+        <Route path="/deals/new_deal_form" element={<AuthGuard><EquityNewDealFormMain /></AuthGuard>} />
+        <Route path="/deals/deal_track" element={<AuthGuard><TickerDashboard /></AuthGuard>} />
 
 
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
