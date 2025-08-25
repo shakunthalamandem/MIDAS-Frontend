@@ -26,7 +26,6 @@ const IntelligenceDashboard: React.FC = () => {
   const [selectedIpoYears, setSelectedIpoYears] = useState<number[]>([2024, 2025]);
   const [selectedFoYears, setSelectedFoYears] = useState<number[]>([2024, 2025]);
 
-  // ✅ Only ticker now (no expected_listing_date)
   const [selectedTickers, setSelectedTickers] = useState<{ ticker: string }[]>([]);
   const [recentSelectedRows, setRecentSelectedRows] = useState<string[]>([]);
 

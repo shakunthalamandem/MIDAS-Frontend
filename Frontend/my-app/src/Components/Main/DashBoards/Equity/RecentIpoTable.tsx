@@ -158,7 +158,8 @@ const RecentIpoTable: React.FC<RecentIpoTableProps> = ({
     return min !== null ? `${min.toFixed(2)}` : `${max?.toFixed(2)}`;
   };
 
-  const handleCheckboxChange = (rowId: string) => {
+  const handleCheckboxChange = async (row: IpoData) => {
+    const rowId = `${row.ticker}_${row.pricing_date}`;
     const isSelected = selectedRows.includes(rowId);
 
     if (!isSelected && selectedRows.length >= 3) {
@@ -172,6 +173,29 @@ const RecentIpoTable: React.FC<RecentIpoTableProps> = ({
 
     onSelectionChange(updated);
     setError(null);
+
+    // send ticker + pricing_date
+    try {
+      const response = await fetch(`${apiUrl}/api/unified_new_deal_data/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          type: "ticker_status",
+          ticker: row.ticker,
+          pricing_date: row.pricing_date,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update ticker status");
+
+      const result = await response.json();
+      console.log("API success:", result);
+    } catch (err) {
+      console.error("Error posting ticker status:", err);
+    }
   };
 
   return (
@@ -244,8 +268,7 @@ const RecentIpoTable: React.FC<RecentIpoTableProps> = ({
                     <TableCell align="center" sx={cellStyle}>
                       <Checkbox
                         checked={isChecked}
-                        onChange={() => handleCheckboxChange(rowId)}
-                        disabled={!isChecked && selectedRows.length >= 3}
+                        onChange={() => handleCheckboxChange(row)}
                         size="small"
                       />
                     </TableCell>
