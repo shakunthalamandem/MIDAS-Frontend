@@ -151,29 +151,40 @@ const IntelligenceDashboard: React.FC = () => {
                   Stay updated with the latest IPO trends and insights. Analyze recent trends and prepare for upcoming opportunities in the IPO landscape.
                 </Typography>
 
-                <Grid container spacing={3} id="ipo-table-section">
-                  <Grid item xs={12} md={6}>
-                    <UpcomingIpoTable
-                      selectedTickers={selectedTickers}
-                      setSelectedTickers={setSelectedTickers}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
+                  <Grid container spacing={3} id="ipo-table-section">
+                    <Grid item xs={12} md={6}>
+                      <UpcomingIpoTable
+                        selectedTickers={selectedTickers}
+                        setSelectedTickers={setSelectedTickers}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} md={6}>
                       <RecentIpoTable
-      selectedRows={recentSelectedRows}
-      onSelectionChange={setRecentSelectedRows}
-    />
+                        selectedRows={recentSelectedRows}
+                        onSelectionChange={setRecentSelectedRows}
+                      />
+                    </Grid>
+
+                    {/* Selected Upcoming IPO deal info cards */}
+                    {selectedTickers.map((tickerObj) => (
+                      <Grid item xs={12} key={tickerObj.ticker}>
+                        <DealInfoTables tickers={[tickerObj.ticker]} />
+                      </Grid>
+                    ))}
+
+                    {/* Selected Recent IPO deal info cards */}
+                    {recentSelectedRows.map((rowId) => {
+                      // rowId format is ticker_pricingDate
+                      const ticker = rowId.split("_")[0];
+                      return (
+                        <Grid item xs={12} key={rowId}>
+                          <DealInfoTables tickers={[ticker]} />
+                        </Grid>
+                      );
+                    })}
                   </Grid>
 
-                  {/* Selected IPO deal info cards */}
-                 {selectedTickers.map((tickerObj) => (
-  <Grid item xs={12} key={tickerObj.ticker}>
-    <DealInfoTables tickers={[tickerObj.ticker]} />
-  </Grid>
-))}
-
-
-                </Grid>
               </MotionPaper>
             </>
           )}
