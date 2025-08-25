@@ -50,7 +50,7 @@ type TickerData = {
   deal_colour_present: string; // note: string here, could be "Yes" or "No" or other string
   deal_captain: string;
   deal_type: string;
-  allocation_deal_size_percentage: number | null;
+  allocation_as_percentage_of_deal_size: number | null;
 };
 
 const EquityNewDealFormMain: React.FC = () => {
