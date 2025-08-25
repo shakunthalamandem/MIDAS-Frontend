@@ -64,9 +64,9 @@ const NavbarMain: React.FC = () => {
       case "Data & Analytics":
         navigate("/data-analytics/writeups");
         break;
-      case "New Deal Form":
-        navigate("/deals/new_deal_form");
-        break;
+      // case "New Deal Form":
+      //   navigate("/deals/new_deal_form");
+      //   break;
       default:
         break;
     }
@@ -183,13 +183,27 @@ const NavbarMain: React.FC = () => {
           </Link>
 
           <Box sx={{ flexGrow: 1, textAlign: "center" }}>
-                  <DropdownTab
+
+
+
+             <DropdownTab
+              label="New Issue Deals "
+              menuItems={[
+                { label: "Dashboard", path: "/deals/dashboard" },
+                { label: "IPO Write-Up", path: "/equity/ipo_dashboard" },
+                { label: "New Deal Form", path: "/deals/new_deal_form" },
+                { label: "AI-ML Model", path: "/machine_learning/equity" },
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+              <DropdownTab
               label="AI-ML"
               menuItems={[
+                { label: "US FO ML Model", path: "/machine_learning/equity" },
                 { label: "Gen AI Tool", path: "/gen_ai_tool" },
                 { label: "Portfolio Sentiment ", path: "/genai_data_set" },
-                { label: "US FO ML Model", path: "/machine_learning/equity" },
-                { label: "IPO Write-up", path: "/deals/dashboard" },
+                // { label: "IPO Write-up", path: "/deals/dashboard" },
                 {label: "Portfolio  News", path: "/macro/news-summary" },
                 // { label: "High Yields", path: "/machine_learning/high-yield" },
                 // { label: "Converts", path: "/machine_learning/converts" },
@@ -199,17 +213,9 @@ const NavbarMain: React.FC = () => {
             />
           
 
-            {/* <DropdownTab
-              label="New Deals (IPO)"
-              menuItems={[
-                { label: "Dashboard", path: "/deals/dashboard" },
-                { label: "New Deal Form", path: "/deals/new_deal_form" },
-              ]}
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-            /> */}
+           
 
-             <Button
+             {/* <Button
               onClick={() => handleTabSelect("New Deal Form")}
               sx={{
                 color: "#005166",
@@ -226,7 +232,7 @@ const NavbarMain: React.FC = () => {
               }}
             >
               New Deal Form
-            </Button>
+            </Button> */}
 
               <Button
               onClick={() => handleTabSelect("P&L Attribution")}
