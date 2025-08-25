@@ -1,8 +1,9 @@
 import React from 'react'
+import NewDealsUpcomingRecent from './NewDealsUpcomingRecent'
 
 const NewDealsCycleMain = () => {
   return (
-    <div>NewDealsCycleMain</div>
+    <NewDealsUpcomingRecent />
   )
 }
 
