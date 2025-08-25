@@ -10,49 +10,82 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Checkbox,
+  Alert,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 interface IpoData {
   ticker: string;
   company_name: string;
+  pricing_date: string;
+  price_min: number | null;
+  price_max: number | null;
   expected_date: string;
   price: string | null;
   exchange?: string;
   deal_size: string | null;
-  t1d_return_from_bloomberg?: number | string | null;
+  deal_type?: string | null;
+  t1d_actual?: number | string | null;
   total_committed_capital?: number | null;
 }
 
-const RecentIpoTable: React.FC = () => {
+interface RecentIpoTableProps {
+  selectedRows: string[]; // controlled from parent
+  onSelectionChange: (selected: string[]) => void; // callback to update parent
+}
+
+const headerStyle = {
+  color: "#fff",
+  fontWeight: 600,
+  fontSize: "0.78rem",
+  padding: "6px 8px",
+  border: "1px solid black",
+  lineHeight: 1.2,
+  backgroundColor: "#002060",
+};
+
+const cellStyle = {
+  fontSize: "0.78rem",
+  padding: "2px 8px",
+  border: "1px solid black",
+  lineHeight: 1.2,
+};
+
+const RecentIpoTable: React.FC<RecentIpoTableProps> = ({
+  selectedRows,
+  onSelectionChange,
+}) => {
   const [ipoData, setIpoData] = useState<IpoData[]>([]);
   const [dashboardTickers, setDashboardTickers] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchIpoData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/recent_ipos/`, {
+        const response = await fetch(`${apiUrl}/api/unified_new_deal_data/`, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
+          body: JSON.stringify({ type: "recent_ipo" }),
         });
 
-        if (!response.ok) throw new Error("Failed to fetch IPO data");
+        if (!response.ok) throw new Error("Failed to fetch recent IPO data");
 
         const data: IpoData[] = await response.json();
         const uniqueRows = Array.from(
           new Map(
-            data.map((item) => [`${item.ticker}_${item.expected_date}`, item])
+            data.map((item) => [`${item.ticker}_${item.pricing_date}`, item])
           ).values()
         );
 
         setIpoData(uniqueRows);
       } catch (error) {
-        console.error("Error fetching IPO data:", error);
+        console.error("Error fetching recent IPO data:", error);
       }
     };
 
@@ -81,10 +114,14 @@ const RecentIpoTable: React.FC = () => {
   const getOrdinalSuffix = (day: number): string => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
-      case 1: return "st";
-      case 2: return "nd";
-      case 3: return "rd";
-      default: return "th";
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
     }
   };
 
@@ -112,8 +149,33 @@ const RecentIpoTable: React.FC = () => {
     return `$${abs.toFixed(2)}`;
   };
 
+  const formatPriceRange = (
+    min: number | null,
+    max: number | null
+  ): string => {
+    if (min === null && max === null) return "—";
+    if (min !== null && max !== null) return `${min.toFixed(2)} - ${max.toFixed(2)}`;
+    return min !== null ? `${min.toFixed(2)}` : `${max?.toFixed(2)}`;
+  };
+
+  const handleCheckboxChange = (rowId: string) => {
+    const isSelected = selectedRows.includes(rowId);
+
+    if (!isSelected && selectedRows.length >= 3) {
+      setError("You can select a maximum of 3 IPOs.");
+      return;
+    }
+
+    const updated = isSelected
+      ? selectedRows.filter((id) => id !== rowId)
+      : [...selectedRows, rowId];
+
+    onSelectionChange(updated);
+    setError(null);
+  };
+
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <Box
         sx={{
           backgroundColor: "#f9f9f9",
@@ -131,85 +193,81 @@ const RecentIpoTable: React.FC = () => {
           color="#002060"
           mb={2}
         >
-          📈 Recently Listed IPOs : Past Two Weeks
+          📈 Recently Listed Deals : Past Two Weeks
         </Typography>
+
+        {error && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <TableContainer
           component={Paper}
-          sx={{
-            borderRadius: 2,
-            maxHeight: "320px",
-
-          }}
+          sx={{ borderRadius: 2, maxHeight: "320px" }}
         >
-          <Table
-            sx={{
-              borderCollapse: "collapse",
-              border: "1px solid black",
-            }}
-          >
+          <Table sx={{ borderCollapse: "collapse", border: "1px solid black" }}>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#002060" }}>
+                <TableCell sx={headerStyle}></TableCell>
                 {[
                   "Symbol",
                   "Company",
-                  "Expected Date",
+                  "Deal Type",
+                  "Pricing Date",
                   "Offer Price",
                   "Deal Size",
                   "T+1D Return",
                   "Total Committed Capital",
                 ].map((heading) => (
-                  <TableCell
-                    key={heading}
-                    align="center"
-                    sx={{
-                      color: "#fff",
-                      fontWeight: 600,
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      lineHeight: 1.2,
-                    }}
-                  >
+                  <TableCell key={heading} align="center" sx={headerStyle}>
                     {heading}
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {ipoData.map((row, index) => {
-                const returnValue = parseFloat(row.t1d_return_from_bloomberg as any);
+              {ipoData.map((row) => {
+                const rowId = `${row.ticker}_${row.pricing_date}`;
+                const returnValue = parseFloat(row.t1d_actual as any);
+                const isChecked = selectedRows.includes(rowId);
 
                 return (
                   <TableRow
-                    key={index}
+                    key={rowId}
                     hover
                     sx={{
                       "&:hover": { backgroundColor: "#f0f8ff" },
                       border: "1px solid black",
                     }}
                   >
-                    <TableCell
-                      align="center"
-                      sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
-                    >
+                    <TableCell align="center" sx={cellStyle}>
+                      <Checkbox
+                        checked={isChecked}
+                        onChange={() => handleCheckboxChange(rowId)}
+                        disabled={!isChecked && selectedRows.length >= 3}
+                        size="small"
+                      />
+                    </TableCell>
+
+                    <TableCell align="center" sx={cellStyle}>
                       {dashboardTickers.includes(row.ticker) ? (
                         <Box
                           component="span"
-                          // sx={{
-                          //   color: "#fc1400",
-                          //   textDecoration: "underline",
-                          //   cursor: "pointer",
-                          //   fontWeight: 600,
-                          //   "&:hover": {
-                          //     color: "#8f0082",
-                          //     textDecoration: "none",
-                          //   },
-                          // }}
-                          // onClick={() => {
-                          //   localStorage.setItem("selected_ticker", row.ticker);
-                          //   window.open("/equity/ipo_dashboard", "_blank");
-                          // }}
+                          sx={{
+                            color: "#fc1400",
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                            fontWeight: 600,
+                            "&:hover": {
+                              color: "#8f0082",
+                              textDecoration: "none",
+                            },
+                          }}
+                          onClick={() => {
+                            localStorage.setItem("selected_ticker", row.ticker);
+                            window.open("/equity/ipo_dashboard", "_blank");
+                          }}
                         >
                           {row.ticker}
                         </Box>
@@ -217,24 +275,33 @@ const RecentIpoTable: React.FC = () => {
                         row.ticker
                       )}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
-                      {row.company_name}
+
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.company_name || "—"}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
-                      {formatDate(row.expected_date)}
+
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.deal_type || "—"}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "8px 10px", border: "1px solid black", lineHeight: 1.2 }}>
-                      {row.price ?? "—"}
+
+                    <TableCell align="center" sx={cellStyle}>
+                      {formatDate(row.pricing_date)}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
-                      {row.deal_size ?? "—"}
+
+                    <TableCell align="center" sx={cellStyle}>
+                      {formatPriceRange(row.price_min, row.price_max)}
                     </TableCell>
+
+                    <TableCell align="center" sx={cellStyle}>
+                      {row.deal_size && !isNaN(Number(row.deal_size))
+                        ? formatCapital(Number(row.deal_size))
+                        : row.deal_size ?? "—"}
+                    </TableCell>
+
                     <TableCell
                       align="center"
                       sx={{
-                        fontSize: "0.78rem",
-                        padding: "6px 8px",
-                        border: "1px solid black",
+                        ...cellStyle,
                         color: isNaN(returnValue)
                           ? "inherit"
                           : returnValue > 0
@@ -243,12 +310,12 @@ const RecentIpoTable: React.FC = () => {
                           ? "red"
                           : "inherit",
                         fontWeight: 500,
-                        lineHeight: 1.2,
                       }}
                     >
-                      {formatReturn(row.t1d_return_from_bloomberg)}
+                      {formatReturn(row.t1d_actual)}
                     </TableCell>
-                    <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
+
+                    <TableCell align="center" sx={cellStyle}>
                       {formatCapital(row.total_committed_capital)}
                     </TableCell>
                   </TableRow>
