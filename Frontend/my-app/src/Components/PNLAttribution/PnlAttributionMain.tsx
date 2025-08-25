@@ -62,7 +62,7 @@ const PnlAttributionMain: React.FC = () => {
   };
 
   return (
-    <Container>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       {/* Top card with gradient and button-like tabs */}
       <Card
         sx={{
