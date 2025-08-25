@@ -26,7 +26,7 @@ interface Deal {
   id: number;
 }
 
-// Format header into multiple lines if needed
+// Format multi-word headers with line breaks
 const formatHeader = (label: string) => {
   const words = label.split(' ');
   return words.length === 1 ? label : (
@@ -147,7 +147,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
         New Deals - Upcoming & Recent
       </Typography>
 
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+      <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 2 }}>
         <Button
           variant={selectedOp === 'all upcoming' ? 'contained' : 'outlined'}
           onClick={() => fetchData('all upcoming')}
@@ -179,11 +179,11 @@ const NewDealsUpcomingRecent: React.FC = () => {
             autoHeight={false}
             disableRowSelectionOnClick
             sx={{
-    "& .MuiDataGrid-container--top [role='row']": {
-      backgroundColor: "#002060",
-      color: "#FFFFFF", 
-    },
-  }}
+              "& .MuiDataGrid-container--top [role='row']": {
+                backgroundColor: "#002060",
+                color: "#FFFFFF",
+              },
+            }}
           />
         </Box>
       )}
