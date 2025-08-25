@@ -143,9 +143,13 @@ const NotificationMenu: React.FC = () => {
                   alignItems: "flex-start",
                 }}
               >
-                <span>{notif.message || "New notification"}</span>
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: notif.message || "New notification",
+                  }}
+                />
 
-                {notif.priority && (
+                {/* {notif.priority && (
                   <span
                     style={{
                       fontSize: "0.75rem",
@@ -155,7 +159,7 @@ const NotificationMenu: React.FC = () => {
                   >
                     {notif.priority.toUpperCase()}
                   </span>
-                )}
+                )} */}
 
                 {notif.created_at && (
                   <span style={{ fontSize: "0.7rem", color: "gray" }}>
@@ -202,7 +206,7 @@ const NotificationMenu: React.FC = () => {
             notifications.map((notif, idx) => (
               <div key={idx} style={{ marginBottom: "12px" }}>
                 <strong>{notif.message || "New notification"}</strong>
-                {notif.priority && (
+                {/* {notif.priority && (
                   <div
                     style={{
                       fontSize: "0.8rem",
@@ -211,7 +215,7 @@ const NotificationMenu: React.FC = () => {
                   >
                     {notif.priority.toUpperCase()}
                   </div>
-                )}
+                )} */}
                 {notif.created_at && (
                   <div style={{ fontSize: "0.75rem", color: "gray" }}>
                     {formatDistanceToNow(new Date(notif.created_at), {
