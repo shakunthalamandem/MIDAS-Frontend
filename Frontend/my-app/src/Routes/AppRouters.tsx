@@ -67,17 +67,8 @@ import EquityDealsIPOFO from "../Components/Main/DashBoards/EquityDealsIPOFO";
 import ChatboxMain from "../Components/ChatboxGroup/ChatboxMain";
 import ExportUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/ExportUnifiedDealData";
 import UnifiedDealDataUpload from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/UnifiedDealDataUpload";
+import TickerDashboard from "../Components/DealTracking/TickerDashboard";
 import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteUpMain";
-
-
-
-
-
-
-
-
-
-
 
 const AppRouters: React.FC = () => {
   return (
@@ -157,7 +148,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/deals/new_deal_form" element={<AuthGuard><EquityNewDealFormMain /></AuthGuard>} />
-
+        <Route path="/deals/deal_track" element={<AuthGuard><TickerDashboard /></AuthGuard>} />
 
 
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
