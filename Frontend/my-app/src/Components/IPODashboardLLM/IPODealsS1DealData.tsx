@@ -299,7 +299,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                         </Stack>
                       ) : (
                         <Typography variant="h5" sx={{ color: "#086000ff", fontWeight: 600}}>
-                          Grade is {dealData.monashee_score ?? 0} / 10
+                          Monashee Grade is {dealData.monashee_score ?? 0} / 10
                         </Typography>
                       )}
                     </Box>
