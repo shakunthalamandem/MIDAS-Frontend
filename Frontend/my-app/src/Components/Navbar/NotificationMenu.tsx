@@ -8,11 +8,14 @@ import {
   Badge,
   CircularProgress,
   Divider,
-  ListItemText,
-  Typography,
-  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import CloseIcon from "@mui/icons-material/Close";
 import { formatDistanceToNow } from "date-fns";
 
 interface Notification {
@@ -21,19 +24,15 @@ interface Notification {
   created_at?: string;
 }
 
-// interface Props {
-//   apiUrl: string;
-//   token: string | null;
-// }
-
-const NotificationMenu: React.FC= () => {
+const NotificationMenu: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [viewAllOpen, setViewAllOpen] = useState(false);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-
 
   // Fetch notifications from API
   const fetchNotifications = async () => {
@@ -54,10 +53,8 @@ const NotificationMenu: React.FC= () => {
         throw new Error(`Failed to fetch notifications: ${res.status}`);
 
       const data = await res.json();
-      console.log("🔔 Raw API response:", data);
-
-      setNotifications(data); // directly set array
-      setUnreadCount(data.length); // update count
+      setNotifications(data);
+      setUnreadCount(data.length);
     } catch (err) {
       console.error("❌ Error fetching notifications:", err);
     } finally {
@@ -65,20 +62,18 @@ const NotificationMenu: React.FC= () => {
     }
   };
 
-  // Fetch once on mount (page refresh)
   useEffect(() => {
     fetchNotifications();
   }, []);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-    // reset unread count when opening
-    setUnreadCount(0);
+    setUnreadCount(0); // reset count when menu is opened
   };
 
   const handleClose = () => setAnchorEl(null);
 
-  // Clear all notifications (frontend only)
+  // Clear all notifications
   const handleClearAll = () => {
     setNotifications([]);
     setUnreadCount(0);
@@ -94,17 +89,40 @@ const NotificationMenu: React.FC= () => {
         </IconButton>
       </Tooltip>
 
+      {/* Dropdown Menu (shows only 3 latest notifications) */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
         PaperProps={{
           elevation: 3,
-          sx: { mt: 1.5, width: "320px", maxHeight: "400px" },
+          sx: { mt: 1.5, width: "320px", maxHeight: "500px" },
         }}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
+        {/* Header */}
+        <MenuItem
+          disableRipple
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontWeight: 600,
+            position: "sticky",
+            top: 0,
+            backgroundColor: "white",
+            zIndex: 1,
+          }}
+        >
+          Notifications
+          <IconButton size="small" onClick={handleClose}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </MenuItem>
+
+        <Divider />
+
         {loading ? (
           <MenuItem>
             <CircularProgress size={20} sx={{ mr: 2 }} /> Loading...
@@ -113,7 +131,8 @@ const NotificationMenu: React.FC= () => {
           <MenuItem>No new notifications....</MenuItem>
         ) : (
           <>
-            {notifications.map((notif, idx) => (
+            {/* Show only first 3 notifications */}
+            {notifications.slice(0, 3).map((notif, idx) => (
               <MenuItem
                 key={idx}
                 sx={{
@@ -155,9 +174,60 @@ const NotificationMenu: React.FC= () => {
             >
               Clear All
             </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                setViewAllOpen(true);
+              }}
+              sx={{ justifyContent: "center", fontWeight: 600, color: "#002060" }}
+            >
+              View All
+            </MenuItem>
           </>
         )}
       </Menu>
+
+      {/* Dialog for View All */}
+      <Dialog
+        open={viewAllOpen}
+        onClose={() => setViewAllOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>All Notifications</DialogTitle>
+        <DialogContent dividers sx={{ maxHeight: "400px" }}>
+          {notifications.length === 0 ? (
+            <p>No notifications available.</p>
+          ) : (
+            notifications.map((notif, idx) => (
+              <div key={idx} style={{ marginBottom: "12px" }}>
+                <strong>{notif.message || "New notification"}</strong>
+                {notif.priority && (
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      color: notif.priority === "high" ? "red" : "gray",
+                    }}
+                  >
+                    {notif.priority.toUpperCase()}
+                  </div>
+                )}
+                {notif.created_at && (
+                  <div style={{ fontSize: "0.75rem", color: "gray" }}>
+                    {formatDistanceToNow(new Date(notif.created_at), {
+                      addSuffix: true,
+                    })}
+                  </div>
+                )}
+                <Divider sx={{ my: 1 }} />
+              </div>
+            ))
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setViewAllOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
