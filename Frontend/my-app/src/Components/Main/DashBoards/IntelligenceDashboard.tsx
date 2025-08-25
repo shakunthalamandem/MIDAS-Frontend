@@ -28,6 +28,7 @@ const IntelligenceDashboard: React.FC = () => {
 
   // ✅ Only ticker now (no expected_listing_date)
   const [selectedTickers, setSelectedTickers] = useState<{ ticker: string }[]>([]);
+  const [recentSelectedRows, setRecentSelectedRows] = useState<string[]>([]);
 
   const handleIpoYearToggle = (year: number) => {
     setSelectedIpoYears((prev) =>
@@ -158,7 +159,10 @@ const IntelligenceDashboard: React.FC = () => {
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <RecentIpoTable />
+                      <RecentIpoTable
+      selectedRows={recentSelectedRows}
+      onSelectionChange={setRecentSelectedRows}
+    />
                   </Grid>
 
                   {/* Selected IPO deal info cards */}

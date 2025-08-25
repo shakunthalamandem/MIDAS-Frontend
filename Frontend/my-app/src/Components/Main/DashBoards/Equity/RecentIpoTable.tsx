@@ -26,6 +26,11 @@ interface IpoData {
   total_committed_capital?: number | null;
 }
 
+interface RecentIpoTableProps {
+  selectedRows: string[]; // controlled from parent
+  onSelectionChange: (selected: string[]) => void; // callback to update parent
+}
+
 const headerStyle = {
   color: "#fff",
   fontWeight: 600,
@@ -43,10 +48,12 @@ const cellStyle = {
   lineHeight: 1.2,
 };
 
-const RecentIpoTable: React.FC = () => {
+const RecentIpoTable: React.FC<RecentIpoTableProps> = ({
+  selectedRows,
+  onSelectionChange,
+}) => {
   const [ipoData, setIpoData] = useState<IpoData[]>([]);
   const [dashboardTickers, setDashboardTickers] = useState<string[]>([]);
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -156,9 +163,11 @@ const RecentIpoTable: React.FC = () => {
       return;
     }
 
-    setSelectedRows((prev) =>
-      isSelected ? prev.filter((id) => id !== rowId) : [...prev, rowId]
-    );
+    const updated = isSelected
+      ? selectedRows.filter((id) => id !== rowId)
+      : [...selectedRows, rowId];
+
+    onSelectionChange(updated);
     setError(null);
   };
 

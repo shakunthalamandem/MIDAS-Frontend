@@ -39,7 +39,7 @@ const UpcomingIpoTable: React.FC<Props> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // Reset selected tickers on mount (page refresh)
+  // Reset selected tickers on mount
   useEffect(() => {
     setSelectedTickers([]);
   }, [setSelectedTickers]);
@@ -110,6 +110,15 @@ const UpcomingIpoTable: React.FC<Props> = ({
     } catch (err) {
       console.error("Error posting ticker status:", err);
     }
+  };
+
+  const formatCapital = (value: number | null | undefined): string => {
+    if (value === null || value === undefined) return "—";
+    const abs = Math.abs(value);
+    if (abs >= 1e9) return `$${(abs / 1e9).toFixed(1)}B`;
+    if (abs >= 1e6) return `$${(abs / 1e6).toFixed(1)}M`;
+    if (abs >= 1e3) return `$${(abs / 1e3).toFixed(1)}K`;
+    return `$${abs.toFixed(2)}`;
   };
 
   return (
@@ -196,7 +205,7 @@ const UpcomingIpoTable: React.FC<Props> = ({
                       {row.exchange || "—"}
                     </TableCell>
                     <TableCell align="center" sx={cellStyle}>
-                      {row.deal_size || "—"}
+                      {formatCapital(row.deal_size)}
                     </TableCell>
                   </TableRow>
                 );
