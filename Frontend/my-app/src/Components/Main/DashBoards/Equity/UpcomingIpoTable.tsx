@@ -13,6 +13,9 @@ import {
   Checkbox,
   Alert,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
 
 interface IpoData {
   ticker: string;

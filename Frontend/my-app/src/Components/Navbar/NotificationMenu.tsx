@@ -8,11 +8,10 @@ import {
   Badge,
   CircularProgress,
   Divider,
-  ListItemText,
-  Typography,
   Box,
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import CloseIcon from "@mui/icons-material/Close";
 import { formatDistanceToNow } from "date-fns";
 
 interface Notification {
@@ -21,19 +20,13 @@ interface Notification {
   created_at?: string;
 }
 
-// interface Props {
-//   apiUrl: string;
-//   token: string | null;
-// }
-
-const NotificationMenu: React.FC= () => {
+const NotificationMenu: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-
 
   // Fetch notifications from API
   const fetchNotifications = async () => {
@@ -56,8 +49,8 @@ const NotificationMenu: React.FC= () => {
       const data = await res.json();
       console.log("🔔 Raw API response:", data);
 
-      setNotifications(data); // directly set array
-      setUnreadCount(data.length); // update count
+      setNotifications(data);
+      setUnreadCount(data.length);
     } catch (err) {
       console.error("❌ Error fetching notifications:", err);
     } finally {
@@ -65,15 +58,14 @@ const NotificationMenu: React.FC= () => {
     }
   };
 
-  // Fetch once on mount (page refresh)
+  // Fetch once on mount
   useEffect(() => {
     fetchNotifications();
   }, []);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-    // reset unread count when opening
-    setUnreadCount(0);
+    setUnreadCount(0); // reset count when menu is opened
   };
 
   const handleClose = () => setAnchorEl(null);
@@ -105,6 +97,28 @@ const NotificationMenu: React.FC= () => {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
+        {/* 🔹 Header with Close button */}
+        <MenuItem
+          disableRipple
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontWeight: 600,
+            position: "sticky",
+            top: 0,
+            backgroundColor: "white",
+            zIndex: 1,
+          }}
+        >
+          Notifications
+          <IconButton size="small" onClick={handleClose}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </MenuItem>
+
+        <Divider />
+
         {loading ? (
           <MenuItem>
             <CircularProgress size={20} sx={{ mr: 2 }} /> Loading...

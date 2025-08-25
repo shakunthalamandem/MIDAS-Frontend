@@ -94,9 +94,9 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     discount_from_announcement_price_category: "",
     allocation_deal_size_percentage_category: "",
     allocation_percentage_category: "",
-    GDP: "",
-    Inflation: "",
-    Treasury: "",
+    GDP: "Stable",
+    Inflation: "Stable",
+    Treasury: "Stable",
   };
 
   const [formData, setFormData] = useState<FormData>(defaultFormData);
@@ -156,7 +156,10 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
         !value &&
         key !== "deal_type" &&
         key !== "region" &&
-        key !== "target"
+        key !== "target" &&
+        key !== "GDP" &&
+        key !== "Inflation" &&
+        key !== "Treasury"
       ) {
         errors[key as keyof FormData] = "This field is required";
         isValid = false;
@@ -224,6 +227,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     }
 
     setLoading(true);
+    const payload = {
+    ...formData,
+    GDP: "Stable",       // enforce
+    Inflation: "Stable", // enforce
+    Treasury: "Stable",  // enforce
+  };
     try {
       const response = await fetch(`${apiUrl}/api/ml_prediction_v2/`, {
         method: "POST",
@@ -231,7 +240,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {

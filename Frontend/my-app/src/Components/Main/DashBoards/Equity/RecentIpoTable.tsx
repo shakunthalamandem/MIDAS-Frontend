@@ -20,6 +20,9 @@ interface IpoData {
   pricing_date: string;
   price_min: number | null;
   price_max: number | null;
+  expected_date: string;
+  price: string | null;
+  exchange?: string;
   deal_size: string | null;
   deal_type?: string | null;
   t1d_actual?: number | string | null;
