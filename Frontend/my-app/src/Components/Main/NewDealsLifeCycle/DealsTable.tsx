@@ -73,8 +73,6 @@ interface DealsTableProps {
 const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) => {
   const [selectedId, setSelectedId] = useState<number | string | null>(null);
 
-  // Get the selected deal from rows
-  const selectedDeal = rows.find((row) => row.id === selectedId);
 
   const columns: GridColDef[] = [
     {
@@ -197,45 +195,34 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <div style={{ maxHeight: 400, width: "100%", overflow: "auto" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          loading={loading}
-          checkboxSelection={false}
-          onRowClick={handleRowClick}
-          rowHeight={35}
-          getRowClassName={(params) =>
-            selectedId === params.id ? "Mui-selected" : ""
-          }
-          sx={{
-            "& .MuiDataGrid-container--top [role='row']": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
-            },
+<div style={{ width: "100%", height: 450 ,maxHeight:'450px'}}>
+  <DataGrid
+    rows={rows}
+    columns={columns}
+    loading={loading}
+    checkboxSelection={false}
+    onRowClick={handleRowClick}
+    rowHeight={35}
+    getRowClassName={(params) =>
+      selectedId === params.id ? "Mui-selected" : ""
+    }
+    sx={{
+      "& .MuiDataGrid-container--top [role='row']": {
+        backgroundColor: "#002060",
+        color: "#FFFFFF",
+      },
+      "& .Mui-selected": {
+        backgroundColor: "#cad0f1ff !important",
+      },
+      cursor: "pointer",
+      border: "1px solid #ccccccff",
+    }}
+  />
+</div>
 
-            "& .Mui-selected": {
-              backgroundColor: "#cad0f1ff !important",
-            },
-            cursor: "pointer",
-            border: "1px solid #ccccccff",
-          }}
-        />
-      </div>
 
-      {selectedDeal && (
-        <Grid container spacing={2} mt={2}>
-          <Grid item xs={12} md={4}>
-            <DealColorInfo data={selectedDeal} />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <DealWriteUpInfo data={selectedDeal} />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <AIMLModelPredictionInfo data={selectedDeal} />
-          </Grid>
-        </Grid>
-      )}
+
+
     </Container>
   );
 };

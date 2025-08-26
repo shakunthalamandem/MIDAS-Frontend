@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -35,6 +35,11 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('access_token');
+
+
+      useEffect(() => {
+      setFormData(data); // Ensure the form is updated when the selected deal changes
+    }, [data]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
