@@ -189,7 +189,6 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
           rows={rows}
           columns={columns}
           loading={loading}
-          autoHeight={false}
           checkboxSelection={false}
           onRowClick={handleRowClick}
           rowHeight={35}
