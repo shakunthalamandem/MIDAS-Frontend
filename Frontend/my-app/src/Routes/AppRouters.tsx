@@ -69,6 +69,9 @@ import ExportUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/Expor
 import UnifiedDealDataUpload from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/UnifiedDealDataUpload";
 import TickerDashboard from "../Components/DealTracking/TickerDashboard";
 import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteUpMain";
+import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
+import TickerTracking from "../Components/DealTracking/TickerTracking";
+import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
 
 const AppRouters: React.FC = () => {
   return (
@@ -148,7 +151,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/deals/new_deal_form" element={<AuthGuard><EquityNewDealFormMain /></AuthGuard>} />
-        <Route path="/deals/deal_track" element={<AuthGuard><TickerDashboard /></AuthGuard>} />
+        <Route path="/deals/deal_Tracking" element={<AuthGuard><TickerDashboard /></AuthGuard>} />
 
 
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
@@ -176,7 +179,7 @@ const AppRouters: React.FC = () => {
   }
 />
 
-
+   <Route path="/ipo-dashboard/:ticker" element={<IPODashboardMain />} />
 
 
 
@@ -198,7 +201,17 @@ const AppRouters: React.FC = () => {
         <Route path="/opportunity/summary" element={<AuthGuard><LandingPageMain/></AuthGuard>} />
         <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO/></AuthGuard>} />
        
-        <Route path="/deals/dashboard" element={<AuthGuard><IntelligenceDashboard/></AuthGuard>} />
+        <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain/></AuthGuard>} />
+        {/* <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTracking ticker={""} pricing_date={""} /></AuthGuard>} /> */}
+         <Route 
+          path="/deals/dashboard/Tracking" 
+          element={
+            <AuthGuard>
+              <TickerTrackingWrapper />
+            </AuthGuard>
+          } 
+        />
+        {/* <Route path="/deals/dashboard" element={<AuthGuard><IntelligenceDashboard/></AuthGuard>} /> */}
 
 
 

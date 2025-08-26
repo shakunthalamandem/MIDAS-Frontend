@@ -8,6 +8,7 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Button,
 } from "@mui/material";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -38,12 +39,6 @@ interface TickerTrackingData {
   am_capital_committed?: number | null;
 }
 
-interface TickerTrackingProps {
-  ticker: string;
-  pricing_date: string;
-}
-
-
 const CustomStepIcon: React.FC<StepIconProps> = (props) => {
   const { completed } = props;
   return completed ? (
@@ -53,13 +48,11 @@ const CustomStepIcon: React.FC<StepIconProps> = (props) => {
   );
 };
 
-const TickerTracking: React.FC<TickerTrackingProps> = ({
+const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
   ticker,
   pricing_date,
 }) => {
-  const [trackingData, setTrackingData] = useState<TickerTrackingData | null>(
-    null
-  );
+  const [trackingData, setTrackingData] = useState<TickerTrackingData | null>(null);
   const [loading, setLoading] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -94,18 +87,16 @@ const TickerTracking: React.FC<TickerTrackingProps> = ({
   };
 
   const formatToMillions = (val: any): string => {
-  if (val === null || val === undefined || isNaN(val)) return "Not Available";
-
-  const num = Number(val);
-  if (Math.abs(num) >= 1_000_000) {
-    return (num / 1_000_000).toFixed(2).replace(/\.00$/, "") + "M";
-  }
-  if (Math.abs(num) >= 1_000) {
-    return (num / 1_000).toFixed(2).replace(/\.00$/, "") + "K";
-  }
-  return num.toString();
-};
-
+    if (val === null || val === undefined || isNaN(val)) return "Not Available";
+    const num = Number(val);
+    if (Math.abs(num) >= 1_000_000) {
+      return (num / 1_000_000).toFixed(2).replace(/\.00$/, "") + "M";
+    }
+    if (Math.abs(num) >= 1_000) {
+      return (num / 1_000).toFixed(2).replace(/\.00$/, "") + "K";
+    }
+    return num.toString();
+  };
 
   const steps = trackingData
     ? [
@@ -152,12 +143,12 @@ const TickerTracking: React.FC<TickerTrackingProps> = ({
           completed: !!trackingData.deal_color,
         },
         {
-            label: "Allocated Capital",
-            value: `$${formatToMillions(trackingData.allocated_capital)}`,
-            extra: `AM Capital Committed: $${formatToMillions(
-                trackingData.am_capital_committed
-            )}`,
-            completed: trackingData.allocated_capital !== null,
+          label: "Allocated Capital",
+          value: `$${formatToMillions(trackingData.allocated_capital)}`,
+          extra: `AM Capital Committed: $${formatToMillions(
+            trackingData.am_capital_committed
+          )}`,
+          completed: trackingData.allocated_capital !== null,
         },
         {
           label: "T+1 Day Prediction",
@@ -206,15 +197,12 @@ const TickerTracking: React.FC<TickerTrackingProps> = ({
 
         {!loading && trackingData && (
           <>
-            <Typography
-                variant="h6"
-                align="center"
-                gutterBottom
-                >
-                {`${ticker} (${trackingData.issuer_name}) on ${dayjs(
-                    trackingData.pricing_date
-                ).format("DD MMM YYYY")}`}
+            <Typography variant="h6" align="center" gutterBottom color="#002060" fontWeight="bold">
+              {`${ticker} (${trackingData.issuer_name}) on ${dayjs(
+                trackingData.pricing_date
+              ).format("DD MMM YYYY")}`}
             </Typography>
+
             <Stepper orientation="vertical" activeStep={steps.length - 1}>
               {steps.map((step, index) => (
                 <Step key={index} completed={step.completed}>
