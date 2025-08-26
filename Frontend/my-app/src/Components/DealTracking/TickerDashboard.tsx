@@ -128,8 +128,8 @@ const TickerDashboard: React.FC = () => {
         {selected && (
           <Box mt={3}>
             <TickerTracking
-              ticker={selected.ticker}
-              pricing_date={selected.pricing_date}
+              // ticker={selected.ticker}
+              // pricing_date={selected.pricing_date}
             />
           </Box>
         )}
