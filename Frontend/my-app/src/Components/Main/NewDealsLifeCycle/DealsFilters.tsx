@@ -13,10 +13,17 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({ selectedOp, onChange }) => 
         <FormControlLabel
           key={value}
           control={
-            <Checkbox
-              checked={selectedOp === value}
-              onChange={() => onChange(value)}
-            />
+           <Checkbox
+  checked={selectedOp === value}
+  onChange={() => onChange(value)}
+  sx={{
+    color: "#9c2007",
+    "&.Mui-checked": {
+      color: "#9c2007",
+    },
+  }}
+/>
+
           }
           label={value.replace(/^\w/, (c) => c.toUpperCase())}
         />

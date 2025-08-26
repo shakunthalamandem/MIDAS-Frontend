@@ -43,12 +43,25 @@ const formatDateCell = (params: GridRenderCellParams<any>) => {
   if (!params.value) return "";
   const date = new Date(params.value);
   if (isNaN(date.getTime())) return params.value;
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  });
+
+  const day = date.getDate();
+  const month = date.toLocaleString("en-US", { month: "short" });
+  const year = date.getFullYear();
+
+  // Add suffix (st, nd, rd, th)
+  const getDaySuffix = (d: number) => {
+    if (d > 3 && d < 21) return "th"; // catch 11th–19th
+    switch (d % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
+    }
+  };
+
+  return `${day}${getDaySuffix(day)} ${month} ${year}`;
 };
+
 // Define columns
 const getColumns = (): GridColDef[] => [
   {
