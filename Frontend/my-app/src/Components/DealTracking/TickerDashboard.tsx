@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import dayjs from "dayjs";
-import TickerTracking from "./TickerTracking";
+import TickerTracking from "./TickerTracking"; // Correct import
 
 interface TickerOption {
   ticker: string;
@@ -112,24 +112,25 @@ const TickerDashboard: React.FC = () => {
             )}
           />
         </Card>
-        <Typography
-            variant="subtitle1"
-            align="left"
-            sx={{ mt: 2, mb: 2 }}
-            >
-            Welcome to the <strong>Ticker Tracking Dashboard</strong>. Use the search bar 
-            in the top-right corner to find a specific ticker. Once selected, you’ll see 
-            its detailed lifecycle, including pricing information, allocations, predictions, 
-            and actual performance, all organized step-by-step for easy tracking.
-        </Typography>
 
+        <Typography
+          variant="subtitle1"
+          align="left"
+          sx={{ mt: 2, mb: 2 }}
+        >
+          Welcome to the <strong>Ticker Tracking Dashboard</strong>. Use the search bar
+          in the top-right corner to find a specific ticker. Once selected, you’ll see
+          its detailed lifecycle, including pricing information, allocations, predictions,
+          and actual performance, all organized step-by-step for easy tracking.
+        </Typography>
 
         {/* Ticker Tracking aligned with header */}
         {selected && (
           <Box mt={3}>
+            {/* Pass ticker and pricing_date as props */}
             <TickerTracking
-              // ticker={selected.ticker}
-              // pricing_date={selected.pricing_date}
+              ticker={selected.ticker}
+              pricing_date={selected.pricing_date}
             />
           </Box>
         )}
