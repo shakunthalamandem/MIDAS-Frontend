@@ -184,7 +184,7 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ maxHeight: 400, width: "100%" }}>
+    <div style={{ maxHeight: 600, width: "100%", overflow: "auto" }}>
         <DataGrid
           rows={rows}
           columns={columns}
@@ -208,7 +208,7 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
             border: "1px solid #ccccccff",
           }}
         />
-      </Box>
+      </div>
 
       {selectedDeal && (
         <Grid container spacing={2} mt={2}>
