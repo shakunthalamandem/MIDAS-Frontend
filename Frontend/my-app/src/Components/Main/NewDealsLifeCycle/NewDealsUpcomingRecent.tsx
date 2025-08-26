@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, CircularProgress } from "@mui/material";
+import {
+  Container,
+  Typography,
+  CircularProgress,
+  Grid,
+} from "@mui/material";
 import DealsFilters from "./DealsFilters";
 import DealsTable from "./DealsTable";
+import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
+import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
+import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 const token = localStorage.getItem("access_token");
@@ -23,14 +31,13 @@ const NewDealsUpcomingRecent: React.FC = () => {
         },
         body: JSON.stringify({ operation }),
       });
-
       const result = await response.json();
       const formattedRows = result.data.map((item: any, index: number) => ({
         id: index,
         ...item,
       }));
       setRows(formattedRows);
-      setSelectedDeal(null); // Clear previous selection when data changes
+      setSelectedDeal(null); // clear old selection on filter change
     } catch (err) {
       console.error(err);
     } finally {
@@ -66,7 +73,19 @@ const NewDealsUpcomingRecent: React.FC = () => {
         />
       )}
 
-      {/* You can use selectedDeal elsewhere here if needed */}
+      {selectedDeal && (
+        <Grid container spacing={2} mt={2}>
+          <Grid item xs={12} md={4}>
+            <DealColorInfo data={selectedDeal} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <DealWriteUpInfo data={selectedDeal} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <AIMLModelPredictionInfo data={selectedDeal} />
+          </Grid>
+        </Grid>
+      )}
     </Container>
   );
 };
