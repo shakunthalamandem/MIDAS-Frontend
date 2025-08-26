@@ -72,7 +72,8 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
   const renderField = (
     label: string,
     name: keyof DealWriteUpData,
-    multiline = false
+    multiline = false,
+    canEdit: boolean = false
   ) => (
     <>
       <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
@@ -85,11 +86,11 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
         fullWidth
         size="small"
         variant="standard"
-        disabled={!editable}
+        disabled={!editable || !canEdit}
         multiline={multiline}
         minRows={multiline ? 3 : 1}
         InputProps={{
-          disableUnderline: !editable,
+          disableUnderline: !editable || !canEdit,
           sx: {
             '&.Mui-disabled': {
               WebkitTextFillColor: '#b1062e',
@@ -131,22 +132,22 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
           </Box>
 
           <Grid container spacing={2} mt={2}>
+            {/* Always read-only */}
             <Grid item xs={12} sm={6}>
               {renderField('Average Sector Return (%)', 'average_sector_return')}
             </Grid>
+    {/* Editable */}
             <Grid item xs={12} sm={6}>
-              {renderField('Monashee Score', 'monashee_score')}
+              {renderField('Monashee Score', 'monashee_score', false, true)}
             </Grid>
             <Grid item xs={12}>
               {renderField('Valuation', 'valuation')}
             </Grid>
             <Grid item xs={12}>
-              {renderField(
-                'Differentiated Summary',
-                'differentiated_summary',
-                true
-              )}
+              {renderField('Differentiated Summary', 'differentiated_summary', true)}
             </Grid>
+
+        
 
             <Grid item xs={12}>
               <Typography variant="body2" color="#002060" fontWeight={500} gutterBottom>
