@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Box } from '@mui/material';
+import { Grid, Box, Typography } from '@mui/material';
 import NewDealsUpcomingRecent from './NewDealsUpcomingRecent';
 import DealColorInfo from './DealsCyclesSections/DealColorInfo';
 import DealWriteUpInfo from './DealsCyclesSections/DealWriteUpInfo';
@@ -37,7 +37,32 @@ const aiMlPredictionPayload = {
 
 const NewDealsCycleMain: React.FC = () => {
   return (
-    <Box p={2}>
+    <Box>
+            <Typography
+        variant="body2"
+        sx={{
+          fontWeight: 500,
+          color: "#FFFFFF",
+          fontSize: { xs: "1rem", sm: "1.2rem" },
+          backgroundColor: "#002060",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "4vh",
+          padding: "8px 16px",
+          borderRadius: "8px",
+          textAlign: "center",
+          marginBottom: "20px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          animation: "fadeIn 1.5s ease-in-out",
+          "@keyframes fadeIn": {
+            "0%": { opacity: 0 },
+            "100%": { opacity: 1 },
+          },
+        }}
+      >
+        Welcome to 📊 Deal Flow Tracker: IPOs, Follow-Ons & Key Highlights.
+      </Typography>
       {/* This stays full width */}
       <NewDealsUpcomingRecent />
 
