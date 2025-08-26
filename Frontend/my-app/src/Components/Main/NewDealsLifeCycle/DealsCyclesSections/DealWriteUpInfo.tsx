@@ -234,11 +234,27 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
             <Grid item xs={12}>
               {renderField('Differentiated Summary', 'differentiated_summary', undefined, true, true)}
             </Grid>
+    
+          </Grid>
+
             <Grid item xs={12}>
-              <Typography variant="body2" color="#002060" fontWeight={500} gutterBottom>
-                Deal Write-Up Rating
-              </Typography>
-              <BlueSlider
+              <Card
+                sx={{
+                  background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
+                  borderRadius: "20px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                  mt: 2,
+                }}
+              >
+                <CardContent>
+                  <Typography
+                    variant="body1"
+                    color="#002060"
+                    fontWeight="bold"
+                    gutterBottom
+                  >
+ Deal Write-Up Rating                  </Typography>
+                  <BlueSlider
                 value={formData.deal_writeup_rating || 0}
                 onChange={(_, value) =>
                   handleSliderChange('deal_writeup_rating', value as number)
@@ -249,8 +265,9 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
                 max={100}
                 disabled={!editable}
               />
+                </CardContent>
+              </Card>
             </Grid>
-          </Grid>
         </CardContent>
       </Card>
     </motion.div>

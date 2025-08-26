@@ -122,17 +122,28 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
             <Grid item xs={12}>
               {renderField('T1D Prediction', formData.t1d_pred)}
             </Grid>
+          </Grid>
+
+
 
             <Grid item xs={12}>
-              <Typography
-                variant="body2"
-                color="#002060"
-                fontWeight={500}
-                gutterBottom
+              <Card
+                sx={{
+                  background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
+                  borderRadius: "20px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                }}
               >
-                Confidence
-              </Typography>
-              <BlueSlider
+                <CardContent>
+                  <Typography
+                    variant="body1"
+                    color="#002060"
+                    fontWeight="bold"
+                    gutterBottom
+                  >
+                   Confidence
+                  </Typography>
+                   <BlueSlider
                 value={formData.confidence || 0}
                 valueLabelDisplay="on"
                 step={1}
@@ -140,8 +151,9 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
                 max={100}
                 disabled
               />
+                </CardContent>
+              </Card>
             </Grid>
-          </Grid>
         </CardContent>
       </Card>
     </motion.div>
