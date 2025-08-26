@@ -1,10 +1,6 @@
 import React, { useState } from "react";
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-} from "@mui/x-data-grid";
-import { Box, Container, Grid } from "@mui/material";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { Box, Container, Grid, Button } from "@mui/material";
 import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
 import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
 import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
@@ -186,6 +182,41 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
         return <span style={{ color: "red" }}>✘</span>;
       },
     },
+    {
+  field: "track_here",
+  headerName: "Track Here",
+  renderHeader: () => formatHeader("Track Here"),
+  flex: 1,
+  headerAlign: "center",
+  align: "center",
+  renderCell: (params: GridRenderCellParams<any>) => {
+    const ticker = params.row.ticker;
+    const pricingDate = params.row.pricing_date;
+
+    // Handle click
+    const handleTrackHereClick = () => {
+      if (ticker && pricingDate) {
+        const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${pricingDate}`;
+        // Open the URL in a new tab
+        window.open(url, "_blank");
+      }
+    };
+
+    return (
+      <span
+        onClick={handleTrackHereClick} // Navigate to the tracking page in a new tab
+        style={{
+          cursor: "pointer",
+          color: "#0066cc",
+          textDecoration: "underline", // Optional: Make it look like a link
+        }}
+      >
+        Track Here
+      </span>
+    );
+  },
+}
+
   ];
 
   const handleRowClick = (params: any) => {
