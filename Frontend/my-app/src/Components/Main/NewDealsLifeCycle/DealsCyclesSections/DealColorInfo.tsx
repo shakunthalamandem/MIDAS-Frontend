@@ -117,7 +117,7 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <Card
         sx={{
-          background: 'linear-gradient(135deg, #f0f4ff, #dce3f5)',
+          background: 'linear-gradient(135deg, #a7b5dfff, #acbbdfff)',
           borderRadius: '20px',
           boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
           p: 2,

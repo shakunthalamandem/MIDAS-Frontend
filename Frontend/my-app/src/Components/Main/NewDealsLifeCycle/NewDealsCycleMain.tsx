@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, Box, Typography } from "@mui/material";
+import { Grid, Box, Typography, Container } from "@mui/material";
 import NewDealsUpcomingRecent from "./NewDealsUpcomingRecent";
 import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
 import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
@@ -31,6 +31,7 @@ const NewDealsCycleMain: React.FC = () => {
       </Typography>
 
       <NewDealsUpcomingRecent onDealSelect={setSelectedDeal} />
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
 
       {selectedDeal && (
         <Grid container spacing={2} mt={2}>
@@ -45,6 +46,7 @@ const NewDealsCycleMain: React.FC = () => {
           </Grid>
         </Grid>
       )}
+      </Container>
     </Box>
   );
 };
