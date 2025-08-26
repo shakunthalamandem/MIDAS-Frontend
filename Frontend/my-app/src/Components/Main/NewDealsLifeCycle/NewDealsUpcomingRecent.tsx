@@ -142,8 +142,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
+    <Container maxWidth="xl" sx={{ mb: 4,mt:2 }}>
+      <Typography variant="h5" gutterBottom color='#002060' align='center' fontWeight={600}>
         New Deals - Upcoming & Recent
       </Typography>
 
