@@ -195,7 +195,7 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
       color: "#FFFFFF",
     },
     "& .MuiDataGrid-cell": {
-      borderBottom: "1px solid #b1aeaeff", // 🔥 Row borders black
+      borderBottom: "1px solid #ccc9c9ff", // 🔥 Row borders black
     },
     "& .MuiDataGrid-columnHeaders": {
       borderBottom: "1px solid #bdb9b9ff", // 🔥 Header border black
