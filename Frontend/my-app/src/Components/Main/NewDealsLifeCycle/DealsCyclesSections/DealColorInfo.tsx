@@ -72,7 +72,7 @@ const handleSave = async () => {
       }
     });
 
-    const response = await fetch(`${apiUrl}/api/unified_deal_ratings/${data.id || ''}`, {
+    const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
