@@ -55,8 +55,61 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
   const handleSliderChange = (name: keyof DealColorData, value: number) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  const mapApiResponseToDealColorData = (apiData: any): Partial<DealColorData> => {
+  return {
+    ticker: apiData.ticker,
+    pricing_date: apiData.pricing_date,
+    deal_type: apiData.deal_type,
+    allocation_as_percentage_of_deal_size: apiData.allocation_as_percentage_of_deal_size,
+    allocation_as_percentage_of_ioi: apiData.allocation_as_percentage_of_ioi,
+    average_ioi: apiData.average_ioi,
+    average_allocation: apiData.average_allocation,
+    times_covered: apiData.times_covered,
+    deal_color_rating: apiData.deal_color_rating,
+  };
+};
+
+useEffect(() => {
+  setFormData(data);
+  if (data?.ticker && data?.pricing_date && data?.deal_type) {
+    fetchDealColorInfo();
+  }
+}, [data]);
 
 
+const fetchDealColorInfo = async () => {
+  try {
+    const payload = {
+      ticker: data.ticker,
+      pricing_date: data.pricing_date,
+      deal_type: data.deal_type,
+    };
+
+    const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      const mapped = mapApiResponseToDealColorData(result.data);
+
+      // Merge into formData
+      setFormData((prev) => ({
+        ...prev,
+        ...mapped,
+      }));
+    } else {
+      console.error('Failed to fetch deal color info');
+    }
+  } catch (error) {
+    console.error('Error fetching deal color info:', error);
+  }
+};
 
 const handleSave = async () => {
   try {
