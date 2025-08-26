@@ -240,38 +240,79 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
             <Grid item xs={12} sm={6}>
               {renderField("Deal Type", "deal_type")}
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography
-                variant="body2"
-                color="#002060"
-                fontWeight={500}
-                gutterBottom
-              >
-                Times Covered
-              </Typography>
-              <RadioGroup
-                row
-                value={formData.times_covered || ""}
-                onChange={handleChange}
-                name="times_covered"
-              >
-                <FormControlLabel
-                  value="1x-5x"
-                  control={<Radio disabled={!editable} />}
-                  label="1x-5x"
-                />
-                <FormControlLabel
-                  value="5x-10x"
-                  control={<Radio disabled={!editable} />}
-                  label="5x-10x"
-                />
-                <FormControlLabel
-                  value=">10x"
-                  control={<Radio disabled={!editable} />}
-                  label=">10x"
-                />
-              </RadioGroup>
-            </Grid>
+<Grid item xs={12} sm={6}>
+  <Typography
+    variant="body2"
+    color="#002060"
+    fontWeight={500}
+    gutterBottom
+  >
+    Times Covered
+  </Typography>
+<RadioGroup
+  row
+  value={formData.times_covered || ""}
+  onChange={handleChange}
+  name="times_covered"
+>
+  <FormControlLabel
+    value="1x-5x"
+    control={
+      <Radio
+        disabled={!editable}
+        sx={{
+          color: '#B1062E',
+          '&.Mui-checked': {
+            color: '#B1062E',
+          },
+        }}
+      />
+    }
+    sx={{
+      color: formData.times_covered === '1x-5x' ? '#B1062E' : '#000000', // Apply color conditionally
+    }}
+    label="1x-5x"
+  />
+  <FormControlLabel
+    value="5x-10x"
+    control={
+      <Radio
+        disabled={!editable}
+        sx={{
+          color: '#B1062E',
+          '&.Mui-checked': {
+            color: '#B1062E',
+          },
+        }}
+      />
+    }
+    sx={{
+      color: formData.times_covered === '5x-10x' ? '#B1062E' : '#000000', // Apply color conditionally
+    }}
+    label="5x-10x"
+  />
+  <FormControlLabel
+    value=">10x"
+    control={
+      <Radio
+        disabled={!editable}
+        sx={{
+          color: '#B1062E',
+          '&.Mui-checked': {
+            color: '#B1062E',
+          },
+        }}
+      />
+    }
+    sx={{
+      color: formData.times_covered === '>10x' ? '#B1062E' : '#000000', // Apply color conditionally
+    }}
+    label=">10x"
+  />
+</RadioGroup>
+
+</Grid>
+
             <Grid item xs={12} sm={6}>
               {renderField(
                 "Last 10 deals Avg Allocation as % of Deal_Size",
