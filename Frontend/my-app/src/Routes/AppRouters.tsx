@@ -178,7 +178,7 @@ const AppRouters: React.FC = () => {
   }
 />
 
-
+   <Route path="/ipo-dashboard/:ticker" element={<IPODashboardMain />} />
 
 
 
