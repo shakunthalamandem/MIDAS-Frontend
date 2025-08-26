@@ -6,14 +6,11 @@ import DealsTable from "./DealsTable";
 const apiUrl = process.env.REACT_APP_API_URL;
 const token = localStorage.getItem("access_token");
 
-interface Props {
-  onDealSelect: (deal: any) => void;
-}
-
-const NewDealsUpcomingRecent: React.FC<Props> = ({ onDealSelect }) => {
+const NewDealsUpcomingRecent: React.FC = () => {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedOp, setSelectedOp] = useState("next 2 weeks");
+  const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
 
   const fetchData = async (operation: string) => {
     setLoading(true);
@@ -26,12 +23,14 @@ const NewDealsUpcomingRecent: React.FC<Props> = ({ onDealSelect }) => {
         },
         body: JSON.stringify({ operation }),
       });
+
       const result = await response.json();
       const formattedRows = result.data.map((item: any, index: number) => ({
         id: index,
         ...item,
       }));
       setRows(formattedRows);
+      setSelectedDeal(null); // Clear previous selection when data changes
     } catch (err) {
       console.error(err);
     } finally {
@@ -60,8 +59,14 @@ const NewDealsUpcomingRecent: React.FC<Props> = ({ onDealSelect }) => {
       {loading ? (
         <CircularProgress sx={{ display: "block", mx: "auto" }} />
       ) : (
-        <DealsTable rows={rows} loading={loading} onRowSelect={onDealSelect} />
+        <DealsTable
+          rows={rows}
+          loading={loading}
+          onRowSelect={(row) => setSelectedDeal(row)}
+        />
       )}
+
+      {/* You can use selectedDeal elsewhere here if needed */}
     </Container>
   );
 };

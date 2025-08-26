@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import { Grid, Box, Typography, Container } from "@mui/material";
 import NewDealsUpcomingRecent from "./NewDealsUpcomingRecent";
-import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
-import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
-import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
+
 
 const NewDealsCycleMain: React.FC = () => {
-  const [selectedDeal, setSelectedDeal] = useState<any>(null);
 
   return (
     <Box>
@@ -30,23 +27,8 @@ const NewDealsCycleMain: React.FC = () => {
         Welcome to 📊 Deal Flow Tracker: IPOs, Follow-Ons & Key Highlights.
       </Typography>
 
-      <NewDealsUpcomingRecent onDealSelect={setSelectedDeal} />
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-
-      {selectedDeal && (
-        <Grid container spacing={2} mt={2}>
-          <Grid item xs={12} md={4}>
-            <DealColorInfo data={selectedDeal} />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <DealWriteUpInfo data={selectedDeal} />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <AIMLModelPredictionInfo data={selectedDeal} />
-          </Grid>
-        </Grid>
-      )}
-      </Container>
+      <NewDealsUpcomingRecent />
+     
     </Box>
   );
 };
