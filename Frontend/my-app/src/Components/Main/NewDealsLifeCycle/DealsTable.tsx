@@ -5,6 +5,7 @@ import {
   GridRenderCellParams,
   GridRowSelectionModel,
 } from "@mui/x-data-grid";
+import { Box } from "@mui/material";
 
 // Helper: Format header
 const formatHeader = (label: string) => {
@@ -177,7 +178,7 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
   };
 
   return (
-    <div style={{ maxHeight: 600, width: "100%", overflow: "auto" }}>
+       <Box sx={{ height: 400, width: "100%" }}>
     <DataGrid
   rows={rows}
   columns={columns}
@@ -212,7 +213,10 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
   }}
 />
 
-    </div>
+
+
+
+    </Box>
   );
 };
 
