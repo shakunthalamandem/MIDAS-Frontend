@@ -80,7 +80,8 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
   const renderField = (
     label: string,
     name: keyof DealColorData,
-    adornment?: string
+    adornment?: string,
+    canEdit: boolean = false
   ) => (
     <>
       <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
@@ -93,9 +94,9 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
         fullWidth
         size="small"
         variant="standard"
-        disabled={!editable}
+        disabled={!editable || !canEdit}
         InputProps={{
-          disableUnderline: !editable,
+          disableUnderline: !editable || !canEdit,
           sx: {
             '&.Mui-disabled': {
               WebkitTextFillColor: '#b1062e',
@@ -117,7 +118,7 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <Card
         sx={{
-          background: 'linear-gradient(135deg, #a7b5dfff, #acbbdfff)',
+          background: 'linear-gradient(135deg, #f0f4ff, #dce3f5)',
           borderRadius: '20px',
           boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
           p: 2,
@@ -138,6 +139,7 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
           </Box>
 
           <Grid container spacing={2} mt={2}>
+            {/* Always readonly fields */}
             <Grid item xs={12} sm={6}>
               {renderField('Ticker', 'ticker')}
             </Grid>
@@ -147,28 +149,7 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
             <Grid item xs={12} sm={6}>
               {renderField('Deal Type', 'deal_type')}
             </Grid>
-            <Grid item xs={12} sm={6}>
-              {renderField(
-                'Allocation of IOI Amount',
-                'allocation_as_percentage_of_ioi',
-                '%'
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              {renderField('Average IOI', 'average_ioi')}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              {renderField(
-                'Allocation as % of Deal Size',
-                'allocation_as_percentage_of_deal_size',
-                '%'
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              {renderField('Average Allocation', 'average_allocation')}
-            </Grid>
-
-            <Grid item xs={12}>
+                        <Grid item xs={12} sm={6} >
               <Typography variant="body2" color="#002060" fontWeight={500} gutterBottom>
                 Times Covered
               </Typography>
@@ -178,11 +159,38 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
                 onChange={handleChange}
                 name="times_covered"
               >
-                <FormControlLabel value="1x-5x" control={<Radio />} label="1x-5x" />
-                <FormControlLabel value="5x-10x" control={<Radio />} label="5x-10x" />
-                <FormControlLabel value=">10x" control={<Radio />} label=">10x" />
+                <FormControlLabel value="1x-5x" control={<Radio disabled={!editable} />} label="1x-5x" />
+                <FormControlLabel value="5x-10x" control={<Radio disabled={!editable} />} label="5x-10x" />
+                <FormControlLabel value=">10x" control={<Radio disabled={!editable} />} label=">10x" />
               </RadioGroup>
             </Grid>
+               <Grid item xs={12} sm={6}>
+              {renderField('Average Allocation as % of Deal_Size', 'average_allocation')}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              {renderField('Avg Allocation as % of IoI', 'average_ioi')}
+            </Grid>
+   {/* Editable fields */}
+            <Grid item xs={12} sm={6}>
+              {renderField(
+                'Allocation as % of Deal Size',
+                'allocation_as_percentage_of_deal_size',
+                '%',
+                true
+              )}
+            </Grid>
+         
+            <Grid item xs={12} sm={6}>
+              {renderField(
+                'Allocation as % of IOI',
+                'allocation_as_percentage_of_ioi',
+                '%',
+                true
+              )}
+            </Grid>
+
+
+
 
             <Grid item xs={12}>
               <BlueSlider
