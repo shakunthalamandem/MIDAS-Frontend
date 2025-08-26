@@ -8,6 +8,7 @@ import { Box, Container, Grid } from "@mui/material";
 import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
 import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
 import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
+import { Link } from "react-router-dom";
 
 // Helper: Format header
 const formatHeader = (label: string) => {
@@ -172,8 +173,20 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
       renderHeader: () => formatHeader("Writeup Available"),
       flex: 1,
       headerAlign: "center",
-      align: "center",
-      renderCell: renderCheckCell,
+      renderCell: (params: GridRenderCellParams<any>) => {
+        if (params.value?.toString().toLowerCase() === "yes") {
+          return (
+     <Link
+    to={`/ipo-dashboard/${params.row.ticker}`}
+    style={{ color: "#002060", fontWeight: "bold", textDecoration: "none" }}
+  >
+    <span style={{ color: "green" }}>✔</span>{" "}
+    <span style={{ textDecoration: "underline" }}>View</span>
+  </Link>
+          );
+        }
+        return <span style={{ color: "red" }}>✘</span>;
+      },
     },
   ];
 
@@ -184,7 +197,7 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-    <div style={{ maxHeight: 400, width: "100%", overflow: "auto" }}>
+      <div style={{ maxHeight: 400, width: "100%", overflow: "auto" }}>
         <DataGrid
           rows={rows}
           columns={columns}
@@ -200,7 +213,7 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
               backgroundColor: "#002060",
               color: "#FFFFFF",
             },
-          
+
             "& .Mui-selected": {
               backgroundColor: "#cad0f1ff !important",
             },

@@ -62,24 +62,54 @@ const IPODashboardMain: React.FC = () => {
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   });
+useEffect(() => {
+  if (ticker) {
+    setSearchText(ticker);
+  }
+}, [ticker]);
 
-  useEffect(() => {
-    const fetchAllIpoTickers = async () => {
-      try {
-        const savedTicker = localStorage.getItem("selected_ticker");
-        setSelectedTicker(savedTicker || "");
-        const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
-          headers: getAuthHeaders(),
-        });
-        if (!response.ok) throw new Error("Failed to fetch IPO tickers");
-        const data = await response.json();
-        setAllIpoTickers(data.distinct_tickers || []);
-      } catch (err) {
-        console.error("Ticker fetch failed", err);
+  // useEffect(() => {
+  //   const fetchAllIpoTickers = async () => {
+  //     try {
+  //       const savedTicker = localStorage.getItem("selected_ticker");
+  //       setSelectedTicker(savedTicker || "");
+  //       const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
+  //         headers: getAuthHeaders(),
+  //       });
+  //       if (!response.ok) throw new Error("Failed to fetch IPO tickers");
+  //       const data = await response.json();
+  //       setAllIpoTickers(data.distinct_tickers || []);
+  //     } catch (err) {
+  //       console.error("Ticker fetch failed", err);
+  //     }
+  //   };
+  //   fetchAllIpoTickers();
+  // }, []);
+useEffect(() => {
+  const fetchAllIpoTickers = async () => {
+    try {
+      const savedTicker = localStorage.getItem("selected_ticker");
+
+      // ✅ Use URL param ticker if available, else fallback to saved ticker
+      if (ticker) {
+        setSelectedTicker(ticker);
+        // localStorage.setItem("selected_ticker", ticker); // keep it in sync
+      } else if (savedTicker) {
+        setSelectedTicker(savedTicker);
       }
-    };
-    fetchAllIpoTickers();
-  }, []);
+
+      const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
+        headers: getAuthHeaders(),
+      });
+      if (!response.ok) throw new Error("Failed to fetch IPO tickers");
+      const data = await response.json();
+      setAllIpoTickers(data.distinct_tickers || []);
+    } catch (err) {
+      console.error("Ticker fetch failed", err);
+    }
+  };
+  fetchAllIpoTickers();
+}, [ticker]); // ✅ depend on URL ticker
 
   const handleAIComparisonClick = () => {
     setShowAIComparison(true);
