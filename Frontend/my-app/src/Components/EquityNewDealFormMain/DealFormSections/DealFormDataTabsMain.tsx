@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Stack, Alert, Snackbar, Grid, Typography, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  Stack,
+  Alert,
+  Snackbar,
+  Grid,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import { format } from "date-fns";
 import DealInformation from "../DealFormDataTabs/DealInformation";
 import DealAllocations from "../DealFormDataTabs/DealAllocations";
 import MarketData from "../DealFormDataTabs/MarketData";
 import TechnicalMarketData from "../DealFormDataTabs/TechnicalMarketData";
 import DealColor from "../DealFormDataTabs/DealColor";
 import axios from "axios";
-import CancelIcon from '@mui/icons-material/Cancel';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import AddIcon from '@mui/icons-material/Add';
-
+import CancelIcon from "@mui/icons-material/Cancel";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import AddIcon from "@mui/icons-material/Add";
 
 interface FormData {
   deal_information: Record<string, any>;
@@ -27,7 +36,11 @@ interface Props {
   selectedTicker: string;
 }
 
-const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTicker }) => {
+const DealFormDataTabsMain: React.FC<Props> = ({
+  formData,
+  isCreate,
+  selectedTicker,
+}) => {
   const [editable, setEditable] = useState<boolean>(isCreate);
   const [localData, setLocalData] = useState<FormData>(formData);
   const [originalData] = useState<FormData>(formData);
@@ -60,12 +73,12 @@ const DealFormDataTabsMain: React.FC<Props> = ({ formData, isCreate, selectedTic
     }
   }, [isCreate, formData]);
 
-const handleSave = async () => {
-  try {
-    console.log("Saving data:", localData);
+  const handleSave = async () => {
+    try {
+      console.log("Saving data:", localData);
 
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem("access_token");
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
 
       const url = isCreate
         ? `${apiUrl}/api/create_newdeal_form/`
@@ -75,40 +88,38 @@ const handleSave = async () => {
       const payload = isCreate
         ? { ...localData } // for create, just send the data
         : {
-          operation: "new_deal_update",
-          data: localData
-        };
+            operation: "new_deal_update",
+            data: localData,
+          };
 
-    const response = await axios.post(url, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+      const response = await axios.post(url, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (response.status === 200 || response.status === 201) {
-      setEditable(false);
+      if (response.status === 200 || response.status === 201) {
+        setEditable(false);
+        setSnackbar({
+          open: true,
+          message: isCreate
+            ? "Deal created successfully!"
+            : "Deal updated successfully!",
+          severity: "success",
+        });
+      } else {
+        throw new Error("Unexpected response");
+      }
+    } catch (error) {
+      console.error("Save failed:", error);
       setSnackbar({
         open: true,
-        message: isCreate
-          ? "Deal created successfully!"
-          : "Deal updated successfully!",
-        severity: "success",
+        message: "Failed to save deal. Please try again.",
+        severity: "error",
       });
-    } else {
-      throw new Error("Unexpected response");
     }
-  } catch (error) {
-    console.error("Save failed:", error);
-    setSnackbar({
-      open: true,
-      message: "Failed to save deal. Please try again.",
-      severity: "error",
-    });
-  }
-};
-
-
+  };
 
   const handleCancel = () => {
     setLocalData(originalData);
@@ -143,8 +154,8 @@ const handleSave = async () => {
   };
 
   const gradientBackground = {
-    background: "linear-gradient(135deg, #A3B5E7 0%, #B9D7F4 25%, #CFF2FA 50%, #E3FAFF 75%, #F5FCFF 100%)",
-
+    background:
+      "linear-gradient(135deg, #A3B5E7 0%, #B9D7F4 25%, #CFF2FA 50%, #E3FAFF 75%, #F5FCFF 100%)",
 
     padding: 2,
     borderRadius: 4,
@@ -152,24 +163,39 @@ const handleSave = async () => {
   };
   return (
     <Box display="flex" flexDirection="column" gap={3}>
-
       <Stack
         direction="row"
         alignItems="center"
         justifyContent="space-between"
         spacing={2}
+        sx={{ mb: 3 }}
       >
-        <Typography variant="h6" color="#3b0090" sx={{ whiteSpace: "nowrap" }}>
+        {/* Title */}
+        <Typography
+          variant="h6"
+          color="#002060"
+          sx={{
+            fontWeight: 600,
+            textAlign: "center",
+            flex: 1,
+          }}
+        >
           {isCreate
-            ? "Creating a new deal – Please fill in the form below."
-            : ` ${selectedTicker || "N/A"} – the following data is available for viewing or editing: Deal Information, Deal Allocation, Market Data, Technical Data, and Deal Colour`}
-
+            ? "New Deal Setup — Complete the required details below."
+            : `Deal Overview & Key Analytics - ${formData.deal_information?.issuer_name} (${selectedTicker || "N/A"}) on ${
+                formData.deal_information?.pricing_date
+                  ? format(
+                      new Date(formData.deal_information.pricing_date),
+                      "dd MMM yyyy"
+                    )
+                  : "N/A"
+              }`}
         </Typography>
 
-
+        {/* Action Buttons */}
         <Stack
           direction="row"
-          spacing={2}
+          spacing={1.5}
           sx={{
             justifyContent: "flex-end",
             flexWrap: "wrap",
@@ -177,79 +203,56 @@ const handleSave = async () => {
         >
           {editable ? (
             <>
-
+              {/* Save */}
               <Button
-
                 variant="contained"
-
                 onClick={handleSave}
-
                 startIcon={
-
                   loading ? (
-
                     <CircularProgress size={20} sx={{ color: "#fff" }} />
-
                   ) : isCreate ? (
-
                     <AddIcon />
-
                   ) : (
-
                     <SaveIcon />
-
                   )
-
                 }
-
                 disabled={loading}
-
                 sx={{
-
-                  background: "linear-gradient(to right, #00b894, #55efc4)",
-
-                  color: "#002060",
-
+                  background: "linear-gradient(to right, #0061a8, #00c6a7)",
+                  color: "#fff",
                   fontWeight: 500,
-
                   px: 3,
-
-                  boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
-
+                  borderRadius: "12px",
+                  boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
                   "&:hover": {
-
-                    background: "linear-gradient(to right,rgb(0, 70, 56), #0055cc)",
-
-                    color: "#fff",
-
+                    background: "linear-gradient(to right, #004c82, #009e85)",
                   },
-
                 }}
-
               >
-
                 {loading ? "Saving..." : isCreate ? "Save" : "Save Changes"}
-
               </Button>
 
+              {/* Cancel */}
               <Button
                 variant="outlined"
                 onClick={handleCancel}
                 startIcon={<CancelIcon />}
                 sx={{
-                  borderColor: "#002060",
-                  color: "#002060",
+                  borderColor: "#0061a8",
+                  color: "#0061a8",
                   fontWeight: 500,
                   px: 3,
+                  borderRadius: "12px",
                   "&:hover": {
-                    borderColor: "#003080",
-                    backgroundColor: "#f0f4ff",
+                    borderColor: "#004c82",
+                    backgroundColor: "#f0f6ff",
                   },
                 }}
               >
                 Cancel
               </Button>
 
+              {/* Reset */}
               <Button
                 variant="outlined"
                 color="warning"
@@ -258,8 +261,9 @@ const handleSave = async () => {
                 sx={{
                   fontWeight: 500,
                   px: 3,
+                  borderRadius: "12px",
                   "&:hover": {
-                    backgroundColor: "#fff3e0",
+                    backgroundColor: "#fff8e1",
                   },
                 }}
               >
@@ -267,17 +271,19 @@ const handleSave = async () => {
               </Button>
             </>
           ) : (
+            /* Edit button */
             <Button
               variant="contained"
-              color="secondary"
               startIcon={<EditIcon />}
               onClick={handleEdit}
               sx={{
                 px: 3,
                 fontWeight: 500,
-                background: "#6a1b9a",
+                borderRadius: "12px",
+                background: "linear-gradient(to right, #0061a8, #00c6a7)",
+                color: "#fff",
                 "&:hover": {
-                  background: "#7b1fa2",
+                  background: "linear-gradient(to right, #004c82, #009e85)",
                 },
               }}
             >
@@ -286,7 +292,7 @@ const handleSave = async () => {
           )}
         </Stack>
       </Stack>
-      <Typography
+      {/* <Typography
         variant="caption"
         color="#002060"
         sx={{
@@ -294,9 +300,9 @@ const handleSave = async () => {
           fontStyle: "italic",
         }}
       >
-        Note: Some of the data fields are empty due to delayed data from Dealogic.
-      </Typography>
-
+        Note: Some of the data fields are empty due to delayed data from
+        Dealogic.
+      </Typography> */}
       <Grid container spacing={2} alignItems="stretch">
         <Grid item xs={12} md={6} mb={4}>
           <Box sx={{ ...gradientBackground, height: "100%" }}>
@@ -348,8 +354,6 @@ const handleSave = async () => {
           </Box>
         </Grid>
       </Grid>
-
-
 
       <Snackbar
         open={snackbar.open}
