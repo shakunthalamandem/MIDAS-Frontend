@@ -3,7 +3,7 @@ import Slider, { SliderProps } from '@mui/material/Slider';
 import { styled } from '@mui/material/styles';
 
 // Styled MUI Slider
-const StyledSlider = styled(Slider)({
+const StyledSlider = styled(Slider)(() => ({
   color: '#002060',
   height: 6,
   padding: '35px 0',
@@ -17,13 +17,15 @@ const StyledSlider = styled(Slider)({
       boxShadow: '0 0 0 6px rgba(0, 32, 96, 0.2)',
     },
   },
+  // Track (filled part) becomes transparent so rail shows
   '& .MuiSlider-track': {
     border: 'none',
-    backgroundColor: '#002060',
+    backgroundColor: 'transparent',
   },
+  // Rail (entire bar) has the gradient
   '& .MuiSlider-rail': {
-    opacity: 0.3,
-    backgroundColor: '#002060',
+    opacity: 1,
+    background: 'linear-gradient(to right, red 0%, orange 50%, green 100%)',
   },
   '& .MuiSlider-valueLabel': {
     backgroundColor: '#c35305',
@@ -32,7 +34,7 @@ const StyledSlider = styled(Slider)({
     fontSize: 12,
     fontWeight: 'bold',
   },
-});
+}));
 
 // Export a functional component with all props passed through
 const BlueSlider: React.FC<SliderProps> = (props) => {
