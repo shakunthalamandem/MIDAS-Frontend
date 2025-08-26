@@ -27,7 +27,12 @@ const TickerDashboard: React.FC = () => {
 
   const [options, setOptions] = useState<TickerOption[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<TickerOption | null>(null);
+  // const [selected, setSelected] = useState<TickerOption | null>(null);
+  const [selected, setSelected] = useState<TickerOption | null>({
+  ticker: "BLSH",
+  pricing_date: "2025-08-13", // <-- Put the correct date here
+  deal_type: "IPO",          // <-- Put the correct type here
+});
 
   // Extract ticker and pricing_date from URL query params
   const tickerFromUrl = queryParams.get("ticker");
@@ -154,18 +159,7 @@ const TickerDashboard: React.FC = () => {
           </Box>
         )}
 
-        {/* Button to track the selected ticker */}
-        {/* {selected && (
-          <Box display="flex" justifyContent="center" mt={3}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleTrackHereClick}
-            >
-              Track Here
-            </Button>
-          </Box>
-        )} */}
+        
       </Container>
     </Box>
   );
