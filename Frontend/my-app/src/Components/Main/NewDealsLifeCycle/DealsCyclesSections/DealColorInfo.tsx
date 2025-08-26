@@ -150,54 +150,54 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
       console.error(error);
     }
   };
+const renderField = (
+  label: string,
+  name: keyof DealColorData,
+  adornment?: string,
+  canEdit: boolean = false
+) => {
+  const value = formData[name] ?? "";
 
-  const renderField = (
-    label: string,
-    name: keyof DealColorData,
-    adornment?: string,
-    canEdit: boolean = false
-  ) => {
-    const value = formData[name] ?? "";
-
-    return (
-      <>
+  return (
+    <>
+      <Typography
+        variant="body2"
+        color="#002060" // Set label color
+        gutterBottom
+        fontWeight={500}
+      >
+        {label}
+      </Typography>
+      {editable && canEdit ? (
+        <TextField
+          name={name}
+          value={value}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+          variant="standard"
+          InputProps={{
+            disableUnderline: false,
+            endAdornment:
+              adornment && value !== "" && value !== null ? (
+                <InputAdornment position="end">{adornment}</InputAdornment>
+              ) : undefined,
+            style: { color: "#002060" },
+          }}
+        />
+      ) : (
         <Typography
-          variant="body2"
-          color="#002060"
-          gutterBottom
-          fontWeight={500}
+          variant="body1"
+          sx={{ color: "#B1062E", fontWeight: 500, py: 0.5 }} // Set value color
         >
-          {label}
+          {value}
+          {value !== "" && value !== null && adornment ? ` ${adornment}` : ""}
         </Typography>
-        {editable && canEdit ? (
-          <TextField
-            name={name}
-            value={value}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            variant="standard"
-            InputProps={{
-              disableUnderline: false,
-              endAdornment:
-                adornment && value !== "" && value !== null ? (
-                  <InputAdornment position="end">{adornment}</InputAdornment>
-                ) : undefined,
-              style: { color: "#002060" },
-            }}
-          />
-        ) : (
-          <Typography
-            variant="body1"
-            sx={{ color: "#002060", fontWeight: 500, py: 0.5 }}
-          >
-            {value}
-            {value !== "" && value !== null && adornment ? ` ${adornment}` : ""}
-          </Typography>
-        )}
-      </>
-    );
-  };
+      )}
+    </>
+  );
+};
+
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
