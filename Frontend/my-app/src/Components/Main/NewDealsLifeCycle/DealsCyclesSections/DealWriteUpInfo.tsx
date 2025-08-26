@@ -8,6 +8,7 @@ import {
   IconButton,
   Grid,
   InputAdornment,
+  Button,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
@@ -33,6 +34,8 @@ interface DealWriteUpInfoProps {
 const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
   const [formData, setFormData] = useState<DealWriteUpData>(data);
   const [editable, setEditable] = useState(false);
+  const [valuationExpanded, setValuationExpanded] = useState(false);
+  const [differentiatedSummaryExpanded, setDifferentiatedSummaryExpanded] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('access_token');
@@ -137,15 +140,6 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
     }
   };
 
-  // Helper for truncating text
-  const truncateText = (text: string, maxWords = 8) => {
-    const words = text.split(' ');
-    return words.length > maxWords
-      ? words.slice(0, maxWords).join(' ') + '...'
-      : text;
-  };
-
-  // Generalized renderField with adornment support
   const renderField = (
     label: string,
     name: keyof DealWriteUpData,
@@ -191,6 +185,98 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
     );
   };
 
+  const renderValuationField = () => {
+    const valuation = formData.valuation ?? '';
+    const truncatedValuation = valuation.slice(0, 150); // Show first 150 characters
+    const isTruncated = valuation.length > 150;
+
+    return (
+      <>
+        <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+          Valuation
+        </Typography>
+        {editable ? (
+          <TextField
+            name="valuation"
+            value={formData.valuation}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+            variant="standard"
+            multiline
+            minRows={3}
+            sx={{ color: '#002060' }}
+          />
+        ) : (
+          <>
+            <Typography
+              variant="body2"
+              sx={{ color: '#b1062e', whiteSpace: 'pre-line' }}
+            >
+              {valuationExpanded || !isTruncated
+                ? valuation
+                : `${truncatedValuation}...`}
+            </Typography>
+            {isTruncated && (
+              <Button
+                onClick={() => setValuationExpanded(!valuationExpanded)}
+                sx={{ color: '#002060', textTransform: 'none' }}
+              >
+                {valuationExpanded ? 'Show Less' : 'Read More'}
+              </Button>
+            )}
+          </>
+        )}
+      </>
+    );
+  };
+
+  const renderDifferentiatedSummaryField = () => {
+    const differentiatedSummary = formData.differentiated_summary ?? '';
+    const truncatedDifferentiatedSummary = differentiatedSummary.slice(0, 150); // Show first 150 characters
+    const isTruncated = differentiatedSummary.length > 150;
+
+    return (
+      <>
+        <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+          Differentiated Summary
+        </Typography>
+        {editable ? (
+          <TextField
+            name="differentiated_summary"
+            value={formData.differentiated_summary}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+            variant="standard"
+            multiline
+            minRows={3}
+            sx={{ color: '#002060' }}
+          />
+        ) : (
+          <>
+            <Typography
+              variant="body2"
+              sx={{ color: '#b1062e', whiteSpace: 'pre-line' }}
+            >
+              {differentiatedSummaryExpanded || !isTruncated
+                ? differentiatedSummary
+                : `${truncatedDifferentiatedSummary}...`}
+            </Typography>
+            {isTruncated && (
+              <Button
+                onClick={() => setDifferentiatedSummaryExpanded(!differentiatedSummaryExpanded)}
+                sx={{ color: '#002060', textTransform: 'none' }}
+              >
+                {differentiatedSummaryExpanded ? 'Show Less' : 'Read More'}
+              </Button>
+            )}
+          </>
+        )}
+      </>
+    );
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <Card
@@ -229,10 +315,10 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
               {renderField('Monashee Score', 'monashee_score', undefined, false, true)}
             </Grid>
             <Grid item xs={12}>
-              {renderField('Valuation', 'valuation', undefined, true, true)}
+              {renderValuationField()}
             </Grid>
             <Grid item xs={12}>
-              {renderField('Differentiated Summary', 'differentiated_summary', undefined, true, true)}
+              {renderDifferentiatedSummaryField()}
             </Grid>
             <Grid item xs={12}>
               <Typography variant="body2" color="#002060" fontWeight={500} gutterBottom>
