@@ -15,6 +15,9 @@ import BlueSlider from './BlueSlider';
 
 interface DealWriteUpData {
   id?: number | string;
+  ticker: string;
+  pricing_date: string; // YYYY-MM-DD
+  deal_type: string;
   average_sector_return?: number | null;
   monashee_score?: number | null;
   valuation?: string;
@@ -44,30 +47,46 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
-    try {
-      const method = data.id ? 'PATCH' : 'POST';
-      const response = await fetch(
-        `${apiUrl}/api/deal_writeup/${data.id || ''}`,
-        {
-          method,
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-      if (response.ok) {
-        alert('Saved successfully!');
-        setEditable(false);
-      } else {
-        alert('Failed to save data');
+const handleSave = async () => {
+  try {
+    // Always include required fields
+    const payload: Partial<DealWriteUpData> = {
+      id: data.id,
+      ticker: data.ticker,
+      pricing_date: data.pricing_date,
+      deal_type: data.deal_type,
+    };
+
+    // Add only edited fields
+    Object.keys(formData).forEach((key) => {
+      const k = key as keyof DealWriteUpData;
+      if (formData[k] !== data[k] && formData[k] !== undefined) {
+        payload[k] = formData[k] as any;
       }
-    } catch (error) {
-      console.error(error);
+    });
+
+    const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      alert("Saved successfully!");
+      setEditable(false);
+      // Optional: sync state with latest saved values
+      // setFormData((prev) => ({ ...prev, ...payload }));
+    } else {
+      alert("Failed to save data");
     }
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
   const renderField = (
     label: string,

@@ -52,30 +52,45 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
-    try {
-      const method = data.id ? 'PATCH' : 'POST';
-      const response = await fetch(
-        `${apiUrl}/api/unified_deal_ratings/${data.id || ''}`,
-        {
-          method,
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-      if (response.ok) {
-        alert('Saved successfully!');
-        setEditable(false);
-      } else {
-        alert('Failed to save data');
+
+
+const handleSave = async () => {
+  try {
+    // Prepare payload with required fields
+    const payload: Partial<DealColorData> = {
+     id: data.id,
+      ticker: data.ticker,
+      pricing_date: data.pricing_date,
+      deal_type: data.deal_type,
+    };
+
+    // Add only changed values
+    Object.keys(formData).forEach((key) => {
+      const k = key as keyof DealColorData;
+      if (formData[k] !== data[k] && formData[k] !== undefined) {
+        payload[k] = formData[k] as any;
       }
-    } catch (error) {
-      console.error(error);
+    });
+
+    const response = await fetch(`${apiUrl}/api/unified_deal_ratings/${data.id || ''}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      alert('Saved successfully!');
+      setEditable(false);
+    } else {
+      alert('Failed to save data');
     }
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const renderField = (
     label: string,
