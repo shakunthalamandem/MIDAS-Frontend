@@ -38,6 +38,17 @@ const renderCheckCell = (params: GridRenderCellParams<any>) => {
   );
 };
 
+
+const formatDateCell = (params: GridRenderCellParams<any>) => {
+  if (!params.value) return "";
+  const date = new Date(params.value);
+  if (isNaN(date.getTime())) return params.value;
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+};
 // Define columns
 const getColumns = (): GridColDef[] => [
   {
@@ -55,6 +66,7 @@ const getColumns = (): GridColDef[] => [
     flex: 1,
     headerAlign: "center",
     align: "center",
+    renderCell: formatDateCell, 
   },
   {
     field: "pricing_date",
@@ -63,6 +75,7 @@ const getColumns = (): GridColDef[] => [
     flex: 1,
     headerAlign: "center",
     align: "center",
+    renderCell: formatDateCell, 
   },
   {
     field: "deal_type",
@@ -80,7 +93,7 @@ const getColumns = (): GridColDef[] => [
   headerAlign: "center",
   align: "center",
   valueGetter: (params: any) => {
-    if (!params || !params.row) return "-"; // ✅ Avoid destructuring undefined
+    if (!params || !params.row) return "-"; 
     const min = params.row.pricing_range_min;
     const max = params.row.pricing_range_max;
 
