@@ -93,7 +93,7 @@ const TickerDashboard: React.FC = () => {
           }}
         >
           {/* Title */}
-          <Typography variant="h6" fontWeight={700}>
+          <Typography variant="h6" fontWeight={700} color="#002060">
             Deal Tracking Dashboard
           </Typography>
 
@@ -155,7 +155,7 @@ const TickerDashboard: React.FC = () => {
         )}
 
         {/* Button to track the selected ticker */}
-        {selected && (
+        {/* {selected && (
           <Box display="flex" justifyContent="center" mt={3}>
             <Button
               variant="contained"
@@ -165,7 +165,7 @@ const TickerDashboard: React.FC = () => {
               Track Here
             </Button>
           </Box>
-        )}
+        )} */}
       </Container>
     </Box>
   );
