@@ -197,7 +197,7 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
 
         {!loading && trackingData && (
           <>
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography variant="h6" align="center" gutterBottom color="#002060" fontWeight="bold">
               {`${ticker} (${trackingData.issuer_name}) on ${dayjs(
                 trackingData.pricing_date
               ).format("DD MMM YYYY")}`}
