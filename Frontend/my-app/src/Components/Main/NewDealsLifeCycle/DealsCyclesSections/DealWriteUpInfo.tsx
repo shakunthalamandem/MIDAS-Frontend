@@ -7,6 +7,7 @@ import {
   Box,
   IconButton,
   Grid,
+  InputAdornment,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
@@ -144,9 +145,11 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
       : text;
   };
 
+  // Generalized renderField with adornment support
   const renderField = (
     label: string,
     name: keyof DealWriteUpData,
+    adornment?: string,
     multiline = false,
     canEdit: boolean = false
   ) => {
@@ -168,6 +171,10 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
             multiline={multiline}
             minRows={multiline ? 3 : 1}
             InputProps={{
+              endAdornment:
+                adornment && value !== '' && value !== null ? (
+                  <InputAdornment position="end">{adornment}</InputAdornment>
+                ) : undefined,
               sx: { color: '#002060' },
             }}
           />
@@ -176,7 +183,8 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
             variant="body2"
             sx={{ color: '#b1062e', whiteSpace: 'pre-line' }}
           >
-            {typeof value === 'string' ? truncateText(value) : value}
+            {value}
+            {value !== '' && value !== null && adornment ? ` ${adornment}` : ''}
           </Typography>
         )}
       </>
@@ -211,16 +219,20 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
 
           <Grid container spacing={2} mt={2}>
             <Grid item xs={12} sm={6}>
-              {renderField('Average Sector Return (%)', 'average_sector_return')}
+              {renderField(
+                'Last 10 days Avg Sector Return(%)',
+                'average_sector_return',
+                '%'
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
-              {renderField('Monashee Score', 'monashee_score', false, true)}
+              {renderField('Monashee Score', 'monashee_score', undefined, false, true)}
             </Grid>
             <Grid item xs={12}>
-              {renderField('Valuation', 'valuation', true, true)}
+              {renderField('Valuation', 'valuation', undefined, true, true)}
             </Grid>
             <Grid item xs={12}>
-              {renderField('Differentiated Summary', 'differentiated_summary', true, true)}
+              {renderField('Differentiated Summary', 'differentiated_summary', undefined, true, true)}
             </Grid>
             <Grid item xs={12}>
               <Typography variant="body2" color="#002060" fontWeight={500} gutterBottom>

@@ -149,42 +149,50 @@ const handleSave = async () => {
   }
 };
 
-  const renderField = (
-    label: string,
-    name: keyof DealColorData,
-    adornment?: string,
-    canEdit: boolean = false
-  ) => (
+ const renderField = (
+  label: string,
+  name: keyof DealColorData,
+  adornment?: string,
+  canEdit: boolean = false
+) => {
+  const value = formData[name] ?? '';
+
+  return (
     <>
       <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
         {label}
       </Typography>
-      <TextField
-        name={name}
-        value={formData[name] ?? ''}
-        onChange={handleChange}
-        fullWidth
-        size="small"
-        variant="standard"
-        disabled={!editable || !canEdit}
-        InputProps={{
-          disableUnderline: !editable || !canEdit,
-          sx: {
-            '&.Mui-disabled': {
-              WebkitTextFillColor: '#b1062e',
-            },
-            '& input.Mui-disabled': {
-              WebkitTextFillColor: '#b1062e',
-            },
-          },
-          endAdornment: adornment ? (
-            <InputAdornment position="end">{adornment}</InputAdornment>
-          ) : undefined,
-          style: { color: '#002060' },
-        }}
-      />
+      {editable && canEdit ? (
+        <TextField
+          name={name}
+          value={value}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+          variant="standard"
+          InputProps={{
+            disableUnderline: false,
+            endAdornment:
+              adornment && value !== '' && value !== null ? (
+                <InputAdornment position="end">{adornment}</InputAdornment>
+              ) : undefined,
+            style: { color: '#002060' },
+          }}
+        />
+      ) : (
+        <Typography
+          variant="body1"
+          sx={{ color: '#002060', fontWeight: 500, py: 0.5 }}
+        >
+          {value}
+          {value !== '' && value !== null && adornment ? ` ${adornment}` : ''}
+        </Typography>
+      )}
     </>
   );
+};
+
+
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -237,10 +245,10 @@ const handleSave = async () => {
               </RadioGroup>
             </Grid>
                <Grid item xs={12} sm={6}>
-              {renderField('Average Allocation as % of Deal_Size', 'average_allocation')}
+              {renderField('Last 10 deals Avg Allocation as % of Deal_Size', 'average_allocation','%')}
             </Grid>
             <Grid item xs={12} sm={6}>
-              {renderField('Avg Allocation as % of IoI', 'average_ioi')}
+              {renderField('Last 10 deals Avg Allocation as % of IoI', 'average_ioi','%')}
             </Grid>
    {/* Editable fields */}
             <Grid item xs={12} sm={6}>
@@ -264,19 +272,34 @@ const handleSave = async () => {
 
 
 
-            <Grid item xs={12}>
-              <BlueSlider
-                value={formData.deal_color_rating || 0}
-                onChange={(_, value) =>
-                  handleSliderChange('deal_color_rating', value as number)
-                }
-                valueLabelDisplay="on"
-                step={1}
-                min={0}
-                max={100}
-                disabled={!editable}
-              />
-            </Grid>
+        <Grid item xs={12}>
+  <Card
+    sx={{
+      background: 'linear-gradient(135deg, #e0ebff, #d4e2fc)',
+      borderRadius: '20px',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+      p: 2,
+    }}
+  >
+    <CardContent>
+      <Typography variant="h6" color="#002060" fontWeight="bold" gutterBottom>
+        Deal Color Rating
+      </Typography>
+      <BlueSlider
+        value={formData.deal_color_rating || 0}
+        onChange={(_, value) =>
+          handleSliderChange('deal_color_rating', value as number)
+        }
+        valueLabelDisplay="on"
+        step={1}
+        min={0}
+        max={100}
+        disabled={!editable}
+      />
+    </CardContent>
+  </Card>
+</Grid>
+
           </Grid>
         </CardContent>
       </Card>
