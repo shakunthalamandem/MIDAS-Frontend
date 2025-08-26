@@ -15,7 +15,6 @@ import dayjs from "dayjs";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { StepIconProps } from "@mui/material/StepIcon";
-import { useLocation } from "react-router-dom";
 
 interface TickerTrackingData {
   deal_type?: string;
@@ -49,12 +48,10 @@ const CustomStepIcon: React.FC<StepIconProps> = (props) => {
   );
 };
 
-const TickerTracking: React.FC = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const ticker = queryParams.get("ticker");
-  const pricingDate = queryParams.get("pricing_date");
-
+const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
+  ticker,
+  pricing_date,
+}) => {
   const [trackingData, setTrackingData] = useState<TickerTrackingData | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -62,12 +59,12 @@ const TickerTracking: React.FC = () => {
   const token = localStorage.getItem("access_token");
 
   const fetchTrackingData = async () => {
-    if (!ticker || !pricingDate) return;
+    if (!ticker || !pricing_date) return;
     setLoading(true);
     try {
       const res = await axios.post(
         `${apiUrl}/api/ticker_tracking/`,
-        { ticker, pricing_date: pricingDate },
+        { ticker, pricing_date },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = res.data as { ticker_tracking_data: TickerTrackingData };
@@ -80,10 +77,8 @@ const TickerTracking: React.FC = () => {
   };
 
   useEffect(() => {
-    if (ticker && pricingDate) {
-      fetchTrackingData();
-    }
-  }, [ticker, pricingDate]);
+    fetchTrackingData();
+  }, [ticker, pricing_date]);
 
   const formatValue = (val: any) => {
     if (val === null || val === undefined) return "Not Available";
@@ -93,7 +88,6 @@ const TickerTracking: React.FC = () => {
 
   const formatToMillions = (val: any): string => {
     if (val === null || val === undefined || isNaN(val)) return "Not Available";
-
     const num = Number(val);
     if (Math.abs(num) >= 1_000_000) {
       return (num / 1_000_000).toFixed(2).replace(/\.00$/, "") + "M";
@@ -183,14 +177,6 @@ const TickerTracking: React.FC = () => {
       ]
     : [];
 
-  const handleTrackHereClick = () => {
-    if (ticker && pricingDate) {
-      const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${pricingDate}`;
-      // Open the URL in a new tab or window
-      window.open(url, "_blank");
-    }
-  };
-
   return (
     <Card
       sx={{
@@ -245,16 +231,6 @@ const TickerTracking: React.FC = () => {
                 </Step>
               ))}
             </Stepper>
-
-            {/* <Box display="flex" justifyContent="center" mt={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleTrackHereClick}
-              >
-                Track Here
-              </Button>
-            </Box> */}
           </>
         )}
       </CardContent>
