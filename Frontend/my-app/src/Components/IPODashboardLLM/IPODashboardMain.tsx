@@ -20,6 +20,10 @@ import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
 import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
 
+interface TickerOption {
+  ticker_name: string;
+  pricing_date: string;
+}
 
 
 
@@ -29,7 +33,7 @@ const IPODashboardMain: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
-  const [allIpoTickers, setAllIpoTickers] = useState<string[]>([]);
+  const [allIpoTickers, setAllIpoTickers] = useState<TickerOption[]>([]);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(ticker || "");
   const [pdfLoading, setPdfLoading] = useState(false);
   const [editMode, setEditMode] = useState<Record<string, boolean>>({});
@@ -67,13 +71,13 @@ useEffect(() => {
       });
       if (!response.ok) throw new Error("Failed to fetch IPO tickers");
       const data = await response.json();
-      setAllIpoTickers(data.distinct_tickers || []);
+      setAllIpoTickers(data || []);
     } catch (err) {
       console.error("Ticker fetch failed", err);
     }
   };
   fetchAllIpoTickers();
-}, [ticker]); // ✅ depend on URL ticker
+}, [ticker]);
 
   const handleAIComparisonClick = () => {
     setShowAIComparison(true);
