@@ -79,27 +79,29 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
     }
   }, [data]);
 
-  const renderField = (label: string, value: string | number | null | undefined) => (
+const renderField = (label: string, value: string | number | null | undefined) => {
+  const isValueAvailable = value !== null && value !== undefined && value !== "";
+  const displayValue = isValueAvailable ? value : "Not Available";
+
+  return (
     <>
       <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
         {label}
       </Typography>
-      <TextField
-        value={value ?? ''}
-        fullWidth
-        size="small"
-        variant="standard"
-        disabled
-        InputProps={{
-          sx: {
-            '&.Mui-disabled': { WebkitTextFillColor: '#b1062e' },
-            '& input.Mui-disabled': { WebkitTextFillColor: '#b1062e' },
-          },
-          style: { color: '#002060' },
+      <Typography
+        variant="body1"
+        sx={{
+          color: isValueAvailable ? "#b1062e" : "#999",
+          fontStyle: isValueAvailable ? "normal" : "italic",
+          py: 0.5,
         }}
-      />
+      >
+        {displayValue}
+      </Typography>
     </>
   );
+};
+
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

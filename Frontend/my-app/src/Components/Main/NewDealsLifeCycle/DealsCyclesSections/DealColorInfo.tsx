@@ -156,13 +156,15 @@ const renderField = (
   adornment?: string,
   canEdit: boolean = false
 ) => {
-  const value = formData[name] ?? "";
+  const rawValue = formData[name];
+  const isValueAvailable = rawValue !== null && rawValue !== undefined && rawValue !== "";
+  const displayValue = isValueAvailable ? rawValue : "Not Available";
 
   return (
     <>
       <Typography
         variant="body2"
-        color="#002060" // Set label color
+        color="#002060"
         gutterBottom
         fontWeight={500}
       >
@@ -171,7 +173,7 @@ const renderField = (
       {editable && canEdit ? (
         <TextField
           name={name}
-          value={value}
+          value={isValueAvailable ? rawValue : ""}
           onChange={handleChange}
           fullWidth
           size="small"
@@ -179,19 +181,19 @@ const renderField = (
           InputProps={{
             disableUnderline: false,
             endAdornment:
-              adornment && value !== "" && value !== null ? (
-                <InputAdornment position="end">{adornment}</InputAdornment>
-              ) : undefined,
+              adornment && isValueAvailable
+                ? <InputAdornment position="end">{adornment}</InputAdornment>
+                : undefined,
             style: { color: "#002060" },
           }}
         />
       ) : (
         <Typography
           variant="body1"
-          sx={{ color: "#B1062E", fontWeight: 500, py: 0.5 }} // Set value color
+          sx={{ color: isValueAvailable ? "#B1062E" : "#999", fontWeight: 500, py: 0.5 }}
         >
-          {value}
-          {value !== "" && value !== null && adornment ? ` ${adornment}` : ""}
+          {displayValue}
+          {isValueAvailable && adornment ? ` ${adornment}` : ""}
         </Typography>
       )}
     </>

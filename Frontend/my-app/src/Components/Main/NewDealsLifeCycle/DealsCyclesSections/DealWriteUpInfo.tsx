@@ -140,142 +140,169 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
     }
   };
 
-  const renderField = (
-    label: string,
-    name: keyof DealWriteUpData,
-    adornment?: string,
-    multiline = false,
-    canEdit: boolean = false
-  ) => {
-    const value = formData[name] ?? '';
+const renderField = (
+  label: string,
+  name: keyof DealWriteUpData,
+  adornment?: string,
+  multiline = false,
+  canEdit: boolean = false
+) => {
+  const rawValue = formData[name];
+  const isValueAvailable =
+    rawValue !== null && rawValue !== undefined && rawValue !== "";
+  const displayValue = isValueAvailable ? rawValue : "Not Available";
 
-    return (
-      <>
-        <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-          {label}
+  return (
+    <>
+      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+        {label}
+      </Typography>
+      {editable && canEdit ? (
+        <TextField
+          name={name}
+          value={isValueAvailable ? rawValue : ""}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+          variant="standard"
+          multiline={multiline}
+          minRows={multiline ? 3 : 1}
+          InputProps={{
+            endAdornment:
+              adornment && isValueAvailable ? (
+                <InputAdornment position="end">{adornment}</InputAdornment>
+              ) : undefined,
+            sx: { color: "#002060" },
+          }}
+        />
+      ) : (
+        <Typography
+          variant="body2"
+          sx={{
+            color: isValueAvailable ? "#b1062e" : "#999",
+            whiteSpace: "pre-line",
+            fontStyle: isValueAvailable ? "normal" : "italic",
+          }}
+        >
+          {displayValue}
+          {isValueAvailable && adornment ? ` ${adornment}` : ""}
         </Typography>
-        {editable && canEdit ? (
-          <TextField
-            name={name}
-            value={value}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            variant="standard"
-            multiline={multiline}
-            minRows={multiline ? 3 : 1}
-            InputProps={{
-              endAdornment:
-                adornment && value !== '' && value !== null ? (
-                  <InputAdornment position="end">{adornment}</InputAdornment>
-                ) : undefined,
-              sx: { color: '#002060' },
-            }}
-          />
-        ) : (
+      )}
+    </>
+  );
+};
+
+const renderValuationField = () => {
+  const rawValuation = formData.valuation;
+  const isAvailable =
+    rawValuation !== null && rawValuation !== undefined && rawValuation !== "";
+  const valuation = isAvailable ? rawValuation : "Not Available";
+  const truncatedValuation = isAvailable
+    ? valuation.slice(0, 150)
+    : "Not Available";
+  const isTruncated = isAvailable && valuation.length > 150;
+
+  return (
+    <>
+      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+        Valuation
+      </Typography>
+      {editable ? (
+        <TextField
+          name="valuation"
+          value={isAvailable ? rawValuation : ""}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+          variant="standard"
+          multiline
+          minRows={3}
+          sx={{ color: "#002060" }}
+        />
+      ) : (
+        <>
           <Typography
             variant="body2"
-            sx={{ color: '#b1062e', whiteSpace: 'pre-line' }}
+            sx={{
+              color: isAvailable ? "#b1062e" : "#999",
+              whiteSpace: "pre-line",
+              fontStyle: isAvailable ? "normal" : "italic",
+            }}
           >
-            {value}
-            {value !== '' && value !== null && adornment ? ` ${adornment}` : ''}
+            {valuationExpanded || !isTruncated
+              ? valuation
+              : `${truncatedValuation}...`}
           </Typography>
-        )}
-      </>
-    );
-  };
-
-  const renderValuationField = () => {
-    const valuation = formData.valuation ?? '';
-    const truncatedValuation = valuation.slice(0, 150); // Show first 150 characters
-    const isTruncated = valuation.length > 150;
-
-    return (
-      <>
-        <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-          Valuation
-        </Typography>
-        {editable ? (
-          <TextField
-            name="valuation"
-            value={formData.valuation}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            variant="standard"
-            multiline
-            minRows={3}
-            sx={{ color: '#002060' }}
-          />
-        ) : (
-          <>
-            <Typography
-              variant="body2"
-              sx={{ color: '#b1062e', whiteSpace: 'pre-line' }}
+          {isTruncated && (
+            <Button
+              onClick={() => setValuationExpanded(!valuationExpanded)}
+              sx={{ color: "#002060", textTransform: "none" }}
             >
-              {valuationExpanded || !isTruncated
-                ? valuation
-                : `${truncatedValuation}...`}
-            </Typography>
-            {isTruncated && (
-              <Button
-                onClick={() => setValuationExpanded(!valuationExpanded)}
-                sx={{ color: '#002060', textTransform: 'none' }}
-              >
-                {valuationExpanded ? 'Show Less' : 'Read More'}
-              </Button>
-            )}
-          </>
-        )}
-      </>
-    );
-  };
+              {valuationExpanded ? "Show Less" : "Read More"}
+            </Button>
+          )}
+        </>
+      )}
+    </>
+  );
+};
 
-  const renderDifferentiatedSummaryField = () => {
-    const differentiatedSummary = formData.differentiated_summary ?? '';
-    const truncatedDifferentiatedSummary = differentiatedSummary.slice(0, 150); // Show first 150 characters
-    const isTruncated = differentiatedSummary.length > 150;
+const renderDifferentiatedSummaryField = () => {
+  const rawSummary = formData.differentiated_summary;
+  const isAvailable =
+    rawSummary !== null && rawSummary !== undefined && rawSummary !== "";
+  const summary = isAvailable ? rawSummary : "Not Available";
+  const truncatedSummary = isAvailable
+    ? summary.slice(0, 150)
+    : "Not Available";
+  const isTruncated = isAvailable && summary.length > 150;
 
-    return (
-      <>
-        <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-          Differentiated Summary
-        </Typography>
-        {editable ? (
-          <TextField
-            name="differentiated_summary"
-            value={formData.differentiated_summary}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            variant="standard"
-            multiline
-            minRows={3}
-            sx={{ color: '#002060' }}
-          />
-        ) : (
-          <>
-            <Typography
-              variant="body2"
-              sx={{ color: '#b1062e', whiteSpace: 'pre-line' }}
+  return (
+    <>
+      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+        Differentiated Summary
+      </Typography>
+      {editable ? (
+        <TextField
+          name="differentiated_summary"
+          value={isAvailable ? rawSummary : ""}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+          variant="standard"
+          multiline
+          minRows={3}
+          sx={{ color: "#002060" }}
+        />
+      ) : (
+        <>
+          <Typography
+            variant="body2"
+            sx={{
+              color: isAvailable ? "#b1062e" : "#999",
+              whiteSpace: "pre-line",
+              fontStyle: isAvailable ? "normal" : "italic",
+            }}
+          >
+            {differentiatedSummaryExpanded || !isTruncated
+              ? summary
+              : `${truncatedSummary}...`}
+          </Typography>
+          {isTruncated && (
+            <Button
+              onClick={() =>
+                setDifferentiatedSummaryExpanded(!differentiatedSummaryExpanded)
+              }
+              sx={{ color: "#002060", textTransform: "none" }}
             >
-              {differentiatedSummaryExpanded || !isTruncated
-                ? differentiatedSummary
-                : `${truncatedDifferentiatedSummary}...`}
-            </Typography>
-            {isTruncated && (
-              <Button
-                onClick={() => setDifferentiatedSummaryExpanded(!differentiatedSummaryExpanded)}
-                sx={{ color: '#002060', textTransform: 'none' }}
-              >
-                {differentiatedSummaryExpanded ? 'Show Less' : 'Read More'}
-              </Button>
-            )}
-          </>
-        )}
-      </>
-    );
-  };
+              {differentiatedSummaryExpanded ? "Show Less" : "Read More"}
+            </Button>
+          )}
+        </>
+      )}
+    </>
+  );
+};
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
