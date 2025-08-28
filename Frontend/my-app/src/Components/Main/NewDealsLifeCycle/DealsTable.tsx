@@ -107,9 +107,9 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
     },
 
     {
-      field: "company_name",
-      headerName: "Company Name",
-      renderHeader: () => formatHeader("Company Name"),
+      field: "issuer_name",
+      headerName: "Issuer Name",
+      renderHeader: () => formatHeader("issuer_name"),
       flex: 2,
       headerAlign: "center",
       align: "center",
