@@ -167,6 +167,7 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
       renderHeader: () => formatHeader("Writeup Available"),
       flex: 1,
       headerAlign: "center",
+      align: "center",
       renderCell: (params: GridRenderCellParams<any>) => {
         if (params.value?.toString().toLowerCase() === "yes") {
           return (
