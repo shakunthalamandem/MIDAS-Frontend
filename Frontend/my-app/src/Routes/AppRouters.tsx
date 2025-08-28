@@ -70,6 +70,7 @@ import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteU
 import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
 import WriteUpDashboard from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpDashboard";
+import WriteupDashboardMain from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteupDashboardMain";
 
 const AppRouters: React.FC = () => {
   return (
@@ -208,7 +209,7 @@ const AppRouters: React.FC = () => {
             </AuthGuard>
           } 
         />
-        <Route path="/writeup/dashboard" element={<AuthGuard><WriteUpDashboard/></AuthGuard>} />
+        <Route path="/writeup/dashboard" element={<AuthGuard><WriteupDashboardMain/></AuthGuard>} />
 
 
 
