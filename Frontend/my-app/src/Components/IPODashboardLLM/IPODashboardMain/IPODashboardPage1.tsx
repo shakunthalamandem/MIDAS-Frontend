@@ -1,13 +1,18 @@
 // components/IPODashboardPage1.tsx
 import React from "react";
 import IPODashboardHeader from "../IPODashboardHeader";
+
+interface TickerOption {
+  ticker_name: string;
+  pricing_date: string;
+}
+
 interface Props {
   ipoData: any;
-  allIpoTickers: string[];
+  allIpoTickers: TickerOption[];
   selectedTicker: string;
   searchText: string;
   setSelectedTicker: (ticker: string | null) => void;
-
   setSearchText: (text: string) => void;
   handleExportPDF: () => void;
   pdfLoading: boolean;
@@ -35,8 +40,6 @@ const IPODashboardPage1: React.FC<Props> = ({
         onExportPDF={handleExportPDF}
         pdfLoading={pdfLoading}
       />
-   
-
     </div>
   );
 };
