@@ -53,57 +53,94 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
     };
   };
 
-  const fetchDealWriteUpInfo = async () => {
-    try {
-      const payload = {
-        ticker: data.ticker,
-        pricing_date: data.pricing_date,
-        deal_type: data.deal_type,
+const fetchDealWriteUpInfo = async () => {
+  try {
+    const payload = {
+      ticker: data.ticker,
+      pricing_date: data.pricing_date,
+      deal_type: data.deal_type,
+    };
+
+    console.log("🔹 Sending unified_deal_ratings payload:", payload);
+
+    const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("✅ unified_deal_ratings response:", result);
+
+      const apiData = result.data;
+
+      // ✅ Update form data
+      setFormData((prev) => ({
+        ...prev,
+        ...mapApiResponseToDealWriteUpData(apiData),
+      }));
+
+      // ✅ Build payload for ipo_valuation_ai_summary
+      const valuationPayload = {
+        ticker: apiData.ticker,
+        company_name: apiData.company_name || "", // fallback if missing
+        valuation_summary: apiData.valuation || "",
+        differentiate_summary: apiData.differentiated_summary || "",
       };
 
-      const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token ? `Bearer ${token}` : '',
-        },
-        body: JSON.stringify(payload),
-      });
+      console.log("🔹 Sending ipo_valuation_ai_summary payload:", valuationPayload);
 
-      if (response.ok) {
-        const result = await response.json();
-        const mapped = mapApiResponseToDealWriteUpData(result.data);
-
-        setFormData((prev) => ({
-          ...prev,
-          ...mapped,
-        }));
-      } else {
-        console.error('Failed to fetch deal write-up info');
-      }
-    } catch (error) {
-      console.error('Error fetching deal write-up info:', error);
+      // 🔥 Call second API
+      fetchValuationSummary(valuationPayload);
+    } else {
+      console.error("❌ Failed to fetch unified_deal_ratings:", await response.text());
     }
-  };
+  } catch (error) {
+    console.error("❌ Error fetching unified_deal_ratings:", error);
+  }
+};
 
-  useEffect(() => {
-    setFormData(data);
-    if (data?.ticker && data?.pricing_date && data?.deal_type) {
-      fetchDealWriteUpInfo();
+
+const fetchValuationSummary = async (payload: {
+  ticker: string;
+  company_name: string;
+  valuation_summary: string;
+  differentiate_summary: string;
+}) => {
+  try {
+    const response = await fetch(`${apiUrl}/api/ipo_valuation_ai_summary/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("✅ ipo_valuation_ai_summary response:", result);
+
+      setFormData((prev) => ({
+        ...prev,
+        valuation: result.valuation_summary,
+        differentiated_summary: result.differentiate_summary,
+      }));
+    } else {
+      console.error("❌ Failed to fetch ipo_valuation_ai_summary:", await response.text());
     }
-  }, [data]);
+  } catch (error) {
+    console.error("❌ Error fetching ipo_valuation_ai_summary:", error);
+  }
+};
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
-  const handleSliderChange = (name: keyof DealWriteUpData, value: number) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
+  // 🔹 Save edits
   const handleSave = async () => {
     try {
       const payload: Partial<DealWriteUpData> = {
@@ -139,6 +176,26 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    setFormData(data);
+    if (data?.ticker && data?.deal_type) {
+      fetchDealWriteUpInfo();
+    }
+  }, [data]);
+
+  // 🔹 Render helpers (same as your code, no changes)
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSliderChange = (name: keyof DealWriteUpData, value: number) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+
+
 
 const renderField = (
   label: string,
