@@ -236,7 +236,7 @@ const renderValuationField = () => {
           {isTruncated && (
             <Button
               onClick={() => setValuationExpanded(!valuationExpanded)}
-              sx={{ color: "#002060", textTransform: "none" }}
+              sx={{ color: "#136000ff", textTransform: "none" }}
             >
               {valuationExpanded ? "Show Less" : "Read More"}
             </Button>
@@ -293,7 +293,7 @@ const renderDifferentiatedSummaryField = () => {
               onClick={() =>
                 setDifferentiatedSummaryExpanded(!differentiatedSummaryExpanded)
               }
-              sx={{ color: "#002060", textTransform: "none" }}
+              sx={{ color: "#136000ff", textTransform: "none" }}
             >
               {differentiatedSummaryExpanded ? "Show Less" : "Read More"}
             </Button>
