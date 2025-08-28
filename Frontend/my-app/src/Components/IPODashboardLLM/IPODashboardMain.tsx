@@ -140,6 +140,10 @@ useEffect(() => {
 
     if (selectedTicker) fetchData();
   }, [selectedTicker]);
+
+
+// Generate the Monashee PDF report
+
 const handleExportPDF = async () => {
   setPdfLoading(true);
 
