@@ -91,6 +91,29 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
         </span>
       ),
     },
+    {      field: "region",
+      headerName: "Region",
+      renderHeader: () => formatHeader("Region"),
+      flex: 0.75,
+      headerAlign: "center",
+      align: "center",
+    },
+{      field: "sector",
+      headerName: "Sector",
+      renderHeader: () => formatHeader("Sector"),
+      flex: 1.25,
+      headerAlign: "center",
+      align: "center",
+    },
+
+    {
+      field: "issuer_name",
+      headerName: "Issuer Name",
+      renderHeader: () => formatHeader("Issuer Name"),
+      flex: 2,
+      headerAlign: "center",
+      align: "left",
+    },
     {
       field: "expected_listing_date",
       headerName: "Expected Listing Date",
@@ -100,20 +123,20 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
       align: "center",
       renderCell: formatDateCell,
     },
-    {
-      field: "pricing_date",
-      headerName: "Pricing Date",
-      renderHeader: () => formatHeader("Pricing Date"),
-      flex: 1,
-      headerAlign: "center",
-      align: "center",
-      renderCell: formatDateCell,
-    },
+    // {
+    //   field: "pricing_date",
+    //   headerName: "Pricing Date",
+    //   renderHeader: () => formatHeader("Pricing Date"),
+    //   flex: 1,
+    //   headerAlign: "center",
+    //   align: "center",
+    //   renderCell: formatDateCell,
+    // },
     {
       field: "deal_type",
       headerName: "Deal Type",
       renderHeader: () => formatHeader("Deal Type"),
-      flex: 1,
+      flex: 0.75,
       headerAlign: "center",
       align: "center",
     },
@@ -167,6 +190,7 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
       renderHeader: () => formatHeader("Writeup Available"),
       flex: 1,
       headerAlign: "center",
+      align: "center",
       renderCell: (params: GridRenderCellParams<any>) => {
         if (params.value?.toString().toLowerCase() === "yes") {
           return (

@@ -19,6 +19,7 @@ import IPODashboardPage2 from "./IPODashboardMain/IPODashboardPage2";
 import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
 import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
+import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 
 interface TickerOption {
   ticker_name: string;
@@ -412,7 +413,7 @@ const handleExportPDF = async () => {
         Welcome to detailed Insights on IPO - {selectedTicker}
       </Typography>
 
-      
+      <WriteUpIPODashbaord />
 
       <Box sx={{ px: 2 }}>
         {ipoData && (

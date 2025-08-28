@@ -79,33 +79,35 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
     }
   }, [data]);
 
-  const renderField = (label: string, value: string | number | null | undefined) => (
+const renderField = (label: string, value: string | number | null | undefined) => {
+  const isValueAvailable = value !== null && value !== undefined && value !== "";
+  const displayValue = isValueAvailable ? value : "Not Available";
+
+  return (
     <>
       <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
         {label}
       </Typography>
-      <TextField
-        value={value ?? ''}
-        fullWidth
-        size="small"
-        variant="standard"
-        disabled
-        InputProps={{
-          sx: {
-            '&.Mui-disabled': { WebkitTextFillColor: '#b1062e' },
-            '& input.Mui-disabled': { WebkitTextFillColor: '#b1062e' },
-          },
-          style: { color: '#002060' },
+      <Typography
+        variant="body1"
+        sx={{
+          color: isValueAvailable ? "#b1062e" : "#999",
+          fontStyle: isValueAvailable ? "normal" : "italic",
+          py: 0.5,
         }}
-      />
+      >
+        {displayValue}
+      </Typography>
     </>
   );
+};
+
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <Card
         sx={{
-          background: 'linear-gradient(135deg, #bcc9ecff, #c5d1f0ff)',
+          background: 'linear-gradient(135deg, #e0ebff, #d4e2fc)',
           borderRadius: '20px',
           boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
           p: 2,
@@ -129,7 +131,7 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
             <Grid item xs={12}>
               <Card
                 sx={{
-                  background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
+                  background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
                   borderRadius: "20px",
                   boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
                 }}

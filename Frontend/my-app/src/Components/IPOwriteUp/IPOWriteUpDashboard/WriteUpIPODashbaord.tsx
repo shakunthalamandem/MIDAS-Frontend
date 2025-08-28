@@ -11,25 +11,21 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 interface IpoData {
   ticker: string;
   company_name: string;
-  expected_date: string;
+  pricing_date: string | null;
   price: string | number | null;
-  exchange: string;
+  exchange: string | null;
   deal_size: number | null;
 }
 
 const WriteUpIPODashbaord: React.FC = () => {
   const [ipoData, setIpoData] = useState<IpoData[]>([]);
-  const [dashboardTickers, setDashboardTickers] = useState<string[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchIpoData = async () => {
@@ -43,10 +39,13 @@ const WriteUpIPODashbaord: React.FC = () => {
 
         if (!response.ok) throw new Error("Failed to fetch IPO data");
 
-        const data: IpoData[] = await response.json();
+        const json = await response.json();
+        const data: IpoData[] = json.results || [];
+
+        // Ensure uniqueness by ticker + pricing_date
         const uniqueRows = Array.from(
           new Map(
-            data.map((item) => [`${item.ticker}_${item.expected_date}`, item])
+            data.map((item) => [`${item.ticker}_${item.pricing_date}`, item])
           ).values()
         );
 
@@ -56,26 +55,7 @@ const WriteUpIPODashbaord: React.FC = () => {
       }
     };
 
-    const fetchDashboardTickers = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch dashboard tickers");
-
-        const data = await response.json();
-        setDashboardTickers(data.distinct_tickers || []);
-      } catch (error) {
-        console.error("Error fetching dashboard tickers:", error);
-      }
-    };
-
     fetchIpoData();
-    fetchDashboardTickers();
   }, [apiUrl, token]);
 
   const getOrdinalSuffix = (day: number): string => {
@@ -88,7 +68,8 @@ const WriteUpIPODashbaord: React.FC = () => {
     }
   };
 
-  const formatDate = (dateStr: string): string => {
+  const formatDate = (dateStr: string | null): string => {
+    if (!dateStr) return "—";
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return dateStr;
     const day = date.getDate();
@@ -117,7 +98,7 @@ const WriteUpIPODashbaord: React.FC = () => {
           color="#002060"
           mb={2}
         >
-          📅 Upcoming & Recent IPOs : Past Week to Next Two Weeks
+          📅 All Upcoming IPO's 
         </Typography>
 
         <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
@@ -132,7 +113,7 @@ const WriteUpIPODashbaord: React.FC = () => {
                 {[
                   "Symbol",
                   "Company",
-                  "Expected Date",
+                  "Expected Listing Date",
                   "Offer Price",
                   "Exchange",
                   "Deal Size",
@@ -170,60 +151,64 @@ const WriteUpIPODashbaord: React.FC = () => {
                       fontSize: "0.78rem",
                       padding: "6px 8px",
                       border: "1px solid black",
+                      fontWeight: 600,
                       lineHeight: 1.2,
                     }}
                   >
-                    {dashboardTickers.includes(row.ticker) ? (
-                      <Box
-                        component="span"
-                        sx={{
-                          color: "#fc1400",
-                          textDecoration: "underline",
-                          cursor: "pointer",
-                          fontWeight: 600,
-                          "&:hover": {
-                            color: "#8f0082",
-                            textDecoration: "none",
-                          },
-                        }}
-                        onClick={() => {
-                          localStorage.setItem("selected_ticker", row.ticker);
-                          window.open("/equity/ipo_dashboard", "_blank");
-                        }}
-                      >
-                        {row.ticker}
-                      </Box>
-                    ) : (
-                      row.ticker
-                    )}
+                    {row.ticker}
                   </TableCell>
                   <TableCell
                     align="center"
-                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
+                    sx={{
+                      fontSize: "0.78rem",
+                      padding: "6px 8px",
+                      border: "1px solid black",
+                      lineHeight: 1.2,
+                    }}
                   >
                     {row.company_name}
                   </TableCell>
                   <TableCell
                     align="center"
-                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
+                    sx={{
+                      fontSize: "0.78rem",
+                      padding: "6px 8px",
+                      border: "1px solid black",
+                      lineHeight: 1.2,
+                    }}
                   >
-                    {formatDate(row.expected_date)}
+                    {formatDate(row.pricing_date)}
                   </TableCell>
                   <TableCell
                     align="center"
-                    sx={{ fontSize: "0.78rem", padding: "8px 10px", border: "1px solid black", lineHeight: 1.2 }}
+                    sx={{
+                      fontSize: "0.78rem",
+                      padding: "6px 8px",
+                      border: "1px solid black",
+                      lineHeight: 1.2,
+                    }}
                   >
                     {row.price !== null ? `${row.price}` : "—"}
                   </TableCell>
                   <TableCell
                     align="center"
-                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
+                    sx={{
+                      fontSize: "0.78rem",
+                      padding: "6px 8px",
+                      border: "1px solid black",
+                      lineHeight: 1.2,
+                    }}
                   >
-                    {row.exchange}
+                    {row.exchange || "—"}
                   </TableCell>
                   <TableCell
                     align="center"
-                    sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}
+                    sx={{
+                      fontSize: "0.78rem",
+                      padding: "6px 8px",
+                      border: "1px solid black",
+                      lineHeight: 1.2,
+                    }}
                   >
                     {row.deal_size !== null ? `${row.deal_size}` : "—"}
                   </TableCell>
@@ -233,16 +218,21 @@ const WriteUpIPODashbaord: React.FC = () => {
           </Table>
         </TableContainer>
       </Box>
-     <Typography
-  variant="body2"
-  textAlign="center"
-  color="textSecondary"
-  sx={{ fontStyle: "italic", mt: 1, display: "flex", justifyContent: "center", alignItems: "center" }}
->
-  <InfoOutlinedIcon fontSize="small" color="action" />
-  Note: IPO deals above $50M offer size.
-</Typography>
-
+      <Typography
+        variant="body2"
+        textAlign="center"
+        color="textSecondary"
+        sx={{
+          fontStyle: "italic",
+          mt: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <InfoOutlinedIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
+        Note: IPO deals above $50M offer size.
+      </Typography>
     </Container>
   );
 };
