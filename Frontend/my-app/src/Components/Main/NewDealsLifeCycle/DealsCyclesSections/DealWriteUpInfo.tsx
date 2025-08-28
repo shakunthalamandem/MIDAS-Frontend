@@ -281,7 +281,7 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <Card
         sx={{
-          background: 'linear-gradient(135deg, #bcc9ecff, #c5d1f0ff)',
+          background: 'linear-gradient(135deg, #e0ebff, #d4e2fc)',
           borderRadius: '20px',
           boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
           p: 2,
@@ -326,7 +326,7 @@ const DealWriteUpInfo: React.FC<DealWriteUpInfoProps> = ({ data }) => {
             <Grid item xs={12}>
               <Card
                 sx={{
-                  background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
+                  background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
                   borderRadius: "20px",
                   boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
                   mt: 2,

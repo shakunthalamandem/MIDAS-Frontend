@@ -25,10 +25,10 @@ const StyledSlider = styled(Slider)(() => ({
   // Rail (entire bar) has the gradient
   '& .MuiSlider-rail': {
     opacity: 1,
-    background: 'linear-gradient(to right, red 0%, orange 50%, green 100%)',
+    background: 'linear-gradient(to right, red 0%, orange 30%, green 100%)',
   },
   '& .MuiSlider-valueLabel': {
-    backgroundColor: '#c35305',
+    backgroundColor: '#918882ff',
     color: '#fff',
     borderRadius: 4,
     fontSize: 12,

@@ -91,7 +91,7 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
                 "Ticker",
                 "Pricing Date",
                 "Issuer Name",
-                "Deal Size",
+                "Deal Size($)",
                 "1 Day Return (%)",
                 "1 Month Return (%)",
               ].map((header, index, arr) => (
