@@ -112,7 +112,7 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
       renderHeader: () => formatHeader("Issuer Name"),
       flex: 2,
       headerAlign: "center",
-      align: "center",
+      align: "left",
     },
     {
       field: "expected_listing_date",
