@@ -44,7 +44,6 @@ import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquity
 
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
 import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
-import IntelligenceDashboard from "../Components/Main/DashBoards/IntelligenceDashboard";
 import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdashboardMain";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
@@ -64,13 +63,11 @@ import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis"
 import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
 import EquityDealsIPOFO from "../Components/Main/DashBoards/EquityDealsIPOFO";
-import ChatboxMain from "../Components/ChatboxGroup/ChatboxMain";
 import ExportUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/ExportUnifiedDealData";
 import UnifiedDealDataUpload from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/UnifiedDealDataUpload";
 import TickerDashboard from "../Components/DealTracking/TickerDashboard";
 import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteUpMain";
 import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
-import TickerTracking from "../Components/DealTracking/TickerTracking";
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
 
 const AppRouters: React.FC = () => {
@@ -222,7 +219,6 @@ const AppRouters: React.FC = () => {
 
         <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis/></AuthGuard>} />
         <Route path="/genai_data_set" element={<AuthGuard><HeatMapMain/></AuthGuard>} />
-        <Route path="/chatbot" element={<AuthGuard><ChatboxMain /></AuthGuard>} />
 
 
 
@@ -243,7 +239,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/download_deals_data" element={<AuthGuard><ExportUnifiedDealData /></AuthGuard>} />
         <Route path="/deal_data_upload" element={<AuthGuard><UnifiedDealDataUpload /></AuthGuard>} />
-                <Route path="/pdf_upload" element={<AuthGuard><UploadsWriteUpMain /></AuthGuard>} />
+        <Route path="/pdf_upload" element={<AuthGuard><UploadsWriteUpMain /></AuthGuard>} />
 
 
       </Routes>
