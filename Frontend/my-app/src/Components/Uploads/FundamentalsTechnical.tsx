@@ -13,8 +13,7 @@ import {
   Button,
 } from '@mui/material';
 
-const apiUrl = process.env.REACT_APP_API_URL;
-const token = localStorage.getItem("access_token");
+
 
 const FundamentalsTechnical: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -25,7 +24,8 @@ const FundamentalsTechnical: React.FC = () => {
     setSelectedType(event.target.value as 'technical' | 'fundamental' | 'news');
     setResponse(null); // clear previous messages
   };
-
+const apiUrl = process.env.REACT_APP_API_URL;
+const token = localStorage.getItem("access_token");
   const handleSubmit = async () => {
     if (!selectedType) {
       setResponse("Please select a data type first.");

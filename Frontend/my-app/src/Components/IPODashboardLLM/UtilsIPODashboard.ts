@@ -31,3 +31,24 @@ export const cardColors = [
     },
     { key: "key_management_personnel", title: "Key Management Personnel" },
   ];
+
+
+export  const getOrdinalSuffix = (n: number): string => {
+    if (n > 3 && n < 21) return "th";
+    switch (n % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
+    }
+  };
+  
+  export const formatDate = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const day = date.getDate();
+    const suffix = getOrdinalSuffix(day);
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}${suffix} ${month} ${year}`;
+  };
