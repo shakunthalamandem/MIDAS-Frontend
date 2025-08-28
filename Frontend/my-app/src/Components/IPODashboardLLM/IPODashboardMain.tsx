@@ -10,7 +10,7 @@ import {
 import { useParams } from "react-router-dom";
 
 import axios from "axios";
-import { cardColors } from "./UtilsIPODashboard";
+import { cardColors, formatDate } from "./UtilsIPODashboard";
 import introImage from "../../Assets/images/monashee_page1.png";
 import outroImage from "../../Assets/images/Disclaimer.jpg";
 import monasheeLogo from "../../Assets/images/monashee_logo.png";
@@ -21,25 +21,7 @@ import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
 
 
-const getOrdinalSuffix = (n: number): string => {
-  if (n > 3 && n < 21) return "th";
-  switch (n % 10) {
-    case 1: return "st";
-    case 2: return "nd";
-    case 3: return "rd";
-    default: return "th";
-  }
-};
 
-const formatDate = (dateStr: string): string => {
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr;
-  const day = date.getDate();
-  const suffix = getOrdinalSuffix(day);
-  const month = date.toLocaleString("default", { month: "short" });
-  const year = date.getFullYear();
-  return `${day}${suffix} ${month} ${year}`;
-};
 
 const IPODashboardMain: React.FC = () => {
   const { ticker } = useParams<{ ticker: string }>();
@@ -68,32 +50,14 @@ useEffect(() => {
   }
 }, [ticker]);
 
-  // useEffect(() => {
-  //   const fetchAllIpoTickers = async () => {
-  //     try {
-  //       const savedTicker = localStorage.getItem("selected_ticker");
-  //       setSelectedTicker(savedTicker || "");
-  //       const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
-  //         headers: getAuthHeaders(),
-  //       });
-  //       if (!response.ok) throw new Error("Failed to fetch IPO tickers");
-  //       const data = await response.json();
-  //       setAllIpoTickers(data.distinct_tickers || []);
-  //     } catch (err) {
-  //       console.error("Ticker fetch failed", err);
-  //     }
-  //   };
-  //   fetchAllIpoTickers();
-  // }, []);
+
 useEffect(() => {
   const fetchAllIpoTickers = async () => {
     try {
       const savedTicker = localStorage.getItem("selected_ticker");
 
-      // ✅ Use URL param ticker if available, else fallback to saved ticker
       if (ticker) {
         setSelectedTicker(ticker);
-        // localStorage.setItem("selected_ticker", ticker); // keep it in sync
       } else if (savedTicker) {
         setSelectedTicker(savedTicker);
       }
