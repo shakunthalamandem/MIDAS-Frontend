@@ -69,6 +69,7 @@ import TickerDashboard from "../Components/DealTracking/TickerDashboard";
 import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteUpMain";
 import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
+import WriteUpDashboard from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpDashboard";
 
 const AppRouters: React.FC = () => {
   return (
@@ -199,7 +200,6 @@ const AppRouters: React.FC = () => {
         <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO/></AuthGuard>} />
        
         <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain/></AuthGuard>} />
-        {/* <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTracking ticker={""} pricing_date={""} /></AuthGuard>} /> */}
          <Route 
           path="/deals/dashboard/Tracking" 
           element={
@@ -208,7 +208,7 @@ const AppRouters: React.FC = () => {
             </AuthGuard>
           } 
         />
-        {/* <Route path="/deals/dashboard" element={<AuthGuard><IntelligenceDashboard/></AuthGuard>} /> */}
+        <Route path="/writeup/dashboard" element={<AuthGuard><WriteUpDashboard/></AuthGuard>} />
 
 
 
