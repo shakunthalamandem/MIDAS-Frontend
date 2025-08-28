@@ -147,13 +147,15 @@ useEffect(() => {
 const handleExportPDF = async () => {
   setPdfLoading(true);
 
+  // 🔹 Pages to capture
   const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3", "ipo-dashboard-page4"];
 
+  // 🔹 Use A3 size for bigger fonts and less scaling
   const pdf = new jsPDF({
-    orientation: "portrait",
+    orientation: "portrait", // or "portrait" if you prefer
     unit: "mm",
-    format: "a4",
-    compress: true, // ✅ enable internal compression
+    format: [600, 420], // A3: Wider than A4
+    compress: true, // Enable compression
   });
 
   const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -180,10 +182,9 @@ const handleExportPDF = async () => {
       logoImg.onload = () => resolve();
     });
 
-    // ✅ Add Front Page (Intro image + formatted text)
+    // ✅ Intro Page
     const introImg = new Image();
     introImg.src = introImage;
-
     await new Promise<void>((resolve) => {
       introImg.onload = () => {
         pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
@@ -195,11 +196,10 @@ const handleExportPDF = async () => {
           const companyName = ipoData.company_name;
           const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
           const pricingDate = ipoData.pricing_date;
-
           const startY = 40;
 
           // Company Name
-          pdf.setFontSize(16);
+          pdf.setFontSize(20); // 🔹 Slightly larger font
           pdf.setTextColor(color[0], color[1], color[2]);
           pdf.text(
             companyName,
@@ -208,24 +208,23 @@ const handleExportPDF = async () => {
           );
 
           // Exchange and Ticker
-          pdf.setFontSize(16);
+          pdf.setFontSize(18);
           pdf.text(
             exchangeTicker,
             pdfWidth - margin - pdf.getTextWidth(exchangeTicker),
-            startY + 12
+            startY + 14
           );
 
           // Pricing Date
           if (pricingDate) {
-            pdf.setFontSize(11);
+            pdf.setFontSize(12);
             pdf.text(
               pricingDate,
               pdfWidth - margin - pdf.getTextWidth(pricingDate),
-              startY + 24
+              startY + 28
             );
           }
         }
-
         resolve();
       };
     });
@@ -244,21 +243,20 @@ const handleExportPDF = async () => {
       if (!element) continue;
 
       const canvas = await html2canvas(element, {
-        scale: 2, // ✅ reduced from 3
+        scale: 4, // 🔹 High resolution for sharp text
         useCORS: true,
         scrollY: -window.scrollY,
         windowWidth: element.scrollWidth,
         windowHeight: element.scrollHeight,
       });
 
-      // ✅ JPEG with quality compression
-      const imgData = canvas.toDataURL("image/jpeg", 0.6);
+      const imgData = canvas.toDataURL("image/jpeg", 0.8); // 🔹 Higher quality
 
       pdf.addPage();
 
       // ➤ Logo top-right
-      const logoWidth = 40;
-      const logoHeight = 12;
+      const logoWidth = 50;
+      const logoHeight = 15;
       const logoX = pdfWidth - logoWidth - 10;
       const logoY = 10;
 
@@ -270,31 +268,31 @@ const handleExportPDF = async () => {
       pdf.setLineWidth(1);
       pdf.line(10, lineY, pdfWidth - 10, lineY);
 
-      // ➤ Add canvas image
+      // ➤ Add dashboard page image
       const marginTop = lineY + 5;
       const imageWidth = pdfWidth;
       const imageHeight = (canvas.height * imageWidth) / canvas.width;
       pdf.addImage(imgData, "JPEG", 0, marginTop, imageWidth, imageHeight, undefined, "FAST");
 
-      // ➤ Add footer
+      // ➤ Footer
       const footerY = pdfHeight - 20;
-      pdf.setFontSize(6);
+      pdf.setFontSize(7);
       pdf.setTextColor(100);
       pdf.setFont("helvetica", "normal");
       pdf.text(
-        ` Data as of ${dataAsOfText} Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
+        `Data as of ${dataAsOfText}. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
         10,
         footerY,
         { maxWidth: pdfWidth - 20 }
       );
 
-      pdf.setFontSize(8);
+      pdf.setFontSize(9);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(128);
       pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
     }
 
-    // ✅ Restore original accordion states
+    // ✅ Restore accordions
     setExpandedPanels(originalPanels);
     await waitForDOMUpdate();
 
@@ -306,19 +304,18 @@ const handleExportPDF = async () => {
         pdf.addPage();
         pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
 
-        // ➤ Add footer
         const footerY = pdfHeight - 20;
-        pdf.setFontSize(8);
+        pdf.setFontSize(9);
         pdf.setTextColor(100);
         pdf.setFont("helvetica", "normal");
         pdf.text(
-          ` Data as of ${dataAsOfText} Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
+          `Data as of ${dataAsOfText}. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
           10,
           footerY,
           { maxWidth: pdfWidth - 20 }
         );
 
-        pdf.setFontSize(10);
+        pdf.setFontSize(11);
         pdf.setFont("helvetica", "bold");
         pdf.setTextColor(128);
         pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
