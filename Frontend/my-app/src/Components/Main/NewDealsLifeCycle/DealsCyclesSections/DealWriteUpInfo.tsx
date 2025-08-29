@@ -128,91 +128,96 @@ const handleReadMore = () => {
         </Grid>
 
 
-            {/* Valuation */}
-        <Box
-          sx={{
-            background: "linear-gradient(135deg, #ffffff, #f5f8ff)",
-            borderRadius: "20px",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-            p: 2,
-            mt: 2,
-          }}
+{/* Valuation */}
+<Box
+  sx={{
+                  background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
+    borderRadius: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+    p: 2,
+    mt: 2,
+  }}
+>
+  <Typography
+    variant="subtitle1"
+    color="#002060"
+    fontWeight="bold"
+    gutterBottom
+  >
+    Valuation (AI)
+  </Typography>
+  {loadingValuation ? (
+    <Box display="flex" alignItems="center" gap={1}>
+      <CircularProgress size={20} />
+      <Typography variant="body2" color="textSecondary">
+        Generating data...
+      </Typography>
+    </Box>
+  ) : (
+    <>
+      <Typography variant="body1">
+        {!formData.valuation || formData.valuation.length === 0
+          ? "Not Available"
+          : formData.valuation}
+      </Typography>
+      {formData.valuation && formData.valuation.length > 0 && (
+        <Button
+          variant="text"
+          onClick={handleReadMore}
+          sx={{ mt: 1, color: "#006005ff" }}
         >
-          <Typography
-            variant="subtitle1"
-            color="#002060"
-            fontWeight="bold"
-            gutterBottom
-          >
-            Valuation (AI)
-          </Typography>
-          {loadingValuation ? (
-            <Box display="flex" alignItems="center" gap={1}>
-              <CircularProgress size={20} />
-              <Typography variant="body2" color="textSecondary">
-                Generating data...
-              </Typography>
-            </Box>
-          ) : (
-            <>
-              <Typography variant="body1">
-                {formData.valuation || "No valuation available"}
-              </Typography>
-              {formData.valuation && (
-                <Button
-                  variant="text"
-                  onClick={handleReadMore}
-                  sx={{ mt: 1, color:'#006005ff' }}
-                >
-                  Read More
-                </Button>
-              )}
-            </>
-          )}
-        </Box>
+          Read More
+        </Button>
+      )}
+    </>
+  )}
+</Box>
 
-        {/* Differentiated Summary */}
-        <Box
-          sx={{
-            background: "linear-gradient(135deg, #ffffff, #f5f8ff)",
-            borderRadius: "20px",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-            p: 2,
-            mt: 2,
-          }}
+{/* Differentiated Summary */}
+<Box
+  sx={{
+                  background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
+    borderRadius: "20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+    p: 2,
+    mt: 2,
+  }}
+>
+  <Typography
+    variant="subtitle1"
+    color="#002060"
+    fontWeight="bold"
+    gutterBottom
+  >
+    Differentiated Summary (AI)
+  </Typography>
+  {loadingSummary ? (
+    <Box display="flex" alignItems="center" gap={1}>
+      <CircularProgress size={20} />
+      <Typography variant="body2" color="textSecondary">
+        Generating data...
+      </Typography>
+    </Box>
+  ) : (
+    <>
+      <Typography variant="body1">
+        {!formData.differentiated_summary || formData.differentiated_summary.length === 0
+          ? "Not Available"
+          : formData.differentiated_summary}
+      </Typography>
+      {formData.differentiated_summary && formData.differentiated_summary.length > 0 && (
+        <Button
+          variant="text"
+          onClick={handleReadMore}
+          sx={{ mt: 1, color: "#006005ff" }}
         >
-          <Typography
-            variant="subtitle1"
-            color="#002060"
-            fontWeight="bold"
-            gutterBottom
-          >
-            Differentiated Summary (AI)
-          </Typography>
-          {loadingSummary ? (
-            <Box display="flex" alignItems="center" gap={1}>
-              <CircularProgress size={20} />
-              <Typography variant="body2" color="textSecondary">
-                Generating data...
-              </Typography>
-            </Box>
-          ) : (
-            <>
-              <Typography variant="body1">
-                {formData.differentiated_summary || "No summary available"}
-              </Typography>
-              {formData.differentiated_summary && (
-                <Button
-                  variant="text"
-                  onClick={handleReadMore}
-                  sx={{ mt: 1 ,color:'#006005ff'}}
-                >
-                  Read More
-                </Button>
-              )}
-            </>
-          )}
-        </Box>
+          Read More
+        </Button>
+      )}
+    </>
+  )}
+</Box>
+
 
     
       </CardContent>
