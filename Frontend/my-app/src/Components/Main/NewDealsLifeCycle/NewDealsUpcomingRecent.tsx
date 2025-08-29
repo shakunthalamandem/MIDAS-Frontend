@@ -10,6 +10,7 @@ import DealsTable from "./DealsTable";
 import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
 import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
 import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
+import DealIoiValuesTable from "./DealsCyclesSections/DealIoiValuesTable";
 
 
 
@@ -75,7 +76,7 @@ const token = localStorage.getItem("access_token");
       )}
 
       {selectedDeal && (
-        <Grid container spacing={2} mt={2}>
+        <><Grid container spacing={2} mt={2}>
           <Grid item xs={12} md={4}>
             <DealColorInfo data={selectedDeal} />
           </Grid>
@@ -85,7 +86,9 @@ const token = localStorage.getItem("access_token");
           <Grid item xs={12} md={4}>
             <AIMLModelPredictionInfo data={selectedDeal} />
           </Grid>
-        </Grid>
+
+        </Grid><DealIoiValuesTable data={selectedDeal} 
+        /></>
       )}
     </Container>
   );
