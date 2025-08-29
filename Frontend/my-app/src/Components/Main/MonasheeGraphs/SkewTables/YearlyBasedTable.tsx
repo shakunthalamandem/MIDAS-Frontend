@@ -108,12 +108,16 @@ const YearlyBasedTable: React.FC = () => {
       }
     })();
   }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
+  
+const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
+  const newStartYear = Number(event.target.value);
+  setStartYear(newStartYear);
 
-  const handleStartYearChange = (e: SelectChangeEvent<number | string>) => {
-    const val = Number(e.target.value);
-    setStartYear(val);
-    setEndYear(val + 1);
-  };
+  setEndYear((prevEndYear) => {
+    return prevEndYear <= newStartYear ? newStartYear + 1 : prevEndYear;
+  });
+};
+
   const handleEndYearChange = (e: SelectChangeEvent<number | string>) => setEndYear(Number(e.target.value));
   const handleDealTypeChange = (e: SelectChangeEvent<string>) => setDealType(e.target.value);
   const handleRegionChange = (e: SelectChangeEvent<string>) => setRegion(e.target.value);
