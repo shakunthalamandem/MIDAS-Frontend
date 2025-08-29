@@ -38,10 +38,11 @@ const renderCheckCell = (params: GridRenderCellParams<any>) => {
 };
 
 // Date formatter
+// Date formatter
 const formatDateCell = (params: GridRenderCellParams<any>) => {
-  if (!params.value) return "";
+  if (!params.value) return "To Be Announced"; // ✅ If empty, show TBA
   const date = new Date(params.value);
-  if (isNaN(date.getTime())) return params.value;
+  if (isNaN(date.getTime())) return "To Be Announced"; // ✅ If invalid date, show TBA
 
   const day = date.getDate();
   const month = date.toLocaleString("en-US", { month: "short" });

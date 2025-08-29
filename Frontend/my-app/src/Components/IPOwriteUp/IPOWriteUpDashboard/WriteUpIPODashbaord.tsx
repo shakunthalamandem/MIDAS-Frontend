@@ -68,17 +68,18 @@ const WriteUpIPODashbaord: React.FC = () => {
       default: return "th";
     }
   };
+const formatDate = (dateStr: string | null): string => {
+  if (!dateStr) return "To Be Announced"; // ✅ Empty date
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "To Be Announced"; // ✅ Invalid date
 
-  const formatDate = (dateStr: string | null): string => {
-    if (!dateStr) return "—";
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr;
-    const day = date.getDate();
-    const suffix = getOrdinalSuffix(day);
-    const month = date.toLocaleString("default", { month: "short" });
-    const year = date.getFullYear();
-    return `${day}${suffix} ${month} ${year}`;
-  };
+  const day = date.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = date.toLocaleString("default", { month: "short" });
+  const year = date.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
+
 
   return (
     <Container maxWidth="lg">
