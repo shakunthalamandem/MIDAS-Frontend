@@ -5,12 +5,11 @@ import { motion } from 'framer-motion';
 interface NoDataPopupProps {
   open: boolean;
   onClose: () => void;
+  onConfirm?: () => void;
 }
 
-const NoDataPopup: React.FC<NoDataPopupProps> = ({ open, onClose }) => {
-  const handleClose = () => {
-    window.location.reload(); // Refresh the page
-  };
+const NoDataPopup: React.FC<NoDataPopupProps> = ({ open, onClose, onConfirm  }) => {
+  
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -40,12 +39,13 @@ const NoDataPopup: React.FC<NoDataPopupProps> = ({ open, onClose }) => {
           Please change the applied filters and try again.
         </Typography>
         <Button
-          variant="contained"
-          sx={{ bgcolor: '#002060', '&:hover': { bgcolor: '#001540' } }}
-          onClick={handleClose}
-        >
-          Okay
-        </Button>
+  variant="contained"
+  sx={{ bgcolor: '#002060', '&:hover': { bgcolor: '#001540' } }}
+  onClick={onConfirm || onClose} // ✅ fallback to onClose if onConfirm not provided
+>
+  Okay
+</Button>
+
       </Box>
     </Modal>
   );
