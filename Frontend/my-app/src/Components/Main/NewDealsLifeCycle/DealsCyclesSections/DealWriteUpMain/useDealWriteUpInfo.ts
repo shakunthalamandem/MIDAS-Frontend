@@ -1,28 +1,38 @@
-import { useCallback } from 'react';
-import { DealWriteUpData } from './types';
+import { useCallback } from "react";
+import { DealWriteUpData } from "../DealWriteUpInfo";
 
 interface UseDealWriteUpInfoProps {
   apiUrl: string;
   token?: string | null;
   setFormData: React.Dispatch<React.SetStateAction<DealWriteUpData>>;
+  setLoadingValuation: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoadingSummary: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const useDealWriteUpInfo = ({ apiUrl, token, setFormData }: UseDealWriteUpInfoProps) => {
-  // Map API data to DealWriteUpData
-  const mapApiResponseToDealWriteUpData = useCallback((apiData: any): Partial<DealWriteUpData> => {
-    return {
-      ticker: apiData.ticker,
-      pricing_date: apiData.pricing_date,
-      deal_type: apiData.deal_type,
-      average_sector_return: apiData.average_sector_return,
-      monashee_score: apiData.monashee_score,
-      valuation: apiData.valuation,
-      differentiated_summary: apiData.differentiated_summary,
-      deal_writeup_rating: apiData.deal_writeup_rating,
-    };
-  }, []);
+export const useDealWriteUpInfo = ({
+  apiUrl,
+  token,
+  setFormData,
+  setLoadingValuation,
+  setLoadingSummary,
+}: UseDealWriteUpInfoProps) => {
+  // 🔹 Map API data to DealWriteUpData
+  const mapApiResponseToDealWriteUpData = useCallback(
+    (apiData: any): Partial<DealWriteUpData> => {
+      return {
+        ticker: apiData.ticker,
+        pricing_date: apiData.pricing_date,
+        deal_type: apiData.deal_type,
+        valuation: apiData.valuation,
+        differentiated_summary: apiData.differentiated_summary,
+        average_sector_return: apiData.average_sector_return,
+        monashee_score: apiData.monashee_score,
+      };
+    },
+    []
+  );
 
-  // Fetch Valuation Summary
+  // 🔹 Fetch Valuation Summary
   const fetchValuationSummary = useCallback(
     async (payload: {
       ticker: string;
@@ -31,18 +41,21 @@ export const useDealWriteUpInfo = ({ apiUrl, token, setFormData }: UseDealWriteU
       differentiate_summary: string;
     }) => {
       try {
-        const response = await fetch(`${apiUrl}/api/ipo_valuation_ai_summary/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-          body: JSON.stringify(payload),
-        });
+        const response = await fetch(
+          `${apiUrl}/api/ipo_valuation_ai_summary/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
 
         if (response.ok) {
           const result = await response.json();
-          console.log('✅ ipo_valuation_ai_summary response:', result);
+          console.log("✅ ipo_valuation_ai_summary response:", result);
 
           setFormData((prev) => ({
             ...prev,
@@ -50,16 +63,22 @@ export const useDealWriteUpInfo = ({ apiUrl, token, setFormData }: UseDealWriteU
             differentiated_summary: result.differentiate_summary,
           }));
         } else {
-          console.error('❌ Failed to fetch ipo_valuation_ai_summary:', await response.text());
+          console.error(
+            "❌ Failed to fetch ipo_valuation_ai_summary:",
+            await response.text()
+          );
         }
       } catch (error) {
-        console.error('❌ Error fetching ipo_valuation_ai_summary:', error);
+        console.error("❌ Error fetching ipo_valuation_ai_summary:", error);
+      } finally {
+        setLoadingValuation(false);
+        setLoadingSummary(false);
       }
     },
-    [apiUrl, token, setFormData]
+    [apiUrl, token, setFormData, setLoadingValuation, setLoadingSummary]
   );
 
-  // Fetch Deal Write-Up Info
+  // 🔹 Fetch Deal Write-Up Info (POST)
   const fetchDealWriteUpInfo = useCallback(
     async (data: DealWriteUpData) => {
       try {
@@ -69,91 +88,109 @@ export const useDealWriteUpInfo = ({ apiUrl, token, setFormData }: UseDealWriteU
           deal_type: data.deal_type,
         };
 
-        console.log('🔹 Sending unified_deal_ratings payload:', payload);
+        console.log("🔹 Sending unified_deal_ratings payload:", payload);
 
         const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(payload),
         });
 
         if (response.ok) {
           const result = await response.json();
-          console.log('✅ unified_deal_ratings response:', result);
+          console.log("✅ unified_deal_ratings response:", result);
 
           const apiData = result.data;
 
-          // Update form data
+          // ✅ Update form data
           setFormData((prev) => ({
             ...prev,
             ...mapApiResponseToDealWriteUpData(apiData),
           }));
 
-          // Build payload for ipo_valuation_ai_summary
+          // ✅ Build payload for ipo_valuation_ai_summary
           const valuationPayload = {
             ticker: apiData.ticker,
-            company_name: apiData.company_name || '',
-            valuation_summary: apiData.valuation || '',
-            differentiate_summary: apiData.differentiated_summary || '',
+            company_name: apiData.company_name || "",
+            valuation_summary: apiData.valuation || "",
+            differentiate_summary: apiData.differentiated_summary || "",
           };
 
-          console.log('🔹 Sending ipo_valuation_ai_summary payload:', valuationPayload);
+          console.log(
+            "🔹 Sending ipo_valuation_ai_summary payload:",
+            valuationPayload
+          );
 
+          // 🔥 Call second API
           fetchValuationSummary(valuationPayload);
         } else {
-          console.error('❌ Failed to fetch unified_deal_ratings:', await response.text());
+          console.error(
+            "❌ Failed to fetch unified_deal_ratings:",
+            await response.text()
+          );
         }
       } catch (error) {
-        console.error('❌ Error fetching unified_deal_ratings:', error);
+        console.error("❌ Error fetching unified_deal_ratings:", error);
+        setLoadingValuation(false);
+        setLoadingSummary(false);
       }
     },
-    [apiUrl, token, setFormData, mapApiResponseToDealWriteUpData, fetchValuationSummary]
+    [
+      apiUrl,
+      token,
+      setFormData,
+      mapApiResponseToDealWriteUpData,
+      fetchValuationSummary,
+      setLoadingValuation,
+      setLoadingSummary,
+    ]
   );
 
-  // Save data (PATCH)
+  // 🔹 Save Deal Write-Up Info (PATCH)
   const saveDealWriteUpInfo = useCallback(
-    async (data: DealWriteUpData, formData: DealWriteUpData) => {
+    async (oldData: DealWriteUpData, newData: DealWriteUpData) => {
       try {
-        const payload: Partial<DealWriteUpData> = {
-          id: data.id,
-          ticker: data.ticker,
-          pricing_date: data.pricing_date,
-          deal_type: data.deal_type,
+        const payload = {
+          ticker: newData.ticker,
+          deal_type: newData.deal_type,
+          pricing_date: newData.pricing_date,
+          valuation: newData.valuation,
+          differentiated_summary: newData.differentiated_summary,
+          average_sector_return: newData.average_sector_return,
+          monashee_score: newData.monashee_score,
         };
 
-        Object.keys(formData).forEach((key) => {
-          const k = key as keyof DealWriteUpData;
-          if (formData[k] !== data[k] && formData[k] !== undefined) {
-            payload[k] = formData[k] as any;
-          }
-        });
+        console.log("🔹 Saving unified_deal_ratings with PATCH:", payload);
 
         const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
-          method: 'PATCH',
+          method: "PATCH",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(payload),
         });
 
         if (response.ok) {
-          alert('Saved successfully!');
+          console.log("✅ Successfully saved unified_deal_ratings");
           return true;
         } else {
-          alert('Failed to save data');
+          console.error(
+            "❌ Failed to save unified_deal_ratings:",
+            await response.text()
+          );
           return false;
         }
       } catch (error) {
-        console.error(error);
+        console.error("❌ Error saving unified_deal_ratings:", error);
         return false;
       }
     },
     [apiUrl, token]
   );
 
-  return { fetchDealWriteUpInfo, fetchValuationSummary, saveDealWriteUpInfo };
+  return { fetchDealWriteUpInfo, saveDealWriteUpInfo };
 };
