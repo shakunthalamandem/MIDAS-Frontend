@@ -155,7 +155,7 @@ const handleReadMore = () => {
     </Box>
   ) : (
     <>
-      <Typography variant="body1">
+      <Typography variant="body1" sx={{ color: "#727272ff" }}>
         {!formData.valuation || formData.valuation.length === 0
           ? "Not Available"
           : formData.valuation}
@@ -200,7 +200,7 @@ const handleReadMore = () => {
     </Box>
   ) : (
     <>
-      <Typography variant="body1">
+      <Typography variant="body1" sx={{ color: "#727272ff" }}>
         {!formData.differentiated_summary || formData.differentiated_summary.length === 0
           ? "Not Available"
           : formData.differentiated_summary}
