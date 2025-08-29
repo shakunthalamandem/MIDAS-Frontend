@@ -137,15 +137,9 @@ const handleReadMore = () => {
 
 
 {/* Valuation */}
-<Box
-  sx={{
-                  background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
-    borderRadius: "20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-    p: 2,
-    mt: 2,
-  }}
->
+
+          <Grid item xs={12}>
+
   <Typography
     variant="subtitle1"
     color="#002060"
@@ -179,18 +173,17 @@ const handleReadMore = () => {
       )}
     </>
   )}
-</Box>
+
+
+          </Grid>
+
+{/* </Box> */}
 
 {/* Differentiated Summary */}
-<Box
-  sx={{
-                  background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
-    borderRadius: "20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-    p: 2,
-    mt: 2,
-  }}
->
+
+
+          <Grid item xs={12}>
+
   <Typography
     variant="subtitle1"
     color="#002060"
@@ -224,7 +217,11 @@ const handleReadMore = () => {
       )}
     </>
   )}
-</Box>
+
+
+          </Grid>
+
+{/* </Box> */}
 
 
       <Grid item xs={12}>
