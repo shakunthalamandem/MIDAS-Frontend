@@ -177,7 +177,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
                 <Button
                   variant="text"
                   onClick={handleReadMore}
-                  sx={{ mt: 1, color: "#006005ff" }}
+                  sx={{ mt: 1, color: "#006005ff",fontWeight:'bold'  }}
                 >
                   Read More
                 </Button>
