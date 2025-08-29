@@ -164,6 +164,7 @@ export const useDealWriteUpInfo = ({
           differentiated_summary: newData.differentiated_summary,
           average_sector_return: newData.average_sector_return,
           monashee_score: newData.monashee_score,
+          deal_writeup_rating: newData.deal_writeup_rating,
         };
 
         console.log("🔹 Saving unified_deal_ratings with PATCH:", payload);
