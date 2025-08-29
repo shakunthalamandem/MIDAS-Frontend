@@ -17,7 +17,7 @@ import FieldRenderer from "./DealWriteUpMain/FieldRenderer";
 import BlueSlider from "./BlueSlider";
 
 export interface DealWriteUpData {
-    id?: number | string;
+  id?: number | string;
   ticker: string;
   pricing_date?: string;
   deal_type?: string;
@@ -71,12 +71,15 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
     if (success) setEditable(false);
   };
 
-const handleReadMore = () => {
-  if (formData?.ticker) {
-    window.open(`/ipo-dashboard/${formData.ticker}`, "_blank", "noopener,noreferrer");
-  }
-};
-
+  const handleReadMore = () => {
+    if (formData?.ticker) {
+      window.open(
+        `/ipo-dashboard/${formData.ticker}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
+  };
 
   const handleSliderChange = (name: keyof DealWriteUpData, value: number) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -88,7 +91,6 @@ const handleReadMore = () => {
         background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
         borderRadius: "20px",
         boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-        p: 2,
         width: "100%",
         maxWidth: "100%",
         margin: "0 auto",
@@ -135,116 +137,132 @@ const handleReadMore = () => {
           </Grid>
         </Grid>
 
+        {/* Valuation */}
 
-{/* Valuation */}
-
-          <Grid item xs={12}>
-
-  <Typography
-    variant="subtitle1"
-    color="#002060"
-    fontWeight="bold"
-    gutterBottom
-  >
-    Valuation (AI)
-  </Typography>
-  {loadingValuation ? (
-    <Box display="flex" alignItems="center" gap={1}>
-      <CircularProgress size={20} />
-      <Typography variant="body2" color="textSecondary">
-        Generating data...
-      </Typography>
-    </Box>
-  ) : (
-    <>
-      <Typography variant="body1" sx={{ color: "#727272ff" }}>
-        {!formData.valuation || formData.valuation.length === 0
-          ? "Not Available"
-          : formData.valuation}
-      </Typography>
-      {formData.valuation && formData.valuation.length > 0 && (
-        <Button
-          variant="text"
-          onClick={handleReadMore}
-          sx={{ mt: 1, color: "#006005ff" }}
-        >
-          Read More
-        </Button>
-      )}
-    </>
-  )}
-
-
-          </Grid>
-
-{/* </Box> */}
-
-{/* Differentiated Summary */}
-
-
-          <Grid item xs={12}>
-
-  <Typography
-    variant="subtitle1"
-    color="#002060"
-    fontWeight="bold"
-    gutterBottom
-  >
-    Differentiated Summary (AI)
-  </Typography>
-  {loadingSummary ? (
-    <Box display="flex" alignItems="center" gap={1}>
-      <CircularProgress size={20} />
-      <Typography variant="body2" color="textSecondary">
-        Generating data...
-      </Typography>
-    </Box>
-  ) : (
-    <>
-      <Typography variant="body1" sx={{ color: "#727272ff" }}>
-        {!formData.differentiated_summary || formData.differentiated_summary.length === 0
-          ? "Not Available"
-          : formData.differentiated_summary}
-      </Typography>
-      {formData.differentiated_summary && formData.differentiated_summary.length > 0 && (
-        <Button
-          variant="text"
-          onClick={handleReadMore}
-          sx={{ mt: 1, color: "#006005ff" }}
-        >
-          Read More
-        </Button>
-      )}
-    </>
-  )}
-
-
-          </Grid>
-
-{/* </Box> */}
-
-
-      <Grid item xs={12}>
-              <Card
+        <Grid item xs={12}>
+          <Typography
+            variant="subtitle1"
+            color="#002060"
+            fontWeight="bold"
+            gutterBottom
+          >
+            Valuation (AI)
+          </Typography>
+          {loadingValuation ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <CircularProgress size={20} />
+              <Typography variant="body2" color="textSecondary">
+                Generating data...
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <Typography
+                variant="body1"
                 sx={{
-                  background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
-                  borderRadius: "20px",
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                  mt: 2,
+                  color: "#727272ff",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2, // ✅ Limit to 2 lines
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
               >
-                <CardContent>
-                  <Typography
-                    variant="body1"
-                    color="#002060"
-                    fontWeight="bold"
-                    gutterBottom
+                {!formData.valuation || formData.valuation.length === 0
+                  ? "Not Available"
+                  : formData.valuation}
+              </Typography>
+
+              {formData.valuation && formData.valuation.length > 0 && (
+                <Button
+                  variant="text"
+                  onClick={handleReadMore}
+                  sx={{ mt: 1, color: "#006005ff" }}
+                >
+                  Read More
+                </Button>
+              )}
+            </>
+          )}
+        </Grid>
+
+        {/* </Box> */}
+
+        {/* Differentiated Summary */}
+
+        <Grid item xs={12}>
+          <Typography
+            variant="subtitle1"
+            color="#002060"
+            fontWeight="bold"
+            gutterBottom
+          >
+            Differentiated Summary (AI)
+          </Typography>
+          {loadingSummary ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <CircularProgress size={20} />
+              <Typography variant="body2" color="textSecondary">
+                Generating data...
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "#727272ff",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2, // ✅ Limit to 2 lines
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {!formData.differentiated_summary ||
+                formData.differentiated_summary.length === 0
+                  ? "Not Available"
+                  : formData.differentiated_summary}
+              </Typography>
+
+              {formData.differentiated_summary &&
+                formData.differentiated_summary.length > 0 && (
+                  <Button
+                    variant="text"
+                    onClick={handleReadMore}
+                    sx={{ mt: 1, color: "#006005ff" }}
                   >
- Deal Write-Up Rating                  </Typography>
-                  <BlueSlider
+                    Read More
+                  </Button>
+                )}
+            </>
+          )}
+        </Grid>
+
+        {/* </Box> */}
+
+        <Grid item xs={12}>
+          <Card
+            sx={{
+              background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
+              borderRadius: "20px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+              mt: 2,
+            }}
+          >
+            <CardContent>
+              <Typography
+                variant="body1"
+                color="#002060"
+                fontWeight="bold"
+                gutterBottom
+              >
+                Deal Write-Up Rating{" "}
+              </Typography>
+              <BlueSlider
                 value={formData.deal_writeup_rating || 0}
                 onChange={(_, value) =>
-                  handleSliderChange('deal_writeup_rating', value as number)
+                  handleSliderChange("deal_writeup_rating", value as number)
                 }
                 valueLabelDisplay="on"
                 step={1}
@@ -252,12 +270,9 @@ const handleReadMore = () => {
                 max={100}
                 disabled={!editable}
               />
-                </CardContent>
-              </Card>
-            </Grid>
-
-
-    
+            </CardContent>
+          </Card>
+        </Grid>
       </CardContent>
     </Card>
   );
