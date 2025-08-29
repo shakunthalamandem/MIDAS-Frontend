@@ -88,15 +88,10 @@ const token = localStorage.getItem("access_token");
           </Grid>
 
         </Grid>
-<<<<<<< HEAD
         
           <Grid item xs={12}>
             <DealIoiValuesTable data={selectedDeal} />
           </Grid>
-=======
-        <DealIoiValuesTable data={selectedDeal} />
-        
->>>>>>> d6cdc726a3b8e2c142145e5ce0b27d6469269953
         </>
       )}
     </Container>
