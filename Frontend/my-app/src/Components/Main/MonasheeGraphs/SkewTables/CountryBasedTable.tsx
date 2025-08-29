@@ -147,11 +147,14 @@ const CountryBasedTable: React.FC = () => {
     }
   }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
 
-  const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
-    const newStartYear = Number(event.target.value);
-    setStartYear(newStartYear);
-    setEndYear(newStartYear + 1);
-  };
+const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
+  const newStartYear = Number(event.target.value);
+  setStartYear(newStartYear);
+
+  setEndYear((prevEndYear) => {
+    return Number(prevEndYear) <= newStartYear ? newStartYear + 1 : prevEndYear;
+  });
+};
 
   const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
     setEndYear(Number(event.target.value));
