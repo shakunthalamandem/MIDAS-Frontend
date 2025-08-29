@@ -20,6 +20,11 @@ import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
 import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
 import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
+import NoDataPopup from "../../Pages/NoDataPopup";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+
 
 interface TickerOption {
   ticker_name: string;
@@ -41,6 +46,13 @@ const IPODashboardMain: React.FC = () => {
   const [editedContent, setEditedContent] = useState<Record<string, string[]>>({});
   const [showAIComparison, setShowAIComparison] = useState(false);
   const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>({});
+  const location = useLocation();
+const fromTickerClick = location.state?.fromTickerClick || false;
+const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
+const navigate = useNavigate();
+
+
+
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -49,6 +61,10 @@ const IPODashboardMain: React.FC = () => {
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   });
+  const handleNoDataConfirm = () => {
+  navigate("/equity/ipo_dashboard", { replace: true });
+};
+
 useEffect(() => {
   if (ticker) {
     setSearchText(ticker);
@@ -95,7 +111,14 @@ useEffect(() => {
           body: JSON.stringify({ ticker: selectedTicker || "" }),
         });
 
-        if (!response.ok) throw new Error("Failed to fetch IPO data");
+        if (!response.ok) {
+  if (fromTickerClick) {
+    setNoDataPopupOpen(true);
+  }
+  throw new Error("Failed to fetch IPO data");
+}
+
+;
         const jsonData = await response.json();
        
         
@@ -383,14 +406,19 @@ const handleExportPDF = async () => {
 
 
   if (loading) return <CircularProgress />;
-  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <>
+    <NoDataPopup
+  open={noDataPopupOpen}
+  onClose={() => setNoDataPopupOpen(false)}
+  onConfirm={handleNoDataConfirm}
+/>
+
       <Typography
         variant="body2"
         sx={{
-          fontWeight: 500,
+          fontWeight: 500,  
           color: "#FFFFFF",
           fontSize: { xs: "1rem", sm: "1.2rem" },
           backgroundColor: "#002060",

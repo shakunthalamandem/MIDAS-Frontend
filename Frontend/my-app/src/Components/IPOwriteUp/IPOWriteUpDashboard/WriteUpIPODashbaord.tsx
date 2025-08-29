@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { Link } from "react-router-dom";
 
 interface IpoData {
   ticker: string;
@@ -145,18 +146,30 @@ const WriteUpIPODashbaord: React.FC = () => {
                     border: "1px solid black",
                   }}
                 >
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      fontWeight: 600,
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {row.ticker}
-                  </TableCell>
+                 <TableCell
+  align="center"
+  sx={{
+    fontSize: "0.78rem",
+    padding: "6px 8px",
+    border: "1px solid black",
+    fontWeight: 600,
+    lineHeight: 1.2,
+  }}
+>
+  <Link
+  to={`/ipo-dashboard/${row.ticker}`}
+  state={{ fromTickerClick: true }}
+  style={{
+    color: "#d80606ff",
+    fontWeight: "bold",
+    textDecoration: "underline",
+  }}
+>
+  {row.ticker}
+</Link>
+
+</TableCell>
+
                   <TableCell
                     align="center"
                     sx={{
