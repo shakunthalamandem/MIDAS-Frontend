@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useDealWriteUpInfo } from "./DealWriteUpMain/useDealWriteUpInfo";
 import FieldRenderer from "./DealWriteUpMain/FieldRenderer";
 import BlueSlider from "./BlueSlider";
+import { motion } from "framer-motion";
 
 export interface DealWriteUpData {
   id?: number | string;
@@ -86,16 +87,15 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
   };
 
   return (
-    <Card
-      sx={{
-        background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
-        borderRadius: "20px",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-        width: "100%",
-        maxWidth: "100%",
-        margin: "0 auto",
-      }}
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <Card
+        sx={{
+          background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
+          borderRadius: "20px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+          p: 2,
+        }}
+      >
       <CardContent>
         {/* Header with Edit/Save */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -158,7 +158,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
           ) : (
             <>
               <Typography
-                variant="body1"
+                variant="body2"
                 sx={{
                   color: "#727272ff",
                   display: "-webkit-box",
@@ -209,7 +209,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
           ) : (
             <>
               <Typography
-                variant="body1"
+                variant="body2"
                 sx={{
                   color: "#727272ff",
                   display: "-webkit-box",
@@ -230,7 +230,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
                   <Button
                     variant="text"
                     onClick={handleReadMore}
-                    sx={{ mt: 1, color: "#006005ff" }}
+                    sx={{ mt: 1, color: "#006005ff",fontWeight:'bold' }}
                   >
                     Read More
                   </Button>
@@ -275,6 +275,8 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
         </Grid>
       </CardContent>
     </Card>
+        </motion.div>
+
   );
 };
 
