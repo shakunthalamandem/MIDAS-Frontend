@@ -27,6 +27,7 @@ export const useDealWriteUpInfo = ({
         differentiated_summary: apiData.differentiated_summary,
         average_sector_return: apiData.average_sector_return,
         monashee_score: apiData.monashee_score,
+        deal_writeup_rating: apiData.deal_writeup_rating,
       };
     },
     []

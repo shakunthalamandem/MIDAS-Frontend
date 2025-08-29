@@ -14,6 +14,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useNavigate } from "react-router-dom";
 import { useDealWriteUpInfo } from "./DealWriteUpMain/useDealWriteUpInfo";
 import FieldRenderer from "./DealWriteUpMain/FieldRenderer";
+import BlueSlider from "./BlueSlider";
 
 export interface DealWriteUpData {
     id?: number | string;
@@ -24,6 +25,7 @@ export interface DealWriteUpData {
   differentiated_summary?: string;
   average_sector_return?: string | number;
   monashee_score?: string | number;
+  deal_writeup_rating?: number;
 }
 
 interface Props {
@@ -74,6 +76,11 @@ const handleReadMore = () => {
     window.open(`/ipo-dashboard/${formData.ticker}`, "_blank", "noopener,noreferrer");
   }
 };
+
+
+  const handleSliderChange = (name: keyof DealWriteUpData, value: number) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <Card
@@ -218,6 +225,39 @@ const handleReadMore = () => {
     </>
   )}
 </Box>
+
+
+      <Grid item xs={12}>
+              <Card
+                sx={{
+                  background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
+                  borderRadius: "20px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                  mt: 2,
+                }}
+              >
+                <CardContent>
+                  <Typography
+                    variant="body1"
+                    color="#002060"
+                    fontWeight="bold"
+                    gutterBottom
+                  >
+ Deal Write-Up Rating                  </Typography>
+                  <BlueSlider
+                value={formData.deal_writeup_rating || 0}
+                onChange={(_, value) =>
+                  handleSliderChange('deal_writeup_rating', value as number)
+                }
+                valueLabelDisplay="on"
+                step={1}
+                min={0}
+                max={100}
+                disabled={!editable}
+              />
+                </CardContent>
+              </Card>
+            </Grid>
 
 
     
