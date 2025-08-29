@@ -1,244 +1,236 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import {
   Card,
   CardContent,
   Typography,
-  Grid,
   TextField,
   InputAdornment,
   RadioGroup,
   FormControlLabel,
   Radio,
+  Grid,
   IconButton,
-  CircularProgress,
+  Box,
   Tooltip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Cancel";
+import { motion } from "framer-motion";
 
-interface DealIoiValuesTableProps {
-  data: any;
-  onSaveSuccess?: (updatedData: any) => void; // Optional callback for parent update
+// --- Types ---
+interface DealIoiValuesTableData {
+  id?: number | string;
+  ticker: string;
+  pricing_date: string;
+  deal_type: string;
+  ioi_as_percentage_of_deal_size_status?: number | string;
+  potential_am_quantity?: number | string;
+  [key: string]: any;
 }
 
+interface DealIoiValuesTableProps {
+  data: DealIoiValuesTableData;
+}
 
-const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({
-  data,
-  onSaveSuccess,
-}) => {
-  const [formData, setFormData] = useState({
-    ioi_as_percentage_of_deal_size_status: "",
-    potential_am_quantity: "0",
-  });
+// --- Component ---
+const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
+  const [formData, setFormData] = useState<DealIoiValuesTableData>(data);
   const [editable, setEditable] = useState(false);
-  const [loading, setLoading] = useState(false);
-  
-const apiUrl = process.env.REACT_APP_API_URL;
-const token = localStorage.getItem("access_token");
 
-  // Map API response to formData shape
-  const mapApiResponseToFormData = (apiData: any) => {
-    return {
-      ioi_as_percentage_of_deal_size_status:
-        apiData.ioi_as_percentage_of_deal_size_status !== undefined
-          ? String(apiData.ioi_as_percentage_of_deal_size_status)
-          : "",
-      potential_am_quantity:
-        apiData.potential_am_quantity !== undefined
-          ? String(apiData.potential_am_quantity)
-          : "0",
-    };
-  };
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    if (data) {
-      setFormData(mapApiResponseToFormData(data));
-      setEditable(false);
+    setFormData(data);
+    if (data.ticker && data.pricing_date && data.deal_type) {
+      fetchDealColorInfo();
     }
   }, [data]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === "ioi_as_percentage_of_deal_size_status") {
-      // Allow empty or numeric input only
-      if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
-        setFormData((prev) => ({ ...prev, [name]: value }));
-      }
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSave = async () => {
-    if (!data) return;
-    setLoading(true);
-
+  const fetchDealColorInfo = async () => {
     try {
-      const payload: any = {
+      const payload = {
         ticker: data.ticker,
         pricing_date: data.pricing_date,
         deal_type: data.deal_type,
       };
 
-      if (
-        formData.ioi_as_percentage_of_deal_size_status !==
-          String(data.ioi_as_percentage_of_deal_size_status) &&
-        formData.ioi_as_percentage_of_deal_size_status !== ""
-      ) {
-        payload.ioi_as_percentage_of_deal_size_status = parseFloat(
-          formData.ioi_as_percentage_of_deal_size_status
-        );
-      }
-
-      if (
-        formData.potential_am_quantity !== String(data.potential_am_quantity) &&
-        formData.potential_am_quantity !== ""
-      ) {
-        payload.potential_am_quantity = parseFloat(formData.potential_am_quantity);
-      }
-
-      let response;
-
-      if (data.id) {
-        // PATCH update existing record
-        payload.id = data.id;
-        response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify(payload),
-        });
-      } else {
-        // POST create new record
-        response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify(payload),
-        });
-      }
+      const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (response.ok) {
         const result = await response.json();
-
-        // Update form data with response data
-        const updatedData = mapApiResponseToFormData(result.data || result); // assuming result.data contains new object or result itself
-
-        setFormData(updatedData);
-        setEditable(false);
-
-        if (onSaveSuccess) {
-          onSaveSuccess(result.data || result);
-        }
-
-        alert("Saved successfully!");
+        setFormData((prev) => ({
+          ...prev,
+          ...result.data,
+        }));
       } else {
-        const errorData = await response.json();
-        alert(`Failed to save data: ${errorData.detail || response.statusText}`);
+        console.error("Failed to fetch deal info");
       }
     } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Error saving data");
-    } finally {
-      setLoading(false);
+      console.error("Error fetching deal info:", error);
     }
   };
 
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const payload: Partial<DealIoiValuesTableData> = {
+        id: data.id,
+        ticker: data.ticker,
+        pricing_date: data.pricing_date,
+        deal_type: data.deal_type,
+      };
+
+      Object.keys(formData).forEach((key) => {
+        if (
+          formData[key] !== data[key] &&
+          formData[key] !== undefined &&
+          key !== "id" &&
+          key !== "ticker" &&
+          key !== "pricing_date" &&
+          key !== "deal_type"
+        ) {
+          payload[key] = formData[key];
+        }
+      });
+
+      const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        alert("Saved successfully!");
+        setEditable(false);
+      } else {
+        alert("Failed to save data");
+      }
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+  };
+
+  const renderField = (
+    label: string,
+    name: keyof DealIoiValuesTableData,
+    adornment?: string
+  ) => {
+    const rawValue = formData[name];
+    const isValueAvailable =
+      rawValue !== null && rawValue !== undefined && rawValue !== "";
+    const displayValue = isValueAvailable ? rawValue : "Not Available";
+
+    return (
+      <>
+        <Typography
+          variant="body2"
+          color="#002060"
+          fontWeight={500}
+          gutterBottom
+        >
+          {label}
+        </Typography>
+        {editable ? (
+          <TextField
+  name={String(name)}
+  value={isValueAvailable ? rawValue : ""}
+  onChange={handleChange}
+  fullWidth
+  size="small"
+  variant="standard"
+  InputProps={{
+    endAdornment: adornment ? (
+      <InputAdornment position="end">{adornment}</InputAdornment>
+    ) : undefined,
+  }}
+/>
+
+        ) : (
+          <Typography
+            variant="body1"
+            sx={{
+              color: isValueAvailable ? "#B1062E" : "#999",
+              fontWeight: 500,
+              py: 0.5,
+            }}
+          >
+            {displayValue}
+            {isValueAvailable && adornment ? ` ${adornment}` : ""}
+          </Typography>
+        )}
+      </>
+    );
+  };
+
   return (
-    <Grid item xs={12}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <Card
         sx={{
           background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
           borderRadius: "20px",
           boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-          position: "relative",
+          p: 2,
         }}
       >
         <CardContent>
-          <Grid container alignItems="center" justifyContent="space-between" mb={2}>
-            <Grid item>
-              <Typography variant="body1" color="#002060" fontWeight="bold">
-                IOI values
-              </Typography>
-            </Grid>
-
-            <Grid item>
-              {loading ? (
-                <CircularProgress size={24} />
-              ) : editable ? (
-                <>
-                  <Tooltip title="Cancel">
-                    <IconButton
-                      aria-label="cancel"
-                      onClick={() => {
-                        setFormData(mapApiResponseToFormData(data));
-                        setEditable(false);
-                      }}
-                      size="small"
-                      sx={{ mr: 1 }}
-                    >
-                      <CancelIcon />
-                    </IconButton>
-                  </Tooltip>
-
-                  <Tooltip title="Save">
-                    <IconButton aria-label="save" onClick={handleSave} size="small">
-                      <SaveIcon />
-                    </IconButton>
-                  </Tooltip>
-                </>
-              ) : (
-                <Tooltip title="Edit">
-                  <IconButton
-                    aria-label="edit"
-                    onClick={() => setEditable(true)}
-                    size="small"
-                  >
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </Grid>
-          </Grid>
-
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-                IOI value
-              </Typography>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography variant="h6" color="#002060" fontWeight="bold">
+              IOI Values
+            </Typography>
+            <IconButton
+              onClick={() => (editable ? handleSave() : setEditable(true))}
+            >
               {editable ? (
-                <TextField
-                  name="ioi_as_percentage_of_deal_size_status"
-                  value={formData.ioi_as_percentage_of_deal_size_status || ""}
-                  onChange={handleChange}
-                  fullWidth
-                  size="small"
-                  variant="standard"
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">% of deal size</InputAdornment>,
-                  }}
-                />
+                <SaveIcon sx={{ color: "#002060" }} />
               ) : (
-                <Typography variant="body1" sx={{ color: "#B1062E", fontWeight: 500 }}>
-                  {formData.ioi_as_percentage_of_deal_size_status || "—"}{" "}
-                  {formData.ioi_as_percentage_of_deal_size_status ? "% of deal size" : ""}
-                </Typography>
+                <EditIcon sx={{ color: "#002060" }} />
+              )}
+            </IconButton>
+          </Box>
+
+          <Grid container spacing={2} mt={2}>
+            <Grid item xs={12} sm={6}>
+              {renderField(
+                "IOI as % of Deal Size",
+                "ioi_as_percentage_of_deal_size_status",
+                "% of deal size"
               )}
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+              <Typography
+                variant="body2"
+                color="#002060"
+                fontWeight={500}
+                gutterBottom
+              >
                 Potential AM Quantity
               </Typography>
               <RadioGroup
                 row
                 name="potential_am_quantity"
-                value={formData.potential_am_quantity || "0"}
+                value={formData.potential_am_quantity?.toString() || "0"}
                 onChange={handleChange}
               >
                 {[
@@ -256,7 +248,9 @@ const token = localStorage.getItem("access_token");
                         disabled={!editable}
                         sx={{
                           color: "#B1062E",
-                          "&.Mui-checked": { color: "#B1062E" },
+                          "&.Mui-checked": {
+                            color: "#B1062E",
+                          },
                         }}
                       />
                     }
@@ -268,7 +262,7 @@ const token = localStorage.getItem("access_token");
           </Grid>
         </CardContent>
       </Card>
-    </Grid>
+    </motion.div>
   );
 };
 
