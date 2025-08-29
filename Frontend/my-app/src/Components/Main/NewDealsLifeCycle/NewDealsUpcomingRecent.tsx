@@ -87,8 +87,10 @@ const token = localStorage.getItem("access_token");
             <AIMLModelPredictionInfo data={selectedDeal} />
           </Grid>
 
-        </Grid><DealIoiValuesTable data={selectedDeal} 
-        /></>
+        </Grid>
+        <DealIoiValuesTable data={selectedDeal} />
+        
+        </>
       )}
     </Container>
   );
