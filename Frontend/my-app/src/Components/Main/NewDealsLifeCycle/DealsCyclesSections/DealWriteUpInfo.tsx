@@ -16,6 +16,7 @@ import { useDealWriteUpInfo } from "./DealWriteUpMain/useDealWriteUpInfo";
 import FieldRenderer from "./DealWriteUpMain/FieldRenderer";
 
 export interface DealWriteUpData {
+    id?: number | string;
   ticker: string;
   pricing_date?: string;
   deal_type?: string;

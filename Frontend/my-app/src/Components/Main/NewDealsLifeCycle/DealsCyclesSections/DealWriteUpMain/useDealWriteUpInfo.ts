@@ -154,6 +154,8 @@ export const useDealWriteUpInfo = ({
     async (oldData: DealWriteUpData, newData: DealWriteUpData) => {
       try {
         const payload = {
+
+          id: newData.id, 
           ticker: newData.ticker,
           deal_type: newData.deal_type,
           pricing_date: newData.pricing_date,
