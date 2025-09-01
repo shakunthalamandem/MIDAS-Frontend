@@ -83,7 +83,7 @@ const FOWriteUpMain: React.FC = () => {
       >
         Welcome to detailed Insights on Follow-On (FO) Write-Ups!
       </Typography>
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
+    <Container maxWidth="xl" sx={{ mt: 2 }}>
       <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
         <CardContent>
          <FOWriteUpDashboardMain />

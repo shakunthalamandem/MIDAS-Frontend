@@ -86,16 +86,6 @@ const FOWriteUpDashboardMain: React.FC = () => {
 
   return (
     <Container maxWidth="lg">
-      <Box
-        sx={{
-          backgroundColor: "#f9f9f9",
-          borderRadius: 3,
-          boxShadow: 2,
-          p: 3,
-          mt: 2,
-          mb: 4,
-        }}
-      >
         <Typography
           variant="h6"
           fontWeight="bold"
@@ -233,23 +223,8 @@ const FOWriteUpDashboardMain: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Box>
-      {/* <Typography
-        variant="body2"
-        textAlign="center"
-        color="textSecondary"
-        sx={{
-          fontStyle: "italic",
-          mt: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <InfoOutlinedIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
-        Note: FO deals above $50M offer size.
-      </Typography> */}
-    </Container>
+      </Container>
+
   );
 };
 
