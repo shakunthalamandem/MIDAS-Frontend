@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Card, CardContent, Typography, CircularProgress, Box } from '@mui/material';
 import FOSectionsMain from './FOWriteUpHooks/FOSectionsMain';
+import FOWriteUpDashboardMain from './FOWriteUpDashboardMain';
 
 interface ApiResponse {
   ticker: string;
@@ -85,9 +86,7 @@ const FOWriteUpMain: React.FC = () => {
     <Container maxWidth="xl" sx={{ mt: 4 }}>
       <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
         <CardContent>
-          <Typography variant="h5" gutterBottom fontWeight="bold" align='center' color="#002060">
-            FO Write-Up Dashboard
-          </Typography>
+         <FOWriteUpDashboardMain />
 
           {/* Loading State */}
           {loading && (
