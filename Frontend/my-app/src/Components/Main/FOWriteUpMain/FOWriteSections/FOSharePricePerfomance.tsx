@@ -62,7 +62,8 @@ const FOSharePricePerformance: React.FC<Props> = ({ selectedData }) => {
               <CardContent>
                 <Typography
                   variant="h5"
-                  sx={{ fontWeight: 700, color: "#124180", mb: 3 }}
+                  sx={{ fontWeight: 700, color: "#127080ff", mb: 3 }}
+                  align="center"
                 >
                   Share Price Performance
                 </Typography>
