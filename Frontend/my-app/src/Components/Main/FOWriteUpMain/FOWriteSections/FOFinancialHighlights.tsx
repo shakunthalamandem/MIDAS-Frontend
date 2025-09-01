@@ -8,7 +8,7 @@ interface ChildProps {
 const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
   return (
     <div>
-      <h2>Business Highlights</h2>
+      <h2>Financial  Highlights</h2>
       <p>Ticker: {ticker}</p>
       <p>Deal ID: {deal_id}</p>
     </div>
