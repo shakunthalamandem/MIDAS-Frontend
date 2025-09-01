@@ -10,7 +10,7 @@ import {
   Box,
   Pagination,
 } from "@mui/material";
-
+import ReactMarkdown from "react-markdown";
 interface NewsArticle {
   id: number;
   title: string;
@@ -149,7 +149,7 @@ const StockTickerNews = () => {
                 </Box>
 
                 <Typography variant="h6" color="primary" gutterBottom>
-                  {news.title}
+                  <ReactMarkdown>{news.title}</ReactMarkdown>
                 </Typography>
 
                 {news.ai_summary && (
@@ -165,7 +165,7 @@ const StockTickerNews = () => {
                       🤖 AI Summary:
                     </Typography>
                     <Typography variant="body2" color="textSecondary" mt={1}>
-                      {news.ai_summary}
+                      <ReactMarkdown>{news.ai_summary}</ReactMarkdown>
                     </Typography>
                   </Box>
                 )}
