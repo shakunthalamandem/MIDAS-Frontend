@@ -37,12 +37,14 @@ const REGION_COLORS: Record<string, string> = {
   "Non-US America": "#000000",
 };
 
+// ✅ Modified: preserve sign for negative values
 const formatShortCurrency = (value: number): string => {
+  const sign = value < 0 ? "-" : "";
   const abs = Math.abs(value);
-  if (abs >= 1_000_000_000) return `${(abs / 1_000_000_000).toFixed(0)}B`;
-  if (abs >= 1_000_000) return `${(abs / 1_000_000).toFixed(0)}M`;
-  if (abs >= 1_000) return `${(abs / 1_000).toFixed(0)}K`;
-  return abs.toFixed(0);
+  if (abs >= 1_000_000_000) return `${sign}${(abs / 1_000_000_000).toFixed(0)}B`;
+  if (abs >= 1_000_000) return `${sign}${(abs / 1_000_000).toFixed(0)}M`;
+  if (abs >= 1_000) return `${sign}${(abs / 1_000).toFixed(0)}K`;
+  return `${sign}${abs.toFixed(0)}`;
 };
 
 const formatCurrency = (value: number): string => {

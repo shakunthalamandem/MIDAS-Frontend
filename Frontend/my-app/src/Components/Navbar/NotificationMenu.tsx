@@ -199,35 +199,32 @@ const NotificationMenu: React.FC = () => {
         maxWidth="sm"
       >
         <DialogTitle>All Notifications</DialogTitle>
-        <DialogContent dividers sx={{ maxHeight: "400px" }}>
-          {notifications.length === 0 ? (
-            <p>No notifications available.</p>
-          ) : (
-            notifications.map((notif, idx) => (
-              <div key={idx} style={{ marginBottom: "12px" }}>
-                <strong>{notif.message || "New notification"}</strong>
-                {/* {notif.priority && (
-                  <div
-                    style={{
-                      fontSize: "0.8rem",
-                      color: notif.priority === "high" ? "red" : "gray",
-                    }}
-                  >
-                    {notif.priority.toUpperCase()}
-                  </div>
-                )} */}
-                {notif.created_at && (
-                  <div style={{ fontSize: "0.75rem", color: "gray" }}>
-                    {formatDistanceToNow(new Date(notif.created_at), {
-                      addSuffix: true,
-                    })}
-                  </div>
-                )}
-                <Divider sx={{ my: 1 }} />
-              </div>
-            ))
-          )}
-        </DialogContent>
+<DialogContent dividers sx={{ maxHeight: "400px" }}>
+  {notifications.length === 0 ? (
+    <p>No notifications available.</p>
+  ) : (
+    notifications.map((notif, idx) => (
+      <div key={idx} style={{ marginBottom: "12px" }}>
+        <span
+          dangerouslySetInnerHTML={{
+            __html: notif.message || "New notification",
+          }}
+          style={{ fontWeight: 600, color: "#002060" }} // 🔵 Blue text like dropdown
+        />
+
+        {notif.created_at && (
+          <div style={{ fontSize: "0.75rem", color: "gray" }}>
+            {formatDistanceToNow(new Date(notif.created_at), {
+              addSuffix: true,
+            })}
+          </div>
+        )}
+        <Divider sx={{ my: 1 }} />
+      </div>
+    ))
+  )}
+</DialogContent>
+
         <DialogActions>
           <Button onClick={() => setViewAllOpen(false)}>Close</Button>
         </DialogActions>
