@@ -174,26 +174,37 @@ const DealFormDataTabsMain: React.FC<Props> = ({
         sx={{ mb: 3 }}
       >
         {/* Title */}
-        <Typography
-          variant="h6"
-          color="#002060"
-          sx={{
-            fontWeight: 600,
-            textAlign: "center",
-            flex: 1,
-          }}
-        >
-          {isCreate
-            ? "New Deal Setup — Complete the required details below."
-            : `Deal Overview & Key Analytics - ${formData.deal_information?.issuer_name} (${selectedTicker || "N/A"}) on ${
-                formData.deal_information?.pricing_date
-                  ? format(
-                      new Date(formData.deal_information.pricing_date),
-                      "dd MMM yyyy"
-                    )
-                  : "N/A"
-              }`}
-        </Typography>
+<Typography
+  variant="h6"
+  color="#002060"
+  sx={{
+    fontWeight: 600,
+    textAlign: "center",
+    flex: 1,
+  }}
+>
+  {isCreate
+    ? "New Deal Setup — Complete the required details below."
+    : `Deal Overview & Key Analytics - ${
+        formData.deal_information?.issuer_name
+      } (${selectedTicker || "N/A"}) on ${
+        formData.deal_information?.pricing_date
+          ? (() => {
+              const rawDate = formData.deal_information.pricing_date;
+              const dateStr = typeof rawDate === "string" ? rawDate.trim().toLowerCase() : "";
+              if (!rawDate || dateStr === "to be announced") {
+                return "To be Announced";
+              }
+              try {
+                return format(new Date(rawDate), "dd MMM yyyy");
+              } catch {
+                return "To be Announced";
+              }
+            })()
+          : "To be Announced"
+      }`}
+</Typography>
+
 
         {/* Action Buttons */}
         <Stack
