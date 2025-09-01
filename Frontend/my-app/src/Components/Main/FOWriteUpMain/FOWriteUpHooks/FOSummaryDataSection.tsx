@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import FODealInformation from "../FOWriteSections/FODealInformation";
 import FOTradingDetails from "../FOWriteSections/FOTradingDetails";
-import FOSharePricePerfomance from "../FOWriteSections/FOSharePricePerfomance";
 import FOValuationWriteup from "../FOWriteSections/FOValuationWriteup";
 import FOStrengthWriteUp from "../FOWriteSections/FOStrengthWriteUp";
 import FOFutureOutlook from "../FOWriteSections/FOFutureOutlook";
-import FOBusinessHighlights from "../FOWriteSections/FOBusinessHighlights";
-import FOManagementWriteUp from "../FOWriteSections/FOManagementWriteUp";
+
 import { CircularProgress, Box, Typography } from "@mui/material";
+import FOSharePricePerformance from "../FOWriteSections/FOSharePricePerformance";
 
 interface ChildProps {
   ticker: string;
@@ -89,7 +88,7 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
       {/* Passing API response sections to each component */}
       <FODealInformation selectedData={selectedData.deal_information || {}} />
       <FOTradingDetails selectedData={selectedData.trading_details || {}} />
-      <FOSharePricePerfomance selectedData={selectedData.share_price_performance || {}} />
+      <FOSharePricePerformance selectedData={selectedData.share_price_performance || {}} />
       <FOValuationWriteup selectedData={selectedData.valuation_writeup || {}} />
       <FOStrengthWriteUp selectedData={selectedData.strength_writeup || {}} />
       <FOFutureOutlook selectedData={selectedData.future_outlook || {}} />

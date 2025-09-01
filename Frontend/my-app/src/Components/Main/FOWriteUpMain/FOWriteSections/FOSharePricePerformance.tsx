@@ -10,7 +10,7 @@ import {
 import { motion } from "framer-motion";
 
 interface SharePricePerformance {
-  ipo_to_date_return?: number;
+  three_year_total_return?: number;
   one_year_total_return?: number;
   ytd_return?: number;
   six_month_return?: number;
@@ -24,7 +24,7 @@ interface Props {
 
 // Config array for fields
 const perfFields: { label: string; key: keyof SharePricePerformance }[] = [
-  { label: "IPO to Date Return (%)", key: "ipo_to_date_return" },
+  { label: "3-Year Total Return (%)", key: "three_year_total_return" },
   { label: "1-Year Total Return (%)", key: "one_year_total_return" },
   { label: "YTD Return (%)", key: "ytd_return" },
   { label: "6-Month Return (%)", key: "six_month_return" },
