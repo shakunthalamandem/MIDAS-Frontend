@@ -1,17 +1,85 @@
-import React from 'react';
+import React from "react";
+import {
+  Box,
+  Typography,
+  Container,
+  Card,
+  CardContent,
+  Grid,
+} from "@mui/material";
+import { motion } from "framer-motion";
 
-interface ChildProps {
-  ticker: string;
-  deal_id: string;
+interface StrengthWriteupProps {
+  selectedData: {
+    strengths?: string;
+    weakness?: string;
+  };
 }
 
-const FOStrengthWriteUp: React.FC<ChildProps> = ({ ticker, deal_id }) => {
+const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData }) => {
+  if (!selectedData || (!selectedData.strengths && !selectedData.weakness)) {
+    return null;
+  }
+
   return (
-    <div>
-      <h2>Business Highlights</h2>
-      <p>Ticker: {ticker}</p>
-      <p>Deal ID: {deal_id}</p>
-    </div>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <Card
+          sx={{
+            borderRadius: 4,
+            background: "linear-gradient(#f0f5ff)",
+            boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
+            p: 2,
+          }}
+        >
+          <CardContent>
+        
+
+            <Grid container spacing={4}>
+              {/* Strengths */}
+              <Grid item xs={12} md={6}>
+                <Box>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 600, mb: 1, color: "#2E7D32" }}
+                  >
+                    Strengths
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
+                  >
+                    {selectedData.strengths || "N/A"}
+                  </Typography>
+                </Box>
+              </Grid>
+
+              {/* Weaknesses */}
+              <Grid item xs={12} md={6}>
+                <Box>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 600, mb: 1, color: "#C62828" }}
+                  >
+                    Weaknesses
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
+                  >
+                    {selectedData.weakness || "N/A"}
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </Container>
   );
 };
 

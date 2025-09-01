@@ -88,13 +88,13 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
     <>
       {/* Passing API response sections to each component */}
       <FODealInformation selectedData={selectedData.deal_information || {}} />
-      {/* <FOTradingDetails selectedData={selectedData.trading_details || {}} />
+      <FOTradingDetails selectedData={selectedData.trading_details || {}} />
       <FOSharePricePerfomance selectedData={selectedData.share_price_performance || {}} />
       <FOValuationWriteup selectedData={selectedData.valuation_writeup || {}} />
       <FOStrengthWriteUp selectedData={selectedData.strength_writeup || {}} />
       <FOFutureOutlook selectedData={selectedData.future_outlook || {}} />
-      <FOBusinessHighlights selectedData={selectedData.business_highlights || {}} />
-      <FOManagementWriteUp selectedData={selectedData.management_writeup || {}} /> */}
+      {/* <FOBusinessHighlights selectedData={selectedData.business_highlights || {}} /> */}
+      {/* <FOManagementWriteUp selectedData={selectedData.management_writeup || {}} /> */}
     </>
   );
 };
