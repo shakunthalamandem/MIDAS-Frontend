@@ -37,19 +37,21 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
             Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify({
-            type: "ticker_list", 
+            type: "ticker_list",
           }),
         });
 
         const data = await response.json();
-
 
         if (data.tickers) {
           const formattedRows = data.tickers.map(
             (item: TickerData, index: number) => ({
               id: index + 1,
               ticker: item.ticker,
-              pricing_date: item.pricing_date,
+              pricing_date:
+                item.pricing_date && item.pricing_date.trim() !== ""
+                  ? item.pricing_date
+                  : "To be Announced", // 👈 Added this
               deal_type: item.deal_type,
               deal_captain: item.deal_captain,
               allocation_as_percentage_of_deal_size:
@@ -87,9 +89,27 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
         </span>
       ),
     },
-    { field: "pricing_date", headerName: "Pricing Date", width: 180, align: "center", headerAlign: "center"  },
-    { field: "deal_type", headerName: "Deal Type", width: 150, align: "center", headerAlign: "center"  },
-    { field: "deal_captain", headerName: "Deal Captain", width: 180, align: "center" , headerAlign: "center" },
+    {
+      field: "pricing_date",
+      headerName: "Pricing Date",
+      width: 180,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "deal_type",
+      headerName: "Deal Type",
+      width: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "deal_captain",
+      headerName: "Deal Captain",
+      width: 180,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "allocation_as_percentage_of_deal_size",
       headerName: "Allocation Deal Size %",
@@ -133,27 +153,25 @@ const DealFormAllTickersTable: React.FC<DealFormAllTickersTableProps> = ({
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 2,mb: 4 }}>
-       <Box sx={{ height: 400, width: "100%" }}>
-   
-  <DataGrid
-  rows={rows}
-  columns={columns}
-  loading={loading}
-  autoHeight={false}
-  rowHeight={35}
-  onRowClick={(params) => {
-    if (onRowClick) onRowClick(params.row as TickerData);
-  }}
-  sx={{
-    "& .MuiDataGrid-container--top [role='row']": {
-      backgroundColor: "#002060",
-      color: "#FFFFFF", 
-    },
-  }}
-/>
-
-    </Box>
+    <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
+      <Box sx={{ height: 400, width: "100%" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          loading={loading}
+          autoHeight={false}
+          rowHeight={35}
+          onRowClick={(params) => {
+            if (onRowClick) onRowClick(params.row as TickerData);
+          }}
+          sx={{
+            "& .MuiDataGrid-container--top [role='row']": {
+              backgroundColor: "#002060",
+              color: "#FFFFFF",
+            },
+          }}
+        />
+      </Box>
     </Container>
   );
 };
