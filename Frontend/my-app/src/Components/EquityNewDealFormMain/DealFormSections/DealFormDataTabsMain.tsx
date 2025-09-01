@@ -74,6 +74,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
   }, [isCreate, formData]);
 
   const handleSave = async () => {
+    setLoading(true); // Start loading
     try {
       console.log("Saving data:", localData);
 
@@ -118,6 +119,8 @@ const DealFormDataTabsMain: React.FC<Props> = ({
         message: "Failed to save deal. Please try again.",
         severity: "error",
       });
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -156,11 +159,11 @@ const DealFormDataTabsMain: React.FC<Props> = ({
   const gradientBackground = {
     background:
       "linear-gradient(135deg, #A3B5E7 0%, #B9D7F4 25%, #CFF2FA 50%, #E3FAFF 75%, #F5FCFF 100%)",
-
     padding: 2,
     borderRadius: 4,
     boxShadow: 3,
   };
+
   return (
     <Box display="flex" flexDirection="column" gap={3}>
       <Stack
@@ -237,6 +240,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
                 variant="outlined"
                 onClick={handleCancel}
                 startIcon={<CancelIcon />}
+                disabled={loading}
                 sx={{
                   borderColor: "#0061a8",
                   color: "#0061a8",
@@ -258,6 +262,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
                 color="warning"
                 onClick={handleReset}
                 startIcon={<RestartAltIcon />}
+                disabled={loading}
                 sx={{
                   fontWeight: 500,
                   px: 3,
@@ -276,6 +281,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
               variant="contained"
               startIcon={<EditIcon />}
               onClick={handleEdit}
+              disabled={loading}
               sx={{
                 px: 3,
                 fontWeight: 500,
@@ -292,17 +298,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
           )}
         </Stack>
       </Stack>
-      {/* <Typography
-        variant="caption"
-        color="#002060"
-        sx={{
-          fontSize: "0.95rem", // adjust as needed (e.g., "1rem" or "14px")
-          fontStyle: "italic",
-        }}
-      >
-        Note: Some of the data fields are empty due to delayed data from
-        Dealogic.
-      </Typography> */}
+
       <Grid container spacing={2} alignItems="stretch">
         <Grid item xs={12} md={6} mb={4}>
           <Box sx={{ ...gradientBackground, height: "100%" }}>
