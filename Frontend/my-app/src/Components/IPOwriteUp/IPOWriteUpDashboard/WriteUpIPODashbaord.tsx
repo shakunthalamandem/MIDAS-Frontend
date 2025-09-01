@@ -115,7 +115,7 @@ const formatDate = (dateStr: string | null): string => {
                 {[
                   "Symbol",
                   "Company",
-                  "Expected Listing Date",
+                  "Pricing Date",
                   "Offer Price",
                   "Exchange",
                   "Deal Size",
