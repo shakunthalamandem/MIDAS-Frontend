@@ -265,6 +265,9 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
   const handleRepredictWithPrice = async (t1dOpenPrice: number) => {
     const updatedPayload = {
       ...formData,
+      GDP: "Stable",       // enforce
+      Inflation: "Stable", // enforce
+      Treasury: "Stable",  // enforce
       t1d_open_category: t1dOpenPrice,
       expectations: ["T1D"]
     };
@@ -305,6 +308,9 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
 
     const weeklyMonthlyPayload = {
       ...formData,
+    GDP: "Stable",       // enforce
+    Inflation: "Stable", // enforce
+    Treasury: "Stable",  // enforce
       t1d_return_from_bloomberg_category: t1dCloseReturn,
       expectations: ["T1W", "T1M"]
     };
