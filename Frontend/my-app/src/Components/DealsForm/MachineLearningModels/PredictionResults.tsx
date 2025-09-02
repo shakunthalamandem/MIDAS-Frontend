@@ -25,10 +25,11 @@ import MethodologyAccordion1Day from "./MethodologyAccordion1Day";
 
 interface PredictionModel {
   prediction: string | null;
-  Accuracy: number;
-  Confidence: number;
+  accuracy: number;
+  confidence: number;
   model: string;
   range: string;
+  explanation?: string;
 }
 
 interface PredictionResultsProps {
@@ -59,14 +60,16 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
       }
     }
   };
+
+  // versions are like ["t1d", "t1d_open"]
   const modelVersions = Array.from(
-    new Set(Object.keys(result).map((key) => key.split("_")[0]))
+    new Set(Object.keys(result).map((key) => key.split("_")[0] + (key.includes("open") ? "_open" : "")))
   );
 
   const modelTypes = ["main", "positive", "negative"];
 
   const getModelKey = (version: string, type: string): string => {
-    const regex = new RegExp(`^${version}.*${type}`);
+    const regex = new RegExp(`^${version}.*${type}_model$`);
     return Object.keys(result).find((key) => regex.test(key)) || "";
   };
 
@@ -244,19 +247,6 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
     negative: "High Negative Return Risk",
   };
 
-  const rowExplanations: Record<string, string> = {
-    main: `Classifies the expected return into categories:
-📉 Negative: Return < -1%
-⚖️ Neutral: -1% to 1%
-📈 Positive: Return > 1%`,
-
-    positive: `Predicts the likelihood of a strong positive return.
-📈 Threshold: Return > 3%`,
-
-    negative: `Estimates the risk of a significant negative return.
-📉 Threshold: Return < -2%`,
-  };
-
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
       <Paper
@@ -339,8 +329,7 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
                 <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
                 {modelVersions.map((version, idx) => {
-                  const isV2 = version.toLowerCase().startsWith("v2");
-                  const label = isV2
+                  const label = version.includes("open")
                     ? "T+1D Close from T+1D Open"
                     : "T+1D Close from Issue Price";
                   const cellBgColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
@@ -373,7 +362,10 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
                   <TableCell>{rowLabels[type]}</TableCell>
                   <TableCell>
                     <Typography variant="body2" whiteSpace="pre-line">
-                      {rowExplanations[type]}
+                      {
+                        result[getModelKey(modelVersions[0], type)]
+                          ?.explanation || ""
+                      }
                     </Typography>
                   </TableCell>
 
@@ -407,8 +399,8 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
                         </TableCell>
                         <TableCell sx={{ bgcolor: cellColor }}>
                           <Box display="flex" flexDirection="column" gap={1}>
-                            {/* {renderAccuracyLevel(modelData.Accuracy)} */}
-                            {renderConfidenceLevel(modelData.Confidence)}
+                            {/* {renderAccuracyLevel(modelData.accuracy)} */}
+                            {renderConfidenceLevel(modelData.confidence)}
                           </Box>
                         </TableCell>
                       </React.Fragment>
