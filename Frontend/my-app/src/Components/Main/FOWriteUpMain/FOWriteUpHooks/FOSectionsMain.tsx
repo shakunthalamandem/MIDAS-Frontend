@@ -108,7 +108,6 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
   if (newValue) {
     setSelected({ ticker: newValue.ticker, deal_id: newValue.deal_id });
   }
-  // Do nothing when cleared
 };
 
 
