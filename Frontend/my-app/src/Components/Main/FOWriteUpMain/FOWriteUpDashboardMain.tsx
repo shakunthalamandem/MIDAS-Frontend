@@ -49,7 +49,7 @@ const FOWriteUpDashboardMain: React.FC = () => {
 
   const formatDate = (dateStr: string | null): string =>
     !dateStr || isNaN(new Date(dateStr).getTime())
-      ? "Not Available"
+      ? "To Be Announced"
       : new Date(dateStr).toLocaleDateString("en-GB", {
           day: "numeric",
           month: "short",
