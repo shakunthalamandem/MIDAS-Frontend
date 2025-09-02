@@ -1,21 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  Container,
-  Typography,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Box,
-} from "@mui/material";
+import { Container, Typography, Box } from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import FOSectionsMain from "./FOWriteUpHooks/FOSectionsMain";
 
 interface FOData {
   ticker: string;
-  issuer_name: string; // corrected key to match API
+  issuer_name: string;
   pricing_date: string | null;
   deal_id: string;
   exchange: string | null;
@@ -24,14 +14,14 @@ interface FOData {
 }
 
 const FOWriteUpDashboardMain: React.FC = () => {
-  const [FOData, setFOData] = useState<FOData[]>([]);
+  const [rows, setRows] = useState<FOData[]>([]);
   const [selected, setSelected] = useState<{ ticker: string; deal_id: string } | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchData = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/fo_writeup_tickers/`, {
           headers: {
@@ -43,40 +33,56 @@ const FOWriteUpDashboardMain: React.FC = () => {
         if (!response.ok) throw new Error("Failed to fetch FO data");
 
         const json = await response.json();
-        setFOData(json);
+        setRows(json);
       } catch (err) {
         console.error("Error fetching FO data:", err);
       }
     };
 
-    fetchDashboardData();
+    fetchData();
   }, [apiUrl, token]);
 
-  const getOrdinalSuffix = (day: number): string => {
-    if (day > 3 && day < 21) return "th";
-    switch (day % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
-    }
-  };
+  const formatDate = (dateStr: string | null): string =>
+    !dateStr || isNaN(new Date(dateStr).getTime())
+      ? "To Be Announced"
+      : new Date(dateStr).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
 
-  const formatDate = (dateStr: string | null): string => {
-    if (!dateStr) return "To Be Announced";
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return "To Be Announced";
-
-    const day = date.getDate();
-    const suffix = getOrdinalSuffix(day);
-    const month = date.toLocaleString("default", { month: "short" });
-    const year = date.getFullYear();
-    return `${day}${suffix} ${month} ${year}`;
-  };
+  const columns: GridColDef[] = [
+    {
+      field: "ticker",
+      headerName: "Symbol",
+      flex: 1,
+      renderCell: (params) => (
+        <span style={{ color: "red", textDecoration: "underline", fontWeight: 600 }}>
+          {params.value}
+        </span>
+      ),
+    },
+    { field: "issuer_name", headerName: "Company", flex: 1 },
+    {
+      field: "expected_listing_date",
+      headerName: "Expected Listing Date",
+      flex: 1.2,
+      valueFormatter: (params) => formatDate(params),
+    },
+    {
+      field: "pricing_date",
+      headerName: "Pricing Date",
+      flex: 1,
+      valueFormatter: (params) => formatDate(params),
+    },
+    { field: "exchange", headerName: "Exchange", flex: 1 },
+    {
+      field: "deal_size",
+      headerName: "Deal Size",
+      flex: 1,
+      valueFormatter: (params) => (params !== null ? params : "—"),
+    },
+  ];
 
   return (
     <Container maxWidth="lg">
@@ -90,68 +96,30 @@ const FOWriteUpDashboardMain: React.FC = () => {
         📅 All Upcoming Follow-On Offers
       </Typography>
 
-      <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
-        <Table sx={{ borderCollapse: "collapse" }}>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "#002060" }}>
-              {[
-                "Symbol",
-                "Company",
-                "Expected Listing Date",
-                "Pricing Date",
-                "Exchange",
-                "Deal Size",
-              ].map((heading) => (
-                <TableCell
-                  key={heading}
-                  align="center"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    fontSize: "0.85rem",
-                    padding: "8px 10px",
-                    border: "1px solid #ddd",
-                  }}
-                >
-                  {heading}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {FOData.map((row, index) => (
-              <TableRow
-                key={index}
-                hover
-                sx={{
-                  "&:hover": { backgroundColor: "#f9f9f9", cursor: "pointer" },
-                  borderBottom: "1px solid #ddd",
-                }}
-                onClick={() => setSelected({ ticker: row.ticker, deal_id: row.deal_id })}
-              >
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontSize: "0.85rem",
-                    fontWeight: 700,
-                    color: "red",
-                    textDecoration: "underline",
-                  }}
-                >
-                  {row.ticker}
-                </TableCell>
-                <TableCell align="center">{row.issuer_name || "—"}</TableCell>
-                <TableCell align="center">{formatDate(row.expected_listing_date)}</TableCell>
-                <TableCell align="center">{formatDate(row.pricing_date)}</TableCell>
-                <TableCell align="center">{row.exchange || "—"}</TableCell>
-                <TableCell align="center">
-                  {row.deal_size !== null ? row.deal_size : "—"}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Box sx={{ maxHeight: 500, bgcolor: "white", borderRadius: 2, boxShadow: 3 }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          getRowId={(row) => row.deal_id}
+          pageSizeOptions={[5, 10, 20]}
+          rowHeight={40}
+          disableRowSelectionOnClick
+          onRowClick={(params) =>
+            setSelected({ ticker: params.row.ticker, deal_id: params.row.deal_id })
+          }
+    sx={{
+      "& .MuiDataGrid-container--top [role='row']": {
+        backgroundColor: "#002060",
+        color: "#FFFFFF",
+      },
+      "& .Mui-selected": {
+        backgroundColor: "#cad0f1ff !important",
+      },
+      cursor: "pointer",
+      border: "1px solid #ccccccff",
+    }}
+        />
+      </Box>
 
       {selected && (
         <Box mt={4}>
