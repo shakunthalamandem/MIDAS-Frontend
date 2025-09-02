@@ -13,6 +13,7 @@ import {
   Alert,
   Container,
   Grid,
+  styled,
 } from "@mui/material";
 
 interface ChildProps {
@@ -38,6 +39,12 @@ interface FinancialHighlights {
 interface ApiResponse {
   financial_highlights: FinancialHighlights;
 }
+
+// Styled TableCell for white text in TableHead
+const StyledTableCell = styled(TableCell)({
+  color: "#FFFFFF",
+  fontWeight: "bold",
+});
 
 const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
   const [selectedData, setSelectedData] = useState<ApiResponse | null>(null);
@@ -122,32 +129,20 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
     return (
       <TableContainer component={Paper} sx={{ mt: 3 }}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "#002060" }}>
             <TableRow>
-              <TableCell>
-                <strong>Metric</strong>
-              </TableCell>
-              <TableCell align="right">
-                <strong>Current Year</strong>
-              </TableCell>
-              <TableCell align="right">
-                <strong>Previous Year</strong>
-              </TableCell>
-              <TableCell align="right">
-                <strong>YoY Change (%)</strong>
-              </TableCell>
+              <StyledTableCell>Metric</StyledTableCell>
+              <StyledTableCell align="right">Current Year</StyledTableCell>
+              <StyledTableCell align="right">Previous Year</StyledTableCell>
+              <StyledTableCell align="right">YoY Change (%)</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => (
               <TableRow key={row.label}>
                 <TableCell>{row.label}</TableCell>
-                <TableCell align="right">
-                  {formatValue(row.current)}
-                </TableCell>
-                <TableCell align="right">
-                  {formatValue(row.previous)}
-                </TableCell>
+                <TableCell align="right">{formatValue(row.current)}</TableCell>
+                <TableCell align="right">{formatValue(row.previous)}</TableCell>
                 <TableCell align="right">
                   {row.yoy !== null ? `${row.yoy.toFixed(2)}%` : "N/A"}
                 </TableCell>
@@ -159,12 +154,18 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
     );
   };
 
-  // ✅ Proper return is now placed inside the component
   return (
-    <Container maxWidth="xl" >
+    <Container maxWidth="lg">
       <Grid container spacing={4} mb={4}>
         <Grid item xs={12}>
-          <Typography variant="h5" align="center" sx={{ fontWeight: 'bold', textAlign: 'center', color: '#002060' }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: "bold",
+              textAlign: "center",
+              color: "#002060",
+            }}
+          >
             Financial Highlights
           </Typography>
 

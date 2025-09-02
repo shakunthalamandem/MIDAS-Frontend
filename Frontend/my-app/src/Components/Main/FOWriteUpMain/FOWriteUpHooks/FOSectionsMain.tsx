@@ -192,8 +192,8 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
 
       {/* 🔹 Sections */}
       <FOSummaryDataSection ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
-      <FOComparisionTableMain ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
       <FOFinancialHighlights ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
+      <FOComparisionTableMain ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
     </>
   );
 };
