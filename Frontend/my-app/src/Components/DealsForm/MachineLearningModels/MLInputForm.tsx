@@ -3,6 +3,7 @@ import { Typography, MenuProps } from "@mui/material";
 import EquityMLFormData from "./EquityMLFormData";
 import PredictionResults from "./PredictionResults";
 import WeeklyMonthlyPredictionResults from "./WeeklyMonthlyPredictionResults";
+import IpoPredictionResults from "./IpoPredictionResults";
 
 interface PredictionModel {
   prediction: string | null;
@@ -384,18 +385,26 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
         inputWidth={inputWidth}
         menuProps={menuProps}
       />
-      {prediction && (
-        <PredictionResults
+      {prediction && formData.deal_type === "FO" && (
+        <>
+          <PredictionResults
+            result={prediction}
+            onRepredict={handleRepredictWithPrice}
+          />
+          <WeeklyMonthlyPredictionResults
+            result={newWeeklyMonthlyPredictionData}
+            onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredictionRequest}
+          />
+        </>
+      )}
+
+      {prediction && formData.deal_type === "IPO" && (
+        <IpoPredictionResults
           result={prediction}
           onRepredict={handleRepredictWithPrice}
         />
       )}
-      {prediction && (
-        <WeeklyMonthlyPredictionResults
-          result={newWeeklyMonthlyPredictionData}
-          onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredictionRequest}
-        />
-      )}
+
     </>
   );
 };
