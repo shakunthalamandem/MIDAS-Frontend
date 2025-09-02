@@ -42,6 +42,12 @@ const MethodologyAccordion1Day: React.FC = () => {
     "Sector & Market Returns (3-month, 1-month, 1-week)",
     "NYSE Volume (vs. 1-month average)",
   ];
+  const newIssueFlowIndicators = [
+    "Recent Deal Flow Activity (1M vs 2M)",
+    "Total Monthly Opportunity Value",
+    "Monthly Positive Deal Count & Returns",
+    "Monthly Excess Return (All Deals)",
+  ];
 
   // A helper to split array roughly in half for two columns
   const splitArrayInTwo = (arr: string[]) => {
@@ -260,6 +266,44 @@ const MethodologyAccordion1Day: React.FC = () => {
               ))}
             </Grid>
           </Box>
+          {/* New Issue Flow-Based Indicators in two columns */}
+          <Box mt={3}>
+            <Typography
+              variant="subtitle1"
+              fontWeight="600"
+              gutterBottom
+              color={theme.palette.text.primary}
+            >
+              New Issue Flow-Based Indicators:
+            </Typography>
+            <Grid container spacing={1}>
+              {splitArrayInTwo(newIssueFlowIndicators).map((column, idx) => (
+                <Grid item xs={12} sm={6} key={idx}>
+                  <List dense sx={{ pl: 1 }}>
+                    {column.map((item, i) => (
+                      <ListItem key={i} sx={{ py: 0.5 }}>
+                        <ListItemIcon>
+                          <CheckCircleOutlineIcon
+                            color="secondary" // matches Economic & Macro Indicators
+                            fontSize="small"
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={item}
+                          primaryTypographyProps={{
+                            variant: "body2",
+                            fontWeight: 500,
+                            color: theme.palette.text.primary,
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+
         </AccordionDetails>
       </Accordion>
     </>
