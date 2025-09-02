@@ -249,7 +249,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
       }
 
       const data = await response.json();
-      setPrediction(data);
+      setPrediction(data.predictions);
     } catch (error) {
       console.error("Prediction error:", error);
       setSnackbar({
@@ -288,7 +288,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
       }
 
       const data = await response.json();
-      setPrediction(data);
+      setPrediction(data.predictions);
     } catch (error) {
       console.error("Reprediction error:", error);
       setSnackbar({
@@ -330,11 +330,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
       }
 
       const fullResponse = await response.json();
+      const fullResponseData = fullResponse.predictions;
 
       // Extract only prediction and Accuracy from each key
       const simplifiedResponse: Record<string, PredictionModel> = {};
-      for (const key in fullResponse) {
-        const { prediction, Accuracy, Confidence, range } = fullResponse[key];
+      for (const key in fullResponseData) {
+        const { prediction, Accuracy, Confidence, range } = fullResponseData[key];
         simplifiedResponse[key] = { prediction, Accuracy, Confidence, range };
       }
 
