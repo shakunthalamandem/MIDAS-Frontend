@@ -232,9 +232,10 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     GDP: "Stable",       // enforce
     Inflation: "Stable", // enforce
     Treasury: "Stable",  // enforce
+    expectations: ["T1D"]
   };
     try {
-      const response = await fetch(`${apiUrl}/api/ml_prediction_v2/`, {
+      const response = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -265,11 +266,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     const updatedPayload = {
       ...formData,
       t1d_open_category: t1dOpenPrice,
+      expectations: ["T1D"]
     };
 
     setLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/api/ml_prediction_v2/`, {
+      const response = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -304,10 +306,11 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     const weeklyMonthlyPayload = {
       ...formData,
       t1d_return_from_bloomberg_category: t1dCloseReturn,
+      expectations: ["T1W", "T1M"]
     };
 
     try {
-      const response = await fetch(`${apiUrl}/api/ml_weekly_monthly/`, {
+      const response = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
