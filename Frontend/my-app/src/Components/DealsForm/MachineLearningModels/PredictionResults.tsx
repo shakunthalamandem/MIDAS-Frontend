@@ -70,11 +70,17 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
 
   const modelTypes = ["main", "positive", "negative"];
 
-  const getModelKey = (version: string, type: string) => {
-    const regex = new RegExp(`^${version}.*${type}_model$`);
-    return Object.keys(result).find((key) => regex.test(key)) || "";
-  };
+const getModelKey = (version: string, type: string) => {
+  // pick t1d_open if exists, otherwise fallback to any version
+  const regex = new RegExp(`^${version}.*${type}_model$`);
+  const keys = Object.keys(result).filter((key) => regex.test(key));
 
+  if (keys.length === 0) return "";
+
+  // prefer t1d_open model if available
+  const openKey = keys.find((k) => k.includes("t1d_open"));
+  return openKey || keys[0];
+};
   const getOutcomeCategory = (
     prediction: string | null | undefined
   ): "Negative" | "Neutral" | "Positive" => {
@@ -85,6 +91,20 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
     if (lower.includes("positive")) return "Positive";
     return "Neutral";
   };
+
+const getOverallPrediction = (): "Negative" | "Neutral" | "Positive" => {
+  const mainModelKeys = Object.keys(result).filter((k) => k.includes("main_model"));
+  // prioritize t1d_open_main_model if exists
+  const preferredKey =
+    mainModelKeys.find((k) => k.includes("t1d_open_main_model")) || mainModelKeys[0];
+
+  const prediction = result[preferredKey]?.prediction;
+  return getOutcomeCategory(prediction);
+};
+
+
+const overallPrediction = getOverallPrediction();
+
 
   const renderOutcome = (prediction: string | null | undefined) => {
     const outcomeCategory = getOutcomeCategory(prediction);
@@ -158,10 +178,11 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
     );
   };
 
+
   // Determine overall prediction
-  const overallPrediction = getOutcomeCategory(
-    result[getModelKey(modelVersions[0], "main")]?.prediction
-  );
+  // const overallPrediction = getOutcomeCategory(
+  //   result[getModelKey(modelVersions[0], "main")]?.prediction
+  // );
 
   // Dynamically filter row labels
   const rowLabels: Record<string, string> = (() => {
