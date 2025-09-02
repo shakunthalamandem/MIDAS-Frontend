@@ -51,11 +51,15 @@ const inputFields: {
   adornment?: string;
   disabled?: boolean;
   selectOptions?: string[];
-  labelMap?: Record<string, string>; // ✅ typed for safe indexing
+  labelMap?: Record<string, string>;
 }[] = [
   { label: "Ticker Symbol", name: "ticker", type: "string", placeholder: "e.g., AAPL" },
   { label: "Pricing Date", name: "pricing_date", type: "date" },
-  { label: "Deal Type", name: "deal_type", disabled: true },
+  {
+    label: "Deal Type",
+    name: "deal_type",
+    selectOptions: ["FO", "IPO"],
+  },
   { label: "Region", name: "region", disabled: true },
   { label: "Deal Size ($ Million)", name: "deal_size_category", type: "number", adornment: "$M", placeholder: "e.g., 100" },
   { label: "Sponsor (Y/N)", name: "sponsor_yn_category", type: "string", selectOptions: [], placeholder: "Select sponsor" },
@@ -64,12 +68,10 @@ const inputFields: {
   { label: "Percentage Primary (%)", name: "percentage_primary_category", type: "number", adornment: "%", placeholder: "e.g., 100" },
   { label: "Selected Bank", name: "selected_bank_category", selectOptions: [] },
   { label: "Allocation as % of Deal Size", name: "allocation_deal_size_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 0.5" },
-  // { label: "GDP Growth", name: "GDP", selectOptions: [] },
   { label: "Allocation as % of IOI", name: "allocation_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 30" },
-  // { label: "Inflation Rate", name: "Inflation", selectOptions: [] },
-  // { label: "Treasury Rates", name: "Treasury", selectOptions: [] },
   { label: "Target Variable", name: "target_variable", disabled: true },
 ];
+
 
 const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
   snackbar,
