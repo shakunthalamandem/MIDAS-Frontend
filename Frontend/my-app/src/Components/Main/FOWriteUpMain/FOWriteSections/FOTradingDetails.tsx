@@ -16,7 +16,7 @@ interface TradingDetails {
   short_interest_as_percent_float?: number;
   volume_30day_average?: number;
   mean_target_price?: number;
-  consensus_recommendations?: number;
+  concensus_recomendations?: number;
   percentage_of_52_week_high?: number;
 }
 
@@ -32,7 +32,7 @@ const tradingFields: { label: string; key: keyof TradingDetails; suffix?: string
   { label: "Short Interest (% Float)", key: "short_interest_as_percent_float", suffix: "%" },
   { label: "Volume (30-day Avg)", key: "volume_30day_average" },
   { label: "Mean Target Price", key: "mean_target_price", suffix: "$" },
-  { label: "Consensus Recommendations", key: "consensus_recommendations" },
+  { label: "Consensus Recommendations", key: "concensus_recomendations" },
   { label: "% of 52-Week High", key: "percentage_of_52_week_high", suffix: "%" },
 ];
 
