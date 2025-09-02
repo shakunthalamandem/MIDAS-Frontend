@@ -46,19 +46,19 @@ const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
   const [selectedData, setSelectedData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [noData, setNoData] = useState<boolean>(false); // new state
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+      setNoData(false);
 
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
-        if (!apiUrl) {
-          throw new Error("API URL is not defined in environment variables");
-        }
+        if (!apiUrl) throw new Error("API URL is not defined");
 
         const response = await fetch(`${apiUrl}/api/fo_companymetric_data/`, {
           method: "POST",
@@ -73,10 +73,17 @@ const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
           throw new Error(`API error: ${response.statusText}`);
         }
 
-        const result: ApiResponse = await response.json();
-        setSelectedData(result);
+        const result = await response.json();
+
+        if (result.error || Object.keys(result).length === 0) {
+          setNoData(true);  // handle "no data" response
+          setSelectedData(null);
+        } else {
+          setSelectedData(result);
+        }
       } catch (err: any) {
         setError(err.message || "Something went wrong");
+        setSelectedData(null);
       } finally {
         setLoading(false);
       }
@@ -107,7 +114,10 @@ const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
       </Typography>
 
       {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {noData && !loading && !error && (
+        <p style={{ textAlign: "center", color: "#555" }}>No data found.</p>
+      )}
 
       {!loading && !error && selectedData && (
         <TableContainer
@@ -167,5 +177,6 @@ const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
     </Box>
   );
 };
+
 
 export default FOComparisionTableMain;
