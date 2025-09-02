@@ -212,6 +212,7 @@ const MainUpload: React.FC = () => {
           <Tab label="Downloads" />
           <Tab label="Calendar" />
           <Tab label="LK File" />
+          <Tab label="FO Files" />
 
         </Tabs>
 
@@ -317,6 +318,19 @@ const MainUpload: React.FC = () => {
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
               <Card elevation={3} sx={{ borderRadius: 3, pt: 6, p: 2, background: "linear-gradient(to right, #ffecd2, #fcb69f)" }}>
                 <LkFileUpload />
+              </Card>
+            </motion.div>
+          )}
+
+          
+          {selectedTab === 6 && (
+            <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+              <Card elevation={3} sx={{ borderRadius: 3, p: 3, background: "linear-gradient(to right, #ffecd2, #fcb69f)" }}>
+                <Typography variant="h6" align="center" color="primary" sx={{ fontWeight: 600, mb: 2 }}>
+                  Upload FO Files
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <IPOS1FileUpload />
               </Card>
             </motion.div>
           )}
