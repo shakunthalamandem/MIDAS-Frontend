@@ -162,9 +162,9 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
   // ✅ Proper return is now placed inside the component
   return (
     <Container maxWidth="xl" >
-      <Grid container spacing={4}>
+      <Grid container spacing={4} mb={4}>
         <Grid item xs={12}>
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h5" align="center" sx={{ fontWeight: 'bold', textAlign: 'center', color: '#002060' }}>
             Financial Highlights
           </Typography>
 
