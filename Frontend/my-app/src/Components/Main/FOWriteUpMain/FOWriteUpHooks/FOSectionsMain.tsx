@@ -104,13 +104,13 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
     setTimeout(() => setPdfLoading(false), 2000);
   };
 
-  const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
-    if (newValue) {
-      setSelected({ ticker: newValue.ticker, deal_id: newValue.deal_id });
-    } else {
-      setSelected(null);
-    }
-  };
+const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
+  if (newValue) {
+    setSelected({ ticker: newValue.ticker, deal_id: newValue.deal_id });
+  }
+  // Do nothing when cleared
+};
+
 
   return (
     <>
