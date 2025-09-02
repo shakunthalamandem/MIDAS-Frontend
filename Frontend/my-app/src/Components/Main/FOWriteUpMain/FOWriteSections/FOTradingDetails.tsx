@@ -69,7 +69,7 @@ const FOTradingDetails: React.FC<FOTradingDetailsProps> = ({ selectedData }) => 
               <CardContent>
                 <Typography
                   variant="h5"
-                  sx={{ fontWeight: 700, color: "#127c80ff", mb: 3 }}
+                  sx={{ fontWeight: 700, color: "#026269", mb: 3 }}
                   align="center"
                 >
                   Trading Details

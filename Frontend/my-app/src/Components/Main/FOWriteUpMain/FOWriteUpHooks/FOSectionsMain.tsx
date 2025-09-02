@@ -7,6 +7,7 @@ import {
   Autocomplete,
   TextField,
   InputAdornment,
+  Container,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import FOComparisionTableMain from "../FOWriteSections/FOComparisionTableMain";
@@ -114,6 +115,7 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
   return (
     <>
       {/* 🔹 Header Section */}
+      <Container>
       <Box
         sx={{
           display: "flex",
@@ -127,7 +129,7 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
       >
         {/* Company Info and Button */}
         <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
-          <Typography variant="h5" color="#002060" sx={{ fontWeight: 600 }}>
+          <Typography variant="h6" color="#026269" sx={{ fontWeight: 600 }}>
             {ipoData
               ? `${ipoData.company_name ?? "Unknown Company"} (${ipoData.ticker ?? "N/A"} | ${
                   ipoData.exchange ?? "N/A"
@@ -189,6 +191,7 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
           )}
         />
       </Box>
+      </Container>
 
       {/* 🔹 Sections */}
       <FOSummaryDataSection ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />

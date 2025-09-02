@@ -163,7 +163,7 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
             sx={{
               fontWeight: "bold",
               textAlign: "center",
-              color: "#127c80ff",
+              color: "#026269",
             }}
           >
             Financial Highlights
