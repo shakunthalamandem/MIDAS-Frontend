@@ -8,33 +8,26 @@ import {
   Chip,
   Divider,
   Grid,
-  Tooltip,
 } from "@mui/material";
 import { green, red, grey } from "@mui/material/colors";
 
 interface FormData {
-  ticker_symbol: string;
+  ticker: string;
   pricing_date: string;
   deal_type: string;
   region: string;
-  target_variable: string;
-  sponsor: string;
-  deal_size_million: number;
-  selected_bank: string;
-  percentage_primary: number;
+  sponsor: string | null;
+  deal_size: number;
+  lead_bank: string | null;
+  primary_percentage: number | null;
   sector: string;
-  discount_announcement_price: number;
-  allocation_percentage_of_deal: number;
-  allocation_percentage_of_ioi: number;
-  gdp_growth: string;
-  inflation_rate: string;
-  treasury_rates: string;
-  v1_main_model_predicted: string;
-  v1_positive_model_predicted: boolean;
-  v1_negative_model_predicted: boolean;
-  main_model_actual: string | null;
-  positive_model_actual: string | null;
-  negative_model_actual: string | null;
+  discount_from_announcement_price: number | null;
+  allocation_as_percentage_of_deal_size: number | null;
+  allocation_as_percentage_of_ioi: number | null;
+  gdp_growth: string | null;
+  inflation_rate: string | null;
+  treasury_rates: string | null;
+  t1d_pred: string;
 }
 
 interface ApiResponse {
@@ -50,13 +43,18 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`${apiUrl}/api/predicted_forms/`);
+        const response = await fetch(`${apiUrl}/api/recent_predictions/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           const text = await response.text();
           throw new Error(`HTTP ${response.status}: ${text}`);
@@ -65,7 +63,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
         const sorted = json.data.sort(
           (a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime()
         );
-        setForms(sorted.slice(0, 10)); // max 4 cards, i.e., 2 rows
+        setForms(sorted.slice(0, 10));
       } catch (err: any) {
         setError(err.message || "Something went wrong");
       } finally {
@@ -104,6 +102,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
   };
 
   const formatSector = (raw: string) => {
+    if (!raw) return "N/A";
     const cleaned = raw.replace(/^(sp500_|nasdaq_|nyse_)/i, "");
     return cleaned
       .split("_")
@@ -142,7 +141,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
     );
 
   return (
-    <Box sx={{ width: "100%",}}>
+    <Box sx={{ width: "100%" }}>
       <Typography
         variant="subtitle1"
         fontWeight={600}
@@ -172,14 +171,19 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
               <CardContent sx={{ py: 4, px: 4 }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Typography variant="body1" fontWeight={600} color="#002060">
-                    {form.ticker_symbol}
+                    {form.ticker}
                   </Typography>
-                  {renderPredictionChip(form.v1_main_model_predicted)}
+                  {renderPredictionChip(form.t1d_pred)}
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
                   <Typography variant="body1" color="#002060">
-                    Discount: <strong>{form.discount_announcement_price}%</strong>
+                    Discount:{" "}
+                    <strong>
+                      {form.discount_from_announcement_price !== null
+                        ? `${form.discount_from_announcement_price}%`
+                        : "N/A"}
+                    </strong>
                   </Typography>
                   <Typography variant="body1" color="#002060">
                     {formatDate(form.pricing_date)}
@@ -190,7 +194,9 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
 
                 <Box display="flex" justifyContent="space-between">
                   <Typography variant="body1">Deal Size</Typography>
-                  <Typography variant="body1">${form.deal_size_million}M</Typography>
+                  <Typography variant="body1">
+                    ${form.deal_size ? (form.deal_size / 1_000_000).toFixed(1) : "N/A"}M
+                  </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography variant="body1">Sector</Typography>
@@ -207,10 +213,14 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
 
                 <Box display="flex" justifyContent="space-between" mt={2}>
                   <Typography variant="body1" color="#002060">
-                    {form.selected_bank}
+                    {form.lead_bank || "N/A"}
                   </Typography>
                   <Typography variant="body1" color="#002060">
-                    {form.sponsor === "Y" ? "Sponsored" : "Not Sponsored"}
+                    {form.sponsor === "Y"
+                      ? "Sponsored"
+                      : form.sponsor === "N"
+                      ? "Not Sponsored"
+                      : "N/A"}
                   </Typography>
                 </Box>
               </CardContent>
