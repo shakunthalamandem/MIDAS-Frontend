@@ -83,7 +83,7 @@ const MlEquityMain: React.FC = () => {
           selected_bank_category:
             rawData.selected_bank || rawData.lead_bank || "",
           percentage_primary_category: String(
-            rawData.percentage_primary ?? ""
+            rawData.percentage_primary ?? rawData.primary_percentage ?? ""
           ),
           sector_category: rawData.sector,
           discount_from_announcement_price_category: String(
@@ -104,6 +104,7 @@ const MlEquityMain: React.FC = () => {
           GDP: rawData.gdp_growth ?? rawData.gdp ?? "",
           Inflation: rawData.inflation_rate ?? rawData.inflation ?? "",
           Treasury: rawData.treasury_rates ?? "",
+          expectations: ["T1D"]
         };
 
         setInitialData(mappedData);
