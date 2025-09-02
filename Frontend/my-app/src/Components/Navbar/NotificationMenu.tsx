@@ -34,33 +34,35 @@ const NotificationMenu: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // Fetch notifications from API
-  const fetchNotifications = async () => {
-    if (!token) {
-      console.warn("⚠️ No token provided, skipping fetch");
-      return;
-    }
-    try {
-      setLoading(true);
-      const res = await fetch(`${apiUrl}/api/notifications/`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok)
-        throw new Error(`Failed to fetch notifications: ${res.status}`);
+// Fetch notifications from API
+const fetchNotifications = async () => {
+  if (!token) {
+    console.warn("⚠️ No token provided, skipping fetch");
+    return;
+  }
+  try {
+    setLoading(true);
+    const res = await fetch(`${apiUrl}/api/notifications/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok)
+      throw new Error(`Failed to fetch notifications: ${res.status}`);
 
-      const data = await res.json();
-      setNotifications(data);
-      setUnreadCount(data.length);
-    } catch (err) {
-      console.error("❌ Error fetching notifications:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const data = await res.json();
+
+    // 👇 Adapt to new API response
+    setNotifications(data.notifications || []);
+    setUnreadCount(data.last_3_days_count || 0);
+  } catch (err) {
+    console.error("❌ Error fetching notifications:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchNotifications();
