@@ -49,7 +49,7 @@ const FOWriteUpDashboardMain: React.FC = () => {
 
   const formatDate = (dateStr: string | null): string =>
     !dateStr || isNaN(new Date(dateStr).getTime())
-      ? "Not Available"
+      ? "To Be Announced"
       : new Date(dateStr).toLocaleDateString("en-GB", {
           day: "numeric",
           month: "short",
@@ -111,47 +111,50 @@ const FOWriteUpDashboardMain: React.FC = () => {
       >
         📅 All Upcoming Follow-On Offers
       </Typography>
-          <Container maxWidth="lg">
-
-
-      <Box sx={{ maxHeight: 500, bgcolor: "white", borderRadius: 2, boxShadow: 3 }}>
- <DataGrid
-  rows={rows}
-  columns={columns}
-  getRowId={(row) => row.deal_id}
-  pageSizeOptions={[5, 10, 20]}
-  rowHeight={40}
-  disableRowSelectionOnClick
-  onRowClick={(params) =>
-    setSelected({ ticker: params.row.ticker, deal_id: params.row.deal_id })
-  }
-  sx={{
-    "& .MuiDataGrid-container--top [role='row']": {
-      backgroundColor: "#002060",
-      color: "#FFFFFF",
-    },
-    "& .Mui-selected": {
-      backgroundColor: "#cad0f1ff !important",
-    },
-    "& .MuiDataGrid-footerContainer": {
-      minHeight: "40px", // 🔥 Decrease footer height
-      height: "40px",    // 🔥 Explicit height
-    },
-    "& .MuiTablePagination-toolbar": {
-      minHeight: "40px", // 🔥 Adjust pagination toolbar too
-      height: "40px",
-    },
-    cursor: "pointer",
-    border: "1px solid #ccccccff",
-  }}
-/>
-
-      </Box>
-       </Container>
+      <Container maxWidth="lg">
+        <Box sx={{ maxHeight: 500, bgcolor: "white", borderRadius: 2, boxShadow: 3 }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            getRowId={(row) => row.deal_id}
+            pageSizeOptions={[5, 10, 20]}
+            rowHeight={40}
+            disableRowSelectionOnClick
+            rowSelectionModel={selected ? [selected.deal_id] : []} // 🔥 Highlight selected
+            onRowClick={(params) =>
+              setSelected({ ticker: params.row.ticker, deal_id: params.row.deal_id })
+            }
+            sx={{
+              "& .MuiDataGrid-container--top [role='row']": {
+                backgroundColor: "#002060",
+                color: "#FFFFFF",
+              },
+              "& .Mui-selected": {
+                backgroundColor: "#cad0f1ff !important",
+              },
+              "& .MuiDataGrid-footerContainer": {
+                minHeight: "40px",
+                height: "40px",
+              },
+              "& .MuiTablePagination-toolbar": {
+                minHeight: "40px",
+                height: "40px",
+              },
+              cursor: "pointer",
+              border: "1px solid #ccccccff",
+            }}
+          />
+        </Box>
+      </Container>
 
       {selected && (
         <Box mt={4}>
-          <FOSectionsMain ticker={selected.ticker} deal_id={selected.deal_id} />
+          <FOSectionsMain
+            ticker={selected.ticker}
+            deal_id={selected.deal_id}
+            selected={selected}
+            setSelected={setSelected} // 🔥 Pass control down
+          />
         </Box>
       )}
     </Container>

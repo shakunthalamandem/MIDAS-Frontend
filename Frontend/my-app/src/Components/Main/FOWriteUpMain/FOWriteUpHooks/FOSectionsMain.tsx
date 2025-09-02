@@ -17,36 +17,38 @@ import { format } from "date-fns";
 interface FOSectionsMainProps {
   ticker: string;
   deal_id: string;
+  selected: { ticker: string; deal_id: string } | null;
+  setSelected: React.Dispatch<
+    React.SetStateAction<{ ticker: string; deal_id: string } | null>
+  >;
 }
 
 interface TickerData {
   ticker: string;
-  issuer_name: string;
-  pricing_date: string | null;
+  company_name?: string; // optional
+  pricing_date?: string | null;
   deal_id: string;
-  exchange: string;
-  deal_size: number;
-  expected_listing_date: string | null;
+  exchange?: string | null;
+  expected_listing_date?: string | null;
 }
 
-const FOSectionsMain: React.FC<FOSectionsMainProps> = ({ ticker, deal_id }) => {
+const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
+  ticker,
+  deal_id,
+  selected,
+  setSelected,
+}) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [ipoData, setIpoData] = useState({
-    company_name: "Company Name",
-    ticker_name: ticker,
-    exchange: "NYSE",
-    pricing_date: null,
-  });
+  const [ipoData, setIpoData] = useState<TickerData | null>(null);
   const [sortedTickers, setSortedTickers] = useState<TickerData[]>([]);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(ticker);
   const [searchText, setSearchText] = useState<string>(ticker);
 
-  // 🔹 Fetch ticker data from API
+  // 🔹 Fetch ticker list for search
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchTickers = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/fo_writeup_distinct_tickers/`, {
           headers: {
@@ -55,10 +57,7 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({ ticker, deal_id }) => {
           },
         });
 
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-
+        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
         const data: TickerData[] = await response.json();
         setSortedTickers(data);
       } catch (error) {
@@ -66,17 +65,55 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({ ticker, deal_id }) => {
       }
     };
 
-    fetchData();
+    fetchTickers();
   }, [apiUrl, token]);
+
+  // 🔹 Fetch selected ticker details using POST
+  const fetchIpoDetails = async (tickerSymbol: string) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/fowriteup_ticker_data/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker: tickerSymbol }),
+      });
+
+      if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+      const data: TickerData = await response.json();
+      console.log("IPO Data Response:", data);
+      setIpoData(data);
+    } catch (error) {
+      console.error("Failed to fetch IPO details:", error);
+    }
+  };
+
+  // 🔹 Load IPO details when ticker or selected changes
+  useEffect(() => {
+    if (selected?.ticker) {
+      fetchIpoDetails(selected.ticker);
+      setSearchText(selected.ticker);
+    } else if (ticker) {
+      fetchIpoDetails(ticker);
+    }
+  }, [selected, ticker]);
 
   const onExportPDF = () => {
     setPdfLoading(true);
-    setTimeout(() => setPdfLoading(false), 2000); // Simulate PDF generation
+    setTimeout(() => setPdfLoading(false), 2000);
   };
+
+const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
+  if (newValue) {
+    setSelected({ ticker: newValue.ticker, deal_id: newValue.deal_id });
+  }
+};
+
 
   return (
     <>
-      {/* 🔹 Header Section with Button & Search */}
+      {/* 🔹 Header Section */}
       <Box
         sx={{
           display: "flex",
@@ -88,10 +125,14 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({ ticker, deal_id }) => {
           gap: 2,
         }}
       >
-        {/* Header Left */}
+        {/* Company Info and Button */}
         <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
           <Typography variant="h5" color="#002060" sx={{ fontWeight: 600 }}>
-            {ipoData.company_name} ({ipoData.ticker_name} | {ipoData.exchange})
+            {ipoData
+              ? `${ipoData.company_name ?? "Unknown Company"} (${ipoData.ticker ?? "N/A"} | ${
+                  ipoData.exchange ?? "N/A"
+                })`
+              : "Loading..."}
           </Typography>
 
           <Button
@@ -112,7 +153,7 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({ ticker, deal_id }) => {
           </Button>
         </Box>
 
-        {/* 🔹 Search Dropdown */}
+        {/* 🔹 Search Autocomplete */}
         <Autocomplete
           size="small"
           options={sortedTickers}
@@ -122,16 +163,13 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({ ticker, deal_id }) => {
               try {
                 formattedDate = format(new Date(option.pricing_date), "dd MMM yyyy");
               } catch {
-                formattedDate = option.pricing_date;
+                formattedDate = option.pricing_date || "N/A";
               }
             }
             return `${option.ticker} (${formattedDate})`;
           }}
-          value={sortedTickers.find((t) => t.ticker === selectedTicker) || null}
-          onChange={(_, newValue) => {
-            setSelectedTicker(newValue ? newValue.ticker : null);
-            setSearchText(newValue ? newValue.ticker : "");
-          }}
+          value={sortedTickers.find((t) => t.ticker === selected?.ticker) || null}
+          onChange={handleAutocompleteChange}
           inputValue={searchText}
           onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
           sx={{ width: { xs: "100%", sm: "300px" } }}
@@ -152,10 +190,10 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({ ticker, deal_id }) => {
         />
       </Box>
 
-      {/* 🔹 Existing Sections */}
-      <FOSummaryDataSection ticker={ticker} deal_id={deal_id} />
-      <FOComparisionTableMain ticker={ticker} deal_id={deal_id} />
-      <FOFinancialHighlights ticker={ticker} deal_id={deal_id} />
+      {/* 🔹 Sections */}
+      <FOSummaryDataSection ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
+      <FOComparisionTableMain ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
+      <FOFinancialHighlights ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
     </>
   );
 };
