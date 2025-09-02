@@ -32,8 +32,13 @@ const FOWriteUpDashboardMain: React.FC = () => {
 
         if (!response.ok) throw new Error("Failed to fetch FO data");
 
-        const json = await response.json();
+        const json: FOData[] = await response.json();
         setRows(json);
+
+        // ✅ Select the first row by default
+        if (json.length > 0) {
+          setSelected({ ticker: json[0].ticker, deal_id: json[0].deal_id });
+        }
       } catch (err) {
         console.error("Error fetching FO data:", err);
       }
@@ -42,7 +47,6 @@ const FOWriteUpDashboardMain: React.FC = () => {
     fetchData();
   }, [apiUrl, token]);
 
-  // Helper to format dates consistently
   const formatDate = (dateStr: string | null): string =>
     !dateStr || isNaN(new Date(dateStr).getTime())
       ? "Not Available"
@@ -91,7 +95,8 @@ const FOWriteUpDashboardMain: React.FC = () => {
       field: "deal_size",
       headerName: "Deal Size",
       flex: 1,
-      valueFormatter: (params) => (params !== null && params !== undefined ? params : "Not Available"),
+      valueFormatter: (params) =>
+        params !== null && params !== undefined ? params : "Not Available",
     },
   ];
 
