@@ -47,6 +47,7 @@ const MethodologyAccordion1Day: React.FC = () => {
     "Total Monthly Opportunity Value",
     "Monthly Positive Deal Count & Returns",
     "Monthly Excess Return (All Deals)",
+    "Recent IPO Sector Deal Flow Activity (1D & 1M)",
   ];
 
   // A helper to split array roughly in half for two columns
