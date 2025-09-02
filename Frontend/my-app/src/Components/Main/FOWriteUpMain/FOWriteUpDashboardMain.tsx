@@ -15,7 +15,7 @@ import FOSectionsMain from "./FOWriteUpHooks/FOSectionsMain";
 
 interface FOData {
   ticker: string;
-  company_name: string;
+  issuer_name: string; // corrected key to match API
   pricing_date: string | null;
   deal_id: string;
   exchange: string | null;
@@ -87,11 +87,11 @@ const FOWriteUpDashboardMain: React.FC = () => {
         color="#002060"
         mb={2}
       >
-        📅 All Upcoming Follow On's
+        📅 All Upcoming Follow-On Offers
       </Typography>
 
-      <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-        <Table sx={{ borderCollapse: "collapse", border: "1px solid black" }}>
+      <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
+        <Table sx={{ borderCollapse: "collapse" }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#002060" }}>
               {[
@@ -107,11 +107,10 @@ const FOWriteUpDashboardMain: React.FC = () => {
                   align="center"
                   sx={{
                     color: "#fff",
-                    fontWeight: 600,
-                    fontSize: "0.78rem",
-                    padding: "6px 8px",
-                    border: "1px solid black",
-                    lineHeight: 1.2,
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    padding: "8px 10px",
+                    border: "1px solid #ddd",
                   }}
                 >
                   {heading}
@@ -125,33 +124,28 @@ const FOWriteUpDashboardMain: React.FC = () => {
                 key={index}
                 hover
                 sx={{
-                  "&:hover": { backgroundColor: "#f0f8ff", cursor: "pointer" },
-                  border: "1px solid black",
+                  "&:hover": { backgroundColor: "#f9f9f9", cursor: "pointer" },
+                  borderBottom: "1px solid #ddd",
                 }}
                 onClick={() => setSelected({ ticker: row.ticker, deal_id: row.deal_id })}
               >
                 <TableCell
                   align="center"
                   sx={{
-                    fontSize: "0.78rem",
-                    padding: "6px 8px",
-                    border: "1px solid black",
-                    fontWeight: 600,
-                    lineHeight: 1.2,
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    color: "red",
+                    textDecoration: "underline",
                   }}
                 >
                   {row.ticker}
                 </TableCell>
-                <TableCell align="center">{row.company_name}</TableCell>
-                <TableCell align="center">
-                  {formatDate(row.expected_listing_date)}
-                </TableCell>
-                <TableCell align="center">
-                  {formatDate(row.pricing_date)}
-                </TableCell>
+                <TableCell align="center">{row.issuer_name || "—"}</TableCell>
+                <TableCell align="center">{formatDate(row.expected_listing_date)}</TableCell>
+                <TableCell align="center">{formatDate(row.pricing_date)}</TableCell>
                 <TableCell align="center">{row.exchange || "—"}</TableCell>
                 <TableCell align="center">
-                  {row.deal_size !== null ? `${row.deal_size}` : "—"}
+                  {row.deal_size !== null ? row.deal_size : "—"}
                 </TableCell>
               </TableRow>
             ))}
@@ -159,7 +153,6 @@ const FOWriteUpDashboardMain: React.FC = () => {
         </Table>
       </TableContainer>
 
-      {/* ✅ Show FOSectionsMain below table if a row is clicked */}
       {selected && (
         <Box mt={4}>
           <FOSectionsMain ticker={selected.ticker} deal_id={selected.deal_id} />
