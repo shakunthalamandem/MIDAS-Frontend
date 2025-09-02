@@ -32,12 +32,9 @@ const FOWriteUpMain: React.FC = () => {
       </Typography>
 
       <Container maxWidth="xl" sx={{ mt: 2 }}>
-        <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
-          <CardContent>
             {/* Dashboard now handles fetching data */}
             <FOWriteUpDashboardMain />
-          </CardContent>
-        </Card>
+         
       </Container>
     </Box>
   );

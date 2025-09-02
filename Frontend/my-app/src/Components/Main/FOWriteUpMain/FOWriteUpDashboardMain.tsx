@@ -101,7 +101,7 @@ const FOWriteUpDashboardMain: React.FC = () => {
   ];
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <Typography
         variant="h6"
         fontWeight="bold"
@@ -111,6 +111,8 @@ const FOWriteUpDashboardMain: React.FC = () => {
       >
         📅 All Upcoming Follow-On Offers
       </Typography>
+          <Container maxWidth="lg">
+
 
       <Box sx={{ maxHeight: 500, bgcolor: "white", borderRadius: 2, boxShadow: 3 }}>
         <DataGrid
@@ -136,6 +138,7 @@ const FOWriteUpDashboardMain: React.FC = () => {
           }}
         />
       </Box>
+       </Container>
 
       {selected && (
         <Box mt={4}>
