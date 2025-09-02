@@ -71,6 +71,7 @@ import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycl
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
 import WriteUpDashboard from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpDashboard";
 import WriteupDashboardMain from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteupDashboardMain";
+import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
 
 const AppRouters: React.FC = () => {
   return (
@@ -241,6 +242,12 @@ const AppRouters: React.FC = () => {
         <Route path="/download_deals_data" element={<AuthGuard><ExportUnifiedDealData /></AuthGuard>} />
         <Route path="/deal_data_upload" element={<AuthGuard><UnifiedDealDataUpload /></AuthGuard>} />
         <Route path="/pdf_upload" element={<AuthGuard><UploadsWriteUpMain /></AuthGuard>} />
+
+            {/* FO Write Up Routes */}
+
+        <Route path="/equity/fo_dashboard" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
+
+
 
 
       </Routes>

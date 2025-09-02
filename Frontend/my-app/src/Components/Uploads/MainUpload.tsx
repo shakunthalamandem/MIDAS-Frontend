@@ -53,6 +53,24 @@ const uploadConfigs = [
     apiEndpoint: "companymetric_data_upload",
     buttonColor: "warning",
   },
+  {
+    key: "fowriteup",
+    label: "Upload FO writeUp Data",
+    apiEndpoint: "fo_writeup_data_upload",
+    buttonColor: "error",
+  },
+  {
+    key: "FOfinancialForecasts",
+    label: "Upload FO S1 FinancialForecasts",
+    apiEndpoint: "fo_financial_forecasts_data_upload",
+    buttonColor: "success",
+  },
+  {
+    key: "focompanymetric",
+    label: "Upload FO Companymetric Data",
+    apiEndpoint: "fo_companymetric_data_upload",
+    buttonColor: "warning",
+  },
 ];
 
 const monasheeUploadConfigs = [

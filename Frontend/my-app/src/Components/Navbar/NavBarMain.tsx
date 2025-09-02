@@ -192,6 +192,7 @@ const NavbarMain: React.FC = () => {
                 { label: "Dashboard", path: "/deals/dashboard" },
                 {label: "Deal Tracking", path: "deals/deal_Tracking" },
                 { label: "IPO Write-Up", path: "/equity/ipo_dashboard" },
+                { label: "FO Write-Up", path: "/equity/fo_dashboard" },
                 { label: "New Deal Form", path: "/deals/new_deal_form" },
                 { label: "AI-ML Model", path: "/machine_learning/equity" },
               ]}
