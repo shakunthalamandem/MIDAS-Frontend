@@ -42,7 +42,7 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
           throw new Error("API URL is not defined in environment variables");
         }
 
-        const response = await fetch(`${apiUrl}/api/fo_document_data_info/`, {
+        const response = await fetch(`${apiUrl}/api/fo_writeup_data/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

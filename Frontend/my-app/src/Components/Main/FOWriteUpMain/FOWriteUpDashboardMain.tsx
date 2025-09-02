@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Box,
   Container,
   Typography,
   Paper,
@@ -10,53 +9,47 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Box,
 } from "@mui/material";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Link } from "react-router-dom";
+import FOSectionsMain from "./FOWriteUpHooks/FOSectionsMain";
 
 interface FOData {
   ticker: string;
   company_name: string;
   pricing_date: string | null;
-  price: string | number | null;
+  deal_id: string;
   exchange: string | null;
   deal_size: number | null;
+  expected_listing_date: string | null;
 }
 
 const FOWriteUpDashboardMain: React.FC = () => {
   const [FOData, setFOData] = useState<FOData[]>([]);
+  const [selected, setSelected] = useState<{ ticker: string; deal_id: string } | null>(null);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    const fetchFOData = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/ipo_dashboard_data/`, {
+        const response = await fetch(`${apiUrl}/api/fo_writeup_tickers/`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
         });
 
-        if (!response.ok) throw new Error("Failed to fetch IPO data");
+        if (!response.ok) throw new Error("Failed to fetch FO data");
 
         const json = await response.json();
-        const data: FOData[] = json.results || [];
-
-        // Ensure uniqueness by ticker + pricing_date
-        const uniqueRows = Array.from(
-          new Map(
-            data.map((item) => [`${item.ticker}_${item.pricing_date}`, item])
-          ).values()
-        );
-
-        setFOData(uniqueRows);
-      } catch (error) {
-        console.error("Error fetching IPO data:", error);
+        setFOData(json);
+      } catch (err) {
+        console.error("Error fetching FO data:", err);
       }
     };
 
-    fetchFOData();
+    fetchDashboardData();
   }, [apiUrl, token]);
 
   const getOrdinalSuffix = (day: number): string => {
@@ -72,10 +65,11 @@ const FOWriteUpDashboardMain: React.FC = () => {
         return "th";
     }
   };
+
   const formatDate = (dateStr: string | null): string => {
-    if (!dateStr) return "To Be Announced"; // ✅ Empty date
+    if (!dateStr) return "To Be Announced";
     const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return "To Be Announced"; // ✅ Invalid date
+    if (isNaN(date.getTime())) return "To Be Announced";
 
     const day = date.getDate();
     const suffix = getOrdinalSuffix(day);
@@ -86,145 +80,92 @@ const FOWriteUpDashboardMain: React.FC = () => {
 
   return (
     <Container maxWidth="lg">
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          textAlign="center"
-          color="#002060"
-          mb={2}
-        >
-          📅 All Upcoming Follow On's
-        </Typography>
+      <Typography
+        variant="h6"
+        fontWeight="bold"
+        textAlign="center"
+        color="#002060"
+        mb={2}
+      >
+        📅 All Upcoming Follow On's
+      </Typography>
 
-        <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-          <Table
-            sx={{
-              borderCollapse: "collapse",
-              border: "1px solid black",
-            }}
-          >
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#002060" }}>
-                {[
-                  "Symbol",
-                  "Company",
-                  "Expected Listing Date",
-                  "Offer Price",
-                  "Exchange",
-                  "Deal Size",
-                ].map((heading) => (
-                  <TableCell
-                    key={heading}
-                    align="center"
-                    sx={{
-                      color: "#fff",
-                      fontWeight: 600,
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {heading}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {FOData.map((row, index) => (
-                <TableRow
-                  key={index}
-                  hover
+      <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+        <Table sx={{ borderCollapse: "collapse", border: "1px solid black" }}>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#002060" }}>
+              {[
+                "Symbol",
+                "Company",
+                "Expected Listing Date",
+                "Pricing Date",
+                "Exchange",
+                "Deal Size",
+              ].map((heading) => (
+                <TableCell
+                  key={heading}
+                  align="center"
                   sx={{
-                    "&:hover": { backgroundColor: "#f0f8ff" },
+                    color: "#fff",
+                    fontWeight: 600,
+                    fontSize: "0.78rem",
+                    padding: "6px 8px",
                     border: "1px solid black",
+                    lineHeight: 1.2,
                   }}
                 >
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      fontWeight: 600,
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    <Link
-                      to={`/ipo-dashboard/${row.ticker}`}
-                      state={{ fromTickerClick: true }}
-                      style={{
-                        color: "#d80606ff",
-                        fontWeight: "bold",
-                        textDecoration: "underline",
-                      }}
-                    >
-                      {row.ticker}
-                    </Link>
-                  </TableCell>
-
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {row.company_name}
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {formatDate(row.pricing_date)}
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {row.price !== null ? `${row.price}` : "—"}
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {row.exchange || "—"}
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontSize: "0.78rem",
-                      padding: "6px 8px",
-                      border: "1px solid black",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {row.deal_size !== null ? `${row.deal_size}` : "—"}
-                  </TableCell>
-                </TableRow>
+                  {heading}
+                </TableCell>
               ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Container>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {FOData.map((row, index) => (
+              <TableRow
+                key={index}
+                hover
+                sx={{
+                  "&:hover": { backgroundColor: "#f0f8ff", cursor: "pointer" },
+                  border: "1px solid black",
+                }}
+                onClick={() => setSelected({ ticker: row.ticker, deal_id: row.deal_id })}
+              >
+                <TableCell
+                  align="center"
+                  sx={{
+                    fontSize: "0.78rem",
+                    padding: "6px 8px",
+                    border: "1px solid black",
+                    fontWeight: 600,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {row.ticker}
+                </TableCell>
+                <TableCell align="center">{row.company_name}</TableCell>
+                <TableCell align="center">
+                  {formatDate(row.expected_listing_date)}
+                </TableCell>
+                <TableCell align="center">
+                  {formatDate(row.pricing_date)}
+                </TableCell>
+                <TableCell align="center">{row.exchange || "—"}</TableCell>
+                <TableCell align="center">
+                  {row.deal_size !== null ? `${row.deal_size}` : "—"}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
+      {/* ✅ Show FOSectionsMain below table if a row is clicked */}
+      {selected && (
+        <Box mt={4}>
+          <FOSectionsMain ticker={selected.ticker} deal_id={selected.deal_id} />
+        </Box>
+      )}
+    </Container>
   );
 };
 
