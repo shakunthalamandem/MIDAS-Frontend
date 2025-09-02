@@ -25,11 +25,11 @@ interface FOSectionsMainProps {
 
 interface TickerData {
   ticker: string;
-  company_name: string;
-  pricing_date: string | null;
+  company_name?: string; // optional
+  pricing_date?: string | null;
   deal_id: string;
-  exchange: string | null;
-  expected_listing_date: string | null;
+  exchange?: string | null;
+  expected_listing_date?: string | null;
 }
 
 const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
@@ -46,7 +46,7 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
   const [sortedTickers, setSortedTickers] = useState<TickerData[]>([]);
   const [searchText, setSearchText] = useState<string>(ticker);
 
-  // 🔹 Fetch ticker list
+  // 🔹 Fetch ticker list for search
   useEffect(() => {
     const fetchTickers = async () => {
       try {
@@ -68,31 +68,36 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
     fetchTickers();
   }, [apiUrl, token]);
 
-  // 🔹 Fetch selected ticker details
+  // 🔹 Fetch selected ticker details using POST
   const fetchIpoDetails = async (tickerSymbol: string) => {
     try {
-      const response = await fetch(`${apiUrl}/api/fo_writeup_ticker_details/?ticker=${tickerSymbol}`, {
+      const response = await fetch(`${apiUrl}/api/fowriteup_ticker_data/`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
+        body: JSON.stringify({ ticker: tickerSymbol }),
       });
 
       if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
       const data: TickerData = await response.json();
+      console.log("IPO Data Response:", data);
       setIpoData(data);
     } catch (error) {
       console.error("Failed to fetch IPO details:", error);
     }
   };
 
-  // 🔹 Load IPO details when ticker changes
+  // 🔹 Load IPO details when ticker or selected changes
   useEffect(() => {
     if (selected?.ticker) {
       fetchIpoDetails(selected.ticker);
       setSearchText(selected.ticker);
+    } else if (ticker) {
+      fetchIpoDetails(ticker);
     }
-  }, [selected]);
+  }, [selected, ticker]);
 
   const onExportPDF = () => {
     setPdfLoading(true);
@@ -125,7 +130,9 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
         <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
           <Typography variant="h5" color="#002060" sx={{ fontWeight: 600 }}>
             {ipoData
-              ? `${ipoData.company_name} (${ipoData.ticker} | ${ipoData.exchange ?? "N/A"})`
+              ? `${ipoData.company_name ?? "Unknown Company"} (${ipoData.ticker ?? "N/A"} | ${
+                  ipoData.exchange ?? "N/A"
+                })`
               : "Loading..."}
           </Typography>
 
@@ -157,7 +164,7 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
               try {
                 formattedDate = format(new Date(option.pricing_date), "dd MMM yyyy");
               } catch {
-                formattedDate = option.pricing_date;
+                formattedDate = option.pricing_date || "N/A";
               }
             }
             return `${option.ticker} (${formattedDate})`;
