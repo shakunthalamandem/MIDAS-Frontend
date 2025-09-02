@@ -42,9 +42,10 @@ const FOWriteUpDashboardMain: React.FC = () => {
     fetchData();
   }, [apiUrl, token]);
 
+  // Helper to format dates consistently
   const formatDate = (dateStr: string | null): string =>
     !dateStr || isNaN(new Date(dateStr).getTime())
-      ? "To Be Announced"
+      ? "Not Available"
       : new Date(dateStr).toLocaleDateString("en-GB", {
           day: "numeric",
           month: "short",
@@ -58,11 +59,16 @@ const FOWriteUpDashboardMain: React.FC = () => {
       flex: 1,
       renderCell: (params) => (
         <span style={{ color: "red", textDecoration: "underline", fontWeight: 600 }}>
-          {params.value}
+          {params.value || "Not Available"}
         </span>
       ),
     },
-    { field: "issuer_name", headerName: "Company", flex: 1 },
+    {
+      field: "issuer_name",
+      headerName: "Company",
+      flex: 1,
+      valueFormatter: (params) => params || "Not Available",
+    },
     {
       field: "expected_listing_date",
       headerName: "Expected Listing Date",
@@ -75,12 +81,17 @@ const FOWriteUpDashboardMain: React.FC = () => {
       flex: 1,
       valueFormatter: (params) => formatDate(params),
     },
-    { field: "exchange", headerName: "Exchange", flex: 1 },
+    {
+      field: "exchange",
+      headerName: "Exchange",
+      flex: 1,
+      valueFormatter: (params) => params || "Not Available",
+    },
     {
       field: "deal_size",
       headerName: "Deal Size",
       flex: 1,
-      valueFormatter: (params) => (params !== null ? params : "—"),
+      valueFormatter: (params) => (params !== null && params !== undefined ? params : "Not Available"),
     },
   ];
 
@@ -107,17 +118,17 @@ const FOWriteUpDashboardMain: React.FC = () => {
           onRowClick={(params) =>
             setSelected({ ticker: params.row.ticker, deal_id: params.row.deal_id })
           }
-    sx={{
-      "& .MuiDataGrid-container--top [role='row']": {
-        backgroundColor: "#002060",
-        color: "#FFFFFF",
-      },
-      "& .Mui-selected": {
-        backgroundColor: "#cad0f1ff !important",
-      },
-      cursor: "pointer",
-      border: "1px solid #ccccccff",
-    }}
+          sx={{
+            "& .MuiDataGrid-container--top [role='row']": {
+              backgroundColor: "#002060",
+              color: "#FFFFFF",
+            },
+            "& .Mui-selected": {
+              backgroundColor: "#cad0f1ff !important",
+            },
+            cursor: "pointer",
+            border: "1px solid #ccccccff",
+          }}
         />
       </Box>
 
