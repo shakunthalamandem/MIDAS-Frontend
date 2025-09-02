@@ -128,7 +128,7 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
 
     return (
       <TableContainer component={Paper} sx={{ mt: 3 }}>
-        <Table>
+  <Table size="small"> {/* ↓ smaller height globally */}
           <TableHead sx={{ backgroundColor: "#002060" }}>
             <TableRow>
               <StyledTableCell>Metric</StyledTableCell>
@@ -163,7 +163,7 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
             sx={{
               fontWeight: "bold",
               textAlign: "center",
-              color: "#002060",
+              color: "#127c80ff",
             }}
           >
             Financial Highlights

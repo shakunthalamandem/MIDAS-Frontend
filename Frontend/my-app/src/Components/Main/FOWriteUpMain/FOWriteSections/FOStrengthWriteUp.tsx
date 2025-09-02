@@ -45,7 +45,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData }) => 
                 <Box>
                   <Typography
                     variant="h6"
-                    sx={{ fontWeight: 600, mb: 1, color: "#2E7D32" }}
+                    sx={{ fontWeight: 600, mb: 1, color: "#127c80ff" }}
                     align="center"
                   >
                     Strengths
@@ -64,7 +64,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData }) => 
                 <Box>
                   <Typography
                     variant="h6"
-                    sx={{ fontWeight: 600, mb: 1, color: "#C62828" }}
+                    sx={{ fontWeight: 600, mb: 1, color: "#127c80ff" }}
                     align="center"
                   >
                     Concerns

@@ -102,7 +102,7 @@ const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
 
   return (
     <Box p={3}>
-      <Typography variant="h6" align='center' gutterBottom sx={{ fontWeight: 'bold',color: '#002060', mb: 3 }}>
+      <Typography variant="h6" align='center' gutterBottom sx={{ fontWeight: 'bold',color: '#127c80ff', mb: 3 }}>
         Comparative Trading Multiples & Performance Metrics
       </Typography>
 
