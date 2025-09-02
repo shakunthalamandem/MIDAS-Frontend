@@ -27,10 +27,11 @@ import MethodologyAccordion1w1m from "./MethodologyAccordion1w1m";
 
 interface PredictionModel {
   prediction: string | null;
-  Accuracy: number;
-  Confidence: number;
+  accuracy?: number | null;
+  confidence?: number | null;
   range?: string | null;
   model?: string | null;
+  explanation?: string | null;
 }
 
 interface WeeklyMonthlyPredictionResultsProps {
@@ -235,22 +236,16 @@ const WeeklyMonthlyPredictionResults: React.FC<
 
   const rowConfig = [
     {
-      key: "main",
+      key: "main_model",
       label: "Outcome Classification",
-      explanation: `Classifies the expected return into categories:\n📉 Negative: Return ≤ 0%\n📈 Positive: Return > 0%`,
     },
-
     {
-      key: "positive",
+      key: "positive_model",
       label: "High Positive Return Likelihood",
-      explanation:
-        "Binary classifier predicting a strong gain (e.g., Return > 5%).",
     },
     {
-      key: "negative",
+      key: "negative_model",
       label: "High Negative Return Risk",
-      explanation:
-        "Binary classifier estimating significant loss risk (e.g., Return < -3%).",
     },
   ];
 
@@ -364,15 +359,10 @@ const WeeklyMonthlyPredictionResults: React.FC<
                       monthly: `t1m_${row.key}`,
                     };
 
-                    const isWeeklyNull =
-                      !predictionResult?.[modelKeys.weekly]?.prediction &&
-                      predictionResult?.[modelKeys.weekly]?.Accuracy == null;
+                    const weeklyData = predictionResult?.[modelKeys.weekly];
+                    const monthlyData = predictionResult?.[modelKeys.monthly];
 
-                    const isMonthlyNull =
-                      !predictionResult?.[modelKeys.monthly]?.prediction &&
-                      predictionResult?.[modelKeys.monthly]?.Accuracy == null;
-
-                    if (isWeeklyNull && isMonthlyNull) return null;
+                    if (!weeklyData && !monthlyData) return null;
 
                     return (
                       <TableRow
@@ -393,7 +383,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
                             variant="body2"
                             sx={{ whiteSpace: "pre-line" }}
                           >
-                            {row.explanation}
+                            {weeklyData?.explanation ||
+                              monthlyData?.explanation ||
+                              "N/A"}
                           </Typography>
                         </TableCell>
                         {timeFrames.map((frame, index) => {
@@ -419,7 +411,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                           }
 
                           const renderResult =
-                            row.key === "main"
+                            row.key === "main_model"
                               ? renderOutcome(modelData.prediction)
                               : renderBinaryResult(modelData.prediction);
 
@@ -440,7 +432,7 @@ const WeeklyMonthlyPredictionResults: React.FC<
                                   gap={1}
                                 >
                                   {/* {renderAccuracyLevel(modelData.Accuracy)} */}
-                                  {renderConfidenceLevel(modelData.Confidence)}
+                                  {renderConfidenceLevel(modelData.confidence)}
                                 </Box>
                               </TableCell>
                             </React.Fragment>
