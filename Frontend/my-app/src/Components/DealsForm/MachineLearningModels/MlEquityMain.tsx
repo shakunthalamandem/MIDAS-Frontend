@@ -64,39 +64,52 @@ const MlEquityMain: React.FC = () => {
     const storedData = sessionStorage.getItem("selected_form_data");
     if (storedData) {
       try {
-        const rawData: PredictedForm = JSON.parse(storedData);
+        const rawData = JSON.parse(storedData);
 
+        // Support both old (ticker_symbol, deal_size_million, etc.)
+        // and new API response (ticker, deal_size, etc.)
         const mappedData = {
-          ticker: rawData.ticker_symbol,
+          ticker: rawData.ticker_symbol || rawData.ticker,
           pricing_date: rawData.pricing_date
             ? new Date(rawData.pricing_date)
             : null,
           deal_type: rawData.deal_type,
           region: rawData.region,
-          target: rawData.target_variable,
-          sponsor_yn_category: rawData.sponsor,
-          deal_size_category: String(rawData.deal_size_million),
-          selected_bank_category: rawData.selected_bank,
-          percentage_primary_category: String(rawData.percentage_primary),
+          target: rawData.target_variable || "T1D", // fallback if missing
+          sponsor_yn_category: rawData.sponsor ?? null,
+          deal_size_category: String(
+            rawData.deal_size_million ?? rawData.deal_size ?? ""
+          ),
+          selected_bank_category:
+            rawData.selected_bank || rawData.lead_bank || "",
+          percentage_primary_category: String(
+            rawData.percentage_primary ?? ""
+          ),
           sector_category: rawData.sector,
           discount_from_announcement_price_category: String(
-            rawData.discount_announcement_price
+            rawData.discount_announcement_price ??
+              rawData.discount_from_announcement_price ??
+              ""
           ),
           allocation_deal_size_percentage_category: String(
-            rawData.allocation_percentage_of_deal
+            rawData.allocation_percentage_of_deal ??
+              rawData.allocation_as_percentage_of_deal_size ??
+              ""
           ),
           allocation_percentage_category: String(
-            rawData.allocation_percentage_of_ioi
+            rawData.allocation_percentage_of_ioi ??
+              rawData.allocation_as_percentage_of_ioi ??
+              ""
           ),
-          GDP: rawData.gdp_growth,
-          Inflation: rawData.inflation_rate,
-          Treasury: rawData.treasury_rates,
+          GDP: rawData.gdp_growth ?? rawData.gdp ?? "",
+          Inflation: rawData.inflation_rate ?? rawData.inflation ?? "",
+          Treasury: rawData.treasury_rates ?? "",
         };
 
         setInitialData(mappedData);
         sessionStorage.removeItem("selected_form_data");
       } catch (e) {
-        console.error("Invalid JSON in sessionStorage");
+        console.error("Invalid JSON in sessionStorage", e);
       }
     }
 
