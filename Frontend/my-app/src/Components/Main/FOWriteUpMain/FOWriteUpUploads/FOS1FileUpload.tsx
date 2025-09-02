@@ -9,54 +9,39 @@ import {
   Snackbar,
   Alert,
   TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { SelectChangeEvent } from "@mui/material";
 
 const FOS1FileUpload: React.FC = () => {
-  const [uploadType, setUploadType] = useState<"s1" | "report">("s1");
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [market, setMarket] = useState<string>("");
   const [ticker, setTicker] = useState<string>("");
   const [message, setMessage] = useState<string>("");
-  const [severity, setSeverity] = useState<"success" | "error" | "info">(
-    "info"
-  );
+  const [severity, setSeverity] = useState<"success" | "error" | "info">("info");
   const [loading, setLoading] = useState<boolean>(false);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const handleUploadTypeChange = (e: SelectChangeEvent) => {
-    const value = e.target.value as "s1" | "report";
-    setUploadType(value);
-    setFile(null);
-    setMarket("");
-    setTicker("");
-    setMessage("");
-  };
-
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0] || null;
-    if (selectedFile?.type !== "application/pdf") {
+    const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
+    const invalidFiles = selectedFiles.filter(file => file.type !== "application/pdf");
+
+    if (invalidFiles.length > 0) {
       setMessage("Only PDF files are allowed.");
       setSeverity("error");
       setSnackbarOpen(true);
-      setFile(null);
       return;
     }
-    setFile(selectedFile);
+
+    setFiles(selectedFiles);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!file) {
-      setMessage("Please select a PDF file.");
+    if (files.length === 0) {
+      setMessage("Please select at least one PDF file.");
       setSeverity("error");
       setSnackbarOpen(true);
       return;
@@ -69,7 +54,7 @@ const FOS1FileUpload: React.FC = () => {
       return;
     }
 
-    if (uploadType === "report" && !ticker.trim()) {
+    if (!ticker.trim()) {
       setMessage("Please enter a ticker.");
       setSeverity("error");
       setSnackbarOpen(true);
@@ -77,16 +62,11 @@ const FOS1FileUpload: React.FC = () => {
     }
 
     const formData = new FormData();
-    formData.append("file", file);
+    files.forEach((file) => formData.append("files", file)); // note: key "files" should be handled by backend
     formData.append("market", market.trim());
-    if (uploadType === "report") {
-      formData.append("ticker", ticker.trim());
-    }
+    formData.append("ticker", ticker.trim());
 
-    const endpoint =
-      uploadType === "s1"
-        ? `${apiUrl}/api/upload_s1/`
-        : `${apiUrl}/api/upload_ipo_s1_categories/`;
+    const endpoint = `${apiUrl}/api/upload_s1_data/`;
 
     setLoading(true);
     setSnackbarOpen(false);
@@ -100,8 +80,11 @@ const FOS1FileUpload: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(data.message || "File uploaded successfully.");
+        setMessage(data.message || "Files uploaded successfully.");
         setSeverity("success");
+        setFiles([]);
+        setMarket("");
+        setTicker("");
       } else {
         setMessage(data.error || "Upload failed.");
         setSeverity("error");
@@ -121,21 +104,8 @@ const FOS1FileUpload: React.FC = () => {
       <Card elevation={3} sx={{ p: 3, backgroundColor: "#f9f9f9" }}>
         <CardContent>
           <Typography variant="h6" gutterBottom align="center" color="primary">
-            Upload IPO Documents
+            Upload S1 Documents
           </Typography>
-
-          <FormControl fullWidth sx={{ mb: 3 }}>
-            <InputLabel id="upload-type-label">Upload Type</InputLabel>
-            <Select
-              labelId="upload-type-label"
-              value={uploadType}
-              label="Upload Type"
-              onChange={handleUploadTypeChange}
-            >
-              <MenuItem value="s1">S1 Upload</MenuItem>
-              <MenuItem value="report">Report Card</MenuItem>
-            </Select>
-          </FormControl>
 
           <Box display="flex" justifyContent="center" mb={2}>
             <Button
@@ -143,20 +113,25 @@ const FOS1FileUpload: React.FC = () => {
               component="label"
               startIcon={<CloudUploadIcon />}
             >
-              Select PDF File
+              Select PDF Files
               <input
                 type="file"
                 hidden
                 accept="application/pdf"
+                multiple
                 onChange={handleFileChange}
               />
             </Button>
           </Box>
 
-          {file && (
-            <Typography variant="body2" align="center" sx={{ mb: 2 }}>
-              Selected: {file.name}
-            </Typography>
+          {files.length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              {files.map((file, index) => (
+                <Typography key={index} variant="body2">
+                  {file.name}
+                </Typography>
+              ))}
+            </Box>
           )}
 
           <TextField
@@ -168,35 +143,24 @@ const FOS1FileUpload: React.FC = () => {
             sx={{ mb: 2 }}
           />
 
-          {uploadType === "report" && (
-            <TextField
-              label="Ticker (e.g., AAPL)"
-              value={ticker}
-              onChange={(e) => setTicker(e.target.value)}
-              variant="outlined"
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-          )}
+          <TextField
+            label="Ticker (e.g., AAPL)"
+            value={ticker}
+            onChange={(e) => setTicker(e.target.value)}
+            variant="outlined"
+            fullWidth
+            sx={{ mb: 2 }}
+          />
 
           <Box component="form" onSubmit={handleSubmit}>
             <Button
               type="submit"
               variant="contained"
               color="primary"
-              disabled={
-                loading ||
-                !file ||
-                !market.trim() ||
-                (uploadType === "report" && !ticker.trim())
-              }
+              disabled={loading || files.length === 0 || !market.trim() || !ticker.trim()}
               fullWidth
             >
-              {loading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Upload"
-              )}
+              {loading ? <CircularProgress size={24} color="inherit" /> : "Upload"}
             </Button>
           </Box>
         </CardContent>

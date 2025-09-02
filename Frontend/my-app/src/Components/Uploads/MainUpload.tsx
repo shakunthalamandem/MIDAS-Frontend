@@ -21,6 +21,7 @@ import IPOS1FileUpload from "../IPOwriteUp/IPOS1FileUpload";
 import UploadDataCard from "./UploadDataCard";
 import LkFileUpload from "./LkFileUpload";
 import DailyNoteUpload from "./DailyNoteUpload";
+import FOS1FileUpload from "../Main/FOWriteUpMain/FOWriteUpUploads/FOS1FileUpload";
 
 const uploadConfigs = [
   {
@@ -330,7 +331,7 @@ const MainUpload: React.FC = () => {
                   Upload FO Files
                 </Typography>
                 <Divider sx={{ my: 2 }} />
-                <IPOS1FileUpload />
+                <FOS1FileUpload />
               </Card>
             </motion.div>
           )}
