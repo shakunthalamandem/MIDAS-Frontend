@@ -115,28 +115,37 @@ const FOWriteUpDashboardMain: React.FC = () => {
 
 
       <Box sx={{ maxHeight: 500, bgcolor: "white", borderRadius: 2, boxShadow: 3 }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          getRowId={(row) => row.deal_id}
-          pageSizeOptions={[5, 10, 20]}
-          rowHeight={40}
-          disableRowSelectionOnClick
-          onRowClick={(params) =>
-            setSelected({ ticker: params.row.ticker, deal_id: params.row.deal_id })
-          }
-          sx={{
-            "& .MuiDataGrid-container--top [role='row']": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
-            },
-            "& .Mui-selected": {
-              backgroundColor: "#cad0f1ff !important",
-            },
-            cursor: "pointer",
-            border: "1px solid #ccccccff",
-          }}
-        />
+ <DataGrid
+  rows={rows}
+  columns={columns}
+  getRowId={(row) => row.deal_id}
+  pageSizeOptions={[5, 10, 20]}
+  rowHeight={40}
+  disableRowSelectionOnClick
+  onRowClick={(params) =>
+    setSelected({ ticker: params.row.ticker, deal_id: params.row.deal_id })
+  }
+  sx={{
+    "& .MuiDataGrid-container--top [role='row']": {
+      backgroundColor: "#002060",
+      color: "#FFFFFF",
+    },
+    "& .Mui-selected": {
+      backgroundColor: "#cad0f1ff !important",
+    },
+    "& .MuiDataGrid-footerContainer": {
+      minHeight: "40px", // 🔥 Decrease footer height
+      height: "40px",    // 🔥 Explicit height
+    },
+    "& .MuiTablePagination-toolbar": {
+      minHeight: "40px", // 🔥 Adjust pagination toolbar too
+      height: "40px",
+    },
+    cursor: "pointer",
+    border: "1px solid #ccccccff",
+  }}
+/>
+
       </Box>
        </Container>
 
