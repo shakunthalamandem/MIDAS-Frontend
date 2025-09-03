@@ -83,7 +83,7 @@ const MlEquityMain: React.FC = () => {
           selected_bank_category:
             rawData.selected_bank || rawData.lead_bank || "",
           percentage_primary_category: String(
-            rawData.percentage_primary ?? ""
+            rawData.percentage_primary ?? rawData.primary_percentage ?? ""
           ),
           sector_category: rawData.sector,
           discount_from_announcement_price_category: String(
@@ -104,6 +104,7 @@ const MlEquityMain: React.FC = () => {
           GDP: rawData.gdp_growth ?? rawData.gdp ?? "",
           Inflation: rawData.inflation_rate ?? rawData.inflation ?? "",
           Treasury: rawData.treasury_rates ?? "",
+          expectations: ["T1D"]
         };
 
         setInitialData(mappedData);
@@ -151,7 +152,7 @@ const MlEquityMain: React.FC = () => {
                 textAlign="center"
                 color="#002060"
               >
-                🧠 Machine Learning Equity Deal Predictor - US Follow-on's
+                🧠 Machine Learning Equity Deal Predictor - US IPO & Follow-on's
               </Typography>
 
               <Typography
@@ -160,7 +161,7 @@ const MlEquityMain: React.FC = () => {
                 sx={{ ml: 2, mt: 2, mb: 2 }}
               >
                 Welcome to the ML-powered equity deal predictor for{" "}
-                <strong>US follow-on's (Marketed & Overnight)</strong>. Input key market and
+                <strong>US IPO & Follow-on's (Marketed & Overnight)</strong>. Input key market and
                 macroeconomic parameters to forecast deal outcomes using
                 advanced machine learning models trained on over 4000 historical
                 deal records.

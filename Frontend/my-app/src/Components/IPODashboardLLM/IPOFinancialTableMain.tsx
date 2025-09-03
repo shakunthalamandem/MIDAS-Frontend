@@ -54,6 +54,25 @@ function formatFinancialMargin(value: number | string): string {
   return num < 0 ? `(${absValue})` : absValue;
 }
 
+const priorityOrder = [
+  "Sales",
+  "Sales Growth",
+  "Net Interest Income",
+  "Net Interest Income Growth",
+  "Gross Profit",
+  "Gross Profit Growth",
+  "Gross Profit Margin", // margin just after gross profit
+  "EBIT",
+  "EBIT Growth",
+  "NII after provision for credit losses",
+  "NII after provision for credit losses Growth",
+  "PBT",
+  "PBT Growth",
+  "Net Income",
+  "Net Income Growth",
+  "Net Income Margin", // margin after net income
+];
+
 const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
   defaultTicker = "",
 }) => {
@@ -75,18 +94,23 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
       if (!apiUrl) throw new Error("API URL not set");
 
       const tickerToFetch = customTicker ?? forecastsInput;
-      const response = await fetch(`${apiUrl}/api/financial_forecasts_data_view/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({ ticker: tickerToFetch }),
-      });
+      const response = await fetch(
+        `${apiUrl}/api/financial_forecasts_data_view/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ ticker: tickerToFetch }),
+        }
+      );
 
       const json = await response.json();
       if (!response.ok) {
-        throw new Error(json.error || json.message || "Failed to fetch forecasts");
+        throw new Error(
+          json.error || json.message || "Failed to fetch forecasts"
+        );
       }
 
       setForecasts(json);
@@ -102,13 +126,103 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
     setForecastsInput(defaultTicker);
     setForecastsTicker(defaultTicker);
     handleFetchForecasts(defaultTicker);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultTicker]);
+
+  const safeNumber = (v: any) => {
+    const n = Number(v);
+    return isNaN(n) ? 0 : n;
+  };
+
+  const computeGrowthPct = (prev: number, curr: number) => {
+    if (!prev || prev === 0) return null;
+    return ((curr - prev) / prev) * 100;
+  };
+
+  const computeValueFromGrowth = (prev: number, growthPct: number) => {
+    return prev * (1 + growthPct / 100);
+  };
+
+  const ensureMetricStructure = (data: any, metric: string) => {
+    if (!data[metric]) {
+      data[metric] = {};
+      for (const k of forecastYearKeys) data[metric][k] = null;
+    }
+  };
 
   const handleEdit = () => {
     setEditing(true);
     const copied = JSON.parse(
       JSON.stringify(forecasts[forecastsTicker.toUpperCase()] || {})
     );
+    // Ensure paired metrics and margins exist so calculations don't break
+    const allNeeded = new Set<string>([...priorityOrder]);
+    // also add whatever keys exist in copied (we don't want to lose them)
+    Object.keys(copied || {}).forEach((k) => allNeeded.add(k));
+
+    Array.from(allNeeded).forEach((key) => {
+      ensureMetricStructure(copied, key);
+    });
+
+    // If growth fields are null but we can compute them from existing data, compute
+    for (const metric of [
+      "Sales",
+      "Net Interest Income",
+      "NII after provision for credit losses",
+      "Gross Profit",
+      "EBIT",
+      "PBT",
+      "Net Income",
+    ]) {
+      const growthMetric = metric + " Growth";
+      if (!copied[growthMetric]) ensureMetricStructure(copied, growthMetric);
+
+      for (const idx of [2, 3, 4]) {
+        // indices for one_year_before (2), current_year (3), one_year_later (4) match forecastYearKeys
+        // Only compute current_year and one_year_later
+      }
+      // compute current_year growth if possible
+      const prev = safeNumber(copied[metric]?.["one_year_before"]);
+      const curr = safeNumber(copied[metric]?.["current_year"]);
+      const next = safeNumber(copied[metric]?.["one_year_later"]);
+
+      const currGrowth = computeGrowthPct(prev, curr);
+      const nextGrowth = computeGrowthPct(curr, next);
+
+      copied[growthMetric]["one_year_before"] =
+        copied[growthMetric]["one_year_before"] ?? null;
+      copied[growthMetric]["current_year"] =
+        currGrowth !== null
+          ? Number(currGrowth)
+          : (copied[growthMetric]["current_year"] ?? null);
+      copied[growthMetric]["one_year_later"] =
+        nextGrowth !== null
+          ? Number(nextGrowth)
+          : (copied[growthMetric]["one_year_later"] ?? null);
+
+      // For margins compute if underlying values exist
+      if (metric === "Gross Profit") {
+        ensureMetricStructure(copied, "Gross Profit Margin");
+        for (const ky of forecastYearKeys) {
+          const gp = safeNumber(copied["Gross Profit"]?.[ky]);
+          const sales = safeNumber(copied["Sales"]?.[ky]);
+          copied["Gross Profit Margin"][ky] = sales
+            ? (gp / sales) * 100
+            : (copied["Gross Profit Margin"][ky] ?? null);
+        }
+      }
+      if (metric === "Net Income") {
+        ensureMetricStructure(copied, "Net Income Margin");
+        for (const ky of forecastYearKeys) {
+          const ni = safeNumber(copied["Net Income"]?.[ky]);
+          const sales = safeNumber(copied["Sales"]?.[ky]);
+          copied["Net Income Margin"][ky] = sales
+            ? (ni / sales) * 100
+            : (copied["Net Income Margin"][ky] ?? null);
+        }
+      }
+    }
+
     setEditedData({ [forecastsTicker.toUpperCase()]: copied });
   };
 
@@ -116,110 +230,214 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
     setEditing(false);
     setEditedData({});
   };
-const handleEditChange = (metricName: string, yearKey: string, value: string) => {
-  setEditedData((prev: any) => {
-    const updated = {
-      ...prev,
-      [forecastsTicker.toUpperCase()]: {
-        ...prev[forecastsTicker.toUpperCase()],
-        [metricName]: {
-          ...prev[forecastsTicker.toUpperCase()]?.[metricName],
-          [yearKey]: value,
+
+  const handleEditChange = (
+    metricName: string,
+    yearKey: string,
+    value: string
+  ) => {
+    setEditedData((prev: any) => {
+      const updated = {
+        ...prev,
+        [forecastsTicker.toUpperCase()]: {
+          ...prev[forecastsTicker.toUpperCase()],
+          [metricName]: {
+            ...prev[forecastsTicker.toUpperCase()]?.[metricName],
+            [yearKey]: value === "" ? null : value,
+          },
         },
-      },
-    };
+      };
 
-    const data = updated[forecastsTicker.toUpperCase()];
-    const numValue = Number(value) || 0;
+      const data = updated[forecastsTicker.toUpperCase()];
 
-    // ==== SALES ↔ SALES GROWTH ====
-    if (metricName === "Sales") {
-      const salesPrev = Number(data["Sales"]?.["one_year_before"]) || 0;
-      const salesCurr = Number(data["Sales"]?.["current_year"]) || 0;
-      const salesNext = Number(data["Sales"]?.["one_year_later"]) || 0;
+      // Helper to parse numbers safely
+      const num = (v: any) => {
+        const n = Number(v);
+        return isNaN(n) ? 0 : n;
+      };
 
-      if (yearKey === "current_year" && salesPrev) {
-        data["Sales Growth"] = {
-          ...data["Sales Growth"],
-          current_year: ((salesCurr - salesPrev) / salesPrev) * 100,
-        };
+      // When a base metric changes, update associated growth/margins
+      const recalcGrowthForMetric = (baseMetric: string) => {
+        const growthMetric = baseMetric + " Growth";
+        ensureMetricStructure(data, growthMetric);
+
+        const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
+        const currVal = safeNumber(data[baseMetric]?.["current_year"]);
+        const nextVal = safeNumber(data[baseMetric]?.["one_year_later"]);
+
+        data[growthMetric]["current_year"] = prevVal
+          ? computeGrowthPct(prevVal, currVal)
+          : data[growthMetric]["current_year"];
+        data[growthMetric]["one_year_later"] = currVal
+          ? computeGrowthPct(currVal, nextVal)
+          : data[growthMetric]["one_year_later"];
+      };
+
+      const recalcBaseFromGrowth = (
+        baseMetric: string,
+        growthMetric: string
+      ) => {
+        ensureMetricStructure(data, baseMetric);
+        // If user edited growth current_year -> base current_year = prev * (1 + growth/100)
+        const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
+        const growthCurr = safeNumber(data[growthMetric]?.["current_year"]);
+        const growthNext = safeNumber(data[growthMetric]?.["one_year_later"]);
+        if (
+          yearKey === "current_year" &&
+          prevVal &&
+          data[growthMetric]?.["current_year"] != null
+        ) {
+          data[baseMetric]["current_year"] = computeValueFromGrowth(
+            prevVal,
+            Number(data[growthMetric]["current_year"])
+          );
+        }
+        if (
+          yearKey === "one_year_later" &&
+          safeNumber(data[baseMetric]?.["current_year"]) &&
+          data[growthMetric]?.["one_year_later"] != null
+        ) {
+          const currBase = safeNumber(data[baseMetric]["current_year"]);
+          data[baseMetric]["one_year_later"] = computeValueFromGrowth(
+            currBase,
+            Number(data[growthMetric]["one_year_later"])
+          );
+        }
+      };
+
+      // ==== SALES ↔ SALES GROWTH ====
+      if (metricName === "Sales") {
+        recalcGrowthForMetric("Sales");
       }
-      if (yearKey === "one_year_later" && salesCurr) {
-        data["Sales Growth"] = {
-          ...data["Sales Growth"],
-          one_year_later: ((salesNext - salesCurr) / salesCurr) * 100,
-        };
+      if (metricName === "Sales Growth") {
+        recalcBaseFromGrowth("Sales", "Sales Growth");
       }
-    }
-    if (metricName === "Sales Growth") {
-      if (yearKey === "current_year") {
-        const salesPrev = Number(data["Sales"]?.["one_year_before"]) || 0;
-        if (salesPrev) {
-          data["Sales"] = {
-            ...data["Sales"],
-            current_year: salesPrev * (1 + numValue / 100),
-          };
+
+      // ==== NET INTEREST INCOME ↔ NET INTEREST INCOME GROWTH ====
+      if (metricName === "Net Interest Income") {
+        recalcGrowthForMetric("Net Interest Income");
+      }
+      if (metricName === "Net Interest Income Growth") {
+        recalcBaseFromGrowth(
+          "Net Interest Income",
+          "Net Interest Income Growth"
+        );
+      }
+
+      // ==== NII after provision for credit losses ↔ its Growth ====
+      if (metricName === "NII after provision for credit losses") {
+        recalcGrowthForMetric("NII after provision for credit losses");
+      }
+      if (metricName === "NII after provision for credit losses Growth") {
+        recalcBaseFromGrowth(
+          "NII after provision for credit losses",
+          "NII after provision for credit losses Growth"
+        );
+      }
+
+      // ==== GROSS PROFIT ↔ GROSS PROFIT GROWTH & GROSS PROFIT MARGIN ====
+      if (metricName === "Gross Profit") {
+        recalcGrowthForMetric("Gross Profit");
+        // update Gross Profit Margin for the changed yearKey
+        const gp = safeNumber(data["Gross Profit"]?.[yearKey]);
+        const sales = safeNumber(data["Sales"]?.[yearKey]);
+        ensureMetricStructure(data, "Gross Profit Margin");
+        data["Gross Profit Margin"][yearKey] = sales
+          ? (gp / sales) * 100
+          : data["Gross Profit Margin"][yearKey];
+      }
+      if (metricName === "Gross Profit Growth") {
+        recalcBaseFromGrowth("Gross Profit", "Gross Profit Growth");
+        // also update margin if Sales exists
+        const gp = safeNumber(data["Gross Profit"]?.[yearKey]);
+        const sales = safeNumber(data["Sales"]?.[yearKey]);
+        ensureMetricStructure(data, "Gross Profit Margin");
+        data["Gross Profit Margin"][yearKey] = sales
+          ? (gp / sales) * 100
+          : data["Gross Profit Margin"][yearKey];
+      }
+      if (metricName === "Gross Profit Margin") {
+        // if margin edited, update Gross Profit = Sales * margin%
+        const sales = safeNumber(data["Sales"]?.[yearKey]);
+        const marginNum = Number(data["Gross Profit Margin"]?.[yearKey]);
+        if (sales && !isNaN(marginNum)) {
+          ensureMetricStructure(data, "Gross Profit");
+          data["Gross Profit"][yearKey] = (sales * marginNum) / 100;
+          // recalc gross profit growth as well
+          recalcGrowthForMetric("Gross Profit");
         }
       }
-      if (yearKey === "one_year_later") {
-        const salesCurr = Number(data["Sales"]?.["current_year"]) || 0;
-        if (salesCurr) {
-          data["Sales"] = {
-            ...data["Sales"],
-            one_year_later: salesCurr * (1 + numValue / 100),
-          };
+
+      // ==== EBIT ↔ EBIT Growth ====
+      if (metricName === "EBIT") {
+        recalcGrowthForMetric("EBIT");
+      }
+      if (metricName === "EBIT Growth") {
+        recalcBaseFromGrowth("EBIT", "EBIT Growth");
+      }
+
+      // ==== PBT ↔ PBT Growth ====
+      if (metricName === "PBT") {
+        recalcGrowthForMetric("PBT");
+      }
+      if (metricName === "PBT Growth") {
+        recalcBaseFromGrowth("PBT", "PBT Growth");
+      }
+
+      // ==== NET INCOME ↔ NET INCOME GROWTH & NET INCOME MARGIN ====
+      if (metricName === "Net Income") {
+        recalcGrowthForMetric("Net Income");
+        // update Net Income Margin
+        const ni = safeNumber(data["Net Income"]?.[yearKey]);
+        const sales = safeNumber(data["Sales"]?.[yearKey]);
+        ensureMetricStructure(data, "Net Income Margin");
+        data["Net Income Margin"][yearKey] = sales
+          ? (ni / sales) * 100
+          : data["Net Income Margin"][yearKey];
+      }
+      if (metricName === "Net Income Growth") {
+        recalcBaseFromGrowth("Net Income", "Net Income Growth");
+        // update margin too
+        const ni = safeNumber(data["Net Income"]?.[yearKey]);
+        const sales = safeNumber(data["Sales"]?.[yearKey]);
+        ensureMetricStructure(data, "Net Income Margin");
+        data["Net Income Margin"][yearKey] = sales
+          ? (ni / sales) * 100
+          : data["Net Income Margin"][yearKey];
+      }
+      if (metricName === "Net Income Margin") {
+        // if margin edited, update Net Income = Sales * margin%
+        const sales = safeNumber(data["Sales"]?.[yearKey]);
+        const marginNum = Number(data["Net Income Margin"]?.[yearKey]);
+        if (sales && !isNaN(marginNum)) {
+          ensureMetricStructure(data, "Net Income");
+          data["Net Income"][yearKey] = (sales * marginNum) / 100;
+          recalcGrowthForMetric("Net Income");
         }
       }
-    }
 
-    // ==== GROSS PROFIT ↔ GROSS PROFIT MARGIN ====
-    if (metricName === "Gross Profit" || metricName === "Sales") {
-      const gp = Number(data["Gross Profit"]?.[yearKey]) || 0;
-      const sales = Number(data["Sales"]?.[yearKey]) || 0;
-      if (sales) {
-        data["Gross Profit Margin"] = {
-          ...data["Gross Profit Margin"],
-          [yearKey]: (gp / sales) * 100,
-        };
+      // When Sales changes, recompute all margins that depend on Sales
+      if (metricName === "Sales") {
+        // Gross Profit Margin and Net Income Margin
+        for (const ky of forecastYearKeys) {
+          const gp = safeNumber(data["Gross Profit"]?.[ky]);
+          const ni = safeNumber(data["Net Income"]?.[ky]);
+          const sales = safeNumber(data["Sales"]?.[ky]);
+          ensureMetricStructure(data, "Gross Profit Margin");
+          ensureMetricStructure(data, "Net Income Margin");
+          data["Gross Profit Margin"][ky] = sales
+            ? (gp / sales) * 100
+            : data["Gross Profit Margin"][ky];
+          data["Net Income Margin"][ky] = sales
+            ? (ni / sales) * 100
+            : data["Net Income Margin"][ky];
+        }
       }
-    }
-    if (metricName === "Gross Profit Margin") {
-      const sales = Number(data["Sales"]?.[yearKey]) || 0;
-      if (sales) {
-        data["Gross Profit"] = {
-          ...data["Gross Profit"],
-          [yearKey]: sales * (numValue / 100),
-        };
-      }
-    }
 
-    // ==== NET INCOME ↔ NET INCOME MARGIN ====
-    if (metricName === "Net Income" || metricName === "Sales") {
-      const ni = Number(data["Net Income"]?.[yearKey]) || 0;
-      const sales = Number(data["Sales"]?.[yearKey]) || 0;
-      if (sales) {
-        data["Net Income Margin"] = {
-          ...data["Net Income Margin"],
-          [yearKey]: (ni / sales) * 100,
-        };
-      }
-    }
-    if (metricName === "Net Income Margin") {
-      const sales = Number(data["Sales"]?.[yearKey]) || 0;
-      if (sales) {
-        data["Net Income"] = {
-          ...data["Net Income"],
-          [yearKey]: sales * (numValue / 100),
-        };
-      }
-    }
-
-    updated[forecastsTicker.toUpperCase()] = data;
-    return updated;
-  });
-};
-
-
+      updated[forecastsTicker.toUpperCase()] = data;
+      return updated;
+    });
+  };
 
   const handleSave = async () => {
     setEditing(false);
@@ -235,13 +453,21 @@ const handleEditChange = (metricName: string, yearKey: string, value: string) =>
 
       for (const metricName in updatedMetrics) {
         const row = updatedMetrics[metricName];
-        const originalRow = forecasts?.[forecastsTicker.toUpperCase()]?.[metricName];
+        const originalRow =
+          forecasts?.[forecastsTicker.toUpperCase()]?.[metricName];
 
+        // If originalRow is undefined, we still try to patch provided fields
         const fieldsToUpdate: any = {};
-        if (row["current_year"] !== originalRow["current_year"]) {
+        if (
+          !originalRow ||
+          row["current_year"] !== originalRow["current_year"]
+        ) {
           fieldsToUpdate["current_year"] = row["current_year"];
         }
-        if (row["one_year_later"] !== originalRow["one_year_later"]) {
+        if (
+          !originalRow ||
+          row["one_year_later"] !== originalRow["one_year_later"]
+        ) {
           fieldsToUpdate["one_year_later"] = row["one_year_later"];
         }
 
@@ -252,18 +478,23 @@ const handleEditChange = (metricName: string, yearKey: string, value: string) =>
             ...fieldsToUpdate,
           };
 
-          const response = await fetch(`${apiUrl}/api/financial_forecasts_data_view/`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-            body: JSON.stringify(payload),
-          });
+          const response = await fetch(
+            `${apiUrl}/api/financial_forecasts_data_view/`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: token ? `Bearer ${token}` : "",
+              },
+              body: JSON.stringify(payload),
+            }
+          );
 
           const result = await response.json();
           if (!response.ok) {
-            throw new Error(result.error || result.message || `Failed to update ${metricName}`);
+            throw new Error(
+              result.error || result.message || `Failed to update ${metricName}`
+            );
           }
         }
       }
@@ -272,6 +503,27 @@ const handleEditChange = (metricName: string, yearKey: string, value: string) =>
     } catch (error: any) {
       setForecastsError(error.message || "Failed to save data.");
     }
+  };
+
+  // Determine the ordering for display
+  const getOrderedMetricList = (dataObj: any) => {
+    if (!dataObj) return [];
+    const existing = new Set(Object.keys(dataObj));
+    const ordered: string[] = [];
+
+    for (const name of priorityOrder) {
+      if (existing.has(name)) {
+        ordered.push(name);
+        existing.delete(name);
+      }
+    }
+
+    // Append any remaining metrics that existed but weren't in priorityOrder
+    const remaining = Array.from(existing);
+    // Keep original API order if possible (we don't have that reliably), else append alphabetically
+    remaining.sort();
+    ordered.push(...remaining);
+    return ordered;
   };
 
   return (
@@ -312,7 +564,8 @@ const handleEditChange = (metricName: string, yearKey: string, value: string) =>
                   {forecastYearLabels.map((label, index) => {
                     const yearKey = forecastYearKeys[index];
                     const isEditableColumn =
-                      yearKey === "current_year" || yearKey === "one_year_later";
+                      yearKey === "current_year" ||
+                      yearKey === "one_year_later";
 
                     return (
                       <TableCell
@@ -365,95 +618,106 @@ const handleEditChange = (metricName: string, yearKey: string, value: string) =>
               </TableHead>
 
               <TableBody>
-                {Object.entries(
-                  forecasts[forecastsTicker.toUpperCase()] || {}
-                ).map(([metricName, years]: [string, any], rowIndex) => {
-                  const isEvenRow = rowIndex % 2 === 0;
+                {(() => {
+                  const dataObj = forecasts[forecastsTicker.toUpperCase()];
+                  const orderedMetrics = getOrderedMetricList(dataObj);
 
-                  return (
-                    <TableRow key={metricName}>
-                      <TableCell
-                        sx={{
-                          border: "1px solid #000000",
-                          fontWeight: "bold",
-                          fontStyle: isEvenRow ? "normal" : "italic",
-                          fontSize: isEvenRow ? "1.3rem" : "1.3rem",
-                          backgroundColor: isEvenRow ? "" : "#ebebeb",
-                        }}
-                      >
-                        {metricName}
-                      </TableCell>
-                      {forecastYearKeys.map((yearKey) => {
-                        const isEditableCell =
-                          editing &&
-                          (yearKey === "current_year" ||
-                            yearKey === "one_year_later");
+                  return orderedMetrics.map(
+                    (metricName: string, rowIndex: number) => {
+                      const years = dataObj[metricName] || {};
+                      const isEvenRow = rowIndex % 2 === 0;
 
-                        const isHighlightColumn =
-                          yearKey === "current_year" ||
-                          yearKey === "one_year_later";
-
-                        const value = editing
-                          ? editedData?.[forecastsTicker.toUpperCase()]?.[metricName]?.[yearKey] ??
-                            years[yearKey]
-                          : years[yearKey];
-
-                        return (
+                      return (
+                        <TableRow key={metricName}>
                           <TableCell
-                            key={yearKey}
-                            align="center"
                             sx={{
                               border: "1px solid #000000",
+                              fontWeight: "bold",
                               fontStyle: isEvenRow ? "normal" : "italic",
                               fontSize: isEvenRow ? "1.3rem" : "1.3rem",
-                              backgroundColor: isHighlightColumn
-                                ? "rgba(248, 247, 245, 1)"
-                                : isEvenRow
-                                ? ""
-                                : "#ebebeb",
-                              color: "#000000",
+                              backgroundColor: isEvenRow ? "" : "#ebebeb",
                             }}
                           >
-                            {isEditableCell ? (
-                              <TextField
-                                variant="outlined"
-                                value={value ?? ""}
-                                onChange={(e) =>
-                                  handleEditChange(
-                                    metricName,
-                                    yearKey,
-                                    e.target.value
-                                  )
-                                }
-                                inputProps={{
-                                  style: {
-                                    fontSize: isEvenRow ? "1rem" : "1rem",
-                                    textAlign: "center",
-                                    padding: "6px 8px",
-                                  },
-                                }}
-                                sx={{
-                                  width: "100%",
-                                  borderRadius: 1,
-                                  "& .MuiOutlinedInput-root": {
-                                    padding: 0,
-                                  },
-                                  "& .MuiInputBase-input": {
-                                    height: "1.5rem",
-                                  },
-                                }}
-                              />
-                            ) : metricName.includes("margin") ? (
-                              formatFinancialMargin(value)
-                            ) : (
-                              formatFinancialValue(value)
-                            )}
+                            {metricName}
                           </TableCell>
-                        );
-                      })}
-                    </TableRow>
+                          {forecastYearKeys.map((yearKey) => {
+                            const isEditableCell =
+                              editing &&
+                              (yearKey === "current_year" ||
+                                yearKey === "one_year_later");
+
+                            const isHighlightColumn =
+                              yearKey === "current_year" ||
+                              yearKey === "one_year_later";
+
+                            const value = editing
+                              ? (editedData?.[forecastsTicker.toUpperCase()]?.[
+                                  metricName
+                                ]?.[yearKey] ?? years[yearKey])
+                              : years[yearKey];
+
+                            const isMarginMetric = metricName
+                              .toLowerCase()
+                              .includes("margin");
+
+                            return (
+                              <TableCell
+                                key={yearKey}
+                                align="center"
+                                sx={{
+                                  border: "1px solid #000000",
+                                  fontStyle: isEvenRow ? "normal" : "italic",
+                                  fontSize: isEvenRow ? "1.3rem" : "1.3rem",
+                                  backgroundColor: isHighlightColumn
+                                    ? "rgba(248, 247, 245, 1)"
+                                    : isEvenRow
+                                      ? ""
+                                      : "#ebebeb",
+                                  color: "#000000",
+                                }}
+                              >
+                                {isEditableCell ? (
+                                  <TextField
+                                    variant="outlined"
+                                    value={value ?? ""}
+                                    onChange={(e) =>
+                                      handleEditChange(
+                                        metricName,
+                                        yearKey,
+                                        e.target.value
+                                      )
+                                    }
+                                    inputProps={{
+                                      style: {
+                                        fontSize: isEvenRow ? "1rem" : "1rem",
+                                        textAlign: "center",
+                                        padding: "6px 8px",
+                                      },
+                                    }}
+                                    sx={{
+                                      width: "100%",
+                                      borderRadius: 1,
+                                      "& .MuiOutlinedInput-root": {
+                                        padding: 0,
+                                      },
+                                      "& .MuiInputBase-input": {
+                                        height: "1.5rem",
+                                      },
+                                    }}
+                                  />
+                                ) : isMarginMetric ? (
+                                  formatFinancialMargin(value)
+                                ) : (
+                                  formatFinancialValue(value)
+                                )}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    }
                   );
-                })}
+                })()}
               </TableBody>
             </Table>
           </TableContainer>

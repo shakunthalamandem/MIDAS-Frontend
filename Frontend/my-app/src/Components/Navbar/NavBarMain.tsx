@@ -202,7 +202,7 @@ const NavbarMain: React.FC = () => {
               <DropdownTab
               label="AI-ML"
               menuItems={[
-                { label: "US FO ML Model", path: "/machine_learning/equity" },
+                { label: "US IPO & FO ML Model", path: "/machine_learning/equity" },
                 { label: "Gen AI Tool", path: "/gen_ai_tool" },
                 { label: "Portfolio Sentiment ", path: "/genai_data_set" },
                 // { label: "IPO Write-up", path: "/deals/dashboard" },
