@@ -60,27 +60,25 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
     }
   };
 
+  /** 🔹 Identify model groups: baseline vs open */
   const modelVersions = Array.from(
     new Set(
-      Object.keys(result).map(
-        (key) => key.split("_")[0] + (key.includes("open") ? "_open" : "")
+      Object.keys(result).map((key) =>
+        key.includes("open") ? "t1d_open" : "t1d"
       )
     )
   );
 
   const modelTypes = ["main", "positive", "negative"];
 
-const getModelKey = (version: string, type: string) => {
-  // pick t1d_open if exists, otherwise fallback to any version
-  const regex = new RegExp(`^${version}.*${type}_model$`);
-  const keys = Object.keys(result).filter((key) => regex.test(key));
+  /** 🔹 Helper to pick the right key for a version + type */
+  const getModelKey = (version: string, type: string) => {
+    const regex = new RegExp(`^${version}.*${type}_model$`);
+    const keys = Object.keys(result).filter((key) => regex.test(key));
+    return keys[0] || "";
+  };
 
-  if (keys.length === 0) return "";
-
-  // prefer t1d_open model if available
-  const openKey = keys.find((k) => k.includes("t1d_open"));
-  return openKey || keys[0];
-};
+  /** 🔹 Normalize prediction outcome */
   const getOutcomeCategory = (
     prediction: string | null | undefined
   ): "Negative" | "Neutral" | "Positive" => {
@@ -92,20 +90,23 @@ const getModelKey = (version: string, type: string) => {
     return "Neutral";
   };
 
-const getOverallPrediction = (): "Negative" | "Neutral" | "Positive" => {
-  const mainModelKeys = Object.keys(result).filter((k) => k.includes("main_model"));
-  // prioritize t1d_open_main_model if exists
-  const preferredKey =
-    mainModelKeys.find((k) => k.includes("t1d_open_main_model")) || mainModelKeys[0];
+  /** 🔹 Decide overall prediction (prefer open if price entered) */
+  const getOverallPrediction = (): "Negative" | "Neutral" | "Positive" => {
+    const mainModel = result["t1d_main_model"];
+    const openMainModel = result["t1d_open_main_model"];
 
-  const prediction = result[preferredKey]?.prediction;
-  return getOutcomeCategory(prediction);
-};
+    if (openMainModel && typeof price === "number") {
+      return getOutcomeCategory(openMainModel.prediction);
+    }
+    if (mainModel) {
+      return getOutcomeCategory(mainModel.prediction);
+    }
+    return "Neutral";
+  };
 
+  const overallPrediction = getOverallPrediction();
 
-const overallPrediction = getOverallPrediction();
-
-
+  /** 🔹 UI renderers */
   const renderOutcome = (prediction: string | null | undefined) => {
     const outcomeCategory = getOutcomeCategory(prediction);
     switch (outcomeCategory) {
@@ -131,11 +132,7 @@ const overallPrediction = getOverallPrediction();
           </Box>
         );
       default:
-        return (
-          <Box display="flex" alignItems="center" color="text.disabled">
-            N/A
-          </Box>
-        );
+        return <Box color="text.disabled">N/A</Box>;
     }
   };
 
@@ -143,7 +140,11 @@ const overallPrediction = getOverallPrediction();
     if (!value) return <Box color="text.disabled">N/A</Box>;
     const isTrue = value.toLowerCase() === "true";
     return (
-      <Box display="flex" alignItems="center" color={isTrue ? "success.main" : "error.main"}>
+      <Box
+        display="flex"
+        alignItems="center"
+        color={isTrue ? "success.main" : "error.main"}
+      >
         {isTrue ? <CheckCircleIcon sx={{ mr: 1 }} /> : <CancelIcon sx={{ mr: 1 }} />}
         {isTrue ? "Yes" : "No"}
       </Box>
@@ -151,7 +152,8 @@ const overallPrediction = getOverallPrediction();
   };
 
   const renderConfidenceLevel = (confidence: number | null | undefined) => {
-    if (confidence == null || isNaN(confidence)) return <Box color="text.disabled">N/A</Box>;
+    if (confidence == null || isNaN(confidence))
+      return <Box color="text.disabled">N/A</Box>;
 
     let color = "#f44336";
     if (confidence >= 60) color = "#4caf50";
@@ -169,55 +171,63 @@ const overallPrediction = getOverallPrediction();
             "& .MuiLinearProgress-bar": { backgroundColor: color },
           }}
         />
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-          <Typography variant="caption" sx={{ fontStyle: "italic", color: "text.secondary" }}>
-            Confidence - {confidence.toFixed(1)}%
-          </Typography>
-        </Box>
+        <Typography
+          variant="caption"
+          sx={{ fontStyle: "italic", color: "text.secondary", mt: 0.5 }}
+        >
+          Confidence - {confidence.toFixed(1)}%
+        </Typography>
       </Box>
     );
   };
 
+const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
+  const labels: Record<string, { issue?: string; open?: string }> = {
+    main: {},
+    positive: {},
+    negative: {},
+  };
 
-  // Determine overall prediction
-  // const overallPrediction = getOutcomeCategory(
-  //   result[getModelKey(modelVersions[0], "main")]?.prediction
-  // );
+  // ---- MAIN ----
+  if (result["t1d_main_model"]?.prediction) {
+    labels.main.issue = "Overall Return Category";
+  }
+  if (result["t1d_open_main_model"]?.prediction) {
+    labels.main.open = "Overall Return Category";
+  }
 
-  // Dynamically filter row labels
-  const rowLabels: Record<string, string> = (() => {
-    if (overallPrediction === "Positive") {
-      return {
-        main: "Overall Return Category",
-        positive: "High Positive Return Probability",
-        negative: "",
-      };
-    }
-    if (overallPrediction === "Neutral") {
-      return {
-        main: "Overall Return Category",
-        positive: "",
-        negative: "",
-      };
-    }
-    if (overallPrediction === "Negative") {
-      return {
-        main: "Overall Return Category",
-        positive: "",
-        negative: "High Negative Return Risk",
-      };
-    }
-    return {
-      main: "Overall Return Category",
-      positive: "High Positive Return Probability",
-      negative: "High Negative Return Risk",
-    };
-  })();
+  // ---- POSITIVE ----
+  if (result["t1d_positive_model"]?.prediction?.toLowerCase() === "true") {
+    labels.positive.issue = "High Positive Return Probability";
+  }
+  if (result["t1d_open_positive_model"]?.prediction?.toLowerCase() === "true") {
+    labels.positive.open = "High Positive Return Probability";
+  }
+
+  // ---- NEGATIVE ----
+  if (result["t1d_negative_model"]?.prediction?.toLowerCase() === "true") {
+    labels.negative.issue = "High Negative Return Risk";
+  }
+  if (result["t1d_open_negative_model"]?.prediction?.toLowerCase() === "true") {
+    labels.negative.open = "High Negative Return Risk";
+  }
+
+  return labels;
+})();
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
-      <Paper sx={{ p: 3, mt: 4, bgcolor: "#f9fafb", borderRadius: 3, boxShadow: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Paper
+        sx={{
+          p: 3,
+          mt: 4,
+          bgcolor: "#f9fafb",
+          borderRadius: 3,
+          boxShadow: 3,
+        }}
+      >
+        {/* ---- Header ---- */}
+        <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
             <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
             <Typography variant="h6" fontWeight="bold" color="primary.main">
@@ -232,7 +242,12 @@ const overallPrediction = getOverallPrediction();
                 size="small"
                 value={price}
                 onChange={handlePriceChange}
-                sx={{ mr: 2, width: 194, backgroundColor: "#ede7f6", borderRadius: 1 }}
+                sx={{
+                  mr: 2,
+                  width: 194,
+                  backgroundColor: "#ede7f6",
+                  borderRadius: 1,
+                }}
                 type="number"
               />
               <Button
@@ -246,7 +261,11 @@ const overallPrediction = getOverallPrediction();
                   "&:disabled": { backgroundColor: "#002060", color: "#ccc" },
                 }}
               >
-                {isLoading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Repredict"}
+                {isLoading ? (
+                  <CircularProgress size={24} sx={{ color: "#fff" }} />
+                ) : (
+                  "Repredict"
+                )}
               </Button>
             </Box>
           )}
@@ -255,32 +274,44 @@ const overallPrediction = getOverallPrediction();
         <Divider sx={{ my: 3 }} />
         <MethodologyAccordion1Day />
 
+        {/* ---- Table ---- */}
         <TableContainer>
           <Table>
             <TableBody>
+              {/* Header Row */}
               <TableRow sx={{ bgcolor: "#f0f4f8" }}>
                 <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
                 {modelVersions.map((version, idx) => {
-                  const label = version.includes("open") ? "T+1D Close from T+1D Open" : "T+1D Close from Issue Price";
+                  const label = version.includes("open")
+                    ? "T+1D Close from T+1D Open"
+                    : "T+1D Close from Issue Price";
                   const cellBgColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
                   return (
                     <React.Fragment key={version}>
-                      <TableCell sx={{ fontWeight: 600, bgcolor: cellBgColor }}>{label}</TableCell>
-                      <TableCell sx={{ fontWeight: 600, bgcolor: cellBgColor }}>Confidence</TableCell>
+                      <TableCell sx={{ fontWeight: 600, bgcolor: cellBgColor }}>
+                        {label}
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, bgcolor: cellBgColor }}>
+                        Confidence
+                      </TableCell>
                     </React.Fragment>
                   );
                 })}
               </TableRow>
 
+              {/* Dynamic Rows */}
               {Object.entries(rowLabels)
-                .filter(([_, label]) => label) // keep only non-empty labels
+                .filter(([_, label]) => label)
                 .map(([type, label]) => (
                   <TableRow key={type}>
-                    <TableCell>{label}</TableCell>
+                    <TableCell>
+                      {label.issue || label.open || ""}
+                    </TableCell>
                     <TableCell>
                       <Typography variant="body2" whiteSpace="pre-line">
-                        {result[getModelKey(modelVersions[0], type)]?.explanation || ""}
+                        {result[getModelKey(modelVersions[0], type)]?.explanation ||
+                          ""}
                       </Typography>
                     </TableCell>
 
@@ -289,7 +320,7 @@ const overallPrediction = getOverallPrediction();
                       const modelData = result[key];
                       const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
 
-                      if (!modelData)
+                      if (!modelData) {
                         return (
                           <React.Fragment key={version}>
                             <TableCell sx={{ bgcolor: cellColor }}>
@@ -300,6 +331,7 @@ const overallPrediction = getOverallPrediction();
                             </TableCell>
                           </React.Fragment>
                         );
+                      }
 
                       const renderResult =
                         type === "main"
@@ -308,7 +340,9 @@ const overallPrediction = getOverallPrediction();
 
                       return (
                         <React.Fragment key={version}>
-                          <TableCell sx={{ bgcolor: cellColor }}>{renderResult}</TableCell>
+                          <TableCell sx={{ bgcolor: cellColor }}>
+                            {renderResult}
+                          </TableCell>
                           <TableCell sx={{ bgcolor: cellColor }}>
                             {renderConfidenceLevel(modelData.confidence)}
                           </TableCell>
@@ -317,7 +351,6 @@ const overallPrediction = getOverallPrediction();
                     })}
                   </TableRow>
                 ))}
-
             </TableBody>
           </Table>
         </TableContainer>
