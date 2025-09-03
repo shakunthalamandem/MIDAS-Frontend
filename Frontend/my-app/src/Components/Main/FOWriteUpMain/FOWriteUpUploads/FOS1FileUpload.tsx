@@ -66,7 +66,7 @@ const FOS1FileUpload: React.FC = () => {
     formData.append("market", market.trim());
     formData.append("ticker", ticker.trim());
 
-    const endpoint = `${apiUrl}/api/upload_s1_data/`;
+    const endpoint = `${apiUrl}/api/upload_fo_s1_data/`;
 
     setLoading(true);
     setSnackbarOpen(false);

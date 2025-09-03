@@ -325,7 +325,7 @@ const EquityNewDealFormMain: React.FC = () => {
             {error}
           </Alert>
         )}
-<DealFormAllTickersTable onRowClick={handleTickerRowClick} />
+        <DealFormAllTickersTable onRowClick={handleTickerRowClick} />
         <DealFormSectionMainTable selectedOption={selectedOption} />
       </Paper>
     </Fade>
