@@ -95,7 +95,7 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
       <FOValuationWriteup selectedData={selectedData.valuation_writeup || {}} />
       <FOFutureOutlook selectedData={selectedData.future_outlook || {}} />
       <FOBusinessHighlights selectedData={selectedData.business_highlights || {}} />
-      {/* <FOManagementWriteUp selectedData={selectedData.management_writeup || {}} /> */}
+      <FOManagementWriteUp selectedData={selectedData.management_writeup || {}} />
     </>
   );
 };
