@@ -51,10 +51,14 @@ const formatDateCell = (params: GridRenderCellParams<any>) => {
   const getDaySuffix = (d: number) => {
     if (d > 3 && d < 21) return "th";
     switch (d % 10) {
-      case 1: return "st";
-      case 2: return "nd";
-      case 3: return "rd";
-      default: return "th";
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
     }
   };
 
@@ -67,9 +71,12 @@ interface DealsTableProps {
   onRowSelect: (row: any) => void;
 }
 
-const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) => {
+const DealsTable: React.FC<DealsTableProps> = ({
+  rows,
+  loading,
+  onRowSelect,
+}) => {
   const [selectedId, setSelectedId] = useState<number | string | null>(null);
-
 
   const columns: GridColDef[] = [
     {
@@ -92,14 +99,16 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
         </span>
       ),
     },
-    {      field: "region",
+    {
+      field: "region",
       headerName: "Region",
       renderHeader: () => formatHeader("Region"),
       flex: 0.75,
       headerAlign: "center",
       align: "center",
     },
-{      field: "sector",
+    {
+      field: "sector",
       headerName: "Sector",
       renderHeader: () => formatHeader("Sector"),
       flex: 1.25,
@@ -148,14 +157,23 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
       flex: 1,
       headerAlign: "center",
       align: "center",
-      valueGetter: (params: any) => {
-        if (!params || !params.row) return "-";
-        const min = params.row.pricing_range_min;
-        const max = params.row.pricing_range_max;
-        if (typeof min === "number" && typeof max === "number") {
-          return `${min.toFixed(2)}-${max.toFixed(2)}`;
+      renderCell: (params: GridRenderCellParams<any>) => {
+        const minRaw = params.row.pricing_range_min;
+        const maxRaw = params.row.pricing_range_max;
+
+        // ✅ If either value is null, undefined, or an empty string → show TBD
+        if (!minRaw || !maxRaw) {
+          return "TBD";
         }
-        return "-";
+
+        const min = Number(minRaw);
+        const max = Number(maxRaw);
+
+        if (!isNaN(min) && !isNaN(max)) {
+          return `$${min.toFixed(0)} - $${max.toFixed(0)}`;
+        }
+
+        return "TBD";
       },
     },
     {
@@ -195,53 +213,56 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
       renderCell: (params: GridRenderCellParams<any>) => {
         if (params.value?.toString().toLowerCase() === "yes") {
           return (
-     <Link
-    to={`/ipo-dashboard/${params.row.ticker}`}
-    style={{ color: "#002060", fontWeight: "bold", textDecoration: "none" }}
-  >
-    <span style={{ color: "green" }}>✔</span>{" "}
-    <span style={{ textDecoration: "underline" }}>View</span>
-  </Link>
+            <Link
+              to={`/ipo-dashboard/${params.row.ticker}`}
+              style={{
+                color: "#002060",
+                fontWeight: "bold",
+                textDecoration: "none",
+              }}
+            >
+              <span style={{ color: "green" }}>✔</span>{" "}
+              <span style={{ textDecoration: "underline" }}>View</span>
+            </Link>
           );
         }
         return <span style={{ color: "red" }}>✘</span>;
       },
     },
     {
-  field: "track_here",
-  headerName: "Track Here",
-  renderHeader: () => formatHeader("Track Here"),
-  flex: 1,
-  headerAlign: "center",
-  align: "center",
-  renderCell: (params: GridRenderCellParams<any>) => {
-    const ticker = params.row.ticker;
-    const pricingDate = params.row.pricing_date;
+      field: "track_here",
+      headerName: "Track Here",
+      renderHeader: () => formatHeader("Track Here"),
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params: GridRenderCellParams<any>) => {
+        const ticker = params.row.ticker;
+        const pricingDate = params.row.pricing_date;
 
-    // Handle click
-    const handleTrackHereClick = () => {
-      if (ticker && pricingDate) {
-        const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${pricingDate}`;
-        // Open the URL in a new tab
-        window.open(url, "_blank");
-      }
-    };
+        // Handle click
+        const handleTrackHereClick = () => {
+          if (ticker && pricingDate) {
+            const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${pricingDate}`;
+            // Open the URL in a new tab
+            window.open(url, "_blank");
+          }
+        };
 
-    return (
-      <span
-        onClick={handleTrackHereClick} // Navigate to the tracking page in a new tab
-        style={{
-          cursor: "pointer",
-          color: "#0066cc",
-          textDecoration: "underline", // Optional: Make it look like a link
-        }}
-      >
-        Track Here
-      </span>
-    );
-  },
-}
-
+        return (
+          <span
+            onClick={handleTrackHereClick} // Navigate to the tracking page in a new tab
+            style={{
+              cursor: "pointer",
+              color: "#0066cc",
+              textDecoration: "underline", // Optional: Make it look like a link
+            }}
+          >
+            Track Here
+          </span>
+        );
+      },
+    },
   ];
 
   const handleRowClick = (params: any) => {
@@ -251,34 +272,30 @@ const DealsTable: React.FC<DealsTableProps> = ({ rows, loading, onRowSelect }) =
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-<div style={{ width: "100%", height: 450 ,maxHeight:'450px'}}>
-  <DataGrid
-    rows={rows}
-    columns={columns}
-    loading={loading}
-    checkboxSelection={false}
-    onRowClick={handleRowClick}
-    rowHeight={35}
-    getRowClassName={(params) =>
-      selectedId === params.id ? "Mui-selected" : ""
-    }
-    sx={{
-      "& .MuiDataGrid-container--top [role='row']": {
-        backgroundColor: "#002060",
-        color: "#FFFFFF",
-      },
-      "& .Mui-selected": {
-        backgroundColor: "#cad0f1ff !important",
-      },
-      cursor: "pointer",
-      border: "1px solid #ccccccff",
-    }}
-  />
-</div>
-
-
-
-
+      <div style={{ width: "100%", height: 450, maxHeight: "450px" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          loading={loading}
+          checkboxSelection={false}
+          onRowClick={handleRowClick}
+          rowHeight={35}
+          getRowClassName={(params) =>
+            selectedId === params.id ? "Mui-selected" : ""
+          }
+          sx={{
+            "& .MuiDataGrid-container--top [role='row']": {
+              backgroundColor: "#002060",
+              color: "#FFFFFF",
+            },
+            "& .Mui-selected": {
+              backgroundColor: "#cad0f1ff !important",
+            },
+            cursor: "pointer",
+            border: "1px solid #ccccccff",
+          }}
+        />
+      </div>
     </Container>
   );
 };
