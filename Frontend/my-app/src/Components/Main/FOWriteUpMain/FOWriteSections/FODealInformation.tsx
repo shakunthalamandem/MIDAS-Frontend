@@ -16,27 +16,23 @@ interface FODealInformationProps {
 // Fields to be displayed in IPO summary
 const infoFields: { label: string; key: string }[] = [
   { label: "Pricing Date", key: "pricing_date" },
-  { label: "Price Range", key: "price_range" },
+  { label: "Issue price($)", key: "issue_price" },
   { label: "Deal Size ($ Million)", key: "deal_size" },
   { label: "Industry", key: "industry" },
   { label: "Shares Offered", key: "shares_offered" },
-  { label: "No of Shares Outstanding", key: "nosh" },
-  { label: "Established", key: "established_year" },
+  { label: "No of Shares Outstanding", key: "number_of_shares_outstanding" },
+  { label: "Greenshoe", key: "greenshoe" },
   { label: "Bookrunners", key: "bookrunners" },
 ];
 
 // 🔹 Format value
 const formatValue = (key: string, value: any, selectedData: Record<string, any>) => {
-  if (key === "price_range") {
-    return selectedData.lower_bound && selectedData.upper_bound
-      ? `$${selectedData.lower_bound} - $${selectedData.upper_bound}`
-      : "N/A";
-  }
-  if (key === "deal_size" || key === "shares_offered") {
+  
+  if (key === "deal_size" || key === "shares_offered" || key === "issue_price") {
     return value ? Number(value).toLocaleString() : "N/A";
   }
-  if (key === "nosh") {
-    return value ? `${Number(value).toLocaleString()}M` : "N/A";
+  if (key === "number_of_shares_outstanding"  || key === "greenshoe") {
+    return value ? `${Number(value).toLocaleString()}` : "N/A";
   }
   if (key === "bookrunners") {
     return Array.isArray(value) && value.length > 0 ? value.join(", ") : "N/A";
