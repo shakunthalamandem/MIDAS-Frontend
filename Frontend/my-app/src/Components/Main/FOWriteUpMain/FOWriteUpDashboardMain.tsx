@@ -91,13 +91,21 @@ const FOWriteUpDashboardMain: React.FC = () => {
       flex: 1,
       valueFormatter: (params) => params || "Not Available",
     },
-    {
-      field: "deal_size",
-      headerName: "Deal Size",
-      flex: 1,
-      valueFormatter: (params) =>
-        params !== null && params !== undefined ? params : "Not Available",
-    },
+{
+  field: "deal_size",
+  headerName: "Deal Size ($ Million)",
+  flex: 1,
+  valueFormatter: (params) => {
+    if (params === null || params === undefined || params === 0) {
+      return "Not Available";
+    }
+    
+    const millions = params / 1000000;
+    return `$ ${Math.round(millions).toLocaleString()}M`;
+  },
+}
+
+
   ];
 
   return (
