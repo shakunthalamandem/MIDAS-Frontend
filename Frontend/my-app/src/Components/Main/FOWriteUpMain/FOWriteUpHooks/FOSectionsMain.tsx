@@ -137,7 +137,7 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
               : "Loading..."}
           </Typography>
 
-          <Button
+          {/* <Button
             variant="contained"
             onClick={onExportPDF}
             sx={{
@@ -152,7 +152,7 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
             startIcon={pdfLoading ? <CircularProgress color="inherit" size={18} /> : null}
           >
             {pdfLoading ? "Generating..." : "Generate Monashee PDF"}
-          </Button>
+          </Button> */}
         </Box>
 
         {/* 🔹 Search Autocomplete */}

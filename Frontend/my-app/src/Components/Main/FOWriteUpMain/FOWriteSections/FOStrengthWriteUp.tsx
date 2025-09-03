@@ -6,7 +6,11 @@ import {
   Card,
   CardContent,
   Grid,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { motion } from "framer-motion";
 
 interface StrengthWriteupProps {
@@ -21,66 +25,107 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData }) => 
     return null;
   }
 
+  const MotionBox = motion(Box);
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 30 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
-        <Card
-          sx={{
-            borderRadius: 4,
-            background: "linear-gradient(#f0f5ff)",
-            boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
-            p: 2,
-          }}
-        >
-          <CardContent>
-        
-
-            <Grid container spacing={4}>
-              {/* Strengths */}
-              <Grid item xs={12} md={6}>
-                <Box>
+      <Grid container spacing={4}>
+        {/* Strengths Section */}
+        {selectedData.strengths && (
+          <Grid item xs={12} md={6}>
+            <MotionBox
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  id="strengths-header"
+                >
                   <Typography
                     variant="h6"
-                    sx={{ fontWeight: 600, mb: 1, color: "#026269" }}
                     align="center"
+                    sx={{
+                      color: "#026269",
+                      fontWeight: "bold",
+                      flex: 1,
+                    }}
                   >
                     Strengths
                   </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Card
+                    sx={{
+                      borderRadius: 3,
+                      background: "linear-gradient(to bottom, #f0f5ff, #ffffff)",
+                      boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+                    }}
                   >
-                    {selectedData.strengths || "N/A"}
-                  </Typography>
-                </Box>
-              </Grid>
+                    <CardContent>
+                      <Typography
+                        variant="body1"
+                        sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
+                      >
+                        {selectedData.strengths}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </AccordionDetails>
+              </Accordion>
+            </MotionBox>
+          </Grid>
+        )}
 
-              {/* Weaknesses */}
-              <Grid item xs={12} md={6}>
-                <Box>
+        {/* Weaknesses Section */}
+        {selectedData.weakness && (
+          <Grid item xs={12} md={6}>
+            <MotionBox
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  id="weakness-header"
+                >
                   <Typography
                     variant="h6"
-                    sx={{ fontWeight: 600, mb: 1, color: "#026269" }}
                     align="center"
+                    sx={{
+                      color: "#8a1c1c",
+                      fontWeight: "bold",
+                      flex: 1,
+                    }}
                   >
                     Concerns
                   </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Card
+                    sx={{
+                      borderRadius: 3,
+                      background: "linear-gradient(to bottom, #fef6f6, #ffffff)",
+                      boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+                    }}
                   >
-                    {selectedData.weakness || "N/A"}
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-      </motion.div>
+                    <CardContent>
+                      <Typography
+                        variant="body1"
+                        sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
+                      >
+                        {selectedData.weakness || "N/A"}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </AccordionDetails>
+              </Accordion>
+            </MotionBox>
+          </Grid>
+        )}
+      </Grid>
     </Container>
   );
 };

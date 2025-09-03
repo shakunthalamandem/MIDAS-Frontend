@@ -7,6 +7,8 @@ import FOFutureOutlook from "../FOWriteSections/FOFutureOutlook";
 
 import { CircularProgress, Box, Typography } from "@mui/material";
 import FOSharePricePerformance from "../FOWriteSections/FOSharePricePerformance";
+import FOBusinessHighlights from "../FOWriteSections/FOBusinessHighlights";
+import FOManagementWriteUp from "../FOWriteSections/FOManagementWriteUp";
 
 interface ChildProps {
   ticker: string;
@@ -89,11 +91,11 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
       <FODealInformation selectedData={selectedData.deal_information || {}} />
       <FOTradingDetails selectedData={selectedData.trading_details || {}} />
       <FOSharePricePerformance selectedData={selectedData.share_price_performance || {}} />
-      <FOValuationWriteup selectedData={selectedData.valuation_writeup || {}} />
       <FOStrengthWriteUp selectedData={selectedData.strength_writeup || {}} />
+      <FOValuationWriteup selectedData={selectedData.valuation_writeup || {}} />
       <FOFutureOutlook selectedData={selectedData.future_outlook || {}} />
-      {/* <FOBusinessHighlights selectedData={selectedData.business_highlights || {}} /> */}
-      {/* <FOManagementWriteUp selectedData={selectedData.management_writeup || {}} /> */}
+      <FOBusinessHighlights selectedData={selectedData.business_highlights || {}} />
+      <FOManagementWriteUp selectedData={selectedData.management_writeup || {}} />
     </>
   );
 };

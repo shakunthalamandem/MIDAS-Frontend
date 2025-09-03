@@ -132,8 +132,8 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
           <TableHead sx={{ backgroundColor: "#002060" }}>
             <TableRow>
               <StyledTableCell>Metric</StyledTableCell>
-              <StyledTableCell align="right">Current Year</StyledTableCell>
-              <StyledTableCell align="right">Previous Year</StyledTableCell>
+              <StyledTableCell align="right">Current Year($)</StyledTableCell>
+              <StyledTableCell align="right">Previous Year($)</StyledTableCell>
               <StyledTableCell align="right">YoY Change (%)</StyledTableCell>
             </TableRow>
           </TableHead>
