@@ -162,6 +162,15 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({
     data?.[ticker]?.data?.some((item) => item.ai_generated) || false;
 
   const columns = getColumns(ticker, ai_generated);
+
+  const selectedRow: ComparableMetric | undefined = data?.[ticker]?.data?.find(
+    (m) =>
+      (m.competitor || "")
+        .toUpperCase()
+        .trim()
+        .startsWith(ticker.toUpperCase().trim())
+  );
+
   return (
     <Box sx={{ p: 0, width: "100%" }}>
       <Typography
@@ -213,15 +222,123 @@ const IPODashboardMainTable: React.FC<IPODashboardMainTableProps> = ({
                 ))}
               </TableRow>
             </TableHead>
+
             <TableBody>
+              {/* --- NEW: render the selected ticker's own data row first, highlighted & bold --- */}
+              {selectedRow && (
+                <Fade in timeout={500}>
+                  <TableRow
+                    sx={{
+                      backgroundColor: "#9de0f5ff",
+                      // ensure cells inherit the highlight & bold reliably
+                      "& td": {
+                        backgroundColor: "#ffecb8ff",
+                        fontWeight: 700,
+                      },
+                    }}
+                  >
+                    {columns.map((col) => {
+                      const value = selectedRow[col.key];
+                      let displayValue =
+                        value === null ||
+                        value === undefined ||
+                        (typeof value === "number" && isNaN(value))
+                          ? "N/A"
+                          : col.key === "price_usd"
+                            ? Number(value).toFixed(1)
+                            : col.key === "market_cap" ||
+                                col.key === "ev_usd_million"
+                              ? typeof value === "number"
+                                ? value.toLocaleString(undefined, {
+                                    maximumFractionDigits: 1,
+                                  })
+                                : value
+                              : typeof value === "number"
+                                ? formatNumber(
+                                    value,
+                                    col.isCurrency,
+                                    col.isPercentage
+                                  )
+                                : value;
+
+                      return (
+                        <TableCell
+                          key={col.key}
+                          align="center"
+                          sx={{ borderBottom: "none", whiteSpace: "nowrap" }}
+                        >
+                          {columnsWithX.has(col.key) &&
+                          typeof value === "number" &&
+                          col.key !== "competitor" ? (
+                            `${displayValue}x`
+                          ) : (
+                            <>
+                              {displayValue}
+                              {col.key === "competitor" &&
+                                selectedRow.ai_generated && (
+                                  <span
+                                    style={{
+                                      color: "#FF5722",
+                                      fontWeight: "bold",
+                                      marginLeft: "4px",
+                                    }}
+                                  >
+                                    (AI)
+                                  </span>
+                                )}
+                            </>
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                </Fade>
+              )}
+
               {Object.entries(data).map(([tickerKey, metricsObj]) => {
+                // For the section that matches the selected ticker,
+                // exclude the selected row so it doesn't duplicate below.
                 const metrics = metricsObj.data
-                  ? [...metricsObj.data].sort((a, b) => {
-                      if (a.competitor === tickerKey) return -1;
-                      if (b.competitor === tickerKey) return 1;
-                      return 0;
-                    })
+                  ? tickerKey === ticker
+                    ? metricsObj.data
+                        // exclude the main ticker row (competitor startsWith ticker)
+                        .filter(
+                          (m) =>
+                            !(m.competitor || "")
+                              .toUpperCase()
+                              .trim()
+                              .startsWith(ticker.toUpperCase().trim())
+                        )
+                        .sort((a, b) => {
+                          const aIsTicker = (a.competitor || "")
+                            .toUpperCase()
+                            .trim()
+                            .startsWith(tickerKey.toUpperCase().trim());
+                          const bIsTicker = (b.competitor || "")
+                            .toUpperCase()
+                            .trim()
+                            .startsWith(tickerKey.toUpperCase().trim());
+
+                          if (aIsTicker && !bIsTicker) return -1;
+                          if (!aIsTicker && bIsTicker) return 1;
+                          return 0;
+                        })
+                    : [...metricsObj.data].sort((a, b) => {
+                        const aIsTicker = (a.competitor || "")
+                          .toUpperCase()
+                          .trim()
+                          .startsWith(tickerKey.toUpperCase().trim());
+                        const bIsTicker = (b.competitor || "")
+                          .toUpperCase()
+                          .trim()
+                          .startsWith(tickerKey.toUpperCase().trim());
+
+                        if (aIsTicker && !bIsTicker) return -1;
+                        if (!aIsTicker && bIsTicker) return 1;
+                        return 0;
+                      })
                   : [];
+
                 const averages = metricsObj.Averages;
 
                 return (
