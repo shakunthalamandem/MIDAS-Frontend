@@ -264,7 +264,7 @@ const EquityNewDealFormMain: React.FC = () => {
               sx={{ minWidth: 300, backgroundColor: "#fff", borderRadius: 1 }}
               options={filteredOptions}
               getOptionLabel={(option) =>
-                `${option.ticker} - ${formatDateSimple(option.pricing_date)}`
+                `${option.ticker} - ${option.pricing_date && option.pricing_date.trim() ? formatDateSimple(option.pricing_date) : "TBA"}`
               }
               onChange={handleAutocompleteChange}
               value={
@@ -337,12 +337,22 @@ const EquityNewDealFormMain: React.FC = () => {
                       }}
                     />
                   </Box>
+
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    sx={{ textAlign: "left", width: "100%" }}
+                    sx={{
+                      textAlign: "left",
+                      width: "100%",
+                      fontStyle:
+                        !option.pricing_date || !option.pricing_date.trim()
+                          ? "italic"
+                          : "normal",
+                    }}
                   >
-                    {formatDateSimple(option.pricing_date)}
+                    {option.pricing_date && option.pricing_date.trim()
+                      ? formatDateSimple(option.pricing_date)
+                      : "TBA"}
                   </Typography>
                 </Box>
               )}
