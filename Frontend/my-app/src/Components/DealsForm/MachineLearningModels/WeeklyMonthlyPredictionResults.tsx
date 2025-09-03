@@ -448,9 +448,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
         ) : (
           <Box sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="h6" color="text.secondary">
-              Enter the **T+1D Close Return (%)** to predict the T+1W and T+1M
-              outcomes.
+              Enter the <b>T+1D Close Return (%)</b> to predict the T+1W and T+1M outcomes.
             </Typography>
+
           </Box>
         )}
       </Paper>

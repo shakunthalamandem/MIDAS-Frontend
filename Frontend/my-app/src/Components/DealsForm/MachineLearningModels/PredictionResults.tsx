@@ -51,32 +51,40 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
 
   const handleRepredict = async () => {
     if (typeof price === "number" && onRepredict) {
-      onRepredict(price);
       setIsLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await onRepredict(price);
       } finally {
         setIsLoading(false);
       }
     }
   };
 
-  // versions are like ["t1d", "t1d_open"]
   const modelVersions = Array.from(
-    new Set(Object.keys(result).map((key) => key.split("_")[0] + (key.includes("open") ? "_open" : "")))
+    new Set(
+      Object.keys(result).map(
+        (key) => key.split("_")[0] + (key.includes("open") ? "_open" : "")
+      )
+    )
   );
 
   const modelTypes = ["main", "positive", "negative"];
 
-  const getModelKey = (version: string, type: string): string => {
-    const regex = new RegExp(`^${version}.*${type}_model$`);
-    return Object.keys(result).find((key) => regex.test(key)) || "";
-  };
+const getModelKey = (version: string, type: string) => {
+  // pick t1d_open if exists, otherwise fallback to any version
+  const regex = new RegExp(`^${version}.*${type}_model$`);
+  const keys = Object.keys(result).filter((key) => regex.test(key));
 
+  if (keys.length === 0) return "";
+
+  // prefer t1d_open model if available
+  const openKey = keys.find((k) => k.includes("t1d_open"));
+  return openKey || keys[0];
+};
   const getOutcomeCategory = (
     prediction: string | null | undefined
   ): "Negative" | "Neutral" | "Positive" => {
-    if (!prediction || typeof prediction !== "string") return "Neutral";
+    if (!prediction) return "Neutral";
     const lower = prediction.toLowerCase();
     if (lower.includes("negative")) return "Negative";
     if (lower.includes("neutral")) return "Neutral";
@@ -84,15 +92,21 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
     return "Neutral";
   };
 
-  const renderOutcome = (prediction: string | null | undefined) => {
-    if (!prediction) {
-      return (
-        <Box display="flex" alignItems="center" color="text.disabled">
-          N/A
-        </Box>
-      );
-    }
+const getOverallPrediction = (): "Negative" | "Neutral" | "Positive" => {
+  const mainModelKeys = Object.keys(result).filter((k) => k.includes("main_model"));
+  // prioritize t1d_open_main_model if exists
+  const preferredKey =
+    mainModelKeys.find((k) => k.includes("t1d_open_main_model")) || mainModelKeys[0];
 
+  const prediction = result[preferredKey]?.prediction;
+  return getOutcomeCategory(prediction);
+};
+
+
+const overallPrediction = getOverallPrediction();
+
+
+  const renderOutcome = (prediction: string | null | undefined) => {
     const outcomeCategory = getOutcomeCategory(prediction);
     switch (outcomeCategory) {
       case "Negative":
@@ -126,86 +140,18 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
   };
 
   const renderBinaryResult = (value: string | null | undefined) => {
-    if (!value) {
-      return (
-        <Box display="flex" alignItems="center" color="text.disabled">
-          N/A
-        </Box>
-      );
-    }
-
+    if (!value) return <Box color="text.disabled">N/A</Box>;
     const isTrue = value.toLowerCase() === "true";
     return (
-      <Box
-        display="flex"
-        alignItems="center"
-        color={isTrue ? "success.main" : "error.main"}
-      >
-        {isTrue ? (
-          <>
-            <CheckCircleIcon sx={{ mr: 1 }} /> Yes
-          </>
-        ) : (
-          <>
-            <CancelIcon sx={{ mr: 1 }} /> No
-          </>
-        )}
-      </Box>
-    );
-  };
-
-  const renderAccuracyLevel = (accuracy: number | null | undefined) => {
-    if (accuracy == null || isNaN(accuracy)) {
-      return (
-        <Box display="flex" alignItems="center" color="text.disabled">
-          N/A
-        </Box>
-      );
-    }
-
-    let color = "#f44336";
-    if (accuracy >= 70) color = "#4caf50";
-    else if (accuracy >= 50) color = "#ff9800";
-
-    return (
-      <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        {/* <LinearProgress
-          variant="determinate"
-          value={accuracy}
-          sx={{
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: "rgba(0,0,0,0.05)",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: color,
-            },
-          }}
-        /> */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-          <Typography
-            variant="caption"
-            sx={{
-              fontStyle: "italic",
-              ml: 1,
-              color: "text.secondary",
-              fontWeight: "bold",
-            }}
-          >
-            Accuracy - {accuracy.toFixed(1)}%
-          </Typography>
-        </Box>
+      <Box display="flex" alignItems="center" color={isTrue ? "success.main" : "error.main"}>
+        {isTrue ? <CheckCircleIcon sx={{ mr: 1 }} /> : <CancelIcon sx={{ mr: 1 }} />}
+        {isTrue ? "Yes" : "No"}
       </Box>
     );
   };
 
   const renderConfidenceLevel = (confidence: number | null | undefined) => {
-    if (confidence == null || isNaN(confidence)) {
-      return (
-        <Box display="flex" alignItems="center" color="text.disabled">
-          N/A
-        </Box>
-      );
-    }
+    if (confidence == null || isNaN(confidence)) return <Box color="text.disabled">N/A</Box>;
 
     let color = "#f44336";
     if (confidence >= 60) color = "#4caf50";
@@ -220,20 +166,11 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
             height: 8,
             borderRadius: 4,
             backgroundColor: "rgba(0,0,0,0.05)",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: color,
-            },
+            "& .MuiLinearProgress-bar": { backgroundColor: color },
           }}
         />
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-          <Typography
-            variant="caption"
-            sx={{
-              fontStyle: "italic",
-              ml: 1,
-              color: "text.secondary",
-            }}
-          >
+          <Typography variant="caption" sx={{ fontStyle: "italic", color: "text.secondary" }}>
             Confidence - {confidence.toFixed(1)}%
           </Typography>
         </Box>
@@ -241,57 +178,61 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
     );
   };
 
-  const rowLabels: Record<string, string> = {
-    main: "Overall Return Category",
-    positive: "High Positive Return Probability",
-    negative: "High Negative Return Risk",
-  };
+
+  // Determine overall prediction
+  // const overallPrediction = getOutcomeCategory(
+  //   result[getModelKey(modelVersions[0], "main")]?.prediction
+  // );
+
+  // Dynamically filter row labels
+  const rowLabels: Record<string, string> = (() => {
+    if (overallPrediction === "Positive") {
+      return {
+        main: "Overall Return Category",
+        positive: "High Positive Return Probability",
+        negative: "",
+      };
+    }
+    if (overallPrediction === "Neutral") {
+      return {
+        main: "Overall Return Category",
+        positive: "",
+        negative: "",
+      };
+    }
+    if (overallPrediction === "Negative") {
+      return {
+        main: "Overall Return Category",
+        positive: "",
+        negative: "High Negative Return Risk",
+      };
+    }
+    return {
+      main: "Overall Return Category",
+      positive: "High Positive Return Probability",
+      negative: "High Negative Return Risk",
+    };
+  })();
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
-      <Paper
-        sx={{
-          p: 3,
-          mt: 4,
-          bgcolor: "#f9fafb",
-          borderRadius: 3,
-          boxShadow: 3,
-        }}
-      >
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={2}
-        >
+      <Paper sx={{ p: 3, mt: 4, bgcolor: "#f9fafb", borderRadius: 3, boxShadow: 3 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Box display="flex" alignItems="center">
             <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
-            <Typography
-              variant="h6"
-              component="h2"
-              color="primary.main"
-              fontWeight="bold"
-            >
+            <Typography variant="h6" fontWeight="bold" color="primary.main">
               T+1D Close - Model Predictions
             </Typography>
           </Box>
-
           {onRepredict && (
             <Box display="flex" alignItems="center">
               <TextField
                 label="T+1D Open Return (%)"
                 variant="outlined"
+                size="small"
                 value={price}
                 onChange={handlePriceChange}
-                size="small"
-                sx={{
-                  mr: 2,
-                  width: "194px",
-                  position: "relative",
-                  top: "18px",
-                  backgroundColor: "#ede7f6",
-                  borderRadius: "4px",
-                }}
+                sx={{ mr: 2, width: 194, backgroundColor: "#ede7f6", borderRadius: 1 }}
                 type="number"
               />
               <Button
@@ -299,28 +240,20 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
                 onClick={handleRepredict}
                 disabled={isLoading}
                 sx={{
-                  position: "relative",
-                  top: "18px",
                   backgroundColor: "#ede7f6",
                   color: "#002060",
                   border: "1px solid #B99976",
                   "&:disabled": { backgroundColor: "#002060", color: "#ccc" },
                 }}
               >
-                {isLoading ? (
-                  <CircularProgress size={24} sx={{ color: "#fff" }} />
-                ) : (
-                  "Repredict"
-                )}
+                {isLoading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Repredict"}
               </Button>
             </Box>
           )}
         </Box>
 
         <Divider sx={{ my: 3 }} />
-        <Box mb={2}>
-          <MethodologyAccordion1Day />
-        </Box>
+        <MethodologyAccordion1Day />
 
         <TableContainer>
           <Table>
@@ -329,85 +262,62 @@ const PredictionResults: React.FC<PredictionResultsProps> = ({
                 <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
                 {modelVersions.map((version, idx) => {
-                  const label = version.includes("open")
-                    ? "T+1D Close from T+1D Open"
-                    : "T+1D Close from Issue Price";
+                  const label = version.includes("open") ? "T+1D Close from T+1D Open" : "T+1D Close from Issue Price";
                   const cellBgColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
-
                   return (
                     <React.Fragment key={version}>
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          bgcolor: cellBgColor,
-                        }}
-                      >
-                        {label}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          bgcolor: cellBgColor,
-                        }}
-                      >
-                        Confidence
-                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, bgcolor: cellBgColor }}>{label}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, bgcolor: cellBgColor }}>Confidence</TableCell>
                     </React.Fragment>
                   );
                 })}
               </TableRow>
 
-              {modelTypes.map((type) => (
-                <TableRow key={type}>
-                  <TableCell>{rowLabels[type]}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2" whiteSpace="pre-line">
-                      {
-                        result[getModelKey(modelVersions[0], type)]
-                          ?.explanation || ""
-                      }
-                    </Typography>
-                  </TableCell>
+              {Object.entries(rowLabels)
+                .filter(([_, label]) => label) // keep only non-empty labels
+                .map(([type, label]) => (
+                  <TableRow key={type}>
+                    <TableCell>{label}</TableCell>
+                    <TableCell>
+                      <Typography variant="body2" whiteSpace="pre-line">
+                        {result[getModelKey(modelVersions[0], type)]?.explanation || ""}
+                      </Typography>
+                    </TableCell>
 
-                  {modelVersions.map((version, idx) => {
-                    const key = getModelKey(version, type);
-                    const modelData = result[key];
-                    const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
+                    {modelVersions.map((version, idx) => {
+                      const key = getModelKey(version, type);
+                      const modelData = result[key];
+                      const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
 
-                    if (!modelData) {
+                      if (!modelData)
+                        return (
+                          <React.Fragment key={version}>
+                            <TableCell sx={{ bgcolor: cellColor }}>
+                              <Box color="text.disabled">N/A</Box>
+                            </TableCell>
+                            <TableCell sx={{ bgcolor: cellColor }}>
+                              <Box color="text.disabled">N/A</Box>
+                            </TableCell>
+                          </React.Fragment>
+                        );
+
+                      const renderResult =
+                        type === "main"
+                          ? renderOutcome(modelData.prediction)
+                          : renderBinaryResult(modelData.prediction);
+
                       return (
                         <React.Fragment key={version}>
+                          <TableCell sx={{ bgcolor: cellColor }}>{renderResult}</TableCell>
                           <TableCell sx={{ bgcolor: cellColor }}>
-                            <Box color="text.disabled">N/A</Box>
-                          </TableCell>
-                          <TableCell sx={{ bgcolor: cellColor }}>
-                            <Box color="text.disabled">N/A</Box>
+                            {renderConfidenceLevel(modelData.confidence)}
                           </TableCell>
                         </React.Fragment>
                       );
-                    }
+                    })}
+                  </TableRow>
+                ))}
 
-                    const renderResult =
-                      type === "main"
-                        ? renderOutcome(modelData.prediction)
-                        : renderBinaryResult(modelData.prediction);
-
-                    return (
-                      <React.Fragment key={version}>
-                        <TableCell sx={{ bgcolor: cellColor }}>
-                          {renderResult}
-                        </TableCell>
-                        <TableCell sx={{ bgcolor: cellColor }}>
-                          <Box display="flex" flexDirection="column" gap={1}>
-                            {/* {renderAccuracyLevel(modelData.accuracy)} */}
-                            {renderConfidenceLevel(modelData.confidence)}
-                          </Box>
-                        </TableCell>
-                      </React.Fragment>
-                    );
-                  })}
-                </TableRow>
-              ))}
             </TableBody>
           </Table>
         </TableContainer>

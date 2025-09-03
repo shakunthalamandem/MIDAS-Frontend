@@ -9,30 +9,31 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 
+// Updated interface with new field names
 interface SharePricePerformance {
-  three_year_total_return?: number;
-  one_year_total_return?: number;
+  _3_year_total_return?: number; // optional: add this if you expect it
+  _1_year_total_return?: number;
   ytd_return?: number;
-  six_month_return?: number;
-  three_month_return?: number;
-  one_month_return?: number;
+  _6_month_return?: number;
+  _3_month_return?: number;
+  _1_month_return?: number;
 }
 
 interface Props {
   selectedData: SharePricePerformance;
 }
 
-// Config array for fields
+// Updated mapping with new keys from API
 const perfFields: { label: string; key: keyof SharePricePerformance }[] = [
-  { label: "3-Year Total Return (%)", key: "three_year_total_return" },
-  { label: "1-Year Total Return (%)", key: "one_year_total_return" },
+  { label: "3-Year Total Return (%)", key: "_3_year_total_return" }, // optional
+  { label: "1-Year Total Return (%)", key: "_1_year_total_return" },
   { label: "YTD Return (%)", key: "ytd_return" },
-  { label: "6-Month Return (%)", key: "six_month_return" },
-  { label: "3-Month Return (%)", key: "three_month_return" },
-  { label: "1-Month Return (%)", key: "one_month_return" },
+  { label: "6-Month Return (%)", key: "_6_month_return" },
+  { label: "3-Month Return (%)", key: "_3_month_return" },
+  { label: "1-Month Return (%)", key: "_1_month_return" },
 ];
 
-// Format values
+// Format the value safely
 const formatValue = (value: any) => {
   if (value === undefined || value === null) return "N/A";
   if (typeof value === "number") return `${value.toLocaleString()}%`;

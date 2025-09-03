@@ -21,6 +21,7 @@ import IPOS1FileUpload from "../IPOwriteUp/IPOS1FileUpload";
 import UploadDataCard from "./UploadDataCard";
 import LkFileUpload from "./LkFileUpload";
 import DailyNoteUpload from "./DailyNoteUpload";
+import FOS1FileUpload from "../Main/FOWriteUpMain/FOWriteUpUploads/FOS1FileUpload";
 
 const uploadConfigs = [
   {
@@ -58,12 +59,6 @@ const uploadConfigs = [
     label: "Upload FO writeUp Data",
     apiEndpoint: "fo_writeup_data_upload",
     buttonColor: "error",
-  },
-  {
-    key: "FOfinancialForecasts",
-    label: "Upload FO S1 FinancialForecasts",
-    apiEndpoint: "fo_financial_forecasts_data_upload",
-    buttonColor: "success",
   },
   {
     key: "focompanymetric",
@@ -218,6 +213,7 @@ const MainUpload: React.FC = () => {
           <Tab label="Downloads" />
           <Tab label="Calendar" />
           <Tab label="LK File" />
+          <Tab label="FO Files" />
 
         </Tabs>
 
@@ -323,6 +319,19 @@ const MainUpload: React.FC = () => {
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
               <Card elevation={3} sx={{ borderRadius: 3, pt: 6, p: 2, background: "linear-gradient(to right, #ffecd2, #fcb69f)" }}>
                 <LkFileUpload />
+              </Card>
+            </motion.div>
+          )}
+
+          
+          {selectedTab === 6 && (
+            <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+              <Card elevation={3} sx={{ borderRadius: 3, p: 3, background: "linear-gradient(to right, #ffecd2, #fcb69f)" }}>
+                <Typography variant="h6" align="center" color="primary" sx={{ fontWeight: 600, mb: 2 }}>
+                  Upload FO Files
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <FOS1FileUpload />
               </Card>
             </motion.div>
           )}
