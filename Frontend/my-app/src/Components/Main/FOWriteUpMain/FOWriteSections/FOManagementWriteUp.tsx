@@ -10,12 +10,12 @@ import { motion } from "framer-motion";
 
 interface ValuationWriteupProps {
   selectedData: {
-    valuation?: string;
+    management_writeup?: string;
   };
 }
 
 const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({ selectedData }) => {
-  if (!selectedData || !selectedData.valuation) return null;
+  if (!selectedData || !selectedData.management_writeup) return null;
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -38,7 +38,7 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({ selectedData }) =
               align="center"
               sx={{ fontWeight: 700, color: "#128080ff", mb: 2 }}
             >
-              Valuation Writeup
+              Management Writeup
             </Typography>
             <Box>
               <Typography
@@ -49,7 +49,7 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({ selectedData }) =
                   fontSize: "1.1rem",
                 }}
               >
-                {selectedData.valuation}
+                {selectedData.management_writeup}
               </Typography>
             </Box>
           </CardContent>
