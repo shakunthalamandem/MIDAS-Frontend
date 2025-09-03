@@ -117,7 +117,7 @@ const FOWriteUpDashboardMain: React.FC = () => {
         color="#002060"
         mb={2}
       >
-        📅 All Upcoming Follow-On Offers
+        📅 All Upcoming  and Recent Follow-On Offers 
       </Typography>
       <Container maxWidth="lg">
         <Box sx={{ maxHeight: 500, bgcolor: "white", borderRadius: 2, boxShadow: 3 }}>

@@ -27,7 +27,7 @@ interface FOTradingDetailsProps {
 // Config array for fields
 const tradingFields: { label: string; key: keyof TradingDetails; suffix?: string }[] = [
   { label: "Current Share Price", key: "current_share_price", suffix: "$" },
-  { label: "Market Cap", key: "current_market_cap", suffix: "$" },
+  { label: "Market Cap(M)", key: "current_market_cap", suffix: "$" },
   { label: "Float (% Shares Outstanding)", key: "float_as_percent_shares_outstanding", suffix: "%" },
   { label: "Short Interest (% Float)", key: "short_interest_as_percent_float", suffix: "%" },
   { label: "Volume (30-day Avg)", key: "volume_30day_average" },
