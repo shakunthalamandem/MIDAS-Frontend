@@ -72,7 +72,6 @@ const inputFields: {
   { label: "Target Variable", name: "target_variable", disabled: true },
 ];
 
-
 const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
   snackbar,
   handleSnackbarClose,
@@ -87,6 +86,16 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
   sectorLabels,
   menuProps,
 }) => {
+  // Separate deal_type and region so they show first
+  const prioritizedFields = ["deal_type", "region"];
+
+  const fieldsToRender = [
+    // deal_type and region first
+    ...inputFields.filter((f) => prioritizedFields.includes(f.name)),
+    // then everything else except deal_type & region
+    ...inputFields.filter((f) => !prioritizedFields.includes(f.name)),
+  ];
+
   return (
     <>
       <Snackbar
@@ -113,8 +122,8 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
           boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.06)",
         }}
       >
-        <Grid container spacing={1.5}> {/* ⬅️ Slightly reduced spacing */}
-          {inputFields.map(
+        <Grid container spacing={1.5}>
+          {fieldsToRender.map(
             ({
               label,
               name,
@@ -125,6 +134,14 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
               selectOptions,
               labelMap,
             }) => {
+              // hide discount field when deal_type is IPO
+              if (
+                name === "discount_from_announcement_price_category" &&
+                formData.deal_type === "IPO"
+              ) {
+                return null;
+              }
+
               const value =
                 formData[name] ??
                 (name === "deal_type"
@@ -150,7 +167,8 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                   ? options.treasury_rates
                   : selectOptions;
 
-              const finalLabelMap = name === "sector_category" ? sectorLabels : labelMap;
+              const finalLabelMap =
+                name === "sector_category" ? sectorLabels : labelMap;
 
               return (
                 <Grid item xs={12} sm={6} key={name}>
@@ -160,7 +178,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                       flexDirection: { xs: "column", sm: "row" },
                       alignItems: { sm: "center" },
                       gap: 1,
-                      minHeight: { sm: "48px" }, // ⬅️ reduced height
+                      minHeight: { sm: "48px" },
                     }}
                   >
                     <Typography
@@ -272,7 +290,9 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
                 color="primary"
                 onClick={handlePredict}
                 disabled={loading}
-                startIcon={loading && <CircularProgress size={20} color="inherit" />}
+                startIcon={
+                  loading && <CircularProgress size={20} color="inherit" />
+                }
                 sx={{ minWidth: "120px" }}
               >
                 {loading ? "Predicting..." : "Predict"}
