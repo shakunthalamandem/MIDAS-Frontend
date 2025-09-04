@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -6,14 +6,18 @@ import {
   Container,
   Card,
   CardContent,
+  TextField,
+  IconButton,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
 
 interface FODealInformationProps {
-  selectedData: Record<string, any>; // ✅ Updated prop
+  data: Record<string, any>;
+  ticker: string;
 }
 
-// Fields to be displayed in IPO summary
 const infoFields: { label: string; key: string }[] = [
   { label: "Pricing Date", key: "pricing_date" },
   { label: "Issue price($)", key: "issue_price" },
@@ -25,23 +29,62 @@ const infoFields: { label: string; key: string }[] = [
   { label: "Bookrunners", key: "bookrunners" },
 ];
 
-// 🔹 Format value
-const formatValue = (key: string, value: any, selectedData: Record<string, any>) => {
-  
-  if (key === "deal_size" || key === "shares_offered" || key === "issue_price") {
-    return value ? Number(value).toLocaleString() : "N/A";
+const formatValue = (key: string, value: any) => {
+  if (!value) return "N/A";
+  if (["deal_size", "shares_offered", "issue_price"].includes(key)) {
+    return Number(value).toLocaleString();
   }
-  if (key === "number_of_shares_outstanding"  || key === "greenshoe") {
-    return value ? `${Number(value).toLocaleString()}` : "N/A";
+  if (["number_of_shares_outstanding", "greenshoe"].includes(key)) {
+    return Number(value).toLocaleString();
   }
   if (key === "bookrunners") {
-    return Array.isArray(value) && value.length > 0 ? value.join(", ") : "N/A";
+    return Array.isArray(value) ? value.join(", ") : value;
   }
-  return value || "N/A";
+  return value;
 };
 
-const FODealInformation: React.FC<FODealInformationProps> = ({ selectedData }) => {
-  if (!selectedData || Object.keys(selectedData).length === 0) return null;
+const FODealInformation: React.FC<FODealInformationProps> = ({ data, ticker }) => {
+  const [editMode, setEditMode] = useState(false);
+  const [localData, setLocalData] = useState<Record<string, any>>(data);
+
+  const handleChange = (key: string, value: string) => {
+    if (key === "bookrunners") {
+      setLocalData({ ...localData, [key]: value.split(",").map((item) => item.trim()) });
+    } else {
+      setLocalData({ ...localData, [key]: value });
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const payload = {
+        ticker,
+        ...localData,
+      };
+
+      const response = await fetch(`${apiUrl}/api/fo_writeup_data/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error("Save failed");
+      } else {
+        setEditMode(false);
+      }
+    } catch (err) {
+      console.error("Save error:", err);
+    }
+  };
+
+  if (!localData || Object.keys(localData).length === 0) return null;
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -58,8 +101,17 @@ const FODealInformation: React.FC<FODealInformationProps> = ({ selectedData }) =
                 background: "linear-gradient(#f0f5ff)",
                 boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
                 p: 2,
+                position: "relative",
               }}
             >
+              {/* Top-right Edit/Save Button */}
+              <IconButton
+                onClick={() => (editMode ? handleSave() : setEditMode(true))}
+                sx={{ position: "absolute", top: 8, right: 8,color: "#002060" }}
+              >
+                {editMode ? <SaveIcon /> : <EditIcon />}
+              </IconButton>
+
               <CardContent>
                 <Grid container spacing={3}>
                   {infoFields.map((field, idx) => (
@@ -76,9 +128,24 @@ const FODealInformation: React.FC<FODealInformationProps> = ({ selectedData }) =
                           >
                             {field.label}
                           </Typography>
-                          <Typography variant="h6" sx={{ color: "#333" }}>
-                            {formatValue(field.key, selectedData[field.key], selectedData)}
-                          </Typography>
+
+                          {editMode ? (
+                            <TextField
+                              fullWidth
+                              variant="outlined"
+                              size="small"
+                              value={
+                                field.key === "bookrunners"
+                                  ? (localData[field.key] || []).join(", ")
+                                  : localData[field.key] ?? ""
+                              }
+                              onChange={(e) => handleChange(field.key, e.target.value)}
+                            />
+                          ) : (
+                            <Typography variant="h6" sx={{ color: "#333" }}>
+                              {formatValue(field.key, localData[field.key])}
+                            </Typography>
+                          )}
                         </Box>
                       </motion.div>
                     </Grid>

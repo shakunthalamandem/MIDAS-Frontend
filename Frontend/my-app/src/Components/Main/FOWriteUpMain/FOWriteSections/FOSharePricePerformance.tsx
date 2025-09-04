@@ -1,6 +1,14 @@
-import React from "react";
-import { Box, Typography, Container } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Typography,
+  Container,
+  IconButton,
+  TextField,
+} from "@mui/material";
 import { motion } from "framer-motion";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
 
 interface SharePricePerformance {
   _3_year_total_return?: number;
@@ -13,6 +21,7 @@ interface SharePricePerformance {
 
 interface Props {
   selectedData: SharePricePerformance;
+  ticker: string;
 }
 
 const perfFields: { label: string; key: keyof SharePricePerformance }[] = [
@@ -30,12 +39,51 @@ const formatValue = (value: any) => {
   return value;
 };
 
-const FOSharePricePerformance: React.FC<Props> = ({ selectedData }) => {
-  if (!selectedData || Object.keys(selectedData).length === 0) return null;
+const FOSharePricePerformance: React.FC<Props> = ({ selectedData, ticker }) => {
+  const [editMode, setEditMode] = useState(false);
+  const [localData, setLocalData] = useState<SharePricePerformance>(selectedData);
 
-  // Split fields into two columns
-  const leftFields = perfFields.slice(0, 4);
-  const rightFields = perfFields.slice(4);
+  const handleChange = (key: keyof SharePricePerformance, value: string) => {
+    const parsed = parseFloat(value);
+    setLocalData({
+      ...localData,
+      [key]: isNaN(parsed) ? undefined : parsed,
+    });
+  };
+
+  const handleSave = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const payload = {
+        ticker,
+        ...localData,
+      };
+
+      const response = await fetch(`${apiUrl}/api/fo_writeup_data/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error("Save failed");
+      } else {
+        setEditMode(false);
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+    }
+  };
+
+  if (!localData || Object.keys(localData).length === 0) return null;
+
+  const leftFields = perfFields.slice(0, 3);
+  const rightFields = perfFields.slice(3);
 
   return (
     <Container maxWidth="xl">
@@ -48,16 +96,21 @@ const FOSharePricePerformance: React.FC<Props> = ({ selectedData }) => {
           background: "linear-gradient(#f0f5ff)",
           boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
           padding: "20px",
+          position: "relative",
         }}
       >
+        {/* Edit/Save button */}
+        <IconButton
+          onClick={() => (editMode ? handleSave() : setEditMode(true))}
+          sx={{ position: "absolute", top: 8, right: 8 ,color: "#002060"}}
+        >
+          {editMode ? <SaveIcon /> : <EditIcon />}
+        </IconButton>
+
         <Typography
           variant="h6"
           align="center"
-          sx={{
-            color: "#026269",
-            fontWeight: "bold",
-            mb: 3,
-          }}
+          sx={{ color: "#026269", fontWeight: "bold", mb: 3 }}
         >
           Share Price Performance
         </Typography>
@@ -74,15 +127,23 @@ const FOSharePricePerformance: React.FC<Props> = ({ selectedData }) => {
                 transition={{ delay: idx * 0.05 }}
                 style={{ marginBottom: "16px" }}
               >
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}
-                >
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}>
                   {field.label}
                 </Typography>
-                <Typography variant="h6" sx={{ color: "#333" }}>
-                  {formatValue(selectedData[field.key])}
-                </Typography>
+                {editMode ? (
+                  <TextField
+                    type="number"
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    value={localData[field.key] ?? ""}
+                    onChange={(e) => handleChange(field.key, e.target.value)}
+                  />
+                ) : (
+                  <Typography variant="h6" sx={{ color: "#333" }}>
+                    {formatValue(localData[field.key])}
+                  </Typography>
+                )}
               </motion.div>
             ))}
           </Box>
@@ -97,15 +158,23 @@ const FOSharePricePerformance: React.FC<Props> = ({ selectedData }) => {
                 transition={{ delay: (idx + leftFields.length) * 0.05 }}
                 style={{ marginBottom: "16px" }}
               >
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}
-                >
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}>
                   {field.label}
                 </Typography>
-                <Typography variant="h6" sx={{ color: "#333" }}>
-                  {formatValue(selectedData[field.key])}
-                </Typography>
+                {editMode ? (
+                  <TextField
+                    type="number"
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    value={localData[field.key] ?? ""}
+                    onChange={(e) => handleChange(field.key, e.target.value)}
+                  />
+                ) : (
+                  <Typography variant="h6" sx={{ color: "#333" }}>
+                    {formatValue(localData[field.key])}
+                  </Typography>
+                )}
               </motion.div>
             ))}
           </Box>
