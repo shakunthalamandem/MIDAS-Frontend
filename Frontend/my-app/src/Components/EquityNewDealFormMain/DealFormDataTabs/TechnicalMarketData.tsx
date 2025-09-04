@@ -60,7 +60,7 @@ const TechnicalMarketData: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
-        {renderField("3-Month ADTV ($ Million)", "_3_month_adtv")}
+        {renderField("3-Month ADTV ($)", "_3_month_adtv")}
         {renderField("3-Month ADTV Shares", "_3_month_adtv_shares")}
         {renderField("Beta (S&P500)", "beta_snp_500")}
         {renderField("3-Month Volatility", "_3_month_volatility")}

@@ -18,12 +18,7 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({ selectedData }) =
   if (!selectedData || !selectedData.management_writeup) return null;
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 30 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
+  
         <Card
           sx={{
             borderRadius: 4,
@@ -54,8 +49,6 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({ selectedData }) =
             </Box>
           </CardContent>
         </Card>
-      </motion.div>
-    </Container>
   );
 };
 

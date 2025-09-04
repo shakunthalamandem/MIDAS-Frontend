@@ -156,7 +156,7 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
 
   return (
     <Container maxWidth="lg">
-      <Grid container spacing={4} mb={4}>
+      <Grid container spacing={4} mb={4} mt={2}>
         <Grid item xs={12}>
           <Typography
             variant="h5"

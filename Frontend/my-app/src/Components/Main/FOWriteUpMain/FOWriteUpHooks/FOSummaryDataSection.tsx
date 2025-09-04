@@ -4,11 +4,12 @@ import FOTradingDetails from "../FOWriteSections/FOTradingDetails";
 import FOValuationWriteup from "../FOWriteSections/FOValuationWriteup";
 import FOStrengthWriteUp from "../FOWriteSections/FOStrengthWriteUp";
 import FOFutureOutlook from "../FOWriteSections/FOFutureOutlook";
-
-import { CircularProgress, Box, Typography } from "@mui/material";
 import FOSharePricePerformance from "../FOWriteSections/FOSharePricePerformance";
 import FOBusinessHighlights from "../FOWriteSections/FOBusinessHighlights";
 import FOManagementWriteUp from "../FOWriteSections/FOManagementWriteUp";
+
+import { CircularProgress, Box, Typography, Container, Grid } from "@mui/material";
+import { motion } from "framer-motion";
 
 interface ChildProps {
   ticker: string;
@@ -16,19 +17,19 @@ interface ChildProps {
 }
 
 interface ApiResponse {
-  deal_information?: Record<string, any>;
-  trading_details?: Record<string, any>;
-  share_price_performance?: Record<string, any>;
-  valuation_writeup?: Record<string, any>;
-  strength_writeup?: Record<string, any>;
-  future_outlook?: Record<string, any>;
-  business_highlights?: Record<string, any>;
-  management_writeup?: Record<string, any>;
+  deal_information?: Record<string, unknown>;
+  trading_details?: Record<string, unknown>;
+  share_price_performance?: Record<string, unknown>;
+  valuation_writeup?: Record<string, unknown>;
+  strength_writeup?: Record<string, unknown>;
+  future_outlook?: Record<string, unknown>;
+  business_highlights?: Record<string, unknown>;
+  management_writeup?: Record<string, unknown>;
 }
 
 const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
   const [selectedData, setSelectedData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,8 +60,12 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
 
         const result: ApiResponse = await response.json();
         setSelectedData(result);
-      } catch (err: any) {
-        setError(err.message || "Something went wrong");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Something went wrong");
+        }
       } finally {
         setLoading(false);
       }
@@ -69,33 +74,69 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
     fetchData();
   }, [ticker, deal_id]);
 
-  if (loading)
+  if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
         <CircularProgress />
       </Box>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <Typography color="error" align="center">
         {error}
       </Typography>
     );
+  }
 
   if (!selectedData) return null;
 
   return (
     <>
-      {/* Passing API response sections to each component */}
+      {/* Deal Info */}
       <FODealInformation selectedData={selectedData.deal_information || {}} />
-      <FOTradingDetails selectedData={selectedData.trading_details || {}} />
-      <FOSharePricePerformance selectedData={selectedData.share_price_performance || {}} />
+
+      {/* Trading & Share Price (Side by Side) */}
+      <Container maxWidth="xl" sx={{ mt: 4 }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 30 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <FOTradingDetails selectedData={selectedData.trading_details || {}} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FOSharePricePerformance selectedData={selectedData.share_price_performance || {}} />
+            </Grid>
+          </Grid>
+        </motion.div>
+      </Container>
+
+      {/* Strength, Valuation, Outlook */}
       <FOStrengthWriteUp selectedData={selectedData.strength_writeup || {}} />
       <FOValuationWriteup selectedData={selectedData.valuation_writeup || {}} />
       <FOFutureOutlook selectedData={selectedData.future_outlook || {}} />
-      <FOBusinessHighlights selectedData={selectedData.business_highlights || {}} />
-      <FOManagementWriteUp selectedData={selectedData.management_writeup || {}} />
+
+      {/* Business Highlights & Management (Side by Side) */}
+      <Container maxWidth="xl" sx={{ mt: 4 }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 30 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <FOBusinessHighlights selectedData={selectedData.business_highlights || {}} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FOManagementWriteUp selectedData={selectedData.management_writeup || {}} />
+            </Grid>
+          </Grid>
+        </motion.div>
+      </Container>
     </>
   );
 };

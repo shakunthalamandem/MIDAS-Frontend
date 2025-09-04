@@ -18,7 +18,6 @@ const FOBusinessHighlights: React.FC<ValuationWriteupProps> = ({ selectedData })
   if (!selectedData || !selectedData.business_highlights) return null;
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -54,7 +53,6 @@ const FOBusinessHighlights: React.FC<ValuationWriteupProps> = ({ selectedData })
           </CardContent>
         </Card>
       </motion.div>
-    </Container>
   );
 };
 

@@ -126,9 +126,9 @@ const DealAllocations: React.FC<FormSectionProps> = ({
         {renderField("Percentage Primary", "primary_percentage")}
         {renderField("Issue Price($) ", "issue_price")}
         {renderField("Discount From Announcement Price", "discount_from_announcement_price")}
-        {renderField("IOI Amount ($ Million)", "ioi_amount")}
+        {renderField("IOI Amount ($)", "ioi_amount")}
         {renderField("IOI as % of Deal Size", "ioi_as_percentage_of_deal_size")}
-        {renderField("Allocation Amount ($ Million)", "allocation_amount")}
+        {renderField("Allocation Amount ($)", "allocation_amount")}
         {renderField("Allocation as % of Deal Size ", "allocation_as_percentage_of_deal_size")}
         {renderField("Allocation as % of IOI", "allocation_as_percentage_of_ioi")}
       </Grid>

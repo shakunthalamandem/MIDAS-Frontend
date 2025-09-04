@@ -86,7 +86,7 @@ const MarketData: React.FC<FormSectionProps> = ({
       <Grid container spacing={2}>
         {renderField("Launch Date", "launch_date", "date", true)}
         {renderField("Trade Date", "trade_date", "date", true)}
-        {renderField("Market Cap($ Million)", "market_cap")}
+        {renderField("Market Cap($)", "market_cap")}
         {renderField("52 Week High", "_52_week_high")}
         {renderField("% Below 52 Week High", "percentage_below_52_week_high")}
         {renderField("% Change Last 7 Days", "percentage_change_last_7_days")}
@@ -96,7 +96,7 @@ const MarketData: React.FC<FormSectionProps> = ({
         {renderField("Shares Outstanding", "shares_outstanding")}
 
         {renderField("% of Free Float", "percentage_of_free_float")}
-        {renderField("Short Interest ($ Million)", "short_interest")}
+        {renderField("Short Interest ($)", "short_interest")}
         {renderField(
           "Short Interest % of Deal",
           "short_interest_percentage_of_deal"

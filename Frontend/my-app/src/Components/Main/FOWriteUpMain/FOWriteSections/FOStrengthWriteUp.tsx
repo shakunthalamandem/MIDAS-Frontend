@@ -38,10 +38,20 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData }) => 
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              <Accordion>
+              <Accordion
+                sx={{
+                  borderRadius: 3,
+            background: "linear-gradient(#f0f5ff)",
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+                }}
+              >
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   id="strengths-header"
+                  sx={{
+            background: "linear-gradient(#f0f5ff)",
+                    borderBottom: "1px solid rgba(0,0,0,0.05)",
+                  }}
                 >
                   <Typography
                     variant="h6"
@@ -56,22 +66,14 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData }) => 
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Card
-                    sx={{
-                      borderRadius: 3,
-                      background: "linear-gradient(to bottom, #f0f5ff, #ffffff)",
-                      boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-                    }}
-                  >
-                    <CardContent>
+
                       <Typography
                         variant="body1"
                         sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
                       >
                         {selectedData.strengths}
                       </Typography>
-                    </CardContent>
-                  </Card>
+                 
                 </AccordionDetails>
               </Accordion>
             </MotionBox>
@@ -86,10 +88,20 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData }) => 
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              <Accordion>
+              <Accordion
+                sx={{
+                  borderRadius: 3,
+            background: "linear-gradient(#f0f5ff)",
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+                }}
+              >
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   id="weakness-header"
+                  sx={{
+            background: "linear-gradient(#f0f5ff)",
+                    borderBottom: "1px solid rgba(0,0,0,0.05)",
+                  }}
                 >
                   <Typography
                     variant="h6"
@@ -104,22 +116,14 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData }) => 
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Card
-                    sx={{
-                      borderRadius: 3,
-                      background: "linear-gradient(to bottom, #fef6f6, #ffffff)",
-                      boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-                    }}
-                  >
-                    <CardContent>
+
                       <Typography
                         variant="body1"
                         sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
                       >
                         {selectedData.weakness || "N/A"}
                       </Typography>
-                    </CardContent>
-                  </Card>
+              
                 </AccordionDetails>
               </Accordion>
             </MotionBox>
