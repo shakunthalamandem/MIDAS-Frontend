@@ -1,24 +1,28 @@
-import React, { useEffect, useState } from 'react';
+// FOComparisionTableMain.tsx
+
+import React, { useState, useEffect } from "react";
 import {
   Box,
-  Typography,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-} from '@mui/material';
+  CircularProgress,
+  Alert,
+  Fade,
+  Typography,
+} from "@mui/material";
 
-interface ChildProps {
+interface FOComparisionTableMainProps {
   ticker: string;
   deal_id: string;
 }
 
-interface ApiResponse {
+type ComparableMetric = {
   ticker: string;
-  deal_id: string;
   competitor: string;
   price_usd: string;
   market_cap: number | null;
@@ -31,15 +35,31 @@ interface ApiResponse {
   one_year_later_ev_ebitda: number | null;
   sales_growth: number | null;
   eps_growth: number | null;
-  created_at?: string;
-  updated_at?: string;
   ai_generated: boolean;
-}
+};
 
-interface Column {
-  key: keyof ApiResponse;
-  label: string;
-}
+type AveragesType = {
+  [key: string]: {
+    average?: number;
+    median?: number;
+  };
+};
+
+type ApiResponse = {
+  [ticker: string]: {
+    data: ComparableMetric[];
+    Averages?: AveragesType;
+  };
+};
+
+const columnsWithX = new Set([
+  "present_year_ev_sales",
+  "one_year_later_ev_sales",
+  "present_year_price_earning",
+  "one_year_later_price_earning",
+  "present_year_ev_ebitda",
+  "one_year_later_ev_ebitda",
+]);
 
 const formatNumber = (
   value: number,
@@ -66,24 +86,52 @@ const formatNumber = (
   return value < 0 ? `-${formattedValue}` : formattedValue;
 };
 
-const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
-  const [selectedData, setSelectedData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+const getColumns = (
+  ticker: string,
+  ai_generated: boolean
+): {
+  key: keyof ComparableMetric;
+  label: string;
+  isCurrency?: boolean;
+  isPercentage?: boolean;
+}[] => [
+  { key: "competitor", label: "Ticker" },
+  { key: "price_usd", label: "Price (USD)", isCurrency: true },
+  { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
+  { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
+  { key: "present_year_ev_sales", label: "2025 EV/Sales" },
+  { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
+  { key: "present_year_price_earning", label: "2025 P/E" },
+  { key: "one_year_later_price_earning", label: "2026 P/E" },
+  {
+    key: "present_year_ev_ebitda",
+    label: "2025 EV/EBITDA",
+  },
+  {
+    key: "one_year_later_ev_ebitda",
+    label: "2026 EV/EBITDA",
+  },
+  { key: "sales_growth", label: "Sales Growth (25–26)", isPercentage: true },
+  { key: "eps_growth", label: "EPS Growth (25–26)", isPercentage: true },
+];
+
+const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
+  ticker,
+  deal_id,
+}) => {
+  const [data, setData] = useState<ApiResponse | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [noData, setNoData] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-      setNoData(false);
-
+      setData(null);
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
-
-        if (!apiUrl) throw new Error("API URL is not defined");
-
+        if (!apiUrl) throw new Error("API URL not set");
         const response = await fetch(`${apiUrl}/api/fo_companymetric_data/`, {
           method: "POST",
           headers: {
@@ -92,22 +140,13 @@ const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
           },
           body: JSON.stringify({ ticker, deal_id }),
         });
-
+        const json = await response.json();
         if (!response.ok) {
-          throw new Error(`API error: ${response.statusText}`);
+          throw new Error(json.error || json.message || "Failed to fetch data");
         }
-
-        const result = await response.json();
-
-        if (result.error || Object.keys(result).length === 0) {
-          setNoData(true);
-          setSelectedData(null);
-        } else {
-          setSelectedData(result);
-        }
-      } catch (err: any) {
-        setError(err.message || "Something went wrong");
-        setSelectedData(null);
+        setData(json);
+      } catch (e: any) {
+        setError(e.message || "Unknown error");
       } finally {
         setLoading(false);
       }
@@ -116,39 +155,33 @@ const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
     fetchData();
   }, [ticker, deal_id]);
 
-  const columns: Column[] = [
-    { key: "competitor", label: "Ticker" },
-    { key: "price_usd", label: "Price (USD)" },
-    { key: "market_cap", label: "Market Cap (USDm)" },
-    { key: "ev_usd_million", label: "EV (USDm)" },
-    { key: "present_year_ev_sales", label: "2025 EV/Sales" },
-    { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
-    { key: "present_year_price_earning", label: "2025 P/E" },
-    { key: "one_year_later_price_earning", label: "2026 P/E" },
-    { key: "present_year_ev_ebitda", label: "2025 EV/EBITDA" },
-    { key: "one_year_later_ev_ebitda", label: "2026 EV/EBITDA" },
-    { key: "sales_growth", label: "Sales Growth (25–26)" },
-    { key: "eps_growth", label: "EPS Growth (25–26)" },
-  ];
+  const noData =
+    data &&
+    Object.values(data).every(
+      (metrics) => !metrics.data || metrics.data.length === 0
+    );
+
+  const ai_generated =
+    data?.[ticker]?.data?.some((item) => item.ai_generated) || false;
+
+  const columns = getColumns(ticker, ai_generated);
 
   return (
-    <Box p={3}>
+    <Box sx={{ p: 0, width: "100%" }}>
       <Typography
         variant="h6"
-        align="center"
-        gutterBottom
-        sx={{ fontWeight: "bold", color: "#026269", mb: 3 }}
+        color="#002060"
+        fontWeight={600}
+        sx={{ whiteSpace: "nowrap", mb: 2, textAlign: "center" }}
       >
         Comparative Trading Multiples & Performance Metrics
       </Typography>
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {noData && !loading && !error && (
-        <p style={{ textAlign: "center", color: "#555" }}>No data found.</p>
-      )}
+      {loading && <CircularProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
+      {noData && <Alert severity="info">No data found for this ticker.</Alert>}
 
-      {!loading && !error && selectedData && (
+      {!loading && !error && data && !noData && (
         <TableContainer
           component={Paper}
           elevation={4}
@@ -179,55 +212,76 @@ const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
                 ))}
               </TableRow>
             </TableHead>
+
             <TableBody>
-              <TableRow>
-                {columns.map((col) => {
-                  const rawValue = selectedData[col.key];
-                  let displayValue: string;
+              {Object.entries(data).map(([tickerKey, metricsObj]) => {
+                const rows = metricsObj.data || [];
 
-                  switch (col.key) {
-                    case "price_usd":
-                      displayValue = rawValue
-                        ? `$${parseFloat(rawValue as string).toFixed(2)}`
-                        : "N/A";
-                      break;
-                    case "market_cap":
-                    case "ev_usd_million":
-                      displayValue = formatNumber(rawValue as number, true);
-                      break;
-                    case "sales_growth":
-                    case "eps_growth":
-                      displayValue = formatNumber(rawValue as number, false, true);
-                      break;
-                    case "present_year_ev_sales":
-                    case "one_year_later_ev_sales":
-                    case "present_year_price_earning":
-                    case "one_year_later_price_earning":
-                    case "present_year_ev_ebitda":
-                    case "one_year_later_ev_ebitda":
-                      displayValue = formatNumber(rawValue as number);
-                      break;
-                    default:
-  displayValue = rawValue !== null && rawValue !== undefined ? String(rawValue) : "N/A";
-  break;
+                const mainTickerRow = rows.find((m) =>
+                  (m.competitor || "")
+                    .toUpperCase()
+                    .startsWith(ticker.toUpperCase())
+                );
 
-                  }
+                const competitorRows = rows.filter((m) => m !== mainTickerRow);
 
-                  return (
-                    <TableCell
-                      key={col.key}
-                      sx={{
-                        textAlign: "center",
-                        fontSize: "0.75rem",
-                        whiteSpace: "normal",
-                        wordWrap: "break-word",
-                      }}
-                    >
-                      {displayValue}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
+                return (
+                  <React.Fragment key={tickerKey}>
+                    {mainTickerRow && (
+                      <Fade in timeout={500}>
+                        <TableRow
+                          sx={{
+                            backgroundColor: "#9de0f5ff",
+                            "& td": {
+                              backgroundColor: "#ffecb8ff",
+                              fontWeight: 700,
+                            },
+                          }}
+                        >
+                          {columns.map((col) => {
+                            const value = mainTickerRow[col.key];
+                            const displayValue =
+                              typeof value === "number"
+                                ? formatNumber(
+                                    value,
+                                    col.isCurrency,
+                                    col.isPercentage
+                                  )
+                                : value || "N/A";
+                            return (
+                              <TableCell key={col.key} align="center">
+                                {displayValue}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      </Fade>
+                    )}
+                    {competitorRows.map((row, idx) => (
+                      <Fade in timeout={500} key={idx}>
+                        <TableRow>
+                          {columns.map((col) => {
+                            const value = row[col.key];
+                            const displayValue =
+                              typeof value === "number"
+                                ? formatNumber(
+                                    value,
+                                    col.isCurrency,
+                                    col.isPercentage
+                                  )
+                                : value || "N/A";
+                            return (
+                              <TableCell key={col.key} align="center">
+                                {displayValue}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      </Fade>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
@@ -236,4 +290,4 @@ const FOComparisionTableMain: React.FC<ChildProps> = ({ ticker, deal_id }) => {
   );
 };
 
-export default FOComparisionTableMain;
+export default FOComparisionTableMain
