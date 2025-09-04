@@ -123,26 +123,30 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
 
     const formatValue = (value: number | null): string =>
       value !== null
-        ? value.toLocaleString(undefined, { maximumFractionDigits: 2 })
+        ? value < 0
+          ? `- $${Math.abs(value).toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+          : `$${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}`
         : "N/A";
 
     return (
       <TableContainer component={Paper} sx={{ mt: 3 }}>
-  <Table size="small"> {/* ↓ smaller height globally */}
+        <Table size="medium">
+          {" "}
+          {/* ↓ smaller height globally */}
           <TableHead sx={{ backgroundColor: "#002060" }}>
             <TableRow>
               <StyledTableCell>Metric</StyledTableCell>
-              <StyledTableCell align="right">Current Year($)</StyledTableCell>
-              <StyledTableCell align="right">Previous Year($)</StyledTableCell>
+              <StyledTableCell align="right">2024 ($)</StyledTableCell>
+              <StyledTableCell align="right">2025 ($)</StyledTableCell>
               <StyledTableCell align="right">YoY Change (%)</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.label}>
+              <TableRow key={row.label} sx={{ fontSize: "1rem" }}>
                 <TableCell>{row.label}</TableCell>
-                <TableCell align="right">{formatValue(row.current)}</TableCell>
                 <TableCell align="right">{formatValue(row.previous)}</TableCell>
+                <TableCell align="right">{formatValue(row.current)}</TableCell>
                 <TableCell align="right">
                   {row.yoy !== null ? `${row.yoy.toFixed(2)}%` : "N/A"}
                 </TableCell>

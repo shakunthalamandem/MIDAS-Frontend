@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -23,11 +23,38 @@ interface StrengthWriteupProps {
   ticker: string;
 }
 
-const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticker }) => {
+const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({
+  selectedData,
+  ticker,
+}) => {
   const [editStrength, setEditStrength] = useState(false);
   const [editWeakness, setEditWeakness] = useState(false);
-  const [strengthValue, setStrengthValue] = useState(selectedData.strengths || "");
-  const [weaknessValue, setWeaknessValue] = useState(selectedData.weakness || "");
+  const [strengthValue, setStrengthValue] = useState(
+    selectedData.strengths || ""
+  );
+  const [weaknessValue, setWeaknessValue] = useState(
+    selectedData.weakness || ""
+  );
+
+  // Controlled expansion state
+  const [expandedStrength, setExpandedStrength] = useState(false);
+  const [expandedWeakness, setExpandedWeakness] = useState(false);
+
+  // Refs to focus textarea when entering edit
+  const strengthRef = useRef<HTMLInputElement | null>(null);
+  const weaknessRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (editStrength && strengthRef.current) {
+      strengthRef.current.focus();
+    }
+  }, [editStrength]);
+
+  useEffect(() => {
+    if (editWeakness && weaknessRef.current) {
+      weaknessRef.current.focus();
+    }
+  }, [editWeakness]);
 
   const handleSave = async (field: "strengths" | "weakness") => {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -59,6 +86,34 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
     }
   };
 
+  // Only toggle expand when the click originates from the chevron IconButton
+  const handleAccordionChange =
+    (which: "strengths" | "weakness") =>
+    (event: React.SyntheticEvent, _isExpanded: boolean) => {
+      const fromExpander = (event.target as HTMLElement)?.closest(
+        '[data-expander="true"]'
+      );
+      if (!fromExpander) return; // ignore clicks not from the expander
+
+      if (which === "strengths") {
+        setExpandedStrength((prev) => !prev);
+      } else {
+        setExpandedWeakness((prev) => !prev);
+      }
+    };
+
+  // Edit buttons: expand + enter edit mode, then focus textarea
+  const handleEditClick = (which: "strengths" | "weakness") => {
+    if (which === "strengths") {
+      setExpandedStrength(true);
+      setEditStrength(true);
+      // focus happens via useEffect
+    } else {
+      setExpandedWeakness(true);
+      setEditWeakness(true);
+    }
+  };
+
   const MotionBox = motion(Box);
 
   return (
@@ -73,6 +128,8 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <Accordion
+                expanded={expandedStrength}
+                onChange={handleAccordionChange("strengths")}
                 sx={{
                   borderRadius: 3,
                   background: "linear-gradient(#f0f5ff)",
@@ -80,7 +137,16 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                 }}
               >
                 <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
+                  // We prevent full-header toggling by gating in onChange (above).
+                  expandIcon={
+                    <IconButton
+                      data-expander="true"
+                      size="small"
+                      sx={{ color: "#002060" }}
+                    >
+                      <ExpandMoreIcon />
+                    </IconButton>
+                  }
                   id="strengths-header"
                   sx={{
                     background: "linear-gradient(#f0f5ff)",
@@ -90,6 +156,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                 >
                   <Typography
                     variant="h6"
+                    align="center"
                     sx={{
                       color: "#026269",
                       fontWeight: "bold",
@@ -99,9 +166,13 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                     Strengths
                   </Typography>
                   <IconButton
-                    onClick={() => (editStrength ? handleSave("strengths") : setEditStrength(true))}
-                                sx={{ color: "#002060" }}  // <-- Icon color updated here
-
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      editStrength
+                        ? handleSave("strengths")
+                        : handleEditClick("strengths");
+                    }}
+                    sx={{ color: "#002060" }}
                   >
                     {editStrength ? <SaveIcon /> : <EditIcon />}
                   </IconButton>
@@ -109,6 +180,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                 <AccordionDetails>
                   {editStrength ? (
                     <TextField
+                      inputRef={strengthRef}
                       multiline
                       fullWidth
                       minRows={6}
@@ -118,7 +190,11 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                   ) : (
                     <Typography
                       variant="body1"
-                      sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
+                      sx={{
+                        color: "#333",
+                        lineHeight: 1.7,
+                        fontSize: "1.05rem",
+                      }}
                     >
                       {selectedData.strengths}
                     </Typography>
@@ -138,6 +214,8 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <Accordion
+                expanded={expandedWeakness}
+                onChange={handleAccordionChange("weakness")}
                 sx={{
                   borderRadius: 3,
                   background: "linear-gradient(#f0f5ff)",
@@ -145,7 +223,15 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                 }}
               >
                 <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
+                  expandIcon={
+                    <IconButton
+                      data-expander="true"
+                      size="small"
+                      sx={{ color: "#002060" }}
+                    >
+                      <ExpandMoreIcon />
+                    </IconButton>
+                  }
                   id="weakness-header"
                   sx={{
                     background: "linear-gradient(#f0f5ff)",
@@ -155,6 +241,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                 >
                   <Typography
                     variant="h6"
+                    align="center"
                     sx={{
                       color: "#026269",
                       fontWeight: "bold",
@@ -164,7 +251,13 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                     Concerns
                   </Typography>
                   <IconButton
-                    onClick={() => (editWeakness ? handleSave("weakness") : setEditWeakness(true))}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      editWeakness
+                        ? handleSave("weakness")
+                        : handleEditClick("weakness");
+                    }}
+                    sx={{ color: "#002060" }}
                   >
                     {editWeakness ? <SaveIcon /> : <EditIcon />}
                   </IconButton>
@@ -172,6 +265,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                 <AccordionDetails>
                   {editWeakness ? (
                     <TextField
+                      inputRef={weaknessRef}
                       multiline
                       fullWidth
                       minRows={6}
@@ -181,7 +275,11 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData, ticke
                   ) : (
                     <Typography
                       variant="body1"
-                      sx={{ color: "#333", lineHeight: 1.7, fontSize: "1.05rem" }}
+                      sx={{
+                        color: "#333",
+                        lineHeight: 1.7,
+                        fontSize: "1.05rem",
+                      }}
                     >
                       {selectedData.weakness}
                     </Typography>

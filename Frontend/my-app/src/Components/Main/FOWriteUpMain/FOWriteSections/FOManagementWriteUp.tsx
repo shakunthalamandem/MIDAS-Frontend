@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -20,10 +20,25 @@ interface FOManagementWriteupProps {
   ticker: string;
 }
 
-const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({ selectedData, ticker }) => {
+const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
+  selectedData,
+  ticker,
+}) => {
   const [editMode, setEditMode] = useState(false);
   const [value, setValue] = useState(selectedData.management_writeup || "");
   const [loading, setLoading] = useState(false);
+
+  // Accordion controlled expansion
+  const [expanded, setExpanded] = useState(false);
+
+  // Ref to focus textarea
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (editMode && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [editMode]);
 
   if (!selectedData || !selectedData.management_writeup) return null;
 
@@ -45,15 +60,35 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({ selectedData,
         }),
       });
 
-      if (!response.ok) {
-        console.error("Failed to update management writeup");
+      if (response.ok) {
+        setEditMode(false); // go back to showing Edit button
+        setExpanded(true); // keep accordion open after saving
       } else {
-        setEditMode(false);
+        console.error("Failed to update management writeup");
       }
     } catch (error) {
       console.error("Error updating management writeup:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Toggle accordion only if chevron is clicked
+  const handleAccordionChange = (event: React.SyntheticEvent) => {
+    const fromExpander = (event.target as HTMLElement)?.closest(
+      '[data-expander="true"]'
+    );
+    if (!fromExpander) return;
+    setExpanded((prev) => !prev);
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (editMode) {
+      handleSave();
+    } else {
+      setExpanded(true);
+      setEditMode(true);
     }
   };
 
@@ -64,6 +99,8 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({ selectedData,
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <Accordion
+        expanded={expanded}
+        onChange={handleAccordionChange as any}
         sx={{
           borderRadius: 3,
           background: "linear-gradient(#f0f5ff)",
@@ -72,7 +109,15 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({ selectedData,
         }}
       >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
+          expandIcon={
+            <IconButton
+              data-expander="true"
+              size="small"
+              sx={{ color: "#002060" }}
+            >
+              <ExpandMoreIcon />
+            </IconButton>
+          }
           id="management-writeup-header"
           sx={{
             background: "linear-gradient(#f0f5ff)",
@@ -80,10 +125,6 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({ selectedData,
             display: "flex",
             alignItems: "center",
             gap: 1,
-          }}
-          onClick={(e) => {
-            // prevent accordion toggle when clicking on edit/save button
-            e.stopPropagation();
           }}
         >
           <Typography
@@ -95,22 +136,14 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({ selectedData,
               textAlign: "center",
             }}
           >
-            Management Writeup
+            Management
           </Typography>
 
           <IconButton
             size="small"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent accordion toggle
-              if (editMode) {
-                handleSave();
-              } else {
-                setEditMode(true);
-              }
-            }}
+            onClick={handleEditClick}
             disabled={loading}
-                        sx={{ color: "#002060" }}  // <-- Icon color updated here
-
+            sx={{ color: "#002060" }}
           >
             {editMode ? <SaveIcon /> : <EditIcon />}
           </IconButton>
@@ -119,6 +152,7 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({ selectedData,
         <AccordionDetails>
           {editMode ? (
             <TextField
+              inputRef={inputRef}
               multiline
               fullWidth
               minRows={6}
