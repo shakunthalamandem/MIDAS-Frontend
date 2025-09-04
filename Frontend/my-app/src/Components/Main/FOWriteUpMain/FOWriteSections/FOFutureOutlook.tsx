@@ -34,7 +34,7 @@ const FOFutureOutlook: React.FC<FutureOutlookProps> = ({ selectedData }) => {
         >
           <CardContent>
             <Typography
-              variant="h5"
+              variant="h6"
               align="center"
               sx={{ fontWeight: 700, color: "#128080ff", mb: 2 }}
             >

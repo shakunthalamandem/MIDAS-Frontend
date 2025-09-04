@@ -5,7 +5,11 @@ import {
   Container,
   Card,
   CardContent,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { motion } from "framer-motion";
 
 interface TradingDetails {
@@ -53,57 +57,74 @@ const FOTradingDetails: React.FC<FOTradingDetailsProps> = ({ selectedData }) => 
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <Card
+        {/* Accordion Wrapper */}
+        <Accordion
+          
           sx={{
-            borderRadius: 4,
+            borderRadius: 3,
             background: "linear-gradient(#f0f5ff)",
-            boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
-            p: 2,
+            boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+            "&:before": { display: "none" },
           }}
         >
-          <CardContent>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            id="trading-details-header"
+            sx={{
+            background: "linear-gradient(#f0f5ff)",
+              borderBottom: "1px solid rgba(0,0,0,0.05)",
+            }}
+          >
             <Typography
-              variant="h5"
-              sx={{ fontWeight: 700, color: "#026269", mb: 3 }}
+              variant="h6"
               align="center"
+              sx={{
+                color: "#026269",
+                fontWeight: "bold",
+                flex: 1,
+              }}
             >
               Trading Details
             </Typography>
+          </AccordionSummary>
 
-            {/* Flexbox Container for Items */}
-            <Box
-              display="flex"
-              flexWrap="wrap"
-              gap={3}
-              justifyContent="space-between"
-            >
-              {tradingFields.map((field, idx) => (
-                <motion.div
-                  key={field.key}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  style={{
-                    flex: "1 1 calc(50% - 12px)", // Two per row
-                    minWidth: "250px",
-                  }}
+          <AccordionDetails>
+       
+                {/* Flexbox Container for Items */}
+                <Box
+                  display="flex"
+                  flexWrap="wrap"
+                  gap={3}
+                  justifyContent="space-between"
                 >
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}
+                  {tradingFields.map((field, idx) => (
+                    <motion.div
+                      key={field.key}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      style={{
+                        flex: "1 1 calc(50% - 12px)", // Two per row
+                        minWidth: "250px",
+                      }}
                     >
-                      {field.label}
-                    </Typography>
-                    <Typography variant="h6" sx={{ color: "#333" }}>
-                      {formatTradingValue(selectedData[field.key], field.suffix)}
-                    </Typography>
-                  </Box>
-                </motion.div>
-              ))}
-            </Box>
-          </CardContent>
-        </Card>
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}
+                        >
+                          {field.label}
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: "#333" }}>
+                          {formatTradingValue(selectedData[field.key], field.suffix)}
+                        </Typography>
+                      </Box>
+                    </motion.div>
+                  ))}
+                </Box>
+
+          </AccordionDetails>
+        </Accordion>
       </motion.div>
     </Container>
   );

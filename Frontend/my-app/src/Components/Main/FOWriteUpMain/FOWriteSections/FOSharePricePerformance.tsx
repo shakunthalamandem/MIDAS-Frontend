@@ -5,7 +5,11 @@ import {
   Container,
   Card,
   CardContent,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { motion } from "framer-motion";
 
 interface SharePricePerformance {
@@ -39,7 +43,7 @@ const formatValue = (value: any) => {
 const FOSharePricePerformance: React.FC<Props> = ({ selectedData }) => {
   if (!selectedData || Object.keys(selectedData).length === 0) return null;
 
-  // Split into two columns
+  // Split fields into two columns
   const leftFields = perfFields.slice(0, 4);
   const rightFields = perfFields.slice(4);
 
@@ -50,73 +54,89 @@ const FOSharePricePerformance: React.FC<Props> = ({ selectedData }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <Card
+        {/* Accordion Wrapper */}
+        <Accordion
           sx={{
-            borderRadius: 4,
+            borderRadius: 3,
             background: "linear-gradient(#f0f5ff)",
-            boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
-            p: 2,
+            boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+            "&:before": { display: "none" },
           }}
         >
-          <CardContent>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            id="share-price-performance-header"
+            sx={{
+            background: "linear-gradient(#f0f5ff)",
+              borderBottom: "1px solid rgba(0,0,0,0.05)",
+            }}
+          >
             <Typography
-              variant="h5"
-              sx={{ fontWeight: 700, color: "#127080ff", mb: 3 }}
+              variant="h6"
               align="center"
+              sx={{
+                color: "#026269",
+                fontWeight: "bold",
+                flex: 1,
+              }}
             >
               Share Price Performance
             </Typography>
+          </AccordionSummary>
 
-            {/* Two Columns Layout */}
-            <Box display="flex" gap={4} flexWrap="wrap">
-              {/* Left Column (4 values) */}
-              <Box flex="1">
-                {leftFields.map((field, idx) => (
-                  <motion.div
-                    key={field.key}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    style={{ marginBottom: "16px" }}
-                  >
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}
-                    >
-                      {field.label}
-                    </Typography>
-                    <Typography variant="h6" sx={{ color: "#333" }}>
-                      {formatValue(selectedData[field.key])}
-                    </Typography>
-                  </motion.div>
-                ))}
-              </Box>
+          <AccordionDetails>
 
-              {/* Right Column (2 values) */}
-              <Box flex="1">
-                {rightFields.map((field, idx) => (
-                  <motion.div
-                    key={field.key}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: (idx + leftFields.length) * 0.05 }}
-                    style={{ marginBottom: "16px" }}
-                  >
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}
-                    >
-                      {field.label}
-                    </Typography>
-                    <Typography variant="h6" sx={{ color: "#333" }}>
-                      {formatValue(selectedData[field.key])}
-                    </Typography>
-                  </motion.div>
-                ))}
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
+                {/* Two Columns Layout */}
+                <Box display="flex" gap={4} flexWrap="wrap">
+                  {/* Left Column */}
+                  <Box flex="1">
+                    {leftFields.map((field, idx) => (
+                      <motion.div
+                        key={field.key}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        style={{ marginBottom: "16px" }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}
+                        >
+                          {field.label}
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: "#333" }}>
+                          {formatValue(selectedData[field.key])}
+                        </Typography>
+                      </motion.div>
+                    ))}
+                  </Box>
+
+                  {/* Right Column */}
+                  <Box flex="1">
+                    {rightFields.map((field, idx) => (
+                      <motion.div
+                        key={field.key}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: (idx + leftFields.length) * 0.05 }}
+                        style={{ marginBottom: "16px" }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: 600, mb: 0.5, color: "#124180" }}
+                        >
+                          {field.label}
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: "#333" }}>
+                          {formatValue(selectedData[field.key])}
+                        </Typography>
+                      </motion.div>
+                    ))}
+                  </Box>
+                </Box>
+ 
+          </AccordionDetails>
+        </Accordion>
       </motion.div>
     </Container>
   );
