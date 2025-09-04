@@ -181,7 +181,7 @@ const DealInformation: React.FC<FormSectionProps> = ({
         {renderSelectField("Sector", "sector", sectors)}
         {renderSelectField("Deal Captain", "deal_captain", dealCaptains)}
         {renderSelectField("Lead Bank", "lead_bank", invitationBanks)}
-        {renderTextField("Deal Size ($)", "deal_size")}
+        {renderTextField("Deal Size ($ Million)", "deal_size")}
       </Grid>
     </>
   );
