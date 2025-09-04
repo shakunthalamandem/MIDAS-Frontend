@@ -122,39 +122,40 @@ const DealInformation: React.FC<FormSectionProps> = ({
     </Grid>
   );
 
-  const renderTextField = (
-    label: string,
-    name: string,
-    type: string = "text"
-  ) => (
-    <Grid item xs={12} sm={6} md={4}>
-      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-        {label}
-      </Typography>
-      <TextField
-        name={name}
-        type={type}
-        value={data[name] || ""}
-        onChange={handleChange}
-        fullWidth
-        size="small"
-        variant="standard"
-        disabled={!editable}
-        InputProps={{
-          disableUnderline: !editable,
-          sx: {
-            "&.Mui-disabled": {
-              WebkitTextFillColor: "#b1062e",
-            },
-            "& input.Mui-disabled": {
-              WebkitTextFillColor: "#b1062e",
-            },
+const renderTextField = (
+  label: string,
+  name: string,
+  type: string = "text",
+  overrideValue?: string
+) => (
+  <Grid item xs={12} sm={6} md={4}>
+    <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+      {label}
+    </Typography>
+    <TextField
+      name={name}
+      type={type}
+      value={overrideValue !== undefined ? overrideValue : data[name] || ""}
+      onChange={handleChange}
+      fullWidth
+      size="small"
+      variant="standard"
+      disabled={!editable}
+      InputProps={{
+        disableUnderline: !editable,
+        sx: {
+          "&.Mui-disabled": {
+            WebkitTextFillColor: "#b1062e",
           },
-        }}
-        InputLabelProps={type === "date" ? { shrink: true } : undefined}
-      />
-    </Grid>
-  );
+          "& input.Mui-disabled": {
+            WebkitTextFillColor: "#b1062e",
+          },
+        },
+      }}
+    />
+  </Grid>
+);
+
 
   return (
     <>
@@ -172,7 +173,13 @@ const DealInformation: React.FC<FormSectionProps> = ({
       </Typography>
 
       <Grid container spacing={2}>
-        {renderTextField("Ticker", "ticker")}
+        {renderTextField("Ticker", "ticker")}{renderTextField(
+  "Pricing Date Status",
+  "pricing_date_status",
+  "text",
+  data["pricing_date"] ? data["pricing_date_status"] : "TBA"
+)}
+
         {renderTextField("Pricing Date", "pricing_date", "date")}
         {renderTextField("Vendor/Issuer", "issuer_name")}
         {renderSelectField("Region", "region", regions)}
