@@ -107,7 +107,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({ selectedData }) => 
                     variant="h6"
                     align="center"
                     sx={{
-                      color: "#8a1c1c",
+                      color: "#026269",
                       fontWeight: "bold",
                       flex: 1,
                     }}
