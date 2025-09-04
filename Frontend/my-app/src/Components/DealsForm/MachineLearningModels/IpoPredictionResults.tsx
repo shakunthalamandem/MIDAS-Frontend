@@ -11,9 +11,6 @@ import {
   Divider,
   LinearProgress,
   Container,
-  Button,
-  TextField,
-  CircularProgress,
 } from "@mui/material";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
@@ -63,27 +60,40 @@ const IpoPredictionResults: React.FC<PredictionResultsProps> = ({
 
   // versions are like ["t1d", "t1d_open"]
   const modelVersions = Array.from(
-    new Set(Object.keys(result).map((key) => key.split("_")[0] + (key.includes("open") ? "_open" : "")))
+    new Set(
+      Object.keys(result).map((key) => {
+        const parts = key.split("_");
+        // handle "t1d_main_model" => version = "t1d"
+        // handle "t1d_open_main_model" => version = "t1d_open"
+        return parts[1] === "open" ? `${parts[0]}_${parts[1]}` : parts[0];
+      })
+    )
   );
 
-  const modelTypes = ["main"
+  const modelTypes = [
+    "main",
     // , "positive", "negative"
-];
+  ];
 
   const getModelKey = (version: string, type: string): string => {
-    const regex = new RegExp(`^${version}.*${type}_model$`);
-    return Object.keys(result).find((key) => regex.test(key)) || "";
+    // direct construction of key ensures correct mapping
+    return version.includes("open")
+      ? `${version}_${type}_model` // e.g. "t1d_open_main_model"
+      : `${version}_${type}_model`; // e.g. "t1d_main_model"
   };
 
   const getOutcomeCategory = (
     prediction: string | null | undefined
-  ): "Negative" | "Neutral" | "Positive" => {
-    if (!prediction || typeof prediction !== "string") return "Neutral";
-    const lower = prediction.toLowerCase();
-    if (lower.includes("negative")) return "Negative";
-    if (lower.includes("neutral")) return "Neutral";
-    if (lower.includes("positive")) return "Positive";
-    return "Neutral";
+  ): "Low Return" | "Neutral Return" | "Positive Return" => {
+    const DEFAULT = "Neutral Return" as const;
+    if (!prediction || typeof prediction !== "string") return DEFAULT;
+    const lower = prediction.trim().toLowerCase();
+
+    if (lower.includes("low return")) return "Low Return";
+    if (lower.includes("neutral return")) return "Neutral Return";
+    if (lower.includes("positive return")) return "Positive Return";
+
+    return DEFAULT;
   };
 
   const renderOutcome = (prediction: string | null | undefined) => {
@@ -97,25 +107,25 @@ const IpoPredictionResults: React.FC<PredictionResultsProps> = ({
 
     const outcomeCategory = getOutcomeCategory(prediction);
     switch (outcomeCategory) {
-      case "Negative":
+      case "Low Return":
         return (
           <Box display="flex" alignItems="center" color="error.main">
             <TrendingDownIcon sx={{ mr: 1 }} />
-            Negative Deal
+            Low Return Deal
           </Box>
         );
-      case "Neutral":
+      case "Neutral Return":
         return (
           <Box display="flex" alignItems="center" color="text.secondary">
             <TrendingFlatIcon sx={{ mr: 1 }} />
-            Neutral Deal
+            Neutral Return Deal
           </Box>
         );
-      case "Positive":
+      case "Positive Return":
         return (
           <Box display="flex" alignItems="center" color="success.main">
             <TrendingUpIcon sx={{ mr: 1 }} />
-            Positive Deal
+            Positive Return Deal
           </Box>
         );
       default:
@@ -364,10 +374,8 @@ const IpoPredictionResults: React.FC<PredictionResultsProps> = ({
                   <TableCell>{rowLabels[type]}</TableCell>
                   <TableCell>
                     <Typography variant="body2" whiteSpace="pre-line">
-                      {
-                        result[getModelKey(modelVersions[0], type)]
-                          ?.explanation || ""
-                      }
+                      {result[getModelKey(modelVersions[0], type)]
+                        ?.explanation || ""}
                     </Typography>
                   </TableCell>
 
