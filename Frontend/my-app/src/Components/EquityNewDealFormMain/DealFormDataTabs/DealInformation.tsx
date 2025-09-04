@@ -173,6 +173,7 @@ const DealInformation: React.FC<FormSectionProps> = ({
 
       <Grid container spacing={2}>
         {renderTextField("Ticker", "ticker")}
+        {renderTextField("Pricing Date Status", "pricing_date_status")}
         {renderTextField("Pricing Date", "pricing_date", "date")}
         {renderTextField("Vendor/Issuer", "issuer_name")}
         {renderSelectField("Region", "region", regions)}

@@ -78,6 +78,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
     try {
       console.log("Saving data:", localData);
 
+
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
@@ -123,7 +124,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
       setLoading(false); // Stop loading
     }
   };
-
+console.log("Original Data:", originalData);
   const handleCancel = () => {
     setLocalData(originalData);
     setEditable(false);
