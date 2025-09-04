@@ -54,24 +54,53 @@ function formatFinancialMargin(value: number | string): string {
   return num < 0 ? `(${absValue})` : absValue;
 }
 
+// ---- NEW METRIC MODEL (finance perspective) ----
 const priorityOrder = [
   "Sales",
   "Sales Growth",
+
   "Net Interest Income",
   "Net Interest Income Growth",
+
   "Gross Profit",
-  "Gross Profit Growth",
-  "Gross Profit Margin", // margin just after gross profit
+  "Gross Profit Margin",
+
   "EBIT",
-  "EBIT Growth",
+  "EBIT Margin",
+
   "NII after provision for credit losses",
   "NII after provision for credit losses Growth",
+
+  "EBITDA",
+  "EBITDA Margin",
+
+  "Adj. EBITDA",
+  "Adj. EBITDA Margin",
+
   "PBT",
-  "PBT Growth",
+  "PBT Margin",
+
   "Net Income",
-  "Net Income Growth",
-  "Net Income Margin", // margin after net income
+  "Net Income Margin",
 ];
+
+// Which base metrics have a paired Growth metric
+const growthPairs: Record<string, string> = {
+  "Sales": "Sales Growth",
+  "Net Interest Income": "Net Interest Income Growth",
+  "NII after provision for credit losses":
+    "NII after provision for credit losses Growth",
+};
+
+// Which base metrics have a paired Margin metric (as % of Sales)
+const marginPairs: Record<string, string> = {
+  "Gross Profit": "Gross Profit Margin",
+  "EBIT": "EBIT Margin",
+  "EBITDA": "EBITDA Margin",
+  "Adj. EBITDA": "Adj. EBITDA Margin",
+  "PBT": "PBT Margin",
+  "Net Income": "Net Income Margin",
+};
 
 const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
   defaultTicker = "",
@@ -155,71 +184,45 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
     const copied = JSON.parse(
       JSON.stringify(forecasts[forecastsTicker.toUpperCase()] || {})
     );
-    // Ensure paired metrics and margins exist so calculations don't break
-    const allNeeded = new Set<string>([...priorityOrder]);
-    // also add whatever keys exist in copied (we don't want to lose them)
-    Object.keys(copied || {}).forEach((k) => allNeeded.add(k));
 
-    Array.from(allNeeded).forEach((key) => {
-      ensureMetricStructure(copied, key);
-    });
+    // Ensure all metrics in our finance model exist
+    const needed = new Set<string>([...priorityOrder]);
+    Object.keys(copied || {}).forEach((k) => needed.add(k));
+    Array.from(needed).forEach((key) => ensureMetricStructure(copied, key));
 
-    // If growth fields are null but we can compute them from existing data, compute
-    for (const metric of [
-      "Sales",
-      "Net Interest Income",
-      "NII after provision for credit losses",
-      "Gross Profit",
-      "EBIT",
-      "PBT",
-      "Net Income",
-    ]) {
-      const growthMetric = metric + " Growth";
-      if (!copied[growthMetric]) ensureMetricStructure(copied, growthMetric);
+    // Pre-compute growth for supported pairs and margins for all margin pairs
+    for (const base of Object.keys(growthPairs)) {
+      const growth = growthPairs[base];
+      ensureMetricStructure(copied, base);
+      ensureMetricStructure(copied, growth);
 
-      for (const idx of [2, 3, 4]) {
-        // indices for one_year_before (2), current_year (3), one_year_later (4) match forecastYearKeys
-        // Only compute current_year and one_year_later
-      }
-      // compute current_year growth if possible
-      const prev = safeNumber(copied[metric]?.["one_year_before"]);
-      const curr = safeNumber(copied[metric]?.["current_year"]);
-      const next = safeNumber(copied[metric]?.["one_year_later"]);
+      const prev = safeNumber(copied[base]?.["one_year_before"]);
+      const curr = safeNumber(copied[base]?.["current_year"]);
+      const next = safeNumber(copied[base]?.["one_year_later"]);
 
       const currGrowth = computeGrowthPct(prev, curr);
       const nextGrowth = computeGrowthPct(curr, next);
 
-      copied[growthMetric]["one_year_before"] =
-        copied[growthMetric]["one_year_before"] ?? null;
-      copied[growthMetric]["current_year"] =
+      copied[growth]["one_year_before"] =
+        copied[growth]["one_year_before"] ?? null;
+      copied[growth]["current_year"] =
         currGrowth !== null
           ? Number(currGrowth)
-          : (copied[growthMetric]["current_year"] ?? null);
-      copied[growthMetric]["one_year_later"] =
+          : copied[growth]["current_year"] ?? null;
+      copied[growth]["one_year_later"] =
         nextGrowth !== null
           ? Number(nextGrowth)
-          : (copied[growthMetric]["one_year_later"] ?? null);
+          : copied[growth]["one_year_later"] ?? null;
+    }
 
-      // For margins compute if underlying values exist
-      if (metric === "Gross Profit") {
-        ensureMetricStructure(copied, "Gross Profit Margin");
-        for (const ky of forecastYearKeys) {
-          const gp = safeNumber(copied["Gross Profit"]?.[ky]);
-          const sales = safeNumber(copied["Sales"]?.[ky]);
-          copied["Gross Profit Margin"][ky] = sales
-            ? (gp / sales) * 100
-            : (copied["Gross Profit Margin"][ky] ?? null);
-        }
-      }
-      if (metric === "Net Income") {
-        ensureMetricStructure(copied, "Net Income Margin");
-        for (const ky of forecastYearKeys) {
-          const ni = safeNumber(copied["Net Income"]?.[ky]);
-          const sales = safeNumber(copied["Sales"]?.[ky]);
-          copied["Net Income Margin"][ky] = sales
-            ? (ni / sales) * 100
-            : (copied["Net Income Margin"][ky] ?? null);
-        }
+    for (const [base, margin] of Object.entries(marginPairs)) {
+      ensureMetricStructure(copied, base);
+      ensureMetricStructure(copied, "Sales");
+      ensureMetricStructure(copied, margin);
+      for (const ky of forecastYearKeys) {
+        const b = safeNumber(copied[base][ky]);
+        const s = safeNumber(copied["Sales"][ky]);
+        copied[margin][ky] = s ? (b / s) * 100 : copied[margin][ky] ?? null;
       }
     }
 
@@ -250,187 +253,108 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
 
       const data = updated[forecastsTicker.toUpperCase()];
 
-      // Helper to parse numbers safely
-      const num = (v: any) => {
-        const n = Number(v);
-        return isNaN(n) ? 0 : n;
-      };
-
-      // When a base metric changes, update associated growth/margins
-      const recalcGrowthForMetric = (baseMetric: string) => {
-        const growthMetric = baseMetric + " Growth";
+      const recalcGrowthFor = (baseMetric: string) => {
+        const growthMetric = growthPairs[baseMetric];
+        if (!growthMetric) return;
+        ensureMetricStructure(data, baseMetric);
         ensureMetricStructure(data, growthMetric);
 
         const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
         const currVal = safeNumber(data[baseMetric]?.["current_year"]);
         const nextVal = safeNumber(data[baseMetric]?.["one_year_later"]);
 
-        data[growthMetric]["current_year"] = prevVal
-          ? computeGrowthPct(prevVal, currVal)
-          : data[growthMetric]["current_year"];
-        data[growthMetric]["one_year_later"] = currVal
-          ? computeGrowthPct(currVal, nextVal)
-          : data[growthMetric]["one_year_later"];
+        data[growthMetric]["current_year"] =
+          prevVal ? computeGrowthPct(prevVal, currVal) : data[growthMetric]["current_year"];
+        data[growthMetric]["one_year_later"] =
+          currVal ? computeGrowthPct(currVal, nextVal) : data[growthMetric]["one_year_later"];
       };
 
-      const recalcBaseFromGrowth = (
-        baseMetric: string,
-        growthMetric: string
-      ) => {
+      const recalcBaseFromGrowth = (baseMetric: string, growthMetric: string) => {
         ensureMetricStructure(data, baseMetric);
-        // If user edited growth current_year -> base current_year = prev * (1 + growth/100)
+        ensureMetricStructure(data, growthMetric);
+
         const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
-        const growthCurr = safeNumber(data[growthMetric]?.["current_year"]);
-        const growthNext = safeNumber(data[growthMetric]?.["one_year_later"]);
-        if (
-          yearKey === "current_year" &&
-          prevVal &&
-          data[growthMetric]?.["current_year"] != null
-        ) {
+        const currBase = safeNumber(data[baseMetric]?.["current_year"]);
+        const growthCurr = data[growthMetric]?.["current_year"];
+        const growthNext = data[growthMetric]?.["one_year_later"];
+
+        if (yearKey === "current_year" && prevVal && growthCurr != null) {
           data[baseMetric]["current_year"] = computeValueFromGrowth(
             prevVal,
-            Number(data[growthMetric]["current_year"])
+            Number(growthCurr)
           );
         }
-        if (
-          yearKey === "one_year_later" &&
-          safeNumber(data[baseMetric]?.["current_year"]) &&
-          data[growthMetric]?.["one_year_later"] != null
-        ) {
-          const currBase = safeNumber(data[baseMetric]["current_year"]);
+        if (yearKey === "one_year_later" && currBase && growthNext != null) {
           data[baseMetric]["one_year_later"] = computeValueFromGrowth(
             currBase,
-            Number(data[growthMetric]["one_year_later"])
+            Number(growthNext)
           );
         }
       };
 
-      // ==== SALES ↔ SALES GROWTH ====
-      if (metricName === "Sales") {
-        recalcGrowthForMetric("Sales");
-      }
-      if (metricName === "Sales Growth") {
-        recalcBaseFromGrowth("Sales", "Sales Growth");
-      }
+      const recalcMarginFor = (baseMetric: string, key: string) => {
+        const marginMetric = marginPairs[baseMetric];
+        if (!marginMetric) return;
+        ensureMetricStructure(data, "Sales");
+        ensureMetricStructure(data, baseMetric);
+        ensureMetricStructure(data, marginMetric);
+        const s = safeNumber(data["Sales"]?.[key]);
+        const b = safeNumber(data[baseMetric]?.[key]);
+        data[marginMetric][key] = s ? (b / s) * 100 : data[marginMetric][key];
+      };
 
-      // ==== NET INTEREST INCOME ↔ NET INTEREST INCOME GROWTH ====
-      if (metricName === "Net Interest Income") {
-        recalcGrowthForMetric("Net Interest Income");
-      }
-      if (metricName === "Net Interest Income Growth") {
-        recalcBaseFromGrowth(
-          "Net Interest Income",
-          "Net Interest Income Growth"
+      const applyMarginEdit = (marginMetric: string, key: string) => {
+        // margin edited -> base = Sales * margin%
+        const baseMetric = Object.keys(marginPairs).find(
+          (b) => marginPairs[b] === marginMetric
         );
-      }
+        if (!baseMetric) return;
+        ensureMetricStructure(data, baseMetric);
+        ensureMetricStructure(data, "Sales");
+        const s = safeNumber(data["Sales"]?.[key]);
+        const m = Number(data[marginMetric]?.[key]);
+        if (s && !isNaN(m)) {
+          data[baseMetric][key] = (s * m) / 100;
+          // if base changed due to margin edit, re-derive its growth (if applicable)
+          if (growthPairs[baseMetric]) recalcGrowthFor(baseMetric);
+        }
+      };
 
-      // ==== NII after provision for credit losses ↔ its Growth ====
-      if (metricName === "NII after provision for credit losses") {
-        recalcGrowthForMetric("NII after provision for credit losses");
-      }
-      if (metricName === "NII after provision for credit losses Growth") {
-        recalcBaseFromGrowth(
-          "NII after provision for credit losses",
-          "NII after provision for credit losses Growth"
+      // Base ↔ Growth pairs
+      if (metricName in growthPairs) {
+        recalcGrowthFor(metricName);
+      } else {
+        // if a *Growth metric* is being edited
+        const baseForThisGrowth = Object.keys(growthPairs).find(
+          (b) => growthPairs[b] === metricName
         );
-      }
-
-      // ==== GROSS PROFIT ↔ GROSS PROFIT GROWTH & GROSS PROFIT MARGIN ====
-      if (metricName === "Gross Profit") {
-        recalcGrowthForMetric("Gross Profit");
-        // update Gross Profit Margin for the changed yearKey
-        const gp = safeNumber(data["Gross Profit"]?.[yearKey]);
-        const sales = safeNumber(data["Sales"]?.[yearKey]);
-        ensureMetricStructure(data, "Gross Profit Margin");
-        data["Gross Profit Margin"][yearKey] = sales
-          ? (gp / sales) * 100
-          : data["Gross Profit Margin"][yearKey];
-      }
-      if (metricName === "Gross Profit Growth") {
-        recalcBaseFromGrowth("Gross Profit", "Gross Profit Growth");
-        // also update margin if Sales exists
-        const gp = safeNumber(data["Gross Profit"]?.[yearKey]);
-        const sales = safeNumber(data["Sales"]?.[yearKey]);
-        ensureMetricStructure(data, "Gross Profit Margin");
-        data["Gross Profit Margin"][yearKey] = sales
-          ? (gp / sales) * 100
-          : data["Gross Profit Margin"][yearKey];
-      }
-      if (metricName === "Gross Profit Margin") {
-        // if margin edited, update Gross Profit = Sales * margin%
-        const sales = safeNumber(data["Sales"]?.[yearKey]);
-        const marginNum = Number(data["Gross Profit Margin"]?.[yearKey]);
-        if (sales && !isNaN(marginNum)) {
-          ensureMetricStructure(data, "Gross Profit");
-          data["Gross Profit"][yearKey] = (sales * marginNum) / 100;
-          // recalc gross profit growth as well
-          recalcGrowthForMetric("Gross Profit");
+        if (baseForThisGrowth) {
+          recalcBaseFromGrowth(baseForThisGrowth, metricName);
         }
       }
 
-      // ==== EBIT ↔ EBIT Growth ====
-      if (metricName === "EBIT") {
-        recalcGrowthForMetric("EBIT");
-      }
-      if (metricName === "EBIT Growth") {
-        recalcBaseFromGrowth("EBIT", "EBIT Growth");
-      }
-
-      // ==== PBT ↔ PBT Growth ====
-      if (metricName === "PBT") {
-        recalcGrowthForMetric("PBT");
-      }
-      if (metricName === "PBT Growth") {
-        recalcBaseFromGrowth("PBT", "PBT Growth");
-      }
-
-      // ==== NET INCOME ↔ NET INCOME GROWTH & NET INCOME MARGIN ====
-      if (metricName === "Net Income") {
-        recalcGrowthForMetric("Net Income");
-        // update Net Income Margin
-        const ni = safeNumber(data["Net Income"]?.[yearKey]);
-        const sales = safeNumber(data["Sales"]?.[yearKey]);
-        ensureMetricStructure(data, "Net Income Margin");
-        data["Net Income Margin"][yearKey] = sales
-          ? (ni / sales) * 100
-          : data["Net Income Margin"][yearKey];
-      }
-      if (metricName === "Net Income Growth") {
-        recalcBaseFromGrowth("Net Income", "Net Income Growth");
-        // update margin too
-        const ni = safeNumber(data["Net Income"]?.[yearKey]);
-        const sales = safeNumber(data["Sales"]?.[yearKey]);
-        ensureMetricStructure(data, "Net Income Margin");
-        data["Net Income Margin"][yearKey] = sales
-          ? (ni / sales) * 100
-          : data["Net Income Margin"][yearKey];
-      }
-      if (metricName === "Net Income Margin") {
-        // if margin edited, update Net Income = Sales * margin%
-        const sales = safeNumber(data["Sales"]?.[yearKey]);
-        const marginNum = Number(data["Net Income Margin"]?.[yearKey]);
-        if (sales && !isNaN(marginNum)) {
-          ensureMetricStructure(data, "Net Income");
-          data["Net Income"][yearKey] = (sales * marginNum) / 100;
-          recalcGrowthForMetric("Net Income");
+      // Base ↔ Margin pairs
+      if (metricName in marginPairs) {
+        // base changed -> update its margin for the edited column
+        recalcMarginFor(metricName, yearKey);
+      } else {
+        // margin edited -> recompute base from margin
+        const baseForThisMargin = Object.keys(marginPairs).find(
+          (b) => marginPairs[b] === metricName
+        );
+        if (baseForThisMargin) {
+          applyMarginEdit(metricName, yearKey);
         }
       }
 
-      // When Sales changes, recompute all margins that depend on Sales
+      // If Sales changes, recompute *all* margins that depend on Sales
       if (metricName === "Sales") {
-        // Gross Profit Margin and Net Income Margin
-        for (const ky of forecastYearKeys) {
-          const gp = safeNumber(data["Gross Profit"]?.[ky]);
-          const ni = safeNumber(data["Net Income"]?.[ky]);
-          const sales = safeNumber(data["Sales"]?.[ky]);
-          ensureMetricStructure(data, "Gross Profit Margin");
-          ensureMetricStructure(data, "Net Income Margin");
-          data["Gross Profit Margin"][ky] = sales
-            ? (gp / sales) * 100
-            : data["Gross Profit Margin"][ky];
-          data["Net Income Margin"][ky] = sales
-            ? (ni / sales) * 100
-            : data["Net Income Margin"][ky];
+        for (const [base, margin] of Object.entries(marginPairs)) {
+          ensureMetricStructure(data, base);
+          ensureMetricStructure(data, margin);
+          const s = safeNumber(data["Sales"]?.[yearKey]);
+          const b = safeNumber(data[base]?.[yearKey]);
+          data[margin][yearKey] = s ? (b / s) * 100 : data[margin][yearKey];
         }
       }
 
@@ -456,7 +380,6 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
         const originalRow =
           forecasts?.[forecastsTicker.toUpperCase()]?.[metricName];
 
-        // If originalRow is undefined, we still try to patch provided fields
         const fieldsToUpdate: any = {};
         if (
           !originalRow ||
@@ -505,7 +428,6 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
     }
   };
 
-  // Determine the ordering for display
   const getOrderedMetricList = (dataObj: any) => {
     if (!dataObj) return [];
     const existing = new Set(Object.keys(dataObj));
@@ -517,10 +439,7 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
         existing.delete(name);
       }
     }
-
-    // Append any remaining metrics that existed but weren't in priorityOrder
     const remaining = Array.from(existing);
-    // Keep original API order if possible (we don't have that reliably), else append alphabetically
     remaining.sort();
     ordered.push(...remaining);
     return ordered;
@@ -627,6 +546,10 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                       const years = dataObj[metricName] || {};
                       const isEvenRow = rowIndex % 2 === 0;
 
+                      const isMarginMetric =
+                        metricName.toLowerCase().includes("margin") ||
+                        metricName.toLowerCase().includes("growth");
+
                       return (
                         <TableRow key={metricName}>
                           <TableCell
@@ -656,9 +579,10 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                                 ]?.[yearKey] ?? years[yearKey])
                               : years[yearKey];
 
-                            const isMarginMetric = metricName
-                              .toLowerCase()
-                              .includes("margin");
+                            // render % for any *Margin or *Growth rows
+                            const renderAsPercent =
+                              metricName.toLowerCase().includes("margin") ||
+                              metricName.toLowerCase().includes("growth");
 
                             return (
                               <TableCell
@@ -697,15 +621,11 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
                                     sx={{
                                       width: "100%",
                                       borderRadius: 1,
-                                      "& .MuiOutlinedInput-root": {
-                                        padding: 0,
-                                      },
-                                      "& .MuiInputBase-input": {
-                                        height: "1.5rem",
-                                      },
+                                      "& .MuiOutlinedInput-root": { padding: 0 },
+                                      "& .MuiInputBase-input": { height: "1.5rem" },
                                     }}
                                   />
-                                ) : isMarginMetric ? (
+                                ) : renderAsPercent ? (
                                   formatFinancialMargin(value)
                                 ) : (
                                   formatFinancialValue(value)
