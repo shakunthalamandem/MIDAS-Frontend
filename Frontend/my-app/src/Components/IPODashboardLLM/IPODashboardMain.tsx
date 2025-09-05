@@ -496,7 +496,6 @@ const handleExportPDFPaginated = async () => {
       const availableHeightPx = availableHeightMm / mmPerPx;
 
       let yOffsetPx = 0;
-      const sliceOverlapPx = 12; // overlap to avoid cutting off last line between pages
       while (yOffsetPx < canvas.height) {
         const sliceHeightPx = Math.min(availableHeightPx, canvas.height - yOffsetPx);
         const sliceCanvas = document.createElement("canvas");
@@ -524,9 +523,8 @@ const handleExportPDFPaginated = async () => {
         pdf.addImage(sliceImg, "JPEG", 0, contentTopY, imageWidthMm, sliceHeightMm, undefined, "FAST");
         drawFooter();
 
-        const nextOffset = yOffsetPx + sliceHeightPx - sliceOverlapPx;
-        // Prevent infinite loop if remaining height is smaller than overlap
-        yOffsetPx = nextOffset > yOffsetPx ? nextOffset : yOffsetPx + sliceHeightPx;
+        yOffsetPx += sliceHeightPx;
+
       }
     }
 
