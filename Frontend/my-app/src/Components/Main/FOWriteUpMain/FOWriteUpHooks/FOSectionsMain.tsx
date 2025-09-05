@@ -14,6 +14,8 @@ import FOComparisionTableMain from "../FOWriteSections/FOComparisionTableMain";
 import FOFinancialHighlights from "../FOWriteSections/FOFinancialHighlights";
 import FOSummaryDataSection from "./FOSummaryDataSection";
 import { format } from "date-fns";
+import { ExportProvider } from "../../../../contexts/ExportContext";
+import { useFoPdfExport } from "../hooks/useFoPdfExport";
 
 interface FOSectionsMainProps {
   ticker: string;
@@ -100,9 +102,17 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
     }
   }, [selected, ticker]);
 
-  const onExportPDF = () => {
+  // Export Monashee-style PDF via shared hook
+  const [forceExpand, setForceExpand] = useState(false);
+  const exportFoPDF = useFoPdfExport({
+    pages: ["fo-page1", "fo-page2"],
+    ipoData,
+    tickerFallback: selected?.ticker || ticker,
+    setForceExpand,
+  });
+  const handleExportPDF = async () => {
     setPdfLoading(true);
-    setTimeout(() => setPdfLoading(false), 2000);
+    try { await exportFoPDF(); } finally { setPdfLoading(false); }
   };
 
 const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
@@ -113,7 +123,7 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
 
 
   return (
-    <>
+    <ExportProvider forceExpand={forceExpand} setForceExpand={setForceExpand}>
       {/* 🔹 Header Section */}
       <Container>
       <Box
@@ -137,22 +147,24 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
               : "Loading..."}
           </Typography>
 
-          {/* <Button
+          <Button
             variant="contained"
-            onClick={onExportPDF}
+            onClick={handleExportPDF}
             sx={{
               backgroundColor: "#002060",
               color: "#ffffff",
               textTransform: "none",
               px: 3,
               py: 1,
-              minWidth: "130px",
+              minWidth: "180px",
+              boxShadow: 2,
+              '&:hover': { backgroundColor: '#093b99' }
             }}
             disabled={pdfLoading}
             startIcon={pdfLoading ? <CircularProgress color="inherit" size={18} /> : null}
           >
-            {pdfLoading ? "Generating..." : "Generate Monashee PDF"}
-          </Button> */}
+            {pdfLoading ? "Generating..." : "Export PDF"}
+          </Button>
         </Box>
 
         {/* 🔹 Search Autocomplete */}
@@ -194,10 +206,14 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
       </Container>
 
       {/* 🔹 Sections */}
-      <FOSummaryDataSection ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
-      <FOFinancialHighlights ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
-      <FOComparisionTableMain ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
-    </>
+      <div id="fo-page1">
+        <FOSummaryDataSection ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
+      </div>
+      <div id="fo-page2">
+        <FOFinancialHighlights ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
+        <FOComparisionTableMain ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
+      </div>
+    </ExportProvider>
   );
 };
 

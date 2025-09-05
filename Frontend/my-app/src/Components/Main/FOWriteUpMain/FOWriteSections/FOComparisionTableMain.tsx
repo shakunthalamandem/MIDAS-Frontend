@@ -170,7 +170,7 @@ const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
   const averages: AveragesType | undefined = data?.[ticker]?.Averages;
 
   return (
-    <Box sx={{ p: 0, width: "100%" }}>
+    <Box sx={{ p: 2, width: "100%" }}>
       <Typography
         variant="h6"
         color="#002060"

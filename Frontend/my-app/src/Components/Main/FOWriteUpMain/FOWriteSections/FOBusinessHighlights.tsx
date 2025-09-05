@@ -12,6 +12,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { motion } from "framer-motion";
+import { useExportContext } from "../../../../contexts/ExportContext";
 
 interface FOBusinessHighlightsProps {
   selectedData: {
@@ -30,6 +31,7 @@ const FOBusinessHighlights: React.FC<FOBusinessHighlightsProps> = ({
 
   // Controlled expansion
   const [expanded, setExpanded] = useState(false);
+  const { forceExpand } = useExportContext();
 
   // Focus ref
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -96,7 +98,7 @@ const FOBusinessHighlights: React.FC<FOBusinessHighlightsProps> = ({
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <Accordion
-        expanded={expanded}
+        expanded={forceExpand || expanded}
         // Gate expansion to chevron only
         onChange={handleAccordionChange as any}
         sx={{

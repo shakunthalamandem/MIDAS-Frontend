@@ -12,6 +12,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { motion } from "framer-motion";
+import { useExportContext } from "../../../../contexts/ExportContext";
 
 interface FOManagementWriteupProps {
   selectedData: {
@@ -30,6 +31,7 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
 
   // Accordion controlled expansion
   const [expanded, setExpanded] = useState(false);
+  const { forceExpand } = useExportContext();
 
   // Ref to focus textarea
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -99,7 +101,7 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <Accordion
-        expanded={expanded}
+        expanded={forceExpand || expanded}
         onChange={handleAccordionChange as any}
         sx={{
           borderRadius: 3,
