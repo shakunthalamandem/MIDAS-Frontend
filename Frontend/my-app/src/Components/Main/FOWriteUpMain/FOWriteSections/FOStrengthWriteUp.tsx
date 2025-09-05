@@ -14,6 +14,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { motion } from "framer-motion";
+import { useExportContext } from "../../../../contexts/ExportContext";
 
 interface StrengthWriteupProps {
   selectedData: {
@@ -39,6 +40,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({
   // Controlled expansion state
   const [expandedStrength, setExpandedStrength] = useState(false);
   const [expandedWeakness, setExpandedWeakness] = useState(false);
+  const { forceExpand } = useExportContext();
 
   // Refs to focus textarea when entering edit
   const strengthRef = useRef<HTMLInputElement | null>(null);
@@ -128,7 +130,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <Accordion
-                expanded={expandedStrength}
+                expanded={forceExpand || expandedStrength}
                 onChange={handleAccordionChange("strengths")}
                 sx={{
                   borderRadius: 3,
@@ -214,7 +216,7 @@ const FOStrengthWriteUp: React.FC<StrengthWriteupProps> = ({
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <Accordion
-                expanded={expandedWeakness}
+                expanded={forceExpand || expandedWeakness}
                 onChange={handleAccordionChange("weakness")}
                 sx={{
                   borderRadius: 3,
