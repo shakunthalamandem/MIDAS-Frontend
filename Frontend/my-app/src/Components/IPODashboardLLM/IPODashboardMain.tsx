@@ -303,14 +303,17 @@ const handleExportPDF = async () => {
       pdf.addImage(imgData, "JPEG", 0, marginTop, imageWidth, imageHeight, undefined, "FAST");
 
       // ➤ Footer
-      const footerY = pdfHeight - 20;
+      const footerTextTopY = pdfHeight - 22;
+      pdf.setDrawColor(0, 32, 96);
+      pdf.setLineWidth(1);
+      pdf.line(10, footerTextTopY - 4, pdfWidth - 10, footerTextTopY - 4);
       pdf.setFontSize(7);
       pdf.setTextColor(100);
       pdf.setFont("helvetica", "normal");
       pdf.text(
         `Data as of ${dataAsOfText}. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
         10,
-        footerY,
+        footerTextTopY,
         { maxWidth: pdfWidth - 20 }
       );
 
@@ -332,14 +335,19 @@ const handleExportPDF = async () => {
         pdf.addPage();
         pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
 
-        const footerY = pdfHeight - 20;
-        pdf.setFontSize(9);
+        const footerTextTopY0 = pdfHeight - 22;
+        // Blue line at the top of the footer
+        pdf.setDrawColor(0, 32, 96);
+        pdf.setLineWidth(1);
+        pdf.line(10, footerTextTopY0 - 4, pdfWidth - 10, footerTextTopY0 - 4);
+        // Footer text
+        pdf.setFontSize(7);
         pdf.setTextColor(100);
         pdf.setFont("helvetica", "normal");
         pdf.text(
           `Data as of ${dataAsOfText}. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
           10,
-          footerY,
+          footerTextTopY0,
           { maxWidth: pdfWidth - 20 }
         );
 
@@ -353,6 +361,231 @@ const handleExportPDF = async () => {
     });
 
     // ✅ Save the PDF
+    pdf.save(`${selectedTicker}_IPO_Report.pdf`);
+  } catch (error) {
+    console.error("PDF export failed", error);
+  } finally {
+    setPdfLoading(false);
+  }
+};
+
+// Export with dynamic pagination so variable content fits into the PDF cleanly
+const handleExportPDFPaginated = async () => {
+  setPdfLoading(true);
+
+  const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3", "ipo-dashboard-page4"];
+
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
+
+  const waitForDOMUpdate = (delay = 300) => new Promise<void>((resolve) => setTimeout(resolve, delay));
+
+  try {
+    // Compute data-as-of text
+    let dataAsOfText = "";
+    if (ipoData?.pricing_date) {
+      const cleanDateStr = ipoData.pricing_date.replace(/(\d+)(st|nd|rd|th)/, "$1");
+      const dateObj = new Date(cleanDateStr);
+      const month = dateObj.toLocaleString("default", { month: "short" });
+      const year = dateObj.getFullYear();
+      dataAsOfText = `${month} ${year}`;
+    }
+
+    // Preload logo
+    const logoImg = new Image();
+    logoImg.src = monasheeLogo;
+    await new Promise<void>((resolve) => { logoImg.onload = () => resolve(); });
+
+    // Intro page
+    const introImg = new Image();
+    introImg.src = introImage;
+    await new Promise<void>((resolve) => {
+      introImg.onload = () => {
+        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
+
+        const margin = 10;
+        const color = [0, 32, 96];
+        if (ipoData?.company_name && ipoData?.exchange && ipoData?.ticker_name) {
+          const companyName = ipoData.company_name;
+          const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
+          const pricingDate = ipoData.pricing_date;
+          const startY = 40;
+          pdf.setFontSize(20);
+          pdf.setTextColor(color[0], color[1], color[2]);
+          pdf.text(companyName, pdfWidth - margin - pdf.getTextWidth(companyName), startY);
+          pdf.setFontSize(18);
+          pdf.text(exchangeTicker, pdfWidth - margin - pdf.getTextWidth(exchangeTicker), startY + 14);
+          if (pricingDate) {
+            pdf.setFontSize(12);
+            pdf.text(pricingDate, pdfWidth - margin - pdf.getTextWidth(pricingDate), startY + 28);
+          }
+        }
+        resolve();
+      };
+    });
+
+    // Expand accordions for full capture
+    const originalPanels = { ...expandedPanels };
+    const allKeys = Object.keys(editedContent);
+    const expandedAll: Record<string, boolean> = {};
+    allKeys.forEach((key) => (expandedAll[key] = true));
+    setExpandedPanels(expandedAll);
+    await waitForDOMUpdate(500);
+
+    const drawHeader = () => {
+      const logoWidth = 40; // mm
+      const logoHeight = 12; // mm
+      const logoX = pdfWidth - logoWidth - 10;
+      const logoY = 10;
+      pdf.addImage(logoImg, "JPEG", logoX, logoY, logoWidth, logoHeight, undefined, "FAST");
+      const lineY = logoY + logoHeight + 2;
+      pdf.setDrawColor(0, 32, 96);
+      pdf.setLineWidth(1);
+      pdf.line(10, lineY, pdfWidth - 10, lineY);
+      return lineY + 5;
+    };
+
+    const drawFooter = () => {
+      const marginX = 10;
+      const footerTextTopY = pdfHeight - 22;
+      // Blue line at the top of the footer
+      pdf.setDrawColor(0, 32, 96);
+      pdf.setLineWidth(1);
+      pdf.line(marginX, footerTextTopY - 4, pdfWidth - marginX, footerTextTopY - 4);
+      // Footer text
+      pdf.setFontSize(7);
+      pdf.setTextColor(100);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(
+        `Data as of ${dataAsOfText}. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
+        marginX,
+        footerTextTopY,
+        { maxWidth: pdfWidth - marginX * 2 }
+      );
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(128);
+      pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
+    };
+
+    for (let i = 0; i < pages.length; i++) {
+      const element = document.getElementById(pages[i]);
+      if (!element) continue;
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        scrollY: -window.scrollY,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      });
+
+      const imageWidthMm = pdfWidth; // fill page width
+      const mmPerPx = imageWidthMm / canvas.width;
+      const headerTopY = (() => {
+        const logoHeight = 12;
+        const logoY = 10;
+        const lineY = logoY + logoHeight + 2;
+        return lineY + 5;
+      })();
+      const footerReserveMm = 28;
+      const availableHeightMm = Math.max(10, pdfHeight - headerTopY - footerReserveMm);
+      const availableHeightPx = availableHeightMm / mmPerPx;
+
+      let yOffsetPx = 0;
+      while (yOffsetPx < canvas.height) {
+        const sliceHeightPx = Math.min(availableHeightPx, canvas.height - yOffsetPx);
+        const sliceCanvas = document.createElement("canvas");
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = Math.ceil(sliceHeightPx);
+        const ctx = sliceCanvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(
+            canvas,
+            0,
+            yOffsetPx,
+            canvas.width,
+            sliceHeightPx,
+            0,
+            0,
+            canvas.width,
+            sliceHeightPx
+          );
+        }
+        const sliceImg = sliceCanvas.toDataURL("image/jpeg", 0.9);
+
+        pdf.addPage();
+        const contentTopY = drawHeader();
+        const sliceHeightMm = (sliceHeightPx as number) * mmPerPx;
+        pdf.addImage(sliceImg, "JPEG", 0, contentTopY, imageWidthMm, sliceHeightMm, undefined, "FAST");
+        drawFooter();
+
+        yOffsetPx += sliceHeightPx;
+      }
+    }
+
+    // Restore accordions
+    setExpandedPanels(originalPanels);
+    await waitForDOMUpdate();
+
+    // Outro page (render disclaimer text instead of image)
+    pdf.addPage();
+    const marginX = 12;
+    // Header
+    const headerLogoWidth = 40;
+    const headerLogoHeight = 12;
+    const headerLogoX = pdfWidth - headerLogoWidth - 10;
+    const headerLogoY = 10;
+    const logoImgFinal = new Image();
+    logoImgFinal.src = monasheeLogo;
+    await new Promise<void>((resolve) => { logoImgFinal.onload = () => resolve(); });
+    pdf.addImage(logoImgFinal, "JPEG", headerLogoX, headerLogoY, headerLogoWidth, headerLogoHeight, undefined, "FAST");
+    const headerLineY = headerLogoY + headerLogoHeight + 2;
+    pdf.setDrawColor(0, 32, 96);
+    pdf.setLineWidth(1);
+    pdf.line(10, headerLineY, pdfWidth - 10, headerLineY);
+
+    // Title
+    const titleY = headerLineY + 10;
+    pdf.setTextColor(0, 32, 96);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(16);
+    pdf.text("Disclaimer", marginX, titleY);
+    pdf.setLineWidth(0.8);
+    pdf.line(marginX, titleY + 2, pdfWidth - marginX, titleY + 2);
+
+    // Body text
+    const bodyY = titleY + 10;
+    const disclaimerText =
+      "This report is for informational purposes only and does not constitute investment advice, an offer to sell, or a solicitation of an offer to buy any security. Data is derived from sources believed to be reliable, including company filings and management, but is not guaranteed for accuracy or completeness. Opinions and estimates reflect our judgment as of the date of this material and are subject to change without notice. Past performance is not indicative of future results. Investing involves risk, including the possible loss of principal.\n\n" +
+      "This document is confidential and intended solely for the designated recipient. Distribution, reproduction, or disclosure, in whole or in part, without the prior written consent of Monashee Investment Management is strictly prohibited. Any projections, forecasts, or forward-looking statements are inherently uncertain and actual outcomes may differ materially.\n\n" +
+      "By accepting this document, you agree to maintain its confidentiality and to use it only for the purpose for which it was provided. Do not copy. Do not distribute.";
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10.5);
+    pdf.setTextColor(60);
+    pdf.text(disclaimerText, marginX, bodyY, { maxWidth: pdfWidth - marginX * 2 });
+
+    // Footer with blue line at top
+    const footerTextTopY2 = pdfHeight - 22;
+    pdf.setDrawColor(0, 32, 96);
+    pdf.setLineWidth(1);
+    pdf.line(10, footerTextTopY2 - 4, pdfWidth - 10, footerTextTopY2 - 4);
+    pdf.setFontSize(7);
+    pdf.setTextColor(100);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(
+      `Data as of ${dataAsOfText}. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
+      marginX,
+      footerTextTopY2,
+      { maxWidth: pdfWidth - marginX * 2 }
+    );
+    pdf.setFontSize(9);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(128);
+    pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
+
     pdf.save(`${selectedTicker}_IPO_Report.pdf`);
   } catch (error) {
     console.error("PDF export failed", error);
@@ -453,7 +686,7 @@ const handleExportPDF = async () => {
   searchText={searchText}
   setSelectedTicker={setSelectedTicker}
   setSearchText={setSearchText}
-  handleExportPDF={handleExportPDF}
+  handleExportPDF={handleExportPDFPaginated}
   pdfLoading={pdfLoading}
 />
 
