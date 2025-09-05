@@ -34,7 +34,6 @@ interface ApiResponse {
 const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
   const [formData, setFormData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -65,38 +64,7 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
     fetchData();
   }, [ticker, deal_id]);
 
-  const handleSave = async () => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
 
-      const patchPayload = {
-        ticker,
-        ...(formData?.deal_information || {}),
-        ...(formData?.trading_details || {}),
-        ...(formData?.share_price_performance || {}),
-        ...(formData?.valuation_writeup || {}),
-        ...(formData?.strength_writeup || {}),
-        ...(formData?.future_outlook || {}),
-        ...(formData?.business_highlights || {}),
-        ...(formData?.management_writeup || {}),
-      };
-
-      const res = await fetch(`${apiUrl}/api/fo_writeup_data/`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify(patchPayload),
-      });
-
-      if (!res.ok) throw new Error("Failed to save data");
-      setEditMode(false);
-    } catch (error) {
-      console.error("Save failed:", error);
-    }
-  };
 
   if (loading) {
     return (
@@ -138,7 +106,6 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
 <FOStrengthWriteUp selectedData={formData.strength_writeup} ticker={ticker} />
 
 <FOValuationWriteup selectedData={formData.valuation_writeup} ticker={ticker} />
-{/* <FOFutureOutlook selectedData={formData.future_outlook_data} ticker={ticker} /> */}
 
       <Container maxWidth="xl" sx={{ mt: 4 }}>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
