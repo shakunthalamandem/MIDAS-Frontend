@@ -20,7 +20,7 @@ type UseFoPdfExportParams = {
 
 export function useFoPdfExport({ pages, ipoData, tickerFallback = "FO", setForceExpand }: UseFoPdfExportParams) {
   const exportFoPDF = async () => {
-    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: [600, 420], compress: true });
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 

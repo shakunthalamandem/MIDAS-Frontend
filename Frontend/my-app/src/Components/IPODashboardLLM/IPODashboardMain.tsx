@@ -179,7 +179,7 @@ const handleExportPDFPaginated = async () => {
 
   const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3", "ipo-dashboard-page4"];
 
-  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: [600, 420], compress: true });
   const pdfWidth = pdf.internal.pageSize.getWidth();
   const pdfHeight = pdf.internal.pageSize.getHeight();
 
