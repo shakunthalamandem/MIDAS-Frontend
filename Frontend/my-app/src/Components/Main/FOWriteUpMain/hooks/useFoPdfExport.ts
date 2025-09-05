@@ -106,6 +106,16 @@ export function useFoPdfExport({ pages, ipoData, tickerFallback = "FO", setForce
       const headerTopY = (() => { const logoH = 12, logoY = 10; return logoY + logoH + 2 + 5; })();
       const footerReserveMm = 28;
 
+      // Hide UI controls (IconButtons, expanders) so they don't appear in PDF
+      const hiddenEls: Array<{ el: HTMLElement; prev: string }> = [];
+      const toHide = document.querySelectorAll<HTMLElement>(
+        ".MuiIconButton-root, [data-expander=\"true\"]"
+      );
+      toHide.forEach((el) => {
+        hiddenEls.push({ el, prev: el.style.visibility });
+        el.style.visibility = "hidden";
+      });
+
       for (const id of pages) {
         const el = document.getElementById(id);
         if (!el) continue;
@@ -200,6 +210,9 @@ export function useFoPdfExport({ pages, ipoData, tickerFallback = "FO", setForce
           }
         }
       }
+
+      // Restore hidden UI controls
+      hiddenEls.forEach(({ el, prev }) => (el.style.visibility = prev));
 
       // Disclaimer page (text-based, multi-page safe)
       const addDisclaimerHeader = () => {

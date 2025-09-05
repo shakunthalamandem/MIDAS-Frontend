@@ -274,6 +274,16 @@ const handleExportPDFPaginated = async () => {
       pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
     };
 
+    // Hide UI controls (IconButtons, expanders) so they don't appear in PDF
+    const hiddenEls: Array<{ el: HTMLElement; prev: string }> = [];
+    const toHide = document.querySelectorAll<HTMLElement>(
+      ".MuiIconButton-root, [data-expander=\"true\"]"
+    );
+    toHide.forEach((el) => {
+      hiddenEls.push({ el, prev: el.style.visibility });
+      el.style.visibility = "hidden";
+    });
+
     for (let i = 0; i < pages.length; i++) {
       const element = document.getElementById(pages[i]);
       if (!element) continue;
@@ -331,6 +341,8 @@ const handleExportPDFPaginated = async () => {
       }
     }
 
+    // Restore hidden UI controls
+    hiddenEls.forEach(({ el, prev }) => (el.style.visibility = prev));
     // Restore accordions
     setExpandedPanels(originalPanels);
     await waitForDOMUpdate();
