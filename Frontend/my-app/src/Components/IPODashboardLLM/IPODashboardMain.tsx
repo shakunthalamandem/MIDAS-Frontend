@@ -288,12 +288,20 @@ const handleExportPDFPaginated = async () => {
       const element = document.getElementById(pages[i]);
       if (!element) continue;
 
+      // Dynamic scale for sharpness on larger PDF size
+      const elRect = element.getBoundingClientRect();
+      const elCssWidth = elRect.width || element.scrollWidth || 1024;
+      const targetDpi = 180;
+      const targetPxWidth = (pdfWidth / 25.4) * targetDpi;
+      const dynamicScale = Math.max(2, Math.min(4, targetPxWidth / elCssWidth));
+
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: dynamicScale,
         useCORS: true,
         scrollY: -window.scrollY,
         windowWidth: element.scrollWidth,
         windowHeight: element.scrollHeight,
+        backgroundColor: "#ffffff",
       });
 
       const imageWidthMm = pdfWidth; // fill page width
@@ -328,12 +336,12 @@ const handleExportPDFPaginated = async () => {
             sliceHeightPx
           );
         }
-        const sliceImg = sliceCanvas.toDataURL("image/jpeg", 0.9);
+        const sliceImg = sliceCanvas.toDataURL("image/png");
 
         pdf.addPage();
         const contentTopY = drawHeader();
         const sliceHeightMm = (sliceHeightPx as number) * mmPerPx;
-        pdf.addImage(sliceImg, "JPEG", 0, contentTopY, imageWidthMm, sliceHeightMm, undefined, "FAST");
+        pdf.addImage(sliceImg, "PNG", 0, contentTopY, imageWidthMm, sliceHeightMm);
         drawFooter();
 
         yOffsetPx += sliceHeightPx;

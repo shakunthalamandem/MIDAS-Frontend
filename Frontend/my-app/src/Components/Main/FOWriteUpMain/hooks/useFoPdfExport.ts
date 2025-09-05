@@ -158,8 +158,15 @@ export function useFoPdfExport({ pages, ipoData, tickerFallback = "FO", setForce
         // Give layout a frame to settle
         await wait(50);
 
+        // Compute dynamic scale to achieve crisp output in the larger PDF size
+        const elRect = el.getBoundingClientRect();
+        const elCssWidth = elRect.width || el.scrollWidth || 1024;
+        const targetDpi = 180; // balance sharpness vs. size
+        const targetPxWidth = (pdfWidth / 25.4) * targetDpi; // mm -> inch -> px
+        const dynamicScale = Math.max(2, Math.min(4, targetPxWidth / elCssWidth));
+
         const canvas = await html2canvas(el, {
-          scale: 2,
+          scale: dynamicScale,
           useCORS: true,
           scrollY: -window.scrollY,
           windowWidth: el.scrollWidth,
@@ -191,12 +198,12 @@ export function useFoPdfExport({ pages, ipoData, tickerFallback = "FO", setForce
           if (ctx) {
             ctx.drawImage(canvas, 0, yOffsetPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
           }
-          const slice = sliceCanvas.toDataURL("image/jpeg", 0.9);
+          const slice = sliceCanvas.toDataURL("image/png");
 
           pdf.addPage();
           const contentTopY = drawHeader();
           const sliceHeightMm = sliceHeightPx * mmPerPx;
-          pdf.addImage(slice, "JPEG", 0, contentTopY, pdfWidth, sliceHeightMm, undefined, "FAST");
+          pdf.addImage(slice, "PNG", 0, contentTopY, pdfWidth, sliceHeightMm);
           drawFooter();
 
           const nextOffset = yOffsetPx + sliceHeightPx - overlapPx;
