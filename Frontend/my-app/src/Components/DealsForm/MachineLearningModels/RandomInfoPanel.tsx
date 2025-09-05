@@ -177,14 +177,8 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
-                  <Typography variant="body1" color="#002060">
-                    Discount:{" "}
-                    <strong>
-                      {form.discount_from_announcement_price !== null
-                        ? `${form.discount_from_announcement_price}%`
-                        : "N/A"}
-                    </strong>
-                  </Typography>
+                                    
+                  <Typography variant="body1">{form.deal_type}</Typography>
                   <Typography variant="body1" color="#002060">
                     {formatDate(form.pricing_date)}
                   </Typography>
@@ -195,7 +189,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                 <Box display="flex" justifyContent="space-between">
                   <Typography variant="body1">Deal Size</Typography>
                   <Typography variant="body1">
-                    ${form.deal_size ? (form.deal_size / 1_000_000).toFixed(1) : "N/A"}M
+                    ${form.deal_size ? (form.deal_size ).toFixed(1) : "N/A"}M
                   </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
@@ -203,8 +197,15 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                   <Typography variant="body1">{formatSector(form.sector)}</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="body1">Deal Type</Typography>
-                  <Typography variant="body1">{form.deal_type}</Typography>
+
+                  <Typography variant="body1" color="#002060">
+                    Discount:{" "}
+                    <strong>
+                      {form.discount_from_announcement_price !== null
+                        ? `${form.discount_from_announcement_price}%`
+                        : "N/A"}
+                    </strong>
+                  </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography variant="body1">Region</Typography>
