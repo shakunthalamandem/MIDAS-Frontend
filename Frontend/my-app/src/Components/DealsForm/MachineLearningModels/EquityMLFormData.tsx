@@ -86,15 +86,296 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
   sectorLabels,
   menuProps,
 }) => {
-  // Separate deal_type and region so they show first
   const prioritizedFields = ["deal_type", "region"];
 
-  const fieldsToRender = [
-    // deal_type and region first
-    ...inputFields.filter((f) => prioritizedFields.includes(f.name)),
-    // then everything else except deal_type & region
-    ...inputFields.filter((f) => !prioritizedFields.includes(f.name)),
-  ];
+  const prioritizedFieldComponents = inputFields
+    .filter((f) => prioritizedFields.includes(f.name))
+    .map(
+      ({
+        label,
+        name,
+        type = "string",
+        placeholder = "",
+        adornment,
+        disabled = false,
+        selectOptions,
+        labelMap,
+      }) => {
+        if (
+          name === "discount_from_announcement_price_category" &&
+          formData.deal_type === "IPO"
+        ) {
+          return null;
+        }
+
+        const value =
+          formData[name] ??
+          (name === "deal_type"
+            ? "FO"
+            : name === "region"
+            ? "US"
+            : name === "target_variable"
+            ? "T+1 Day Return(close)"
+            : "");
+
+        const finalSelectOptions =
+          name === "sponsor_yn_category"
+            ? options.sponsor
+            : name === "sector_category"
+            ? options.sector
+            : name === "selected_bank_category"
+            ? options.selected_bank
+            : name === "GDP"
+            ? options.gdp
+            : name === "Inflation"
+            ? options.inflation
+            : name === "Treasury"
+            ? options.treasury_rates
+            : selectOptions;
+
+        const finalLabelMap =
+          name === "sector_category" ? sectorLabels : labelMap;
+
+        return (
+          <Grid item xs={12} sm={6} key={name}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { sm: "center" },
+                gap: 1,
+                minHeight: { sm: "48px" },
+              }}
+            >
+              <Typography
+                sx={{
+                  width: { xs: "100%", sm: "180px", md: "200px" },
+                  minWidth: { sm: "180px", md: "200px" },
+                  fontSize: { xs: "0.875rem", sm: "0.875rem", md: "1rem" },
+                  fontWeight: 500,
+                }}
+              >
+                {label}
+              </Typography>
+
+              {finalSelectOptions ? (
+                <TextField
+                  select
+                  size="small"
+                  name={name}
+                  value={value}
+                  onChange={handleChange}
+                  error={!!formErrors[name]}
+                  helperText={formErrors[name]}
+                  fullWidth
+                  sx={{
+                    maxWidth: { xs: "100%", sm: "200px", md: "220px" },
+                    minWidth: { sm: "200px", md: "220px" },
+                  }}
+                  SelectProps={{ MenuProps: menuProps }}
+                >
+                  {finalSelectOptions.map((opt) => (
+                    <MenuItem key={opt} value={opt}>
+                      {finalLabelMap?.[opt] ?? opt}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              ) : (
+                <TextField
+                  size="small"
+                  name={name}
+                  type={type}
+                  value={
+                    type === "date" && value
+                      ? new Date(value).toISOString().split("T")[0]
+                      : value
+                  }
+                  onChange={
+                    name === "pricing_date"
+                      ? (e) =>
+                          setFormData((prev: typeof formData) => ({
+                            ...prev,
+                            pricing_date: e.target.value
+                              ? new Date(e.target.value)
+                              : null,
+                          }))
+                      : handleChange
+                  }
+                  placeholder={placeholder}
+                  error={!!formErrors[name]}
+                  helperText={formErrors[name]}
+                  disabled={disabled}
+                  fullWidth
+                  sx={{
+                    maxWidth: { xs: "100%", sm: "200px", md: "220px" },
+                    minWidth: { sm: "200px", md: "220px" },
+                  }}
+                  InputProps={{
+                    startAdornment:
+                      typeof adornment === "string" &&
+                      adornment.startsWith("$") ? (
+                        <InputAdornment position="start">$</InputAdornment>
+                      ) : undefined,
+                    endAdornment:
+                      typeof adornment === "string" &&
+                      (adornment.endsWith("%") || adornment.endsWith("M")) ? (
+                        <InputAdornment position="end">
+                          {adornment.replace("$", "")}
+                        </InputAdornment>
+                      ) : undefined,
+                  }}
+                />
+              )}
+            </Box>
+          </Grid>
+        );
+      }
+    );
+
+  const otherFieldComponents = inputFields
+    .filter((f) => !prioritizedFields.includes(f.name))
+    .map(
+      ({
+        label,
+        name,
+        type = "string",
+        placeholder = "",
+        adornment,
+        disabled = false,
+        selectOptions,
+        labelMap,
+      }) => {
+        if (
+          name === "discount_from_announcement_price_category" &&
+          formData.deal_type === "IPO"
+        ) {
+          return null;
+        }
+
+        const value =
+          formData[name] ??
+          (name === "deal_type"
+            ? "FO"
+            : name === "region"
+            ? "US"
+            : name === "target_variable"
+            ? "T+1 Day Return(close)"
+            : "");
+
+        const finalSelectOptions =
+          name === "sponsor_yn_category"
+            ? options.sponsor
+            : name === "sector_category"
+            ? options.sector
+            : name === "selected_bank_category"
+            ? options.selected_bank
+            : name === "GDP"
+            ? options.gdp
+            : name === "Inflation"
+            ? options.inflation
+            : name === "Treasury"
+            ? options.treasury_rates
+            : selectOptions;
+
+        const finalLabelMap =
+          name === "sector_category" ? sectorLabels : labelMap;
+
+        return (
+          <Grid item xs={12} sm={6} key={name}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { sm: "center" },
+                gap: 1,
+                minHeight: { sm: "48px" },
+              }}
+            >
+              <Typography
+                sx={{
+                  width: { xs: "100%", sm: "180px", md: "200px" },
+                  minWidth: { sm: "180px", md: "200px" },
+                  fontSize: { xs: "0.875rem", sm: "0.875rem", md: "1rem" },
+                  fontWeight: 500,
+                }}
+              >
+                {label}
+              </Typography>
+
+              {finalSelectOptions ? (
+                <TextField
+                  select
+                  size="small"
+                  name={name}
+                  value={value}
+                  onChange={handleChange}
+                  error={!!formErrors[name]}
+                  helperText={formErrors[name]}
+                  disabled={disabled}
+                  fullWidth
+                  sx={{
+                    maxWidth: { xs: "100%", sm: "200px", md: "220px" },
+                    minWidth: { sm: "200px", md: "220px" },
+                  }}
+                  SelectProps={{ MenuProps: menuProps }}
+                >
+                  {finalSelectOptions.map((opt) => (
+                    <MenuItem key={opt} value={opt}>
+                      {finalLabelMap?.[opt] ?? opt}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              ) : (
+                <TextField
+                  size="small"
+                  name={name}
+                  type={type}
+                  value={
+                    type === "date" && value
+                      ? new Date(value).toISOString().split("T")[0]
+                      : value
+                  }
+                  onChange={
+                    name === "pricing_date"
+                      ? (e) =>
+                          setFormData((prev: typeof formData) => ({
+                            ...prev,
+                            pricing_date: e.target.value
+                              ? new Date(e.target.value)
+                              : null,
+                          }))
+                      : handleChange
+                  }
+                  placeholder={placeholder}
+                  error={!!formErrors[name]}
+                  helperText={formErrors[name]}
+                  disabled={disabled}
+                  fullWidth
+                  sx={{
+                    maxWidth: { xs: "100%", sm: "200px", md: "220px" },
+                    minWidth: { sm: "200px", md: "220px" },
+                  }}
+                  InputProps={{
+                    startAdornment:
+                      typeof adornment === "string" &&
+                      adornment.startsWith("$") ? (
+                        <InputAdornment position="start">$</InputAdornment>
+                      ) : undefined,
+                    endAdornment:
+                      typeof adornment === "string" &&
+                      (adornment.endsWith("%") || adornment.endsWith("M")) ? (
+                        <InputAdornment position="end">
+                          {adornment.replace("$", "")}
+                        </InputAdornment>
+                      ) : undefined,
+                  }}
+                />
+              )}
+            </Box>
+          </Grid>
+        );
+      }
+    );
 
   return (
     <>
@@ -123,148 +404,27 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
         }}
       >
         <Grid container spacing={1.5}>
-          {fieldsToRender.map(
-            ({
-              label,
-              name,
-              type = "string",
-              placeholder = "",
-              adornment,
-              disabled = false,
-              selectOptions,
-              labelMap,
-            }) => {
-              // hide discount field when deal_type is IPO
-              if (
-                name === "discount_from_announcement_price_category" &&
-                formData.deal_type === "IPO"
-              ) {
-                return null;
-              }
+          {/* Wrap Deal Type & Region inside a box with background */}
+          <Grid item xs={12}>
+  <Box
+    sx={{
+      backgroundColor: "#cef5f1",
+      p: 2,
+      borderRadius: 1,
+      display: "flex",
+      flexWrap: "nowrap",   // prevent wrap, keep side by side
+      gap: 2,
+      justifyContent: "flex-start", // align left, but you can change to space-between if you want
+      alignItems: "center", // vertical center alignment
+    }}
+  >
+    {prioritizedFieldComponents}
+  </Box>
+</Grid>
 
-              const value =
-                formData[name] ??
-                (name === "deal_type"
-                  ? "FO"
-                  : name === "region"
-                  ? "US"
-                  : name === "target_variable"
-                  ? "T+1 Day Return(close)"
-                  : "");
 
-              const finalSelectOptions =
-                name === "sponsor_yn_category"
-                  ? options.sponsor
-                  : name === "sector_category"
-                  ? options.sector
-                  : name === "selected_bank_category"
-                  ? options.selected_bank
-                  : name === "GDP"
-                  ? options.gdp
-                  : name === "Inflation"
-                  ? options.inflation
-                  : name === "Treasury"
-                  ? options.treasury_rates
-                  : selectOptions;
-
-              const finalLabelMap =
-                name === "sector_category" ? sectorLabels : labelMap;
-
-              return (
-                <Grid item xs={12} sm={6} key={name}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: { xs: "column", sm: "row" },
-                      alignItems: { sm: "center" },
-                      gap: 1,
-                      minHeight: { sm: "48px" },
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        width: { xs: "100%", sm: "180px", md: "200px" },
-                        minWidth: { sm: "180px", md: "200px" },
-                        fontSize: { xs: "0.875rem", sm: "0.875rem", md: "1rem" },
-                        fontWeight: 500,
-                      }}
-                    >
-                      {label}
-                    </Typography>
-
-                    {finalSelectOptions ? (
-                      <TextField
-                        select
-                        size="small"
-                        name={name}
-                        value={value}
-                        onChange={handleChange}
-                        error={!!formErrors[name]}
-                        helperText={formErrors[name]}
-                        fullWidth
-                        sx={{
-                          maxWidth: { xs: "100%", sm: "200px", md: "220px" },
-                          minWidth: { sm: "200px", md: "220px" },
-                        }}
-                        SelectProps={{ MenuProps: menuProps }}
-                      >
-                        {finalSelectOptions.map((opt) => (
-                          <MenuItem key={opt} value={opt}>
-                            {finalLabelMap?.[opt] ?? opt}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    ) : (
-                      <TextField
-                        size="small"
-                        name={name}
-                        type={type}
-                        value={
-                          type === "date" && value
-                            ? new Date(value).toISOString().split("T")[0]
-                            : value
-                        }
-                        onChange={
-                          name === "pricing_date"
-                            ? (e) =>
-                                setFormData((prev: typeof formData) => ({
-                                  ...prev,
-                                  pricing_date: e.target.value
-                                    ? new Date(e.target.value)
-                                    : null,
-                                }))
-                            : handleChange
-                        }
-                        placeholder={placeholder}
-                        error={!!formErrors[name]}
-                        helperText={formErrors[name]}
-                        disabled={disabled}
-                        fullWidth
-                        sx={{
-                          maxWidth: { xs: "100%", sm: "200px", md: "220px" },
-                          minWidth: { sm: "200px", md: "220px" },
-                        }}
-                        InputProps={{
-                          startAdornment:
-                            typeof adornment === "string" &&
-                            adornment.startsWith("$") ? (
-                              <InputAdornment position="start">$</InputAdornment>
-                            ) : undefined,
-                          endAdornment:
-                            typeof adornment === "string" &&
-                            (adornment.endsWith("%") || adornment.endsWith("M")) ? (
-                              <InputAdornment position="end">
-                                {adornment.replace("$", "")}
-                              </InputAdornment>
-                            ) : undefined,
-                        }}
-                      />
-                    )}
-                  </Box>
-                </Grid>
-              );
-            }
-          )}
+          {/* Render rest of the fields */}
+          {otherFieldComponents}
 
           <Grid item xs={12}>
             <Box
