@@ -172,203 +172,6 @@ useEffect(() => {
 
 // Generate the Monashee PDF report
 
-const handleExportPDF = async () => {
-  setPdfLoading(true);
-
-  // 🔹 Pages to capture
-  const pages = ["ipo-dashboard-page1", "ipo-dashboard-page2", "ipo-dashboard-page3", "ipo-dashboard-page4"];
-
-  // 🔹 Use A3 size for bigger fonts and less scaling
-  const pdf = new jsPDF({
-    orientation: "portrait", // or "portrait" if you prefer
-    unit: "mm",
-    format: [600, 420], // A3: Wider than A4
-    compress: true, // Enable compression
-  });
-
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = pdf.internal.pageSize.getHeight();
-
-  const waitForDOMUpdate = (delay = 300) =>
-    new Promise<void>((resolve) => setTimeout(resolve, delay));
-
-  try {
-    // ✅ Prepare dynamic "Data as of" text
-    let dataAsOfText = "";
-    if (ipoData?.pricing_date) {
-      const cleanDateStr = ipoData.pricing_date.replace(/(\d+)(st|nd|rd|th)/, "$1");
-      const dateObj = new Date(cleanDateStr);
-      const month = dateObj.toLocaleString("default", { month: "short" });
-      const year = dateObj.getFullYear();
-      dataAsOfText = `${month} ${year}`;
-    }
-
-    // ✅ Load Logo
-    const logoImg = new Image();
-    logoImg.src = monasheeLogo;
-    await new Promise<void>((resolve) => {
-      logoImg.onload = () => resolve();
-    });
-
-    // ✅ Intro Page
-    const introImg = new Image();
-    introImg.src = introImage;
-    await new Promise<void>((resolve) => {
-      introImg.onload = () => {
-        // Use PNG and no fast compression to preserve HD quality
-        pdf.addImage(introImg, "PNG", 0, 0, pdfWidth, pdfHeight);
-
-        const margin = 10;
-        const color = [0, 32, 96]; // #002060
-
-        if (ipoData?.company_name && ipoData?.exchange && ipoData?.ticker_name) {
-          const companyName = ipoData.company_name;
-          const exchangeTicker = `(${ipoData.exchange}: ${ipoData.ticker_name})`;
-          const pricingDate = ipoData.pricing_date;
-          const startY = 40;
-
-          // Company Name
-          pdf.setFontSize(20); // 🔹 Slightly larger font
-          pdf.setTextColor(color[0], color[1], color[2]);
-          pdf.text(
-            companyName,
-            pdfWidth - margin - pdf.getTextWidth(companyName),
-            startY
-          );
-
-          // Exchange and Ticker
-          pdf.setFontSize(18);
-          pdf.text(
-            exchangeTicker,
-            pdfWidth - margin - pdf.getTextWidth(exchangeTicker),
-            startY + 14
-          );
-
-          // Pricing Date
-          if (pricingDate) {
-            pdf.setFontSize(12);
-            pdf.text(
-              pricingDate,
-              pdfWidth - margin - pdf.getTextWidth(pricingDate),
-              startY + 28
-            );
-          }
-        }
-        resolve();
-      };
-    });
-
-    // ✅ Expand all accordions
-    const originalPanels = { ...expandedPanels };
-    const allKeys = Object.keys(editedContent);
-    const expandedAll: Record<string, boolean> = {};
-    allKeys.forEach((key) => (expandedAll[key] = true));
-    setExpandedPanels(expandedAll);
-    await waitForDOMUpdate(500);
-
-    // ✅ Render each dashboard page
-    for (let i = 0; i < pages.length; i++) {
-      const element = document.getElementById(pages[i]);
-      if (!element) continue;
-
-      const canvas = await html2canvas(element, {
-        scale: 4, // 🔹 High resolution for sharp text
-        useCORS: true,
-        scrollY: -window.scrollY,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
-      });
-
-      const imgData = canvas.toDataURL("image/jpeg", 0.8); // 🔹 Higher quality
-
-      pdf.addPage();
-
-      // ➤ Logo top-right
-      const logoWidth = 50;
-      const logoHeight = 15;
-      const logoX = pdfWidth - logoWidth - 10;
-      const logoY = 10;
-
-      pdf.addImage(logoImg, "JPEG", logoX, logoY, logoWidth, logoHeight, undefined, "FAST");
-
-      // ➤ Blue line below logo
-      const lineY = logoY + logoHeight + 2;
-      pdf.setDrawColor(0, 32, 96);
-      pdf.setLineWidth(1);
-      pdf.line(10, lineY, pdfWidth - 10, lineY);
-
-      // ➤ Add dashboard page image
-      const marginTop = lineY + 5;
-      const imageWidth = pdfWidth;
-      const imageHeight = (canvas.height * imageWidth) / canvas.width;
-      pdf.addImage(imgData, "JPEG", 0, marginTop, imageWidth, imageHeight, undefined, "FAST");
-
-      // ➤ Footer
-      const footerTextTopY = pdfHeight - 22;
-      pdf.setDrawColor(0, 32, 96);
-      pdf.setLineWidth(1);
-      pdf.line(10, footerTextTopY - 4, pdfWidth - 10, footerTextTopY - 4);
-      pdf.setFontSize(7);
-      pdf.setTextColor(100);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(
-        `Data as of ${dataAsOfText}. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
-        10,
-        footerTextTopY,
-        { maxWidth: pdfWidth - 20 }
-      );
-
-      pdf.setFontSize(9);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(128);
-      pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
-    }
-
-    // ✅ Restore accordions
-    setExpandedPanels(originalPanels);
-    await waitForDOMUpdate();
-
-    // ✅ Outro Page
-    const outroImg = new Image();
-    outroImg.src = outroImage;
-    await new Promise<void>((resolve) => {
-      outroImg.onload = () => {
-        pdf.addPage();
-        pdf.addImage(outroImg, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
-
-        const footerTextTopY0 = pdfHeight - 22;
-        // Blue line at the top of the footer
-        pdf.setDrawColor(0, 32, 96);
-        pdf.setLineWidth(1);
-        pdf.line(10, footerTextTopY0 - 4, pdfWidth - 10, footerTextTopY0 - 4);
-        // Footer text
-        pdf.setFontSize(7);
-        pdf.setTextColor(100);
-        pdf.setFont("helvetica", "normal");
-        pdf.text(
-          `Data as of ${dataAsOfText}. Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
-          10,
-          footerTextTopY0,
-          { maxWidth: pdfWidth - 20 }
-        );
-
-        pdf.setFontSize(11);
-        pdf.setFont("helvetica", "bold");
-        pdf.setTextColor(128);
-        pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
-
-        resolve();
-      };
-    });
-
-    // ✅ Save the PDF
-    pdf.save(`${selectedTicker}_IPO_Report.pdf`);
-  } catch (error) {
-    console.error("PDF export failed", error);
-  } finally {
-    setPdfLoading(false);
-  }
-};
 
 // Export with dynamic pagination so variable content fits into the PDF cleanly
 const handleExportPDFPaginated = async () => {
@@ -496,7 +299,6 @@ const handleExportPDFPaginated = async () => {
       const availableHeightPx = availableHeightMm / mmPerPx;
 
       let yOffsetPx = 0;
-      const sliceOverlapPx = 12; // overlap to avoid cutting off last line between pages
       while (yOffsetPx < canvas.height) {
         const sliceHeightPx = Math.min(availableHeightPx, canvas.height - yOffsetPx);
         const sliceCanvas = document.createElement("canvas");
@@ -524,9 +326,8 @@ const handleExportPDFPaginated = async () => {
         pdf.addImage(sliceImg, "JPEG", 0, contentTopY, imageWidthMm, sliceHeightMm, undefined, "FAST");
         drawFooter();
 
-        const nextOffset = yOffsetPx + sliceHeightPx - sliceOverlapPx;
-        // Prevent infinite loop if remaining height is smaller than overlap
-        yOffsetPx = nextOffset > yOffsetPx ? nextOffset : yOffsetPx + sliceHeightPx;
+        yOffsetPx += sliceHeightPx;
+
       }
     }
 
@@ -559,17 +360,58 @@ const handleExportPDFPaginated = async () => {
     pdf.text("Disclaimer", marginX, titleY);
     // Removed extra underline to avoid double lines at top
 
-    // Body text
+    // Body text (multi-page safe)
     const bodyY = titleY + 10;
-    const disclaimerText =
-      "This report is for informational purposes only and does not constitute investment advice, an offer to sell, or a solicitation of an offer to buy any security. Data is derived from sources believed to be reliable, including company filings and management, but is not guaranteed for accuracy or completeness. Opinions and estimates reflect our judgment as of the date of this material and are subject to change without notice. Past performance is not indicative of future results. Investing involves risk, including the possible loss of principal.\n\n" +
-      "This document is confidential and intended solely for the designated recipient. Distribution, reproduction, or disclosure, in whole or in part, without the prior written consent of Monashee Investment Management is strictly prohibited. Any projections, forecasts, or forward-looking statements are inherently uncertain and actual outcomes may differ materially.\n\n" +
-      "By accepting this document, you agree to maintain its confidentiality and to use it only for the purpose for which it was provided. Do not copy. Do not distribute.";
+    const disclaimerText = (
+      "The information contained herein has been compiled by Monashee internally and may be based on unaudited data from the relevant funds' books and records, and hypothetical information that has not been verified or reconciled by such funds' administrator. As such, the information contained herein should not serve as any kind of basis for any investment decision.\n\n" +
+      "This document does not constitute advice or a recommendation or offer to sell or a solicitation to deal in any security or financial product. It is provided for information purposes only and on the understanding that the recipient has sufficient knowledge and experience to be able to understand and make their own evaluation of the proposals and services described herein, any risks associated therewith and any related legal, tax, accounting or other material considerations. To the extent that the reader has any questions regarding the applicability of any specific issue discussed above to their specific portfolio or situation, prospective investors are encouraged to contact Monashee Investment Management or consult with the professional advisor of their choosing.\n\n" +
+      "Certain information contained herein has been obtained from third party sources and such information has not been independently verified by Monashee Investment Management. No representation, warranty, or undertaking, expressed or implied, is given to the accuracy or completeness of such information by Monashee Investment Management or any other person. While such sources are believed to be reliable. Monashee Investment Management does not assume any responsibility for the accuracy or completeness of such information. Monashee Investment Management does not undertake any obligation to update the information contained herein as of any future date.\n\n" +
+      "Except where otherwise indicated, the information contained in this presentation is based on matters as they exist as of the date of preparation of such material and not as of the date of distribution or any future date. Recipients should not rely on this material in making any future investment decision.\n\n" +
+      "This presentation is confidential, is intended only for the person to whom it has been directly provided and under no circumstances may a copy be shown, copied, transmitted or otherwise be given to any person other than the authorized recipient without the prior written consent of Monashee Investment Management.\n\n" +
+      "There is no guarantee that the investment objectives will be achieved. Moreover, the past performance is not a guarantee or indicator of future results.\n\n" +
+      "Certain information contained herein constitutes \"forward-looking statements,\" which can be identified by the use of forward-looking terminology such as \"may,\" \"will.\" \"should,\" \"expect,\" \"anticipate,\" \"project,\" \"estimate,\" \"intend,\" \"continue,\" or \"believe.\" or the negatives thereof or other variations thereon or comparable terminology. Due to various risks and uncertainties, actual events, results or actual performance may differ materially from those reflected or contemplated in such forward-looking statements. Nothing contained herein may be relied upon as a guarantee, promise, assurance or a representation as to the future"
+    );
 
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10.5);
     pdf.setTextColor(60);
-    pdf.text(disclaimerText, marginX, bodyY, { maxWidth: pdfWidth - marginX * 2 });
+    const maxWidth = pdfWidth - marginX * 2;
+    const lines: string[] = (pdf as any).splitTextToSize(disclaimerText, maxWidth);
+    const lineHeightMm = (pdf.getFontSize() * 0.3528) * 1.2; // approx 1.2 line-height
+    let yCursor = bodyY;
+    const bottomLimit = pdfHeight - 28; // reserve for footer
+    let idx = 0;
+    while (idx < lines.length) {
+      // Compute how many lines fit on this page
+      const linesFit = Math.max(1, Math.floor((bottomLimit - yCursor) / lineHeightMm));
+      const chunk = lines.slice(idx, idx + linesFit);
+      pdf.text(chunk, marginX, yCursor, { maxWidth });
+      idx += linesFit;
+      if (idx < lines.length) {
+        // Draw footer, add page and repeat header + title for continuation
+        drawFooter();
+        pdf.addPage();
+        // Recreate header and title for continuation
+        const headerLogoWidthC = 40;
+        const headerLogoHeightC = 12;
+        const headerLogoXC = pdfWidth - headerLogoWidthC - 10;
+        const headerLogoYC = 10;
+        pdf.addImage(logoImgFinal, "JPEG", headerLogoXC, headerLogoYC, headerLogoWidthC, headerLogoHeightC, undefined, "FAST");
+        const headerLineYC = headerLogoYC + headerLogoHeightC + 2;
+        pdf.setDrawColor(0, 32, 96);
+        pdf.setLineWidth(1);
+        pdf.line(10, headerLineYC, pdfWidth - 10, headerLineYC);
+        pdf.setTextColor(0, 32, 96);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(16);
+        pdf.text("Disclaimer", marginX, headerLineYC + 6);
+        // Reset cursor for next page
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10.5);
+        pdf.setTextColor(60);
+        yCursor = headerLineYC + 16; // 6 for title offset + ~10 body spacing
+      }
+    }
 
     // Footer with blue line at top
     const footerTextTopY2 = pdfHeight - 22;
