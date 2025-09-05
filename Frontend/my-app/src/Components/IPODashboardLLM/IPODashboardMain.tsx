@@ -215,7 +215,8 @@ const handleExportPDF = async () => {
     introImg.src = introImage;
     await new Promise<void>((resolve) => {
       introImg.onload = () => {
-        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
+        // Use PNG and no fast compression to preserve HD quality
+        pdf.addImage(introImg, "PNG", 0, 0, pdfWidth, pdfHeight);
 
         const margin = 10;
         const color = [0, 32, 96]; // #002060
@@ -402,7 +403,8 @@ const handleExportPDFPaginated = async () => {
     introImg.src = introImage;
     await new Promise<void>((resolve) => {
       introImg.onload = () => {
-        pdf.addImage(introImg, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
+        // Use PNG and no fast compression to preserve HD quality
+        pdf.addImage(introImg, "PNG", 0, 0, pdfWidth, pdfHeight);
 
         const margin = 10;
         const color = [0, 32, 96];
@@ -494,6 +496,7 @@ const handleExportPDFPaginated = async () => {
       const availableHeightPx = availableHeightMm / mmPerPx;
 
       let yOffsetPx = 0;
+      const sliceOverlapPx = 12; // overlap to avoid cutting off last line between pages
       while (yOffsetPx < canvas.height) {
         const sliceHeightPx = Math.min(availableHeightPx, canvas.height - yOffsetPx);
         const sliceCanvas = document.createElement("canvas");
@@ -521,7 +524,9 @@ const handleExportPDFPaginated = async () => {
         pdf.addImage(sliceImg, "JPEG", 0, contentTopY, imageWidthMm, sliceHeightMm, undefined, "FAST");
         drawFooter();
 
-        yOffsetPx += sliceHeightPx;
+        const nextOffset = yOffsetPx + sliceHeightPx - sliceOverlapPx;
+        // Prevent infinite loop if remaining height is smaller than overlap
+        yOffsetPx = nextOffset > yOffsetPx ? nextOffset : yOffsetPx + sliceHeightPx;
       }
     }
 
@@ -547,13 +552,12 @@ const handleExportPDFPaginated = async () => {
     pdf.line(10, headerLineY, pdfWidth - 10, headerLineY);
 
     // Title
-    const titleY = headerLineY + 10;
+    const titleY = headerLineY + 6; // keep title closer to header area
     pdf.setTextColor(0, 32, 96);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(16);
     pdf.text("Disclaimer", marginX, titleY);
-    pdf.setLineWidth(0.8);
-    pdf.line(marginX, titleY + 2, pdfWidth - marginX, titleY + 2);
+    // Removed extra underline to avoid double lines at top
 
     // Body text
     const bodyY = titleY + 10;
