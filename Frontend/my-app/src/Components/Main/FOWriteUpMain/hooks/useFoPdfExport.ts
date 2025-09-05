@@ -131,7 +131,10 @@ export function useFoPdfExport({ pages, ipoData, tickerFallback = "FO", setForce
         let yOffsetPx = 0;
         const overlapPx = 12;
         while (yOffsetPx < canvas.height) {
-          const sliceHeightPx = Math.min(availableHeightPx, canvas.height - yOffsetPx);
+          const remainingPx = canvas.height - yOffsetPx;
+          // If remaining content is only overlap-sized, skip to avoid a nearly-blank trailing page
+          if (remainingPx <= overlapPx + 1) break;
+          const sliceHeightPx = Math.min(availableHeightPx, remainingPx);
           if (sliceHeightPx <= 1) break; // avoid blank/zero-height pages
           const sliceCanvas = document.createElement("canvas");
           sliceCanvas.width = canvas.width;
