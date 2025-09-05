@@ -360,17 +360,58 @@ const handleExportPDFPaginated = async () => {
     pdf.text("Disclaimer", marginX, titleY);
     // Removed extra underline to avoid double lines at top
 
-    // Body text
+    // Body text (multi-page safe)
     const bodyY = titleY + 10;
-    const disclaimerText =
-      "This report is for informational purposes only and does not constitute investment advice, an offer to sell, or a solicitation of an offer to buy any security. Data is derived from sources believed to be reliable, including company filings and management, but is not guaranteed for accuracy or completeness. Opinions and estimates reflect our judgment as of the date of this material and are subject to change without notice. Past performance is not indicative of future results. Investing involves risk, including the possible loss of principal.\n\n" +
-      "This document is confidential and intended solely for the designated recipient. Distribution, reproduction, or disclosure, in whole or in part, without the prior written consent of Monashee Investment Management is strictly prohibited. Any projections, forecasts, or forward-looking statements are inherently uncertain and actual outcomes may differ materially.\n\n" +
-      "By accepting this document, you agree to maintain its confidentiality and to use it only for the purpose for which it was provided. Do not copy. Do not distribute.";
+    const disclaimerText = (
+      "The information contained herein has been compiled by Monashee internally and may be based on unaudited data from the relevant funds' books and records, and hypothetical information that has not been verified or reconciled by such funds' administrator. As such, the information contained herein should not serve as any kind of basis for any investment decision.\n\n" +
+      "This document does not constitute advice or a recommendation or offer to sell or a solicitation to deal in any security or financial product. It is provided for information purposes only and on the understanding that the recipient has sufficient knowledge and experience to be able to understand and make their own evaluation of the proposals and services described herein, any risks associated therewith and any related legal, tax, accounting or other material considerations. To the extent that the reader has any questions regarding the applicability of any specific issue discussed above to their specific portfolio or situation, prospective investors are encouraged to contact Monashee Investment Management or consult with the professional advisor of their choosing.\n\n" +
+      "Certain information contained herein has been obtained from third party sources and such information has not been independently verified by Monashee Investment Management. No representation, warranty, or undertaking, expressed or implied, is given to the accuracy or completeness of such information by Monashee Investment Management or any other person. While such sources are believed to be reliable. Monashee Investment Management does not assume any responsibility for the accuracy or completeness of such information. Monashee Investment Management does not undertake any obligation to update the information contained herein as of any future date.\n\n" +
+      "Except where otherwise indicated, the information contained in this presentation is based on matters as they exist as of the date of preparation of such material and not as of the date of distribution or any future date. Recipients should not rely on this material in making any future investment decision.\n\n" +
+      "This presentation is confidential, is intended only for the person to whom it has been directly provided and under no circumstances may a copy be shown, copied, transmitted or otherwise be given to any person other than the authorized recipient without the prior written consent of Monashee Investment Management.\n\n" +
+      "There is no guarantee that the investment objectives will be achieved. Moreover, the past performance is not a guarantee or indicator of future results.\n\n" +
+      "Certain information contained herein constitutes \"forward-looking statements,\" which can be identified by the use of forward-looking terminology such as \"may,\" \"will.\" \"should,\" \"expect,\" \"anticipate,\" \"project,\" \"estimate,\" \"intend,\" \"continue,\" or \"believe.\" or the negatives thereof or other variations thereon or comparable terminology. Due to various risks and uncertainties, actual events, results or actual performance may differ materially from those reflected or contemplated in such forward-looking statements. Nothing contained herein may be relied upon as a guarantee, promise, assurance or a representation as to the future"
+    );
 
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10.5);
     pdf.setTextColor(60);
-    pdf.text(disclaimerText, marginX, bodyY, { maxWidth: pdfWidth - marginX * 2 });
+    const maxWidth = pdfWidth - marginX * 2;
+    const lines: string[] = (pdf as any).splitTextToSize(disclaimerText, maxWidth);
+    const lineHeightMm = (pdf.getFontSize() * 0.3528) * 1.2; // approx 1.2 line-height
+    let yCursor = bodyY;
+    const bottomLimit = pdfHeight - 28; // reserve for footer
+    let idx = 0;
+    while (idx < lines.length) {
+      // Compute how many lines fit on this page
+      const linesFit = Math.max(1, Math.floor((bottomLimit - yCursor) / lineHeightMm));
+      const chunk = lines.slice(idx, idx + linesFit);
+      pdf.text(chunk, marginX, yCursor, { maxWidth });
+      idx += linesFit;
+      if (idx < lines.length) {
+        // Draw footer, add page and repeat header + title for continuation
+        drawFooter();
+        pdf.addPage();
+        // Recreate header and title for continuation
+        const headerLogoWidthC = 40;
+        const headerLogoHeightC = 12;
+        const headerLogoXC = pdfWidth - headerLogoWidthC - 10;
+        const headerLogoYC = 10;
+        pdf.addImage(logoImgFinal, "JPEG", headerLogoXC, headerLogoYC, headerLogoWidthC, headerLogoHeightC, undefined, "FAST");
+        const headerLineYC = headerLogoYC + headerLogoHeightC + 2;
+        pdf.setDrawColor(0, 32, 96);
+        pdf.setLineWidth(1);
+        pdf.line(10, headerLineYC, pdfWidth - 10, headerLineYC);
+        pdf.setTextColor(0, 32, 96);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(16);
+        pdf.text("Disclaimer", marginX, headerLineYC + 6);
+        // Reset cursor for next page
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10.5);
+        pdf.setTextColor(60);
+        yCursor = headerLineYC + 16; // 6 for title offset + ~10 body spacing
+      }
+    }
 
     // Footer with blue line at top
     const footerTextTopY2 = pdfHeight - 22;
