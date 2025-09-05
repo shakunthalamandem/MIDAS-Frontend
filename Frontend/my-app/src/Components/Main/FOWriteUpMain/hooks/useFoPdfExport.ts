@@ -110,6 +110,44 @@ export function useFoPdfExport({ pages, ipoData, tickerFallback = "FO", setForce
         const el = document.getElementById(id);
         if (!el) continue;
 
+        // Temporarily relax overflow/size constraints so full content (e.g., wide tables) is rendered
+        const changed: Array<{ el: HTMLElement; prev: Record<string, string | null | undefined> }> = [];
+        const remember = (node: HTMLElement, key: string, val: string) => {
+          const found = changed.find((c) => c.el === node);
+          if (found) {
+            if (found.prev[key] === undefined) found.prev[key] = (node.style as any)[key] as any;
+          } else {
+            const prev: Record<string, string | null | undefined> = {};
+            prev[key] = (node.style as any)[key];
+            changed.push({ el: node, prev });
+          }
+          (node.style as any)[key] = val;
+        };
+        const relaxNode = (node: HTMLElement) => {
+          const cs = window.getComputedStyle(node);
+          const isScrollable = node.scrollHeight > node.clientHeight || node.scrollWidth > node.clientWidth;
+          if (isScrollable || cs.overflowX !== 'visible' || cs.overflowY !== 'visible' || cs.maxHeight !== 'none') {
+            remember(node, 'overflow', 'visible');
+            remember(node, 'overflowX', 'visible');
+            remember(node, 'overflowY', 'visible');
+            remember(node, 'maxHeight', 'none');
+            remember(node, 'height', 'auto');
+          }
+          // Widen containers to accommodate full-width tables
+          if (node.tagName === 'TABLE' || node.tagName === 'THEAD' || node.tagName === 'TBODY') {
+            remember(node, 'width', 'auto');
+          }
+          // Disable animations/transitions during capture
+          if (cs.animationName !== 'none' || cs.transitionDuration !== '0s') {
+            remember(node, 'animation', 'none');
+            remember(node, 'transition', 'none');
+          }
+        };
+        const allNodes = [el, ...Array.from(el.querySelectorAll<HTMLElement>('*'))];
+        allNodes.forEach(relaxNode);
+        // Give layout a frame to settle
+        await wait(50);
+
         const canvas = await html2canvas(el, {
           scale: 2,
           useCORS: true,
@@ -153,6 +191,13 @@ export function useFoPdfExport({ pages, ipoData, tickerFallback = "FO", setForce
 
           const nextOffset = yOffsetPx + sliceHeightPx - overlapPx;
           yOffsetPx = nextOffset > yOffsetPx ? nextOffset : yOffsetPx + sliceHeightPx;
+        }
+
+        // Restore styles
+        for (const c of changed) {
+          for (const k in c.prev) {
+            (c.el.style as any)[k] = (c.prev as any)[k];
+          }
         }
       }
 
