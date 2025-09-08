@@ -129,12 +129,12 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
         },
         {
           label: "IOI (Indication of Interest)",
-          value: formatValue(trackingData.allocation_as_percentage_of_ioi),
+          value: `${formatValue(trackingData.allocation_as_percentage_of_ioi)}%`,
           completed: trackingData.allocation_as_percentage_of_ioi !== null,
         },
         {
           label: "Allocation % of Deal Size",
-          value: formatValue(trackingData.allocation_as_percentage_of_deal_size),
+          value: `${formatValue(trackingData.allocation_as_percentage_of_deal_size)}%`,
           completed: trackingData.allocation_as_percentage_of_deal_size !== null,
         },
         {
