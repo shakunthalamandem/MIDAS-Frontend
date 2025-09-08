@@ -90,6 +90,8 @@ const DealInformation: React.FC<FormSectionProps> = ({
     "Others",
   ];
 
+  const sponsors = ["Y", "N"];
+
   const renderSelectField = (
     label: string,
     name: string,
@@ -207,7 +209,8 @@ const DealInformation: React.FC<FormSectionProps> = ({
         {renderSelectField("Sector", "sector", sectors)}
         {renderSelectField("Deal Captain", "deal_captain", dealCaptains)}
         {renderSelectField("Lead Bank", "lead_bank", invitationBanks)}
-        {renderTextField("Deal Size ($)", "deal_size")}
+        
+        {renderSelectField("Sponsor", "sponsor", sponsors)}
       </Grid>
     </>
   );
