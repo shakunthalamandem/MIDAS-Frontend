@@ -160,7 +160,11 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
         key !== "target" &&
         key !== "GDP" &&
         key !== "Inflation" &&
-        key !== "Treasury"
+        key !== "Treasury" &&
+        !(
+          formData.deal_type === "IPO" &&
+          key === "discount_from_announcement_price_category"
+        )
       ) {
         errors[key as keyof FormData] = "This field is required";
         isValid = false;
@@ -229,12 +233,12 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
 
     setLoading(true);
     const payload = {
-    ...formData,
-    GDP: "Stable",       // enforce
-    Inflation: "Stable", // enforce
-    Treasury: "Stable",  // enforce
-    expectations: ["T1D"]
-  };
+      ...formData,
+      GDP: "Stable", // enforce
+      Inflation: "Stable", // enforce
+      Treasury: "Stable", // enforce
+      expectations: ["T1D"],
+    };
     try {
       const response = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
         method: "POST",
@@ -266,11 +270,11 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
   const handleRepredictWithPrice = async (t1dOpenPrice: number) => {
     const updatedPayload = {
       ...formData,
-      GDP: "Stable",       // enforce
+      GDP: "Stable", // enforce
       Inflation: "Stable", // enforce
-      Treasury: "Stable",  // enforce
+      Treasury: "Stable", // enforce
       t1d_open_category: t1dOpenPrice,
-      expectations: ["T1D"]
+      expectations: ["T1D"],
     };
 
     setLoading(true);
@@ -309,11 +313,11 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
 
     const weeklyMonthlyPayload = {
       ...formData,
-    GDP: "Stable",       // enforce
-    Inflation: "Stable", // enforce
-    Treasury: "Stable",  // enforce
+      GDP: "Stable", // enforce
+      Inflation: "Stable", // enforce
+      Treasury: "Stable", // enforce
       t1d_return_from_bloomberg_category: t1dCloseReturn,
-      expectations: ["T1W", "T1M"]
+      expectations: ["T1W", "T1M"],
     };
 
     try {
@@ -336,7 +340,8 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
       // Extract only prediction and Accuracy from each key
       const simplifiedResponse: Record<string, PredictionModel> = {};
       for (const key in fullResponseData) {
-        const { prediction, Accuracy, Confidence, range } = fullResponseData[key];
+        const { prediction, Accuracy, Confidence, range } =
+          fullResponseData[key];
         simplifiedResponse[key] = { prediction, Accuracy, Confidence, range };
       }
 
@@ -404,7 +409,6 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
           onRepredict={handleRepredictWithPrice}
         />
       )}
-
     </>
   );
 };
