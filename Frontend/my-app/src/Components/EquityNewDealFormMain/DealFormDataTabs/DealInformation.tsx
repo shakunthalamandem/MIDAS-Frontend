@@ -93,56 +93,59 @@ const DealInformation: React.FC<FormSectionProps> = ({
   const sponsors = ["Y", "N"];
   const deal_stats = ["Announced", "Priced","Issued"];
 
-  const renderSelectField = (
-    label: string,
-    name: string,
-    options: string[]
-  ) => (
-    <Grid item xs={12} sm={6} md={4}>
-      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-        {label}
-      </Typography>
-      <TextField
-        select
-        name={name}
-        value={data[name] || ""}
-        onChange={handleChange}
-        fullWidth
-        size="small"
-        variant="standard"
-        disabled={!editable}
-        InputProps={{
-          disableUnderline: !editable,
-          sx: {
-            "&.Mui-disabled": {
-              WebkitTextFillColor: "#b1062e",
-            },
-            "& input.Mui-disabled": {
-              WebkitTextFillColor: "#b1062e",
-            },
-            "& .MuiSelect-select.Mui-disabled": {
-              WebkitTextFillColor: "#b1062e",
+const renderSelectField = (
+  label: string,
+  name: string,
+  options: string[]
+) => (
+  <Grid item xs={12} sm={6} md={4}>
+    <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+      {label}
+    </Typography>
+    <TextField
+      select
+      name={name}
+      value={data[name] || ""}
+      onChange={handleChange}
+      fullWidth
+      size="small"
+      variant="standard"
+      disabled={!editable}
+      InputProps={{
+        disableUnderline: !editable,
+        sx: {
+          "&.Mui-disabled": {
+            WebkitTextFillColor: "#b1062e",
+          },
+          "& input.Mui-disabled": {
+            WebkitTextFillColor: "#b1062e",
+          },
+          "& .MuiSelect-select.Mui-disabled": {
+            WebkitTextFillColor: "#b1062e",
+          },
+          // ⬇️ Hide the dropdown icon in view mode
+          "& .MuiSelect-icon": !editable ? { display: "none" } : {},
+        },
+      }}
+      SelectProps={{
+        MenuProps: {
+          PaperProps: {
+            style: {
+              maxHeight: 400,
             },
           },
-        }}
-        SelectProps={{
-          MenuProps: {
-            PaperProps: {
-              style: {
-                maxHeight: 400,
-              },
-            },
-          },
-        }}
-      >
-        {options.map((option) => (
-          <MenuItem key={option} value={option}>
-            {option}
-          </MenuItem>
-        ))}
-      </TextField>
-    </Grid>
-  );
+        },
+      }}
+    >
+      {options.map((option) => (
+        <MenuItem key={option} value={option}>
+          {option}
+        </MenuItem>
+      ))}
+    </TextField>
+  </Grid>
+);
+
 
   const renderTextField = (
     label: string,
