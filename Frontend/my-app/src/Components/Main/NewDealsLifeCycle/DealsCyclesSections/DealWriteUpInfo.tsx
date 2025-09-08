@@ -150,7 +150,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
               fontWeight="bold"
               gutterBottom
             >
-              Valuation (AI)
+              Valuation (Using AI)
             </Typography>
             {loadingValuation ? (
               <Box display="flex" alignItems="center" gap={1}>
@@ -222,7 +222,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
               fontWeight="bold"
               gutterBottom
             >
-              Differentiated Summary (AI)
+              Differentiated Summary (Using AI )
             </Typography>
             {loadingSummary ? (
               <Box display="flex" alignItems="center" gap={1}>
