@@ -250,12 +250,17 @@ const DealsTable: React.FC<DealsTableProps> = ({
 
         // Handle click
         const handleTrackHereClick = () => {
-          if (ticker && pricingDate) {
-            const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${pricingDate}`;
-            // Open the URL in a new tab
-            window.open(url, "_blank");
-          }
-        };
+  if (ticker) {
+    // If pricingDate is null, undefined, '""', or an empty string, use ""
+    const cleanPricingDate =
+      pricingDate === '""' || !pricingDate ? '""' : pricingDate;
+
+    const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${cleanPricingDate}`;
+    window.open(url, "_blank");
+  }
+};
+
+
 
         return (
           <span

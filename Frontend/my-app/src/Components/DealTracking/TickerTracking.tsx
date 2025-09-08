@@ -62,12 +62,17 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
   const token = localStorage.getItem("access_token");
 
   const fetchTrackingData = async () => {
-    if (!ticker || !pricing_date) return;
+    if (!ticker) return;
+
+    // Clean the pricing_date value
+    const cleanPricingDate =
+      pricing_date === '""' || pricing_date === "" ? "" : pricing_date;
+
     setLoading(true);
     try {
       const res = await axios.post(
         `${apiUrl}/api/ticker_tracking/`,
-        { ticker, pricing_date },
+        { ticker, pricing_date: cleanPricingDate },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = res.data as { ticker_tracking_data: TickerTrackingData };
@@ -213,9 +218,11 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
               color="#002060"
               fontWeight="bold"
             >
-              {`${ticker} (${trackingData.issuer_name}) on ${dayjs(
+              {`${ticker} (${trackingData.issuer_name})${
                 trackingData.pricing_date
-              ).format("DD MMM YYYY")}`}
+                  ? ` on ${dayjs(trackingData.pricing_date).format("DD MMM YYYY")}`
+                  : ""
+              }`}
             </Typography>
 
             <Stepper orientation="vertical" activeStep={steps.length - 1}>
@@ -232,7 +239,6 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
                         {step.label}
                       </Typography>
 
-                      {/* VALUE + READ MORE INLINE */}
                       <Box textAlign="left" maxWidth="300px">
                         <Box display="flex" alignItems="center" gap={1}>
                           <Typography
