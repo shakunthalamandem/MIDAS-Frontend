@@ -1,6 +1,4 @@
 import { GridRenderCellParams } from "@mui/x-data-grid";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
 import { Box } from "@mui/material";
 
 // ✅ Format header with line breaks
@@ -15,14 +13,24 @@ export const formatHeader = (label: string) => {
   );
 };
 
-// ✅ Check / Cross renderer for boolean-like values
+// ✅ Simple text ✔ / ✘ for boolean-like values
 export const renderCheckCell = (params: GridRenderCellParams<any>) => {
   const val = params.value?.toString().toLowerCase();
   const isValid = val && val !== "no" && val !== "-" && val !== "";
-  return isValid ? (
-    <CheckCircleIcon sx={{ color: "green", fontSize: 18 }} />
-  ) : (
-    <CancelIcon sx={{ color: "red", fontSize: 18 }} />
+
+  return (
+    <span
+      style={{
+        color: isValid ? "green" : "red",
+        fontWeight: "bold",
+        fontSize: "12px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {isValid ? "✔" : "✘"}
+    </span>
   );
 };
 
@@ -54,10 +62,10 @@ export const renderDealStatsCell = (params: GridRenderCellParams<any>) => {
   const status = params.value;
 
   if (!status) {
-    // ❌ No data → red cross
+    // ❌ No data → red ✘
     return (
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-        <CancelIcon sx={{ color: "red", fontSize: 18 }} />
+        <span style={{ color: "red", fontWeight: "bold", fontSize: 12 }}>✘</span>
       </Box>
     );
   }
@@ -72,18 +80,18 @@ export const renderDealStatsCell = (params: GridRenderCellParams<any>) => {
   } else if (status === "Issued") {
     color = "green"; letter = "I";
   } else {
-    // ❌ Unknown status → red cross
+    // ❌ Unknown status → red ✘
     return (
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-        <CancelIcon sx={{ color: "red", fontSize: 18 }} />
+        <span style={{ color: "red", fontWeight: "bold", fontSize: 12 }}>✘</span>
       </Box>
     );
   }
 
-  // ✅ Valid status → green tick + colored circle
+  // ✅ Valid status → green ✔ + colored circle with letter
   return (
     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, height: "100%" }}>
-      <CheckCircleIcon sx={{ color: "green", fontSize: 16 }} />
+      <span style={{ color: "green", fontWeight: "bold", fontSize: 12 }}>✔</span>
       <Box
         sx={{
           width: 20,
