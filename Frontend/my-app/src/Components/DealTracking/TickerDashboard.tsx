@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import dayjs from "dayjs";
-import { useLocation, useNavigate } from "react-router-dom"; // useNavigate here
+import { useLocation } from "react-router-dom"; // useNavigate here
 import TickerTracking from "./TickerTracking"; // Correct import
 
 interface TickerOption {
@@ -22,7 +22,6 @@ interface TickerOption {
 
 const TickerDashboard: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate(); // useNavigate hook for navigation
   const queryParams = new URLSearchParams(location.search);
 
   const [options, setOptions] = useState<TickerOption[]>([]);
@@ -68,14 +67,6 @@ const TickerDashboard: React.FC = () => {
 
   const handleSelect = (_: any, value: TickerOption | null) => {
     setSelected(value);
-  };
-
-  const handleTrackHereClick = () => {
-    if (selected) {
-      const url = `/deals/dashboard/Tracking?ticker=${selected.ticker}&pricing_date=${selected.pricing_date}`;
-      // Open the URL in a new tab
-      window.open(url, "_blank");
-    }
   };
 
   // Use URL params if available, otherwise, rely on the selected state
