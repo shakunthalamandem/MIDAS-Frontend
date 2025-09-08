@@ -176,34 +176,25 @@ const DealsTable: React.FC<DealsTableProps> = ({
         return "TBD";
       },
     },
-    {
-      field: "allocation_as_percentage_of_deal_size",
-      headerName: "Allocation %",
-      renderHeader: () => formatHeader("Allocation %"),
-      flex: 1,
-      headerAlign: "center",
-      align: "center",
-      renderCell: renderCheckCell,
-    },
-    {
-      field: "deal_color",
-      headerName: "Deal Color",
-      renderHeader: () => formatHeader("Deal Color"),
-      flex: 1,
-      headerAlign: "center",
-      align: "center",
-      renderCell: renderCheckCell,
-    },
-    {
-      field: "t1d_pred",
-      headerName: "T1D Prediction",
-      renderHeader: () => formatHeader("T1D Prediction"),
-      flex: 1,
-      headerAlign: "center",
-      align: "center",
-      renderCell: renderCheckCell,
-    },
-    {
+    // {
+    //   field: "allocation_as_percentage_of_deal_size",
+    //   headerName: "Allocation %",
+    //   renderHeader: () => formatHeader("Allocation %"),
+    //   flex: 1,
+    //   headerAlign: "center",
+    //   align: "center",
+    //   renderCell: renderCheckCell,
+    // },
+    // {
+    //   field: "deal_color",
+    //   headerName: "Deal Color",
+    //   renderHeader: () => formatHeader("Deal Color"),
+    //   flex: 1,
+    //   headerAlign: "center",
+    //   align: "center",
+    //   renderCell: renderCheckCell,
+    // },
+      {
       field: "writeup_available",
       headerName: "Writeup Available",
       renderHeader: () => formatHeader("Writeup Available"),
@@ -230,9 +221,19 @@ const DealsTable: React.FC<DealsTableProps> = ({
       },
     },
     {
+      field: "t1d_pred",
+      headerName: "AIML Prediction",
+      renderHeader: () => formatHeader("AI-ML Prediction"),
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+      renderCell: renderCheckCell,
+    },
+  
+    {
       field: "track_here",
-      headerName: "Track Here",
-      renderHeader: () => formatHeader("Track Here"),
+      headerName: "Track",
+      renderHeader: () => formatHeader("Track"),
       flex: 1,
       headerAlign: "center",
       align: "center",
@@ -258,7 +259,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
               textDecoration: "underline", // Optional: Make it look like a link
             }}
           >
-            Track Here
+            Track
           </span>
         );
       },
