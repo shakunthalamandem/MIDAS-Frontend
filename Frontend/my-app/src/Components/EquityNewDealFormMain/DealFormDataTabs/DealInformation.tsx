@@ -123,7 +123,6 @@ const renderSelectField = (
           "& .MuiSelect-select.Mui-disabled": {
             WebkitTextFillColor: "#b1062e",
           },
-          // ⬇️ Hide the dropdown icon in view mode
           "& .MuiSelect-icon": !editable ? { display: "none" } : {},
         },
       }}
