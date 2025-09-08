@@ -204,209 +204,208 @@ const EquityNewDealFormMain: React.FC = () => {
 
   return (
     <>
-       
-                    <Typography
-                variant="body2"
-                sx={{
-                  fontWeight: 500,  
-                  color: "#FFFFFF",
-                  fontSize: { xs: "1rem", sm: "1.2rem" },
-                  backgroundColor: "#002060",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "4vh",
-                  padding: "8px 16px",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                  animation: "fadeIn 1.5s ease-in-out",
-                  "@keyframes fadeIn": {
-                    "0%": { opacity: 0 },
-                    "100%": { opacity: 1 },
-                  },
-                }}
-              >
-Equity New Deal Form - Create or Search by Ticker and Pricing Date to Access Complete Deal Details              </Typography>
-    <Fade in timeout={500}>
-   
-      <Paper
-        elevation={4}
+      <Typography
+        variant="body2"
         sx={{
-          p: 4,
-          borderRadius: 4,
-          background: "linear-gradient(145deg, #f4f8ff, #ffffff)",
+          fontWeight: 500,
+          color: "#FFFFFF",
+          fontSize: { xs: "1rem", sm: "1.2rem" },
+          backgroundColor: "#002060",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "4vh",
+          padding: "8px 16px",
+          borderRadius: "8px",
+          textAlign: "center",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          animation: "fadeIn 1.5s ease-in-out",
+          "@keyframes fadeIn": {
+            "0%": { opacity: 0 },
+            "100%": { opacity: 1 },
+          },
         }}
       >
-        
-
-        <Container>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          flexWrap="wrap"
-          mb={3}
+        Equity New Deal Form - Create or Search by Ticker and Pricing Date to
+        Access Complete Deal Details{" "}
+      </Typography>
+      <Fade in timeout={500}>
+        <Paper
+          elevation={4}
+          sx={{
+            p: 4,
+            borderRadius: 4,
+            background: "linear-gradient(145deg, #f4f8ff, #ffffff)",
+          }}
         >
-
-
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={2}
-            mt={{ xs: 2, sm: 0 }}
-            flexWrap="wrap"
-            justifyContent="flex-end"
-          >
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreateClick}
-              sx={{
-                minWidth: 100,
-                textTransform: "none",
-                background: "linear-gradient(to right, #002060, #004aad)",
-                color: "#fff",
-                fontWeight: 500,
-                px: 2,
-                boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
-                "&:hover": {
-                  background: "linear-gradient(to right, #003080, #0055cc)",
-                },
-              }}
+          <Container>
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              flexWrap="wrap"
+              mb={3}
             >
-              Create New
-            </Button>
-
-            {/* Autocomplete is now controlled via inputValue so searches are predictable. We also removed automatic fetching on open. */}
-            <Autocomplete
-              sx={{ minWidth: 300, backgroundColor: "#fff", borderRadius: 1 }}
-              options={filteredOptions}
-              getOptionLabel={(option) =>
-                `${option.ticker} - ${option.pricing_date && option.pricing_date.trim() ? formatDateSimple(option.pricing_date) : "TBA"}`
-              }
-              onChange={handleAutocompleteChange}
-              value={
-                selectedOption
-                  ? ((options.find(
-                      (opt) =>
-                        opt.ticker === selectedOption.ticker &&
-                        opt.pricing_date === selectedOption.pricing_date
-                    ) as TickerOption) ?? null)
-                  : null
-              }
-              inputValue={inputValue}
-              onInputChange={(_, newValue) => setInputValue(newValue)}
-              loading={loading}
-              isOptionEqualToValue={(option, value) =>
-                option.ticker === value.ticker &&
-                option.pricing_date === value.pricing_date
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Search Ticker"
-                  variant="outlined"
-                  size="small"
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <>
-                        <SearchIcon sx={{ color: "#666", mr: 1 }} />
-                        {params.InputProps.startAdornment}
-                      </>
-                    ),
-                    endAdornment: (
-                      <>
-                        {loading && (
-                          <CircularProgress
-                            color="inherit"
-                            size={20}
-                            sx={{ mr: 1 }}
-                          />
-                        )}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={2}
+                mt={{ xs: 2, sm: 0 }}
+                flexWrap="wrap"
+                justifyContent="flex-start"
+              >
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleCreateClick}
+                  sx={{
+                    minWidth: 100,
+                    textTransform: "none",
+                    background: "linear-gradient(to right, #002060, #004aad)",
+                    color: "#fff",
+                    fontWeight: 500,
+                    px: 2,
+                    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
+                    "&:hover": {
+                      background: "linear-gradient(to right, #003080, #0055cc)",
+                    },
                   }}
-                />
-              )}
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  {...props}
-                  key={`${option.ticker}-${option.pricing_date}`}
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="flex-start"
-                  gap={0.5}
                 >
-                  <Box display="flex" alignItems="center" gap={1} width="100%">
-                    <Typography fontWeight="bold">{option.ticker}</Typography>
-                    <Box
-                      sx={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        backgroundColor:
-                          option.deal_colour_present === "Yes"
-                            ? "green"
-                            : "red",
-                        mt: "2px",
+                  Create New
+                </Button>
+
+                {/* Autocomplete is now controlled via inputValue so searches are predictable. We also removed automatic fetching on open. */}
+                <Autocomplete
+                  sx={{
+                    minWidth: 300,
+                    backgroundColor: "#fff",
+                    borderRadius: 1,
+                  }}
+                  options={filteredOptions}
+                  getOptionLabel={(option) =>
+                    `${option.ticker} - ${option.pricing_date && option.pricing_date.trim() ? formatDateSimple(option.pricing_date) : "TBA"}`
+                  }
+                  onChange={handleAutocompleteChange}
+                  value={
+                    selectedOption
+                      ? ((options.find(
+                          (opt) =>
+                            opt.ticker === selectedOption.ticker &&
+                            opt.pricing_date === selectedOption.pricing_date
+                        ) as TickerOption) ?? null)
+                      : null
+                  }
+                  inputValue={inputValue}
+                  onInputChange={(_, newValue) => setInputValue(newValue)}
+                  loading={loading}
+                  isOptionEqualToValue={(option, value) =>
+                    option.ticker === value.ticker &&
+                    option.pricing_date === value.pricing_date
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Search Ticker"
+                      variant="outlined"
+                      size="small"
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <>
+                            <SearchIcon sx={{ color: "#666", mr: 1 }} />
+                            {params.InputProps.startAdornment}
+                          </>
+                        ),
+                        endAdornment: (
+                          <>
+                            {loading && (
+                              <CircularProgress
+                                color="inherit"
+                                size={20}
+                                sx={{ mr: 1 }}
+                              />
+                            )}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
                       }}
                     />
-                  </Box>
+                  )}
+                  renderOption={(props, option) => (
+                    <Box
+                      component="li"
+                      {...props}
+                      key={`${option.ticker}-${option.pricing_date}`}
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="flex-start"
+                      gap={0.5}
+                    >
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        gap={1}
+                        width="100%"
+                      >
+                        <Typography fontWeight="bold">
+                          {option.ticker}
+                        </Typography>
+                        <Box
+                          sx={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: "50%",
+                            backgroundColor:
+                              option.deal_colour_present === "Yes"
+                                ? "green"
+                                : "red",
+                            mt: "2px",
+                          }}
+                        />
+                      </Box>
 
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      textAlign: "left",
-                      width: "100%",
-                      fontStyle:
-                        !option.pricing_date || !option.pricing_date.trim()
-                          ? "italic"
-                          : "normal",
-                    }}
-                  >
-                    {option.pricing_date && option.pricing_date.trim()
-                      ? formatDateSimple(option.pricing_date)
-                      : "TBA"}
-                  </Typography>
-                </Box>
-              )}
-            />
-            {/* 
-            <Button variant="outlined" onClick={fetchTickers} startIcon={<SearchIcon />} sx={{ height: 40 }}>
-              Refresh
-            </Button> */}
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          textAlign: "left",
+                          width: "100%",
+                          fontStyle:
+                            !option.pricing_date || !option.pricing_date.trim()
+                              ? "italic"
+                              : "normal",
+                        }}
+                      >
+                        {option.pricing_date && option.pricing_date.trim()
+                          ? formatDateSimple(option.pricing_date)
+                          : "TBA"}
+                      </Typography>
+                    </Box>
+                  )}
+                />
 
-            {/* <DealsDropdown /> */}
-
-            <Box width="100%" display="flex" justifyContent="flex-end" mt={1}>
-              <Typography variant="caption" color="red">
-                🔴 {totalDealColourNo} deal colour
-                {totalDealColourNo > 1 ? "s" : ""} are missing
-              </Typography>
+                <Typography variant="caption" color="red">
+                  🔴 {totalDealColourNo} deal colour
+                  {totalDealColourNo > 1 ? "s" : ""} are missing
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-        </Box>
-        </Container>
+          </Container>
 
-        {error && (
-          <Alert
-            severity="warning"
-            onClose={() => setError(null)}
-            sx={{ mb: 2 }}
-          >
-            {error}
-          </Alert>
-        )}
- {/* Hiding the table for now as per feedback */}
-        {/* <DealFormAllTickersTable onRowClick={handleTickerRowClick} /> */}
-        <DealFormSectionMainTable selectedOption={selectedOption} />
-      </Paper>
-    </Fade>
+          {error && (
+            <Alert
+              severity="warning"
+              onClose={() => setError(null)}
+              sx={{ mb: 2 }}
+            >
+              {error}
+            </Alert>
+          )}
+          {/* Hiding the table for now as per feedback */}
+          {/* <DealFormAllTickersTable onRowClick={handleTickerRowClick} /> */}
+          <DealFormSectionMainTable selectedOption={selectedOption} />
+        </Paper>
+      </Fade>
     </>
   );
 };
