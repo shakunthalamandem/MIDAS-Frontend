@@ -117,7 +117,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
         <Grid container spacing={2} mt={2}>
           <Grid item xs={12} sm={6}>
             <FieldRenderer
-              label="Last 10 days Avg Sector Return(%)"
+              label="Last 10 deals Avg Sector Return(%)"
               name="average_sector_return"
               value={formData.average_sector_return}
               editable={editable}
