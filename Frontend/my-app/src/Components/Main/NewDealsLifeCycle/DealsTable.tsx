@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-
 import { Link } from "react-router-dom";
 import { Container } from "@mui/material";
 
@@ -36,11 +35,10 @@ const renderCheckCell = (params: GridRenderCellParams<any>) => {
 };
 
 // Date formatter
-// Date formatter
 const formatDateCell = (params: GridRenderCellParams<any>) => {
-  if (!params.value) return "To Be Announced"; // ✅ If empty, show TBA
+  if (!params.value) return "To Be Announced";
   const date = new Date(params.value);
-  if (isNaN(date.getTime())) return "To Be Announced"; // ✅ If invalid date, show TBA
+  if (isNaN(date.getTime())) return "To Be Announced";
 
   const day = date.getDate();
   const month = date.toLocaleString("en-US", { month: "short" });
@@ -49,14 +47,10 @@ const formatDateCell = (params: GridRenderCellParams<any>) => {
   const getDaySuffix = (d: number) => {
     if (d > 3 && d < 21) return "th";
     switch (d % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
     }
   };
 
@@ -67,14 +61,40 @@ interface DealsTableProps {
   rows: any[];
   loading: boolean;
   onRowSelect: (row: any) => void;
+  selectedOp: string; // <-- new prop from DealsFilters
 }
 
 const DealsTable: React.FC<DealsTableProps> = ({
   rows,
   loading,
   onRowSelect,
+  selectedOp,
 }) => {
   const [selectedId, setSelectedId] = useState<number | string | null>(null);
+
+  // ✅ Dynamic date column (based on filter)
+  const dateColumn: GridColDef = useMemo(() => {
+    if (selectedOp === "Last 1 Month") {
+      return {
+        field: "pricing_date",
+        headerName: "Pricing Date",
+        renderHeader: () => formatHeader("Pricing Date"),
+        flex: 1.5,
+        headerAlign: "center",
+        align: "center",
+        renderCell: formatDateCell,
+      };
+    }
+    return {
+      field: "expected_listing_date",
+      headerName: "Expected Listing Date",
+      renderHeader: () => formatHeader("Expected Listing Date"),
+      flex: 1.5,
+      headerAlign: "center",
+      align: "center",
+      renderCell: formatDateCell,
+    };
+  }, [selectedOp]);
 
   const columns: GridColDef[] = [
     {
@@ -84,7 +104,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
       flex: 1,
       headerAlign: "center",
       align: "center",
-      renderCell: (params: GridRenderCellParams<any>) => (
+      renderCell: (params) => (
         <span
           style={{
             color: "#96000A",
@@ -97,49 +117,13 @@ const DealsTable: React.FC<DealsTableProps> = ({
         </span>
       ),
     },
-    {
-      field: "region",
-      headerName: "Region",
-      renderHeader: () => formatHeader("Region"),
-      flex: 0.75,
-      headerAlign: "center",
-      align: "center",
-    },
-    {
-      field: "sector",
-      headerName: "Sector",
-      renderHeader: () => formatHeader("Sector"),
-      flex: 1.25,
-      headerAlign: "left",
-      align: "left",
-    },
+    { field: "region", headerName: "Region", renderHeader: () => formatHeader("Region"), flex: 0.75, headerAlign: "center", align: "center" },
+    { field: "sector", headerName: "Sector", renderHeader: () => formatHeader("Sector"), flex: 1.25, headerAlign: "left", align: "left" },
+    { field: "issuer_name", headerName: "Issuer Name", renderHeader: () => formatHeader("Issuer Name"), flex: 2, headerAlign: "left", align: "left" },
+    
+    // ✅ Insert dynamic date column here
+    dateColumn,
 
-    {
-      field: "issuer_name",
-      headerName: "Issuer Name",
-      renderHeader: () => formatHeader("Issuer Name"),
-      flex: 2,
-      headerAlign: "left",
-      align: "left",
-    },
-    {
-      field: "expected_listing_date",
-      headerName: "Expected Listing Date",
-      renderHeader: () => formatHeader("Expected Listing Date"),
-      flex: 2,
-      headerAlign: "center",
-      align: "center",
-      renderCell: formatDateCell,
-    },
-    // {
-    //   field: "pricing_date",
-    //   headerName: "Pricing Date",
-    //   renderHeader: () => formatHeader("Pricing Date"),
-    //   flex: 1,
-    //   headerAlign: "center",
-    //   align: "center",
-    //   renderCell: formatDateCell,
-    // },
     {
       field: "deal_type",
       headerName: "Deal Type",
@@ -155,88 +139,43 @@ const DealsTable: React.FC<DealsTableProps> = ({
       flex: 1,
       headerAlign: "center",
       align: "center",
-      renderCell: (params: GridRenderCellParams<any>) => {
+      renderCell: (params) => {
         const minRaw = params.row.pricing_range_min;
         const maxRaw = params.row.pricing_range_max;
-
-        // ✅ If either value is null, undefined, or an empty string → show TBD
-        if (!minRaw || !maxRaw) {
-          return "TBD";
-        }
-
+        if (!minRaw || !maxRaw) return "TBD";
         const min = Number(minRaw);
         const max = Number(maxRaw);
-
-        if (!isNaN(min) && !isNaN(max)) {
-          return `$${min.toFixed(0)} - $${max.toFixed(0)}`;
-        }
-
-        return "TBD";
+        return !isNaN(min) && !isNaN(max)
+          ? `$${min.toFixed(0)} - $${max.toFixed(0)}`
+          : "TBD";
       },
     },
-    // {
-    //   field: "allocation_as_percentage_of_deal_size",
-    //   headerName: "Allocation %",
-    //   renderHeader: () => formatHeader("Allocation %"),
-    //   flex: 1,
-    //   headerAlign: "center",
-    //   align: "center",
-    //   renderCell: renderCheckCell,
-    // },
-    // {
-    //   field: "deal_color",
-    //   headerName: "Deal Color",
-    //   renderHeader: () => formatHeader("Deal Color"),
-    //   flex: 1,
-    //   headerAlign: "center",
-    //   align: "center",
-    //   renderCell: renderCheckCell,
-    // },
-      {
+    {
       field: "writeup_available",
       headerName: "Writeup Available",
       renderHeader: () => formatHeader("Writeup Available"),
       flex: 1,
       headerAlign: "center",
       align: "center",
-      renderCell: (params: GridRenderCellParams<any>) => {
-        if (params.value?.toString().toLowerCase() === "yes") {
-          return (
-            <Link
-              to={`/ipo-dashboard/${params.row.ticker}`}
-              style={{
-                color: "#002060",
-                fontWeight: "bold",
-                textDecoration: "none",
-              }}
-            >
-              <span style={{ color: "green" }}>✔</span>{" "}
-              <span style={{ textDecoration: "underline" }}>View</span>
-            </Link>
-          );
-        }
-        return <span style={{ color: "red" }}>✘</span>;
-      },
+      renderCell: (params) =>
+        params.value?.toString().toLowerCase() === "yes" ? (
+          <Link
+            to={`/ipo-dashboard/${params.row.ticker}`}
+            style={{
+              color: "#002060",
+              fontWeight: "bold",
+              textDecoration: "none",
+            }}
+          >
+            <span style={{ color: "green" }}>✔</span>{" "}
+            <span style={{ textDecoration: "underline" }}>View</span>
+          </Link>
+        ) : (
+          <span style={{ color: "red" }}>✘</span>
+        ),
     },
-    {
-      field: "deal_stats",
-      headerName: "Deal Status",
-      renderHeader: () => formatHeader("Deal Status"),
-      flex: 1,
-      headerAlign: "center",
-      align: "center",
-      renderCell: renderCheckCell,
-    },
-        {
-      field: "t1d_pred",
-      headerName: "AIML Prediction",
-      renderHeader: () => formatHeader("AI-ML Prediction"),
-      flex: 1,
-      headerAlign: "center",
-      align: "center",
-      renderCell: renderCheckCell,
-    },
-  
+    { field: "deal_stats", headerName: "Deal Status", renderHeader: () => formatHeader("Deal Status"), flex: 1, headerAlign: "center", align: "center", renderCell: renderCheckCell },
+    { field: "t1d_pred", headerName: "AI-ML Prediction", renderHeader: () => formatHeader("AI-ML Prediction"), flex: 1, headerAlign: "center", align: "center", renderCell: renderCheckCell },
     {
       field: "track_here",
       headerName: "Track",
@@ -244,32 +183,21 @@ const DealsTable: React.FC<DealsTableProps> = ({
       flex: 1,
       headerAlign: "center",
       align: "center",
-      renderCell: (params: GridRenderCellParams<any>) => {
+      renderCell: (params) => {
         const ticker = params.row.ticker;
         const pricingDate = params.row.pricing_date;
-
-        // Handle click
         const handleTrackHereClick = () => {
-  if (ticker) {
-    // If pricingDate is null, undefined, '""', or an empty string, use ""
-    const cleanPricingDate =
-      pricingDate === '""' || !pricingDate ? '""' : pricingDate;
-
-    const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${cleanPricingDate}`;
-    window.open(url, "_blank");
-  }
-};
-
-
-
+          if (ticker) {
+            const cleanPricingDate =
+              pricingDate === '""' || !pricingDate ? '""' : pricingDate;
+            const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${cleanPricingDate}`;
+            window.open(url, "_blank");
+          }
+        };
         return (
           <span
-            onClick={handleTrackHereClick} // Navigate to the tracking page in a new tab
-            style={{
-              cursor: "pointer",
-              color: "#0066cc",
-              textDecoration: "underline", // Optional: Make it look like a link
-            }}
+            onClick={handleTrackHereClick}
+            style={{ cursor: "pointer", color: "#0066cc", textDecoration: "underline" }}
           >
             Track
           </span>
@@ -279,8 +207,8 @@ const DealsTable: React.FC<DealsTableProps> = ({
   ];
 
   const handleRowClick = (params: any) => {
-    setSelectedId(params.id); // Update selected ID
-    onRowSelect(params.row); // Pass the selected row data
+    setSelectedId(params.id);
+    onRowSelect(params.row);
   };
 
   return (
