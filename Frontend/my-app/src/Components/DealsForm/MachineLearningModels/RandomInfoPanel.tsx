@@ -13,6 +13,7 @@ import {
 import { green, red, grey } from "@mui/material/colors";
 
 interface FormData {
+  deal_stats: string;
   ticker: string;
   pricing_date: string;
   deal_type: string;
@@ -62,7 +63,9 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
         }
         const json: ApiResponse = await response.json();
         const sorted = json.data.sort(
-          (a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime()
+          (a, b) =>
+            new Date(b.pricing_date).getTime() -
+            new Date(a.pricing_date).getTime()
         );
         setForms(sorted.slice(0, 10));
       } catch (err: any) {
@@ -80,27 +83,32 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
     sessionStorage.setItem("auto_predict", "true");
     window.open("/machine_learning/equity");
   };
+const renderPredictionChip = (prediction: string) => {
+  const normalized = prediction?.toLowerCase(); // handle null/undefined
 
-  const renderPredictionChip = (prediction: string) => {
-    const color =
-      prediction === "Positive"
-        ? green[600]
-        : prediction === "Negative"
-        ? red[600]
-        : grey[600];
-    return (
-      <Chip
-        label={prediction.toUpperCase()}
-        size="small"
-        sx={{
-          backgroundColor: color,
-          color: "white",
-          fontWeight: "bold",
-          height: 22,
-        }}
-      />
-    );
-  };
+  const color =
+    normalized === "positive" || normalized === "positive return"
+      ? green[600]
+      : normalized === "negative" || normalized === "low return"
+      ? red[500]
+      : normalized === "neutral"
+      ? grey[600]
+      : grey[600]; // fallback for any other value
+
+  return (
+    <Chip
+      label={prediction?.toUpperCase() || "N/A"}
+      size="small"
+      sx={{
+        backgroundColor: color,
+        color: "white",
+        fontWeight: "bold",
+        height: 22,
+      }}
+    />
+  );
+};
+
 
   const formatSector = (raw: string) => {
     if (!raw) return "N/A";
@@ -127,7 +135,12 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
 
   if (loading)
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100px"
+      >
         <CircularProgress size={20} />
       </Box>
     );
@@ -203,14 +216,48 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
               variant="outlined"
             >
               <CardContent sx={{ py: 4, px: 4 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body1" fontWeight={600} color="#002060">
-                    {form.ticker}
-                  </Typography>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={1}
+                >
+                  <Box>
+                    <Typography
+                      variant="body1"
+                      fontWeight={600}
+                      color="#002060"
+                    >
+                      {form.ticker}{" "}
+                      <Box
+                        component="span"
+                        sx={{
+                          fontWeight: 500,
+                          ml: 1,
+                          color:
+                            form.deal_stats === "Announced"
+                              ? "blue"
+                              : form.deal_stats === "Issued"
+                                ? "green"
+                                : form.deal_stats === "Priced"
+                                  ? "orange"
+                                  : "grey",
+                        }}
+                      >
+                        {form.deal_stats || "N/A"}
+                      </Box>
+                    </Typography>
+                  </Box>
                   {renderPredictionChip(form.t1d_pred)}
                 </Box>
 
-                <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mt={1}
+                  mb={1}
+                >
                   <Typography variant="body1">{form.deal_type}</Typography>
                   <Typography variant="body1" color="#002060">
                     {formatDate(form.pricing_date)}
@@ -227,7 +274,9 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography variant="body1">Sector</Typography>
-                  <Typography variant="body1">{formatSector(form.sector)}</Typography>
+                  <Typography variant="body1">
+                    {formatSector(form.sector)}
+                  </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography variant="body1" color="#002060">
@@ -252,8 +301,8 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                     {form.sponsor === "Y"
                       ? "Sponsored"
                       : form.sponsor === "N"
-                      ? "Not Sponsored"
-                      : "N/A"}
+                        ? "Not Sponsored"
+                        : "N/A"}
                   </Typography>
                 </Box>
               </CardContent>
