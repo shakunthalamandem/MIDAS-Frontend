@@ -10,6 +10,7 @@ import {
   CircularProgress,
   Typography,
   Fade,
+  Container,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
@@ -202,7 +203,33 @@ const EquityNewDealFormMain: React.FC = () => {
   }, [options, debouncedInput]);
 
   return (
+    <>
+       
+                    <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 500,  
+                  color: "#FFFFFF",
+                  fontSize: { xs: "1rem", sm: "1.2rem" },
+                  backgroundColor: "#002060",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "4vh",
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  textAlign: "center",
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                  animation: "fadeIn 1.5s ease-in-out",
+                  "@keyframes fadeIn": {
+                    "0%": { opacity: 0 },
+                    "100%": { opacity: 1 },
+                  },
+                }}
+              >
+Equity New Deal Form - Create or Search by Ticker and Pricing Date to Access Complete Deal Details              </Typography>
     <Fade in timeout={500}>
+   
       <Paper
         elevation={4}
         sx={{
@@ -211,6 +238,9 @@ const EquityNewDealFormMain: React.FC = () => {
           background: "linear-gradient(145deg, #f4f8ff, #ffffff)",
         }}
       >
+        
+
+        <Container>
         <Box
           display="flex"
           justifyContent="space-between"
@@ -218,18 +248,7 @@ const EquityNewDealFormMain: React.FC = () => {
           flexWrap="wrap"
           mb={3}
         >
-          <Box>
-            <Typography
-              variant="h5"
-              sx={{ fontWeight: 600, color: "#002060", mb: 0.5 }}
-            >
-              Equity New Deal Form
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-              Create or search for an equity deal by ticker and pricing date to
-              get the complete deal form.
-            </Typography>
-          </Box>
+
 
           <Box
             display="flex"
@@ -362,7 +381,7 @@ const EquityNewDealFormMain: React.FC = () => {
               Refresh
             </Button> */}
 
-            <DealsDropdown />
+            {/* <DealsDropdown /> */}
 
             <Box width="100%" display="flex" justifyContent="flex-end" mt={1}>
               <Typography variant="caption" color="red">
@@ -372,6 +391,7 @@ const EquityNewDealFormMain: React.FC = () => {
             </Box>
           </Box>
         </Box>
+        </Container>
 
         {error && (
           <Alert
@@ -382,11 +402,12 @@ const EquityNewDealFormMain: React.FC = () => {
             {error}
           </Alert>
         )}
-
-        <DealFormAllTickersTable onRowClick={handleTickerRowClick} />
+ {/* Hiding the table for now as per feedback */}
+        {/* <DealFormAllTickersTable onRowClick={handleTickerRowClick} /> */}
         <DealFormSectionMainTable selectedOption={selectedOption} />
       </Paper>
     </Fade>
+    </>
   );
 };
 

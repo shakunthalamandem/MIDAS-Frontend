@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Button,
+  Container,
   Menu,
   MenuItem,
   Typography,
@@ -27,6 +28,7 @@ const DealsDropdown: React.FC = () => {
 
   return (
     <>
+    <Container>
       <Button
         variant="contained"
         onClick={handleOpen}
@@ -60,6 +62,8 @@ const DealsDropdown: React.FC = () => {
           </Typography>
         </MenuItem>
       </Menu>
+          </Container>
+
     </>
   );
 };
