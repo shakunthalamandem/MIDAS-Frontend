@@ -8,6 +8,7 @@ import {
   Chip,
   Divider,
   Grid,
+  Stack,
 } from "@mui/material";
 import { green, red, grey } from "@mui/material/colors";
 
@@ -119,6 +120,11 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
     return new Date(dateString).toLocaleDateString("en-GB", options);
   };
 
+  const getCardBackgroundColor = (dealType: string) => {
+    if (dealType.toLowerCase() === "ipo") return "#f6e9c6";
+    return "#e8f4fc"; // FO or others
+  };
+
   if (loading)
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100px">
@@ -153,6 +159,34 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
         Recent Predictions
       </Typography>
 
+      {/* Color Legend */}
+      <Stack direction="row" spacing={2} justifyContent="center" mb={2}>
+        <Box display="flex" alignItems="center">
+          <Box
+            sx={{
+              width: 16,
+              height: 16,
+              backgroundColor: "#f6e9c6",
+              borderRadius: "4px",
+              mr: 0.5,
+            }}
+          />
+          <Typography fontSize={12}>IPO</Typography>
+        </Box>
+        <Box display="flex" alignItems="center">
+          <Box
+            sx={{
+              width: 16,
+              height: 16,
+              backgroundColor: "#e8f4fc",
+              borderRadius: "4px",
+              mr: 0.5,
+            }}
+          />
+          <Typography fontSize={12}>FO</Typography>
+        </Box>
+      </Stack>
+
       <Grid container spacing={2}>
         {forms.map((form, i) => (
           <Grid item xs={12} key={i}>
@@ -163,7 +197,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                 transition: "box-shadow 0.2s, transform 0.15s",
                 "&:hover": { boxShadow: 4, transform: "translateY(-3px)" },
                 borderRadius: 2,
-                backgroundColor: "#e8f4fc",
+                backgroundColor: getCardBackgroundColor(form.deal_type),
                 minHeight: 180,
               }}
               variant="outlined"
@@ -177,14 +211,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
-                  <Typography variant="body1" color="#002060">
-                    Discount:{" "}
-                    <strong>
-                      {form.discount_from_announcement_price !== null
-                        ? `${form.discount_from_announcement_price}%`
-                        : "N/A"}
-                    </strong>
-                  </Typography>
+                  <Typography variant="body1">{form.deal_type}</Typography>
                   <Typography variant="body1" color="#002060">
                     {formatDate(form.pricing_date)}
                   </Typography>
@@ -195,7 +222,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                 <Box display="flex" justifyContent="space-between">
                   <Typography variant="body1">Deal Size</Typography>
                   <Typography variant="body1">
-                    ${form.deal_size ? (form.deal_size / 1_000_000).toFixed(1) : "N/A"}M
+                    ${form.deal_size ? form.deal_size.toFixed(1) : "N/A"}M
                   </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
@@ -203,8 +230,14 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                   <Typography variant="body1">{formatSector(form.sector)}</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="body1">Deal Type</Typography>
-                  <Typography variant="body1">{form.deal_type}</Typography>
+                  <Typography variant="body1" color="#002060">
+                    Discount:{" "}
+                    <strong>
+                      {form.discount_from_announcement_price !== null
+                        ? `${form.discount_from_announcement_price}%`
+                        : "N/A"}
+                    </strong>
+                  </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography variant="body1">Region</Typography>
