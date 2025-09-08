@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
-import { Container } from "@mui/material";
+import { Container, Box, Tooltip, Typography } from "@mui/material";
 
-// Helper: Format header
+// ✅ Helper: Format header
 const formatHeader = (label: string) => {
   const words = label.split(" ");
   return words.length === 1 ? (
@@ -15,7 +15,7 @@ const formatHeader = (label: string) => {
   );
 };
 
-// Helper: Render check/cross
+// ✅ Helper: Render check/cross
 const renderCheckCell = (params: GridRenderCellParams<any>) => {
   const val = params.value?.toString().toLowerCase();
   const isValid = val && val !== "no" && val !== "-" && val !== "";
@@ -34,7 +34,7 @@ const renderCheckCell = (params: GridRenderCellParams<any>) => {
   );
 };
 
-// Date formatter
+// ✅ Helper: Date formatter
 const formatDateCell = (params: GridRenderCellParams<any>) => {
   if (!params.value) return "To Be Announced";
   const date = new Date(params.value);
@@ -55,6 +55,69 @@ const formatDateCell = (params: GridRenderCellParams<any>) => {
   };
 
   return `${day}${getDaySuffix(day)} ${month} ${year}`;
+};
+
+// ✅ Deal Status Circle Renderer
+const statusConfig: Record<string, { color: string; label: string }> = {
+  Announced: { color: "#002060", label: "A" }, // Dark Blue
+  Priced: { color: "orange", label: "P" },
+  Issued: { color: "green", label: "I" },
+};
+
+const renderDealStatsCell = (params: GridRenderCellParams<any>) => {
+  const value = params.value; // "Announced" | "Priced" | "Issued"
+  const config = statusConfig[value as keyof typeof statusConfig];
+
+  if (!config) {
+    // ❌ Empty → red ✘
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+          gap: 0.5,
+        }}
+      >
+        <span style={{ color: "red", fontWeight: "bold" }}>✘</span>
+
+      </Box>
+    );
+  }
+
+  // ✅ Valid → green ✔ before circle
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100%",
+        gap: 0.5,
+      }}
+    >
+      <span style={{ color: "green", fontWeight: "bold" }}>✔</span>
+      <Tooltip title={value}>
+        <Box
+          sx={{
+            width: 18,
+            height: 18,
+            borderRadius: "50%",
+            backgroundColor: config.color,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "10px",
+          }}
+        >
+          {config.label}
+        </Box>
+      </Tooltip>
+    </Box>
+  );
 };
 
 interface DealsTableProps {
@@ -120,8 +183,8 @@ const DealsTable: React.FC<DealsTableProps> = ({
     { field: "region", headerName: "Region", renderHeader: () => formatHeader("Region"), flex: 0.75, headerAlign: "center", align: "center" },
     { field: "sector", headerName: "Sector", renderHeader: () => formatHeader("Sector"), flex: 1.25, headerAlign: "left", align: "left" },
     { field: "issuer_name", headerName: "Issuer Name", renderHeader: () => formatHeader("Issuer Name"), flex: 2, headerAlign: "left", align: "left" },
-    
-    // ✅ Insert dynamic date column here
+
+    // ✅ Insert dynamic date column
     dateColumn,
 
     {
@@ -174,8 +237,24 @@ const DealsTable: React.FC<DealsTableProps> = ({
           <span style={{ color: "red" }}>✘</span>
         ),
     },
-    { field: "deal_stats", headerName: "Deal Status", renderHeader: () => formatHeader("Deal Status"), flex: 1, headerAlign: "center", align: "center", renderCell: renderCheckCell },
-    { field: "t1d_pred", headerName: "AI-ML Prediction", renderHeader: () => formatHeader("AI-ML Prediction"), flex: 1, headerAlign: "center", align: "center", renderCell: renderCheckCell },
+    {
+      field: "deal_stats",
+      headerName: "Deal Status",
+      renderHeader: () => formatHeader("Deal Status"),
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+      renderCell: renderDealStatsCell,
+    },
+    {
+      field: "t1d_pred",
+      headerName: "AI-ML Prediction",
+      renderHeader: () => formatHeader("AI-ML Prediction"),
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+      renderCell: renderCheckCell,
+    },
     {
       field: "track_here",
       headerName: "Track",
@@ -197,7 +276,11 @@ const DealsTable: React.FC<DealsTableProps> = ({
         return (
           <span
             onClick={handleTrackHereClick}
-            style={{ cursor: "pointer", color: "#0066cc", textDecoration: "underline" }}
+            style={{
+              cursor: "pointer",
+              color: "#0066cc",
+              textDecoration: "underline",
+            }}
           >
             Track
           </span>
@@ -211,34 +294,89 @@ const DealsTable: React.FC<DealsTableProps> = ({
     onRowSelect(params.row);
   };
 
-  return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <div style={{ width: "100%", height: 450, maxHeight: "450px" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          loading={loading}
-          checkboxSelection={false}
-          onRowClick={handleRowClick}
-          rowHeight={35}
-          getRowClassName={(params) =>
-            selectedId === params.id ? "Mui-selected" : ""
-          }
+return (
+  <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+    <div style={{ width: "100%", height: 450, maxHeight: "450px" }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        loading={loading}
+        checkboxSelection={false}
+        onRowClick={handleRowClick}
+        rowHeight={35}
+        getRowClassName={(params) =>
+          selectedId === params.id ? "Mui-selected" : ""
+        }
+        sx={{
+          "& .MuiDataGrid-container--top [role='row']": {
+            backgroundColor: "#002060",
+            color: "#FFFFFF",
+          },
+          "& .Mui-selected": {
+            backgroundColor: "#cad0f1ff !important",
+          },
+          cursor: "pointer",
+          border: "1px solid #ccccccff",
+        }}
+      />
+    </div>
+
+    {/* Legend / Note */}
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 3,
+        mt: 2,
+        ml: 1,
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
           sx={{
-            "& .MuiDataGrid-container--top [role='row']": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
-            },
-            "& .Mui-selected": {
-              backgroundColor: "#cad0f1ff !important",
-            },
-            cursor: "pointer",
-            border: "1px solid #ccccccff",
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: "#002060",
           }}
         />
-      </div>
-    </Container>
-  );
+        <Typography variant="body2" color="text.secondary">
+          A - Announced
+        </Typography>
+      </Box>
+
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: "orange",
+          }}
+        />
+        <Typography variant="body2" color="text.secondary">
+          P - Priced
+        </Typography>
+      </Box>
+
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: "green",
+          }}
+        />
+        <Typography variant="body2" color="text.secondary">
+          I - Issued
+        </Typography>
+      </Box>
+    </Box>
+  </Container>
+);
+
+  
 };
 
 export default DealsTable;
