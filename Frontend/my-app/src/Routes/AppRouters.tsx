@@ -72,6 +72,7 @@ import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrap
 import WriteUpDashboard from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpDashboard";
 import WriteupDashboardMain from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteupDashboardMain";
 import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
+import DealsDropdown from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
 
 const AppRouters: React.FC = () => {
   return (
@@ -164,6 +165,7 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} /> */}
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
         <Route path="/ai_upload" element={<AuthGuard><UploadAiInsights /></AuthGuard>} />
+        <Route path="/new_deal_data_upload" element={<AuthGuard><DealsDropdown /></AuthGuard>} />    
 
 
   

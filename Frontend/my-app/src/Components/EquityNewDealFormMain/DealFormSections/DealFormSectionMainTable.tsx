@@ -41,10 +41,11 @@ const DealFormSectionMainTable: React.FC<Props> = ({ selectedOption }) => {
           sector: '',
           deal_captain: '',
           invitation_bank: '',
+          sponsor: '',
+          deal_stats: '',
         },
         deal_allocations: {
           deal_size_amount_usd: '',
-          sponsor: '',
           percentage_primary: '',
           price_local_currency: '',
           discount_percentage: '',
