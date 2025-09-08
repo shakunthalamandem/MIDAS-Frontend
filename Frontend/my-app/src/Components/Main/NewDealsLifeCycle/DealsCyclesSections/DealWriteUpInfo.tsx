@@ -117,7 +117,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
         <Grid container spacing={2} mt={2}>
           <Grid item xs={12} sm={6}>
             <FieldRenderer
-              label="Last 10 deals Avg Sector Return(%)"
+              label="Sector Avg 1D Return % - Last 10 Deals"
               name="average_sector_return"
               value={formData.average_sector_return}
               editable={editable}
@@ -177,7 +177,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
                 <Button
                   variant="text"
                   onClick={handleReadMore}
-                  sx={{ mt: 1, color: "#006005ff",fontWeight:'bold'  }}
+                  sx={{  color: "#002060",fontStyle:'italic' }}
                 >
                   Read More
                 </Button>
@@ -230,7 +230,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
                   <Button
                     variant="text"
                     onClick={handleReadMore}
-                    sx={{ mt: 1, color: "#006005ff",fontWeight:'bold' }}
+                  sx={{  color: "#002060",fontStyle:'italic' }}
                   >
                     Read More
                   </Button>
