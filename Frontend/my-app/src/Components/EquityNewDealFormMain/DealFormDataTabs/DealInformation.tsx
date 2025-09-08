@@ -214,7 +214,7 @@ const renderSelectField = (
         {renderSelectField("Lead Bank", "lead_bank", invitationBanks)}
         
         {renderSelectField("Sponsor", "sponsor", sponsors)}
-        {renderSelectField("Deal Stats", "deal_stats", deal_stats)}
+        {renderSelectField("Deal Status", "deal_stats", deal_stats)}
       </Grid>
     </>
   );
