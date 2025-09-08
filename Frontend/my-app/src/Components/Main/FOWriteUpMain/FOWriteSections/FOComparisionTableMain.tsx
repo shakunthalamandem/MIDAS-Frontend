@@ -67,8 +67,10 @@ const formatNumber = (
   isPercentage = false
 ): string => {
   if (value === null || value === undefined || isNaN(value)) return "N/A";
-  let formattedValue: string;
+
+  const isNegative = value < 0;
   const absValue = Math.abs(value);
+  let formattedValue: string;
 
   if (absValue >= 1e9) {
     formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
@@ -80,10 +82,17 @@ const formatNumber = (
     formattedValue = absValue.toFixed(1);
   }
 
-  if (isCurrency) formattedValue = `$${formattedValue}`;
-  if (isPercentage) formattedValue = `${value.toFixed(1)}%`;
+  if (isCurrency) {
+    formattedValue = `$${formattedValue}`;
+    if (isNegative) formattedValue = `-${formattedValue}`;
+  } else if (isPercentage) {
+    // Let toFixed handle the sign automatically
+    formattedValue = `${value.toFixed(1)}%`;
+  } else {
+    if (isNegative) formattedValue = `-${formattedValue}`;
+  }
 
-  return value < 0 ? `-${formattedValue}` : formattedValue;
+  return formattedValue;
 };
 
 const getColumns = (

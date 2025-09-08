@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Grid,
   TextField,
   Typography,
   MenuItem,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import { FormSectionProps } from "../../../types/NewDealFormData";
 import DatasetIcon from "@mui/icons-material/Dataset";
 
-// Utility to format date
 const formatDate = (dateStr: string) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
@@ -22,129 +22,127 @@ const formatDate = (dateStr: string) => {
   return `${day}-${month}-${year}`; // DD-MM-YYYY
 };
 
+interface ApiField {
+  [key: string]: {
+    options: string[] | number[];
+    label: string;
+    description: string;
+  };
+}
 
 const DealInformation: React.FC<FormSectionProps> = ({
   data,
   editable,
   onChange,
 }) => {
+  const [optionsData, setOptionsData] = useState<ApiField | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     const newValue = type === "text" ? value.toUpperCase() : value;
     onChange({ ...data, [name]: newValue });
   };
 
-  const regions = ["US", "EMEA", "APAC", "Non-US America"];
-  const dealTypes = ["IPO", "FO"];
-  const foTypes = ["Marketed", "Overnight", "Block"];
-  const sectors = [
-    "Health Care",
-    "Information Technology",
-    "Financials",
-    "Consumer Staples",
-    "Real Estate",
-    "Materials",
-    "Industrials",
-    "Energy",
-    "Utilities",
-    "Consumer Discretionary",
-    "Communication Services",
-  ];
-  const dealCaptains = ["Robin", "Tom", "Block", "HC", "Jay", "Mike", "ECM Other", "Others"];
-  const invitationBanks = [
-    "ABN AMRO Bank",
-    "Bank of America",
-    "Barclays",
-    "BMO Capital Markets",
-    "BNP Paribas",
-    "Canaccord Genuity",
-    "CIBC World Markets",
-    "Citigroup Global Markets Inc",
-    "Commerzbank Group",
-    "Cowen & Company LLC",
-    "Credit Suisse",
-    "Deutsche Bank",
-    "Evercore Inc",
-    "Goldman Sachs",
-    "HSBC",
-    "Jefferies LLC",
-    "JMP Securities LLC",
-    "JPMorgan",
-    "Keefe Bruyette & Woods",
-    "Lazard Capital Markets",
-    "Leerink Partners LLC",
-    "Morgan Stanley",
-    "Needham & Co LLC",
-    "Nomura Securities Co Ltd",
-    "Oppenheimer & Co Inc",
-    "Raymond James & Associates Inc",
-    "RBC Capital Markets",
-    "Robert W Baird & Co",
-    "SG Corporate & Investment Banking",
-    "Stifel",
-    "SunTrust Robinson Humphrey Inc",
-    "SVB Securities LLC",
-    "TD Securities Inc",
-    "UBS",
-    "William Blair & Co LLC",
-    "Others",
-  ];
+  useEffect(() => {
+    const fetchOptions = async () => {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      if (!apiUrl) {
+        setError("API URL is not defined in environment variables");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiUrl}/api/mdd_distinct_values/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const result = await response.json();
+
+        // Convert the array into a key-value object
+        const formatted: ApiField = {};
+        result.forEach((item: any) => {
+          const key = Object.keys(item)[0];
+          formatted[key] = item[key];
+        });
+
+        setOptionsData(formatted);
+      } catch (err: any) {
+        setError(err.message || "Error fetching options");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOptions();
+  }, []);
 
   const sponsors = ["Y", "N"];
-  const deal_stats = ["Announced", "Priced","Issued"];
+  const deal_stats = ["Announced", "Priced", "Issued"];
 
-const renderSelectField = (
-  label: string,
-  name: string,
-  options: string[]
-) => (
-  <Grid item xs={12} sm={6} md={4}>
-    <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-      {label}
-    </Typography>
-    <TextField
-      select
-      name={name}
-      value={data[name] || ""}
-      onChange={handleChange}
-      fullWidth
-      size="small"
-      variant="standard"
-      disabled={!editable}
-      InputProps={{
-        disableUnderline: !editable,
-        sx: {
-          "&.Mui-disabled": {
-            WebkitTextFillColor: "#b1062e",
+  const renderSelectField = (
+    label: string,
+    name: string,
+    options: string[] | number[] = []
+  ) => (
+    <Grid item xs={12} sm={6} md={4}>
+      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+        {label}
+      </Typography>
+      <TextField
+        select
+        name={name}
+        value={data[name] || ""}
+        onChange={handleChange}
+        fullWidth
+        size="small"
+        variant="standard"
+        disabled={!editable}
+        InputProps={{
+          disableUnderline: !editable,
+          sx: {
+            "&.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& input.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& .MuiSelect-select.Mui-disabled": {
+              WebkitTextFillColor: "#b1062e",
+            },
+            "& .MuiSelect-icon": !editable ? { display: "none" } : {},
           },
-          "& input.Mui-disabled": {
-            WebkitTextFillColor: "#b1062e",
-          },
-          "& .MuiSelect-select.Mui-disabled": {
-            WebkitTextFillColor: "#b1062e",
-          },
-          "& .MuiSelect-icon": !editable ? { display: "none" } : {},
-        },
-      }}
-      SelectProps={{
-        MenuProps: {
-          PaperProps: {
-            style: {
-              maxHeight: 400,
+        }}
+        SelectProps={{
+          MenuProps: {
+            PaperProps: {
+              style: {
+                maxHeight: 400,
+              },
             },
           },
-        },
-      }}
-    >
-      {options.map((option) => (
-        <MenuItem key={option} value={option}>
-          {option}
-        </MenuItem>
-      ))}
-    </TextField>
-  </Grid>
-);
-
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
+          </MenuItem>
+        ))}
+      </TextField>
+    </Grid>
+  );
 
   const renderTextField = (
     label: string,
@@ -181,10 +179,13 @@ const renderSelectField = (
     </Grid>
   );
 
-  // Derived value for Pricing Date Status
   const pricingDateStatus = data["pricing_date"]
     ? formatDate(data["pricing_date"])
     : "TBA";
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Typography color="error">{error}</Typography>;
+  if (!optionsData) return null;
 
   return (
     <>
@@ -203,18 +204,50 @@ const renderSelectField = (
 
       <Grid container spacing={2}>
         {renderTextField("Ticker", "ticker")}
-        {renderTextField("Pricing Date Status", "pricing_date_status", "text", pricingDateStatus, true)}
+        {renderTextField(
+          "Pricing Date Status",
+          "pricing_date_status",
+          "text",
+          pricingDateStatus,
+          true
+        )}
         {renderTextField("Pricing Date", "pricing_date", "date")}
         {renderTextField("Vendor/Issuer", "issuer_name")}
-        {renderSelectField("Region", "region", regions)}
-        {renderSelectField("Deal Type", "deal_type", dealTypes)}
-        {renderSelectField("FO Type", "fo_type", foTypes)}
-        {renderSelectField("Sector", "sector", sectors)}
-        {renderSelectField("Deal Captain", "deal_captain", dealCaptains)}
-        {renderSelectField("Lead Bank", "lead_bank", invitationBanks)}
-        
+
+        {renderSelectField(
+          optionsData?.broad_region.label || "Region",
+          "region",
+          optionsData?.broad_region.options
+        )}
+        {renderSelectField(
+          optionsData?.deal_type.label || "Deal Type",
+          "deal_type",
+          optionsData?.deal_type.options
+        )}
+        {renderSelectField(
+          optionsData?.fo_type.label || "FO Type",
+          "fo_type",
+          optionsData?.fo_type.options
+        )}
+        {renderSelectField(
+          optionsData?.gics_sector.label || "Sector",
+          "sector",
+          optionsData?.gics_sector.options
+        )}
+        {renderSelectField(
+          optionsData?.deal_captain.label || "Deal Captain",
+          "deal_captain",
+          optionsData?.deal_captain.options
+        )}
+        {renderSelectField(
+          optionsData?.selected_bank.label || "Lead Bank",
+          "lead_bank",
+          optionsData?.selected_bank.options
+        )}
+
+        {/* Hardcoded fields */}
         {renderSelectField("Sponsor", "sponsor", sponsors)}
-        {renderSelectField("Deal Stats", "deal_stats", deal_stats)}
+        {renderSelectField("Deal Status", "deal_stats", deal_stats)}
       </Grid>
     </>
   );

@@ -56,11 +56,13 @@ const WriteUpDashboard: React.FC = () => {
       {loading ? (
         <CircularProgress sx={{ display: "block", mx: "auto" }} />
       ) : (
-        <DealsTable
-          rows={rows}
-          loading={loading}
-          onRowSelect={(row) => setSelectedDeal(row)}
-        />
+<DealsTable
+  rows={rows}
+  loading={loading}
+  onRowSelect={(row) => setSelectedDeal(row)}
+  selectedOp={selectedOp}   // ✅ add this
+/>
+
       )}
 
     </Container>

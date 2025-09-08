@@ -63,7 +63,7 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
       pricing_date: apiData.pricing_date,
       deal_type: apiData.deal_type,
       allocation_as_percentage_of_deal_size:
-        apiData.allocation_as_percentage_of_deal_size,
+      apiData.allocation_as_percentage_of_deal_size,
       allocation_as_percentage_of_ioi: apiData.allocation_as_percentage_of_ioi,
       average_ioi: apiData.average_ioi,
       average_allocation: apiData.average_allocation,
@@ -317,14 +317,14 @@ const renderField = (
 
             <Grid item xs={12} sm={6}>
               {renderField(
-                "Last 10 deals Avg Allocation as % of Deal_Size",
+                "Sector Avg Allocation as % of Deal Size - Last 10 Deals",
                 "average_allocation",
                 "%"
               )}
             </Grid>
             <Grid item xs={12} sm={6}>
               {renderField(
-                "Last 10 deals Avg Allocation as % of IoI",
+                "Sector Avg Allocation as % of IOI - Last 10 Deals",
                 "average_ioi",
                 "%"
               )}

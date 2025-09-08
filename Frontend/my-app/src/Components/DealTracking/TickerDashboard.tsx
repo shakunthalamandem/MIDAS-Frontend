@@ -7,12 +7,11 @@ import {
   Typography,
   Card,
   Container,
-  Button,
 } from "@mui/material";
 import axios from "axios";
 import dayjs from "dayjs";
-import { useLocation } from "react-router-dom"; // useNavigate here
-import TickerTracking from "./TickerTracking"; // Correct import
+import { useLocation } from "react-router-dom";
+import TickerTracking from "./TickerTracking";
 
 interface TickerOption {
   ticker: string;
@@ -26,14 +25,14 @@ const TickerDashboard: React.FC = () => {
 
   const [options, setOptions] = useState<TickerOption[]>([]);
   const [loading, setLoading] = useState(false);
-  // const [selected, setSelected] = useState<TickerOption | null>(null);
-  const [selected, setSelected] = useState<TickerOption | null>({
-  ticker: "BLSH",
-  pricing_date: "2025-08-13", // <-- Put the correct date here
-  deal_type: "IPO",          // <-- Put the correct type here
-});
 
-  // Extract ticker and pricing_date from URL query params
+  // Default selected value (optional)
+  const [selected, setSelected] = useState<TickerOption | null>({
+    ticker: "BLSH",
+    pricing_date: "2025-08-13",
+    deal_type: "IPO",
+  });
+
   const tickerFromUrl = queryParams.get("ticker");
   const pricingDateFromUrl = queryParams.get("pricing_date");
 
@@ -51,7 +50,6 @@ const TickerDashboard: React.FC = () => {
           }
         );
 
-        // ✅ Sort tickers by pricing_date DESC using dayjs for reliability
         const sorted = res.data.data.sort((a, b) =>
           dayjs(b.pricing_date).valueOf() - dayjs(a.pricing_date).valueOf()
         );
@@ -69,9 +67,14 @@ const TickerDashboard: React.FC = () => {
     setSelected(value);
   };
 
-  // Use URL params if available, otherwise, rely on the selected state
-  const ticker = tickerFromUrl || selected?.ticker;
-  const pricingDate = pricingDateFromUrl || selected?.pricing_date;
+  // 👇 Ensure we always pass a string
+  const ticker = tickerFromUrl || selected?.ticker || "";
+
+  // 👇 If no pricing date is found, set to '""'
+  const pricingDate =
+    pricingDateFromUrl ||
+    selected?.pricing_date ||
+    '""'; // This ensures it is passed as `""`
 
   return (
     <Box sx={{ minHeight: "100vh", background: "#f5f7fa", py: 3 }}>
@@ -88,12 +91,10 @@ const TickerDashboard: React.FC = () => {
             background: "linear-gradient(135deg, #ffffff, #f0f4f8)",
           }}
         >
-          {/* Title */}
           <Typography variant="h6" fontWeight={700} color="#002060">
             Deal Tracking Dashboard
           </Typography>
 
-          {/* Search Bar */}
           <Autocomplete
             sx={{ width: 350 }}
             options={options}
@@ -131,26 +132,19 @@ const TickerDashboard: React.FC = () => {
           />
         </Card>
 
-        <Typography
-          variant="subtitle1"
-          align="left"
-          sx={{ mt: 2, mb: 2 }}
-        >
+        <Typography variant="subtitle1" align="left" sx={{ mt: 2, mb: 2 }}>
           Welcome to the <strong>Ticker Tracking Dashboard</strong>. Use the search bar
           in the top-right corner to find a specific ticker. Once selected, you’ll see
           its detailed lifecycle, including pricing information, allocations, predictions,
           and actual performance, all organized step-by-step for easy tracking.
         </Typography>
 
-        {/* Ticker Tracking aligned with header */}
-        {ticker && pricingDate && (
+        {/* Render only if ticker exists */}
+        {ticker && (
           <Box mt={3}>
-            {/* Pass ticker and pricing_date as props */}
             <TickerTracking ticker={ticker} pricing_date={pricingDate} />
           </Box>
         )}
-
-        
       </Container>
     </Box>
   );
