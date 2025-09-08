@@ -52,7 +52,9 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
   ticker,
   pricing_date,
 }) => {
-  const [trackingData, setTrackingData] = useState<TickerTrackingData | null>(null);
+  const [trackingData, setTrackingData] = useState<TickerTrackingData | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
@@ -109,20 +111,19 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
           value: `${trackingData.deal_type} - ${trackingData.region}`,
           completed: true,
         },
-{
-  label: "Pricing Range",
-  value:
-    trackingData.pricing_range_min !== null &&
-    trackingData.pricing_range_max !== null
-      ? `$: ${formatValue(trackingData.pricing_range_min)} - $: ${formatValue(
-          trackingData.pricing_range_max
-        )}`
-      : "Not Available",
-  completed:
-    trackingData.pricing_range_min !== null &&
-    trackingData.pricing_range_max !== null,
-},
-
+        {
+          label: "Pricing Range",
+          value:
+            trackingData.pricing_range_min !== null &&
+            trackingData.pricing_range_max !== null
+              ? `$: ${formatValue(trackingData.pricing_range_min)} - $: ${formatValue(
+                  trackingData.pricing_range_max
+                )}`
+              : "Not Available",
+          completed:
+            trackingData.pricing_range_min !== null &&
+            trackingData.pricing_range_max !== null,
+        },
         {
           label: "Preliminary Writeup",
           value: trackingData.basic_writeup_available,
@@ -140,7 +141,9 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
         },
         {
           label: "Allocation % of Deal Size",
-          value: `${formatValue(trackingData.allocation_as_percentage_of_deal_size)}%`,
+          value: `${formatValue(
+            trackingData.allocation_as_percentage_of_deal_size
+          )}%`,
           completed: trackingData.allocation_as_percentage_of_deal_size !== null,
         },
         {
@@ -229,51 +232,51 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
                         {step.label}
                       </Typography>
 
-                      {/* LEFt side value */}
+                      {/* VALUE + READ MORE INLINE */}
                       <Box textAlign="left" maxWidth="300px">
-                        <Typography
-                          variant="body2"
-                          color="#010e29ff"
-                          sx={{
-                            textAlign: "left",
-                            display: "-webkit-box",
-                            WebkitLineClamp:
-                              expandedIndex === index ? "unset" : 1,
-                            WebkitBoxOrient: "vertical",
-                            overflow: "hidden",
-                          }}
-                        >
-                          {step.value || "Not Available"}
-                        </Typography>
-
-                        {step.value && step.value.length > 25 && (
-                          <Button
-                            size="small"
-                            onClick={() =>
-                              setExpandedIndex(
-                                expandedIndex === index ? null : index
-                              )
-                            }
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Typography
+                            variant="body2"
+                            color="#010e29ff"
                             sx={{
-                              mt: 0.5,
-                              fontSize: "0.75rem",
-                              textTransform: "none",
+                              textAlign: "left",
+                              display: "-webkit-box",
+                              WebkitLineClamp:
+                                expandedIndex === index ? "unset" : 1,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                              flex: 1,
                             }}
                           >
-                            {expandedIndex === index
-                              ? "Read less"
-                              : "Read more"}
-                          </Button>
-                        )}
+                            {step.value || "Not Available"}
+                          </Typography>
+
+                          {step.value && step.value.length > 25 && (
+                            <Button
+                              size="small"
+                              onClick={() =>
+                                setExpandedIndex(
+                                  expandedIndex === index ? null : index
+                                )
+                              }
+                              sx={{
+                                fontSize: "0.75rem",
+                                textTransform: "none",
+                                minWidth: "fit-content",
+                              }}
+                            >
+                              {expandedIndex === index
+                                ? "Read less"
+                                : "Read more"}
+                            </Button>
+                          )}
+                        </Box>
 
                         {step.extra && (
                           <Typography
                             variant="body2"
                             color="text.secondary"
-                            sx={{
-                              textAlign: "left",
-                              mt: 0.5,
-                            }}
+                            sx={{ textAlign: "left", mt: 0.5 }}
                           >
                             {step.extra}
                           </Typography>
