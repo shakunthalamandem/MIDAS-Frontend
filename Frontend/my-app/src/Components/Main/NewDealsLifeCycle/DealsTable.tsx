@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { Box, Container, Grid, Button } from "@mui/material";
-import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
-import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
-import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
+
 import { Link } from "react-router-dom";
+import { Container } from "@mui/material";
 
 // Helper: Format header
 const formatHeader = (label: string) => {
@@ -221,6 +219,15 @@ const DealsTable: React.FC<DealsTableProps> = ({
       },
     },
     {
+      field: "deal_stats",
+      headerName: "Deal Status",
+      renderHeader: () => formatHeader("Deal Status"),
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+      renderCell: renderCheckCell,
+    },
+        {
       field: "t1d_pred",
       headerName: "AIML Prediction",
       renderHeader: () => formatHeader("AI-ML Prediction"),
