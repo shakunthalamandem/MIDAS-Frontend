@@ -5,17 +5,18 @@ import {
   Typography,
   InputAdornment,
   Box,
-  MenuItem,
+  IconButton,
 } from "@mui/material";
 import { FormSectionProps } from "../../../types/NewDealFormData";
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from "@mui/icons-material/Info";
+import { useNavigate } from "react-router-dom";
 
 const percentageFields = [
   "primary_percentage",
   "discount_from_announcement_price",
   "ioi_as_percentage_of_deal_size",
   "allocation_as_percentage_of_deal_size",
-  "allocation_as_percentage_of_ioi"
+  "allocation_as_percentage_of_ioi",
 ];
 
 const DealAllocations: React.FC<FormSectionProps> = ({
@@ -23,6 +24,8 @@ const DealAllocations: React.FC<FormSectionProps> = ({
   editable,
   onChange,
 }) => {
+  const navigate = useNavigate();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     let newValue = value;
@@ -72,16 +75,26 @@ const DealAllocations: React.FC<FormSectionProps> = ({
 
   return (
     <>
-      <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600}>
+      <Typography
+        variant="h6"
+        gutterBottom
+        align="center"
+        color="#002060"
+        fontWeight={600}
+      >
         <Box display="inline-flex" alignItems="center" gap={1}>
-          <InfoIcon />
+          <IconButton
+            size="small"
+            sx={{ color: "#002060" }}
+            onClick={() => navigate("/new_deal_data_upload")}
+          >
+            <InfoIcon />
+          </IconButton>
           Deal Allocations
-          
         </Box>
       </Typography>
 
       <Grid container spacing={2}>
-        
         {renderField("Deal Size ($)", "deal_size")}
         {renderField("Percentage Primary", "primary_percentage")}
         {renderField("Issue Price($) ", "issue_price")}
