@@ -18,7 +18,8 @@ interface IpoData {
   ticker: string;
   company_name: string;
   pricing_date: string | null;
-  price: string | number | null;
+  pricing_range_min: number | null;
+  pricing_range_max: number | null;
   exchange: string | null;
   deal_size: number | null;
 }
@@ -62,24 +63,34 @@ const WriteUpIPODashbaord: React.FC = () => {
   const getOrdinalSuffix = (day: number): string => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
-      case 1: return "st";
-      case 2: return "nd";
-      case 3: return "rd";
-      default: return "th";
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
     }
   };
-const formatDate = (dateStr: string | null): string => {
-  if (!dateStr) return "To Be Announced"; // ✅ Empty date
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return "To Be Announced"; // ✅ Invalid date
 
-  const day = date.getDate();
-  const suffix = getOrdinalSuffix(day);
-  const month = date.toLocaleString("default", { month: "short" });
-  const year = date.getFullYear();
-  return `${day}${suffix} ${month} ${year}`;
-};
+  const formatDate = (dateStr: string | null): string => {
+    if (!dateStr) return "To Be Announced";
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return "To Be Announced";
 
+    const day = date.getDate();
+    const suffix = getOrdinalSuffix(day);
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}${suffix} ${month} ${year}`;
+  };
+
+  // Format deal size to $XM
+  const formatDealSize = (size: number | null): string => {
+    if (size === null) return "TBA";
+    return `$${(size / 1_000_000).toFixed(1)}M`;
+  };
 
   return (
     <Container maxWidth="lg">
@@ -100,7 +111,7 @@ const formatDate = (dateStr: string | null): string => {
           color="#002060"
           mb={2}
         >
-          📅 All Upcoming IPO's 
+          📅 All Upcoming IPO's
         </Typography>
 
         <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
@@ -116,7 +127,7 @@ const formatDate = (dateStr: string | null): string => {
                   "Symbol",
                   "Company",
                   "Pricing Date",
-                  "Offer Price",
+                  "Price Range",
                   "Exchange",
                   "Deal Size",
                 ].map((heading) => (
@@ -147,30 +158,31 @@ const formatDate = (dateStr: string | null): string => {
                     border: "1px solid black",
                   }}
                 >
-                 <TableCell
-  align="center"
-  sx={{
-    fontSize: "0.78rem",
-    padding: "6px 8px",
-    border: "1px solid black",
-    fontWeight: 600,
-    lineHeight: 1.2,
-  }}
->
-  <Link
-  to={`/ipo-dashboard/${row.ticker}`}
-  state={{ fromTickerClick: true }}
-  style={{
-    color: "#d80606ff",
-    fontWeight: "bold",
-    textDecoration: "underline",
-  }}
->
-  {row.ticker}
-</Link>
+                  {/* Symbol */}
+                  <TableCell
+                    align="center"
+                    sx={{
+                      fontSize: "0.78rem",
+                      padding: "6px 8px",
+                      border: "1px solid black",
+                      fontWeight: 600,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    <Link
+                      to={`/ipo-dashboard/${row.ticker}`}
+                      state={{ fromTickerClick: true }}
+                      style={{
+                        color: "#d80606ff",
+                        fontWeight: "bold",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      {row.ticker}
+                    </Link>
+                  </TableCell>
 
-</TableCell>
-
+                  {/* Company */}
                   <TableCell
                     align="center"
                     sx={{
@@ -182,6 +194,8 @@ const formatDate = (dateStr: string | null): string => {
                   >
                     {row.company_name}
                   </TableCell>
+
+                  {/* Pricing Date */}
                   <TableCell
                     align="center"
                     sx={{
@@ -193,6 +207,8 @@ const formatDate = (dateStr: string | null): string => {
                   >
                     {formatDate(row.pricing_date)}
                   </TableCell>
+
+                  {/* Price Range */}
                   <TableCell
                     align="center"
                     sx={{
@@ -202,8 +218,13 @@ const formatDate = (dateStr: string | null): string => {
                       lineHeight: 1.2,
                     }}
                   >
-                    {row.price !== null ? `${row.price}` : "—"}
+                    {row.pricing_range_min !== null &&
+                    row.pricing_range_max !== null
+                      ? `$${row.pricing_range_min} - $${row.pricing_range_max}`
+                      : "TBA"}
                   </TableCell>
+
+                  {/* Exchange */}
                   <TableCell
                     align="center"
                     sx={{
@@ -215,6 +236,8 @@ const formatDate = (dateStr: string | null): string => {
                   >
                     {row.exchange || "—"}
                   </TableCell>
+
+                  {/* Deal Size */}
                   <TableCell
                     align="center"
                     sx={{
@@ -224,7 +247,7 @@ const formatDate = (dateStr: string | null): string => {
                       lineHeight: 1.2,
                     }}
                   >
-                    {row.deal_size !== null ? `${row.deal_size}` : "—"}
+                    {formatDealSize(row.deal_size)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -232,6 +255,7 @@ const formatDate = (dateStr: string | null): string => {
           </Table>
         </TableContainer>
       </Box>
+
       <Typography
         variant="body2"
         textAlign="center"

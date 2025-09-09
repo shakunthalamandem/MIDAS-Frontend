@@ -66,6 +66,7 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
 
       if (response.ok) {
         const result = await response.json();
+
         setFormData((prev) => ({
           ...prev,
           ...result.data,

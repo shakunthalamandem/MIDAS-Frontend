@@ -56,7 +56,6 @@ export const useDealWriteUpInfo = ({
 
         if (response.ok) {
           const result = await response.json();
-          console.log("✅ ipo_valuation_ai_summary response:", result);
 
           setFormData((prev) => ({
             ...prev,
@@ -89,7 +88,6 @@ export const useDealWriteUpInfo = ({
           deal_type: data.deal_type,
         };
 
-        console.log("🔹 Sending unified_deal_ratings payload:", payload);
 
         const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
           method: "POST",
@@ -102,7 +100,6 @@ export const useDealWriteUpInfo = ({
 
         if (response.ok) {
           const result = await response.json();
-          console.log("✅ unified_deal_ratings response:", result);
 
           const apiData = result.data;
 
@@ -120,10 +117,7 @@ export const useDealWriteUpInfo = ({
             differentiate_summary: apiData.differentiated_summary || "",
           };
 
-          console.log(
-            "🔹 Sending ipo_valuation_ai_summary payload:",
-            valuationPayload
-          );
+         
 
           // 🔥 Call second API
           fetchValuationSummary(valuationPayload);
