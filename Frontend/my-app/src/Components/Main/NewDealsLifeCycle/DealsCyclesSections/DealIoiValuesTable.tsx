@@ -77,6 +77,7 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
       console.error("Error fetching deal info:", error);
     }
   };
+  console.log("DealIoiValuesTable data:", data);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
