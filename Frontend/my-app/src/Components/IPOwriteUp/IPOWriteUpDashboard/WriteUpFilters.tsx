@@ -17,7 +17,7 @@ const WriteUpFilters: React.FC<WriteUpFiltersProps> = ({
   selectedOp,
   onChange,
 }) => {
-  const options = ["all upcoming", "next 2 weeks", "Last 1 Month"];
+  const options = ["all upcoming", "next 2 weeks", "September to Date"];
 
   return (
     <Stack
