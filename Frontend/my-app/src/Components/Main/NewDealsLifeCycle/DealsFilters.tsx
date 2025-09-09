@@ -9,7 +9,7 @@ interface DealsFiltersProps {
 const DealsFilters: React.FC<DealsFiltersProps> = ({ selectedOp, onChange }) => {
   return (
     <Stack direction="row" spacing={4} justifyContent="center" sx={{ mb: 2 }}>
-      {["all upcoming", "next 2 weeks", "Last 1 Month"].map((value) => (
+      {["all upcoming", "next 2 weeks", "September to Date"].map((value) => (
         <FormControlLabel
           key={value}
           control={

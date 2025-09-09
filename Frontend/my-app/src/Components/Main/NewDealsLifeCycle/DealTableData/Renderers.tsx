@@ -75,7 +75,7 @@ export const renderDealStatsCell = (params: GridRenderCellParams<any>) => {
 
   if (status === "Announced") {
     color = "#002060"; letter = "A";
-  } else if (status === "Priced") {
+  } else if (status === "Price Range") {
     color = "orange"; letter = "P";
   } else if (status === "Issued") {
     color = "green"; letter = "I";

@@ -9,7 +9,7 @@ export const getColumns = (
 ): GridColDef[] => {
   // ✅ Dynamic date column
   const dateColumn: GridColDef =
-    selectedOp === "Last 1 Month"
+    selectedOp === "September to Date"
       ? {
           field: "pricing_date",
           headerName: "Pricing Date",
@@ -31,7 +31,7 @@ export const getColumns = (
 
   // ✅ Dynamic price/issue price column
   const priceOrIssueColumn: GridColDef =
-    selectedOp === "Last 1 Month"
+    selectedOp === "September to Date"
       ? {
           field: "issue_price",
           headerName: "Issue Price",
@@ -94,6 +94,14 @@ export const getColumns = (
       field: "deal_type",
       headerName: "Deal Type",
       renderHeader: () => formatHeader("Deal Type"),
+      flex: 0.75,
+      headerAlign: "center",
+      align: "center",
+    },
+        {
+      field: "fo_type",
+      headerName: "FO Type",
+      renderHeader: () => formatHeader("FO Type"),
       flex: 0.75,
       headerAlign: "center",
       align: "center",

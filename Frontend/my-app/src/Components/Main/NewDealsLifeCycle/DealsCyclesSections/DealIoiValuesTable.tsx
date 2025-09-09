@@ -8,10 +8,10 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  Grid,
   IconButton,
   Box,
-  Tooltip,
+  Grid,
+  Container,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -149,19 +149,18 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
         </Typography>
         {editable ? (
           <TextField
-  name={String(name)}
-  value={isValueAvailable ? rawValue : ""}
-  onChange={handleChange}
-  fullWidth
-  size="small"
-  variant="standard"
-  InputProps={{
-    endAdornment: adornment ? (
-      <InputAdornment position="end">{adornment}</InputAdornment>
-    ) : undefined,
-  }}
-/>
-
+            name={String(name)}
+            value={isValueAvailable ? rawValue : ""}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+            variant="standard"
+            InputProps={{
+              endAdornment: adornment ? (
+                <InputAdornment position="end">{adornment}</InputAdornment>
+              ) : undefined,
+            }}
+          />
         ) : (
           <Typography
             variant="body1"
@@ -180,90 +179,125 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
   };
 
   return (
+<Container maxWidth="xl" sx={{ mb: 4, mt: 2, pb: 8 }}>
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <Card
-        sx={{
-          background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
-          borderRadius: "20px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-          p: 2,
-          mt: 2,
-        }}
-      >
-        <CardContent>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
+      <Grid container spacing={2} mt={2} mb={4}>
+        {/* --- Card 1 --- */}
+        <Grid item xs={12} md={6}>
+          <Card
+            sx={{
+              background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
+              borderRadius: "20px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+              p: 2,
+              height: "100%",
+            }}
           >
-            <Typography variant="h6" color="#002060" fontWeight="bold">
-              IOI Values
-            </Typography>
-            <IconButton
-              onClick={() => (editable ? handleSave() : setEditable(true))}
-            >
-              {editable ? (
-                <SaveIcon sx={{ color: "#002060" }} />
-              ) : (
-                <EditIcon sx={{ color: "#002060" }} />
-              )}
-            </IconButton>
-          </Box>
-
-          <Grid container spacing={2} mt={2}>
-            <Grid item xs={12} sm={6}>
-              {renderField(
-                "IOI as % of Deal Size",
-                "ioi_as_percentage_of_deal_size_status",
-                "% of deal size"
-              )}
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Typography
-                variant="body2"
-                color="#002060"
-                fontWeight={500}
-                gutterBottom
+            <CardContent>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
               >
-                Potential AM Quantity
-              </Typography>
-              <RadioGroup
-                row
-                name="potential_am_quantity"
-                value={formData.potential_am_quantity?.toString() || "0"}
-                onChange={handleChange}
+                <Typography variant="h6" color="#002060">
+IOI Values
+                </Typography>
+                <IconButton
+                  onClick={() =>
+                    editable ? handleSave() : setEditable(true)
+                  }
+                >
+                  {editable ? (
+                    <SaveIcon sx={{ color: "#002060" }} />
+                  ) : (
+                    <EditIcon sx={{ color: "#002060" }} />
+                  )}
+                </IconButton>
+              </Box>
+
+              <Box mt={2}>
+                {renderField(
+                  "IOI as % of Deal Size",
+                  "ioi_as_percentage_of_deal_size_status",
+                  "% of deal size"
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* --- Card 2 --- */}
+        <Grid item xs={12} md={6}>
+          <Card
+            sx={{
+              background: "linear-gradient(135deg, #e0ebff, #d4e2fc)",
+              borderRadius: "20px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+              p: 2,
+              height: "100%",
+            }}
+          >
+            <CardContent>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
               >
-                {[
-                  { label: "None", value: "0" },
-                  { label: "0.5 * allocations", value: "0.5" },
-                  { label: "1 * allocations", value: "1" },
-                  { label: "2 * allocations", value: "2" },
-                  { label: "5 * allocations", value: "5" },
-                ].map((option) => (
-                  <FormControlLabel
-                    key={option.value}
-                    value={option.value}
-                    control={
-                      <Radio
-                        disabled={!editable}
-                        sx={{
-                          color: "#B1062E",
-                          "&.Mui-checked": {
+                <Typography variant="h6" color="#002060" >
+                  Potential AM Quantity
+                </Typography>
+                <IconButton
+                  onClick={() =>
+                    editable ? handleSave() : setEditable(true)
+                  }
+                >
+                  {editable ? (
+                    <SaveIcon sx={{ color: "#002060" }} />
+                  ) : (
+                    <EditIcon sx={{ color: "#002060" }} />
+                  )}
+                </IconButton>
+              </Box>
+
+              <Box mt={2}>
+                <RadioGroup
+                  row
+                  name="potential_am_quantity"
+                  value={formData.potential_am_quantity?.toString() || "0"}
+                  onChange={handleChange}
+                >
+                  {[
+                    { label: "None", value: "0" },
+                    { label: "0.5 * allocations", value: "0.5" },
+                    { label: "1 * allocations", value: "1" },
+                    { label: "2 * allocations", value: "2" },
+                    { label: "5 * allocations", value: "5" },
+                  ].map((option) => (
+                    <FormControlLabel
+                      key={option.value}
+                      value={option.value}
+                      control={
+                        <Radio
+                          disabled={!editable}
+                          sx={{
                             color: "#B1062E",
-                          },
-                        }}
-                      />
-                    }
-                    label={option.label}
-                  />
-                ))}
-              </RadioGroup>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+                            "&.Mui-checked": {
+                              color: "#B1062E",
+                            },
+                          }}
+                        />
+                      }
+                      label={option.label}
+                    />
+                  ))}
+                </RadioGroup>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </motion.div>
+    </Container>
   );
 };
 
