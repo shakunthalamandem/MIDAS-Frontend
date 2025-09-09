@@ -179,7 +179,7 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mb: 4, mt: 2 }}>
+<Container maxWidth="xl" sx={{ mb: 4, mt: 2, pb: 8 }}>
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <Grid container spacing={2} mt={2} mb={4}>
         {/* --- Card 1 --- */}
@@ -199,8 +199,8 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Typography variant="h6" color="#002060" fontWeight="bold">
-                  IOI as % of Deal Size
+                <Typography variant="h6" color="#002060">
+IOI Values
                 </Typography>
                 <IconButton
                   onClick={() =>
@@ -243,7 +243,7 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Typography variant="h6" color="#002060" fontWeight="bold">
+                <Typography variant="h6" color="#002060" >
                   Potential AM Quantity
                 </Typography>
                 <IconButton
