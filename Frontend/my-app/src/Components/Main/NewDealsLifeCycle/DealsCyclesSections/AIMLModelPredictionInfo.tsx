@@ -122,6 +122,16 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
           </Box>
 
           <Grid container spacing={2} mt={2}>
+
+
+             <Box mt={2}>
+                    <Typography variant="body2" color="text.secondary">
+                      Classifies the expected return into categories:
+                    </Typography>
+                    <Typography variant="body2">📉 <b>Low Return</b>: Return &lt; 3%</Typography>
+                    <Typography variant="body2">⚖️ <b>Neutral Return</b>: Return between 3% to 8%</Typography>
+                    <Typography variant="body2">📈 <b>Positive Return</b>: Return &gt; 8%</Typography>
+                  </Box>
             {/* T1D Prediction */}
             <Grid item xs={12}>
               {renderField('T+1D Close from Issue Price', formData.t1d_pred)}
@@ -160,15 +170,7 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
                     disabled
                   />
 
-                  {/* Explanation */}
-                  <Box mt={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      Classifies the expected return into categories:
-                    </Typography>
-                    <Typography variant="body2">📉 <b>Low Return</b>: Return &lt; 3%</Typography>
-                    <Typography variant="body2">⚖️ <b>Neutral Return</b>: Return between 3% to 8%</Typography>
-                    <Typography variant="body2">📈 <b>Positive Return</b>: Return &gt; 8%</Typography>
-                  </Box>
+                 
                 </CardContent>
               </Card>
             </Grid>
