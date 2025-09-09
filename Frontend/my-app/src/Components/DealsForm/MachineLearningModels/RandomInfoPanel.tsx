@@ -239,7 +239,7 @@ const renderPredictionChip = (prediction: string) => {
                               ? "blue"
                               : form.deal_stats === "Issued"
                                 ? "green"
-                                : form.deal_stats === "Priced"
+                                : form.deal_stats === "Price Range"
                                   ? "orange"
                                   : "grey",
                         }}

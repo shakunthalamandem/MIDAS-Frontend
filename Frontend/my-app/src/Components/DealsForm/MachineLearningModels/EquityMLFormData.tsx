@@ -71,7 +71,7 @@ const inputFields: {
   { label: "Allocation as % of Deal Size", name: "allocation_deal_size_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 0.5" },
   { label: "Allocation as % of IOI", name: "allocation_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 30" },
   { label: "Target Variable", name: "target_variable", disabled: true },
-  { label: "Deal Stats", name: "deal_stats", selectOptions: ['Announced', 'Priced', 'Issued'] },
+  { label: "Deal Status", name: "deal_stats", selectOptions: ['Announced', 'Price Range', 'Issued'] },
 ];
 
 const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({

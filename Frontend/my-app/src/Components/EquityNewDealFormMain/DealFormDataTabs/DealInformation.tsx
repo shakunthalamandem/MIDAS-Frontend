@@ -90,7 +90,7 @@ const DealInformation: React.FC<FormSectionProps> = ({
   }, []);
 
   const sponsors = ["Y", "N"];
-  const deal_stats = ["Announced", "Priced", "Issued"];
+  const deal_stats = ["Announced", "Price Range", "Issued"];
 
   const renderSelectField = (
     label: string,

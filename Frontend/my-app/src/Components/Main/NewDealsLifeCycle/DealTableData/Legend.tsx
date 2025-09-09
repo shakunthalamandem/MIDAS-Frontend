@@ -13,7 +13,7 @@ const Legend = () => {
     >
       {[
         { color: "#002060", label: "A - Announced" },
-        { color: "orange", label: "P - Priced" },
+        { color: "orange", label: "P - Price Range" },
         { color: "green", label: "I - Issued" },
       ].map(({ color, label }) => (
         <Box
