@@ -143,7 +143,7 @@ const renderField = (label: string, value: string | number | null | undefined) =
                     fontWeight="bold"
                     gutterBottom
                   >
-                   Confidence
+                   AI / ML Model Prediction Rating
                   </Typography>
                    <BlueSlider
                 value={formData.confidence || 0}
