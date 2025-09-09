@@ -88,7 +88,6 @@ export const useDealWriteUpInfo = ({
           deal_type: data.deal_type,
         };
 
-        console.log("🔹 Sending unified_deal_ratings payload:", payload);
 
         const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
           method: "POST",

@@ -66,6 +66,7 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
 
       if (response.ok) {
         const result = await response.json();
+
         setFormData((prev) => ({
           ...prev,
           ...result.data,
@@ -77,7 +78,6 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
       console.error("Error fetching deal info:", error);
     }
   };
-  console.log("DealIoiValuesTable data:", data);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
