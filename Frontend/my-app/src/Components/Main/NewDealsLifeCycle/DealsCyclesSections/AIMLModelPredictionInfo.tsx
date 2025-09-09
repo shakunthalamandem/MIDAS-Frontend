@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   Typography,
-  TextField,
   Box,
   Grid,
 } from '@mui/material';
@@ -15,8 +14,9 @@ interface AIMLModelPredictionData {
   ticker?: string;
   pricing_date?: string;
   deal_type?: string;
-  t1d_pred?: number | null;      // Prediction score
-  confidence?: number | null;    // Confidence (0–100)
+  t1d_pred?: number | null;        // Prediction score
+  confidence?: number | null;      // Confidence (0–100)
+  ml_pred_rating?: number | null;  // New rating field
 }
 
 interface AIMLModelPredictionInfoProps {
@@ -34,6 +34,7 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
     return {
       t1d_pred: apiData.t1d_pred,
       confidence: apiData.confidence,
+      ml_pred_rating: apiData.ml_pred_rating, // ✅ new field
     };
   };
 
@@ -79,29 +80,29 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
     }
   }, [data]);
 
-const renderField = (label: string, value: string | number | null | undefined) => {
-  const isValueAvailable = value !== null && value !== undefined && value !== "";
-  const displayValue = isValueAvailable ? value : "Not Available";
+  // 🔹 Reusable field renderer
+  const renderField = (label: string, value: string | number | null | undefined) => {
+    const isValueAvailable = value !== null && value !== undefined && value !== "";
+    const displayValue = isValueAvailable ? value : "Not Available";
 
-  return (
-    <>
-      <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
-        {label}
-      </Typography>
-      <Typography
-        variant="body1"
-        sx={{
-          color: isValueAvailable ? "#b1062e" : "#999",
-          fontStyle: isValueAvailable ? "normal" : "italic",
-          py: 0.5,
-        }}
-      >
-        {displayValue}
-      </Typography>
-    </>
-  );
-};
-
+    return (
+      <>
+        <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
+          {label}
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            color: isValueAvailable ? "#b1062e" : "#999",
+            fontStyle: isValueAvailable ? "normal" : "italic",
+            py: 0.5,
+          }}
+        >
+          {displayValue}
+        </Typography>
+      </>
+    );
+  };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -121,13 +122,17 @@ const renderField = (label: string, value: string | number | null | undefined) =
           </Box>
 
           <Grid container spacing={2} mt={2}>
+            {/* T1D Prediction */}
             <Grid item xs={12}>
-              {renderField('T1D Prediction', formData.t1d_pred)}
+              {renderField('T+1D Close from Issue Price', formData.t1d_pred)}
             </Grid>
-          </Grid>
 
+            {/* Confidence */}
+            <Grid item xs={12}>
+              {renderField('Confidence', formData.confidence)}
+            </Grid>
 
-
+            {/* ML Pred Rating */}
             <Grid item xs={12}>
               <Card
                 sx={{
@@ -143,19 +148,31 @@ const renderField = (label: string, value: string | number | null | undefined) =
                     fontWeight="bold"
                     gutterBottom
                   >
-                   AI / ML Model Prediction Rating
+                    AI / ML Model Prediction Rating
                   </Typography>
-                   <BlueSlider
-                value={formData.confidence || 0}
-                valueLabelDisplay="on"
-                step={1}
-                min={0}
-                max={100}
-                disabled
-              />
+
+                  <BlueSlider
+                    value={formData.ml_pred_rating || 0}
+                    valueLabelDisplay="on"
+                    step={1}
+                    min={0}
+                    max={100}
+                    disabled
+                  />
+
+                  {/* Explanation */}
+                  <Box mt={2}>
+                    <Typography variant="body2" color="text.secondary">
+                      Classifies the expected return into categories:
+                    </Typography>
+                    <Typography variant="body2">📉 <b>Low Return</b>: Return &lt; 3%</Typography>
+                    <Typography variant="body2">⚖️ <b>Neutral Return</b>: Return between 3% to 8%</Typography>
+                    <Typography variant="body2">📈 <b>Positive Return</b>: Return &gt; 8%</Typography>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
+          </Grid>
         </CardContent>
       </Card>
     </motion.div>
