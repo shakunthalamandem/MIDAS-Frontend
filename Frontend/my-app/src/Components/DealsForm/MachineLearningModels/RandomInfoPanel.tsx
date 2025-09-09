@@ -16,7 +16,7 @@ import { green, red, grey } from "@mui/material/colors";
 import SearchIcon from "@mui/icons-material/Search";
 
 interface FormData {
-  deal_stats: string;
+  deal_status: string;
   ticker: string;
   pricing_date: string;
   deal_type: string;
@@ -338,11 +338,11 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
       <Grid container spacing={2}>
         {filteredForms.map((form, i) => {
           const dealStatColor =
-            form.deal_stats === "Announced"
+            form.deal_status === "Announced"
               ? "blue"
-              : form.deal_stats === "Issued"
+              : form.deal_status === "Issued"
               ? "green"
-              : form.deal_stats === "Price Range"
+              : form.deal_status === "Price Range"
               ? "orange"
               : "grey";
 
@@ -367,7 +367,7 @@ const RandomInfoPanel: React.FC<RandomInfoPanelProps> = ({ onSelect }) => {
                     <Typography variant="body1" fontWeight={700} color="#002060">
                       {form.ticker}{" "}
                       <Box component="span" sx={{ fontWeight: 600, ml: 1, color: dealStatColor }}>
-                        {form.deal_stats || "N/A"}
+                        {form.deal_status || "N/A"}
                       </Box>
                     </Typography>
                     {renderPredictionChip(form.t1d_pred)}

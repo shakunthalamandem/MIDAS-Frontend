@@ -37,7 +37,7 @@ interface EquityMLFormDataProps {
     gdp: string[];
     inflation: string[];
     treasury_rates: string[];
-    deal_stats: string[];
+    deal_status: string[];
   };
   sectorLabels: Record<string, string>;
   inputWidth: number | string;
@@ -71,7 +71,7 @@ const inputFields: {
   { label: "Allocation as % of Deal Size", name: "allocation_deal_size_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 0.5" },
   { label: "Allocation as % of IOI", name: "allocation_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 30" },
   { label: "Target Variable", name: "target_variable", disabled: true },
-  { label: "Deal Status", name: "deal_stats", selectOptions: ['Announced', 'Price Range', 'Issued'] },
+  { label: "Deal Status", name: "deal_status", selectOptions: ['Announced', 'Price Range', 'Issued'] },
 ];
 
 const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
@@ -134,7 +134,7 @@ const EquityMLFormData: React.FC<EquityMLFormDataProps> = ({
             : name === "Treasury"
             ? options.treasury_rates
             : name === "Deal Stats"
-            ? options.deal_stats
+            ? options.deal_status
             : selectOptions;
 
         const finalLabelMap =

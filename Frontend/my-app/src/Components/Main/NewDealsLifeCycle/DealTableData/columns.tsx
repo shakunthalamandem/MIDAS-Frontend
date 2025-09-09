@@ -134,7 +134,7 @@ export const getColumns = (
         ),
     },
     {
-      field: "deal_stats",
+      field: "deal_status",
       headerName: "Deal Status",
       renderHeader: () => formatHeader("Deal Status"),
       flex: 1,

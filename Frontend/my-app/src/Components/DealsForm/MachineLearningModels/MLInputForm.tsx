@@ -45,7 +45,7 @@ type OptionsResponse = {
   inflation: string[];
   treasury_rates: string[];
   target: string[];
-  deal_stats: string[];
+  deal_status: string[];
 };
 
 type FormData = {
@@ -62,7 +62,7 @@ type FormData = {
   selected_bank_category: string;
   sponsor_yn_category: string;
   sector_category: string;
-  deal_stats: string;
+  deal_status: string;
   GDP: string;
   Inflation: string;
   Treasury: string;
@@ -100,7 +100,7 @@ const MLInputForm: React.FC<MLInputFormProps> = ({
     GDP: "Stable",
     Inflation: "Stable",
     Treasury: "Stable",
-    deal_stats: "Announced",
+    deal_status: "Announced",
   };
 
   const [formData, setFormData] = useState<FormData>(defaultFormData);

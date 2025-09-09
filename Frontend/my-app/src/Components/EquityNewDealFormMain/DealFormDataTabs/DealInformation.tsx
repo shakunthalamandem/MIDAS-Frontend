@@ -90,7 +90,7 @@ const DealInformation: React.FC<FormSectionProps> = ({
   }, []);
 
   const sponsors = ["Y", "N"];
-  const deal_stats = ["Announced", "Price Range", "Issued"];
+  const deal_status = ["Announced", "Price Range", "Issued"];
 
   const renderSelectField = (
     label: string,
@@ -247,7 +247,7 @@ const DealInformation: React.FC<FormSectionProps> = ({
 
         {/* Hardcoded fields */}
         {renderSelectField("Sponsor", "sponsor", sponsors)}
-        {renderSelectField("Deal Status", "deal_stats", deal_stats)}
+        {renderSelectField("Deal Status", "deal_status", deal_status)}
       </Grid>
     </>
   );

@@ -22,7 +22,7 @@ type OptionsResponse = {
   inflation: string[];
   treasury_rates: string[];
   target: string[];
-  deal_stats: string[];
+  deal_status: string[];
 };
 
 const MlEquityMain: React.FC = () => {
@@ -105,7 +105,7 @@ const MlEquityMain: React.FC = () => {
           GDP: rawData.gdp_growth ?? rawData.gdp ?? "",
           Inflation: rawData.inflation_rate ?? rawData.inflation ?? "",
           Treasury: rawData.treasury_rates ?? "",
-          deal_stats: rawData.deal_stats ?? "",
+          deal_status: rawData.deal_status ?? "",
           expectations: ["T1D"]
         };
 
