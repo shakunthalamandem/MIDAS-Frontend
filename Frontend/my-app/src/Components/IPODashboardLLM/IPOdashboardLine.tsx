@@ -195,13 +195,12 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
       );
 
       setIpoData(refreshed.data);
-
-      setEditMode(false);
       setEditedData({});
     } catch (error: any) {
       console.error("Save Error:", error.response?.data || error.message || error);
     } finally {
       setLoading(false);
+      setEditMode(false);
     }
   };
 
