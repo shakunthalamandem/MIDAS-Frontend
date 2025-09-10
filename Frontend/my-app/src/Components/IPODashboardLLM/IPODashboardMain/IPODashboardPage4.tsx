@@ -77,38 +77,7 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
     fetchDealData();
   }, [selectedTicker]);
 
-  // ✅ Save Monashee Score (POST)
-  // const handleSaveMonasheeScore = async () => {
-  //   if (!apiUrl || !dealData) return;
-  //   try {
-  //     setSaving(true);
-
-  //     const response = await fetch(`${apiUrl}/api/ipo_deal_data_fairvalues/`, {
-  //       method: "PATCH", // 👈 POST for update
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: token ? `Bearer ${token}` : "",
-  //       },
-  //       body: JSON.stringify({
-  //         ticker: selectedTicker,
-  //         monashee_score: tempScore,
-  //       }),
-  //     });
-
-  //     if (!response.ok) throw new Error("Failed to save Monashee Score");
-
-  //     const updated = await response.json();
-
-  //     // ✅ Update local state with API response
-  //     setDealData(updated);
-  //     setEditMode(false);
-  //     setError(null);
-  //   } catch (err: any) {
-  //     setError(err.message || "Unknown error");
-  //   } finally {
-  //     setSaving(false);
-  //   }
-  // };
+  
   const handleSaveMonasheeScore = async () => {
     if (!apiUrl || !dealData) return;
     try {
@@ -156,143 +125,155 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
           </Grid>
 
           {/* Monashee Score */}
-          <Grid item xs={12}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              style={{ flex: 1 }}
+     <Grid item xs={12}>
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.5 }}
+    style={{ flex: 1 }}
+  >
+    <Card
+      variant="outlined"
+      sx={{
+        boxShadow: 2,
+        borderRadius: 2,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* --- Custom Header --- */}
+      <Box
+        sx={{
+          position: "relative",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          py: 1,
+          // borderBottom: "1px solid #e0e0e0",
+        }}
+      >
+        <Box display="flex" alignItems="center">
+          <FaChartLine
+            size={24}
+            color="#002060"
+            style={{ marginRight: 8 }}
+          />
+          <Typography
+            variant="h6"
+            sx={{ color: "#002060", fontWeight: "bold" }}
+            align="center"
+          >
+            Monashee Proprietary Grade
+          </Typography>
+        </Box>
+
+        {/* Edit Button absolutely positioned */}
+        <IconButton
+          onClick={() => {
+            if (dealData) {
+              setTempScore(dealData.monashee_score); // prefill
+              setEditMode(true);
+            }
+          }}
+          sx={{ position: "absolute", right: 8 }}
+        >
+          <Edit />
+        </IconButton>
+      </Box>
+
+      <CardContent sx={{ backgroundColor: "#fff", flexGrow: 1 }}>
+        {loading ? (
+          <Box display="flex" justifyContent="center" my={3}>
+            <CircularProgress />
+          </Box>
+        ) : !dealData ? (
+          <Typography color="error">No deal data found</Typography>
+        ) : (
+          <>
+            <Box display="flex" justifyContent="center" mb={2}>
+              <Typography>
+                Recent IPO Performances related to this Sector.
+              </Typography>
+            </Box>
+
+            {/* Progress / Chart */}
+            <IPOMonasheeScore
+              ticker={selectedTicker ?? ""}
+              monasheeScore={dealData.monashee_score}
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: 100,
+                textAlign: "center",
+              }}
             >
-              <Card
-                variant="outlined"
-                sx={{
-                  boxShadow: 2,
-                  borderRadius: 2,
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <CardHeader
-                  title={
-                    <Box display="flex" alignItems="center">
-                      <FaChartLine
-                        size={24}
-                        color="#002060"
-                        style={{ marginRight: 8 }}
-                      />
-                      <Typography
-                        variant="h6"
-                        sx={{ color: "#002060", fontWeight: "bold" }}
-                      >
-                        Monashee Proprietary Grade
-                      </Typography>
-                    </Box>
-                  }
-                  action={
-                    <IconButton
-                      onClick={() => {
-                        if (dealData) {
-                          setTempScore(dealData.monashee_score); // ✅ prefill from DB
-                          setEditMode(true);
-                        }
-                      }}
+              {editMode ? (
+                <Stack spacing={1} alignItems="center">
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ color: "#555" }}
+                  >
+                    Enter Monashee Grade (0–10)
+                  </Typography>
+                  <TextField
+                    type="number"
+                    size="small"
+                    inputProps={{ min: 0, max: 10, step: 0.25 }}
+                    placeholder="0–10"
+                    value={tempScore}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setTempScore(val === "" ? "" : Number(val));
+                    }}
+                    sx={{
+                      width: 150,
+                      "& input": { textAlign: "center" },
+                    }}
+                  />
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={handleSaveMonasheeScore}
+                      disabled={saving}
                     >
-                      <Edit />
-                    </IconButton>
-                  }
-                />
-                <CardContent sx={{ backgroundColor: "#fff", flexGrow: 1 }}>
-                  {loading ? (
-                    <Box display="flex" justifyContent="center" my={3}>
-                      <CircularProgress />
-                    </Box>
-                  ) : !dealData ? (
-                    <Typography color="error">No deal data found</Typography>
-                  ) : (
-                    <>
-                      <Box display="flex" justifyContent="center" mb={2}>
-                        <Typography>
-                          Recent IPO Performances related to this Sector.
-                        </Typography>
-                      </Box>
-
-                      {/* Progress / Chart */}
-                      <IPOMonasheeScore
-                        ticker={selectedTicker ?? ""}
-                        monasheeScore={dealData.monashee_score}
-                      />
-
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          minHeight: 100,
-                          textAlign: "center",
-                        }}
-                      >
-                        {editMode ? (
-                          <Stack spacing={1} alignItems="center">
-                            <Typography
-                              variant="subtitle2"
-                              sx={{ color: "#555" }}
-                            >
-                              Enter Monashee Grade (0–10)
-                            </Typography>
-                            <TextField
-                              type="number"
-                              size="small"
-                              inputProps={{ min: 0, max: 10, step: 0.25 }}
-                              placeholder="0–10"
-                              value={tempScore}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                setTempScore(val === "" ? "" : Number(val));
-                              }}
-                              sx={{
-                                width: 150,
-                                "& input": { textAlign: "center" },
-                              }}
-                            />
-                            <Stack direction="row" spacing={1}>
-                              <Button
-                                variant="contained"
-                                size="small"
-                                onClick={handleSaveMonasheeScore}
-                                disabled={saving}
-                              >
-                                {saving ? "Saving..." : "Save"}
-                              </Button>
-                              <Button
-                                variant="text"
-                                size="small"
-                                onClick={() => setEditMode(false)}
-                              >
-                                Cancel
-                              </Button>
-                            </Stack>
-                            {error && (
-                              <Typography color="error" variant="caption">
-                                {error}
-                              </Typography>
-                            )}
-                          </Stack>
-                        ) : (
-                          <Typography
-                            variant="h5"
-                            sx={{ color: "#086000ff", fontWeight: 600 }}
-                          >
-                            Monashee Grade is {dealData.monashee_score} / 10
-                          </Typography>
-                        )}
-                      </Box>
-                    </>
+                      {saving ? "Saving..." : "Save"}
+                    </Button>
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => setEditMode(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </Stack>
+                  {error && (
+                    <Typography color="error" variant="caption">
+                      {error}
+                    </Typography>
                   )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          </Grid>
+                </Stack>
+              ) : (
+                <Typography
+                  variant="h5"
+                  sx={{ color: "#086000ff", fontWeight: 600 }}
+                >
+                  Monashee Grade is {dealData.monashee_score} / 10
+                </Typography>
+              )}
+            </Box>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  </motion.div>
+</Grid>
+
         </Grid>
       </Container>
     </div>
