@@ -1,16 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
-  Grid,
   Typography,
   Box,
   Container,
+  IconButton,
+  TextField,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
+import axios from "axios";
 
 interface IPOdashboardLineProps {
   ipodata: Record<string, any>;
+  selectedTicker: string;
+  setIpoData: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const timelineFields = [
@@ -20,13 +27,58 @@ const timelineFields = [
   { label: "Trade Date", key: "trade_date" },
 ];
 
-const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
+const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
+  ipodata,
+  selectedTicker,
+  setIpoData,
+}) => {
+  const [editMode, setEditMode] = useState(false);
+  const [editedData, setEditedData] = useState<Record<string, any>>({});
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
+  const getAuthHeaders = () => ({
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  });
+
+  const handleSave = async () => {
+    try {
+      if (!apiUrl) throw new Error("API URL not defined");
+
+      const payload = {
+        ticker_name: selectedTicker,
+        ...editedData,
+      };
+
+      await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
+        headers: getAuthHeaders(),
+      });
+
+      setIpoData((prev: any) => ({
+        ...prev,
+        ...editedData,
+      }));
+
+      setEditMode(false);
+      setEditedData({});
+    } catch (error: any) {
+      console.error("Save Error:", error.response?.data || error.message || error);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditedData({});
+    setEditMode(false);
+  };
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
       <Card
         sx={{
           borderRadius: 4,
-          background: "linear-gradient(#f0f5ff)", 
+          background: "linear-gradient(#f0f5ff)",
           boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
           overflowX: "auto",
           p: 2,
@@ -43,7 +95,10 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
             }}
           >
             {timelineFields.map((item, index) => {
-              const value = ipodata[item.key];
+              const value = editMode
+                ? editedData[item.key] ?? ipodata[item.key] ?? ""
+                : ipodata[item.key] ?? "N/A";
+
               return (
                 <Box
                   key={item.key}
@@ -53,7 +108,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
                     position: "relative",
                   }}
                 >
-                  {/* Top label */}
+                  {/* Label */}
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -82,26 +137,42 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
                     }}
                   />
 
-                  {/* Date below */}
+                  {/* Value or Input */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.2 }}
                   >
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        mt: 1,
-                        display: "block",
-                        fontWeight: 500,
-                        color: "#333",
-                      }}
-                    >
-                      {value || "N/A"}
-                    </Typography>
+                    {editMode ? (
+                      <TextField
+                        type="date"
+                        size="small"
+                        fullWidth
+                        value={value ? value.slice(0, 10) : ""}
+                        onChange={(e) =>
+                          setEditedData((prev) => ({
+                            ...prev,
+                            [item.key]: e.target.value,
+                          }))
+                        }
+                        sx={{ mt: 1 }}
+                      />
+                    ) : (
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          mt: 1,
+                          display: "block",
+                          fontWeight: 500,
+                          color: "#333",
+                        }}
+                      >
+                        {value}
+                      </Typography>
+                    )}
                   </motion.div>
 
-                  {/* Connecting line */}
+                  {/* Connecting Line */}
                   {index < timelineFields.length - 1 && (
                     <Box
                       sx={{
@@ -118,6 +189,24 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({ ipodata }) => {
                 </Box>
               );
             })}
+
+            {/* Action Buttons */}
+            <Box position="absolute" top={0} right={0}>
+              {editMode ? (
+                <>
+                  <IconButton color="primary" onClick={handleSave}>
+                    <SaveIcon />
+                  </IconButton>
+                  <IconButton color="secondary" onClick={handleCancel}>
+                    <CancelIcon />
+                  </IconButton>
+                </>
+              ) : (
+                <IconButton onClick={() => setEditMode(true)}>
+                  <EditIcon />
+                </IconButton>
+              )}
+            </Box>
           </Box>
         </CardContent>
       </Card>
