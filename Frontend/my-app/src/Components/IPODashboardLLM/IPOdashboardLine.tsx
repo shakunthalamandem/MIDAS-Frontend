@@ -188,9 +188,19 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
         headers: getAuthHeaders(),
       });
 
+      // Exit edit mode and optimistically update UI with new dates
+      setEditMode(false);
+      setIpoData((prev: any) => {
+        const updates: Record<string, any> = {};
+        timelineFields.forEach(({ key }) => {
+          if (editedData[key] !== undefined) updates[key] = editedData[key];
+        });
+        return { ...(prev || {}), ...updates };
+      });
+
       // 🔄 Re-fetch latest IPO data from API
       const refreshed = await axios.get(
-        `${apiUrl}/api/writeup_data/${selectedTicker}/`,
+        `${apiUrl}/api/writeup_data/${selectedTicker}/?t=${Date.now()}`,
         { headers: getAuthHeaders() }
       );
 
@@ -324,7 +334,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
                           color: "#333",
                         }}
                       >
-                        {ipodata[item.key] ?? "N/A"}
+                        {editedData[item.key] ?? ipodata[item.key] ?? "N/A"}
                       </Typography>
                     )}
                   </motion.div>
