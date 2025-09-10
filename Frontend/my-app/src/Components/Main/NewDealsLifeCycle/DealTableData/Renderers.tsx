@@ -104,6 +104,8 @@ export const renderDealStatsCell = (params: GridRenderCellParams<any>) => {
 
 
 
+
+
 export const renderCheckCell = (params: GridRenderCellParams<any>) => {
   const val = params.value?.toString().toLowerCase();
 
@@ -117,9 +119,26 @@ export const renderCheckCell = (params: GridRenderCellParams<any>) => {
     } else if (val.includes("negative") || val.includes("low return")) {
       hasPrediction = true;
       valueIcon = <RemoveCircleRoundedIcon style={{ color: "red", fontSize: 18 }} />;
-    } else if (val.includes("neutral") || val.includes("netural")) {
+    } else if (val.includes("neutral") || val.includes("netural return")) {
       hasPrediction = true;
-      valueIcon = <PauseCircleFilledRoundedIcon style={{ color: "orange", fontSize: 18 }} />;
+      valueIcon = (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "18px",
+            height: "18px",
+            borderRadius: "50%",
+            backgroundColor: "orange",
+            color: "white",
+            fontSize: "11px",
+            fontWeight: "bold",
+          }}
+        >
+          N
+        </span>
+      );
     }
   }
 
@@ -130,6 +149,8 @@ export const renderCheckCell = (params: GridRenderCellParams<any>) => {
         alignItems: "center",
         justifyContent: "center",
         gap: "4px",
+        fontWeight: "bold",
+        fontSize: "14px",
       }}
     >
       {hasPrediction ? (
@@ -137,7 +158,7 @@ export const renderCheckCell = (params: GridRenderCellParams<any>) => {
       ) : (
         <span style={{ color: "red" }}>✘</span>
       )}
-            {valueIcon && valueIcon}
+            {valueIcon}
 
     </span>
   );
