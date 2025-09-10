@@ -7,6 +7,7 @@ import {
   Container,
   IconButton,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import EditIcon from "@mui/icons-material/Edit";
@@ -34,6 +35,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
 }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedData, setEditedData] = useState<Record<string, any>>({});
+  const [loading, setLoading] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -47,6 +49,8 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
     try {
       if (!apiUrl) throw new Error("API URL not defined");
 
+      setLoading(true);
+
       const payload = {
         ticker_name: selectedTicker,
         ...editedData,
@@ -56,6 +60,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
         headers: getAuthHeaders(),
       });
 
+      // Update local state
       setIpoData((prev: any) => ({
         ...prev,
         ...editedData,
@@ -65,6 +70,8 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
       setEditedData({});
     } catch (error: any) {
       console.error("Save Error:", error.response?.data || error.message || error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -147,7 +154,6 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
                       <TextField
                         type="date"
                         size="small"
-                        fullWidth
                         value={value ? value.slice(0, 10) : ""}
                         onChange={(e) =>
                           setEditedData((prev) => ({
@@ -155,7 +161,11 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
                             [item.key]: e.target.value,
                           }))
                         }
-                        sx={{ mt: 1 }}
+                        sx={{
+                          mt: 1,
+                          p: 2,
+                          width: 150,
+                        }}
                       />
                     ) : (
                       <Typography
@@ -194,10 +204,18 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
             <Box position="absolute" top={0} right={0}>
               {editMode ? (
                 <>
-                  <IconButton color="primary" onClick={handleSave}>
-                    <SaveIcon />
+                  <IconButton
+                    color="primary"
+                    onClick={handleSave}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      <SaveIcon />
+                    )}
                   </IconButton>
-                  <IconButton color="secondary" onClick={handleCancel}>
+                  <IconButton color="secondary" onClick={handleCancel} disabled={loading}>
                     <CancelIcon />
                   </IconButton>
                 </>
