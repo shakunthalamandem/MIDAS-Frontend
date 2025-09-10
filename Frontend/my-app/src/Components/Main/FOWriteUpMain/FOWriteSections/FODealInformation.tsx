@@ -31,17 +31,35 @@ const infoFields: { label: string; key: string }[] = [
 
 const formatValue = (key: string, value: any) => {
   if (!value) return "N/A";
+
   if (["deal_size", "shares_offered", "issue_price"].includes(key)) {
     return Number(value).toLocaleString();
   }
+
   if (["number_of_shares_outstanding", "greenshoe"].includes(key)) {
     return Number(value).toLocaleString();
   }
+
   if (key === "bookrunners") {
-    return Array.isArray(value) ? value.join(", ") : value;
+    if (Array.isArray(value)) {
+      try {
+        if (value.length === 1 && typeof value[0] === "string" && value[0].includes("'")) {
+          const parsed = JSON.parse(
+            value[0].replace(/'/g, '"') 
+          );
+          return parsed.join(", ");
+        }
+        return value.join(", ");
+      } catch {
+        return value.join(", ");
+      }
+    }
+    return value;
   }
+
   return value;
 };
+
 
 const FODealInformation: React.FC<FODealInformationProps> = ({ data, ticker }) => {
   const [editMode, setEditMode] = useState(false);
