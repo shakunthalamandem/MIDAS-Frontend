@@ -130,7 +130,12 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
       </Box>
 
       {/* Child Components */}
-      <IPOdashboardLine ipodata={ipoData} />
+<IPOdashboardLine
+  ipodata={ipoData}
+  selectedTicker={selectedTicker || ""}
+  setIpoData={ipoData} // ✅ Correct function to update IPO data
+/>
+
       <IPOSummaryTable
         ipodata={ipoData}
         selectedTicker={selectedTicker || ""}
