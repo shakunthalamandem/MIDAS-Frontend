@@ -23,8 +23,8 @@ interface DealIoiValuesTableData {
   ticker: string;
   pricing_date: string;
   deal_type: string;
-  ioi_as_percentage_of_deal_size_status?: number | string;
-  potential_am_quantity?: number | string;
+  ioi_as_percentage_of_deal_size_status?: number ;
+  potential_am_quantity?: number ;
   [key: string]: any;
 }
 
@@ -127,57 +127,65 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
       console.error("Error saving data:", error);
     }
   };
+const renderField = (
+  label: string,
+  name: keyof DealIoiValuesTableData,
+  adornment?: string
+) => {
+  const rawValue = formData[name];
+  const isValueAvailable =
+    rawValue !== null && rawValue !== undefined && rawValue !== "";
 
-  const renderField = (
-    label: string,
-    name: keyof DealIoiValuesTableData,
-    adornment?: string
-  ) => {
-    const rawValue = formData[name];
-    const isValueAvailable =
-      rawValue !== null && rawValue !== undefined && rawValue !== "";
-    const displayValue = isValueAvailable ? rawValue : "Not Available";
+  // ✅ Default to 10 for "ioi_as_percentage_of_deal_size_status"
+  const displayValue =
+    isValueAvailable
+      ? rawValue
+      : name === "ioi_as_percentage_of_deal_size_status"
+      ? 10
+      : "Not Available";
 
-    return (
-      <>
+  return (
+    <>
+      <Typography
+        variant="body2"
+        color="#002060"
+        fontWeight={500}
+        gutterBottom
+      >
+        {label}
+      </Typography>
+      {editable ? (
+        <TextField
+          name={String(name)}
+          value={isValueAvailable ? rawValue : name === "ioi_as_percentage_of_deal_size_status" ? 10 : ""}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+          variant="standard"
+          InputProps={{
+            endAdornment: adornment ? (
+              <InputAdornment position="end">{adornment}</InputAdornment>
+            ) : undefined,
+          }}
+        />
+      ) : (
         <Typography
-          variant="body2"
-          color="#002060"
-          fontWeight={500}
-          gutterBottom
+          variant="body1"
+          sx={{
+            color: isValueAvailable ? "#B1062E" : "#999",
+            fontWeight: 500,
+            py: 0.5,
+          }}
         >
-          {label}
+          {displayValue}
+          {((isValueAvailable || name === "ioi_as_percentage_of_deal_size_status") && adornment)
+            ? ` ${adornment}`
+            : ""}
         </Typography>
-        {editable ? (
-          <TextField
-            name={String(name)}
-            value={isValueAvailable ? rawValue : ""}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            variant="standard"
-            InputProps={{
-              endAdornment: adornment ? (
-                <InputAdornment position="end">{adornment}</InputAdornment>
-              ) : undefined,
-            }}
-          />
-        ) : (
-          <Typography
-            variant="body1"
-            sx={{
-              color: isValueAvailable ? "#B1062E" : "#999",
-              fontWeight: 500,
-              py: 0.5,
-            }}
-          >
-            {displayValue}
-            {isValueAvailable && adornment ? ` ${adornment}` : ""}
-          </Typography>
-        )}
-      </>
-    );
-  };
+      )}
+    </>
+  );
+};
 
   return (
 <Container maxWidth="xl" sx={{ mb: 4, mt: 2, pb: 8 }}>
@@ -201,7 +209,7 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
                 alignItems="center"
               >
                 <Typography variant="h6" color="#002060">
-IOI Values
+                  IOI Values
                 </Typography>
                 <IconButton
                   onClick={() =>
@@ -264,7 +272,7 @@ IOI Values
                 <RadioGroup
                   row
                   name="potential_am_quantity"
-                  value={formData.potential_am_quantity?.toString() || "0"}
+                  value={formData.potential_am_quantity?.toString() || "1"}
                   onChange={handleChange}
                 >
                   {[
