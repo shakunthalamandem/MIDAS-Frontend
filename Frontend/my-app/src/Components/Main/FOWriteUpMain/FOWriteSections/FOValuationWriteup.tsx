@@ -33,9 +33,10 @@ interface ValuationWriteupProps {
 type SectionKey = keyof ValuationWriteup;
 
 const SECTION_ORDER: { key: SectionKey; title: string }[] = [
-  { key: "future_outlook", title: "Future Outlook" },
   { key: "company_overview", title: "Company Overview" },
   { key: "recent_developments", title: "Recent Developments" },
+    { key: "future_outlook", title: "Future Outlook" },
+
 ];
 
 const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({
