@@ -56,15 +56,18 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
         ...editedData,
       };
 
+      // Save updated data
       await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
         headers: getAuthHeaders(),
       });
 
-      // Update local state
-      setIpoData((prev: any) => ({
-        ...prev,
-        ...editedData,
-      }));
+      // 🔄 Re-fetch latest IPO data from API
+      const refreshed = await axios.get(
+        `${apiUrl}/api/writeup_data/${selectedTicker}/`,
+        { headers: getAuthHeaders() }
+      );
+
+      setIpoData(refreshed.data);
 
       setEditMode(false);
       setEditedData({});
@@ -102,10 +105,6 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
             }}
           >
             {timelineFields.map((item, index) => {
-              const value = editMode
-                ? editedData[item.key] ?? ipodata[item.key] ?? ""
-                : ipodata[item.key] ?? "N/A";
-
               return (
                 <Box
                   key={item.key}
@@ -154,7 +153,13 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
                       <TextField
                         type="date"
                         size="small"
-                        value={value ? value.slice(0, 10) : ""}
+                        value={
+                          editedData[item.key] !== undefined
+                            ? editedData[item.key]
+                            : ipodata[item.key]
+                            ? ipodata[item.key].slice(0, 10)
+                            : ""
+                        }
                         onChange={(e) =>
                           setEditedData((prev) => ({
                             ...prev,
@@ -177,7 +182,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
                           color: "#333",
                         }}
                       >
-                        {value}
+                        {ipodata[item.key] ?? "N/A"}
                       </Typography>
                     )}
                   </motion.div>
@@ -215,7 +220,11 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
                       <SaveIcon />
                     )}
                   </IconButton>
-                  <IconButton color="secondary" onClick={handleCancel} disabled={loading}>
+                  <IconButton
+                    color="secondary"
+                    onClick={handleCancel}
+                    disabled={loading}
+                  >
                     <CancelIcon />
                   </IconButton>
                 </>
