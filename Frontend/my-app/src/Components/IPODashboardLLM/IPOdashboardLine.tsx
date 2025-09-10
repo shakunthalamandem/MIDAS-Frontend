@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -45,6 +45,133 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
     Authorization: token ? `Bearer ${token}` : "",
   });
 
+  // Normalize various date formats to `YYYY-MM-DD` for <input type="date">
+  const normalizeDateForInput = (value: any): string => {
+    if (!value) return "";
+    if (typeof value === "string") {
+      let str = value.trim();
+      // Clean up common noise
+      str = str.replace(/,+/g, " "); // remove commas
+      str = str.replace(/\s+/g, " "); // collapse spaces
+      // ISO or ISO-like: 2025-09-12 or 2025-09-12T00:00:00Z
+      if (/^\d{4}-\d{2}-\d{2}/.test(str)) return str.slice(0, 10);
+      // dd/mm/yyyy or dd-mm-yyyy
+      const dmy = str.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.]([\d]{4})$/);
+      if (dmy) {
+        const d = dmy[1].padStart(2, "0");
+        const m = dmy[2].padStart(2, "0");
+        const y = dmy[3];
+        return `${y}-${m}-${d}`;
+      }
+      // mm/dd/yyyy (US)
+      const mdy = str.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.]([\d]{4})$/);
+      if (mdy) {
+        const m = mdy[1].padStart(2, "0");
+        const d = mdy[2].padStart(2, "0");
+        const y = mdy[3];
+        // This will also match dmy; prefer valid calendar check below
+        const iso = `${y}-${m}-${d}`;
+        const test = new Date(iso);
+        if (!isNaN(test.getTime())) return iso;
+      }
+      // d MMM yyyy or d MMMM yyyy
+      const monthMap: Record<string, string> = {
+        jan: "01",
+        january: "01",
+        feb: "02",
+        february: "02",
+        mar: "03",
+        march: "03",
+        apr: "04",
+        april: "04",
+        may: "05",
+        jun: "06",
+        june: "06",
+        jul: "07",
+        july: "07",
+        aug: "08",
+        august: "08",
+        sep: "09",
+        sept: "09",
+        september: "09",
+        oct: "10",
+        october: "10",
+        nov: "11",
+        november: "11",
+        dec: "12",
+        december: "12",
+      };
+      const dMonY = str.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})$/i);
+      if (dMonY) {
+        const d = dMonY[1].padStart(2, "0");
+        const mon = monthMap[dMonY[2].toLowerCase()];
+        const y = dMonY[3];
+        if (mon) return `${y}-${mon}-${d}`;
+      }
+      // Mon d yyyy
+      const monDY = str.match(/^([A-Za-z]{3,9})\s+(\d{1,2})\s+(\d{4})$/i);
+      if (monDY) {
+        const mon = monthMap[monDY[1].toLowerCase()];
+        const d = monDY[2].padStart(2, "0");
+        const y = monDY[3];
+        if (mon) return `${y}-${mon}-${d}`;
+      }
+      // Remove ordinal suffixes on day numbers (1st, 2nd, 3rd, 4th, ...)
+      str = str.replace(/\b(\d{1,2})(st|nd|rd|th)\b/i, "$1");
+
+      // Try Date parsing as a quick path
+      const dt = new Date(str);
+      if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+
+      // Very forgiving numeric extraction fallback
+      const nums = (str.match(/\d+/g) || []).map((n) => parseInt(n, 10));
+      if (nums.length >= 3) {
+        let y = 0, m = 0, d = 0;
+        // If first token is year
+        if (nums[0] > 31) {
+          y = nums[0];
+          m = nums[1];
+          d = nums[2];
+        } else {
+          // Guess DMY vs MDY by constraints
+          const a = nums[0];
+          const b = nums[1];
+          const c = nums[2];
+          if (a > 12) {
+            // DMY
+            d = a; m = b; y = c;
+          } else if (b > 12) {
+            // MDY
+            m = a; d = b; y = c;
+          } else {
+            // Default to DMY
+            d = a; m = b; y = c;
+          }
+        }
+        // Normalize year if two digits
+        if (y < 100) y = y + 2000;
+        const iso = `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        const valid = new Date(iso);
+        if (!isNaN(valid.getTime())) return iso;
+      }
+      return "";
+    }
+    if (value instanceof Date && !isNaN(value.getTime())) {
+      return value.toISOString().slice(0, 10);
+    }
+    return "";
+  };
+
+  // Prepare initial edited values when entering edit mode
+  const handleEnterEdit = () => {
+    const initial: Record<string, any> = {};
+    timelineFields.forEach(({ key }) => {
+      initial[key] = normalizeDateForInput(ipodata?.[key]);
+    });
+    setEditedData(initial);
+    setEditMode(true);
+  };
+
   const handleSave = async () => {
     try {
       if (!apiUrl) throw new Error("API URL not defined");
@@ -82,6 +209,24 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
     setEditedData({});
     setEditMode(false);
   };
+
+  // On mount or ticker change, fetch the latest data so reload shows current values
+  useEffect(() => {
+    const fetchLatest = async () => {
+      if (!apiUrl || !selectedTicker) return;
+      try {
+        const resp = await axios.get(`${apiUrl}/api/writeup_data/${selectedTicker}/`, {
+          headers: getAuthHeaders(),
+        });
+        setIpoData(resp.data);
+      } catch (err) {
+        // Non-fatal: keep existing data
+        console.error("Fetch latest IPO data failed:", err);
+      }
+    };
+    fetchLatest();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTicker]);
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
@@ -156,9 +301,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
                         value={
                           editedData[item.key] !== undefined
                             ? editedData[item.key]
-                            : ipodata[item.key]
-                            ? ipodata[item.key].slice(0, 10)
-                            : ""
+                            : normalizeDateForInput(ipodata[item.key])
                         }
                         onChange={(e) =>
                           setEditedData((prev) => ({
@@ -229,7 +372,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
                   </IconButton>
                 </>
               ) : (
-                <IconButton onClick={() => setEditMode(true)}>
+                <IconButton onClick={handleEnterEdit}>
                   <EditIcon />
                 </IconButton>
               )}
