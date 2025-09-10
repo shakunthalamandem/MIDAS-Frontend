@@ -248,6 +248,7 @@ const AppRouters: React.FC = () => {
             {/* FO Write Up Routes */}
 
         <Route path="/equity/fo_dashboard" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
+         <Route path="/fo-dashboard/:ticker" element={<FOWriteUpMain />} />
 
 
 
