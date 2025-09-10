@@ -4,14 +4,12 @@ import {
   CardContent,
   Typography,
   Button,
-  CircularProgress,
   Box,
   IconButton,
   Grid,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { useNavigate } from "react-router-dom";
 import { useDealWriteUpInfo } from "./DealWriteUpMain/useDealWriteUpInfo";
 import FieldRenderer from "./DealWriteUpMain/FieldRenderer";
 import BlueSlider from "./BlueSlider";
@@ -35,27 +33,20 @@ interface Props {
 
 const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
   const [formData, setFormData] = useState<DealWriteUpData>(data);
-  const [loadingValuation, setLoadingValuation] = useState(false);
-  const [loadingSummary, setLoadingSummary] = useState(false);
   const [editable, setEditable] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL || "";
   const token = localStorage.getItem("access_token");
-  const navigate = useNavigate();
 
   const { fetchDealWriteUpInfo, saveDealWriteUpInfo } = useDealWriteUpInfo({
     apiUrl,
     token,
     setFormData,
-    setLoadingValuation,
-    setLoadingSummary,
   });
 
   useEffect(() => {
     setFormData(data);
     if (data?.ticker && data?.deal_type) {
-      setLoadingValuation(true);
-      setLoadingSummary(true);
       fetchDealWriteUpInfo(data);
     }
   }, [data, fetchDealWriteUpInfo]);
@@ -98,11 +89,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
       >
         <CardContent>
           {/* Header with Edit/Save */}
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
+          <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h6" color="#002060" fontWeight="bold">
               Deal Write-Up Info
             </Typography>
@@ -142,149 +129,122 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
           </Grid>
 
           {/* Valuation */}
+{/* Valuation */}
+<Grid item xs={12} mt={2}>
+  <Typography
+    variant="subtitle1"
+    color="#002060"
+    fontWeight="bold"
+    gutterBottom
+  >
+    Valuation
+  </Typography>
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "flex-end", // align button with text baseline
+      justifyContent: "space-between",
+      overflow: "hidden",
+    }}
+  >
+    <Typography
+      variant="body2"
+      sx={{
+        color: "#727272ff",
+        display: "-webkit-box",
+        WebkitLineClamp: 3,   // 🔹 Show max 3 lines
+        WebkitBoxOrient: "vertical",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        mr: 1,
+        flex: 1,
+      }}
+    >
+      {!formData.valuation || formData.valuation.length === 0
+        ? "Not Available"
+        : formData.valuation}
+    </Typography>
 
-          <Grid item xs={12}>
-            <Typography
-              variant="subtitle1"
-              color="#002060"
-              fontWeight="bold"
-              gutterBottom
-            >
-              Valuation (Using AI)
-            </Typography>
-            {loadingValuation ? (
-              <Box display="flex" alignItems="center" gap={1}>
-                <CircularProgress size={20} />
-                <Typography variant="body2" color="textSecondary">
-                  Generating data...
-                </Typography>
-              </Box>
-            ) : (
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "#727272ff",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      mr: 1, // small margin so text doesn't touch button
-                      flex: 1, // allow text to take available space
-                    }}
-                  >
-                    {!formData.valuation ||
-                    formData.valuation.length === 0
-                      ? "Not Available"
-                      : formData.valuation}
-                  </Typography>
+    {formData.valuation && formData.valuation.length > 0 && (
+      <Button
+        onClick={handleReadMore}
+        sx={{
+          color: "#002060",
+          fontStyle: "italic",
+          fontSize: "0.8rem",
+          textTransform: "none",
+          minWidth: "auto",
+          p: 0,
+          ml: 1,
+          alignSelf: "flex-end", // 🔹 Stick to last line
+        }}
+      >
+        Read More
+      </Button>
+    )}
+  </Box>
+</Grid>
 
-                  {formData.valuation &&
-                    formData.valuation.length > 0 && (
-                      <Button
-                        onClick={handleReadMore}
-                        sx={{
-                          color: "#002060",
-                          fontStyle: "italic",
-                          fontSize: "0.8rem",
-                          textTransform: "none",
-                          minWidth: "auto",
-                          p: 0,
-                          ml: 1,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Read More
-                      </Button>
-                    )}
-                </Box>
-              </>
-            )}
-          </Grid>
+{/* Differentiated Summary */}
+<Grid item xs={12} mt={2}>
+  <Typography
+    variant="subtitle1"
+    color="#002060"
+    fontWeight="bold"
+    gutterBottom
+  >
+    Differentiated Summary
+  </Typography>
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "flex-end", // align button with last line
+      justifyContent: "space-between",
+      overflow: "hidden",
+    }}
+  >
+    <Typography
+      variant="body2"
+      sx={{
+        color: "#727272ff",
+        display: "-webkit-box",
+        WebkitLineClamp: 3,   // 🔹 Limit to 3 lines
+        WebkitBoxOrient: "vertical",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        mr: 1,
+        flex: 1,
+      }}
+    >
+      {!formData.differentiated_summary ||
+      formData.differentiated_summary.length === 0
+        ? "Not Available"
+        : formData.differentiated_summary}
+    </Typography>
 
-          {/* </Box> */}
+    {formData.differentiated_summary &&
+      formData.differentiated_summary.length > 0 && (
+        <Button
+          onClick={handleReadMore}
+          sx={{
+            color: "#002060",
+            fontStyle: "italic",
+            fontSize: "0.8rem",
+            textTransform: "none",
+            minWidth: "auto",
+            p: 0,
+            ml: 1,
+            alignSelf: "flex-end", // 🔹 Stick to last line
+          }}
+        >
+          Read More
+        </Button>
+      )}
+  </Box>
+</Grid>
 
-          {/* Differentiated Summary */}
 
-          <Grid item xs={12}>
-            <Typography
-              variant="subtitle1"
-              color="#002060"
-              fontWeight="bold"
-              gutterBottom
-            >
-              Differentiated Summary (Using AI )
-            </Typography>
-            {loadingSummary ? (
-              <Box display="flex" alignItems="center" gap={1}>
-                <CircularProgress size={20} />
-                <Typography variant="body2" color="textSecondary">
-                  Generating data...
-                </Typography>
-              </Box>
-            ) : (
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "#727272ff",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      mr: 1, // small margin so text doesn't touch button
-                      flex: 1, // allow text to take available space
-                    }}
-                  >
-                    {!formData.differentiated_summary ||
-                    formData.differentiated_summary.length === 0
-                      ? "Not Available"
-                      : formData.differentiated_summary}
-                  </Typography>
-
-                  {formData.differentiated_summary &&
-                    formData.differentiated_summary.length > 0 && (
-                      <Button
-                        onClick={handleReadMore}
-                        sx={{
-                          color: "#002060",
-                          fontStyle: "italic",
-                          fontSize: "0.8rem",
-                          textTransform: "none",
-                          minWidth: "auto",
-                          p: 0,
-                          ml: 1,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Read More
-                      </Button>
-                    )}
-                </Box>
-              </>
-            )}
-          </Grid>
-
-          {/* </Box> */}
-
+          {/* Deal Write-Up Rating */}
           <Grid item xs={12}>
             <Card
               sx={{
@@ -301,7 +261,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
                   fontWeight="bold"
                   gutterBottom
                 >
-                  Deal Write-Up Rating{" "}
+                  Deal Write-Up Rating
                 </Typography>
                 <BlueSlider
                   value={formData.deal_writeup_rating || 0}
