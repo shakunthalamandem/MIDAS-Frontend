@@ -14,9 +14,10 @@ interface AIMLModelPredictionData {
   ticker?: string;
   pricing_date?: string;
   deal_type?: string;
-  t1d_pred?: number | null;        // Prediction score
+  t1d_pred?: string | null;        // Prediction score
+  t1w_pred?: string | null;       // New field for T+1W prediction
+  t1m_pred?: string | null;       // New field for T+1M prediction
   confidence?: number | null;      // Confidence (0–100)
-  ml_pred_rating?: number | null;  // New rating field
 }
 
 interface AIMLModelPredictionInfoProps {
@@ -34,7 +35,8 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
     return {
       t1d_pred: apiData.t1d_pred,
       confidence: apiData.confidence,
-      ml_pred_rating: apiData.ml_pred_rating, // ✅ new field
+      t1w_pred: apiData.t1w_pred,
+      t1m_pred: apiData.t1m_pred,
     };
   };
 
@@ -136,11 +138,17 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
             <Grid item xs={12}>
               {renderField('T+1D Close from Issue Price', formData.t1d_pred)}
             </Grid>
+                <Grid item xs={12}>
+              {renderField('T+1W from T+1D Close', formData.t1w_pred)}
+            </Grid>
+                <Grid item xs={12}>
+              {renderField('T+1M from T+1D Close', formData.t1m_pred)}
+            </Grid>
 
             {/* Confidence */}
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               {renderField('Confidence', formData.confidence)}
-            </Grid>
+            </Grid> */}
 
             {/* ML Pred Rating */}
             <Grid item xs={12}>
@@ -162,7 +170,7 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
                   </Typography>
 
                   <BlueSlider
-                    value={formData.ml_pred_rating || 0}
+                    value={formData.confidence || 0}
                     valueLabelDisplay="on"
                     step={1}
                     min={0}

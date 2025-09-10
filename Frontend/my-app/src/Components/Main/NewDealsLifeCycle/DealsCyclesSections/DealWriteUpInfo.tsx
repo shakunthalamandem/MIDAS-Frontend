@@ -139,25 +139,19 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
   >
     Valuation
   </Typography>
-  <Box
-    sx={{
-      display: "flex",
-      alignItems: "flex-end", // align button with text baseline
-      justifyContent: "space-between",
-      overflow: "hidden",
-    }}
-  >
+
+  <Box sx={{ position: "relative" }}>
+    {/* Valuation Text */}
     <Typography
       variant="body2"
       sx={{
         color: "#727272ff",
         display: "-webkit-box",
-        WebkitLineClamp: 3,   // 🔹 Show max 3 lines
+        WebkitLineClamp: 3, // 🔹 Show max 3 lines
         WebkitBoxOrient: "vertical",
         overflow: "hidden",
         textOverflow: "ellipsis",
         mr: 1,
-        flex: 1,
       }}
     >
       {!formData.valuation || formData.valuation.length === 0
@@ -165,22 +159,23 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
         : formData.valuation}
     </Typography>
 
+    {/* Read More Button */}
     {formData.valuation && formData.valuation.length > 0 && (
-      <Button
-        onClick={handleReadMore}
-        sx={{
-          color: "#002060",
-          fontStyle: "italic",
-          fontSize: "0.8rem",
-          textTransform: "none",
-          minWidth: "auto",
-          p: 0,
-          ml: 1,
-          alignSelf: "flex-end", // 🔹 Stick to last line
-        }}
-      >
-        Read More
-      </Button>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>
+        <Button
+          onClick={handleReadMore}
+          sx={{
+            color: "#006030ff",
+            fontStyle: "italic",
+            fontSize: "0.8rem",
+            textTransform: "none",
+            minWidth: "auto",
+            p: 0,
+          }}
+        >
+          Read More
+        </Button>
+      </Box>
     )}
   </Box>
 </Grid>
@@ -195,14 +190,9 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
   >
     Differentiated Summary
   </Typography>
-  <Box
-    sx={{
-      display: "flex",
-      alignItems: "flex-end", // align button with last line
-      justifyContent: "space-between",
-      overflow: "hidden",
-    }}
-  >
+
+  <Box sx={{ position: "relative" }}>
+    {/* Summary Text */}
     <Typography
       variant="body2"
       sx={{
@@ -213,7 +203,6 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
         overflow: "hidden",
         textOverflow: "ellipsis",
         mr: 1,
-        flex: 1,
       }}
     >
       {!formData.differentiated_summary ||
@@ -222,26 +211,28 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
         : formData.differentiated_summary}
     </Typography>
 
+    {/* Read More Button */}
     {formData.differentiated_summary &&
       formData.differentiated_summary.length > 0 && (
-        <Button
-          onClick={handleReadMore}
-          sx={{
-            color: "#002060",
-            fontStyle: "italic",
-            fontSize: "0.8rem",
-            textTransform: "none",
-            minWidth: "auto",
-            p: 0,
-            ml: 1,
-            alignSelf: "flex-end", // 🔹 Stick to last line
-          }}
-        >
-          Read More
-        </Button>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>
+          <Button
+            onClick={handleReadMore}
+            sx={{
+              color: "#006030ff",
+              fontStyle: "italic",
+              fontSize: "0.8rem",
+              textTransform: "none",
+              minWidth: "auto",
+              p: 0,
+            }}
+          >
+            Read More
+          </Button>
+        </Box>
       )}
   </Box>
 </Grid>
+
 
 
           {/* Deal Write-Up Rating */}
