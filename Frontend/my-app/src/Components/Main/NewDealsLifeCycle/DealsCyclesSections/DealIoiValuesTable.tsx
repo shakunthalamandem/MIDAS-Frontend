@@ -272,7 +272,7 @@ const renderField = (
                 <RadioGroup
                   row
                   name="potential_am_quantity"
-                  value={formData.potential_am_quantity?.toString() || "2"}
+                  value={formData.potential_am_quantity?.toString() || "1"}
                   onChange={handleChange}
                 >
                   {[
