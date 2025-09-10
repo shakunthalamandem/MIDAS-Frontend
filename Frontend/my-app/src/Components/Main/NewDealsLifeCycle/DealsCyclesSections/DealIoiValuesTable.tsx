@@ -23,8 +23,8 @@ interface DealIoiValuesTableData {
   ticker: string;
   pricing_date: string;
   deal_type: string;
-  ioi_as_percentage_of_deal_size_status?: number | string;
-  potential_am_quantity?: number | string;
+  ioi_as_percentage_of_deal_size_status?: number ;
+  potential_am_quantity?: number ;
   [key: string]: any;
 }
 
