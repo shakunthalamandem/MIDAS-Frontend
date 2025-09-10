@@ -25,13 +25,7 @@ const TickerDashboard: React.FC = () => {
 
   const [options, setOptions] = useState<TickerOption[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // Default selected value (optional)
-  const [selected, setSelected] = useState<TickerOption | null>({
-    ticker: "BLSH",
-    pricing_date: "2025-08-13",
-    deal_type: "IPO",
-  });
+  const [selected, setSelected] = useState<TickerOption | null>(null);
 
   const tickerFromUrl = queryParams.get("ticker");
   const pricingDateFromUrl = queryParams.get("pricing_date");
@@ -39,8 +33,9 @@ const TickerDashboard: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  const handleOpen = async () => {
-    if (options.length === 0) {
+  // 🔹 Fetch tickers immediately on mount
+  useEffect(() => {
+    const fetchTickers = async () => {
       setLoading(true);
       try {
         const res = await axios.get<{ data: TickerOption[] }>(
@@ -50,31 +45,35 @@ const TickerDashboard: React.FC = () => {
           }
         );
 
-        const sorted = res.data.data.sort((a, b) =>
-          dayjs(b.pricing_date).valueOf() - dayjs(a.pricing_date).valueOf()
+        const sorted = res.data.data.sort(
+          (a, b) =>
+            dayjs(b.pricing_date).valueOf() - dayjs(a.pricing_date).valueOf()
         );
 
         setOptions(sorted);
+
+        // ✅ Default select: latest deal if no URL params
+        if (!tickerFromUrl && !pricingDateFromUrl && sorted.length > 0) {
+          setSelected(sorted[0]);
+        }
       } catch (err) {
         console.error("Error fetching tickers:", err);
       } finally {
         setLoading(false);
       }
-    }
-  };
+    };
+
+    fetchTickers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSelect = (_: any, value: TickerOption | null) => {
     setSelected(value);
   };
 
-  // 👇 Ensure we always pass a string
+  // Use URL params first, fallback to selected state
   const ticker = tickerFromUrl || selected?.ticker || "";
-
-  // 👇 If no pricing date is found, set to '""'
-  const pricingDate =
-    pricingDateFromUrl ||
-    selected?.pricing_date ||
-    '""'; // This ensures it is passed as `""`
+  const pricingDate = pricingDateFromUrl || selected?.pricing_date || "";
 
   return (
     <Box sx={{ minHeight: "100vh", background: "#f5f7fa", py: 3 }}>
@@ -99,7 +98,6 @@ const TickerDashboard: React.FC = () => {
             sx={{ width: 350 }}
             options={options}
             loading={loading}
-            onOpen={handleOpen}
             value={selected}
             getOptionLabel={(option) =>
               `${option.ticker} - ${dayjs(option.pricing_date).format(
@@ -133,10 +131,11 @@ const TickerDashboard: React.FC = () => {
         </Card>
 
         <Typography variant="subtitle1" align="left" sx={{ mt: 2, mb: 2 }}>
-          Welcome to the <strong>Ticker Tracking Dashboard</strong>. Use the search bar
-          in the top-right corner to find a specific ticker. Once selected, you’ll see
-          its detailed lifecycle, including pricing information, allocations, predictions,
-          and actual performance, all organized step-by-step for easy tracking.
+          Welcome to the <strong>Ticker Tracking Dashboard</strong>. Use the
+          search bar in the top-right corner to find a specific ticker. Once
+          selected, you’ll see its detailed lifecycle, including pricing
+          information, allocations, predictions, and actual performance, all
+          organized step-by-step for easy tracking.
         </Typography>
 
         {/* Render only if ticker exists */}

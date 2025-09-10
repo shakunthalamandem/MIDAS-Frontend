@@ -1,5 +1,11 @@
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+
+import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
+import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
+import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded"; // for Neutral
 
 // ✅ Format header with line breaks
 export const formatHeader = (label: string) => {
@@ -13,26 +19,9 @@ export const formatHeader = (label: string) => {
   );
 };
 
-// ✅ Simple text ✔ / ✘ for boolean-like values
-export const renderCheckCell = (params: GridRenderCellParams<any>) => {
-  const val = params.value?.toString().toLowerCase();
-  const isValid = val && val !== "no" && val !== "-" && val !== "";
 
-  return (
-    <span
-      style={{
-        color: isValid ? "green" : "red",
-        fontWeight: "bold",
-        fontSize: "12px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {isValid ? "✔" : "✘"}
-    </span>
-  );
-};
+
+
 
 // ✅ Date formatter (shows "To Be Announced" if empty/invalid)
 export const formatDateCell = (params: GridRenderCellParams<any>) => {
@@ -109,5 +98,68 @@ export const renderDealStatsCell = (params: GridRenderCellParams<any>) => {
         {letter}
       </Box>
     </Box>
+  );
+};
+
+
+
+
+
+
+export const renderCheckCell = (params: GridRenderCellParams<any>) => {
+  const val = params.value?.toString().toLowerCase();
+
+  let hasPrediction = false;
+  let valueIcon: JSX.Element | null = null;
+
+  if (val) {
+    if (val.includes("positive")) {
+      hasPrediction = true;
+      valueIcon = <AddCircleRoundedIcon style={{ color: "green", fontSize: 18 }} />;
+    } else if (val.includes("negative") || val.includes("low return")) {
+      hasPrediction = true;
+      valueIcon = <RemoveCircleRoundedIcon style={{ color: "red", fontSize: 18 }} />;
+    } else if (val.includes("neutral") || val.includes("netural return")) {
+      hasPrediction = true;
+      valueIcon = (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "18px",
+            height: "18px",
+            borderRadius: "50%",
+            backgroundColor: "orange",
+            color: "white",
+            fontSize: "11px",
+            fontWeight: "bold",
+          }}
+        >
+          N
+        </span>
+      );
+    }
+  }
+
+  return (
+    <span
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "4px",
+        fontWeight: "bold",
+        fontSize: "14px",
+      }}
+    >
+      {hasPrediction ? (
+        <span style={{ color: "green" }}>✔</span>
+      ) : (
+        <span style={{ color: "red" }}>✘</span>
+      )}
+            {valueIcon}
+
+    </span>
   );
 };
