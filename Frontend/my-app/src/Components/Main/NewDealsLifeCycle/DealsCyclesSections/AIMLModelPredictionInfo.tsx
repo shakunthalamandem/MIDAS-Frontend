@@ -111,9 +111,12 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
     if (formData.deal_type === "IPO") {
       return (
         <Box mt={2}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body1" color="text.secondary">
             Classifies the expected return into categories:
           </Typography>
+          <br></br>
+
+
           <Typography variant="body2">📉 <b>Low Return</b>: Return &lt; 3%</Typography>
           <Typography variant="body2">⚖️ <b>Neutral Return</b>: Return between 3% to 8%</Typography>
           <Typography variant="body2">📈 <b>Positive Return</b>: Return &gt; 8%</Typography>
