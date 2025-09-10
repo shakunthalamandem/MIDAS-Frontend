@@ -70,25 +70,26 @@ const formatNumber = (
 
   const isNegative = value < 0;
   const absValue = Math.abs(value);
+
   let formattedValue: string;
 
-  if (absValue >= 1e9) {
-    formattedValue = `${(absValue / 1e9).toFixed(1)}B`;
-  } else if (absValue >= 1e6) {
-    formattedValue = `${(absValue / 1e6).toFixed(1)}M`;
-  } else if (absValue >= 1e3) {
-    formattedValue = `${(absValue / 1e3).toFixed(1)}K`;
-  } else {
-    formattedValue = absValue.toFixed(1);
-  }
-
-  if (isCurrency) {
+  if (isPercentage) {
+    // Always show one decimal with %
+    formattedValue = `${value.toFixed(1)}%`;
+  } else if (isCurrency) {
+    // Round to whole number, commas only
+    formattedValue = absValue.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
     formattedValue = `$${formattedValue}`;
     if (isNegative) formattedValue = `-${formattedValue}`;
-  } else if (isPercentage) {
-    // Let toFixed handle the sign automatically
-    formattedValue = `${value.toFixed(1)}%`;
   } else {
+    // For normal numbers, keep one decimal place
+    formattedValue = absValue.toLocaleString("en-US", {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    });
     if (isNegative) formattedValue = `-${formattedValue}`;
   }
 
@@ -104,7 +105,7 @@ const getColumns = (
   isCurrency?: boolean;
   isPercentage?: boolean;
 }[] => [
-  { key: "competitor", label: "Ticker" },
+  { key: "competitor", label: "Ticker", isCurrency: true },
   { key: "price_usd", label: "Price (USD)", isCurrency: true },
   { key: "market_cap", label: "Market Cap (USDm)", isCurrency: true },
   { key: "ev_usd_million", label: "EV (USDm)", isCurrency: true },
@@ -260,9 +261,15 @@ const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
                                     col.isPercentage
                                   )
                                 : value || "N/A";
+
+                            const showX =
+                              columnsWithX.has(col.key) &&
+                              displayValue !== "N/A";
+
                             return (
                               <TableCell key={col.key} align="center">
                                 {displayValue}
+                                {showX ? "x" : ""}
                               </TableCell>
                             );
                           })}
@@ -282,121 +289,127 @@ const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
                                     col.isPercentage
                                   )
                                 : value || "N/A";
+
+                            const showX =
+                              columnsWithX.has(col.key) &&
+                              displayValue !== "N/A";
+
                             return (
                               <TableCell key={col.key} align="center">
                                 {displayValue}
+                                {showX ? "x" : ""}
                               </TableCell>
                             );
                           })}
                         </TableRow>
                       </Fade>
                     ))}
-                     {averages && (
-                                          <>
-                                            <TableRow>
-                                              {columns.map((col, colIdx) => {
-                                                if (colIdx === 0) {
-                                                  return (
-                                                    <TableCell
-                                                      key="overall-average-label"
-                                                      align="center"
-                                                      colSpan={4}
-                                                      sx={{
-                                                        borderBottom: "none",
-                                                        color: "#0288d1",
-                                                        fontWeight: "bold",
-                                                        whiteSpace: "nowrap",
-                                                        textAlign: "center",
-                                                        fontSize: "1rem",
-                                                      }}
-                                                    >
-                                                      Overall Average
-                                                    </TableCell>
-                                                  );
-                                                }
-                                                if (colIdx < 4) return null;
-                                                return (
-                                                  <TableCell
-                                                    key={col.key}
-                                                    align="center"
-                                                    sx={{
-                                                      borderBottom: "none",
-                                                      color: "#0288d1",
-                                                      fontWeight: "bold",
-                                                      whiteSpace: "nowrap",
-                                                    }}
-                                                  >
-                                                    {averages[col.key] &&
-                                                    averages[col.key].average !== undefined
-                                                      ? columnsWithX.has(col.key)
-                                                        ? `${formatNumber(
-                                                            averages[col.key].average!,
-                                                            col.isCurrency,
-                                                            col.isPercentage
-                                                          )}x`
-                                                        : formatNumber(
-                                                            averages[col.key].average!,
-                                                            col.isCurrency,
-                                                            col.isPercentage
-                                                          )
-                                                      : ""}
-                                                  </TableCell>
-                                                );
-                                              })}
-                                            </TableRow>
-                                            <TableRow>
-                                              {columns.map((col, colIdx) => {
-                                                if (colIdx === 0) {
-                                                  return (
-                                                    <TableCell
-                                                      key="overall-median-label"
-                                                      align="center"
-                                                      colSpan={4}
-                                                      sx={{
-                                                        borderBottom: "none",
-                                                        color: "#0288d1",
-                                                        fontWeight: "bold",
-                                                        whiteSpace: "nowrap",
-                                                        textAlign: "center",
-                                                        fontSize: "1rem",
-                                                      }}
-                                                    >
-                                                      Overall Median
-                                                    </TableCell>
-                                                  );
-                                                }
-                                                if (colIdx < 4) return null;
-                                                return (
-                                                  <TableCell
-                                                    key={col.key}
-                                                    align="center"
-                                                    sx={{
-                                                      borderBottom: "none",
-                                                      color: "#0288d1",
-                                                      fontWeight: "bold",
-                                                      whiteSpace: "nowrap",
-                                                    }}
-                                                  >
-                                                    {averages[col.key] &&
-                                                    averages[col.key].median !== undefined
-                                                      ? columnsWithX.has(col.key)
-                                                        ? `${formatNumber(
-                                                            averages[col.key].median!,
-                                                            col.isCurrency,
-                                                            col.isPercentage
-                                                          )}x`
-                                                        : formatNumber(
-                                                            averages[col.key].median!,
-                                                            col.isCurrency,
-                                                            col.isPercentage
-                                                          )
-                                                      : ""}
-                                                  </TableCell>
-                                                );
-                                              })}
-                                            </TableRow>
-                                          </>
-                                        )}
+                    {averages && (
+                      <>
+                        <TableRow>
+                          {columns.map((col, colIdx) => {
+                            if (colIdx === 0) {
+                              return (
+                                <TableCell
+                                  key="overall-average-label"
+                                  align="center"
+                                  colSpan={4}
+                                  sx={{
+                                    borderBottom: "none",
+                                    color: "#0288d1",
+                                    fontWeight: "bold",
+                                    whiteSpace: "nowrap",
+                                    textAlign: "center",
+                                    fontSize: "1rem",
+                                  }}
+                                >
+                                  Overall Average
+                                </TableCell>
+                              );
+                            }
+                            if (colIdx < 4) return null;
+                            return (
+                              <TableCell
+                                key={col.key}
+                                align="center"
+                                sx={{
+                                  borderBottom: "none",
+                                  color: "#0288d1",
+                                  fontWeight: "bold",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {averages[col.key] &&
+                                averages[col.key].average !== undefined
+                                  ? columnsWithX.has(col.key)
+                                    ? `${formatNumber(
+                                        averages[col.key].average!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )}x`
+                                    : formatNumber(
+                                        averages[col.key].average!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )
+                                  : ""}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                        <TableRow>
+                          {columns.map((col, colIdx) => {
+                            if (colIdx === 0) {
+                              return (
+                                <TableCell
+                                  key="overall-median-label"
+                                  align="center"
+                                  colSpan={4}
+                                  sx={{
+                                    borderBottom: "none",
+                                    color: "#0288d1",
+                                    fontWeight: "bold",
+                                    whiteSpace: "nowrap",
+                                    textAlign: "center",
+                                    fontSize: "1rem",
+                                  }}
+                                >
+                                  Overall Median
+                                </TableCell>
+                              );
+                            }
+                            if (colIdx < 4) return null;
+                            return (
+                              <TableCell
+                                key={col.key}
+                                align="center"
+                                sx={{
+                                  borderBottom: "none",
+                                  color: "#0288d1",
+                                  fontWeight: "bold",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {averages[col.key] &&
+                                averages[col.key].median !== undefined
+                                  ? columnsWithX.has(col.key)
+                                    ? `${formatNumber(
+                                        averages[col.key].median!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )}x`
+                                    : formatNumber(
+                                        averages[col.key].median!,
+                                        col.isCurrency,
+                                        col.isPercentage
+                                      )
+                                  : ""}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      </>
+                    )}
                   </React.Fragment>
                 );
               })}
@@ -408,4 +421,4 @@ const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
   );
 };
 
-export default FOComparisionTableMain
+export default FOComparisionTableMain;

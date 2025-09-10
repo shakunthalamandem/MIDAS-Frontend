@@ -26,51 +26,42 @@ const infoFields: { label: string; key: string }[] = [
   { label: "Shares Offered", key: "shares_offered" },
   { label: "No of Shares Outstanding", key: "number_of_shares_outstanding" },
   { label: "Greenshoe", key: "greenshoe" },
-  { label: "Bookrunners", key: "bookrunners" },
+  { label: "Bookrunners", key: "bookrunners" }, // string only
 ];
 
+const isNumeric = (v: any) =>
+  v !== null && v !== undefined && String(v).trim() !== "" && !isNaN(Number(v));
+
 const formatValue = (key: string, value: any) => {
-  if (!value) return "N/A";
+  if (value === null || value === undefined || value === "") return "N/A";
 
-  if (["deal_size", "shares_offered", "issue_price"].includes(key)) {
-    return Number(value).toLocaleString();
+  // numeric display (safe)
+  const numericKeys = [
+    "deal_size",
+    "shares_offered",
+    "issue_price",
+    "number_of_shares_outstanding",
+    "greenshoe",
+  ];
+  if (numericKeys.includes(key)) {
+    return isNumeric(value) ? Number(value).toLocaleString() : String(value);
   }
 
-  if (["number_of_shares_outstanding", "greenshoe"].includes(key)) {
-    return Number(value).toLocaleString();
-  }
-
+  // bookrunners is a plain string now
   if (key === "bookrunners") {
-    if (Array.isArray(value)) {
-      try {
-        if (value.length === 1 && typeof value[0] === "string" && value[0].includes("'")) {
-          const parsed = JSON.parse(
-            value[0].replace(/'/g, '"') 
-          );
-          return parsed.join(", ");
-        }
-        return value.join(", ");
-      } catch {
-        return value.join(", ");
-      }
-    }
-    return value;
+    return String(value);
   }
 
   return value;
 };
-
 
 const FODealInformation: React.FC<FODealInformationProps> = ({ data, ticker }) => {
   const [editMode, setEditMode] = useState(false);
   const [localData, setLocalData] = useState<Record<string, any>>(data);
 
   const handleChange = (key: string, value: string) => {
-    if (key === "bookrunners") {
-      setLocalData({ ...localData, [key]: value.split(",").map((item) => item.trim()) });
-    } else {
-      setLocalData({ ...localData, [key]: value });
-    }
+    // bookrunners (and everything else here) stored as-is
+    setLocalData((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = async () => {
@@ -125,7 +116,7 @@ const FODealInformation: React.FC<FODealInformationProps> = ({ data, ticker }) =
               {/* Top-right Edit/Save Button */}
               <IconButton
                 onClick={() => (editMode ? handleSave() : setEditMode(true))}
-                sx={{ position: "absolute", top: 8, right: 8,color: "#002060" }}
+                sx={{ position: "absolute", top: 8, right: 8, color: "#002060" }}
               >
                 {editMode ? <SaveIcon /> : <EditIcon />}
               </IconButton>
@@ -152,11 +143,7 @@ const FODealInformation: React.FC<FODealInformationProps> = ({ data, ticker }) =
                               fullWidth
                               variant="outlined"
                               size="small"
-                              value={
-                                field.key === "bookrunners"
-                                  ? (localData[field.key] || []).join(", ")
-                                  : localData[field.key] ?? ""
-                              }
+                              value={localData[field.key] ?? ""}
                               onChange={(e) => handleChange(field.key, e.target.value)}
                             />
                           ) : (
