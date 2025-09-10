@@ -127,7 +127,7 @@ export const getColumns = (
             }}
           >
             <span style={{ color: "green" }}>✔</span>{" "}
-            <span style={{ textDecoration: "underline" }}>View</span>
+            <span style={{ textDecoration: "underline" }}>Report</span>
           </Link>
         ) : (
           <span style={{ color: "red" }}>✘</span>
