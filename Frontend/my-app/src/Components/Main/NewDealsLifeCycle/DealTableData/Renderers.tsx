@@ -130,7 +130,7 @@ export const renderCheckCell = (params: GridRenderCellParams<any>) => {
             width: "18px",
             height: "18px",
             borderRadius: "50%",
-            backgroundColor: "orange",
+            backgroundColor: "grey",
             color: "white",
             fontSize: "11px",
             fontWeight: "bold",

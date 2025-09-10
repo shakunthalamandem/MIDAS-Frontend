@@ -74,7 +74,7 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
 
   useEffect(() => {
     setFormData(data);
-    if (data?.ticker && data?.pricing_date && data?.deal_type) {
+    if (data?.ticker &&  data?.deal_type) {
       fetchDealColorInfo();
     }
   }, [data]);
@@ -83,7 +83,7 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
     try {
       const payload = {
         ticker: data.ticker,
-        pricing_date: data.pricing_date,
+        // pricing_date: data.pricing_date,
         deal_type: data.deal_type,
       };
 
