@@ -14,9 +14,10 @@ interface AIMLModelPredictionData {
   ticker?: string;
   pricing_date?: string;
   deal_type?: string;
-  t1d_pred?: number | null;        // Prediction score
-  confidence?: number | null;      // Confidence (0–100)
-  ml_pred_rating?: number | null;  // New rating field
+  t1d_pred?: string | null;
+  t1w_pred?: string | null;
+  t1m_pred?: string | null;
+  confidence?: number | null;
 }
 
 interface AIMLModelPredictionInfoProps {
@@ -34,7 +35,8 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
     return {
       t1d_pred: apiData.t1d_pred,
       confidence: apiData.confidence,
-      ml_pred_rating: apiData.ml_pred_rating, // ✅ new field
+      t1w_pred: apiData.t1w_pred,
+      t1m_pred: apiData.t1m_pred,
     };
   };
 
@@ -104,6 +106,37 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
     );
   };
 
+  // 🔹 Return classification section
+  const renderReturnClassification = () => {
+    if (formData.deal_type === "IPO") {
+      return (
+        <Box mt={2}>
+          <Typography variant="body1" color="text.secondary">
+            Classifies the expected return into categories:
+          </Typography>
+          <br></br>
+
+
+          <Typography variant="body2">📉 <b>Low Return</b>: Return &lt; 3%</Typography>
+          <Typography variant="body2">⚖️ <b>Neutral Return</b>: Return between 3% to 8%</Typography>
+          <Typography variant="body2">📈 <b>Positive Return</b>: Return &gt; 8%</Typography>
+        </Box>
+      );
+    } else if (formData.deal_type === "FO") {
+      return (
+        <Box mt={2}>
+          <Typography variant="body2" color="text.secondary">
+            Classifies the expected return into categories:
+          </Typography>
+          <Typography variant="body2">📉 <b>Negative</b>: Return &lt; -1%</Typography>
+          <Typography variant="body2">⚖️ <b>Neutral</b>: Return between -1% to 1%</Typography>
+          <Typography variant="body2">📈 <b>Positive</b>: Return &gt; 1%</Typography>
+        </Box>
+      );
+    }
+    return null;
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <Card
@@ -122,27 +155,23 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
           </Box>
 
           <Grid container spacing={2} mt={2}>
+            {/* Conditional Return Classification */}
+            <Grid item xs={12}>
+              {renderReturnClassification()}
+            </Grid>
 
-
-             <Box mt={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      Classifies the expected return into categories:
-                    </Typography>
-                    <Typography variant="body2">📉 <b>Low Return</b>: Return &lt; 3%</Typography>
-                    <Typography variant="body2">⚖️ <b>Neutral Return</b>: Return between 3% to 8%</Typography>
-                    <Typography variant="body2">📈 <b>Positive Return</b>: Return &gt; 8%</Typography>
-                  </Box>
             {/* T1D Prediction */}
             <Grid item xs={12}>
               {renderField('T+1D Close from Issue Price', formData.t1d_pred)}
             </Grid>
-
-            {/* Confidence */}
             <Grid item xs={12}>
-              {renderField('Confidence', formData.confidence)}
+              {renderField('T+1W from T+1D Close', formData.t1w_pred)}
+            </Grid>
+            <Grid item xs={12}>
+              {renderField('T+1M from T+1D Close', formData.t1m_pred)}
             </Grid>
 
-            {/* ML Pred Rating */}
+            {/* Confidence Slider */}
             <Grid item xs={12}>
               <Card
                 sx={{
@@ -162,15 +191,13 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
                   </Typography>
 
                   <BlueSlider
-                    value={formData.ml_pred_rating || 0}
+                    value={formData.confidence || 0}
                     valueLabelDisplay="on"
                     step={1}
                     min={0}
                     max={100}
                     disabled
                   />
-
-                 
                 </CardContent>
               </Card>
             </Grid>
