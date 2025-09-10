@@ -298,8 +298,8 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData })
 
           {/* Comparative Table */}
           <Grid item xs={12}> 
-            <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-              <CardContent sx={{ backgroundColor: "#fff" }}>
+            {/* <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}> */}
+              {/* <CardContent sx={{ backgroundColor: "#fff" }}> */}
                 <IPODashboardMainTable ticker={selectedData?.ticker_name ?? ""} />
                 <Typography
                   variant="caption"
@@ -309,8 +309,8 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData })
                 >
                   Source: Factset
                 </Typography>
-              </CardContent>
-            </Card>
+              {/* </CardContent>
+            </Card> */}
           </Grid>
 
           {/* AI Suggestions */}
