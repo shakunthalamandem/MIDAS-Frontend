@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom"; // ✅ useParams added
 import { formatDate, formatDealSize } from "./IPOWriteUpUtils";
 import IPODashboardMain from "../../IPODashboardLLM/IPODashboardMain";
 
@@ -28,7 +28,9 @@ interface IpoData {
 
 const WriteUpIPODashbaord: React.FC = () => {
   const [ipoData, setIpoData] = useState<IpoData[]>([]);
-  const [selectedTicker, setSelectedTicker] = useState<string>(""); // State to track selected ticker
+  const [selectedTicker, setSelectedTicker] = useState<string>("");
+  const { ticker } = useParams<{ ticker: string }>(); // ✅ get ticker from URL
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -56,8 +58,10 @@ const WriteUpIPODashbaord: React.FC = () => {
 
         setIpoData(uniqueRows);
 
-        // Set default selected ticker to the first one (if available)
-        if (uniqueRows.length > 0) {
+        // ✅ If ticker comes from URL, use it; else fallback to first IPO
+        if (ticker) {
+          setSelectedTicker(ticker);
+        } else if (uniqueRows.length > 0) {
           setSelectedTicker(uniqueRows[0].ticker);
         }
       } catch (error) {
@@ -66,14 +70,14 @@ const WriteUpIPODashbaord: React.FC = () => {
     };
 
     fetchIpoData();
-  }, [apiUrl, token]);
+  }, [apiUrl, token, ticker]); // ✅ depend on ticker also
 
   return (
     <>
-          <Typography
+      <Typography
         variant="body2"
         sx={{
-          fontWeight: 500,  
+          fontWeight: 500,
           color: "#FFFFFF",
           fontSize: { xs: "1rem", sm: "1.2rem" },
           backgroundColor: "#002060",
@@ -95,6 +99,7 @@ const WriteUpIPODashbaord: React.FC = () => {
       >
         Welcome to detailed Insights on IPO - {selectedTicker}
       </Typography>
+
       <Container maxWidth="lg">
         <Box
           sx={{
@@ -157,6 +162,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                     hover
                     sx={{
                       "&:hover": { backgroundColor: "#f0f8ff" },
+                      backgroundColor:
+                        row.ticker === selectedTicker ? "#e6f7ff" : "inherit", // ✅ highlight selected
                       border: "1px solid black",
                     }}
                   >
@@ -174,7 +181,7 @@ const WriteUpIPODashbaord: React.FC = () => {
                       <Link
                         to={`/equity/ipo_dashboard/${row.ticker}`}
                         state={{ fromTickerClick: true }}
-                        onClick={() => setSelectedTicker(row.ticker)} // Set selected ticker on click
+                        onClick={() => setSelectedTicker(row.ticker)}
                         style={{
                           color: "#d80606ff",
                           fontWeight: "bold",
