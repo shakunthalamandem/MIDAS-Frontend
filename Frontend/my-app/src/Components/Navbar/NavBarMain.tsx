@@ -10,10 +10,10 @@ import {
   MenuItem,
   Avatar,
   Tooltip,
-  Badge
+  Badge,
 } from "@mui/material";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import NotificationMenu from "./NotificationMenu"; 
+import NotificationMenu from "./NotificationMenu";
 import logo from "../../Assets/images/Monashee-Cap-Logos.png";
 import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/TradingViewTickerTape";
 import Logs from "../Main/HomePage/Authentication/Logs";
@@ -24,13 +24,14 @@ const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [selectedTab, setSelectedTab] = useState<string>(() => localStorage.getItem("selectedTab") || "");
+  const [selectedTab, setSelectedTab] = useState<string>(
+    () => localStorage.getItem("selectedTab") || ""
+  );
 
   const isSuperUser = localStorage.getItem("is_superuser") === "true";
   const [showLogs, setShowLogs] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
-
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -47,11 +48,11 @@ const NavbarMain: React.FC = () => {
   }, [selectedTab]);
 
   useEffect(() => {
-  if (location.pathname === "/") {
-    setSelectedTab("");
-    localStorage.removeItem("selectedTab");
-  }
-}, [location.pathname]);
+    if (location.pathname === "/") {
+      setSelectedTab("");
+      localStorage.removeItem("selectedTab");
+    }
+  }, [location.pathname]);
 
   const handleTabSelect = (tabName: string) => {
     setSelectedTab(tabName);
@@ -120,7 +121,10 @@ const NavbarMain: React.FC = () => {
 
   return (
     <>
-      <AppBar position="sticky" sx={{ backgroundColor: "#FFFFFF", zIndex: 1200 }}>
+      <AppBar
+        position="sticky"
+        sx={{ backgroundColor: "#FFFFFF", zIndex: 1200 }}
+      >
         {(location.pathname === "/macro/prime" ||
           location.pathname.startsWith("/equity/technical/")) && (
           <Box sx={{ marginBottom: "50px" }}>
@@ -161,7 +165,8 @@ const NavbarMain: React.FC = () => {
             }}
           >
             <span className="marquee">
-              MIDAS is for internal usage only. All Data and Analytics are Confidential
+              MIDAS is for internal usage only. All Data and Analytics are
+              Confidential
             </span>
           </Typography>
         </Box>
@@ -174,7 +179,14 @@ const NavbarMain: React.FC = () => {
             flexWrap: "wrap",
           }}
         >
-          <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+          <Link
+            to="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+          >
             <img
               src={logo}
               alt="MIDAS Logo"
@@ -183,14 +195,11 @@ const NavbarMain: React.FC = () => {
           </Link>
 
           <Box sx={{ flexGrow: 1, textAlign: "center" }}>
-
-
-
-             <DropdownTab
+            <DropdownTab
               label="New Issue Deals "
               menuItems={[
                 { label: "Dashboard", path: "/deals/dashboard" },
-                {label: "Deal Tracking", path: "deals/deal_Tracking" },
+                { label: "DealTracking", path: "/deals/deal_Tracking" },
                 { label: "IPO Write-Up", path: "/equity/ipo_dashboard" },
                 { label: "FO Write-Up", path: "/equity/fo_dashboard" },
                 { label: "New Deal Form", path: "/deals/new_deal_form" },
@@ -199,44 +208,22 @@ const NavbarMain: React.FC = () => {
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
             />
-              <DropdownTab
+            <DropdownTab
               label="AI-ML"
               menuItems={[
-                { label: "US IPO & FO ML Model", path: "/machine_learning/equity" },
+                {
+                  label: "US IPO & FO ML Model",
+                  path: "/machine_learning/equity",
+                },
                 { label: "Gen AI Tool", path: "/gen_ai_tool" },
                 { label: "Portfolio Sentiment ", path: "/genai_data_set" },
-                // { label: "IPO Write-up", path: "/deals/dashboard" },
-                {label: "Portfolio  News", path: "/macro/news-summary" },
-                // { label: "High Yields", path: "/machine_learning/high-yield" },
-                // { label: "Converts", path: "/machine_learning/converts" },
+                { label: "Portfolio  News", path: "/macro/news-summary" },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
             />
-          
 
-           
-
-             {/* <Button
-              onClick={() => handleTabSelect("New Deal Form")}
-              sx={{
-                color: "#005166",
-                fontWeight: "bold",
-                fontSize: "0.725rem",
-                mx: 1,
-                borderBottom:
-                  selectedTab === "New Deal Form" ? "3px solid #005166" : "3px solid transparent",
-                borderRadius: 0,
-                "&:hover": {
-                  borderBottom: "3px solid #005166",
-                  backgroundColor: "transparent",
-                },
-              }}
-            >
-              New Deal Form
-            </Button> */}
-
-              <Button
+            <Button
               onClick={() => handleTabSelect("P&L Attribution")}
               sx={{
                 color: "#005166",
@@ -244,7 +231,9 @@ const NavbarMain: React.FC = () => {
                 fontSize: "0.725rem",
                 mx: 1,
                 borderBottom:
-                  selectedTab === "P&L Attribution" ? "3px solid #005166" : "3px solid transparent",
+                  selectedTab === "P&L Attribution"
+                    ? "3px solid #005166"
+                    : "3px solid transparent",
                 borderRadius: 0,
                 "&:hover": {
                   borderBottom: "3px solid #005166",
@@ -255,16 +244,23 @@ const NavbarMain: React.FC = () => {
               P&L Attribution
             </Button>
 
-      
-
             <DropdownTab
               label="Opportunity & Performance"
               menuItems={[
                 { label: "Summary Dashboard", path: "/opportunity/summary" },
-                { label: "Equity Market Opportunity", path: "/opportunity/equity" },
+                {
+                  label: "Equity Market Opportunity",
+                  path: "/opportunity/equity",
+                },
                 { label: "Past IPOs & FOs", path: "/opportunity/pastdeals" },
-                { label: "High Yields Market Opportunity", path: "/opportunity/high-yield" },
-                { label: "Converts Market Opportunity", path: "/opportunity/converts" },
+                {
+                  label: "High Yields Market Opportunity",
+                  path: "/opportunity/high-yield",
+                },
+                {
+                  label: "Converts Market Opportunity",
+                  path: "/opportunity/converts",
+                },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
@@ -304,16 +300,26 @@ const NavbarMain: React.FC = () => {
           </Box>
 
           {/* Right Side */}
- <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginRight: "10px" }}>
-  {isLoggedIn && (
-    <>
-      {/* 🔔 Notifications */}
-      <NotificationMenu />
-    </>
-  )}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              marginRight: "10px",
+            }}
+          >
+            {isLoggedIn && (
+              <>
+                {/* 🔔 Notifications */}
+                <NotificationMenu />
+              </>
+            )}
 
             {isLoggedIn && isSuperUser && (
-              <Button sx={{ color: "#000", fontWeight: "bold", marginRight: "20px" }} onClick={() => setShowLogs(true)}>
+              <Button
+                sx={{ color: "#000", fontWeight: "bold", marginRight: "20px" }}
+                onClick={() => setShowLogs(true)}
+              >
                 <Logs />
               </Button>
             )}
@@ -345,10 +351,10 @@ const NavbarMain: React.FC = () => {
                         padding: "4px 0px",
                         borderRadius: "3px",
                         textAlign: "center",
-                        '&:hover': {
+                        "&:hover": {
                           backgroundColor: "#005166",
                           color: "#FFFFFF",
-                        }
+                        },
                       }}
                     >
                       Logout
@@ -357,7 +363,15 @@ const NavbarMain: React.FC = () => {
                 </Menu>
               </>
             ) : (
-              <Button sx={{ color: "#FFFFFF", backgroundColor: "#002060", fontWeight: "bold", px: "18px" }} onClick={() => navigate("/login")}>
+              <Button
+                sx={{
+                  color: "#FFFFFF",
+                  backgroundColor: "#002060",
+                  fontWeight: "bold",
+                  px: "18px",
+                }}
+                onClick={() => navigate("/login")}
+              >
                 Login
               </Button>
             )}
@@ -365,7 +379,9 @@ const NavbarMain: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {showLogout && <Logout onConfirm={handleConfirmLogout} onCancel={handleCancelLogout} />}
+      {showLogout && (
+        <Logout onConfirm={handleConfirmLogout} onCancel={handleCancelLogout} />
+      )}
     </>
   );
 };
