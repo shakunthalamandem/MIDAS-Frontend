@@ -1,8 +1,12 @@
+// FOWriteUpMain.tsx
 import React from 'react';
-import { Container, Card, CardContent, Typography, Box } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
+import { useParams } from 'react-router-dom';
 import FOWriteUpDashboardMain from './FOWriteUpDashboardMain';
 
 const FOWriteUpMain: React.FC = () => {
+  const { ticker } = useParams<{ ticker: string }>(); // ✅ get ticker from URL
+
   return (
     <Box>
       <Typography
@@ -32,9 +36,8 @@ const FOWriteUpMain: React.FC = () => {
       </Typography>
 
       <Container maxWidth="xl" sx={{ mt: 2 }}>
-            {/* Dashboard now handles fetching data */}
-            <FOWriteUpDashboardMain />
-         
+        {/* ✅ pass ticker as prop */}
+        <FOWriteUpDashboardMain ticker={ticker} />
       </Container>
     </Box>
   );

@@ -172,7 +172,7 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
           size="small"
           options={sortedTickers}
           getOptionLabel={(option) => {
-            let formattedDate = "N/A";
+            let formattedDate = "TBA";
             if (option.pricing_date) {
               try {
                 formattedDate = format(new Date(option.pricing_date), "dd MMM yyyy");

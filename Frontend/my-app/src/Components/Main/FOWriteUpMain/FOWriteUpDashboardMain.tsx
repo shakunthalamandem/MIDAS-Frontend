@@ -13,7 +13,11 @@ interface FOData {
   expected_listing_date: string | null;
 }
 
-const FOWriteUpDashboardMain: React.FC = () => {
+interface FOWriteUpDashboardMainProps {
+  ticker?: string; // ✅ new optional prop
+}
+
+const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({ ticker }) => {
   const [rows, setRows] = useState<FOData[]>([]);
   const [selected, setSelected] = useState<{ ticker: string; deal_id: string } | null>(null);
 
@@ -35,8 +39,15 @@ const FOWriteUpDashboardMain: React.FC = () => {
         const json: FOData[] = await response.json();
         setRows(json);
 
-        // ✅ Select the first row by default
-        if (json.length > 0) {
+        // ✅ Select ticker from props if available, else fallback to first row
+        if (ticker) {
+          const match = json.find((item) => item.ticker === ticker);
+          if (match) {
+            setSelected({ ticker: match.ticker, deal_id: match.deal_id });
+          } else if (json.length > 0) {
+            setSelected({ ticker: json[0].ticker, deal_id: json[0].deal_id });
+          }
+        } else if (json.length > 0) {
           setSelected({ ticker: json[0].ticker, deal_id: json[0].deal_id });
         }
       } catch (err) {
@@ -45,7 +56,7 @@ const FOWriteUpDashboardMain: React.FC = () => {
     };
 
     fetchData();
-  }, [apiUrl, token]);
+  }, [apiUrl, token, ticker]); // 🔥 include ticker
 
   const formatDate = (dateStr: string | null): string =>
     !dateStr || isNaN(new Date(dateStr).getTime())
@@ -91,21 +102,18 @@ const FOWriteUpDashboardMain: React.FC = () => {
       flex: 1,
       valueFormatter: (params) => params || "Not Available",
     },
-{
-  field: "deal_size",
-  headerName: "Deal Size ($ Million)",
-  flex: 1,
-  valueFormatter: (params) => {
-    if (params === null || params === undefined || params === 0) {
-      return "Not Available";
-    }
-    
-    const millions = params / 1000000;
-    return `$ ${Math.round(millions).toLocaleString()}M`;
-  },
-}
-
-
+    {
+      field: "deal_size",
+      headerName: "Deal Size ($ Million)",
+      flex: 1,
+      valueFormatter: (params) => {
+        if (params === null || params === undefined || params === 0) {
+          return "Not Available";
+        }
+        const millions = params / 1000000;
+        return `$ ${Math.round(millions).toLocaleString()}M`;
+      },
+    },
   ];
 
   return (
