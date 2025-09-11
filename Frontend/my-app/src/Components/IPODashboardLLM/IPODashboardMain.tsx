@@ -29,7 +29,7 @@ interface TickerOption {
   pricing_date: string;
 }
 interface IPODashboardMainProps {
-  selectedTicker?: string; // Make selectedTicker optional, as it might be passed or derived from the URL
+  selectedTicker?: string; // Optional: may be passed or derived from URL
 }
 
 
@@ -41,7 +41,8 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({ selectedTicker }) =
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [allIpoTickers, setAllIpoTickers] = useState<TickerOption[]>([]);
-  // const [selectedTicker, setSelectedTicker] = useState<string | null>(selectedTicker || "");
+  // Manage local ticker state and sync with prop
+  const [currentTicker, setCurrentTicker] = useState<string | null>(selectedTicker ?? null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [editMode, setEditMode] = useState<Record<string, boolean>>({});
   const [editedContent, setEditedContent] = useState<Record<string, string[]>>({});
@@ -66,9 +67,11 @@ const navigate = useNavigate();
 //   navigate("/equity/ipo_dashboard", { replace: true });
 // };
 
+// Keep local ticker in sync with incoming prop
 useEffect(() => {
-  if (selectedTicker) {
-    setSearchText(selectedTicker);
+  if (selectedTicker !== undefined) {
+    setCurrentTicker(selectedTicker ?? null);
+    setSearchText(selectedTicker ?? "");
   }
 }, [selectedTicker]);
 
@@ -95,7 +98,9 @@ useEffect(() => {
     }
   };
   fetchAllIpoTickers();
-}, [selectedTicker]);
+  // Fetch tickers once; not dependent on selected ticker
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   const handleAIComparisonClick = () => {
     setShowAIComparison(true);
@@ -109,7 +114,7 @@ useEffect(() => {
         const response = await fetch(`${apiUrl}/api/writeup_data/`, {
           method: "POST",
           headers: getAuthHeaders(),
-          body: JSON.stringify({ ticker: selectedTicker || "" }),
+          body: JSON.stringify({ ticker: currentTicker || "" }),
         });
 
         if (!response.ok) {
@@ -165,8 +170,8 @@ useEffect(() => {
       }
     };
 
-    if (selectedTicker) fetchData();
-  }, [selectedTicker]);
+    if (currentTicker) fetchData();
+  }, [currentTicker]);
 
 
 // Generate the Monashee PDF report
@@ -451,7 +456,7 @@ const handleExportPDFPaginated = async () => {
     pdf.setTextColor(128);
     pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, { align: "center" });
 
-    pdf.save(`${selectedTicker}_IPO_Report.pdf`);
+    pdf.save(`${currentTicker || "IPO"}_IPO_Report.pdf`);
   } catch (error) {
     console.error("PDF export failed", error);
   } finally {
@@ -464,7 +469,7 @@ const handleExportPDFPaginated = async () => {
     try {
       const cleaned = editedContent[key].filter((item) => item.trim() !== "");
       const formatted = cleaned.map((item) => `• ${item}`).join("\n");
-      const payload = { ticker_name: selectedTicker, [key]: formatted };
+      const payload = { ticker_name: currentTicker, [key]: formatted };
       await axios.patch(`${apiUrl}/api/writeup_data/`, payload, { headers: getAuthHeaders() });
 
       setIpoData((prev: any) => ({ ...prev, [key]: cleaned }));
@@ -519,19 +524,19 @@ const handleExportPDFPaginated = async () => {
         {ipoData && (
           <>
           <IPODashboardPage1
-  ipoData={ipoData}
-  allIpoTickers={allIpoTickers}
-  selectedTicker={selectedTicker || ""}
-  searchText={searchText}
-  setSelectedTicker={setSelectedTicker}
-  setSearchText={setSearchText}
-  handleExportPDF={handleExportPDFPaginated}
-  pdfLoading={pdfLoading}
-/>
+            ipoData={ipoData}
+            allIpoTickers={allIpoTickers}
+            selectedTicker={currentTicker || ""}
+            searchText={searchText}
+            setSelectedTicker={setCurrentTicker}
+            setSearchText={setSearchText}
+            handleExportPDF={handleExportPDFPaginated}
+            pdfLoading={pdfLoading}
+          />
 
 <IPODashboardPage2
   ipoData={ipoData}
-  selectedTicker={selectedTicker || ""}
+  selectedTicker={currentTicker || ""}
   setIpoData={setIpoData}
 />
 <IPODashboardPage3
@@ -557,7 +562,7 @@ const handleExportPDFPaginated = async () => {
 
 
 <IPODashboardPage4
-  selectedTicker={selectedTicker || ""}
+  selectedTicker={currentTicker || ""}
   ipoData={ipoData}
   showAIComparison={showAIComparison}
   handleAIComparisonClick={handleAIComparisonClick}
