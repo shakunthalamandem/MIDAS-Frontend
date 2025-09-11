@@ -61,9 +61,9 @@ const navigate = useNavigate();
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   });
-  const handleNoDataConfirm = () => {
-  navigate("/equity/ipo_dashboard", { replace: true });
-};
+//   const handleNoDataConfirm = () => {
+//   navigate("/equity/ipo_dashboard", { replace: true });
+// };
 
 useEffect(() => {
   if (ticker) {
@@ -116,9 +116,7 @@ useEffect(() => {
     setNoDataPopupOpen(true);
   }
   throw new Error("Failed to fetch IPO data");
-}
-
-;
+};
         const jsonData = await response.json();
        
         
@@ -507,11 +505,11 @@ const handleExportPDFPaginated = async () => {
 
   return (
     <>
-    <NoDataPopup
+    {/* <NoDataPopup
   open={noDataPopupOpen}
   onClose={() => setNoDataPopupOpen(false)}
   onConfirm={handleNoDataConfirm}
-/>
+/> */}
 
       <Typography
         variant="body2"
