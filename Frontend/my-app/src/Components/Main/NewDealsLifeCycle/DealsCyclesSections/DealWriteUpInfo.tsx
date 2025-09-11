@@ -66,7 +66,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
   const handleReadMore = () => {
     if (formData?.ticker) {
       window.open(
-        `/ipo-dashboard/${formData.ticker}`,
+        `/equity/ipo_dashboard/${formData.ticker}`,
         "_blank",
         "noopener,noreferrer"
       );

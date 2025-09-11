@@ -170,7 +170,7 @@ const WriteUpIPODashbaord: React.FC = () => {
                     }}
                   >
                     <Link
-                      to={`/ipo-dashboard/${row.ticker}`}
+                      to={`/equity/ipo_dashboard/${row.ticker}`}
                       state={{ fromTickerClick: true }}
                       style={{
                         color: "#d80606ff",

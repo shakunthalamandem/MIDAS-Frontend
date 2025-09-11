@@ -123,9 +123,9 @@ export const getColumns = (
 
         const link =
           dealType === "ipo"
-            ? `/ipo-dashboard/${ticker}`
+            ? `/equity/ipo_dashboard/${ticker}`
             : dealType === "fo"
-            ? `/fo-dashboard/${ticker}`
+            ? `/equity/fo_dashboard/${ticker}`
             : "#"; // fallback or no link
 
         return params.value?.toString().toLowerCase() === "yes" ? (
