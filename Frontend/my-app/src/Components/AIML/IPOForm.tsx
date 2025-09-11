@@ -13,6 +13,8 @@ import {
   Box,
 } from "@mui/material";
 import IPOPredictionResults from "./IPOPredictionResults";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+
 
 interface OptionsData {
   region: string[];
@@ -535,6 +537,23 @@ const IPOForm: React.FC<IPOFormProps> = ({
                 {loading ? "Predicting..." : "Predict"}
               </Button>
             </Box>
+           <Typography
+  variant="body2"
+  sx={{
+    mt: 1,
+    textAlign: { xs: "center", sm: "right" },
+    color: "text.secondary",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: { xs: "center", sm: "flex-end" },
+    gap: 0.5, // spacing between icon & text
+  }}
+>
+  <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
+  {values.deal_status === "Issued"
+    ? "Above values are original values"
+    : "Above values are assumption values"}
+</Typography>
           </Grid>
         </Grid>
       </Paper>

@@ -14,6 +14,8 @@ import {
 } from "@mui/material";
 import FOWeeklyMonthlyPredictionResults from "./FOWeeklyMonthlyPredictionResults";
 import FOPredictionResults from "./FOPredictionResults";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+
 
 interface PredictionModel {
   prediction: string | null;
@@ -569,6 +571,26 @@ const FOForm: React.FC<FOFormProps> = ({
                 {loading ? "Predicting..." : "Predict"}
               </Button>
             </Box>
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 1,
+                textAlign: { xs: "center", sm: "right" },
+                color: "text.secondary",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: { xs: "center", sm: "flex-end" },
+                gap: 0.5, // spacing between icon & text
+              }}
+            >
+              <InfoOutlinedIcon
+                fontSize="small"
+                sx={{ color: "text.secondary" }}
+              />
+              {values.deal_status === "Issued"
+                ? "Above values are original values"
+                : "Above values are assumption values"}
+            </Typography>
           </Grid>
         </Grid>
       </Paper>
