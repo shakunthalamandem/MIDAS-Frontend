@@ -3,7 +3,7 @@ import WriteupsReports from './WriteupsReports'
 import CustomAnalysiswriteups from './CustomAnalysiswriteups'
 import GapAnalysisWriteups from './GapAnalysisWriteups'
 
-const WriteUpdashboardMain = () => {
+const ReportWriteUpMain = () => {
   return (
    <>
     <WriteupsReports />
@@ -13,4 +13,4 @@ const WriteUpdashboardMain = () => {
   )
 }
 
-export default WriteUpdashboardMain
+export default ReportWriteUpMain
