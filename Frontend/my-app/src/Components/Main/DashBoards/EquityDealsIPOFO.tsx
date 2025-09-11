@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import UpcomingIpoTable from "./Equity/UpcomingIpoTable";
 import FoPredictionCards from "./Equity/FoPredictionCards";
 import MddIpoOpportunityChart from "./Equity/MddIpoOpportunityChart";
 import MddFoDealsOpportunityChart from "./Equity/MddFoDealsOpportunityChart";
-import RecentIpoTable from "./Equity/RecentIpoTable";
 import {
   Box,
   Paper,
@@ -14,7 +12,6 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
-  Grid,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -22,7 +19,6 @@ import { motion } from "framer-motion";
 const MotionPaper = motion(Paper);
 
 // Years for selection
-const yearOptions = [2024, 2025];
 const EquityDealsIPOFO: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<"IPO" | "FO">("IPO");
   const [selectedIpoYears, setSelectedIpoYears] = useState<number[]>([
@@ -34,7 +30,6 @@ const EquityDealsIPOFO: React.FC = () => {
 
   const handleYearToggle = (year: number, isIPO: boolean) => {
     const setSelectedYears = isIPO ? setSelectedIpoYears : setSelectedFoYears;
-    const selectedYears = isIPO ? selectedIpoYears : selectedFoYears;
 
     setSelectedYears((prev) =>
       prev.includes(year)
@@ -154,25 +149,7 @@ const EquityDealsIPOFO: React.FC = () => {
 
       {selectedTab === "IPO" && (
         <>
-          <MotionPaper elevation={3} sx={{ p: 3, borderRadius: 3, mb: 3 }}>
-            <Typography
-              variant="subtitle1"
-              sx={{ color: "#002060", fontWeight: 400, mb: 2 }}
-              textAlign="center"
-            >
-              Stay updated with the latest IPO trends and insights. Analyze
-              recent trends and prepare for upcoming opportunities in the IPO
-              landscape.
-            </Typography>
-            <Grid container spacing={3} id="ipo-table-section">
-              <Grid item xs={12} md={6}>
-                {/* <UpcomingIpoTable /> */}
-              </Grid>
-              <Grid item xs={12} md={6}>
-                {/* <RecentIpoTable /> */}
-              </Grid>
-            </Grid>
-          </MotionPaper>
+
 
           <MotionPaper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
             {renderHeader(selectedIpoYears, true)}
