@@ -43,6 +43,9 @@ const defaultIPOValues = {
   Inflation: "Stable",
   Treasury: "Stable",
   target: "T1D",
+  revenue_category: "",
+  revenue_growth_category: "",
+  net_profit_margin_category: "",
 };
 
 interface OptionsData {
