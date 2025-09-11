@@ -69,7 +69,6 @@ import TickerDashboard from "../Components/DealTracking/TickerDashboard";
 import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteUpMain";
 import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
-import WriteUpDashboard from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpDashboard";
 import WriteupDashboardMain from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteupDashboardMain";
 import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
 import DealsDropdown from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
@@ -166,22 +165,9 @@ const AppRouters: React.FC = () => {
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
         <Route path="/ai_upload" element={<AuthGuard><UploadAiInsights /></AuthGuard>} />
         <Route path="/new_deal_data_upload" element={<AuthGuard><DealsDropdown /></AuthGuard>} />    
+        <Route path="/equity/ipo_dashboard" element={<AuthGuard><IPODashboardMain /></AuthGuard>} />
 
-
-  
-
-
-<Route
-  path="/equity/ipo_dashboard"
-  element={
-    <AuthGuard>
-      <IPODashboardMain />
-      
-    </AuthGuard>
-  }
-/>
-
-   <Route path="/equity/ipo_dashboard/:ticker" element={<IPODashboardMain />} />
+        <Route path="/equity/ipo_dashboard/:ticker" element={<AuthGuard><IPODashboardMain /></AuthGuard>} />
 
 
 
@@ -204,14 +190,7 @@ const AppRouters: React.FC = () => {
         <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO/></AuthGuard>} />
        
         <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain/></AuthGuard>} />
-         <Route 
-          path="/deals/dashboard/Tracking" 
-          element={
-            <AuthGuard>
-              <TickerTrackingWrapper />
-            </AuthGuard>
-          } 
-        />
+         <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTrackingWrapper /></AuthGuard>} />
         <Route path="/writeup/dashboard" element={<AuthGuard><WriteupDashboardMain/></AuthGuard>} />
 
 
@@ -248,7 +227,7 @@ const AppRouters: React.FC = () => {
             {/* FO Write Up Routes */}
 
         <Route path="/equity/fo_dashboard" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
-         <Route path="/equity/fo_dashboard/:ticker" element={<FOWriteUpMain />} />
+         <Route path="/equity/fo_dashboard/:ticker" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
 
 
 
