@@ -446,6 +446,16 @@ const IPOForm: React.FC<IPOFormProps> = ({
                       error={!!formErrors[field.name]}
                       helperText={formErrors[field.name]}
                       fullWidth
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: {
+                              maxHeight: 300, // limit height
+                              overflowY: "auto", // enable scroll
+                            },
+                          },
+                        },
+                      }}
                     >
                       {field.selectOptions.map((opt) => (
                         <MenuItem key={opt} value={opt}>
