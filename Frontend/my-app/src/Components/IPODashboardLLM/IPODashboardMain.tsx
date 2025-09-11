@@ -504,7 +504,6 @@ const handleExportPDFPaginated = async () => {
   };
 
 
-  if (loading) return <CircularProgress />;
 
   return (
     <>
