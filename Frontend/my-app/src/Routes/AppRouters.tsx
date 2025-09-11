@@ -49,7 +49,6 @@ import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
 import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketOpportnuityMain";
 import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
-import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
 import EquityNewDealFormMain from "../Components/EquityNewDealFormMain/EquityNewDealFormMain";
 import LkFileUpload from "../Components/Uploads/LkFileUpload";
@@ -72,6 +71,7 @@ import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrap
 
 import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
 import DealsDropdown from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
+import WriteUpIPODashbaord from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 
 const AppRouters: React.FC = () => {
   return (
@@ -165,9 +165,9 @@ const AppRouters: React.FC = () => {
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
         <Route path="/ai_upload" element={<AuthGuard><UploadAiInsights /></AuthGuard>} />
         <Route path="/new_deal_data_upload" element={<AuthGuard><DealsDropdown /></AuthGuard>} />    
-        <Route path="/equity/ipo_dashboard" element={<AuthGuard><IPODashboardMain /></AuthGuard>} />
+        <Route path="/equity/ipo_dashboard" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
 
-        <Route path="/equity/ipo_dashboard/:ticker" element={<AuthGuard><IPODashboardMain /></AuthGuard>} />
+        <Route path="/equity/ipo_dashboard/:ticker" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
 
 
 

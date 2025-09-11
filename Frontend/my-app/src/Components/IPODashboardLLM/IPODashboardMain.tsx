@@ -4,7 +4,7 @@ import html2canvas from "html2canvas";
 import {
   Box,
   Typography,
-  CircularProgress,
+
 
 } from "@mui/material";
 import { useParams } from "react-router-dom";
@@ -12,14 +12,12 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { cardColors, formatDate } from "./UtilsIPODashboard";
 import introImage from "../../Assets/images/monashee_page1.png";
-import outroImage from "../../Assets/images/Disclaimer.jpg";
 import monasheeLogo from "../../Assets/images/monashee_logo.png";
 import IPODashboardPage1 from "./IPODashboardMain/IPODashboardPage1";
 import IPODashboardPage2 from "./IPODashboardMain/IPODashboardPage2";
 import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
 import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
-import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 import NoDataPopup from "../../Pages/NoDataPopup";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -30,17 +28,20 @@ interface TickerOption {
   ticker_name: string;
   pricing_date: string;
 }
+interface IPODashboardMainProps {
+  selectedTicker?: string; // Make selectedTicker optional, as it might be passed or derived from the URL
+}
 
 
 
-const IPODashboardMain: React.FC = () => {
-  const { ticker } = useParams<{ ticker: string }>();
+const IPODashboardMain: React.FC<IPODashboardMainProps> = ({ selectedTicker }) => {
+  // const { ticker: urlTicker } = useParams<{ ticker: string }>(); //
   const [ipoData, setIpoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [allIpoTickers, setAllIpoTickers] = useState<TickerOption[]>([]);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(ticker || "");
+  // const [selectedTicker, setSelectedTicker] = useState<string | null>(selectedTicker || "");
   const [pdfLoading, setPdfLoading] = useState(false);
   const [editMode, setEditMode] = useState<Record<string, boolean>>({});
   const [editedContent, setEditedContent] = useState<Record<string, string[]>>({});
@@ -66,22 +67,22 @@ const navigate = useNavigate();
 // };
 
 useEffect(() => {
-  if (ticker) {
-    setSearchText(ticker);
+  if (selectedTicker) {
+    setSearchText(selectedTicker);
   }
-}, [ticker]);
+}, [selectedTicker]);
 
 
 useEffect(() => {
   const fetchAllIpoTickers = async () => {
     try {
-      const savedTicker = localStorage.getItem("selected_ticker");
+      // const savedTicker = localStorage.getItem("selected_ticker");
 
-      if (ticker) {
-        setSelectedTicker(ticker);
-      } else if (savedTicker) {
-        setSelectedTicker(savedTicker);
-      }
+      // if (selectedTicker) {
+      //   // setSelectedTicker(selectedTicker);
+      // } else if (savedTicker) {
+      //   setSelectedTicker(savedTicker);
+      // }
 
       const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
         headers: getAuthHeaders(),
@@ -94,7 +95,7 @@ useEffect(() => {
     }
   };
   fetchAllIpoTickers();
-}, [ticker]);
+}, [selectedTicker]);
 
   const handleAIComparisonClick = () => {
     setShowAIComparison(true);
@@ -511,33 +512,8 @@ const handleExportPDFPaginated = async () => {
   onConfirm={handleNoDataConfirm}
 /> */}
 
-      <Typography
-        variant="body2"
-        sx={{
-          fontWeight: 500,  
-          color: "#FFFFFF",
-          fontSize: { xs: "1rem", sm: "1.2rem" },
-          backgroundColor: "#002060",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "4vh",
-          padding: "8px 16px",
-          borderRadius: "8px",
-          textAlign: "center",
-          marginBottom: "40px",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-          animation: "fadeIn 1.5s ease-in-out",
-          "@keyframes fadeIn": {
-            "0%": { opacity: 0 },
-            "100%": { opacity: 1 },
-          },
-        }}
-      >
-        Welcome to detailed Insights on IPO - {selectedTicker}
-      </Typography>
 
-      <WriteUpIPODashbaord />
+
 
       <Box sx={{ px: 2 }}>
         {ipoData && (
