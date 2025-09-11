@@ -145,7 +145,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
     <Typography
       variant="body2"
       sx={{
-        color: "#727272ff",
+        color: "#000000ff",
         display: "-webkit-box",
         WebkitLineClamp: 3, // 🔹 Show max 3 lines
         WebkitBoxOrient: "vertical",
@@ -196,7 +196,7 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
     <Typography
       variant="body2"
       sx={{
-        color: "#727272ff",
+        color: "#000000ff",
         display: "-webkit-box",
         WebkitLineClamp: 3,   // 🔹 Limit to 3 lines
         WebkitBoxOrient: "vertical",
