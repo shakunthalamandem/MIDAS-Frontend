@@ -55,11 +55,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   });
-  //   const handleNoDataConfirm = () => {
-  //   navigate("/equity/ipo_dashboard", { replace: true });
-  // };
 
-  // Keep local ticker in sync with incoming prop
   useEffect(() => {
     if (selectedTicker !== undefined) {
       setCurrentTicker(selectedTicker ?? null);
@@ -70,14 +66,6 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   useEffect(() => {
     const fetchAllIpoTickers = async () => {
       try {
-        // const savedTicker = localStorage.getItem("selected_ticker");
-
-        // if (selectedTicker) {
-        //   // setSelectedTicker(selectedTicker);
-        // } else if (savedTicker) {
-        //   setSelectedTicker(savedTicker);
-        // }
-
         const response = await fetch(`${apiUrl}/api/ipo_dashboard_tickers/`, {
           headers: getAuthHeaders(),
         });
@@ -89,8 +77,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
       }
     };
     fetchAllIpoTickers();
-    // Fetch tickers once; not dependent on selected ticker
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, []);
 
   const handleAIComparisonClick = () => {
@@ -598,11 +585,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
 
   return (
     <>
-      {/* <NoDataPopup
-  open={noDataPopupOpen}
-  onClose={() => setNoDataPopupOpen(false)}
-  onConfirm={handleNoDataConfirm}
-/> */}
+
 
       <Box sx={{ px: 2 }}>
         {ipoData && (
