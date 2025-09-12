@@ -379,12 +379,9 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
                           {row.label}
                         </TableCell>
                         <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ whiteSpace: "pre-line" }}
-                          >
-                            {weeklyData?.explanation ||
-                              monthlyData?.explanation ||
+                          <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
+                            {weeklyData?.explanation || (weeklyData as any)?.Explanation ||
+                              monthlyData?.explanation || (monthlyData as any)?.Explanation ||
                               "N/A"}
                           </Typography>
                         </TableCell>
@@ -432,7 +429,9 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
                                   gap={1}
                                 >
                                   {/* {renderAccuracyLevel(modelData.Accuracy)} */}
-                                  {renderConfidenceLevel(modelData.confidence)}
+                                  {renderConfidenceLevel(
+                                    modelData.confidence ?? (modelData as any)?.Confidence ?? null
+                                  )}
                                 </Box>
                               </TableCell>
                             </React.Fragment>

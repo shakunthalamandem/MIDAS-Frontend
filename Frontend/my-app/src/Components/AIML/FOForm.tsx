@@ -275,8 +275,13 @@ const FOForm: React.FC<FOFormProps> = ({
       const fullData = fullResponse.predictions;
       const simplified: Record<string, PredictionModel> = {};
       for (const key in fullData) {
-        const { prediction, Accuracy, Confidence, range } = fullData[key];
-        simplified[key] = { prediction, accuracy: Accuracy, confidence: Confidence, model: "", range };
+        const item = fullData[key] || {};
+        const prediction = item.prediction ?? item.Prediction ?? null;
+        const accuracy = item.Accuracy ?? item.accuracy ?? null;
+        const confidence = item.Confidence ?? item.confidence ?? null;
+        const range = item.range ?? item.Range ?? null;
+        const explanation = item.explanation ?? item.Explanation ?? null;
+        simplified[key] = { prediction, accuracy, confidence, model: "", range, explanation };
       }
       setWeeklyPrediction(simplified);
       return simplified;
