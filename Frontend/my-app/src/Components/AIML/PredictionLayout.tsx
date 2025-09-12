@@ -107,7 +107,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
             : "",
         selected_bank_category: item.lead_bank || "",
         sponsor_yn_category:
-          item.sponsor === "Y" ? "Yes" : item.sponsor === "N" ? "No" : "",
+          item.sponsor === "Y" ? "Y" : item.sponsor === "N" ? "N" : "",
         sector_category: item.sector || "",
         deal_status: item.deal_status || "Announced",
         GDP: "Stable",
@@ -149,7 +149,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
             : "",
         selected_bank_category: item.lead_bank || "",
         sponsor_yn_category:
-          item.sponsor === "Y" ? "Yes" : item.sponsor === "N" ? "No" : "",
+          item.sponsor === "Y" ? "Y" : item.sponsor === "N" ? "N" : "",
         sector_category: item.sector || "",
         deal_status: item.deal_status || "Announced",
         GDP: "Stable",

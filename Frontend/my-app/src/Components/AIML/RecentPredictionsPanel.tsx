@@ -21,14 +21,14 @@ interface RecentPrediction {
   pricing_date: string;
   deal_type: string;
   region: string;
-  sponsor: string | null;
+  sponsor: string;
   deal_size: number;
-  lead_bank: string | null;
-  primary_percentage: number | null;
+  lead_bank: string;
+  primary_percentage: number;
   sector: string;
-  discount_from_announcement_price: number | null;
-  allocation_as_percentage_of_deal_size: number | null;
-  allocation_as_percentage_of_ioi: number | null;
+  discount_from_announcement_price: number;
+  allocation_as_percentage_of_deal_size: number;
+  allocation_as_percentage_of_ioi: number;
   gdp_growth: string | null;
   inflation_rate: string | null;
   treasury_rates: string | null;
@@ -295,19 +295,6 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
           )}
         />
       </Box>
-
-      {/* Color Legend */}
-      <Stack direction="row" spacing={2} justifyContent="center" mb={2}>
-        <Box display="flex" alignItems="center">
-          <Box sx={{ width: 16, height: 16, backgroundColor: "#fde2e2", borderRadius: "4px", mr: 0.5 }} />
-          <Typography fontSize={12}>IPO</Typography>
-        </Box>
-        <Box display="flex" alignItems="center">
-          <Box sx={{ width: 16, height: 16, backgroundColor: "#e8f4fc", borderRadius: "4px", mr: 0.5 }} />
-          <Typography fontSize={12}>FO</Typography>
-        </Box>
-      </Stack>
-
       {/* Cards */}
       <Grid container spacing={2}>
         {filteredCards.map((form, i) => {
