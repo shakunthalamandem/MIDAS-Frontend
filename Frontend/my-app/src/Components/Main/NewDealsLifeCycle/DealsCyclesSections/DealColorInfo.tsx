@@ -141,64 +141,67 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
       });
 
       if (response.ok) {
+
         alert("Saved successfully!");
         setEditable(false);
-      } else {
+        await fetchDealColorInfo();  // ✅ refetch fresh data
+      }
+      else {
         alert("Failed to save data");
       }
     } catch (error) {
       console.error(error);
     }
   };
-const renderField = (
-  label: string,
-  name: keyof DealColorData,
-  adornment?: string,
-  canEdit: boolean = false
-) => {
-  const rawValue = formData[name];
-  const isValueAvailable = rawValue !== null && rawValue !== undefined && rawValue !== "";
-  const displayValue = isValueAvailable ? rawValue : "Not Available";
+  const renderField = (
+    label: string,
+    name: keyof DealColorData,
+    adornment?: string,
+    canEdit: boolean = false
+  ) => {
+    const rawValue = formData[name];
+    const isValueAvailable = rawValue !== null && rawValue !== undefined && rawValue !== "";
+    const displayValue = isValueAvailable ? rawValue : "Not Available";
 
-  return (
-    <>
-      <Typography
-        variant="body2"
-        color="#002060"
-        gutterBottom
-        fontWeight={500}
-      >
-        {label}
-      </Typography>
-      {editable && canEdit ? (
-        <TextField
-          name={name}
-          value={isValueAvailable ? rawValue : ""}
-          onChange={handleChange}
-          fullWidth
-          size="small"
-          variant="standard"
-          InputProps={{
-            disableUnderline: false,
-            endAdornment:
-              adornment && isValueAvailable
-                ? <InputAdornment position="end">{adornment}</InputAdornment>
-                : undefined,
-            style: { color: "#002060" },
-          }}
-        />
-      ) : (
+    return (
+      <>
         <Typography
-          variant="body1"
-          sx={{ color: isValueAvailable ? "#B1062E" : "#999", fontWeight: 500, py: 0.5 }}
+          variant="body2"
+          color="#002060"
+          gutterBottom
+          fontWeight={500}
         >
-          {displayValue}
-          {isValueAvailable && adornment ? ` ${adornment}` : ""}
+          {label}
         </Typography>
-      )}
-    </>
-  );
-};
+        {editable && canEdit ? (
+          <TextField
+            name={name}
+            value={isValueAvailable ? rawValue : ""}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+            variant="standard"
+            InputProps={{
+              disableUnderline: false,
+              endAdornment:
+                adornment && isValueAvailable
+                  ? <InputAdornment position="end">{adornment}</InputAdornment>
+                  : undefined,
+              style: { color: "#002060" },
+            }}
+          />
+        ) : (
+          <Typography
+            variant="body1"
+            sx={{ color: isValueAvailable ? "#B1062E" : "#999", fontWeight: 500, py: 0.5 }}
+          >
+            {displayValue}
+            {isValueAvailable && adornment ? ` ${adornment}` : ""}
+          </Typography>
+        )}
+      </>
+    );
+  };
 
 
   return (
@@ -242,78 +245,78 @@ const renderField = (
             <Grid item xs={12} sm={6}>
               {renderField("Deal Type", "deal_type")}
             </Grid>
-<Grid item xs={12} sm={6}>
-  <Typography
-    variant="body2"
-    color="#002060"
-    fontWeight={500}
-    gutterBottom
-  >
-    Times Covered
-  </Typography>
-<RadioGroup
-  row
-  value={formData.times_covered || ""}
-  onChange={handleChange}
-  name="times_covered"
->
-  <FormControlLabel
-    value="1x-5x"
-    control={
-      <Radio
-        disabled={!editable}
-        sx={{
-          color: '#B1062E',
-          '&.Mui-checked': {
-            color: '#B1062E',
-          },
-        }}
-      />
-    }
-    sx={{
-      color: formData.times_covered === '1x-5x' ? '#B1062E' : '#000000', // Apply color conditionally
-    }}
-    label="1x-5x"
-  />
-  <FormControlLabel
-    value="5x-10x"
-    control={
-      <Radio
-        disabled={!editable}
-        sx={{
-          color: '#B1062E',
-          '&.Mui-checked': {
-            color: '#B1062E',
-          },
-        }}
-      />
-    }
-    sx={{
-      color: formData.times_covered === '5x-10x' ? '#B1062E' : '#000000', // Apply color conditionally
-    }}
-    label="5x-10x"
-  />
-  <FormControlLabel
-    value=">10x"
-    control={
-      <Radio
-        disabled={!editable}
-        sx={{
-          color: '#B1062E',
-          '&.Mui-checked': {
-            color: '#B1062E',
-          },
-        }}
-      />
-    }
-    sx={{
-      color: formData.times_covered === '>10x' ? '#B1062E' : '#000000', // Apply color conditionally
-    }}
-    label=">10x"
-  />
-</RadioGroup>
+            <Grid item xs={12} sm={6}>
+              <Typography
+                variant="body2"
+                color="#002060"
+                fontWeight={500}
+                gutterBottom
+              >
+                Times Covered
+              </Typography>
+              <RadioGroup
+                row
+                value={formData.times_covered || ""}
+                onChange={handleChange}
+                name="times_covered"
+              >
+                <FormControlLabel
+                  value="1x-5x"
+                  control={
+                    <Radio
+                      disabled={!editable}
+                      sx={{
+                        color: '#B1062E',
+                        '&.Mui-checked': {
+                          color: '#B1062E',
+                        },
+                      }}
+                    />
+                  }
+                  sx={{
+                    color: formData.times_covered === '1x-5x' ? '#B1062E' : '#000000', // Apply color conditionally
+                  }}
+                  label="1x-5x"
+                />
+                <FormControlLabel
+                  value="5x-10x"
+                  control={
+                    <Radio
+                      disabled={!editable}
+                      sx={{
+                        color: '#B1062E',
+                        '&.Mui-checked': {
+                          color: '#B1062E',
+                        },
+                      }}
+                    />
+                  }
+                  sx={{
+                    color: formData.times_covered === '5x-10x' ? '#B1062E' : '#000000', // Apply color conditionally
+                  }}
+                  label="5x-10x"
+                />
+                <FormControlLabel
+                  value=">10x"
+                  control={
+                    <Radio
+                      disabled={!editable}
+                      sx={{
+                        color: '#B1062E',
+                        '&.Mui-checked': {
+                          color: '#B1062E',
+                        },
+                      }}
+                    />
+                  }
+                  sx={{
+                    color: formData.times_covered === '>10x' ? '#B1062E' : '#000000', // Apply color conditionally
+                  }}
+                  label=">10x"
+                />
+              </RadioGroup>
 
-</Grid>
+            </Grid>
 
             <Grid item xs={12} sm={6}>
               {renderField(
