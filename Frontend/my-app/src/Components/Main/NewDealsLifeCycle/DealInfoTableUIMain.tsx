@@ -32,6 +32,7 @@ const formatDealSize = (dealSize: any) => {
       ...row,
       deal_size: row.deal_size ? formatDealSize(row.deal_size.toFixed()) : "$0",
       issue_offer_price: row.issue_offer_price ? formatDealSize(row.issue_offer_price.toFixed(2)) : "$0",
+      ioi_deal_size: row.ioi_deal_size ? `${row.ioi_deal_size.toFixed(2)}%` : "0%",
       allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
       allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed()}%` : "0%",
       model_am_return: row.model_am_return ? `${formatDealSize(row.model_am_return.toFixed())}` : "$0",
@@ -86,7 +87,13 @@ const formatDealSize = (dealSize: any) => {
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 180 },
+    // { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 180 },
+    {
+  field: "ioi_deal_size",
+  headerName: "IOI as % Deal Size",
+  width: 120,
+  
+},
 {
   field: "number_of_shares_offered",
   headerName: "Shares Offered",
