@@ -47,8 +47,6 @@ const DealUnifiedSummaryTableDashboard: React.FC<DealUnifiedSummaryTableDashboar
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-     console.log("Effect running with:", { sector, region, dealtype, fo_type });
-    // Prevent API call if essential values are missing
     if (!sector || !region || !dealtype) return;
 
     const fetchData = async () => {
@@ -107,9 +105,6 @@ const DealUnifiedSummaryTableDashboard: React.FC<DealUnifiedSummaryTableDashboar
 
   return (
     <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        MDD Summary Table
-      </Typography>
 
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
