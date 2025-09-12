@@ -24,7 +24,12 @@ export interface DealWriteUpData {
   differentiated_summary?: string;
   average_sector_return?: string | number;
   monashee_score?: string | number;
-  deal_writeup_rating?: number;
+  deal_writeup_rating?: {
+    score?: number;
+    revenue?: number;
+    growth?: number;
+    net_income?: number;
+  };
 }
 
 interface Props {
@@ -45,36 +50,58 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
   });
 
   useEffect(() => {
-    setFormData(data);
-    if (data?.ticker && data?.deal_type) {
-      fetchDealWriteUpInfo(data);
-    }
+    setFormData({
+      ...data,
+      deal_writeup_rating: data.deal_writeup_rating || {},
+    });
+    if (data?.ticker && data?.deal_type) fetchDealWriteUpInfo(data);
   }, [data, fetchDealWriteUpInfo]);
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
-    const success = await saveDealWriteUpInfo(data, formData);
-    if (success) setEditable(false);
+  const handleSliderChange = (value: number) => {
+    setFormData(prev => ({
+      ...prev,
+      deal_writeup_rating: { ...prev.deal_writeup_rating, score: value },
+    }));
   };
 
-  const handleReadMore = () => {
-    if (formData?.ticker) {
-      window.open(
-        `/equity/ipo_dashboard/${formData.ticker}`,
-        "_blank",
-        "noopener,noreferrer"
-      );
+const handleSave = async () => {
+  const payload = {
+    average_sector_return: formData.average_sector_return,
+    deal_type: formData.deal_type,
+    deal_writeup_rating: undefined, // other ratings read-only
+    differentiated_summary: formData.differentiated_summary,
+    id: formData.id,
+    monashee_score: formData.monashee_score,
+    pricing_date: formData.pricing_date,
+    ticker: formData.ticker,
+    valuation: formData.valuation,
+  };
+
+  try {
+    const success = await saveDealWriteUpInfo(data, payload);
+
+    if (success) {
+      alert("Saved successfully!");   // ✅ show success alert
+      setEditable(false);             // ✅ disable edit mode
+      await fetchDealWriteUpInfo(data); // ✅ refetch fresh data
+    } else {
+      alert("Failed to save data");   // optional failure alert
     }
-  };
+  } catch (error) {
+    console.error("Error saving deal write-up:", error);
+    alert("Error saving data");
+  }
+};
 
-  const handleSliderChange = (name: keyof DealWriteUpData, value: number) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleReadMore = (field: "valuation" | "differentiated_summary") => {
+    if (formData?.ticker) {
+      window.open(`/equity/ipo_dashboard/${formData.ticker}`, "_blank", "noopener,noreferrer");
+    }
   };
 
   return (
@@ -88,19 +115,13 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
         }}
       >
         <CardContent>
-          {/* Header with Edit/Save */}
+          {/* Header */}
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h6" color="#002060" fontWeight="bold">
               Deal Write-Up Info
             </Typography>
-            <IconButton
-              onClick={() => (editable ? handleSave() : setEditable(true))}
-            >
-              {editable ? (
-                <SaveIcon sx={{ color: "#002060" }} />
-              ) : (
-                <EditIcon sx={{ color: "#002060" }} />
-              )}
+            <IconButton onClick={() => (editable ? handleSave() : setEditable(true))}>
+              {editable ? <SaveIcon sx={{ color: "#002060" }} /> : <EditIcon sx={{ color: "#002060" }} />}
             </IconButton>
           </Box>
 
@@ -111,16 +132,16 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
                 label="Sector Avg 1D Return % - Last 10 Deals"
                 name="average_sector_return"
                 value={formData.average_sector_return}
-                editable={editable}
+                editable={false}
                 adornment="%"
-                onChange={handleChange}
+                onChange={() => {}}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <FieldRenderer
                 label="Monashee Score"
                 name="monashee_score"
-                value={formData.monashee_score}
+                value={formData.monashee_score || ""}
                 editable={editable}
                 canEdit
                 onChange={handleChange}
@@ -128,137 +149,77 @@ const DealWriteUpInfo: React.FC<Props> = ({ data }) => {
             </Grid>
           </Grid>
 
-          {/* Valuation */}
-{/* Valuation */}
-<Grid item xs={12} mt={2}>
-  <Typography
-    variant="subtitle1"
-    color="#002060"
-    fontWeight="bold"
-    gutterBottom
-  >
-    Valuation
-  </Typography>
-
-  <Box sx={{ position: "relative" }}>
-    {/* Valuation Text */}
-    <Typography
-      variant="body2"
-      sx={{
-        color: "#000000ff",
-        display: "-webkit-box",
-        WebkitLineClamp: 3, // 🔹 Show max 3 lines
-        WebkitBoxOrient: "vertical",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        mr: 1,
-      }}
-    >
-      {!formData.valuation || formData.valuation.length === 0
-        ? "Not Available"
-        : formData.valuation}
-    </Typography>
-
-    {/* Read More Button */}
-    {formData.valuation && formData.valuation.length > 0 && (
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>
-        <Button
-          onClick={handleReadMore}
-          sx={{
-            color: "#006030ff",
-            fontStyle: "italic",
-            fontSize: "0.8rem",
-            textTransform: "none",
-            minWidth: "auto",
-            p: 0,
-          }}
-        >
-          Read More
-        </Button>
-      </Box>
-    )}
-  </Box>
-</Grid>
-
-{/* Differentiated Summary */}
-<Grid item xs={12} mt={2}>
-  <Typography
-    variant="subtitle1"
-    color="#002060"
-    fontWeight="bold"
-    gutterBottom
-  >
-    Differentiated Summary
-  </Typography>
-
-  <Box sx={{ position: "relative" }}>
-    {/* Summary Text */}
-    <Typography
-      variant="body2"
-      sx={{
-        color: "#000000ff",
-        display: "-webkit-box",
-        WebkitLineClamp: 3,   // 🔹 Limit to 3 lines
-        WebkitBoxOrient: "vertical",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        mr: 1,
-      }}
-    >
-      {!formData.differentiated_summary ||
-      formData.differentiated_summary.length === 0
-        ? "Not Available"
-        : formData.differentiated_summary}
-    </Typography>
-
-    {/* Read More Button */}
-    {formData.differentiated_summary &&
-      formData.differentiated_summary.length > 0 && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>
-          <Button
-            onClick={handleReadMore}
-            sx={{
-              color: "#006030ff",
-              fontStyle: "italic",
-              fontSize: "0.8rem",
-              textTransform: "none",
-              minWidth: "auto",
-              p: 0,
-            }}
-          >
-            Read More
-          </Button>
-        </Box>
-      )}
-  </Box>
-</Grid>
 
 
-
-          {/* Deal Write-Up Rating */}
-          <Grid item xs={12}>
-            <Card
-              sx={{
-                background: "linear-gradient(135deg, #e0eeecff, #e0eeecff)",
-                borderRadius: "20px",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                mt: 2,
-              }}
-            >
-              <CardContent>
+          {/* Valuation & Differentiated Summary */}
+          {(["valuation", "differentiated_summary"] as const).map((field) => (
+            <Grid item xs={12} mt={2} key={field}>
+              <Typography variant="subtitle1" color="#002060" fontWeight="bold" gutterBottom>
+                {field === "valuation" ? "Valuation" : "Differentiated Summary"}
+              </Typography>
+              <Box sx={{ position: "relative" }}>
                 <Typography
-                  variant="body1"
-                  color="#002060"
-                  fontWeight="bold"
-                  gutterBottom
+                  variant="body2"
+                  sx={{
+                    color: "#000",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    mr: 1,
+                  }}
                 >
+                  {!formData[field] ? "Not Available" : formData[field]}
+                </Typography>
+                {formData[field] && (
+                  <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>
+                    <Button
+                      onClick={() => handleReadMore(field)}
+                      sx={{
+                        color: "#006030",
+                        fontStyle: "italic",
+                        fontSize: "0.8rem",
+                        textTransform: "none",
+                        p: 0,
+                      }}
+                    >
+                      Read More
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+            </Grid>
+          ))}
+          {/* Revenue / Growth / Net Income */}
+          <Grid container spacing={2} mt={2}>
+            {(["revenue", "growth", "net_income"] as const).map((field) => (
+              <Grid item xs={12} sm={4} key={field}>
+                <FieldRenderer
+                  label={field === "growth" ? "Growth (%)" : field.charAt(0).toUpperCase() + field.slice(1)}
+                  name={field}
+                  value={
+                    formData.deal_writeup_rating?.[field] !== undefined
+                      ? Number(formData.deal_writeup_rating?.[field]).toFixed(2)
+                      : ""
+                  }
+                  editable={false} // read-only
+                  adornment={field === "growth" ? "%" : undefined}
+                  onChange={() => {}}
+                />
+              </Grid>
+            ))}
+          </Grid>
+          {/* Deal Write-Up Rating Slider */}
+          <Grid item xs={12} mt={2}>
+            <Card sx={{ background: "#e0eeec", borderRadius: "20px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
+              <CardContent>
+                <Typography variant="body1" color="#002060" fontWeight="bold" gutterBottom>
                   Deal Write-Up Rating
                 </Typography>
                 <BlueSlider
-                  value={formData.deal_writeup_rating || 0}
-                  onChange={(_, value) =>
-                    handleSliderChange("deal_writeup_rating", value as number)
-                  }
+                  value={formData.deal_writeup_rating?.score || 0}
+                  onChange={(_, value) => handleSliderChange(value as number)}
                   valueLabelDisplay="on"
                   step={1}
                   min={0}
