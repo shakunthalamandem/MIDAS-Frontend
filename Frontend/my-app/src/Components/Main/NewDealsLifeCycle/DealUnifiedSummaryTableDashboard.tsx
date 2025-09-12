@@ -9,8 +9,8 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 type DealUnifiedSummaryTableDashboardProps = {
   data?: {
-    gics_sector_from_bloomberg?: string;
-    broad_region?: string;
+    sector?: string;
+    region?: string;
     deal_type?: string;
     fo_type?: string;
   };
@@ -35,11 +35,11 @@ type MddSummaryRow = {
 };
 
 const DealUnifiedSummaryTableDashboard: React.FC<DealUnifiedSummaryTableDashboardProps> = ({ data }) => {
-  // Map input props to API-compatible keys
-  const sector = data?.gics_sector_from_bloomberg;
-  const region = data?.broad_region;
+  const sector = data?.sector;
+  const region = data?.region;
   const dealtype = data?.deal_type;
   const fo_type = data?.fo_type || "";
+
 
   const [rows, setRows] = useState<MddSummaryRow[]>([]);
   const [loading, setLoading] = useState(false);
