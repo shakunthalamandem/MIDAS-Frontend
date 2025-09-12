@@ -16,9 +16,6 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import { SelectedOption } from "../../types/NewDealFormData";
 import DealFormSectionMainTable from "./DealFormSections/DealFormSectionMainTable";
-import DealFormAllTickersTable from "./DealFormSections/DealFormAllTickersTable";
-import { useNavigate } from "react-router-dom";
-import DealsDropdown from "../Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
 
 // Helper: safe-format date for display / searching
 function formatDateSimple(dateString: string): string {
@@ -55,14 +52,6 @@ type TickerOption = {
   deal_colour_present: "Yes" | "No" | string;
 };
 
-type TickerData = {
-  ticker: string;
-  pricing_date: string;
-  deal_colour_present: string;
-  deal_captain?: string;
-  deal_type?: string;
-  allocation_as_percentage_of_deal_size?: number | null;
-};
 
 const EquityNewDealFormMain: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<SelectedOption | null>(
