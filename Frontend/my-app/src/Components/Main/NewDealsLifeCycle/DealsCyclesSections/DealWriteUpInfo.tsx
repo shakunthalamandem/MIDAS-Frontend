@@ -192,24 +192,31 @@ const handleSave = async () => {
             </Grid>
           ))}
           {/* Revenue / Growth / Net Income */}
-          <Grid container spacing={2} mt={2}>
-            {(["revenue", "growth", "net_income"] as const).map((field) => (
-              <Grid item xs={12} sm={4} key={field}>
-                <FieldRenderer
-                  label={field === "growth" ? "Growth (%)" : field.charAt(0).toUpperCase() + field.slice(1)}
-                  name={field}
-                  value={
-                    formData.deal_writeup_rating?.[field] !== undefined
-                      ? Number(formData.deal_writeup_rating?.[field]).toFixed(2)
-                      : ""
-                  }
-                  editable={false} // read-only
-                  adornment={field === "growth" ? "%" : undefined}
-                  onChange={() => {}}
-                />
-              </Grid>
-            ))}
-          </Grid>
+<Grid container spacing={2} mt={2}>
+  {(["revenue", "growth", "net_income"] as const).map((field) => (
+    <Grid item xs={12} sm={4} key={field}>
+      <FieldRenderer
+        label={
+          field === "growth"
+            ? "Growth (%)"
+            : field === "net_income"
+            ? "Net Income (%)"
+            : field.charAt(0).toUpperCase() + field.slice(1)
+        }
+        name={field}
+        value={
+          formData.deal_writeup_rating?.[field] !== undefined
+            ? Number(formData.deal_writeup_rating?.[field]).toFixed(2)
+            : ""
+        }
+        editable={false} // read-only
+        adornment={field === "growth" || field === "net_income" ? "%" : undefined}
+        onChange={() => {}}
+      />
+    </Grid>
+  ))}
+</Grid>
+
           {/* Deal Write-Up Rating Slider */}
           <Grid item xs={12} mt={2}>
             <Card sx={{ background: "#e0eeec", borderRadius: "20px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
