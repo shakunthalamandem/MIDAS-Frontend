@@ -166,7 +166,6 @@ const IPOForm: React.FC<IPOFormProps> = ({
       }
     };
     boundedPct("revenue_growth_category");
-    boundedPct("net_profit_margin_category");
 
     setFormErrors(errors);
     return isValid;
@@ -370,9 +369,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
     {
       label: "Net Profit Margin (%)",
       name: "net_profit_margin_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 12.5",
+      selectOptions: ['Negative', 'Positive']
     },
 
     {

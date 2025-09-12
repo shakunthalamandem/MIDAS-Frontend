@@ -29,7 +29,7 @@ const defaultFOValues = {
   revenue_category: "",
   revenue_growth_category: "",
   net_profit_margin_category: "",
-  issue_to_pre_day_close_category: "",
+  issue_to_pre_day_close_return_category: "",
 };
 
 const defaultIPOValues = {
@@ -122,7 +122,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           item.revenue_growth != null ? String(item.revenue_growth) : "",
         net_profit_margin_category:
           item.net_profit_margin != null ? String(item.net_profit_margin) : "",
-        issue_to_pre_day_close_category:
+        issue_to_pre_day_close_return_category:
           item.issue_to_pre_day_close != null
             ? String(item.issue_to_pre_day_close)
             : "",
