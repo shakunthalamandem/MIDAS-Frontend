@@ -38,6 +38,7 @@ type MddSummaryRow = {
   model_am_return: number;
   model_return_1_allocation: number;
   model_actual_return: number;
+  ioi_deal_size: number;
 };
 
 const DealUnifiedSummaryTableDashboard: React.FC<
@@ -105,6 +106,7 @@ const DealUnifiedSummaryTableDashboard: React.FC<
     { field: "model_am_return", headerName: "Model AM Return", width: 150, type: "number" },
     { field: "model_return_1_allocation", headerName: "Model Return 1 Alloc", width: 180, type: "number" },
     { field: "model_actual_return", headerName: "Model Actual Return", width: 160, type: "number" },
+    { field: "ioi_deal_size", headerName: "IOI Deal Size", width: 130, type: "number" }, // ✅ Fixed this line
   ];
 
   return (
