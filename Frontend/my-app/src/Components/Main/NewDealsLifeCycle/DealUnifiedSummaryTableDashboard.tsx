@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   CircularProgress,
-  Typography,
   Paper,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -39,7 +38,6 @@ const DealUnifiedSummaryTableDashboard: React.FC<DealUnifiedSummaryTableDashboar
   const region = data?.region;
   const dealtype = data?.deal_type;
   const fo_type = data?.fo_type || "";
-
 
   const [rows, setRows] = useState<MddSummaryRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -105,18 +103,31 @@ const DealUnifiedSummaryTableDashboard: React.FC<DealUnifiedSummaryTableDashboar
 
   return (
     <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
-
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
           <CircularProgress />
         </Box>
       ) : (
         <Box sx={{ height: 600, width: "100%" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            getRowHeight={() => "auto"}
-          />
+             <DataGrid
+                       rows={rows}
+                       columns={columns}
+                       loading={loading}
+                       checkboxSelection={false}
+                       rowHeight={35}
+    
+                       sx={{
+                         "& .MuiDataGrid-container--top [role='row']": {
+                           backgroundColor: "#002060",
+                           color: "#FFFFFF",
+                         },
+                         "& .Mui-selected": {
+                           backgroundColor: "#cad0f1ff !important",
+                         },
+                         cursor: "pointer",
+                         border: "1px solid #ccccccff",
+                       }}
+                     />
         </Box>
       )}
     </Paper>
