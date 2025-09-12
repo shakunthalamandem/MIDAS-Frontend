@@ -75,15 +75,11 @@ const EquityNewDealFormMain: React.FC = () => {
   const [totalDealColourNo, setTotalDealColourNo] = useState<number>(0);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  const navigate = useNavigate();
 
-  // keep track if we've fetched at least once (so we don't overwrite user selection unexpectedly)
   const fetchedOnceRef = useRef(false);
 
-  // Debounced input used to filter list (avoids excessive re-renders)
   const debouncedInput = useDebounce(inputValue, 250);
 
-  // Fetch tickers from server (call on mount and when user explicitly refreshes)
   const fetchTickers = async () => {
     setLoading(true);
     setError(null);
@@ -101,7 +97,6 @@ const EquityNewDealFormMain: React.FC = () => {
 
       const tickers = response.data.tickers || [];
 
-      // Deduplicate by ticker + pricing_date
       const uniqueMap = new Map<string, TickerOption>();
       for (const t of tickers) {
         const key = `${t.ticker}||${t.pricing_date}`;
@@ -112,7 +107,6 @@ const EquityNewDealFormMain: React.FC = () => {
       setOptions(uniqueTickers);
       setTotalDealColourNo(response.data.total_deal_colour_no ?? 0);
 
-      // Only set a default selection the first time we fetch and only if user hasn't picked anything
       if (!fetchedOnceRef.current) {
         fetchedOnceRef.current = true;
         const defaultTicker = response.data.default_ticker;
@@ -136,10 +130,8 @@ const EquityNewDealFormMain: React.FC = () => {
   // initial fetch
   useEffect(() => {
     fetchTickers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // If the user has selected something that isn't in the options list (eg. created manually), ensure it's present so Autocomplete can display it
   useEffect(() => {
     if (selectedOption && !selectedOption.create) {
       const exists = options.some(
@@ -178,17 +170,7 @@ const EquityNewDealFormMain: React.FC = () => {
     }
   };
 
-  // This handler is used by the table rows
-  const handleTickerRowClick = (row: TickerData) => {
-    const option: TickerOption = {
-      ticker: row.ticker,
-      pricing_date: row.pricing_date,
-      deal_colour_present: row.deal_colour_present === "Yes" ? "Yes" : "No",
-    };
-    setSelectedOption({ ...option, create: false });
-  };
 
-  // Filtering logic for Autocomplete — uses debounced input to reduce chattiness
   const filteredOptions = React.useMemo(() => {
     const q = debouncedInput.trim().toLowerCase();
     if (!q) return options;
@@ -274,7 +256,6 @@ const EquityNewDealFormMain: React.FC = () => {
                   Create New
                 </Button>
 
-                {/* Autocomplete is now controlled via inputValue so searches are predictable. We also removed automatic fetching on open. */}
                 <Autocomplete
                   sx={{
                     minWidth: 300,
@@ -401,8 +382,6 @@ const EquityNewDealFormMain: React.FC = () => {
               {error}
             </Alert>
           )}
-          {/* Hiding the table for now as per feedback */}
-          {/* <DealFormAllTickersTable onRowClick={handleTickerRowClick} /> */}
           <DealFormSectionMainTable selectedOption={selectedOption} />
         </Paper>
       </Fade>
