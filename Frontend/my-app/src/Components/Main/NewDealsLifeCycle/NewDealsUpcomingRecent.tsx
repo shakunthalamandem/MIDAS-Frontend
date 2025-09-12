@@ -11,6 +11,7 @@ import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionIn
 import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
 import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
 import DealIoiValuesTable from "./DealsCyclesSections/DealIoiValuesTable";
+import MddSummaryTable from "./MddSummaryTable";
 
 
 
@@ -94,7 +95,9 @@ const token = localStorage.getItem("access_token");
           <Grid item xs={12} md={4} mb={4}>
             <DealIoiValuesTable data={selectedDeal} />
           </Grid>
-        </>
+
+        <MddSummaryTable data={selectedDeal} />
+  </>
       )}
     </Container>
   );
