@@ -7,8 +7,7 @@ import {
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
-// Props type (matches selectedDeal structure passed from parent)
-type MddSummaryTableProps = {
+type DealUnifiedSummaryTableDashboardProps = {
   data?: {
     gics_sector_from_bloomberg?: string;
     broad_region?: string;
@@ -35,7 +34,7 @@ type MddSummaryRow = {
   model_actual_return: number;
 };
 
-const MddSummaryTable: React.FC<MddSummaryTableProps> = ({ data }) => {
+const DealUnifiedSummaryTableDashboard: React.FC<DealUnifiedSummaryTableDashboardProps> = ({ data }) => {
   // Map input props to API-compatible keys
   const sector = data?.gics_sector_from_bloomberg;
   const region = data?.broad_region;
@@ -129,4 +128,4 @@ const MddSummaryTable: React.FC<MddSummaryTableProps> = ({ data }) => {
   );
 };
 
-export default MddSummaryTable;
+export default DealUnifiedSummaryTableDashboard;
