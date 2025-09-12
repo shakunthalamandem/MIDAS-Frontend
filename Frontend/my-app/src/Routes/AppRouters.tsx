@@ -68,9 +68,10 @@ import TickerDashboard from "../Components/DealTracking/TickerDashboard";
 import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteUpMain";
 import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
-
 import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
 import DealsDropdown from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
+import EquityAiMlPage from "../Components/AIML/EquityAiMlPage";
+
 import WriteUpIPODashbaord from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 
 const AppRouters: React.FC = () => {
@@ -86,6 +87,8 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/machine_learning/equity" element={<AuthGuard><MlEquityMain /></AuthGuard>} />
+        
+        <Route path="/equity/ai_ml_models" element={<AuthGuard><EquityAiMlPage /></AuthGuard>} />
 
 
 
