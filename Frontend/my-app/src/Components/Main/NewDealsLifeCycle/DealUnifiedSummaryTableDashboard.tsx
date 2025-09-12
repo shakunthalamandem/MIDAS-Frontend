@@ -96,18 +96,22 @@ const DealUnifiedSummaryTableDashboard: React.FC<
 
   const columns: GridColDef[] = [
     { field: "ticker", headerName: "Ticker", width: 100 },
-    { field: "allocated_capital", headerName: "Allocated Capital ($)", width: 150, type: "number" },
-    { field: "allocation_percentage", headerName: "Allocation as % of IOI ", width: 130, type: "number" },
+
+
+
+ 
     { field: "allocation_deal_size_percentage", headerName: "Allocation as % of Deal Size", width: 130, type: "number" },
+    { field: "allocation_percentage", headerName: "Allocation as % of IOI ", width: 130, type: "number" },
     { field: "ioi_deal_size", headerName: "IOI as % Deal Size", width: 130, type: "number" },
+    { field: "allocated_capital", headerName: "Allocated Capital ($)", width: 150, type: "number" },
     { field: "am_capital_committed", headerName: "AM Capital ($)", width: 130, type: "number" },
     { field: "allocation_return", headerName: "Allocation P&L ($)", width: 130, type: "number" },
     { field: "am_return", headerName: "AM P&L ($)", width: 130, type: "number" },
     { field: "total_return", headerName: "Total P&L ($)", width: 130, type: "number" },
+    { field: "model_return_1_allocation", headerName: "Model Allocation Capital ($)", width: 180, type: "number" },
     { field: "model_am_capital", headerName: "Model AM Capital($)", width: 150, type: "number" },
-    { field: "model_am_return", headerName: "Model P&L with Model AM ($)", width: 150, type: "number" },
     { field: "model_return_1_allocation", headerName: "Model P&L with Model Allocation ($)", width: 180, type: "number" },
-    { field: "model_capital_1_allocation", headerName: "Model Allocation Capital ($)", width: 180, type: "number" },
+    { field: "model_am_return", headerName: "Model P&L with Model AM ($)", width: 150, type: "number" },
     { field: "model_actual_return", headerName: "Model Actual P&L", width: 160, type: "number" },
   ];
 
