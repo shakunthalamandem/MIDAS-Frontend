@@ -226,7 +226,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
         textAlign="center"
         color="#002060"
       >
-        Recent Predictions
+        Recent {selectedType} Predictions
       </Typography>
 
       {/* Search (scrollable results; ~5 visible) */}
