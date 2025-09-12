@@ -86,7 +86,7 @@ const AppRouters: React.FC = () => {
         <Route path="/user_log" element={<Logs />} />
 
 
-        <Route path="/machine_learning/equity" element={<AuthGuard><MlEquityMain /></AuthGuard>} />
+        {/* <Route path="/machine_learning/equity" element={<AuthGuard><MlEquityMain /></AuthGuard>} /> */}
         
         <Route path="/equity/ai_ml_models" element={<AuthGuard><EquityAiMlPage /></AuthGuard>} />
 
