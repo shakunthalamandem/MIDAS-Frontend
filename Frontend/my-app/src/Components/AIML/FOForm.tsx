@@ -58,7 +58,7 @@ interface FOFormValues {
   revenue_category: string;             // e.g. in $M
   revenue_growth_category: string;      // %
   net_profit_margin_category: string;   // %
-  issue_to_pre_day_close_category: string; // %
+  issue_to_pre_day_close_return_category: string; // %
 }
 
 interface FOFormProps {
@@ -144,7 +144,7 @@ const FOForm: React.FC<FOFormProps> = ({
       { key: "net_profit_margin_category", range: [-1000, 1000] },
 
       // NEW: issue_to_pre_day_close may be negative or positive; keep a wide bound
-      { key: "issue_to_pre_day_close_category", range: [-1000, 1000] },
+      { key: "issue_to_pre_day_close_return_category", range: [-1000, 1000] },
     ];
 
     percentChecks.forEach(({ key, range }) => {
@@ -317,7 +317,7 @@ const FOForm: React.FC<FOFormProps> = ({
       revenue_category: "",
       revenue_growth_category: "",
       net_profit_margin_category: "",
-      issue_to_pre_day_close_category: "",
+      issue_to_pre_day_close_return_category: "",
     }));
     setFormErrors({});
     setPrediction(null);
@@ -363,7 +363,7 @@ const FOForm: React.FC<FOFormProps> = ({
     { label: "Revenue ($ Million)", name: "revenue_category", type: "number", adornment: "$M", placeholder: "e.g., 250" },
     { label: "Revenue Growth (%)", name: "revenue_growth_category", type: "number", adornment: "%", placeholder: "e.g., 12.5" },
     { label: "Net Profit Margin (%)", name: "net_profit_margin_category", type: "number", adornment: "%", placeholder: "e.g., 18.2" },
-    { label: "Issue → Pre-day Close (%)", name: "issue_to_pre_day_close_category", type: "number", adornment: "%", placeholder: "e.g., -3.2" },
+    { label: "Issue → Pre-day Close (%)", name: "issue_to_pre_day_close_return_category", type: "number", adornment: "%", placeholder: "e.g., -3.2" },
 
     { label: "Deal Status", name: "deal_status", selectOptions: options.deal_status },
   ];
