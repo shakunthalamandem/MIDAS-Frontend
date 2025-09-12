@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -21,26 +21,41 @@ interface FOBusinessHighlightsProps {
   ticker: string;
 }
 
+const toBulletItems = (text?: string): string[] => {
+  if (!text) return [];
+  return text
+    .split(/[\n;]|[•]/g)
+    .map((s) => s.replace(/^\s*[-–—•\d\)\.]+\s*/g, "").trim())
+    .filter(Boolean);
+};
+
 const FOBusinessHighlights: React.FC<FOBusinessHighlightsProps> = ({
   selectedData,
   ticker,
 }) => {
+  const raw = selectedData?.business_highlights || "";
+
   const [editMode, setEditMode] = useState(false);
-  const [value, setValue] = useState(selectedData.business_highlights || "");
+  const [value, setValue] = useState(raw);
   const [loading, setLoading] = useState(false);
 
-  // Controlled expansion
+  // keep local value in sync when NOT editing
+  useEffect(() => {
+    if (!editMode) setValue(raw);
+  }, [raw, editMode]);
+
+  const bullets = useMemo(() => toBulletItems(raw), [raw]);
+
+  // Accordion expansion
   const [expanded, setExpanded] = useState(false);
   const { forceExpand } = useExportContext();
+  const isExpanded = forceExpand || expanded || editMode;
 
-  // Focus ref
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
+  // Focus ref (multiline -> textarea)
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   useEffect(() => {
     if (editMode && inputRef.current) inputRef.current.focus();
   }, [editMode]);
-
-  if (!selectedData || !selectedData.business_highlights) return null;
 
   const handleSave = async () => {
     setLoading(true);
@@ -72,11 +87,8 @@ const FOBusinessHighlights: React.FC<FOBusinessHighlightsProps> = ({
     }
   };
 
-  // Only toggle when chevron is clicked
   const handleAccordionChange = (event: React.SyntheticEvent) => {
-    const fromExpander = (event.target as HTMLElement)?.closest(
-      '[data-expander="true"]'
-    );
+    const fromExpander = (event.target as HTMLElement)?.closest('[data-expander="true"]');
     if (!fromExpander) return;
     setExpanded((prev) => !prev);
   };
@@ -86,21 +98,22 @@ const FOBusinessHighlights: React.FC<FOBusinessHighlightsProps> = ({
     if (editMode) {
       handleSave();
     } else {
-      setExpanded(true); // auto-open
-      setEditMode(true); // enter edit mode (focus via useEffect)
+      setExpanded(true);
+      setEditMode(true);
     }
   };
 
+  // 🚨 Move hooks before return
+  if (!selectedData || selectedData.business_highlights == null) {
+    return null;
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    >
+    <motion.div initial={false} animate={{ opacity: 1, scale: 1, y: 0 }}>
       <Accordion
-        expanded={forceExpand || expanded}
-        // Gate expansion to chevron only
+        expanded={isExpanded}
         onChange={handleAccordionChange as any}
+        TransitionProps={{ unmountOnExit: false, timeout: editMode ? 0 : 200 }}
         sx={{
           borderRadius: 3,
           background: "linear-gradient(#f0f5ff)",
@@ -110,11 +123,7 @@ const FOBusinessHighlights: React.FC<FOBusinessHighlightsProps> = ({
       >
         <AccordionSummary
           expandIcon={
-            <IconButton
-              data-expander="true"
-              size="small"
-              sx={{ color: "#002060" }}
-            >
+            <IconButton data-expander="true" size="small" sx={{ color: "#002060" }}>
               <ExpandMoreIcon />
             </IconButton>
           }
@@ -129,12 +138,7 @@ const FOBusinessHighlights: React.FC<FOBusinessHighlightsProps> = ({
         >
           <Typography
             variant="h6"
-            sx={{
-              color: "#026269",
-              fontWeight: "bold",
-              flex: 1,
-              textAlign: "center",
-            }}
+            sx={{ color: "#026269", fontWeight: "bold", flex: 1, textAlign: "center" }}
           >
             Business Highlights
           </Typography>
@@ -160,21 +164,22 @@ const FOBusinessHighlights: React.FC<FOBusinessHighlightsProps> = ({
               onChange={(e) => setValue(e.target.value)}
               disabled={loading}
               variant="outlined"
+              placeholder={"Enter one point per line, or separate with ';' or '•'."}
             />
-          ) : (
-            <Box>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: "#333",
-                  lineHeight: 1.7,
-                  fontSize: "1.1rem",
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {value}
-              </Typography>
+          ) : bullets.length ? (
+            <Box component="ul" sx={{ pl: 3, m: 0 }}>
+              {bullets.map((item, i) => (
+                <li key={i}>
+                  <Typography variant="body1" sx={{ color: "#333", lineHeight: 1.7 }}>
+                    {item}
+                  </Typography>
+                </li>
+              ))}
             </Box>
+          ) : (
+            <Typography variant="body2" sx={{ color: "text.secondary", fontStyle: "italic" }}>
+              No highlights available.
+            </Typography>
           )}
         </AccordionDetails>
       </Accordion>

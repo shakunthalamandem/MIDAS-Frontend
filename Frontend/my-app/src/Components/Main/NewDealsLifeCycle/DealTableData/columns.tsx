@@ -116,10 +116,21 @@ export const getColumns = (
       flex: 1,
       headerAlign: "center",
       align: "center",
-      renderCell: (params) =>
-        params.value?.toString().toLowerCase() === "yes" ? (
+      renderCell: (params) => {
+        // Determine the link based on the deal_type dynamically
+        const dealType = params.row.deal_type?.toLowerCase();
+        const ticker = params.row.ticker;
+
+        const link =
+          dealType === "ipo"
+            ? `/equity/ipo_dashboard/${ticker}`
+            : dealType === "fo"
+            ? `/equity/fo_dashboard/${ticker}`
+            : "#"; // fallback or no link
+
+        return params.value?.toString().toLowerCase() === "yes" ? (
           <Link
-            to={`/ipo-dashboard/${params.row.ticker}`}
+            to={link}
             style={{
               color: "#002060",
               fontWeight: "bold",
@@ -131,8 +142,10 @@ export const getColumns = (
           </Link>
         ) : (
           <span style={{ color: "red" }}>✘</span>
-        ),
+        );
+      },
     },
+
     {
       field: "deal_status",
       headerName: "Deal Status",

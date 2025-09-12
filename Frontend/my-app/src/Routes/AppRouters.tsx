@@ -44,12 +44,11 @@ import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquity
 
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
 import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
-import WriteUpdashboardMain from "../Components/Main/WriteUpsRecords/WriteUpdashboardMain";
+import ReportWriteUpMain from "../Components/Main/WriteUpsRecords/ReportWriteUpMain";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
 import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketOpportnuityMain";
 import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
-import IPODashboardMain from "../Components/IPODashboardLLM/IPODashboardMain";
 import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
 import EquityNewDealFormMain from "../Components/EquityNewDealFormMain/EquityNewDealFormMain";
 import LkFileUpload from "../Components/Uploads/LkFileUpload";
@@ -69,10 +68,11 @@ import TickerDashboard from "../Components/DealTracking/TickerDashboard";
 import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteUpMain";
 import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
-import WriteupDashboardMain from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteupDashboardMain";
 import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
 import DealsDropdown from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
 import EquityAiMlPage from "../Components/AIML/EquityAiMlPage";
+
+import WriteUpIPODashbaord from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 
 const AppRouters: React.FC = () => {
   return (
@@ -168,22 +168,9 @@ const AppRouters: React.FC = () => {
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
         <Route path="/ai_upload" element={<AuthGuard><UploadAiInsights /></AuthGuard>} />
         <Route path="/new_deal_data_upload" element={<AuthGuard><DealsDropdown /></AuthGuard>} />    
+        <Route path="/equity/ipo_dashboard" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
 
-
-  
-
-
-<Route
-  path="/equity/ipo_dashboard"
-  element={
-    <AuthGuard>
-      <IPODashboardMain />
-      
-    </AuthGuard>
-  }
-/>
-
-   <Route path="/ipo-dashboard/:ticker" element={<IPODashboardMain />} />
+        <Route path="/equity/ipo_dashboard/:ticker" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
 
 
 
@@ -206,20 +193,12 @@ const AppRouters: React.FC = () => {
         <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO/></AuthGuard>} />
        
         <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain/></AuthGuard>} />
-         <Route 
-          path="/deals/dashboard/Tracking" 
-          element={
-            <AuthGuard>
-              <TickerTrackingWrapper />
-            </AuthGuard>
-          } 
-        />
-        <Route path="/writeup/dashboard" element={<AuthGuard><WriteupDashboardMain/></AuthGuard>} />
+         <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTrackingWrapper /></AuthGuard>} />
 
 
 
         <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
-        <Route path="/data-analytics/writeups" element={<AuthGuard><WriteUpdashboardMain /></AuthGuard>} />
+        <Route path="/data-analytics/writeups" element={<AuthGuard><ReportWriteUpMain /></AuthGuard>} />
 
         <Route path="/gen_ai_tool" element={<AuthGuard><PerplexityChatMain /></AuthGuard>} />
 
@@ -250,6 +229,7 @@ const AppRouters: React.FC = () => {
             {/* FO Write Up Routes */}
 
         <Route path="/equity/fo_dashboard" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
+         <Route path="/equity/fo_dashboard/:ticker" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
 
 
 

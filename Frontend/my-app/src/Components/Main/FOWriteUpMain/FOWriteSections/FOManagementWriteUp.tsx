@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -21,30 +21,45 @@ interface FOManagementWriteupProps {
   ticker: string;
 }
 
+// Split into points, strip leading markers like "-", "•", "1)", etc.
+const toBulletItems = (text?: string): string[] => {
+  if (!text) return [];
+  return text
+    .split(/[\n;]|[•]/g)
+    .map((s) => s.replace(/^\s*[-–—•\d]+\s*\)?\.?\s*/g, "").trim())
+    .map((s) => s.replace(/\s+/g, " ")) // collapse extra spaces
+    .filter(Boolean);
+};
+
 const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
   selectedData,
   ticker,
 }) => {
+  const raw = selectedData?.management_writeup || "";
+
   const [editMode, setEditMode] = useState(false);
-  const [value, setValue] = useState(selectedData.management_writeup || "");
+  const [value, setValue] = useState(raw);
   const [loading, setLoading] = useState(false);
+
+  // Keep local editable value in sync when NOT editing (prevents caret jumps)
+  useEffect(() => {
+    if (!editMode) setValue(raw);
+  }, [raw, editMode]);
+
+  const bullets = useMemo(() => toBulletItems(raw), [raw]);
 
   // Accordion controlled expansion
   const [expanded, setExpanded] = useState(false);
   const { forceExpand } = useExportContext();
+  const isExpanded = forceExpand || expanded || editMode; // keep open while editing
 
-  // Ref to focus textarea
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
+  // Textarea ref & focus
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   useEffect(() => {
-    if (editMode && inputRef.current) {
-      inputRef.current.focus();
-    }
+    if (editMode && inputRef.current) inputRef.current.focus();
   }, [editMode]);
 
-  if (!selectedData || !selectedData.management_writeup) return null;
-
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     setLoading(true);
     const apiUrl = process.env.REACT_APP_API_URL;
     const token = localStorage.getItem("access_token");
@@ -63,8 +78,8 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
       });
 
       if (response.ok) {
-        setEditMode(false); // go back to showing Edit button
-        setExpanded(true); // keep accordion open after saving
+        setEditMode(false);
+        setExpanded(true);
       } else {
         console.error("Failed to update management writeup");
       }
@@ -73,13 +88,11 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [ticker, value]);
 
   // Toggle accordion only if chevron is clicked
   const handleAccordionChange = (event: React.SyntheticEvent) => {
-    const fromExpander = (event.target as HTMLElement)?.closest(
-      '[data-expander="true"]'
-    );
+    const fromExpander = (event.target as HTMLElement)?.closest('[data-expander="true"]');
     if (!fromExpander) return;
     setExpanded((prev) => !prev);
   };
@@ -94,29 +107,37 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
     }
   };
 
+  // Caret-preserving change handler (avoids cursor jump)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const el = e.target as HTMLTextAreaElement;
+    const pos = el.selectionStart ?? e.target.value.length;
+    setValue(e.target.value);
+    queueMicrotask(() => {
+      try { el.setSelectionRange(pos, pos); } catch {}
+    });
+  };
+
+  // If API didn't send this field, don't render the section at all
+  if (!selectedData || selectedData.management_writeup == null) return null;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    >
+    <motion.div initial={false} animate={{ opacity: 1, scale: 1, y: 0 }}>
       <Accordion
-        expanded={forceExpand || expanded}
+        expanded={isExpanded}
         onChange={handleAccordionChange as any}
+        TransitionProps={{ unmountOnExit: false, timeout: editMode ? 0 : 200 }} // no animation while editing
         sx={{
           borderRadius: 3,
           background: "linear-gradient(#f0f5ff)",
           boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
           "&:before": { display: "none" },
+          "& .MuiAccordionSummary-root": { minHeight: 56 },
+          "& .MuiAccordionSummary-content": { my: 0 },
         }}
       >
         <AccordionSummary
           expandIcon={
-            <IconButton
-              data-expander="true"
-              size="small"
-              sx={{ color: "#002060" }}
-            >
+            <IconButton data-expander="true" size="small" sx={{ color: "#002060" }}>
               <ExpandMoreIcon />
             </IconButton>
           }
@@ -131,12 +152,7 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
         >
           <Typography
             variant="h6"
-            sx={{
-              color: "#026269",
-              fontWeight: "bold",
-              flex: 1,
-              textAlign: "center",
-            }}
+            sx={{ color: "#026269", fontWeight: "bold", flex: 1, textAlign: "center" }}
           >
             Management
           </Typography>
@@ -146,6 +162,7 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
             onClick={handleEditClick}
             disabled={loading}
             sx={{ color: "#002060" }}
+            aria-label={editMode ? "save management writeup" : "edit management writeup"}
           >
             {editMode ? <SaveIcon /> : <EditIcon />}
           </IconButton>
@@ -159,24 +176,25 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
               fullWidth
               minRows={6}
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={handleChange}
               disabled={loading}
               variant="outlined"
+              placeholder={"Enter one leader per line, or separate with ';' or '•'."}
             />
-          ) : (
-            <Box>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: "#333",
-                  lineHeight: 1.7,
-                  fontSize: "1.1rem",
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {value}
-              </Typography>
+          ) : bullets.length ? (
+            <Box component="ul" sx={{ pl: 3, m: 0 }}>
+              {bullets.map((item, i) => (
+                <li key={i}>
+                  <Typography variant="body1" sx={{ color: "#333", lineHeight: 1.7 }}>
+                    {item}
+                  </Typography>
+                </li>
+              ))}
             </Box>
+          ) : (
+            <Typography variant="body2" sx={{ color: "text.secondary", fontStyle: "italic" }}>
+              No management details available.
+            </Typography>
           )}
         </AccordionDetails>
       </Accordion>

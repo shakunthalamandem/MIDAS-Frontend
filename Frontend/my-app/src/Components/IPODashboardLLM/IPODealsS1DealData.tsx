@@ -8,21 +8,22 @@ import {
   CircularProgress,
   TextField,
   IconButton,
-  Stack,
   Container,
+  CardHeader,
+  Button,
 } from "@mui/material";
 import {
   FaBullseye,
   FaHandshake,
   FaTruckMoving,
-  FaChartLine,
   FaClipboardList,
 } from "react-icons/fa";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
-import IPOMonasheeScore from "./IPOMonasheeScore";
-import { motion } from "framer-motion";
+import { LightbulbOutlined } from "@mui/icons-material";
+import IPODashboardMainTable from "./IPODashboardMainTable";
+import IPOAITickersMain from "./Hooks/IPOAITickersMain";
 
 type DealData = {
   fair_value_estimate: string;
@@ -34,18 +35,28 @@ type DealData = {
 
 type EditableField = keyof DealData;
 
-interface IPODealsS1DealDataProps {
-  selectedTicker: string | null;
+interface SelectedData {
+  ticker_name?: string;
+  company_name?: string;
+  exchange?: string;
 }
 
-const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
-  selectedTicker,
-}) => {
+interface IPODealsS1DealDataProps {
+  selectedData: SelectedData;
+}
+
+const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData }) => {
   const [dealData, setDealData] = useState<DealData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editedDealData, setEditedDealData] = useState<DealData | null>(null);
+
+  // Toggle AI comparison
+  const [showAIComparison, setShowAIComparison] = useState(false);
+  const handleAIComparisonClick = () => {
+    setShowAIComparison((prev) => !prev);
+  };
 
   useEffect(() => {
     const fetchDeals = async () => {
@@ -58,24 +69,21 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
         return;
       }
 
-      if (!selectedTicker) {
+      if (!selectedData?.ticker_name) {
         setError("No selected ticker provided.");
         setLoading(false);
         return;
       }
 
       try {
-        const response = await fetch(
-          `${apiUrl}/api/ipo_deal_data_fairvalues/`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-            body: JSON.stringify({ ticker: selectedTicker }),
-          }
-        );
+        const response = await fetch(`${apiUrl}/api/ipo_deal_data_fairvalues/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ ticker: selectedData.ticker_name }),
+        });
 
         if (!response.ok) {
           const errData = await response.json();
@@ -96,10 +104,10 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
       }
     };
 
-    if (selectedTicker) {
+    if (selectedData?.ticker_name) {
       fetchDeals();
     }
-  }, [selectedTicker]);
+  }, [selectedData]);
 
   const handleSaveDealData = async () => {
     if (!editedDealData) return;
@@ -117,7 +125,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
           Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({
-          ticker: selectedTicker,
+          ticker: selectedData.ticker_name,
           ...editedDealData,
         }),
       });
@@ -149,17 +157,17 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
   if (!dealData) return <Typography>No deal data found.</Typography>;
 
   return (
-    <Container maxWidth="xl" style={{ marginTop: "20px", position: "relative" }}>
+    <Container maxWidth="xl" sx={{ mt: 3, position: "relative" }}>
       <Card
         sx={{
           position: "relative",
           boxShadow: 3,
           borderRadius: 2,
           backgroundColor: "#f4f6f9",
-          padding: 3,
+          p: 3,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           {editMode ? (
             <>
               <IconButton color="primary" onClick={handleSaveDealData}>
@@ -176,61 +184,44 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
           )}
         </Box>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          <Grid container spacing={3}>
-            {/* First Row */}
-            {[{ label: "Fair Value Estimate", key: "fair_value_estimate", icon: <FaBullseye size={24} color="#002060" /> },
-            { label: "Indication of Interest", key: "indication_of_interest", icon: <FaHandshake size={24} color="#002060" /> },
-            { label: "After Market Threshold", key: "after_market_threshold", icon: <FaTruckMoving size={24} color="#002060" /> }]
-            .map((field, idx) => (
-              <Grid item xs={12} sm={4} key={idx} sx={{ display: "flex", flexDirection: "column" }}>
-                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-                  <CardContent sx={{ backgroundColor:"#fff", padding: 2, flexGrow: 1 ,border:'2px solid #002060',borderRadius: 2}}>
-                    <Grid container spacing={2} alignItems="flex-start" sx={{ height: "100%" }}>
-                      <Grid item xs>
-                        <Box display="flex" >
-                          <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold", mr: 1 }}>
-                            {field.icon}
-                          </Typography>
-                          <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
-                            {field.label}
-                          </Typography>
-                        </Box>
-
-                        {editMode ? (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            multiline
-                            minRows={2}
-                            value={editedDealData?.[field.key as EditableField] ?? dealData[field.key as EditableField] ?? ""}
-                            onChange={(e) =>
-                              setEditedDealData((prev) => ({
-                                ...prev!,
-                                [field.key]: e.target.value,
-                              }))
-                            }
-                          />
-                        ) : (
-                          <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
-                            {dealData[field.key as EditableField] ?? ""}
-                          </Typography>
-                        )}
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-
-            {/* Differentiated Summary */}
-            <Grid item xs={12} sx={{ display: "flex", flexDirection: "column" }}>
-              <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-                <CardContent sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}>
-                  <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
-                    <FaClipboardList size={24} color="#002060" style={{ marginRight: 8 }} />
-                    <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
-                      Differentiated Summary
+        <Grid container spacing={3}>
+          {/* Fair Value / Indication / After Market */}
+          {[
+            {
+              label: "Fair Value Estimate",
+              key: "fair_value_estimate",
+              icon: <FaBullseye size={24} color="#002060" />,
+            },
+            {
+              label: "Indication of Interest",
+              key: "indication_of_interest",
+              icon: <FaHandshake size={24} color="#002060" />,
+            },
+            {
+              label: "After Market Threshold",
+              key: "after_market_threshold",
+              icon: <FaTruckMoving size={24} color="#002060" />,
+            },
+          ].map((field, idx) => (
+            <Grid item xs={12} sm={4} key={idx}>
+              <Card
+                variant="outlined"
+                sx={{ boxShadow: 2, borderRadius: 2, height: "100%" }}
+              >
+                <CardContent
+                  sx={{
+                    backgroundColor: "#fff",
+                    border: "2px solid #002060",
+                    borderRadius: 2,
+                  }}
+                >
+                  <Box display="flex" alignItems="center" mb={1}>
+                    {field.icon}
+                    <Typography
+                      variant="h6"
+                      sx={{ ml: 1, fontWeight: "bold", color: "#002060" }}
+                    >
+                      {field.label}
                     </Typography>
                   </Box>
                   {editMode ? (
@@ -238,78 +229,129 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({
                       fullWidth
                       size="small"
                       multiline
-                      minRows={4}
-                      value={editedDealData?.differentiated_summary ?? dealData.differentiated_summary ?? ""}
+                      minRows={2}
+                      value={
+                        editedDealData?.[field.key as EditableField] ??
+                        dealData[field.key as EditableField] ??
+                        ""
+                      }
                       onChange={(e) =>
                         setEditedDealData((prev) => ({
                           ...prev!,
-                          differentiated_summary: e.target.value,
+                          [field.key]: e.target.value,
                         }))
                       }
                     />
                   ) : (
                     <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
-                      {dealData.differentiated_summary ?? ""}
+                      {dealData[field.key as EditableField] ?? ""}
                     </Typography>
                   )}
                 </CardContent>
               </Card>
             </Grid>
+          ))}
 
-            {/* Monashee Score */}
-            <Grid item xs={12} sx={{ display: "flex", flexDirection: "column" }}>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} style={{ flex: 1 }}>
-                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-                  <CardContent sx={{ backgroundColor: "#fff", padding: 2, flexGrow: 1 }}>
-                    <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
-                      <FaChartLine size={24} color="#002060" style={{ marginRight: 8 }} />
-                      <Typography variant="h6" sx={{ color: "#002060", fontWeight: "bold" }}>
-                        Monashee Proprietary Grade
-                      </Typography>
-                    </Box>
-                    <Box display="flex" justifyContent="center" mb={2}>
-                      <Typography>
-                        Recent IPO Performances related to this Sector.
-                      </Typography>
-                    </Box>
-
-                    <IPOMonasheeScore ticker={selectedTicker ?? ""} monasheeScore={dealData.monashee_score} />
-                    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 100, textAlign: "center" }}>
-                      {editMode ? (
-                        <Stack spacing={1} alignItems="center">
-                          <Typography variant="subtitle2" sx={{ color: "#555" }}>
-                            Enter Monashee Grade (0–10)
-                          </Typography>
-                          <TextField
-                            type="number"
-                            size="small"
-                            inputProps={{ min: 0, max: 10, step: 1 }}
-                            placeholder="0–10"
-                            value={editedDealData?.monashee_score ?? dealData.monashee_score ?? ""}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              const parsed = value === "" ? undefined : Number(value);
-                              setEditedDealData((prev) => ({
-                                ...prev!,
-                                monashee_score: parsed === undefined ? 0 : parsed,
-                              }));
-                            }}
-                            sx={{ width: 150, "& input": { textAlign: "center" } }}
-                          />
-                        </Stack>
-                      ) : (
-                        <Typography variant="h5" sx={{ color: "#086000ff", fontWeight: 600}}>
-                          Monashee Grade is {dealData.monashee_score ?? 0} / 10
-                        </Typography>
-                      )}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
+          {/* Differentiated Summary */}
+          <Grid item xs={12}>
+            <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+              <CardContent sx={{ backgroundColor: "#fff" }}>
+                <Box display="flex" alignItems="center" mb={2}>
+                  <FaClipboardList
+                    size={24}
+                    color="#002060"
+                    style={{ marginRight: 8 }}
+                  />
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: "bold", color: "#002060" }}
+                  >
+                    Differentiated Summary
+                  </Typography>
+                </Box>
+                {editMode ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    multiline
+                    minRows={4}
+                    value={
+                      editedDealData?.differentiated_summary ??
+                      dealData.differentiated_summary ??
+                      ""
+                    }
+                    onChange={(e) =>
+                      setEditedDealData((prev) => ({
+                        ...prev!,
+                        differentiated_summary: e.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
+                    {dealData.differentiated_summary ?? ""}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
           </Grid>
 
-        </Box>
+          {/* Comparative Table */}
+          <Grid item xs={12}> 
+            {/* <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}> */}
+              {/* <CardContent sx={{ backgroundColor: "#fff" }}> */}
+                <IPODashboardMainTable ticker={selectedData?.ticker_name ?? ""} />
+                <Typography
+                  variant="caption"
+                  display="block"
+                  align="right"
+                  sx={{ fontStyle: "italic", color: "gray", mt: 1 }}
+                >
+                  Source: Factset
+                </Typography>
+              {/* </CardContent>
+            </Card> */}
+          </Grid>
+
+          {/* AI Suggestions */}
+          <Grid item xs={12}>
+            <Card
+              sx={{
+                backgroundColor: "#f4f9ff",
+                animation: showAIComparison ? "glowPulse 2s ease-out" : "none",
+                "@keyframes glowPulse": {
+                  "0%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
+                  "50%": { boxShadow: "0 0 20px rgba(0, 150, 255, 0.5)" },
+                  "100%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
+                },
+              }}
+            >
+              <CardHeader
+                avatar={<LightbulbOutlined color="primary" />}
+                title={
+                  <Typography variant="h6" color="primary" fontWeight={600}>
+                    Get AI-Recommended Comparative Tickers
+                  </Typography>
+                }
+                action={
+                  <Button
+                    variant={showAIComparison ? "outlined" : "contained"}
+                    color="primary"
+                    onClick={handleAIComparisonClick}
+                    sx={{ textTransform: "none", fontWeight: 500 }}
+                  >
+                    {showAIComparison ? "Hide Suggestions" : "Show Suggestions"}
+                  </Button>
+                }
+              />
+              <CardContent>
+                {showAIComparison && (
+                  <IPOAITickersMain selectedData={selectedData} />
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       </Card>
     </Container>
   );

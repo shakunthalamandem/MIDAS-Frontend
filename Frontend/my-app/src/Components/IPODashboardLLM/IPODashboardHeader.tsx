@@ -18,6 +18,8 @@ import IPOSummaryTable from "./IPODashboardMain/IPOSummaryTable";
 
 interface TickerOption {
   ticker_name: string;
+  company_name?: string;
+  exchange?: string;
   pricing_date: string | null;
 }
 
@@ -45,9 +47,9 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   // ✅ Sort tickers: no date → top, then newest first
   const sortedTickers = [...allIpoTickers].sort((a, b) => {
     if (!a.pricing_date && !b.pricing_date) return 0;
-    if (!a.pricing_date) return -1; // a goes on top
-    if (!b.pricing_date) return 1; // b goes on top
-    return new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime(); // desc order
+    if (!a.pricing_date) return -1;
+    if (!b.pricing_date) return 1;
+    return new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime();
   });
 
   return (
@@ -128,13 +130,24 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
       </Box>
 
       {/* Child Components */}
-      <IPOdashboardLine ipodata={ipoData} />
+<IPOdashboardLine
+  ipodata={ipoData}
+  selectedTicker={selectedTicker || ""}
+  setIpoData={ipoData} // ✅ Correct function to update IPO data
+/>
+
       <IPOSummaryTable
         ipodata={ipoData}
         selectedTicker={selectedTicker || ""}
         setIpoData={setSelectedTicker}
       />
-      <IPODealsS1DealData selectedTicker={selectedTicker || ""} />
+      <IPODealsS1DealData
+        selectedData={{
+          ticker_name: ipoData?.ticker_name,
+          company_name: ipoData?.company_name,
+          exchange: ipoData?.exchange,
+        }}
+      />
     </Container>
   );
 };

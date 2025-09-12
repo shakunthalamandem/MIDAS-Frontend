@@ -43,7 +43,7 @@ interface IPOData {
   revenue_growth?: RevenueGrowth;
 }
 
-interface IPORatingCriteriaCardProps {
+interface IPODashboardCardRatingsProps {
   selectedTicker: string;
   ipodata: IPOData;
   setIpoData: React.Dispatch<React.SetStateAction<IPOData>>;
@@ -81,7 +81,7 @@ const getColorHex = (color: string | null | undefined) => {
 };
 
 // ---------- ✅ Component ----------
-const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
+const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
   selectedTicker,
   ipodata,
   setIpoData,
@@ -413,4 +413,4 @@ const IPORatingCriteriaCard: React.FC<IPORatingCriteriaCardProps> = ({
   );
 };
 
-export default IPORatingCriteriaCard;
+export default IPODashboardCardRatings;
