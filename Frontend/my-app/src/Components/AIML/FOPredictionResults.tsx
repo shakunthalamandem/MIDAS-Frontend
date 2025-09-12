@@ -302,55 +302,56 @@ const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
 
               {/* Dynamic Rows */}
               {Object.entries(rowLabels)
-                .filter(([_, label]) => label)
-                .map(([type, label]) => (
-                  <TableRow key={type}>
-                    <TableCell>
-                      {label.issue || label.open || ""}
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" whiteSpace="pre-line">
-                        {result[getModelKey(modelVersions[0], type)]?.explanation ||
-                          ""}
-                      </Typography>
-                    </TableCell>
+                // Only include rows that have a label (issue or open)
+                .filter(([_, label]) => Boolean(label.issue || label.open))
+                // And at least one model version has data
+                .filter(([type]) =>
+                  modelVersions.some((version) => {
+                    const key = getModelKey(version, type);
+                    return Boolean(result[key]);
+                  })
+                )
+                .map(([type, label]) => {
+                  const labelText = label.issue || label.open || "";
+                  const explanation =
+                    result[getModelKey(modelVersions[0], type)]?.explanation || "";
 
-                    {modelVersions.map((version, idx) => {
-                      const key = getModelKey(version, type);
-                      const modelData = result[key];
-                      const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
+                  return (
+                    <TableRow key={type}>
+                      <TableCell>{labelText}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" whiteSpace="pre-line">
+                          {explanation}
+                        </Typography>
+                      </TableCell>
 
-                      if (!modelData) {
+                      {modelVersions.map((version, idx) => {
+                        const key = getModelKey(version, type);
+                        const modelData = result[key];
+                        const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
+
+                        if (!modelData) {
+                          // Skip rendering cells for this version if no data
+                          return <React.Fragment key={version} />;
+                        }
+
+                        const rendered =
+                          type === "main"
+                            ? renderOutcome(modelData.prediction)
+                            : renderBinaryResult(modelData.prediction);
+
                         return (
                           <React.Fragment key={version}>
+                            <TableCell sx={{ bgcolor: cellColor }}>{rendered}</TableCell>
                             <TableCell sx={{ bgcolor: cellColor }}>
-                              <Box color="text.disabled">N/A</Box>
-                            </TableCell>
-                            <TableCell sx={{ bgcolor: cellColor }}>
-                              <Box color="text.disabled">N/A</Box>
+                              {renderConfidenceLevel(modelData.confidence)}
                             </TableCell>
                           </React.Fragment>
                         );
-                      }
-
-                      const renderResult =
-                        type === "main"
-                          ? renderOutcome(modelData.prediction)
-                          : renderBinaryResult(modelData.prediction);
-
-                      return (
-                        <React.Fragment key={version}>
-                          <TableCell sx={{ bgcolor: cellColor }}>
-                            {renderResult}
-                          </TableCell>
-                          <TableCell sx={{ bgcolor: cellColor }}>
-                            {renderConfidenceLevel(modelData.confidence)}
-                          </TableCell>
-                        </React.Fragment>
-                      );
-                    })}
-                  </TableRow>
-                ))}
+                      })}
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </TableContainer>
