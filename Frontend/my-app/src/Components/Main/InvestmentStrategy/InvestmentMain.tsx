@@ -39,7 +39,7 @@ const InvestmentMain: React.FC = () => {
           },
         }}
       >
-         Last Three years Moanshee participated  Deal Information for PRIME Investment Strategies
+         Last Five years Moanshee participated  Deal Information for PRIME Investment Strategies
           </Typography>
 
       {/* Fetch Data */}
