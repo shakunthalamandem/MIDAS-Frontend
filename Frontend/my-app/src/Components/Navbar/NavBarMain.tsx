@@ -203,7 +203,7 @@ const NavbarMain: React.FC = () => {
                 { label: "IPO Write-Up", path: "/equity/ipo_dashboard" },
                 { label: "FO Write-Up", path: "/equity/fo_dashboard" },
                 { label: "New Deal Form", path: "/deals/new_deal_form" },
-                { label: "AI-ML Model", path: "/machine_learning/equity" },
+                { label: "AI-ML Model", path: "/equity/ai_ml_models" },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
@@ -213,7 +213,7 @@ const NavbarMain: React.FC = () => {
               menuItems={[
                 {
                   label: "US IPO & FO ML Model",
-                  path: "/machine_learning/equity",
+                  path: "/equity/ai_ml_models",
                 },
                 { label: "Gen AI Tool", path: "/gen_ai_tool" },
                 { label: "Portfolio Sentiment ", path: "/genai_data_set" },
