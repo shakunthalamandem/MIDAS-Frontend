@@ -252,49 +252,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData })
             </Grid>
           ))}
 
-          {/* Differentiated Summary */}
-          <Grid item xs={12}>
-            <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-              <CardContent sx={{ backgroundColor: "#fff" }}>
-                <Box display="flex" alignItems="center" mb={2}>
-                  <FaClipboardList
-                    size={24}
-                    color="#002060"
-                    style={{ marginRight: 8 }}
-                  />
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", color: "#002060" }}
-                  >
-                    Differentiated Summary
-                  </Typography>
-                </Box>
-                {editMode ? (
-                  <TextField
-                    fullWidth
-                    size="small"
-                    multiline
-                    minRows={4}
-                    value={
-                      editedDealData?.differentiated_summary ??
-                      dealData.differentiated_summary ??
-                      ""
-                    }
-                    onChange={(e) =>
-                      setEditedDealData((prev) => ({
-                        ...prev!,
-                        differentiated_summary: e.target.value,
-                      }))
-                    }
-                  />
-                ) : (
-                  <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
-                    {dealData.differentiated_summary ?? ""}
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
+
 
           {/* Comparative Table */}
           <Grid item xs={12}> 
@@ -347,6 +305,51 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData })
               <CardContent>
                 {showAIComparison && (
                   <IPOAITickersMain selectedData={selectedData} />
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+                    {/* Differentiated Summary */}
+          <Grid item xs={12}>
+            <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+              <CardContent sx={{ backgroundColor: "#fff" }}>
+                <Box display="flex" alignItems="center" mb={2}>
+                  <FaClipboardList
+                    size={24}
+                    color="#002060"
+                    style={{ marginRight: 8 }}
+                  />
+                  <Typography
+                    variant="h6"
+                    align="center"
+                    sx={{ fontWeight: "bold", color: "#002060" }}
+                  >
+                    Differentiated Summary
+                  </Typography>
+                </Box>
+                {editMode ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    multiline
+                    minRows={4}
+                    value={
+                      editedDealData?.differentiated_summary ??
+                      dealData.differentiated_summary ??
+                      ""
+                    }
+                    onChange={(e) =>
+                      setEditedDealData((prev) => ({
+                        ...prev!,
+                        differentiated_summary: e.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
+                    {dealData.differentiated_summary ?? ""}
+                  </Typography>
                 )}
               </CardContent>
             </Card>
