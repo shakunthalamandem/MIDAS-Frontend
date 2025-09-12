@@ -279,16 +279,7 @@ return (
 <Box mb={15} sx={{ height: 600, width: "100%" }}>
   <Card>
     <CardContent>
-      <Box sx={{ display: "flex", marginBottom: 2 }}>
-        <TextField
-          label="Search by Ticker"
-          variant="outlined"
-          size="small"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ width: "200px" }}
-        />
-      </Box>
+
       <Box sx={{ height: 600, width: "100%", marginTop: 3 }}>
         <DataGrid
           rows={filteredRows}
