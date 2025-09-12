@@ -17,9 +17,14 @@ interface FOWriteUpDashboardMainProps {
   ticker?: string; // ✅ new optional prop
 }
 
-const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({ ticker }) => {
+const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({
+  ticker,
+}) => {
   const [rows, setRows] = useState<FOData[]>([]);
-  const [selected, setSelected] = useState<{ ticker: string; deal_id: string } | null>(null);
+  const [selected, setSelected] = useState<{
+    ticker: string;
+    deal_id: string;
+  } | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -40,15 +45,22 @@ const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({ ticker 
         setRows(json);
 
         // ✅ Select ticker from props if available, else fallback to first row
+        // ✅ Select ticker from props if available, else fallback to last row
         if (ticker) {
           const match = json.find((item) => item.ticker === ticker);
           if (match) {
             setSelected({ ticker: match.ticker, deal_id: match.deal_id });
           } else if (json.length > 0) {
-            setSelected({ ticker: json[0].ticker, deal_id: json[0].deal_id });
+            setSelected({
+              ticker: json[json.length - 1].ticker,
+              deal_id: json[json.length - 1].deal_id,
+            });
           }
         } else if (json.length > 0) {
-          setSelected({ ticker: json[0].ticker, deal_id: json[0].deal_id });
+          setSelected({
+            ticker: json[json.length - 1].ticker,
+            deal_id: json[json.length - 1].deal_id,
+          });
         }
       } catch (err) {
         console.error("Error fetching FO data:", err);
@@ -73,7 +85,9 @@ const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({ ticker 
       headerName: "Symbol",
       flex: 1,
       renderCell: (params) => (
-        <span style={{ color: "red", textDecoration: "underline", fontWeight: 600 }}>
+        <span
+          style={{ color: "red", textDecoration: "underline", fontWeight: 600 }}
+        >
           {params.value || "Not Available"}
         </span>
       ),
@@ -125,10 +139,17 @@ const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({ ticker 
         color="#002060"
         mb={2}
       >
-        📅 All Upcoming  and Recent Follow-On Offers 
+        📅 All Upcoming and Recent Follow-On Offers
       </Typography>
       <Container maxWidth="lg">
-        <Box sx={{ maxHeight: 500, bgcolor: "white", borderRadius: 2, boxShadow: 3 }}>
+        <Box
+          sx={{
+            maxHeight: 500,
+            bgcolor: "white",
+            borderRadius: 2,
+            boxShadow: 3,
+          }}
+        >
           <DataGrid
             rows={rows}
             columns={columns}
@@ -138,7 +159,10 @@ const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({ ticker 
             disableRowSelectionOnClick
             rowSelectionModel={selected ? [selected.deal_id] : []} // 🔥 Highlight selected
             onRowClick={(params) =>
-              setSelected({ ticker: params.row.ticker, deal_id: params.row.deal_id })
+              setSelected({
+                ticker: params.row.ticker,
+                deal_id: params.row.deal_id,
+              })
             }
             sx={{
               "& .MuiDataGrid-container--top [role='row']": {
