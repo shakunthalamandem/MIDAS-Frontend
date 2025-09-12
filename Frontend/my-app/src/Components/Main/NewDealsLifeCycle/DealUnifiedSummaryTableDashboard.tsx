@@ -2,9 +2,16 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   CircularProgress,
+  Container,
   Paper,
+  Typography,
+  Stack,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import BusinessIcon from "@mui/icons-material/Business";
+import PublicIcon from "@mui/icons-material/Public";
+import CategoryIcon from "@mui/icons-material/Category";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 type DealUnifiedSummaryTableDashboardProps = {
   data?: {
@@ -33,10 +40,12 @@ type MddSummaryRow = {
   model_actual_return: number;
 };
 
-const DealUnifiedSummaryTableDashboard: React.FC<DealUnifiedSummaryTableDashboardProps> = ({ data }) => {
-  const sector = data?.sector;
-  const region = data?.region;
-  const dealtype = data?.deal_type;
+const DealUnifiedSummaryTableDashboard: React.FC<
+  DealUnifiedSummaryTableDashboardProps
+> = ({ data }) => {
+  const sector = data?.sector || "-";
+  const region = data?.region || "-";
+  const dealtype = data?.deal_type || "-";
   const fo_type = data?.fo_type || "";
 
   const [rows, setRows] = useState<MddSummaryRow[]>([]);
@@ -86,9 +95,6 @@ const DealUnifiedSummaryTableDashboard: React.FC<DealUnifiedSummaryTableDashboar
 
   const columns: GridColDef[] = [
     { field: "ticker", headerName: "Ticker", width: 100 },
-    { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 150 },
-    { field: "deal_type", headerName: "Deal Type", width: 100 },
-    { field: "broad_region", headerName: "Region", width: 100 },
     { field: "allocated_capital", headerName: "Allocated Capital", width: 150, type: "number" },
     { field: "allocation_percentage", headerName: "Allocation %", width: 130, type: "number" },
     { field: "allocation_deal_size_percentage", headerName: "Deal Size %", width: 130, type: "number" },
@@ -102,35 +108,80 @@ const DealUnifiedSummaryTableDashboard: React.FC<DealUnifiedSummaryTableDashboar
   ];
 
   return (
-    <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
+    <Container maxWidth="xl" sx={{ mb: 4, mt: 2 }}>
+      {/* Info Section Above Table */}
+      <Paper
+        elevation={3}
+        sx={{
+          p: 2,
+          mb: 2,
+          borderRadius: 3,
+          backgroundColor: "#f8f9fb",
+        }}
+      >
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={4}
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Stack direction="row" spacing={2} alignItems="center">
+            <BusinessIcon color="primary" />
+            <Typography variant="body1" fontWeight={500}>
+              Sector: <strong>{sector}</strong>
+            </Typography>
+          </Stack>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <PublicIcon color="success" />
+            <Typography variant="body1" fontWeight={500}>
+              Region: <strong>{region}</strong>
+            </Typography>
+          </Stack>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <CategoryIcon color="secondary" />
+            <Typography variant="body1" fontWeight={500}>
+              Deal Type: <strong>{dealtype}</strong>
+            </Typography>
+          </Stack>
+        </Stack>
+
+        <Stack direction="row" spacing={1} alignItems="center" mt={2}>
+          <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
+          <Typography variant="body2" color="text.secondary">
+            Below table consists of past 3 years of performance for tickers
+            Monashee participated in.
+          </Typography>
+        </Stack>
+      </Paper>
+
+      {/* DataGrid Table */}
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
           <CircularProgress />
         </Box>
       ) : (
         <Box sx={{ height: 600, width: "100%" }}>
-             <DataGrid
-                       rows={rows}
-                       columns={columns}
-                       loading={loading}
-                       checkboxSelection={false}
-                       rowHeight={35}
-    
-                       sx={{
-                         "& .MuiDataGrid-container--top [role='row']": {
-                           backgroundColor: "#002060",
-                           color: "#FFFFFF",
-                         },
-                         "& .Mui-selected": {
-                           backgroundColor: "#cad0f1ff !important",
-                         },
-                         cursor: "pointer",
-                         border: "1px solid #ccccccff",
-                       }}
-                     />
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            loading={loading}
+            checkboxSelection={false}
+            rowHeight={35}
+            sx={{
+              "& .MuiDataGrid-container--top [role='row']": {
+                backgroundColor: "#002060",
+                color: "#FFFFFF",
+              },
+              "& .Mui-selected": {
+                backgroundColor: "#cad0f1ff !important",
+              },
+              cursor: "pointer",
+              border: "1px solid #ccccccff",
+            }}
+          />
         </Box>
       )}
-    </Paper>
+    </Container>
   );
 };
 
