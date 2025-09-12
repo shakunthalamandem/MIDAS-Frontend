@@ -24,6 +24,12 @@ const defaultFOValues = {
   Inflation: "Stable",
   Treasury: "Stable",
   target: "T1D",
+
+  // NEW: fundamentals + feature
+  revenue_category: "",
+  revenue_growth_category: "",
+  net_profit_margin_category: "",
+  issue_to_pre_day_close_category: "",
 };
 
 const defaultIPOValues = {
@@ -69,10 +75,8 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const [ipoAutoPredict, setIpoAutoPredict] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
 
-  // ---- Toggle between IPO and FO forms (no scroll here) ----
   const handleTypeChange = (type: "IPO" | "FO") => {
     setSelectedType(type);
-    // intentionally no scroll on toggle
   };
 
   // ---- When a recent card is clicked: prefill + scroll to form ----
@@ -110,6 +114,18 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         Inflation: "Stable",
         Treasury: "Stable",
         target: "T1D",
+
+        // NEW: prefill from recent item if available
+        revenue_category:
+          item.revenue != null ? String(item.revenue) : "",
+        revenue_growth_category:
+          item.revenue_growth != null ? String(item.revenue_growth) : "",
+        net_profit_margin_category:
+          item.net_profit_margin != null ? String(item.net_profit_margin) : "",
+        issue_to_pre_day_close_category:
+          item.issue_to_pre_day_close != null
+            ? String(item.issue_to_pre_day_close)
+            : "",
       });
       setSelectedType("FO");
       setFoAutoPredict(true);
@@ -140,38 +156,34 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         Inflation: "Stable",
         Treasury: "Stable",
         target: "T1D",
+
+        // NEW / ensure
+        revenue_category:
+          item.revenue != null ? String(item.revenue) : "",
+        revenue_growth_category:
+          item.revenue_growth != null ? String(item.revenue_growth) : "",
+        net_profit_margin_category:
+          item.net_profit_margin != null ? String(item.net_profit_margin) : "",
       });
       setSelectedType("IPO");
       setIpoAutoPredict(true);
     }
 
-    // Smooth scroll only on card click
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
     <Box sx={{ width: "100%" }}>
-      {/* Top area with centered pill switcher and subtle subtitle */}
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 2 }}>
         <FormSwitcher selectedType={selectedType} onChangeType={handleTypeChange} />
-        <Typography
-          variant="caption"
-          sx={{ color: "text.secondary", mt: 0.5 }}
-        >
+        <Typography variant="caption" sx={{ mt: 0.5 }}>
           {selectedType === "IPO" ? "Initial Public Offering" : "Follow-on Offering"}
         </Typography>
       </Box>
 
       <Grid container spacing={2} alignItems="flex-start">
-        {/* Left: 75% — form + results */}
         <Grid item xs={12} md={9}>
-          <Box
-            ref={formRef}
-            sx={{
-              // makes the scroll target sit nicely below any sticky headers
-              scrollMarginTop: 16,
-            }}
-          >
+          <Box ref={formRef} sx={{ scrollMarginTop: 16 }}>
             {selectedType === "FO" ? (
               <FOForm
                 values={foValues}
@@ -192,16 +204,11 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           </Box>
         </Grid>
 
-        {/* Right: 25% — Recent predictions (sticky) */}
         <Grid
           item
           xs={12}
           md={3}
-          sx={{
-            position: { md: "sticky" },
-            top: { md: 20 },
-            height: "fit-content",
-          }}
+          sx={{ position: { md: "sticky" }, top: { md: 20 }, height: "fit-content" }}
         >
           <RecentPredictionsPanel
             selectedType={selectedType}
