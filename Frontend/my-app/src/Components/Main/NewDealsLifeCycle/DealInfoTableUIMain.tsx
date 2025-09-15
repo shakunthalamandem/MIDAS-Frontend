@@ -44,6 +44,9 @@ const formatDealSize = (dealSize: any) => {
       ioi_deal_size: row.ioi_deal_size ? `${row.ioi_deal_size.toFixed(2)}%` : "0%",
       allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
       allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed()}%` : "0%",
+      t1m_return_actual: row.t1m_return_actual ? `${row.t1m_return_actual.toFixed(2)}%` : "0%",
+      t1d_return_actual: row.t1d_return_actual ? `${row.t1d_return_actual.toFixed(2)}%` : "0%",
+      am_return_difference: row.am_return_difference ? `${row.am_return_difference.toFixed(2)}%` : "0%",
       model_am_return: row.model_am_return ? `${formatDealSize(row.model_am_return.toFixed())}` : "$0",
       total_model_capital: row.total_model_capital ? `${formatDealSize(row.total_model_capital.toFixed())}` : "$0",
       model_am_capital: row.model_am_capital ? `${formatDealSize(row.model_am_capital.toFixed())}` : "$0",
@@ -139,16 +142,34 @@ const formatDealSize = (dealSize: any) => {
       renderCell: (params) => `${params.value}`,
     sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
-  { 
-    field: "t1m_return_from_bloomberg", 
+  // { 
+  //   field: "t1m_return_from_bloomberg", 
+  //   headerName: "T+1Month Return(Gap)", 
+  //   width: 140,
+  //   renderCell: (params) => `${params.value}`,
+  //     sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  // },
+
+    { 
+    field: "t1m_return_actual", 
     headerName: "T+1Month Return", 
     width: 140,
     renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
-  {field: "am_return",
+    { 
+    field: "t1d_return_actual", 
+    headerName: "T+1Day Return", 
+    width: 140,
+    renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  },
+  {field: "am_return_difference",
     headerName: "AM Return",
     width: 215,
+     renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+
   },
   { 
     field: "allocated_capital", 
