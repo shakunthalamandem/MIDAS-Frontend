@@ -36,11 +36,11 @@ interface RecentPrediction {
 
   t1d_pred: string | null;
 
-  // NEW FIELDS
-  revenue?: number | string | null; // backend may send string
-  revenue_growth?: number | string | null; // percentage
-  net_profit_margin?: number | string | null; // percentage
-  issue_to_previous_day_close?: number | string | null; // percentage, FO only
+  // May still arrive from backend but no longer shown
+  revenue?: number | string | null;
+  revenue_growth?: number | string | null;
+  net_profit_margin?: number | string | null;
+  issue_to_previous_day_close?: number | string | null; // shown only for FO
 }
 
 interface ApiResponse {
@@ -54,20 +54,7 @@ interface RecentPredictionsPanelProps {
 }
 
 /** ----- helpers ----- */
-const monthShort = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+const monthShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const formatDateShort = (dateString?: string) => {
   if (!dateString) return "N/A";
   const d = new Date(dateString);
@@ -78,17 +65,10 @@ const formatDateShort = (dateString?: string) => {
   return `${dd} ${mm} ${yyyy}`;
 };
 
-const normalizePrediction = (p?: string | null) =>
-  (p || "").trim().toLowerCase();
+const normalizePrediction = (p?: string | null) => (p || "").trim().toLowerCase();
 const hasPrediction = (p?: string | null) => {
   const n = normalizePrediction(p);
-  return (
-    n === "positive" ||
-    n === "positive return" ||
-    n === "negative" ||
-    n === "low return" ||
-    n === "neutral"
-  );
+  return n === "positive" || n === "positive return" || n === "negative" || n === "low return" || n === "neutral";
 };
 const mapPredToColor = (p?: string | null) => {
   const n = normalizePrediction(p);
@@ -98,8 +78,8 @@ const mapPredToColor = (p?: string | null) => {
   return grey[500];
 };
 
-// Visible but calm background + subtle accent
-const CARD_BG = "#EEF2FF"; // light indigo
+// Calm background + accent
+const CARD_BG = "#EEF2FF";
 const CARD_BORDER = "#DDE4FF";
 const ACCENT = "#B6C4FF";
 
@@ -138,13 +118,11 @@ type Option = {
   display: string; // e.g., "NVDA on 11 Sep 2025 - Positive"
 };
 
-// map deal_status to subtle chip colors (avoid warning/error feel)
 const statusChip = (status?: string) => {
   const s = (status || "").toLowerCase();
   if (s === "issued") return { color: "success" as const, label: "Issued" };
   if (s === "announced") return { color: "info" as const, label: "Announced" };
-  if (s === "price range")
-    return { color: "secondary" as const, label: "Price Range" };
+  if (s === "price range") return { color: "secondary" as const, label: "Price Range" };
   return { color: "default" as const, label: status || "Status" };
 };
 
@@ -152,26 +130,16 @@ const metricRow = (label: string, value: React.ReactNode, tooltip?: string) => (
   <Stack direction="row" justifyContent="space-between" alignItems="center">
     {tooltip ? (
       <Tooltip title={tooltip} arrow>
-        <Typography variant="body2" sx={{ color: grey[700] }}>
-          {label}
-        </Typography>
+        <Typography variant="body2" sx={{ color: grey[700] }}>{label}</Typography>
       </Tooltip>
     ) : (
-      <Typography variant="body2" sx={{ color: grey[700] }}>
-        {label}
-      </Typography>
+      <Typography variant="body2" sx={{ color: grey[700] }}>{label}</Typography>
     )}
-    <Typography variant="body2" sx={{ fontWeight: 600, color: "#0f172a" }}>
-      {value}
-    </Typography>
+    <Typography variant="body2" sx={{ fontWeight: 600, color: "#0f172a" }}>{value}</Typography>
   </Stack>
 );
 
-const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
-  selectedType,
-  onSelect,
-  refreshKey,
-}) => {
+const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selectedType, onSelect, refreshKey }) => {
   const [allDeals, setAllDeals] = useState<RecentPrediction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -201,15 +169,10 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
         const json: ApiResponse = await res.json();
         const sorted = (json.data || [])
           .slice()
-          .sort(
-            (a, b) =>
-              new Date(b.pricing_date).getTime() -
-              new Date(a.pricing_date).getTime()
-          );
+          .sort((a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime());
         if (isMounted) setAllDeals(sorted);
       } catch (err: any) {
-        if (isMounted && err.name !== "AbortError")
-          setError(err.message || "Something went wrong");
+        if (isMounted && err.name !== "AbortError") setError(err.message || "Something went wrong");
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -223,10 +186,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
 
   // Apply IPO/FO filter (driven by top radio)
   const filteredByType = useMemo(
-    () =>
-      allDeals.filter(
-        (d) => (d.deal_type || "").toUpperCase() === selectedType
-      ),
+    () => allDeals.filter((d) => (d.deal_type || "").toUpperCase() === selectedType),
     [allDeals, selectedType]
   );
 
@@ -261,12 +221,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
 
   if (loading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100px"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100px">
         <CircularProgress size={20} />
       </Box>
     );
@@ -323,9 +278,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
         <Autocomplete
           freeSolo
           options={options}
-          getOptionLabel={(opt) =>
-            typeof opt === "string" ? opt : opt.display
-          }
+          getOptionLabel={(opt) => (typeof opt === "string" ? opt : opt.display)}
           isOptionEqualToValue={(opt, val) =>
             (typeof opt === "string" ? opt : opt.ticker) ===
             (typeof val === "string" ? val : val.ticker)
@@ -367,7 +320,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
             );
           }}
           ListboxProps={{
-            sx: { maxHeight: 240, overflowY: "auto" }, // show ~5 results then scroll
+            sx: { maxHeight: 240, overflowY: "auto" },
           }}
           renderInput={(params) => (
             <TextField
@@ -392,7 +345,6 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
         {filteredCards.map((form, i) => {
           const isFO = (form.deal_type || "").toUpperCase() === "FO";
           const stChip = statusChip(form.deal_status);
-
           const sectorLabel = formatSector(form.sector);
 
           return (
@@ -408,7 +360,6 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
                   border: "1px solid",
                   borderColor: CARD_BORDER,
                   position: "relative",
-                  // subtle left accent bar
                   "&::before": {
                     content: '""',
                     position: "absolute",
@@ -425,128 +376,42 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
               >
                 <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
                   {/* Header */}
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mb={1}
-                  >
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                     <Typography variant="h6" fontWeight={800} color="#0f172a">
                       {form.ticker}
                     </Typography>
                     {renderPredictionChip(form.t1d_pred)}
                   </Box>
 
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{ mb: 1 }}
-                  >
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                     <Stack direction="row" spacing={1} alignItems="center">
-                      <Chip
-                        size="small"
-                        label={stChip.label}
-                        color={stChip.color}
-                        variant="outlined"
-                      />
-                      <Chip
-                        size="small"
-                        label={(form.deal_type || "N/A").toUpperCase()}
-                        variant="outlined"
-                      />
+                      <Chip size="small" label={stChip.label} color={stChip.color} variant="outlined" />
+                      <Chip size="small" label={(form.deal_type || "N/A").toUpperCase()} variant="outlined" />
                     </Stack>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: grey[700], fontWeight: 600 }}
-                    >
+                    <Typography variant="body2" sx={{ color: grey[700], fontWeight: 600 }}>
                       {formatDateShort(form.pricing_date)}
                     </Typography>
                   </Stack>
 
                   <Divider sx={{ my: 1.5 }} />
 
-                  {/* Metrics */}
+                  {/* Deal block ONLY (simple + clear) */}
                   <Grid container spacing={1.5}>
-                    {/* Deal block */}
-                    {/* Deal block */}
-                    <Grid item xs={12} sm={6}>
-                      <Typography
-                        variant="overline"
-                        sx={{ color: grey[600], letterSpacing: 0.6 }}
-                      >
+                    <Grid item xs={12}>
+                      <Typography variant="overline" sx={{ letterSpacing: 0.6, fontWeight: "bold" }}>
                         Deal
                       </Typography>
                       <Stack spacing={0.75} sx={{ mt: 0.5 }}>
-                        {metricRow(
-                          "Deal Size",
-                          fmtMoneyM(form.deal_size),
-                          "Aggregate offering size"
-                        )}
-
-                        {/* Lead Bank row with ellipsis + Tooltip (moved up here) */}
-                        <Stack
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Typography variant="body2" sx={{ color: grey[700] }}>
-                            Lead Bank
-                          </Typography>
-                          <Tooltip
-                            title={form.lead_bank || "N/A"}
-                            arrow
-                            disableHoverListener={
-                              !form.lead_bank ||
-                              (form.lead_bank?.length ?? 0) <= 18
-                            }
-                          >
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                fontWeight: 600,
-                                color: "#0f172a",
-                                maxWidth: { xs: 140, sm: 200, md: 240 },
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                textAlign: "right",
-                              }}
-                            >
-                              {form.lead_bank || "N/A"}
-                            </Typography>
-                          </Tooltip>
-                        </Stack>
-
+                        {metricRow("Deal Size", fmtMoneyM(form.deal_size), "Aggregate offering size")}
+                        {metricRow("Sector", sectorLabel)}
                         {metricRow("Region", form.region || "N/A")}
-                      </Stack>
-                    </Grid>
-
-                    {/* Fundamentals block */}
-                    <Grid item xs={12} sm={6}>
-                      <Typography
-                        variant="overline"
-                        sx={{ color: grey[600], letterSpacing: 0.6 }}
-                      >
-                        Fundamentals
-                      </Typography>
-                      <Stack spacing={0.75} sx={{ mt: 0.5 }}>
-                        {metricRow("Revenue", fmtMoneyM(form.revenue))}
-                        {metricRow(
-                          "Revenue Growth",
-                          fmtPct(form.revenue_growth)
-                        )}
-                        {metricRow("Net Profit Margin", form.net_profit_margin)}
                       </Stack>
                     </Grid>
 
                     {/* FO-only block */}
                     {isFO && (
                       <Grid item xs={12}>
-                        <Typography
-                          variant="overline"
-                          sx={{ color: grey[600], letterSpacing: 0.6 }}
-                        >
+                        <Typography variant="overline" sx={{ color: grey[600], letterSpacing: 0.6 }}>
                           Offering Dynamics (FO)
                         </Typography>
                         <Stack spacing={0.75} sx={{ mt: 0.5 }}>
@@ -565,24 +430,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
                     )}
                   </Grid>
 
-                  {/* Footer – Lead bank only */}
-                  {/* Footer – Sector only (moved here) */}
-                  <Divider sx={{ my: 1.5 }} />
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: "#0f172a",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Sector — {sectorLabel}
-                    </Typography>
-                  </Box>
+                  {/* Footer removed (simplified card) */}
                 </CardContent>
               </Card>
             </Grid>
@@ -592,10 +440,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
 
       {/* Footer hint */}
       {!query && !selectedTicker && (
-        <Typography
-          variant="body2"
-          sx={{ mt: 2, textAlign: "center", color: grey[700] }}
-        >
+        <Typography variant="body2" sx={{ mt: 2, textAlign: "center", color: grey[700] }}>
           Showing the latest 5 deals. Search a ticker above to see more details.
         </Typography>
       )}
