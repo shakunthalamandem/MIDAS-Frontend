@@ -39,7 +39,7 @@ const formatDealSize = (dealSize: any) => {
       gics_sector_from_bloomberg: row.gics_sector_from_bloomberg || "N/A",
       broad_region: row.broad_region || "N/A",
       deal_type: row.deal_type || "N/A",
-      number_of_shares_offered: row.number_of_shares_offered ? `${row.number_of_shares_offered.toFixed(2)}%` : "0%",
+      number_of_shares_offered: row.number_of_shares_offered ? `${row.number_of_shares_offered.toFixed(0)}` : "0",
       issue_offer_price: row.issue_offer_price ? formatDealSize(row.issue_offer_price.toFixed(2)) : "$0",
       ioi_deal_size: row.ioi_deal_size ? `${row.ioi_deal_size.toFixed(2)}%` : "0%",
       allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
@@ -80,39 +80,44 @@ const formatDealSize = (dealSize: any) => {
     );
   }, [rows, searchQuery]);
 
-  const columns: GridColDef[] = [
-
-    // {
-    //   field: "deal_size",
-    //   headerName: "Deal Size",
-    //   width: 120,
-    //   renderCell: (params) => `${params.value}`,
-    //   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    // },
-    //     {
-    //   field: "issue_offer_price",
-    //   headerName: "Issue Offer Price",
-    //   width: 120,
-    //   renderCell: (params) => `${params.value}`,
-    //   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    // },
-    // { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 180 },
-    {
-  field: "ioi_deal_size",
-  headerName: "IOI as % Deal Size",
-  width: 150,
-  
+  const columns: GridColDef[] = [{
+  field: "ticker",
+  headerName: "Ticker",
+  width: 100,
+  cellClassName: "ticker-cell",
 },
-// {
-//   field: "number_of_shares_offered",
-//   headerName: "Shares Offered",
-//   width: 120,
-//   valueFormatter: (params) => {
-//     const value = Number(params);
-//     return isNaN(value) ? '' : value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-//   }
-// }
-// ,
+
+  { field: "pricing_date", headerName: "Pricing Date", width: 100 },
+     { field: "first_trade_date", headerName: "First Trade Date", width: 100 },
+    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
+    { field: "deal_type", headerName: "Deal Type", width: 80 },
+    { field: "fo_type", headerName: "FO Type", width: 80 },
+    { field: "broad_region", headerName: "Region", width: 80 },
+    {
+      field: "deal_size",
+      headerName: "Deal Size",
+      width: 120,
+      renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+        {
+      field: "issue_offer_price",
+      headerName: "Issue Offer Price",
+      width: 120,
+      renderCell: (params) => `${params.value}`,
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
+    { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 180 },
+{
+  field: "number_of_shares_offered",
+  headerName: "Shares Offered",
+  width: 120,
+    valueFormatter: (params) => {
+    const value = Number(params);
+    return isNaN(value) ? '' : value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+},
+
   { 
     field: "allocation_deal_size_percentage", 
     headerName: "Allocation % of Deal Size", 
@@ -125,6 +130,13 @@ const formatDealSize = (dealSize: any) => {
     headerName: "Allocation IOI %", 
     width: 150,
     renderCell: (params) => `${params.value}`,
+    sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+  },
+  {
+    field:"ioi_deal_size",
+    headerName:"IOI % of Deal Size",
+    width:150,
+      renderCell: (params) => `${params.value}`,
     sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
   { 
@@ -155,32 +167,32 @@ const formatDealSize = (dealSize: any) => {
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
-    { 
-      field: "model_capital_1_allocation", 
-      headerName: "Model Allocation", 
-      width: 180,
+//     { 
+//       field: "model_capital_1_allocation", 
+//       headerName: "Model Allocation", 
+//       width: 180,
       
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-    { 
-      field: "model_am_capital", 
-      headerName: "Model AM Capital", 
-      width: 180,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//       renderCell: (params) => `${params.value}`,
+//       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//     },
+//     { 
+//       field: "model_am_capital", 
+//       headerName: "Model AM Capital", 
+//       width: 180,
+//       renderCell: (params) => `${params.value}`,
+//       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
 
-    },
-    {
-      field: "total_model_capital",
-      headerName: "Total Model Capital",
-      width: 180,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//     },
+//     {
+//       field: "total_model_capital",
+//       headerName: "Total Model Capital",
+//       width: 180,
+//       renderCell: (params) => `${params.value}`,
+//       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
 
-    }
+//     }
     
-,    
+// ,    
 { 
   field: "allocation_return", 
   headerName: "Monashee Actual Allocation PnL(Gross)", 
@@ -190,37 +202,37 @@ const formatDealSize = (dealSize: any) => {
   cellClassName: "first-column-border",
 
 },
-{ 
-  field: "model_actual_return", 
-  headerName: "Model PnL With Actual Allocation(Gross)", 
-  width: 260,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-},
-{ 
-  field: "model_return_1_allocation", 
-  headerName: "Model PnL with Model Allocation", 
-  width: 260,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-},
-{ 
-  field: "model_allocation_gap", 
-  headerName: "Model Allocation Gap", 
-  width: 180,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "highlight-cell",
-},
-{ 
-  field: "monashee_exit_gap", 
-  headerName: "Monashee Exit Gap", 
-  width: 150,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "last-columns-border highlight-cell",
+// { 
+//   field: "model_actual_return", 
+//   headerName: "Model PnL With Actual Allocation(Gross)", 
+//   width: 260,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+// },
+// { 
+//   field: "model_return_1_allocation", 
+//   headerName: "Model PnL with Model Allocation", 
+//   width: 260,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+// },
+// { 
+//   field: "model_allocation_gap", 
+//   headerName: "Model Allocation Gap", 
+//   width: 180,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//   cellClassName: "highlight-cell",
+// },
+// { 
+//   field: "monashee_exit_gap", 
+//   headerName: "Monashee Exit Gap", 
+//   width: 150,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//   cellClassName: "last-columns-border highlight-cell",
 
-},
+// },
 { 
   field: "am_return", 
   headerName: "Monashee Actual AM PnL(Gross)", 
@@ -228,37 +240,37 @@ const formatDealSize = (dealSize: any) => {
   renderCell: (params) => `${params.value}`,
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
 },
-{ 
-  field: "model_actual_am_return", 
-  headerName: "Model PnL with Actual AM", 
-  width: 215,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-},
-{ 
-  field: "model_am_return", 
-  headerName: "Model PnL with Model AM(Gross)", 
-  width: 220,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  // cellClassName: "last-columns-border",
-},
-{ 
-  field: "am_gap", 
-  headerName: "Model AM Gap", 
-  width: 120,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "highlight-cell",
-},
-{ 
-  field: "am_exit_gap", 
-  headerName: "Monashee AM Exit Gap", 
-  width: 180,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "last-columns-border   highlight-cell",
-},
+// { 
+//   field: "model_actual_am_return", 
+//   headerName: "Model PnL with Actual AM", 
+//   width: 215,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+// },
+// { 
+//   field: "model_am_return", 
+//   headerName: "Model PnL with Model AM(Gross)", 
+//   width: 220,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//   // cellClassName: "last-columns-border",
+// },
+// { 
+//   field: "am_gap", 
+//   headerName: "Model AM Gap", 
+//   width: 120,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//   cellClassName: "highlight-cell",
+// },
+// { 
+//   field: "am_exit_gap", 
+//   headerName: "Monashee AM Exit Gap", 
+//   width: 180,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//   cellClassName: "last-columns-border   highlight-cell",
+// },
 {
   field: "monahsee_actual_total", 
   headerName: "Monashee Actual Total PnL(Gross)",
@@ -268,26 +280,25 @@ const formatDealSize = (dealSize: any) => {
   },
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
 },
-{ 
-  field: "model_actual_total", 
-  headerName: "Model Actual Total PnL(Gross)", 
-  width: 220,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  // cellClassName: "last-columns-border",
-},
-{
-  field: "total_gap", 
-  headerName: "Total Gap",
-  width: 120,
-  renderCell: (params) => {
-    return `${params.value}`;
-  },
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "last-columns-border highlight-cell",
+// { 
+//   field: "model_actual_total", 
+//   headerName: "Model Actual Total PnL(Gross)", 
+//   width: 220,
+//   renderCell: (params) => `${params.value}`,
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//   // cellClassName: "last-columns-border",
+// },
+// {
+//   field: "total_gap", 
+//   headerName: "Total Gap",
+//   width: 120,
+//   renderCell: (params) => {
+//     return `${params.value}`;
+//   },
+//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+//   cellClassName: "last-columns-border highlight-cell",
  
-},
-
+// },
 
 ];
 
@@ -337,9 +348,9 @@ return (
         </Stack>
       </Paper>
 
-<Box mb={15} sx={{ height: 600, width: "100%" }}>
-  <Card>
-    <CardContent>
+
+
+
 
       <Box sx={{ height: 600, width: "100%", marginTop: 3 }}>
         <DataGrid
@@ -374,13 +385,18 @@ return (
               borderRight: "2px solid rgb(110, 110, 110)",
             },
             "& .highlight-cell": {
-              backgroundColor: "#F8F9CD",},
+              backgroundColor: "#F8F9CD",
+            },
+            "& .ticker-cell": {
+              fontWeight: "bold",
+              color: "#96000A",
+            },
           }}
         />
       </Box>
-    </CardContent>
-  </Card>
-</Box>
+
+
+
   </>
 );
 };
