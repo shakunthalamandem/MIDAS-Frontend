@@ -40,28 +40,32 @@ const handleRowClick = (params: any) => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <div style={{ width: "100%", height: 450, maxHeight: "450px" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          loading={loading}
-          checkboxSelection={false}
-          onRowClick={handleRowClick}
-          rowHeight={35}
-          getRowClassName={(params) =>
-            selectedId === params.id ? "Mui-selected" : ""
-          }
-          sx={{
-            "& .MuiDataGrid-container--top [role='row']": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
-            },
-            "& .Mui-selected": {
-              backgroundColor: "#cad0f1ff !important",
-            },
-            cursor: "pointer",
-            border: "1px solid #ccccccff",
-          }}
-        />
+       <DataGrid
+  rows={rows}
+  columns={columns}
+  loading={loading}
+  checkboxSelection={false}
+  onRowClick={handleRowClick}
+  rowHeight={35}
+  getRowClassName={(params) =>
+    selectedId === params.id ? "Mui-selected" : ""
+  }
+  sx={{
+    "& .MuiDataGrid-container--top [role='row']": {
+      backgroundColor: "#002060",
+      color: "#FFFFFF",
+    },
+    "& .Mui-selected": {
+      backgroundColor: "#cad0f1ff !important",
+    },
+    "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
+      color: "#FFFFFF",
+    },
+    cursor: "pointer",
+    border: "1px solid #ccccccff",
+  }}
+/>
+
       </div>
 
       {/* Legend */}
