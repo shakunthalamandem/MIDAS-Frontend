@@ -88,9 +88,10 @@ export const getColumns = (
     { field: "region", headerName: "Region", renderHeader: () => formatHeader("Region"), flex: 0.75, headerAlign: "left", align: "left" },
     { field: "sector", headerName: "Sector", renderHeader: () => formatHeader("Sector"), flex: 1.25, headerAlign: "left", align: "left" },
     { field: "issuer_name", headerName: "Issuer Name", renderHeader: () => formatHeader("Issuer Name"), flex: 2, headerAlign: "left", align: "left" },
+    { field: "deal_size", headerName: "Deal Size ($M)", renderHeader: () => formatHeader("Deal Size ($M)"), flex: 1, headerAlign: "left", align: "left",},
 
     // dateColumn,
-    {field: "expected_listing_date", headerName: "First Trade Date", renderHeader: () => formatHeader("First Trade Date"), flex: 1.5, headerAlign: "left", align: "left", renderCell: formatDateCell},
+    {field: "trade_date", headerName: "First Trade Date", renderHeader: () => formatHeader("First Trade Date"), flex: 1.5, headerAlign: "left", align: "left", renderCell: formatDateCell},
     {field: "pricing_date", headerName: "Pricing Date", renderHeader: () => formatHeader("Pricing Date"), flex: 1.12, headerAlign: "left", align: "left", renderCell: formatDateCell},
 
     {
