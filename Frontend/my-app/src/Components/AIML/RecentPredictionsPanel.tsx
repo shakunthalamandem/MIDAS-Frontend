@@ -10,6 +10,8 @@ import {
   Grid,
   TextField,
   Autocomplete,
+  Stack,
+  Tooltip,
 } from "@mui/material";
 import { green, red, grey } from "@mui/material/colors";
 import SearchIcon from "@mui/icons-material/Search";
@@ -34,11 +36,11 @@ interface RecentPrediction {
 
   t1d_pred: string | null;
 
-  // NEW FIELDS
-  revenue?: number | null;               // value expected in Millions
-  revenue_growth?: number | null;        // percentage
-  net_profit_margin?: number | null;     // percentage
-  issue_to_previous_day_close?: number | null; // percentage, FO only
+  // May still arrive from backend but no longer shown
+  revenue?: number | string | null;
+  revenue_growth?: number | string | null;
+  net_profit_margin?: number | string | null;
+  issue_to_previous_day_close?: number | string | null; // shown only for FO
 }
 
 interface ApiResponse {
@@ -63,13 +65,6 @@ const formatDateShort = (dateString?: string) => {
   return `${dd} ${mm} ${yyyy}`;
 };
 
-const formatDateLong = (dateString?: string) => {
-  if (!dateString) return "N/A";
-  const d = new Date(dateString);
-  if (Number.isNaN(d.getTime())) return "N/A";
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-};
-
 const normalizePrediction = (p?: string | null) => (p || "").trim().toLowerCase();
 const hasPrediction = (p?: string | null) => {
   const n = normalizePrediction(p);
@@ -82,11 +77,12 @@ const mapPredToColor = (p?: string | null) => {
   if (n === "neutral") return grey[700];
   return grey[500];
 };
-const getCardBackgroundColor = (dealType?: string) => {
-  if ((dealType || "").toLowerCase() === "ipo") return "#fde2e2"; // light pink
-  if ((dealType || "").toLowerCase() === "fo") return "#e8f4fc";  // light blue
-  return "#ffffff";
-};
+
+// Calm background + accent
+const CARD_BG = "#EEF2FF";
+const CARD_BORDER = "#DDE4FF";
+const ACCENT = "#B6C4FF";
+
 const formatSector = (raw?: string) => {
   if (!raw) return "N/A";
   const cleaned = raw.replace(/^(sp500_|nasdaq_|nyse_)/i, "");
@@ -97,12 +93,23 @@ const formatSector = (raw?: string) => {
     .join(" ");
 };
 
-// small format helpers
-const fmtMoneyM = (v?: number | null) =>
-  v === null || v === undefined || Number.isNaN(Number(v)) ? "N/A" : `$${Number(v).toFixed(1)}M`;
+// forgiving parse for number-like strings (handles "-2.5%", "1,234.5", etc.)
+const parseNumberLike = (val?: number | string | null): number | null => {
+  if (val === null || val === undefined) return null;
+  if (typeof val === "number") return Number.isNaN(val) ? null : val;
+  const n = parseFloat(String(val).replace(/[^\d.-]/g, ""));
+  return Number.isNaN(n) ? null : n;
+};
 
-const fmtPct = (v?: number | null) =>
-  v === null || v === undefined || Number.isNaN(Number(v)) ? "N/A" : `${Number(v).toFixed(1)}%`;
+// small format helpers
+const fmtMoneyM = (v?: number | string | null) => {
+  const n = parseNumberLike(v);
+  return n === null ? "N/A" : `$${n.toFixed(1)}M`;
+};
+const fmtPct = (v?: number | string | null) => {
+  const n = parseNumberLike(v);
+  return n === null ? "N/A" : `${n.toFixed(1)}%`;
+};
 
 type Option = {
   ticker: string;
@@ -111,7 +118,28 @@ type Option = {
   display: string; // e.g., "NVDA on 11 Sep 2025 - Positive"
 };
 
-const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selectedType, onSelect, refreshKey}) => {
+const statusChip = (status?: string) => {
+  const s = (status || "").toLowerCase();
+  if (s === "issued") return { color: "success" as const, label: "Issued" };
+  if (s === "announced") return { color: "info" as const, label: "Announced" };
+  if (s === "price range") return { color: "secondary" as const, label: "Price Range" };
+  return { color: "default" as const, label: status || "Status" };
+};
+
+const metricRow = (label: string, value: React.ReactNode, tooltip?: string) => (
+  <Stack direction="row" justifyContent="space-between" alignItems="center">
+    {tooltip ? (
+      <Tooltip title={tooltip} arrow>
+        <Typography variant="body2" sx={{ color: grey[700] }}>{label}</Typography>
+      </Tooltip>
+    ) : (
+      <Typography variant="body2" sx={{ color: grey[700] }}>{label}</Typography>
+    )}
+    <Typography variant="body2" sx={{ fontWeight: 600, color: "#0f172a" }}>{value}</Typography>
+  </Stack>
+);
+
+const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selectedType, onSelect, refreshKey }) => {
   const [allDeals, setAllDeals] = useState<RecentPrediction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -120,41 +148,41 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
   const [query, setQuery] = useState<string>("");
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
-useEffect(() => {
-  let isMounted = true;
-  const ac = new AbortController(); // cancel fetch on unmount or rapid refreshes
+  useEffect(() => {
+    let isMounted = true;
+    const ac = new AbortController();
 
-  (async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
-      const res = await fetch(`${apiUrl}/api/recent_predictions/`, {
-        headers: { Authorization: token ? `Bearer ${token}` : "" },
-        signal: ac.signal,
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`HTTP ${res.status}: ${text}`);
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
+        const res = await fetch(`${apiUrl}/api/recent_predictions/`, {
+          headers: { Authorization: token ? `Bearer ${token}` : "" },
+          signal: ac.signal,
+        });
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`HTTP ${res.status}: ${text}`);
+        }
+        const json: ApiResponse = await res.json();
+        const sorted = (json.data || [])
+          .slice()
+          .sort((a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime());
+        if (isMounted) setAllDeals(sorted);
+      } catch (err: any) {
+        if (isMounted && err.name !== "AbortError") setError(err.message || "Something went wrong");
+      } finally {
+        if (isMounted) setLoading(false);
       }
-      const json: ApiResponse = await res.json();
-      const sorted = (json.data || [])
-        .slice()
-        .sort((a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime());
-      if (isMounted) setAllDeals(sorted);
-    } catch (err: any) {
-      if (isMounted && err.name !== "AbortError") setError(err.message || "Something went wrong");
-    } finally {
-      if (isMounted) setLoading(false);
-    }
-  })();
+    })();
 
-  return () => {
-    isMounted = false;
-    ac.abort();
-  };
-}, [refreshKey]);
+    return () => {
+      isMounted = false;
+      ac.abort();
+    };
+  }, [refreshKey]);
 
   // Apply IPO/FO filter (driven by top radio)
   const filteredByType = useMemo(
@@ -292,7 +320,7 @@ useEffect(() => {
             );
           }}
           ListboxProps={{
-            sx: { maxHeight: 240, overflowY: "auto" }, // show ~5 results then scroll
+            sx: { maxHeight: 240, overflowY: "auto" },
           }}
           renderInput={(params) => (
             <TextField
@@ -315,16 +343,9 @@ useEffect(() => {
       {/* Cards */}
       <Grid container spacing={2}>
         {filteredCards.map((form, i) => {
-          const dealStatColor =
-            form.deal_status === "Announced"
-              ? "blue"
-              : form.deal_status === "Issued"
-              ? "green"
-              : form.deal_status === "Price Range"
-              ? "orange"
-              : "grey";
-
           const isFO = (form.deal_type || "").toUpperCase() === "FO";
+          const stChip = statusChip(form.deal_status);
+          const sectorLabel = formatSector(form.sector);
 
           return (
             <Grid item xs={12} key={`${form.ticker}-${form.pricing_date}-${i}`}>
@@ -335,94 +356,81 @@ useEffect(() => {
                   transition: "box-shadow 0.2s, transform 0.15s",
                   "&:hover": { boxShadow: 4, transform: "translateY(-3px)" },
                   borderRadius: 2,
-                  backgroundColor: getCardBackgroundColor(form.deal_type),
-                  minHeight: 180,
+                  backgroundColor: CARD_BG,
                   border: "1px solid",
-                  borderColor: "#e0e0e0",
+                  borderColor: CARD_BORDER,
+                  position: "relative",
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 4,
+                    backgroundColor: ACCENT,
+                    borderTopLeftRadius: 8,
+                    borderBottomLeftRadius: 8,
+                  },
                 }}
                 variant="outlined"
               >
-                <CardContent sx={{ py: 4, px: 4, "&:last-child": { pb: 4 } }}>
+                <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
+                  {/* Header */}
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                    <Typography variant="body1" fontWeight={700} color="#002060">
-                      {form.ticker}{" "}
-                      <Box component="span" sx={{ fontWeight: 600, ml: 1, color: dealStatColor }}>
-                        {form.deal_status || "N/A"}
-                      </Box>
+                    <Typography variant="h6" fontWeight={800} color="#0f172a">
+                      {form.ticker}
                     </Typography>
                     {renderPredictionChip(form.t1d_pred)}
                   </Box>
 
-                  <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                      {form.deal_type || "N/A"}
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Chip size="small" label={stChip.label} color={stChip.color} variant="outlined" />
+                      <Chip size="small" label={(form.deal_type || "N/A").toUpperCase()} variant="outlined" />
+                    </Stack>
+                    <Typography variant="body2" sx={{ color: grey[700], fontWeight: 600 }}>
+                      {formatDateShort(form.pricing_date)}
                     </Typography>
-                    <Typography variant="body1" color="#002060">
-                      {formatDateLong(form.pricing_date)}
-                    </Typography>
-                  </Box>
+                  </Stack>
 
-                  <Divider sx={{ my: 1 }} />
-
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body1">Deal Size</Typography>
-                    <Typography variant="body1">{fmtMoneyM(form.deal_size)}</Typography>
-                  </Box>
-
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body1">Sector</Typography>
-                    <Typography variant="body1">{formatSector(form.sector)}</Typography>
-                  </Box>
-
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body1" color="#002060">
-                      Discount: <strong>{fmtPct(form.discount_from_announcement_price)}</strong>
-                    </Typography>
-                  </Box>
-
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body1">Region</Typography>
-                    <Typography variant="body1">{form.region || "N/A"}</Typography>
-                  </Box>
-
-                  {/* --- NEW METRICS ROWS --- */}
                   <Divider sx={{ my: 1.5 }} />
 
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body1">Revenue</Typography>
-                    <Typography variant="body1">{fmtMoneyM(form.revenue)}</Typography>
-                  </Box>
+                  {/* Deal block ONLY (simple + clear) */}
+                  <Grid container spacing={1.5}>
+                    <Grid item xs={12}>
+                      <Typography variant="overline" sx={{ letterSpacing: 0.6, fontWeight: "bold" }}>
+                        Deal
+                      </Typography>
+                      <Stack spacing={0.75} sx={{ mt: 0.5 }}>
+                        {metricRow("Deal Size", fmtMoneyM(form.deal_size), "Aggregate offering size")}
+                        {metricRow("Sector", sectorLabel)}
+                        {metricRow("Region", form.region || "N/A")}
+                      </Stack>
+                    </Grid>
 
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body1">Revenue Growth</Typography>
-                    <Typography variant="body1">{fmtPct(form.revenue_growth)}</Typography>
-                  </Box>
+                    {/* FO-only block */}
+                    {isFO && (
+                      <Grid item xs={12}>
+                        <Typography variant="overline" sx={{ color: grey[600], letterSpacing: 0.6 }}>
+                          Offering Dynamics (FO)
+                        </Typography>
+                        <Stack spacing={0.75} sx={{ mt: 0.5 }}>
+                          {metricRow(
+                            "Discount from Announcement",
+                            fmtPct(form.discount_from_announcement_price),
+                            "Issue price vs announcement reference"
+                          )}
+                          {metricRow(
+                            "Change in Price from T-1D to Issue",
+                            fmtPct(form.issue_to_previous_day_close),
+                            "Relative change from T-1 close to issue price"
+                          )}
+                        </Stack>
+                      </Grid>
+                    )}
+                  </Grid>
 
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body1">Net Profit Margin</Typography>
-                    <Typography variant="body1">{fmtPct(form.net_profit_margin)}</Typography>
-                  </Box>
-
-                  {isFO && (
-                    <Box display="flex" justifyContent="space-between">
-                      <Typography variant="body1">Change in Price from T-1D to Issue</Typography>
-                      <Typography variant="body1">{fmtPct(form.issue_to_previous_day_close)}</Typography>
-                    </Box>
-                  )}
-
-                  {/* Footer line with bank / sponsor */}
-                  <Box display="flex" justifyContent="space-between" mt={2}>
-                    <Typography variant="body1" color="#002060">
-                      {form.lead_bank || "N/A"}
-                    </Typography>
-                    <Typography variant="body1" color="#002060">
-                      {form.sponsor === "Y"
-                        ? "Sponsored"
-                        : form.sponsor === "N"
-                        ? "Not Sponsored"
-                        : "N/A"}
-                    </Typography>
-                  </Box>
+                  {/* Footer removed (simplified card) */}
                 </CardContent>
               </Card>
             </Grid>

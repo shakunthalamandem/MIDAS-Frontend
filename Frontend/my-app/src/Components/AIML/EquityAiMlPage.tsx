@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Card, Container, Typography, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Card,
+  Container,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import PredictionLayout from "./PredictionLayout";
 
 type OptionsData = {
@@ -62,29 +68,38 @@ const EquityAiMlPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", gap: 2, p: 2 }}>
-      <Box sx={{ flex: 1 }}>
-        {/* Hero banner (same tone as before) */}
-        <Box
-          sx={{
-            fontWeight: 500,
-            color: "#FFFFFF",
-            fontSize: { xs: "1rem", sm: "1.2rem" },
-            backgroundColor: "#002060",
-            textAlign: "center",
-            py: 1,
-            borderRadius: 2,
-            boxShadow: 2,
-            mb: 2,
-          }}
-        >
-          Welcome to the Prediction Dashboard! Effortlessly input data and track
-          all model outcomes, from feature details to prediction results and
-          confidence levels.
-        </Box>
+    // Full-width container with no default gutters
+    <Container maxWidth={false} disableGutters>
+      {/* Centered wrapper with equal margins; ~80% width on desktop */}
+      <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+        <Box sx={{ width: { xs: "96%", sm: "90%", md: "80%" } }}>
+          {/* Hero banner sits inside the centered wrapper */}
+          <Box
+            sx={{
+              fontWeight: 500,
+              color: "#FFFFFF",
+              fontSize: { xs: "1rem", sm: "1.15rem" },
+              backgroundColor: "#002060",
+              textAlign: "center",
+              py: 1.25,
+              borderRadius: 2,
+              mt: 1.5,
+              mb: 2,
+            }}
+          >
+            Welcome to the Prediction Dashboard! Effortlessly input data and track
+            all model outcomes, from feature details to prediction results and
+            confidence levels.
+          </Box>
 
-        <Container maxWidth="xl" sx={{ p: 0 }}>
-          <Card sx={{ p: 3, boxShadow: 3, borderRadius: 2 }}>
+          {/* Main working surface inside the same centered wrapper */}
+          <Card
+            sx={{
+              borderRadius: 2,
+              boxShadow: 4,
+              p: { xs: 2, md: 3 },
+            }}
+          >
             <Typography
               variant="h5"
               fontWeight="bold"
@@ -95,21 +110,20 @@ const EquityAiMlPage: React.FC = () => {
               🧠 Machine Learning Equity Deal Predictor — US IPO & Follow-ons
             </Typography>
 
-            <Typography variant="body1" gutterBottom sx={{ ml: 2, mt: 2, mb: 2 }}>
-                Welcome to the ML-powered equity deal predictor for{" "}
-                <strong>US IPOs & Follow-ons (Marketed & Overnight)</strong>. 
-                Input key parameters like market trends, and more to forecast deal outcomes.
+            <Typography variant="body1" gutterBottom sx={{ mt: 1, mb: 2 }}>
+              Welcome to the ML-powered equity deal predictor for{" "}
+              <strong>US IPOs & Follow-ons (Marketed & Overnight)</strong>.
+              Input key parameters to forecast deal outcomes.
             </Typography>
 
-
-            {/* Soft background for the working area */}
-            <Box sx={{ backgroundColor: "#f4f6f8", p: 3, borderRadius: 1 }}>
+            {/* Work zone */}
+            <Box sx={{ backgroundColor: "#f7f9fc", p: { xs: 2, md: 3 }, borderRadius: 2 }}>
               <PredictionLayout options={options} />
             </Box>
           </Card>
-        </Container>
+        </Box>
       </Box>
-    </Box>
+    </Container>
   );
 };
 
