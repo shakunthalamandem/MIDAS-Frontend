@@ -82,37 +82,37 @@ const formatDealSize = (dealSize: any) => {
 
   const columns: GridColDef[] = [
 
-    {
-      field: "deal_size",
-      headerName: "Deal Size",
-      width: 120,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-        {
-      field: "issue_offer_price",
-      headerName: "Issue Offer Price",
-      width: 120,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
+    // {
+    //   field: "deal_size",
+    //   headerName: "Deal Size",
+    //   width: 120,
+    //   renderCell: (params) => `${params.value}`,
+    //   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    // },
+    //     {
+    //   field: "issue_offer_price",
+    //   headerName: "Issue Offer Price",
+    //   width: 120,
+    //   renderCell: (params) => `${params.value}`,
+    //   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    // },
     // { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 180 },
     {
   field: "ioi_deal_size",
   headerName: "IOI as % Deal Size",
-  width: 120,
+  width: 150,
   
 },
-{
-  field: "number_of_shares_offered",
-  headerName: "Shares Offered",
-  width: 120,
-  valueFormatter: (params) => {
-    const value = Number(params);
-    return isNaN(value) ? '' : value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  }
-}
-,
+// {
+//   field: "number_of_shares_offered",
+//   headerName: "Shares Offered",
+//   width: 120,
+//   valueFormatter: (params) => {
+//     const value = Number(params);
+//     return isNaN(value) ? '' : value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+//   }
+// }
+// ,
   { 
     field: "allocation_deal_size_percentage", 
     headerName: "Allocation % of Deal Size", 
