@@ -293,7 +293,7 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                                       <ListItemIcon>
                                         <LooksOneIcon
                                           fontSize="small"
-                                          color="primary"
+                                            sx={{ color: "#002060" }}
                                         />
                                       </ListItemIcon>
                                       <ListItemText
@@ -314,7 +314,7 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                                       <ListItemIcon>
                                         <LooksTwoIcon
                                           fontSize="small"
-                                          color="primary"
+                                          sx={{ color: "#002060" }}
                                         />
                                       </ListItemIcon>
                                       <ListItemText primary="Repeat the same process for the 1-month return." />
@@ -323,7 +323,7 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                                       <ListItemIcon>
                                         <Looks3Icon
                                           fontSize="small"
-                                          color="primary"
+                                          sx={{ color: "#002060" }}
                                         />
                                       </ListItemIcon>
                                       <ListItemText primary="Add both ratings together to get a final score out of 10." />
