@@ -267,7 +267,7 @@ return (
   <Stack direction="row" spacing={1} alignItems="center" mt={2}>
     <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
     <Typography variant="body2" color="text.secondary">
-      Below table consists of past 2 years of performance for tickers
+      Below table consists of past 3 years of performance for tickers
       Monashee participated in.
     </Typography>
   </Stack>
