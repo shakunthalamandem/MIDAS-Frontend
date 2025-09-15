@@ -23,9 +23,9 @@ interface IPOdashboardLineProps {
 
 const timelineFields = [
   { label: "Filed Date", key: "filed_date" },
-  { label: "Term Date", key: "term_date" },
+  { label: "Pricing Range Date", key: "term_date" },
   { label: "Pricing Date", key: "pricing_date" },
-  { label: "Trade Date", key: "trade_date" },
+  { label: "First Trade Date", key: "trade_date" },
 ];
 
 const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
