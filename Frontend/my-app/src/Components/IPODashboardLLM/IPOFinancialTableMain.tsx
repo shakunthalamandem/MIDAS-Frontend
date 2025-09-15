@@ -20,14 +20,14 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 
 const forecastYearKeys = [
-  "three_years_before",
+  // "three_years_before",
   "two_years_before",
   "one_year_before",
   "current_year",
   "one_year_later",
 ];
 
-const forecastYearLabels = ["2022 A", "2023 A", "2024 A", "2025 E", "2026 E"];
+const forecastYearLabels = [ "2023 A", "2024 A", "2025 E", "2026 E"];
 
 interface FinancialForecastTableProps {
   defaultTicker?: string;
