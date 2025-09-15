@@ -382,7 +382,7 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
                 </>
               ) : (
                 <IconButton onClick={handleEnterEdit}>
-                  <EditIcon />
+                  {/* <EditIcon /> */}
                 </IconButton>
               )}
             </Box>

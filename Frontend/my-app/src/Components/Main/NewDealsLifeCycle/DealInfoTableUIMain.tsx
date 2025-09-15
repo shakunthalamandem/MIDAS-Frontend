@@ -1,6 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Card, CardContent, TextField } from "@mui/material";
+import { Box, Card, CardContent, Paper, Stack, TextField, Typography } from "@mui/material";
+import BusinessIcon from "@mui/icons-material/Business";
+import PublicIcon from "@mui/icons-material/Public";
+import CategoryIcon from "@mui/icons-material/Category";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 
 interface DealInfoTableUIMainProps {
@@ -24,6 +28,7 @@ const formatDealSize = (dealSize: any) => {
   const formattedValue = absoluteValue.toLocaleString("en-US");
   return (isNegative ? "-$" : "$") + formattedValue;
 };
+  const headerRow = data && data.length > 0 ? data[0] : {};
 
 
   const preprocessRows = (rows: any[]) =>
@@ -31,6 +36,10 @@ const formatDealSize = (dealSize: any) => {
       id: index,
       ...row,
       deal_size: row.deal_size ? formatDealSize(row.deal_size.toFixed()) : "$0",
+      gics_sector_from_bloomberg: row.gics_sector_from_bloomberg || "N/A",
+      broad_region: row.broad_region || "N/A",
+      deal_type: row.deal_type || "N/A",
+      number_of_shares_offered: row.number_of_shares_offered ? `${row.number_of_shares_offered.toFixed(2)}%` : "0%",
       issue_offer_price: row.issue_offer_price ? formatDealSize(row.issue_offer_price.toFixed(2)) : "$0",
       ioi_deal_size: row.ioi_deal_size ? `${row.ioi_deal_size.toFixed(2)}%` : "0%",
       allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
@@ -283,6 +292,51 @@ const formatDealSize = (dealSize: any) => {
 ];
 
 return (
+  <>
+        <Paper
+        elevation={3}
+        sx={{
+          p: 2,
+          mb: 2,
+          borderRadius: 3,
+          backgroundColor: "#f8f9fb",
+        }}
+      >
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={4}
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Stack direction="row" spacing={2} alignItems="center">
+            <BusinessIcon color="primary" />
+            <Typography variant="body1" fontWeight={500}>
+              Sector: <strong>{headerRow.gics_sector_from_bloomberg}</strong>
+            </Typography>
+          </Stack>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <PublicIcon color="success" />
+            <Typography variant="body1" fontWeight={500}>
+              Region: <strong>{headerRow.broad_region}</strong>
+            </Typography>
+          </Stack>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <CategoryIcon color="secondary" />
+            <Typography variant="body1" fontWeight={500}>
+              Deal Type: <strong>{headerRow.deal_type}</strong>
+            </Typography>
+          </Stack>
+        </Stack>
+
+        <Stack direction="row" spacing={1} alignItems="center" mt={2}>
+          <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
+          <Typography variant="body2" color="text.secondary">
+            Below table consists of past 3 years of performance for tickers
+            Monashee participated in.
+          </Typography>
+        </Stack>
+      </Paper>
+
 <Box mb={15} sx={{ height: 600, width: "100%" }}>
   <Card>
     <CardContent>
@@ -327,6 +381,7 @@ return (
     </CardContent>
   </Card>
 </Box>
+  </>
 );
 };
 

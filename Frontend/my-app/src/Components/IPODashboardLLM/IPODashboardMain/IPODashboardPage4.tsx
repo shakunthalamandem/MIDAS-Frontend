@@ -20,6 +20,10 @@ import { cardStyle } from "../UtilsIPODashboard";
 import { motion } from "framer-motion";
 import IPOMonasheeScore from "../IPOMonasheeScore";
 import { Edit, InfoOutlined } from "@mui/icons-material";
+import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import LooksOneIcon from "@mui/icons-material/LooksOne";
+import LooksTwoIcon from "@mui/icons-material/LooksTwo";
+import Looks3Icon from "@mui/icons-material/Looks3";
 
 interface Props {
   selectedTicker: string;
@@ -47,7 +51,6 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-
 
   // ✅ Fetch deal data (POST with ticker)
   useEffect(() => {
@@ -79,7 +82,6 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
     fetchDealData();
   }, [selectedTicker]);
 
-  
   const handleSaveMonasheeScore = async () => {
     if (!apiUrl || !dealData) return;
     try {
@@ -127,166 +129,226 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
           </Grid>
 
           {/* Monashee Score */}
-     <Grid item xs={12}>
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
-    style={{ flex: 1 }}
-  >
-    <Card
-      variant="outlined"
-      sx={{
-        boxShadow: 2,
-        borderRadius: 2,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      {/* --- Custom Header --- */}
-      <Box
-        sx={{
-          position: "relative",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          py: 1,
-          // borderBottom: "1px solid #e0e0e0",
-        }}
-      >
-        <Box display="flex" alignItems="center">
-          <FaChartLine
-            size={24}
-            color="#002060"
-            style={{ marginRight: 8 }}
-          />
-          <Typography
-            variant="h6"
-            sx={{ color: "#002060", fontWeight: "bold" }}
-            align="center"
-          >
-            Monashee Proprietary Grade
-          </Typography>
-        </Box>
-
-        {/* Edit Button absolutely positioned */}
-        <IconButton
-          onClick={() => {
-            if (dealData) {
-              setTempScore(dealData.monashee_score); // prefill
-              setEditMode(true);
-            }
-          }}
-          sx={{ position: "absolute", right: 8 }}
-        >
-          <Edit />
-        </IconButton>
-      </Box>
-
-      <CardContent sx={{ backgroundColor: "#fff", flexGrow: 1 }}>
-        {loading ? (
-          <Box display="flex" justifyContent="center" my={3}>
-            <CircularProgress />
-          </Box>
-        ) : !dealData ? (
-          <Typography color="error">No deal data found</Typography>
-        ) : (
-          <>
-            <Box display="flex" justifyContent="center" mb={2}>
-              <Typography>
-                Recent IPO Performances related to this <span style={{color:'#002060',fontWeight:600}}>{dealData.sector}</span>.
-              </Typography>
-            </Box>
-
-            {/* Progress / Chart */}
-            <IPOMonasheeScore
-              ticker={selectedTicker ?? ""}
-              monasheeScore={dealData.monashee_score}
-            />
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: 100,
-                textAlign: "center",
-              }}
+          <Grid item xs={12}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              style={{ flex: 1 }}
             >
-              {editMode ? (
-                <Stack spacing={1} alignItems="center">
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: "#555" }}
-                  >
-                    Enter Monashee Grade (0–10)
-                  </Typography>
-                  <TextField
-                    type="number"
-                    size="small"
-                    inputProps={{ min: 0, max: 10, step: 0.25 }}
-                    placeholder="0–10"
-                    value={tempScore}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setTempScore(val === "" ? "" : Number(val));
-                    }}
-                    sx={{
-                      width: 150,
-                      "& input": { textAlign: "center" },
-                    }}
-                  />
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={handleSaveMonasheeScore}
-                      disabled={saving}
+              <Card
+                variant="outlined"
+                sx={{
+                  boxShadow: 2,
+                  borderRadius: 2,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                {/* --- Custom Header --- */}
+                <Box
+                  sx={{
+                    position: "relative",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    py: 1,
+                    // borderBottom: "1px solid #e0e0e0",
+                  }}
+                >
+                  <Box display="flex" alignItems="center">
+                    <FaChartLine
+                      size={24}
+                      color="#002060"
+                      style={{ marginRight: 8 }}
+                    />
+                    <Typography
+                      variant="h6"
+                      sx={{ color: "#002060", fontWeight: "bold" }}
+                      align="center"
                     >
-                      {saving ? "Saving..." : "Save"}
-                    </Button>
-                    <Button
-                      variant="text"
-                      size="small"
-                      onClick={() => setEditMode(false)}
-                    >
-                      Cancel
-                    </Button>
-                  </Stack>
-                  {error && (
-                    <Typography color="error" variant="caption">
-                      {error}
+                      Monashee Proprietary Grade
                     </Typography>
-                  )}
-                </Stack>
-              ) : (
-                <>
-                            <Typography
-                  variant="h5"
-                  sx={{ color: "#086000ff", fontWeight: 600, display: "inline-block", mr: 1 }}
-                >
-                  Monashee Grade is {dealData.monashee_score} / 10
-                </Typography>
-                <Tooltip
-                  title="The values are temporarily stored in the database"
-                  arrow
-                >
-                  <IconButton size="small" sx={{ verticalAlign: "middle" }}>
-                    <InfoOutlined />
-                  </IconButton>
-                </Tooltip>
-             </>
-                
-              )}
-            </Box>
-          </>
-        )}
-      </CardContent>
-    </Card>
-  </motion.div>
-</Grid>
+                  </Box>
 
+                  {/* Edit Button absolutely positioned */}
+                  <IconButton
+                    onClick={() => {
+                      if (dealData) {
+                        setTempScore(dealData.monashee_score); // prefill
+                        setEditMode(true);
+                      }
+                    }}
+                    sx={{ position: "absolute", right: 8 }}
+                  >
+                    <Edit />
+                  </IconButton>
+                </Box>
+
+                <CardContent sx={{ backgroundColor: "#fff", flexGrow: 1 }}>
+                  {loading ? (
+                    <Box display="flex" justifyContent="center" my={3}>
+                      <CircularProgress />
+                    </Box>
+                  ) : !dealData ? (
+                    <Typography color="error">No deal data found</Typography>
+                  ) : (
+                    <>
+                      <Box display="flex" justifyContent="center" mb={2}>
+                        <Typography>
+                          Recent IPO Performances related to this{" "}
+                          <span style={{ color: "#002060", fontWeight: 600 }}>
+                            {dealData.sector}
+                          </span>
+                          .
+                        </Typography>
+                      </Box>
+
+                      {/* Progress / Chart */}
+                      <IPOMonasheeScore
+                        ticker={selectedTicker ?? ""}
+                        monasheeScore={dealData.monashee_score}
+                      />
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          minHeight: 100,
+                          textAlign: "center",
+                        }}
+                      >
+                        {editMode ? (
+                          <Stack spacing={1} alignItems="center">
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ color: "#555" }}
+                            >
+                              Enter Monashee Grade (0–10)
+                            </Typography>
+                            <TextField
+                              type="number"
+                              size="small"
+                              inputProps={{ min: 0, max: 10, step: 0.25 }}
+                              placeholder="0–10"
+                              value={tempScore}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setTempScore(val === "" ? "" : Number(val));
+                              }}
+                              sx={{
+                                width: 150,
+                                "& input": { textAlign: "center" },
+                              }}
+                            />
+                            <Stack direction="row" spacing={1}>
+                              <Button
+                                variant="contained"
+                                size="small"
+                                onClick={handleSaveMonasheeScore}
+                                disabled={saving}
+                              >
+                                {saving ? "Saving..." : "Save"}
+                              </Button>
+                              <Button
+                                variant="text"
+                                size="small"
+                                onClick={() => setEditMode(false)}
+                              >
+                                Cancel
+                              </Button>
+                            </Stack>
+                            {error && (
+                              <Typography color="error" variant="caption">
+                                {error}
+                              </Typography>
+                            )}
+                          </Stack>
+                        ) : (
+                          <>
+                            <Typography
+                              variant="h5"
+                              sx={{
+                                color: "#086000ff",
+                                fontWeight: 600,
+                                display: "inline-block",
+                                mr: 1,
+                              }}
+                            >
+                              Monashee Grade is {dealData.monashee_score} / 10
+                            </Typography>
+                            <Tooltip
+                              title={
+                                <Box>
+                                  <Typography
+                                    variant="subtitle2"
+                                    sx={{ fontWeight: 600, mb: 1 }}
+                                  >
+                                    How is the Monashee Score calculated?
+                                  </Typography>
+                                  <List dense>
+                                    <ListItem>
+                                      <ListItemIcon>
+                                        <LooksOneIcon
+                                          fontSize="small"
+                                          color="primary"
+                                        />
+                                      </ListItemIcon>
+                                      <ListItemText
+                                        primary="Take the average T+1 day return of the last 5 deals."
+                                        secondary={
+                                          <Box
+                                            component="span"
+                                            sx={{ fontSize: 12 }}
+                                          >
+                                            <strong>Rating:</strong> 50 → 5,
+                                            40-50 → 4, 30-40 → 3, 20-30 → 2, ≤20
+                                            → 1
+                                          </Box>
+                                        }
+                                      />
+                                    </ListItem>
+                                    <ListItem>
+                                      <ListItemIcon>
+                                        <LooksTwoIcon
+                                          fontSize="small"
+                                          color="primary"
+                                        />
+                                      </ListItemIcon>
+                                      <ListItemText primary="Repeat the same process for the 1-month return." />
+                                    </ListItem>
+                                    <ListItem>
+                                      <ListItemIcon>
+                                        <Looks3Icon
+                                          fontSize="small"
+                                          color="primary"
+                                        />
+                                      </ListItemIcon>
+                                      <ListItemText primary="Add both ratings together to get a final score out of 10." />
+                                    </ListItem>
+                                  </List>
+                                </Box>
+                              }
+                              arrow
+                            >
+                              <IconButton
+                                size="small"
+                                sx={{ verticalAlign: "middle" }}
+                              >
+                                <InfoOutlined />
+                              </IconButton>
+                            </Tooltip>
+                          </>
+                        )}
+                      </Box>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </Grid>
         </Grid>
       </Container>
     </div>
