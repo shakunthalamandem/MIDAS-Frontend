@@ -128,9 +128,9 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
           <Typography variant="body2" color="text.secondary">
             Classifies the expected return into categories:
           </Typography>
-          <Typography variant="body2">📉 <b>Negative</b>: Return &lt; -1%</Typography>
-          <Typography variant="body2">⚖️ <b>Neutral</b>: Return between -1% to 1%</Typography>
-          <Typography variant="body2">📈 <b>Positive</b>: Return &gt; 1%</Typography>
+          <Typography variant="body2">📉 <b>Negative</b>: Return &lt;  1.8%%</Typography>
+          {/* <Typography variant="body2">⚖️ <b>Neutral</b>: Return between -1% to 1%</Typography> */}
+          <Typography variant="body2">📈 <b>Positive</b>: Return &gt; 1.8%</Typography>
         </Box>
       );
     }
