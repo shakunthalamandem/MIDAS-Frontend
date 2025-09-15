@@ -196,30 +196,37 @@ const handleSave = async () => {
           {/* Revenue / Growth / Net Income */}
 <Grid container spacing={2} mt={2}>
   {(["revenue", "growth", "net_income"] as Array<keyof NonNullable<DealWriteUpData["deal_writeup_rating"]>>).map((field) => (
-    <Grid item xs={12} sm={4} key={field}>
-      <FieldRenderer
-        label={
-          field === "revenue"
-            ? "Revenue ($M)"
-            :
-          field === "growth"
-            ? "Growth (%)"
-            : field === "net_income"
-            ? "Net Income (%)"
-            : String(field).charAt(0).toUpperCase() + String(field).slice(1)
-        }
-        name={field}
-        value={
-  formData.deal_writeup_rating?.[field] !== undefined
-    ? Math.round(Number(formData.deal_writeup_rating?.[field])).toString()
-    : ""
-}
+   <Grid item xs={12} sm={4} key={field}>
+  <FieldRenderer
+    label={
+      field === "revenue"
+        ? "Revenue ($M)"
+        : field === "growth"
+        ? "Growth (%)"
+        : field === "net_income"
+        ? "Net Income (%)"
+        : String(field).charAt(0).toUpperCase() + String(field).slice(1)
+    }
+    name={field}
+    value={
+      formData.deal_writeup_rating?.[field] === null ||
+      formData.deal_writeup_rating?.[field] === undefined
+        ? "Not Available"
+        : Math.round(Number(formData.deal_writeup_rating?.[field])).toString()
+    }
+    editable={false}
+    adornment={
+      (formData.deal_writeup_rating?.[field] !== null &&
+        formData.deal_writeup_rating?.[field] !== undefined &&
+        (field === "growth" || field === "net_income"))
+        ? "%"
+        : undefined
+    }
+    onChange={() => {}}
+  />
+</Grid>
 
-        editable={false} // read-only
-        adornment={field === "growth" || field === "net_income" ? "%" : undefined}
-        onChange={() => {}}
-      />
-    </Grid>
+
   ))}
 </Grid>
 <Box position="relative" mt={1}>
