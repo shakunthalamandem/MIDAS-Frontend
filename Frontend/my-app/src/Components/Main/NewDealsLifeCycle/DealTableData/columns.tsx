@@ -39,6 +39,7 @@ export const getColumns = (
           renderHeader: () => formatHeader("Issue Price"),
           flex: 1,
           headerAlign: "left",
+          minWidth: 120,
           align: "left",
           renderCell: (params) => {
             const val = params.value;
@@ -51,6 +52,7 @@ export const getColumns = (
           renderHeader: () => formatHeader("Price Range"),
           flex: 1,
           headerAlign: "left",
+          minWidth: 120,
           align: "left",
           renderCell: (params) => {
             const { deal_type, issue_price, pricing_range_min, pricing_range_max } = params.row;
@@ -94,6 +96,7 @@ const formatDealSize = (value: any): string => {
       flex: 1,
       headerAlign: "left",
       align: "left",
+          minWidth: 120,
       renderCell: (params) => (
         <span
           style={{
@@ -107,7 +110,8 @@ const formatDealSize = (value: any): string => {
         </span>
       ),
     },
-    { field: "region", headerName: "Region", renderHeader: () => formatHeader("Region"), flex: 0.75, headerAlign: "left", align: "left" },
+    { field: "region", headerName: "Region", renderHeader: () => formatHeader("Region"), flex: 0.75, 
+          minWidth: 120,headerAlign: "left", align: "left" },
     { field: "sector", headerName: "Sector", renderHeader: () => formatHeader("Sector"), flex: 1.25, headerAlign: "left", align: "left" },
     { field: "issuer_name", headerName: "Issuer Name", renderHeader: () => formatHeader("Issuer Name"), flex: 2, headerAlign: "left", align: "left" },
 
@@ -116,14 +120,17 @@ const formatDealSize = (value: any): string => {
   headerName: "Deal Size",
   renderHeader: () => formatHeader("Deal Size ($M)"),
   flex: 1,
+          minWidth: 120,
   headerAlign: "left",
   align: "left",
   renderCell: (params) => formatDealSize(params.value),
   sortComparator: (v1, v2) => Number(v1) - Number(v2),
 },
     // dateColumn,
-    {field: "trade_date", headerName: "First Trade Date", renderHeader: () => formatHeader("First Trade Date"), flex: 1.5, headerAlign: "left", align: "left", renderCell: formatDateCell},
-    {field: "pricing_date", headerName: "Pricing Date", renderHeader: () => formatHeader("Pricing Date"), flex: 1.12, headerAlign: "left", align: "left", renderCell: formatDateCell},
+    {field: "trade_date", headerName: "First Trade Date", renderHeader: () => formatHeader("First Trade Date"), 
+          minWidth: 120,flex: 1.5, headerAlign: "left", align: "left", renderCell: formatDateCell},
+    {field: "pricing_date", headerName: "Pricing Date", renderHeader: () => formatHeader("Pricing Date"), 
+          minWidth: 120,flex: 1.12, headerAlign: "left", align: "left", renderCell: formatDateCell},
 
     {
       field: "deal_type",
@@ -131,6 +138,7 @@ const formatDealSize = (value: any): string => {
       renderHeader: () => formatHeader("Deal Type"),
       flex: 0.70,
       headerAlign: "left",
+          minWidth: 120,
       align: "left",
     },
         {
@@ -138,6 +146,7 @@ const formatDealSize = (value: any): string => {
       headerName: "FO Type",
       renderHeader: () => formatHeader("FO Type"),
       flex: 0.80,
+          minWidth: 120,
       headerAlign: "left",
       align: "left",
     },
@@ -150,6 +159,7 @@ const formatDealSize = (value: any): string => {
       renderHeader: () => formatHeader("Writeup Available"),
       flex: 1,
       headerAlign: "left",
+          minWidth: 120,
       align: "left",
       renderCell: (params) => {
         // Determine the link based on the deal_type dynamically
@@ -186,6 +196,7 @@ const formatDealSize = (value: any): string => {
       headerName: "Deal Status",
       renderHeader: () => formatHeader("Deal Status"),
       flex: 1,
+          minWidth: 120,
       headerAlign: "left",
       align: "left",
       renderCell: renderDealStatsCell,
@@ -193,6 +204,7 @@ const formatDealSize = (value: any): string => {
     {
       field: "t1d_pred",
       headerName: "AI-ML Prediction",
+          minWidth: 120,
       renderHeader: () => formatHeader("AI-ML Prediction"),
       flex: 1,
       headerAlign: "left",
