@@ -243,10 +243,9 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
             sx={{
               fontStyle: "italic",
               ml: 1,
-              color: "text.secondary",
             }}
           >
-            Confidence - {confidence.toFixed(1)}%
+            Confidence: {confidence.toFixed(1)}%
           </Typography>
         </Box>
       </Box>
