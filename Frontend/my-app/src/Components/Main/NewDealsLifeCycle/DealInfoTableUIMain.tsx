@@ -45,6 +45,12 @@ const formatDealSize = (dealSize: any) => {
       ioi_deal_size: row.ioi_deal_size ? `${row.ioi_deal_size.toFixed(2)}%` : "0%",
       allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
       allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed()}%` : "0%",
+      // model_am_return: row.model_am_return ? `${formatDealSize(row.model_am_return.toFixed())}` : "$0",
+      // total_model_capital: row.total_model_capital ? `${formatDealSize(row.total_model_capital.toFixed())}` : "$0",
+      // model_am_capital: row.model_am_capital ? `${formatDealSize(row.model_am_capital.toFixed())}` : "$0",
+      // model_return_1_allocation: row.model_return_1_allocation ? `${formatDealSize(row.model_return_1_allocation.toFixed())}` : "$0",
+      // model_capital_1_allocation: row.model_capital_1_allocation ? `${formatDealSize(row.model_capital_1_allocation.toFixed())}` : "$0",
+      // model_actual_return: row.model_actual_return ? `${formatDealSize(row.model_actual_return.toFixed())}` : "$0",
       t1m_return_actual: row.t1m_return_actual ? `${row.t1m_return_actual.toFixed(2)}%` : "0%",
       t1d_return_actual: row.t1d_return_actual ? `${row.t1d_return_actual.toFixed(2)}%` : "0%",
       am_return_difference: row.am_return_difference ? `${row.am_return_difference.toFixed(2)}%` : "0%",
@@ -54,6 +60,14 @@ const formatDealSize = (dealSize: any) => {
       allocated_capital: row.allocated_capital ? `${formatDealSize(row.allocated_capital.toFixed())}` : "$0",
       allocation_deal_size_percentage: row.allocation_deal_size_percentage ? `${row.allocation_deal_size_percentage.toFixed(2)}%` : "0%",
       monahsee_actual_total: row.monahsee_actual_total ? `${formatDealSize(row.monahsee_actual_total.toFixed())}` : "$0",
+      model_actual_am_return: row.model_actual_am_return ? `${formatDealSize(row.model_actual_am_return.toFixed())}` : "$0",
+      model_allocation_gap: row.model_allocation_gap ? `${formatDealSize(row.model_allocation_gap.toFixed())}` : "$0",
+      monashee_exit_gap: row.monashee_exit_gap ? `${formatDealSize(row.monashee_exit_gap.toFixed())}` : "$0",
+      am_gap: row.am_gap ? `${formatDealSize(row.am_gap.toFixed())}` : "$0",
+      am_exit_gap: row.am_exit_gap ? `${formatDealSize(row.am_exit_gap.toFixed())}` : "$0",
+      total_gap: row.monahsee_actual_total - row.model_actual_total 
+      ? formatDealSize((row.monahsee_actual_total - row.model_actual_total).toFixed()) 
+      : "$0",
       
 
     }));
