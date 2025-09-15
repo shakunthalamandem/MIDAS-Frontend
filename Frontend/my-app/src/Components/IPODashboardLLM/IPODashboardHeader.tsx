@@ -21,6 +21,7 @@ interface TickerOption {
   company_name?: string;
   exchange?: string;
   pricing_date: string | null;
+  valuation?: string[];
 }
 
 interface IPODashboardHeaderProps {
@@ -146,6 +147,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
           ticker_name: ipoData?.ticker_name,
           company_name: ipoData?.company_name,
           exchange: ipoData?.exchange,
+          valuation: ipoData?.valuation || [],
         }}
       />
     </Container>

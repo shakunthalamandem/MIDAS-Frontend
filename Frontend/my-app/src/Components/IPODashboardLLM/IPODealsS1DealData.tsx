@@ -25,6 +25,10 @@ import { LightbulbOutlined } from "@mui/icons-material";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import IPOAITickersMain from "./Hooks/IPOAITickersMain";
 
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+
+
 type DealData = {
   fair_value_estimate: string;
   indication_of_interest: string;
@@ -39,6 +43,7 @@ interface SelectedData {
   ticker_name?: string;
   company_name?: string;
   exchange?: string;
+  valuation?: string[];
 }
 
 interface IPODealsS1DealDataProps {
@@ -51,12 +56,58 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData })
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editedDealData, setEditedDealData] = useState<DealData | null>(null);
+  const [editValuationMode, setEditValuationMode] = useState(false);
+const [editedValuation, setEditedValuation] = useState<string[]>([]);
+const valuation = selectedData?.valuation ?? []; // If valuation is part of dealData
+console.log("Valuation data:", selectedData);
+
 
   // Toggle AI comparison
   const [showAIComparison, setShowAIComparison] = useState(false);
   const handleAIComparisonClick = () => {
     setShowAIComparison((prev) => !prev);
   };
+
+
+
+  
+const handleAddValuationLine = (index: number) => {
+  const updated = [...editedValuation];
+  updated.splice(index + 1, 0, "");
+  setEditedValuation(updated);
+};
+
+const handleRemoveValuationLine = (index: number) => {
+  const updated = [...editedValuation];
+  updated.splice(index, 1);
+  setEditedValuation(updated);
+};
+
+const handleSaveValuation = async () => {
+  try {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("access_token");
+    if (!apiUrl) throw new Error("API URL not defined");
+
+    const response = await fetch(`${apiUrl}/api/ipo_deal_data_fairvalues/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify({
+        ticker: selectedData.ticker_name,
+        valuation: editedValuation,
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to save valuation");
+    setEditValuationMode(false);
+    setDealData((prev) => prev ? { ...prev, valuation: editedValuation } : prev);
+  } catch (err: any) {
+    setError(err.message || "Unknown error occurred");
+  }
+};
 
   useEffect(() => {
     const fetchDeals = async () => {
@@ -251,50 +302,137 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData })
               </Card>
             </Grid>
           ))}
-                    {/* Differentiated Summary */}
+
+
+
 <Grid item xs={12}>
-  <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-    <CardContent sx={{ backgroundColor: "#fff" }}>
-      <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
-        <FaClipboardList
-          size={24}
-          color="#002060"
-          style={{ marginRight: 8 }}
-        />
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: "bold", color: "#002060" }}
-        >
-          Differentiated Summary
+  {/* Valuation Information Section */}
+  <Container maxWidth="xl">
+    <Card
+      elevation={0}
+      sx={{
+        borderRadius: 4,
+        background: "linear-gradient(#f0f5ff, #f0f5ff)",
+        mb: 2,
+        mt: 4,
+        width: "100%",
+        mx: "auto",
+      }}
+    >
+      <Box
+        position="relative"
+        px={3}
+        pt={2}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
+          Valuation Information
         </Typography>
+        <Box position="absolute" right={24}>
+          {editValuationMode ? (
+            <>
+              <IconButton color="primary" onClick={handleSaveValuation}>
+                <SaveIcon />
+              </IconButton>
+              <IconButton
+                color="secondary"
+                onClick={() => {
+                  setEditedValuation(Array.isArray(valuation) ? valuation : []);
+                  setEditValuationMode(false);
+                }}
+              >
+                <CancelIcon />
+              </IconButton>
+            </>
+          ) : (
+            <IconButton onClick={() => {
+              setEditedValuation(Array.isArray(valuation) ? valuation : []);
+              setEditValuationMode(true);
+            }}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
       </Box>
 
-      {editMode ? (
-        <TextField
-          fullWidth
-          size="small"
-          multiline
-          minRows={4}
-          value={
-            editedDealData?.differentiated_summary ??
-            dealData.differentiated_summary ??
-            ""
-          }
-          onChange={(e) =>
-            setEditedDealData((prev) => ({
-              ...prev!,
-              differentiated_summary: e.target.value,
-            }))
-          }
-        />
-      ) : (
-        <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
-          {dealData.differentiated_summary ?? ""}
-        </Typography>
-      )}
-    </CardContent>
-  </Card>
+      <Box px={3} pb={3}>
+        {editValuationMode ? (
+          <>
+            {editedValuation.map((item, index) => (
+              <Box
+                key={index}
+                display="flex"
+                alignItems="center"
+                gap={1}
+                mb={1}
+              >
+                <TextField
+                  value={item}
+                  onChange={(e) => {
+                    const updated = [...editedValuation];
+                    updated[index] = e.target.value;
+                    setEditedValuation(updated);
+                  }}
+                  fullWidth
+                  multiline
+                  size="small"
+                  InputProps={{ style: { backgroundColor: "#fff" } }}
+                />
+                <IconButton
+                  color="primary"
+                  onClick={() => handleAddValuationLine(index)}
+                  size="small"
+                >
+                  <AddCircleOutlineIcon />
+                </IconButton>
+                {editedValuation.length > 1 && (
+                  <IconButton
+                    color="error"
+                    onClick={() => handleRemoveValuationLine(index)}
+                    size="small"
+                  >
+                    <RemoveCircleOutlineIcon />
+                  </IconButton>
+                )}
+              </Box>
+            ))}
+            {editedValuation.length === 0 && (
+              <Button
+                variant="outlined"
+                onClick={() => handleAddValuationLine(-1)}
+              >
+                Add First Point
+              </Button>
+            )}
+          </>
+        ) : (
+          <>
+            {Array.isArray(valuation) && valuation.length > 0 ? (
+              <Box component="ul" sx={{ pl: 3, color: "#333", mt: 1 }}>
+                {valuation.map((item: string, index: number) => (
+                  <li key={index} style={{ marginBottom: 8, lineHeight: 1.6 }}>
+                    {item}
+                  </li>
+                ))}
+              </Box>
+            ) : (
+              <Typography
+                variant="body1"
+                sx={{ color: "#333", textAlign: "center", mt: 2 }}
+              >
+                No valuation data available.
+              </Typography>
+            )}
+          </>
+        )}
+      </Box>
+    </Card>
+  </Container>
 </Grid>
+
+
 
 
 
@@ -353,6 +491,53 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData })
               </CardContent>
             </Card>
           </Grid>
+
+
+                    
+                    {/* Differentiated Summary */}
+<Grid item xs={12}>
+  <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+    <CardContent sx={{ backgroundColor: "#fff" }}>
+      <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
+        <FaClipboardList
+          size={24}
+          color="#002060"
+          style={{ marginRight: 8 }}
+        />
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "bold", color: "#002060" }}
+        >
+          Differentiated Summary
+        </Typography>
+      </Box>
+
+      {editMode ? (
+        <TextField
+          fullWidth
+          size="small"
+          multiline
+          minRows={4}
+          value={
+            editedDealData?.differentiated_summary ??
+            dealData.differentiated_summary ??
+            ""
+          }
+          onChange={(e) =>
+            setEditedDealData((prev) => ({
+              ...prev!,
+              differentiated_summary: e.target.value,
+            }))
+          }
+        />
+      ) : (
+        <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
+          {dealData.differentiated_summary ?? ""}
+        </Typography>
+      )}
+    </CardContent>
+  </Card>
+</Grid>
 
 
         </Grid>

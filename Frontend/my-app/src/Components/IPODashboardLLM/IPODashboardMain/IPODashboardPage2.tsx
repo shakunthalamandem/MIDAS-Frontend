@@ -96,7 +96,7 @@ const IPODashboardPage2: React.FC<Props> = ({
 
   return (
     <div id="ipo-dashboard-page2">
-      <Container maxWidth="xl" >
+      {/* <Container maxWidth="xl" >
       <Card
         elevation={0}
         sx={{
@@ -216,7 +216,7 @@ const IPODashboardPage2: React.FC<Props> = ({
           )}
         </Box>
       </Card>
-      </Container>
+      </Container> */}
 
       <IPODashboardCardRatings
         ipodata={ipoData}
