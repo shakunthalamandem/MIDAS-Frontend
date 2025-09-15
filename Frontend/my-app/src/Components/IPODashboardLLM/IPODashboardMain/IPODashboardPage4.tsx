@@ -197,9 +197,9 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                     <>
                       <Box display="flex" justifyContent="center" mb={2}>
                         <Typography>
-                          Recent IPO Performances related to this{" "}
+                          Recent IPO Performances related to {" "}
                           <span style={{ color: "#002060", fontWeight: 600 }}>
-                            {dealData.sector}
+                            {dealData.sector} Sector
                           </span>
                           .
                         </Typography>
