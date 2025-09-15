@@ -13,6 +13,8 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useDealWriteUpInfo } from "./DealWriteUpMain/useDealWriteUpInfo";
 import FieldRenderer from "./DealWriteUpMain/FieldRenderer";
 import BlueSlider from "./BlueSlider";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
 import { motion } from "framer-motion";
 
 export interface DealWriteUpData {
@@ -193,22 +195,26 @@ const handleSave = async () => {
           ))}
           {/* Revenue / Growth / Net Income */}
 <Grid container spacing={2} mt={2}>
-  {(["revenue", "growth", "net_income"] as const).map((field) => (
+  {(["revenue", "growth", "net_income"] as Array<keyof NonNullable<DealWriteUpData["deal_writeup_rating"]>>).map((field) => (
     <Grid item xs={12} sm={4} key={field}>
       <FieldRenderer
         label={
+          field === "revenue"
+            ? "Revenue ($M)"
+            :
           field === "growth"
             ? "Growth (%)"
             : field === "net_income"
             ? "Net Income (%)"
-            : field.charAt(0).toUpperCase() + field.slice(1)
+            : String(field).charAt(0).toUpperCase() + String(field).slice(1)
         }
         name={field}
         value={
-          formData.deal_writeup_rating?.[field] !== undefined
-            ? Number(formData.deal_writeup_rating?.[field]).toFixed(2)
-            : ""
-        }
+  formData.deal_writeup_rating?.[field] !== undefined
+    ? Math.round(Number(formData.deal_writeup_rating?.[field])).toString()
+    : ""
+}
+
         editable={false} // read-only
         adornment={field === "growth" || field === "net_income" ? "%" : undefined}
         onChange={() => {}}
@@ -216,6 +222,27 @@ const handleSave = async () => {
     </Grid>
   ))}
 </Grid>
+<Box position="relative" mt={1}>
+  <InfoOutlinedIcon
+    fontSize="small"
+    color="action"
+    sx={{
+      position: "absolute",
+      top: 4,
+      left: 0,
+    }}
+  />
+  <Typography
+    variant="body2"
+    color="textSecondary"
+    sx={{ pl: 3 }} // padding-left to make space for the icon
+  >
+    To update these numbers, please make changes in the Deal Write-Up section.
+  </Typography>
+</Box>
+
+
+
 
           {/* Deal Write-Up Rating Slider */}
           <Grid item xs={12} mt={2}>
