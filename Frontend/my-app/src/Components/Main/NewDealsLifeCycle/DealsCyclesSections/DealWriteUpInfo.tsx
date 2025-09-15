@@ -165,7 +165,7 @@ const handleSave = async () => {
                   sx={{
                     color: "#000",
                     display: "-webkit-box",
-                    WebkitLineClamp: 3,
+                    WebkitLineClamp: 2,
                     WebkitBoxOrient: "vertical",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
