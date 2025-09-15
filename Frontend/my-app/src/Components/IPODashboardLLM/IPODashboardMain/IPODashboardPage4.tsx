@@ -281,7 +281,7 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                             </Typography>
                             <Tooltip
                               title={
-                                <Box>
+                                <Box sx={{bgcolor: 'grey',  maxWidth: 300}}>
                                   <Typography
                                     variant="subtitle2"
                                     sx={{ fontWeight: 600, mb: 1 }}
@@ -301,7 +301,7 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                                         secondary={
                                           <Box
                                             component="span"
-                                            sx={{ fontSize: 12 }}
+                                            sx={{ fontSize: 12,color:"#FFFFFF"}}
                                           >
                                             <strong>Rating:</strong> 50 → 5,
                                             40-50 → 4, 30-40 → 3, 20-30 → 2, ≤20
