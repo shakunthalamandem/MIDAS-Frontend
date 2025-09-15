@@ -264,7 +264,7 @@ return (
 
 
 
-      <Box sx={{ height: 600, width: "100%", marginTop: 3 }}>
+      <Box sx={{ height: 450, width: "100%", marginTop: 3 }}>
         <DataGrid
           rows={filteredRows}
           columns={columns}
