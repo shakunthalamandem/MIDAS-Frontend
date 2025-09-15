@@ -60,10 +60,10 @@ const WriteUpIPODashbaord: React.FC = () => {
 
         // ✅ If ticker comes from URL, use it; else fallback to first IPO
         if (ticker) {
-          setSelectedTicker(ticker);
-        } else if (uniqueRows.length > 0) {
-          setSelectedTicker(uniqueRows[0].ticker);
-        }
+          setSelectedTicker(ticker);}
+        // } else if (uniqueRows.length > 0) {
+        //   setSelectedTicker(uniqueRows[0].ticker);
+        // }
       } catch (error) {
         console.error("Error fetching IPO data:", error);
       }
