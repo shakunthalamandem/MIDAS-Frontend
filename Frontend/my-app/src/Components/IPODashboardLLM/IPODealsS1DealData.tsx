@@ -106,8 +106,13 @@ const handleSaveValuation = async () => {
 
     if (!response.ok) throw new Error("Failed to save valuation");
     setEditValuationMode(false);
-    setDealData((prev) => prev ? { ...prev, valuation: editedValuation } : prev);
-  } catch (err: any) {
+
+
+    selectedData.valuation = cleaned;
+    setEditedValuation(cleaned);
+
+    // Optionally, update dealData if you want to keep it in sync
+    setDealData((prev) => prev ? { ...prev, valuation: formatted } : prev);  } catch (err: any) {
     setError(err.message || "Unknown error occurred");
   }
 };

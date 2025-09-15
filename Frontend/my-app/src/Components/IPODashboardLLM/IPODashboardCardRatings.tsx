@@ -174,6 +174,8 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
         ...prev,
         revenue_growth: payload.revenue_growth,
       }));
+            setLocalRevenueGrowth(payload.revenue_growth); // <-- Add this line
+
 
       setEditedData({});
       setEditMode(false);
