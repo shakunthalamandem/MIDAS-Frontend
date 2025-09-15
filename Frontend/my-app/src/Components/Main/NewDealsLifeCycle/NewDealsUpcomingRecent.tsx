@@ -18,7 +18,7 @@ import DealInfoContainer from "./DealInfoContainer";
 const NewDealsUpcomingRecent: React.FC = () => {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedOp, setSelectedOp] = useState("next 2 weeks");
+  const [selectedOp, setSelectedOp] = useState("Upcoming Deals");
   const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
 const apiUrl = process.env.REACT_APP_API_URL;
 const token = localStorage.getItem("access_token");
