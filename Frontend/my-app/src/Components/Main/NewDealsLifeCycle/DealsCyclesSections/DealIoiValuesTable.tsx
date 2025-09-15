@@ -89,47 +89,38 @@ const DealIoiValuesTable: React.FC<DealIoiValuesTableProps> = ({ data }) => {
     }));
   };
 
-  const handleSave = async () => {
-    try {
-      const payload: Partial<DealIoiValuesTableData> = {
-        id: data.id,
-        ticker: data.ticker,
-        pricing_date: data.pricing_date,
-        deal_type: data.deal_type,
-      };
+const handleSave = async () => {
+  try {
+    // Explicitly only pick these 2 fields
+    const payload: Partial<DealIoiValuesTableData> = {
+      ticker: formData.ticker,
+      pricing_date: formData.pricing_date,
+      deal_type: formData.deal_type,
+      ioi_as_percentage_of_deal_size_status: formData.ioi_as_percentage_of_deal_size_status,
+      potential_am_quantity: formData.potential_am_quantity,
+    };
 
-      Object.keys(formData).forEach((key) => {
-        if (
-          formData[key] !== data[key] &&
-          formData[key] !== undefined &&
-          key !== "id" &&
-          key !== "ticker" &&
-          key !== "pricing_date" &&
-          key !== "deal_type"
-        ) {
-          payload[key] = formData[key];
-        }
-      });
+    const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(payload),
+    });
 
-      const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        alert("Saved successfully!");
-        setEditable(false);
-      } else {
-        alert("Failed to save data");
-      }
-    } catch (error) {
-      console.error("Error saving data:", error);
+    if (response.ok) {
+      alert("Saved successfully!");
+      setEditable(false);
+    } else {
+      alert("Failed to save data");
     }
-  };
+  } catch (error) {
+    console.error("Error saving data:", error);
+  }
+};
+
+
 
   const renderField = (
     label: string,
