@@ -24,7 +24,7 @@ const NewDealsCycleMain: React.FC = () => {
           marginBottom: "20px",
         }}
       >
-        Welcome to 📊 Deal Flow Tracker: IPOs, Follow-Ons & Key Highlights.
+        Welcome to 📊 Deal Flow Tracker: IPOs, Follow-Ons
       </Typography>
 
       <NewDealsUpcomingRecent />
