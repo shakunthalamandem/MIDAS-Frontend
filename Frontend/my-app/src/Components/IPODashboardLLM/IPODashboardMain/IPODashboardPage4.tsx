@@ -12,13 +12,14 @@ import {
   IconButton,
   CardHeader,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import { FaChartLine } from "react-icons/fa";
 import FinancialForecastTable from "../IPOFinancialTableMain";
 import { cardStyle } from "../UtilsIPODashboard";
 import { motion } from "framer-motion";
 import IPOMonasheeScore from "../IPOMonasheeScore";
-import { Edit } from "@mui/icons-material";
+import { Edit, InfoOutlined } from "@mui/icons-material";
 
 interface Props {
   selectedTicker: string;
@@ -260,12 +261,23 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                   )}
                 </Stack>
               ) : (
-                <Typography
+                <>
+                            <Typography
                   variant="h5"
-                  sx={{ color: "#086000ff", fontWeight: 600 }}
+                  sx={{ color: "#086000ff", fontWeight: 600, display: "inline-block", mr: 1 }}
                 >
                   Monashee Grade is {dealData.monashee_score} / 10
                 </Typography>
+                <Tooltip
+                  title="The values are temporarily stored in the database"
+                  arrow
+                >
+                  <IconButton size="small" sx={{ verticalAlign: "middle" }}>
+                    <InfoOutlined />
+                  </IconButton>
+                </Tooltip>
+             </>
+                
               )}
             </Box>
           </>
