@@ -173,9 +173,9 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
         />
         <Typography
           variant="caption"
-          sx={{ fontStyle: "italic", color: "text.secondary", mt: 0.5 }}
+          sx={{ fontStyle: "italic", mt: 0.5 }}
         >
-          Confidence - {confidence.toFixed(1)}%
+          Confidence: {confidence.toFixed(1)}%
         </Typography>
       </Box>
     );
