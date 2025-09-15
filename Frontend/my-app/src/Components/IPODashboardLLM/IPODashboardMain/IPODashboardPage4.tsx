@@ -197,7 +197,7 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                     <>
                       <Box display="flex" justifyContent="center" mb={2}>
                         <Typography>
-                          Recent IPO Performances related to {" "}
+                          Recent IPO Performances related to{" "}
                           <span style={{ color: "#002060", fontWeight: 600 }}>
                             {dealData.sector} Sector
                           </span>
@@ -281,57 +281,37 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                             </Typography>
                             <Tooltip
                               title={
-                                <Box sx={{bgcolor: 'grey',  maxWidth: 300}}>
-                                  <Typography
-                                    variant="subtitle2"
-                                    sx={{ fontWeight: 600, mb: 1 }}
-                                  >
-                                    How is the Monashee Score calculated?
-                                  </Typography>
-                                  <List dense>
-                                    <ListItem>
-                                      <ListItemIcon>
-                                        <LooksOneIcon
-                                          fontSize="small"
-                                            sx={{ color: "#002060" }}
-                                        />
-                                      </ListItemIcon>
-                                      <ListItemText
-                                        primary="Take the average T+1 day return of the last 5 deals."
-                                        secondary={
-                                          <Box
-                                            component="span"
-                                            sx={{ fontSize: 12,color:"#FFFFFF"}}
-                                          >
-                                            <strong>Rating:</strong> 50 → 5,
-                                            40-50 → 4, 30-40 → 3, 20-30 → 2, ≤20
-                                            → 1
-                                          </Box>
-                                        }
-                                      />
-                                    </ListItem>
-                                    <ListItem>
-                                      <ListItemIcon>
-                                        <LooksTwoIcon
-                                          fontSize="small"
-                                          sx={{ color: "#002060" }}
-                                        />
-                                      </ListItemIcon>
-                                      <ListItemText primary="Repeat the same process for the 1-month return." />
-                                    </ListItem>
-                                    <ListItem>
-                                      <ListItemIcon>
-                                        <Looks3Icon
-                                          fontSize="small"
-                                          sx={{ color: "#002060" }}
-                                        />
-                                      </ListItemIcon>
-                                      <ListItemText primary="Add both ratings together to get a final score out of 10." />
-                                    </ListItem>
-                                  </List>
-                                </Box>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontSize: 13,
+                                    color: "#fff", // white text
+                                  }}
+                                >
+                                  The Monashee Score is based on the average
+                                  returns of the last five IPOs. A rating of 1–5
+                                  is assigned for the average T+1 day return and
+                                  again for the average 1-month return (with
+                                  &gt;50% = 5, 40–50% = 4, 30–40% = 3, 20–30% =
+                                  2, ≤20% = 1). The two ratings are then added
+                                  to give a total score out of 10, reflecting
+                                  both short- and medium-term performance.
+                                </Typography>
                               }
                               arrow
+                              placement="top"
+                              slotProps={{
+                                popper: {
+                                  sx: {
+                                    "& .MuiTooltip-tooltip": {
+                                      backgroundColor: "#002060", // dark blue bg
+                                      borderRadius: 2,
+                                      padding: "10px 14px",
+                                      maxWidth: 320,
+                                    },
+                                  },
+                                },
+                              }}
                             >
                               <IconButton
                                 size="small"
