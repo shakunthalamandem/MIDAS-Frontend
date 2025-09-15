@@ -33,7 +33,7 @@ useEffect(() => {
         fo_type: selectedDeal.fo_type ? [selectedDeal.fo_type] : [],
         broad_region: region ? [region] : [],
         gics_sector: sector ? [sector] : [],
-       years: [2025], // 👈 add if needed
+       years: [2023,2024, 2025], // 👈 add if needed
       };
 
       const response = await fetch(`${apiUrl}/api/detailed_gap_analysis/`, {
