@@ -53,11 +53,19 @@ export const getColumns = (
           headerAlign: "left",
           align: "left",
           renderCell: (params) => {
-            const minRaw = params.row.pricing_range_min;
-            const maxRaw = params.row.pricing_range_max;
-            if (!minRaw || !maxRaw) return "TBD";
-            const min = Number(minRaw);
-            const max = Number(maxRaw);
+            const { deal_type, issue_price, pricing_range_min, pricing_range_max } = params.row;
+
+            // Case 1: FO → show issue_price
+            if (deal_type === "FO") {
+              const price = Number(issue_price);
+              return !isNaN(price) ? `$${price.toFixed(0)}` : "TBD";
+            }
+
+            // Case 2: IPO (or others) → show range
+            if (!pricing_range_min || !pricing_range_max) return "TBD";
+
+            const min = Number(pricing_range_min);
+            const max = Number(pricing_range_max);
             return !isNaN(min) && !isNaN(max)
               ? `$${min.toFixed(0)} - $${max.toFixed(0)}`
               : "TBD";
