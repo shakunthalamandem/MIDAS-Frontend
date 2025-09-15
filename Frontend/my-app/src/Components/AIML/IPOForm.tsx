@@ -15,7 +15,6 @@ import {
 import IPOPredictionResults from "./IPOPredictionResults";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-
 interface OptionsData {
   region: string[];
   selected_bank: string[];
@@ -71,7 +70,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
   options,
   autoPredict = false,
   onAutoPredictComplete,
-  onPredicted
+  onPredicted,
 }) => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
@@ -372,7 +371,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
     {
       label: "Net Profit Margin (%)",
       name: "net_profit_margin_category",
-      selectOptions: ['Negative', 'Positive']
+      selectOptions: ["Negative", "Positive"],
     },
 
     {
@@ -506,6 +505,27 @@ const IPOForm: React.FC<IPOFormProps> = ({
             );
           })}
           <Grid item xs={12}>
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 1,
+                textAlign: { xs: "center", sm: "right" },
+                color: "text.secondary",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: { xs: "center", sm: "flex-end" },
+                gap: 0.5,
+              }}
+            >
+              <InfoOutlinedIcon
+                fontSize="small"
+                sx={{ color: "text.secondary" }}
+              />
+              {values.deal_status === "Issued"
+                ? "Values treated as confirmed"
+                : "Values used for temporary assumptions"}
+            </Typography>
+
             <Box
               sx={{
                 display: "flex",
@@ -537,23 +557,6 @@ const IPOForm: React.FC<IPOFormProps> = ({
                 {loading ? "Predicting..." : "Predict"}
               </Button>
             </Box>
-           <Typography
-  variant="body2"
-  sx={{
-    mt: 1,
-    textAlign: { xs: "center", sm: "right" },
-    color: "text.secondary",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: { xs: "center", sm: "flex-end" },
-    gap: 0.5, // spacing between icon & text
-  }}
->
-  <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
-  {values.deal_status === "Issued"
-    ? "Above values are original values"
-    : "Above values are assumption values"}
-</Typography>
           </Grid>
         </Grid>
       </Paper>

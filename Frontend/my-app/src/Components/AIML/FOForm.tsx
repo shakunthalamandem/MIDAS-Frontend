@@ -16,7 +16,6 @@ import FOWeeklyMonthlyPredictionResults from "./FOWeeklyMonthlyPredictionResults
 import FOPredictionResults from "./FOPredictionResults";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-
 interface PredictionModel {
   prediction: string | null;
   accuracy: number;
@@ -55,9 +54,9 @@ interface FOFormValues {
   target: string;
 
   // NEW: fundamentals + feature for APIs
-  revenue_category: string;             // e.g. in $M
-  revenue_growth_category: string;      // %
-  net_profit_margin_category: string;   // %
+  revenue_category: string; // e.g. in $M
+  revenue_growth_category: string; // %
+  net_profit_margin_category: string; // %
   issue_to_pre_day_close_return_category: number; // %
 }
 
@@ -76,7 +75,7 @@ const FOForm: React.FC<FOFormProps> = ({
   options,
   autoPredict = false,
   onAutoPredictComplete,
-  onPredicted
+  onPredicted,
 }) => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
@@ -85,8 +84,14 @@ const FOForm: React.FC<FOFormProps> = ({
     message: string;
     severity: "error" | "success";
   }>({ open: false, message: "", severity: "error" });
-  const [prediction, setPrediction] = useState<Record<string, PredictionModel> | null>(null);
-  const [weeklyPrediction, setWeeklyPrediction] = useState<Record<string, PredictionModel> | null>(null);
+  const [prediction, setPrediction] = useState<Record<
+    string,
+    PredictionModel
+  > | null>(null);
+  const [weeklyPrediction, setWeeklyPrediction] = useState<Record<
+    string,
+    PredictionModel
+  > | null>(null);
 
   const formatSector = (sectorCode: string): string => {
     if (!sectorCode) return "";
@@ -101,7 +106,10 @@ const FOForm: React.FC<FOFormProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "pricing_date") {
-      setValues((prev) => ({ ...prev, pricing_date: value ? new Date(value) : null }));
+      setValues((prev) => ({
+        ...prev,
+        pricing_date: value ? new Date(value) : null,
+      }));
     } else {
       setValues((prev) => ({ ...prev, [name]: value }));
     }
@@ -130,13 +138,21 @@ const FOForm: React.FC<FOFormProps> = ({
     });
 
     // Deal size > 0
-    if (data.deal_size_category === "" || isNaN(parseFloat(data.deal_size_category)) || parseFloat(data.deal_size_category) <= 0) {
+    if (
+      data.deal_size_category === "" ||
+      isNaN(parseFloat(data.deal_size_category)) ||
+      parseFloat(data.deal_size_category) <= 0
+    ) {
       errors.deal_size_category = "Must be greater than 0";
       isValid = false;
     }
 
     // Percent ranges
-    const percentChecks: Array<{ key: keyof FOFormValues; label?: string; range?: [number, number] }> = [
+    const percentChecks: Array<{
+      key: keyof FOFormValues;
+      label?: string;
+      range?: [number, number];
+    }> = [
       { key: "percentage_primary_category", range: [0, 100] },
       { key: "allocation_deal_size_percentage_category", range: [0, 100] },
       { key: "allocation_percentage_category", range: [0, 100] },
@@ -164,7 +180,11 @@ const FOForm: React.FC<FOFormProps> = ({
     });
 
     // NEW: revenue non-negative
-    if (data.revenue_category === "" || isNaN(parseFloat(data.revenue_category)) || parseFloat(data.revenue_category) < 0) {
+    if (
+      data.revenue_category === "" ||
+      isNaN(parseFloat(data.revenue_category)) ||
+      parseFloat(data.revenue_category) < 0
+    ) {
       errors.revenue_category = "Must be ≥ 0";
       isValid = false;
     }
@@ -175,7 +195,11 @@ const FOForm: React.FC<FOFormProps> = ({
 
   const handlePredict = async () => {
     if (!validateForm()) {
-      setSnackbar({ open: true, message: "Please fill in all required fields correctly", severity: "error" });
+      setSnackbar({
+        open: true,
+        message: "Please fill in all required fields correctly",
+        severity: "error",
+      });
       return;
     }
     setLoading(true);
@@ -210,7 +234,11 @@ const FOForm: React.FC<FOFormProps> = ({
       setWeeklyPrediction(null);
     } catch (error) {
       console.error("Prediction error:", error);
-      setSnackbar({ open: true, message: "Failed to get prediction. Please try again.", severity: "error" });
+      setSnackbar({
+        open: true,
+        message: "Failed to get prediction. Please try again.",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -246,13 +274,19 @@ const FOForm: React.FC<FOFormProps> = ({
       onPredicted?.();
     } catch (error) {
       console.error("Repredict error:", error);
-      setSnackbar({ open: true, message: "Failed to update prediction. Please try again.", severity: "error" });
+      setSnackbar({
+        open: true,
+        message: "Failed to update prediction. Please try again.",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleWeeklyMonthlyRepredict = async (t1dCloseReturn: number): Promise<Record<string, PredictionModel>> => {
+  const handleWeeklyMonthlyRepredict = async (
+    t1dCloseReturn: number
+  ): Promise<Record<string, PredictionModel>> => {
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
     const payload = {
@@ -284,14 +318,25 @@ const FOForm: React.FC<FOFormProps> = ({
         const confidence = item.Confidence ?? item.confidence ?? null;
         const range = item.range ?? item.Range ?? null;
         const explanation = item.explanation ?? item.Explanation ?? null;
-        simplified[key] = { prediction, accuracy, confidence, model: "", range, explanation };
+        simplified[key] = {
+          prediction,
+          accuracy,
+          confidence,
+          model: "",
+          range,
+          explanation,
+        };
       }
       setWeeklyPrediction(simplified);
       onPredicted?.();
       return simplified;
     } catch (error) {
       console.error("Weekly/Monthly repredict error:", error);
-      setSnackbar({ open: true, message: "Failed to get weekly/monthly predictions.", severity: "error" });
+      setSnackbar({
+        open: true,
+        message: "Failed to get weekly/monthly predictions.",
+        severity: "error",
+      });
       return {};
     }
   };
@@ -351,25 +396,94 @@ const FOForm: React.FC<FOFormProps> = ({
   }> = [
     { label: "Region", name: "region", disabled: true },
     { label: "Target Variable", name: "target_variable", disabled: true },
-    { label: "Ticker Symbol", name: "ticker", type: "string", placeholder: "e.g., AAPL" },
+    {
+      label: "Ticker Symbol",
+      name: "ticker",
+      type: "string",
+      placeholder: "e.g., AAPL",
+    },
     { label: "Pricing Date", name: "pricing_date", type: "date" },
 
-    { label: "Deal Size ($ Million)", name: "deal_size_category", type: "number", adornment: "$M", placeholder: "e.g., 100" },
-    { label: "Sponsor (Y/N)", name: "sponsor_yn_category", selectOptions: options.sponsor },
-    { label: "Discount from Announcement Price (%)", name: "discount_from_announcement_price_category", type: "number", adornment: "%", placeholder: "e.g., 2" },
+    {
+      label: "Deal Size ($ Million)",
+      name: "deal_size_category",
+      type: "number",
+      adornment: "$M",
+      placeholder: "e.g., 100",
+    },
+    {
+      label: "Sponsor (Y/N)",
+      name: "sponsor_yn_category",
+      selectOptions: options.sponsor,
+    },
+    {
+      label: "Discount from Announcement Price (%)",
+      name: "discount_from_announcement_price_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 2",
+    },
     { label: "Sector", name: "sector_category", selectOptions: options.sector },
-    { label: "Percentage Primary (%)", name: "percentage_primary_category", type: "number", adornment: "%", placeholder: "e.g., 100" },
-    { label: "Selected Bank", name: "selected_bank_category", selectOptions: options.selected_bank },
-    { label: "Allocation as % of Deal Size", name: "allocation_deal_size_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 0.5" },
-    { label: "Allocation as % of IOI", name: "allocation_percentage_category", type: "number", adornment: "%", placeholder: "e.g., 30" },
+    {
+      label: "Percentage Primary (%)",
+      name: "percentage_primary_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 100",
+    },
+    {
+      label: "Selected Bank",
+      name: "selected_bank_category",
+      selectOptions: options.selected_bank,
+    },
+    {
+      label: "Allocation as % of Deal Size",
+      name: "allocation_deal_size_percentage_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 0.5",
+    },
+    {
+      label: "Allocation as % of IOI",
+      name: "allocation_percentage_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 30",
+    },
 
     // NEW: Fundamentals and price-feature
-    { label: "Current Year Revenue ($ M)", name: "revenue_category", type: "number", adornment: "$M", placeholder: "e.g., 250" },
-    { label: "Revenue Growth (%) (YOY)", name: "revenue_growth_category", type: "number", adornment: "%", placeholder: "e.g., 12.5" },
-    { label: "Net Profit Margin", name: "net_profit_margin_category", selectOptions: ['Negative', 'Positive'] },
-    { label: "Change in Price from T-1D to Issue(%)", name: "issue_to_pre_day_close_return_category", type: "number", adornment: "%", placeholder: "e.g., -3.2" },
+    {
+      label: "Current Year Revenue ($ M)",
+      name: "revenue_category",
+      type: "number",
+      adornment: "$M",
+      placeholder: "e.g., 250",
+    },
+    {
+      label: "Revenue Growth (%) (YOY)",
+      name: "revenue_growth_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 12.5",
+    },
+    {
+      label: "Net Profit Margin",
+      name: "net_profit_margin_category",
+      selectOptions: ["Negative", "Positive"],
+    },
+    {
+      label: "Change in Price from T-1D to Issue(%)",
+      name: "issue_to_pre_day_close_return_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., -3.2",
+    },
 
-    { label: "Deal Status", name: "deal_status", selectOptions: options.deal_status },
+    {
+      label: "Deal Status",
+      name: "deal_status",
+      selectOptions: options.deal_status,
+    },
   ];
 
   return (
@@ -380,12 +494,24 @@ const FOForm: React.FC<FOFormProps> = ({
         onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))} severity={snackbar.severity} sx={{ width: "100%" }}>
+        <Alert
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
 
-      <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, mb: 2, borderRadius: 2, border: "1px solid #e0e0e0", boxShadow: "0px 4px 16px rgba(0,0,0,0.06)" }}>
+      <Paper
+        sx={{
+          p: { xs: 2, sm: 3, md: 4 },
+          mb: 2,
+          borderRadius: 2,
+          border: "1px solid #e0e0e0",
+          boxShadow: "0px 4px 16px rgba(0,0,0,0.06)",
+        }}
+      >
         <Grid container spacing={2}>
           {fields.map((field, idx) => {
             let value: any;
@@ -394,12 +520,31 @@ const FOForm: React.FC<FOFormProps> = ({
             } else {
               value = values[field.name as keyof FOFormValues] ?? "";
             }
-            const isLastSingle = idx === fields.length - 1 && fields.length % 2 === 1;
+            const isLastSingle =
+              idx === fields.length - 1 && fields.length % 2 === 1;
 
             return (
-              <Grid item xs={12} sm={isLastSingle ? 12 : 6} key={String(field.name)}>
-                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: { sm: "center" }, gap: 1 }}>
-                  <Typography sx={{ width: { xs: "100%", sm: "180px", md: "200px" }, minWidth: { sm: "180px", md: "200px" }, fontWeight: 500 }}>
+              <Grid
+                item
+                xs={12}
+                sm={isLastSingle ? 12 : 6}
+                key={String(field.name)}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    alignItems: { sm: "center" },
+                    gap: 1,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      width: { xs: "100%", sm: "180px", md: "200px" },
+                      minWidth: { sm: "180px", md: "200px" },
+                      fontWeight: 500,
+                    }}
+                  >
                     {field.label}
                   </Typography>
 
@@ -415,12 +560,18 @@ const FOForm: React.FC<FOFormProps> = ({
                       helperText={formErrors[String(field.name)]}
                       fullWidth
                       SelectProps={{
-                        MenuProps: { PaperProps: { sx: { maxHeight: 300, overflowY: "auto" } } },
+                        MenuProps: {
+                          PaperProps: {
+                            sx: { maxHeight: 300, overflowY: "auto" },
+                          },
+                        },
                       }}
                     >
                       {field.selectOptions.map((opt) => (
                         <MenuItem key={opt} value={opt}>
-                          {field.name === "sector_category" ? formatSector(opt) : opt}
+                          {field.name === "sector_category"
+                            ? formatSector(opt)
+                            : opt}
                         </MenuItem>
                       ))}
                     </TextField>
@@ -447,7 +598,10 @@ const FOForm: React.FC<FOFormProps> = ({
                           ) : undefined,
                         endAdornment:
                           field.adornment &&
-                          (field.adornment === "%" || field.adornment === "M" || field.adornment.endsWith("%") || field.adornment.endsWith("M")) ? (
+                          (field.adornment === "%" ||
+                            field.adornment === "M" ||
+                            field.adornment.endsWith("%") ||
+                            field.adornment.endsWith("M")) ? (
                             <InputAdornment position="end">
                               {field.adornment.replace("$", "")}
                             </InputAdornment>
@@ -461,16 +615,6 @@ const FOForm: React.FC<FOFormProps> = ({
           })}
 
           <Grid item xs={12}>
-            <Box sx={{ display: "flex", justifyContent: { xs: "center", sm: "flex-end" }, flexWrap: "wrap", gap: 2, mt: 2 }}>
-              <Button variant="outlined" color="secondary" onClick={handleReset} disabled={loading}>
-                Reset
-              </Button>
-              <Button variant="contained" color="primary" onClick={handlePredict} disabled={loading}
-                startIcon={loading ? <CircularProgress size={20} color="inherit" /> : undefined}>
-                {loading ? "Predicting..." : "Predict"}
-              </Button>
-            </Box>
-
             <Typography
               variant="body2"
               sx={{
@@ -483,17 +627,60 @@ const FOForm: React.FC<FOFormProps> = ({
                 gap: 0.5,
               }}
             >
-              <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
-              {values.deal_status === "Issued" ? "Above values are original values" : "Above values are assumption values"}
+              <InfoOutlinedIcon
+                fontSize="small"
+                sx={{ color: "text.secondary" }}
+              />
+              {values.deal_status === "Issued"
+                ? "Values treated as confirmed"
+                : "Values used for temporary assumptions"}
             </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: { xs: "center", sm: "flex-end" },
+                flexWrap: "wrap",
+                gap: 2,
+                mt: 2,
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleReset}
+                disabled={loading}
+              >
+                Reset
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handlePredict}
+                disabled={loading}
+                startIcon={
+                  loading ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : undefined
+                }
+              >
+                {loading ? "Predicting..." : "Predict"}
+              </Button>
+            </Box>
           </Grid>
         </Grid>
       </Paper>
 
       {prediction && (
         <>
-          <FOPredictionResults result={prediction} onRepredict={handleRepredictWithPrice} />
-          <FOWeeklyMonthlyPredictionResults result={weeklyPrediction} onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredict} />
+          <FOPredictionResults
+            result={prediction}
+            onRepredict={handleRepredictWithPrice}
+          />
+          <FOWeeklyMonthlyPredictionResults
+            result={weeklyPrediction}
+            onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredict}
+          />
         </>
       )}
     </>

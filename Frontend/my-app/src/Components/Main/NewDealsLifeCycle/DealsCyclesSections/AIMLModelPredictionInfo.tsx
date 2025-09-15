@@ -31,56 +31,62 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
   const token = localStorage.getItem('access_token');
 
   // 🔹 Mapper (API → AIMLModelPredictionData)
-  const mapApiResponseToPredictionData = (apiData: any): Partial<AIMLModelPredictionData> => {
-    return {
-      t1d_pred: apiData.t1d_pred,
-      confidence: apiData.confidence,
-      t1w_pred: apiData.t1w_pred,
-      t1m_pred: apiData.t1m_pred,
-    };
-  };
+const mapApiResponseToPredictionData = (apiData: any): Partial<AIMLModelPredictionData> => ({
+  t1d_pred: apiData.t1d_pred,
+  t1w_pred: apiData.t1w_pred,
+  t1m_pred: apiData.t1m_pred,
+  confidence: apiData.confidence,
+});
+
 
   // 🔹 Fetch prediction from API
-  const fetchPrediction = async () => {
-    try {
-      const payload = {
-        ticker: data.ticker,
-        pricing_date: data.pricing_date,
-        deal_type: data.deal_type,
-      };
+const fetchPrediction = async () => {
+  try {
+    const payload = {
+      ticker: data.ticker,
+      pricing_date: data.pricing_date,
+      deal_type: data.deal_type,
+    };
 
-      const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token ? `Bearer ${token}` : '',
-        },
-        body: JSON.stringify(payload),
-      });
+    const response = await fetch(`${apiUrl}/api/unified_deal_ratings/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+      body: JSON.stringify(payload),
+    });
 
-      if (response.ok) {
-        const result = await response.json();
-        const mapped = mapApiResponseToPredictionData(result.data);
-
-        setFormData((prev) => ({
-          ...prev,
-          ...mapped,
-        }));
-      } else {
-        console.error('Failed to fetch AI/ML model prediction');
-      }
-    } catch (error) {
-      console.error('Error fetching AI/ML prediction:', error);
+    if (!response.ok) {
+      console.error('Failed to fetch AI/ML model prediction');
+      return;
     }
-  };
+
+    const result = await response.json();
+
+    // Make sure to access result.data
+    const mapped = mapApiResponseToPredictionData(result.data);
+
+    setFormData((prev) => ({
+      ...prev,
+      ...mapped,
+    }));
+
+  } catch (error) {
+    console.error('Error fetching AI/ML prediction:', error);
+  }
+};
+
 
   // 🔹 Trigger on data change
-  useEffect(() => {
-    setFormData(data);
-    if (data?.ticker && data?.pricing_date && data?.deal_type) {
-      fetchPrediction();
-    }
-  }, [data]);
+useEffect(() => {
+  setFormData(data);
+  if (data?.ticker && data?.deal_type) { // remove pricing_date check
+    fetchPrediction();
+  }
+}, [data]);
+
+
 
   // 🔹 Reusable field renderer
   const renderField = (label: string, value: string | number | null | undefined) => {
@@ -128,9 +134,9 @@ const AIMLModelPredictionInfo: React.FC<AIMLModelPredictionInfoProps> = ({ data 
           <Typography variant="body2" color="text.secondary">
             Classifies the expected return into categories:
           </Typography>
-          <Typography variant="body2">📉 <b>Negative</b>: Return &lt; -1%</Typography>
-          <Typography variant="body2">⚖️ <b>Neutral</b>: Return between -1% to 1%</Typography>
-          <Typography variant="body2">📈 <b>Positive</b>: Return &gt; 1%</Typography>
+          <Typography variant="body2">📉 <b>Negative</b>: Return &lt;  1.8%</Typography>
+          {/* <Typography variant="body2">⚖️ <b>Neutral</b>: Return between -1% to 1%</Typography> */}
+          <Typography variant="body2">📈 <b>Positive</b>: Return &gt; 1.8%</Typography>
         </Box>
       );
     }

@@ -8,28 +8,29 @@ export const getColumns = (
   selectedId: string | number | null
 ): GridColDef[] => {
   // ✅ Dynamic date column
-  const dateColumn: GridColDef =
-    selectedOp === "September to Date"
-      ? {
-          field: "pricing_date",
-          headerName: "Pricing Date",
-          renderHeader: () => formatHeader("Pricing Date"),
-          flex: 1.5,
-          headerAlign: "center",
-          align: "center",
-          renderCell: formatDateCell,
-        }
-      : {
-          field: "expected_listing_date",
-          headerName: "Expected Listing Date",
-          renderHeader: () => formatHeader("Expected Listing Date"),
-          flex: 1.5,
-          headerAlign: "center",
-          align: "center",
-          renderCell: formatDateCell,
-        };
+  // const dateColumn: GridColDef =
+  //   selectedOp === "September to Date"
+  //     ? {
+  //         field: "pricing_date",
+  //         headerName: "Pricing Date",
+  //         renderHeader: () => formatHeader("Pricing Date"),
+  //         flex: 1.5,
+  //         headerAlign: "left",
+  //         align: "left",
+  //         renderCell: formatDateCell,
+  //       }
+  //     : {
+  //         field: "expected_listing_date",
+  //         headerName: "Expected Listing Date",
+  //         renderHeader: () => formatHeader("Expected Listing Date"),
+  //         flex: 1.5,
+  //         headerAlign: "left",
+  //         align: "left",
+  //         renderCell: formatDateCell,
+  //       };
 
   // ✅ Dynamic price/issue price column
+  
   const priceOrIssueColumn: GridColDef =
     selectedOp === "September to Date"
       ? {
@@ -37,8 +38,8 @@ export const getColumns = (
           headerName: "Issue Price",
           renderHeader: () => formatHeader("Issue Price"),
           flex: 1,
-          headerAlign: "center",
-          align: "center",
+          headerAlign: "left",
+          align: "left",
           renderCell: (params) => {
             const val = params.value;
             return val ? `$${Number(val).toFixed(2)}` : "TBD";
@@ -49,8 +50,8 @@ export const getColumns = (
           headerName: "Price Range",
           renderHeader: () => formatHeader("Price Range"),
           flex: 1,
-          headerAlign: "center",
-          align: "center",
+          headerAlign: "left",
+          align: "left",
           renderCell: (params) => {
             const minRaw = params.row.pricing_range_min;
             const maxRaw = params.row.pricing_range_max;
@@ -69,8 +70,8 @@ export const getColumns = (
       headerName: "Ticker",
       renderHeader: () => formatHeader("Ticker"),
       flex: 1,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: "left",
+      align: "left",
       renderCell: (params) => (
         <span
           style={{
@@ -84,27 +85,29 @@ export const getColumns = (
         </span>
       ),
     },
-    { field: "region", headerName: "Region", renderHeader: () => formatHeader("Region"), flex: 0.75, headerAlign: "center", align: "center" },
+    { field: "region", headerName: "Region", renderHeader: () => formatHeader("Region"), flex: 0.75, headerAlign: "left", align: "left" },
     { field: "sector", headerName: "Sector", renderHeader: () => formatHeader("Sector"), flex: 1.25, headerAlign: "left", align: "left" },
     { field: "issuer_name", headerName: "Issuer Name", renderHeader: () => formatHeader("Issuer Name"), flex: 2, headerAlign: "left", align: "left" },
 
-    dateColumn,
+    // dateColumn,
+    {field: "expected_listing_date", headerName: "First Trade Date", renderHeader: () => formatHeader("First Trade Date"), flex: 1.5, headerAlign: "left", align: "left", renderCell: formatDateCell},
+    {field: "pricing_date", headerName: "Pricing Date", renderHeader: () => formatHeader("Pricing Date"), flex: 1.12, headerAlign: "left", align: "left", renderCell: formatDateCell},
 
     {
       field: "deal_type",
       headerName: "Deal Type",
       renderHeader: () => formatHeader("Deal Type"),
-      flex: 0.75,
-      headerAlign: "center",
-      align: "center",
+      flex: 0.70,
+      headerAlign: "left",
+      align: "left",
     },
         {
       field: "fo_type",
       headerName: "FO Type",
       renderHeader: () => formatHeader("FO Type"),
-      flex: 0.75,
-      headerAlign: "center",
-      align: "center",
+      flex: 0.80,
+      headerAlign: "left",
+      align: "left",
     },
 
     priceOrIssueColumn,
@@ -114,8 +117,8 @@ export const getColumns = (
       headerName: "Writeup Available",
       renderHeader: () => formatHeader("Writeup Available"),
       flex: 1,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: "left",
+      align: "left",
       renderCell: (params) => {
         // Determine the link based on the deal_type dynamically
         const dealType = params.row.deal_type?.toLowerCase();
@@ -151,8 +154,8 @@ export const getColumns = (
       headerName: "Deal Status",
       renderHeader: () => formatHeader("Deal Status"),
       flex: 1,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: "left",
+      align: "left",
       renderCell: renderDealStatsCell,
     },
     {
@@ -160,41 +163,41 @@ export const getColumns = (
       headerName: "AI-ML Prediction",
       renderHeader: () => formatHeader("AI-ML Prediction"),
       flex: 1,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: "left",
+      align: "left",
       renderCell: renderCheckCell,
     },
-    {
-      field: "track_here",
-      headerName: "Track",
-      renderHeader: () => formatHeader("Track"),
-      flex: 1,
-      headerAlign: "center",
-      align: "center",
-      renderCell: (params) => {
-        const ticker = params.row.ticker;
-        const pricingDate = params.row.pricing_date;
-        const handleTrackHereClick = () => {
-          if (ticker) {
-            const cleanPricingDate =
-              pricingDate === '""' || !pricingDate ? '""' : pricingDate;
-            const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${cleanPricingDate}`;
-            window.open(url, "_blank");
-          }
-        };
-        return (
-          <span
-            onClick={handleTrackHereClick}
-            style={{
-              cursor: "pointer",
-              color: "#0066cc",
-              textDecoration: "underline",
-            }}
-          >
-            Track
-          </span>
-        );
-      },
-    },
+    // {
+    //   field: "track_here",
+    //   headerName: "Track",
+    //   renderHeader: () => formatHeader("Track"),
+    //   flex: 1,
+    //   headerAlign: "left",
+    //   align: "left",
+    //   renderCell: (params) => {
+    //     const ticker = params.row.ticker;
+    //     const pricingDate = params.row.pricing_date;
+    //     const handleTrackHereClick = () => {
+    //       if (ticker) {
+    //         const cleanPricingDate =
+    //           pricingDate === '""' || !pricingDate ? '""' : pricingDate;
+    //         const url = `/deals/dashboard/Tracking?ticker=${ticker}&pricing_date=${cleanPricingDate}`;
+    //         window.open(url, "_blank");
+    //       }
+    //     };
+    //     return (
+    //       <span
+    //         onClick={handleTrackHereClick}
+    //         style={{
+    //           cursor: "pointer",
+    //           color: "#0066cc",
+    //           textDecoration: "underline",
+    //         }}
+    //       >
+    //         Track
+    //       </span>
+    //     );
+    //   },
+    // },
   ];
 };
