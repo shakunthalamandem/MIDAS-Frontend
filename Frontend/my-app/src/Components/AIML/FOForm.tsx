@@ -58,7 +58,7 @@ interface FOFormValues {
   revenue_category: string;             // e.g. in $M
   revenue_growth_category: string;      // %
   net_profit_margin_category: string;   // %
-  issue_to_pre_day_close_return_category: string; // %
+  issue_to_pre_day_close_return_category: number; // %
 }
 
 interface FOFormProps {
@@ -316,7 +316,7 @@ const FOForm: React.FC<FOFormProps> = ({
       revenue_category: "",
       revenue_growth_category: "",
       net_profit_margin_category: "",
-      issue_to_pre_day_close_return_category: "",
+      issue_to_pre_day_close_return_category: 0,
     }));
     setFormErrors({});
     setPrediction(null);

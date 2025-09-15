@@ -8,7 +8,6 @@ import {
   Chip,
   Divider,
   Grid,
-  Stack,
   TextField,
   Autocomplete,
 } from "@mui/material";
@@ -32,7 +31,14 @@ interface RecentPrediction {
   gdp_growth: string | null;
   inflation_rate: string | null;
   treasury_rates: string | null;
+
   t1d_pred: string | null;
+
+  // NEW FIELDS
+  revenue?: number | null;               // value expected in Millions
+  revenue_growth?: number | null;        // percentage
+  net_profit_margin?: number | null;     // percentage
+  issue_to_previous_day_close?: number | null; // percentage, FO only
 }
 
 interface ApiResponse {
@@ -90,6 +96,13 @@ const formatSector = (raw?: string) => {
     .join(" ");
 };
 
+// small format helpers
+const fmtMoneyM = (v?: number | null) =>
+  v === null || v === undefined || Number.isNaN(Number(v)) ? "N/A" : `$${Number(v).toFixed(1)}M`;
+
+const fmtPct = (v?: number | null) =>
+  v === null || v === undefined || Number.isNaN(Number(v)) ? "N/A" : `${Number(v).toFixed(1)}%`;
+
 type Option = {
   ticker: string;
   pricing_date: string;
@@ -124,10 +137,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
         const json: ApiResponse = await res.json();
         const sorted = (json.data || [])
           .slice()
-          .sort(
-            (a, b) =>
-              new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime()
-          );
+          .sort((a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime());
         if (isMounted) setAllDeals(sorted);
       } catch (err: any) {
         if (isMounted) setError(err.message || "Something went wrong");
@@ -295,6 +305,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
           )}
         />
       </Box>
+
       {/* Cards */}
       <Grid container spacing={2}>
         {filteredCards.map((form, i) => {
@@ -307,10 +318,12 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
               ? "orange"
               : "grey";
 
+          const isFO = (form.deal_type || "").toUpperCase() === "FO";
+
           return (
             <Grid item xs={12} key={`${form.ticker}-${form.pricing_date}-${i}`}>
               <Card
-                onClick={() => onSelect(form)} // same-tab behavior: parent will prefill + scroll
+                onClick={() => onSelect(form)}
                 sx={{
                   cursor: "pointer",
                   transition: "box-shadow 0.2s, transform 0.15s",
@@ -347,11 +360,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
 
                   <Box display="flex" justifyContent="space-between">
                     <Typography variant="body1">Deal Size</Typography>
-                    <Typography variant="body1">
-                      {Number.isFinite(Number(form.deal_size))
-                        ? `$${Number(form.deal_size).toFixed(1)}M`
-                        : "N/A"}
-                    </Typography>
+                    <Typography variant="body1">{fmtMoneyM(form.deal_size)}</Typography>
                   </Box>
 
                   <Box display="flex" justifyContent="space-between">
@@ -361,12 +370,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
 
                   <Box display="flex" justifyContent="space-between">
                     <Typography variant="body1" color="#002060">
-                      Discount:{" "}
-                      <strong>
-                        {form.discount_from_announcement_price != null
-                          ? `${form.discount_from_announcement_price}%`
-                          : "N/A"}
-                      </strong>
+                      Discount: <strong>{fmtPct(form.discount_from_announcement_price)}</strong>
                     </Typography>
                   </Box>
 
@@ -375,6 +379,32 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
                     <Typography variant="body1">{form.region || "N/A"}</Typography>
                   </Box>
 
+                  {/* --- NEW METRICS ROWS --- */}
+                  <Divider sx={{ my: 1.5 }} />
+
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="body1">Revenue</Typography>
+                    <Typography variant="body1">{fmtMoneyM(form.revenue)}</Typography>
+                  </Box>
+
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="body1">Revenue Growth</Typography>
+                    <Typography variant="body1">{fmtPct(form.revenue_growth)}</Typography>
+                  </Box>
+
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="body1">Net Profit Margin</Typography>
+                    <Typography variant="body1">{fmtPct(form.net_profit_margin)}</Typography>
+                  </Box>
+
+                  {isFO && (
+                    <Box display="flex" justifyContent="space-between">
+                      <Typography variant="body1">Change in Price from T-1D to Issue</Typography>
+                      <Typography variant="body1">{fmtPct(form.issue_to_previous_day_close)}</Typography>
+                    </Box>
+                  )}
+
+                  {/* Footer line with bank / sponsor */}
                   <Box display="flex" justifyContent="space-between" mt={2}>
                     <Typography variant="body1" color="#002060">
                       {form.lead_bank || "N/A"}

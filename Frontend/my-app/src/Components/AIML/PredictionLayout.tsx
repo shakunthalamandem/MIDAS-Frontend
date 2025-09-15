@@ -29,7 +29,7 @@ const defaultFOValues = {
   revenue_category: "",
   revenue_growth_category: "",
   net_profit_margin_category: "",
-  issue_to_pre_day_close_return_category: "",
+  issue_to_pre_day_close_return_category: 0,
 };
 
 const defaultIPOValues = {
@@ -90,9 +90,12 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         pricing_date: item.pricing_date ? new Date(item.pricing_date) : null,
         deal_type: "FO",
         region: item.region || "US",
+        sponsor_yn_category:
+          item.sponsor === "Y" ? "Y" : item.sponsor === "N" ? "N" : "",
         deal_size_category: item.deal_size ? String(item.deal_size) : "",
         percentage_primary_category:
           item.primary_percentage != null ? String(item.primary_percentage) : "",
+        sector_category: item.sector || "",
         discount_from_announcement_price_category:
           item.discount_from_announcement_price != null
             ? String(item.discount_from_announcement_price)
@@ -106,9 +109,8 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
             ? String(item.allocation_as_percentage_of_ioi)
             : "",
         selected_bank_category: item.lead_bank || "",
-        sponsor_yn_category:
-          item.sponsor === "Y" ? "Y" : item.sponsor === "N" ? "N" : "",
-        sector_category: item.sector || "",
+        
+        
         deal_status: item.deal_status || "Announced",
         GDP: "Stable",
         Inflation: "Stable",
@@ -123,9 +125,9 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         net_profit_margin_category:
           item.net_profit_margin != null ? String(item.net_profit_margin) : "",
         issue_to_pre_day_close_return_category:
-          item.issue_to_pre_day_close != null
-            ? String(item.issue_to_pre_day_close)
-            : "",
+          item.issue_to_previous_day_close != null
+            ? item.issue_to_previous_day_close
+            : 0,
       });
       setSelectedType("FO");
       setFoAutoPredict(true);
