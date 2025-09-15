@@ -90,11 +90,13 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
   const [editedData, setEditedData] = useState<RevenueGrowth>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [localRevenueGrowth, setLocalRevenueGrowth] = useState<RevenueGrowth>({});
+
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  const revenueGrowth = ipodata?.revenue_growth || {};
+  // const revenueGrowth = ipodata?.revenue_growth || {};
 
   const getAuthHeaders = () => ({
     "Content-Type": "application/json",
@@ -121,13 +123,13 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
           throw new Error(errData.message || "Failed to fetch revenue growth data");
         }
 
-        const data: RevenueGrowth = await response.json();
-
-        if (data && typeof data === "object") {
-          setIpoData((prev: IPOData) => ({
-            ...prev,
-            revenue_growth: data,
-          }));
+    const data: RevenueGrowth = await response.json();
+    if (data && typeof data === "object") {
+      setLocalRevenueGrowth(data); // <-- update local state
+      setIpoData((prev: IPOData) => ({
+        ...prev,
+        revenue_growth: data,
+      }));
         } else {
           setError("No revenue growth data available.");
         }
@@ -142,6 +144,8 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
       fetchRevenueGrowthData();
     }
   }, [selectedTicker, apiUrl, setIpoData]);
+  const revenueGrowth = localRevenueGrowth; // <-- use local state for rendering
+
 
   const handleSaveRevenueGrowthData = async () => {
     try {
