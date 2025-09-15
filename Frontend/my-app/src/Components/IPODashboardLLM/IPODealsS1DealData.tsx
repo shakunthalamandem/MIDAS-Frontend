@@ -58,8 +58,7 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData })
   const [editedDealData, setEditedDealData] = useState<DealData | null>(null);
   const [editValuationMode, setEditValuationMode] = useState(false);
 const [editedValuation, setEditedValuation] = useState<string[]>([]);
-const valuation = selectedData?.valuation ?? []; // If valuation is part of dealData
-console.log("Valuation data:", selectedData);
+const valuation = selectedData?.valuation ?? []; 
 
 
   // Toggle AI comparison
@@ -89,14 +88,14 @@ const handleSaveValuation = async () => {
     const token = localStorage.getItem("access_token");
     if (!apiUrl) throw new Error("API URL not defined");
 
-    const response = await fetch(`${apiUrl}/api/ipo_deal_data_fairvalues/`, {
+    const response = await fetch(`${apiUrl}/api/writeup_data/`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : "",
       },
       body: JSON.stringify({
-        ticker: selectedData.ticker_name,
+        ticker_name: selectedData.ticker_name,
         valuation: editedValuation,
       }),
     });
