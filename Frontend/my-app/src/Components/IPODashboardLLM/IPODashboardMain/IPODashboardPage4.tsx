@@ -33,6 +33,7 @@ interface DealData {
   after_market_threshold: string;
   monashee_score: number;
   differentiated_summary: string;
+  sector: string;
 }
 
 const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
@@ -193,7 +194,7 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
           <>
             <Box display="flex" justifyContent="center" mb={2}>
               <Typography>
-                Recent IPO Performances related to this Sector.
+                Recent IPO Performances related to this {dealData.sector}.
               </Typography>
             </Box>
 
