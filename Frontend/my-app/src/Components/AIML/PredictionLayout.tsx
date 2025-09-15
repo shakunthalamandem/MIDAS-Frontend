@@ -75,6 +75,9 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const [ipoAutoPredict, setIpoAutoPredict] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
 
+  const [refreshKey, setRefreshKey] = useState(0);
+  const bumpRecentRefresh = () => setRefreshKey((k) => k + 1);
+
   const handleTypeChange = (type: "IPO" | "FO") => {
     setSelectedType(type);
   };
@@ -178,9 +181,6 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
     <Box sx={{ width: "100%" }}>
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 2 }}>
         <FormSwitcher selectedType={selectedType} onChangeType={handleTypeChange} />
-        <Typography variant="caption" sx={{ mt: 0.5 }}>
-          {selectedType === "IPO" ? "Initial Public Offering" : "Follow-on Offering"}
-        </Typography>
       </Box>
 
       <Grid container spacing={2} alignItems="flex-start">
@@ -193,6 +193,8 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
                 options={options}
                 autoPredict={foAutoPredict}
                 onAutoPredictComplete={() => setFoAutoPredict(false)}
+                // NEW: notify parent to refresh recents after a successful predict/save
+                onPredicted={bumpRecentRefresh}
               />
             ) : (
               <IPOForm
@@ -201,6 +203,8 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
                 options={options}
                 autoPredict={ipoAutoPredict}
                 onAutoPredictComplete={() => setIpoAutoPredict(false)}
+                // NEW
+                onPredicted={bumpRecentRefresh}
               />
             )}
           </Box>
@@ -215,6 +219,8 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           <RecentPredictionsPanel
             selectedType={selectedType}
             onSelect={handlePredictionSelect}
+            // NEW: pass the counter so panel re-fetches when it changes
+            refreshKey={refreshKey}
           />
         </Grid>
       </Grid>

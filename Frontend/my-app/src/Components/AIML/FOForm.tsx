@@ -67,6 +67,7 @@ interface FOFormProps {
   options: OptionsData;
   autoPredict?: boolean;
   onAutoPredictComplete?: () => void;
+  onPredicted?: () => void;
 }
 
 const FOForm: React.FC<FOFormProps> = ({
@@ -75,6 +76,7 @@ const FOForm: React.FC<FOFormProps> = ({
   options,
   autoPredict = false,
   onAutoPredictComplete,
+  onPredicted
 }) => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
@@ -203,6 +205,7 @@ const FOForm: React.FC<FOFormProps> = ({
       });
       if (!res.ok) throw new Error("Prediction request failed");
       const data = await res.json();
+      onPredicted?.();
       setPrediction(data.predictions);
       setWeeklyPrediction(null);
     } catch (error) {
@@ -240,6 +243,7 @@ const FOForm: React.FC<FOFormProps> = ({
       if (!res.ok) throw new Error("Repredict request failed");
       const data = await res.json();
       setPrediction(data.predictions);
+      onPredicted?.();
     } catch (error) {
       console.error("Repredict error:", error);
       setSnackbar({ open: true, message: "Failed to update prediction. Please try again.", severity: "error" });
@@ -283,6 +287,7 @@ const FOForm: React.FC<FOFormProps> = ({
         simplified[key] = { prediction, accuracy, confidence, model: "", range, explanation };
       }
       setWeeklyPrediction(simplified);
+      onPredicted?.();
       return simplified;
     } catch (error) {
       console.error("Weekly/Monthly repredict error:", error);

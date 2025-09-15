@@ -48,6 +48,7 @@ interface ApiResponse {
 interface RecentPredictionsPanelProps {
   selectedType: "IPO" | "FO";
   onSelect: (item: RecentPrediction) => void;
+  refreshKey?: number;
 }
 
 /** ----- helpers ----- */
@@ -110,7 +111,7 @@ type Option = {
   display: string; // e.g., "NVDA on 11 Sep 2025 - Positive"
 };
 
-const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selectedType, onSelect }) => {
+const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selectedType, onSelect, refreshKey}) => {
   const [allDeals, setAllDeals] = useState<RecentPrediction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -119,36 +120,41 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
   const [query, setQuery] = useState<string>("");
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem("access_token");
-        const res = await fetch(`${apiUrl}/api/recent_predictions/`, {
-          headers: { Authorization: token ? `Bearer ${token}` : "" },
-        });
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(`HTTP ${res.status}: ${text}`);
-        }
-        const json: ApiResponse = await res.json();
-        const sorted = (json.data || [])
-          .slice()
-          .sort((a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime());
-        if (isMounted) setAllDeals(sorted);
-      } catch (err: any) {
-        if (isMounted) setError(err.message || "Something went wrong");
-      } finally {
-        if (isMounted) setLoading(false);
+useEffect(() => {
+  let isMounted = true;
+  const ac = new AbortController(); // cancel fetch on unmount or rapid refreshes
+
+  (async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${apiUrl}/api/recent_predictions/`, {
+        headers: { Authorization: token ? `Bearer ${token}` : "" },
+        signal: ac.signal,
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
       }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+      const json: ApiResponse = await res.json();
+      const sorted = (json.data || [])
+        .slice()
+        .sort((a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime());
+      if (isMounted) setAllDeals(sorted);
+    } catch (err: any) {
+      if (isMounted && err.name !== "AbortError") setError(err.message || "Something went wrong");
+    } finally {
+      if (isMounted) setLoading(false);
+    }
+  })();
+
+  return () => {
+    isMounted = false;
+    ac.abort();
+  };
+}, [refreshKey]);
 
   // Apply IPO/FO filter (driven by top radio)
   const filteredByType = useMemo(

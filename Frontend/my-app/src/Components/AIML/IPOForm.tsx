@@ -62,6 +62,7 @@ interface IPOFormProps {
   options: OptionsData;
   autoPredict?: boolean;
   onAutoPredictComplete?: () => void;
+  onPredicted?: () => void;
 }
 
 const IPOForm: React.FC<IPOFormProps> = ({
@@ -70,6 +71,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
   options,
   autoPredict = false,
   onAutoPredictComplete,
+  onPredicted
 }) => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
@@ -207,6 +209,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
       if (!res.ok) throw new Error("Prediction request failed");
       const data = await res.json();
       setPrediction(data.predictions);
+      onPredicted?.();
     } catch (error) {
       console.error("Prediction error:", error);
       setSnackbar({
