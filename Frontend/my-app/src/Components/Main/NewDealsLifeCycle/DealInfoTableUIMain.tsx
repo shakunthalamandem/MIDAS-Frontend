@@ -146,6 +146,10 @@ const formatDealSize = (dealSize: any) => {
     renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
+  {field: "am_return",
+    headerName: "AM Return",
+    width: 215,
+  },
   { 
     field: "allocated_capital", 
     headerName: "Allocation Capital", 
@@ -304,49 +308,64 @@ const formatDealSize = (dealSize: any) => {
 
 return (
   <>
-        <Paper
-        elevation={3}
-        sx={{
-          p: 2,
-          mb: 2,
-          borderRadius: 3,
-          backgroundColor: "#f8f9fb",
-        }}
-      >
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={4}
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Stack direction="row" spacing={2} alignItems="center">
-            <BusinessIcon color="primary" />
-            <Typography variant="body1" fontWeight={500}>
-              Sector: <strong>{headerRow.gics_sector_from_bloomberg}</strong>
-            </Typography>
-          </Stack>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <PublicIcon color="success" />
-            <Typography variant="body1" fontWeight={500}>
-              Region: <strong>{headerRow.broad_region}</strong>
-            </Typography>
-          </Stack>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <CategoryIcon color="secondary" />
-            <Typography variant="body1" fontWeight={500}>
-              Deal Type: <strong>{headerRow.deal_type}</strong>
-            </Typography>
-          </Stack>
-        </Stack>
+ <Paper
+  elevation={3}
+  sx={{
+    p: 2,
+    mb: 2,
+    borderRadius: 3,
+    backgroundColor: "#f8f9fb",
+  }}
+>
+  {/* Title Section */}
+  <Typography
+    variant="h6"
+    fontWeight={600}
+    sx={{
+      mb: 2,
+      textAlign: 'center',  // Center-align the text
+      color: '#002060',  // Set text color
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',  // Set the font family
+    }}
+  >
+    Past Deals of the Sector for the Comparison
+  </Typography>
 
-        <Stack direction="row" spacing={1} alignItems="center" mt={2}>
-          <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
-          <Typography variant="body2" color="text.secondary">
-            Below table consists of past 3 years of performance for tickers
-            Monashee participated in.
-          </Typography>
-        </Stack>
-      </Paper>
+  {/* Existing Stack Content */}
+  <Stack
+    direction={{ xs: "column", sm: "row" }}
+    spacing={4}
+    alignItems="center"
+    justifyContent="space-between"
+  >
+    <Stack direction="row" spacing={2} alignItems="center">
+      <BusinessIcon color="primary" />
+      <Typography variant="body1" fontWeight={500}>
+        Sector: <strong>{headerRow.gics_sector_from_bloomberg}</strong>
+      </Typography>
+    </Stack>
+    <Stack direction="row" spacing={2} alignItems="center">
+      <PublicIcon color="success" />
+      <Typography variant="body1" fontWeight={500}>
+        Region: <strong>{headerRow.broad_region}</strong>
+      </Typography>
+    </Stack>
+    <Stack direction="row" spacing={2} alignItems="center">
+      <CategoryIcon color="secondary" />
+      <Typography variant="body1" fontWeight={500}>
+        Deal Type: <strong>{headerRow.deal_type}</strong>
+      </Typography>
+    </Stack>
+  </Stack>
+
+  <Stack direction="row" spacing={1} alignItems="center" mt={2}>
+    <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
+    <Typography variant="body2" color="text.secondary">
+      Below table consists of past 3 years of performance for tickers
+      Monashee participated in.
+    </Typography>
+  </Stack>
+</Paper>
 
 
 
