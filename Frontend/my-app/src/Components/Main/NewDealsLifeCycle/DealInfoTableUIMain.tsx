@@ -48,31 +48,12 @@ const formatDealSize = (dealSize: any) => {
       t1m_return_actual: row.t1m_return_actual ? `${row.t1m_return_actual.toFixed(2)}%` : "0%",
       t1d_return_actual: row.t1d_return_actual ? `${row.t1d_return_actual.toFixed(2)}%` : "0%",
       am_return_difference: row.am_return_difference ? `${row.am_return_difference.toFixed(2)}%` : "0%",
-      model_am_return: row.model_am_return ? `${formatDealSize(row.model_am_return.toFixed())}` : "$0",
-      total_model_capital: row.total_model_capital ? `${formatDealSize(row.total_model_capital.toFixed())}` : "$0",
-      model_am_capital: row.model_am_capital ? `${formatDealSize(row.model_am_capital.toFixed())}` : "$0",
-      model_return_1_allocation: row.model_return_1_allocation ? `${formatDealSize(row.model_return_1_allocation.toFixed())}` : "$0",
-      model_capital_1_allocation: row.model_capital_1_allocation ? `${formatDealSize(row.model_capital_1_allocation.toFixed())}` : "$0",
-      model_actual_return: row.model_actual_return ? `${formatDealSize(row.model_actual_return.toFixed())}` : "$0",
       am_return: row.am_return ? `${formatDealSize(row.am_return.toFixed())}` : "$0",
-      t1d_return_from_bloomberg: row.t1d_return_from_bloomberg ? `${row.t1d_return_from_bloomberg.toFixed(2)}%` : "",
-      t1m_return_from_bloomberg: row.t1m_return_from_bloomberg ? `${row.t1m_return_from_bloomberg.toFixed(2)}%` : "",
       total_committed_capital: row.total_committed_capital ? `${formatDealSize(row.total_committed_capital.toFixed())}` : "$0",
       am_capital_committed: row.am_capital_committed ? `${formatDealSize(row.am_capital_committed.toFixed())}` : "$0",
       allocated_capital: row.allocated_capital ? `${formatDealSize(row.allocated_capital.toFixed())}` : "$0",
-      allocation_price: row.allocation_price ? `${row.allocation_price.toFixed()}%` : "",
-      subscription_bid_shares: row.subscription_bid_shares ? `${row.subscription_bid_shares.toFixed(2)}%` : "",
       allocation_deal_size_percentage: row.allocation_deal_size_percentage ? `${row.allocation_deal_size_percentage.toFixed(2)}%` : "0%",
-      model_actual_total: row.model_actual_total ? `${formatDealSize(row.model_actual_total.toFixed())}` : "$0",
       monahsee_actual_total: row.monahsee_actual_total ? `${formatDealSize(row.monahsee_actual_total.toFixed())}` : "$0",
-      model_actual_am_return: row.model_actual_am_return ? `${formatDealSize(row.model_actual_am_return.toFixed())}` : "$0",
-      model_allocation_gap: row.model_allocation_gap ? `${formatDealSize(row.model_allocation_gap.toFixed())}` : "$0",
-      monashee_exit_gap: row.monashee_exit_gap ? `${formatDealSize(row.monashee_exit_gap.toFixed())}` : "$0",
-      am_gap: row.am_gap ? `${formatDealSize(row.am_gap.toFixed())}` : "$0",
-      am_exit_gap: row.am_exit_gap ? `${formatDealSize(row.am_exit_gap.toFixed())}` : "$0",
-      total_gap: row.monahsee_actual_total - row.model_actual_total 
-      ? formatDealSize((row.monahsee_actual_total - row.model_actual_total).toFixed()) 
-      : "$0",
       
 
     }));
@@ -143,13 +124,6 @@ const formatDealSize = (dealSize: any) => {
       renderCell: (params) => `${params.value}`,
     sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
-  // { 
-  //   field: "t1m_return_from_bloomberg", 
-  //   headerName: "T+1Month Return(Gap)", 
-  //   width: 140,
-  //   renderCell: (params) => `${params.value}`,
-  //     sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  // },
 
     { 
     field: "t1m_return_actual", 
@@ -193,32 +167,7 @@ const formatDealSize = (dealSize: any) => {
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
   },
-//     { 
-//       field: "model_capital_1_allocation", 
-//       headerName: "Model Allocation", 
-//       width: 180,
-      
-//       renderCell: (params) => `${params.value}`,
-//       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-//     },
-//     { 
-//       field: "model_am_capital", 
-//       headerName: "Model AM Capital", 
-//       width: 180,
-//       renderCell: (params) => `${params.value}`,
-//       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-
-//     },
-//     {
-//       field: "total_model_capital",
-//       headerName: "Total Model Capital",
-//       width: 180,
-//       renderCell: (params) => `${params.value}`,
-//       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-
-//     }
-    
-// ,    
+   
 { 
   field: "allocation_return", 
   headerName: "Monashee Actual Allocation PnL(Gross)", 
@@ -228,37 +177,7 @@ const formatDealSize = (dealSize: any) => {
   cellClassName: "first-column-border",
 
 },
-// { 
-//   field: "model_actual_return", 
-//   headerName: "Model PnL With Actual Allocation(Gross)", 
-//   width: 260,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-// },
-// { 
-//   field: "model_return_1_allocation", 
-//   headerName: "Model PnL with Model Allocation", 
-//   width: 260,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-// },
-// { 
-//   field: "model_allocation_gap", 
-//   headerName: "Model Allocation Gap", 
-//   width: 180,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-//   cellClassName: "highlight-cell",
-// },
-// { 
-//   field: "monashee_exit_gap", 
-//   headerName: "Monashee Exit Gap", 
-//   width: 150,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-//   cellClassName: "last-columns-border highlight-cell",
 
-// },
 { 
   field: "am_return", 
   headerName: "Monashee Actual AM PnL(Gross)", 
@@ -266,37 +185,7 @@ const formatDealSize = (dealSize: any) => {
   renderCell: (params) => `${params.value}`,
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
 },
-// { 
-//   field: "model_actual_am_return", 
-//   headerName: "Model PnL with Actual AM", 
-//   width: 215,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-// },
-// { 
-//   field: "model_am_return", 
-//   headerName: "Model PnL with Model AM(Gross)", 
-//   width: 220,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-//   // cellClassName: "last-columns-border",
-// },
-// { 
-//   field: "am_gap", 
-//   headerName: "Model AM Gap", 
-//   width: 120,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-//   cellClassName: "highlight-cell",
-// },
-// { 
-//   field: "am_exit_gap", 
-//   headerName: "Monashee AM Exit Gap", 
-//   width: 180,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-//   cellClassName: "last-columns-border   highlight-cell",
-// },
+
 {
   field: "monahsee_actual_total", 
   headerName: "Monashee Actual Total PnL(Gross)",
@@ -306,25 +195,6 @@ const formatDealSize = (dealSize: any) => {
   },
   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
 },
-// { 
-//   field: "model_actual_total", 
-//   headerName: "Model Actual Total PnL(Gross)", 
-//   width: 220,
-//   renderCell: (params) => `${params.value}`,
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-//   // cellClassName: "last-columns-border",
-// },
-// {
-//   field: "total_gap", 
-//   headerName: "Total Gap",
-//   width: 120,
-//   renderCell: (params) => {
-//     return `${params.value}`;
-//   },
-//   sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-//   cellClassName: "last-columns-border highlight-cell",
- 
-// },
 
 ];
 
