@@ -220,6 +220,13 @@ const MDDScreenerDataTable: React.FC<MDDScreenerDataTableProps> = ({ sectorwiseD
       renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
+        {
+      field: "am_return",
+      headerName: "AM Return",
+      width: 150,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
     {
       field: "allocation_deal_size",
       headerName: "Allocation as % Deal Size",

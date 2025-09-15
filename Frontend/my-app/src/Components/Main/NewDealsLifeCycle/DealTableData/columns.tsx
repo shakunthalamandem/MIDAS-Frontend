@@ -63,6 +63,20 @@ export const getColumns = (
               : "TBD";
           },
         };
+// utils/formatters.ts
+const formatDealSize = (value: any): string => {
+  if (value == null || isNaN(value)) return "TBD";
+
+  const millions = Number(value) / 1_000_000;
+
+  if (millions < 0) {
+    // return `($${Math.abs(millions).toFixed()}M)`; // finance style
+    return `-$${Math.abs(millions).toFixed()}M`;    // minus sign style ✅
+  }
+
+  return `$${millions.toFixed()}M`;
+};
+
 
   return [
     {
@@ -88,8 +102,17 @@ export const getColumns = (
     { field: "region", headerName: "Region", renderHeader: () => formatHeader("Region"), flex: 0.75, headerAlign: "left", align: "left" },
     { field: "sector", headerName: "Sector", renderHeader: () => formatHeader("Sector"), flex: 1.25, headerAlign: "left", align: "left" },
     { field: "issuer_name", headerName: "Issuer Name", renderHeader: () => formatHeader("Issuer Name"), flex: 2, headerAlign: "left", align: "left" },
-    { field: "deal_size", headerName: "Deal Size ($M)", renderHeader: () => formatHeader("Deal Size ($M)"), flex: 1, headerAlign: "left", align: "left",},
 
+{
+  field: "deal_size",
+  headerName: "Deal Size",
+  renderHeader: () => formatHeader("Deal Size ($M)"),
+  flex: 1,
+  headerAlign: "left",
+  align: "left",
+  renderCell: (params) => formatDealSize(params.value),
+  sortComparator: (v1, v2) => Number(v1) - Number(v2),
+},
     // dateColumn,
     {field: "trade_date", headerName: "First Trade Date", renderHeader: () => formatHeader("First Trade Date"), flex: 1.5, headerAlign: "left", align: "left", renderCell: formatDateCell},
     {field: "pricing_date", headerName: "Pricing Date", renderHeader: () => formatHeader("Pricing Date"), flex: 1.12, headerAlign: "left", align: "left", renderCell: formatDateCell},

@@ -213,6 +213,13 @@ const handleClosePopup = () => {
       renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
+        {
+      field: "am_return",
+      headerName: "AM Return ",
+      width: 220,
+      renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
     {
       field: "allocation_deal_size",
       headerName: "Allocation as % of Deal Size",

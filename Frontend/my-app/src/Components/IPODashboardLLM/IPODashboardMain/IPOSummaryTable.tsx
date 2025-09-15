@@ -15,14 +15,12 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import axios from "axios";
 
-// ✅ Interface declared before usage
 interface IPOSummaryTableProps {
   ipodata: Record<string, any>;
   selectedTicker: string;
   setIpoData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-// Fields to be displayed in IPO summary
 const infoFields: { label: string; key: string }[] = [
   { label: "Pricing Date", key: "pricing_date" },
   { label: "Price Range", key: "price_range" },
@@ -34,7 +32,6 @@ const infoFields: { label: string; key: string }[] = [
   { label: "Bookrunners", key: "bookrunners" },
 ];
 
-// Format value based on key
 const formatValue = (key: string, value: any, ipodata: Record<string, any>) => {
   if (key === "price_range") {
     return ipodata.lower_bound && ipodata.upper_bound
@@ -104,10 +101,28 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
     setSummaryEditMode(false);
   };
 
+  // Helper to normalize date for input type="date"
+  const normalizeDateForInput = (value: any): string => {
+    if (!value) return "";
+    if (typeof value === "string") {
+      // Try to extract YYYY-MM-DD
+      const match = value.match(/^\d{4}-\d{2}-\d{2}/);
+      if (match) return match[0];
+      // Try Date parsing
+      const dt = new Date(value);
+      if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+      return "";
+    }
+    if (value instanceof Date && !isNaN(value.getTime())) {
+      return value.toISOString().slice(0, 10);
+    }
+    return "";
+  };
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={4}>
-<Grid item xs={12} >
+        <Grid item xs={12}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -144,7 +159,7 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
                       </>
                     ) : (
                       <IconButton onClick={() => setSummaryEditMode(true)}>
-                        <EditIcon />
+                        {/* <EditIcon /> */}
                       </IconButton>
                     )}
                   </Box>
@@ -200,6 +215,23 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
                                   }
                                 />
                               </Box>
+                            ) : field.key === "pricing_date" ? (
+                              <TextField
+                                fullWidth
+                                size="small"
+                                type="date"
+                                value={
+                                  editedSummaryData.pricing_date ??
+                                  normalizeDateForInput(ipodata.pricing_date)
+                                }
+                                onChange={(e) =>
+                                  setEditedSummaryData((prev) => ({
+                                    ...prev,
+                                    pricing_date: e.target.value,
+                                  }))
+                                }
+                                InputLabelProps={{ shrink: true }}
+                              />
                             ) : (
                               <TextField
                                 fullWidth

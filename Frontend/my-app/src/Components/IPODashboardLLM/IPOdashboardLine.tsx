@@ -220,22 +220,24 @@ const IPOdashboardLine: React.FC<IPOdashboardLineProps> = ({
   };
 
   // On mount or ticker change, fetch the latest data so reload shows current values
-  useEffect(() => {
-    const fetchLatest = async () => {
-      if (!apiUrl || !selectedTicker) return;
-      try {
-        const resp = await axios.get(`${apiUrl}/api/writeup_data/${selectedTicker}/`, {
-          headers: getAuthHeaders(),
-        });
-        setIpoData(resp.data);
-      } catch (err) {
-        // Non-fatal: keep existing data
-        console.error("Fetch latest IPO data failed:", err);
-      }
-    };
-    fetchLatest();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTicker]);
+useEffect(() => {
+  const fetchLatest = async () => {
+    if (!apiUrl || !selectedTicker) return;
+    try {
+      const resp = await axios.post(
+        `${apiUrl}/api/writeup_data/`,
+        { ticker: selectedTicker },          // 👈 body (payload)
+        { headers: getAuthHeaders() }        // 👈 headers (config)
+      );
+      setIpoData(resp.data);
+    } catch (err) {
+      console.error("Fetch latest IPO data failed:", err);
+    }
+  };
+  fetchLatest();
+}, [selectedTicker]);
+
+
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
