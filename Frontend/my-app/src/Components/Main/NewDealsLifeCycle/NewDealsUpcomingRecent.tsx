@@ -11,6 +11,7 @@ import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionIn
 import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
 import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
 import DealIoiValuesTable from "./DealsCyclesSections/DealIoiValuesTable";
+import DealInfoContainer from "./DealInfoContainer";
 
 
 
@@ -46,7 +47,7 @@ const token = localStorage.getItem("access_token");
       setLoading(false);
     }
   };
-
+console.log("ddddd",selectedDeal);
   useEffect(() => {
     fetchData(selectedOp);
   }, [selectedOp]);
@@ -93,8 +94,11 @@ const token = localStorage.getItem("access_token");
         
           <Grid item xs={12} md={4} mb={4}>
             <DealIoiValuesTable data={selectedDeal} />
+            {/* <DealUnifiedSummaryTableDashboard data={selectedDeal} /> */}
+<DealInfoContainer selectedDeal={selectedDeal} />
           </Grid>
-        </>
+
+  </>
       )}
     </Container>
   );

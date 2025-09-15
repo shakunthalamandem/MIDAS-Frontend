@@ -1,11 +1,9 @@
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
+
 
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
-import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded"; // for Neutral
 
 // ✅ Format header with line breaks
 export const formatHeader = (label: string) => {

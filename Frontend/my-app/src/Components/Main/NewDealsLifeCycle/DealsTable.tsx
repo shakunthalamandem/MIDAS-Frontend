@@ -20,10 +20,20 @@ const DealsTable: React.FC<DealsTableProps> = ({
 }) => {
   const [selectedId, setSelectedId] = useState<number | string | null>(null);
 
-  const handleRowClick = (params: any) => {
-    setSelectedId(params.id);
-    onRowSelect(params.row);
-  };
+const handleRowClick = (params: any) => {
+  setSelectedId(params.id);
+
+  const { ticker, deal_type, region, fo_type,sector } = params.row;
+
+  onRowSelect({
+    ticker,
+    deal_type,
+    region,
+    fo_type,
+    sector,
+  });
+};
+
 
   const columns = getColumns(selectedOp, selectedId);
 
