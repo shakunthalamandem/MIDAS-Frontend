@@ -60,6 +60,9 @@ const IPODealsS1DealData: React.FC<IPODealsS1DealDataProps> = ({ selectedData })
 const [editedValuation, setEditedValuation] = useState<string[]>([]);
 const valuation = selectedData?.valuation ?? []; 
 
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
 
   // Toggle AI comparison
   const [showAIComparison, setShowAIComparison] = useState(false);
@@ -84,9 +87,10 @@ const handleRemoveValuationLine = (index: number) => {
 
 const handleSaveValuation = async () => {
   try {
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem("access_token");
+
     if (!apiUrl) throw new Error("API URL not defined");
+      const cleaned = editedValuation.filter((item) => item.trim() !== "");
+      const formatted = cleaned.map((item) => `• ${item}`).join("\n");
 
     const response = await fetch(`${apiUrl}/api/writeup_data/`, {
       method: "PATCH",
@@ -96,7 +100,7 @@ const handleSaveValuation = async () => {
       },
       body: JSON.stringify({
         ticker_name: selectedData.ticker_name,
-        valuation: editedValuation,
+        valuation: formatted,
       }),
     });
 
@@ -110,8 +114,7 @@ const handleSaveValuation = async () => {
 
   useEffect(() => {
     const fetchDeals = async () => {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
+
 
       if (!apiUrl) {
         setError("API URL is not defined in environment variables");
