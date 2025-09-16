@@ -96,7 +96,7 @@ const formatDealSize = (value: any): string => {
       flex: 1,
       headerAlign: "left",
       align: "left",
-          minWidth: 120,
+          minWidth: 90,
       renderCell: (params) => (
         <span
           style={{
@@ -111,16 +111,16 @@ const formatDealSize = (value: any): string => {
       ),
     },
     { field: "region", headerName: "Region", renderHeader: () => formatHeader("Region"), flex: 0.75, 
-          minWidth: 120,headerAlign: "left", align: "left" },
-    { field: "sector", headerName: "Sector", renderHeader: () => formatHeader("Sector"), flex: 1.25, headerAlign: "left", align: "left" },
-    { field: "issuer_name", headerName: "Issuer Name", renderHeader: () => formatHeader("Issuer Name"), flex: 2, headerAlign: "left", align: "left" },
+          minWidth: 70,headerAlign: "left", align: "left" },
+    { field: "sector", headerName: "Sector", renderHeader: () => formatHeader("Sector"), flex: 1.25, headerAlign: "left", align: "left",  minWidth: 170 },
+    { field: "issuer_name", headerName: "Issuer Name", renderHeader: () => formatHeader("Issuer Name"), flex: 2, headerAlign: "left", align: "left", minWidth: 150 },
 
 {
   field: "deal_size",
   headerName: "Deal Size",
   renderHeader: () => formatHeader("Deal Size ($M)"),
   flex: 1,
-          minWidth: 120,
+          minWidth: 100,
   headerAlign: "left",
   align: "left",
   renderCell: (params) => formatDealSize(params.value),
@@ -138,7 +138,7 @@ const formatDealSize = (value: any): string => {
       renderHeader: () => formatHeader("Deal Type"),
       flex: 0.70,
       headerAlign: "left",
-          minWidth: 120,
+          minWidth: 70,
       align: "left",
     },
         {
@@ -146,7 +146,7 @@ const formatDealSize = (value: any): string => {
       headerName: "FO Type",
       renderHeader: () => formatHeader("FO Type"),
       flex: 0.80,
-          minWidth: 120,
+          minWidth: 70,
       headerAlign: "left",
       align: "left",
     },
@@ -196,7 +196,7 @@ const formatDealSize = (value: any): string => {
       headerName: "Deal Status",
       renderHeader: () => formatHeader("Deal Status"),
       flex: 1,
-          minWidth: 120,
+          minWidth: 70,
       headerAlign: "left",
       align: "left",
       renderCell: renderDealStatsCell,
@@ -204,7 +204,7 @@ const formatDealSize = (value: any): string => {
     {
       field: "t1d_pred",
       headerName: "AI-ML Prediction",
-          minWidth: 120,
+          minWidth: 100,
       renderHeader: () => formatHeader("AI-ML Prediction"),
       flex: 1,
       headerAlign: "left",
