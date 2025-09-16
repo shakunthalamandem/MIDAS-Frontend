@@ -67,34 +67,32 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
     "Content-Type": "application/json",
     Authorization: token ? `Bearer ${token}` : "",
   });
+const handleSaveSummary = async () => {
+  try {
+    if (!apiUrl) throw new Error("API URL not defined");
 
-  const handleSaveSummary = async () => {
-    try {
-      if (!apiUrl) throw new Error("API URL not defined");
+    const payload: any = {
+      ticker_name: selectedTicker,
+      ...editedSummaryData,
+    };
 
-      const payload: any = {
-        ticker_name: selectedTicker,
-        ...editedSummaryData,
-      };
-
-      if ("lower_bound" in editedSummaryData && editedSummaryData.lower_bound !== undefined) {
-        payload.lower_bound = parseFloat(editedSummaryData.lower_bound);
-      }
-      if ("upper_bound" in editedSummaryData && editedSummaryData.upper_bound !== undefined) {
-        payload.upper_bound = parseFloat(editedSummaryData.upper_bound);
-      }
-
-      const response = await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
-        headers: getAuthHeaders(),
-      });
-
-      setIpoData((prev: any) => ({ ...prev, ...editedSummaryData }));
-      setSummaryEditMode(false);
-      setEditedSummaryData({});
-    } catch (error: any) {
-      console.error("Save Summary Error:", error.response?.data || error.message || error);
+    if ("lower_bound" in editedSummaryData && editedSummaryData.lower_bound !== undefined) {
+      payload.lower_bound = parseFloat(editedSummaryData.lower_bound);
     }
-  };
+    if ("upper_bound" in editedSummaryData && editedSummaryData.upper_bound !== undefined) {
+      payload.upper_bound = parseFloat(editedSummaryData.upper_bound);
+    }
+
+    await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
+      headers: getAuthHeaders(),
+    });
+
+    setSummaryEditMode(false);
+    setEditedSummaryData({});
+  } catch (error: any) {
+    console.error("Save Summary Error:", error.response?.data || error.message || error);
+  }
+};
 
   const handleCancelSummary = () => {
     setEditedSummaryData({});
