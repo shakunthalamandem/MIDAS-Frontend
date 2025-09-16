@@ -28,6 +28,7 @@ const theme = createTheme({
 interface DealOption {
   ticker: string;
   pricing_date: string;
+  deal_id: string | null;
 }
 
 interface UnifiedDealSelectorProps {
@@ -45,7 +46,7 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // Fetch ticker + pricing_date options
+  // Fetch ticker + deal_id options
   useEffect(() => {
     const fetchOptions = async () => {
       if (!apiUrl) return;
@@ -82,10 +83,8 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
     if (selected.length === 0) return "";
 
     // Always show only the first selected item
-    const [firstTicker, firstDate] = selected[0].split("|");
-    const firstLabel = `${firstTicker} (${new Date(
-      firstDate
-    ).toLocaleDateString()})`;
+    const [firstTicker, firstDeal] = selected[0].split("|");
+    const firstLabel = `${firstTicker} (${firstDeal})`;
 
     if (selected.length === 1) {
       return firstLabel;
@@ -123,7 +122,8 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
                 </MenuItem>
               ) : options.length > 0 ? (
                 options.map((item, idx) => {
-                  const value = `${item.ticker}|${item.pricing_date}`;
+                  if (!item.deal_id) return null; // skip null deal_id
+                  const value = `${item.ticker}|${item.deal_id}`;
                   return (
                     <MenuItem key={idx} value={value}>
                       <Checkbox checked={selected.indexOf(value) > -1} />
@@ -132,11 +132,8 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
                           <Typography fontWeight="bold">{item.ticker}</Typography>
                         }
                         secondary={
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                          >
-                            {new Date(item.pricing_date).toLocaleDateString()}
+                          <Typography variant="caption" color="text.secondary">
+                            {item.deal_id}
                           </Typography>
                         }
                       />
@@ -153,11 +150,11 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
           {selected.length > 0 && (
             <Box display="flex" flexWrap="wrap" gap={1}>
               {selected.map((val) => {
-                const [ticker, date] = val.split("|");
+                const [ticker, dealId] = val.split("|");
                 return (
                   <Chip
                     key={val}
-                    label={`${ticker} (${new Date(date).toLocaleDateString()})`}
+                    label={`${ticker} (${dealId})`}
                     onDelete={() => handleDelete(val)}
                     color="primary"
                     variant="outlined"

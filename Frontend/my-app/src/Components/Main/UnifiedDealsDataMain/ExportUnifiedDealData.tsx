@@ -35,8 +35,8 @@ const ExportUnifiedDealData: React.FC = () => {
       // Prepare payload for API
       const payload = {
         selections: selected.map((val) => {
-          const [ticker, pricing_date] = val.split("|");
-          return { ticker, pricing_date };
+          const [ticker, deal_id] = val.split("|");
+          return { ticker, deal_id };
         }),
       };
 
