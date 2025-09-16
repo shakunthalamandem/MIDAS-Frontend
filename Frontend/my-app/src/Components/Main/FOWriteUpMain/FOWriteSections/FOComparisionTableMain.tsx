@@ -14,6 +14,7 @@ import {
   Alert,
   Fade,
   Typography,
+  Container,
 } from "@mui/material";
 
 interface FOComparisionTableMainProps {
@@ -180,6 +181,7 @@ const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
   const averages: AveragesType | undefined = data?.[ticker]?.Averages;
 
   return (
+    <>
     <Box sx={{ width: "100%" }}>
       <Typography
         variant="h6"
@@ -418,6 +420,7 @@ const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
         </TableContainer>
       )}
     </Box>
+    </>
   );
 };
 

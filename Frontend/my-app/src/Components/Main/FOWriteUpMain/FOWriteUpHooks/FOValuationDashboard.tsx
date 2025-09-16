@@ -1,4 +1,4 @@
-// FOSummaryDataSection.tsx
+// FOValuationDashboard.tsx
 import React, { useEffect, useState } from "react";
 import {
   CircularProgress,
@@ -11,11 +11,11 @@ import {
 
 import { motion } from "framer-motion";
 
-import FODealInformation from "../FOWriteSections/FODealInformation";
-import FOTradingDetails from "../FOWriteSections/FOTradingDetails";
 
-import FOSharePricePerformance from "../FOWriteSections/FOSharePricePerformance";
-
+import FOValuationWriteup from "../FOWriteSections/FOValuationWriteup";
+import FOStrengthWriteUp from "../FOWriteSections/FOStrengthWriteUp";
+import FOBusinessHighlights from "../FOWriteSections/FOBusinessHighlights";
+import FOManagementWriteUp from "../FOWriteSections/FOManagementWriteUp";
 
 interface ChildProps {
   ticker: string;
@@ -26,7 +26,7 @@ interface ApiResponse {
   [key: string]: Record<string, any>;
 }
 
-const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
+const FOValuationDashboard: React.FC<ChildProps> = ({ ticker, deal_id }) => {
   const [formData, setFormData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,27 +80,29 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
       {/* Top Action Bar */}
 
 
- <FODealInformation data={formData.deal_information} ticker={ticker} />
-
+<FOValuationWriteup selectedData={formData.valuation_writeup} ticker={ticker} />
 
       <Container maxWidth="xl" sx={{ mt: 4 }}>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-             <FOTradingDetails data={formData.trading_details} ticker={ticker} />
-
+              <FOBusinessHighlights
+                selectedData={formData.business_highlights} ticker={ticker} 
+              />
             </Grid>
             <Grid item xs={12} md={6}>
-              <FOSharePricePerformance selectedData={formData.share_price_performance} ticker={ticker} />
-
+              <FOManagementWriteUp
+                selectedData={formData.management_writeup}
+                ticker={ticker}
+              />
             </Grid>
           </Grid>
+          <FOStrengthWriteUp selectedData={formData.strength_writeup} ticker={ticker} />
+
         </motion.div>
       </Container>
-
-
     </>
   );
 };
 
-export default FOSummaryDataSection;
+export default FOValuationDashboard;
