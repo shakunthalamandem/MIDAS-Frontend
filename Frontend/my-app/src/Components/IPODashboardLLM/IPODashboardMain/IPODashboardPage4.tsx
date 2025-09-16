@@ -288,15 +288,20 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
                                     color: "#fff", // white text
                                   }}
                                 >
-                                  The Monashee Score is based on the average
-                                  returns of the last five IPOs. A rating of 1–5
-                                  is assigned for the average T+1 day return and
-                                  again for the average 1-month return (with
-                                  &gt;50% = 5, 40–50% = 4, 30–40% = 3, 20–30% =
-                                  2, ≤20% = 1). The two ratings are then added
-                                  to give a total score out of 10, reflecting
-                                  both short- and medium-term performance.
+                                  • The Monashee Score is based on the average returns of the last five IPOs. <br />
+                                  • A rating of 1–5 is assigned for the average T+1 day return. <br />
+                                  • Another rating of 1–5 is assigned for the average 1-month return. <br />
+                                  • Rating scale: <br />
+                                  &nbsp;&nbsp;• &gt;50% = 5 <br />
+                                  &nbsp;&nbsp;• 40–50% = 4 <br />
+                                  &nbsp;&nbsp;• 30–40% = 3 <br />
+                                  &nbsp;&nbsp;• 20–30% = 2 <br />
+                                  &nbsp;&nbsp;• ≤20% = 1 <br />
+                                  • The two ratings are then added to give a total score out of 10. <br />
+                                  • This reflects both short-term and medium-term performance.
                                 </Typography>
+
+
                               }
                               arrow
                               placement="top"

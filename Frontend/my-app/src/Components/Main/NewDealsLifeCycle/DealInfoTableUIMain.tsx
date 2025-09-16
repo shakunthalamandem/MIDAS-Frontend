@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Card, CardContent, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Box, Card, CardContent, Link, Paper, Stack, TextField, Typography } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
 import PublicIcon from "@mui/icons-material/Public";
 import CategoryIcon from "@mui/icons-material/Category";
@@ -40,7 +40,6 @@ const formatDealSize = (dealSize: any) => {
       broad_region: row.broad_region || "N/A",
       deal_type: row.deal_type || "N/A",
       fo_type: row.deal_type === "IPO" ? "-" : row.fo_type || "-",
-      number_of_shares_offered: row.number_of_shares_offered ? `${row.number_of_shares_offered.toFixed(0)}` : "0",
       issue_offer_price: row.issue_offer_price ? formatDealSize(row.issue_offer_price.toFixed(2)) : "$0",
       ioi_deal_size: row.ioi_deal_size ? `${row.ioi_deal_size.toFixed(2)}%` : "0%",
       allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
@@ -66,12 +65,36 @@ const formatDealSize = (dealSize: any) => {
     );
   }, [rows, searchQuery]);
 
-  const columns: GridColDef[] = [{
+  const columns: GridColDef[] = [ {
   field: "ticker",
   headerName: "Ticker",
   width: 100,
-  cellClassName: "ticker-cell",
-},
+  headerAlign: "left",
+  renderCell: (params) => (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "left",
+        alignItems: "left",
+        height: "100%",
+      }}
+    >
+      <Link
+        href={`/opportunity/equity/${params.value}`}
+        style={{
+          color: "brown",
+          fontWeight: "bold",
+          paddingLeft: 15,
+          textDecoration: "none",
+        }}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {params.value}
+      </Link>
+    </div>
+  ),
+}, 
 
   { field: "pricing_date", headerName: "Pricing Date", width: 100 },
      { field: "first_trade_date", headerName: "First Trade Date", width: 100 },
