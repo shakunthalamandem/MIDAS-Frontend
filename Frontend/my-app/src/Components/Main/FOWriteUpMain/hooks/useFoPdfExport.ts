@@ -144,9 +144,9 @@ export function useFoPdfExport({ pages, ipoData, tickerFallback = "FO", setForce
             remember(node, 'height', 'auto');
           }
           // Widen containers to accommodate full-width tables
-          if (node.tagName === 'TABLE' || node.tagName === 'THEAD' || node.tagName === 'TBODY') {
-            remember(node, 'width', 'auto');
-          }
+          // if (node.tagName === 'TABLE' || node.tagName === 'THEAD' || node.tagName === 'TBODY') {
+          //   remember(node, 'width', 'auto');
+          // }
           // Disable animations/transitions during capture
           if (cs.animationName !== 'none' || cs.transitionDuration !== '0s') {
             remember(node, 'animation', 'none');

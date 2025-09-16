@@ -16,6 +16,7 @@ import FOSummaryDataSection from "./FOSummaryDataSection";
 import { format } from "date-fns";
 import { ExportProvider } from "../../../../contexts/ExportContext";
 import { useFoPdfExport } from "../hooks/useFoPdfExport";
+import FOValuationDashboard from "./FOValuationDashboard";
 
 interface FOSectionsMainProps {
   ticker: string;
@@ -105,7 +106,7 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
   // Export Monashee-style PDF via shared hook
   const [forceExpand, setForceExpand] = useState(false);
   const exportFoPDF = useFoPdfExport({
-    pages: ["fo-page1", "fo-page2"],
+    pages: ["fo-page1", "fo-page2","fo-page3"],
     ipoData,
     tickerFallback: selected?.ticker || ticker,
     setForceExpand,
@@ -209,7 +210,10 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
       <div id="fo-page1">
         <FOSummaryDataSection ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
       </div>
-      <div id="fo-page2">
+            <div id="fo-page2">
+        <FOValuationDashboard ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
+      </div>
+      <div id="fo-page3">
         <FOFinancialHighlights ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
         <FOComparisionTableMain ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
       </div>
