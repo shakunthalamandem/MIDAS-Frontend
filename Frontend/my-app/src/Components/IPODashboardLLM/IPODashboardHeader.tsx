@@ -15,7 +15,6 @@ import { format } from "date-fns";
 import IPOdashboardLine from "./IPOdashboardLine";
 import IPODealsS1DealData from "./IPODealsS1DealData";
 import IPOSummaryTable from "./IPODashboardMain/IPOSummaryTable";
-import { useState } from "react";
 
 interface TickerOption {
   ticker_name: string;
@@ -37,7 +36,8 @@ interface IPODashboardHeaderProps {
 }
 
 const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
-  ipoData: initialIpoData,   allIpoTickers,
+  ipoData,
+  allIpoTickers,
   selectedTicker,
   searchText,
   setSelectedTicker,
@@ -45,15 +45,13 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   onExportPDF,
   pdfLoading,
 }) => {
-     const [ipoData, setIpoData] = useState(initialIpoData);
   // ✅ Sort tickers: no date → top, then newest first
   const sortedTickers = [...allIpoTickers].sort((a, b) => {
     if (!a.pricing_date && !b.pricing_date) return 0;
     if (!a.pricing_date) return -1;
     if (!b.pricing_date) return 1;
     return new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime();
-  }); 
-
+  });
 
   return (
     <Container maxWidth="xl" sx={{ mb: 2 }}>
@@ -138,10 +136,11 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   selectedTicker={selectedTicker || ""}
   setIpoData={ipoData} // ✅ Correct function to update IPO data
 />
+
       <IPOSummaryTable
         ipodata={ipoData}
         selectedTicker={selectedTicker || ""}
-        setIpoData={setIpoData} // ✅ fixed
+        setIpoData={setSelectedTicker}
       />
       <IPODealsS1DealData
         selectedData={{
