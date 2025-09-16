@@ -159,7 +159,7 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
                       </>
                     ) : (
                       <IconButton onClick={() => setSummaryEditMode(true)}>
-                        {/* <EditIcon /> */}
+                        <EditIcon />
                       </IconButton>
                     )}
                   </Box>
