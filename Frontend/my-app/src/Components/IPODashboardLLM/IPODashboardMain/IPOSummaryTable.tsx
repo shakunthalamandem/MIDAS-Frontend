@@ -57,6 +57,8 @@ const IPOSummaryTable: React.FC<IPOSummaryTableProps> = ({
 }) => {
   const [summaryEditMode, setSummaryEditMode] = useState(false);
   const [editedSummaryData, setEditedSummaryData] = useState<Record<string, any>>({});
+  const [localSummaryData, setLocalSummaryData] = useState<Record<string, any>>({});
+
 
   if (!ipodata || Object.keys(ipodata).length === 0) return null;
 
@@ -86,6 +88,11 @@ const handleSaveSummary = async () => {
     await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
       headers: getAuthHeaders(),
     });
+        setLocalSummaryData((prev) => ({
+        ...prev,
+        ...editedSummaryData,
+      }));
+
 
     setSummaryEditMode(false);
     setEditedSummaryData({});
@@ -116,9 +123,10 @@ const handleSaveSummary = async () => {
     }
     return "";
   };
+  const displayData = { ...ipodata, ...localSummaryData };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+<Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <motion.div
@@ -142,9 +150,6 @@ const handleSaveSummary = async () => {
                   justifyContent="center"
                   alignItems="center"
                 >
-                  {/* <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
-                    IPO Summary
-                  </Typography> */}
                   <Box position="absolute" right={0}>
                     {summaryEditMode ? (
                       <>
@@ -188,7 +193,7 @@ const handleSaveSummary = async () => {
                                   size="small"
                                   fullWidth
                                   value={
-                                    editedSummaryData.lower_bound ?? ipodata.lower_bound ?? ""
+                                    editedSummaryData.lower_bound ?? displayData.lower_bound ?? ""
                                   }
                                   onChange={(e) =>
                                     setEditedSummaryData((prev) => ({
@@ -203,7 +208,7 @@ const handleSaveSummary = async () => {
                                   size="small"
                                   fullWidth
                                   value={
-                                    editedSummaryData.upper_bound ?? ipodata.upper_bound ?? ""
+                                    editedSummaryData.upper_bound ?? displayData.upper_bound ?? ""
                                   }
                                   onChange={(e) =>
                                     setEditedSummaryData((prev) => ({
@@ -220,7 +225,7 @@ const handleSaveSummary = async () => {
                                 type="date"
                                 value={
                                   editedSummaryData.pricing_date ??
-                                  normalizeDateForInput(ipodata.pricing_date)
+                                  normalizeDateForInput(displayData.pricing_date)
                                 }
                                 onChange={(e) =>
                                   setEditedSummaryData((prev) => ({
@@ -236,7 +241,7 @@ const handleSaveSummary = async () => {
                                 multiline
                                 size="small"
                                 value={
-                                  editedSummaryData[field.key] ?? ipodata[field.key] ?? ""
+                                  editedSummaryData[field.key] ?? displayData[field.key] ?? ""
                                 }
                                 onChange={(e) =>
                                   setEditedSummaryData((prev) => ({
@@ -248,7 +253,7 @@ const handleSaveSummary = async () => {
                             )
                           ) : (
                             <Typography variant="h6" sx={{ color: "#333" }}>
-                              {formatValue(field.key, ipodata[field.key], ipodata)}
+                              {formatValue(field.key, displayData[field.key], displayData)}
                             </Typography>
                           )}
                         </Box>
