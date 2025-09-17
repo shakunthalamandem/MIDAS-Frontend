@@ -35,6 +35,7 @@ type DealData = {
   after_market_threshold: string;
   monashee_score: number;
   differentiated_summary: string;
+  internal_notes: string;
 };
 
 type EditableField = keyof DealData;
@@ -44,7 +45,6 @@ interface SelectedData {
   company_name?: string;
   exchange?: string;
   valuation?: string[];
-  internal_notes?: string;
 }
 
 interface IPODealsS1DealDataProps {
@@ -314,55 +314,75 @@ const handleSaveValuation = async () => {
         </Grid>
       </Card>
     </Container>
+
+{/* Internal notes */}
     <Container maxWidth="xl" sx={{ mt: 4 }}>
-      <Card
-        elevation={0}
-        sx={{
-          borderRadius: 4,
-          background: "linear-gradient(#f0f5ff, #f0f5ff)",
-          width: "100%",
-          mx: "auto",
-        }}
+  <Card
+    elevation={0}
+    sx={{
+      borderRadius: 4,
+      background: "linear-gradient(#f0f5ff, #f0f5ff)",
+      width: "100%",
+      mx: "auto",
+      p: 3,
+    }}
+  >
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      mb={2}
+    >
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: 700, color: "#002060" }}
       >
-        <Box
-          position="relative"
-          px={3}
-          pt={2}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
-            Internal Notes
-          </Typography>
-           <Box position="absolute" right={24}>
-            {editValuationMode ? (
-              <>
-                <IconButton color="primary" onClick={handleSaveValuation}>
-                  <SaveIcon />
-                </IconButton>
-                <IconButton
-                  color="secondary"
-                  onClick={() => {
-                    setEditedValuation(Array.isArray(valuation) ? valuation : []);
-                    setEditValuationMode(false);
-                  }}
-                >
-                  <CancelIcon />
-                </IconButton>
-              </>
-            ) : (
-            <IconButton onClick={() => {
-                  setEditedValuation(Array.isArray(valuation) ? valuation : []);
-                  setEditValuationMode(true);
-            }}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-           </Box>
-      </Card>
-    </Container>
+        Internal Notes
+      </Typography>
+      {editMode ? (
+        <Box>
+          <IconButton color="primary" onClick={handleSaveDealData}>
+            <SaveIcon />
+          </IconButton>
+          <IconButton color="secondary" onClick={handleCancelEdit}>
+            <CancelIcon />
+          </IconButton>
+        </Box>
+      ) : (
+        <IconButton color="default" onClick={enterEditMode}>
+          <EditIcon />
+        </IconButton>
+      )}
+    </Box>
+
+    {editMode ? (
+      <TextField
+        fullWidth
+        multiline
+        minRows={4}
+        placeholder="Enter internal notes here..."
+        value={
+          editedDealData?.internal_notes ??
+          dealData.internal_notes ??
+          ""
+        }
+        onChange={(e) =>
+          setEditedDealData((prev) => ({
+            ...prev!,
+            internal_notes: e.target.value,
+          }))
+        }
+      />
+    ) : (
+      <Typography
+        sx={{ color: "#333", whiteSpace: "pre-line", mt: 1 }}
+      >
+        {dealData.internal_notes || "No internal notes provided."}
+      </Typography>
+    )}
+  </Card>
+</Container>
+
 
     {/* VALUATION INFORMATION */}
     <Container maxWidth="xl" sx={{ mt: 4 }}>
