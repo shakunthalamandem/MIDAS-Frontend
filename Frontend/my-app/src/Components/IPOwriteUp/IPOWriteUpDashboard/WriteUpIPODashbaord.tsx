@@ -19,6 +19,7 @@ import IPODashboardMain from "../../IPODashboardLLM/IPODashboardMain";
 interface IpoData {
   ticker: string;
   company_name: string;
+  sector: string | null;
   pricing_date: string | null;
   pricing_range_min: number | null;
   pricing_range_max: number | null;
@@ -134,6 +135,7 @@ const WriteUpIPODashbaord: React.FC = () => {
                     "Symbol",
                     "Company",
                     "Pricing Date",
+                    "Sector",
                     "Price Range",
                     "Exchange",
                     "Deal Size",
@@ -216,6 +218,17 @@ const WriteUpIPODashbaord: React.FC = () => {
                       }}
                     >
                       {formatDate(row.pricing_date)}
+                    </TableCell>  
+                    <TableCell
+                      align="center"
+                      sx={{
+                        fontSize: "0.78rem",
+                        padding: "6px 8px",
+                        border: "1px solid black",
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {row.sector || "—"}
                     </TableCell>
 
                     {/* Price Range */}
