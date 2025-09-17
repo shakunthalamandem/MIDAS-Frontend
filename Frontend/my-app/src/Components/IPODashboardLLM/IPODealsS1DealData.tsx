@@ -44,6 +44,7 @@ interface SelectedData {
   company_name?: string;
   exchange?: string;
   valuation?: string[];
+  internal_notes?: string;
 }
 
 interface IPODealsS1DealDataProps {
@@ -313,6 +314,55 @@ const handleSaveValuation = async () => {
         </Grid>
       </Card>
     </Container>
+    <Container maxWidth="xl" sx={{ mt: 4 }}>
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: 4,
+          background: "linear-gradient(#f0f5ff, #f0f5ff)",
+          width: "100%",
+          mx: "auto",
+        }}
+      >
+        <Box
+          position="relative"
+          px={3}
+          pt={2}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
+            Internal Notes
+          </Typography>
+           <Box position="absolute" right={24}>
+            {editValuationMode ? (
+              <>
+                <IconButton color="primary" onClick={handleSaveValuation}>
+                  <SaveIcon />
+                </IconButton>
+                <IconButton
+                  color="secondary"
+                  onClick={() => {
+                    setEditedValuation(Array.isArray(valuation) ? valuation : []);
+                    setEditValuationMode(false);
+                  }}
+                >
+                  <CancelIcon />
+                </IconButton>
+              </>
+            ) : (
+            <IconButton onClick={() => {
+                  setEditedValuation(Array.isArray(valuation) ? valuation : []);
+                  setEditValuationMode(true);
+            }}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+            )}
+          </Box>
+           </Box>
+      </Card>
+    </Container>
 
     {/* VALUATION INFORMATION */}
     <Container maxWidth="xl" sx={{ mt: 4 }}>
@@ -325,6 +375,7 @@ const handleSaveValuation = async () => {
           mx: "auto",
         }}
       >
+         
         <Box
           position="relative"
           px={3}
@@ -362,6 +413,7 @@ const handleSaveValuation = async () => {
             )}
           </Box>
         </Box>
+       
 
         <Box px={3} pb={3}>
           {editValuationMode ? (
