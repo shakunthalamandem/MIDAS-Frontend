@@ -61,6 +61,7 @@ const formatValue = (key: string, value: number | string) => {
 
   if (typeof value === "string") return value;
 
+  if (percentageColumns.includes(key) && value > 500) return "N/A";
   if (negativeColumns.includes(key)) return value < 0 ? "N/A" : `${Math.round(value * 10) / 10}x`;
   if (percentageColumns.includes(key)) return value < 0 ? "N/A" : `${Math.round(value * 10) / 10}%`;
   if (numberColumns.includes(key))
@@ -185,14 +186,11 @@ const handleSave = async (idx: number) => {
 
   return (
     <div style={{ marginTop: 20 }}>
-      {/* Add competitor input above table */}
 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-  {/* Left side: Title */}
   <Typography variant="h6" color="#002060" fontWeight={600}>
     Comparative Trading Multiples & Performance Metrics
   </Typography>
 
-  {/* Right side: TextField + Button */}
   <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
     <TextField
       size="small"
@@ -224,7 +222,7 @@ const handleSave = async (idx: number) => {
                   {col.label}
                 </TableCell>
               ))}
-              <TableCell sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Actions</TableCell>
+              <TableCell sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Action</TableCell>
             </TableRow>
           </TableHead>
 
