@@ -18,6 +18,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import IPOModelMethodologyAccordion from "./IPOModelMethodologyAccordion";
 // import MethodologyAccordion1Day from "./MethodologyAccordion1Day";
 
 interface PredictionModel {
@@ -329,6 +330,9 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
         </Box>
 
         <Divider sx={{ my: 3 }} />
+        <IPOModelMethodologyAccordion />
+        <Divider sx={{ my: 3 }} />
+
         {/* <Box mb={2}>
           <MethodologyAccordion1Day />
         </Box> */}
