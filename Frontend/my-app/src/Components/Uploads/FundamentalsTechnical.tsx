@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   CircularProgress,
@@ -11,21 +11,27 @@ import {
   InputLabel,
   Container,
   Button,
-} from '@mui/material';
-
-
+} from "@mui/material";
 
 const FundamentalsTechnical: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedType, setSelectedType] = useState("");
 
   const handleChange = (event: SelectChangeEvent) => {
-    setSelectedType(event.target.value as 'technical' | 'fundamental' | 'news');
+    setSelectedType(
+      event.target.value as
+        | "technical"
+        | "fundamental"
+        | "news"
+        | "facset_comp_data"
+    );
     setResponse(null); // clear previous messages
   };
-const apiUrl = process.env.REACT_APP_API_URL;
-const token = localStorage.getItem("access_token");
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
   const handleSubmit = async () => {
     if (!selectedType) {
       setResponse("Please select a data type first.");
@@ -35,32 +41,37 @@ const token = localStorage.getItem("access_token");
     setLoading(true);
     setResponse(null);
 
-    let endpoint = '';
-    if (selectedType === 'technical') {
+    let endpoint = "";
+    let method: "GET" | "POST" = "POST"; // default is POST
+
+    if (selectedType === "technical") {
       endpoint = `${apiUrl}/api/technical_data_download/`;
-    } else if (selectedType === 'fundamental') {
+    } else if (selectedType === "fundamental") {
       endpoint = `${apiUrl}/api/fundamental_data_download/`;
-    } else if (selectedType === 'news') {
+    } else if (selectedType === "news") {
       endpoint = `${apiUrl}/api/upload_news/`;
+    } else if (selectedType === "facset_comp_data") {
+      endpoint = `${apiUrl}/api/fs_comp_data_daily_get/`;
+      method = "GET"; // use GET for this one
     }
 
     try {
       const res = await fetch(endpoint, {
-        method: 'POST',
+        method,
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: token ? `Bearer ${token}` : '',
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({}),
+        body: method === "POST" ? JSON.stringify({}) : undefined, // only send body for POST
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData?.error || 'Failed to fetch data');
+        throw new Error(errorData?.error || "Failed to fetch data");
       }
 
       const data = await res.json();
-      setResponse(`Success: ${data.message || 'Data uploaded successfully!'}`);
+      setResponse(`Success: ${data.message || "Data uploaded successfully!"}`);
     } catch (error: any) {
       setResponse(`Error: ${error.message}`);
     } finally {
@@ -70,7 +81,10 @@ const token = localStorage.getItem("access_token");
 
   return (
     <Container maxWidth="md" sx={{ marginTop: 20 }}>
-      <Box mt={2} sx={{ padding: 2, backgroundColor: '#f9f9f9', boxShadow: 3 }}>
+      <Box
+        mt={2}
+        sx={{ padding: 2, backgroundColor: "#f9f9f9", boxShadow: 3 }}
+      >
         <Stack spacing={2} alignItems="center">
           <Typography variant="h6" color="#002060">
             Select Data Type to Upload
@@ -86,6 +100,7 @@ const token = localStorage.getItem("access_token");
               <MenuItem value="technical">Technicals</MenuItem>
               <MenuItem value="fundamental">Fundamentals</MenuItem>
               <MenuItem value="news">Upload News</MenuItem>
+              <MenuItem value="facset_comp_data">FS Comps Update</MenuItem>
             </Select>
           </FormControl>
 
