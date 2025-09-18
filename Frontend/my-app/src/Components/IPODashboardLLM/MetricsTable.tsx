@@ -73,7 +73,6 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [newCompetitor, setNewCompetitor] = useState("");
 
-  // Highlight first row where ticker === competitor
   useEffect(() => {
     const allRows = data[ticker]?.data || [];
     const highlightRow = allRows.find(
@@ -289,9 +288,9 @@ const handleSave = async (idx: number) => {
           return <TableCell key={col.key} align="center">{formatValue(col.key, avgValue)}</TableCell>;
         }
 
-        return null; // Columns 1-3 already merged
+        return null; 
       })}
-      <TableCell /> {/* Empty Actions column */}
+      <TableCell /> 
     </TableRow>
   ))}
 
