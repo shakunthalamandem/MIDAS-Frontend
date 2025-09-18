@@ -1,4 +1,3 @@
-// components/IPODashboardPage3.tsx
 import React from "react";
 import { Container, Grid } from "@mui/material";
 import { cardSections } from "../UtilsIPODashboard";
@@ -9,11 +8,7 @@ interface Props {
 
 const IPODashboardPage3: React.FC<Props> = ({ renderEditableCard }) => {
   return (
-    <div
-      id="ipo-dashboard-page3"
-      data-pdf-page="3"
-      style={{ background: "#fff" }}
-    >
+    <div id="ipo-dashboard-page3">
       <Container maxWidth="xl" sx={{ mb: 3 }}>
         <Grid
           container

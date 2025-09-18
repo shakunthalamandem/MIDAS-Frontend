@@ -15,29 +15,6 @@ import IPOdashboardLine from "./IPOdashboardLine";
 import IPODealsS1DealData from "./IPODealsS1DealData";
 import IPOSummaryTable from "./IPODashboardMain/IPOSummaryTable";
 
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-
-async function handleExportPDF() {
-  const node = document.getElementById("ipo-dashboard-page1");
-  if (!node) return;
-
-  const canvas = await html2canvas(node, {
-    scale: 2,
-    ignoreElements: (el) => el.classList?.contains("pdf-hidden"),
-  });
-
-  const imgData = canvas.toDataURL("image/png");
-  const pdf = new jsPDF("p", "pt", "a4");
-
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const imgWidth = pageWidth;
-  const imgHeight = (canvas.height * pageWidth) / canvas.width;
-
-  pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-  pdf.save("monashee-report.pdf");
-}
-
 interface TickerOption {
   ticker_name: string;
   company_name?: string;
@@ -53,7 +30,7 @@ interface IPODashboardHeaderProps {
   searchText: string;
   setSelectedTicker: (ticker: string | null) => void;
   setSearchText: (text: string) => void;
-  onExportPDF?: () => void; // optional now, since we can use internal handleExportPDF
+  onExportPDF: () => void;
   pdfLoading: boolean;
 }
 
@@ -64,9 +41,10 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   searchText,
   setSelectedTicker,
   setSearchText,
+  onExportPDF,
   pdfLoading,
 }) => {
-  // ✅ Sort tickers
+  // ✅ Sort tickers: no date → top, then newest first
   const sortedTickers = [...allIpoTickers].sort((a, b) => {
     if (!a.pricing_date && !b.pricing_date) return 0;
     if (!a.pricing_date) return -1;
@@ -95,7 +73,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
 
           <Button
             variant="contained"
-            onClick={handleExportPDF}
+            onClick={onExportPDF}
             sx={{
               backgroundColor: "#002060",
               color: "#ffffff",
