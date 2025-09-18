@@ -315,48 +315,60 @@ const handleSaveValuation = async () => {
       </Card>
     </Container>
 
-{/* Internal notes */}
  {/* Internal Notes */}
 <Container maxWidth="xl" sx={{ mt: 4 }}>
   <Card
     elevation={0}
-    className="pdf-hidden"   // 👈 ensures it's hidden in PDF export
+    className="pdf-hidden"
     sx={{
       borderRadius: 4,
       background: "linear-gradient(#f0f5ff, #f0f5ff)",
       width: "100%",
       mx: "auto",
-      p: 3,
+      p: 3, 
     }}
   >
+    {/* Header row */}
     <Box
       display="flex"
-      justifyContent="space-between"
       alignItems="center"
       mb={2}
+      sx={{ position: "relative" }} // 👈 allows absolute centering
     >
+      {/* Centered title */}
       <Typography
         variant="h6"
-        sx={{ fontWeight: 700, color: "#002060" }}
+        sx={{
+          fontWeight: 700,
+          color: "#002060",
+          position: "absolute",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
       >
         Internal Notes
       </Typography>
-      {editMode ? (
-        <Box>
-          <IconButton color="primary" onClick={handleSaveDealData}>
-            <SaveIcon />
+
+      {/* Action buttons on the right */}
+      <Box ml="auto">
+        {editMode ? (
+          <>
+            <IconButton color="primary" onClick={handleSaveDealData}>
+              <SaveIcon />
+            </IconButton>
+            <IconButton color="secondary" onClick={handleCancelEdit}>
+              <CancelIcon />
+            </IconButton>
+          </>
+        ) : (
+          <IconButton color="default" onClick={enterEditMode}>
+            <EditIcon />
           </IconButton>
-          <IconButton color="secondary" onClick={handleCancelEdit}>
-            <CancelIcon />
-          </IconButton>
-        </Box>
-      ) : (
-        <IconButton color="default" onClick={enterEditMode}>
-          <EditIcon />
-        </IconButton>
-      )}
+        )}
+      </Box>
     </Box>
 
+    {/* Body */}
     {editMode ? (
       <TextField
         fullWidth
@@ -377,7 +389,11 @@ const handleSaveValuation = async () => {
       />
     ) : (
       <Typography
-        sx={{ color: "#333", whiteSpace: "pre-line", mt: 1 }}
+        sx={{
+          color: "#333",
+          whiteSpace: "pre-line",
+          mt: 2, // 👈 adds gap from header
+        }}
       >
         {dealData.internal_notes || "No internal notes provided."}
       </Typography>
@@ -387,17 +403,19 @@ const handleSaveValuation = async () => {
 
 
 
+
     {/* VALUATION INFORMATION */}
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
-      <Card
-        elevation={0}
-        sx={{
-          borderRadius: 4,
-          background: "linear-gradient(#f0f5ff, #f0f5ff)",
-          width: "100%",
-          mx: "auto",
-        }}
-      >
+   <Container maxWidth="xl" sx={{ mt: 4 }}>
+  <Card
+    elevation={0}
+    sx={{
+      borderRadius: 4,
+      background: "linear-gradient(#f0f5ff, #f0f5ff)",
+      width: "100%",
+      mx: "auto",
+      p: 3, // 👈 padding inside the card
+    }}
+  >
          
         <Box
           position="relative"
