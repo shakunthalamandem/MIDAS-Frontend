@@ -10,6 +10,7 @@ import {
   TextField,
   IconButton,
   Button,
+  Box, Typography,
 } from "@mui/material";
 import { Edit, Save, Delete } from "@mui/icons-material";
 
@@ -185,21 +186,31 @@ const handleSave = async (idx: number) => {
   return (
     <div style={{ marginTop: 20 }}>
       {/* Add competitor input above table */}
-      <div style={{ display: "flex", marginBottom: 15, gap: 10 }}>
-        <TextField
-          size="small"
-          label="Add Competitor"
-          value={newCompetitor}
-          onChange={(e) => setNewCompetitor(e.target.value)}
-        />
-        <Button
-          onClick={handleAddRow}
-          sx={{ backgroundColor: "#002060", color: "white" }}
-          variant="contained"
-        >
-          Add
-        </Button>
-      </div>
+<Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+  {/* Left side: Title */}
+  <Typography variant="h6" color="#002060" fontWeight={600}>
+    Comparative Trading Multiples & Performance Metrics
+  </Typography>
+
+  {/* Right side: TextField + Button */}
+  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+    <TextField
+      size="small"
+      label="Add Competitor"
+      value={newCompetitor}
+      onChange={(e) => setNewCompetitor(e.target.value)}
+    />
+    <Button
+      onClick={handleAddRow}
+      sx={{ backgroundColor: "#002060", color: "white" }}
+      variant="contained"
+    >
+      Add
+    </Button>
+  </Box>
+</Box>
+
+
 
       <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2 }}>
         <Table size="small">

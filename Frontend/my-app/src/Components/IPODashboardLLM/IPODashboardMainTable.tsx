@@ -61,19 +61,7 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
     }
   };
 
-  const handleUpdateClick = async () => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
-      await fetch(`${apiUrl}/api/fs_get_tickers_data/`, {
-        method: "GET",
-        ...(token && { headers: { Authorization: `Bearer ${token}` } }),
-      });
-      fetchData(ticker); // refresh table after update
-    } catch (err) {
-      console.error("Update failed", err);
-    }
-  };
+
 
   useEffect(() => {
     fetchData(ticker);
@@ -81,14 +69,7 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
 
   return (
     <Box sx={{ p: 0, width: "100%" }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-        <Typography variant="h6" color="#002060" fontWeight={600}>
-          Comparative Trading Multiples & Performance Metrics
-        </Typography>
-        <Button variant="contained" onClick={handleUpdateClick} sx={{ backgroundColor: "#002060" }}>
-          Update
-        </Button>
-      </Box>
+
 
       {loading && (
         <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
