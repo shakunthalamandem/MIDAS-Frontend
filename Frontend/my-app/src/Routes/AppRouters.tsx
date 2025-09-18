@@ -73,6 +73,7 @@ import DealsDropdown from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/
 import EquityAiMlPage from "../Components/AIML/EquityAiMlPage";
 
 import WriteUpIPODashbaord from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
+import UploadFactSetTickers from "../Components/Uploads/DailyMonasheeUploads/UploadFactSetTickers";
 
 const AppRouters: React.FC = () => {
   return (
@@ -165,6 +166,7 @@ const AppRouters: React.FC = () => {
         <Route path="/uploads" element={<AuthGuard><MainUpload /></AuthGuard>} />
         <Route path="/lk_upload" element={<AuthGuard><LkFileUpload /></AuthGuard>} />
         {/* <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} /> */}
+        <Route path="/fs_upload" element={<AuthGuard><UploadFactSetTickers /></AuthGuard>} />
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
         <Route path="/ai_upload" element={<AuthGuard><UploadAiInsights /></AuthGuard>} />
         <Route path="/new_deal_data_upload" element={<AuthGuard><DealsDropdown /></AuthGuard>} />    
