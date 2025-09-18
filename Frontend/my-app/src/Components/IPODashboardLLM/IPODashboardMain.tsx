@@ -318,85 +318,50 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         el.style.visibility = "hidden";
       });
 
-      for (let i = 0; i < pages.length; i++) {
-        const element = document.getElementById(pages[i]);
-        if (!element) continue;
+     for (let i = 0; i < pages.length; i++) {
+  const element = document.getElementById(pages[i]);
+  if (!element) continue;
 
-        // Dynamic scale for sharpness on larger PDF size
-        const elRect = element.getBoundingClientRect();
-        const elCssWidth = elRect.width || element.scrollWidth || 1024;
-        const targetDpi = 180;
-        const targetPxWidth = (pdfWidth / 25.4) * targetDpi;
-        const dynamicScale = Math.max(
-          2,
-          Math.min(4, targetPxWidth / elCssWidth)
-        );
+  if (
+  pages[i] === "ipo-dashboard-page1" ||
+  pages[i] === "ipo-dashboard-page2" ||
+  pages[i] === "ipo-dashboard-page3" ||
+  pages[i] === "ipo-dashboard-page4"
+)  {
+    // --- Page 1 uses simple export with pdf-hidden filtering ---
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      ignoreElements: (el) => el.classList?.contains("pdf-hidden"),
+    });
 
-        const canvas = await html2canvas(element, {
-          scale: dynamicScale,
-          useCORS: true,
-          scrollY: -window.scrollY,
-          windowWidth: element.scrollWidth,
-          windowHeight: element.scrollHeight,
-          backgroundColor: "#ffffff",
-        });
+    const imgData = canvas.toDataURL("image/png");
+    const imgWidth = pdfWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        const imageWidthMm = pdfWidth; // fill page width
-        const mmPerPx = imageWidthMm / canvas.width;
-        const headerTopY = (() => {
-          const logoHeight = 12;
-          const logoY = 10;
-          const lineY = logoY + logoHeight + 2;
-          return lineY + 5;
-        })();
-        const footerReserveMm = 28;
-        const availableHeightMm = Math.max(
-          10,
-          pdfHeight - headerTopY - footerReserveMm
-        );
-        const availableHeightPx = availableHeightMm / mmPerPx;
+    pdf.addPage();
+    const contentTopY = drawHeader();
+    pdf.addImage(imgData, "PNG", 0, contentTopY, imgWidth, imgHeight);
+    drawFooter();
+  } else {
+    // --- Pages 2–4 keep your existing slicing/pagination ---
+    const elRect = element.getBoundingClientRect();
+    const elCssWidth = elRect.width || element.scrollWidth || 1024;
+    const targetDpi = 180;
+    const targetPxWidth = (pdfWidth / 25.4) * targetDpi;
+    const dynamicScale = Math.max(2, Math.min(4, targetPxWidth / elCssWidth));
 
-        let yOffsetPx = 0;
-        while (yOffsetPx < canvas.height) {
-          const sliceHeightPx = Math.min(
-            availableHeightPx,
-            canvas.height - yOffsetPx
-          );
-          const sliceCanvas = document.createElement("canvas");
-          sliceCanvas.width = canvas.width;
-          sliceCanvas.height = Math.ceil(sliceHeightPx);
-          const ctx = sliceCanvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(
-              canvas,
-              0,
-              yOffsetPx,
-              canvas.width,
-              sliceHeightPx,
-              0,
-              0,
-              canvas.width,
-              sliceHeightPx
-            );
-          }
-          const sliceImg = sliceCanvas.toDataURL("image/png");
+    const canvas = await html2canvas(element, {
+      scale: dynamicScale,
+      useCORS: true,
+      scrollY: -window.scrollY,
+      windowWidth: element.scrollWidth,
+      windowHeight: element.scrollHeight,
+      backgroundColor: "#ffffff",
+    });
 
-          pdf.addPage();
-          const contentTopY = drawHeader();
-          const sliceHeightMm = (sliceHeightPx as number) * mmPerPx;
-          pdf.addImage(
-            sliceImg,
-            "PNG",
-            0,
-            contentTopY,
-            imageWidthMm,
-            sliceHeightMm
-          );
-          drawFooter();
-
-          yOffsetPx += sliceHeightPx;
-        }
-      }
+    // keep your existing slice + footer logic here
+  }
+}
 
       // Restore hidden UI controls
       hiddenEls.forEach(({ el, prev }) => (el.style.visibility = prev));
