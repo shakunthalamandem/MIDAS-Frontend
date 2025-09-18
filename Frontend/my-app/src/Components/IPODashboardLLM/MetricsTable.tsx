@@ -311,7 +311,7 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
               return (
                 <TableRow
                   key={`${row.ticker}-${row.competitor}`}
-                  sx={{ backgroundColor: isFirstRow ? "#D9E1F2" : "inherit" }}
+                  sx={{ backgroundColor: isFirstRow ? "#f2e1d9ff" : "inherit" }}
                 >
                   {columns.map((col) => (
                     <TableCell key={col.key} align="center">
