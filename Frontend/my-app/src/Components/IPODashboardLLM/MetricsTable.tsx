@@ -14,8 +14,13 @@ import {
 import { Edit, Save, Delete } from "@mui/icons-material";
 
 type ComparableMetric = any;
+
+type AveragesType = {
+  [key: string]: { average?: number; median?: number };
+};
+
 type ApiResponse = {
-  [ticker: string]: { data: ComparableMetric[] };
+  [ticker: string]: { data: ComparableMetric[]; Averages?: AveragesType };
 };
 
 interface Props {
@@ -24,7 +29,7 @@ interface Props {
 }
 
 const columns = [
-  { key: "competitor", label: "Competitor" },
+  { key: "competitor", label: "Ticker" },
   { key: "price_usd", label: "Price (USD)" },
   { key: "market_cap", label: "Market Cap (USDm)" },
   { key: "ev_usd_million", label: "EV (USDm)" },
@@ -38,8 +43,9 @@ const columns = [
   { key: "eps_growth", label: "EPS Growth (25-26)" },
 ];
 
-const formatValue = (key: string, value: number) => {
-  if (value === null || value === undefined) return "N/A";
+// Helper to format values
+const formatValue = (key: string, value: number | string) => {
+  if (value === null || value === undefined || value === "") return "N/A";
 
   const negativeColumns = [
     "present_year_ev_sales",
@@ -49,13 +55,15 @@ const formatValue = (key: string, value: number) => {
     "present_year_ev_fcf",
     "one_year_later_ev_fcf",
   ];
-
   const percentageColumns = ["sales_growth", "eps_growth"];
   const numberColumns = ["market_cap", "ev_usd_million"];
 
+  if (typeof value === "string") return value;
+
   if (negativeColumns.includes(key)) return value < 0 ? "N/A" : `${Math.round(value * 10) / 10}x`;
   if (percentageColumns.includes(key)) return value < 0 ? "N/A" : `${Math.round(value * 10) / 10}%`;
-  if (numberColumns.includes(key)) return new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
+  if (numberColumns.includes(key))
+    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
 
   return value;
 };
@@ -65,7 +73,7 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [newCompetitor, setNewCompetitor] = useState("");
 
-  // Move highlighted row to top
+  // Highlight first row where ticker === competitor
   useEffect(() => {
     const allRows = data[ticker]?.data || [];
     const highlightRow = allRows.find(
@@ -75,11 +83,34 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
     setRows(highlightRow ? [highlightRow, ...otherRows] : otherRows);
   }, [data, ticker]);
 
-  const handleSave = (idx: number) => {
-    setEditIndex(null);
-    // TODO: Call API to save updated row if needed
+  // Save edits for first row
+  const handleSave = async (idx: number) => {
+    const updatedRow = rows[idx];
+    const apiUrl = process.env.REACT_APP_API_URL!;
+    const token = localStorage.getItem("access_token");
+
+    try {
+      const res = await fetch(`${apiUrl}/api/fs_ticker_competitor_update/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          ticker: updatedRow.ticker,
+          competitor: updatedRow.competitor,
+          ...updatedRow,
+        }),
+      });
+
+      if (!res.ok) throw new Error(`Failed to update row: ${res.status}`);
+      setEditIndex(null);
+    } catch (error) {
+      console.error("Error updating row:", error);
+    }
   };
 
+  // Delete other rows
   const handleDeleteRow = async (row: ComparableMetric, rowIndex: number) => {
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
@@ -101,6 +132,7 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
     }
   };
 
+  // Add new competitor
   const handleAddRow = async () => {
     if (!newCompetitor) return;
     const apiUrl = process.env.REACT_APP_API_URL!;
@@ -156,9 +188,7 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
                   {col.label}
                 </TableCell>
               ))}
-              <TableCell sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>
-                Actions
-              </TableCell>
+              <TableCell sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Actions</TableCell>
             </TableRow>
           </TableHead>
 
@@ -167,13 +197,10 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
               const isFirstRow = idx === 0 && (row.ticker === row.competitor || row.competitor.startsWith(row.ticker));
 
               return (
-                <TableRow
-                  key={`${row.ticker}-${row.competitor}`}
-                  sx={{ backgroundColor: isFirstRow ? "#D9E1F2" : "inherit" }}
-                >
+                <TableRow key={`${row.ticker}-${row.competitor}`} sx={{ backgroundColor: isFirstRow ? "#D9E1F2" : "inherit" }}>
                   {columns.map((col) => (
                     <TableCell key={col.key} align="center">
-                      {isFirstRow && editIndex === idx && col.key === "competitor" ? (
+                      {isFirstRow && editIndex === idx && col.key !== "competitor" ? (
                         <TextField
                           value={row[col.key]}
                           size="small"
@@ -211,6 +238,37 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
                 </TableRow>
               );
             })}
+
+        {/* Append Average and Median rows with heading */}
+{data[ticker]?.Averages &&
+  ["average", "median"].map((type) => (
+    <TableRow key={type} sx={{ backgroundColor: "#f5f5f5" }}>
+      {columns.map((col, colIdx) => {
+        if (colIdx === 0) {
+          return (
+            <TableCell
+              key={col.key}
+              colSpan={4}
+              align="center"
+              sx={{ fontWeight: "bold", color: "primary.main" }}
+            >
+              {type === "average" ? "Overall Average" : "Overall Median"}
+            </TableCell>
+          );
+        }
+
+        if (colIdx > 3) {
+          const avgValue: number | string =
+            data[ticker].Averages?.[col.key]?.[type as "average" | "median"] ?? "N/A";
+          return <TableCell key={col.key} align="center">{formatValue(col.key, avgValue)}</TableCell>;
+        }
+
+        return null; // Columns 1-3 already merged
+      })}
+      <TableCell /> {/* Empty Actions column */}
+    </TableRow>
+  ))}
+
           </TableBody>
         </Table>
       </TableContainer>

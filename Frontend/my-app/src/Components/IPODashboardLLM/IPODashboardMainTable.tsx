@@ -46,10 +46,11 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
         body: JSON.stringify({ ticker: customTicker ?? ticker }),
       });
+
       const json = await response.json();
       if (!response.ok) throw new Error(json.error || json.message);
       setData(json);
@@ -66,7 +67,7 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
       const token = localStorage.getItem("access_token");
       await fetch(`${apiUrl}/api/fs_get_tickers_data/`, {
         method: "GET",
-        headers: { Authorization: token ? `Bearer ${token}` : "" },
+        ...(token && { headers: { Authorization: `Bearer ${token}` } }),
       });
       fetchData(ticker); // refresh table after update
     } catch (err) {
@@ -84,16 +85,18 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
         <Typography variant="h6" color="#002060" fontWeight={600}>
           Comparative Trading Multiples & Performance Metrics
         </Typography>
-        <Button variant="contained" onClick={handleUpdateClick}>
+        <Button variant="contained" onClick={handleUpdateClick} sx={{ backgroundColor: "#002060" }}>
           Update
         </Button>
       </Box>
 
-      {loading && <CircularProgress />}
-      {error && <Alert severity="error">{error}</Alert>}
-      {!loading && !error && data && (
-        <MetricsTable ticker={ticker} data={data} />
+      {loading && (
+        <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
+          <CircularProgress />
+        </Box>
       )}
+      {error && <Alert severity="error">{error}</Alert>}
+      {!loading && !error && data && <MetricsTable ticker={ticker} data={data} />}
     </Box>
   );
 };
