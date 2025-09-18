@@ -24,7 +24,7 @@ export const cardColors = [
     { key: "key_highlights", title: "Key Highlights" },
     { key: "strengths", title: "Strengths" },
     { key: "concerns", title: "Concerns" },
-    // We'll inject FinancialForecastTable dynamically after this
+    // We'll inject IPOFinancialTableMain dynamically after this
     {
       key: "principal_stockholders_preipo",
       title: "Principal Stockholders (post-IPO)",

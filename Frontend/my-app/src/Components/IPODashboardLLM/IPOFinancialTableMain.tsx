@@ -29,7 +29,7 @@ const forecastYearKeys = [
 
 const forecastYearLabels = [ "2023 A", "2024 A", "2025 E", "2026 E"];
 
-interface FinancialForecastTableProps {
+interface IPOFinancialTableMainProps {
   defaultTicker?: string;
 }
 
@@ -102,7 +102,7 @@ const marginPairs: Record<string, string> = {
   "Net Income": "Net Income Margin",
 };
 
-const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
+const IPOFinancialTableMain: React.FC<IPOFinancialTableMainProps> = ({
   defaultTicker = "",
 }) => {
   const [forecastsInput, setForecastsInput] = useState(defaultTicker);
@@ -646,4 +646,4 @@ const FinancialForecastTable: React.FC<FinancialForecastTableProps> = ({
   );
 };
 
-export default FinancialForecastTable;
+export default IPOFinancialTableMain;
