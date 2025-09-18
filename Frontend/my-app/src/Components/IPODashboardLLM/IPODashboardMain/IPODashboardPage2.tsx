@@ -82,9 +82,7 @@ const IPODashboardPage2: React.FC<Props> = ({
     let tempHeights: number[] = [];
 
     cardRefs.current.forEach((card, i) => {
-      if (card) {
-        tempHeights.push(card.offsetHeight);
-      }
+      if (card) tempHeights.push(card.offsetHeight);
       if ((i + 1) % 2 === 0 || i === cardRefs.current.length - 1) {
         heights.push(Math.max(...tempHeights));
         tempHeights = [];
@@ -95,129 +93,135 @@ const IPODashboardPage2: React.FC<Props> = ({
   }, [ipoData]);
 
   return (
-    <div id="ipo-dashboard-page2">
-      {/* <Container maxWidth="xl" >
-      <Card
-        elevation={0}
-        sx={{
-          borderRadius: 4,
-          background: "linear-gradient(#f0f5ff, #f0f5ff)",
-          mb: 2,
-          mt: 4,
-          width: "100%",
-          mx: "auto",
-        }}
-      >
-        <Box
-          position="relative"
-          px={3}
-          pt={2}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
+    <div
+      id="ipo-dashboard-page2"
+      data-pdf-page="2"
+      style={{ background: "#fff" }}
+    >
+      {/* Valuation Information */}
+      {/* <Container maxWidth="xl">
+        <Card
+          elevation={0}
+          sx={{
+            borderRadius: 4,
+            background: "linear-gradient(#f0f5ff, #f0f5ff)",
+            mb: 2,
+            mt: 4,
+            width: "100%",
+            mx: "auto",
+          }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
-            Valuation Information
-          </Typography>
-          <Box position="absolute" right={24}>
+          <Box
+            position="relative"
+            px={3}
+            pt={2}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
+              Valuation Information
+            </Typography>
+            <Box position="absolute" right={24}>
+              {editValuationMode ? (
+                <>
+                  <IconButton color="primary" onClick={handleSaveValuation}>
+                    <SaveIcon />
+                  </IconButton>
+                  <IconButton
+                    color="secondary"
+                    onClick={() => {
+                      setEditedValuation(ipoData?.valuation || []);
+                      setEditValuationMode(false);
+                    }}
+                  >
+                    <CancelIcon />
+                  </IconButton>
+                </>
+              ) : (
+                <IconButton onClick={() => setEditValuationMode(true)}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+          </Box>
+
+          <Box px={3} pb={3}>
             {editValuationMode ? (
               <>
-                <IconButton color="primary" onClick={handleSaveValuation}>
-                  <SaveIcon />
-                </IconButton>
-                <IconButton
-                  color="secondary"
-                  onClick={() => {
-                    setEditedValuation(ipoData?.valuation || []);
-                    setEditValuationMode(false);
-                  }}
-                >
-                  <CancelIcon />
-                </IconButton>
-              </>
-            ) : (
-              <IconButton onClick={() => setEditValuationMode(true)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        </Box>
-
-        <Box px={3} pb={3}>
-          {editValuationMode ? (
-            <>
-              {editedValuation.map((item, index) => (
-                <Box
-                  key={index}
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                  mb={1}
-                >
-                  <TextField
-                    value={item}
-                    onChange={(e) => {
-                      const updated = [...editedValuation];
-                      updated[index] = e.target.value;
-                      setEditedValuation(updated);
-                    }}
-                    fullWidth
-                    multiline
-                    size="small"
-                    InputProps={{ style: { backgroundColor: "#fff" } }}
-                  />
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleAddValuationLine(index)}
-                    size="small"
+                {editedValuation.map((item, index) => (
+                  <Box
+                    key={index}
+                    display="flex"
+                    alignItems="center"
+                    gap={1}
+                    mb={1}
                   >
-                    <AddCircleOutlineIcon />
-                  </IconButton>
-                  {editedValuation.length > 1 && (
+                    <TextField
+                      value={item}
+                      onChange={(e) => {
+                        const updated = [...editedValuation];
+                        updated[index] = e.target.value;
+                        setEditedValuation(updated);
+                      }}
+                      fullWidth
+                      multiline
+                      size="small"
+                      InputProps={{ style: { backgroundColor: "#fff" } }}
+                    />
                     <IconButton
-                      color="error"
-                      onClick={() => handleRemoveValuationLine(index)}
+                      color="primary"
+                      onClick={() => handleAddValuationLine(index)}
                       size="small"
                     >
-                      <RemoveCircleOutlineIcon />
+                      <AddCircleOutlineIcon />
                     </IconButton>
-                  )}
-                </Box>
-              ))}
-              {editedValuation.length === 0 && (
-                <Button
-                  variant="outlined"
-                  onClick={() => handleAddValuationLine(-1)}
-                >
-                  Add First Point
-                </Button>
-              )}
-            </>
-          ) : (
-            <>
-              {Array.isArray(ipoData?.valuation) &&
-              ipoData.valuation.length > 0 ? (
-                <Box component="ul" sx={{ pl: 3, color: "#333", mt: 1 }}>
-                  {ipoData.valuation.map((item: string, index: number) => (
-                    <li key={index} style={{ marginBottom: 8, lineHeight: 1.6 }}>
-                      {item}
-                    </li>
-                  ))}
-                </Box>
-              ) : (
-                <Typography
-                  variant="body1"
-                  sx={{ color: "#333", textAlign: "center", mt: 2 }}
-                >
-                  No valuation data available.
-                </Typography>
-              )}
-            </>
-          )}
-        </Box>
-      </Card>
+                    {editedValuation.length > 1 && (
+                      <IconButton
+                        color="error"
+                        onClick={() => handleRemoveValuationLine(index)}
+                        size="small"
+                      >
+                        <RemoveCircleOutlineIcon />
+                      </IconButton>
+                    )}
+                  </Box>
+                ))}
+                {editedValuation.length === 0 && (
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleAddValuationLine(-1)}
+                  >
+                    Add First Point
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                {Array.isArray(ipoData?.valuation) &&
+                ipoData.valuation.length > 0 ? (
+                  <Box component="ul" sx={{ pl: 3, color: "#333", mt: 1 }}>
+                    {ipoData.valuation.map((item: string, index: number) => (
+                      <li key={index} style={{ marginBottom: 8, lineHeight: 1.6 }}>
+                        {item}
+                      </li>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="body1"
+                    sx={{ color: "#333", textAlign: "center", mt: 2 }}
+                  >
+                    No valuation data available.
+                  </Typography>
+                )}
+              </>
+            )}
+          </Box>
+        </Card>
       </Container> */}
 
+      {/* Ratings / other content */}
       <IPODashboardCardRatings
         ipodata={ipoData}
         selectedTicker={selectedTicker}

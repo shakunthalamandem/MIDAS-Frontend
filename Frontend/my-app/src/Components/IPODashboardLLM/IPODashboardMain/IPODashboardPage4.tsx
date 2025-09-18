@@ -106,7 +106,6 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
         ...dealData,
         monashee_score: tempScore === "" ? 0 : (tempScore as number),
       });
-
       setEditMode(false);
       setError(null);
     } catch (err: any) {
@@ -115,8 +114,13 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
       setSaving(false);
     }
   };
+
   return (
-    <div id="ipo-dashboard-page4">
+    <div
+      id="ipo-dashboard-page4"
+      data-pdf-page="4"
+      style={{ background: "#fff" }}
+    >
       <Container maxWidth="xl" sx={{ mb: 4 }}>
         <Grid container spacing={3}>
           {/* Financial Forecast */}

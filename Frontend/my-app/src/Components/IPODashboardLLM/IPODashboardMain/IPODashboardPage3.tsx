@@ -9,7 +9,11 @@ interface Props {
 
 const IPODashboardPage3: React.FC<Props> = ({ renderEditableCard }) => {
   return (
-    <div id="ipo-dashboard-page3">
+    <div
+      id="ipo-dashboard-page3"
+      data-pdf-page="3"
+      style={{ background: "#fff" }}
+    >
       <Container maxWidth="xl" sx={{ mb: 3 }}>
         <Grid
           container
