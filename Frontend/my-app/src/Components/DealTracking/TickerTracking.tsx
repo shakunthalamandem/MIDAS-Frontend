@@ -105,7 +105,10 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
     }
     return num.toString();
   };
-
+const isValidWriteup = (val?: string | null) => {
+  if (!val) return false;
+  return val.trim() !== "We are launching the FO writeups soon.";
+};
   const steps = trackingData
     ? [
         {
@@ -116,6 +119,11 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
           value: `${trackingData.deal_type} - ${trackingData.region}`,
           completed: true,
         },
+      {
+        label: "Preliminary Writeup",
+        value: trackingData.basic_writeup_available,
+        completed: isValidWriteup(trackingData.basic_writeup_available),
+      },
         {
           label: "Pricing Range",
           value:
@@ -129,28 +137,24 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
             trackingData.pricing_range_min !== null &&
             trackingData.pricing_range_max !== null,
         },
-        {
-          label: "Preliminary Writeup",
-          value: trackingData.basic_writeup_available,
-          completed: !!trackingData.basic_writeup_available,
-        },
-        {
-          label: "Deal Writeup Finalised",
-          value: trackingData.writeup_finalised,
-          completed: !!trackingData.writeup_finalised,
-        },
-        {
-          label: "IOI (Indication of Interest)",
-          value: `${formatValue(trackingData.allocation_as_percentage_of_ioi)}%`,
-          completed: trackingData.allocation_as_percentage_of_ioi !== null,
-        },
-        {
+      {
+        label: "Deal Writeup Finalised",
+        value: trackingData.writeup_finalised,
+        completed: isValidWriteup(trackingData.writeup_finalised),
+      },
+          {
           label: "Allocation % of Deal Size",
           value: `${formatValue(
             trackingData.allocation_as_percentage_of_deal_size
           )}%`,
           completed: trackingData.allocation_as_percentage_of_deal_size !== null,
         },
+        {
+          label: "IOI (Indication of Interest)",
+          value: `${formatValue(trackingData.allocation_as_percentage_of_ioi)}%`,
+          completed: trackingData.allocation_as_percentage_of_ioi !== null,
+        },
+
         {
           label: "Deal Color",
           value: trackingData.deal_color,

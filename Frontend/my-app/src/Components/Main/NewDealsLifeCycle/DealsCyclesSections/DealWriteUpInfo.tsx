@@ -260,7 +260,7 @@ const handleSave = async () => {
                 </Typography>
                 <BlueSlider
                   value={formData.deal_writeup_rating?.score || 0}
-                  onChange={(_, value) => handleSliderChange(value as number)}
+                  // onChange={(_, value) => handleSliderChange(value as number)}
                   valueLabelDisplay="on"
                   step={1}
                   min={0}

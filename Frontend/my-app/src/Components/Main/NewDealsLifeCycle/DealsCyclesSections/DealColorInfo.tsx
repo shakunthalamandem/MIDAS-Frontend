@@ -370,9 +370,9 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
                   </Typography>
                   <BlueSlider
                     value={formData.deal_color_rating || 0}
-                    onChange={(_, value) =>
-                      handleSliderChange("deal_color_rating", value as number)
-                    }
+                    // onChange={(_, value) =>
+                    //   handleSliderChange("deal_color_rating", value as number)
+                    // }
                     valueLabelDisplay="on"
                     step={1}
                     min={0}
