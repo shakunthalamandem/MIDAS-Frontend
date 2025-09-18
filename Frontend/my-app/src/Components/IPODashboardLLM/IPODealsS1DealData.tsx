@@ -346,7 +346,7 @@ const handleSaveValuation = async () => {
           transform: "translateX(-50%)",
         }}
       >
-        Internal Notes
+        Aftermarket Strategy
       </Typography>
 
       {/* Action buttons on the right */}
