@@ -316,9 +316,11 @@ const handleSaveValuation = async () => {
     </Container>
 
 {/* Internal notes */}
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
+ {/* Internal Notes */}
+<Container maxWidth="xl" sx={{ mt: 4 }}>
   <Card
     elevation={0}
+    className="pdf-hidden"   // 👈 ensures it's hidden in PDF export
     sx={{
       borderRadius: 4,
       background: "linear-gradient(#f0f5ff, #f0f5ff)",
@@ -382,6 +384,7 @@ const handleSaveValuation = async () => {
     )}
   </Card>
 </Container>
+
 
 
     {/* VALUATION INFORMATION */}
