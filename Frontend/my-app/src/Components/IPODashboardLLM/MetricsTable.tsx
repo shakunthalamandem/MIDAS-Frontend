@@ -90,7 +90,7 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
     const token = localStorage.getItem("access_token");
 
     try {
-      const res = await fetch(`${apiUrl}/api/fs_ticker_competitor_update/`, {
+      const res = await fetch(`${apiUrl}/api/fs_fundamental_data_upload/`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
