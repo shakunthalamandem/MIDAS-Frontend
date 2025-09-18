@@ -83,32 +83,58 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
     setRows(highlightRow ? [highlightRow, ...otherRows] : otherRows);
   }, [data, ticker]);
 
-  // Save edits for first row
-  const handleSave = async (idx: number) => {
-    const updatedRow = rows[idx];
-    const apiUrl = process.env.REACT_APP_API_URL!;
-    const token = localStorage.getItem("access_token");
+const handleSave = async (idx: number) => {
+  const updatedRow = { ...rows[idx] };
 
-    try {
-      const res = await fetch(`${apiUrl}/api/fs_fundamental_data_upload/`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          ticker: updatedRow.ticker,
-          competitor: updatedRow.competitor,
-          ...updatedRow,
-        }),
-      });
+  // Convert numeric fields back to numbers before sending to API and storing
+  const numericColumns = [
+    "present_year_ev_sales",
+    "one_year_later_ev_sales",
+    "present_year_price_earning",
+    "one_year_later_price_earning",
+    "present_year_ev_fcf",
+    "one_year_later_ev_fcf",
+    "sales_growth",
+    "eps_growth",
+    "market_cap",
+    "ev_usd_million",
+    "price_usd"
+  ];
 
-      if (!res.ok) throw new Error(`Failed to update row: ${res.status}`);
-      setEditIndex(null);
-    } catch (error) {
-      console.error("Error updating row:", error);
+  numericColumns.forEach((key) => {
+    if (updatedRow[key] !== "" && updatedRow[key] !== null && updatedRow[key] !== undefined) {
+      updatedRow[key] = Number(updatedRow[key]);
     }
-  };
+  });
+
+  const apiUrl = process.env.REACT_APP_API_URL!;
+  const token = localStorage.getItem("access_token");
+
+  try {
+    const res = await fetch(`${apiUrl}/api/fs_fundamental_data_upload/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify(updatedRow),
+    });
+
+    if (!res.ok) throw new Error(`Failed to update row: ${res.status}`);
+
+    // Update row in state with proper number types so formatValue works
+    setRows((prev) => {
+      const copy = [...prev];
+      copy[idx] = updatedRow;
+      return copy;
+    });
+
+    setEditIndex(null);
+  } catch (error) {
+    console.error("Error updating row:", error);
+  }
+};
+
 
   // Delete other rows
   const handleDeleteRow = async (row: ComparableMetric, rowIndex: number) => {
