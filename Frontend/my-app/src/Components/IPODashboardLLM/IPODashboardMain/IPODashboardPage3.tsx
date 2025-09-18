@@ -1,4 +1,3 @@
-// components/IPODashboardPage3.tsx
 import React from "react";
 import { Container, Grid } from "@mui/material";
 import { cardSections } from "../UtilsIPODashboard";

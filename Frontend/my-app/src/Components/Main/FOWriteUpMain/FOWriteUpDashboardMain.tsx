@@ -11,6 +11,7 @@ interface FOData {
   exchange: string | null;
   deal_size: number | null;
   expected_listing_date: string | null;
+  sector: string | null;
 }
 
 interface FOWriteUpDashboardMainProps {
@@ -95,6 +96,12 @@ const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({
     {
       field: "issuer_name",
       headerName: "Company",
+      flex: 1,
+      valueFormatter: (params) => params || "Not Available",
+    },
+    {
+      field: "sector",
+      headerName: "Sector",
       flex: 1,
       valueFormatter: (params) => params || "Not Available",
     },

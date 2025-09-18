@@ -35,6 +35,7 @@ type DealData = {
   after_market_threshold: string;
   monashee_score: number;
   differentiated_summary: string;
+  internal_notes: string;
 };
 
 type EditableField = keyof DealData;
@@ -215,7 +216,9 @@ const handleSaveValuation = async () => {
   if (!dealData) return <Typography>No deal data found.</Typography>;
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 3, position: "relative" }}>
+  <>
+    {/* FAIR VALUE / INDICATION / AFTER MARKET */}
+    <Container maxWidth="xl" sx={{ mt: 3 }}>
       <Card
         sx={{
           position: "relative",
@@ -243,7 +246,6 @@ const handleSaveValuation = async () => {
         </Box>
 
         <Grid container spacing={3}>
-          {/* Fair Value / Indication / After Market */}
           {[
             {
               label: "Fair Value Estimate",
@@ -309,65 +311,155 @@ const handleSaveValuation = async () => {
               </Card>
             </Grid>
           ))}
+        </Grid>
+      </Card>
+    </Container>
 
-
-
-<Grid item xs={12}>
-  {/* Valuation Information Section */}
-  <Container maxWidth="xl">
-    <Card
-      elevation={0}
-      sx={{
-        borderRadius: 4,
-        background: "linear-gradient(#f0f5ff, #f0f5ff)",
-        mb: 2,
-        mt: 4,
-        width: "100%",
-        mx: "auto",
-      }}
+ {/* Internal Notes */}
+<Container maxWidth="xl" sx={{ mt: 4 }}>
+  <Card
+    elevation={0}
+    className="pdf-hidden"
+    sx={{
+      borderRadius: 4,
+      background: "linear-gradient(#f0f5ff, #f0f5ff)",
+      width: "100%",
+      mx: "auto",
+      p: 3, 
+    }}
+  >
+    {/* Header row */}
+    <Box
+      display="flex"
+      alignItems="center"
+      mb={2}
+      sx={{ position: "relative" }} // 👈 allows absolute centering
     >
-      <Box
-        position="relative"
-        px={3}
-        pt={2}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
+      {/* Centered title */}
+      <Typography
+        variant="h6"
+        sx={{
+          fontWeight: 700,
+          color: "#002060",
+          position: "absolute",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
-          Valuation Information
-        </Typography>
-        <Box position="absolute" right={24}>
+        Aftermarket Strategy
+      </Typography>
+
+      {/* Action buttons on the right */}
+      <Box ml="auto">
+        {editMode ? (
+          <>
+            <IconButton color="primary" onClick={handleSaveDealData}>
+              <SaveIcon />
+            </IconButton>
+            <IconButton color="secondary" onClick={handleCancelEdit}>
+              <CancelIcon />
+            </IconButton>
+          </>
+        ) : (
+          <IconButton color="default" onClick={enterEditMode}>
+            <EditIcon />
+          </IconButton>
+        )}
+      </Box>
+    </Box>
+
+    {/* Body */}
+    {editMode ? (
+      <TextField
+        fullWidth
+        multiline
+        minRows={4}
+        placeholder="Enter internal notes here..."
+        value={
+          editedDealData?.internal_notes ??
+          dealData.internal_notes ??
+          ""
+        }
+        onChange={(e) =>
+          setEditedDealData((prev) => ({
+            ...prev!,
+            internal_notes: e.target.value,
+          }))
+        }
+      />
+    ) : (
+      <Typography
+        sx={{
+          color: "#333",
+          whiteSpace: "pre-line",
+          mt: 2, // 👈 adds gap from header
+        }}
+      >
+        {dealData.internal_notes || "No internal notes provided."}
+      </Typography>
+    )}
+  </Card>
+</Container>
+
+
+
+
+    {/* VALUATION INFORMATION */}
+   <Container maxWidth="xl" sx={{ mt: 4 }}>
+  <Card
+    elevation={0}
+    sx={{
+      borderRadius: 4,
+      background: "linear-gradient(#f0f5ff, #f0f5ff)",
+      width: "100%",
+      mx: "auto",
+      p: 3, // 👈 padding inside the card
+    }}
+  >
+         
+        <Box
+          position="relative"
+          px={3}
+          pt={2}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
+            Valuation Information
+          </Typography>
+          <Box position="absolute" right={24}>
+            {editValuationMode ? (
+              <>
+                <IconButton color="primary" onClick={handleSaveValuation}>
+                  <SaveIcon />
+                </IconButton>
+                <IconButton
+                  color="secondary"
+                  onClick={() => {
+                    setEditedValuation(Array.isArray(valuation) ? valuation : []);
+                    setEditValuationMode(false);
+                  }}
+                >
+                  <CancelIcon />
+                </IconButton>
+              </>
+            ) : (
+            <IconButton onClick={() => {
+                  setEditedValuation(Array.isArray(valuation) ? valuation : []);
+                  setEditValuationMode(true);
+            }}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+            )}
+          </Box>
+        </Box>
+       
+
+        <Box px={3} pb={3}>
           {editValuationMode ? (
             <>
-              <IconButton color="primary" onClick={handleSaveValuation}>
-                <SaveIcon />
-              </IconButton>
-              <IconButton
-                color="secondary"
-                onClick={() => {
-                  setEditedValuation(Array.isArray(valuation) ? valuation : []);
-                  setEditValuationMode(false);
-                }}
-              >
-                <CancelIcon />
-              </IconButton>
-            </>
-          ) : (
-            <IconButton onClick={() => {
-              setEditedValuation(Array.isArray(valuation) ? valuation : []);
-              setEditValuationMode(true);
-            }}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          )}
-        </Box>
-      </Box>
-
-      <Box px={3} pb={3}>
-        {editValuationMode ? (
-          <>
-            {editedValuation.map((item, index) => (
+              {editedValuation.map((item, index) => (
               <Box
                 key={index}
                 display="flex"
@@ -375,156 +467,186 @@ const handleSaveValuation = async () => {
                 gap={1}
                 mb={1}
               >
-                <TextField
-                  value={item}
-                  onChange={(e) => {
-                    const updated = [...editedValuation];
-                    updated[index] = e.target.value;
-                    setEditedValuation(updated);
-                  }}
-                  fullWidth
-                  multiline
-                  size="small"
-                  InputProps={{ style: { backgroundColor: "#fff" } }}
-                />
-                <IconButton
-                  color="primary"
-                  onClick={() => handleAddValuationLine(index)}
-                  size="small"
-                >
-                  <AddCircleOutlineIcon />
-                </IconButton>
-                {editedValuation.length > 1 && (
+                  <TextField
+                    value={item}
+                    onChange={(e) => {
+                      const updated = [...editedValuation];
+                      updated[index] = e.target.value;
+                      setEditedValuation(updated);
+                    }}
+                    fullWidth
+                    multiline
+                    size="small"
+                    InputProps={{ style: { backgroundColor: "#fff" } }}
+                  />
                   <IconButton
-                    color="error"
-                    onClick={() => handleRemoveValuationLine(index)}
+                    color="primary"
+                    onClick={() => handleAddValuationLine(index)}
                     size="small"
                   >
-                    <RemoveCircleOutlineIcon />
+                    <AddCircleOutlineIcon />
                   </IconButton>
-                )}
-              </Box>
-            ))}
-            {editedValuation.length === 0 && (
-              <Button
-                variant="outlined"
-                onClick={() => handleAddValuationLine(-1)}
-              >
-                Add First Point
-              </Button>
-            )}
-          </>
-        ) : (
-          <>
-            {Array.isArray(valuation) && valuation.length > 0 ? (
-              <Box component="ul" sx={{ pl: 3, color: "#333", mt: 1 }}>
-                {valuation.map((item: string, index: number) => (
-                  <li key={index} style={{ marginBottom: 8, lineHeight: 1.6 }}>
-                    {item}
-                  </li>
-                ))}
-              </Box>
-            ) : (
-              <Typography
-                variant="body1"
-                sx={{ color: "#333", textAlign: "center", mt: 2 }}
-              >
-                No valuation data available.
-              </Typography>
-            )}
-          </>
-        )}
-      </Box>
-    </Card>
-  </Container>
-</Grid>
-
-
-
-
-
-          {/* Comparative Table */}
-          <Grid item xs={12}> 
-            {/* <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}> */}
-              {/* <CardContent sx={{ backgroundColor: "#fff" }}> */}
-                <IPODashboardMainTable ticker={selectedData?.ticker_name ?? ""} />
-                <Typography
-                  variant="caption"
-                  display="block"
-                  align="right"
-                  sx={{ fontStyle: "italic", color: "gray", mt: 1 }}
+                  {editedValuation.length > 1 && (
+                    <IconButton
+                      color="error"
+                      onClick={() => handleRemoveValuationLine(index)}
+                      size="small"
+                    >
+                      <RemoveCircleOutlineIcon />
+                    </IconButton>
+                  )}
+                </Box>
+              ))}
+              {editedValuation.length === 0 && (
+                <Button
+                  variant="outlined"
+                  onClick={() => handleAddValuationLine(-1)}
                 >
-                  Source: Factset
+                  Add First Point
+                </Button>
+              )}
+            </>
+          ) : (
+            <>
+              {Array.isArray(valuation) && valuation.length > 0 ? (
+                <Box component="ul" sx={{ pl: 3, color: "#333", mt: 1 }}>
+                  {valuation.map((item: string, index: number) => (
+                    <li key={index} style={{ marginBottom: 8, lineHeight: 1.6 }}>
+                      {item}
+                    </li>
+                  ))}
+                </Box>
+              ) : (
+                <Typography
+                  variant="body1"
+                  sx={{ color: "#333", textAlign: "center", mt: 2 }}
+                >
+                  No valuation data available.
                 </Typography>
-              {/* </CardContent>
-            </Card> */}
-          </Grid>
+              )}
+            </>
+          )}
+        </Box>
+      </Card>
+    </Container>
 
-          {/* AI Suggestions */}
-          <Grid item xs={12}>
-            <Card
-              sx={{
-                backgroundColor: "#f4f9ff",
-                animation: showAIComparison ? "glowPulse 2s ease-out" : "none",
-                "@keyframes glowPulse": {
-                  "0%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
-                  "50%": { boxShadow: "0 0 20px rgba(0, 150, 255, 0.5)" },
-                  "100%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
-                },
-              }}
+    {/* COMPARATIVE TABLE */}
+    <Container maxWidth="xl" sx={{ mt: 4 }}>
+      <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+        <CardContent sx={{ backgroundColor: "#fff" }}>
+          <IPODashboardMainTable ticker={selectedData?.ticker_name ?? ""} />
+          <Typography
+            variant="caption"
+            display="block"
+            align="right"
+            sx={{ fontStyle: "italic", color: "gray", mt: 1 }}
+          >
+            Source: Factset
+          </Typography>
+        </CardContent>
+      </Card>
+    </Container>
+
+    {/* AI COMPARISON */}
+    <Container maxWidth="xl" sx={{ mt: 4 }}>
+      <Card
+        sx={{
+          backgroundColor: "#f4f9ff",
+          animation: showAIComparison ? "glowPulse 2s ease-out" : "none",
+          "@keyframes glowPulse": {
+            "0%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
+            "50%": { boxShadow: "0 0 20px rgba(0, 150, 255, 0.5)" },
+            "100%": { boxShadow: "0 0 0px rgba(0, 150, 255, 0)" },
+          },
+        }}
+      >
+        <CardHeader
+          avatar={<LightbulbOutlined color="primary" />}
+          title={
+            <Typography variant="h6" color="primary" fontWeight={600}>
+              Get AI-Recommended Comparative Tickers
+            </Typography>
+          }
+          action={
+            <Button
+              variant={showAIComparison ? "outlined" : "contained"}
+              color="primary"
+              onClick={handleAIComparisonClick}
+              sx={{ textTransform: "none", fontWeight: 500 }}
             >
-              <CardHeader
-                avatar={<LightbulbOutlined color="primary" />}
-                title={
-                  <Typography variant="h6" color="primary" fontWeight={600}>
-                    Get AI-Recommended Comparative Tickers
-                  </Typography>
-                }
-                action={
-                  <Button
-                    variant={showAIComparison ? "outlined" : "contained"}
-                    color="primary"
-                    onClick={handleAIComparisonClick}
-                    sx={{ textTransform: "none", fontWeight: 500 }}
-                  >
-                    {showAIComparison ? "Hide Suggestions" : "Show Suggestions"}
-                  </Button>
-                }
-              />
-              <CardContent>
-                {showAIComparison && (
-                  <IPOAITickersMain selectedData={selectedData} />
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
+              {showAIComparison ? "Hide Suggestions" : "Show Suggestions"}
+            </Button>
+          }
+        />
+        <CardContent>
+          {showAIComparison && (
+            <IPOAITickersMain selectedData={selectedData} />
+          )}
+        </CardContent>
+      </Card>
+    </Container>
 
-
-                    
-                    {/* Differentiated Summary */}
-<Grid item xs={12}>
+    {/* DIFFERENTIATED SUMMARY */}
+   <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
   <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
     <CardContent sx={{ backgroundColor: "#fff" }}>
-      <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
-        <FaClipboardList
-          size={24}
-          color="#002060"
-          style={{ marginRight: 8 }}
-        />
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: "bold", color: "#002060" }}
+      {/* Header row */}
+      <Box
+        display="flex"
+        alignItems="center"
+        mb={2}
+        sx={{ position: "relative" }}
+      >
+        {/* Centered title with icon */}
+        <Box
+          sx={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            alignItems: "center",
+          }}
         >
-          Differentiated Summary
-        </Typography>
+          <FaClipboardList
+            size={24}
+            color="#002060"
+            style={{ marginRight: 8 }}
+          />
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: "bold", color: "#002060" }}
+          >
+            Differentiated Summary
+          </Typography>
+        </Box>
+
+        {/* Action buttons on the right */}
+        <Box ml="auto">
+          {editMode ? (
+            <>
+              <IconButton color="primary" onClick={handleSaveDealData}>
+                <SaveIcon />
+              </IconButton>
+              <IconButton color="secondary" onClick={handleCancelEdit}>
+                <CancelIcon />
+              </IconButton>
+            </>
+          ) : (
+            <IconButton color="default" onClick={enterEditMode}>
+              <EditIcon />
+            </IconButton>
+          )}
+        </Box>
       </Box>
 
+      {/* Body */}
       {editMode ? (
         <TextField
           fullWidth
           size="small"
           multiline
           minRows={4}
+          placeholder="Enter differentiated summary..."
           value={
             editedDealData?.differentiated_summary ??
             dealData.differentiated_summary ??
@@ -538,19 +660,19 @@ const handleSaveValuation = async () => {
           }
         />
       ) : (
-        <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
-          {dealData.differentiated_summary ?? ""}
+        <Typography
+          sx={{ color: "#333", whiteSpace: "pre-line", mt: 2 }}
+        >
+          {dealData.differentiated_summary || "No differentiated summary provided."}
         </Typography>
       )}
     </CardContent>
   </Card>
-</Grid>
+</Container>
 
+  </>
+);
 
-        </Grid>
-      </Card>
-    </Container>
-  );
 };
 
 export default IPODealsS1DealData;

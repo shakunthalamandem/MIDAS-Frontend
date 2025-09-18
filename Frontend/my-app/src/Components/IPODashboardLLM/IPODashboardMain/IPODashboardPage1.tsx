@@ -29,7 +29,11 @@ const IPODashboardPage1: React.FC<Props> = ({
   pdfLoading,
 }) => {
   return (
-    <div id="ipo-dashboard-page1">
+    <div
+      id="ipo-dashboard-page1"
+      data-pdf-page="1"
+      style={{ background: "#fff" }} // keeps capture clean
+    >
       <IPODashboardHeader
         ipoData={ipoData}
         allIpoTickers={allIpoTickers}
