@@ -132,7 +132,7 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
       {/* 🔹 Delete Confirmation Dialog */}
       <Dialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, row: null, index: null })}>
         <DialogTitle>
-          <Typography >Delete Competitor</Typography>
+          <Typography color="#002060" >Delete Competitor</Typography>
           </DialogTitle>
         <DialogContent>
           Are you sure you want to permanently delete{" "}
