@@ -39,7 +39,6 @@ import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
 
 import MainUpload from "../Components/Uploads/MainUpload";
 import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
-import MlEquityMain from "../Components/DealsForm/MachineLearningModels/MlEquityMain";
 
 
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
