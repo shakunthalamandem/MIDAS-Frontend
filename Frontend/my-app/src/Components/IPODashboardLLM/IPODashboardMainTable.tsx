@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, CircularProgress, Alert, Button } from "@mui/material";
 import MetricsTable from "./MetricsTable";
+import MetricsTableMain from "./IPODashboardMain/IPOCompsTableMain/MetricsTableMain";
 
 type ComparableMetric = {
   ticker: string;
@@ -78,6 +79,8 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
       )}
       {error && <Alert severity="error">{error}</Alert>}
       {!loading && !error && data && <MetricsTable ticker={ticker} data={data} />}
+            {/* {!loading && !error && data && <MetricsTableMain ticker={ticker} data={data} />} */}
+
     </Box>
   );
 };
