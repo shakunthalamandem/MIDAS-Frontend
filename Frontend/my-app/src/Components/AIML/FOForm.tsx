@@ -11,6 +11,8 @@ import {
   Alert,
   CircularProgress,
   Box,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import FOWeeklyMonthlyPredictionResults from "./FOWeeklyMonthlyPredictionResults";
 import FOPredictionResults from "./FOPredictionResults";
@@ -153,16 +155,16 @@ const FOForm: React.FC<FOFormProps> = ({
       label?: string;
       range?: [number, number];
     }> = [
-      { key: "percentage_primary_category", range: [0, 100] },
-      { key: "allocation_deal_size_percentage_category", range: [0, 100] },
-      { key: "allocation_percentage_category", range: [0, 100] },
+        { key: "percentage_primary_category", range: [0, 100] },
+        { key: "allocation_deal_size_percentage_category", range: [0, 100] },
+        { key: "allocation_percentage_category", range: [0, 100] },
 
-      // NEW: business-y ranges; growth/margin generally -100..100
-      { key: "revenue_growth_category", range: [-1000, 1000] },
+        // NEW: business-y ranges; growth/margin generally -100..100
+        { key: "revenue_growth_category", range: [-1000, 1000] },
 
-      // NEW: issue_to_pre_day_close may be negative or positive; keep a wide bound
-      { key: "issue_to_pre_day_close_return_category", range: [-1000, 1000] },
-    ];
+        // NEW: issue_to_pre_day_close may be negative or positive; keep a wide bound
+        { key: "issue_to_pre_day_close_return_category", range: [-1000, 1000] },
+      ];
 
     percentChecks.forEach(({ key, range }) => {
       const raw = data[key];
@@ -393,98 +395,134 @@ const FOForm: React.FC<FOFormProps> = ({
     selectOptions?: string[];
     adornment?: string;
     disabled?: boolean;
+    tooltip?: React.ReactNode;
   }> = [
-    { label: "Region", name: "region", disabled: true },
-    { label: "Target Variable", name: "target_variable", disabled: true },
-    {
-      label: "Ticker Symbol",
-      name: "ticker",
-      type: "string",
-      placeholder: "e.g., AAPL",
-    },
-    { label: "Pricing Date", name: "pricing_date", type: "date" },
+      { label: "Region", name: "region", disabled: true },
+      { label: "Target Variable", name: "target_variable", disabled: true },
+      {
+        label: "Ticker Symbol",
+        name: "ticker",
+        type: "string",
+        placeholder: "e.g., AAPL",
+      },
+      { label: "Pricing Date", name: "pricing_date", type: "date" },
 
-    {
-      label: "Deal Size ($ Million)",
-      name: "deal_size_category",
-      type: "number",
-      adornment: "$M",
-      placeholder: "e.g., 100",
-    },
-    {
-      label: "Sponsor (Y/N)",
-      name: "sponsor_yn_category",
-      selectOptions: options.sponsor,
-    },
-    {
-      label: "Discount from Announcement Price (%)",
-      name: "discount_from_announcement_price_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 2",
-    },
-    { label: "Sector", name: "sector_category", selectOptions: options.sector },
-    {
-      label: "Percentage Primary (%)",
-      name: "percentage_primary_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 100",
-    },
-    {
-      label: "Selected Bank",
-      name: "selected_bank_category",
-      selectOptions: options.selected_bank,
-    },
-    {
-      label: "Allocation as % of Deal Size",
-      name: "allocation_deal_size_percentage_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 0.5",
-    },
-    {
-      label: "Allocation as % of IOI",
-      name: "allocation_percentage_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 30",
-    },
+      {
+        label: "Deal Size ($ Million)",
+        name: "deal_size_category",
+        type: "number",
+        adornment: "$M",
+        placeholder: "e.g., 100",
+      },
+      {
+        label: "Sponsor (Y/N)",
+        name: "sponsor_yn_category",
+        selectOptions: options.sponsor,
+      },
+      {
+        label: "Discount from Announcement Price (%)",
+        name: "discount_from_announcement_price_category",
+        type: "number",
+        adornment: "%",
+        placeholder: "e.g., 2",
+      },
+      { label: "Sector", name: "sector_category", selectOptions: options.sector },
+      {
+        label: "Percentage Primary (%)",
+        name: "percentage_primary_category",
+        type: "number",
+        adornment: "%",
+        placeholder: "e.g., 100",
+      },
+      {
+        label: "Selected Bank",
+        name: "selected_bank_category",
+        selectOptions: options.selected_bank,
+      },
+      {
+        label: "Allocation as % of Deal Size",
+        name: "allocation_deal_size_percentage_category",
+        type: "number",
+        adornment: "%",
+        placeholder: "e.g., 0.5",
+      },
+      {
+        label: "Allocation as % of IOI",
+        name: "allocation_percentage_category",
+        type: "number",
+        adornment: "%",
+        placeholder: "e.g., 30",
+      },
 
-    // NEW: Fundamentals and price-feature
-    {
-      label: "Current Year Revenue ($ M)",
-      name: "revenue_category",
-      type: "number",
-      adornment: "$M",
-      placeholder: "e.g., 250",
-    },
-    {
-      label: "Revenue Growth (%) (YOY)",
-      name: "revenue_growth_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 12.5",
-    },
-    {
-      label: "Net Profit Margin",
-      name: "net_profit_margin_category",
-      selectOptions: ["Negative", "Positive"],
-    },
-    {
-      label: "Change in Price from T-1D to Issue(%)",
-      name: "issue_to_pre_day_close_return_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., -3.2",
-    },
+      // NEW: Fundamentals and price-feature
+      {
+        label: "Current Year Revenue ($ M)",
+        name: "revenue_category",
+        type: "number",
+        adornment: "$M",
+        placeholder: "e.g., 250",
+      },
+      {
+        label: "Revenue Growth (%) (YOY)",
+        name: "revenue_growth_category",
+        type: "number",
+        adornment: "%",
+        placeholder: "e.g., 12.5",
+      },
+      {
+        label: "Net Profit Margin",
+        name: "net_profit_margin_category",
+        selectOptions: ["Negative", "Positive"],
+      },
+      {
+        label: "Change in Price from T-1D to Issue(%)",
+        name: "issue_to_pre_day_close_return_category",
+        type: "number",
+        adornment: "%",
+        placeholder: "e.g., -3.2",
+        tooltip: (
+          <Tooltip
+            title={
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: 13,
+                  color: "#fff", // white text
+                }}
+              >
+                • This value represents the change in the stock price from the previous day's close (T-1D) to the price at the time of issue. <br />
+                • It is expressed as a percentage and can be either positive or negative. <br />
+                • A negative value suggests a drop in price, while a positive value indicates a rise in price.
+              </Typography>
+            }
+            arrow
+            placement="top"
+            slotProps={{
+              popper: {
+                sx: {
+                  "& .MuiTooltip-tooltip": {
+                    backgroundColor: "#002060", // dark blue bg
+                    borderRadius: 2,
+                    padding: "10px 14px",
+                    maxWidth: 320,
+                  },
+                },
+              },
+            }}
+          >
+            <IconButton size="small" sx={{ verticalAlign: "middle" }}>
+              <InfoOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        ),
+      },
 
-    {
-      label: "Deal Status",
-      name: "deal_status",
-      selectOptions: options.deal_status,
-    },
-  ];
+      {
+        label: "Deal Status",
+        name: "deal_status",
+        selectOptions: options.deal_status,
+      },
+    ];
 
   return (
     <>
@@ -538,15 +576,26 @@ const FOForm: React.FC<FOFormProps> = ({
                     gap: 1,
                   }}
                 >
-                  <Typography
+                  <Box
                     sx={{
+                      display: "flex",
+                      alignItems: "center",
                       width: { xs: "100%", sm: "180px", md: "200px" },
                       minWidth: { sm: "180px", md: "200px" },
                       fontWeight: 500,
                     }}
                   >
-                    {field.label}
-                  </Typography>
+                    <Typography component="span" sx={{ fontWeight: 500 }}>
+                      {field.label}
+                      {field.tooltip && (
+                        <Box component="span" sx={{ ml: 0.5 }}>
+                          {field.tooltip}
+                        </Box>
+                      )}
+                    </Typography>
+                  </Box>
+
+
 
                   {field.selectOptions ? (
                     <TextField
@@ -598,10 +647,10 @@ const FOForm: React.FC<FOFormProps> = ({
                           ) : undefined,
                         endAdornment:
                           field.adornment &&
-                          (field.adornment === "%" ||
-                            field.adornment === "M" ||
-                            field.adornment.endsWith("%") ||
-                            field.adornment.endsWith("M")) ? (
+                            (field.adornment === "%" ||
+                              field.adornment === "M" ||
+                              field.adornment.endsWith("%") ||
+                              field.adornment.endsWith("M")) ? (
                             <InputAdornment position="end">
                               {field.adornment.replace("$", "")}
                             </InputAdornment>
