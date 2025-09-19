@@ -76,15 +76,38 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
     }
   };
 
-  const handleAddCompetitor = async (competitorTicker: string) => {
-    try {
-      const result = await addCompetitor(ticker, competitorTicker);
-      setRows((prev) => [...prev, result.record]);
-      setSnackbar({ open: true, message: "Competitor added", severity: "success" });
-    } catch (err: any) {
-      setSnackbar({ open: true, message: err.message, severity: "error" });
-    }
-  };
+const handleAddCompetitor = async (competitorTicker: string) => {
+  const exists = rows.some(
+    (row) => row.competitor.toLowerCase() === competitorTicker.toLowerCase()
+  );
+  if (exists) {
+    setSnackbar({
+      open: true,
+      message: "Competitor already exists!",
+      severity: "error",
+    });
+    return;
+  }
+
+  try {
+    const result = await addCompetitor(ticker, competitorTicker);
+
+    setRows((prev) => [...prev, result.record]);
+    setSnackbar({
+      open: true,
+      message: "Competitor added successfully!",
+      severity: "success",
+    });
+  } catch (err: any) {
+    setSnackbar({
+      open: true,
+      message: err.message || "Error adding competitor",
+      severity: "error",
+    });
+  } finally {
+  }
+};
+
 
   return (
     <div style={{ marginTop: 20 }}>
