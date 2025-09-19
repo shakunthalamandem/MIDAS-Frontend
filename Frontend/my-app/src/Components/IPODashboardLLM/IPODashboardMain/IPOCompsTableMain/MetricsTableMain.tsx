@@ -9,7 +9,6 @@ import {
   TableCell,
   TableBody,
   TableContainer,
-
 } from "@mui/material";
 import CompetitorSearch from "./CompetitorSearch";
 import MetricsRow from "./MetricsRow";
@@ -21,7 +20,9 @@ import { addCompetitor, deleteCompetitor, updateRow } from "./Services/api";
 
 type ComparableMetric = any;
 type AveragesType = { [key: string]: { average?: number; median?: number } };
-type ApiResponse = { [ticker: string]: { data: ComparableMetric[]; Averages?: AveragesType } };
+type ApiResponse = {
+  [ticker: string]: { data: ComparableMetric[]; Averages?: AveragesType };
+};
 
 interface Props {
   ticker: string;
@@ -31,10 +32,18 @@ interface Props {
 const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
   const [rows, setRows] = useState<ComparableMetric[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" as "success" | "error" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
 
   // 🔹 state for delete confirmation
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; row: ComparableMetric | null; index: number | null }>({
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    row: ComparableMetric | null;
+    index: number | null;
+  }>({
     open: false,
     row: null,
     index: null,
@@ -42,8 +51,12 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
 
   useEffect(() => {
     const allRows = data[ticker]?.data || [];
-    const highlightRow = allRows.find((r) => r.ticker === r.competitor || r.competitor.startsWith(r.ticker));
-    const otherRows = allRows.filter((r) => !highlightRow || r !== highlightRow);
+    const highlightRow = allRows.find(
+      (r) => r.ticker === r.competitor || r.competitor.startsWith(r.ticker)
+    );
+    const otherRows = allRows.filter(
+      (r) => !highlightRow || r !== highlightRow
+    );
     setRows(highlightRow ? [highlightRow, ...otherRows] : otherRows);
   }, [data, ticker]);
 
@@ -51,7 +64,11 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
     try {
       await updateRow(rows[idx]);
       setEditIndex(null);
-      setSnackbar({ open: true, message: "Row updated successfully", severity: "success" });
+      setSnackbar({
+        open: true,
+        message: "Row updated successfully",
+        severity: "success",
+      });
     } catch (err: any) {
       setSnackbar({ open: true, message: err.message, severity: "error" });
     }
@@ -66,9 +83,16 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
   const confirmDelete = async () => {
     if (!deleteDialog.row || deleteDialog.index === null) return;
     try {
-      await deleteCompetitor(deleteDialog.row.ticker, deleteDialog.row.competitor);
+      await deleteCompetitor(
+        deleteDialog.row.ticker,
+        deleteDialog.row.competitor
+      );
       setRows((prev) => prev.filter((_, idx) => idx !== deleteDialog.index));
-      setSnackbar({ open: true, message: "Competitor deleted permanently", severity: "success" });
+      setSnackbar({
+        open: true,
+        message: "Competitor deleted permanently",
+        severity: "success",
+      });
     } catch (err: any) {
       setSnackbar({ open: true, message: err.message, severity: "error" });
     } finally {
@@ -76,42 +100,48 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
     }
   };
 
-const handleAddCompetitor = async (competitorTicker: string) => {
-  const exists = rows.some(
-    (row) => row.competitor.toLowerCase() === competitorTicker.toLowerCase()
-  );
-  if (exists) {
-    setSnackbar({
-      open: true,
-      message: "Competitor already exists!",
-      severity: "error",
-    });
-    return;
-  }
+  const handleAddCompetitor = async (competitorTicker: string) => {
+    const exists = rows.some(
+      (row) => row.competitor.toLowerCase() === competitorTicker.toLowerCase()
+    );
+    if (exists) {
+      setSnackbar({
+        open: true,
+        message: "Competitor already exists!",
+        severity: "error",
+      });
+      return;
+    }
 
-  try {
-    const result = await addCompetitor(ticker, competitorTicker);
+    try {
+      const result = await addCompetitor(ticker, competitorTicker);
 
-    setRows((prev) => [...prev, result.record]);
-    setSnackbar({
-      open: true,
-      message: "Competitor added successfully!",
-      severity: "success",
-    });
-  } catch (err: any) {
-    setSnackbar({
-      open: true,
-      message: err.message || "Error adding competitor",
-      severity: "error",
-    });
-  } finally {
-  }
-};
-
+      setRows((prev) => [...prev, result.record]);
+      setSnackbar({
+        open: true,
+        message: "Competitor added successfully!",
+        severity: "success",
+      });
+    } catch (err: any) {
+      setSnackbar({
+        open: true,
+        message: err.message || "Error adding competitor",
+        severity: "error",
+      });
+    } finally {
+    }
+  };
 
   return (
     <div style={{ marginTop: 20 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
         <Typography variant="h6" color="#002060" fontWeight={600}>
           Comparative Trading Multiples & Performance Metrics
         </Typography>
@@ -123,11 +153,22 @@ const handleAddCompetitor = async (competitorTicker: string) => {
           <TableHead>
             <TableRow sx={{ backgroundColor: "#002060" }}>
               {columns.map((col) => (
-                <TableCell key={col.key} sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>
+                <TableCell
+                  key={col.key}
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
                   {col.label}
                 </TableCell>
               ))}
-              <TableCell sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Action</TableCell>
+              <TableCell
+                sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}
+              >
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
 
@@ -140,22 +181,61 @@ const handleAddCompetitor = async (competitorTicker: string) => {
                 editIndex={editIndex}
                 setEditIndex={setEditIndex}
                 onSave={handleSave}
-                onDelete={handleDeleteRow}  
+                onDelete={handleDeleteRow}
                 columns={columns}
                 formatValue={formatValue}
               />
             ))}
+            {/* Append Average and Median rows with heading */}
+            {data[ticker]?.Averages &&
+              ["average", "median"].map((type) => (
+                <TableRow key={type} sx={{ backgroundColor: "#f5f5f5" }}>
+                  {columns.map((col, colIdx) => {
+                    if (colIdx === 0) {
+                      return (
+                        <TableCell
+                          key={col.key}
+                          colSpan={4}
+                          align="center"
+                          sx={{ fontWeight: "bold", color: "primary.main" }}
+                        >
+                          {type === "average"
+                            ? "Overall Average"
+                            : "Overall Median"}
+                        </TableCell>
+                      );
+                    }
+
+                    if (colIdx > 3) {
+                      const avgValue: number | string =
+                        data[ticker].Averages?.[col.key]?.[
+                          type as "average" | "median"
+                        ] ?? "N/A";
+                      return (
+                        <TableCell key={col.key} align="center">
+                          {formatValue(col.key, avgValue)}
+                        </TableCell>
+                      );
+                    }
+
+                    return null;
+                  })}
+                  <TableCell />
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
 
       {/* 🔹 Delete Confirmation Dialog */}
-    <DeleteConfirmDialog
-  open={deleteDialog.open}
-  competitor={deleteDialog.row?.competitor}
-  onCancel={() => setDeleteDialog({ open: false, row: null, index: null })}
-  onConfirm={confirmDelete}
-/>
+      <DeleteConfirmDialog
+        open={deleteDialog.open}
+        competitor={deleteDialog.row?.competitor}
+        onCancel={() =>
+          setDeleteDialog({ open: false, row: null, index: null })
+        }
+        onConfirm={confirmDelete}
+      />
 
       <SnackbarAlert
         open={snackbar.open}

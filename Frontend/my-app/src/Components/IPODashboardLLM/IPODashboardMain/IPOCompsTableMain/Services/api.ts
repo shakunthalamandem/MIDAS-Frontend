@@ -18,7 +18,7 @@ export const addCompetitor = async (ticker: string, competitor: string) => {
     headers,
     body: JSON.stringify({ ticker, competitor }),
   });
-  if (!res.ok) throw new Error("Failed to add competitor");
+  if (!res.ok) throw new Error("No data found for the given ticker");
   return res.json();
 };
 
