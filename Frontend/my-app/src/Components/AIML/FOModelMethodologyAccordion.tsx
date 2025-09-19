@@ -83,7 +83,7 @@ const SectionHeader: React.FC<{ icon: React.ReactNode; label: string }> = ({ ico
     );
 };
 
-const IPOModelMethodologyAccordion: React.FC<IPOModelMethodologyProps> = ({
+const FOModelMethodologyAccordion: React.FC<IPOModelMethodologyProps> = ({
     featureImportance,
     defaultExpanded = false,
     title = "Model Methodology",
@@ -123,8 +123,14 @@ const IPOModelMethodologyAccordion: React.FC<IPOModelMethodologyProps> = ({
             <BulletRow
                 text={
                     <>
-                        <strong>Sponsor (Y/N)</strong> - Presence of a credible sponsor can improve distribution and aftermarket
-                        support.
+                        <strong>Discount from Announcement Price</strong> - Discount from the price currenctly trading to issue offer price.
+                    </>
+                }
+            />
+            <BulletRow
+                text={
+                    <>
+                        <strong>Change in Price from T-1D to Issue(%)</strong> - Comparing T-1D close to issue price.
                     </>
                 }
             />
@@ -160,6 +166,13 @@ const IPOModelMethodologyAccordion: React.FC<IPOModelMethodologyProps> = ({
                 text={
                     <>
                         <strong>Lead Bank Tier</strong> - Tier-1 vs. Tier-2/3 underwriters.
+                    </>
+                }
+            />
+            <BulletRow
+                text={
+                    <>
+                        <strong>Sponsor (Y/N)</strong> - Sponsored or not.
                     </>
                 }
             />
@@ -495,4 +508,4 @@ const IPOModelMethodologyAccordion: React.FC<IPOModelMethodologyProps> = ({
     );
 };
 
-export default IPOModelMethodologyAccordion;
+export default FOModelMethodologyAccordion;

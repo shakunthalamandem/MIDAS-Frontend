@@ -41,7 +41,7 @@ interface WeeklyMonthlyPredictionResultsProps {
   ) => Promise<Record<string, PredictionModel>>;
 }
 
-const FOWeeklyMonthlyPredictionResults: React.FC<
+const IPOWeeklyMonthlyPredictionResults: React.FC<
   WeeklyMonthlyPredictionResultsProps
 > = ({ result, onWeeklyMonthlyRepredict }) => {
   const [t1dCloseReturn, setT1dCloseReturn] = useState<number | "">("");
@@ -462,4 +462,4 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
   );
 };
 
-export default FOWeeklyMonthlyPredictionResults;
+export default IPOWeeklyMonthlyPredictionResults;
