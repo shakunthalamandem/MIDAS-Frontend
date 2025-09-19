@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import IPOPredictionResults from "./IPOPredictionResults";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import IPOWeeklyMonthlyPredictionResults from "./IPOWeeklyMonthlyPredictionResults";
 
 interface OptionsData {
   region: string[];
@@ -80,6 +81,10 @@ const IPOForm: React.FC<IPOFormProps> = ({
     severity: "error" | "success";
   }>({ open: false, message: "", severity: "error" });
   const [prediction, setPrediction] = useState<Record<
+    string,
+    PredictionModel
+  > | null>(null);
+  const [weeklyPrediction, setWeeklyPrediction] = useState<Record<
     string,
     PredictionModel
   > | null>(null);
@@ -218,6 +223,63 @@ const IPOForm: React.FC<IPOFormProps> = ({
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleWeeklyMonthlyRepredict = async (
+    t1dCloseReturn: number
+  ): Promise<Record<string, PredictionModel>> => {
+    const apiUrl = process.env.REACT_APP_API_URL!;
+    const token = localStorage.getItem("access_token");
+    const payload = {
+      ...values, // includes new fields
+      deal_type: "IPO",
+      GDP: "Stable",
+      Inflation: "Stable",
+      Treasury: "Stable",
+      t1d_return_from_bloomberg_category: t1dCloseReturn,
+      expectations: ["T1W", "T1M"],
+    };
+    try {
+      const res = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Weekly/Monthly prediction failed");
+      const fullResponse = await res.json();
+      const fullData = fullResponse.predictions;
+      const simplified: Record<string, PredictionModel> = {};
+      for (const key in fullData) {
+        const item = fullData[key] || {};
+        const prediction = item.prediction ?? item.Prediction ?? null;
+        const accuracy = item.Accuracy ?? item.accuracy ?? null;
+        const confidence = item.Confidence ?? item.confidence ?? null;
+        const range = item.range ?? item.Range ?? null;
+        const explanation = item.explanation ?? item.Explanation ?? null;
+        simplified[key] = {
+          prediction,
+          accuracy,
+          confidence,
+          model: "",
+          range,
+          explanation,
+        };
+      }
+      setWeeklyPrediction(simplified);
+      onPredicted?.();
+      return simplified;
+    } catch (error) {
+      console.error("Weekly/Monthly repredict error:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to get weekly/monthly predictions.",
+        severity: "error",
+      });
+      return {};
     }
   };
 
@@ -489,10 +551,10 @@ const IPOForm: React.FC<IPOFormProps> = ({
                           ) : undefined,
                         endAdornment:
                           field.adornment &&
-                          (field.adornment === "%" ||
-                            field.adornment === "M" ||
-                            field.adornment.endsWith("%") ||
-                            field.adornment.endsWith("M")) ? (
+                            (field.adornment === "%" ||
+                              field.adornment === "M" ||
+                              field.adornment.endsWith("%") ||
+                              field.adornment.endsWith("M")) ? (
                             <InputAdornment position="end">
                               {field.adornment.replace("$", "")}
                             </InputAdornment>
@@ -562,10 +624,16 @@ const IPOForm: React.FC<IPOFormProps> = ({
       </Paper>
 
       {prediction && (
-        <IPOPredictionResults
-          result={prediction}
-          onRepredict={handleRepredictWithPrice}
-        />
+        <>
+          <IPOPredictionResults
+            result={prediction}
+            onRepredict={handleRepredictWithPrice}
+          />
+          <IPOWeeklyMonthlyPredictionResults
+            result={weeklyPrediction}
+            onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredict}
+          />
+        </>
       )}
     </>
   );

@@ -23,7 +23,7 @@ import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import MethodologyAccordion1w1m from "./MethodologyAccordion1w1m";
+// import MethodologyAccordion1w1m from "./MethodologyAccordion1w1m";
 
 interface PredictionModel {
   prediction: string | null;
@@ -41,7 +41,7 @@ interface WeeklyMonthlyPredictionResultsProps {
   ) => Promise<Record<string, PredictionModel>>;
 }
 
-const WeeklyMonthlyPredictionResults: React.FC<
+const IPOWeeklyMonthlyPredictionResults: React.FC<
   WeeklyMonthlyPredictionResultsProps
 > = ({ result, onWeeklyMonthlyRepredict }) => {
   const [t1dCloseReturn, setT1dCloseReturn] = useState<number | "">("");
@@ -224,10 +224,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
             sx={{
               fontStyle: "italic",
               ml: 1,
-              color: "text.secondary",
             }}
           >
-            Confidence - {confidence.toFixed(1)}%
+            Confidence: {confidence.toFixed(1)}%
           </Typography>
         </Box>
       </Box>
@@ -309,9 +308,15 @@ const WeeklyMonthlyPredictionResults: React.FC<
         </Box>
 
         <Divider sx={{ my: 3 }} />
-        <Box mb={2}>
-          <MethodologyAccordion1w1m />
+        <Box>
+          <Typography>
+            A long with the above parameters that are considered for T+1Day, We are adding T+1Day close return as additional parameter for T+1 week and T+1 Month.
+          </Typography>
         </Box>
+        <Divider sx={{ my: 3 }} />
+        {/* <Box mb={2}>
+          <MethodologyAccordion1w1m />
+        </Box> */}
 
         {showTable ? (
           <>
@@ -379,12 +384,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
                           {row.label}
                         </TableCell>
                         <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ whiteSpace: "pre-line" }}
-                          >
-                            {weeklyData?.explanation ||
-                              monthlyData?.explanation ||
+                          <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
+                            {weeklyData?.explanation || (weeklyData as any)?.Explanation ||
+                              monthlyData?.explanation || (monthlyData as any)?.Explanation ||
                               "N/A"}
                           </Typography>
                         </TableCell>
@@ -432,7 +434,9 @@ const WeeklyMonthlyPredictionResults: React.FC<
                                   gap={1}
                                 >
                                   {/* {renderAccuracyLevel(modelData.Accuracy)} */}
-                                  {renderConfidenceLevel(modelData.confidence)}
+                                  {renderConfidenceLevel(
+                                    modelData.confidence ?? (modelData as any)?.Confidence ?? null
+                                  )}
                                 </Box>
                               </TableCell>
                             </React.Fragment>
@@ -458,4 +462,4 @@ const WeeklyMonthlyPredictionResults: React.FC<
   );
 };
 
-export default WeeklyMonthlyPredictionResults;
+export default IPOWeeklyMonthlyPredictionResults;

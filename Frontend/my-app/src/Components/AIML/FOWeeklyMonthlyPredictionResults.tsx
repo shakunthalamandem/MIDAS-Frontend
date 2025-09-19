@@ -308,6 +308,12 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
         </Box>
 
         <Divider sx={{ my: 3 }} />
+        <Box>
+          <Typography>
+            A long with the above parameters that are considered for T+1Day, We are adding T+1Day close return as additional parameter for T+1 week and T+1 Month.
+          </Typography>
+        </Box>
+        <Divider sx={{ my: 3 }} />
         {/* <Box mb={2}>
           <MethodologyAccordion1w1m />
         </Box> */}

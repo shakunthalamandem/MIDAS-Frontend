@@ -21,6 +21,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import FOModelMethodologyAccordion from "./FOModelMethodologyAccordion";
 // import MethodologyAccordion1Day from "./MethodologyAccordion1Day";
 
 interface PredictionModel {
@@ -273,6 +274,8 @@ const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
 
         <Divider sx={{ my: 3 }} />
         {/* <MethodologyAccordion1Day /> */}
+        <FOModelMethodologyAccordion />
+        <Divider sx={{ my: 3 }} />
 
         {/* ---- Table ---- */}
         <TableContainer>

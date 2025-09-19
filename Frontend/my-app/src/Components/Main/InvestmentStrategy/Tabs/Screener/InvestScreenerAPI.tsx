@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import InvestScreenerMain from './InvestScreenerMain';
 import CumulativeReturns from '../../TechnicalIndicators/CumulativeReturns';
-import CumulativeyearlyChart from '../../StrategyCharts/CumulativeChart';
-import NoDataPopup from '../../../../../Pages/NoDataPopup';
 
 interface InvestScreenerAPIProps {
   appliedValues: any;
@@ -13,15 +11,13 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [totalRows, setTotalRows] = useState(0); // Total rows from API
-  const [tickers, setTickers] = useState<string[]>([]); // State to store tickers
-  const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
+  const [totalRows, setTotalRows] = useState(0);
+  const [tickers, setTickers] = useState<string[]>([]);
+  const [noData, setNoData] = useState(false);
 
   useEffect(() => {
     const transformAppliedValues = (values: any) => {
-      if (!values) {
-        return {}; // Return an empty object if values is null or undefined
-      }
+      if (!values) return {};
       return {
         ...values.Fundamentals,
         ...values.MonasheeSpecific,
@@ -31,14 +27,12 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
 
     const fetchData = async () => {
       setLoading(true);
-      setError(null); // Reset error state before new request
+      setError(null);
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
-        if (!apiUrl) {
-          throw new Error("API URL is not defined");
-        }
+        if (!apiUrl) throw new Error("API URL is not defined");
 
         const transformedValues = transformAppliedValues(appliedValues);
 
@@ -57,19 +51,18 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
           setRows(rows);
           setTotalRows(data.pagination?.total_items || 0);
 
-          // Extract tickers from the response data
           const extractedTickers = rows.map((row: any) => row.ticker);
-          setTickers(extractedTickers); // Set tickers state
-          if (appliedValues && rows.length === 0) {
-            setNoDataPopupOpen(true);
-          }
+          setTickers(extractedTickers);
+
+          setNoData(appliedValues && rows.length === 0);
         } else {
           throw new Error("Failed to fetch investment screener data");
         }
       } catch (error: any) {
         console.error("Error fetching data:", error);
-        setRows([]); // Reset rows on error
+        setRows([]);
         setError(error.message || "An error occurred while fetching investment screener data");
+        setNoData(true);
       } finally {
         setLoading(false);
       }
@@ -88,16 +81,16 @@ const InvestScreenerAPI: React.FC<InvestScreenerAPIProps> = ({ appliedValues }) 
         )}
       </Box>
 
-      {/* Pass the fetched data to the grid component */}
-      <InvestScreenerMain rows={rows} loading={loading} totalRows={totalRows} />
-      <CumulativeReturns tickerList={tickers} />
-      <NoDataPopup
-  open={noDataPopupOpen}
-  onClose={() => {
-    setNoDataPopupOpen(false);
-    window.location.reload();
-  }}
-/>
+      {noData ? (
+        <Typography variant="body1" color="textSecondary" align="center" sx={{ mt: 3 }}>
+          No data available for selected filters
+        </Typography>
+      ) : (
+        <>
+          <InvestScreenerMain rows={rows} loading={loading} totalRows={totalRows} />
+          <CumulativeReturns tickerList={tickers} />
+        </>
+      )}
     </Box>
   );
 };
