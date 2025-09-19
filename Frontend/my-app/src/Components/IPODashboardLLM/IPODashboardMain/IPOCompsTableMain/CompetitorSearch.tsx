@@ -10,12 +10,13 @@ import {
 import { searchTickers } from "./Services/api";
 
 interface CompetitorSearchProps {
-  onSelect: (ticker: string) => void;
+  onSelect: (ticker: string) => Promise<void> | void; // make it async-capable
 }
 
 const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
   const [options, setOptions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // for search
+  const [adding, setAdding] = useState(false); // for add button
   const [selected, setSelected] = useState<any>(null);
 
   const handleSearch = async (query: string) => {
@@ -31,6 +32,19 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAdd = async () => {
+    if (!selected) return;
+    setAdding(true);
+    try {
+      await onSelect(selected.ticker);
+      setSelected(null); // clear selection
+    } catch (err) {
+      console.error("Error adding competitor:", err);
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -88,11 +102,11 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
       />
       <Button
         variant="contained"
-        sx={{ backgroundColor: "#002060", color: "white" }}
-        disabled={!selected}
-        onClick={() => selected && onSelect(selected.ticker)}
+        sx={{ backgroundColor: "#002060", color: "white", minWidth: 80 }}
+        disabled={!selected || adding}
+        onClick={handleAdd}
       >
-        Add
+        {adding ? <CircularProgress size={20} color="inherit" /> : "Add"}
       </Button>
     </Box>
   );
