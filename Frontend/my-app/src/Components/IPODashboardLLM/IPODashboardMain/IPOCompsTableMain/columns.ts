@@ -1,5 +1,5 @@
 export const columns = [
-  { key: "competitor", label: "Ticker", minWidth: 100 },
+  { key: "competitor", label: "Ticker", minWidth: 80 },
   { key: "price_usd", label: "Price (USD)" },
   { key: "market_cap", label: "Market Cap (USDm)" },
   { key: "ev_usd_million", label: "EV (USDm)" },
@@ -9,6 +9,6 @@ export const columns = [
   { key: "one_year_later_price_earning", label: "2026 P/E" },
   { key: "present_year_ev_fcf", label: "2025 EV/EBITDA" },
   { key: "one_year_later_ev_fcf", label: "2026 EV/EBITDA" },
-  { key: "sales_growth", label: "Sales Growth (25-26)" },
+  { key: "sales_growth", label: "Sales Growth (25-26)",minWidth: 80  },
   { key: "eps_growth", label: "EPS Growth (25-26)" },
 ];

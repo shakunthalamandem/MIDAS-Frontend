@@ -169,6 +169,7 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
                     color: "white",
                     fontWeight: "bold",
                     textAlign: "center",
+                                        minWidth: col.minWidth || 70,
                   }}
                 >
                   {col.label}
