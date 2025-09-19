@@ -533,7 +533,7 @@ const handleSaveValuation = async () => {
     {/* COMPARATIVE TABLE */}
     <Container maxWidth="xl" sx={{ mt: 4 }}>
       <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-        <CardContent sx={{ backgroundColor: "#fff" }}>
+        <CardContent sx={{       background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
           <IPODashboardMainTable ticker={selectedData?.ticker_name ?? ""} />
           <Typography
             variant="caption"
