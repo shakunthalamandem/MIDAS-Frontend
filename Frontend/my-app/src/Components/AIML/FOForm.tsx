@@ -490,9 +490,9 @@ const FOForm: React.FC<FOFormProps> = ({
                   color: "#fff", // white text
                 }}
               >
-                • This value represents the change in the stock price from the previous day's close (T-1D) to the price at the time of issue. <br />
-                • It is expressed as a percentage and can be either positive or negative. <br />
-                • A negative value suggests a drop in price, while a positive value indicates a rise in price.
+                • This value represents the percentage change in the stock price from the previous day's close (T-1D) to the price at the time of the issue. <br />
+                • The formula used is: <br />
+                 ((T-1D Close Price / Issue Price) - 1) * 100.<br />
               </Typography>
             }
             arrow
