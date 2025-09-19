@@ -1,5 +1,5 @@
 export const formatValue = (key: string, value: number | string) => {
-  if (value === null || value === undefined || value === "") return "N/A";
+  if (value === null || value === undefined || value === "") return "nm";
 
   const negativeColumns = [
     "present_year_ev_sales",
@@ -14,11 +14,11 @@ export const formatValue = (key: string, value: number | string) => {
 
   if (typeof value === "string") return value;
 
-  if (percentageColumns.includes(key) && value > 500) return "N/A";
+  // if (percentageColumns.includes(key) && value > 500) return "N/A";
   if (negativeColumns.includes(key))
-    return value < 0 ? "N/A" : `${Math.round(value * 10) / 10}x`;
+    return value < 0 ? "nm" : `${Math.round(value * 10) / 10}x`;
   if (percentageColumns.includes(key))
-    return value < 0 ? "N/A" : `${Math.round(value * 10) / 10}%`;
+    return value < 0 ? "nm" : `${Math.round(value * 10) / 10}%`;
   if (numberColumns.includes(key))
     return new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(
       value
