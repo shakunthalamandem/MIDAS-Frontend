@@ -90,9 +90,9 @@ const DealFormDataTabsMain: React.FC<Props> = ({
       const payload = isCreate
         ? { ...localData } // for create, just send the data
         : {
-            operation: "new_deal_update",
-            data: localData,
-          };
+          operation: "new_deal_update",
+          data: localData,
+        };
 
       const response = await axios.post(url, payload, {
         headers: {
@@ -115,16 +115,45 @@ const DealFormDataTabsMain: React.FC<Props> = ({
       }
     } catch (error) {
       console.error("Save failed:", error);
+
+      let errorMessage = "Failed to save deal.";
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as any).response === "object" &&
+        (error as any).response !== null &&
+        "data" in (error as any).response
+      ) {
+        const responseData = (error as any).response.data;
+        // If backend sends { "error": "...msg..." }
+        if (typeof responseData.error === "string") {
+          errorMessage = responseData.error;
+        }
+        // If backend sends error as array or object
+        else {
+          errorMessage = JSON.stringify(responseData);
+        }
+      } else if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as any).message === "string"
+      ) {
+        errorMessage = (error as any).message;
+      }
+
       setSnackbar({
         open: true,
-        message: "Failed to save deal. Please try again.",
+        message: errorMessage,
         severity: "error",
       });
     } finally {
       setLoading(false); // Stop loading
     }
   };
-console.log("Original Data:", originalData);
+
+  console.log("Original Data:", originalData);
   const handleCancel = () => {
     setLocalData(originalData);
     setEditable(false);
@@ -175,36 +204,34 @@ console.log("Original Data:", originalData);
         sx={{ mb: 3 }}
       >
         {/* Title */}
-<Typography
-  variant="h6"
-  color="#002060"
-  sx={{
-    fontWeight: 600,
-    textAlign: "center",
-    flex: 1,
-  }}
->
-  {isCreate
-    ? "New Deal Setup — Complete the required details below."
-    : `Deal Overview & Key Analytics - ${
-        formData.deal_information?.issuer_name
-      } (${selectedTicker || "N/A"}) on ${
-        formData.deal_information?.pricing_date
-          ? (() => {
-              const rawDate = formData.deal_information.pricing_date;
-              const dateStr = typeof rawDate === "string" ? rawDate.trim().toLowerCase() : "";
-              if (!rawDate || dateStr === "to be announced") {
-                return "To be Announced";
-              }
-              try {
-                return format(new Date(rawDate), "dd MMM yyyy");
-              } catch {
-                return "To be Announced";
-              }
-            })()
-          : "To be Announced"
-      }`}
-</Typography>
+        <Typography
+          variant="h6"
+          color="#002060"
+          sx={{
+            fontWeight: 600,
+            textAlign: "center",
+            flex: 1,
+          }}
+        >
+          {isCreate
+            ? "New Deal Setup — Complete the required details below."
+            : `Deal Overview & Key Analytics - ${formData.deal_information?.issuer_name
+            } (${selectedTicker || "N/A"}) on ${formData.deal_information?.pricing_date
+              ? (() => {
+                const rawDate = formData.deal_information.pricing_date;
+                const dateStr = typeof rawDate === "string" ? rawDate.trim().toLowerCase() : "";
+                if (!rawDate || dateStr === "to be announced") {
+                  return "To be Announced";
+                }
+                try {
+                  return format(new Date(rawDate), "dd MMM yyyy");
+                } catch {
+                  return "To be Announced";
+                }
+              })()
+              : "To be Announced"
+            }`}
+        </Typography>
 
 
         {/* Action Buttons */}
