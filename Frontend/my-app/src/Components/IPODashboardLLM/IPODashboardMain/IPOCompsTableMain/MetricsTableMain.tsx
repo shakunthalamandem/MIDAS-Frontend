@@ -9,15 +9,12 @@ import {
   TableCell,
   TableBody,
   TableContainer,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
+
 } from "@mui/material";
 import CompetitorSearch from "./CompetitorSearch";
 import MetricsRow from "./MetricsRow";
 import SnackbarAlert from "./SnackbarAlert";
+import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import { columns } from "./columns";
 import { formatValue } from "./formatValue";
 import { addCompetitor, deleteCompetitor, updateRow } from "./Services/api";
@@ -130,23 +127,12 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
       </TableContainer>
 
       {/* 🔹 Delete Confirmation Dialog */}
-      <Dialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, row: null, index: null })}>
-        <DialogTitle>
-          <Typography >Delete Competitor</Typography>
-          </DialogTitle>
-        <DialogContent>
-          Are you sure you want to permanently delete{" "}
-          <strong>{deleteDialog.row?.competitor}</strong>?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialog({ open: false, row: null, index: null })} color="inherit">
-            No
-          </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
-            Yes, Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+    <DeleteConfirmDialog
+  open={deleteDialog.open}
+  competitor={deleteDialog.row?.competitor}
+  onCancel={() => setDeleteDialog({ open: false, row: null, index: null })}
+  onConfirm={confirmDelete}
+/>
 
       <SnackbarAlert
         open={snackbar.open}
