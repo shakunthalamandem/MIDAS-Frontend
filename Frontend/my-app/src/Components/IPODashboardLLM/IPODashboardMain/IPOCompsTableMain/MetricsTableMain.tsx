@@ -79,6 +79,16 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
     setDeleteDialog({ open: true, row, index: rowIndex });
   };
 
+
+  const handleChangeCell = (rowIndex: number, key: string, value: string) => {
+  setRows((prev) => {
+    const copy = [...prev];
+    copy[rowIndex] = { ...copy[rowIndex], [key]: value };
+    return copy;
+  });
+};
+
+
   // 🔹 confirm delete action
   const confirmDelete = async () => {
     if (!deleteDialog.row || deleteDialog.index === null) return;
@@ -182,6 +192,7 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
                 setEditIndex={setEditIndex}
                 onSave={handleSave}
                 onDelete={handleDeleteRow}
+                onChangeCell={handleChangeCell}
                 columns={columns}
                 formatValue={formatValue}
               />

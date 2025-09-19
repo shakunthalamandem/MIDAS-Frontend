@@ -10,7 +10,7 @@ export const formatValue = (key: string, value: number | string) => {
     "one_year_later_ev_fcf",
   ];
   const percentageColumns = ["sales_growth", "eps_growth"];
-  const numberColumns = ["market_cap", "ev_usd_million"];
+  const numberColumns = ["market_cap", "ev_usd_million", "price_usd"];
 
   if (typeof value === "string") return value;
 

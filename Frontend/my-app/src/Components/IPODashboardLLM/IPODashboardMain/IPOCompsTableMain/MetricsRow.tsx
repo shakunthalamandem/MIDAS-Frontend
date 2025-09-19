@@ -9,6 +9,7 @@ interface MetricsRowProps {
   setEditIndex: (idx: number | null) => void;
   onSave: (idx: number) => void;
   onDelete: (row: any, idx: number) => void;
+  onChangeCell: (rowIndex: number, key: string, value: string) => void; 
   columns: { key: string; label: string; minWidth?: number }[];
   formatValue: (key: string, value: any) => string | number;
 }
@@ -20,10 +21,13 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
   setEditIndex,
   onSave,
   onDelete,
+  onChangeCell,
   columns,
   formatValue,
 }) => {
-  const isFirstRow = idx === 0 && (row.ticker === row.competitor || row.competitor.startsWith(row.ticker));
+  const isFirstRow =
+    idx === 0 &&
+    (row.ticker === row.competitor || row.competitor.startsWith(row.ticker));
 
   return (
     <TableRow sx={{ backgroundColor: isFirstRow ? "#f2e1d9ff" : "inherit" }}>
@@ -32,8 +36,8 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
           {isFirstRow && editIndex === idx && col.key !== "competitor" ? (
             <TextField
               size="small"
-              value={row[col.key]}
-              onChange={(e) => (row[col.key] = e.target.value)}
+              value={row[col.key] ?? ""}
+              onChange={(e) => onChangeCell(idx, col.key, e.target.value)}
             />
           ) : (
             formatValue(col.key, row[col.key])
@@ -48,7 +52,10 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
               <Save fontSize="small" />
             </IconButton>
           ) : (
-            <IconButton onClick={() => setEditIndex(idx)} sx={{ color: "#002060" }}>
+            <IconButton
+              onClick={() => setEditIndex(idx)}
+              sx={{ color: "#002060" }}
+            >
               <Edit fontSize="small" />
             </IconButton>
           )
