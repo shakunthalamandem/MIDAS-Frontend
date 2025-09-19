@@ -1,5 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, TableContainer } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableContainer,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import CompetitorSearch from "./CompetitorSearch";
 import MetricsRow from "./MetricsRow";
 import SnackbarAlert from "./SnackbarAlert";
@@ -21,6 +36,13 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" as "success" | "error" });
 
+  // 🔹 state for delete confirmation
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; row: ComparableMetric | null; index: number | null }>({
+    open: false,
+    row: null,
+    index: null,
+  });
+
   useEffect(() => {
     const allRows = data[ticker]?.data || [];
     const highlightRow = allRows.find((r) => r.ticker === r.competitor || r.competitor.startsWith(r.ticker));
@@ -38,13 +60,22 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
     }
   };
 
-  const handleDeleteRow = async (row: ComparableMetric, rowIndex: number) => {
+  // 🔹 open confirmation dialog
+  const handleDeleteRow = (row: ComparableMetric, rowIndex: number) => {
+    setDeleteDialog({ open: true, row, index: rowIndex });
+  };
+
+  // 🔹 confirm delete action
+  const confirmDelete = async () => {
+    if (!deleteDialog.row || deleteDialog.index === null) return;
     try {
-      await deleteCompetitor(row.ticker, row.competitor);
-      setRows((prev) => prev.filter((_, idx) => idx !== rowIndex));
-      setSnackbar({ open: true, message: "Competitor deleted", severity: "success" });
+      await deleteCompetitor(deleteDialog.row.ticker, deleteDialog.row.competitor);
+      setRows((prev) => prev.filter((_, idx) => idx !== deleteDialog.index));
+      setSnackbar({ open: true, message: "Competitor deleted permanently", severity: "success" });
     } catch (err: any) {
       setSnackbar({ open: true, message: err.message, severity: "error" });
+    } finally {
+      setDeleteDialog({ open: false, row: null, index: null });
     }
   };
 
@@ -89,7 +120,7 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
                 editIndex={editIndex}
                 setEditIndex={setEditIndex}
                 onSave={handleSave}
-                onDelete={handleDeleteRow}
+                onDelete={handleDeleteRow}  
                 columns={columns}
                 formatValue={formatValue}
               />
@@ -97,6 +128,25 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* 🔹 Delete Confirmation Dialog */}
+      <Dialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, row: null, index: null })}>
+        <DialogTitle>
+          <Typography >Delete Competitor</Typography>
+          </DialogTitle>
+        <DialogContent>
+          Are you sure you want to permanently delete{" "}
+          <strong>{deleteDialog.row?.competitor}</strong>?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialog({ open: false, row: null, index: null })} color="inherit">
+            No
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Yes, Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <SnackbarAlert
         open={snackbar.open}
