@@ -24,7 +24,7 @@ export const addCompetitor = async (ticker: string, competitor: string) => {
 
 export const deleteCompetitor = async (ticker: string, competitor: string) => {
   const res = await fetch(`${apiUrl}/api/fs_ticker_competitor_delete/`, {
-    method: "DELETE",
+    method: "POST",
     headers,
     body: JSON.stringify({ ticker, competitor }),
   });
