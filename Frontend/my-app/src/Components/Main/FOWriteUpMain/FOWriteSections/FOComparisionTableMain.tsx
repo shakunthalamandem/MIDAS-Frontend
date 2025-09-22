@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import FOMetricsTableMain from "./FOComparisionData/FOMetricsTableMain";
+import { Card, CardContent, Container } from "@mui/material";
 
 interface FOComparisionTableMainProps {
   ticker: string;
@@ -67,7 +68,13 @@ const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
 
   return (
     <>
-      <FOMetricsTableMain ticker={ticker} data={data} />
+      <Container maxWidth="xl" sx={{ mt: 4 ,mb:4}}>
+        <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+          <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
+            <FOMetricsTableMain ticker={ticker} data={data} />
+          </CardContent>
+        </Card>
+      </Container>
     </>
   );
 };

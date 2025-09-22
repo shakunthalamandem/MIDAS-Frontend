@@ -14,6 +14,8 @@ import {
   Container,
   Grid,
   styled,
+  CardContent,
+  Card,
 } from "@mui/material";
 
 interface ChildProps {
@@ -159,35 +161,39 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
   };
 
   return (
-    <Container maxWidth="lg">
-      <Grid container spacing={4} mb={4} mt={2}>
-        <Grid item xs={12}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: "bold",
-              textAlign: "center",
-              color: "#026269",
-            }}
-          >
-            Financial Highlights
-          </Typography>
+    <Container maxWidth="xl">
+      <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+        <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
+          <Grid container spacing={4} mb={4} mt={2}>
+            <Grid item xs={12}>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  color: "#026269",
+                }}
+              >
+                Financial Highlights
+              </Typography>
 
-          {loading && (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-              <CircularProgress />
-            </Box>
-          )}
+              {loading && (
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                  <CircularProgress />
+                </Box>
+              )}
 
-          {error && (
-            <Alert severity="error" sx={{ mt: 3 }}>
-              {error}
-            </Alert>
-          )}
+              {error && (
+                <Alert severity="error" sx={{ mt: 3 }}>
+                  {error}
+                </Alert>
+              )}
 
-          {!loading && !error && renderTable()}
-        </Grid>
-      </Grid>
+              {!loading && !error && renderTable()}
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
     </Container>
   );
 };

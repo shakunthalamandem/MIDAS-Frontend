@@ -145,7 +145,7 @@ const FOMetricsTableMain: React.FC<Props> = ({ ticker,data }) => {
   };
 
   return (
-    <div style={{ marginTop: 20, marginBottom: 40 }}>
+    <div style={{ marginTop: 20, marginBottom: 20 }}>
       <Box
         sx={{
           display: "flex",
