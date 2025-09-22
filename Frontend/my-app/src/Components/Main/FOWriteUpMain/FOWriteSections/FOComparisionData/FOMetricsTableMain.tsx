@@ -30,8 +30,9 @@ interface Props {
   data: ApiResponse;
 }
 
-const FOMetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
+const FOMetricsTableMain: React.FC<Props> = ({ ticker,data }) => {
   const [rows, setRows] = useState<ComparableMetric[]>([]);
+  
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -144,7 +145,7 @@ const FOMetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
   };
 
   return (
-    <div style={{ marginTop: 20 }}>
+    <div style={{ marginTop: 20, marginBottom: 40 }}>
       <Box
         sx={{
           display: "flex",

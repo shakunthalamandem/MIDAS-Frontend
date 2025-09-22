@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { ExportProvider } from "../../../../contexts/ExportContext";
 import { useFoPdfExport } from "../hooks/useFoPdfExport";
 import FOValuationDashboard from "./FOValuationDashboard";
+import FOMetricsTableMain from "../FOWriteSections/FOComparisionData/FOMetricsTableMain";
 
 interface FOSectionsMainProps {
   ticker: string;
