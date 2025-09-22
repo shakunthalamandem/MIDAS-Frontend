@@ -14,7 +14,7 @@ export const formatValue = (key: string, value: number | string) => {
 
   if (typeof value === "string") return value;
 
-  // if (percentageColumns.includes(key) && value > 500) return "N/A";
+  if (percentageColumns.includes(key) && value > 500) return "nm";
   if (negativeColumns.includes(key))
     return value < 0 ? "nm" : `${Math.round(value * 10) / 10}x`;
   if (percentageColumns.includes(key))
