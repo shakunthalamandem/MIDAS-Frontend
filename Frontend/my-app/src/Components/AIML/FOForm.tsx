@@ -143,7 +143,7 @@ const FOForm: React.FC<FOFormProps> = ({
     if (
       data.deal_size_category === "" ||
       isNaN(parseFloat(data.deal_size_category)) ||
-      parseFloat(data.deal_size_category) <= 0
+      parseFloat(data.deal_size_category) < 0
     ) {
       errors.deal_size_category = "Must be greater than 0";
       isValid = false;

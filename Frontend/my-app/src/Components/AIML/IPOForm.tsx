@@ -134,7 +134,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
     });
 
     // Deal Size > 0
-    if (parseFloat(data.deal_size_category) <= 0) {
+    if (parseFloat(data.deal_size_category) < 0) {
       errors.deal_size_category = "Must be greater than 0";
       isValid = false;
     }
