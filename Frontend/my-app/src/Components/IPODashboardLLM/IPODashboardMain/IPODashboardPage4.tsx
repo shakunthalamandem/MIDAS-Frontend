@@ -15,7 +15,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { FaChartLine } from "react-icons/fa";
-import FinancialForecastTable from "../IPOFinancialTableMain";
+import IPOFinancialTableMain from "../IPOFinancialTableMain";
 import { cardStyle } from "../UtilsIPODashboard";
 import { motion } from "framer-motion";
 import IPOMonasheeScore from "../IPOMonasheeScore";
@@ -123,7 +123,7 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
           <Grid item xs={12}>
             <Card sx={{ ...cardStyle, backgroundColor: "#f9fafc" }}>
               <CardContent>
-                <FinancialForecastTable defaultTicker={selectedTicker} />
+                <IPOFinancialTableMain defaultTicker={selectedTicker} />
               </CardContent>
             </Card>
           </Grid>

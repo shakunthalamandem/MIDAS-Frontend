@@ -87,7 +87,7 @@ const MarketData: React.FC<FormSectionProps> = ({
         {renderField("Launch Date", "launch_date", "date", true)}
         {renderField("Trade Date", "trade_date", "date", true)}
         {renderField("Market Cap($M)", "market_cap")}
-        {renderField("52 Week High", "_52_week_high")}
+        {renderField("52 Week High (Lcl)", "_52_week_high")}
         {renderField("% Below 52 Week High", "percentage_below_52_week_high")}
         {renderField("% Change Last 7 Days", "percentage_change_last_7_days")}
         {renderField("LTM FCF Yield", "ltm_fcf_yield")}

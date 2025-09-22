@@ -533,7 +533,7 @@ const handleSaveValuation = async () => {
     {/* COMPARATIVE TABLE */}
     <Container maxWidth="xl" sx={{ mt: 4 }}>
       <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-        <CardContent sx={{ backgroundColor: "#fff" }}>
+        <CardContent sx={{       background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
           <IPODashboardMainTable ticker={selectedData?.ticker_name ?? ""} />
           <Typography
             variant="caption"
@@ -587,49 +587,89 @@ const handleSaveValuation = async () => {
     </Container>
 
     {/* DIFFERENTIATED SUMMARY */}
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
-      <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-        <CardContent sx={{ backgroundColor: "#fff" }}>
-          <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
-            <FaClipboardList
-              size={24}
-              color="#002060"
-              style={{ marginRight: 8 }}
-            />
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold", color: "#002060" }}
-            >
-              Differentiated Summary
-            </Typography>
-          </Box>
+   <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
+  <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+    <CardContent sx={{ backgroundColor: "#fff" }}>
+      {/* Header row */}
+      <Box
+        display="flex"
+        alignItems="center"
+        mb={2}
+        sx={{ position: "relative" }}
+      >
+        {/* Centered title with icon */}
+        <Box
+          sx={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <FaClipboardList
+            size={24}
+            color="#002060"
+            style={{ marginRight: 8 }}
+          />
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: "bold", color: "#002060" }}
+          >
+            Differentiated Summary
+          </Typography>
+        </Box>
 
+        {/* Action buttons on the right */}
+        <Box ml="auto">
           {editMode ? (
-            <TextField
-              fullWidth
-              size="small"
-              multiline
-              minRows={4}
-              value={
-                editedDealData?.differentiated_summary ??
-                dealData.differentiated_summary ??
-                ""
-              }
-              onChange={(e) =>
-                setEditedDealData((prev) => ({
-                  ...prev!,
-                  differentiated_summary: e.target.value,
-                }))
-              }
-            />
+            <>
+              <IconButton color="primary" onClick={handleSaveDealData}>
+                <SaveIcon />
+              </IconButton>
+              <IconButton color="secondary" onClick={handleCancelEdit}>
+                <CancelIcon />
+              </IconButton>
+            </>
           ) : (
-            <Typography sx={{ color: "#333", whiteSpace: "pre-line" }}>
-              {dealData.differentiated_summary ?? ""}
-            </Typography>
+            <IconButton color="default" onClick={enterEditMode}>
+              <EditIcon />
+            </IconButton>
           )}
-        </CardContent>
-      </Card>
-    </Container>
+        </Box>
+      </Box>
+
+      {/* Body */}
+      {editMode ? (
+        <TextField
+          fullWidth
+          size="small"
+          multiline
+          minRows={4}
+          placeholder="Enter differentiated summary..."
+          value={
+            editedDealData?.differentiated_summary ??
+            dealData.differentiated_summary ??
+            ""
+          }
+          onChange={(e) =>
+            setEditedDealData((prev) => ({
+              ...prev!,
+              differentiated_summary: e.target.value,
+            }))
+          }
+        />
+      ) : (
+        <Typography
+          sx={{ color: "#333", whiteSpace: "pre-line", mt: 2 }}
+        >
+          {dealData.differentiated_summary || "No differentiated summary provided."}
+        </Typography>
+      )}
+    </CardContent>
+  </Card>
+</Container>
+
   </>
 );
 
