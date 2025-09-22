@@ -6,8 +6,8 @@ export const formatValue = (key: string, value: number | string) => {
     "one_year_later_ev_sales",
     "present_year_price_earning",
     "one_year_later_price_earning",
-    "present_year_ev_fcf",
-    "one_year_later_ev_fcf",
+    "present_year_ev_ebitda",
+    "one_year_later_ev_ebitda",
   ];
   const percentageColumns = ["sales_growth", "eps_growth"];
   const numberColumns = ["market_cap", "ev_usd_million", "price_usd"];

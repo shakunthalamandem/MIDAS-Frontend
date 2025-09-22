@@ -42,8 +42,8 @@ const columns = [
   { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
   { key: "present_year_price_earning", label: "2025 P/E" },
   { key: "one_year_later_price_earning", label: "2026 P/E" },
-  { key: "present_year_ev_fcf", label: "2025 EV/EBITDA" },
-  { key: "one_year_later_ev_fcf", label: "2026 EV/EBITDA" },
+  { key: "present_year_ev_ebitda", label: "2025 EV/EBITDA" },
+  { key: "one_year_later_ev_ebitda", label: "2026 EV/EBITDA" },
   { key: "sales_growth", label: "Sales Growth (25-26)" },
   { key: "eps_growth", label: "EPS Growth (25-26)" },
 ];
@@ -57,8 +57,8 @@ const formatValue = (key: string, value: number | string) => {
     "one_year_later_ev_sales",
     "present_year_price_earning",
     "one_year_later_price_earning",
-    "present_year_ev_fcf",
-    "one_year_later_ev_fcf",
+    "present_year_ev_ebitda",
+    "one_year_later_ev_ebitda",
   ];
   const percentageColumns = ["sales_growth", "eps_growth"];
   const numberColumns = ["market_cap", "ev_usd_million"];
@@ -114,8 +114,8 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
       "one_year_later_ev_sales",
       "present_year_price_earning",
       "one_year_later_price_earning",
-      "present_year_ev_fcf",
-      "one_year_later_ev_fcf",
+      "present_year_ev_ebitda",
+      "one_year_later_ev_ebitda",
       "sales_growth",
       "eps_growth",
       "market_cap",
