@@ -52,7 +52,7 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
     <Box sx={{ display: "flex", gap: 1 }}>
       <Autocomplete
         options={options}
-        getOptionLabel={(option: any) => option.ticker} // just ticker for value binding
+        getOptionLabel={(option: any) => option.ticker}
         loading={loading}
         onInputChange={(_, value) => handleSearch(value)}
         onChange={(_, newValue) => setSelected(newValue)}
@@ -87,6 +87,7 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
             {...params}
             size="small"
             label="Add Competitor"
+            placeholder="Please search here"
             InputProps={{
               ...params.InputProps,
               endAdornment: (
