@@ -30,7 +30,7 @@ export const addCompetitor = async (ticker: string, competitor: string) => {
 
 export const deleteCompetitor = async (ticker: string, competitor: string) => {
   const res = await fetch(`${apiUrl}/api/fo_fs_ticker_competitor_delete/`, {
-    method: "DELETE",
+    method: "POST",
      headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
@@ -40,6 +40,8 @@ export const deleteCompetitor = async (ticker: string, competitor: string) => {
   if (!res.ok) throw new Error("Failed to delete competitor");
   return res.json();
 };
+
+
 
 export const updateRow = async (row: any) => {
   const res = await fetch(`${apiUrl}/api/fo_fs_fundamental_data_upload/`, {
