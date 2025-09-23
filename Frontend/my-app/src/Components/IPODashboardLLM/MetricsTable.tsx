@@ -168,7 +168,7 @@ const MetricsTable: React.FC<Props> = ({ ticker, data }) => {
 
     try {
       const res = await fetch(`${apiUrl}/api/fs_ticker_competitor_delete/`, {
-        method: "DELETE",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
