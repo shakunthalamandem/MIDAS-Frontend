@@ -95,7 +95,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         region: item.region || "US",
         sponsor_yn_category:
           item.sponsor === "Y" ? "Y" : item.sponsor === "N" ? "N" : "",
-        deal_size_category: item.deal_size ? String(item.deal_size) : "",
+        deal_size_category: item.deal_size ? String(item.deal_size) : "0",
         percentage_primary_category:
           item.primary_percentage != null ? String(item.primary_percentage) : "",
         sector_category: item.sector || "",
@@ -141,7 +141,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         pricing_date: item.pricing_date ? new Date(item.pricing_date) : null,
         deal_type: "IPO",
         region: item.region || "US",
-        deal_size_category: item.deal_size ? String(item.deal_size) : "",
+        deal_size_category: item.deal_size ? String(item.deal_size) : "0",
         percentage_primary_category:
           item.primary_percentage != null ? String(item.primary_percentage) : "",
         allocation_deal_size_percentage_category:
