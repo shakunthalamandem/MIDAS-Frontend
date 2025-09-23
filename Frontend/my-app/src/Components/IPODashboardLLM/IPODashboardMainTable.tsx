@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, CircularProgress, Alert, Button } from "@mui/material";
-import MetricsTable from "./MetricsTable";
 import MetricsTableMain from "./IPODashboardMain/IPOCompsTableMain/MetricsTableMain";
 
 type ComparableMetric = {

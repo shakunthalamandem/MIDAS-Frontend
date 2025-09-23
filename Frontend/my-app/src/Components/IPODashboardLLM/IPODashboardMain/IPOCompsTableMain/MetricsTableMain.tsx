@@ -90,26 +90,44 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
 };
 
 
-  // 🔹 confirm delete action
-  const confirmDelete = async () => {
-    if (!deleteDialog.row || deleteDialog.index === null) return;
-    try {
-      await deleteCompetitor(
-        deleteDialog.row.ticker,
-        deleteDialog.row.competitor
-      );
+
+const confirmDelete = async () => {
+  if (!deleteDialog.row || deleteDialog.index === null) return;
+  try {
+    await deleteCompetitor(deleteDialog.row.ticker, deleteDialog.row.competitor);
+
+    // refresh if callback provided
+    if (onRefresh) {
+      try {
+        await onRefresh();
+      } catch (refreshErr: any) {
+        console.error("Error refreshing competitor metrics:", refreshErr);
+        setSnackbar({
+          open: true,
+          message:
+            refreshErr?.message ||
+            "Competitor deleted, but failed to refresh the latest metrics.",
+          severity: "error",
+        });
+        return;
+      }
+    } else {
+      // fallback: update local state only
       setRows((prev) => prev.filter((_, idx) => idx !== deleteDialog.index));
-      setSnackbar({
-        open: true,
-        message: "Competitor deleted permanently",
-        severity: "success",
-      });
-    } catch (err: any) {
-      setSnackbar({ open: true, message: err.message, severity: "error" });
-    } finally {
-      setDeleteDialog({ open: false, row: null, index: null });
     }
-  };
+
+    setSnackbar({
+      open: true,
+      message: "Competitor deleted permanently",
+      severity: "success",
+    });
+  } catch (err: any) {
+    setSnackbar({ open: true, message: err.message, severity: "error" });
+  } finally {
+    setDeleteDialog({ open: false, row: null, index: null });
+  }
+};
+
 
   const handleAddCompetitor = async (competitorTicker: string) => {
     const exists = rows.some(

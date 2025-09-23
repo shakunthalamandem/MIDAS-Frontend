@@ -71,7 +71,7 @@ const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
       <Container maxWidth="xl" sx={{ mt: 4 ,mb:4}}>
         <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
           <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
-            <FOMetricsTableMain ticker={ticker} data={data} />
+            <FOMetricsTableMain ticker={ticker} data={data}  />
           </CardContent>
         </Card>
       </Container>
