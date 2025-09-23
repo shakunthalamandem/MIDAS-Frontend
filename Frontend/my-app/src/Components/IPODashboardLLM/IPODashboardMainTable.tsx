@@ -13,8 +13,8 @@ type ComparableMetric = {
   one_year_later_ev_sales: number | null;
   present_year_price_earning: number | null;
   one_year_later_price_earning: number | null;
-  present_year_ev_fcf: number | null;
-  one_year_later_ev_fcf: number | null;
+  present_year_ev_ebitda: number | null;
+  one_year_later_ev_ebitda: number | null;
   sales_growth: number | null;
   eps_growth: number | null;
   ai_generated: boolean;

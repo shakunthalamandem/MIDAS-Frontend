@@ -16,7 +16,7 @@ export const searchTickers = async (query: string) => {
 };
 
 export const addCompetitor = async (ticker: string, competitor: string) => {
-  const res = await fetch(`${apiUrl}/api/fs_ticker_competitor_insert/`, {
+  const res = await fetch(`${apiUrl}/api/fo_fs_ticker_competitor_insert/`, {
     method: "POST",
      headers: {
             "Content-Type": "application/json",
@@ -29,8 +29,8 @@ export const addCompetitor = async (ticker: string, competitor: string) => {
 };
 
 export const deleteCompetitor = async (ticker: string, competitor: string) => {
-  const res = await fetch(`${apiUrl}/api/fs_ticker_competitor_delete/`, {
-    method: "POST",
+  const res = await fetch(`${apiUrl}/api/fo_fs_ticker_competitor_delete/`, {
+    method: "DELETE",
      headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
@@ -42,7 +42,7 @@ export const deleteCompetitor = async (ticker: string, competitor: string) => {
 };
 
 export const updateRow = async (row: any) => {
-  const res = await fetch(`${apiUrl}/api/fs_fundamental_data_upload/`, {
+  const res = await fetch(`${apiUrl}/api/fo_fs_fundamental_data_upload/`, {
     method: "PATCH",
      headers: {
             "Content-Type": "application/json",

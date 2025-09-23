@@ -24,7 +24,8 @@ const FundamentalsTechnical: React.FC = () => {
         | "technical"
         | "fundamental"
         | "news"
-        | "facset_comp_data"
+        | "ipo_facset_comp_data"
+        | "fo_facset_comp_data"
     );
     setResponse(null); // clear previous messages
   };
@@ -50,9 +51,12 @@ const FundamentalsTechnical: React.FC = () => {
       endpoint = `${apiUrl}/api/fundamental_data_download/`;
     } else if (selectedType === "news") {
       endpoint = `${apiUrl}/api/upload_news/`;
-    } else if (selectedType === "facset_comp_data") {
+    } else if (selectedType === "ipo_facset_comp_data") {
       endpoint = `${apiUrl}/api/fs_comp_data_daily_get/`;
-      method = "GET"; // use GET for this one
+      method = "GET"; 
+    } else if (selectedType === "fo_facset_comp_data") {
+      endpoint = `${apiUrl}/api/fo_fs_comp_data_daily_get/`;
+      method = "GET"; 
     }
 
     try {
@@ -100,7 +104,8 @@ const FundamentalsTechnical: React.FC = () => {
               <MenuItem value="technical">Technicals</MenuItem>
               <MenuItem value="fundamental">Fundamentals</MenuItem>
               <MenuItem value="news">Upload News</MenuItem>
-              <MenuItem value="facset_comp_data">FS Comps Update</MenuItem>
+              <MenuItem value="ipo_facset_comp_data"> IPO FS Comps Update</MenuItem>
+              <MenuItem value="fo_facset_comp_data">FO FS Comps Update</MenuItem>
             </Select>
           </FormControl>
 

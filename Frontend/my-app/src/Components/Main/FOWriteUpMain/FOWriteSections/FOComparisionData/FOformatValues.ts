@@ -1,4 +1,4 @@
-export const formatValue = (key: string, value: number | string) => {
+export const FOformatValue = (key: string, value: number | string) => {
   if (value === null || value === undefined || value === "") return "nm";
 
   const negativeColumns = [
