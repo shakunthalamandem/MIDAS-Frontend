@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Box, Typography, CircularProgress, Alert, Button } from "@mui/material";
+import React, { useEffect, useState, useCallback } from "react";
+import { Box, CircularProgress, Alert } from "@mui/material";
 import MetricsTableMain from "./IPODashboardMain/IPOCompsTableMain/MetricsTableMain";
 
 type ComparableMetric = {
@@ -36,7 +36,7 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async (customTicker?: string) => {
+  const fetchData = useCallback(async (customTicker?: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -59,18 +59,14 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-
+  }, [ticker]);
 
   useEffect(() => {
-    fetchData(ticker);
-  }, [ticker]);
+    fetchData();
+  }, [fetchData]);
 
   return (
     <Box sx={{ p: 0, width: "100%" }}>
-
-
       {loading && (
         <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
           <CircularProgress />
@@ -81,11 +77,9 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
         <MetricsTableMain
           ticker={ticker}
           data={data}
-          onRefresh={() => fetchData()}
+          onRefresh={fetchData} 
         />
       )}
-            {/* {!loading && !error && data && <MetricsTableMain ticker={ticker} data={data} />} */}
-
     </Box>
   );
 };
