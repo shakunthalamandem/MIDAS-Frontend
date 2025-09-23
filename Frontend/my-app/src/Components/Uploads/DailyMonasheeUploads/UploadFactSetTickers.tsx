@@ -37,9 +37,10 @@ const UploadFactSetTickers: React.FC = () => {
 
       const response = await fetch(`${apiUrl}/api/upload_factset_tickers/`, {
         method: "POST",
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
+         headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
         body: formData,
       });
 
