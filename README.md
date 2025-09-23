@@ -105,12 +105,3 @@ yarn build
 * This is a **private repository** — intended for internal Monashee teams only.
 * Ensure `.env` is configured properly before running.
 * Do not commit sensitive information (API keys, credentials, etc.) into version control.
-
-```
-
----
-
-✅ This mirrors the backend README style so both repos feel consistent.  
-
-Would you like me to also add a **"Quick Start" block at the very top** (just 3 commands: install, env setup, start) so new devs can get running immediately?
-```
