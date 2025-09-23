@@ -27,9 +27,10 @@ type ApiResponse = {
 interface Props {
   ticker: string;
   data: ApiResponse;
+  onRefresh?: () => Promise<void> | void;
 }
 
-const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
+const MetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
   const [rows, setRows] = useState<ComparableMetric[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState({
@@ -127,6 +128,23 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data }) => {
       const result = await addCompetitor(ticker, competitorTicker);
 
       setRows((prev) => [...prev, result.record]);
+
+      if (onRefresh) {
+        try {
+          await onRefresh();
+        } catch (refreshErr: any) {
+          console.error("Error refreshing competitor metrics:", refreshErr);
+          setSnackbar({
+            open: true,
+            message:
+              refreshErr?.message ||
+              "Competitor added, but failed to refresh the latest metrics.",
+            severity: "error",
+          });
+          return;
+        }
+      }
+
       setSnackbar({
         open: true,
         message: "Competitor added successfully!",

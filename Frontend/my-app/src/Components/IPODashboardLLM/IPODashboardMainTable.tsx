@@ -78,7 +78,13 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
         </Box>
       )}
       {error && <Alert severity="error">{error}</Alert>}
-      {!loading && !error && data && <MetricsTableMain ticker={ticker} data={data} />}
+      {!loading && !error && data && (
+        <MetricsTableMain
+          ticker={ticker}
+          data={data}
+          onRefresh={() => fetchData()}
+        />
+      )}
             {/* {!loading && !error && data && <MetricsTableMain ticker={ticker} data={data} />} */}
 
     </Box>
