@@ -142,7 +142,7 @@ const FundLevelPNLTable: React.FC = () => {
   const overallRowBgColor = "#fde8b7";
 
   return (
-    <Container>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Typography
         variant="h6"
         sx={{ mt: 4, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}
