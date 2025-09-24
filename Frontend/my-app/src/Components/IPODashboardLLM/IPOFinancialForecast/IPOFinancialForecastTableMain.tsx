@@ -74,23 +74,19 @@ const IPOFinancialForecastTableMain: React.FC<IPOFinancialForecastTableMainProps
   }, [defaultTicker]);
 
   // ---------------------- Edit ----------------------
-  const handleEdit = () => {
-    setEditing(true);
-    const copied = JSON.parse(
-      JSON.stringify(forecasts[forecastsTicker.toUpperCase()] || {})
-    );
+const handleEdit = () => {
+  setEditing(true);
+  const copied = JSON.parse(
+    JSON.stringify(forecasts[forecastsTicker.toUpperCase()] || {})
+  );
 
-    // Ensure metrics exist
-    Object.keys({ ...copied, ...growthPairs, ...marginPairs }).forEach((key) =>
-      ensureMetricStructure(copied, key)
-    );
+  // Ensure only existing metrics are structured
+  Object.keys(copied).forEach((key) => ensureMetricStructure(copied, key));
 
-    // Precompute growth
-    for (const base of Object.keys(growthPairs)) {
-      const growth = growthPairs[base];
-      ensureMetricStructure(copied, base);
-      ensureMetricStructure(copied, growth);
-
+  // Precompute growth for ONLY backend metrics that have growth pairs
+  for (const base of Object.keys(copied)) {
+    const growth = growthPairs[base];
+    if (growth && copied[growth]) {
       const prev = safeNumber(copied[base]?.["one_year_before"]);
       const curr = safeNumber(copied[base]?.["current_year"]);
       const next = safeNumber(copied[base]?.["one_year_later"]);
@@ -100,21 +96,22 @@ const IPOFinancialForecastTableMain: React.FC<IPOFinancialForecastTableMainProps
       copied[growth]["one_year_later"] =
         computeGrowthPct(curr, next) ?? copied[growth]["one_year_later"];
     }
+  }
 
-    // Precompute margins
-    for (const [base, margin] of Object.entries(marginPairs)) {
-      ensureMetricStructure(copied, base);
-      ensureMetricStructure(copied, "Sales");
-      ensureMetricStructure(copied, margin);
+  // Precompute margins for ONLY backend metrics that have margin pairs
+  for (const [base, margin] of Object.entries(marginPairs)) {
+    if (copied[base] && copied[margin]) {
       for (const ky of forecastYearKeys) {
         const b = safeNumber(copied[base][ky]);
-        const s = safeNumber(copied["Sales"][ky]);
+        const s = safeNumber(copied["Sales"]?.[ky]);
         copied[margin][ky] = s ? (b / s) * 100 : copied[margin][ky];
       }
     }
+  }
 
-    setEditedData({ [forecastsTicker.toUpperCase()]: copied });
-  };
+  setEditedData({ [forecastsTicker.toUpperCase()]: copied });
+};
+
 
   const handleCancelEdit = () => {
     setEditing(false);

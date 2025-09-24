@@ -111,7 +111,6 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
 
         <TableBody>
             {orderedMetrics.map((metricName: string, rowIndex: number) => {
-            const years = data[metricName] || {};
             const isOddRow = rowIndex % 2 === 1;
 
             return (
