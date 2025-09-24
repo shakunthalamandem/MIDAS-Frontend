@@ -287,8 +287,6 @@ const handleSave = async () => {
     // ---------------- POST fo_fs_ticker_competitor_insert ----------------
     const competitorPayload = {
       ticker: forecastsTicker.toUpperCase(),
-      ev: parseFloat(updatedMetrics["EV"]?.["current_year"] ?? 0),
-      market_cap: parseFloat(updatedMetrics["Market Cap"]?.["current_year"] ?? 0),
       sales_2025: parseFloat(updatedMetrics["Sales"]?.["current_year"] ?? 0),
       sales_2026: parseFloat(updatedMetrics["Sales"]?.["one_year_later"] ?? 0),
       ebitda_2025: parseFloat(updatedMetrics["EBITDA"]?.["current_year"] ?? 0),
