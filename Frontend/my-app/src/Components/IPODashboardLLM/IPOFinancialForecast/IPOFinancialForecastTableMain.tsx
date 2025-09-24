@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Container, Typography, CircularProgress, Alert, Snackbar } from "@mui/material";
+import {
+  Container,
+  Typography,
+  CircularProgress,
+  Alert,
+  Snackbar,
+} from "@mui/material";
 
 import FinancialTableData from "./FinancialTableData";
 import {
@@ -16,9 +22,9 @@ interface IPOFinancialForecastTableMainProps {
   defaultTicker?: string;
 }
 
-const IPOFinancialForecastTableMain: React.FC<IPOFinancialForecastTableMainProps> = ({
-  defaultTicker = "",
-}) => {
+const IPOFinancialForecastTableMain: React.FC<
+  IPOFinancialForecastTableMainProps
+> = ({ defaultTicker = "" }) => {
   const [forecastsInput, setForecastsInput] = useState(defaultTicker);
   const [forecastsTicker, setForecastsTicker] = useState(defaultTicker);
   const [forecasts, setForecasts] = useState<any | null>(null);
@@ -27,12 +33,12 @@ const IPOFinancialForecastTableMain: React.FC<IPOFinancialForecastTableMainProps
   const [editing, setEditing] = useState(false);
   const [editedData, setEditedData] = useState<any>({});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-const [snackbarMessage, setSnackbarMessage] = useState("");
-const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
-const handleCloseSnackbar = () => setSnackbarOpen(false);
-
-  
+  const handleCloseSnackbar = () => setSnackbarOpen(false);
 
   // ---------------------- Fetch ----------------------
   const handleFetchForecasts = async (customTicker?: string) => {
@@ -81,44 +87,43 @@ const handleCloseSnackbar = () => setSnackbarOpen(false);
   }, [defaultTicker]);
 
   // ---------------------- Edit ----------------------
-const handleEdit = () => {
-  setEditing(true);
-  const copied = JSON.parse(
-    JSON.stringify(forecasts[forecastsTicker.toUpperCase()] || {})
-  );
+  const handleEdit = () => {
+    setEditing(true);
+    const copied = JSON.parse(
+      JSON.stringify(forecasts[forecastsTicker.toUpperCase()] || {})
+    );
 
-  // Ensure only existing metrics are structured
-  Object.keys(copied).forEach((key) => ensureMetricStructure(copied, key));
+    // Ensure only existing metrics are structured
+    Object.keys(copied).forEach((key) => ensureMetricStructure(copied, key));
 
-  // Precompute growth for ONLY backend metrics that have growth pairs
-  for (const base of Object.keys(copied)) {
-    const growth = growthPairs[base];
-    if (growth && copied[growth]) {
-      const prev = safeNumber(copied[base]?.["one_year_before"]);
-      const curr = safeNumber(copied[base]?.["current_year"]);
-      const next = safeNumber(copied[base]?.["one_year_later"]);
+    // Precompute growth for ONLY backend metrics that have growth pairs
+    for (const base of Object.keys(copied)) {
+      const growth = growthPairs[base];
+      if (growth && copied[growth]) {
+        const prev = safeNumber(copied[base]?.["one_year_before"]);
+        const curr = safeNumber(copied[base]?.["current_year"]);
+        const next = safeNumber(copied[base]?.["one_year_later"]);
 
-      copied[growth]["current_year"] =
-        computeGrowthPct(prev, curr) ?? copied[growth]["current_year"];
-      copied[growth]["one_year_later"] =
-        computeGrowthPct(curr, next) ?? copied[growth]["one_year_later"];
-    }
-  }
-
-  // Precompute margins for ONLY backend metrics that have margin pairs
-  for (const [base, margin] of Object.entries(marginPairs)) {
-    if (copied[base] && copied[margin]) {
-      for (const ky of forecastYearKeys) {
-        const b = safeNumber(copied[base][ky]);
-        const s = safeNumber(copied["Sales"]?.[ky]);
-        copied[margin][ky] = s ? (b / s) * 100 : copied[margin][ky];
+        copied[growth]["current_year"] =
+          computeGrowthPct(prev, curr) ?? copied[growth]["current_year"];
+        copied[growth]["one_year_later"] =
+          computeGrowthPct(curr, next) ?? copied[growth]["one_year_later"];
       }
     }
-  }
 
-  setEditedData({ [forecastsTicker.toUpperCase()]: copied });
-};
+    // Precompute margins for ONLY backend metrics that have margin pairs
+    for (const [base, margin] of Object.entries(marginPairs)) {
+      if (copied[base] && copied[margin]) {
+        for (const ky of forecastYearKeys) {
+          const b = safeNumber(copied[base][ky]);
+          const s = safeNumber(copied["Sales"]?.[ky]);
+          copied[margin][ky] = s ? (b / s) * 100 : copied[margin][ky];
+        }
+      }
+    }
 
+    setEditedData({ [forecastsTicker.toUpperCase()]: copied });
+  };
 
   const handleCancelEdit = () => {
     setEditing(false);
@@ -126,213 +131,243 @@ const handleEdit = () => {
   };
 
   // ---------------------- Cell Edit Change ----------------------
-const handleEditChange = (metricName: string, yearKey: string, value: string) => {
-  setEditedData((prev: any) => {
-    const updated = {
-      ...prev,
-      [forecastsTicker.toUpperCase()]: {
-        ...prev[forecastsTicker.toUpperCase()],
-        [metricName]: {
-          ...prev[forecastsTicker.toUpperCase()]?.[metricName],
-          [yearKey]: value === "" ? null : value,
+  const handleEditChange = (
+    metricName: string,
+    yearKey: string,
+    value: string
+  ) => {
+    setEditedData((prev: any) => {
+      const updated = {
+        ...prev,
+        [forecastsTicker.toUpperCase()]: {
+          ...prev[forecastsTicker.toUpperCase()],
+          [metricName]: {
+            ...prev[forecastsTicker.toUpperCase()]?.[metricName],
+            [yearKey]: value === "" ? null : value,
+          },
         },
-      },
-    };
+      };
 
-    const data = updated[forecastsTicker.toUpperCase()];
+      const data = updated[forecastsTicker.toUpperCase()];
 
-    // ---------------- Growth recalculation ----------------
-    const recalcGrowthFor = (baseMetric: string) => {
-      const growthMetric = growthPairs[baseMetric];
-      if (!growthMetric) return;
-      if (!data[baseMetric] || !data[growthMetric]) return; // only recalc if both exist
+      // ---------------- Growth recalculation ----------------
+      const recalcGrowthFor = (baseMetric: string) => {
+        const growthMetric = growthPairs[baseMetric];
+        if (!growthMetric) return;
+        if (!data[baseMetric] || !data[growthMetric]) return; // only recalc if both exist
 
-      const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
-      const currVal = safeNumber(data[baseMetric]?.["current_year"]);
-      const nextVal = safeNumber(data[baseMetric]?.["one_year_later"]);
+        const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
+        const currVal = safeNumber(data[baseMetric]?.["current_year"]);
+        const nextVal = safeNumber(data[baseMetric]?.["one_year_later"]);
 
-      if (data[growthMetric]) {
-        data[growthMetric]["current_year"] =
-          prevVal ? computeGrowthPct(prevVal, currVal) : data[growthMetric]["current_year"];
-        data[growthMetric]["one_year_later"] =
-          currVal ? computeGrowthPct(currVal, nextVal) : data[growthMetric]["one_year_later"];
+        if (data[growthMetric]) {
+          data[growthMetric]["current_year"] = prevVal
+            ? computeGrowthPct(prevVal, currVal)
+            : data[growthMetric]["current_year"];
+          data[growthMetric]["one_year_later"] = currVal
+            ? computeGrowthPct(currVal, nextVal)
+            : data[growthMetric]["one_year_later"];
+        }
+      };
+
+      const recalcBaseFromGrowth = (
+        baseMetric: string,
+        growthMetric: string
+      ) => {
+        if (!data[baseMetric] || !data[growthMetric]) return; // only if both exist
+
+        const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
+        const currBase = safeNumber(data[baseMetric]?.["current_year"]);
+        const growthCurr = data[growthMetric]?.["current_year"];
+        const growthNext = data[growthMetric]?.["one_year_later"];
+
+        if (yearKey === "current_year" && prevVal && growthCurr != null) {
+          data[baseMetric]["current_year"] = computeValueFromGrowth(
+            prevVal,
+            Number(growthCurr)
+          );
+        }
+        if (yearKey === "one_year_later" && currBase && growthNext != null) {
+          data[baseMetric]["one_year_later"] = computeValueFromGrowth(
+            currBase,
+            Number(growthNext)
+          );
+        }
+      };
+
+      // ---------------- Margin recalculation ----------------
+      const recalcMarginFor = (baseMetric: string, key: string) => {
+        const marginMetric = marginPairs[baseMetric];
+        if (!marginMetric) return;
+        if (!data["Sales"] || !data[baseMetric] || !data[marginMetric]) return; // only if all exist
+
+        const s = safeNumber(data["Sales"]?.[key]);
+        const b = safeNumber(data[baseMetric]?.[key]);
+        data[marginMetric][key] = s ? (b / s) * 100 : data[marginMetric][key];
+      };
+
+      const applyMarginEdit = (marginMetric: string, key: string) => {
+        const baseMetric = Object.keys(marginPairs).find(
+          (b) => marginPairs[b] === marginMetric
+        );
+        if (!baseMetric) return;
+        if (!data["Sales"] || !data[baseMetric] || !data[marginMetric]) return;
+
+        const s = safeNumber(data["Sales"]?.[key]);
+        const m = Number(data[marginMetric]?.[key]);
+        if (s && !isNaN(m)) {
+          data[baseMetric][key] = (s * m) / 100;
+          if (growthPairs[baseMetric]) recalcGrowthFor(baseMetric);
+        }
+      };
+
+      // ---------------- Apply rules ----------------
+      if (metricName in growthPairs) {
+        recalcGrowthFor(metricName);
+      } else {
+        const baseForThisGrowth = Object.keys(growthPairs).find(
+          (b) => growthPairs[b] === metricName
+        );
+        if (baseForThisGrowth)
+          recalcBaseFromGrowth(baseForThisGrowth, metricName);
       }
-    };
 
-    const recalcBaseFromGrowth = (baseMetric: string, growthMetric: string) => {
-      if (!data[baseMetric] || !data[growthMetric]) return; // only if both exist
-
-      const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
-      const currBase = safeNumber(data[baseMetric]?.["current_year"]);
-      const growthCurr = data[growthMetric]?.["current_year"];
-      const growthNext = data[growthMetric]?.["one_year_later"];
-
-      if (yearKey === "current_year" && prevVal && growthCurr != null) {
-        data[baseMetric]["current_year"] = computeValueFromGrowth(prevVal, Number(growthCurr));
+      if (metricName in marginPairs) {
+        recalcMarginFor(metricName, yearKey);
+      } else {
+        const baseForThisMargin = Object.keys(marginPairs).find(
+          (b) => marginPairs[b] === metricName
+        );
+        if (baseForThisMargin) applyMarginEdit(metricName, yearKey);
       }
-      if (yearKey === "one_year_later" && currBase && growthNext != null) {
-        data[baseMetric]["one_year_later"] = computeValueFromGrowth(currBase, Number(growthNext));
-      }
-    };
 
-    // ---------------- Margin recalculation ----------------
-    const recalcMarginFor = (baseMetric: string, key: string) => {
-      const marginMetric = marginPairs[baseMetric];
-      if (!marginMetric) return;
-      if (!data["Sales"] || !data[baseMetric] || !data[marginMetric]) return; // only if all exist
-
-      const s = safeNumber(data["Sales"]?.[key]);
-      const b = safeNumber(data[baseMetric]?.[key]);
-      data[marginMetric][key] = s ? (b / s) * 100 : data[marginMetric][key];
-    };
-
-    const applyMarginEdit = (marginMetric: string, key: string) => {
-      const baseMetric = Object.keys(marginPairs).find(
-        (b) => marginPairs[b] === marginMetric
-      );
-      if (!baseMetric) return;
-      if (!data["Sales"] || !data[baseMetric] || !data[marginMetric]) return;
-
-      const s = safeNumber(data["Sales"]?.[key]);
-      const m = Number(data[marginMetric]?.[key]);
-      if (s && !isNaN(m)) {
-        data[baseMetric][key] = (s * m) / 100;
-        if (growthPairs[baseMetric]) recalcGrowthFor(baseMetric);
-      }
-    };
-
-    // ---------------- Apply rules ----------------
-    if (metricName in growthPairs) {
-      recalcGrowthFor(metricName);
-    } else {
-      const baseForThisGrowth = Object.keys(growthPairs).find(
-        (b) => growthPairs[b] === metricName
-      );
-      if (baseForThisGrowth) recalcBaseFromGrowth(baseForThisGrowth, metricName);
-    }
-
-    if (metricName in marginPairs) {
-      recalcMarginFor(metricName, yearKey);
-    } else {
-      const baseForThisMargin = Object.keys(marginPairs).find(
-        (b) => marginPairs[b] === metricName
-      );
-      if (baseForThisMargin) applyMarginEdit(metricName, yearKey);
-    }
-
-    if (metricName === "Sales") {
-      for (const [base, margin] of Object.entries(marginPairs)) {
-        if (data[base] && data[margin]) {
-          const s = safeNumber(data["Sales"]?.[yearKey]);
-          const b = safeNumber(data[base]?.[yearKey]);
-          data[margin][yearKey] = s ? (b / s) * 100 : data[margin][yearKey];
+      if (metricName === "Sales") {
+        for (const [base, margin] of Object.entries(marginPairs)) {
+          if (data[base] && data[margin]) {
+            const s = safeNumber(data["Sales"]?.[yearKey]);
+            const b = safeNumber(data[base]?.[yearKey]);
+            data[margin][yearKey] = s ? (b / s) * 100 : data[margin][yearKey];
+          }
         }
       }
-    }
 
-    updated[forecastsTicker.toUpperCase()] = data;
-    return updated;
-  });
-};
+      updated[forecastsTicker.toUpperCase()] = data;
+      return updated;
+    });
+  };
 
+  const handleSave = async () => {
+    setEditing(false);
+    setForecastsError(null);
 
-const handleSave = async () => {
-  setEditing(false);
-  setForecastsError(null);
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem("access_token");
+    if (!apiUrl) return;
 
-  const apiUrl = process.env.REACT_APP_API_URL;
-  const token = localStorage.getItem("access_token");
-  if (!apiUrl) return;
+    try {
+      const updatedMetrics = editedData?.[forecastsTicker.toUpperCase()];
+      if (!updatedMetrics) throw new Error("No edited data found.");
 
-  try {
-    const updatedMetrics = editedData?.[forecastsTicker.toUpperCase()];
-    if (!updatedMetrics) throw new Error("No edited data found.");
+      // ---------------- PATCH financial_forecasts_data_view ----------------
+      for (const metricName in updatedMetrics) {
+        const row = updatedMetrics[metricName];
+        const originalRow =
+          forecasts?.[forecastsTicker.toUpperCase()]?.[metricName];
 
-    // ---------------- PATCH financial_forecasts_data_view ----------------
-    for (const metricName in updatedMetrics) {
-      const row = updatedMetrics[metricName];
-      const originalRow =
-        forecasts?.[forecastsTicker.toUpperCase()]?.[metricName];
+        const fieldsToUpdate: any = {};
+        if (
+          !originalRow ||
+          row["current_year"] !== originalRow["current_year"]
+        ) {
+          fieldsToUpdate["current_year"] = row["current_year"];
+        }
+        if (
+          !originalRow ||
+          row["one_year_later"] !== originalRow["one_year_later"]
+        ) {
+          fieldsToUpdate["one_year_later"] = row["one_year_later"];
+        }
 
-      const fieldsToUpdate: any = {};
-      if (!originalRow || row["current_year"] !== originalRow["current_year"]) {
-        fieldsToUpdate["current_year"] = row["current_year"];
+        if (Object.keys(fieldsToUpdate).length > 0) {
+          const payload = {
+            ticker_name: forecastsTicker.toUpperCase(),
+            metric_name: metricName,
+            ...fieldsToUpdate,
+          };
+
+          const response = await fetch(
+            `${apiUrl}/api/financial_forecasts_data_view/`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: token ? `Bearer ${token}` : "",
+              },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(
+              result.error || result.message || `Failed to update ${metricName}`
+            );
+          }
+        }
       }
-      if (!originalRow || row["one_year_later"] !== originalRow["one_year_later"]) {
-        fieldsToUpdate["one_year_later"] = row["one_year_later"];
-      }
 
-      if (Object.keys(fieldsToUpdate).length > 0) {
-        const payload = {
-          ticker_name: forecastsTicker.toUpperCase(),
-          metric_name: metricName,
-          ...fieldsToUpdate,
+      // ---------------- POST competitor API (fire-and-forget with snackbar) ----------------
+      try {
+        const competitorPayload = {
+          ticker: forecastsTicker.toUpperCase(),
+          sales_2025: parseFloat(
+            updatedMetrics["Sales"]?.["current_year"] ?? 0
+          ),
+          sales_2026: parseFloat(
+            updatedMetrics["Sales"]?.["one_year_later"] ?? 0
+          ),
+          ebitda_2025: parseFloat(
+            updatedMetrics["EBITDA"]?.["current_year"] ?? 0
+          ),
+          ebitda_2026: parseFloat(
+            updatedMetrics["EBITDA"]?.["one_year_later"] ?? 0
+          ),
+          net_income_2025: parseFloat(
+            updatedMetrics["Net Income"]?.["current_year"] ?? 0
+          ),
+          net_income_2026: parseFloat(
+            updatedMetrics["Net Income"]?.["one_year_later"] ?? 0
+          ),
         };
 
-        const response = await fetch(
-          `${apiUrl}/api/financial_forecasts_data_view/`,
+        const competitorResponse = await fetch(
+          `${apiUrl}/api/ipo_financial_data_update_comps`,
           {
-            method: "PATCH",
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization: token ? `Bearer ${token}` : "",
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(competitorPayload),
           }
         );
 
-        const result = await response.json();
-        if (!response.ok) {
-          throw new Error(
-            result.error || result.message || `Failed to update ${metricName}`
-          );
+        if (competitorResponse.ok) {
+          setSnackbarMessage("Competitor table values updated successfully!");
+          setSnackbarSeverity("success");
+          setSnackbarOpen(true);
         }
+        // Failures are ignored
+      } catch (e) {
+        console.warn("Competitor API call failed (ignored):", e);
       }
+
+      // ---------------- Refresh forecasts ----------------
+      await handleFetchForecasts(forecastsTicker);
+    } catch (error: any) {
+      setForecastsError(error.message || "Failed to save data.");
     }
-
-    // ---------------- POST competitor API (fire-and-forget with snackbar) ----------------
-    try {
-      const competitorPayload = {
-        ticker: forecastsTicker.toUpperCase(),
-        sales_2025: parseFloat(updatedMetrics["Sales"]?.["current_year"] ?? 0),
-        sales_2026: parseFloat(updatedMetrics["Sales"]?.["one_year_later"] ?? 0),
-        ebitda_2025: parseFloat(updatedMetrics["EBITDA"]?.["current_year"] ?? 0),
-        ebitda_2026: parseFloat(updatedMetrics["EBITDA"]?.["one_year_later"] ?? 0),
-        net_income_2025: parseFloat(updatedMetrics["Net Income"]?.["current_year"] ?? 0),
-        net_income_2026: parseFloat(updatedMetrics["Net Income"]?.["one_year_later"] ?? 0),
-      };
-
-      const competitorResponse = await fetch(
-        `${apiUrl}/api/ipo_financial_data_update_comps`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify(competitorPayload),
-        }
-      );
-
-      if (competitorResponse.ok) {
-        setSnackbarMessage("Competitor table values updated successfully!");
-        setSnackbarSeverity("success");
-        setSnackbarOpen(true);
-      }
-      // Failures are ignored
-    } catch (e) {
-      console.warn("Competitor API call failed (ignored):", e);
-    }
-
-    // ---------------- Refresh forecasts ----------------
-    await handleFetchForecasts(forecastsTicker);
-
-  } catch (error: any) {
-    setForecastsError(error.message || "Failed to save data.");
-  }
-};
-
-
+  };
 
   // ---------------------- Render ----------------------
   return (
@@ -356,7 +391,11 @@ const handleSave = async () => {
         forecasts &&
         forecasts[forecastsTicker.toUpperCase()] && (
           <FinancialTableData
-            data={editing ? editedData[forecastsTicker.toUpperCase()] : forecasts[forecastsTicker.toUpperCase()]}
+            data={
+              editing
+                ? editedData[forecastsTicker.toUpperCase()]
+                : forecasts[forecastsTicker.toUpperCase()]
+            }
             editing={editing}
             onEdit={handleEdit}
             onSave={handleSave}
@@ -366,21 +405,21 @@ const handleSave = async () => {
           />
         )}
 
-        <Snackbar
-  open={snackbarOpen}
-  autoHideDuration={4000}
-  onClose={handleCloseSnackbar}
-  anchorOrigin={{ vertical: "top", horizontal: "center" }}
->
-  <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: "100%" }}>
-    {snackbarMessage}
-  </Alert>
-</Snackbar>
-
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
-
-
-
   );
 };
 
