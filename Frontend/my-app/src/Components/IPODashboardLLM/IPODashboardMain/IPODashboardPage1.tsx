@@ -14,6 +14,7 @@ interface Props {
   searchText: string;
   setSelectedTicker: (ticker: string | null) => void;
   setSearchText: (text: string) => void;
+  setIpoData: (data: any) => void;
   handleExportPDF: () => void;
   pdfLoading: boolean;
 }
@@ -25,6 +26,7 @@ const IPODashboardPage1: React.FC<Props> = ({
   searchText,
   setSelectedTicker,
   setSearchText,
+  setIpoData,
   handleExportPDF,
   pdfLoading,
 }) => {
@@ -41,6 +43,7 @@ const IPODashboardPage1: React.FC<Props> = ({
         searchText={searchText}
         setSelectedTicker={setSelectedTicker}
         setSearchText={setSearchText}
+        setIpoData={setIpoData}
         onExportPDF={handleExportPDF}
         pdfLoading={pdfLoading}
       />

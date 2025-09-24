@@ -562,6 +562,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
               searchText={searchText}
               setSelectedTicker={setCurrentTicker}
               setSearchText={setSearchText}
+              setIpoData={setIpoData}
               handleExportPDF={handleExportPDFPaginated}
               pdfLoading={pdfLoading}
             />

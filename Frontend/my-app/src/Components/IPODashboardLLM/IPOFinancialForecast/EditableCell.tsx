@@ -26,7 +26,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
       sx={{
         border: "1px solid #000000",
         fontStyle: isEvenRow ? "normal" : "italic",
-        fontSize: "1.3rem",
+        fontSize:isEvenRow ? "1.3rem": "1.1rem",
         backgroundColor: isHighlightColumn
           ? "rgba(248, 247, 245, 1)"
           : isEvenRow

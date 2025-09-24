@@ -110,9 +110,8 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
         </TableHead>
 
         <TableBody>
-          {orderedMetrics.map((metricName: string, rowIndex: number) => {
-            const years = data[metricName] || {};
-            const isEvenRow = rowIndex % 2 === 0;
+            {orderedMetrics.map((metricName: string, rowIndex: number) => {
+            const isOddRow = rowIndex % 2 === 1;
 
             return (
               <TableRow key={metricName}>
@@ -120,9 +119,9 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
                   sx={{
                     border: "1px solid #000000",
                     fontWeight: "bold",
-                    fontStyle: isEvenRow ? "normal" : "italic",
-                    fontSize: "1.3rem",
-                    backgroundColor: isEvenRow ? "" : "#ebebeb",
+                    fontStyle: isOddRow ? "italic" : "normal",
+                    fontSize: isOddRow ? "1rem" : "1.3rem",
+                    backgroundColor: isOddRow ? "" : "#ebebeb",
                   }}
                 >
                   {metricName}
@@ -130,7 +129,9 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
 
                 {forecastYearKeys.map((yearKey) => {
                   const isEditableCell =
-                    editing && (yearKey === "current_year" || yearKey === "one_year_later");
+                    editing &&
+                    (yearKey === "current_year" || yearKey === "one_year_later") &&
+                    !isOddRow;
                   const isHighlightColumn =
                     yearKey === "current_year" || yearKey === "one_year_later";
                   const renderAsPercent =
@@ -145,7 +146,7 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
                       isEditable={isEditableCell}
                       value={value}
                       onChange={(val) => onChange(metricName, yearKey, val)}
-                      isEvenRow={isEvenRow}
+                      isEvenRow={!isOddRow}
                       isHighlightColumn={isHighlightColumn}
                       renderAsPercent={renderAsPercent}
                       formatter={renderAsPercent ? formatFinancialMargin : formatFinancialValue}
