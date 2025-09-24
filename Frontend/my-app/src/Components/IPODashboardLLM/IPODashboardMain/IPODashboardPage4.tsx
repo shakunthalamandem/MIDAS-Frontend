@@ -24,6 +24,7 @@ import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
 import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
+import IPOFinancialForecastTableMain from "../IPOFinancialForecast/IPOFinancialForecastTableMain";
 
 interface Props {
   selectedTicker: string;
@@ -123,7 +124,8 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
           <Grid item xs={12}>
             <Card sx={{ ...cardStyle, backgroundColor: "#f9fafc" }}>
               <CardContent>
-                <IPOFinancialTableMain defaultTicker={selectedTicker} />
+                {/* <IPOFinancialTableMain defaultTicker={selectedTicker} /> */}
+                <IPOFinancialForecastTableMain defaultTicker={selectedTicker} />
               </CardContent>
             </Card>
           </Grid>
