@@ -341,7 +341,7 @@ const IPOFinancialForecastTableMain: React.FC<
         };
 
         const competitorResponse = await fetch(
-          `${apiUrl}/api/ipo_financial_data_update_comps`,
+          `${apiUrl}/api/ipo_financial_data_update_comps/`,
           {
             method: "POST",
             headers: {
