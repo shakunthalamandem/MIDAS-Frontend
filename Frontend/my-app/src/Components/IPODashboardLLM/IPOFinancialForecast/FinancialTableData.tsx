@@ -119,7 +119,7 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
                   sx={{
                     border: "1px solid #000000",
                     fontWeight: "bold",
-                    fontStyle: isOddRow ? "normal" : "italic",
+                    fontStyle: isOddRow ? "italic" : "normal",
                     fontSize: isOddRow ? "1rem" : "1.3rem",
                     backgroundColor: isOddRow ? "" : "#ebebeb",
                   }}
