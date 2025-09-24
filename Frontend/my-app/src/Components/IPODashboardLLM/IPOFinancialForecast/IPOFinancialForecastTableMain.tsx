@@ -230,64 +230,102 @@ const handleEditChange = (metricName: string, yearKey: string, value: string) =>
 
 
   // ---------------------- Save ----------------------
-  const handleSave = async () => {
-    setEditing(false);
-    setForecastsError(null);
+const handleSave = async () => {
+  setEditing(false);
+  setForecastsError(null);
 
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem("access_token");
-    if (!apiUrl) return;
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+  if (!apiUrl) return;
 
-    try {
-      const updatedMetrics = editedData?.[forecastsTicker.toUpperCase()];
-      if (!updatedMetrics) throw new Error("No edited data found.");
+  try {
+    const updatedMetrics = editedData?.[forecastsTicker.toUpperCase()];
+    if (!updatedMetrics) throw new Error("No edited data found.");
 
-      for (const metricName in updatedMetrics) {
-        const row = updatedMetrics[metricName];
-        const originalRow =
-          forecasts?.[forecastsTicker.toUpperCase()]?.[metricName];
+    // ---------------- PATCH financial_forecasts_data_view ----------------
+    for (const metricName in updatedMetrics) {
+      const row = updatedMetrics[metricName];
+      const originalRow =
+        forecasts?.[forecastsTicker.toUpperCase()]?.[metricName];
 
-        const fieldsToUpdate: any = {};
-        if (!originalRow || row["current_year"] !== originalRow["current_year"]) {
-          fieldsToUpdate["current_year"] = row["current_year"];
-        }
-        if (!originalRow || row["one_year_later"] !== originalRow["one_year_later"]) {
-          fieldsToUpdate["one_year_later"] = row["one_year_later"];
-        }
-
-        if (Object.keys(fieldsToUpdate).length > 0) {
-          const payload = {
-            ticker_name: forecastsTicker.toUpperCase(),
-            metric_name: metricName,
-            ...fieldsToUpdate,
-          };
-
-          const response = await fetch(
-            `${apiUrl}/api/financial_forecasts_data_view/`,
-            {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: token ? `Bearer ${token}` : "",
-              },
-              body: JSON.stringify(payload),
-            }
-          );
-
-          const result = await response.json();
-          if (!response.ok) {
-            throw new Error(
-              result.error || result.message || `Failed to update ${metricName}`
-            );
-          }
-        }
+      const fieldsToUpdate: any = {};
+      if (!originalRow || row["current_year"] !== originalRow["current_year"]) {
+        fieldsToUpdate["current_year"] = row["current_year"];
+      }
+      if (!originalRow || row["one_year_later"] !== originalRow["one_year_later"]) {
+        fieldsToUpdate["one_year_later"] = row["one_year_later"];
       }
 
-      await handleFetchForecasts(forecastsTicker);
-    } catch (error: any) {
-      setForecastsError(error.message || "Failed to save data.");
+      if (Object.keys(fieldsToUpdate).length > 0) {
+        const payload = {
+          ticker_name: forecastsTicker.toUpperCase(),
+          metric_name: metricName,
+          ...fieldsToUpdate,
+        };
+
+        const response = await fetch(
+          `${apiUrl}/api/financial_forecasts_data_view/`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(
+            result.error || result.message || `Failed to update ${metricName}`
+          );
+        }
+      }
     }
-  };
+
+    // ---------------- POST fo_fs_ticker_competitor_insert ----------------
+    const competitorPayload = {
+      ticker: forecastsTicker.toUpperCase(),
+      ev: parseFloat(updatedMetrics["EV"]?.["current_year"] ?? 0),
+      market_cap: parseFloat(updatedMetrics["Market Cap"]?.["current_year"] ?? 0),
+      sales_2025: parseFloat(updatedMetrics["Sales"]?.["current_year"] ?? 0),
+      sales_2026: parseFloat(updatedMetrics["Sales"]?.["one_year_later"] ?? 0),
+      ebitda_2025: parseFloat(updatedMetrics["EBITDA"]?.["current_year"] ?? 0),
+      ebitda_2026: parseFloat(updatedMetrics["EBITDA"]?.["one_year_later"] ?? 0),
+      net_income_2025: parseFloat(updatedMetrics["Net Income"]?.["current_year"] ?? 0),
+      net_income_2026: parseFloat(updatedMetrics["Net Income"]?.["one_year_later"] ?? 0),
+    };
+
+    const competitorResponse = await fetch(
+      `${apiUrl}/api/fo_fs_ticker_competitor_insert`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(competitorPayload),
+      }
+    );
+
+    const competitorResult = await competitorResponse.json();
+    if (!competitorResponse.ok) {
+      throw new Error(
+        competitorResult.error ||
+          competitorResult.message ||
+          "Failed to insert competitor data."
+      );
+    }
+
+    // ---------------- Refresh forecasts ----------------
+    await handleFetchForecasts(forecastsTicker);
+
+  } catch (error: any) {
+    setForecastsError(error.message || "Failed to save data.");
+  }
+};
+
 
   // ---------------------- Render ----------------------
   return (
