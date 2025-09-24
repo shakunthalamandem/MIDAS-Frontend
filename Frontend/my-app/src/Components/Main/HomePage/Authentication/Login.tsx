@@ -164,176 +164,196 @@ const Login: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xs" sx={{ mt: 8, mb: 8 }}>
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-        <Box textAlign="center" mb={2}>
-          <Typography
-            variant="h5"
-            fontWeight={600}
-            color="primary"
-            gutterBottom
-          >
-            Welcome to MIDAS!
-          </Typography>
-          <Typography variant="body2">Please log in to continue.</Typography>
-        </Box>
-
-        {errorMsg && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {errorMsg}
-          </Alert>
-        )}
-
-        <Box component="form" onSubmit={handleLogin} noValidate>
-          <TextField
-            fullWidth
-            label="Username"
-            autoComplete="username"
-            autoFocus
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            sx={{ mb: 2 }}
-            InputLabelProps={{ shrink: true }}
-          />
-
-          <Box position="relative" width="100%" sx={{ mb: 2 }}>
-            <TextField
-              fullWidth
-              label="Password"
-              type={passwordVisible ? "text" : "password"}
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-            <IconButton
-              aria-label={passwordVisible ? "Hide password" : "Show password"}
-              onClick={togglePasswordVisibility}
-              edge="end"
-              sx={{ position: "absolute", top: 6, right: 8 }}
+    <Box>
+      <Box
+        sx={{
+          fontWeight: 500,
+          color: "#FFFFFF",
+          fontSize: { xs: "1rem", sm: "1.15rem" },
+          backgroundColor: "#002060",
+          textAlign: "center",
+          py: 1.25,
+          borderRadius: 2,
+          mt: 1.5,
+          mb: 2,
+        }}
+      >
+        Welcome to Monashee Insights & Data Application System! Access powerful
+        insights and data with MIDAS.
+      </Box>
+      <Container maxWidth={false} sx={{ mt: 8, mb: 8, maxWidth: "500px" }}>
+        <Paper
+          elevation={4}
+          sx={{ p: 4, borderRadius: 3, backgroundColor: "#e8f1f9" }}
+        >
+          <Box textAlign="center" mb={2}>
+            <Typography
+              variant="h5"
+              fontWeight={500}
+              color="primary"
+              gutterBottom
             >
-              {passwordVisible ? <BsEye /> : <BsEyeSlash />}
-            </IconButton>
+              Login to Continue
+            </Typography>
           </Box>
 
-          {/* CAPTCHA */}
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            gap={1.5}
-            sx={{ mb: 2 }}
-          >
-            <Box display="flex" alignItems="center" gap={1}>
-              <canvas
-                ref={canvasRef}
-                width={120}
-                height={40}
-                aria-label="CAPTCHA"
-                role="img"
-                style={{
-                  border: "1px solid #d3d3d3",
-                  backgroundColor: "#fafafa",
-                  borderRadius: 6,
-                }}
+          {errorMsg && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {errorMsg}
+            </Alert>
+          )}
+
+          <Box component="form" onSubmit={handleLogin} noValidate>
+            <TextField
+              fullWidth
+              label="Username"
+              autoComplete="username"
+              autoFocus
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              sx={{ mb: 2 }}
+              InputLabelProps={{ shrink: true }}
+            />
+
+            <Box position="relative" width="100%" sx={{ mb: 2 }}>
+              <TextField
+                fullWidth
+                label="Password"
+                type={passwordVisible ? "text" : "password"}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
               <IconButton
-                aria-label="Refresh CAPTCHA"
-                onClick={refreshCaptcha}
-                size="small"
+                aria-label={passwordVisible ? "Hide password" : "Show password"}
+                onClick={togglePasswordVisibility}
+                edge="end"
+                sx={{ position: "absolute", top: 6, right: 8 }}
               >
-                <Refresh />
+                {passwordVisible ? <BsEye /> : <BsEyeSlash />}
               </IconButton>
             </Box>
 
-            <TextField
-              label={`Enter ${CAPTCHA_LEN}-digit Captcha`}
-              placeholder=""
-              inputMode="numeric"
-              value={userInput}
-              onChange={(e) => {
-                const v = e.target.value
-                  .replace(/\D+/g, "")
-                  .slice(0, CAPTCHA_LEN);
-                setUserInput(v);
+            {/* CAPTCHA */}
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              gap={1.5}
+              sx={{ mb: 2 }}
+            >
+              <Box display="flex" alignItems="center" gap={1}>
+                <canvas
+                  ref={canvasRef}
+                  width={120}
+                  height={40}
+                  aria-label="CAPTCHA"
+                  role="img"
+                  style={{
+                    border: "1px solid #d3d3d3",
+                    backgroundColor: "#fafafa",
+                    borderRadius: 6,
+                  }}
+                />
+                <IconButton
+                  aria-label="Refresh CAPTCHA"
+                  onClick={refreshCaptcha}
+                  size="small"
+                >
+                  <Refresh />
+                </IconButton>
+              </Box>
+
+              <TextField
+                label={`Enter ${CAPTCHA_LEN}-digit Captcha`}
+                placeholder=""
+                inputMode="numeric"
+                value={userInput}
+                onChange={(e) => {
+                  const v = e.target.value
+                    .replace(/\D+/g, "")
+                    .slice(0, CAPTCHA_LEN);
+                  setUserInput(v);
+                }}
+                onFocus={() => setSnackbarOpen(false)}
+                sx={{ width: 160 }}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Box>
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={!canSubmit}
+              sx={{
+                py: 1.25,
+                borderRadius: 2,
               }}
-              onFocus={() => setSnackbarOpen(false)}
-              sx={{ width: 160 }}
-              InputLabelProps={{ shrink: true }}
-            />
+            >
+              {loading ? (
+                <CircularProgress size={22} color="inherit" />
+              ) : (
+                "Log In"
+              )}
+            </Button>
           </Box>
 
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            disabled={!canSubmit}
-            sx={{
-              py: 1.25,
-              borderRadius: 2,
-            }}
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            spacing={1}
+            mt={3}
           >
-            {loading ? (
-              <CircularProgress size={22} color="inherit" />
-            ) : (
-              "Log In"
-            )}
-          </Button>
-        </Box>
-
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          spacing={1}
-          mt={3}
-        >
-          <Grid item>
-            <Typography variant="body2" color="text.secondary">
-              Don&apos;t have an account?
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Link to="/summarypopup" style={{ textDecoration: "none" }}>
-              <Typography variant="body2" color="primary">
-                Sign Up
+            <Grid item>
+              <Typography variant="body2" color="text.secondary">
+                Don&apos;t have an account?
               </Typography>
-            </Link>
+            </Grid>
+            <Grid item>
+              <Link to="/summarypopup" style={{ textDecoration: "none" }}>
+                <Typography variant="body2" color="primary">
+                  Sign Up
+                </Typography>
+              </Link>
+            </Grid>
           </Grid>
-        </Grid>
 
-        <Grid container justifyContent="center" alignItems="center" mt={2}>
-          <Typography
-            onClick={() => setOpen(true)}
-            variant="body2"
-            color="error"
-            sx={{
-              cursor: "pointer",
-              "&:hover": { textDecoration: "underline" },
-            }}
-          >
-            Forgot Password?
-          </Typography>
-          <ForgotPassword open={open} onClose={() => setOpen(false)} />
-        </Grid>
-      </Paper>
+          <Grid container justifyContent="center" alignItems="center" mt={2}>
+            <Typography
+              onClick={() => setOpen(true)}
+              variant="body2"
+              color="error"
+              sx={{
+                cursor: "pointer",
+                "&:hover": { textDecoration: "underline" },
+              }}
+            >
+              Forgot Password?
+            </Typography>
+            <ForgotPassword open={open} onClose={() => setOpen(false)} />
+          </Grid>
+        </Paper>
 
-      {/* Wrong captcha snackbar */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={2400}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
+        {/* Wrong captcha snackbar */}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={2400}
           onClose={() => setSnackbarOpen(false)}
-          severity="warning"
-          sx={{ width: "100%" }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
-          Incorrect CAPTCHA. Please try again.
-        </Alert>
-      </Snackbar>
-    </Container>
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity="warning"
+            sx={{ width: "100%" }}
+          >
+            Incorrect CAPTCHA. Please try again.
+          </Alert>
+        </Snackbar>
+      </Container>
+    </Box>
   );
 };
 
