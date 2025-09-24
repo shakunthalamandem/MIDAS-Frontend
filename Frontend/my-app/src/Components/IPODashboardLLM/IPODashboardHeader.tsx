@@ -30,6 +30,7 @@ interface IPODashboardHeaderProps {
   searchText: string;
   setSelectedTicker: (ticker: string | null) => void;
   setSearchText: (text: string) => void;
+  setIpoData: (data: any) => void;
   onExportPDF: () => void;
   pdfLoading: boolean;
 }
@@ -41,6 +42,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   searchText,
   setSelectedTicker,
   setSearchText,
+  setIpoData,
   onExportPDF,
   pdfLoading,
 }) => {
@@ -133,13 +135,13 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
 <IPOdashboardLine
   ipodata={ipoData}
   selectedTicker={selectedTicker || ""}
-  setIpoData={ipoData} // ✅ Correct function to update IPO data
+  setIpoData={setIpoData}
 />
 
       <IPOSummaryTable
         ipodata={ipoData}
         selectedTicker={selectedTicker || ""}
-        setIpoData={setSelectedTicker}
+        setIpoData={setIpoData}
       />
       <IPODealsS1DealData
         selectedData={{
