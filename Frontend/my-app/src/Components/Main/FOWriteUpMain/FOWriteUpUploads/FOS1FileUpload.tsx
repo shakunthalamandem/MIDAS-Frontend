@@ -22,6 +22,7 @@ const FOS1FileUpload: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
@@ -62,20 +63,23 @@ const FOS1FileUpload: React.FC = () => {
     }
 
     const formData = new FormData();
-    files.forEach((file) => formData.append("files", file)); // note: key "files" should be handled by backend
+    files.forEach((file) => formData.append("files", file)); 
     formData.append("market", market.trim());
     formData.append("ticker", ticker.trim());
 
-    const endpoint = `${apiUrl}/api/upload_fo_s1_data/`;
 
     setLoading(true);
     setSnackbarOpen(false);
 
     try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        body: formData,
-      });
+const response = await fetch(`${apiUrl}/api/upload_fo_s1_data/`, {
+  method: "POST",
+  headers: {
+    Authorization: token ? `Bearer ${token}` : "",
+  },
+  body: formData,
+});
+
 
       const data = await response.json();
 
