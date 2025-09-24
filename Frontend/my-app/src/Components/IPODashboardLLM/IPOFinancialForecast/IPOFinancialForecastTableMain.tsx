@@ -298,7 +298,7 @@ const handleSave = async () => {
     };
 
     const competitorResponse = await fetch(
-      `${apiUrl}/api/fo_fs_ticker_competitor_insert`,
+      `${apiUrl}/api/ipo_financial_data_update_comps`,
       {
         method: "POST",
         headers: {
