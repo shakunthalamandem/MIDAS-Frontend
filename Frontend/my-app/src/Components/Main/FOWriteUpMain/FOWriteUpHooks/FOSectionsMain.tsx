@@ -86,7 +86,6 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
 
       if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
       const data: TickerData = await response.json();
-      console.log("IPO Data Response:", data);
       setIpoData(data);
     } catch (error) {
       console.error("Failed to fetch IPO details:", error);
