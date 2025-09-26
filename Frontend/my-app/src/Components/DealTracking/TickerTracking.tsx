@@ -24,6 +24,7 @@ interface TickerTrackingData {
   region?: string;
   pricing_range_min?: number | null;
   pricing_range_max?: number | null;
+  issue_price?: number | null;
   basic_writeup_available?: string | null;
   writeup_finalised?: string | null;
   allocation_as_percentage_of_ioi?: number | null;
@@ -105,10 +106,10 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
     }
     return num.toString();
   };
-const isValidWriteup = (val?: string | null) => {
-  if (!val) return false;
-  return val.trim() !== "We are launching the FO writeups soon.";
-};
+  const isValidWriteup = (val?: string | null) => {
+    if (!val) return false;
+    return val.trim() !== "We are launching the FO writeups soon.";
+  };
   const steps = trackingData
     ? [
         {
@@ -119,35 +120,46 @@ const isValidWriteup = (val?: string | null) => {
           value: `${trackingData.deal_type} - ${trackingData.region}`,
           completed: true,
         },
-      {
-        label: "Preliminary Writeup",
-        value: trackingData.basic_writeup_available,
-        completed: isValidWriteup(trackingData.basic_writeup_available),
-      },
         {
-          label: "Pricing Range",
-          value:
-            trackingData.pricing_range_min !== null &&
-            trackingData.pricing_range_max !== null
-              ? `$: ${formatValue(trackingData.pricing_range_min)} - $: ${formatValue(
-                  trackingData.pricing_range_max
-                )}`
-              : "Not Available",
-          completed:
-            trackingData.pricing_range_min !== null &&
-            trackingData.pricing_range_max !== null,
+          label: "Preliminary Writeup",
+          value: trackingData.basic_writeup_available,
+          completed: isValidWriteup(trackingData.basic_writeup_available),
         },
-      {
-        label: "Deal Writeup Finalised",
-        value: trackingData.writeup_finalised,
-        completed: isValidWriteup(trackingData.writeup_finalised),
-      },
-          {
+        {
+          label: "Pricing",
+          value:
+            trackingData.deal_type === "IPO"
+              ? trackingData.pricing_range_min !== null &&
+                trackingData.pricing_range_max !== null
+                ? `$${formatValue(trackingData.pricing_range_min)} - $${formatValue(
+                    trackingData.pricing_range_max
+                  )}`
+                : "Not Available"
+              : trackingData.deal_type === "FO"
+                ? trackingData.issue_price !== null
+                  ? `$${formatValue(trackingData.issue_price)}`
+                  : "Not Available"
+                : "Not Available",
+          completed:
+            trackingData.deal_type === "IPO"
+              ? trackingData.pricing_range_min !== null &&
+                trackingData.pricing_range_max !== null
+              : trackingData.deal_type === "FO"
+                ? trackingData.issue_price !== null
+                : false,
+        },
+        {
+          label: "Deal Writeup Finalised",
+          value: trackingData.writeup_finalised,
+          completed: isValidWriteup(trackingData.writeup_finalised),
+        },
+        {
           label: "Allocation % of Deal Size",
           value: `${formatValue(
             trackingData.allocation_as_percentage_of_deal_size
           )}%`,
-          completed: trackingData.allocation_as_percentage_of_deal_size !== null,
+          completed:
+            trackingData.allocation_as_percentage_of_deal_size !== null,
         },
         {
           label: "IOI (Indication of Interest)",
