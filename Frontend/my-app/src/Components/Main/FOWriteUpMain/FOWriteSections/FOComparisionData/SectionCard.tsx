@@ -49,11 +49,19 @@ const SectionCard: React.FC<SectionCardProps> = ({
         borderRadius: 3,
         boxShadow: "0 6px 14px rgba(0,0,0,0.06)",
         background: "linear-gradient(#f0f5ff, #f0f5ff)",
+        height: "100%", // ✅ makes all cards same height in flex/grid
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Accordion
         disableGutters
-        sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}
+        sx={{
+          background: "linear-gradient(#f0f5ff, #f0f5ff)",
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
@@ -71,7 +79,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
               textAlign: "center",
               userSelect: "none",
             }}
-            onClick={(e) => e.stopPropagation()} // ✅ prevent toggle on title click
+            onClick={(e) => e.stopPropagation()} // ✅ prevent toggle on title
           >
             {title}
           </Typography>
@@ -82,7 +90,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
               <CheckCircle
                 fontSize="small"
                 sx={{ color: "#1e7f34", mr: 1 }}
-                onClick={(e) => e.stopPropagation()} // ✅ prevent toggle
+                onClick={(e) => e.stopPropagation()}
               />
             </Tooltip>
           )}
@@ -92,16 +100,14 @@ const SectionCard: React.FC<SectionCardProps> = ({
                 fontSize="small"
                 color="error"
                 sx={{ mr: 1 }}
-                onClick={(e) => e.stopPropagation()} // ✅ prevent toggle
+                onClick={(e) => e.stopPropagation()}
               />
             </Tooltip>
           )}
 
           {/* Edit / Save Button */}
           <Tooltip title={isEditing ? "Save" : "Edit"}>
-            <span
-              onClick={(e) => e.stopPropagation()} // ✅ prevent toggle
-            >
+            <span onClick={(e) => e.stopPropagation()}>
               <IconButton
                 onClick={isEditing ? onSave : onEdit}
                 disabled={isLoading}
@@ -114,17 +120,18 @@ const SectionCard: React.FC<SectionCardProps> = ({
           </Tooltip>
         </AccordionSummary>
 
-        <AccordionDetails>
-          <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
+        <AccordionDetails sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+          <CardContent
+            sx={{
+              background: "linear-gradient(#f0f5ff, #f0f5ff)",
+              flexGrow: 1,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             {isLoading && <LinearProgress sx={{ mb: 2, borderRadius: 1 }} />}
 
-            <Box
-              mt={1}
-              display="flex"
-              flexDirection="column"
-              gap={1}
-              sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}
-            >
+            <Box mt={1} display="flex" flexDirection="column" gap={1} flexGrow={1}>
               {values.map((sentence, idx) => (
                 <SectionEditor
                   key={idx}
