@@ -12,9 +12,8 @@ import {
 import { motion } from "framer-motion";
 
 import FODealInformation from "../FOWriteSections/FODealInformation";
-import FOTradingDetails from "../FOWriteSections/FOTradingDetails";
 
-import FOSharePricePerformance from "../FOWriteSections/FOSharePricePerformance";
+import FOCombined from "../FOWriteSections/FOCombined";
 
 
 interface ChildProps {
@@ -86,14 +85,13 @@ const FOSummaryDataSection: React.FC<ChildProps> = ({ ticker, deal_id }) => {
       <Container maxWidth="xl" sx={{ mt: 4 }}>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-             <FOTradingDetails data={formData.trading_details} ticker={ticker} />
 
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FOSharePricePerformance selectedData={formData.share_price_performance} ticker={ticker} />
+<FOCombined 
+  shareData={formData.share_price_performance} 
+  tradingData={formData.trading_details} 
+  ticker={ticker} 
+/>
 
-            </Grid>
           </Grid>
         </motion.div>
       </Container>
