@@ -4,18 +4,15 @@ import {
   CircularProgress,
   Box,
   Typography,
-  Container,
-  Grid,
+
 
 } from "@mui/material";
 
-import { motion } from "framer-motion";
 
 
 import FOValuationWriteup from "../FOWriteSections/FOValuationWriteup";
-import FOStrengthWriteUp from "../FOWriteSections/FOStrengthWriteUp";
-import FOBusinessHighlights from "../FOWriteSections/FOBusinessHighlights";
-import FOManagementWriteUp from "../FOWriteSections/FOManagementWriteUp";
+
+import FOBusinessDetails from "../FOWriteSections/FOBusinessDetails";
 
 interface ChildProps {
   ticker: string;
@@ -81,26 +78,10 @@ const FOValuationDashboard: React.FC<ChildProps> = ({ ticker, deal_id }) => {
 
 
 <FOValuationWriteup selectedData={formData.valuation_writeup} ticker={ticker} />
+<FOBusinessDetails selectedData={formData.business_details} ticker={ticker} />
 
-      <Container maxWidth="xl" sx={{ mt: 4 }}>
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <FOBusinessHighlights
-                selectedData={formData.business_highlights} ticker={ticker} 
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FOManagementWriteUp
-                selectedData={formData.management_writeup}
-                ticker={ticker}
-              />
-            </Grid>
-          </Grid>
-          <FOStrengthWriteUp selectedData={formData.strength_writeup} ticker={ticker} />
 
-        </motion.div>
-      </Container>
+
     </>
   );
 };
