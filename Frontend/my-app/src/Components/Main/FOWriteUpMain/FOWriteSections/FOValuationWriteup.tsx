@@ -20,9 +20,6 @@ import ErrorOutline from "@mui/icons-material/ErrorOutline";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 
-
-
-
 interface ValuationWriteup {
   future_outlook?: string;
   company_overview?: string;
@@ -51,7 +48,9 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({
   // Store each section as an array of sentences
   const [values, setValues] = useState<Record<SectionKey, string[]>>({
     future_outlook: vw?.future_outlook ? vw.future_outlook.split("\n") : [],
-    company_overview: vw?.company_overview ? vw.company_overview.split("\n") : [],
+    company_overview: vw?.company_overview
+      ? vw.company_overview.split("\n")
+      : [],
     recent_developments: vw?.recent_developments
       ? vw.recent_developments.split("\n")
       : [],
@@ -69,7 +68,9 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({
     recent_developments: false,
   });
 
-  const [status, setStatus] = useState<Record<SectionKey, "idle" | "success" | "error">>({
+  const [status, setStatus] = useState<
+    Record<SectionKey, "idle" | "success" | "error">
+  >({
     future_outlook: "idle",
     company_overview: "idle",
     recent_developments: "idle",
@@ -81,7 +82,9 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({
   useEffect(() => {
     setValues({
       future_outlook: vw?.future_outlook ? vw.future_outlook.split("\n") : [],
-      company_overview: vw?.company_overview ? vw.company_overview.split("\n") : [],
+      company_overview: vw?.company_overview
+        ? vw.company_overview.split("\n")
+        : [],
       recent_developments: vw?.recent_developments
         ? vw.recent_developments.split("\n")
         : [],
@@ -185,80 +188,115 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({
                     sx={{
                       p: { xs: 1, md: 1.5 },
                       borderRadius: 3,
-                      background: isEditing ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.6)",
+                      background: isEditing
+                        ? "rgba(255,255,255,0.9)"
+                        : "rgba(255,255,255,0.6)",
                       border: "1px solid rgba(0,0,0,0.06)",
-                      boxShadow: isEditing ? "0 6px 14px rgba(0,0,0,0.06)" : "none",
+                      boxShadow: isEditing
+                        ? "0 6px 14px rgba(0,0,0,0.06)"
+                        : "none",
                     }}
                   >
                     <Box display="flex" alignItems="center" gap={1}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#026269", flexGrow: 1 }}>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ fontWeight: 700, color: "#026269", flexGrow: 1 }}
+                      >
                         {i + 1}. {title}
                       </Typography>
 
-                      {state === "success" && <Tooltip title="Saved"><CheckCircle fontSize="small" sx={{ color: "#1e7f34" }} /></Tooltip>}
-                      {state === "error" && <Tooltip title="Failed to save"><ErrorOutline fontSize="small" color="error" /></Tooltip>}
+                      {state === "success" && (
+                        <Tooltip title="Saved">
+                          <CheckCircle
+                            fontSize="small"
+                            sx={{ color: "#1e7f34" }}
+                          />
+                        </Tooltip>
+                      )}
+                      {state === "error" && (
+                        <Tooltip title="Failed to save">
+                          <ErrorOutline fontSize="small" color="error" />
+                        </Tooltip>
+                      )}
 
                       <Tooltip title={isEditing ? "Save" : "Edit"}>
                         <span>
-                          <IconButton onClick={() => isEditing ? handleSave(key) : startEdit(key)} disabled={isLoading} sx={{ color: "#002060" }} size="small">
+                          <IconButton
+                            onClick={() =>
+                              isEditing ? handleSave(key) : startEdit(key)
+                            }
+                            disabled={isLoading}
+                            sx={{ color: "#002060" }}
+                            size="small"
+                          >
                             {isEditing ? <SaveIcon /> : <EditIcon />}
                           </IconButton>
                         </span>
                       </Tooltip>
                     </Box>
 
-                    {isLoading && <LinearProgress sx={{ my: 1, borderRadius: 1 }} />}
+                    {isLoading && (
+                      <LinearProgress sx={{ my: 1, borderRadius: 1 }} />
+                    )}
 
-<Box mt={1} display="flex" flexDirection="column" gap={1}>
-  {values[key].map((sentence, idx) => (
-    <Box key={idx} display="flex" alignItems="center" gap={1}>
-      {isEditing ? (
-        <>
-          <TextField
-            fullWidth
-            value={sentence}
-            onChange={(e) => handleChange(key, idx, e.target.value)}
-            size="small"
-          />
-          {/* Circles for + and - */}
-          <Box display="flex" gap={0.5}>
-            <IconButton
-              size="small"
-              onClick={() => handleAddSentence(key)}
-              sx={{
-                bgcolor: "#e0f7fa",
-                "&:hover": { bgcolor: "#b2ebf2" },
-                width: 32,
-                height: 32,
-                p: 0,
-              }}
-            >
-              <AddIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={() => handleRemoveSentence(key, idx)}
-              sx={{
-                bgcolor: "#ffebee",
-                "&:hover": { bgcolor: "#ffcdd2" },
-                width: 32,
-                height: 32,
-                p: 0,
-              }}
-            >
-              <RemoveIcon fontSize="small" />
-            </IconButton>
-          </Box>
-        </>
-      ) : (
-        <Typography sx={{ lineHeight: 1.8, whiteSpace: "pre-line" }}>
-          • {sentence || "—"}
-        </Typography>
-      )}
-    </Box>
-  ))}
-</Box>
-
+                    <Box mt={1} display="flex" flexDirection="column" gap={1}>
+                      {values[key].map((sentence, idx) => (
+                        <Box
+                          key={idx}
+                          display="flex"
+                          alignItems="center"
+                          gap={1}
+                        >
+                          {isEditing ? (
+                            <>
+                              <TextField
+                                fullWidth
+                                value={sentence}
+                                onChange={(e) =>
+                                  handleChange(key, idx, e.target.value)
+                                }
+                                size="small"
+                              />
+                              {/* Circles for + and - */}
+                              <Box display="flex" gap={0.5}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleAddSentence(key)}
+                                  sx={{
+                                    bgcolor: "#e0f7fa",
+                                    "&:hover": { bgcolor: "#b2ebf2" },
+                                    width: 32,
+                                    height: 32,
+                                    p: 0,
+                                  }}
+                                >
+                                  <AddIcon fontSize="small" />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleRemoveSentence(key, idx)}
+                                  sx={{
+                                    bgcolor: "#ffebee",
+                                    "&:hover": { bgcolor: "#ffcdd2" },
+                                    width: 32,
+                                    height: 32,
+                                    p: 0,
+                                  }}
+                                >
+                                  <RemoveIcon fontSize="small" />
+                                </IconButton>
+                              </Box>
+                            </>
+                          ) : (
+                            <Typography
+                              sx={{ lineHeight: 1.8, whiteSpace: "pre-line" }}
+                            >
+                              • {sentence || "—"}
+                            </Typography>
+                          )}
+                        </Box>
+                      ))}
+                    </Box>
                   </Box>
                 );
               })}
