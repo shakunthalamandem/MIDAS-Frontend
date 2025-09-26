@@ -8,8 +8,8 @@ export interface BusinessDetails {
 export type SectionKey = keyof BusinessDetails;
 
 export const SECTION_ORDER: { key: SectionKey; title: string }[] = [
-  { key: "strengths", title: "Strengths" },
-  { key: "weakness", title: "Weakness" },
-  { key: "management", title: "Management" },
   { key: "business_highlights", title: "Business Highlights" },
+  { key: "management", title: "Management" },
+  { key: "strengths", title: "Strengths" },
+  { key: "weakness", title: "Concerns" },
 ];
