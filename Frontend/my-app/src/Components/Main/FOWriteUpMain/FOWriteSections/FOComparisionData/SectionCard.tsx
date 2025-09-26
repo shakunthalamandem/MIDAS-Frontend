@@ -54,7 +54,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
       <Accordion disableGutters>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography
-            variant="subtitle1"
+            variant="h6"
             sx={{
               fontWeight: 700,
               color: "#026269",
