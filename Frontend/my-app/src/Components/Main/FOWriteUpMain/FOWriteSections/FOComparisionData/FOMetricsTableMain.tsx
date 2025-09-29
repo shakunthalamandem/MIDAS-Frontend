@@ -31,8 +31,9 @@ interface Props {
   data: ApiResponse;
   onRefresh?: () => Promise<void> | void;
 }
-const FOMetricsTableMain: React.FC<Props> = ({ ticker,data,onRefresh}) => {
+const FOMetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
   const { forceExpand } = useExportContext();
+  const showActions = !forceExpand;
   const [rows, setRows] = useState<ComparableMetric[]>([]);
   
   const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -197,11 +198,13 @@ const confirmDelete = async () => {
                   {col.label}
                 </TableCell>
               ))}
-              <TableCell
-                sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}
-              >
-                Action
-              </TableCell>
+              {showActions && (
+                <TableCell
+                  sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}
+                >
+                  Action
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
 
@@ -218,6 +221,7 @@ const confirmDelete = async () => {
                 onChangeCell={handleChangeCell}
                 columns={columns}
                 formatValue={FOformatValue}
+                showActions={showActions}
               />
             ))}
             {/* Append Average and Median rows with heading */}
@@ -254,7 +258,7 @@ const confirmDelete = async () => {
 
                     return null;
                   })}
-                  <TableCell />
+                  {showActions && <TableCell />}
                 </TableRow>
               ))}
           </TableBody>
@@ -282,4 +286,3 @@ const confirmDelete = async () => {
 };
 
 export default FOMetricsTableMain;
-
