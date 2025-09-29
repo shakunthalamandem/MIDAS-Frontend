@@ -9,6 +9,7 @@ import {
   Card,
   CardContent,
   Box,
+  Container,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -101,13 +102,15 @@ const FSDealUnifiedMain: React.FC = () => {
   );
 
   return (
-    <Paper elevation={3} sx={{ padding: 4, maxWidth: 1400, margin: "2rem auto" }}>
-      <Typography variant="h5" gutterBottom color="#002060" align="center">
+    <>
+    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
+        <Card sx={{ padding: 3, bgcolor: "#f9f9f9" }} elevation={6}>
+      <Typography variant="h6" gutterBottom color="#002060" align="center">
         Deal Data Fetcher
       </Typography>
 
       <Grid container spacing={2} sx={{ marginBottom: 2 }}>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
           <TextField
             label="Ticker"
             fullWidth
@@ -115,7 +118,7 @@ const FSDealUnifiedMain: React.FC = () => {
             onChange={(e) => setTicker(e.target.value)}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
           <TextField
             label="Pricing Date"
             type="date"
@@ -125,17 +128,21 @@ const FSDealUnifiedMain: React.FC = () => {
             InputLabelProps={{ shrink: true }}
           />
         </Grid>
-      </Grid>
+        <Grid item xs={12} sm={4}>
 
+            
       <Button
         variant="contained"
         color="primary"
         onClick={fetchData}
         disabled={loading}
-        sx={{ marginBottom: 3 }}
+        sx={{ marginBottom: 3,bgcolor: "#002060",}}
       >
         {loading ? <CircularProgress size={24} color="inherit" /> : "Fetch Data"}
       </Button>
+        </Grid>
+      </Grid>
+
 
       {error && (
         <Typography color="error" sx={{ marginTop: 2 }}>
@@ -171,7 +178,9 @@ const FSDealUnifiedMain: React.FC = () => {
           </Grid>
         </Box>
       )}
-    </Paper>
+      </Card>
+    </Container>
+    </>
   );
 };
 
