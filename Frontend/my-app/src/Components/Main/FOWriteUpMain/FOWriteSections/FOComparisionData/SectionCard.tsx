@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -17,6 +17,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 import ErrorOutline from "@mui/icons-material/ErrorOutline";
 import SectionEditor from "./SectionEditor";
+import { useExportContext } from "../../../../../contexts/ExportContext";
 
 interface SectionCardProps {
   title: string;
@@ -43,6 +44,20 @@ const SectionCard: React.FC<SectionCardProps> = ({
   onAdd,
   onRemove,
 }) => {
+  const { forceExpand } = useExportContext();
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    if (isEditing) {
+      setExpanded(true);
+    }
+  }, [isEditing]);
+
+  const handleAccordionChange = (_event: React.SyntheticEvent, isOpen: boolean) => {
+    setExpanded(isOpen);
+  };
+
+  const isAccordionExpanded = forceExpand || isEditing || expanded;
   return (
     <Card
       sx={{
@@ -56,6 +71,9 @@ const SectionCard: React.FC<SectionCardProps> = ({
     >
       <Accordion
         disableGutters
+        expanded={isAccordionExpanded}
+        onChange={handleAccordionChange}
+        TransitionProps={{ unmountOnExit: false }}
         sx={{
           background: "linear-gradient(#f0f5ff, #f0f5ff)",
           flexGrow: 1,
@@ -64,7 +82,11 @@ const SectionCard: React.FC<SectionCardProps> = ({
         }}
       >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
+          expandIcon={
+            <Box component="span" data-expander="true">
+              <ExpandMoreIcon />
+            </Box>
+          }
           sx={{
             alignItems: "center",
             background: "linear-gradient(#f0f5ff, #f0f5ff)",
@@ -152,3 +174,4 @@ const SectionCard: React.FC<SectionCardProps> = ({
 };
 
 export default SectionCard;
+
