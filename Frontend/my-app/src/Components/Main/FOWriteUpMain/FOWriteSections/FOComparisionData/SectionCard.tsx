@@ -67,6 +67,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
         height: "100%", // ✅ makes all cards same height in flex/grid
         display: "flex",
         flexDirection: "column",
+        flex: 1,
       }}
     >
       <Accordion
