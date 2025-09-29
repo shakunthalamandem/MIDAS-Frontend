@@ -124,7 +124,13 @@ const FOBusinessDetails: React.FC<FOBusinessDetailsProps> = ({
       >
         <Grid container spacing={2}>
           {SECTION_ORDER.map(({ key, title }) => (
-            <Grid item xs={12} md={6} key={key}>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              key={key}
+              sx={{ display: "flex", alignItems: "stretch" }}
+            >
               <SectionCard
                 title={title}
                 values={values[key]}
@@ -146,3 +152,4 @@ const FOBusinessDetails: React.FC<FOBusinessDetailsProps> = ({
 };
 
 export default FOBusinessDetails;
+
