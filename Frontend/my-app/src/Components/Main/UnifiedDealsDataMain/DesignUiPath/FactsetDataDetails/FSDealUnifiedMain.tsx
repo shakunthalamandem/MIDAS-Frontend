@@ -81,7 +81,7 @@ const FSDealUnifiedMain: React.FC = () => {
 
   return (
     <Paper elevation={3} sx={{ padding: 4, maxWidth: 600, margin: "2rem auto" }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h6" gutterBottom color="#002060" align="center">
         Fetch Deal Data
       </Typography>
 
