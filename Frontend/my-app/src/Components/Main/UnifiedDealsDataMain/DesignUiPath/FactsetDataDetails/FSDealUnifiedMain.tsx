@@ -82,7 +82,7 @@ const FSDealUnifiedMain: React.FC = () => {
     value !== null ? (isPercentage ? value.toFixed(2) + "%" : value.toFixed(2)) : "-";
 
   const renderCardItem = (label: string, value: number | string | null, isPercentage = false) => (
-    <Grid item xs={12} sm={6} md={2.4} key={label}>
+    <Grid item xs={12} sm={6} md={2} key={label}>
       <Card
         component={motion.div}
         whileHover={{ scale: 1.03 }}
