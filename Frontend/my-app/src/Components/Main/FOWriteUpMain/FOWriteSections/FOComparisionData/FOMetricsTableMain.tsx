@@ -16,6 +16,7 @@ import DeleteConfirmDialog from "../../../../IPODashboardLLM/IPODashboardMain/IP
 import MetricsRow from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/MetricsRow";
 import SnackbarAlert from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/SnackbarAlert";
 import { FOformatValue } from "./FOformatValues";
+import { useExportContext } from "../../../../../contexts/ExportContext";
 import { addCompetitor, deleteCompetitor, updateRow } from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/Services/FOapi";
 
 
@@ -31,6 +32,7 @@ interface Props {
   onRefresh?: () => Promise<void> | void;
 }
 const FOMetricsTableMain: React.FC<Props> = ({ ticker,data,onRefresh}) => {
+  const { forceExpand } = useExportContext();
   const [rows, setRows] = useState<ComparableMetric[]>([]);
   
   const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -165,7 +167,7 @@ const confirmDelete = async () => {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: forceExpand ? "flex-start" : "space-between",
           alignItems: "center",
           mb: 2,
         }}
@@ -173,7 +175,9 @@ const confirmDelete = async () => {
         <Typography variant="h6" color="#002060" fontWeight={600}>
           Comparative Trading Multiples & Performance Metrics
         </Typography>
-        <CompetitorSearch onSelect={handleAddCompetitor} />
+        {!forceExpand && (
+          <CompetitorSearch onSelect={handleAddCompetitor} />
+        )}
       </Box>
 
       <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2 }}>
@@ -278,3 +282,4 @@ const confirmDelete = async () => {
 };
 
 export default FOMetricsTableMain;
+
