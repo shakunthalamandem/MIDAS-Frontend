@@ -29,7 +29,7 @@ interface LoginResponse {
 }
 
 const CAPTCHA_LEN = 4;
-const REQUEST_TIMEOUT_MS = 10000;
+const REQUEST_TIMEOUT_MS = 60000;
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
