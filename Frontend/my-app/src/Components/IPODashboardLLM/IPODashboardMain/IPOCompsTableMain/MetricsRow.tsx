@@ -12,6 +12,7 @@ interface MetricsRowProps {
   onChangeCell: (rowIndex: number, key: string, value: string) => void; 
   columns: { key: string; label: string; minWidth?: number }[];
   formatValue: (key: string, value: any) => string | number;
+  showActions?: boolean;
 }
 
 const MetricsRow: React.FC<MetricsRowProps> = ({
@@ -24,6 +25,7 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
   onChangeCell,
   columns,
   formatValue,
+  showActions = true,
 }) => {
   const isFirstRow =
     idx === 0 &&
@@ -45,26 +47,28 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
         </TableCell>
       ))}
 
-      <TableCell align="center">
-        {isFirstRow ? (
-          editIndex === idx ? (
-            <IconButton onClick={() => onSave(idx)} sx={{ color: "#002060" }}>
-              <Save fontSize="small" />
-            </IconButton>
+      {showActions && (
+        <TableCell align="center">
+          {isFirstRow ? (
+            editIndex === idx ? (
+              <IconButton onClick={() => onSave(idx)} sx={{ color: "#002060" }}>
+                <Save fontSize="small" />
+              </IconButton>
+            ) : (
+              <IconButton
+                onClick={() => setEditIndex(idx)}
+                sx={{ color: "#002060" }}
+              >
+                <Edit fontSize="small" />
+              </IconButton>
+            )
           ) : (
-            <IconButton
-              onClick={() => setEditIndex(idx)}
-              sx={{ color: "#002060" }}
-            >
-              <Edit fontSize="small" />
+            <IconButton onClick={() => onDelete(row, idx)} sx={{ color: "red" }}>
+              <Delete fontSize="small" />
             </IconButton>
-          )
-        ) : (
-          <IconButton onClick={() => onDelete(row, idx)} sx={{ color: "red" }}>
-            <Delete fontSize="small" />
-          </IconButton>
-        )}
-      </TableCell>
+          )}
+        </TableCell>
+      )}
     </TableRow>
   );
 };
