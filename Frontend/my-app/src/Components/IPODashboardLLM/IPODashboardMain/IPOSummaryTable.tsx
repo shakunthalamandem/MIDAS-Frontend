@@ -25,7 +25,7 @@ const infoFields: { label: string; key: string }[] = [
   { label: "Pricing Date", key: "pricing_date" },
   { label: "Price Range", key: "price_range" },
   { label: "Deal Size ($ Million)", key: "deal_size" },
-  { label: "Sector", key: "sector" },
+  { label: "Sector", key: "industry" },
   { label: "Shares Offered", key: "shares_offered" },
   { label: "No of Shares Outstanding", key: "nosh" },
   { label: "Established", key: "established_year" },
