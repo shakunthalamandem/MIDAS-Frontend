@@ -158,7 +158,7 @@ const FSDealUnifiedMain: React.FC = () => {
             {renderCardItem("Market Cap", data.market_cap)}
             {renderCardItem("52 Week High", data.fifty_two_week_high)}
             {renderCardItem("% Below 52W High", data.percentage_below_52_week_high, true)}
-            {renderCardItem("Price Change Week", data.price_change_week)}
+            {renderCardItem("% Change Last 7 Days", data.price_change_week)}
             {renderCardItem("LTM FCF Yield", data.fcf_yield_ltm)}
             {renderCardItem("LTM Dividend Yield ", data.dividend_yield_ltm, true)}
             {renderCardItem("Shares Outstanding", data.shares_outstanding)}
