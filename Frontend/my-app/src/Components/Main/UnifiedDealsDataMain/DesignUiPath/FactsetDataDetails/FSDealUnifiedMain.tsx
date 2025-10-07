@@ -163,6 +163,8 @@ const FSDealUnifiedMain: React.FC = () => {
             {renderCardItem("LTM Dividend Yield ", data.dividend_yield_ltm, true)}
             {renderCardItem("Shares Outstanding", data.shares_outstanding)}
             {renderCardItem("% of Free Float", data.free_float_percentage, true)}
+            {renderCardItem("Short Interest", data.short_interest)}
+            {renderCardItem("Short Interest % of Deal", data.short_interest_percentage_of_deal, true)}
             {renderCardItem("Short Interest Shares", data.short_interest_shares)}
             {renderCardItem("3-Month ADTV", data.three_months_adtv_shares)}
             {renderCardItem("3M ADTV Shares", data.three_months_adtv_shares)}
@@ -175,8 +177,7 @@ const FSDealUnifiedMain: React.FC = () => {
             {renderCardItem("DMA 50", data.dma_50)}
             {renderCardItem("DMA 100", data.dma_100)}
             {renderCardItem("Date", data.date)}
-            {renderCardItem("Short Interest", data.short_interest)}
-            {renderCardItem("Short Interest % of Deal", data.short_interest_percentage_of_deal, true)}
+          
           </Grid>
         </Box>
       )}
