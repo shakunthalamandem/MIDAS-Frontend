@@ -106,7 +106,7 @@ const FSDealUnifiedMain: React.FC = () => {
     <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
         <Card sx={{ padding: 3, bgcolor: "#f9f9f9" }} elevation={6}>
       <Typography variant="h6" gutterBottom color="#002060" align="center">
-        Deal Data Fetcher
+        Factset Deals Data Details
       </Typography>
 
       <Grid container spacing={2} sx={{ marginBottom: 2 }}>
