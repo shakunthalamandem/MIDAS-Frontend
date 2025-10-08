@@ -29,6 +29,7 @@ interface DealData {
   price_change_week: number | null;
   dividend_yield_ltm: number | null;
   three_months_adtv_shares: number | null;
+  three_months_adtv_value: number | null;
   beta_sp500: number | null;
   three_month_volatility: number | null;
   rsi_14d: number | null;
@@ -166,7 +167,7 @@ const FSDealUnifiedMain: React.FC = () => {
             {renderCardItem("Short Interest", data.short_interest)}
             {renderCardItem("Short Interest % of Deal", data.short_interest_percentage_of_deal, true)}
             {renderCardItem("Short Interest Shares", data.short_interest_shares)}
-            {renderCardItem("3-Month ADTV", data.three_months_adtv_shares)}
+            {renderCardItem("3-Month ADTV", data.three_months_adtv_value)}
             {renderCardItem("3M ADTV Shares", data.three_months_adtv_shares)}
             {renderCardItem("Beta S&P500", data.beta_sp500)}
             {renderCardItem("3M Volatility", data.three_month_volatility, true)}
