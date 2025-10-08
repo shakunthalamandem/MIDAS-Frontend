@@ -2,17 +2,22 @@ import React from "react";
 import {
   Box,
   Grid,
+  IconButton,
   TextField,
   Typography,
 } from "@mui/material";
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { FormSectionProps } from "../../../types/NewDealFormData";
+import { useNavigate } from "react-router-dom";
 
 const TechnicalMarketData: React.FC<FormSectionProps> = ({
   data,
   editable,
   onChange,
 }) => {
+
+    const navigate = useNavigate();
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...data, [e.target.name]: e.target.value });
   };
@@ -22,6 +27,8 @@ const TechnicalMarketData: React.FC<FormSectionProps> = ({
       <Typography variant="body2" color="#002060" gutterBottom fontWeight={500}>
         {label}
       </Typography>
+
+
       <TextField
         name={name}
         value={data[name] || ""}
@@ -52,9 +59,23 @@ const TechnicalMarketData: React.FC<FormSectionProps> = ({
 
   return (
     <>
-      <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600} mb={2}>
+      {/* <Typography variant="h6" gutterBottom align="center" color="#002060" fontWeight={600} mb={2}> */}
+
+            <Typography
+        variant="h6"
+        gutterBottom
+        align="center"
+        color="#002060"
+        fontWeight={600}
+      >
         <Box display="inline-flex" alignItems="center" gap={1}>
-          <AssessmentIcon  />
+          <IconButton
+            size="small"
+            sx={{ color: "#002060" }}
+            onClick={() => navigate("/fs_new_deal_data")}
+          >
+            <AssessmentIcon />
+          </IconButton>
           Technical Market Data
         </Box>
       </Typography>
