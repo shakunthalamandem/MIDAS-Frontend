@@ -5,17 +5,15 @@ import PNLLmvDataTablesMain from "./PNLLmvDataTablesMain"; // make sure path is 
 const PNLRiskReportMain = () => {
   const defaultFund = "FMAP"; // default fund
 
+  // Get today's date in MM/DD/YYYY format
+  const today = new Date();
+  const formattedDate = `${String(today.getMonth() + 1).padStart(2, "0")}/${String(
+    today.getDate()
+  ).padStart(2, "0")}/${today.getFullYear()}`;
+
   return (
     <Container sx={{ mt: 4, mb: 4 }} maxWidth="xl">
-      <Typography
-        variant="h5"
-        color="#002060"
-        fontWeight={700}
-        gutterBottom
-        sx={{ mb: 3 }}
-      >
-        Risk Report to Fund
-      </Typography>
+     
 
       {/* Card container */}
       <Paper
@@ -27,6 +25,13 @@ const PNLRiskReportMain = () => {
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
         }}
       >
+        <Box sx={{ mb: 2 }}>
+          {/* Dynamic fund summary heading */}
+          <Typography variant="h6" fontWeight={600} color="#002060" align="center">
+            {`${defaultFund}: Summary as of ${formattedDate}`}
+          </Typography>
+        </Box>
+
         <Box>
           <PNLLmvDataTablesMain fund={defaultFund} />
         </Box>
