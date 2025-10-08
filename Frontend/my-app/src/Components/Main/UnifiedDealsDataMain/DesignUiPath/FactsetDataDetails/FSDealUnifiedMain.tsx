@@ -9,10 +9,11 @@ import {
   CircularProgress,
   Box,
   Container,
+  Stack,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import FSNewDealFormUpdate from "./FSNewDealFormUpdate"; // Modal form
-import FSCompetitorSearch from "./FSCompetitorSearch"; // Search ticker/company
+import FSNewDealFormUpdate from "./FSNewDealFormUpdate";
+import FSCompetitorSearch from "./FSCompetitorSearch";
 
 interface DealData {
   ticker: string;
@@ -106,22 +107,34 @@ const FSDealUnifiedMain: React.FC = () => {
     }
   };
 
+  // Reset all fields
+  const resetFields = () => {
+    setTicker("");
+    setPricingDate("2025-09-29");
+    setData(null);
+    setError(null);
+  };
+
   const formatValue = (value: number | null, isPercentage = false) =>
     value !== null ? (isPercentage ? value.toFixed(2) + "%" : value.toFixed(2)) : "-";
 
   const renderCardItem = (label: string, value: number | string | null, isPercentage = false) => (
-    <Grid item xs={12} sm={6} md={2} key={label}>
+    <Grid item xs={12} sm={4} md={2} key={label}>
       <Card
         component={motion.div}
-        whileHover={{ scale: 1.03 }}
-        sx={{ backgroundColor: "#f0f4ff", margin: 1 }}
+        whileHover={{ scale: 1.05 }}
+        sx={{
+          margin: 1,
+          background: "linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%)",
+          color: "#002060",
+        }}
         elevation={4}
       >
-        <CardContent>
-          <Typography variant="subtitle2" color="#555">
+        <CardContent sx={{ py: 1 }}>
+          <Typography variant="caption" color="#555">
             {label}
           </Typography>
-          <Typography variant="h6" color="#002060">
+          <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
             {typeof value === "number" ? formatValue(value, isPercentage) : value || "-"}
           </Typography>
         </CardContent>
@@ -130,82 +143,105 @@ const FSDealUnifiedMain: React.FC = () => {
   );
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
-      <Card sx={{ padding: 3, bgcolor: "#f9f9f9" }} elevation={6}>
+    <Container maxWidth="xl" sx={{ mt: 3, mb: 4 }}>
+      <Card
+        sx={{
+          padding: 3,
+          bgcolor: "#f9f9f9",
+          borderRadius: 3,
+          boxShadow: "0 6px 15px rgba(0,0,0,0.1)",
+        }}
+        elevation={6}
+      >
         <Typography variant="h6" gutterBottom color="#002060" align="center">
           Factset Deals Data Details
         </Typography>
 
-        {/* === Ticker Search Component === */}
-        <Box sx={{ marginBottom: 3 }}>
-          <FSCompetitorSearch onSelect={(selectedTicker) => setTicker(selectedTicker)} />
-        </Box>
+        {/* Ticker Search Component */}
+        <Stack direction="row" spacing={2} sx={{ mb: 2 }} alignItems="center">
+          <Box sx={{ flex: 1 }}>
+            <FSCompetitorSearch onSelect={(selectedTicker) => setTicker(selectedTicker)} />
+          </Box>
 
-        <Grid container spacing={2} sx={{ marginBottom: 2 }}>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Ticker"
-              fullWidth
-              value={ticker}
-              onChange={(e) => setTicker(e.target.value)}
-              placeholder="Enter ticker manually or select from above"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Pricing Date"
-              type="date"
-              fullWidth
-              value={pricingDate}
-              onChange={(e) => setPricingDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4} display="flex" gap={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={fetchData}
-              disabled={loading}
-              sx={{ bgcolor: "#002060" }}
-            >
-              {loading ? <CircularProgress size={24} color="inherit" /> : "Fetch Data"}
-            </Button>
+          <TextField
+            size="small"
+            label="Ticker"
+            value={ticker}
+            onChange={(e) => setTicker(e.target.value)}
+            placeholder="Enter ticker manually"
+           
+          />
 
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => setOpenForm(true)}
-              disabled={!data}
-            >
-              Upload to New Deal Form
-            </Button>
-          </Grid>
-        </Grid>
+          <TextField
+            size="small"
+            label="Pricing Date"
+            type="date"
+            value={pricingDate}
+            onChange={(e) => setPricingDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={fetchData}
+            disabled={loading}
+            sx={{
+              bgcolor: "#00796b",
+              "&:hover": { bgcolor: "#004d40" },
+              height: "40px",
+            }}
+          >
+            {loading ? <CircularProgress size={20} color="inherit" /> : "Fetch Data"}
+          </Button>
+
+          <Button
+            size="small"
+            variant="outlined"
+            color="secondary"
+            onClick={() => setOpenForm(true)}
+            disabled={!data}
+            sx={{ height: "40px" }}
+          >
+            Upload to New Deal Form
+          </Button>
+
+          <Button
+            size="small"
+            variant="outlined"
+            color="error"
+            onClick={resetFields}
+            sx={{ height: "40px" }}
+          >
+            Reset
+          </Button>
+        </Stack>
 
         {error && (
-          <Typography color="error" sx={{ marginTop: 2 }}>
+          <Typography color="error" sx={{ marginBottom: 2 }}>
             {error}
           </Typography>
         )}
 
+        {/* Data Cards */}
         {data && (
-          <Box sx={{ marginTop: 3 }}>
-            <Grid container spacing={2}>
+          <Box sx={{ mt: 2 }}>
+            <Grid container spacing={1}>
               {renderCardItem("Ticker", data.ticker)}
               {renderCardItem("Current Price ($)", data.current_price)}
-              {renderCardItem("Market Cap ($ in Millions)", data.market_cap)}
-              {renderCardItem("52 Week High ($)", data.fifty_two_week_high)}
+              {renderCardItem("Market Cap ($M)", data.market_cap)}
+              {renderCardItem("52W High ($)", data.fifty_two_week_high)}
               {renderCardItem("% Below 52W High", data.percentage_below_52_week_high, true)}
-              {renderCardItem("% Change Last 7 Days", data.price_change_week)}
+              {renderCardItem("% Change 7D", data.price_change_week)}
               {renderCardItem("LTM FCF Yield", data.fcf_yield_ltm, true)}
               {renderCardItem("LTM Dividend Yield", data.dividend_yield_ltm, true)}
               {renderCardItem("Shares Outstanding", data.shares_outstanding)}
-              {renderCardItem("% of Free Float", data.free_float_percentage, true)}
+              {renderCardItem("% Free Float", data.free_float_percentage, true)}
               {renderCardItem("Short Interest", data.short_interest)}
-              {renderCardItem("Short Interest % of Deal", data.short_interest_percentage_of_deal, true)}
+              {renderCardItem("Short Interest % Deal", data.short_interest_percentage_of_deal, true)}
               {renderCardItem("Short Interest Shares", data.short_interest_shares)}
-              {renderCardItem("3-Month ADTV ($ in M)", data.three_months_adtv_value)}
+              {renderCardItem("3M ADTV ($M)", data.three_months_adtv_value)}
               {renderCardItem("3M ADTV Shares", data.three_months_adtv_shares)}
               {renderCardItem("Beta S&P500", data.beta_sp500)}
               {renderCardItem("3M Volatility", data.three_month_volatility)}
