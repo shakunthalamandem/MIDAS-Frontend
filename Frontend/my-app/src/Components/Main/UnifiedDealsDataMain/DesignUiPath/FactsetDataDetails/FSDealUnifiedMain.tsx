@@ -155,22 +155,22 @@ const FSDealUnifiedMain: React.FC = () => {
         <Box sx={{ marginTop: 3 }}>
           <Grid container spacing={2}>
             {renderCardItem("Ticker", data.ticker)}
-            {renderCardItem("Current Price", data.current_price)}
-            {renderCardItem("Market Cap", data.market_cap)}
-            {renderCardItem("52 Week High", data.fifty_two_week_high)}
+            {renderCardItem("Current Price ($)", data.current_price)}
+            {renderCardItem("Market Cap ($ in Millions)", data.market_cap)}
+            {renderCardItem("52 Week High ($)", data.fifty_two_week_high)}
             {renderCardItem("% Below 52W High", data.percentage_below_52_week_high, true)}
             {renderCardItem("% Change Last 7 Days", data.price_change_week)}
-            {renderCardItem("LTM FCF Yield", data.fcf_yield_ltm)}
+            {renderCardItem("LTM FCF Yield", data.fcf_yield_ltm,true)}
             {renderCardItem("LTM Dividend Yield ", data.dividend_yield_ltm, true)}
             {renderCardItem("Shares Outstanding", data.shares_outstanding)}
             {renderCardItem("% of Free Float", data.free_float_percentage, true)}
             {renderCardItem("Short Interest", data.short_interest)}
             {renderCardItem("Short Interest % of Deal", data.short_interest_percentage_of_deal, true)}
             {renderCardItem("Short Interest Shares", data.short_interest_shares)}
-            {renderCardItem("3-Month ADTV", data.three_months_adtv_value)}
+            {renderCardItem("3-Month ADTV ($ in M)", data.three_months_adtv_value)}
             {renderCardItem("3M ADTV Shares", data.three_months_adtv_shares)}
             {renderCardItem("Beta S&P500", data.beta_sp500)}
-            {renderCardItem("3M Volatility", data.three_month_volatility, true)}
+            {renderCardItem("3M Volatility", data.three_month_volatility)}
             {renderCardItem("RSI 14D", data.rsi_14d)}
             {renderCardItem("RSI 30D", data.rsi_30d)}
             {renderCardItem("DMI 14D", data.macd_9d)}
