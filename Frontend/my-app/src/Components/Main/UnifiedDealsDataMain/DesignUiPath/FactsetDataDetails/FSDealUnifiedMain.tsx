@@ -52,7 +52,6 @@ const FSDealUnifiedMain: React.FC = () => {
   const [data, setData] = useState<DealData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [openForm, setOpenForm] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -63,7 +62,6 @@ const FSDealUnifiedMain: React.FC = () => {
       setError("Please select or enter a ticker first.");
       return;
     }
-
     setLoading(true);
     setError(null);
     const body: Payload = { ticker, pricing_date: pricingDate };
@@ -88,26 +86,56 @@ const FSDealUnifiedMain: React.FC = () => {
     }
   };
 
-  // PATCH to New Deal Form
-  const patchNewDealForm = async (updatedData: DealData) => {
+  // PATCH to FSUnifiedDataUpdate API
+  const uploadToUnifiedData = async () => {
+    if (!data) return;
+      const dbTicker = data.ticker.replace("-", " ");
+
+
+    const payload = {
+      ticker: dbTicker,
+      pricing_date: pricingDate,
+      market_cap: data.market_cap,
+      fifty_two_week_high: data.fifty_two_week_high,
+      percentage_below_52_week_high: data.percentage_below_52_week_high,
+      price_change_week: data.price_change_week,
+      fcf_yield_ltm: data.fcf_yield_ltm,
+      dividend_yield_ltm: data.dividend_yield_ltm,
+      shares_outstanding: data.shares_outstanding,
+      free_float_percentage: data.free_float_percentage,
+      short_interest: data.short_interest,
+      short_interest_percentage_of_deal: data.short_interest_percentage_of_deal,
+      three_months_adtv_value: data.three_months_adtv_value,
+      three_months_adtv_shares: data.three_months_adtv_shares,
+      beta_sp500: data.beta_sp500,
+      three_month_volatility: data.three_month_volatility,
+      rsi_14d: data.rsi_14d,
+      rsi_30d: data.rsi_30d,
+      macd_9d: data.macd_9d,
+      dma_50: data.dma_50,
+      dma_100: data.dma_100,
+    };
+
     try {
-      const response = await fetch(`${apiUrl}/api/new_deal_form/${ticker}/`, {
+      const response = await fetch(`${apiUrl}/api/fs_unified_data_update/`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify(updatedData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) throw new Error(`Error: ${response.status}`);
-      setData(updatedData);
+      const result = await response.json();
+      console.log("Unified data updated:", result);
+      alert("Data uploaded successfully!");
     } catch (err: any) {
-      console.error("Failed to update new deal form:", err.message);
+      console.error("Failed to update unified data:", err.message);
+      alert("Failed to upload data. Check console.");
     }
   };
 
-  // Reset all fields
   const resetFields = () => {
     setTicker("");
     setPricingDate("2025-09-29");
@@ -144,87 +172,34 @@ const FSDealUnifiedMain: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 3, mb: 4 }}>
-      <Card
-        sx={{
-          padding: 3,
-          bgcolor: "#f9f9f9",
-          borderRadius: 3,
-          boxShadow: "0 6px 15px rgba(0,0,0,0.1)",
-        }}
-        elevation={6}
-      >
+      <Card sx={{ padding: 3, bgcolor: "#f9f9f9", borderRadius: 3, boxShadow: "0 6px 15px rgba(0,0,0,0.1)" }} elevation={6}>
         <Typography variant="h6" gutterBottom color="#002060" align="center">
           Factset Deals Data Details
         </Typography>
 
-        {/* Ticker Search Component */}
         <Stack direction="row" spacing={2} sx={{ mb: 2 }} alignItems="center">
           <Box sx={{ flex: 1 }}>
             <FSCompetitorSearch onSelect={(selectedTicker) => setTicker(selectedTicker)} />
           </Box>
 
-          <TextField
-            size="small"
-            label="Ticker"
-            value={ticker}
-            onChange={(e) => setTicker(e.target.value)}
-            placeholder="Enter ticker manually"
-           
-          />
+          <TextField size="small" label="Ticker" value={ticker} onChange={(e) => setTicker(e.target.value)} placeholder="Enter ticker manually" />
+          <TextField size="small" label="Pricing Date" type="date" value={pricingDate} onChange={(e) => setPricingDate(e.target.value)} InputLabelProps={{ shrink: true }} />
 
-          <TextField
-            size="small"
-            label="Pricing Date"
-            type="date"
-            value={pricingDate}
-            onChange={(e) => setPricingDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
-
-          <Button
-            size="small"
-            variant="contained"
-            color="primary"
-            onClick={fetchData}
-            disabled={loading}
-            sx={{
-              bgcolor: "#00796b",
-              "&:hover": { bgcolor: "#004d40" },
-              height: "40px",
-            }}
-          >
+          <Button size="small" variant="contained" color="primary" onClick={fetchData} disabled={loading} sx={{ bgcolor: "#00796b", "&:hover": { bgcolor: "#004d40" }, height: "40px" }}>
             {loading ? <CircularProgress size={20} color="inherit" /> : "Fetch Data"}
           </Button>
 
-          <Button
-            size="small"
-            variant="outlined"
-            color="secondary"
-            onClick={() => setOpenForm(true)}
-            disabled={!data}
-            sx={{ height: "40px" }}
-          >
-            Upload to New Deal Form
+          <Button size="small" variant="outlined" color="secondary" onClick={uploadToUnifiedData} disabled={!data} sx={{ height: "40px" }}>
+            Upload to Unified Data
           </Button>
 
-          <Button
-            size="small"
-            variant="outlined"
-            color="error"
-            onClick={resetFields}
-            sx={{ height: "40px" }}
-          >
+          <Button size="small" variant="outlined" color="error" onClick={resetFields} sx={{ height: "40px" }}>
             Reset
           </Button>
         </Stack>
 
-        {error && (
-          <Typography color="error" sx={{ marginBottom: 2 }}>
-            {error}
-          </Typography>
-        )}
+        {error && <Typography color="error" sx={{ marginBottom: 2 }}>{error}</Typography>}
 
-        {/* Data Cards */}
         {data && (
           <Box sx={{ mt: 2 }}>
             <Grid container spacing={1}>
@@ -254,16 +229,6 @@ const FSDealUnifiedMain: React.FC = () => {
               {renderCardItem("Date", data.date)}
             </Grid>
           </Box>
-        )}
-
-        {/* New Deal Form Modal */}
-        {data && (
-          <FSNewDealFormUpdate
-            open={openForm}
-            onClose={() => setOpenForm(false)}
-            data={data}
-            onSubmit={patchNewDealForm}
-          />
         )}
       </Card>
     </Container>
