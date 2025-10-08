@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Autocomplete, TextField, CircularProgress } from "@mui/material";
+import { Autocomplete, TextField, CircularProgress, Box, Typography, InputAdornment } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface FSCompetitorSearchProps {
   onSelect: (ticker: string) => void;
@@ -63,13 +64,37 @@ const FSCompetitorSearch: React.FC<FSCompetitorSearchProps> = ({ onSelect }) => 
         }
       }}
       loading={loading}
+      renderOption={(props, option) => (
+        <Box
+          component="li"
+          {...props}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            py: 0.5,
+          }}
+        >
+          <Typography sx={{ fontWeight: "bold", color: "red", fontSize: 14 }}>
+            {option.ticker}
+          </Typography>
+          <Typography sx={{ fontSize: 12, color: "grey.500" }}>
+            {option.company}
+          </Typography>
+        </Box>
+      )}
       renderInput={(params) => (
         <TextField
           {...params}
+          size="small"
           label="Search Tickers or Companies"
           variant="outlined"
           InputProps={{
             ...params.InputProps,
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
             endAdornment: (
               <>
                 {loading ? <CircularProgress size={20} /> : null}
