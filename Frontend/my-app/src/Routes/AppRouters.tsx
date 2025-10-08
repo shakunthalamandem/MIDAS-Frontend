@@ -74,6 +74,7 @@ import EquityAiMlPage from "../Components/AIML/EquityAiMlPage";
 import WriteUpIPODashbaord from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 import UploadFactSetTickers from "../Components/Uploads/DailyMonasheeUploads/UploadFactSetTickers";
 import FSDealUnifiedMain from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/FactsetDataDetails/FSDealUnifiedMain";
+import DeleteUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/DeleteUnifiedDealData";
 
 const AppRouters: React.FC = () => {
   return (
@@ -219,6 +220,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/download_deals_data" element={<AuthGuard><ExportUnifiedDealData /></AuthGuard>} />
+        <Route path="/delete_new_deal_data" element={<AuthGuard><DeleteUnifiedDealData /></AuthGuard>} />
         <Route path="/deal_data_upload" element={<AuthGuard><UnifiedDealDataUpload /></AuthGuard>} />
         <Route path="/pdf_upload" element={<AuthGuard><UploadsWriteUpMain /></AuthGuard>} />
 
