@@ -39,7 +39,7 @@ const FSNewDealFormUpdate: React.FC<FSNewDealFormUpdateProps> = ({ open, onClose
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Update New Deal Form</DialogTitle>
+      <DialogTitle align="center" color="#002060">Update New Deal Form</DialogTitle>
       <DialogContent>
         <Grid container spacing={2}>
           {Object.keys(formData).map((key) => (
