@@ -61,6 +61,12 @@ const DealsDropdown: React.FC = () => {
             Upload Deals
           </Typography>
         </MenuItem>
+
+                <MenuItem onClick={() => handleNavigate("/delete_new_deal_data")}>
+          <Typography sx={{ color: "#002060", textDecoration: "underline" }}>
+            Delete  Deals
+          </Typography>
+        </MenuItem>
       </Menu>
           </Container>
 
