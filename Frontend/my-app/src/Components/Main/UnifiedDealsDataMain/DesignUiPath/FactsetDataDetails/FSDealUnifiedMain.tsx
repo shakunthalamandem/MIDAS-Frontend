@@ -3,15 +3,15 @@ import {
   TextField,
   Button,
   Typography,
-  Paper,
-  Grid,
-  CircularProgress,
   Card,
   CardContent,
+  Grid,
+  CircularProgress,
   Box,
   Container,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import FSNewDealFormUpdate from "./FSNewDealFormUpdate";
 
 interface DealData {
   ticker: string;
@@ -51,9 +51,12 @@ const FSDealUnifiedMain: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [openForm, setOpenForm] = useState(false); // controls modal open/close
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
+  // Fetch API Data
   const fetchData = async () => {
     setLoading(true);
     setError(null);
@@ -79,9 +82,30 @@ const FSDealUnifiedMain: React.FC = () => {
     }
   };
 
+  // PATCH Updated Data to New Deal Form
+  const patchNewDealForm = async (updatedData: DealData) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/new_deal_form/${ticker}/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+      setData(updatedData); // update local data after patch
+    } catch (err: any) {
+      console.error("Failed to update new deal form:", err.message);
+    }
+  };
+
+  // Helper to format numbers and percentages
   const formatValue = (value: number | null, isPercentage = false) =>
     value !== null ? (isPercentage ? value.toFixed(2) + "%" : value.toFixed(2)) : "-";
 
+  // Render each data card
   const renderCardItem = (label: string, value: number | string | null, isPercentage = false) => (
     <Grid item xs={12} sm={6} md={2} key={label}>
       <Card
@@ -103,88 +127,101 @@ const FSDealUnifiedMain: React.FC = () => {
   );
 
   return (
-    <>
     <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
-        <Card sx={{ padding: 3, bgcolor: "#f9f9f9" }} elevation={6}>
-      <Typography variant="h6" gutterBottom color="#002060" align="center">
-        Factset Deals Data Details
-      </Typography>
-
-      <Grid container spacing={2} sx={{ marginBottom: 2 }}>
-        <Grid item xs={12} sm={4}>
-          <TextField
-            label="Ticker"
-            fullWidth
-            value={ticker}
-            onChange={(e) => setTicker(e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <TextField
-            label="Pricing Date"
-            type="date"
-            fullWidth
-            value={pricingDate}
-            onChange={(e) => setPricingDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-
-            
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={fetchData}
-        disabled={loading}
-        sx={{ marginBottom: 3,bgcolor: "#002060",}}
-      >
-        {loading ? <CircularProgress size={24} color="inherit" /> : "Fetch Data"}
-      </Button>
-        </Grid>
-      </Grid>
-
-
-      {error && (
-        <Typography color="error" sx={{ marginTop: 2 }}>
-          {error}
+      <Card sx={{ padding: 3, bgcolor: "#f9f9f9" }} elevation={6}>
+        <Typography variant="h6" gutterBottom color="#002060" align="center">
+          Factset Deals Data Details
         </Typography>
-      )}
 
-      {data && (
-        <Box sx={{ marginTop: 3 }}>
-          <Grid container spacing={2}>
-            {renderCardItem("Ticker", data.ticker)}
-            {renderCardItem("Current Price ($)", data.current_price)}
-            {renderCardItem("Market Cap ($ in Millions)", data.market_cap)}
-            {renderCardItem("52 Week High ($)", data.fifty_two_week_high)}
-            {renderCardItem("% Below 52W High", data.percentage_below_52_week_high, true)}
-            {renderCardItem("% Change Last 7 Days", data.price_change_week)}
-            {renderCardItem("LTM FCF Yield", data.fcf_yield_ltm,true)}
-            {renderCardItem("LTM Dividend Yield ", data.dividend_yield_ltm, true)}
-            {renderCardItem("Shares Outstanding", data.shares_outstanding)}
-            {renderCardItem("% of Free Float", data.free_float_percentage, true)}
-            {renderCardItem("Short Interest", data.short_interest)}
-            {renderCardItem("Short Interest % of Deal", data.short_interest_percentage_of_deal, true)}
-            {renderCardItem("Short Interest Shares", data.short_interest_shares)}
-            {renderCardItem("3-Month ADTV ($ in M)", data.three_months_adtv_value)}
-            {renderCardItem("3M ADTV Shares", data.three_months_adtv_shares)}
-            {renderCardItem("Beta S&P500", data.beta_sp500)}
-            {renderCardItem("3M Volatility", data.three_month_volatility)}
-            {renderCardItem("RSI 14D", data.rsi_14d)}
-            {renderCardItem("RSI 30D", data.rsi_30d)}
-            {renderCardItem("DMI 14D", data.macd_9d)}
-            {renderCardItem("MACD 9D", data.macd_9d)}
-            {renderCardItem("DMA 50", data.dma_50)}
-            {renderCardItem("DMA 100", data.dma_100)}
-            {renderCardItem("Date", data.date)}
-          
+        <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Ticker"
+              fullWidth
+              value={ticker}
+              onChange={(e) => setTicker(e.target.value)}
+            />
           </Grid>
-        </Box>
-      )}
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Pricing Date"
+              type="date"
+              fullWidth
+              value={pricingDate}
+              onChange={(e) => setPricingDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4} display="flex" gap={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={fetchData}
+              disabled={loading}
+              sx={{ bgcolor: "#002060" }}
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : "Fetch Data"}
+            </Button>
+
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => setOpenForm(true)}
+              disabled={!data}
+            >
+              Upload to New Deal Form
+            </Button>
+          </Grid>
+        </Grid>
+
+        {error && (
+          <Typography color="error" sx={{ marginTop: 2 }}>
+            {error}
+          </Typography>
+        )}
+
+        {data && (
+          <Box sx={{ marginTop: 3 }}>
+            <Grid container spacing={2}>
+              {renderCardItem("Ticker", data.ticker)}
+              {renderCardItem("Current Price ($)", data.current_price)}
+              {renderCardItem("Market Cap ($ in Millions)", data.market_cap)}
+              {renderCardItem("52 Week High ($)", data.fifty_two_week_high)}
+              {renderCardItem("% Below 52W High", data.percentage_below_52_week_high, true)}
+              {renderCardItem("% Change Last 7 Days", data.price_change_week)}
+              {renderCardItem("LTM FCF Yield", data.fcf_yield_ltm, true)}
+              {renderCardItem("LTM Dividend Yield", data.dividend_yield_ltm, true)}
+              {renderCardItem("Shares Outstanding", data.shares_outstanding)}
+              {renderCardItem("% of Free Float", data.free_float_percentage, true)}
+              {renderCardItem("Short Interest", data.short_interest)}
+              {renderCardItem("Short Interest % of Deal", data.short_interest_percentage_of_deal, true)}
+              {renderCardItem("Short Interest Shares", data.short_interest_shares)}
+              {renderCardItem("3-Month ADTV ($ in M)", data.three_months_adtv_value)}
+              {renderCardItem("3M ADTV Shares", data.three_months_adtv_shares)}
+              {renderCardItem("Beta S&P500", data.beta_sp500)}
+              {renderCardItem("3M Volatility", data.three_month_volatility)}
+              {renderCardItem("RSI 14D", data.rsi_14d)}
+              {renderCardItem("RSI 30D", data.rsi_30d)}
+              {renderCardItem("DMI 14D", data.macd_9d)}
+              {renderCardItem("MACD 9D", data.macd_9d)}
+              {renderCardItem("DMA 50", data.dma_50)}
+              {renderCardItem("DMA 100", data.dma_100)}
+              {renderCardItem("Date", data.date)}
+            </Grid>
+          </Box>
+        )}
+
+        {/* New Deal Form Modal */}
+        {data && (
+          <FSNewDealFormUpdate
+            open={openForm}
+            onClose={() => setOpenForm(false)}
+            data={data}
+            onSubmit={patchNewDealForm}
+          />
+        )}
       </Card>
     </Container>
-    </>
   );
 };
 
