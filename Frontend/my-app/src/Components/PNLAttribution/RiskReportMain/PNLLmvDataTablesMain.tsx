@@ -79,18 +79,18 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
   const renderVerticalTable = (sectionData: TableRowData[], color: string, index: number) => (
     <Grow in timeout={500 + index * 200}>
       <TableContainer component={Paper} sx={{ mb: 4 }}>
-        <Table>
+        <Table size="small"> {/* smaller table size */}
           <TableHead sx={{ backgroundColor: color }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold", color: "#050505ff" }}>Label</TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "#050505ff" }}>Value</TableCell>
+            <TableRow sx={{ height: 30 }}> {/* reduced header row height */}
+              <TableCell sx={{ fontWeight: "bold", color: "#050505ff", py: 0.5 }}>Label</TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#050505ff", py: 0.5 }}>Value</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {sectionData.map((row: TableRowData, idx: number) => (
-              <TableRow key={idx}>
-                <TableCell>{row.label}</TableCell>
-                <TableCell>{row.value}</TableCell>
+              <TableRow key={idx} sx={{ height: 28 }}> {/* reduced row height */}
+                <TableCell sx={{ py: 0.5 }}>{row.label}</TableCell>
+                <TableCell sx={{ py: 0.5 }}>{row.value}</TableCell>
               </TableRow>
             ))}
           </TableBody>
