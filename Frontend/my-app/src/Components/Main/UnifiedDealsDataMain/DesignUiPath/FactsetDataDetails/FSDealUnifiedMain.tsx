@@ -16,7 +16,7 @@ import FSNewDealFormUpdate from "./FSNewDealFormUpdate";
 import FSCompetitorSearch from "./FSCompetitorSearch";
 
 interface DealData {
-  ticker: string;
+  fs_ticker: string;
   current_price: number | null;
   fifty_two_week_high: number | null;
   fcf_yield_ltm: number | null;
@@ -42,12 +42,12 @@ interface DealData {
 }
 
 interface Payload {
-  ticker: string;
+  fs_ticker: string;
   pricing_date: string;
 }
 
 const FSDealUnifiedMain: React.FC = () => {
-  const [ticker, setTicker] = useState("");
+  const [fs_ticker, setTicker] = useState("");
   const [pricingDate, setPricingDate] = useState("2025-09-29");
   const [data, setData] = useState<DealData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,13 +58,13 @@ const FSDealUnifiedMain: React.FC = () => {
 
   // Fetch Deal Data
   const fetchData = async () => {
-    if (!ticker) {
+    if (!fs_ticker) {
       setError("Please select or enter a ticker first.");
       return;
     }
     setLoading(true);
     setError(null);
-    const body: Payload = { ticker, pricing_date: pricingDate };
+    const body: Payload = { fs_ticker, pricing_date: pricingDate };
 
     try {
       const response = await fetch(`${apiUrl}/api/fs_new_deal_data/`, {
@@ -89,11 +89,11 @@ const FSDealUnifiedMain: React.FC = () => {
   // PATCH to FSUnifiedDataUpdate API
   const uploadToUnifiedData = async () => {
     if (!data) return;
-      const dbTicker = data.ticker.replace("-", " ");
-
+      // const dbTicker = data.ticker.replace("-", " ");
+console.log("tickerdata",data.fs_ticker)
 
     const payload = {
-      ticker: dbTicker,
+      fs_ticker: data.fs_ticker,
       pricing_date: pricingDate,
       market_cap: data.market_cap,
       fifty_two_week_high: data.fifty_two_week_high,
@@ -182,7 +182,7 @@ const FSDealUnifiedMain: React.FC = () => {
             <FSCompetitorSearch onSelect={(selectedTicker) => setTicker(selectedTicker)} />
           </Box>
 
-          <TextField size="small" label="Ticker" value={ticker} onChange={(e) => setTicker(e.target.value)} placeholder="Enter ticker manually" />
+          <TextField size="small" label="Ticker" value={fs_ticker} onChange={(e) => setTicker(e.target.value)} placeholder="Enter ticker manually" />
           <TextField size="small" label="Pricing Date" type="date" value={pricingDate} onChange={(e) => setPricingDate(e.target.value)} InputLabelProps={{ shrink: true }} />
 
           <Button size="small" variant="contained" color="primary" onClick={fetchData} disabled={loading} sx={{ bgcolor: "#00796b", "&:hover": { bgcolor: "#004d40" }, height: "40px" }}>
@@ -203,7 +203,7 @@ const FSDealUnifiedMain: React.FC = () => {
         {data && (
           <Box sx={{ mt: 2 }}>
             <Grid container spacing={1}>
-              {renderCardItem("Ticker", data.ticker)}
+              {renderCardItem("Ticker", data.fs_ticker)}
               {renderCardItem("Current Price ($)", data.current_price)}
               {renderCardItem("Market Cap ($M)", data.market_cap)}
               {renderCardItem("52W High ($)", data.fifty_two_week_high)}
