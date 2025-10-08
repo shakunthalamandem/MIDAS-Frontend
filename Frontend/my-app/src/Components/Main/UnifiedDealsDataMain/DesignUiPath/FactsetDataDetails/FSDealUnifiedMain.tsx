@@ -11,7 +11,8 @@ import {
   Container,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import FSNewDealFormUpdate from "./FSNewDealFormUpdate";
+import FSNewDealFormUpdate from "./FSNewDealFormUpdate"; // Modal form
+import FSCompetitorSearch from "./FSCompetitorSearch"; // Search ticker/company
 
 interface DealData {
   ticker: string;
@@ -45,19 +46,23 @@ interface Payload {
 }
 
 const FSDealUnifiedMain: React.FC = () => {
-  const [ticker, setTicker] = useState("AAPL-US");
+  const [ticker, setTicker] = useState("");
   const [pricingDate, setPricingDate] = useState("2025-09-29");
   const [data, setData] = useState<DealData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [openForm, setOpenForm] = useState(false); // controls modal open/close
+  const [openForm, setOpenForm] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // Fetch API Data
+  // Fetch Deal Data
   const fetchData = async () => {
+    if (!ticker) {
+      setError("Please select or enter a ticker first.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     const body: Payload = { ticker, pricing_date: pricingDate };
@@ -82,7 +87,7 @@ const FSDealUnifiedMain: React.FC = () => {
     }
   };
 
-  // PATCH Updated Data to New Deal Form
+  // PATCH to New Deal Form
   const patchNewDealForm = async (updatedData: DealData) => {
     try {
       const response = await fetch(`${apiUrl}/api/new_deal_form/${ticker}/`, {
@@ -95,17 +100,15 @@ const FSDealUnifiedMain: React.FC = () => {
       });
 
       if (!response.ok) throw new Error(`Error: ${response.status}`);
-      setData(updatedData); // update local data after patch
+      setData(updatedData);
     } catch (err: any) {
       console.error("Failed to update new deal form:", err.message);
     }
   };
 
-  // Helper to format numbers and percentages
   const formatValue = (value: number | null, isPercentage = false) =>
     value !== null ? (isPercentage ? value.toFixed(2) + "%" : value.toFixed(2)) : "-";
 
-  // Render each data card
   const renderCardItem = (label: string, value: number | string | null, isPercentage = false) => (
     <Grid item xs={12} sm={6} md={2} key={label}>
       <Card
@@ -133,6 +136,11 @@ const FSDealUnifiedMain: React.FC = () => {
           Factset Deals Data Details
         </Typography>
 
+        {/* === Ticker Search Component === */}
+        <Box sx={{ marginBottom: 3 }}>
+          <FSCompetitorSearch onSelect={(selectedTicker) => setTicker(selectedTicker)} />
+        </Box>
+
         <Grid container spacing={2} sx={{ marginBottom: 2 }}>
           <Grid item xs={12} sm={4}>
             <TextField
@@ -140,6 +148,7 @@ const FSDealUnifiedMain: React.FC = () => {
               fullWidth
               value={ticker}
               onChange={(e) => setTicker(e.target.value)}
+              placeholder="Enter ticker manually or select from above"
             />
           </Grid>
           <Grid item xs={12} sm={4}>
