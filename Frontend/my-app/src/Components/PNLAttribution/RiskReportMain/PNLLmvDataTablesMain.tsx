@@ -8,6 +8,7 @@ import {
   TableRow,
   Paper,
   Grow,
+  Grid,
 } from "@mui/material";
 
 interface TableRowData {
@@ -75,25 +76,23 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
     if (fund) fetchFundData();
   }, [fund]);
 
-  const renderHorizontalTable = (sectionData: TableRowData[], color: string, index: number) => (
+  const renderVerticalTable = (sectionData: TableRowData[], color: string, index: number) => (
     <Grow in timeout={500 + index * 200}>
       <TableContainer component={Paper} sx={{ mb: 4 }}>
         <Table>
           <TableHead sx={{ backgroundColor: color }}>
             <TableRow>
-              {sectionData.map((row: TableRowData, idx: number) => (
-                <TableCell key={idx} sx={{ color: "#050505ff", fontWeight: "bold" }}>
-                  {row.label}
-                </TableCell>
-              ))}
+              <TableCell sx={{ fontWeight: "bold", color: "#050505ff" }}>Label</TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#050505ff" }}>Value</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow>
-              {sectionData.map((row: TableRowData, idx: number) => (
-                <TableCell key={idx}>{row.value}</TableCell>
-              ))}
-            </TableRow>
+            {sectionData.map((row: TableRowData, idx: number) => (
+              <TableRow key={idx}>
+                <TableCell>{row.label}</TableCell>
+                <TableCell>{row.value}</TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -104,12 +103,20 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <div>
-      {renderHorizontalTable(data.section1, headerColors[0], 0)}
-      {renderHorizontalTable(data.section2, headerColors[1], 1)}
-      {renderHorizontalTable(data.section3, headerColors[2], 2)}
-      {renderHorizontalTable(data.section4, headerColors[3], 3)}
-    </div>
+    <Grid container spacing={2}>
+      <Grid item xs={12} md={6}>
+        {renderVerticalTable(data.section1, headerColors[0], 0)}
+      </Grid>
+      <Grid item xs={12} md={6}>
+        {renderVerticalTable(data.section2, headerColors[1], 1)}
+      </Grid>
+      <Grid item xs={12} md={6}>
+        {renderVerticalTable(data.section3, headerColors[2], 2)}
+      </Grid>
+      <Grid item xs={12} md={6}>
+        {renderVerticalTable(data.section4, headerColors[3], 3)}
+      </Grid>
+    </Grid>
   );
 };
 
