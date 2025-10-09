@@ -1,55 +1,67 @@
 import React, { useEffect, useState } from "react";
-import { Paper, Typography, CircularProgress, Box } from "@mui/material";
-import { Line } from "react-chartjs-2";
+import { Paper, Typography, CircularProgress, Box, Grid } from "@mui/material";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface DailyNetOfHedgeChartProps {
   fund: string;
+  date?: string;
 }
 
-const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({ fund }) => {
+interface ChartDataType {
+  labels: string[];
+  daily_net_of_hedge: number[];
+  mtd_net_of_hedge: number[];
+  daily_long_exposure: number[];
+}
+
+const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({ fund, date }) => {
   const [loading, setLoading] = useState(true);
-  const [chartData, setChartData] = useState<any>(null);
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    setLoading(true);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const apiUrl = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem("access_token");
 
-    // Simulate fetching data for the selected fund
-    const timeout = setTimeout(() => {
-      const labels = Array.from({ length: 10 }, (_, i) => `Day ${i + 1}`);
-      const dataValues = labels.map(() => Math.floor(Math.random() * 1000) - 500); // sample P&L
-
-      setChartData({
-        labels,
-        datasets: [
-          {
-            label: `${fund} Daily Net of Hedge P&L`,
-            data: dataValues,
-            borderColor: "#002060",
-            backgroundColor: "rgba(0, 32, 96, 0.2)",
-            tension: 0.4,
+        const res = await fetch(`${apiUrl}/api/risk_report_daily_pnl/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
-        ],
-      });
+          body: JSON.stringify({ fund, date }),
+        });
 
-      setLoading(false);
-    }, 500); // simulate network delay
+        if (!res.ok) {
+          throw new Error("Failed to fetch chart data");
+        }
 
-    return () => clearTimeout(timeout);
-  }, [fund]);
+        const result = await res.json();
+        setData(result);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (loading || !chartData) {
+    fetchData();
+  }, [fund, date]);
+
+  if (loading || !data) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
         <CircularProgress />
@@ -57,29 +69,62 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({ fund }) => 
     );
   }
 
-  return (
-    <Paper
-      elevation={3}
-      sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9", minHeight: 300 }}
-    >
-      <Typography variant="h6" gutterBottom color="#002060">
-        Daily Net of Hedge P&L
+  const renderBarChart = (chartData: ChartDataType, title: string) => (
+    <Paper sx={{ p: 2, mb: 3, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+      <Typography variant="h6" gutterBottom color="#002060" align="center" fontWeight={600}>
+        {title}
       </Typography>
-      <Line
-        data={chartData}
-        options={{
-          responsive: true,
-          plugins: {
-            legend: { display: true, position: "top" },
-            tooltip: { mode: "index", intersect: false },
-          },
-          scales: {
-            x: { title: { display: true, text: "Days" } },
-            y: { title: { display: true, text: "P&L" } },
-          },
-        }}
-      />
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={4}>
+          <Typography variant="subtitle2">Daily Net of Hedge $P&L</Typography>
+          <Bar
+            data={{
+              labels: chartData.labels,
+              datasets: [
+                { label: "Daily P&L", data: chartData.daily_net_of_hedge, backgroundColor: "#002060" },
+              ],
+            }}
+            options={{ responsive: true, plugins: { legend: { display: false } } }}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Typography variant="subtitle2">MTD Net of Hedge $P&L</Typography>
+          <Bar
+            data={{
+              labels: chartData.labels,
+              datasets: [
+                { label: "MTD P&L", data: chartData.mtd_net_of_hedge, backgroundColor: "#0055a5" },
+              ],
+            }}
+            options={{ responsive: true, plugins: { legend: { display: false } } }}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Typography variant="subtitle2">Daily Long Exposure / LMV (%)</Typography>
+          <Bar
+            data={{
+              labels: chartData.labels,
+              datasets: [
+                { label: "Exposure %", data: chartData.daily_long_exposure, backgroundColor: "#9eb0ff" },
+              ],
+            }}
+            options={{
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true, max: 100 } },
+            }}
+          />
+        </Grid>
+      </Grid>
     </Paper>
+  );
+
+  return (
+    <Box>
+      {renderBarChart(data.sector, "GICS Sector")}
+      {renderBarChart(data.region, "Region")}
+      {renderBarChart(data.strategy, "Strategy")}
+    </Box>
   );
 };
 
