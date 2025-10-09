@@ -11,7 +11,14 @@ import {
   Legend,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface DailyNetOfHedgeChartProps {
   fund: string;
@@ -25,7 +32,10 @@ interface ChartDataType {
   daily_long_exposure: number[];
 }
 
-const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({ fund, date }) => {
+const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
+  fund,
+  date,
+}) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
 
@@ -63,7 +73,12 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({ fund, date 
 
   if (loading || !data) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight={200}
+      >
         <CircularProgress />
       </Box>
     );
@@ -71,47 +86,84 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({ fund, date 
 
   const renderBarChart = (chartData: ChartDataType, title: string) => (
     <Paper sx={{ p: 2, mb: 3, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
-      <Typography variant="h6" gutterBottom color="#002060" align="center" fontWeight={600}>
+      <Typography
+        variant="h6"
+        gutterBottom
+        color="#002060"
+        align="center"
+        fontWeight={600}
+      >
         {title}
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
-          <Typography variant="subtitle2">Daily Net of Hedge $P&L</Typography>
+          <Typography variant="subtitle1" align="center" bgcolor={"#e6f0ff"}>Daily Net of Hedge $P&L</Typography>
           <Bar
             data={{
               labels: chartData.labels,
               datasets: [
-                { label: "Daily P&L", data: chartData.daily_net_of_hedge, backgroundColor: "#002060" },
-              ],
-            }}
-            options={{ responsive: true, plugins: { legend: { display: false } } }}
-          />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Typography variant="subtitle2">MTD Net of Hedge $P&L</Typography>
-          <Bar
-            data={{
-              labels: chartData.labels,
-              datasets: [
-                { label: "MTD P&L", data: chartData.mtd_net_of_hedge, backgroundColor: "#0055a5" },
-              ],
-            }}
-            options={{ responsive: true, plugins: { legend: { display: false } } }}
-          />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Typography variant="subtitle2">Daily Long Exposure / LMV (%)</Typography>
-          <Bar
-            data={{
-              labels: chartData.labels,
-              datasets: [
-                { label: "Exposure %", data: chartData.daily_long_exposure, backgroundColor: "#9eb0ff" },
+                {
+                  label: "Daily P&L",
+                  data: chartData.daily_net_of_hedge,
+                  backgroundColor: "#002060",
+                },
               ],
             }}
             options={{
               responsive: true,
               plugins: { legend: { display: false } },
-              scales: { y: { beginAtZero: true, max: 100 } },
+              scales: {
+                x: { grid: { display: false } },
+                y: { grid: { display: false }, beginAtZero: true, max: 100 },
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Typography variant="subtitle1" align="center" bgcolor={"#e6f0ff"}>MTD Net of Hedge $P&L</Typography>
+          <Bar
+            data={{
+              labels: chartData.labels,
+              datasets: [
+                {
+                  label: "MTD P&L",
+                  data: chartData.mtd_net_of_hedge,
+                  backgroundColor: "#0055a5",
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { display: false } },
+                y: { grid: { display: false }, beginAtZero: true, max: 100 },
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Typography variant="subtitle1" align="center" bgcolor={"#e6f0ff"}>
+            Daily Long Exposure / LMV (%)
+          </Typography>
+          <Bar
+            data={{
+              labels: chartData.labels,
+              datasets: [
+                {
+                  label: "Exposure %",
+                  data: chartData.daily_long_exposure,
+                  backgroundColor: "#9eb0ff",
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { display: false } },
+                y: { grid: { display: false }, beginAtZero: true, max: 100 },
+              },
             }}
           />
         </Grid>

@@ -56,7 +56,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
                 ))}
               </Select>
 
-              <RiskPDFExporter exportId="pdf-export-area" fileName={`PNL_Risk_Report_${selectedFund}.pdf`} />
+              {/* <RiskPDFExporter exportId="pdf-export-area" fileName={`PNL_Risk_Report_${selectedFund}.pdf`} /> */}
             </Box>
           </Grid>
         </Grid>
