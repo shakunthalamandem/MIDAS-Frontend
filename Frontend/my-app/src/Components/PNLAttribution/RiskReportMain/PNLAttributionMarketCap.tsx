@@ -27,6 +27,7 @@ import {
   Bar,
   AreaChart,
   Area,
+  Cell,
 } from "recharts";
 
 interface RiskReportData {
@@ -132,17 +133,21 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
     })
   );
 
-
+  // Colors
+  const colors = ["#FF7F0E", "#1F77B4", "#2CA02C"]; // orange, blue, green
 
   // Pie chart (LongExposureLMVPercent)
-  const pieChartData = attribution_by_market_cap?.LongExposureLMVPercent?.map((item: any) => ({
+  const pieChartData = attribution_by_market_cap?.LongExposureLMVPercent?.map((item: any, index: number) => ({
     name: item.category,
     value: item.pnl_percentage,
+    color: colors[index % colors.length],
   }));
 
-    const barChartData = attribution_by_market_cap?.NetOfHedgePNL?.map((item: any) => ({
+  // Bar chart (NetOfHedgePNL)
+  const barChartData = attribution_by_market_cap?.NetOfHedgePNL?.map((item: any, index: number) => ({
     name: item.category,
     value: item.pnl_percentage,
+    color: colors[index % colors.length],
   }));
 
   // 4️⃣ Area chart for historical exposure
@@ -192,7 +197,14 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
       {/* 2️⃣ Table Section */}
       <Grid item xs={12}>
         <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
-          <Typography variant="h6" gutterBottom color="#002060" align="center" fontWeight={600} bgcolor={"#e6f0ff"}>
+          <Typography
+            variant="h6"
+            gutterBottom
+            color="#002060"
+            align="center"
+            fontWeight={600}
+            bgcolor={"#e6f0ff"}
+          >
             Net of Hedge P&L by Region
           </Typography>
           <Table>
@@ -220,59 +232,80 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
         </Paper>
       </Grid>
 
-      {/* 3️⃣ Third section: Bar + Pie charts */}
-{/* 3️⃣ Third section: Bar + Pie charts under Attribution by Market Cap */}
-<Grid item xs={12}>
-  <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
-    <Typography variant="h6" gutterBottom color="#002060" align="center" fontWeight={600} bgcolor={"#e6f0ff"}>
-      Attribution by Market Cap
-    </Typography>
-
-    <Grid container spacing={3}>
-      {/* Bar Chart */}
-      <Grid item xs={12} md={6}>
-        <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
-          Net Of Hedge P&L (%)
-        </Typography>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={barChartData}>
-            <XAxis dataKey="region" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="value" fill="#002060" />
-          </BarChart>
-        </ResponsiveContainer>
-      </Grid>
-
-      {/* Pie Chart */}
-      <Grid item xs={12} md={6}>
-        <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
-          Long Exposure
-        </Typography>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={pieChartData}
-              dataKey="value"
-              nameKey="name"
-              outerRadius="80%"
-              fill="#0070C0"
-            />
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-      </Grid>
-    </Grid>
-  </Paper>
-</Grid>
-
-
-      {/* 4️⃣ Area Chart: Historical Exposure by Region */}
+      {/* 3️⃣ Bar + Pie Charts */}
       <Grid item xs={12}>
         <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
-          <Typography variant="h6" gutterBottom color="#002060" align="center" fontWeight={600} bgcolor={"#e6f0ff"}>
-Historical $Exposure Breakdown(IncludingHedge) by Region          </Typography>
+          <Typography
+            variant="h6"
+            gutterBottom
+            color="#002060"
+            align="center"
+            fontWeight={600}
+            bgcolor={"#e6f0ff"}
+          >
+            Attribution by Market Cap
+          </Typography>
+
+          <Grid container spacing={3}>
+            {/* Bar Chart */}
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
+                Net Of Hedge P&L (%)
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={barChartData}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value">
+                    {barChartData.map((entry: { color: string | undefined; }, index: any) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Grid>
+
+            {/* Pie Chart */}
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
+                Long Exposure
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={pieChartData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius="80%"
+                    label={(entry) => entry.name}
+                  >
+                    {pieChartData.map((entry: { color: string | undefined; }, index: any) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Grid>
+
+      {/* 4️⃣ Area Chart */}
+      <Grid item xs={12}>
+        <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+          <Typography
+            variant="h6"
+            gutterBottom
+            color="#002060"
+            align="center"
+            fontWeight={600}
+            bgcolor={"#e6f0ff"}
+          >
+            Historical $Exposure Breakdown (Including Hedge) by Region
+          </Typography>
           <ResponsiveContainer width="100%" height={400}>
             <AreaChart data={areaChartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -286,8 +319,8 @@ Historical $Exposure Breakdown(IncludingHedge) by Region          </Typography>
                   type="monotone"
                   dataKey={region}
                   stackId="1"
-                  stroke={["#002060", "#0070C0", "#00B0F0"][idx % 3]}
-                  fill={["#002060", "#0070C0", "#00B0F0"][idx % 3]}
+                  stroke={colors[idx % colors.length]}
+                  fill={colors[idx % colors.length]}
                 />
               ))}
             </AreaChart>
