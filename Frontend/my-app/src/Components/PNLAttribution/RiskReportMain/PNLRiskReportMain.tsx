@@ -71,15 +71,16 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
         <Grid container spacing={3} mt={2}>
           <Grid item xs={12}>
             <Box className="pdf-section">
-              <DailyNetOfHedgeChart fund={selectedFund} />
+              <DtdTopBottomMainPNL fund={selectedFund} />
             </Box>
           </Grid>
           <Grid item xs={12}>
             <Box className="pdf-section">
-              <DtdTopBottomMainPNL fund={selectedFund} />
+              <DailyNetOfHedgeChart fund={selectedFund} />
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12}>
             <Box className="pdf-section">
               <PNLAttributionMarketCap fund={selectedFund} />
             </Box>
