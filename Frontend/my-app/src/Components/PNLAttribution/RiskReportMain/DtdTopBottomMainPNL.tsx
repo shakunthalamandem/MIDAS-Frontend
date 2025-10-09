@@ -106,9 +106,9 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({ fund, date })
       <Grid container spacing={3} justifyContent="center" alignItems="flex-start">
         {/* Chart Section */}
         <Grid item xs={12} md={4}>
-              <Typography variant="subtitle1" gutterBottom color="#002060" align="center" >
-      DTD Net of Hedge Gain/Loss over $100K
-    </Typography>
+          <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
+            DTD Net of Hedge Gain/Loss over $100K
+          </Typography>
           <Bar
             data={chartData}
             options={{
@@ -137,18 +137,27 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({ fund, date })
           <Typography variant="subtitle1" color="#002060" gutterBottom align="center">
             Top P&L as on {reportDate}
           </Typography>
-          <TableContainer component={Paper} >
+          <TableContainer component={Paper}>
             <Table size="small" stickyHeader>
-              <TableHead >
+              <TableHead>
                 <TableRow>
-                  <TableCell>Ticker</TableCell>
-                  <TableCell align="right">Net of Hedge P&L (%)</TableCell>
-                  <TableCell align="right">Long Exposure/LMV (%)</TableCell>
+                  <TableCell style={{ color: "#002060" }}>Ticker</TableCell>
+                  <TableCell align="right" style={{ color: "#002060" }}>
+                    Net of Hedge P&L (%)
+                  </TableCell>
+                  <TableCell align="right" style={{ color: "#002060" }}>
+                    Long Exposure/LMV (%)
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {topTable.map((row: any, idx: number) => (
-                  <TableRow key={idx}>
+                  <TableRow
+                    key={idx}
+                    style={{
+                      backgroundColor: idx % 2 === 0 ? "#f5f5f5" : "transparent",
+                    }}
+                  >
                     <TableCell>{row.ticker}</TableCell>
                     <TableCell align="right">{row.net_of_hedge_pnl.toFixed(2)}%</TableCell>
                     <TableCell align="right">{row.long_exposure_lmv.toFixed(2)}%</TableCell>
@@ -161,21 +170,30 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({ fund, date })
 
         {/* Bottom P&L Table */}
         <Grid item xs={12} md={4}>
-          <Typography variant="subtitle1" color="#002060"  gutterBottom align="center">
+          <Typography variant="subtitle1" color="#002060" gutterBottom align="center">
             Bottom P&L as on {reportDate}
           </Typography>
-          <TableContainer component={Paper} >
+          <TableContainer component={Paper}>
             <Table size="small" stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Ticker</TableCell>
-                  <TableCell align="right">Net of Hedge P&L (%)</TableCell>
-                  <TableCell align="right">Long Exposure/LMV (%)</TableCell>
+              <TableHead >
+                <TableRow >
+                  <TableCell style={{ color: "#002060" }}>Ticker</TableCell>
+                  <TableCell align="right" style={{ color: "#002060" }}>
+                    Net of Hedge P&L(%)
+                  </TableCell>
+                  <TableCell align="right" style={{ color: "#002060" }}>
+                    Long Exposure/LMV(%)
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {bottomTable.map((row: any, idx: number) => (
-                  <TableRow key={idx}>
+                  <TableRow
+                    key={idx}
+                    style={{
+                      backgroundColor: idx % 2 === 0 ? "#f5f5f5" : "transparent",
+                    }}
+                  >
                     <TableCell>{row.ticker}</TableCell>
                     <TableCell align="right">{row.net_of_hedge_pnl.toFixed(2)}%</TableCell>
                     <TableCell align="right">{row.long_exposure_lmv.toFixed(2)}%</TableCell>
