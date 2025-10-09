@@ -17,7 +17,6 @@ import {
   Line,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
@@ -25,8 +24,6 @@ import {
   Pie,
   BarChart,
   Bar,
-  AreaChart,
-  Area,
   Cell,
 } from "recharts";
 
@@ -133,7 +130,6 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
   }));
 
 
-  // 2️⃣ Table Data (Net of Hedge P&L by Region)
   const netOfHedgeTableData = Object.keys(net_of_hedge_pnl["NetOfHedgeP&L(%)"] || {}).map(
     (region) => ({
       region,
@@ -197,34 +193,25 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
       {/* 2️⃣ Table Section */}
       <Grid item xs={12}>
         <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
-          <Typography
-            variant="h6"
-            gutterBottom
-            color="#002060"
-            align="center"
-            fontWeight={600}
-            bgcolor={"#e6f0ff"}
-          >
-            Net of Hedge P&L by Region
-          </Typography>
           <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Region</TableCell>
-                <TableCell align="right">NetOfHedgeP&L(%)</TableCell>
-                <TableCell align="right">LongExposure/LMV(%)</TableCell>
-                <TableCell align="right">BetaAdj.LongExp./LMV(%)</TableCell>
-                <TableCell align="right">NetOfHedgeP&L</TableCell>
-              </TableRow>
-            </TableHead>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#e6f0ff" }}>
+              <TableCell align="center">Region</TableCell>
+              <TableCell align="center" color="#002060" >Net Of Hedge P&L(%)</TableCell>
+              <TableCell align="center" color="#002060" >Long Exposure / LMV(%)</TableCell>
+              <TableCell align="center" color="#002060" >Beta Adj.Long Exp./LMV(%)</TableCell>
+              <TableCell align="center" color="#002060" >Net Of Hedge P&L</TableCell>
+            </TableRow>
+          </TableHead>
+
             <TableBody>
               {netOfHedgeTableData.map((row) => (
                 <TableRow key={row.region}>
-                  <TableCell>{row.region}</TableCell>
-                  <TableCell align="right">{row.netOfHedgePnlPercent}</TableCell>
-                  <TableCell align="right">{row.longExposure}</TableCell>
-                  <TableCell align="right">{row.betaAdjLongExp}</TableCell>
-                  <TableCell align="right">{row.netOfHedgePnl}</TableCell>
+                  <TableCell align="center">{row.region}</TableCell>
+                  <TableCell align="center">{row.netOfHedgePnlPercent}</TableCell>
+                  <TableCell align="center">{row.longExposure}</TableCell>
+                  <TableCell align="center">{row.betaAdjLongExp}</TableCell>
+                  <TableCell align="center">{row.netOfHedgePnl}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -248,24 +235,29 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
 
           <Grid container spacing={3}>
             {/* Bar Chart */}
-            <Grid item xs={12} md={6}>
-              <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
-                Net Of Hedge P&L (%)
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={barChartData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="value">
-                    {barChartData.map((entry: { color: string | undefined; }, index: any) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </Grid>
+          <Grid item xs={12} md={6}>
+  <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
+    Net Of Hedge P&L (%)
+  </Typography>
+  <ResponsiveContainer width="100%" height={300}>
+    <BarChart 
+      data={barChartData} 
+      layout="vertical" // <-- This makes the bars horizontal
+      margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+    >
+      <XAxis type="number" />          {/* Numeric axis */}
+      <YAxis dataKey="name" type="category" /> {/* Categorical axis */}
+      <Tooltip />
+      <Legend />
+      <Bar dataKey="value">
+        {barChartData.map((entry: { color: string | undefined }, index: number) => (
+          <Cell key={`cell-${index}`} fill={entry.color} />
+        ))}
+      </Bar>
+    </BarChart>
+  </ResponsiveContainer>
+</Grid>
+
 
             {/* Pie Chart */}
             <Grid item xs={12} md={6}>
