@@ -122,6 +122,17 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
     spxReturn: item.spx_return,
   }));
 
+
+  const historicalReturnChartData = historical_exposure_by_region?.map((item: any) => ({
+    date: item.date,
+    USReturn: item.US,
+    EMEAReturn: item.EMEA,
+    APACReturn: item.APAC,
+    HedgeReturn: item.Hedge,
+
+  }));
+
+
   // 2️⃣ Table Data (Net of Hedge P&L by Region)
   const netOfHedgeTableData = Object.keys(net_of_hedge_pnl["NetOfHedgeP&L(%)"] || {}).map(
     (region) => ({
@@ -150,20 +161,9 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
     color: colors[index % colors.length],
   }));
 
-  // 4️⃣ Area chart for historical exposure
-  const areaChartData = [];
-  const regionKeys = Object.keys(historical_exposure_by_region);
-  if (regionKeys.length) {
-    const length = historical_exposure_by_region[regionKeys[0]].length;
-    for (let i = 0; i < length; i++) {
-      const point: any = {};
-      point.index = i;
-      regionKeys.forEach((region) => {
-        point[region] = historical_exposure_by_region[region][i];
-      });
-      areaChartData.push(point);
-    }
-  }
+
+// 4️⃣ Area chart for historical exposure
+
 
   return (
     <Grid container spacing={3}>
@@ -293,7 +293,6 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
         </Paper>
       </Grid>
 
-      {/* 4️⃣ Area Chart */}
       <Grid item xs={12}>
         <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
           <Typography
@@ -301,33 +300,29 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
             gutterBottom
             color="#002060"
             align="center"
-            fontWeight={600}
             bgcolor={"#e6f0ff"}
+            fontWeight={600}
           >
-            Historical $Exposure Breakdown (Including Hedge) by Region
+            Cumulative Fund Return vs Market Return
           </Typography>
           <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={areaChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="index" />
+            <LineChart data={historicalReturnChartData}>
+              <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
               <Legend />
-              {Object.keys(historical_exposure_by_region).map((region, idx) => (
-                <Area
-                  key={region}
-                  type="monotone"
-                  dataKey={region}
-                  stackId="1"
-                  stroke={colors[idx % colors.length]}
-                  fill={colors[idx % colors.length]}
-                />
-              ))}
-            </AreaChart>
+              <Line type="linear" dataKey="APACReturn" stroke="#002060" />
+              <Line type="linear" dataKey="USReturn" stroke="#0070C0" />
+              <Line type="linear" dataKey="EMEAReturn" stroke="#00B0F0" />
+              <Line type="linear" dataKey="HedgeReturn" stroke="#002060" />
+            </LineChart>
           </ResponsiveContainer>
         </Paper>
       </Grid>
-    </Grid>
+
+
+
+  </Grid>
   );
 };
 
