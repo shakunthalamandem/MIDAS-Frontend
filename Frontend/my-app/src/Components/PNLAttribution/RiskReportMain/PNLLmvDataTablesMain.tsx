@@ -1,3 +1,5 @@
+// src/components/PNLLmvDataTablesMain.tsx
+
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -7,50 +9,46 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Grow,
   Grid,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
+import { RISK_REPORT_LABELS } from "./RiskReportLabels";
 
-interface TableRowData {
-  label: string;
-  value: number | string;
+interface SectionData {
+  [key: string]: number | string;
+}
+
+interface FundData {
+  section1: SectionData;
+  section2: SectionData;
+  section3: SectionData;
+  section4: SectionData;
 }
 
 interface PNLLmvDataTablesMainProps {
   fund: string;
 }
 
-interface FundData {
-  section1: TableRowData[];
-  section2: TableRowData[];
-  section3: TableRowData[];
-  section4: TableRowData[];
-}
-
-const headerColors = ["#8ca2b8ff", "#d7bcdbff", "#e9cdc4ff", "#c5e6c6ff"];
-
 const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => {
-  const [data, setData] = useState<FundData>({
-    section1: [],
-    section2: [],
-    section3: [],
-    section4: [],
-  });
-  const [loading, setLoading] = useState<boolean>(false);
+  const [data, setData] = useState<FundData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
 
   useEffect(() => {
     const fetchFundData = async () => {
+      if (!fund) return;
+
+      setLoading(true);
+      setError(null);
+ 
+
+
       try {
-        setLoading(true);
-        setError(null);
-
-        const apiUrl = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem("access_token");
-
-        if (!apiUrl) throw new Error("API URL is not defined");
-
-        const response = await fetch(`${apiUrl}/api/risk_report_lmv_data/`, {
+        const res = await fetch(`${apiUrl}/api/risk_report_lmv_data/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -59,63 +57,79 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
           body: JSON.stringify({ fund }),
         });
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.statusText}`);
-        }
+        if (!res.ok) throw new Error("Failed to fetch LMV Fund Data");
 
-        const result: FundData = await response.json();
+        const result = await res.json();
         setData(result);
       } catch (err: any) {
-        console.error(err);
-        setError(err.message);
+        console.error("Error fetching LMV fund data:", err);
+        setError(err.message || "Failed to fetch LMV Fund Data");
       } finally {
         setLoading(false);
       }
     };
 
-    if (fund) fetchFundData();
+    fetchFundData();
   }, [fund]);
 
-  const renderVerticalTable = (sectionData: TableRowData[], color: string, index: number) => (
-    <Grow in timeout={500 + index * 200}>
-      <TableContainer component={Paper} sx={{ mb: 4 }}>
-        <Table size="small"> {/* smaller table size */}
-          <TableHead sx={{ backgroundColor: color }}>
-            <TableRow sx={{ height: 30 }}> {/* reduced header row height */}
-              <TableCell sx={{ fontWeight: "bold", color: "#050505ff", py: 0.5 }}>Label</TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "#050505ff", py: 0.5 }}>Value</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sectionData.map((row: TableRowData, idx: number) => (
-              <TableRow key={idx} sx={{ height: 28 }}> {/* reduced row height */}
-                <TableCell sx={{ py: 0.5 }}>{row.label}</TableCell>
-                <TableCell sx={{ py: 0.5 }}>{row.value}</TableCell>
+  if (loading) {
+    return (
+      <Grid container justifyContent="center" alignItems="center" style={{ minHeight: "200px" }}>
+        <CircularProgress />
+      </Grid>
+    );
+  }
+
+  if (error) {
+    return (
+      <Typography color="error" align="center">
+        {error}
+      </Typography>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Typography align="center" color="textSecondary">
+        No data available
+      </Typography>
+    );
+  }
+
+  const renderSection = (section: SectionData, title: string) => (
+    <Grid item xs={12} md={6}>
+      <Paper elevation={3} style={{ padding: "1rem", borderRadius: "12px" }}>
+        <Typography variant="h6" gutterBottom>
+          {title}
+        </Typography>
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell><strong>Label</strong></TableCell>
+                <TableCell align="right"><strong>Value</strong></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Grow>
+            </TableHead>
+            <TableBody>
+              {Object.entries(section).map(([key, value]) => (
+                <TableRow key={key}>
+                  <TableCell>{RISK_REPORT_LABELS[key] || key}</TableCell>
+                  <TableCell align="right">{value}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    </Grid>
   );
 
-  if (loading) return <p>Loading data...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={6}>
-        {renderVerticalTable(data.section1, headerColors[0], 0)}
-      </Grid>
-      <Grid item xs={12} md={6}>
-        {renderVerticalTable(data.section2, headerColors[1], 1)}
-      </Grid>
-      <Grid item xs={12} md={6}>
-        {renderVerticalTable(data.section3, headerColors[2], 2)}
-      </Grid>
-      <Grid item xs={12} md={6}>
-        {renderVerticalTable(data.section4, headerColors[3], 3)}
-      </Grid>
+    <Grid container spacing={3}>
+      {renderSection(data.section1, "Section 1")}
+      {renderSection(data.section2, "Section 2")}
+      {renderSection(data.section3, "Section 3")}
+      {renderSection(data.section4, "Section 4")}
     </Grid>
   );
 };
