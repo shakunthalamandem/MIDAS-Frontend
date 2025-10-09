@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { Container, Typography, Paper, Box, Grid, Select, MenuItem, Button } from "@mui/material";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import { Container, Typography, Paper, Box, Grid, Select, MenuItem } from "@mui/material";
 
 import PNLLmvDataTablesMain from "./PNLLmvDataTablesMain";
 import DailyNetOfHedgeChart from "./DailyNetOfHedgeChart";
@@ -11,7 +9,7 @@ import PNLFundReturnsChartsDifference from "./PNLFundReturnsChartsDifference";
 import PNLHistoricalChart from "./PNLHistoricalChart";
 import PNLRegionWiseTableFundDeatils from "./PNLRegionWiseTableFundDeatils";
 import PNLSectorWiseFundDetails from "./PNLSectorWiseFundDetails";
-
+import RiskPDFExporter from "./RiskPDFExporter";
 interface PNLRiskReportMainProps {
   fund?: string;
 }
@@ -21,52 +19,12 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
   const [selectedFund, setSelectedFund] = useState(fund || "FMAP");
 
   const today = new Date();
-  const formattedDate = `${String(today.getMonth() + 1).padStart(2, "0")}/${String(
-    today.getDate()
-  ).padStart(2, "0")}/${today.getFullYear()}`;
-
-  const handleExportPDF = async () => {
-    const input = document.getElementById("pdf-export-area");
-    if (!input) return;
-
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = pdfWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pdfHeight;
-
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pdfHeight;
-    }
-
-    pdf.save(`PNL_Risk_Report_${selectedFund}.pdf`);
-  };
+  const formattedDate = `${String(today.getMonth() + 1).padStart(2, "0")}/${String(today.getDate()).padStart(2, "0")}/${today.getFullYear()}`;
 
   return (
     <Container sx={{ mt: 4, mb: 4 }} maxWidth="xl">
       {/* Header with Fund Selector */}
-      <Paper
-        elevation={8}
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          backgroundColor: "#f9f9f9",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-          mb: 4,
-        }}
-      >
+      <Paper elevation={8} sx={{ p: 3, borderRadius: 3, backgroundColor: "#f9f9f9", boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", mb: 4 }}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="h5" fontWeight={600} color="#002060">
@@ -98,13 +56,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
                 ))}
               </Select>
 
-              <Button
-                variant="contained"
-                onClick={handleExportPDF}
-                sx={{ backgroundColor: "#002060", color: "#fff", textTransform: "none", px: 3 }}
-              >
-                Export PDF
-              </Button>
+              <RiskPDFExporter exportId="pdf-export-area" fileName={`PNL_Risk_Report_${selectedFund}.pdf`} />
             </Box>
           </Grid>
         </Grid>
@@ -112,31 +64,45 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 
       {/* Main Exportable Content */}
       <Box id="pdf-export-area">
-        {/* LMV / P&L Tables */}
-        <PNLLmvDataTablesMain fund={selectedFund} />
+        <Box className="pdf-section">
+          <PNLLmvDataTablesMain fund={selectedFund} />
+        </Box>
 
-        {/* Charts Section */}
         <Grid container spacing={3} mt={2}>
           <Grid item xs={12} md={6}>
-            <DailyNetOfHedgeChart fund={selectedFund} />
+            <Box className="pdf-section">
+              <DailyNetOfHedgeChart fund={selectedFund} />
+            </Box>
           </Grid>
           <Grid item xs={12} md={6}>
-            <DtdTopBottomMainPNL fund={selectedFund} />
+            <Box className="pdf-section">
+              <DtdTopBottomMainPNL fund={selectedFund} />
+            </Box>
           </Grid>
           <Grid item xs={12} md={6}>
-            <PNLAttributionMarketCap fund={selectedFund} />
+            <Box className="pdf-section">
+              <PNLAttributionMarketCap fund={selectedFund} />
+            </Box>
           </Grid>
           <Grid item xs={12} md={6}>
-            <PNLFundReturnsChartsDifference fund={selectedFund} />
+            <Box className="pdf-section">
+              <PNLFundReturnsChartsDifference fund={selectedFund} />
+            </Box>
           </Grid>
-           <Grid item xs={12} md={6}>
-            <PNLRegionWiseTableFundDeatils fund={selectedFund} />
+          <Grid item xs={12} md={6}>
+            <Box className="pdf-section">
+              <PNLRegionWiseTableFundDeatils fund={selectedFund} />
+            </Box>
           </Grid>
-           <Grid item xs={12} md={6}>
-            <PNLSectorWiseFundDetails fund={selectedFund} />
+          <Grid item xs={12} md={6}>
+            <Box className="pdf-section">
+              <PNLSectorWiseFundDetails fund={selectedFund} />
+            </Box>
           </Grid>
           <Grid item xs={12}>
-            <PNLHistoricalChart fund={selectedFund} />
+            <Box className="pdf-section">
+              <PNLHistoricalChart fund={selectedFund} />
+            </Box>
           </Grid>
         </Grid>
       </Box>
