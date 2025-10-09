@@ -25,6 +25,8 @@ import {
   BarChart,
   Bar,
   Cell,
+  Area,
+  AreaChart,
 } from "recharts";
 
 interface RiskReportData {
@@ -39,7 +41,9 @@ interface PNLAttributionMarketCapProps {
   fund: string;
 }
 
-const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund }) => {
+const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
+  fund,
+}) => {
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<RiskReportData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -85,21 +89,36 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
 
   if (loading)
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight={200}
+      >
         <CircularProgress />
       </Box>
     );
 
   if (error)
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight={200}
+      >
         <Alert severity="error">{error}</Alert>
       </Box>
     );
 
   if (!chartData)
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight={200}
+      >
         <Alert severity="warning">Data is unavailable.</Alert>
       </Box>
     );
@@ -112,60 +131,66 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
   } = chartData;
 
   // 1️⃣ Cumulative Fund Return Chart
-  const cumulativeReturnChartData = cumulative_fund_return?.map((item: any) => ({
-    date: item.date,
-    fundReturn: item.fund_return,
-    msciReturn: item.msci_return,
-    spxReturn: item.spx_return,
-  }));
-
-
-  const historicalReturnChartData = historical_exposure_by_region?.map((item: any) => ({
-    date: item.date,
-    USReturn: item.US,
-    EMEAReturn: item.EMEA,
-    APACReturn: item.APAC,
-    HedgeReturn: item.Hedge,
-
-  }));
-
-
-  const netOfHedgeTableData = Object.keys(net_of_hedge_pnl["NetOfHedgeP&L(%)"] || {}).map(
-    (region) => ({
-      region,
-      netOfHedgePnlPercent: net_of_hedge_pnl["NetOfHedgeP&L(%)"][region],
-      longExposure: net_of_hedge_pnl["LongExposure/LMV(%)"][region],
-      betaAdjLongExp: net_of_hedge_pnl["BetaAdj.LongExp./LMV(%)"][region],
-      netOfHedgePnl: net_of_hedge_pnl["NetOfHedgeP&L"][region],
+  const cumulativeReturnChartData = cumulative_fund_return?.map(
+    (item: any) => ({
+      date: item.date,
+      fundReturn: item.fund_return,
+      msciReturn: item.msci_return,
+      spxReturn: item.spx_return,
     })
   );
+
+  const historicalReturnChartData = historical_exposure_by_region?.map(
+    (item: any) => ({
+      date: item.date,
+      US: item.us_data,
+      EMEA: item.emea_data,
+      APAC: item.apac_data,
+      Hedge: item.hedge_data,
+    })
+  );
+
+  const netOfHedgeTableData = Object.keys(
+    net_of_hedge_pnl["NetOfHedgeP&L(%)"] || {}
+  ).map((region) => ({
+    region,
+    netOfHedgePnlPercent: net_of_hedge_pnl["NetOfHedgeP&L(%)"][region],
+    longExposure: net_of_hedge_pnl["LongExposure/LMV(%)"][region],
+    betaAdjLongExp: net_of_hedge_pnl["BetaAdj.LongExp./LMV(%)"][region],
+    netOfHedgePnl: net_of_hedge_pnl["NetOfHedgeP&L"][region],
+  }));
 
   // Colors
   const colors = ["#FF7F0E", "#1F77B4", "#2CA02C"]; // orange, blue, green
 
   // Pie chart (LongExposureLMVPercent)
-  const pieChartData = attribution_by_market_cap?.LongExposureLMVPercent?.map((item: any, index: number) => ({
-    name: item.category,
-    value: item.pnl_percentage,
-    color: colors[index % colors.length],
-  }));
+  const pieChartData = attribution_by_market_cap?.LongExposureLMVPercent?.map(
+    (item: any, index: number) => ({
+      name: item.category,
+      value: item.pnl_percentage,
+      color: colors[index % colors.length],
+    })
+  );
 
   // Bar chart (NetOfHedgePNL)
-  const barChartData = attribution_by_market_cap?.NetOfHedgePNL?.map((item: any, index: number) => ({
-    name: item.category,
-    value: item.pnl_percentage,
-    color: colors[index % colors.length],
-  }));
+  const barChartData = attribution_by_market_cap?.NetOfHedgePNL?.map(
+    (item: any, index: number) => ({
+      name: item.category,
+      value: item.pnl_percentage,
+      color: colors[index % colors.length],
+    })
+  );
 
-
-// 4️⃣ Area chart for historical exposure
-
+  // 4️⃣ Area chart for historical exposure
 
   return (
     <Grid container spacing={3}>
       {/* 1️⃣ Cumulative Fund Return */}
       <Grid item xs={12}>
-        <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+        <Paper
+          elevation={3}
+          sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}
+        >
           <Typography
             variant="h6"
             gutterBottom
@@ -194,21 +219,31 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
       <Grid item xs={12}>
         <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
           <Table>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "#e6f0ff" }}>
-              <TableCell align="center">Region</TableCell>
-              <TableCell align="center" color="#002060" >Net Of Hedge P&L(%)</TableCell>
-              <TableCell align="center" color="#002060" >Long Exposure / LMV(%)</TableCell>
-              <TableCell align="center" color="#002060" >Beta Adj.Long Exp./LMV(%)</TableCell>
-              <TableCell align="center" color="#002060" >Net Of Hedge P&L</TableCell>
-            </TableRow>
-          </TableHead>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "#e6f0ff" }}>
+                <TableCell align="center">Region</TableCell>
+                <TableCell align="center" color="#002060">
+                  Net Of Hedge P&L(%)
+                </TableCell>
+                <TableCell align="center" color="#002060">
+                  Long Exposure / LMV(%)
+                </TableCell>
+                <TableCell align="center" color="#002060">
+                  Beta Adj.Long Exp./LMV(%)
+                </TableCell>
+                <TableCell align="center" color="#002060">
+                  Net Of Hedge P&L
+                </TableCell>
+              </TableRow>
+            </TableHead>
 
             <TableBody>
               {netOfHedgeTableData.map((row) => (
                 <TableRow key={row.region}>
                   <TableCell align="center">{row.region}</TableCell>
-                  <TableCell align="center">{row.netOfHedgePnlPercent}</TableCell>
+                  <TableCell align="center">
+                    {row.netOfHedgePnlPercent}
+                  </TableCell>
                   <TableCell align="center">{row.longExposure}</TableCell>
                   <TableCell align="center">{row.betaAdjLongExp}</TableCell>
                   <TableCell align="center">{row.netOfHedgePnl}</TableCell>
@@ -221,7 +256,10 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
 
       {/* 3️⃣ Bar + Pie Charts */}
       <Grid item xs={12}>
-        <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+        <Paper
+          elevation={3}
+          sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}
+        >
           <Typography
             variant="h6"
             gutterBottom
@@ -235,33 +273,45 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
 
           <Grid container spacing={3}>
             {/* Bar Chart */}
-          <Grid item xs={12} md={6}>
-  <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
-    Net Of Hedge P&L (%)
-  </Typography>
-  <ResponsiveContainer width="100%" height={300}>
-    <BarChart 
-      data={barChartData} 
-      layout="vertical" // <-- This makes the bars horizontal
-      margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
-    >
-      <XAxis type="number" />          {/* Numeric axis */}
-      <YAxis dataKey="name" type="category" /> {/* Categorical axis */}
-      <Tooltip />
-      <Legend />
-      <Bar dataKey="value">
-        {barChartData.map((entry: { color: string | undefined }, index: number) => (
-          <Cell key={`cell-${index}`} fill={entry.color} />
-        ))}
-      </Bar>
-    </BarChart>
-  </ResponsiveContainer>
-</Grid>
-
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                color="#002060"
+                align="center"
+              >
+                Net Of Hedge P&L (%)
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={barChartData}
+                  layout="vertical" // <-- This makes the bars horizontal
+                  margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+                >
+                  <XAxis type="number" /> {/* Numeric axis */}
+                  <YAxis dataKey="name" type="category" />{" "}
+                  {/* Categorical axis */}
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value">
+                    {barChartData.map(
+                      (entry: { color: string | undefined }, index: number) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      )
+                    )}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Grid>
 
             {/* Pie Chart */}
             <Grid item xs={12} md={6}>
-              <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                color="#002060"
+                align="center"
+              >
                 Long Exposure
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
@@ -273,9 +323,11 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
                     outerRadius="80%"
                     label={(entry) => entry.name}
                   >
-                    {pieChartData.map((entry: { color: string | undefined; }, index: any) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
+                    {pieChartData.map(
+                      (entry: { color: string | undefined }, index: any) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      )
+                    )}
                   </Pie>
                   <Tooltip />
                 </PieChart>
@@ -286,7 +338,10 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
       </Grid>
 
       <Grid item xs={12}>
-        <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+        <Paper
+          elevation={3}
+          sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}
+        >
           <Typography
             variant="h6"
             gutterBottom
@@ -295,26 +350,63 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({ fund 
             bgcolor={"#e6f0ff"}
             fontWeight={600}
           >
-            Cumulative Fund Return vs Market Return
-          </Typography>
+Historical $Exposure Breakdown (Including Hedge) by Region          </Typography>
           <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={historicalReturnChartData}>
+            <AreaChart
+              data={historicalReturnChartData}
+              margin={{ top: 20, right: 20, left: 0, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="colorAPAC" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#002060" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#002060" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorUS" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#0070C0" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#0070C0" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorEMEA" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#00B0F0" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#00B0F0" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorHedge" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#002060" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#002060" stopOpacity={0} />
+                </linearGradient>
+              </defs>
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="linear" dataKey="APACReturn" stroke="#002060" />
-              <Line type="linear" dataKey="USReturn" stroke="#0070C0" />
-              <Line type="linear" dataKey="EMEAReturn" stroke="#00B0F0" />
-              <Line type="linear" dataKey="HedgeReturn" stroke="#002060" />
-            </LineChart>
+              <Area
+                type="monotone"
+                dataKey="APAC"
+                stroke="#707070ff"
+                fill="url(#colorAPAC)"
+              />
+              <Area
+                type="monotone"
+                dataKey="US"
+                stroke="#b66e33ff"
+                fill="url(#colorUS)"
+              />
+              <Area
+                type="monotone"
+                dataKey="EMEA"
+                stroke="#a39c34ff"
+                fill="url(#colorEMEA)"
+              />
+              <Area
+                type="monotone"
+                dataKey="Hedge"
+                stroke="#397580ff"
+                fill="url(#colorHedge)"
+              />
+            </AreaChart>
           </ResponsiveContainer>
         </Paper>
       </Grid>
-
-
-
-  </Grid>
+    </Grid>
   );
 };
 
