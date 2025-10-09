@@ -1,5 +1,3 @@
-// src/components/PNLLmvDataTablesMain.tsx
-
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -37,15 +35,11 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-
   useEffect(() => {
     const fetchFundData = async () => {
       if (!fund) return;
-
       setLoading(true);
       setError(null);
- 
-
 
       try {
         const res = await fetch(`${apiUrl}/api/risk_report_lmv_data/`, {
@@ -96,40 +90,38 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
     );
   }
 
-  const renderSection = (section: SectionData, title: string) => (
-    <Grid item xs={12} md={6}>
-      <Paper elevation={3} style={{ padding: "1rem", borderRadius: "12px" }}>
-        <Typography variant="h6" gutterBottom>
-          {title}
-        </Typography>
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Label</strong></TableCell>
-                <TableCell align="right"><strong>Value</strong></TableCell>
+  const renderSection = (section: SectionData) => (
+    <Paper elevation={3} style={{ padding: "1rem", borderRadius: "12px", marginBottom: "1rem" }}>
+      <TableContainer>
+        <Table size="small">
+          <TableHead>
+            <TableRow style={{ backgroundColor: "#D9E1F2" }}>
+              <TableCell style={{ color: "#002060", fontWeight: "bold" }}>Label</TableCell>
+              <TableCell align="right" style={{ color: "#002060", fontWeight: "bold" }}>Value</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Object.entries(section).map(([key, value]) => (
+              <TableRow key={key}>
+                <TableCell style={{ color: "#002060" }}>{RISK_REPORT_LABELS[key] || key}</TableCell>
+                <TableCell align="right">{value}</TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.entries(section).map(([key, value]) => (
-                <TableRow key={key}>
-                  <TableCell>{RISK_REPORT_LABELS[key] || key}</TableCell>
-                  <TableCell align="right">{value}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-    </Grid>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
   );
 
   return (
     <Grid container spacing={3}>
-      {renderSection(data.section1, "Section 1")}
-      {renderSection(data.section2, "Section 2")}
-      {renderSection(data.section3, "Section 3")}
-      {renderSection(data.section4, "Section 4")}
+      {/* First row: sections 1, 2, 3 */}
+      <Grid item xs={12} md={4}>{renderSection(data.section1)}</Grid>
+      <Grid item xs={12} md={4}>{renderSection(data.section2)}</Grid>
+      <Grid item xs={12} md={4}>{renderSection(data.section4)}</Grid>
+
+      {/* Second row: section 4 full width */}
+      <Grid item xs={12}>{renderSection(data.section3)}</Grid>
     </Grid>
   );
 };
