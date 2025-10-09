@@ -95,96 +95,99 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({ fund, date })
     );
   }
 
-return (
-  <Paper elevation={3} sx={{ p: 3, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
-    <Typography variant="h6" gutterBottom color="#002060">
+  return (
+    <Paper elevation={3} sx={{ p: 3, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+      {/* Summary Section */}
+      <Typography variant="h6" gutterBottom color="#002060" align="center" fontWeight={600}>
+        Summary
+      </Typography>
+
+      {/* Container for Chart and Tables in one row */}
+      <Grid container spacing={3} justifyContent="center" alignItems="flex-start">
+        {/* Chart Section */}
+        <Grid item xs={12} md={4}>
+              <Typography variant="subtitle1" gutterBottom color="#002060" align="center" >
       DTD Net of Hedge Gain/Loss over $100K
     </Typography>
-
-    {/* Container for Chart and Tables in one row */}
-    <Grid container spacing={3} alignItems="flex-start">
-      {/* Chart Section */}
-      <Grid item xs={12} md={4}>
-        <Bar
-          data={chartData}
-          options={{
-            responsive: true,
-            indexAxis: "y",
-            plugins: {
-              legend: { display: false },
-              tooltip: { mode: "index", intersect: false },
-            },
-            scales: {
-              x: {
-                title: { display: true, text: "P&L ($)" },
-                ticks: {
-                  callback: (value: any) => `$${(value / 1000).toFixed(0)}K`,
-                },
+          <Bar
+            data={chartData}
+            options={{
+              responsive: true,
+              indexAxis: "y",
+              plugins: {
+                legend: { display: false },
+                tooltip: { mode: "index", intersect: false },
               },
-              y: { title: { display: false } },
-            },
-          }}
-          height={300}
-        />
-      </Grid>
+              scales: {
+                x: {
+                  title: { display: true, text: "P&L ($)" },
+                  ticks: {
+                    callback: (value: any) => `$${(value / 1000).toFixed(0)}K`,
+                  },
+                },
+                y: { title: { display: false } },
+              },
+            }}
+            height={300}
+          />
+        </Grid>
 
-      {/* Top P&L Table */}
-      <Grid item xs={12} md={4}>
-        <Typography variant="subtitle1" color="#002060" fontWeight={600} gutterBottom>
-          Top P&L as on {reportDate}
-        </Typography>
-        <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
-          <Table size="small" stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell>Ticker</TableCell>
-                <TableCell align="right">Net of Hedge P&L (%)</TableCell>
-                <TableCell align="right">Long Exposure/LMV (%)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {topTable.map((row: any, idx: number) => (
-                <TableRow key={idx}>
-                  <TableCell>{row.ticker}</TableCell>
-                  <TableCell align="right">{row.net_of_hedge_pnl.toFixed(2)}%</TableCell>
-                  <TableCell align="right">{row.long_exposure_lmv.toFixed(2)}%</TableCell>
+        {/* Top P&L Table */}
+        <Grid item xs={12} md={4}>
+          <Typography variant="subtitle1" color="#002060" gutterBottom align="center">
+            Top P&L as on {reportDate}
+          </Typography>
+          <TableContainer component={Paper} >
+            <Table size="small" stickyHeader>
+              <TableHead >
+                <TableRow>
+                  <TableCell>Ticker</TableCell>
+                  <TableCell align="right">Net of Hedge P&L (%)</TableCell>
+                  <TableCell align="right">Long Exposure/LMV (%)</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
+              </TableHead>
+              <TableBody>
+                {topTable.map((row: any, idx: number) => (
+                  <TableRow key={idx}>
+                    <TableCell>{row.ticker}</TableCell>
+                    <TableCell align="right">{row.net_of_hedge_pnl.toFixed(2)}%</TableCell>
+                    <TableCell align="right">{row.long_exposure_lmv.toFixed(2)}%</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
 
-      {/* Bottom P&L Table */}
-      <Grid item xs={12} md={4}>
-        <Typography variant="subtitle1" color="#002060" fontWeight={600} gutterBottom>
-          Bottom P&L as on {reportDate}
-        </Typography>
-        <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
-          <Table size="small" stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell>Ticker</TableCell>
-                <TableCell align="right">Net of Hedge P&L (%)</TableCell>
-                <TableCell align="right">Long Exposure/LMV (%)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {bottomTable.map((row: any, idx: number) => (
-                <TableRow key={idx}>
-                  <TableCell>{row.ticker}</TableCell>
-                  <TableCell align="right">{row.net_of_hedge_pnl.toFixed(2)}%</TableCell>
-                  <TableCell align="right">{row.long_exposure_lmv.toFixed(2)}%</TableCell>
+        {/* Bottom P&L Table */}
+        <Grid item xs={12} md={4}>
+          <Typography variant="subtitle1" color="#002060"  gutterBottom align="center">
+            Bottom P&L as on {reportDate}
+          </Typography>
+          <TableContainer component={Paper} >
+            <Table size="small" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Ticker</TableCell>
+                  <TableCell align="right">Net of Hedge P&L (%)</TableCell>
+                  <TableCell align="right">Long Exposure/LMV (%)</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {bottomTable.map((row: any, idx: number) => (
+                  <TableRow key={idx}>
+                    <TableCell>{row.ticker}</TableCell>
+                    <TableCell align="right">{row.net_of_hedge_pnl.toFixed(2)}%</TableCell>
+                    <TableCell align="right">{row.long_exposure_lmv.toFixed(2)}%</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
       </Grid>
-    </Grid>
-  </Paper>
-);
-
+    </Paper>
+  );
 };
 
 export default DtdTopBottomMainPNL;
