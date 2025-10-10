@@ -7,9 +7,10 @@ import DtdTopBottomMainPNL from "./DtdTopBottomMainPNL";
 import PNLAttributionMarketCap from "./PNLAttributionMarketCap";
 import PNLFundReturnsChartsDifference from "./PNLFundReturnsChartsDifference";
 import PNLHistoricalChart from "./PNLHistoricalChart";
-import PNLRegionWiseTableFundDeatils from "./PNLRegionWiseTableFundDeatils";
+import PNLRegionWiseTableFundDeatils from "./RiskReportDailyPnlvsVarChart";
 import PNLSectorWiseFundDetails from "./PNLSectorWiseFundDetails";
 import RiskPDFExporter from "./RiskPDFExporter";
+import RiskReportDailyPnlvsVarChart from "./RiskReportDailyPnlvsVarChart";
 interface PNLRiskReportMainProps {
   fund?: string;
 }
@@ -92,7 +93,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Box className="pdf-section">
-              <PNLRegionWiseTableFundDeatils fund={selectedFund} />
+              <RiskReportDailyPnlvsVarChart fund={selectedFund} />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
