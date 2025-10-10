@@ -6,7 +6,7 @@ import DailyNetOfHedgeChart from "./DailyNetOfHedgeChart";
 import DtdTopBottomMainPNL from "./DtdTopBottomMainPNL";
 import PNLAttributionMarketCap from "./PNLAttributionMarketCap";
 import PNLFundReturnsChartsDifference from "./RiskReportPNLPortfolioTable";
-import PNLHistoricalChart from "./PNLHistoricalChart";
+import PNLHistoricalChart from "./RiskReportIndexPortfolioTable";
 import PNLRegionWiseTableFundDeatils from "./RiskReportDailyPnlvsVarChart";
 import PNLSectorWiseFundDetails from "./PNLSectorWiseFundDetails";
 import RiskPDFExporter from "./RiskPDFExporter";
