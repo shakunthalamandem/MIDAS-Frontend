@@ -27,11 +27,8 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
       <Paper elevation={8} sx={{ p: 3, borderRadius: 3, backgroundColor: "#f9f9f9", boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", mb: 4 }}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} md={6}>
-            <Typography variant="h5" fontWeight={600} color="#002060">
-              PNL Risk Report - {selectedFund}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Summary as of {formattedDate}
+            <Typography variant="h6" color="#002060" fontWeight={600}>
+              {selectedFund}: Summary as of {formattedDate}
             </Typography>
           </Grid>
 
