@@ -74,7 +74,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
 
   return (
     <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9", mt: 2 }}>
-      <Typography variant="h6" gutterBottom color="#002060" sx={{ fontWeight: "bold" }}>
+      <Typography variant="body1" gutterBottom color="#002060" sx={{ fontWeight: "bold" }} align="center">
         Daily Net of Hedge P&L (%) vs. 1Yr 1% VaR (% of LMV) as of{" "}
         {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
       </Typography>

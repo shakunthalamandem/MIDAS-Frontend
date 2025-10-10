@@ -83,10 +83,11 @@ const PNLSectorWiseFundDetails: React.FC<PNLSectorWiseFundDetailsProps> = ({
       sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9", mt: 2 }}
     >
       <Typography
-        variant="h6"
+        variant="body1"
         gutterBottom
         color="#002060"
         sx={{ fontWeight: "bold" }}
+        align="center"
       >
         {fund}: Summary by category as of{" "}
         {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}

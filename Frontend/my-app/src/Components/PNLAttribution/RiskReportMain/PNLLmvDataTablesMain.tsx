@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -32,6 +32,9 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
   const [data, setData] = useState<FundData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [maxHeight, setMaxHeight] = useState<number>(0);
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -64,7 +67,15 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
     };
 
     fetchFundData();
-  }, [fund]);
+  }, [fund, apiUrl, token]);
+
+  // Update max height after data is rendered
+  useEffect(() => {
+    if (cardRefs.current.length === 0) return;
+    const heights = cardRefs.current.map((ref) => ref?.offsetHeight || 0);
+    const max = Math.max(...heights);
+    setMaxHeight(max);
+  }, [data]);
 
   if (loading) {
     return (
@@ -90,14 +101,27 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
     );
   }
 
-  const renderSection = (section: SectionData) => (
-    <Paper elevation={3} style={{ padding: "1rem", borderRadius: "12px", marginBottom: "1rem" }}>
+  const renderSection = (section: SectionData, index: number) => (
+    <Paper
+      elevation={3}
+      ref={(el) => (cardRefs.current[index] = el)}
+      style={{
+        padding: "1rem",
+        borderRadius: "12px",
+        marginBottom: "1rem",
+        height: maxHeight ? `${maxHeight}px` : "auto", // set equal height
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <TableContainer>
         <Table size="small">
           <TableHead>
             <TableRow style={{ backgroundColor: "#D9E1F2" }}>
               <TableCell style={{ color: "#002060", fontWeight: "bold" }}>Label</TableCell>
-              <TableCell align="right" style={{ color: "#002060", fontWeight: "bold" }}>Value</TableCell>
+              <TableCell align="right" style={{ color: "#002060", fontWeight: "bold" }}>
+                Value
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -115,13 +139,10 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
 
   return (
     <Grid container spacing={3}>
-      {/* First row: sections 1, 2, 3 */}
-      <Grid item xs={12} md={4}>{renderSection(data.section1)}</Grid>
-      <Grid item xs={12} md={4}>{renderSection(data.section2)}</Grid>
-      <Grid item xs={12} md={4}>{renderSection(data.section4)}</Grid>
-
-      {/* Second row: section 4 full width */}
-      <Grid item xs={12}>{renderSection(data.section3)}</Grid>
+      <Grid item xs={12} md={3}>{renderSection(data.section1, 0)}</Grid>
+      <Grid item xs={12} md={3}>{renderSection(data.section2, 1)}</Grid>
+      <Grid item xs={12} md={3}>{renderSection(data.section4, 2)}</Grid>
+      <Grid item xs={12} md={3}>{renderSection(data.section3, 3)}</Grid>
     </Grid>
   );
 };

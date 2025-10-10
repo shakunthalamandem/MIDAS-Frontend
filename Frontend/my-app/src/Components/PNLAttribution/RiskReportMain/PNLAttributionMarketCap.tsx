@@ -268,7 +268,7 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
             fontWeight={600}
             bgcolor={"#e6f0ff"}
           >
-            Attribution by Market Cap
+            Attribution by Market Cap Category
           </Typography>
 
           <Grid container spacing={3}>

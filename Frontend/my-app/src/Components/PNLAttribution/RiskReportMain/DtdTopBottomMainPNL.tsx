@@ -106,7 +106,7 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({ fund, date })
       <Grid container spacing={3} justifyContent="center" alignItems="flex-start">
         {/* Chart Section */}
         <Grid item xs={12} md={4}>
-          <Typography variant="subtitle1" gutterBottom color="#002060" align="center">
+          <Typography variant="subtitle1" gutterBottom color="#002060" align="center" bgcolor={"#e6f0ff"}>
             DTD Net of Hedge Gain/Loss over $100K
           </Typography>
           <Bar
@@ -128,13 +128,13 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({ fund, date })
                 y: { title: { display: false } },
               },
             }}
-            height={300}
+            height={250}
           />
         </Grid>
 
         {/* Top P&L Table */}
         <Grid item xs={12} md={4}>
-          <Typography variant="subtitle1" color="#002060" gutterBottom align="center">
+          <Typography variant="subtitle1" color="#002060" gutterBottom align="center" bgcolor={"#e6f0ff"}>
             Top P&L as on {reportDate}
           </Typography>
           <TableContainer component={Paper}>
@@ -170,7 +170,7 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({ fund, date })
 
         {/* Bottom P&L Table */}
         <Grid item xs={12} md={4}>
-          <Typography variant="subtitle1" color="#002060" gutterBottom align="center">
+          <Typography variant="subtitle1" color="#002060" gutterBottom align="center" bgcolor={"#e6f0ff"}>
             Bottom P&L as on {reportDate}
           </Typography>
           <TableContainer component={Paper}>

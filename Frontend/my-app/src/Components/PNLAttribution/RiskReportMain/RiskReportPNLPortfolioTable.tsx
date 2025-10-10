@@ -72,8 +72,8 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
 
   return (
     <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9", mt: 2 }}>
-      <Typography variant="h6" gutterBottom color="#002060" sx={{ fontWeight: "bold" }}>
-        FMAP: Long Analysis as of {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
+      <Typography variant="body1" gutterBottom color="#002060" sx={{ fontWeight: "bold" }} align="center">
+        {fund}: Long Analysis as {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
       </Typography>
 
       <TableContainer>
@@ -82,28 +82,30 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
             <TableRow sx={{ backgroundColor: "#e1eaff" }}>
               <TableCell><strong>Ticker</strong></TableCell>
               <TableCell><strong>Company</strong></TableCell>
-              <TableCell align="right"><strong>Net Of Hedge P&L</strong></TableCell>
-              <TableCell align="right"><strong>Net Of Hedge P&L (bps)</strong></TableCell>
-              <TableCell align="right"><strong>Long Exposure (%)</strong></TableCell>
-              <TableCell align="right"><strong>Beta</strong></TableCell>
-              <TableCell align="right"><strong>Beta Adj. Exposure / LMV (%)</strong></TableCell>
+              <TableCell align="center"><strong>Net Of Hedge P&L</strong></TableCell>
+              <TableCell align="center"><strong>Net Of Hedge P&L (bps)</strong></TableCell>
+              <TableCell align="center"><strong>Long Exposure (%)</strong></TableCell>
+              <TableCell align="center"><strong>Beta</strong></TableCell>
+              <TableCell align="center"><strong>Beta Adj. Exposure / LMV (%)</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {data.length > 0 ? (
               data.map((row, idx) => (
-                <TableRow key={idx}>
-                  <TableCell>{row.ticker}</TableCell>
+            <TableRow
+                  key={idx}
+                  sx={{ backgroundColor: idx % 2 === 0 ? "transparent" : "#dde6e9ff" }}
+                >                  <TableCell>{row.ticker}</TableCell>
                   <TableCell>{row.company}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {row.net_of_hedge_pnl < 0
                       ? `-$${Math.abs(row.net_of_hedge_pnl).toLocaleString()}`
                       : `$${row.net_of_hedge_pnl.toLocaleString()}`}
                   </TableCell>
-                  <TableCell align="right">{(row.net_of_hedge_pnl_bps * 100).toFixed(2)}</TableCell>
-                  <TableCell align="right">{(row.long_exposure * 100).toFixed(2)}</TableCell>
-                  <TableCell align="right">{row.beta.toFixed(2)}</TableCell>
-                  <TableCell align="right">{(row.beta_adj_exposure_lmv * 100).toFixed(2)}</TableCell>
+                  <TableCell align="center">{(row.net_of_hedge_pnl_bps * 100).toFixed(2)}</TableCell>
+                  <TableCell align="center">{(row.long_exposure * 100).toFixed(2)}</TableCell>
+                  <TableCell align="center">{row.beta.toFixed(2)}</TableCell>
+                  <TableCell align="center">{(row.beta_adj_exposure_lmv * 100).toFixed(2)}</TableCell>
                 </TableRow>
               ))
             ) : (

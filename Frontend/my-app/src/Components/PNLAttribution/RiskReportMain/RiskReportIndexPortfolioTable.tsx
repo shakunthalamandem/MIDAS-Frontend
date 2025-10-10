@@ -72,8 +72,8 @@ const RiskReportIndexPortfolioTable: React.FC<RiskReportIndexPortfolioTableProps
 
   return (
     <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9", mt: 2 }}>
-      <Typography variant="h6" gutterBottom color="#002060" sx={{ fontWeight: "bold" }}>
-        Index Portfolio as of {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
+      <Typography variant="body1" gutterBottom color="#002060" sx={{ fontWeight: "bold" }} align="center">
+        {fund}: Short Analysis as {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
       </Typography>
 
       <TableContainer>
@@ -82,11 +82,11 @@ const RiskReportIndexPortfolioTable: React.FC<RiskReportIndexPortfolioTableProps
             <TableRow sx={{ backgroundColor: "#e1eaff" }}>
               <TableCell><strong>Ticker</strong></TableCell>
               <TableCell><strong>Company</strong></TableCell>
-              <TableCell align="right"><strong>P&L</strong></TableCell>
-              <TableCell align="right"><strong>P&L vs LMV (%)</strong></TableCell>
-              <TableCell align="right"><strong>Beta</strong></TableCell>
-              <TableCell align="right"><strong>Exposure vs LMV (%)</strong></TableCell>
-              <TableCell align="right"><strong>Beta Adj. Exposure / LMV (%)</strong></TableCell>
+              <TableCell align="center"><strong>P&L</strong></TableCell>
+              <TableCell align="center"><strong>P&L vs LMV (%)</strong></TableCell>
+              <TableCell align="center"><strong>Beta</strong></TableCell>
+              <TableCell align="center"><strong>Exposure vs LMV (%)</strong></TableCell>
+              <TableCell align="center"><strong>Beta Adj. Exposure / LMV (%)</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -94,17 +94,17 @@ const RiskReportIndexPortfolioTable: React.FC<RiskReportIndexPortfolioTableProps
               indexData.map((row, idx) => (
                 <TableRow
                   key={idx}
-                  sx={{ backgroundColor: idx % 2 === 0 ? "transparent" : "#f2f2f2" }}
+                  sx={{ backgroundColor: idx % 2 === 0 ? "transparent" : "#e7e1daff" }}
                 >
                   <TableCell>{row.ticker}</TableCell>
                   <TableCell>{row.company}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {row.pnl < 0 ? `-$${Math.abs(row.pnl).toLocaleString()}` : `$${row.pnl.toLocaleString()}`}
                   </TableCell>
-                  <TableCell align="right">{(row.pnlvslmv * 100).toFixed(2)}</TableCell>
-                  <TableCell align="right">{row.beta.toFixed(2)}</TableCell>
-                  <TableCell align="right">{(row.exposurevslmv * 100).toFixed(2)}</TableCell>
-                  <TableCell align="right">{(row.beta_adj_exposure_lmv * 100).toFixed(2)}</TableCell>
+                  <TableCell align="center">{(row.pnlvslmv * 100).toFixed(2)}</TableCell>
+                  <TableCell align="center">{row.beta.toFixed(2)}</TableCell>
+                  <TableCell align="center">{(row.exposurevslmv * 100).toFixed(2)}</TableCell>
+                  <TableCell align="center">{(row.beta_adj_exposure_lmv * 100).toFixed(2)}</TableCell>
                 </TableRow>
               ))
             ) : (

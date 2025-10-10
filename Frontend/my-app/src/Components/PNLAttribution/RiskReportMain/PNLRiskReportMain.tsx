@@ -7,7 +7,6 @@ import DtdTopBottomMainPNL from "./DtdTopBottomMainPNL";
 import PNLAttributionMarketCap from "./PNLAttributionMarketCap";
 import PNLFundReturnsChartsDifference from "./RiskReportPNLPortfolioTable";
 import PNLHistoricalChart from "./RiskReportIndexPortfolioTable";
-import PNLRegionWiseTableFundDeatils from "./RiskReportDailyPnlvsVarChart";
 import PNLSectorWiseFundDetails from "./PNLSectorWiseFundDetails";
 import RiskPDFExporter from "./RiskPDFExporter";
 import RiskReportDailyPnlvsVarChart from "./RiskReportDailyPnlvsVarChart";
@@ -69,7 +68,25 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
           <PNLLmvDataTablesMain fund={selectedFund} />
         </Box>
 
+
+
         <Grid container spacing={3} mt={2}>
+
+          <Grid item xs={12}>
+            <Box className="pdf-section">
+              <PNLAttributionMarketCap fund={selectedFund} />
+            </Box>
+          </Grid>
+                    <Grid item xs={12} md={6}>
+            <Box className="pdf-section">
+              <PNLSectorWiseFundDetails fund={selectedFund} />
+            </Box>
+          </Grid>
+                    <Grid item xs={12} md={6}>
+            <Box className="pdf-section">
+              <RiskReportDailyPnlvsVarChart fund={selectedFund} />
+            </Box>
+          </Grid>
           <Grid item xs={12}>
             <Box className="pdf-section">
               <DtdTopBottomMainPNL fund={selectedFund} />
@@ -81,26 +98,14 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
             </Box>
           </Grid>
 
+   
           <Grid item xs={12}>
-            <Box className="pdf-section">
-              <PNLAttributionMarketCap fund={selectedFund} />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
             <Box className="pdf-section">
               <PNLFundReturnsChartsDifference fund={selectedFund} />
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Box className="pdf-section">
-              <RiskReportDailyPnlvsVarChart fund={selectedFund} />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box className="pdf-section">
-              <PNLSectorWiseFundDetails fund={selectedFund} />
-            </Box>
-          </Grid>
+
+
           <Grid item xs={12}>
             <Box className="pdf-section">
               <PNLHistoricalChart fund={selectedFund} />

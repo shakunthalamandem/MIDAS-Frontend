@@ -87,7 +87,7 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
   const renderBarChart = (chartData: ChartDataType, title: string) => (
     <Paper sx={{ p: 2, mb: 3, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
       <Typography
-        variant="h6"
+        variant="body1"
         gutterBottom
         color="#002060"
         align="center"
@@ -172,11 +172,15 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
   );
 
   return (
-    <Box>
+    <Paper sx={{ p: 2, mb: 3, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+            <Typography variant="h6" gutterBottom color="#002060" sx={{ fontWeight: "bold" }} align="center">
+              {fund}: Attribution as of {date} 
+            </Typography>
       {renderBarChart(data.sector, "GICS Sector")}
       {renderBarChart(data.region, "Region")}
       {renderBarChart(data.strategy, "Strategy")}
-    </Box>
+        </Paper>
+
   );
 };
 
