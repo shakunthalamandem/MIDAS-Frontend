@@ -68,31 +68,10 @@ const DailyNoteDataTickerList: React.FC<DailyNoteDataTickerListProps> = ({
   }, [apiUrl, token]);
 
   // Handle dropdown change
-  const handleChange = (event: any) => {
-    const selectedIds: number[] = event.target.value;
-
-    const updatedSelection: number[] = [];
-    const seenTickers = new Set<string>();
-
-    selectedIds.forEach((id) => {
-      const option = options.find((o) => o.id === id);
-      if (option) {
-        // Only keep the latest selection for each ticker
-        seenTickers.add(option.ticker);
-      }
-    });
-
-    selectedIds.forEach((id) => {
-      const option = options.find((o) => o.id === id);
-      if (option && seenTickers.has(option.ticker) && !updatedSelection.includes(id)) {
-        updatedSelection.push(id);
-        seenTickers.delete(option.ticker);
-      }
-    });
-
-    setSelected(updatedSelection);
-  };
-
+const handleChange = (event: any) => {
+  const selectedIds: number[] = event.target.value;
+  setSelected(selectedIds); // simply store all selected IDs, no ticker restriction
+};
   // Delete chip
   const handleDelete = (id: number) => {
     setSelected(selected.filter((item) => item !== id));
