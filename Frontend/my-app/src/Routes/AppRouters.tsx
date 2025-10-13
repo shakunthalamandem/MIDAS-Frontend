@@ -75,6 +75,7 @@ import WriteUpIPODashbaord from "../Components/IPOwriteUp/IPOWriteUpDashboard/Wr
 import UploadFactSetTickers from "../Components/Uploads/DailyMonasheeUploads/UploadFactSetTickers";
 import FSDealUnifiedMain from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/FactsetDataDetails/FSDealUnifiedMain";
 import DeleteUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/DeleteUnifiedDealData";
+import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTickersData";
 
 const AppRouters: React.FC = () => {
   return (
@@ -232,6 +233,8 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/fs_new_deal_data" element={<AuthGuard><FSDealUnifiedMain /></AuthGuard>} />
+
+        <Route path="/daily_note" element={<AuthGuard><DailyNoteDeleteTickersData /></AuthGuard>} />
 
 
 
