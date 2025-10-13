@@ -27,13 +27,14 @@ const theme = createTheme({
 
 interface DealOption {
   ticker: string;
+  id: number;
   trade_date: string | null;
   deal_type: string | null;
 }
 
 interface DailyNoteDataTickerListProps {
-  selected: string[];
-  setSelected: (values: string[]) => void;
+  selected: number[]; // store IDs
+  setSelected: (values: number[]) => void;
 }
 
 const DailyNoteDataTickerList: React.FC<DailyNoteDataTickerListProps> = ({
@@ -46,7 +47,7 @@ const DailyNoteDataTickerList: React.FC<DailyNoteDataTickerListProps> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // Fetch ticker + trade_date options
+  // Fetch options from API
   useEffect(() => {
     const fetchOptions = async () => {
       if (!apiUrl) return;
@@ -54,9 +55,7 @@ const DailyNoteDataTickerList: React.FC<DailyNoteDataTickerListProps> = ({
       try {
         const resp = await axios.get<DealOption[]>(
           `${apiUrl}/api/daily_note_deals_data/`,
-          {
-            headers: { Authorization: token ? `Bearer ${token}` : "" },
-          }
+          { headers: { Authorization: token ? `Bearer ${token}` : "" } }
         );
         setOptions(resp.data);
       } catch (err) {
@@ -70,35 +69,51 @@ const DailyNoteDataTickerList: React.FC<DailyNoteDataTickerListProps> = ({
 
   // Handle dropdown change
   const handleChange = (event: any) => {
-    setSelected(event.target.value);
+    const selectedIds: number[] = event.target.value;
+
+    const updatedSelection: number[] = [];
+    const seenTickers = new Set<string>();
+
+    selectedIds.forEach((id) => {
+      const option = options.find((o) => o.id === id);
+      if (option) {
+        // Only keep the latest selection for each ticker
+        seenTickers.add(option.ticker);
+      }
+    });
+
+    selectedIds.forEach((id) => {
+      const option = options.find((o) => o.id === id);
+      if (option && seenTickers.has(option.ticker) && !updatedSelection.includes(id)) {
+        updatedSelection.push(id);
+        seenTickers.delete(option.ticker);
+      }
+    });
+
+    setSelected(updatedSelection);
   };
 
-  // Remove a chip
-  const handleDelete = (value: string) => {
-    setSelected(selected.filter((item) => item !== value));
+  // Delete chip
+  const handleDelete = (id: number) => {
+    setSelected(selected.filter((item) => item !== id));
   };
 
-  // Get the label for the selected items in the dropdown
+  // Render dropdown label
   const getSelectedLabel = () => {
     if (selected.length === 0) return "";
 
-    // Always show only the first selected item
-    const [firstTicker, firstDeal] = selected[0].split("|");
-    const firstLabel = `${firstTicker} (${firstDeal})`;
+    const firstOption = options.find((o) => o.id === selected[0]);
+    if (!firstOption) return "";
 
-    if (selected.length === 1) {
-      return firstLabel;
-    }
-
-    // If more than one, show first + count
-    return `${firstLabel}, +${selected.length - 1}`;
+    const firstLabel = `${firstOption.ticker} (${firstOption.trade_date})`;
+    return selected.length === 1 ? firstLabel : `${firstLabel}, +${selected.length - 1}`;
   };
 
   return (
     <ThemeProvider theme={theme}>
       <Container>
         <Box display="flex" flexDirection="column" gap={2} sx={{ width: 350 }}>
-          {/* Dropdown select */}
+          {/* Dropdown */}
           <FormControl fullWidth>
             <InputLabel>Select Deals</InputLabel>
             <Select
@@ -106,39 +121,29 @@ const DailyNoteDataTickerList: React.FC<DailyNoteDataTickerListProps> = ({
               value={selected}
               onChange={handleChange}
               input={<OutlinedInput label="Select Deals" />}
-              renderValue={getSelectedLabel} // Custom render value
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 300, // dropdown max height
-                    width: 350,
-                  },
-                },
-              }}
+              renderValue={getSelectedLabel}
+              MenuProps={{ PaperProps: { style: { maxHeight: 300, width: 350 } } }}
             >
               {loading ? (
                 <MenuItem disabled>
                   <CircularProgress size={20} />
                 </MenuItem>
               ) : options.length > 0 ? (
-                options.map((item, idx) => {
-                  if (!item.trade_date) return null; // skip null trade_date
-                  const value = `${item.ticker}|${item.trade_date}`;
+                options.map((item) => {
+                  if (!item.trade_date) return null;
                   return (
-                    <MenuItem key={idx} value={value}>
-                      <Checkbox checked={selected.indexOf(value) > -1} />
+                    <MenuItem key={item.id} value={item.id}>
+                      <Checkbox checked={selected.includes(item.id)} />
                       <ListItemText
-                        primary={
-                          <Typography fontWeight="bold">{item.ticker}</Typography>
-                        }
+                        primary={<Typography fontWeight="bold">{item.ticker}    <span style={{ color: "#007780ff", fontWeight: 400 ,fontSize:'0.8rem' }}>{item.id}</span></Typography>}
                         secondary={
                           <Typography variant="caption" color="text.secondary">
-                            {item.trade_date} <span style={{color:'#c40303ff' ,fontWeight:600}}>{item.deal_type}</span>
+                            {item.trade_date}{" "}
+                            <span style={{ color: "#c40303ff", fontWeight: 600 }}>
+                              {item.deal_type}
+                            </span>
                           </Typography>
-                          
                         }
-                        
-                        
                       />
                     </MenuItem>
                   );
@@ -149,16 +154,17 @@ const DailyNoteDataTickerList: React.FC<DailyNoteDataTickerListProps> = ({
             </Select>
           </FormControl>
 
-          {/* Chips for selected items */}
+          {/* Chips */}
           {selected.length > 0 && (
             <Box display="flex" flexWrap="wrap" gap={1}>
-              {selected.map((val) => {
-                const [ticker, dealId] = val.split("|");
+              {selected.map((id) => {
+                const option = options.find((o) => o.id === id);
+                if (!option) return null;
                 return (
                   <Chip
-                    key={val}
-                    label={`${ticker} (${dealId})`}
-                    onDelete={() => handleDelete(val)}
+                    key={id}
+                    label={`${option.ticker} (${option.trade_date})`}
+                    onDelete={() => handleDelete(id)}
                     color="primary"
                     variant="outlined"
                   />

@@ -14,7 +14,7 @@ import { Delete } from "@mui/icons-material";
 import DailyNoteDataTickerList from "./DailyNoteDataTickerList";
 
 const DailyNoteDeleteTickersData: React.FC = () => {
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<number[]>([]); // store IDs now
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
@@ -33,15 +33,11 @@ const DailyNoteDeleteTickersData: React.FC = () => {
     setSuccess(false);
 
     try {
-      // Loop through each selected deal and send delete request
-      for (const val of selected) {
-        const [ticker, trade_date] = val.split("|"); // e.g. "FANG-US|2024-09-30"
-        const payload: any = { ticker };
-        if (trade_date) payload.trade_date = trade_date;
-
+      // Send delete requests for each selected ID
+      for (const id of selected) {
         await axios.post(
           `${apiUrl}/api/pnl_daily_note_data_delete/`,
-          payload,
+          { id }, // send only id
           {
             headers: { Authorization: token ? `Bearer ${token}` : "" },
           }
@@ -49,7 +45,7 @@ const DailyNoteDeleteTickersData: React.FC = () => {
       }
 
       setSuccess(true);
-      setSelected([]);
+      setSelected([]); // clear selection
     } catch (err) {
       console.error(err);
       setError("Failed to delete one or more deals. Please try again.");
@@ -102,9 +98,7 @@ const DailyNoteDeleteTickersData: React.FC = () => {
           <Box mt={3} display="flex" justifyContent="center">
             <Button
               variant="contained"
-              startIcon={
-                loading ? <CircularProgress size={20} /> : <Delete />
-              }
+              startIcon={loading ? <CircularProgress size={20} /> : <Delete />}
               onClick={handleDelete}
               disabled={loading || !selected.length}
               sx={{
@@ -112,14 +106,11 @@ const DailyNoteDeleteTickersData: React.FC = () => {
                 py: 1,
                 fontWeight: "bold",
                 borderRadius: 3,
-                background:
-                  "linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%)",
+                background: "linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%)",
                 color: "#fff",
                 "&:hover": {
-                  background:
-                    "linear-gradient(135deg, #ef5350 0%, #e53935 100%)",
-                                    color: "#fff",
-
+                  background: "linear-gradient(135deg, #ef5350 0%, #e53935 100%)",
+                  color: "#fff",
                 },
               }}
             >
