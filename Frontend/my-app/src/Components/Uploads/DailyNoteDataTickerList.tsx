@@ -27,8 +27,8 @@ const theme = createTheme({
 
 interface DealOption {
   ticker: string;
-  pricing_date: string;
   trade_date: string | null;
+  deal_type: string | null;
 }
 
 interface DailyNoteDataTickerListProps {
@@ -133,9 +133,12 @@ const DailyNoteDataTickerList: React.FC<DailyNoteDataTickerListProps> = ({
                         }
                         secondary={
                           <Typography variant="caption" color="text.secondary">
-                            {item.trade_date}
+                            {item.trade_date} <span style={{color:'#c40303ff' ,fontWeight:600}}>{item.deal_type}</span>
                           </Typography>
+                          
                         }
+                        
+                        
                       />
                     </MenuItem>
                   );
