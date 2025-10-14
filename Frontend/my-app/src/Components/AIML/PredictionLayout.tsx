@@ -45,6 +45,7 @@ const defaultFOValues = {
   revenue_growth_category: "",
   net_profit_margin_category: "",
   issue_to_pre_day_close_return_category: 0,
+  t1d_open_return_category: null as number | null,
   t1d_return_from_bloomberg_category: null as number | null,
 };
 
@@ -90,7 +91,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const [ipoValues, setIpoValues] = useState({ ...defaultIPOValues });
   const [foAutoPredict, setFoAutoPredict] = useState(false);
   const [ipoAutoPredict, setIpoAutoPredict] = useState(false);
-  const [foFormKey, setFoFormKey] = useState(0);   // NEW
+  const [foFormKey, setFoFormKey] = useState(0); // NEW
   const [ipoFormKey, setIpoFormKey] = useState(0); // NEW
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -105,15 +106,6 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const handlePredictionSelect = (item: any) => {
     const type = (item.deal_type || "").toUpperCase() as "IPO" | "FO";
 
-    const t1dCloseFromCard = toNullableNumber(
-      pick(item, [
-        "t1d_return_from_bloomberg_category",
-        "t1d_return_from_bloomberg",
-        "t1d_close_return",
-        "t1d_return",
-      ])
-    );
-
     if (type === "FO") {
       setFoValues({
         ...defaultFOValues,
@@ -125,7 +117,9 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           item.sponsor === "Y" ? "Y" : item.sponsor === "N" ? "N" : "",
         deal_size_category: item.deal_size ? String(item.deal_size) : "0",
         percentage_primary_category:
-          item.primary_percentage != null ? String(item.primary_percentage) : "",
+          item.primary_percentage != null
+            ? String(item.primary_percentage)
+            : "",
         sector_category: item.sector || "",
         discount_from_announcement_price_category:
           item.discount_from_announcement_price != null
@@ -154,7 +148,14 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           item.issue_to_previous_day_close != null
             ? Number(item.issue_to_previous_day_close)
             : 0,
-        t1d_return_from_bloomberg_category: t1dCloseFromCard, // may be null
+        t1d_open_return_category: toNullableNumber(
+          pick(item, ["t1d_open_return", "t1d_open_return_category"])
+        ),
+        t1d_return_from_bloomberg_category: toNullableNumber(
+          pick(item, [
+            "t1d_return_from_bloomberg_category",
+          ])
+        ), // may be null
       });
       setSelectedType("FO");
       setFoAutoPredict(true);
@@ -168,7 +169,9 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         region: item.region || "US",
         deal_size_category: item.deal_size ? String(item.deal_size) : "0",
         percentage_primary_category:
-          item.primary_percentage != null ? String(item.primary_percentage) : "",
+          item.primary_percentage != null
+            ? String(item.primary_percentage)
+            : "",
         allocation_deal_size_percentage_category:
           item.allocation_as_percentage_of_deal_size != null
             ? String(item.allocation_as_percentage_of_deal_size)
@@ -191,7 +194,11 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           item.revenue_growth != null ? String(item.revenue_growth) : "",
         net_profit_margin_category:
           item.net_profit_margin != null ? String(item.net_profit_margin) : "",
-        t1d_return_from_bloomberg_category: t1dCloseFromCard, // may be null
+        t1d_return_from_bloomberg_category: toNullableNumber(
+          pick(item, [
+            "t1d_return_from_bloomberg_category",
+          ])
+        ),
       });
       setSelectedType("IPO");
       setIpoAutoPredict(true);
@@ -203,8 +210,18 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 2 }}>
-        <FormSwitcher selectedType={selectedType} onChangeType={handleTypeChange} />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <FormSwitcher
+          selectedType={selectedType}
+          onChangeType={handleTypeChange}
+        />
       </Box>
 
       <Grid container spacing={2} alignItems="flex-start">
@@ -212,7 +229,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           <Box ref={formRef} sx={{ scrollMarginTop: 16 }}>
             {selectedType === "FO" ? (
               <FOForm
-                key={foFormKey}                 // NEW
+                key={foFormKey} // NEW
                 values={foValues}
                 setValues={setFoValues}
                 options={options}
@@ -222,7 +239,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
               />
             ) : (
               <IPOForm
-                key={ipoFormKey}                // NEW
+                key={ipoFormKey} // NEW
                 values={ipoValues}
                 setValues={setIpoValues}
                 options={options}
@@ -238,7 +255,11 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           item
           xs={12}
           md={3}
-          sx={{ position: { md: "sticky" }, top: { md: 20 }, height: "fit-content" }}
+          sx={{
+            position: { md: "sticky" },
+            top: { md: 20 },
+            height: "fit-content",
+          }}
         >
           <RecentPredictionsPanel
             selectedType={selectedType}

@@ -60,6 +60,7 @@ interface FOFormValues {
   revenue_growth_category: string; // %
   net_profit_margin_category: string; // %
   issue_to_pre_day_close_return_category: number; // %
+  t1d_open_return_category: number | null; // %
   t1d_return_from_bloomberg_category: number | null; // %
 }
 
@@ -132,6 +133,7 @@ const FOForm: React.FC<FOFormProps> = ({
       "GDP",
       "Inflation",
       "Treasury",
+      "t1d_open_return_category",
       "t1d_return_from_bloomberg_category", // <-- OPTIONAL
     ]);
 
@@ -754,6 +756,8 @@ const FOForm: React.FC<FOFormProps> = ({
           <FOPredictionResults
             result={prediction}
             onRepredict={handleRepredictWithPrice}
+            // NEW: prefill from the form’s value (number | null)
+            initialT1dOpenReturn={values.t1d_open_return_category ?? null}
           />
           <FOWeeklyMonthlyPredictionResults
             result={weeklyPrediction}
