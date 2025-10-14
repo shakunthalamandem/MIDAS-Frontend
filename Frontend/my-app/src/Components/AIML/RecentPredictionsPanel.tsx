@@ -41,6 +41,7 @@ interface RecentPrediction {
   revenue_growth?: number | string | null;
   net_profit_margin?: number | string | null;
   issue_to_previous_day_close?: number | string | null; // shown only for FO
+  t1d_return_from_bloomberg_category?: string | null;
 }
 
 interface ApiResponse {

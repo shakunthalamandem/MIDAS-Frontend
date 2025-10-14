@@ -1,9 +1,24 @@
 import React, { useRef, useState } from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import FormSwitcher from "./FormSwitcher";
 import FOForm from "./FOForm";
 import IPOForm from "./IPOForm";
 import RecentPredictionsPanel from "./RecentPredictionsPanel";
+
+// ---- Helpers ----
+const toNullableNumber = (v: unknown): number | null => {
+  if (v === null || v === undefined) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+// Finds the first present (non-null/undefined) value among the provided keys
+const pick = (obj: any, keys: string[]) => {
+  for (const k of keys) {
+    if (obj && obj[k] !== undefined && obj[k] !== null) return obj[k];
+  }
+  return null;
+};
 
 // ---- Defaults ----
 const defaultFOValues = {
@@ -30,6 +45,7 @@ const defaultFOValues = {
   revenue_growth_category: "",
   net_profit_margin_category: "",
   issue_to_pre_day_close_return_category: 0,
+  t1d_return_from_bloomberg_category: null as number | null,
 };
 
 const defaultIPOValues = {
@@ -52,6 +68,7 @@ const defaultIPOValues = {
   revenue_category: "",
   revenue_growth_category: "",
   net_profit_margin_category: "",
+  t1d_return_from_bloomberg_category: null as number | null,
 };
 
 interface OptionsData {
@@ -86,6 +103,16 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const handlePredictionSelect = (item: any) => {
     const type = (item.deal_type || "").toUpperCase() as "IPO" | "FO";
 
+    // Accept multiple recent-card key variants for T+1D close return
+    const t1dCloseFromCard = toNullableNumber(
+      pick(item, [
+        "t1d_return_from_bloomberg_category", // your form key
+        "t1d_return_from_bloomberg",          // recent payload key (your CBK example)
+        "t1d_close_return",                   // possible alt
+        "t1d_return",                         // possible alt
+      ])
+    );
+
     if (type === "FO") {
       setFoValues({
         ...defaultFOValues,
@@ -112,8 +139,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
             ? String(item.allocation_as_percentage_of_ioi)
             : "",
         selected_bank_category: item.lead_bank || "",
-        
-        
+
         deal_status: item.deal_status || "Announced",
         GDP: "Stable",
         Inflation: "Stable",
@@ -121,16 +147,18 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         target: "T1D",
 
         // NEW: prefill from recent item if available
-        revenue_category:
-          item.revenue != null ? String(item.revenue) : "",
+        revenue_category: item.revenue != null ? String(item.revenue) : "",
         revenue_growth_category:
           item.revenue_growth != null ? String(item.revenue_growth) : "",
         net_profit_margin_category:
           item.net_profit_margin != null ? String(item.net_profit_margin) : "",
         issue_to_pre_day_close_return_category:
           item.issue_to_previous_day_close != null
-            ? item.issue_to_previous_day_close
+            ? Number(item.issue_to_previous_day_close)
             : 0,
+
+        // IMPORTANT: keep nullable so weekly/monthly only fires when present
+        t1d_return_from_bloomberg_category: t1dCloseFromCard,
       });
       setSelectedType("FO");
       setFoAutoPredict(true);
@@ -163,12 +191,14 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         target: "T1D",
 
         // NEW / ensure
-        revenue_category:
-          item.revenue != null ? String(item.revenue) : "",
+        revenue_category: item.revenue != null ? String(item.revenue) : "",
         revenue_growth_category:
           item.revenue_growth != null ? String(item.revenue_growth) : "",
         net_profit_margin_category:
           item.net_profit_margin != null ? String(item.net_profit_margin) : "",
+
+        // IMPORTANT: keep nullable so weekly/monthly only fires when present
+        t1d_return_from_bloomberg_category: t1dCloseFromCard,
       });
       setSelectedType("IPO");
       setIpoAutoPredict(true);
@@ -193,7 +223,6 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
                 options={options}
                 autoPredict={foAutoPredict}
                 onAutoPredictComplete={() => setFoAutoPredict(false)}
-                // NEW: notify parent to refresh recents after a successful predict/save
                 onPredicted={bumpRecentRefresh}
               />
             ) : (
@@ -203,7 +232,6 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
                 options={options}
                 autoPredict={ipoAutoPredict}
                 onAutoPredictComplete={() => setIpoAutoPredict(false)}
-                // NEW
                 onPredicted={bumpRecentRefresh}
               />
             )}
@@ -219,7 +247,6 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           <RecentPredictionsPanel
             selectedType={selectedType}
             onSelect={handlePredictionSelect}
-            // NEW: pass the counter so panel re-fetches when it changes
             refreshKey={refreshKey}
           />
         </Grid>

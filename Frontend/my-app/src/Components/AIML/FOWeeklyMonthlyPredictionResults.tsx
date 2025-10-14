@@ -39,14 +39,26 @@ interface WeeklyMonthlyPredictionResultsProps {
   onWeeklyMonthlyRepredict: (
     t1dCloseReturn: number
   ) => Promise<Record<string, PredictionModel>>;
+  /** NEW: prefill input when a T+1D close return is already known (nullable) */
+  initialT1dCloseReturn?: number | null;
 }
 
 const FOWeeklyMonthlyPredictionResults: React.FC<
   WeeklyMonthlyPredictionResultsProps
-> = ({ result, onWeeklyMonthlyRepredict }) => {
+> = ({ result, onWeeklyMonthlyRepredict, initialT1dCloseReturn }) => {
   const [t1dCloseReturn, setT1dCloseReturn] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [predictionResult, setPredictionResult] = useState(result);
+
+  // NEW: prefill when available (allow 0)
+  useEffect(() => {
+    if (
+      initialT1dCloseReturn !== null &&
+      initialT1dCloseReturn !== undefined
+    ) {
+      setT1dCloseReturn(initialT1dCloseReturn);
+    }
+  }, [initialT1dCloseReturn]);
 
   useEffect(() => {
     setPredictionResult(result);
@@ -219,13 +231,7 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
           }}
         />
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-          <Typography
-            variant="caption"
-            sx={{
-              fontStyle: "italic",
-              ml: 1,
-            }}
-          >
+          <Typography variant="caption" sx={{ fontStyle: "italic", ml: 1 }}>
             Confidence: {confidence.toFixed(1)}%
           </Typography>
         </Box>
@@ -234,22 +240,12 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
   };
 
   const rowConfig = [
-    {
-      key: "main_model",
-      label: "Outcome Classification",
-    },
-    {
-      key: "positive_model",
-      label: "High Positive Return Likelihood",
-    },
-    {
-      key: "negative_model",
-      label: "High Negative Return Risk",
-    },
+    { key: "main_model", label: "Outcome Classification" },
+    { key: "positive_model", label: "High Positive Return Likelihood" },
+    { key: "negative_model", label: "High Negative Return Risk" },
   ];
 
   const timeFrames = ["Weekly", "Monthly"];
-
   const showTable =
     predictionResult && Object.keys(predictionResult).length > 0;
 
