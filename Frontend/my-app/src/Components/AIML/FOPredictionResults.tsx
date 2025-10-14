@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Paper,
   Typography,
@@ -22,7 +22,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import FOModelMethodologyAccordion from "./FOModelMethodologyAccordion";
-// import MethodologyAccordion1Day from "./MethodologyAccordion1Day";
 
 interface PredictionModel {
   prediction: string | null;
@@ -36,14 +35,26 @@ interface PredictionModel {
 interface PredictionResultsProps {
   result: Record<string, PredictionModel>;
   onRepredict?: (t1dOpenPrice: number) => void;
+  /** NEW: prefill the T+1D Open Return input when known from the card */
+  initialT1dOpenReturn?: number | null;
 }
 
 const FOPredictionResults: React.FC<PredictionResultsProps> = ({
   result,
   onRepredict,
+  initialT1dOpenReturn,
 }) => {
   const [price, setPrice] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // NEW: hydrate input whenever prop changes (allow 0; clear when null/undefined)
+  useEffect(() => {
+    if (initialT1dOpenReturn === null || initialT1dOpenReturn === undefined) {
+      setPrice("");
+    } else {
+      setPrice(initialT1dOpenReturn);
+    }
+  }, [initialT1dOpenReturn]);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -182,39 +193,39 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
     );
   };
 
-const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
-  const labels: Record<string, { issue?: string; open?: string }> = {
-    main: {},
-    positive: {},
-    negative: {},
-  };
+  const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
+    const labels: Record<string, { issue?: string; open?: string }> = {
+      main: {},
+      positive: {},
+      negative: {},
+    };
 
-  // ---- MAIN ----
-  if (result["t1d_main_model"]?.prediction) {
-    labels.main.issue = "Overall Return Category";
-  }
-  if (result["t1d_open_main_model"]?.prediction) {
-    labels.main.open = "Overall Return Category";
-  }
+    // ---- MAIN ----
+    if (result["t1d_main_model"]?.prediction) {
+      labels.main.issue = "Overall Return Category";
+    }
+    if (result["t1d_open_main_model"]?.prediction) {
+      labels.main.open = "Overall Return Category";
+    }
 
-  // ---- POSITIVE ----
-  if (result["t1d_positive_model"]?.prediction?.toLowerCase() === "true") {
-    labels.positive.issue = "High Positive Return Probability";
-  }
-  if (result["t1d_open_positive_model"]?.prediction?.toLowerCase() === "true") {
-    labels.positive.open = "High Positive Return Probability";
-  }
+    // ---- POSITIVE ----
+    if (result["t1d_positive_model"]?.prediction?.toLowerCase() === "true") {
+      labels.positive.issue = "High Positive Return Probability";
+    }
+    if (result["t1d_open_positive_model"]?.prediction?.toLowerCase() === "true") {
+      labels.positive.open = "High Positive Return Probability";
+    }
 
-  // ---- NEGATIVE ----
-  if (result["t1d_negative_model"]?.prediction?.toLowerCase() === "true") {
-    labels.negative.issue = "High Negative Return Risk";
-  }
-  if (result["t1d_open_negative_model"]?.prediction?.toLowerCase() === "true") {
-    labels.negative.open = "High Negative Return Risk";
-  }
+    // ---- NEGATIVE ----
+    if (result["t1d_negative_model"]?.prediction?.toLowerCase() === "true") {
+      labels.negative.issue = "High Negative Return Risk";
+    }
+    if (result["t1d_open_negative_model"]?.prediction?.toLowerCase() === "true") {
+      labels.negative.open = "High Negative Return Risk";
+    }
 
-  return labels;
-})();
+    return labels;
+  })();
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
@@ -254,7 +265,7 @@ const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
               <Button
                 variant="outlined"
                 onClick={handleRepredict}
-                disabled={isLoading}
+                disabled={isLoading || price === ""}
                 sx={{
                   backgroundColor: "#ede7f6",
                   color: "#002060",
@@ -273,7 +284,6 @@ const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
         </Box>
 
         <Divider sx={{ my: 3 }} />
-        {/* <MethodologyAccordion1Day /> */}
         <FOModelMethodologyAccordion />
         <Divider sx={{ my: 3 }} />
 
@@ -305,9 +315,7 @@ const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
 
               {/* Dynamic Rows */}
               {Object.entries(rowLabels)
-                // Only include rows that have a label (issue or open)
                 .filter(([_, label]) => Boolean(label.issue || label.open))
-                // And at least one model version has data
                 .filter(([type]) =>
                   modelVersions.some((version) => {
                     const key = getModelKey(version, type);
@@ -334,7 +342,6 @@ const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
                         const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
 
                         if (!modelData) {
-                          // Skip rendering cells for this version if no data
                           return <React.Fragment key={version} />;
                         }
 

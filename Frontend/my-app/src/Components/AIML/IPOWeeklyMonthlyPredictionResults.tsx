@@ -23,7 +23,6 @@ import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-// import MethodologyAccordion1w1m from "./MethodologyAccordion1w1m";
 
 interface PredictionModel {
   prediction: string | null;
@@ -39,14 +38,25 @@ interface WeeklyMonthlyPredictionResultsProps {
   onWeeklyMonthlyRepredict: (
     t1dCloseReturn: number
   ) => Promise<Record<string, PredictionModel>>;
+  /** NEW: prefill input when a T+1D close return is already known (nullable) */
+  initialT1dCloseReturn?: number | null;
 }
 
 const IPOWeeklyMonthlyPredictionResults: React.FC<
   WeeklyMonthlyPredictionResultsProps
-> = ({ result, onWeeklyMonthlyRepredict }) => {
+> = ({ result, onWeeklyMonthlyRepredict, initialT1dCloseReturn }) => {
   const [t1dCloseReturn, setT1dCloseReturn] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [predictionResult, setPredictionResult] = useState(result);
+
+  // NEW: prefill input when initialT1dCloseReturn becomes available (and allow 0)
+  useEffect(() => {
+    if (initialT1dCloseReturn === null || initialT1dCloseReturn === undefined) {
+      setT1dCloseReturn(""); // NEW: clear the input
+    } else {
+      setT1dCloseReturn(initialT1dCloseReturn); // keep allowing 0
+    }
+  }, [initialT1dCloseReturn]);
 
   useEffect(() => {
     setPredictionResult(result);
@@ -162,18 +172,6 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
 
     return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        {/* <LinearProgress
-          variant="determinate"
-          value={accuracy}
-          sx={{
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: "rgba(0,0,0,0.05)",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: color,
-            },
-          }}
-        /> */}
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
           <Typography
             variant="caption"
@@ -219,13 +217,7 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
           }}
         />
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-          <Typography
-            variant="caption"
-            sx={{
-              fontStyle: "italic",
-              ml: 1,
-            }}
-          >
+          <Typography variant="caption" sx={{ fontStyle: "italic", ml: 1 }}>
             Confidence: {confidence.toFixed(1)}%
           </Typography>
         </Box>
@@ -234,22 +226,12 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
   };
 
   const rowConfig = [
-    {
-      key: "main_model",
-      label: "Outcome Classification",
-    },
-    {
-      key: "positive_model",
-      label: "High Positive Return Likelihood",
-    },
-    {
-      key: "negative_model",
-      label: "High Negative Return Risk",
-    },
+    { key: "main_model", label: "Outcome Classification" },
+    { key: "positive_model", label: "High Positive Return Likelihood" },
+    { key: "negative_model", label: "High Negative Return Risk" },
   ];
 
   const timeFrames = ["Weekly", "Monthly"];
-
   const showTable =
     predictionResult && Object.keys(predictionResult).length > 0;
 
@@ -310,13 +292,12 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
         <Divider sx={{ my: 3 }} />
         <Box>
           <Typography>
-            A long with the above parameters that are considered for T+1Day, We are adding T+1Day close return as additional parameter for T+1 week and T+1 Month.
+            A long with the above parameters that are considered for T+1Day, We
+            are adding T+1Day close return as additional parameter for T+1 week
+            and T+1 Month.
           </Typography>
         </Box>
         <Divider sx={{ my: 3 }} />
-        {/* <Box mb={2}>
-          <MethodologyAccordion1w1m />
-        </Box> */}
 
         {showTable ? (
           <>
@@ -325,9 +306,7 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                 <TableHead>
                   <TableRow
                     sx={{
-                      "& .MuiTableCell-head": {
-                        fontWeight: "bold",
-                      },
+                      "& .MuiTableCell-head": { fontWeight: "bold" },
                     }}
                   >
                     <TableCell sx={{ minWidth: 100, bgcolor: "#F0F0f0" }}>
@@ -339,9 +318,7 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                     {timeFrames.map((frame, index) => (
                       <React.Fragment key={frame}>
                         <TableCell
-                          sx={{
-                            bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6",
-                          }}
+                          sx={{ bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6" }}
                         >
                           T+1 {frame}(AM) from T+1D Close
                         </TableCell>
@@ -384,9 +361,14 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                           {row.label}
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
-                            {weeklyData?.explanation || (weeklyData as any)?.Explanation ||
-                              monthlyData?.explanation || (monthlyData as any)?.Explanation ||
+                          <Typography
+                            variant="body2"
+                            sx={{ whiteSpace: "pre-line" }}
+                          >
+                            {weeklyData?.explanation ||
+                              (weeklyData as any)?.Explanation ||
+                              monthlyData?.explanation ||
+                              (monthlyData as any)?.Explanation ||
                               "N/A"}
                           </Typography>
                         </TableCell>
@@ -433,9 +415,10 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                                   flexDirection="column"
                                   gap={1}
                                 >
-                                  {/* {renderAccuracyLevel(modelData.Accuracy)} */}
                                   {renderConfidenceLevel(
-                                    modelData.confidence ?? (modelData as any)?.Confidence ?? null
+                                    modelData.confidence ??
+                                      (modelData as any)?.Confidence ??
+                                      null
                                   )}
                                 </Box>
                               </TableCell>
@@ -452,9 +435,9 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
         ) : (
           <Box sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="h6" color="text.secondary">
-              Enter the <b>T+1D Close Return (%)</b> to predict the T+1W and T+1M outcomes.
+              Enter the <b>T+1D Close Return (%)</b> to predict the T+1W and
+              T+1M outcomes.
             </Typography>
-
           </Box>
         )}
       </Paper>
