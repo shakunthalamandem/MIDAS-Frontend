@@ -97,11 +97,13 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
                   sx={{ backgroundColor: idx % 2 === 0 ? "transparent" : "#dde6e9ff" }}
                 >                  <TableCell>{row.ticker}</TableCell>
                   <TableCell>{row.company}</TableCell>
-                  <TableCell align="center">
-                    {row.net_of_hedge_pnl < 0
-                      ? `-$${Math.abs(row.net_of_hedge_pnl).toLocaleString()}`
-                      : `$${row.net_of_hedge_pnl.toLocaleString()}`}
-                  </TableCell>
+<TableCell align="center">
+  {row.net_of_hedge_pnl != null
+    ? row.net_of_hedge_pnl < 0
+      ? `-$${Math.abs(row.net_of_hedge_pnl).toLocaleString()}`
+      : `$${row.net_of_hedge_pnl.toLocaleString()}`
+    : "—"}
+</TableCell>
                   <TableCell align="center">{(row.net_of_hedge_pnl_bps * 100).toFixed(2)}</TableCell>
                   <TableCell align="center">{(row.long_exposure * 100).toFixed(2)}</TableCell>
                   <TableCell align="center">{row.beta.toFixed(2)}</TableCell>

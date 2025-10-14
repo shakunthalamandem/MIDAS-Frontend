@@ -98,9 +98,13 @@ const RiskReportIndexPortfolioTable: React.FC<RiskReportIndexPortfolioTableProps
                 >
                   <TableCell>{row.ticker}</TableCell>
                   <TableCell>{row.company}</TableCell>
-                  <TableCell align="center">
-                    {row.pnl < 0 ? `-$${Math.abs(row.pnl).toLocaleString()}` : `$${row.pnl.toLocaleString()}`}
-                  </TableCell>
+ <TableCell align="center">
+  {row.pnl != null
+    ? row.pnl < 0
+      ? `-$${Math.abs(row.pnl).toLocaleString()}`
+      : `$${row.pnl.toLocaleString()}`
+    : "—"}
+</TableCell>
                   <TableCell align="center">{(row.pnlvslmv * 100).toFixed(2)}</TableCell>
                   <TableCell align="center">{row.beta.toFixed(2)}</TableCell>
                   <TableCell align="center">{(row.exposurevslmv * 100).toFixed(2)}</TableCell>
