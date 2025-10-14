@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -8,13 +8,11 @@ import {
   Chip,
   Divider,
   Grid,
-  TextField,
-  Autocomplete,
   Stack,
   Tooltip,
 } from "@mui/material";
 import { green, red, grey } from "@mui/material/colors";
-import SearchIcon from "@mui/icons-material/Search";
+import RecentSearchBar, { SearchOption, sameTicker } from "./RecentSearchBar";
 
 interface RecentPrediction {
   deal_status: string;
@@ -33,14 +31,11 @@ interface RecentPrediction {
   gdp_growth: string | null;
   inflation_rate: string | null;
   treasury_rates: string | null;
-
   t1d_pred: string | null;
-
-  // May still arrive from backend but no longer shown
   revenue?: number | string | null;
   revenue_growth?: number | string | null;
   net_profit_margin?: number | string | null;
-  issue_to_previous_day_close?: number | string | null; // shown only for FO
+  issue_to_previous_day_close?: number | string | null;
   t1d_open_return_category?: string | null;
   t1d_return_from_bloomberg_category?: string | null;
 }
@@ -57,14 +52,27 @@ interface RecentPredictionsPanelProps {
 
 /** ----- helpers ----- */
 const monthShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
 const formatDateShort = (dateString?: string) => {
   if (!dateString) return "N/A";
   const d = new Date(dateString);
   if (Number.isNaN(d.getTime())) return "N/A";
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = monthShort[d.getMonth()];
-  const yyyy = d.getFullYear();
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  const mm = monthShort[d.getUTCMonth()];
+  const yyyy = d.getUTCFullYear();
   return `${dd} ${mm} ${yyyy}`;
+};
+
+// "YYYY-MM-DD" from incoming value; prefer literal prefix to avoid tz shifts
+const dateKey = (dateLike: string): string => {
+  const m = /^\d{4}-\d{2}-\d{2}/.exec(dateLike);
+  if (m) return m[0];
+  const d = new Date(dateLike);
+  if (Number.isNaN(d.getTime())) return "";
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 };
 
 const normalizePrediction = (p?: string | null) => (p || "").trim().toLowerCase();
@@ -80,7 +88,6 @@ const mapPredToColor = (p?: string | null) => {
   return grey[500];
 };
 
-// Calm background + accent
 const CARD_BG = "#EEF2FF";
 const CARD_BORDER = "#DDE4FF";
 const ACCENT = "#B6C4FF";
@@ -95,15 +102,12 @@ const formatSector = (raw?: string) => {
     .join(" ");
 };
 
-// forgiving parse for number-like strings (handles "-2.5%", "1,234.5", etc.)
 const parseNumberLike = (val?: number | string | null): number | null => {
   if (val === null || val === undefined) return null;
   if (typeof val === "number") return Number.isNaN(val) ? null : val;
   const n = parseFloat(String(val).replace(/[^\d.-]/g, ""));
   return Number.isNaN(n) ? null : n;
 };
-
-// small format helpers
 const fmtMoneyM = (v?: number | string | null) => {
   const n = parseNumberLike(v);
   return n === null ? "N/A" : `$${n.toFixed(1)}M`;
@@ -111,13 +115,6 @@ const fmtMoneyM = (v?: number | string | null) => {
 const fmtPct = (v?: number | string | null) => {
   const n = parseNumberLike(v);
   return n === null ? "N/A" : `${n.toFixed(1)}%`;
-};
-
-type Option = {
-  ticker: string;
-  pricing_date: string;
-  prediction: string | null;
-  display: string; // e.g., "NVDA on 11 Sep 2025 - Positive"
 };
 
 const statusChip = (status?: string) => {
@@ -141,7 +138,11 @@ const metricRow = (label: string, value: React.ReactNode, tooltip?: string) => (
   </Stack>
 );
 
-const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selectedType, onSelect, refreshKey }) => {
+const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
+  selectedType,
+  onSelect,
+  refreshKey,
+}) => {
   const [allDeals, setAllDeals] = useState<RecentPrediction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -149,6 +150,10 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
   // Search state
   const [query, setQuery] = useState<string>("");
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
+
+  // for scroll-to-selected
+  const selectedCardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -163,18 +168,29 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
         const res = await fetch(`${apiUrl}/api/recent_predictions/`, {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
           signal: ac.signal,
+          keepalive: true,
         });
         if (!res.ok) {
           const text = await res.text();
           throw new Error(`HTTP ${res.status}: ${text}`);
         }
         const json: ApiResponse = await res.json();
-        const sorted = (json.data || [])
-          .slice()
-          .sort((a, b) => new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime());
+
+        // Sort: pricing_date desc, then ticker asc
+        const sorted = (json.data || []).slice().sort((a, b) => {
+          const da = new Date(a.pricing_date).getTime();
+          const db = new Date(b.pricing_date).getTime();
+          if (db !== da) return db - da;
+          const ta = (a.ticker || "").toUpperCase();
+          const tb = (b.ticker || "").toUpperCase();
+          return ta.localeCompare(tb);
+        });
+
         if (isMounted) setAllDeals(sorted);
       } catch (err: any) {
-        if (isMounted && err.name !== "AbortError") setError(err.message || "Something went wrong");
+        if (isMounted && err.name !== "AbortError") {
+          setError(err.message || "Something went wrong");
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -186,40 +202,57 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
     };
   }, [refreshKey]);
 
-  // Apply IPO/FO filter (driven by top radio)
+  // Clear search whenever IPO/FO changes
+  useEffect(() => {
+    setQuery("");
+    setSelectedTicker(null);
+    setSelectedDateKey(null);
+  }, [selectedType]);
+
+  // Apply IPO/FO filter
   const filteredByType = useMemo(
     () => allDeals.filter((d) => (d.deal_type || "").toUpperCase() === selectedType),
     [allDeals, selectedType]
   );
 
-  // Search options built from filtered list
-  const options: Option[] = useMemo(
+  // Search options (add stable dateKey)
+  const options: SearchOption[] = useMemo(
     () =>
       filteredByType.map((f) => {
-        const dateShort = formatDateShort(f.pricing_date);
-        const predTitle = hasPrediction(f.t1d_pred)
-          ? String(f.t1d_pred)[0].toUpperCase() + String(f.t1d_pred).slice(1)
-          : "Not available";
+        const dk = dateKey(f.pricing_date);
+        const dateShort = formatDateShort(dk);
         return {
           ticker: f.ticker,
           pricing_date: f.pricing_date,
-          prediction: f.t1d_pred,
-          display: `${f.ticker} on ${dateShort} - ${predTitle}`,
+          dateKey: dk,
+          display: `${f.ticker} - ${dateShort}`,
         };
       }),
     [filteredByType]
   );
 
-  // Default: top 5 newest; Search: all matches from filtered list
+  // Cards data
   const filteredCards: RecentPrediction[] = useMemo(() => {
+    // exact selection: ticker-equivalent + dateKey
+    if (selectedTicker && selectedDateKey) {
+      return filteredByType.filter(
+        (f) =>
+          sameTicker(f.ticker, selectedTicker) &&
+          dateKey(f.pricing_date) === selectedDateKey
+      );
+    }
+    // free text by ticker
     const q = query.trim().toLowerCase();
-    if (!q && !selectedTicker) return filteredByType.slice(0, 5);
-    return filteredByType.filter((f) =>
-      selectedTicker
-        ? f.ticker.toLowerCase() === selectedTicker.toLowerCase()
-        : f.ticker.toLowerCase().includes(q)
-    );
-  }, [filteredByType, query, selectedTicker]);
+    if (!q) return filteredByType.slice(0, 5);
+    return filteredByType.filter((f) => f.ticker.toLowerCase().includes(q));
+  }, [filteredByType, query, selectedTicker, selectedDateKey]);
+
+  // Scroll to the selected card, if any
+  useEffect(() => {
+    if (selectedCardRef.current) {
+      selectedCardRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [filteredCards.length]);
 
   if (loading) {
     return (
@@ -262,6 +295,18 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
     );
   };
 
+  const handleSelectFromSearch = (opt: SearchOption | null) => {
+    if (!opt) {
+      setSelectedTicker(null);
+      setSelectedDateKey(null);
+      return;
+    }
+    setSelectedTicker(opt.ticker);
+    setSelectedDateKey(opt.dateKey);
+    // keep input text friendly (ticker only)
+    setQuery(opt.ticker);
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       <Typography
@@ -275,72 +320,18 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
         Recent {selectedType} Predictions
       </Typography>
 
-      {/* Search (scrollable results; ~5 visible) */}
-      <Box sx={{ mb: 2 }}>
-        <Autocomplete
-          freeSolo
-          options={options}
-          getOptionLabel={(opt) => (typeof opt === "string" ? opt : opt.display)}
-          isOptionEqualToValue={(opt, val) =>
-            (typeof opt === "string" ? opt : opt.ticker) ===
-            (typeof val === "string" ? val : val.ticker)
-          }
-          onInputChange={(_e, value) => {
-            setQuery(value || "");
-            setSelectedTicker(null);
-          }}
-          onChange={(_e, value) => {
-            if (typeof value === "string") {
-              setSelectedTicker(value || null);
-              setQuery(value || "");
-            } else if (value && typeof value === "object") {
-              setSelectedTicker(value.ticker);
-              setQuery(value.ticker);
-            } else {
-              setSelectedTicker(null);
-            }
-          }}
-          renderOption={(props, option) => {
-            const colorDot = mapPredToColor(option.prediction);
-            return (
-              <Box
-                component="li"
-                {...props}
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                <Box
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    bgcolor: colorDot,
-                    flex: "0 0 auto",
-                  }}
-                />
-                <Typography variant="body2">{option.display}</Typography>
-              </Box>
-            );
-          }}
-          ListboxProps={{
-            sx: { maxHeight: 240, overflowY: "auto" },
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              placeholder={`Search ${selectedType} ticker (e.g., NVDA)`}
-              size="small"
-              InputProps={{
-                ...params.InputProps,
-                startAdornment: (
-                  <Box sx={{ display: "flex", alignItems: "center", pl: 1 }}>
-                    <SearchIcon fontSize="small" sx={{ mr: 1, opacity: 0.7 }} />
-                  </Box>
-                ),
-              }}
-            />
-          )}
-        />
-      </Box>
+      <RecentSearchBar
+        options={options}
+        inputValue={query}
+        loading={loading}
+        selectedTypeLabel={selectedType}
+        onInputChange={(v) => {
+          setQuery(v);
+          setSelectedTicker(null);
+          setSelectedDateKey(null);
+        }}
+        onSelectOption={handleSelectFromSearch}
+      />
 
       {/* Cards */}
       <Grid container spacing={2}>
@@ -349,8 +340,19 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
           const stChip = statusChip(form.deal_status);
           const sectorLabel = formatSector(form.sector);
 
+          const isExactSelected =
+            selectedTicker &&
+            selectedDateKey &&
+            sameTicker(form.ticker, selectedTicker) &&
+            dateKey(form.pricing_date) === selectedDateKey;
+
           return (
-            <Grid item xs={12} key={`${form.ticker}-${form.pricing_date}-${i}`}>
+            <Grid
+              item
+              xs={12}
+              key={`${form.ticker}-${form.pricing_date}-${i}`}
+              ref={isExactSelected ? selectedCardRef : null}
+            >
               <Card
                 onClick={() => onSelect(form)}
                 sx={{
@@ -360,7 +362,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
                   borderRadius: 2,
                   backgroundColor: CARD_BG,
                   border: "1px solid",
-                  borderColor: CARD_BORDER,
+                  borderColor: isExactSelected ? "primary.main" : CARD_BORDER,
                   position: "relative",
                   "&::before": {
                     content: '""',
@@ -369,7 +371,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
                     top: 0,
                     bottom: 0,
                     width: 4,
-                    backgroundColor: ACCENT,
+                    backgroundColor: isExactSelected ? "primary.main" : ACCENT,
                     borderTopLeftRadius: 8,
                     borderBottomLeftRadius: 8,
                   },
@@ -391,13 +393,13 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
                       <Chip size="small" label={(form.deal_type || "N/A").toUpperCase()} variant="outlined" />
                     </Stack>
                     <Typography variant="body2" sx={{ color: grey[700], fontWeight: 600 }}>
-                      {formatDateShort(form.pricing_date)}
+                      {formatDateShort(dateKey(form.pricing_date))}
                     </Typography>
                   </Stack>
 
                   <Divider sx={{ my: 1.5 }} />
 
-                  {/* Deal block ONLY (simple + clear) */}
+                  {/* Deal block ONLY */}
                   <Grid container spacing={1.5}>
                     <Grid item xs={12}>
                       <Typography variant="overline" sx={{ letterSpacing: 0.6, fontWeight: "bold" }}>
@@ -431,8 +433,6 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
                       </Grid>
                     )}
                   </Grid>
-
-                  {/* Footer removed (simplified card) */}
                 </CardContent>
               </Card>
             </Grid>
@@ -440,7 +440,6 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({ selecte
         })}
       </Grid>
 
-      {/* Footer hint */}
       {!query && !selectedTicker && (
         <Typography variant="body2" sx={{ mt: 2, textAlign: "center", color: grey[700] }}>
           Showing the latest 5 deals. Search a ticker above to see more details.
