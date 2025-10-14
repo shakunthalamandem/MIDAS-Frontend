@@ -233,6 +233,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
       if (!res.ok) throw new Error("Prediction request failed");
       const data = await res.json();
       setPrediction(data.predictions);
+      setWeeklyPrediction(null);  // NEW: clear any stale weekly/monthly results
       onPredicted?.();
     } catch (error) {
       console.error("Prediction error:", error);
@@ -368,6 +369,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
     }));
     setFormErrors({});
     setPrediction(null);
+    setWeeklyPrediction(null);  // NEW
     setSnackbar({ open: false, message: "", severity: "error" });
   };
 

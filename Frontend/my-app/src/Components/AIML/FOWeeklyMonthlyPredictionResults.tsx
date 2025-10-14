@@ -52,10 +52,9 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
 
   // NEW: prefill when available (allow 0)
   useEffect(() => {
-    if (
-      initialT1dCloseReturn !== null &&
-      initialT1dCloseReturn !== undefined
-    ) {
+    if (initialT1dCloseReturn === null || initialT1dCloseReturn === undefined) {
+      setT1dCloseReturn(""); // NEW: clear the input
+    } else {
       setT1dCloseReturn(initialT1dCloseReturn);
     }
   }, [initialT1dCloseReturn]);
@@ -306,7 +305,9 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
         <Divider sx={{ my: 3 }} />
         <Box>
           <Typography>
-            A long with the above parameters that are considered for T+1Day, We are adding T+1Day close return as additional parameter for T+1 week and T+1 Month.
+            A long with the above parameters that are considered for T+1Day, We
+            are adding T+1Day close return as additional parameter for T+1 week
+            and T+1 Month.
           </Typography>
         </Box>
         <Divider sx={{ my: 3 }} />
@@ -380,9 +381,14 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
                           {row.label}
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
-                            {weeklyData?.explanation || (weeklyData as any)?.Explanation ||
-                              monthlyData?.explanation || (monthlyData as any)?.Explanation ||
+                          <Typography
+                            variant="body2"
+                            sx={{ whiteSpace: "pre-line" }}
+                          >
+                            {weeklyData?.explanation ||
+                              (weeklyData as any)?.Explanation ||
+                              monthlyData?.explanation ||
+                              (monthlyData as any)?.Explanation ||
                               "N/A"}
                           </Typography>
                         </TableCell>
@@ -431,7 +437,9 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
                                 >
                                   {/* {renderAccuracyLevel(modelData.Accuracy)} */}
                                   {renderConfidenceLevel(
-                                    modelData.confidence ?? (modelData as any)?.Confidence ?? null
+                                    modelData.confidence ??
+                                      (modelData as any)?.Confidence ??
+                                      null
                                   )}
                                 </Box>
                               </TableCell>
@@ -448,9 +456,9 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
         ) : (
           <Box sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="h6" color="text.secondary">
-              Enter the <b>T+1D Close Return (%)</b> to predict the T+1W and T+1M outcomes.
+              Enter the <b>T+1D Close Return (%)</b> to predict the T+1W and
+              T+1M outcomes.
             </Typography>
-
           </Box>
         )}
       </Paper>

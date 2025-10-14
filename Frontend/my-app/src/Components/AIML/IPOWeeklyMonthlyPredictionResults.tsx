@@ -51,11 +51,10 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
 
   // NEW: prefill input when initialT1dCloseReturn becomes available (and allow 0)
   useEffect(() => {
-    if (
-      initialT1dCloseReturn !== null &&
-      initialT1dCloseReturn !== undefined
-    ) {
-      setT1dCloseReturn(initialT1dCloseReturn);
+    if (initialT1dCloseReturn === null || initialT1dCloseReturn === undefined) {
+      setT1dCloseReturn(""); // NEW: clear the input
+    } else {
+      setT1dCloseReturn(initialT1dCloseReturn); // keep allowing 0
     }
   }, [initialT1dCloseReturn]);
 
@@ -256,7 +255,12 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
         >
           <Box display="flex" alignItems="center">
             <BarChartIcon color="primary" sx={{ mr: 1.5 }} />
-            <Typography variant="h6" component="h2" color="primary.main" fontWeight="bold">
+            <Typography
+              variant="h6"
+              component="h2"
+              color="primary.main"
+              fontWeight="bold"
+            >
               T+1W & T+1M - Model Predictions
             </Typography>
           </Box>
@@ -276,7 +280,11 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
               disabled={isLoading || t1dCloseReturn === ""}
               sx={{ height: "40px" }}
             >
-              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Predict"}
+              {isLoading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Predict"
+              )}
             </Button>
           </Box>
         </Box>
@@ -284,7 +292,9 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
         <Divider sx={{ my: 3 }} />
         <Box>
           <Typography>
-            A long with the above parameters that are considered for T+1Day, We are adding T+1Day close return as additional parameter for T+1 week and T+1 Month.
+            A long with the above parameters that are considered for T+1Day, We
+            are adding T+1Day close return as additional parameter for T+1 week
+            and T+1 Month.
           </Typography>
         </Box>
         <Divider sx={{ my: 3 }} />
@@ -299,14 +309,25 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                       "& .MuiTableCell-head": { fontWeight: "bold" },
                     }}
                   >
-                    <TableCell sx={{ minWidth: 100, bgcolor: "#F0F0f0" }}>Model</TableCell>
-                    <TableCell sx={{ minWidth: 200, bgcolor: "#F0F0f0" }}>Explanation</TableCell>
+                    <TableCell sx={{ minWidth: 100, bgcolor: "#F0F0f0" }}>
+                      Model
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 200, bgcolor: "#F0F0f0" }}>
+                      Explanation
+                    </TableCell>
                     {timeFrames.map((frame, index) => (
                       <React.Fragment key={frame}>
-                        <TableCell sx={{ bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6" }}>
+                        <TableCell
+                          sx={{ bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6" }}
+                        >
                           T+1 {frame}(AM) from T+1D Close
                         </TableCell>
-                        <TableCell sx={{ bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6", minWidth: 90 }}>
+                        <TableCell
+                          sx={{
+                            bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6",
+                            minWidth: 90,
+                          }}
+                        >
                           Confidence
                         </TableCell>
                       </React.Fragment>
@@ -326,12 +347,24 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                     if (!weeklyData && !monthlyData) return null;
 
                     return (
-                      <TableRow key={row.key} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                        <TableCell component="th" scope="row" sx={{ fontWeight: "medium" }}>
+                      <TableRow
+                        key={row.key}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ fontWeight: "medium" }}
+                        >
                           {row.label}
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ whiteSpace: "pre-line" }}
+                          >
                             {weeklyData?.explanation ||
                               (weeklyData as any)?.Explanation ||
                               monthlyData?.explanation ||
@@ -340,9 +373,13 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                           </Typography>
                         </TableCell>
                         {timeFrames.map((frame, index) => {
-                          const apiKey = frame.toLowerCase() === "weekly" ? modelKeys.weekly : modelKeys.monthly;
+                          const apiKey =
+                            frame.toLowerCase() === "weekly"
+                              ? modelKeys.weekly
+                              : modelKeys.monthly;
                           const modelData = predictionResult?.[apiKey];
-                          const cellBgColor = index === 0 ? "#e3f2fd" : "#ede7f6";
+                          const cellBgColor =
+                            index === 0 ? "#e3f2fd" : "#ede7f6";
 
                           if (!modelData) {
                             return (
@@ -364,13 +401,24 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
 
                           return (
                             <React.Fragment key={apiKey}>
-                              <TableCell sx={{ bgcolor: cellBgColor, fontWeight: "medium" }}>
+                              <TableCell
+                                sx={{
+                                  bgcolor: cellBgColor,
+                                  fontWeight: "medium",
+                                }}
+                              >
                                 {renderResult}
                               </TableCell>
                               <TableCell sx={{ bgcolor: cellBgColor }}>
-                                <Box display="flex" flexDirection="column" gap={1}>
+                                <Box
+                                  display="flex"
+                                  flexDirection="column"
+                                  gap={1}
+                                >
                                   {renderConfidenceLevel(
-                                    modelData.confidence ?? (modelData as any)?.Confidence ?? null
+                                    modelData.confidence ??
+                                      (modelData as any)?.Confidence ??
+                                      null
                                   )}
                                 </Box>
                               </TableCell>
@@ -387,7 +435,8 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
         ) : (
           <Box sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="h6" color="text.secondary">
-              Enter the <b>T+1D Close Return (%)</b> to predict the T+1W and T+1M outcomes.
+              Enter the <b>T+1D Close Return (%)</b> to predict the T+1W and
+              T+1M outcomes.
             </Typography>
           </Box>
         )}

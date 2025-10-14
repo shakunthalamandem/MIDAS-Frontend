@@ -90,6 +90,8 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const [ipoValues, setIpoValues] = useState({ ...defaultIPOValues });
   const [foAutoPredict, setFoAutoPredict] = useState(false);
   const [ipoAutoPredict, setIpoAutoPredict] = useState(false);
+  const [foFormKey, setFoFormKey] = useState(0);   // NEW
+  const [ipoFormKey, setIpoFormKey] = useState(0); // NEW
   const formRef = useRef<HTMLDivElement>(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -103,13 +105,12 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const handlePredictionSelect = (item: any) => {
     const type = (item.deal_type || "").toUpperCase() as "IPO" | "FO";
 
-    // Accept multiple recent-card key variants for T+1D close return
     const t1dCloseFromCard = toNullableNumber(
       pick(item, [
-        "t1d_return_from_bloomberg_category", // your form key
-        "t1d_return_from_bloomberg",          // recent payload key (your CBK example)
-        "t1d_close_return",                   // possible alt
-        "t1d_return",                         // possible alt
+        "t1d_return_from_bloomberg_category",
+        "t1d_return_from_bloomberg",
+        "t1d_close_return",
+        "t1d_return",
       ])
     );
 
@@ -139,14 +140,11 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
             ? String(item.allocation_as_percentage_of_ioi)
             : "",
         selected_bank_category: item.lead_bank || "",
-
         deal_status: item.deal_status || "Announced",
         GDP: "Stable",
         Inflation: "Stable",
         Treasury: "Stable",
         target: "T1D",
-
-        // NEW: prefill from recent item if available
         revenue_category: item.revenue != null ? String(item.revenue) : "",
         revenue_growth_category:
           item.revenue_growth != null ? String(item.revenue_growth) : "",
@@ -156,12 +154,11 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           item.issue_to_previous_day_close != null
             ? Number(item.issue_to_previous_day_close)
             : 0,
-
-        // IMPORTANT: keep nullable so weekly/monthly only fires when present
-        t1d_return_from_bloomberg_category: t1dCloseFromCard,
+        t1d_return_from_bloomberg_category: t1dCloseFromCard, // may be null
       });
       setSelectedType("FO");
       setFoAutoPredict(true);
+      setFoFormKey((k) => k + 1); // NEW: remount FO form to clear old state
     } else {
       setIpoValues({
         ...defaultIPOValues,
@@ -189,19 +186,16 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         Inflation: "Stable",
         Treasury: "Stable",
         target: "T1D",
-
-        // NEW / ensure
         revenue_category: item.revenue != null ? String(item.revenue) : "",
         revenue_growth_category:
           item.revenue_growth != null ? String(item.revenue_growth) : "",
         net_profit_margin_category:
           item.net_profit_margin != null ? String(item.net_profit_margin) : "",
-
-        // IMPORTANT: keep nullable so weekly/monthly only fires when present
-        t1d_return_from_bloomberg_category: t1dCloseFromCard,
+        t1d_return_from_bloomberg_category: t1dCloseFromCard, // may be null
       });
       setSelectedType("IPO");
       setIpoAutoPredict(true);
+      setIpoFormKey((k) => k + 1); // NEW: remount IPO form to clear old state
     }
 
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -218,6 +212,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           <Box ref={formRef} sx={{ scrollMarginTop: 16 }}>
             {selectedType === "FO" ? (
               <FOForm
+                key={foFormKey}                 // NEW
                 values={foValues}
                 setValues={setFoValues}
                 options={options}
@@ -227,6 +222,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
               />
             ) : (
               <IPOForm
+                key={ipoFormKey}                // NEW
                 values={ipoValues}
                 setValues={setIpoValues}
                 options={options}
