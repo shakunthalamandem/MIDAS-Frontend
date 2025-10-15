@@ -60,6 +60,8 @@ interface FOFormValues {
   revenue_growth_category: string; // %
   net_profit_margin_category: string; // %
   issue_to_pre_day_close_return_category: number; // %
+  t1d_open_return_category: number | null; // %
+  t1d_return_from_bloomberg_category: number | null; // %
 }
 
 interface FOFormProps {
@@ -118,24 +120,30 @@ const FOForm: React.FC<FOFormProps> = ({
     setFormErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  // ✅ FOForm: validateForm (t1d_return_from_bloomberg_category is optional; validate only if present)
   const validateForm = (): boolean => {
     const errors: { [key: string]: string } = {};
     let isValid = true;
     const data = values;
 
-    // Required fields: keep logic, but include new ones
+    // fields that are allowed to be empty / optional
+    const optionalKeys = new Set([
+      "region",
+      "target",
+      "GDP",
+      "Inflation",
+      "Treasury",
+      "t1d_open_return_category",
+      "t1d_return_from_bloomberg_category", // <-- OPTIONAL
+    ]);
+
+    // Required fields (except optionalKeys)
     Object.entries(data).forEach(([key, val]) => {
-      if (
-        !val &&
-        val !== 0 &&
-        key !== "region" &&
-        key !== "target" &&
-        key !== "GDP" &&
-        key !== "Inflation" &&
-        key !== "Treasury"
-      ) {
-        errors[key] = "This field is required";
-        isValid = false;
+      if (!optionalKeys.has(key)) {
+        if ((val === null || val === undefined || val === "") && val !== 0) {
+          errors[key] = "This field is required";
+          isValid = false;
+        }
       }
     });
 
@@ -149,22 +157,17 @@ const FOForm: React.FC<FOFormProps> = ({
       isValid = false;
     }
 
-    // Percent ranges
+    // Percent / numeric ranges
     const percentChecks: Array<{
       key: keyof FOFormValues;
-      label?: string;
       range?: [number, number];
     }> = [
-        { key: "percentage_primary_category", range: [0, 100] },
-        { key: "allocation_deal_size_percentage_category", range: [0, 100] },
-        { key: "allocation_percentage_category", range: [0, 100] },
-
-        // NEW: business-y ranges; growth/margin generally -100..100
-        { key: "revenue_growth_category", range: [-1000, 1000] },
-
-        // NEW: issue_to_pre_day_close may be negative or positive; keep a wide bound
-        { key: "issue_to_pre_day_close_return_category", range: [-1000, 1000] },
-      ];
+      { key: "percentage_primary_category", range: [0, 100] },
+      { key: "allocation_deal_size_percentage_category", range: [0, 100] },
+      { key: "allocation_percentage_category", range: [0, 100] },
+      { key: "revenue_growth_category", range: [-1000, 1000] },
+      { key: "issue_to_pre_day_close_return_category", range: [-1000, 1000] },
+    ];
 
     percentChecks.forEach(({ key, range }) => {
       const raw = data[key];
@@ -181,7 +184,7 @@ const FOForm: React.FC<FOFormProps> = ({
       }
     });
 
-    // NEW: revenue non-negative
+    // Revenue >= 0
     if (
       data.revenue_category === "" ||
       isNaN(parseFloat(data.revenue_category)) ||
@@ -191,10 +194,24 @@ const FOForm: React.FC<FOFormProps> = ({
       isValid = false;
     }
 
+    // OPTIONAL: if user provided t1d_return_from_bloomberg_category, validate it
+    if (data.t1d_return_from_bloomberg_category !== null) {
+      const v = Number(data.t1d_return_from_bloomberg_category);
+      if (!Number.isFinite(v)) {
+        errors.t1d_return_from_bloomberg_category = "Enter a valid number";
+        isValid = false;
+      } else if (v < -1000 || v > 1000) {
+        errors.t1d_return_from_bloomberg_category =
+          "Must be between -1000 and 1000";
+        isValid = false;
+      }
+    }
+
     setFormErrors(errors);
     return isValid;
   };
 
+  // ✅ FOForm: handlePredict (unchanged behavior; works with optional t1d field)
   const handlePredict = async () => {
     if (!validateForm()) {
       setSnackbar({
@@ -210,7 +227,6 @@ const FOForm: React.FC<FOFormProps> = ({
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
 
-    // NOTE: spreading values ensures the new fields are sent
     const payload = {
       ...values,
       deal_type: "FO",
@@ -252,7 +268,7 @@ const FOForm: React.FC<FOFormProps> = ({
     const token = localStorage.getItem("access_token");
 
     const payload = {
-      ...values, // includes new fields
+      ...values,
       deal_type: "FO",
       GDP: "Stable",
       Inflation: "Stable",
@@ -292,7 +308,7 @@ const FOForm: React.FC<FOFormProps> = ({
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
     const payload = {
-      ...values, // includes new fields
+      ...values,
       deal_type: "FO",
       GDP: "Stable",
       Inflation: "Stable",
@@ -376,11 +392,25 @@ const FOForm: React.FC<FOFormProps> = ({
     setSnackbar({ open: false, message: "", severity: "error" });
   };
 
+  /** ----- NEW helper: detect presence, allow 0 as valid ----- */
+  const hasBloombergT1D = () => {
+    const v = values.t1d_return_from_bloomberg_category;
+    return v !== null && v !== undefined && !Number.isNaN(Number(v));
+  };
+
+  /** ----- UPDATED: autoPredict chains Weekly/Monthly if bloomberg T1D present ----- */
   useEffect(() => {
     if (autoPredict) {
       (async () => {
         const valid = validateForm();
-        if (valid) await handlePredict();
+        if (valid) {
+          await handlePredict(); // T+1D
+          if (hasBloombergT1D()) {
+            await handleWeeklyMonthlyRepredict(
+              Number(values.t1d_return_from_bloomberg_category)
+            );
+          }
+        }
         onAutoPredictComplete && onAutoPredictComplete();
       })();
     }
@@ -397,132 +427,135 @@ const FOForm: React.FC<FOFormProps> = ({
     disabled?: boolean;
     tooltip?: React.ReactNode;
   }> = [
-      { label: "Region", name: "region", disabled: true },
-      { label: "Target Variable", name: "target_variable", disabled: true },
-      {
-        label: "Ticker Symbol",
-        name: "ticker",
-        type: "string",
-        placeholder: "e.g., AAPL",
-      },
-      { label: "Pricing Date", name: "pricing_date", type: "date" },
+    { label: "Region", name: "region", disabled: true },
+    { label: "Target Variable", name: "target_variable", disabled: true },
+    {
+      label: "Ticker Symbol",
+      name: "ticker",
+      type: "string",
+      placeholder: "e.g., AAPL",
+    },
+    { label: "Pricing Date", name: "pricing_date", type: "date" },
 
-      {
-        label: "Deal Size ($ Million)",
-        name: "deal_size_category",
-        type: "number",
-        adornment: "$M",
-        placeholder: "e.g., 100",
-      },
-      {
-        label: "Sponsor (Y/N)",
-        name: "sponsor_yn_category",
-        selectOptions: options.sponsor,
-      },
-      {
-        label: "Discount from Announcement Price (%)",
-        name: "discount_from_announcement_price_category",
-        type: "number",
-        adornment: "%",
-        placeholder: "e.g., 2",
-      },
-      { label: "Sector", name: "sector_category", selectOptions: options.sector },
-      {
-        label: "Percentage Primary (%)",
-        name: "percentage_primary_category",
-        type: "number",
-        adornment: "%",
-        placeholder: "e.g., 100",
-      },
-      {
-        label: "Selected Bank",
-        name: "selected_bank_category",
-        selectOptions: options.selected_bank,
-      },
-      {
-        label: "Allocation as % of Deal Size",
-        name: "allocation_deal_size_percentage_category",
-        type: "number",
-        adornment: "%",
-        placeholder: "e.g., 0.5",
-      },
-      {
-        label: "Allocation as % of IOI",
-        name: "allocation_percentage_category",
-        type: "number",
-        adornment: "%",
-        placeholder: "e.g., 30",
-      },
+    {
+      label: "Deal Size ($ Million)",
+      name: "deal_size_category",
+      type: "number",
+      adornment: "$M",
+      placeholder: "e.g., 100",
+    },
+    {
+      label: "Sponsor (Y/N)",
+      name: "sponsor_yn_category",
+      selectOptions: options.sponsor,
+    },
+    {
+      label: "Discount from Announcement Price (%)",
+      name: "discount_from_announcement_price_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 2",
+    },
+    { label: "Sector", name: "sector_category", selectOptions: options.sector },
+    {
+      label: "Percentage Primary (%)",
+      name: "percentage_primary_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 100",
+    },
+    {
+      label: "Selected Bank",
+      name: "selected_bank_category",
+      selectOptions: options.selected_bank,
+    },
+    {
+      label: "Allocation as % of Deal Size",
+      name: "allocation_deal_size_percentage_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 0.5",
+    },
+    {
+      label: "Allocation as % of IOI",
+      name: "allocation_percentage_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 30",
+    },
 
-      // NEW: Fundamentals and price-feature
-      {
-        label: "Current Year Revenue ($ M)",
-        name: "revenue_category",
-        type: "number",
-        adornment: "$M",
-        placeholder: "e.g., 250",
-      },
-      {
-        label: "Revenue Growth (%) (YOY)",
-        name: "revenue_growth_category",
-        type: "number",
-        adornment: "%",
-        placeholder: "e.g., 12.5",
-      },
-      {
-        label: "Net Profit Margin",
-        name: "net_profit_margin_category",
-        selectOptions: ["Negative", "Positive"],
-      },
-      {
-        label: "Change in Price from T-1D to Issue(%)",
-        name: "issue_to_pre_day_close_return_category",
-        type: "number",
-        adornment: "%",
-        placeholder: "e.g., -3.2",
-        tooltip: (
-          <Tooltip
-            title={
-              <Typography
-                variant="body2"
-                sx={{
-                  fontSize: 13,
-                  color: "#fff", // white text
-                }}
-              >
-                • This value represents the percentage change in the stock price from the previous day's close (T-1D) to the price at the time of the issue. <br />
-                • The formula used is: <br />
-                 ((T-1D Close Price / Issue Price) - 1) * 100.<br />
-              </Typography>
-            }
-            arrow
-            placement="top"
-            slotProps={{
-              popper: {
-                sx: {
-                  "& .MuiTooltip-tooltip": {
-                    backgroundColor: "#002060", // dark blue bg
-                    borderRadius: 2,
-                    padding: "10px 14px",
-                    maxWidth: 320,
-                  },
+    // NEW: Fundamentals and price-feature
+    {
+      label: "Current Year Revenue ($ M)",
+      name: "revenue_category",
+      type: "number",
+      adornment: "$M",
+      placeholder: "e.g., 250",
+    },
+    {
+      label: "Revenue Growth (%) (YOY)",
+      name: "revenue_growth_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 12.5",
+    },
+    {
+      label: "Net Profit Margin",
+      name: "net_profit_margin_category",
+      selectOptions: ["Negative", "Positive"],
+    },
+    {
+      label: "Change in Price from T-1D to Issue(%)",
+      name: "issue_to_pre_day_close_return_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., -3.2",
+      tooltip: (
+        <Tooltip
+          title={
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: 13,
+                color: "#fff",
+              }}
+            >
+              • This value represents the percentage change in the stock price
+              from the previous day's close (T-1D) to the price at the time of
+              the issue. <br />
+              • The formula used is: <br />
+              ((T-1D Close Price / Issue Price) - 1) * 100.
+              <br />
+            </Typography>
+          }
+          arrow
+          placement="top"
+          slotProps={{
+            popper: {
+              sx: {
+                "& .MuiTooltip-tooltip": {
+                  backgroundColor: "#002060",
+                  borderRadius: 2,
+                  padding: "10px 14px",
+                  maxWidth: 320,
                 },
               },
-            }}
-          >
-            <IconButton size="small" sx={{ verticalAlign: "middle" }}>
-              <InfoOutlinedIcon />
-            </IconButton>
-          </Tooltip>
-        ),
-      },
+            },
+          }}
+        >
+          <IconButton size="small" sx={{ verticalAlign: "middle" }}>
+            <InfoOutlinedIcon />
+          </IconButton>
+        </Tooltip>
+      ),
+    },
 
-      {
-        label: "Deal Status",
-        name: "deal_status",
-        selectOptions: options.deal_status,
-      },
-    ];
+    {
+      label: "Deal Status",
+      name: "deal_status",
+      selectOptions: options.deal_status,
+    },
+  ];
 
   return (
     <>
@@ -595,8 +628,6 @@ const FOForm: React.FC<FOFormProps> = ({
                     </Typography>
                   </Box>
 
-
-
                   {field.selectOptions ? (
                     <TextField
                       select
@@ -647,10 +678,10 @@ const FOForm: React.FC<FOFormProps> = ({
                           ) : undefined,
                         endAdornment:
                           field.adornment &&
-                            (field.adornment === "%" ||
-                              field.adornment === "M" ||
-                              field.adornment.endsWith("%") ||
-                              field.adornment.endsWith("M")) ? (
+                          (field.adornment === "%" ||
+                            field.adornment === "M" ||
+                            field.adornment.endsWith("%") ||
+                            field.adornment.endsWith("M")) ? (
                             <InputAdornment position="end">
                               {field.adornment.replace("$", "")}
                             </InputAdornment>
@@ -725,10 +756,16 @@ const FOForm: React.FC<FOFormProps> = ({
           <FOPredictionResults
             result={prediction}
             onRepredict={handleRepredictWithPrice}
+            // NEW: prefill from the form’s value (number | null)
+            initialT1dOpenReturn={values.t1d_open_return_category ?? null}
           />
           <FOWeeklyMonthlyPredictionResults
             result={weeklyPrediction}
             onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredict}
+            // NEW: prefill input when backend provided T+1D close return exists
+            initialT1dCloseReturn={
+              values.t1d_return_from_bloomberg_category ?? null
+            }
           />
         </>
       )}

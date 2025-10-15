@@ -54,6 +54,7 @@ interface IPOFormValues {
   revenue_category: string; // number string ($M)
   revenue_growth_category: string; // number string (%), can be negative
   net_profit_margin_category: string; // number string (%), can be negative
+  t1d_return_from_bloomberg_category: number | null; // (%), can be negative
 }
 
 interface IPOFormProps {
@@ -112,24 +113,29 @@ const IPOForm: React.FC<IPOFormProps> = ({
     setFormErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  // ✅ IPOForm: validateForm (t1d_return_from_bloomberg_category is optional; validate only if present)
   const validateForm = (): boolean => {
     const errors: { [key: string]: string } = {};
     let isValid = true;
     const data = values;
 
-    // Required fields (same logic as before)
+    // fields that are allowed to be empty / optional
+    const optionalKeys = new Set([
+      "region",
+      "target",
+      "GDP",
+      "Inflation",
+      "Treasury",
+      "t1d_return_from_bloomberg_category", // <-- OPTIONAL
+    ]);
+
+    // Required fields (except optionalKeys)
     Object.entries(data).forEach(([key, val]) => {
-      if (
-        !val &&
-        val !== 0 &&
-        key !== "region" &&
-        key !== "target" &&
-        key !== "GDP" &&
-        key !== "Inflation" &&
-        key !== "Treasury"
-      ) {
-        errors[key] = "This field is required";
-        isValid = false;
+      if (!optionalKeys.has(key)) {
+        if ((val === null || val === undefined || val === "") && val !== 0) {
+          errors[key] = "This field is required";
+          isValid = false;
+        }
       }
     });
 
@@ -139,7 +145,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
       isValid = false;
     }
 
-    // NEW: Revenue >= 0
+    // Revenue >= 0
     const revenue = parseFloat(String(data.revenue_category ?? ""));
     if (isNaN(revenue) || revenue < 0) {
       errors.revenue_category = "Must be ≥ 0";
@@ -160,7 +166,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
       }
     });
 
-    // NEW: growth & margin in [-100, 100]
+    // growth in [-100, 100]
     const boundedPct = (
       field: keyof IPOFormValues,
       label = "Must be between -100 and 100"
@@ -173,10 +179,24 @@ const IPOForm: React.FC<IPOFormProps> = ({
     };
     boundedPct("revenue_growth_category");
 
+    // OPTIONAL: if user provided t1d_return_from_bloomberg_category, validate it
+    if (data.t1d_return_from_bloomberg_category !== null) {
+      const v = Number(data.t1d_return_from_bloomberg_category);
+      if (!Number.isFinite(v)) {
+        errors.t1d_return_from_bloomberg_category = "Enter a valid number";
+        isValid = false;
+      } else if (v < -1000 || v > 1000) {
+        errors.t1d_return_from_bloomberg_category =
+          "Must be between -1000 and 1000";
+        isValid = false;
+      }
+    }
+
     setFormErrors(errors);
     return isValid;
   };
 
+  // ✅ IPOForm: handlePredict (unchanged behavior; works with optional t1d field)
   const handlePredict = async () => {
     if (!validateForm()) {
       setSnackbar({
@@ -213,6 +233,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
       if (!res.ok) throw new Error("Prediction request failed");
       const data = await res.json();
       setPrediction(data.predictions);
+      setWeeklyPrediction(null);  // NEW: clear any stale weekly/monthly results
       onPredicted?.();
     } catch (error) {
       console.error("Prediction error:", error);
@@ -232,7 +253,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
     const payload = {
-      ...values, // includes new fields
+      ...values,
       deal_type: "IPO",
       GDP: "Stable",
       Inflation: "Stable",
@@ -348,15 +369,28 @@ const IPOForm: React.FC<IPOFormProps> = ({
     }));
     setFormErrors({});
     setPrediction(null);
+    setWeeklyPrediction(null);  // NEW
     setSnackbar({ open: false, message: "", severity: "error" });
   };
 
+  /** ----- NEW helper: detect presence, allow 0 as valid ----- */
+  const hasBloombergT1D = () => {
+    const v = values.t1d_return_from_bloomberg_category;
+    return v !== null && v !== undefined && !Number.isNaN(Number(v));
+  };
+
+  /** ----- UPDATED: autoPredict chains Weekly/Monthly if bloomberg T1D present ----- */
   useEffect(() => {
     if (autoPredict) {
       (async () => {
         const valid = validateForm();
         if (valid) {
-          await handlePredict();
+          await handlePredict(); // T+1D
+          if (hasBloombergT1D()) {
+            await handleWeeklyMonthlyRepredict(
+              Number(values.t1d_return_from_bloomberg_category)
+            );
+          }
         }
         onAutoPredictComplete && onAutoPredictComplete();
       })();
@@ -513,8 +547,8 @@ const IPOForm: React.FC<IPOFormProps> = ({
                         MenuProps: {
                           PaperProps: {
                             sx: {
-                              maxHeight: 300, // limit height
-                              overflowY: "auto", // enable scroll
+                              maxHeight: 300,
+                              overflowY: "auto",
                             },
                           },
                         },
@@ -551,10 +585,10 @@ const IPOForm: React.FC<IPOFormProps> = ({
                           ) : undefined,
                         endAdornment:
                           field.adornment &&
-                            (field.adornment === "%" ||
-                              field.adornment === "M" ||
-                              field.adornment.endsWith("%") ||
-                              field.adornment.endsWith("M")) ? (
+                          (field.adornment === "%" ||
+                            field.adornment === "M" ||
+                            field.adornment.endsWith("%") ||
+                            field.adornment.endsWith("M")) ? (
                             <InputAdornment position="end">
                               {field.adornment.replace("$", "")}
                             </InputAdornment>
@@ -632,6 +666,10 @@ const IPOForm: React.FC<IPOFormProps> = ({
           <IPOWeeklyMonthlyPredictionResults
             result={weeklyPrediction}
             onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredict}
+            // NEW: prefill input when backend provided T+1D close return exists
+            initialT1dCloseReturn={
+              values.t1d_return_from_bloomberg_category ?? null
+            }
           />
         </>
       )}
