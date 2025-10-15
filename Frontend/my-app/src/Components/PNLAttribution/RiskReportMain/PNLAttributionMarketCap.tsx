@@ -31,7 +31,6 @@ import {
 
 interface RiskReportData {
   cumulative_fund_return: any[];
-  net_of_hedge_pnl: any;
   attribution_by_market_cap: any;
   historical_exposure_by_region: any;
   report_date: string;
@@ -125,7 +124,6 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
 
   const {
     cumulative_fund_return,
-    net_of_hedge_pnl,
     attribution_by_market_cap,
     historical_exposure_by_region,
   } = chartData;
@@ -150,15 +148,6 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
     })
   );
 
-  const netOfHedgeTableData = Object.keys(
-    net_of_hedge_pnl["NetOfHedgeP&L(%)"] || {}
-  ).map((region) => ({
-    region,
-    netOfHedgePnlPercent: net_of_hedge_pnl["NetOfHedgeP&L(%)"][region],
-    longExposure: net_of_hedge_pnl["LongExposure/LMV(%)"][region],
-    betaAdjLongExp: net_of_hedge_pnl["BetaAdj.LongExp./LMV(%)"][region],
-    netOfHedgePnl: net_of_hedge_pnl["NetOfHedgeP&L"][region],
-  }));
 
   // Colors
   const colors = ["#FF7F0E", "#1F77B4", "#2CA02C"]; // orange, blue, green
@@ -215,44 +204,6 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
         </Paper>
       </Grid>
 
-      {/* 2️⃣ Table Section */}
-      <Grid item xs={12}>
-        <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#e6f0ff" }}>
-                <TableCell align="center">Region</TableCell>
-                <TableCell align="center" color="#002060">
-                  Net Of Hedge P&L(%)
-                </TableCell>
-                <TableCell align="center" color="#002060">
-                  Long Exposure / LMV(%)
-                </TableCell>
-                <TableCell align="center" color="#002060">
-                  Beta Adj.Long Exp./LMV(%)
-                </TableCell>
-                <TableCell align="center" color="#002060">
-                  Net Of Hedge P&L
-                </TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {netOfHedgeTableData.map((row) => (
-                <TableRow key={row.region}>
-                  <TableCell align="center">{row.region}</TableCell>
-                  <TableCell align="center">
-                    {row.netOfHedgePnlPercent}
-                  </TableCell>
-                  <TableCell align="center">{row.longExposure}</TableCell>
-                  <TableCell align="center">{row.betaAdjLongExp}</TableCell>
-                  <TableCell align="center">{row.netOfHedgePnl}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
-      </Grid>
 
       {/* 3️⃣ Bar + Pie Charts */}
       <Grid item xs={12}>
