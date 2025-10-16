@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Container, Typography, Paper, Box, Grid, Select, MenuItem } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Paper,
+  Box,
+  Grid,
+  Select,
+  MenuItem,
+} from "@mui/material";
 
 import PNLLmvDataTablesMain from "./PNLLmvDataTablesMain";
 import DailyNetOfHedgeChart from "./DailyNetOfHedgeChart";
@@ -16,7 +24,13 @@ interface PNLRiskReportMainProps {
 }
 
 const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
-  const fundOptions = ["BEMAP2", "FMAP", "Mission Pure Alpha LP", "Monashee Pure Alpha SPV I LP", "MPAM"];
+  const fundOptions = [
+    "BEMAP2",
+    "FMAP",
+    "Mission Pure Alpha LP",
+    "Monashee Pure Alpha SPV I LP",
+    "MPAM",
+  ];
   const [selectedFund, setSelectedFund] = useState(fund || "FMAP");
 
   const today = new Date();
@@ -25,7 +39,16 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
   return (
     <Container sx={{ mt: 4, mb: 4 }} maxWidth="xl">
       {/* Header with Fund Selector */}
-      <Paper elevation={8} sx={{ p: 3, borderRadius: 3, backgroundColor: "#f9f9f9", boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", mb: 4 }}>
+      <Paper
+        elevation={8}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          backgroundColor: "#f9f9f9",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+          mb: 4,
+        }}
+      >
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="h6" color="#002060" fontWeight={600}>
@@ -34,7 +57,12 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Box display="flex" justifyContent={{ xs: "flex-start", md: "flex-end" }} gap={2} mt={{ xs: 2, md: 0 }}>
+            <Box
+              display="flex"
+              justifyContent={{ xs: "flex-start", md: "flex-end" }}
+              gap={2}
+              mt={{ xs: 2, md: 0 }}
+            >
               <Select
                 value={selectedFund}
                 onChange={(e) => setSelectedFund(e.target.value)}
@@ -66,12 +94,9 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
           <PNLLmvDataTablesMain fund={selectedFund} />
         </Box>
 
-
-
         <Grid container spacing={3} mt={2}>
-                    <Grid item xs={12}>
-
-          <Box className="pdf-section">
+          <Grid item xs={12}>
+            <Box className="pdf-section">
               <RiskReportRegionWiseTable fund={selectedFund} />
             </Box>
           </Grid>
@@ -81,12 +106,12 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
             </Box>
           </Grid>
 
-                    <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6}>
             <Box className="pdf-section">
               <PNLSectorWiseFundDetails fund={selectedFund} />
             </Box>
           </Grid>
-                    <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6}>
             <Box className="pdf-section">
               <RiskReportDailyPnlvsVarChart fund={selectedFund} />
             </Box>
@@ -102,13 +127,11 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
             </Box>
           </Grid>
 
-   
           <Grid item xs={12}>
             <Box className="pdf-section">
               <PNLFundReturnsChartsDifference fund={selectedFund} />
             </Box>
           </Grid>
-
 
           <Grid item xs={12}>
             <Box className="pdf-section">

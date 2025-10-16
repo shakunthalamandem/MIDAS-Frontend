@@ -6,11 +6,6 @@ import {
   Box,
   Grid,
   Alert,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
 } from "@mui/material";
 import {
   LineChart,
@@ -68,7 +63,6 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
         const data = await res.json();
         if (
           data.cumulative_fund_return &&
-          data.net_of_hedge_pnl &&
           data.attribution_by_market_cap &&
           data.historical_exposure_by_region
         ) {
@@ -148,7 +142,6 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
     })
   );
 
-
   // Colors
   const colors = ["#FF7F0E", "#1F77B4", "#2CA02C"]; // orange, blue, green
 
@@ -203,7 +196,6 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
           </ResponsiveContainer>
         </Paper>
       </Grid>
-
 
       {/* 3️⃣ Bar + Pie Charts */}
       <Grid item xs={12}>
@@ -301,7 +293,8 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
             bgcolor={"#e6f0ff"}
             fontWeight={600}
           >
-Historical $Exposure Breakdown (Including Hedge) by Region          </Typography>
+            Historical $Exposure Breakdown (Including Hedge) by Region{" "}
+          </Typography>
           <ResponsiveContainer width="100%" height={400}>
             <AreaChart
               data={historicalReturnChartData}
