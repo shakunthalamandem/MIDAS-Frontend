@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Paper,
-  Typography,
-  CircularProgress,
-  Box,
-} from "@mui/material";
+import { Paper, Typography, CircularProgress, Box } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 interface RiskReportPNLPortfolioTableProps {
@@ -71,8 +66,8 @@ const RiskReportPNLPortfolioTable: React.FC<
     { field: "company", headerName: "Company", flex: 1.5, minWidth: 150 },
     {
       field: "net_of_hedge_pnl",
-      headerName: "Net Of Hedge P&L ($)",
-      flex: 1.2,
+      headerName: "Net Of Hedge P&L",
+      flex: 1,
       minWidth: 150,
       type: "number",
       renderCell: (params) => {
@@ -91,32 +86,28 @@ const RiskReportPNLPortfolioTable: React.FC<
       headerName: "Net Of Hedge P&L (bps)",
       flex: 1,
       minWidth: 150,
-      valueFormatter: (params) =>
-        (params * 100).toFixed(2).toString(),
+      valueFormatter: (params) => (params * 100).toFixed(2).toString(),
     },
     {
       field: "long_exposure",
-      headerName: "Long Exposure (%)",
+      headerName: "Long Exp/LMV (%)",
       flex: 1,
       minWidth: 150,
-      valueFormatter: (params) =>
-        (params * 100).toFixed(2).toString(),
+      valueFormatter: (params) => (params * 100).toFixed(2).toString(),
     },
     {
       field: "beta",
       headerName: "Beta",
       flex: 0.7,
       minWidth: 100,
-      valueFormatter: (params) =>
-        params != null ? params : "—",
+      valueFormatter: (params) => (params != null ? params : "—"),
     },
     {
       field: "beta_adj_exposure_lmv",
-      headerName: "Beta Adj. Exposure / LMV (%)",
+      headerName: "Beta Adj.Long Exp. / LMV (%)",
       flex: 1.3,
       minWidth: 180,
-      valueFormatter: (params) =>
-        (params * 100).toFixed(2).toString(),
+      valueFormatter: (params) => (params * 100).toFixed(2).toString(),
     },
   ];
 
@@ -154,22 +145,38 @@ const RiskReportPNLPortfolioTable: React.FC<
         {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
       </Typography>
 
-      <div style={{ height: 500, width: "100%" }}>
+      {/* Increased height */}
+      <div style={{ height: 985, width: "100%" }}>
         <DataGrid
           rows={data}
           columns={columns}
-          pageSizeOptions={[10, 25, 50]}
+          pageSizeOptions={[25, 50, 100]}
           initialState={{
-            pagination: { paginationModel: { pageSize: 10 } },
+            pagination: { paginationModel: { pageSize: 25 } },
           }}
+          rowHeight={35}
           disableRowSelectionOnClick
           sx={{
             border: 0,
             backgroundColor: "white",
             "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#e1eaff",
+              backgroundColor: "#e1eaff", // header background color
               fontWeight: "bold",
               color: "#002060",
+              textAlign: "left", // align header text left
+            },
+            "& .MuiDataGrid-columnHeaderTitle": {
+              justifyContent: "flex-start", // align title text left
+            },
+            "& .MuiDataGrid-row": {
+              alignItems: "center",
+            },
+            "& .MuiDataGrid-cell": {
+              justifyContent: "flex-start", // align cell text left
+              textAlign: "left",
+            },
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "#f5f7ff",
             },
           }}
         />

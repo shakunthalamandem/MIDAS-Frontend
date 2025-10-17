@@ -26,7 +26,9 @@ interface IndexPortfolioData {
   beta_adj_exposure_lmv: number;
 }
 
-const RiskReportIndexPortfolioTable: React.FC<RiskReportIndexPortfolioTableProps> = ({ fund }) => {
+const RiskReportIndexPortfolioTable: React.FC<
+  RiskReportIndexPortfolioTableProps
+> = ({ fund }) => {
   const [loading, setLoading] = useState(true);
   const [indexData, setIndexData] = useState<IndexPortfolioData[]>([]);
   const [reportDate, setReportDate] = useState<string>("");
@@ -64,29 +66,58 @@ const RiskReportIndexPortfolioTable: React.FC<RiskReportIndexPortfolioTableProps
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight={200}
+      >
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9", mt: 2 }}>
-      <Typography variant="body1" gutterBottom color="#002060" sx={{ fontWeight: "bold" }} align="center">
-        {fund}: Short Analysis as {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
+    <Paper
+      elevation={3}
+      sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9", mt: 2 }}
+    >
+      <Typography
+        variant="body1"
+        gutterBottom
+        color="#002060"
+        sx={{ fontWeight: "bold" }}
+        align="center"
+      >
+        {fund}: Short Analysis as{" "}
+        {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
       </Typography>
 
       <TableContainer>
         <Table size="small">
           <TableHead>
             <TableRow sx={{ backgroundColor: "#e1eaff" }}>
-              <TableCell><strong>Ticker</strong></TableCell>
-              <TableCell><strong>Company</strong></TableCell>
-              <TableCell align="center"><strong>P&L</strong></TableCell>
-              <TableCell align="center"><strong>P&L vs LMV (%)</strong></TableCell>
-              <TableCell align="center"><strong>Beta</strong></TableCell>
-              <TableCell align="center"><strong>Exposure vs LMV (%)</strong></TableCell>
-              <TableCell align="center"><strong>Beta Adj. Exposure / LMV (%)</strong></TableCell>
+              <TableCell>
+                <strong>Ticker</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Company</strong>
+              </TableCell>
+              <TableCell align="left">
+                <strong>P&L</strong>
+              </TableCell>
+              <TableCell align="left">
+                <strong>P&L / LMV (%)</strong>
+              </TableCell>
+              <TableCell align="left">
+                <strong>Beta</strong>
+              </TableCell>
+              <TableCell align="left">
+                <strong>Exposure / LMV (%)</strong>
+              </TableCell>
+              <TableCell align="left">
+                <strong>Beta Adj. Exposure / LMV (%)</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -94,21 +125,30 @@ const RiskReportIndexPortfolioTable: React.FC<RiskReportIndexPortfolioTableProps
               indexData.map((row, idx) => (
                 <TableRow
                   key={idx}
-                  sx={{ backgroundColor: idx % 2 === 0 ? "transparent" : "#e7e1daff" }}
+                  sx={{
+                    backgroundColor:
+                      idx % 2 === 0 ? "transparent" : "#e7e1daff",
+                  }}
                 >
                   <TableCell>{row.ticker}</TableCell>
                   <TableCell>{row.company}</TableCell>
- <TableCell align="center">
-  {row.pnl != null
-    ? row.pnl < 0
-      ? `-$${Math.abs(row.pnl).toLocaleString()}`
-      : `$${row.pnl.toLocaleString()}`
-    : "—"}
-</TableCell>
-                  <TableCell align="center">{(row.pnlvslmv * 100).toFixed(2)}</TableCell>
-                  <TableCell align="center">{row.beta.toFixed(2)}</TableCell>
-                  <TableCell align="center">{(row.exposurevslmv * 100).toFixed(2)}</TableCell>
-                  <TableCell align="center">{(row.beta_adj_exposure_lmv * 100).toFixed(2)}</TableCell>
+                  <TableCell align="left">
+                    {row.pnl != null
+                      ? row.pnl < 0
+                        ? `-$${Math.abs(row.pnl).toLocaleString()}`
+                        : `$${row.pnl.toLocaleString()}`
+                      : "—"}
+                  </TableCell>
+                  <TableCell align="left">
+                    {(row.pnlvslmv * 100).toFixed(2)}%
+                  </TableCell>
+                  <TableCell align="left">{row.beta.toFixed(2)}</TableCell>
+                  <TableCell align="left">
+                    {(row.exposurevslmv * 100).toFixed(2)}%
+                  </TableCell>
+                  <TableCell align="left">
+                    {(row.beta_adj_exposure_lmv * 100).toFixed(2)}%
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
