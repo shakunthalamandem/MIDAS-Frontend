@@ -93,7 +93,7 @@ const RiskReportPNLPortfolioTable: React.FC<
       headerName: "Long Exp/LMV (%)",
       flex: 1,
       minWidth: 150,
-      valueFormatter: (params) => (params * 100).toFixed(2).toString(),
+      valueFormatter: (params) => (params * 100).toFixed(2).toString() + "%",
     },
     {
       field: "beta",
@@ -107,8 +107,7 @@ const RiskReportPNLPortfolioTable: React.FC<
       headerName: "Beta Adj.Long Exp. / LMV (%)",
       flex: 1.3,
       minWidth: 180,
-      valueFormatter: (params) => (params * 100).toFixed(2).toString(),
-    },
+valueFormatter: (params) => (params * 100).toFixed(2) + "%",    },
   ];
 
   if (loading) {
