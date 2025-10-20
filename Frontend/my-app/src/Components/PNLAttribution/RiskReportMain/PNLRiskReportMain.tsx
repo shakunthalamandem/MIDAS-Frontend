@@ -19,6 +19,7 @@ import PNLSectorWiseFundDetails from "./PNLSectorWiseFundDetails";
 import RiskPDFExporter from "./RiskPDFExporter";
 import RiskReportDailyPnlvsVarChart from "./RiskReportDailyPnlvsVarChart";
 import RiskReportRegionWiseTable from "./RiskReportRegionWiseTable";
+import CumulativeFundReturnChart from "./CumulativeFundReturnChart";
 interface PNLRiskReportMainProps {
   fund?: string;
 }
@@ -98,6 +99,11 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
           <Grid item xs={12}>
             <Box className="pdf-section">
               <RiskReportRegionWiseTable fund={selectedFund} />
+            </Box>
+          </Grid>
+                    <Grid item xs={12}>
+            <Box className="pdf-section">
+              <CumulativeFundReturnChart fund={selectedFund} />
             </Box>
           </Grid>
           <Grid item xs={12}>
