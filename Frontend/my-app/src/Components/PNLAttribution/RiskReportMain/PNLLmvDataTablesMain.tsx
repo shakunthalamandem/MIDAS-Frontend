@@ -101,41 +101,60 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
     );
   }
 
-  const renderSection = (section: SectionData, index: number) => (
-    <Paper
-      elevation={3}
-      ref={(el) => (cardRefs.current[index] = el)}
-      style={{
-        padding: "1rem",
-        borderRadius: "12px",
-        marginBottom: "1rem",
-        height: maxHeight ? `${maxHeight}px` : "auto", // set equal height
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <TableContainer>
-        <Table size="small">
-          <TableHead>
-            <TableRow style={{ backgroundColor: "#D9E1F2" }}>
-              <TableCell style={{ color: "#002060", fontWeight: "bold" }}>Label</TableCell>
-              <TableCell align="right" style={{ color: "#002060", fontWeight: "bold" }}>
-                Value
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Object.entries(section).map(([key, value]) => (
+const renderSection = (section: SectionData, index: number) => (
+  <Paper
+    elevation={3}
+    ref={(el) => (cardRefs.current[index] = el)}
+    style={{
+      padding: "1rem",
+      borderRadius: "12px",
+      marginBottom: "1rem",
+      height: maxHeight ? `${maxHeight}px` : "auto",
+      display: "flex",
+      flexDirection: "column",
+    }}
+  >
+    <TableContainer>
+      <Table size="small">
+        <TableHead>
+          <TableRow style={{ backgroundColor: "#D9E1F2" }}>
+            <TableCell style={{ color: "#002060", fontWeight: "bold" }}>Label</TableCell>
+            <TableCell align="right" style={{ color: "#002060", fontWeight: "bold" }}>
+              Value
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {Object.entries(section).map(([key, value]) => {
+            let displayValue: string | number = value;
+
+            if (typeof value === "number") {
+              if (key === "LMV") {
+                // LMV in Millions
+                displayValue = `$ ${Math.round(value / 1_000_000).toLocaleString()} M`;
+              } else if (key === "Net_of_Hedge_PnL") {
+                // Full value with $ and commas
+                displayValue = `$ ${value.toLocaleString()}`;
+              } else {
+                // Other numeric values (percentages) formatted to 2 decimals
+                displayValue = value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              }
+            }
+
+            return (
               <TableRow key={key}>
-                <TableCell style={{ color: "#002060" }}>{RISK_REPORT_LABELS[key] || key}</TableCell>
-                <TableCell align="right">{value}</TableCell>
+                <TableCell style={{ color: "#002060" }}>
+                  {RISK_REPORT_LABELS[key] || key}
+                </TableCell>
+                <TableCell align="right">{displayValue}</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Paper>
-  );
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Paper>
+);
 
   return (
     <Grid container spacing={3}>
