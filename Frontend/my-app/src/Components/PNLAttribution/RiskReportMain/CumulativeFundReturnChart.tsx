@@ -18,6 +18,26 @@ const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({ f
   const [data, setData] = useState<CumulativeDataItem[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const formatDateTick = (value: string | number): string => {
+    const parsedDate = new Date(value);
+    if (Number.isNaN(parsedDate.getTime())) return String(value);
+    return parsedDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "2-digit",
+    });
+  };
+
+  const formatYAxisTick = (value: number | string): string => {
+    const numericValue = typeof value === "number" ? value : Number(value);
+    if (Number.isNaN(numericValue)) return String(value);
+    const millions = numericValue / 1_000_000;
+    return `$${millions.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    })}M`;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -92,13 +112,37 @@ const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({ f
       </Typography>
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data}>
-          <XAxis dataKey="date" />
-          <YAxis />
+          <XAxis dataKey="date" tickFormatter={formatDateTick} />
+          <YAxis tickFormatter={formatYAxisTick} />
           <Tooltip />
           <Legend />
-          <Line type="linear" dataKey="fund_return" stroke="#002060" name="Fund Return" />
-          <Line type="linear" dataKey="msci_return" stroke="#0070C0" name="MSCI Return" />
-          <Line type="linear" dataKey="spx_return" stroke="#00B0F0" name="S&P 500 Return" />
+          <Line
+            type="linear"
+            dataKey="fund_return"
+            stroke="#1d82bdff"
+            name="Fund Cumulative $Return"
+            dot={false}
+            activeDot={false}
+            strokeWidth={3}
+          />
+          <Line
+            type="linear"
+            dataKey="msci_return"
+            stroke="#c00000ff"
+            name="MSCI Cumulative $Return"
+            dot={false}
+            activeDot={false}
+            strokeWidth={3}
+          />
+          <Line
+            type="linear"
+            dataKey="spx_return"
+            stroke="#dd5800ff"
+            name="SPXT Cumulative $Return"
+            dot={false}
+            activeDot={false}
+            strokeWidth={3}
+          />
         </LineChart>
       </ResponsiveContainer>
     </Paper>
