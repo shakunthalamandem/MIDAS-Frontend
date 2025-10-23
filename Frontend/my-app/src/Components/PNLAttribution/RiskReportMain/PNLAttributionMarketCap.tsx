@@ -143,7 +143,7 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
   );
 
   // Colors
-  const colors = ["#FF7F0E", "#1F77B4", "#2CA02C"]; // orange, blue, green
+  const colors = [ "#1F77B4","#FF7F0E", "#2CA02C"]; // orange, blue, green
 
   // Pie chart (LongExposureLMVPercent)
   const pieChartData = attribution_by_market_cap?.LongExposureLMVPercent?.map(
