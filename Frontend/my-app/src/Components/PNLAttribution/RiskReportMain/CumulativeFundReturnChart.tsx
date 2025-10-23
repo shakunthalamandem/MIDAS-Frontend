@@ -123,7 +123,7 @@ const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({ f
             name="Fund Cumulative $Return"
             dot={false}
             activeDot={false}
-            strokeWidth={3}
+            strokeWidth={2}
           />
           <Line
             type="linear"
@@ -132,7 +132,7 @@ const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({ f
             name="MSCI Cumulative $Return"
             dot={false}
             activeDot={false}
-            strokeWidth={3}
+            strokeWidth={2}
           />
           <Line
             type="linear"
@@ -141,7 +141,7 @@ const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({ f
             name="SPXT Cumulative $Return"
             dot={false}
             activeDot={false}
-            strokeWidth={3}
+            strokeWidth={2}
           />
         </LineChart>
       </ResponsiveContainer>
