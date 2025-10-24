@@ -302,20 +302,20 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
             >
               <defs>
                 <linearGradient id="colorAPAC" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#002060" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#002060" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#e2863aff" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#e2863aff" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="colorUS" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#0070C0" stopOpacity={0.8} />
                   <stop offset="95%" stopColor="#0070C0" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="colorEMEA" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00B0F0" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#00B0F0" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#96a700ff" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#96a700ff" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="colorHedge" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#002060" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#002060" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#797979ff" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#797979ff" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis dataKey="date" />
