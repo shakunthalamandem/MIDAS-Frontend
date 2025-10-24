@@ -95,7 +95,9 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
-          <Typography variant="subtitle1" align="center" bgcolor={"#e6f0ff"}>Daily Net of Hedge $P&L</Typography>
+          <Typography variant="subtitle1" align="center" bgcolor={"#e6f0ff"}>
+            Daily Net of Hedge $P&L
+          </Typography>
           <Bar
             data={{
               labels: chartData.labels,
@@ -118,7 +120,9 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
           />
         </Grid>
         <Grid item xs={12} md={4}>
-          <Typography variant="subtitle1" align="center" bgcolor={"#e6f0ff"}>MTD Net of Hedge $P&L</Typography>
+          <Typography variant="subtitle1" align="center" bgcolor={"#e6f0ff"}>
+            MTD Net of Hedge $P&L
+          </Typography>
           <Bar
             data={{
               labels: chartData.labels,
@@ -171,14 +175,20 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
 
   return (
     <Paper sx={{ p: 2, mb: 3, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
-            <Typography variant="h6" gutterBottom color="#002060" sx={{ fontWeight: "bold" }} align="center">
-              {fund}: Attribution as of {data.date} 
-            </Typography>
+      <Typography
+        variant="h6"
+        gutterBottom
+        color="#002060"
+        sx={{ fontWeight: "bold" }}
+        align="center"
+      >
+        {fund}: Attribution as of{" "}
+        {data.date ? new Date(data.date).toLocaleDateString() : "—"}
+      </Typography>
       {renderBarChart(data.sector, "GICS Sector")}
       {renderBarChart(data.region, "Region")}
       {renderBarChart(data.strategy, "Strategy")}
-        </Paper>
-
+    </Paper>
   );
 };
 

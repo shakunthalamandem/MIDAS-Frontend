@@ -38,7 +38,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
-        const res = await fetch(`${apiUrl}/api/risk_report_pnl_diff_graph`, {
+        const res = await fetch(`${apiUrl}/api/risk_report_pnl_diff_graph/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
