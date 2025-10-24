@@ -86,14 +86,13 @@ const RiskReportPNLPortfolioTable: React.FC<
       headerName: "Net Of Hedge P&L (bps)",
       flex: 1,
       minWidth: 150,
-      valueFormatter: (params) => (params * 100).toFixed(2).toString(),
     },
     {
       field: "long_exposure",
       headerName: "Long Exp/LMV (%)",
       flex: 1,
       minWidth: 150,
-      valueFormatter: (params) => (params * 100).toFixed(2).toString() + "%",
+      valueFormatter: (params) => `${params}%`,
     },
     {
       field: "beta",
@@ -107,7 +106,8 @@ const RiskReportPNLPortfolioTable: React.FC<
       headerName: "Beta Adj.Long Exp. / LMV (%)",
       flex: 1.3,
       minWidth: 180,
-valueFormatter: (params) => (params * 100).toFixed(2) + "%",    },
+      valueFormatter: (params) => `${params}%`,
+    },
   ];
 
   if (loading) {
