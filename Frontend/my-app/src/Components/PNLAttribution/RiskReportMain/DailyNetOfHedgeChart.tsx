@@ -22,7 +22,6 @@ ChartJS.register(
 
 interface DailyNetOfHedgeChartProps {
   fund: string;
-  date?: string;
 }
 
 interface ChartDataType {
@@ -34,7 +33,6 @@ interface ChartDataType {
 
 const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
   fund,
-  date,
 }) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
@@ -52,7 +50,7 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ fund, date }),
+          body: JSON.stringify({ fund }),
         });
 
         if (!res.ok) {
@@ -69,7 +67,7 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
     };
 
     fetchData();
-  }, [fund, date]);
+  }, [fund]);
 
   if (loading || !data) {
     return (
@@ -174,7 +172,7 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({
   return (
     <Paper sx={{ p: 2, mb: 3, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
             <Typography variant="h6" gutterBottom color="#002060" sx={{ fontWeight: "bold" }} align="center">
-              {fund}: Attribution as of {date} 
+              {fund}: Attribution as of {data.date} 
             </Typography>
       {renderBarChart(data.sector, "GICS Sector")}
       {renderBarChart(data.region, "Region")}
