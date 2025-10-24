@@ -168,34 +168,7 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
   return (
     <Grid container spacing={3}>
       {/* 1️⃣ Cumulative Fund Return */}
-      <Grid item xs={12}>
-        <Paper
-          elevation={3}
-          sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}
-        >
-          <Typography
-            variant="h6"
-            gutterBottom
-            color="#002060"
-            align="center"
-            bgcolor={"#e6f0ff"}
-            fontWeight={600}
-          >
-            Cumulative Fund Return vs Market Return
-          </Typography>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={cumulativeReturnChartData}>
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="linear" dataKey="fundReturn" stroke="#002060" />
-              <Line type="linear" dataKey="msciReturn" stroke="#0070C0" />
-              <Line type="linear" dataKey="spxReturn" stroke="#00B0F0" />
-            </LineChart>
-          </ResponsiveContainer>
-        </Paper>
-      </Grid>
+
 
       {/* 3️⃣ Bar + Pie Charts */}
       <Grid item xs={12}>
