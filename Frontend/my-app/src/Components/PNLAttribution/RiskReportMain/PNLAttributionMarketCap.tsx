@@ -77,23 +77,22 @@ const PNLAttributionMarketCap: React.FC<PNLAttributionMarketCapProps> = ({
     fetchData();
   }, [fund]);
 
-  // Format Y-axis in $M
   const formatYAxis = (value: number) => {
     if (!value) return "$0";
     return `$${(value / 1_000_000).toFixed(0)}M`;
   };
 
-  // Format X-axis as short date (Jan 25)
-  const formatXAxis = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const options: Intl.DateTimeFormatOptions = {
-      month: "short",
-      day: "numeric",
-    };
-    return date.toLocaleDateString("en-US", options);
-  };
 
-  // Format tooltip values in $M
+const formatXAxis = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    year: "2-digit",
+  };
+  return date.toLocaleDateString("en-US", options);
+};
+
+
   const formatTooltip = (value: number) =>
     `$${(value / 1_000_000).toFixed(1)}M`;
 
