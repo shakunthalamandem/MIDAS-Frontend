@@ -149,37 +149,36 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({
           >
             DTD Net of Hedge Gain/Loss over $100K
           </Typography>
-<Bar
-  data={{
-    ...chartData,
-    datasets: chartData.datasets.map((dataset:any, index:any) => ({
-      ...dataset,
-      backgroundColor: dataset.data.map((value: number) =>
-        value >= 0 ? "#005711" : "#C40002"
-      ),
-    })),
-  }}
-  options={{
-    responsive: true,
-    indexAxis: "y",
-    plugins: {
-      legend: { display: false },
-      tooltip: { mode: "index", intersect: false },
-    },
-    scales: {
-      x: {
-        title: { display: true, text: "P&L ($)" },
-        grid: { display: false },
-        ticks: {
-          callback: (value: any) => `$${(value / 1000).toFixed(0)}K`,
-        },
-      },
-      y: { title: { display: false }, grid: { display: false } },
-    },
-  }}
-  height={250}
-/>
-
+          <Bar
+            data={{
+              ...chartData,
+              datasets: chartData.datasets.map((dataset: any, index: any) => ({
+                ...dataset,
+                backgroundColor: dataset.data.map((value: number) =>
+                  value >= 0 ? "#005711" : "#C40002"
+                ),
+              })),
+            }}
+            options={{
+              responsive: true,
+              indexAxis: "y",
+              plugins: {
+                legend: { display: false },
+                tooltip: { mode: "index", intersect: false },
+              },
+              scales: {
+                x: {
+                  title: { display: true, text: "P&L ($)" },
+                  grid: { display: false },
+                  ticks: {
+                    callback: (value: any) => `$${(value / 1000).toFixed(0)}K`,
+                  },
+                },
+                y: { title: { display: false }, grid: { display: false } },
+              },
+            }}
+            height={250}
+          />
         </Grid>
 
         {/* Top P&L Table */}
