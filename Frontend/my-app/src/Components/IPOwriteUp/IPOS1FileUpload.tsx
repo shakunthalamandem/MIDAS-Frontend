@@ -79,9 +79,7 @@ const IPOS1FileUpload: React.FC = () => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("market", market.trim());
-    if (uploadType === "report") {
-      formData.append("ticker", ticker.trim());
-    }
+    formData.append("ticker", ticker.trim());
 
     const endpoint =
       uploadType === "s1"
@@ -168,7 +166,6 @@ const IPOS1FileUpload: React.FC = () => {
             sx={{ mb: 2 }}
           />
 
-          {uploadType === "report" && (
             <TextField
               label="Ticker (e.g., AAPL)"
               value={ticker}
@@ -177,7 +174,6 @@ const IPOS1FileUpload: React.FC = () => {
               fullWidth
               sx={{ mb: 2 }}
             />
-          )}
 
           <Box component="form" onSubmit={handleSubmit}>
             <Button
