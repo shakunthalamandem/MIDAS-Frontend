@@ -19,13 +19,11 @@ import { SelectChangeEvent } from "@mui/material";
 
 const IPOS1FileUpload: React.FC = () => {
   const [uploadType, setUploadType] = useState<"s1" | "report">("s1");
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]); // ✅ multiple files
   const [market, setMarket] = useState<string>("");
   const [ticker, setTicker] = useState<string>("");
   const [message, setMessage] = useState<string>("");
-  const [severity, setSeverity] = useState<"success" | "error" | "info">(
-    "info"
-  );
+  const [severity, setSeverity] = useState<"success" | "error" | "info">("info");
   const [loading, setLoading] = useState<boolean>(false);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
@@ -34,29 +32,32 @@ const IPOS1FileUpload: React.FC = () => {
   const handleUploadTypeChange = (e: SelectChangeEvent) => {
     const value = e.target.value as "s1" | "report";
     setUploadType(value);
-    setFile(null);
+    setFiles([]);
     setMarket("");
     setTicker("");
     setMessage("");
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0] || null;
-    if (selectedFile?.type !== "application/pdf") {
+    const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
+    const invalidFile = selectedFiles.find((f) => f.type !== "application/pdf");
+
+    if (invalidFile) {
       setMessage("Only PDF files are allowed.");
       setSeverity("error");
       setSnackbarOpen(true);
-      setFile(null);
+      setFiles([]);
       return;
     }
-    setFile(selectedFile);
+
+    setFiles(selectedFiles); // ✅ store multiple files
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!file) {
-      setMessage("Please select a PDF file.");
+    if (files.length === 0) {
+      setMessage("Please select at least one PDF file.");
       setSeverity("error");
       setSnackbarOpen(true);
       return;
@@ -77,13 +78,13 @@ const IPOS1FileUpload: React.FC = () => {
     }
 
     const formData = new FormData();
-    formData.append("file", file);
+    files.forEach((f) => formData.append("files", f)); // ✅ append all files
     formData.append("market", market.trim());
     formData.append("ticker", ticker.trim());
 
     const endpoint =
       uploadType === "s1"
-        ? `${apiUrl}/api/upload_s1/`
+        ? `${apiUrl}/api/update_ipo_s1_ai/`
         : `${apiUrl}/api/upload_ipo_s1_categories/`;
 
     setLoading(true);
@@ -98,7 +99,7 @@ const IPOS1FileUpload: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(data.message || "File uploaded successfully.");
+        setMessage(data.message || "Files uploaded successfully.");
         setSeverity("success");
       } else {
         setMessage(data.error || "Upload failed.");
@@ -141,20 +142,28 @@ const IPOS1FileUpload: React.FC = () => {
               component="label"
               startIcon={<CloudUploadIcon />}
             >
-              Select PDF File
+              Select PDF Files
               <input
                 type="file"
                 hidden
                 accept="application/pdf"
+                multiple // ✅ allow multiple
                 onChange={handleFileChange}
               />
             </Button>
           </Box>
 
-          {file && (
-            <Typography variant="body2" align="center" sx={{ mb: 2 }}>
-              Selected: {file.name}
-            </Typography>
+          {files.length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" align="center">
+                Selected Files:
+              </Typography>
+              {files.map((f, idx) => (
+                <Typography key={idx} variant="body2" align="center">
+                  {f.name}
+                </Typography>
+              ))}
+            </Box>
           )}
 
           <TextField
@@ -166,14 +175,14 @@ const IPOS1FileUpload: React.FC = () => {
             sx={{ mb: 2 }}
           />
 
-            <TextField
-              label="Ticker (e.g., AAPL)"
-              value={ticker}
-              onChange={(e) => setTicker(e.target.value)}
-              variant="outlined"
-              fullWidth
-              sx={{ mb: 2 }}
-            />
+          <TextField
+            label="Ticker (e.g., AAPL)"
+            value={ticker}
+            onChange={(e) => setTicker(e.target.value)}
+            variant="outlined"
+            fullWidth
+            sx={{ mb: 2 }}
+          />
 
           <Box component="form" onSubmit={handleSubmit}>
             <Button
@@ -182,7 +191,7 @@ const IPOS1FileUpload: React.FC = () => {
               color="primary"
               disabled={
                 loading ||
-                !file ||
+                files.length === 0 ||
                 !market.trim() ||
                 (uploadType === "report" && !ticker.trim())
               }
