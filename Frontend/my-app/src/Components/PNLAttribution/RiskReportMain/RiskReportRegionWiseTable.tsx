@@ -24,7 +24,7 @@ interface RegionWiseData {
   netOfHedgePnl: number | string;
 }
 
-const REGION_ORDER = ["US", "APAC", "EMEA", "Non-US America", "Total"];
+const REGION_ORDER = ["US",  "EMEA","APAC", "Non-US America", "Total"];
 
 const formatPercent = (value: number | string) => {
   if (value === "–" || value === null || value === undefined) return "–";
