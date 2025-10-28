@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Paper, Typography, CircularProgress, Box, Alert } from "@mui/material";
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 interface CumulativeDataItem {
   date: string;
@@ -13,7 +21,9 @@ interface CumulativeFundReturnChartProps {
   fund: string;
 }
 
-const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({ fund }) => {
+const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({
+  fund,
+}) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<CumulativeDataItem[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -47,14 +57,17 @@ const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({ f
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
-        const res = await fetch(`${apiUrl}/api/risk_report_cummulative_chart/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify({ fund }),
-        });
+        const res = await fetch(
+          `${apiUrl}/api/risk_report_cummulative_chart/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+            body: JSON.stringify({ fund }),
+          }
+        );
 
         if (!res.ok) {
           throw new Error(`API error: ${res.status}`);
@@ -79,27 +92,47 @@ const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({ f
 
   if (loading)
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight={200}
+      >
         <CircularProgress />
       </Box>
     );
 
   if (error)
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight={200}
+      >
         <Alert severity="error">{error}</Alert>
       </Box>
     );
 
   if (!data.length)
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
-        <Alert severity="warning">No data available for the selected fund.</Alert>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight={200}
+      >
+        <Alert severity="warning">
+          No data available for the selected fund.
+        </Alert>
       </Box>
     );
 
   return (
-    <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+    <Paper
+      elevation={3}
+      sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}
+    >
       <Typography
         variant="h6"
         gutterBottom
@@ -114,7 +147,25 @@ const CumulativeFundReturnChart: React.FC<CumulativeFundReturnChartProps> = ({ f
         <LineChart data={data}>
           <XAxis dataKey="date" tickFormatter={formatDateTick} />
           <YAxis tickFormatter={formatYAxisTick} />
-          <Tooltip />
+          <Tooltip
+            formatter={(value: number) => {
+              if (typeof value !== "number" || isNaN(value)) return value;
+              const formatted = Math.abs(value).toLocaleString("en-US", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              });
+              return `${value < 0 ? "-$" : "$"}${formatted}`;
+            }}
+            labelFormatter={(label) => {
+              const parsedDate = new Date(label);
+              if (Number.isNaN(parsedDate.getTime())) return label;
+              return parsedDate.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "2-digit",
+              });
+            }}
+          />
           <Legend />
           <Line
             type="linear"
