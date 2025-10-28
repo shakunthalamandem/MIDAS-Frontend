@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -32,10 +32,43 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
     "Monashee Pure Alpha SPV I LP",
     "MPAM",
   ];
-  const [selectedFund, setSelectedFund] = useState(fund || "FMAP");
 
-  const today = new Date();
-  const formattedDate = `${String(today.getMonth() + 1).padStart(2, "0")}/${String(today.getDate()).padStart(2, "0")}/${today.getFullYear()}`;
+  const [selectedFund, setSelectedFund] = useState(fund || "FMAP");
+  const [maxTradeDate, setMaxTradeDate] = useState<string>("");
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
+  // Fetch latest trade date whenever selectedFund changes
+  useEffect(() => {
+    const fetchMaxTradeDate = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/risk_report_max_trade_date/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ fund: selectedFund }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          console.error("Error fetching max trade date:", err);
+          setMaxTradeDate("N/A");
+          return;
+        }
+
+        const data = await res.json();
+        setMaxTradeDate(data.max_trade_date || "N/A");
+      } catch (error) {
+        console.error("Error fetching max trade date:", error);
+        setMaxTradeDate("N/A");
+      }
+    };
+
+    fetchMaxTradeDate();
+  }, [selectedFund, apiUrl, token]);
 
   return (
     <Container sx={{ mt: 4, mb: 4 }} maxWidth="xl">
@@ -53,7 +86,8 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="h6" color="#002060" fontWeight={600}>
-              {selectedFund}: Summary as of {formattedDate}
+              {selectedFund}: Summary as of{" "}
+              {maxTradeDate !== "N/A" ? maxTradeDate : "—"}
             </Typography>
           </Grid>
 
@@ -82,8 +116,6 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
                   </MenuItem>
                 ))}
               </Select>
-
-              {/* <RiskPDFExporter exportId="pdf-export-area" fileName={`PNL_Risk_Report_${selectedFund}.pdf`} /> */}
             </Box>
           </Grid>
         </Grid>
