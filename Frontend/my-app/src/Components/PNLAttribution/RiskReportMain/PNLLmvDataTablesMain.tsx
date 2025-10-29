@@ -50,23 +50,41 @@ const LMV_KEYS = new Set([
   "YTD_LMV_Daily_Avg",
   "ITD_LMV_Daily_Avg",
 ]);
+const NET_OF_HEDGE_KEYS = new Set([
+  "Net_of_Hedge_PnL",
+  "MTD_Net_of_Hedge_PnL",
+  "YTD_Net_of_Hedge_PnL",
+  "ITD_Net_of_Hedge_PnL",
+]);
+
+const coerceToNumber = (value: number | string): number | null => {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const cleaned = value.replace(/[$,]/g, "").trim();
+    if (cleaned === "") return null;
+    const parsed = Number(cleaned);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+};
 
 const formatValue = (key: string, value: number | string): string => {
-  if (typeof value !== "number") return String(value ?? "");
+  const numericValue = coerceToNumber(value);
+  if (numericValue === null) return String(value ?? "");
+
   if (LMV_KEYS.has(key)) {
-    const sign = value < 0 ? "-" : "";
-    const magnitude = Math.abs(value);
+    const sign = numericValue < 0 ? "-" : "";
+    const magnitude = Math.abs(numericValue);
     return `${sign}$${Math.round(magnitude / 1_000_000).toLocaleString()}M`;
   }
-  if (
-    key === "Net_of_Hedge_PnL" ||
-    key === "MTD_Net_of_Hedge_PnL" ||
-    key === "YTD_Net_of_Hedge_PnL" ||
-    key === "ITD_Net_of_Hedge_PnL"
-  ) {
-    return `$ ${value.toLocaleString()}`;
+
+  if (NET_OF_HEDGE_KEYS.has(key)) {
+    const sign = numericValue < 0 ? "-" : "";
+    const magnitude = Math.abs(numericValue);
+    return `${sign}$${magnitude.toLocaleString()}`;
   }
-  const num = value.toLocaleString(undefined, {
+
+  const num = numericValue.toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
