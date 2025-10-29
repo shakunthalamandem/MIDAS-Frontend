@@ -32,6 +32,24 @@ const REGION_TO_TYPES: Record<Region, DocType[]> = {
   EMEA: ["All Analytic Documents"],
 };
 
+// 🔽 Common sector list (adjust as needed to match your backend enums/values)
+const SECTOR_OPTIONS = [
+    "Consumer Discretionary",
+    "Consumer Staples",
+    "Energy",
+    "Financials",
+    "Health Care",
+    "Industrials",
+    "Information Technology",
+    "Materials",
+    "Communication Services",
+    "Utilities",
+    "Real Estate",
+    "Technology",
+    "Oil & Gas",
+    "Insurance Industry",
+];
+
 const isSingleFileDoc = (region: Region, docType?: DocType) =>
   (region === "US" && docType === "S1") ||
   (region === "HK" && docType === "A1");
@@ -51,6 +69,7 @@ const IPOS1FileUpload: React.FC = () => {
   const [docType, setDocType] = useState<DocType>("S1");
   const [files, setFiles] = useState<File[]>([]);
   const [ticker, setTicker] = useState<string>("");
+  const [sector, setSector] = useState<string>(""); // ✅ new state
   const [message, setMessage] = useState<string>("");
   const [severity, setSeverity] = useState<"success" | "error" | "info">(
     "info"
@@ -72,6 +91,7 @@ const IPOS1FileUpload: React.FC = () => {
     setDocType(firstType);
     setFiles([]);
     setTicker("");
+    setSector(""); // reset sector as well
   };
 
   const handleRegionChange = (e: SelectChangeEvent) => {
@@ -85,6 +105,10 @@ const IPOS1FileUpload: React.FC = () => {
     const value = e.target.value as DocType;
     setDocType(value);
     setFiles([]);
+  };
+
+  const handleSectorChange = (e: SelectChangeEvent) => {
+    setSector(e.target.value as string);
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +146,13 @@ const IPOS1FileUpload: React.FC = () => {
       return false;
     }
     if (!ticker.trim()) {
-      setMessage("Please enter a ticker (mandatory for all).");
+      setMessage("Please enter a ticker (mandatory).");
+      setSeverity("error");
+      setSnackbarOpen(true);
+      return false;
+    }
+    if (!sector.trim()) {
+      setMessage("Please select a sector (mandatory).");
       setSeverity("error");
       setSnackbarOpen(true);
       return false;
@@ -148,6 +178,7 @@ const IPOS1FileUpload: React.FC = () => {
     const formData = new FormData();
     formData.append("market", market);
     formData.append("ticker", ticker.trim());
+    formData.append("sector", sector); // ✅ send sector
 
     if (isSingleFileDoc(region, docType)) {
       formData.append("file", files[0]);
@@ -170,6 +201,7 @@ const IPOS1FileUpload: React.FC = () => {
         setSeverity("success");
         setFiles([]);
         setTicker("");
+        setSector("");
       } else {
         setMessage(data.error || "Upload failed.");
         setSeverity("error");
@@ -242,6 +274,44 @@ const IPOS1FileUpload: React.FC = () => {
                 direction={{ xs: "column", sm: "row" }}
                 spacing={2}
                 sx={{ mb: 2 }}
+              >
+                <TextField
+                  label="Ticker (e.g., AAPL)"
+                  value={ticker}
+                  onChange={(e) => setTicker(e.target.value)}
+                  variant="outlined"
+                  fullWidth
+                />
+
+                <FormControl fullWidth>
+                  <InputLabel id="sector-label">Sector</InputLabel>
+                  <Select
+                    labelId="sector-label"
+                    value={sector}
+                    label="Sector"
+                    onChange={handleSectorChange}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 250, // ✅ Limit height of dropdown
+                          overflowY: "auto", // ✅ Enable scrolling
+                        },
+                      },
+                    }}
+                  >
+                    {SECTOR_OPTIONS.map((s) => (
+                      <MenuItem key={s} value={s}>
+                        {s}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Stack>
+
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                sx={{ mb: 2 }}
                 alignItems="center"
               >
                 <Button
@@ -280,22 +350,17 @@ const IPOS1FileUpload: React.FC = () => {
                 </Stack>
               )}
 
-              <TextField
-                label="Ticker (e.g., AAPL)"
-                value={ticker}
-                onChange={(e) => setTicker(e.target.value)}
-                variant="outlined"
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-
               <Box component="form" onSubmit={handleSubmit}>
                 <Button
                   type="submit"
                   variant="contained"
                   color="primary"
                   disabled={
-                    loading || isEMEA || files.length === 0 || !ticker.trim()
+                    loading ||
+                    isEMEA ||
+                    files.length === 0 ||
+                    !ticker.trim() ||
+                    !sector.trim()
                   }
                   fullWidth
                 >
