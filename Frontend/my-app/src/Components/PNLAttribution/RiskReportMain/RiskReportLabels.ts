@@ -18,7 +18,6 @@ export const RISK_REPORT_LABELS: Record<string, string> = {
   YTD_Net_of_Hedge_PnL_Percent: "YTD Net of Hedge P&L (%)",
   ITD_Net_of_Hedge_PnL: "ITD Net of Hedge P&L",
   ITD_Return_on_LMV_Percent: "ITD Return on LMV (%)",
-  ITD_LMV_Daily_Avg: "ITD LMV Daily Avg",
 
   // Section 3
   Trailing_1M_Beta_wrt_SPXT: "Trailing 1M Beta w.r.t SPXT",
@@ -29,14 +28,16 @@ export const RISK_REPORT_LABELS: Record<string, string> = {
   Trailing_3M_Beta_wrt_MSCI: "Trailing 3M Beta w.r.t MSCI",
   YTD_Beta_wrt_MSCI: "YTD Beta w.r.t MSCI",
   ITD_Beta_wrt_MSCI: "ITD Beta w.r.t MSCI",
-  YTD_SPXT_Volatility: "YTD SPXT Volatility",
-  ITD_SPXT_Volatility: "ITD SPXT Volatility",
+
 
   // Section 4
   YTD_Volatility: "YTD Volatility",
   ITD_Volatility: "ITD Volatility",
   MTD_Daily_LMV_Avg: "MTD Daily LMV Avg",
   YTD_LMV_Daily_Avg: "YTD LMV Daily Avg",
+  ITD_LMV_Daily_Avg: "ITD LMV Daily Avg",
   ITD_SPXT_Return_Percent: "ITD SPXT Return (%)",
   ITD_Annualized_Returns: "ITD Annualized Returns",
+  YTD_SPXT_Volatility: "YTD SPXT Volatility",
+  ITD_SPXT_Volatility: "ITD SPXT Volatility",
 };
