@@ -13,86 +13,32 @@ import {
 import { RadioGroup, Radio, FormControlLabel } from "@mui/material";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 import NewDealDownloadWithFilter from "./NewDealDownloadWithFilter";
 import IpoDashboardCalendar from "../Main/DashBoards/InsightsAi/UploadsInsights/IpoDashboardCalender";
 import Ipos1Download from "../IPOwriteUp/Ipos1Download";
-import IPOS1FileUpload from "../IPOwriteUp/IPOS1FileUpload";
+// ⛔️ Removed: IPOS1FileUpload import from this page
 import UploadDataCard from "./UploadDataCard";
 import LkFileUpload from "./LkFileUpload";
 import DailyNoteUpload from "./DailyNoteUpload";
 import FOS1FileUpload from "../Main/FOWriteUpMain/FOWriteUpUploads/FOS1FileUpload";
 
 const uploadConfigs = [
-  {
-    key: "form",
-    label: "Upload New Deal Data",
-    apiEndpoint: "form_data_upload",
-    buttonColor: "primary",
-  },
-  {
-    key: "ai_insights",
-    label: "Upload AI Insights Data",
-    apiEndpoint: "upload_ai_insights",
-    buttonColor: "secondary",
-  },
-  {
-    key: "writeup",
-    label: "Upload IPO writeUp Data",
-    apiEndpoint: "writeup_data_upload",
-    buttonColor: "error",
-  },
-  {
-    key: "financialForecasts",
-    label: "Upload IPO S1 FinancialForecasts",
-    apiEndpoint: "financial_forecasts_data_upload",
-    buttonColor: "success",
-  },
-  {
-    key: "companymetric",
-    label: "Upload Companymetric Data",
-    apiEndpoint: "companymetric_data_upload",
-    buttonColor: "warning",
-  },
-  {
-    key: "fowriteup",
-    label: "Upload FO writeUp Data",
-    apiEndpoint: "fo_writeup_data_upload",
-    buttonColor: "error",
-  },
-  {
-    key: "focompanymetric",
-    label: "Upload FO Companymetric Data",
-    apiEndpoint: "fo_companymetric_data_upload",
-    buttonColor: "warning",
-  },
+  { key: "form", label: "Upload New Deal Data", apiEndpoint: "form_data_upload", buttonColor: "primary" },
+  { key: "ai_insights", label: "Upload AI Insights Data", apiEndpoint: "upload_ai_insights", buttonColor: "secondary" },
+  { key: "writeup", label: "Upload IPO writeUp Data", apiEndpoint: "writeup_data_upload", buttonColor: "error" },
+  { key: "financialForecasts", label: "Upload IPO S1 FinancialForecasts", apiEndpoint: "financial_forecasts_data_upload", buttonColor: "success" },
+  { key: "companymetric", label: "Upload Companymetric Data", apiEndpoint: "companymetric_data_upload", buttonColor: "warning" },
+  { key: "fowriteup", label: "Upload FO writeUp Data", apiEndpoint: "fo_writeup_data_upload", buttonColor: "error" },
+  { key: "focompanymetric", label: "Upload FO Companymetric Data", apiEndpoint: "fo_companymetric_data_upload", buttonColor: "warning" },
 ];
 
 const monasheeUploadConfigs = [
-  {
-    key: "monashee_deals",
-    label: "Monashee Deals Data",
-    apiEndpoint: "monashee_deals_data_upload",
-    buttonColor: "primary",
-  },
-  {
-    key: "deal_logic",
-    label: "Dealogic Data",
-    apiEndpoint: "dealogic_data_upload",
-    buttonColor: "secondary",
-  },
-  {
-    key: "market_indices",
-    label: "Market Indices",
-    apiEndpoint: "upload_market_index",
-    buttonColor: "success",
-  },
-  {
-    key: "DailyNoteUpload",
-    label: "Daily Note Upload",
-    apiEndpoint: "daily_note_deals_upload",
-    buttonColor: "success",
-  },
+  { key: "monashee_deals", label: "Monashee Deals Data", apiEndpoint: "monashee_deals_data_upload", buttonColor: "primary" },
+  { key: "deal_logic", label: "Dealogic Data", apiEndpoint: "dealogic_data_upload", buttonColor: "secondary" },
+  { key: "market_indices", label: "Market Indices", apiEndpoint: "upload_market_index", buttonColor: "success" },
+  { key: "DailyNoteUpload", label: "Daily Note Upload", apiEndpoint: "daily_note_deals_upload", buttonColor: "success" },
 ];
 
 const MainUpload: React.FC = () => {
@@ -120,6 +66,7 @@ const MainUpload: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
 
   const apiUrl = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>, isMonashee = false) => {
     const selectedFile = event.target.files ? event.target.files[0] : null;
@@ -157,7 +104,11 @@ const MainUpload: React.FC = () => {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
-      });
+        onUploadProgress: (evt: ProgressEvent) => {
+          const pct = Math.round((evt.loaded * 100) / (evt.total || 1));
+          isMonashee ? setMonasheeUploadProgress(pct) : setUploadProgress(pct);
+        },
+      } as any);
 
       setSnackbarMessage(`${config.label} uploaded successfully.`);
       setOpenSnackbar(true);
@@ -179,20 +130,25 @@ const MainUpload: React.FC = () => {
     }
   };
 
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    // When user clicks "IPO Files" tab (index 2), navigate to dedicated page
+    if (newValue === 2) {
+      navigate("/ipouploads");
+      return;
+    }
+    setSelectedTab(newValue);
+  };
+
   return (
     <Box sx={{ backgroundColor: "#fff", minHeight: "100vh", py: 6 }}>
       <Container>
-        <Typography
-          variant="h5"
-          align="center"
-          sx={{ mb: 4, fontWeight: 600, color: "#b41f04" }}
-        >
+        <Typography variant="h5" align="center" sx={{ mb: 4, fontWeight: 600, color: "#b41f04" }}>
           Capital Markets Upload & Tools
         </Typography>
 
         <Tabs
           value={selectedTab}
-          onChange={(e, newValue) => setSelectedTab(newValue)}
+          onChange={handleTabChange}
           textColor="inherit"
           variant="fullWidth"
           indicatorColor="primary"
@@ -202,30 +158,21 @@ const MainUpload: React.FC = () => {
             mb: 4,
             fontWeight: 600,
             color: "white",
-            ".Mui-selected": {
-              color: "#ffd700 !important",
-            },
+            ".Mui-selected": { color: "#ffd700 !important" },
           }}
         >
           <Tab label="Monashee Data" />
           <Tab label="Upload" />
-          <Tab label="IPO Files" />
+          <Tab label="IPO Files" /> {/* routes to /ipouploads */}
           <Tab label="Downloads" />
           <Tab label="Calendar" />
           <Tab label="LK File" />
           <Tab label="FO Files" />
-
         </Tabs>
 
         <Box>
-
-
           {selectedTab === 0 && (
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
+            <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
               {monasheeActiveUpload === "daily_note_upload" ? (
                 <DailyNoteUpload />
               ) : (
@@ -248,8 +195,6 @@ const MainUpload: React.FC = () => {
             </motion.div>
           )}
 
-
-
           {selectedTab === 1 && (
             <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
               <UploadDataCard
@@ -270,17 +215,7 @@ const MainUpload: React.FC = () => {
             </motion.div>
           )}
 
-          {selectedTab === 2 && (
-            <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <Card elevation={3} sx={{ borderRadius: 3, p: 3, background: "linear-gradient(to right, #ffecd2, #fcb69f)" }}>
-                <Typography variant="h6" align="center" color="primary" sx={{ fontWeight: 600, mb: 2 }}>
-                  Upload IPO Files
-                </Typography>
-                <Divider sx={{ my: 2 }} />
-                <IPOS1FileUpload />
-              </Card>
-            </motion.div>
-          )}
+          {/* IPO Files moved to /ipouploads */}
 
           {selectedTab === 3 && (
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
@@ -323,7 +258,6 @@ const MainUpload: React.FC = () => {
             </motion.div>
           )}
 
-          
           {selectedTab === 6 && (
             <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
               <Card elevation={3} sx={{ borderRadius: 3, p: 3, background: "linear-gradient(to right, #ffecd2, #fcb69f)" }}>
@@ -335,8 +269,6 @@ const MainUpload: React.FC = () => {
               </Card>
             </motion.div>
           )}
-
-
         </Box>
 
         <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>

@@ -76,6 +76,7 @@ import UploadFactSetTickers from "../Components/Uploads/DailyMonasheeUploads/Upl
 import FSDealUnifiedMain from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/FactsetDataDetails/FSDealUnifiedMain";
 import DeleteUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/DeleteUnifiedDealData";
 import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTickersData";
+import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
 
 const AppRouters: React.FC = () => {
   return (
@@ -160,6 +161,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/uploads" element={<AuthGuard><MainUpload /></AuthGuard>} />
+        <Route path="/ipouploads" element={<AuthGuard><IPOUploadsPage /></AuthGuard>} />
         <Route path="/lk_upload" element={<AuthGuard><LkFileUpload /></AuthGuard>} />
         {/* <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} /> */}
         <Route path="/fs_upload" element={<AuthGuard><UploadFactSetTickers /></AuthGuard>} />
