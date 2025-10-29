@@ -44,11 +44,19 @@ const brand = {
 };
 
 const isPercentKey = (key: string) => /Percent|Return|Volatility/i.test(key);
+const LMV_KEYS = new Set([
+  "LMV",
+  "MTD_Daily_LMV_Avg",
+  "YTD_LMV_Daily_Avg",
+  "ITD_LMV_Daily_Avg",
+]);
 
 const formatValue = (key: string, value: number | string): string => {
   if (typeof value !== "number") return String(value ?? "");
-  if (key === "LMV") {
-    return `$ ${Math.round(value / 1_000_000).toLocaleString()} M`;
+  if (LMV_KEYS.has(key)) {
+    const sign = value < 0 ? "-" : "";
+    const magnitude = Math.abs(value);
+    return `${sign}$${Math.round(magnitude / 1_000_000).toLocaleString()}M`;
   }
   if (
     key === "Net_of_Hedge_PnL" ||
