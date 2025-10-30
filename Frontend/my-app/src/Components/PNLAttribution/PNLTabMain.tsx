@@ -16,6 +16,7 @@ import PnlAttributionMain from "./PnlAttributionMain";
 import PNLGraphsMain from "./PNLCharts/PNLGraphsMain";
 import PNLPagesMain from "./PNLPages/PNLPagesMain";
 import AttributionFundMainTab from "./AttributionFundMain/AttributionFundMainTab";
+import PNLRiskReportMain from "./RiskReportMain/PNLRiskReportMain";
 
 const PNLTabMain = () => {
   const navigate = useNavigate();
@@ -141,6 +142,23 @@ const PNLTabMain = () => {
                 </Box>
               }
             />
+             {/* <FormControlLabel
+              value="pnl_risk_report"
+              control={
+                <Radio
+                  sx={{
+                    color: "#00796b",
+                    "&.Mui-checked": { color: "#00796b" },
+                  }}
+                />
+              }
+              label={
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
+                  <BarChartIcon fontSize="small" />
+                  <Typography variant="h6">Risk Report to Fund</Typography>
+                </Box>
+              }
+            /> */}
           </RadioGroup>
         </FormControl>
       </Box>
@@ -157,6 +175,9 @@ const PNLTabMain = () => {
       </Fade>
       <Fade in={tab === "pnlfunddeatils"} timeout={400} mountOnEnter unmountOnExit>
         <Box>{tab === "pnlfunddeatils" && <AttributionFundMainTab />}</Box>
+      </Fade>
+        <Fade in={tab === "pnl_risk_report"} timeout={400} mountOnEnter unmountOnExit>
+        <Box>{tab === "pnl_risk_report" && <PNLRiskReportMain />}</Box>
       </Fade>
     </Box>
   );

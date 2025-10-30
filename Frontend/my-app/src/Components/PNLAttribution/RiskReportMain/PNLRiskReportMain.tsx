@@ -1,0 +1,185 @@
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Typography,
+  Paper,
+  Box,
+  Grid,
+  Select,
+  MenuItem,
+} from "@mui/material";
+
+import PNLLmvDataTablesMain from "./PNLLmvDataTablesMain";
+import DailyNetOfHedgeChart from "./DailyNetOfHedgeChart";
+import DtdTopBottomMainPNL from "./DtdTopBottomMainPNL";
+import PNLAttributionMarketCap from "./PNLAttributionMarketCap";
+import PNLFundReturnsChartsDifference from "./RiskReportPNLPortfolioTable";
+import RiskReportIndexPortfolioTable from "./RiskReportIndexPortfolioTable";
+import PNLSectorWiseFundDetails from "./PNLSectorWiseFundDetails";
+import RiskPDFExporter from "./RiskPDFExporter";
+import RiskReportDailyPnlvsVarChart from "./RiskReportDailyPnlvsVarChart";
+import RiskReportRegionWiseTable from "./RiskReportRegionWiseTable";
+import CumulativeFundReturnChart from "./CumulativeFundReturnChart";
+interface PNLRiskReportMainProps {
+  fund?: string;
+}
+
+const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
+  const fundOptions = [
+    "BEMAP2",
+    "FMAP",
+    "Mission Pure Alpha LP",
+    "Monashee Pure Alpha SPV I LP",
+    "MPAM",
+  ];
+
+  const [selectedFund, setSelectedFund] = useState(fund || "FMAP");
+  const [maxTradeDate, setMaxTradeDate] = useState<string>("");
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
+  // Fetch latest trade date whenever selectedFund changes
+  useEffect(() => {
+    const fetchMaxTradeDate = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/risk_report_max_trade_date/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ fund: selectedFund }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          console.error("Error fetching max trade date:", err);
+          setMaxTradeDate("N/A");
+          return;
+        }
+
+        const data = await res.json();
+        setMaxTradeDate(data.max_trade_date || "N/A");
+      } catch (error) {
+        console.error("Error fetching max trade date:", error);
+        setMaxTradeDate("N/A");
+      }
+    };
+
+    fetchMaxTradeDate();
+  }, [selectedFund, apiUrl, token]);
+
+  return (
+    <Container sx={{ mt: 4, mb: 4 }} maxWidth="xl">
+      {/* Header with Fund Selector */}
+      <Paper
+        elevation={8}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          backgroundColor: "#f9f9f9",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+          mb: 4,
+        }}
+      >
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" color="#002060" fontWeight={600}>
+              {selectedFund}: Summary as of{" "}
+              {maxTradeDate !== "N/A" ? maxTradeDate : "—"}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Box
+              display="flex"
+              justifyContent={{ xs: "flex-start", md: "flex-end" }}
+              gap={2}
+              mt={{ xs: 2, md: 0 }}
+            >
+              <Select
+                value={selectedFund}
+                onChange={(e) => setSelectedFund(e.target.value)}
+                size="small"
+                sx={{
+                  minWidth: 200,
+                  backgroundColor: "white",
+                  borderRadius: 1,
+                  "& fieldset": { borderColor: "#002060" },
+                  "&:hover fieldset": { borderColor: "#002060" },
+                }}
+              >
+                {fundOptions.map((f) => (
+                  <MenuItem key={f} value={f}>
+                    {f}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      {/* Main Exportable Content */}
+      <Box id="pdf-export-area">
+        <Box className="pdf-section">
+          <PNLLmvDataTablesMain fund={selectedFund} />
+        </Box>
+
+        <Grid container spacing={3} mt={2}>
+          <Grid item xs={12}>
+            <Box className="pdf-section">
+              <RiskReportRegionWiseTable fund={selectedFund} />
+            </Box>
+          </Grid>
+                    <Grid item xs={12}>
+            <Box className="pdf-section">
+              <CumulativeFundReturnChart fund={selectedFund} />
+            </Box>
+          </Grid>
+          <Grid item xs={12}>
+            <Box className="pdf-section">
+              <PNLAttributionMarketCap fund={selectedFund} />
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Box className="pdf-section">
+              <PNLSectorWiseFundDetails fund={selectedFund} />
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Box className="pdf-section">
+              <RiskReportDailyPnlvsVarChart fund={selectedFund} />
+            </Box>
+          </Grid>
+          <Grid item xs={12}>
+            <Box className="pdf-section">
+              <DtdTopBottomMainPNL fund={selectedFund} />
+            </Box>
+          </Grid>
+          <Grid item xs={12}>
+            <Box className="pdf-section">
+              <DailyNetOfHedgeChart fund={selectedFund} />
+            </Box>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Box className="pdf-section">
+              <PNLFundReturnsChartsDifference fund={selectedFund} />
+            </Box>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Box className="pdf-section">
+              <RiskReportIndexPortfolioTable fund={selectedFund} />
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+    </Container>
+  );
+};
+
+export default PNLRiskReportMain;

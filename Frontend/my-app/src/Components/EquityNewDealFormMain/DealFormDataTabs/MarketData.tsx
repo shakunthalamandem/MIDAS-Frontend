@@ -96,7 +96,7 @@ const MarketData: React.FC<FormSectionProps> = ({
         {renderField("Shares Outstanding", "shares_outstanding")}
 
         {renderField("% of Free Float", "percentage_of_free_float")}
-        {renderField("Short Interest ($M)", "short_interest")}
+        {renderField("Short Interest ($ M)", "short_interest")}
         {renderField(
           "Short Interest % of Deal",
           "short_interest_percentage_of_deal"
