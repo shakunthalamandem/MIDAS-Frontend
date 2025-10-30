@@ -76,6 +76,7 @@ import UploadFactSetTickers from "../Components/Uploads/DailyMonasheeUploads/Upl
 import FSDealUnifiedMain from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/FactsetDataDetails/FSDealUnifiedMain";
 import DeleteUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/DeleteUnifiedDealData";
 import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTickersData";
+import PNLRiskReportMain from "../Components/PNLAttribution/RiskReportMain/PNLRiskReportMain";
 
 const AppRouters: React.FC = () => {
   return (
@@ -235,6 +236,8 @@ const AppRouters: React.FC = () => {
         <Route path="/fs_new_deal_data" element={<AuthGuard><FSDealUnifiedMain /></AuthGuard>} />
 
         <Route path="/daily_note" element={<AuthGuard><DailyNoteDeleteTickersData /></AuthGuard>} />
+
+        <Route path="/riskreport" element={<AuthGuard><PNLRiskReportMain /></AuthGuard>} />
 
 
 
