@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Container,
@@ -14,8 +14,12 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Stack,
+  TextField,
+  InputAdornment,
+  Chip,
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 import { Link, useParams } from "react-router-dom";
 import { formatDate, formatDealSize } from "./IPOWriteUpUtils";
 import IPODashboardMain from "../../IPODashboardLLM/IPODashboardMain";
@@ -36,9 +40,12 @@ type FilterType = "upcoming" | "all";
 const WriteUpIPODashbaord: React.FC = () => {
   const { ticker: paramTicker } = useParams<{ ticker: string }>();
   const [ipoData, setIpoData] = useState<IpoData[]>([]);
-  const [selectedTicker, setSelectedTicker] = useState<string>(paramTicker || "");
+  const [selectedTicker, setSelectedTicker] = useState<string>(
+    paramTicker || ""
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [filterType, setFilterType] = useState<FilterType>("upcoming");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -47,7 +54,6 @@ const WriteUpIPODashbaord: React.FC = () => {
     const fetchIpoData = async () => {
       try {
         setLoading(true);
-
         const response = await fetch(
           `${apiUrl}/api/ipo_dashboard_data/?type=${filterType}`,
           {
@@ -57,12 +63,12 @@ const WriteUpIPODashbaord: React.FC = () => {
             },
           }
         );
-
         if (!response.ok) throw new Error("Failed to fetch IPO data");
 
         const json = await response.json();
         const data: IpoData[] = json.results || [];
 
+        // De-dup by ticker + pricing_date
         const uniqueRows = Array.from(
           new Map(
             data.map((item) => [`${item.ticker}_${item.pricing_date}`, item])
@@ -82,38 +88,46 @@ const WriteUpIPODashbaord: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchIpoData();
-  }, [apiUrl, token, paramTicker, filterType, selectedTicker]);
+    // Note: exclude selectedTicker from deps to avoid re-fetch loops
+  }, [apiUrl, token, paramTicker, filterType]);
+
+  // Filter by ticker or company name
+  const filteredData = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return ipoData;
+    return ipoData.filter(
+      (row) =>
+        row.ticker.toLowerCase().includes(q) ||
+        (row.company_name || "").toLowerCase().includes(q)
+    );
+  }, [ipoData, searchQuery]);
+
+  const headerTitle =
+    filterType === "all"
+      ? "Explore All IPO Listings"
+      : "Upcoming IPO Opportunities";
 
   return (
     <>
-      {/* Header */}
-      <Typography
-        variant="body2"
+      {/* Header bar (simple, clean) */}
+      <Box
         sx={{
-          fontWeight: 500,
-          color: "#FFFFFF",
-          fontSize: { xs: "1rem", sm: "1.2rem" },
-          backgroundColor: "#002060",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "4vh",
-          padding: "8px 16px",
-          borderRadius: "8px",
+          backgroundColor: "#0b2a6b",
+          color: "#fff",
+          py: 1.2,
           textAlign: "center",
-          marginBottom: "40px",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-          animation: "fadeIn 1.5s ease-in-out",
-          "@keyframes fadeIn": {
-            "0%": { opacity: 0 },
-            "100%": { opacity: 1 },
-          },
+          mb: 3,
+          boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
         }}
       >
-        Welcome to detailed Insights on IPO - {selectedTicker || "Loading..."}
-      </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: 600, letterSpacing: 0.2 }}
+        >
+          IPO Insights — {selectedTicker || "Select a symbol"}
+        </Typography>
+      </Box>
 
       <Container maxWidth="lg">
         <Box
@@ -126,75 +140,115 @@ const WriteUpIPODashbaord: React.FC = () => {
             mb: 4,
           }}
         >
-<Stack
-  direction="row"
-  spacing={2}
-  mb={2}
-  alignItems="center"
-  justifyContent="space-between"
-  sx={{ width: "100%" }}
->
-  {/* Centered heading */}
-  <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
-    <Typography
-      variant="h6"
-      fontWeight="bold"
-      textAlign="center"
-      color="#002060"
-    >
-      📅 {filterType === "all" ? "All IPOs" : "Upcoming IPOs"}
-    </Typography>
-  </Box>
+          {/* Top controls: title (left) | chips (center) | toggle + search (right) */}
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+            mb={2}
+            alignItems={{ xs: "stretch", md: "center" }}
+            justifyContent="space-between"
+          >
+            {/* Heading */}
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              color="#0b2a6b"
+              sx={{ lineHeight: 1 }}
+            >
+              {headerTitle}
+            </Typography>
 
-  {/* Right-aligned toggle group */}
-  <ToggleButtonGroup
-    value={filterType}
-    exclusive
-    size="small"
-    onChange={(_, v) => v && setFilterType(v)}
-    sx={{ justifySelf: "flex-end" }}
-  >
-    <ToggleButton
-      value="upcoming"
-      sx={{
-        "&.Mui-selected, &.Mui-selected:hover": {
-          backgroundColor: "#002060",
-          color: "#fff",
-        },
-      }}
-    >
-      Upcoming
-    </ToggleButton>
-    <ToggleButton
-      value="all"
-      sx={{
-        "&.Mui-selected, &.Mui-selected:hover": {
-          backgroundColor: "#002060",
-          color: "#fff",
-        },
-      }}
-    >
-      All
-    </ToggleButton>
-  </ToggleButtonGroup>
-</Stack>
+            {/* Right controls: Toggle + Search */}
+            <Stack
+              direction="row"
+              spacing={1.5}
+              alignItems="center"
+              justifyContent="flex-end"
+              sx={{ width: { xs: "100%", md: "auto" } }}
+            >
+              <ToggleButtonGroup
+                value={filterType}
+                exclusive
+                size="small"
+                onChange={(_, v) => v && setFilterType(v)}
+                sx={{
+                  borderRadius: 2,
+                  "& .MuiToggleButton-root": {
+                    px: 1.5,
+                    py: 0.5,
+                    fontSize: "0.8rem",
+                    textTransform: "none",
+                    borderColor: "#cbd5e1",
+                  },
+                  "& .Mui-selected": {
+                    backgroundColor: "#0b2a6b !important",
+                    color: "#fff !important",
+                    borderColor: "#0b2a6b !important",
+                  },
+                }}
+              >
+                <ToggleButton value="upcoming">Upcoming</ToggleButton>
+                <ToggleButton value="all">All</ToggleButton>
+              </ToggleButtonGroup>
 
+              <TextField
+                placeholder="Search ticker or company…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                size="small"
+                sx={{ minWidth: 260, backgroundColor: "#fff", borderRadius: 1 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Stack>
+          </Stack>
 
           {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center" height="30vh">
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="30vh"
+            >
               <CircularProgress color="primary" />
+            </Box>
+          ) : filteredData.length === 0 ? (
+            <Box
+              sx={{
+                py: 8,
+                textAlign: "center",
+                color: "text.secondary",
+                border: "1px dashed #cbd5e1",
+                borderRadius: 2,
+                backgroundColor: "#fff",
+              }}
+            >
+              <Typography variant="body1" sx={{ mb: 0.5 }}>
+                No IPOs match your search/filter.
+              </Typography>
+              <Typography variant="body2">
+                Try clearing the search or switching filters.
+              </Typography>
             </Box>
           ) : (
             <TableContainer
               component={Paper}
-              sx={{ borderRadius: 2, maxHeight: 350, overflow: "auto" }}  
+              sx={{ borderRadius: 2, maxHeight: 380, overflow: "auto" }}
             >
               <Table
-                stickyHeader  
-                sx={{ borderCollapse: "collapse", border: "1px solid black" }}
+                stickyHeader
+                sx={{
+                  borderCollapse: "collapse",
+                  border: "1px solid black",
+                }}
               >
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: "#002060" }}>
+                  <TableRow sx={{ backgroundColor: "#0b2a6b" }}>
                     {[
                       "Symbol",
                       "Company",
@@ -209,12 +263,13 @@ const WriteUpIPODashbaord: React.FC = () => {
                         align="center"
                         sx={{
                           color: "#fff",
-                          fontWeight: 600,
-                          fontSize: "0.78rem",
-                          padding: "6px 8px",
+                          fontWeight: 700,
+                          fontSize: "0.8rem",
+                          padding: "7px 8px",
                           border: "1px solid black",
                           lineHeight: 1.2,
-                          backgroundColor: "#002060",
+                          backgroundColor: "#0b2a6b",
+                          whiteSpace: "nowrap",
                         }}
                       >
                         {heading}
@@ -224,14 +279,16 @@ const WriteUpIPODashbaord: React.FC = () => {
                 </TableHead>
 
                 <TableBody>
-                  {ipoData.map((row, index) => (
+                  {filteredData.map((row, index) => (
                     <TableRow
-                      key={index}
+                      key={`${row.ticker}_${row.pricing_date}_${index}`}
                       hover
+                      onClick={() => setSelectedTicker(row.ticker)}
                       sx={{
-                        "&:hover": { backgroundColor: "#f0f8ff" },
+                        cursor: "pointer",
+                        "&:hover": { backgroundColor: "#f3f8ff" },
                         backgroundColor:
-                          row.ticker === selectedTicker ? "#e6f7ff" : "inherit",
+                          row.ticker === selectedTicker ? "#e6f3ff" : "inherit",
                         border: "1px solid black",
                       }}
                     >
@@ -239,20 +296,20 @@ const WriteUpIPODashbaord: React.FC = () => {
                       <TableCell
                         align="center"
                         sx={{
-                          fontSize: "0.78rem",
-                          padding: "6px 8px",
+                          fontSize: "0.82rem",
+                          padding: "7px 8px",
                           border: "1px solid black",
-                          fontWeight: 600,
+                          fontWeight: 700,
                           lineHeight: 1.2,
+                          color: "#b10f0f",
                         }}
                       >
                         <Link
                           to={`/equity/ipo_dashboard/${row.ticker}`}
                           state={{ fromTickerClick: true }}
-                          onClick={() => setSelectedTicker(row.ticker)}
                           style={{
-                            color: "#d80606ff",
-                            fontWeight: "bold",
+                            color: "inherit",
+                            fontWeight: 700,
                             textDecoration: "underline",
                           }}
                         >
@@ -261,34 +318,85 @@ const WriteUpIPODashbaord: React.FC = () => {
                       </TableCell>
 
                       {/* Company */}
-                      <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          fontSize: "0.82rem",
+                          padding: "7px 8px",
+                          border: "1px solid black",
+                          lineHeight: 1.2,
+                        }}
+                      >
                         {row.company_name}
                       </TableCell>
 
                       {/* Pricing Date */}
-                      <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          fontSize: "0.82rem",
+                          padding: "7px 8px",
+                          border: "1px solid black",
+                          lineHeight: 1.2,
+                        }}
+                      >
                         {formatDate(row.pricing_date)}
                       </TableCell>
 
                       {/* Sector */}
-                      <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          fontSize: "0.82rem",
+                          padding: "7px 8px",
+                          border: "1px solid black",
+                          lineHeight: 1.2,
+                        }}
+                      >
                         {row.sector || "—"}
                       </TableCell>
 
                       {/* Price Range */}
-                      <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
-                        {row.pricing_range_min !== null && row.pricing_range_max !== null
-                          ? `$${row.pricing_range_min} - $${row.pricing_range_max}`
+                      <TableCell
+                        align="center"
+                        sx={{
+                          fontSize: "0.82rem",
+                          padding: "7px 8px",
+                          border: "1px solid black",
+                          lineHeight: 1.2,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {row.pricing_range_min !== null &&
+                        row.pricing_range_max !== null
+                          ? `$${row.pricing_range_min} – $${row.pricing_range_max}`
                           : "TBA"}
                       </TableCell>
 
                       {/* Exchange */}
-                      <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          fontSize: "0.82rem",
+                          padding: "7px 8px",
+                          border: "1px solid black",
+                          lineHeight: 1.2,
+                        }}
+                      >
                         {row.exchange || "—"}
                       </TableCell>
 
                       {/* Deal Size */}
-                      <TableCell align="center" sx={{ fontSize: "0.78rem", padding: "6px 8px", border: "1px solid black", lineHeight: 1.2 }}>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          fontSize: "0.82rem",
+                          padding: "7px 8px",
+                          border: "1px solid black",
+                          lineHeight: 1.2,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
                         {formatDealSize(row.deal_size)}
                       </TableCell>
                     </TableRow>
@@ -310,14 +418,15 @@ const WriteUpIPODashbaord: React.FC = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            gap: 0.5,
           }}
         >
-          <InfoOutlinedIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
+          <InfoOutlinedIcon fontSize="small" color="action" />
           Note: IPO deals above $50M offer size.
         </Typography>
       </Container>
 
-      {/* ✅ Render Dashboard only when data + ticker are ready */}
+      {/* Dashboard (below table) */}
       <IPODashboardMain selectedTicker={selectedTicker} />
     </>
   );
