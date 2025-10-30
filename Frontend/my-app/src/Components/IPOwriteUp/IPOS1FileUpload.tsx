@@ -21,14 +21,14 @@ import { SelectChangeEvent } from "@mui/material";
 
 type Region = "US" | "HK" | "EMEA";
 type USDocType = "S1" | "Report Card";
-type HKDocType = "A1" | "Additional Analytics";
+type HKDocType = "A1" | "Additional Documents";
 type EMEADocType = "All Analytic Documents";
 type DocType = USDocType | HKDocType | EMEADocType;
 
 const REGION_OPTIONS: Region[] = ["US", "HK", "EMEA"];
 const REGION_TO_TYPES: Record<Region, DocType[]> = {
   US: ["S1", "Report Card"],
-  HK: ["A1", "Additional Analytics"],
+  HK: ["A1", "Additional Documents"],
   EMEA: ["All Analytic Documents"],
 };
 
@@ -59,7 +59,7 @@ const endpointFor = (region: Region, docType?: DocType) => {
   if (region === "US" && docType === "Report Card")
     return "upload_ipo_s1_categories";
   if (region === "HK" && docType === "A1") return "upload_s1";
-  if (region === "HK" && docType === "Additional Analytics")
+  if (region === "HK" && docType === "Additional Documents")
     return "update_ipo_s1_ai";
   return undefined;
 };
