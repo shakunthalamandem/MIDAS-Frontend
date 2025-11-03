@@ -27,8 +27,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
-
-
 // ---------- ✅ Types ----------
 interface RevenueGrowthItem {
   color?: string;
@@ -80,7 +78,6 @@ const getColorHex = (color: string | null | undefined) => {
   }
 };
 
-// ---------- ✅ Component ----------
 const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
   selectedTicker,
   ipodata,
@@ -92,11 +89,8 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [localRevenueGrowth, setLocalRevenueGrowth] = useState<RevenueGrowth>({});
 
-
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-
-  // const revenueGrowth = ipodata?.revenue_growth || {};
 
   const getAuthHeaders = () => ({
     "Content-Type": "application/json",
@@ -123,13 +117,13 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
           throw new Error(errData.message || "Failed to fetch revenue growth data");
         }
 
-    const data: RevenueGrowth = await response.json();
-    if (data && typeof data === "object") {
-      setLocalRevenueGrowth(data); // <-- update local state
-      setIpoData((prev: IPOData) => ({
-        ...prev,
-        revenue_growth: data,
-      }));
+        const data: RevenueGrowth = await response.json();
+        if (data && typeof data === "object") {
+          setLocalRevenueGrowth(data);
+          setIpoData((prev: IPOData) => ({
+            ...prev,
+            revenue_growth: data,
+          }));
         } else {
           setError("No revenue growth data available.");
         }
@@ -144,8 +138,8 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
       fetchRevenueGrowthData();
     }
   }, [selectedTicker, apiUrl, setIpoData]);
-  const revenueGrowth = localRevenueGrowth; // <-- use local state for rendering
 
+  const revenueGrowth = localRevenueGrowth;
 
   const handleSaveRevenueGrowthData = async () => {
     try {
@@ -174,8 +168,7 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
         ...prev,
         revenue_growth: payload.revenue_growth,
       }));
-            setLocalRevenueGrowth(payload.revenue_growth); // <-- Add this line
-
+      setLocalRevenueGrowth(payload.revenue_growth);
 
       setEditedData({});
       setEditMode(false);
@@ -210,211 +203,278 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
+  // ---------- 🔍 Decide which rows to show & which are empty ----------
+  const filledCriteria = criteriaList.filter((item) => {
+    const original = revenueGrowth[item.key];
+    const category = original?.category?.trim();
+    return !!category;
+  });
+
+  const emptyCriteria = criteriaList.filter((item) => {
+    const original = revenueGrowth[item.key];
+    const category = original?.category?.trim();
+    return !category;
+  });
+
+  const rowsToRender = editMode ? criteriaList : filledCriteria;
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 30 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <Card
+          sx={{
+            borderRadius: 2,
+            background: "#fff",
+            boxShadow: "0 12px 24px rgba(0,0,0,0.05)",
+            overflowX: "auto",
+          }}
         >
-          <Card
-            sx={{
-              borderRadius: 2,
-              background: "#fff",
-              boxShadow: "0 12px 24px rgba(0,0,0,0.05)",
-              overflowX: "auto",
-            }}
-          >
-            <CardContent>
-<Box position="relative" mb={2}>
-  <Box display="flex" alignItems="center" justifyContent="center">
-    <Typography
-      variant="h6"
-      align="center"
-      sx={{ fontWeight: 700, color: "#002060", mr: 1 }}
-    >
-      Key Metrics
-    </Typography>
+          <CardContent>
+            <Box position="relative" mb={2}>
+              <Box display="flex" alignItems="center" justifyContent="center">
+                <Typography
+                  variant="h6"
+                  align="center"
+                  sx={{ fontWeight: 700, color: "#002060", mr: 1 }}
+                >
+                  Key Metrics
+                </Typography>
 
-    {/* Info Icon Tooltip */}
-    <Tooltip
-      title={
-       <List dense>
-  <Typography
-    variant="body2"
-    sx={{ fontSize: "1rem", color: "#002060", fontWeight: "bold", mb: 1 }}
-  >
-    Color Key:
-  </Typography>
+                {/* Info Icon Tooltip */}
+                <Tooltip
+                  title={
+                    <List dense>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: "1rem",
+                          color: "#002060",
+                          fontWeight: "bold",
+                          mb: 1,
+                        }}
+                      >
+                        Color Key:
+                      </Typography>
 
-  <ListItem sx={{ py: 0 }}>
-    <ListItemIcon sx={{ minWidth: 24 }}>
-      <FiberManualRecordIcon sx={{ fontSize: 12, color: "#ff4d4f" }} />
-    </ListItemIcon>
-    <ListItemText primary="Red = Negative" />
-  </ListItem>
+                      <ListItem sx={{ py: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 24 }}>
+                          <FiberManualRecordIcon
+                            sx={{ fontSize: 12, color: "#ff4d4f" }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText primary="Red = Negative" />
+                      </ListItem>
 
-  <ListItem sx={{ py: 0 }}>
-    <ListItemIcon sx={{ minWidth: 24 }}>
-      <FiberManualRecordIcon sx={{ fontSize: 12, color: "#ffcc00" }} />
-    </ListItemIcon>
-    <ListItemText primary="Yellow = Neutral" />
-  </ListItem>
+                      <ListItem sx={{ py: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 24 }}>
+                          <FiberManualRecordIcon
+                            sx={{ fontSize: 12, color: "#ffcc00" }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText primary="Yellow = Neutral" />
+                      </ListItem>
 
-  <ListItem sx={{ py: 0 }}>
-    <ListItemIcon sx={{ minWidth: 24 }}>
-      <FiberManualRecordIcon sx={{ fontSize: 12, color: "#3ba55d" }} />
-    </ListItemIcon>
-    <ListItemText primary="Green = Positive" />
-  </ListItem>
-</List>
-      }
-      arrow
-    >
-      <IconButton size="small">
-        <InfoOutlinedIcon sx={{ color: "#7e7e7eff" }} />
-      </IconButton>
-    </Tooltip>
-  </Box>
+                      <ListItem sx={{ py: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 24 }}>
+                          <FiberManualRecordIcon
+                            sx={{ fontSize: 12, color: "#3ba55d" }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText primary="Green = Positive" />
+                      </ListItem>
+                    </List>
+                  }
+                  arrow
+                >
+                  <IconButton size="small">
+                    <InfoOutlinedIcon sx={{ color: "#7e7e7eff" }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
 
-  {/* Edit / Save / Cancel buttons on the right */}
-  <Box
-    position="absolute"
-    right={0}
-    top="50%"
-    sx={{ transform: "translateY(-50%)" }}
-  >
-    {editMode ? (
-      <>
-        <IconButton color="primary" onClick={handleSaveRevenueGrowthData}>
-          <SaveIcon />
-        </IconButton>
-        <IconButton color="secondary" onClick={handleCancel}>
-          <CancelIcon />
-        </IconButton>
-      </>
-    ) : (
-      <IconButton onClick={() => setEditMode(true)}>
-        <EditIcon fontSize="small" />
-      </IconButton>
-    )}
-  </Box>
-</Box>
+              {/* Edit / Save / Cancel buttons on the right */}
+              <Box
+                position="absolute"
+                right={0}
+                top="50%"
+                sx={{ transform: "translateY(-50%)" }}
+              >
+                {editMode ? (
+                  <>
+                    <IconButton color="primary" onClick={handleSaveRevenueGrowthData}>
+                      <SaveIcon />
+                    </IconButton>
+                    <IconButton color="secondary" onClick={handleCancel}>
+                      <CancelIcon />
+                    </IconButton>
+                  </>
+                ) : (
+                  <IconButton onClick={() => setEditMode(true)}>
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
+            </Box>
 
+            <Table sx={{ border: "2px solid #ccc" }}>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#002060" }}>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      borderRight: "2px solid #ccc",
+                      width: "250px",
+                      color: "#fff",
+                    }}
+                  >
+                    Criteria
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      width: "100px",
+                      textAlign: "center",
+                      borderRight: "2px solid #ccc",
+                      color: "#fff",
+                    }}
+                  >
+                    Color
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      width: "auto",
+                      color: "#fff",
+                    }}
+                  >
+                    Notes
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-              <Table sx={{ border: "2px solid #ccc" }}>
-<TableHead>
-  <TableRow sx={{ backgroundColor: "#002060" }} >
-    <TableCell
-      sx={{
-        fontWeight: 600,
-        borderRight: "2px solid #ccc",
-        width: "250px", // Fixed width for Criteria
-        color: "#fff",
-      }}
-    >
-      Criteria
-    </TableCell>
-    <TableCell
-      sx={{
-        fontWeight: 600,
-        width: "100px", // Fixed width for Color
-        textAlign: "center",
-        borderRight: "2px solid #ccc",
-        color: "#fff",
-      }}
-    >
-      Color
-    </TableCell>
-    <TableCell
-      sx={{
-        fontWeight: 600,
-        width: "auto", // Remaining space for Notes
-        color: "#fff",
-      }}
-    >
-      Notes
-    </TableCell>
-  </TableRow>
-</TableHead>
+              <TableBody>
+                {rowsToRender.map((item) => {
+                  const original = revenueGrowth[item.key] || {};
+                  const edited = editedData[item.key] || {};
+                  const value = editMode
+                    ? edited.category ?? original.category
+                    : original.category;
+                  const color = editMode
+                    ? edited.color ?? original.color
+                    : original.color;
 
-                <TableBody>
-                  {criteriaList.map((item) => {
-                    const original = revenueGrowth[item.key] || {};
-                    const edited = editedData[item.key] || {};
-                    const value = editMode ? edited.category ?? original.category : original.category;
-                    const color = editMode ? edited.color ?? original.color : original.color;
+                  return (
+                    <TableRow key={item.key} sx={{ verticalAlign: "top" }}>
+                      <TableCell
+                        sx={{
+                          borderRight: "2px solid #ccc",
+                          fontWeight: 500,
+                          fontSize: "1rem",
+                        }}
+                      >
+                        {item.label}
+                      </TableCell>
 
-                    return (
-                      <TableRow key={item.key} sx={{ verticalAlign: "top" }}>
-                        <TableCell sx={{ borderRight: "2px solid #ccc", fontWeight: 500,fontSize:'1rem' }}>
-                          {item.label}
-                        </TableCell>
-
-                        <TableCell align="center" sx={{ borderRight: "2px solid #ccc" }}>
-                          {editMode ? (
-                            <Box display="flex" justifyContent="center" gap={1}>
-                              {["red", "yellow", "green"].map((c) => {
-                                const isSelected = color === c;
-                                return (
-                                  <IconButton
-                                    key={c}
-                                    onClick={() => handleColorChange(item.key, c)}
-                                    size="small"
-                                    sx={{
-                                      backgroundColor: isSelected ? getColorHex(c) : lightColorMap[c],
-                                      border: isSelected ? "2px solid #000" : "1px solid #aaa",
-                                      borderRadius: "50%",
-                                      width: 28,
-                                      height: 28,
-                                    }}
-                                  />
-                                );
-                              })}
-                            </Box>
-                          ) : (
-                            <Tooltip title={value || "N/A"}>
-                              <CircleIcon fontSize="small" sx={{ color: getColorHex(color) }} />
-                            </Tooltip>
-                          )}
-                        </TableCell>
-
-                        <TableCell>
-                          {editMode ? (
-                            <TextField
-                              fullWidth
-                              size="small"
-                              placeholder="Enter note"
-                              value={value || ""}
-                              onChange={(e) =>
-                                setEditedData((prev) => ({
-                                  ...prev,
-                                  [item.key]: {
-                                    ...prev[item.key],
-                                    category: e.target.value,
-                                    color: color,
-                                  },
-                                }))
-                              }
+                      <TableCell
+                        align="center"
+                        sx={{ borderRight: "2px solid #ccc" }}
+                      >
+                        {editMode ? (
+                          <Box display="flex" justifyContent="center" gap={1}>
+                            {["red", "yellow", "green"].map((c) => {
+                              const isSelected = color === c;
+                              return (
+                                <IconButton
+                                  key={c}
+                                  onClick={() => handleColorChange(item.key, c)}
+                                  size="small"
+                                  sx={{
+                                    backgroundColor: isSelected
+                                      ? getColorHex(c)
+                                      : lightColorMap[c],
+                                    border: isSelected
+                                      ? "2px solid #000"
+                                      : "1px solid #aaa",
+                                    borderRadius: "50%",
+                                    width: 28,
+                                    height: 28,
+                                  }}
+                                />
+                              );
+                            })}
+                          </Box>
+                        ) : (
+                          <Tooltip title={value || ""}>
+                            <CircleIcon
+                              fontSize="small"
+                              sx={{ color: getColorHex(color) }}
                             />
-                          ) : (
-                            <Typography sx={{ color: "#333", fontSize: "1rem" }}>
-                              {value || "No data available"}
-                            </Typography>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                          </Tooltip>
+                        )}
+                      </TableCell>
 
-              {/* Footnote section */}
-             
+                      <TableCell>
+                        {editMode ? (
+                          <TextField
+                            fullWidth
+                            size="small"
+                            placeholder="Enter note"
+                            value={value || ""}
+                            onChange={(e) =>
+                              setEditedData((prev) => ({
+                                ...prev,
+                                [item.key]: {
+                                  ...prev[item.key],
+                                  category: e.target.value,
+                                  color: color,
+                                },
+                              }))
+                            }
+                          />
+                        ) : (
+                          <Typography sx={{ color: "#333", fontSize: "1rem" }}>
+                            {value}
+                          </Typography>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
 
-            </CardContent>
-          </Card>
-        </motion.div>
+            {/* ---------- 📝 Empty fields hint (view mode only) ---------- */}
+            {!editMode && emptyCriteria.length > 0 && (
+              <Box
+                mt={2}
+                p={1.5}
+                sx={{
+                  borderRadius: 1,
+                  border: "1px dashed #ccc",
+                  backgroundColor: "#fafafa",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 600, mb: 0.5 }}
+                >
+                  The empty fields are:
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 0.5 }}>
+                  {emptyCriteria.map((c) => c.label).join(", ")}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  You can click on the edit icon to fill these metrics.
+                </Typography>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
     </Container>
   );
 };
