@@ -31,6 +31,8 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
     "Mission Pure Alpha LP",
     "Monashee Pure Alpha SPV I LP",
     "MPAM",
+    "BHM",
+    "GEPT",
   ];
 
   const [selectedFund, setSelectedFund] = useState(fund || "FMAP");
