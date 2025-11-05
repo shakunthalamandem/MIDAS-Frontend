@@ -1,15 +1,10 @@
 // src/components/IPODashboardMain/ValuationImagePanel.tsx
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Slider,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Slider, Typography } from "@mui/material";
 
 type Props = {
   editMode: boolean;
-  valuationImageId: string | null;   // backend sends this ID
+  valuationImageId: string | null; // backend sends this ID
   apiUrl?: string;
   token: string | null;
   imageFile: File | null;
@@ -30,7 +25,7 @@ const ValuationImagePanel: React.FC<Props> = ({
   const [imageScale, setImageScale] = useState<number>(100);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // ---- When user selects a local file, build a preview ----
+  // Local file preview
   useEffect(() => {
     if (!imageFile) return;
 
@@ -42,12 +37,10 @@ const ValuationImagePanel: React.FC<Props> = ({
     reader.readAsDataURL(imageFile);
   }, [imageFile, setUploadError]);
 
-  // ---- Fetch remote image from backend (DriveImageAPIView) ----
+  // Remote image fetch
   useEffect(() => {
-    // If there's no API URL or no image ID, do nothing
     if (!apiUrl || !valuationImageId) return;
-    // If the user already picked a local file, prefer that and don't fetch
-    if (imageFile) return;
+    if (imageFile) return; // prefer local file if user picked one
 
     let cancelled = false;
 
@@ -110,7 +103,7 @@ const ValuationImagePanel: React.FC<Props> = ({
 
   const hasPreview = Boolean(previewUrl);
 
-  // In pure view mode with no preview, don't render anything
+  // In pure view mode with no preview, render nothing
   if (!editMode && !hasPreview) {
     return null;
   }
@@ -123,10 +116,7 @@ const ValuationImagePanel: React.FC<Props> = ({
         gap: 1,
       }}
     >
-      <Typography
-        variant="subtitle2"
-        sx={{ fontWeight: 600, mb: 0.5 }}
-      >
+      <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
         Supporting Valuation Image
       </Typography>
 
@@ -181,9 +171,7 @@ const ValuationImagePanel: React.FC<Props> = ({
 
           {editMode && (
             <Box sx={{ mt: 1 }}>
-              <Typography variant="caption">
-                Adjust image size
-              </Typography>
+              <Typography variant="caption">Adjust image size</Typography>
               <Slider
                 size="small"
                 value={imageScale}

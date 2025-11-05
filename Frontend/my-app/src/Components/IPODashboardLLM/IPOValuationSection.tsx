@@ -9,6 +9,7 @@ import {
   IconButton,
   TextField,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -31,9 +32,8 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
   const [editValuationMode, setEditValuationMode] = useState(false);
   const [editedValuation, setEditedValuation] = useState<string[]>(valuation);
   const [uploadError, setUploadError] = useState<string | null>(null);
-
-  // Image file to send on PATCH
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const handleAddValuationLine = (index: number) => {
     const updated = [...editedValuation];
@@ -54,6 +54,7 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
   };
 
   const handleCancelValuation = () => {
+    if (saving) return; // don't allow cancel mid-save
     setEditedValuation(Array.isArray(valuation) ? valuation : []);
     setImageFile(null);
     setUploadError(null);
@@ -65,6 +66,9 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
       if (!apiUrl) throw new Error("API URL not defined");
       if (!selectedData.ticker_name) throw new Error("Ticker name is missing");
 
+      setSaving(true);
+      setUploadError(null);
+
       const cleaned = (editedValuation || []).filter(
         (item) => item.trim() !== ""
       );
@@ -75,7 +79,6 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
       formData.append("valuation", formatted);
 
       if (imageFile) {
-        // Backend expects this field name
         formData.append("valuation_image", imageFile);
       }
 
@@ -83,7 +86,7 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
         method: "PATCH",
         headers: {
           Authorization: token ? `Bearer ${token}` : "",
-          // No Content-Type: browser sets multipart boundary
+          // don't set Content-Type manually for FormData
         },
         body: formData,
       });
@@ -91,25 +94,27 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
       const resJson = await response.json();
 
       if (!response.ok) {
-        throw new Error(resJson.message || "Failed to save valuation");
+        throw new Error(resJson.message || resJson.error || "Failed to save valuation");
       }
 
-      // Sync bullets with selectedData (your previous pattern)
+      // Sync bullets with selectedData
       selectedData.valuation = cleaned;
 
-      // If backend returns a new ID, save it back
+      // If backend returns a new image ID, save it back
       if (resJson.valuation_image_url) {
         selectedData.valuation_image_url = resJson.valuation_image_url;
       }
 
       setEditValuationMode(false);
       setUploadError(null);
+      setImageFile(null);
     } catch (err: any) {
       setUploadError(err.message || "Unknown error occurred");
+    } finally {
+      setSaving(false);
     }
   };
 
-  // ----- View mode valuation list -----
   const renderValuationList = () => {
     return Array.isArray(valuation) && valuation.length > 0 ? (
       <Box component="ul" sx={{ pl: 3, color: "#333", mt: 1 }}>
@@ -129,17 +134,10 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
     );
   };
 
-  // ----- Edit mode valuation editor -----
   const renderEditValuation = () => (
     <>
       {editedValuation.map((item, index) => (
-        <Box
-          key={index}
-          display="flex"
-          alignItems="center"
-          gap={1}
-          mb={1}
-        >
+        <Box key={index} display="flex" alignItems="center" gap={1} mb={1}>
           <TextField
             value={item}
             onChange={(e) => {
@@ -171,19 +169,13 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
         </Box>
       ))}
       {editedValuation.length === 0 && (
-        <Button
-          variant="outlined"
-          onClick={() => handleAddValuationLine(-1)}
-        >
+        <Button variant="outlined" onClick={() => handleAddValuationLine(-1)}>
           Add First Point
         </Button>
       )}
     </>
   );
 
-  // Show 2-column layout if:
-  // - In edit mode (so user can upload an image), OR
-  // - We have either an image ID from backend or a newly selected image file
   const showImageColumn =
     editValuationMode ||
     Boolean(selectedData.valuation_image_url) ||
@@ -210,19 +202,34 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
           justifyContent="center"
           alignItems="center"
         >
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, color: "#002060" }}
-          >
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
             Valuation Information
           </Typography>
-          <Box position="absolute" right={24}>
+
+          <Box position="absolute" right={24} display="flex" gap={1}>
             {editValuationMode ? (
               <>
-                <IconButton color="primary" onClick={handleSaveValuation}>
-                  <SaveIcon />
-                </IconButton>
-                <IconButton color="secondary" onClick={handleCancelValuation}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  onClick={handleSaveValuation}
+                  disabled={saving}
+                  startIcon={
+                    saving ? (
+                      <CircularProgress size={16} />
+                    ) : (
+                      <SaveIcon fontSize="small" />
+                    )
+                  }
+                >
+                  {saving ? "Saving..." : "Save"}
+                </Button>
+                <IconButton
+                  color="secondary"
+                  onClick={handleCancelValuation}
+                  disabled={saving}
+                >
                   <CancelIcon />
                 </IconButton>
               </>
@@ -234,6 +241,22 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
           </Box>
         </Box>
 
+        {/* Subtle helper text when saving */}
+        {saving && (
+          <Box
+            px={3}
+            pt={1}
+            display="flex"
+            alignItems="center"
+            gap={1}
+            justifyContent="flex-end"
+          >
+            <Typography variant="caption" sx={{ color: "#555" }}>
+              Uploading image & saving valuation… Please wait.
+            </Typography>
+          </Box>
+        )}
+
         {/* Body */}
         <CardContent sx={{ px: 3, pb: 3 }}>
           <Box
@@ -244,7 +267,7 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
               minHeight: 300,
             }}
           >
-            {/* Left: valuation text (100% or 70%) */}
+            {/* Left side */}
             <Box
               sx={{
                 flex: showImageColumn ? 7 : 1,
@@ -264,7 +287,7 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
               )}
             </Box>
 
-            {/* Right: image panel (30%) */}
+            {/* Right side: image panel */}
             {showImageColumn && (
               <Box
                 sx={{
