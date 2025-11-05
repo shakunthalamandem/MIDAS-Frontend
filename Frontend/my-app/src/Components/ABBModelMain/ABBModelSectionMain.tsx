@@ -1,12 +1,8 @@
 import React, { FormEvent, useCallback, useState } from 'react';
+import { Card, CardContent, Container, Typography } from '@mui/material';
 import ABBSection1 from './ABBSection1';
 import ABBSection2 from './ABBSection2';
 import ABBSection3 from './ABBSection3';
-import ABBSection4 from './ABBSection4';
-import ABBSection5 from './ABBSection5';
-import ABBSection6 from './ABBSection6';
-import ABBSection7 from './ABBSection7';
-import ABBSection8 from './ABBSection8';
 import type { ABBFactsetResponse, ABBSectionProps } from './ABBSection.types';
 import './ABBModelSectionMain.css';
 
@@ -25,31 +21,6 @@ const sectionData: ABBSectionProps[] = [
     title: 'Operational Insights',
     description: 'Operational performance indicators and process efficiency insights.',
     highlights: ['Throughput analysis', 'Cycle-time improvements', 'Resource utilization'],
-  },
-  {
-    title: 'Customer Segmentation',
-    description: 'Segmentation of customers with tailored engagement strategies.',
-    highlights: ['Segment definitions', 'Value propositions', 'Engagement tactics'],
-  },
-  {
-    title: 'Product Performance',
-    description: 'Assessment of product portfolio performance and opportunities.',
-    highlights: ['Top-performing products', 'Underperforming SKUs', 'Innovation pipeline'],
-  },
-  {
-    title: 'Risk Assessment',
-    description: 'Identified risks and mitigation plans associated with the ABB model.',
-    highlights: ['Operational risks', 'Financial risks', 'Mitigation strategies'],
-  },
-  {
-    title: 'Implementation Roadmap',
-    description: 'Step-by-step plan to operationalize ABB model recommendations.',
-    highlights: ['Phase timelines', 'Resource allocation', 'Success metrics'],
-  },
-  {
-    title: 'Appendix & Resources',
-    description: 'Supporting documents, data sources, and contact points.',
-    highlights: ['Reference materials', 'Data dictionaries', 'Support contacts'],
   },
 ];
 
@@ -118,52 +89,59 @@ const ABBModelSectionMain: React.FC = () => {
   );
 
   return (
-    <div className="abb-model-section">
-      <div className="abb-form-card">
-        <form className="abb-form" onSubmit={handleSubmit}>
-          <label htmlFor="abb-ticker">
-            Ticker
-            <input
-              id="abb-ticker"
-              name="ticker"
-              type="text"
-              placeholder="e.g. AAPL-US"
-              value={ticker}
-              onChange={(event) => setTicker(event.target.value)}
-            />
-          </label>
+    <Container maxWidth="xl" className="abb-model-container">
+      <div className="abb-model-section">
+        <Card className="abb-form-card">
+          <CardContent>
+            <Typography variant="h6" component="h3" sx={{ fontWeight: 700, mb: 2, color: '#142b6f' }}>
+              FactSet Technical Snapshot
+            </Typography>
+            <form className="abb-form" onSubmit={handleSubmit}>
+              <label htmlFor="abb-ticker">
+                Ticker
+                <input
+                  id="abb-ticker"
+                  name="ticker"
+                  type="text"
+                  placeholder="e.g. AAPL-US"
+                  value={ticker}
+                  onChange={(event) => setTicker(event.target.value)}
+                />
+              </label>
 
-          <label htmlFor="abb-trade-date">
-            Trade Date
-            <input
-              id="abb-trade-date"
-              name="tradeDate"
-              type="date"
-              value={tradeDate}
-              onChange={(event) => setTradeDate(event.target.value)}
-            />
-          </label>
+              <label htmlFor="abb-trade-date">
+                Trade Date
+                <input
+                  id="abb-trade-date"
+                  name="tradeDate"
+                  type="date"
+                  value={tradeDate}
+                  onChange={(event) => setTradeDate(event.target.value)}
+                />
+              </label>
 
-          <button className="abb-submit" type="submit" disabled={loading}>
-            {loading ? 'Fetching...' : 'Get Data'}
-          </button>
-        </form>
+              <button className="abb-submit" type="submit" disabled={loading}>
+                {loading ? 'Fetching...' : 'Get Data'}
+              </button>
+            </form>
+            {error && !loading && (
+              <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+                {error}
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+
+        <ABBSection1
+          {...sectionData[0]}
+          factsetData={factsetData}
+          loading={loading}
+          error={error}
+        />
+        <ABBSection2 {...sectionData[1]} />
+        <ABBSection3 {...sectionData[2]} />
       </div>
-
-      <ABBSection1
-        {...sectionData[0]}
-        factsetData={factsetData}
-        loading={loading}
-        error={error}
-      />
-      <ABBSection2 {...sectionData[1]} />
-      <ABBSection3 {...sectionData[2]} />
-      <ABBSection4 {...sectionData[3]} />
-      <ABBSection5 {...sectionData[4]} />
-      <ABBSection6 {...sectionData[5]} />
-      <ABBSection7 {...sectionData[6]} />
-      <ABBSection8 {...sectionData[7]} />
-    </div>
+    </Container>
   );
 };
 

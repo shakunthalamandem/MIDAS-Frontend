@@ -1,22 +1,26 @@
+.abb-model-container {
+  padding: 2rem 0 3rem;
+  font-family: 'Poppins', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  color: #0a1f44;
+}
+
 .abb-model-section {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 1rem;
+  gap: 2.5rem;
 }
 
 .abb-form-card {
-  background: #f7f9fc;
+  background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
   border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 12px 32px rgba(15, 35, 95, 0.08);
+  box-shadow: 0 18px 42px rgba(15, 35, 95, 0.12);
   transition: transform 200ms ease, box-shadow 200ms ease;
-  max-width: 640px;
+  overflow: hidden;
 }
 
 .abb-form-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(15, 35, 95, 0.12);
+  box-shadow: 0 22px 48px rgba(15, 35, 95, 0.16);
 }
 
 .abb-form {
@@ -44,8 +48,8 @@
 
 .abb-form input:focus {
   outline: none;
-  border-color: #3e6ae1;
-  box-shadow: 0 0 0 3px rgba(62, 106, 225, 0.2);
+  border-color: #4c6fff;
+  box-shadow: 0 0 0 3px rgba(76, 111, 255, 0.25);
 }
 
 .abb-submit {
@@ -53,7 +57,7 @@
   padding: 0.75rem 1.25rem;
   border-radius: 14px;
   border: none;
-  background: linear-gradient(135deg, #3e6ae1, #678bff);
+  background: linear-gradient(135deg, #4c6fff, #7d95ff);
   color: #ffffff;
   font-weight: 600;
   cursor: pointer;
@@ -71,10 +75,10 @@
 }
 
 .abb-section-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 18px 42px rgba(15, 35, 95, 0.12);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(241, 244, 255, 0.92));
+  border-radius: 22px;
+  padding: 2.25rem;
+  box-shadow: 0 20px 46px rgba(15, 35, 95, 0.14);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -92,14 +96,16 @@
 
 .abb-section-card h2 {
   margin: 0;
-  font-size: 1.5rem;
-  color: #0f235f;
+  font-size: 1.7rem;
+  color: #142b6f;
+  letter-spacing: -0.01em;
 }
 
 .abb-section-card p {
   margin: 0;
-  color: rgba(15, 35, 95, 0.75);
+  color: rgba(15, 35, 95, 0.72);
   max-width: 60ch;
+  font-size: 0.98rem;
 }
 
 .abb-section-chips {
@@ -114,60 +120,63 @@
   padding: 0.4rem 0.75rem;
   border-radius: 999px;
   font-size: 0.8rem;
-  font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(62, 106, 225, 0.25);
+  font-weight: 500;
+  box-shadow: inset 0 0 0 1px rgba(76, 111, 255, 0.25);
   transition: transform 200ms ease, background 200ms ease;
 }
 
 .abb-chip:hover {
   transform: translateY(-2px);
-  background: rgba(62, 106, 225, 0.2);
+  background: rgba(76, 111, 255, 0.22);
 }
 
 .abb-factset-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.2rem;
   animation: fadeInUp 400ms ease;
 }
 
 .abb-factset-card {
-  background: linear-gradient(160deg, rgba(62, 106, 225, 0.12), rgba(103, 139, 255, 0.08));
-  border-radius: 16px;
-  padding: 1rem;
+  background: linear-gradient(160deg, rgba(76, 111, 255, 0.18), rgba(125, 149, 255, 0.12));
+  border-radius: 18px;
+  padding: 1.05rem;
   position: relative;
   overflow: hidden;
   transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
 .abb-factset-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 22px rgba(62, 106, 225, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 26px rgba(76, 111, 255, 0.28);
 }
 
 .abb-factset-label {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: rgba(15, 35, 95, 0.6);
+  letter-spacing: 0.06em;
+  color: rgba(15, 35, 95, 0.65);
 }
 
 .abb-factset-value {
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  color: #0f235f;
-  margin-top: 0.35rem;
+  color: #1b2b8a;
+  margin-top: 0.45rem;
+  letter-spacing: -0.01em;
 }
 
 .abb-info {
   color: rgba(15, 35, 95, 0.7);
   font-style: italic;
+  font-size: 0.95rem;
 }
 
 .abb-error {
   color: #d64545;
   font-weight: 600;
+  font-size: 0.95rem;
 }
 
 @keyframes fadeInUp {
