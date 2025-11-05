@@ -8,8 +8,8 @@ export interface SelectedData {
   ticker_name?: string;
   company_name?: string;
   exchange?: string;
-  valuation?: string[];          // bullet points
-  valuation_image_url?: string;  // OPTIONAL: existing image from backend, if any
+  valuation?: string[];
+  valuation_image_url?: string;
 }
 
 interface IPODealsS1DealDataProps {
