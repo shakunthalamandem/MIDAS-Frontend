@@ -89,7 +89,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
           <Grid item xs={12} md={6}>
             <Typography variant="h6" color="#002060" fontWeight={600}>
               {selectedFund}: Summary as of{" "}
-              {maxTradeDate !== "N/A" ? maxTradeDate : "—"}
+              {maxTradeDate !== "N/A" ? maxTradeDate : "N/A"}
             </Typography>
           </Grid>
 
@@ -97,6 +97,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
             <Box
               display="flex"
               justifyContent={{ xs: "flex-start", md: "flex-end" }}
+              alignItems="center"
               gap={2}
               mt={{ xs: 2, md: 0 }}
             >
@@ -118,6 +119,11 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
                   </MenuItem>
                 ))}
               </Select>
+              <RiskPDFExporter
+                exportId="pdf-export-area"
+                fileName={`${selectedFund}_Risk_Report.pdf`}
+                buttonText="Generate PDF"
+              />
             </Box>
           </Grid>
         </Grid>
