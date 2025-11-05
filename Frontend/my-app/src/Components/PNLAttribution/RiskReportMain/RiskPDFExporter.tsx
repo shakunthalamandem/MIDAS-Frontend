@@ -27,18 +27,26 @@ const RiskPDFExporter: React.FC<RiskPDFExporterProps> = ({
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
       const sections = input.querySelectorAll<HTMLElement>(".pdf-section");
-      let positionY = 20;
+      let positionY = 24;
 
       // Add header
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(0, 32, 96);
       pdf.setFontSize(12);
-      pdf.text("Fund Dashboard Report", 10, 10);
-      pdf.text(new Date().toLocaleDateString(), pdfWidth - 60, 10);
+      pdf.text("Risk Report", 10, 12);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(new Date().toLocaleDateString(), pdfWidth - 50, 12);
+      pdf.setTextColor(0, 0, 0);
 
       for (let i = 0; i < sections.length; i++) {
         // Force white background
-        const canvas = await html2canvas(sections[i], {
-          scale: 1,
+        const section = sections[i];
+        const canvas = await html2canvas(section, {
+          scale: 2,
           backgroundColor: "#ffffff",
+          useCORS: true,
+          windowWidth: section.scrollWidth,
+          windowHeight: section.scrollHeight,
         });
 
         const imgData = canvas.toDataURL("image/png");
@@ -60,7 +68,9 @@ const RiskPDFExporter: React.FC<RiskPDFExporterProps> = ({
       for (let i = 1; i <= pageCount; i++) {
         pdf.setPage(i);
         pdf.setFontSize(10);
+        pdf.setTextColor(80, 80, 80);
         pdf.text(`Page ${i} of ${pageCount}`, pdfWidth - 40, pdfHeight - 10);
+        pdf.setTextColor(0, 0, 0);
       }
 
       pdf.save(fileName);

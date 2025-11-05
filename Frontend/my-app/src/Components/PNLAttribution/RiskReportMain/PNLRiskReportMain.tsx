@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Container,
   Typography,
@@ -72,24 +72,39 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
     fetchMaxTradeDate();
   }, [selectedFund, apiUrl, token]);
 
+  const formattedTradeDate = useMemo(() => {
+    if (!maxTradeDate || maxTradeDate === "N/A") {
+      return "N/A";
+    }
+    const parsed = new Date(maxTradeDate);
+    if (Number.isNaN(parsed.getTime())) {
+      return maxTradeDate;
+    }
+    return parsed.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }, [maxTradeDate]);
+
+  const pdfCardStyles = {
+    backgroundColor: "#ffffff",
+    borderRadius: 3,
+    boxShadow: "0px 24px 48px rgba(0, 32, 96, 0.08)",
+    border: "1px solid rgba(0, 32, 96, 0.06)",
+    padding: "24px",
+    overflow: "hidden",
+  };
+
   return (
     <Container sx={{ mt: 4, mb: 4 }} maxWidth="xl">
       {/* Header with Fund Selector */}
-      <Paper
-        elevation={8}
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          backgroundColor: "#f9f9f9",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-          mb: 4,
-        }}
-      >
+      <Paper elevation={0} sx={{ p: 3, borderRadius: 3, backgroundColor: "#ffffff", boxShadow: "0px 20px 48px rgba(0,32,96,0.08)", mb: 4 }}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="h6" color="#002060" fontWeight={600}>
               {selectedFund}: Summary as of{" "}
-              {maxTradeDate !== "N/A" ? maxTradeDate : "N/A"}
+              {formattedTradeDate}
             </Typography>
           </Grid>
 
@@ -131,56 +146,80 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 
       {/* Main Exportable Content */}
       <Box id="pdf-export-area">
-        <Box className="pdf-section">
+        <Box
+          className="pdf-section"
+          sx={{
+            backgroundColor: "#ffffff",
+            borderRadius: 4,
+            boxShadow: "0px 30px 60px rgba(0, 32, 96, 0.12)",
+            border: "1px solid rgba(0, 32, 96, 0.1)",
+            p: { xs: 4, md: 6 },
+            textAlign: "center",
+            mb: 4,
+          }}
+        >
+          <Typography variant="h3" sx={{ color: "#002060", fontWeight: 700, mb: 2 }}>
+            Risk Report
+          </Typography>
+          <Typography variant="h4" sx={{ color: "#002060", fontWeight: 600, mb: 1 }}>
+            {selectedFund}
+          </Typography>
+          <Typography variant="h6" sx={{ color: "rgba(0, 32, 96, 0.8)", fontWeight: 500 }}>
+            As of {formattedTradeDate}
+          </Typography>
+        </Box>
+
+        <Box className="pdf-section" sx={{ ...pdfCardStyles, mb: 4 }}>
           <PNLLmvDataTablesMain fund={selectedFund} />
         </Box>
 
         <Grid container spacing={3} mt={2}>
           <Grid item xs={12}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <RiskReportRegionWiseTable fund={selectedFund} />
             </Box>
           </Grid>
-                    <Grid item xs={12}>
-            <Box className="pdf-section">
+
+          <Grid item xs={12}>
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <CumulativeFundReturnChart fund={selectedFund} />
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <PNLAttributionMarketCap fund={selectedFund} />
             </Box>
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <PNLSectorWiseFundDetails fund={selectedFund} />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <RiskReportDailyPnlvsVarChart fund={selectedFund} />
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <DtdTopBottomMainPNL fund={selectedFund} />
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <DailyNetOfHedgeChart fund={selectedFund} />
             </Box>
           </Grid>
 
           <Grid item xs={12}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <PNLFundReturnsChartsDifference fund={selectedFund} />
             </Box>
           </Grid>
 
           <Grid item xs={12}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <RiskReportIndexPortfolioTable fund={selectedFund} />
             </Box>
           </Grid>
