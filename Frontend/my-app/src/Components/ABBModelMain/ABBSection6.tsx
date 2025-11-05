@@ -2,15 +2,19 @@ import React from 'react';
 import { ABBSectionProps } from './ABBSection.types';
 
 const ABBSection6: React.FC<ABBSectionProps> = ({ title, description, highlights = [] }) => (
-  <section>
-    <h2>{title}</h2>
-    <p>{description}</p>
+  <section className="abb-section-card">
+    <div>
+      <h2>{title}</h2>
+      <p>{description}</p>
+    </div>
     {highlights.length > 0 && (
-      <ul>
+      <div className="abb-section-chips">
         {highlights.map((highlight, index) => (
-          <li key={`${index}-${highlight}`}>{highlight}</li>
+          <span className="abb-chip" key={`${index}-${highlight}`}>
+            {highlight}
+          </span>
         ))}
-      </ul>
+      </div>
     )}
   </section>
 );
