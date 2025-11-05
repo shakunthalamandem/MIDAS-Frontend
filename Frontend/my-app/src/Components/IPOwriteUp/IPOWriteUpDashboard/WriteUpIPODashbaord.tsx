@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import {
   Box,
   Container,
@@ -16,13 +16,16 @@ import {
   Stack,
   TextField,
   InputAdornment,
-  Chip,
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatDealSize } from "./IPOWriteUpUtils";
-import IPODashboardMain from "../../IPODashboardLLM/IPODashboardMain";
+
+// ✅ Lazy-load the heavy dashboard to keep initial load blazing fast
+const IPODashboardMain = React.lazy(
+  () => import("../../IPODashboardLLM/IPODashboardMain")
+);
 
 interface IpoData {
   ticker: string;
@@ -39,6 +42,8 @@ type FilterType = "upcoming" | "all";
 
 const WriteUpIPODashbaord: React.FC = () => {
   const { ticker: paramTicker } = useParams<{ ticker: string }>();
+  const navigate = useNavigate();
+
   const [ipoData, setIpoData] = useState<IpoData[]>([]);
   const [selectedTicker, setSelectedTicker] = useState<string>(
     paramTicker || ""
@@ -63,6 +68,7 @@ const WriteUpIPODashbaord: React.FC = () => {
             },
           }
         );
+
         if (!response.ok) throw new Error("Failed to fetch IPO data");
 
         const json = await response.json();
@@ -77,10 +83,9 @@ const WriteUpIPODashbaord: React.FC = () => {
 
         setIpoData(uniqueRows);
 
+        // Keep URL param behaviour, but do NOT auto-select first row.
         if (paramTicker) {
           setSelectedTicker(paramTicker);
-        } else if (!selectedTicker && uniqueRows.length > 0) {
-          setSelectedTicker(uniqueRows[0].ticker);
         }
       } catch (error) {
         console.error("Error fetching IPO data:", error);
@@ -88,6 +93,7 @@ const WriteUpIPODashbaord: React.FC = () => {
         setLoading(false);
       }
     };
+
     fetchIpoData();
     // Note: exclude selectedTicker from deps to avoid re-fetch loops
   }, [apiUrl, token, paramTicker, filterType]);
@@ -107,6 +113,16 @@ const WriteUpIPODashbaord: React.FC = () => {
     filterType === "all"
       ? "Explore All IPO Listings"
       : "Upcoming IPO Opportunities";
+
+  // ✅ When clicking any part of the row, update state + URL
+  const handleRowClick = (ticker: string) => {
+    setSelectedTicker(ticker);
+    navigate(`/equity/ipo_dashboard/${ticker}`, {
+      state: { fromTickerClick: true },
+    });
+  };
+
+  const isRowSelected = (ticker: string) => ticker === selectedTicker;
 
   return (
     <>
@@ -140,7 +156,7 @@ const WriteUpIPODashbaord: React.FC = () => {
             mb: 4,
           }}
         >
-          {/* Top controls: title (left) | chips (center) | toggle + search (right) */}
+          {/* Top controls: title | toggle + search */}
           <Stack
             direction={{ xs: "column", md: "row" }}
             spacing={2}
@@ -170,7 +186,7 @@ const WriteUpIPODashbaord: React.FC = () => {
                 value={filterType}
                 exclusive
                 size="small"
-                onChange={(_, v) => v && setFilterType(v)}
+                onChange={(_, v: FilterType | null) => v && setFilterType(v)}
                 sx={{
                   borderRadius: 2,
                   "& .MuiToggleButton-root": {
@@ -279,128 +295,123 @@ const WriteUpIPODashbaord: React.FC = () => {
                 </TableHead>
 
                 <TableBody>
-                  {filteredData.map((row, index) => (
-                    <TableRow
-                      key={`${row.ticker}_${row.pricing_date}_${index}`}
-                      hover
-                      onClick={() => setSelectedTicker(row.ticker)}
-                      sx={{
-                        cursor: "pointer",
-                        "&:hover": { backgroundColor: "#f3f8ff" },
-                        backgroundColor:
-                          row.ticker === selectedTicker ? "#e6f3ff" : "inherit",
-                        border: "1px solid black",
-                      }}
-                    >
-                      {/* Symbol */}
-                      <TableCell
-                        align="center"
+                  {filteredData.map((row, index) => {
+                    const selected = isRowSelected(row.ticker);
+                    return (
+                      <TableRow
+                        key={`${row.ticker}_${row.pricing_date}_${index}`}
+                        hover
+                        onClick={() => handleRowClick(row.ticker)}
                         sx={{
-                          fontSize: "0.82rem",
-                          padding: "7px 8px",
+                          cursor: "pointer",
+                          backgroundColor: selected ? "#81e67eff" : "inherit",
+                          "&:hover": {
+                            backgroundColor: selected ? "#ffe9c2" : "#f3f8ff",
+                          },
                           border: "1px solid black",
-                          fontWeight: 700,
-                          lineHeight: 1.2,
-                          color: "#b10f0f",
                         }}
                       >
-                        <Link
-                          to={`/equity/ipo_dashboard/${row.ticker}`}
-                          state={{ fromTickerClick: true }}
-                          style={{
-                            color: "inherit",
+                        {/* Symbol */}
+                        <TableCell
+                          align="center"
+                          sx={{
+                            fontSize: "0.82rem",
+                            padding: "7px 8px",
+                            border: "1px solid black",
                             fontWeight: 700,
+                            lineHeight: 1.2,
+                            color: "#b10f0f",
                             textDecoration: "underline",
                           }}
                         >
                           {row.ticker}
-                        </Link>
-                      </TableCell>
+                        </TableCell>
 
-                      {/* Company */}
-                      <TableCell
-                        align="center"
-                        sx={{
-                          fontSize: "0.82rem",
-                          padding: "7px 8px",
-                          border: "1px solid black",
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {row.company_name}
-                      </TableCell>
+                        {/* Company */}
+                        <TableCell
+                          align="center"
+                          sx={{
+                            fontSize: "0.82rem",
+                            padding: "7px 8px",
+                            border: "1px solid black",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {row.company_name}
+                        </TableCell>
 
-                      {/* Pricing Date */}
-                      <TableCell
-                        align="center"
-                        sx={{
-                          fontSize: "0.82rem",
-                          padding: "7px 8px",
-                          border: "1px solid black",
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {formatDate(row.pricing_date)}
-                      </TableCell>
+                        {/* Pricing Date */}
+                        <TableCell
+                          align="center"
+                          sx={{
+                            fontSize: "0.82rem",
+                            padding: "7px 8px",
+                            border: "1px solid black",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {formatDate(row.pricing_date)}
+                        </TableCell>
 
-                      {/* Sector */}
-                      <TableCell
-                        align="center"
-                        sx={{
-                          fontSize: "0.82rem",
-                          padding: "7px 8px",
-                          border: "1px solid black",
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {row.sector || "—"}
-                      </TableCell>
+                        {/* Sector */}
+                        <TableCell
+                          align="center"
+                          sx={{
+                            fontSize: "0.82rem",
+                            padding: "7px 8px",
+                            border: "1px solid black",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {row.sector || "—"}
+                        </TableCell>
 
-                      {/* Price Range */}
-                      <TableCell
-                        align="center"
-                        sx={{
-                          fontSize: "0.82rem",
-                          padding: "7px 8px",
-                          border: "1px solid black",
-                          lineHeight: 1.2,
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {row.pricing_range_min !== null &&
-                        row.pricing_range_max !== null
-                          ? `$${row.pricing_range_min} – $${row.pricing_range_max}`
-                          : "TBA"}
-                      </TableCell>
+                        {/* Price Range */}
+                        <TableCell
+                          align="center"
+                          sx={{
+                            fontSize: "0.82rem",
+                            padding: "7px 8px",
+                            border: "1px solid black",
+                            lineHeight: 1.2,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {row.pricing_range_min !== null &&
+                          row.pricing_range_max !== null
+                            ? `$${row.pricing_range_min} – $${row.pricing_range_max}`
+                            : "TBA"}
+                        </TableCell>
 
-                      {/* Exchange */}
-                      <TableCell
-                        align="center"
-                        sx={{
-                          fontSize: "0.82rem",
-                          padding: "7px 8px",
-                          border: "1px solid black",
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {row.exchange || "—"}
-                      </TableCell>
+                        {/* Exchange */}
+                        <TableCell
+                          align="center"
+                          sx={{
+                            fontSize: "0.82rem",
+                            padding: "7px 8px",
+                            border: "1px solid black",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {row.exchange || "—"}
+                        </TableCell>
 
-                      {/* Deal Size */}
-                      <TableCell
-                        align="center"
-                        sx={{
-                          fontSize: "0.82rem",
-                          padding: "7px 8px",
-                          border: "1px solid black",
-                          lineHeight: 1.2,
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {formatDealSize(row.deal_size)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        {/* Deal Size */}
+                        <TableCell
+                          align="center"
+                          sx={{
+                            fontSize: "0.82rem",
+                            padding: "7px 8px",
+                            border: "1px solid black",
+                            lineHeight: 1.2,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {formatDealSize(row.deal_size)}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -415,6 +426,7 @@ const WriteUpIPODashbaord: React.FC = () => {
           sx={{
             fontStyle: "italic",
             mt: 1,
+            mb: 3,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -426,8 +438,58 @@ const WriteUpIPODashbaord: React.FC = () => {
         </Typography>
       </Container>
 
-      {/* Dashboard (below table) */}
-      <IPODashboardMain selectedTicker={selectedTicker} />
+      {/* ✅ Below-table section:
+          - If no ticker selected: show guidance text.
+          - If ticker selected: lazy-load IPODashboardMain with a small spinner.
+          - Width now matches your original setup (no maxWidth constraint).
+      */}
+      <Box sx={{ mb: 6, px: 2 }}>
+        {!selectedTicker ? (
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px dashed #cbd5e1",
+              backgroundColor: "#fdfdfd",
+              py: 4,
+              px: 3,
+              textAlign: "center",
+            }}
+          >
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+              Select a ticker to view detailed IPO write-up
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Click on any row in the table above to load in-depth insights,
+              valuation, and commentary for that IPO.
+            </Typography>
+          </Box>
+        ) : (
+          <Suspense
+            fallback={
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  py: 4,
+                }}
+              >
+                <CircularProgress />
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1.5 }}
+                >
+                  Loading IPO write-up for <strong>{selectedTicker}</strong>…
+                </Typography>
+              </Box>
+            }
+          >
+            <IPODashboardMain selectedTicker={selectedTicker} />
+          </Suspense>
+        )}
+      </Box>
     </>
   );
 };
