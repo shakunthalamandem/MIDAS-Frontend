@@ -4,6 +4,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 interface RiskReportPNLPortfolioTableProps {
   fund: string;
+  showAllRows?: boolean;
 }
 
 interface PortfolioData {
@@ -17,9 +18,10 @@ interface PortfolioData {
   beta_adj_exposure_lmv: number;
 }
 
-const RiskReportPNLPortfolioTable: React.FC<
-  RiskReportPNLPortfolioTableProps
-> = ({ fund }) => {
+const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = ({
+  fund,
+  showAllRows = false,
+}) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<PortfolioData[]>([]);
   const [reportDate, setReportDate] = useState<string>("");
@@ -129,8 +131,10 @@ const RiskReportPNLPortfolioTable: React.FC<
       sx={{
         p: 2,
         borderRadius: 2,
-        backgroundColor: "#f9f9f9",
+        backgroundColor: "#ffffff",
         mt: 2,
+        boxShadow: "0 20px 45px rgba(0, 32, 96, 0.08)",
+        border: "1px solid rgba(0, 32, 96, 0.08)",
       }}
     >
       <Typography
@@ -141,37 +145,47 @@ const RiskReportPNLPortfolioTable: React.FC<
         align="center"
       >
         {fund}: Long Analysis as{" "}
-        {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
+        {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
       </Typography>
 
       {/* Increased height */}
-      <div style={{ height: 985, width: "100%" }}>
+      <div style={showAllRows ? { width: "100%" } : { height: 985, width: "100%" }}>
         <DataGrid
           rows={data}
           columns={columns}
-          pageSizeOptions={[25, 50, 100]}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 25 } },
-          }}
-          rowHeight={35}
+          rowHeight={showAllRows ? 32 : 35}
           disableRowSelectionOnClick
+          {...(showAllRows
+            ? {
+                autoHeight: true,
+                hideFooterPagination: true,
+                hideFooter: true,
+                disableVirtualization: true,
+              }
+            : {
+                pagination: true,
+                pageSizeOptions: [25, 50, 100] as number[],
+                initialState: {
+                  pagination: { paginationModel: { pageSize: 25 } },
+                },
+              })}
           sx={{
             border: 0,
             backgroundColor: "white",
             "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#e1eaff", // header background color
+              backgroundColor: "#e1eaff",
               fontWeight: "bold",
               color: "#002060",
-              textAlign: "left", // align header text left
+              textAlign: "left",
             },
             "& .MuiDataGrid-columnHeaderTitle": {
-              justifyContent: "flex-start", // align title text left
+              justifyContent: "flex-start",
             },
             "& .MuiDataGrid-row": {
               alignItems: "center",
             },
             "& .MuiDataGrid-cell": {
-              justifyContent: "flex-start", // align cell text left
+              justifyContent: "flex-start",
               textAlign: "left",
             },
             "& .MuiDataGrid-row:nth-of-type(odd)": {
