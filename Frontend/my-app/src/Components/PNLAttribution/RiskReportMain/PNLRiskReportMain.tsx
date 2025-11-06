@@ -13,7 +13,7 @@ import PNLLmvDataTablesMain from "./PNLLmvDataTablesMain";
 import DailyNetOfHedgeChart from "./DailyNetOfHedgeChart";
 import DtdTopBottomMainPNL from "./DtdTopBottomMainPNL";
 import PNLAttributionMarketCap from "./PNLAttributionMarketCap";
-import PNLFundReturnsChartsDifference from "./RiskReportPNLPortfolioTable";
+import RiskReportPNLPortfolioTable from "./RiskReportPNLPortfolioTable";
 import RiskReportIndexPortfolioTable from "./RiskReportIndexPortfolioTable";
 import PNLSectorWiseFundDetails from "./PNLSectorWiseFundDetails";
 import RiskPDFExporter from "./RiskPDFExporter";
@@ -227,7 +227,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 
 			<Grid item xs={12}>
 				<Box className="pdf-section" sx={pdfCardStyles} data-footnote={footnotePortfolio}>
-					<PNLFundReturnsChartsDifference fund={selectedFund} showAllRows={pdfMode} />
+					<RiskReportPNLPortfolioTable fund={selectedFund} showAllRows={pdfMode} />
 				</Box>
 			</Grid>
 
