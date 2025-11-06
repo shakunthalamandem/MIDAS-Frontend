@@ -7,12 +7,14 @@ interface RiskPDFExporterProps {
   exportId: string; // ID of container to export
   fileName?: string;
   buttonText?: string;
+  headerTitle?: string;
 }
 
 const RiskPDFExporter: React.FC<RiskPDFExporterProps> = ({
   exportId,
   fileName = "Fund_Report.pdf",
   buttonText = "Export PDF",
+  headerTitle = "Risk Report",
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -27,39 +29,46 @@ const RiskPDFExporter: React.FC<RiskPDFExporterProps> = ({
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
       const sections = input.querySelectorAll<HTMLElement>(".pdf-section");
-      let positionY = 24;
 
-      // Add header
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(0, 32, 96);
-      pdf.setFontSize(12);
-      pdf.text("Risk Report", 10, 12);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(new Date().toLocaleDateString(), pdfWidth - 50, 12);
-      pdf.setTextColor(0, 0, 0);
+      const drawHeader = () => {
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(12);
+        pdf.setTextColor(0, 32, 96);
+        const headerText = headerTitle.trim().length > 0 ? headerTitle : "Risk Report";
+        const lines = pdf.splitTextToSize(headerText, pdfWidth - 20);
+        pdf.text(lines, 10, 14);
+        const headerHeight = Array.isArray(lines) ? lines.length * 6 : 6;
+        pdf.setDrawColor(0, 32, 96);
+        pdf.setLineWidth(0.3);
+        pdf.line(10, 16 + headerHeight - 6, pdfWidth - 10, 16 + headerHeight - 6);
+        pdf.setTextColor(0, 0, 0);
+        return 18 + headerHeight;
+      };
+
+      let positionY = drawHeader();
 
       for (let i = 0; i < sections.length; i++) {
         // Force white background
         const section = sections[i];
         const canvas = await html2canvas(section, {
-          scale: 2,
+          scale: 1.5,
           backgroundColor: "#ffffff",
           useCORS: true,
           windowWidth: section.scrollWidth,
           windowHeight: section.scrollHeight,
         });
 
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg", 0.85);
         const imgProps = pdf.getImageProperties(imgData);
         const imgWidth = pdfWidth - 20;
         const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
 
         if (positionY + imgHeight > pdfHeight - 20) {
           pdf.addPage();
-          positionY = 20;
+          positionY = drawHeader();
         }
 
-        pdf.addImage(imgData, "PNG", 10, positionY, imgWidth, imgHeight);
+        pdf.addImage(imgData, "JPEG", 10, positionY, imgWidth, imgHeight);
         positionY += imgHeight + 10;
       }
 

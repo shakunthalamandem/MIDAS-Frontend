@@ -96,6 +96,11 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
     overflow: "hidden",
   };
 
+  const pdfHeaderTitle =
+    formattedTradeDate === "N/A"
+      ? `Risk Report of ${selectedFund}`
+      : `Risk Report of ${selectedFund} on ${formattedTradeDate}`;
+
   return (
     <Container sx={{ mt: 4, mb: 4 }} maxWidth="xl">
       {/* Header with Fund Selector */}
@@ -138,6 +143,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
                 exportId="pdf-export-area"
                 fileName={`${selectedFund}_Risk_Report.pdf`}
                 buttonText="Generate PDF"
+                headerTitle={pdfHeaderTitle}
               />
             </Box>
           </Grid>
@@ -146,29 +152,6 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 
       {/* Main Exportable Content */}
       <Box id="pdf-export-area">
-        <Box
-          className="pdf-section"
-          sx={{
-            backgroundColor: "#ffffff",
-            borderRadius: 4,
-            boxShadow: "0px 30px 60px rgba(0, 32, 96, 0.12)",
-            border: "1px solid rgba(0, 32, 96, 0.1)",
-            p: { xs: 4, md: 6 },
-            textAlign: "center",
-            mb: 4,
-          }}
-        >
-          <Typography variant="h3" sx={{ color: "#002060", fontWeight: 700, mb: 2 }}>
-            Risk Report
-          </Typography>
-          <Typography variant="h4" sx={{ color: "#002060", fontWeight: 600, mb: 1 }}>
-            {selectedFund}
-          </Typography>
-          <Typography variant="h6" sx={{ color: "rgba(0, 32, 96, 0.8)", fontWeight: 500 }}>
-            As of {formattedTradeDate}
-          </Typography>
-        </Box>
-
         <Box className="pdf-section" sx={{ ...pdfCardStyles, mb: 4 }}>
           <PNLLmvDataTablesMain fund={selectedFund} />
         </Box>
