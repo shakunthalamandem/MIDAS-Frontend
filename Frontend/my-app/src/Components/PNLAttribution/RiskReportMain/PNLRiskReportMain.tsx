@@ -226,8 +226,16 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
           </Grid>
 
 			<Grid item xs={12}>
-				<Box className="pdf-section" sx={pdfCardStyles} data-footnote={footnotePortfolio}>
-					<RiskReportPNLPortfolioTable fund={selectedFund} showAllRows={pdfMode} />
+				<Box
+					className={pdfMode ? undefined : "pdf-section"}
+					sx={pdfCardStyles}
+					data-footnote={pdfMode ? undefined : footnotePortfolio}
+				>
+					<RiskReportPNLPortfolioTable
+						fund={selectedFund}
+						showAllRows={pdfMode}
+						footnote={footnotePortfolio}
+					/>
 				</Box>
 			</Grid>
 

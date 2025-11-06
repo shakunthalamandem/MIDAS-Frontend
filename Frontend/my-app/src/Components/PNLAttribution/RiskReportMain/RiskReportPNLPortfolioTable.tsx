@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Paper, Typography, CircularProgress, Box } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 interface RiskReportPNLPortfolioTableProps {
   fund: string;
   showAllRows?: boolean;
+  footnote?: string;
 }
 
 interface PortfolioData {
@@ -21,6 +22,7 @@ interface PortfolioData {
 const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = ({
   fund,
   showAllRows = false,
+  footnote,
 }) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<PortfolioData[]>([]);
@@ -112,6 +114,35 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
     },
   ];
 
+  const rowsPerPage = 50;
+
+  const paginatedData = useMemo(() => {
+    if (!showAllRows) {
+      return [];
+    }
+    const chunks: PortfolioData[][] = [];
+    for (let i = 0; i < data.length; i += rowsPerPage) {
+      chunks.push(data.slice(i, i + rowsPerPage));
+    }
+    return chunks;
+  }, [data, showAllRows]);
+
+  const formatCurrency = (value: number | null | undefined) => {
+    if (value == null) {
+      return "-";
+    }
+    const absValue = Math.abs(value);
+    const formatted = `$${absValue.toLocaleString()}`;
+    return value < 0 ? `-${formatted}` : formatted;
+  };
+
+  const formatNumber = (value: number | null | undefined, suffix = "") => {
+    if (value == null) {
+      return "-";
+    }
+    return `${value}${suffix}`;
+  };
+
   if (loading) {
     return (
       <Box
@@ -122,6 +153,140 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
       >
         <CircularProgress />
       </Box>
+    );
+  }
+
+  if (showAllRows) {
+    if (!paginatedData.length) {
+      return (
+        <Box
+          className="pdf-section"
+          data-footnote={footnote}
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            backgroundColor: "#ffffff",
+            boxShadow: "0 20px 45px rgba(0, 32, 96, 0.08)",
+            border: "1px solid rgba(0, 32, 96, 0.08)",
+          }}
+        >
+          <Typography
+            variant="body1"
+            gutterBottom
+            color="#002060"
+            sx={{ fontWeight: "bold" }}
+            align="center"
+          >
+            {fund}: Long Analysis as{" "}
+            {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
+          </Typography>
+          <Typography variant="body2" align="center" color="#5a5a5a">
+            No portfolio rows available for export.
+          </Typography>
+        </Box>
+      );
+    }
+
+    return (
+      <>
+        {paginatedData.map((pageRows, pageIndex) => (
+          <Box
+            key={`portfolio-page-${pageIndex}`}
+            className="pdf-section"
+            data-footnote={
+              pageIndex === paginatedData.length - 1 ? footnote : undefined
+            }
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              backgroundColor: "#ffffff",
+              boxShadow: "0 20px 45px rgba(0, 32, 96, 0.08)",
+              border: "1px solid rgba(0, 32, 96, 0.08)",
+              "& + .pdf-section": { mt: 3 },
+            }}
+          >
+            <Typography
+              variant="body1"
+              gutterBottom
+              color="#002060"
+              sx={{ fontWeight: "bold" }}
+              align="center"
+            >
+              {fund}: Long Analysis as{" "}
+              {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
+            </Typography>
+            <Typography
+              variant="body2"
+              align="center"
+              color="#5a5a5a"
+              sx={{ mb: 1 }}
+            >
+              Page {pageIndex + 1} of {paginatedData.length} | {pageRows.length} rows
+            </Typography>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: 12,
+                fontSize: 12,
+              }}
+            >
+              <thead>
+                <tr
+                  style={{
+                    backgroundColor: "#e1eaff",
+                    color: "#002060",
+                    textAlign: "left",
+                  }}
+                >
+                  <th style={{ padding: "8px" }}>Ticker</th>
+                  <th style={{ padding: "8px" }}>Company</th>
+                  <th style={{ padding: "8px" }}>Net Of Hedge P&amp;L</th>
+                  <th style={{ padding: "8px" }}>Net Of Hedge P&amp;L (bps)</th>
+                  <th style={{ padding: "8px" }}>Long Exp/LMV (%)</th>
+                  <th style={{ padding: "8px" }}>Beta</th>
+                  <th style={{ padding: "8px" }}>Beta Adj.Long Exp. / LMV (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pageRows.map((row, rowIndex) => (
+                  <tr
+                    key={row.id ?? `portfolio-row-${pageIndex}-${rowIndex}`}
+                    style={{
+                      backgroundColor:
+                        rowIndex % 2 === 0 ? "#f5f7ff" : "white",
+                    }}
+                  >
+                    <td style={{ padding: "8px" }}>{row.ticker}</td>
+                    <td style={{ padding: "8px" }}>{row.company}</td>
+                    <td
+                      style={{
+                        padding: "8px",
+                        color: row.net_of_hedge_pnl < 0 ? "red" : "green",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {formatCurrency(row.net_of_hedge_pnl)}
+                    </td>
+                    <td style={{ padding: "8px" }}>
+                      {formatNumber(row.net_of_hedge_pnl_bps)}
+                    </td>
+                    <td style={{ padding: "8px" }}>
+                      {formatNumber(row.long_exposure, "%")}
+                    </td>
+                    <td style={{ padding: "8px" }}>
+                      {row.beta == null ? "-" : row.beta}
+                    </td>
+                    <td style={{ padding: "8px" }}>
+                      {formatNumber(row.beta_adj_exposure_lmv, "%")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Box>
+        ))}
+      </>
     );
   }
 
@@ -149,26 +314,17 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
       </Typography>
 
       {/* Increased height */}
-      <div style={showAllRows ? { width: "100%" } : { height: 985, width: "100%" }}>
+      <div style={{ height: 985, width: "100%" }}>
         <DataGrid
           rows={data}
           columns={columns}
-          rowHeight={showAllRows ? 32 : 35}
+          rowHeight={35}
           disableRowSelectionOnClick
-          {...(showAllRows
-            ? {
-                autoHeight: true,
-                hideFooterPagination: true,
-                hideFooter: true,
-                disableVirtualization: true,
-              }
-            : {
-                pagination: true,
-                pageSizeOptions: [25, 50, 100] as number[],
-                initialState: {
-                  pagination: { paginationModel: { pageSize: 25 } },
-                },
-              })}
+          pagination
+          pageSizeOptions={[25, 50, 100] as number[]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 25 } },
+          }}
           sx={{
             border: 0,
             backgroundColor: "white",
