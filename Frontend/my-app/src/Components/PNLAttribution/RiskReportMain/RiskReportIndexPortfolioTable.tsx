@@ -80,7 +80,14 @@ const RiskReportIndexPortfolioTable: React.FC<
   return (
     <Paper
       elevation={3}
-      sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9", mt: 2 }}
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        backgroundColor: "#ffffff",
+        mt: 2,
+        boxShadow: "0 20px 45px rgba(0, 32, 96, 0.08)",
+        border: "1px solid rgba(0, 32, 96, 0.08)",
+      }}
     >
       <Typography
         variant="body1"
@@ -90,9 +97,8 @@ const RiskReportIndexPortfolioTable: React.FC<
         align="center"
       >
         {fund}: Short Analysis as{" "}
-        {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
+        {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
       </Typography>
-
       <TableContainer>
         <Table size="small">
           <TableHead>
@@ -137,7 +143,7 @@ const RiskReportIndexPortfolioTable: React.FC<
                       ? row.pnl < 0
                         ? `-$${Math.abs(row.pnl).toLocaleString()}`
                         : `$${row.pnl.toLocaleString()}`
-                      : "—"}
+                      : "-"}
                   </TableCell>
                   <TableCell align="left">
                     {(row.pnlvslmv * 100).toFixed(2)}%

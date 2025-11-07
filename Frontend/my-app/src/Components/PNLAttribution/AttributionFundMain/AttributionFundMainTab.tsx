@@ -26,7 +26,7 @@ const AttributionFundMainTab = () => {
   const [selectedFund, setSelectedFund] = useState("FMAP");
   const [maxTradeDate, setMaxTradeDate] = useState<string | null>(null);
 
-  const fundOptions = ["BEMAP2", "FMAP", "Mission Pure Alpha LP", "Monashee Pure Alpha SPV I LP", "MPAM"];
+  const fundOptions = ["BEMAP2", "FMAP", "Mission Pure Alpha LP", "Monashee Pure Alpha SPV I LP", "MPAM","GEPT","BHM"];
 
   const formatDate = (dateStr: string): string => {
     const date = new Date(dateStr);
