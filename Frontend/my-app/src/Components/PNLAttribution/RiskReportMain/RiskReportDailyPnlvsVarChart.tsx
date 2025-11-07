@@ -121,20 +121,20 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
         >
           <defs>
             <linearGradient id="colorPnLPos" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#134200ff" stopOpacity={0.6} />
-              <stop offset="95%" stopColor="#134200ff" stopOpacity={0} />
+              <stop offset="5%" stopColor="#247e00ff" stopOpacity={0.6} />
+              <stop offset="95%" stopColor="#247e00ff" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="colorPnLNeg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#134200ff" stopOpacity={0.6} />
-              <stop offset="95%" stopColor="#134200ff" stopOpacity={0} />
+              <stop offset="5%" stopColor="#247e00ff" stopOpacity={0.6} />
+              <stop offset="95%" stopColor="#247e00ff" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="colorVaRPos" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#424242ff" stopOpacity={0.6} />
-              <stop offset="95%" stopColor="#424242ff" stopOpacity={0} />
+              <stop offset="5%" stopColor="#999999ff" stopOpacity={0.6} />
+              <stop offset="95%" stopColor="#999999ff" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="colorVaRNeg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#424242ff" stopOpacity={0.6} />
-              <stop offset="95%" stopColor="#424242ff" stopOpacity={0} />
+              <stop offset="5%" stopColor="#999999ff" stopOpacity={0.6} />
+              <stop offset="95%" stopColor="#999999ff" stopOpacity={0} />
             </linearGradient>
           </defs>
           <XAxis dataKey="date" tickFormatter={formatTickLabel} tick={{ fontSize: 11 }} />
@@ -147,7 +147,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
           <Area
             type="monotone"
             dataKey="pnl_percent"
-            stroke="#134200ff"
+            stroke="#247e00ff"
             fillOpacity={1}
             fill="url(#colorPnLPos)"
             name="Daily Net of Hedge P&L (%)"
@@ -155,7 +155,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
           <Area
             type="monotone"
             dataKey="pnl_percent_neg"
-            stroke="#134200ff"
+            stroke="#247e00ff"
             fillOpacity={1}
             fill="url(#colorPnLNeg)"
             name="Daily Net of Hedge P&L Neg (%)"
@@ -163,7 +163,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
           <Area
             type="monotone"
             dataKey="one_year_var_percent_lmv"
-            stroke="#424242ff"
+            stroke="#999999ff"
             fillOpacity={1}
             fill="url(#colorVaRPos)"
             name="1Yr 1% VaR (% of LMV)"
@@ -171,7 +171,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
           <Area
             type="monotone"
             dataKey="one_year_var_percent_lmv_neg"
-            stroke="#424242ff"
+            stroke="#999999ff"
             fillOpacity={1}
             fill="url(#colorVaRNeg)"
             name="1Yr 1% VaR Neg (% of LMV)"
