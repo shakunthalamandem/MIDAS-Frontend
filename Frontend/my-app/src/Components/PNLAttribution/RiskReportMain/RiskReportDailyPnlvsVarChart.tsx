@@ -137,8 +137,8 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
               <stop offset="95%" stopColor="#424242ff" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <XAxis dataKey="date" tickFormatter={formatTickLabel} />
-          <YAxis tickFormatter={(val) => `${val.toFixed(2)}%`} />
+          <XAxis dataKey="date" tickFormatter={formatTickLabel} tick={{ fontSize: 11 }} />
+          <YAxis tickFormatter={(val) => `${val.toFixed(2)}%`} tick={{ fontSize: 11 }} />
           <Tooltip
             formatter={(val: number) => `${val.toFixed(2)}%`}
             labelFormatter={(label) => new Date(label).toLocaleDateString()}
