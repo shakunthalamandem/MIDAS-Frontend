@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import MetricsTableMain from "./IPODashboardMain/IPOCompsTableMain/MetricsTableMain";
 import IPOCompsChart from "./IPODashboardMain/IPOCompsTableMain/IPOCompsChart";
+import FinancialMetricsChart from "./FinancialMetricsChart";
 
 type ComparableMetric = {
   ticker: string;
@@ -148,6 +149,9 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
           label="Chart View"
         />
       </Paper>
+      <Box>
+        <FinancialMetricsChart ticker={ticker} />
+      </Box>
     </Box>
   );
 };
