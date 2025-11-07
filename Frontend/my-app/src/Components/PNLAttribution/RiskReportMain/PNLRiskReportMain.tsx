@@ -35,7 +35,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
     "GEPT",
   ];
 
-	const [selectedFund, setSelectedFund] = useState(fund || "FMAP");
+	const [selectedFund, setSelectedFund] = useState(fund || "BEMAP2");
 	const [maxTradeDate, setMaxTradeDate] = useState<string>("");
 	const [pdfMode, setPdfMode] = useState<boolean>(false);
 
