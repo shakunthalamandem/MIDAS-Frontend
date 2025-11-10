@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Container,
   Typography,
@@ -13,7 +13,7 @@ import PNLLmvDataTablesMain from "./PNLLmvDataTablesMain";
 import DailyNetOfHedgeChart from "./DailyNetOfHedgeChart";
 import DtdTopBottomMainPNL from "./DtdTopBottomMainPNL";
 import PNLAttributionMarketCap from "./PNLAttributionMarketCap";
-import PNLFundReturnsChartsDifference from "./RiskReportPNLPortfolioTable";
+import RiskReportPNLPortfolioTable from "./RiskReportPNLPortfolioTable";
 import RiskReportIndexPortfolioTable from "./RiskReportIndexPortfolioTable";
 import PNLSectorWiseFundDetails from "./PNLSectorWiseFundDetails";
 import RiskPDFExporter from "./RiskPDFExporter";
@@ -31,10 +31,13 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
     "Mission Pure Alpha LP",
     "Monashee Pure Alpha SPV I LP",
     "MPAM",
+    "BHM",
+    "GEPT",
   ];
 
-  const [selectedFund, setSelectedFund] = useState(fund || "FMAP");
-  const [maxTradeDate, setMaxTradeDate] = useState<string>("");
+	const [selectedFund, setSelectedFund] = useState(fund || "BEMAP2");
+	const [maxTradeDate, setMaxTradeDate] = useState<string>("");
+	const [pdfMode, setPdfMode] = useState<boolean>(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -70,24 +73,72 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
     fetchMaxTradeDate();
   }, [selectedFund, apiUrl, token]);
 
+  const formattedTradeDate = useMemo(() => {
+    if (!maxTradeDate || maxTradeDate === "N/A") {
+      return "N/A";
+    }
+    const parsed = new Date(maxTradeDate);
+    if (Number.isNaN(parsed.getTime())) {
+      return maxTradeDate;
+    }
+    return parsed.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }, [maxTradeDate]);
+
+	const pdfCardStyles = {
+		backgroundColor: "#ffffff",
+		borderRadius: 3,
+		boxShadow: "0px 24px 48px rgba(0, 32, 96, 0.08)",
+		border: "1px solid rgba(0, 32, 96, 0.06)",
+		padding: "24px",
+		overflow: "hidden",
+	};
+
+	const footnoteVaR =
+		[
+			"P&L (%): Calculated as P&L ($) / LMV ($) for a day. For a date range calculated as {Sum of P&L ($) of the date range} / {Average of LMV ($) over the date range}.",
+			"Net of Hedge P&L is calculated as: Long only P&L + Hedge P&L (allocated to each deal on the basis of exposure). This may result in some amount of unallocated Hedge P&L, which will not be captured here.",
+			"Beta Adj Net: Beta adjusted net is sum of beta of portfolio securities in dollars (exposure x beta against S&P TR Index) divided by LMV.",
+			"VaR: Calculated as historical simulated 1 year Value-at-Risk value for 1% confidence level using Bloomberg.",
+		].join("\n");
+
+	const footnoteRegion =
+		[
+			"P&L (%): Calculated as P&L ($) / LMV ($) for a day. For a date range calculated as {Sum of P&L ($) of the date range} / {Average of LMV ($) over the date range}.",
+			"Net of Hedge P&L is calculated as: Long only P&L + Hedge P&L (allocated to each deal on the basis of exposure). This may result in some amount of unallocated Hedge P&L, which will not be captured here.",
+			"Region Definition: has been defined primarily on the basis of Deal Captain, Country of Listing and Country of Domicile.",
+		].join("\n");
+
+	const footnotePortfolio =
+		[
+			"P&L (%): Calculated as P&L ($) / LMV ($) for a day. For a date range calculated as {Sum of P&L ($) of the date range} / {Average of LMV ($) over the date range}.",
+			"Net of Hedge P&L is calculated as: Long only P&L + Hedge P&L (allocated to each deal on the basis of exposure). This may result in some amount of unallocated Hedge P&L, which will not be captured here.",
+			"Beta Adj Net: Beta adjusted net is sum of beta of portfolio securities in dollars (exposure x beta against S&P TR Index) divided by LMV.",
+		].join("\n");
+
+	const footnoteIndex =
+		[
+			"P&L (%): Calculated as P&L ($) / LMV ($) for a day. For a date range calculated as {Sum of P&L ($) of the date range} / {Average of LMV ($) over the date range}.",
+			"Beta Adj Net: Beta adjusted net is sum of beta of portfolio securities in dollars (exposure x beta against S&P TR Index) divided by LMV.",
+		].join("\n");
+
+	const pdfHeaderTitle =
+		formattedTradeDate === "N/A"
+			? `Risk Report of ${selectedFund}`
+      : `Risk Report of ${selectedFund} on ${formattedTradeDate}`;
+
   return (
     <Container sx={{ mt: 4, mb: 4 }} maxWidth="xl">
       {/* Header with Fund Selector */}
-      <Paper
-        elevation={8}
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          backgroundColor: "#f9f9f9",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-          mb: 4,
-        }}
-      >
+      <Paper elevation={0} sx={{ p: 3, borderRadius: 3, backgroundColor: "#ffffff", boxShadow: "0px 20px 48px rgba(0,32,96,0.08)", mb: 4 }}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="h6" color="#002060" fontWeight={600}>
               {selectedFund}: Summary as of{" "}
-              {maxTradeDate !== "N/A" ? maxTradeDate : "—"}
+              {formattedTradeDate}
             </Typography>
           </Grid>
 
@@ -95,6 +146,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
             <Box
               display="flex"
               justifyContent={{ xs: "flex-start", md: "flex-end" }}
+              alignItems="center"
               gap={2}
               mt={{ xs: 2, md: 0 }}
             >
@@ -116,66 +168,82 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
                   </MenuItem>
                 ))}
               </Select>
-            </Box>
-          </Grid>
-        </Grid>
+				<RiskPDFExporter
+					exportId="pdf-export-area"
+					fileName={`${selectedFund}_Risk_Report.pdf`}
+					buttonText="Generate PDF"
+					headerTitle={pdfHeaderTitle}
+					onTogglePdfMode={setPdfMode}
+				/>
+			</Box>
+		</Grid>
+	</Grid>
       </Paper>
 
       {/* Main Exportable Content */}
       <Box id="pdf-export-area">
-        <Box className="pdf-section">
+        <Box className="pdf-section" sx={{ ...pdfCardStyles, mb: 4 }}>
           <PNLLmvDataTablesMain fund={selectedFund} />
         </Box>
 
         <Grid container spacing={3} mt={2}>
-          <Grid item xs={12}>
-            <Box className="pdf-section">
-              <RiskReportRegionWiseTable fund={selectedFund} />
+			<Grid item xs={12}>
+				<Box className="pdf-section" sx={pdfCardStyles} data-footnote={footnoteRegion}>
+					<RiskReportRegionWiseTable fund={selectedFund} />
+				</Box>
+			</Grid>
+
+			<Grid item xs={12}>
+				<Box className="pdf-section" sx={pdfCardStyles}>
+					<CumulativeFundReturnChart fund={selectedFund} />
             </Box>
           </Grid>
-                    <Grid item xs={12}>
-            <Box className="pdf-section">
-              <CumulativeFundReturnChart fund={selectedFund} />
-            </Box>
-          </Grid>
           <Grid item xs={12}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <PNLAttributionMarketCap fund={selectedFund} />
             </Box>
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Box className="pdf-section">
-              <PNLSectorWiseFundDetails fund={selectedFund} />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box className="pdf-section">
-              <RiskReportDailyPnlvsVarChart fund={selectedFund} />
-            </Box>
-          </Grid>
+			<Grid item xs={12} md={pdfMode ? 12 : 6}>
+				<Box className="pdf-section" sx={pdfCardStyles}>
+					<PNLSectorWiseFundDetails fund={selectedFund} />
+				</Box>
+			</Grid>
+			<Grid item xs={12} md={pdfMode ? 12 : 6}>
+				<Box className="pdf-section" sx={pdfCardStyles} data-footnote={footnoteVaR}>
+					<RiskReportDailyPnlvsVarChart fund={selectedFund} />
+				</Box>
+			</Grid>
           <Grid item xs={12}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <DtdTopBottomMainPNL fund={selectedFund} />
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <Box className="pdf-section">
+            <Box className="pdf-section" sx={pdfCardStyles}>
               <DailyNetOfHedgeChart fund={selectedFund} />
             </Box>
           </Grid>
 
-          <Grid item xs={12}>
-            <Box className="pdf-section">
-              <PNLFundReturnsChartsDifference fund={selectedFund} />
-            </Box>
-          </Grid>
+			<Grid item xs={12}>
+				<Box
+					className={pdfMode ? undefined : "pdf-section"}
+					sx={pdfCardStyles}
+					data-footnote={pdfMode ? undefined : footnotePortfolio}
+				>
+					<RiskReportPNLPortfolioTable
+						fund={selectedFund}
+						showAllRows={pdfMode}
+						footnote={footnotePortfolio}
+					/>
+				</Box>
+			</Grid>
 
-          <Grid item xs={12}>
-            <Box className="pdf-section">
-              <RiskReportIndexPortfolioTable fund={selectedFund} />
-            </Box>
-          </Grid>
+			<Grid item xs={12}>
+				<Box className="pdf-section" sx={pdfCardStyles} data-footnote={footnoteIndex}>
+					<RiskReportIndexPortfolioTable fund={selectedFund} />
+				</Box>
+			</Grid>
         </Grid>
       </Box>
     </Container>

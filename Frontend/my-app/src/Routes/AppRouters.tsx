@@ -68,7 +68,7 @@ import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteU
 import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
 import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
-import DealsDropdown from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsDropdown";
+import DealsTabsLayout from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsTabsLayout";
 import EquityAiMlPage from "../Components/AIML/EquityAiMlPage";
 
 import WriteUpIPODashbaord from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
@@ -168,7 +168,18 @@ const AppRouters: React.FC = () => {
         <Route path="/fs_upload" element={<AuthGuard><UploadFactSetTickers /></AuthGuard>} />
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
         <Route path="/ai_upload" element={<AuthGuard><UploadAiInsights /></AuthGuard>} />
-        <Route path="/new_deal_data_upload" element={<AuthGuard><DealsDropdown /></AuthGuard>} />    
+        <Route
+          element={
+            <AuthGuard>
+              <DealsTabsLayout />
+            </AuthGuard>
+          }
+        >
+          <Route path="/new_deal_data_upload" element={<Navigate to="/download_deals_data" replace />} />
+          <Route path="/download_deals_data" element={<ExportUnifiedDealData />} />
+          <Route path="/delete_new_deal_data" element={<DeleteUnifiedDealData />} />
+          <Route path="/deal_data_upload" element={<UnifiedDealDataUpload />} />
+        </Route>    
         <Route path="/equity/ipo_dashboard" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
 
         <Route path="/equity/ipo_dashboard/:ticker" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
@@ -223,9 +234,6 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path="/download_deals_data" element={<AuthGuard><ExportUnifiedDealData /></AuthGuard>} />
-        <Route path="/delete_new_deal_data" element={<AuthGuard><DeleteUnifiedDealData /></AuthGuard>} />
-        <Route path="/deal_data_upload" element={<AuthGuard><UnifiedDealDataUpload /></AuthGuard>} />
         <Route path="/pdf_upload" element={<AuthGuard><UploadsWriteUpMain /></AuthGuard>} />
 
             {/* FO Write Up Routes */}
