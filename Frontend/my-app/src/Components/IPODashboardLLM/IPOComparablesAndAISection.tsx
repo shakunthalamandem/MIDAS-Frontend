@@ -89,9 +89,9 @@ const IPOComparablesAndAISection: React.FC<Props> = ({ selectedData }) => {
       </Container>
 
       {/* Add a container for Financial Metrics Chart here  */}
-            <Box>
+            <Container maxWidth="xl" sx={{ mt: 4 }}>
               <FinancialMetricsChart ticker={selectedData?.ticker_name ?? ""} />
-            </Box>
+            </Container>
     </>
   );
 };

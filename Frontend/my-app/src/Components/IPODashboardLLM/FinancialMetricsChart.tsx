@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import {
   Bar,
-  CartesianGrid,
   Legend,
   ResponsiveContainer,
   Tooltip,
@@ -240,10 +239,11 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
   }
 
   return (
+    <Card>
     <Box mt={3}>
       <Typography
         variant="h6"
-        gutterBottom
+        color="#002060"
         sx={{ fontWeight: 600, textAlign: "center", mb: 3 }}
       >
         Key Financial Metrics – Peer Comparison ({ticker.toUpperCase()})
@@ -262,9 +262,10 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
                   boxShadow: 2,
                   backgroundColor: "#fafafa",
                   borderColor: "#e0e0e0",
+                  p: 2,
                 }}
               >
-                <CardContent sx={{ pb: 2 }}>
+                <CardContent sx={{ p: 2 }}>
                   <Typography
                     variant="subtitle1"
                     gutterBottom
@@ -279,7 +280,6 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
                         data={chartData}
                         margin={{ top: 20, right: 20, left: 50, bottom: 20 }}
                       >
-                        <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="year" />
                         <YAxis
                           tickFormatter={(v) => `${v}`}
@@ -332,6 +332,7 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
         })}
       </Grid>
     </Box>
+    </Card>
   );
 };
 
