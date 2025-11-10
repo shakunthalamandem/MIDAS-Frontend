@@ -1,6 +1,14 @@
 // src/components/IPODashboardMain/ValuationImagePanel.tsx
 import React, { useEffect, useState } from "react";
-import { Box, Button, Slider, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Slider,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 type Props = {
   editMode: boolean;
@@ -12,6 +20,9 @@ type Props = {
   setUploadError: (msg: string | null) => void;
   title?: string;
   altText?: string;
+  tickerName?: string;
+  deleteApiPath?: string;
+  onImageDeleted?: () => void;
 };
 
 const ValuationImagePanel: React.FC<Props> = ({
@@ -24,10 +35,14 @@ const ValuationImagePanel: React.FC<Props> = ({
   setUploadError,
   title = "Supporting Valuation Image",
   altText = "Valuation visual",
+  tickerName,
+  deleteApiPath,
+  onImageDeleted,
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [imageScale, setImageScale] = useState<number>(100);
   const [loading, setLoading] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Local file preview
   useEffect(() => {
@@ -106,6 +121,61 @@ const ValuationImagePanel: React.FC<Props> = ({
   };
 
   const hasPreview = Boolean(previewUrl);
+  const canDeleteRemoteImage = Boolean(
+    deleteApiPath && tickerName && valuationImageId
+  );
+
+  const handleDeleteImage = async () => {
+    if (!apiUrl || !deleteApiPath || !tickerName) {
+      setUploadError("Unable to delete image. Missing configuration.");
+      return;
+    }
+
+    const normalizedDeletePath = deleteApiPath.startsWith("/")
+      ? deleteApiPath
+      : `/${deleteApiPath}`;
+
+    try {
+      setDeleting(true);
+      setUploadError(null);
+
+      const response = await fetch(`${apiUrl}${normalizedDeletePath}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ ticker_name: tickerName }),
+      });
+
+      let responseJson: any = null;
+      try {
+        responseJson = await response.json();
+      } catch {
+        responseJson = null;
+      }
+
+      if (!response.ok) {
+        const message =
+          responseJson?.message ||
+          responseJson?.error ||
+          "Failed to delete image.";
+        throw new Error(message);
+      }
+
+      if (!imageFile) {
+        setPreviewUrl(null);
+      }
+      onImageDeleted?.();
+      if (!imageFile) {
+        onImageFileChange(null);
+      }
+    } catch (err: any) {
+      setUploadError(err?.message || "Failed to delete image.");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   // In pure view mode with no preview, render nothing
   if (!editMode && !hasPreview) {
@@ -125,20 +195,37 @@ const ValuationImagePanel: React.FC<Props> = ({
       </Typography>
 
       {editMode && (
-        <Button
-          variant="contained"
-          component="label"
-          size="small"
-          sx={{ alignSelf: "flex-start" }}
-        >
-          Upload Image
-          <input
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={handleImageInputChange}
-          />
-        </Button>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Button
+            variant="contained"
+            component="label"
+            size="small"
+            sx={{ alignSelf: "flex-start" }}
+          >
+            Upload Image
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleImageInputChange}
+            />
+          </Button>
+
+          {canDeleteRemoteImage && (
+            <Tooltip title="Delete stored image">
+              <span>
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={handleDeleteImage}
+                  disabled={deleting}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
+        </Box>
       )}
 
       {loading && (

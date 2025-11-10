@@ -1,5 +1,5 @@
 // src/components/IPODashboardMain/IPOValuationSection.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -34,6 +34,13 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [valuationImageId, setValuationImageId] = useState<string | null>(
+    selectedData.valuation_image_url ?? null
+  );
+
+  useEffect(() => {
+    setValuationImageId(selectedData?.valuation_image_url ?? null);
+  }, [selectedData?.valuation_image_url]);
 
   const handleAddValuationLine = (index: number) => {
     const updated = [...editedValuation];
@@ -104,6 +111,7 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
       if (resJson.valuation_image_url) {
         selectedData.valuation_image_url = resJson.valuation_image_url;
       }
+      setValuationImageId(resJson.valuation_image_url ?? null);
 
       setEditValuationMode(false);
       setUploadError(null);
@@ -178,7 +186,7 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
 
   const showImageColumn =
     editValuationMode ||
-    Boolean(selectedData.valuation_image_url) ||
+    Boolean(valuationImageId) ||
     Boolean(imageFile);
 
   return (
@@ -297,12 +305,18 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
               >
                 <ValuationImagePanel
                   editMode={editValuationMode}
-                  valuationImageId={selectedData.valuation_image_url ?? null}
+                  valuationImageId={valuationImageId}
                   apiUrl={apiUrl}
                   token={token}
                   imageFile={imageFile}
                   onImageFileChange={setImageFile}
                   setUploadError={setUploadError}
+                  tickerName={selectedData.ticker_name}
+                  deleteApiPath="/api/delete_valuation_image/"
+                  onImageDeleted={() => {
+                    selectedData.valuation_image_url = undefined;
+                    setValuationImageId(null);
+                  }}
                 />
               </Box>
             )}

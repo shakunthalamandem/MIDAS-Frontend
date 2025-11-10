@@ -379,6 +379,18 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({ selec
                     setUploadError={setUploadError}
                     title="Differentiated Summary Image"
                     altText="Differentiated summary visual"
+                    tickerName={selectedData?.ticker_name}
+                    deleteApiPath="/api/delete_differentiated_summary_image/"
+                    onImageDeleted={() =>
+                      setDealData((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              differentiated_summary_image_url: null,
+                            }
+                          : prev
+                      )
+                    }
                   />
                 </Box>
               )}
