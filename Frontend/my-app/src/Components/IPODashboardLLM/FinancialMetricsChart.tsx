@@ -251,25 +251,40 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
   return (
     <Card className={includeInPdf ? "" : "pdf-hidden"}>
     <Box mt={3}>
-      <Box display="flex" justifyContent="flex-end" mb={2}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={includeInPdf}
-              onChange={(event) => setIncludeInPdf(event.target.checked)}
-              size="small"
-            />
-          }
-          label="Include in the PDF"
-        />
-      </Box>
-      <Typography
-        variant="h6"
-        color="#002060"
-        sx={{ fontWeight: 600, textAlign: "center", mb: 3 }}
+      <Box
+        mb={3}
+        position="relative"
+        display="flex"
+        alignItems="center"
+        minHeight={48}
       >
-        Key Financial Metrics – Peer Comparison ({ticker.toUpperCase()})
-      </Typography>
+        <Typography
+          variant="h6"
+          color="#002060"
+          sx={{ fontWeight: 600, textAlign: "center", width: "100%" }}
+        >
+          Key Financial Metrics - Peer Comparison ({ticker.toUpperCase()})
+        </Typography>
+        <Box
+          sx={{
+            position: "absolute",
+            right: 0,
+            top: "50%",
+            transform: "translateY(-50%)",
+          }}
+        >
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={includeInPdf}
+                onChange={(event) => setIncludeInPdf(event.target.checked)}
+                size="small"
+              />
+            }
+            label="Include in the PDF"
+          />
+        </Box>
+      </Box>
 
       <Grid container spacing={3}>
         {METRICS.filter((m) => metricHasData(m.key)).map((metric) => {
