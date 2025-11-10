@@ -7,11 +7,13 @@ import {
   Typography,
   CardHeader,
   Button,
+  Box,
 } from "@mui/material";
 import { LightbulbOutlined } from "@mui/icons-material";
 import IPODashboardMainTable from "./IPODashboardMainTable";
 import IPOAITickersMain from "./Hooks/IPOAITickersMain";
 import { SelectedData } from "./IPODealsS1DealData";
+import FinancialMetricsChart from "./FinancialMetricsChart";
 
 interface Props {
   selectedData: SelectedData;
@@ -85,6 +87,11 @@ const IPOComparablesAndAISection: React.FC<Props> = ({ selectedData }) => {
           </CardContent>
         </Card>
       </Container>
+
+      {/* Add a container for Financial Metrics Chart here  */}
+            <Box>
+              <FinancialMetricsChart ticker={selectedData?.ticker_name ?? ""} />
+            </Box>
     </>
   );
 };
