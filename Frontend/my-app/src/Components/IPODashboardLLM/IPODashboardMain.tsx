@@ -318,50 +318,87 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         el.style.visibility = "hidden";
       });
 
-     for (let i = 0; i < pages.length; i++) {
-  const element = document.getElementById(pages[i]);
-  if (!element) continue;
+      const footerReserveMm = 32;
+      const paginateCanvas = (canvas: HTMLCanvasElement) => {
+        const imgWidth = pdfWidth;
+        const mmPerPx = imgWidth / (canvas.width || 1);
+        let consumedPx = 0;
 
-  if (
-  pages[i] === "ipo-dashboard-page1" ||
-  pages[i] === "ipo-dashboard-page2" ||
-  pages[i] === "ipo-dashboard-page3" ||
-  pages[i] === "ipo-dashboard-page4"
-)  {
-    // --- Page 1 uses simple export with pdf-hidden filtering ---
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      ignoreElements: (el) => el.classList?.contains("pdf-hidden"),
-    });
+        while (consumedPx < canvas.height) {
+          pdf.addPage();
+          const contentTopY = drawHeader();
+          const availableHeight =
+            pdfHeight - contentTopY - footerReserveMm;
+          const slicePx = Math.max(
+            1,
+            Math.floor(availableHeight / mmPerPx)
+          );
+          const currentSlicePx = Math.min(
+            slicePx,
+            canvas.height - consumedPx
+          );
 
-    const imgData = canvas.toDataURL("image/png");
-    const imgWidth = pdfWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          const sliceCanvas = document.createElement("canvas");
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = currentSlicePx;
+          const sliceCtx = sliceCanvas.getContext("2d");
+          if (sliceCtx) {
+            sliceCtx.drawImage(
+              canvas,
+              0,
+              consumedPx,
+              canvas.width,
+              currentSlicePx,
+              0,
+              0,
+              canvas.width,
+              currentSlicePx
+            );
+          }
 
-    pdf.addPage();
-    const contentTopY = drawHeader();
-    pdf.addImage(imgData, "PNG", 0, contentTopY, imgWidth, imgHeight);
-    drawFooter();
-  } else {
-    // --- Pages 2–4 keep your existing slicing/pagination ---
-    const elRect = element.getBoundingClientRect();
-    const elCssWidth = elRect.width || element.scrollWidth || 1024;
-    const targetDpi = 180;
-    const targetPxWidth = (pdfWidth / 25.4) * targetDpi;
-    const dynamicScale = Math.max(2, Math.min(4, targetPxWidth / elCssWidth));
+          const sliceImg = sliceCanvas.toDataURL("image/png");
+          const sliceHeightMm = currentSlicePx * mmPerPx;
+          pdf.addImage(
+            sliceImg,
+            "PNG",
+            0,
+            contentTopY,
+            imgWidth,
+            sliceHeightMm
+          );
+          drawFooter();
+          consumedPx += currentSlicePx;
+        }
+      };
 
-    const canvas = await html2canvas(element, {
-      scale: dynamicScale,
-      useCORS: true,
-      scrollY: -window.scrollY,
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
-      backgroundColor: "#ffffff",
-    });
+      for (const pageId of pages) {
+        const element = document.getElementById(pageId);
+        if (!element) continue;
 
-    // keep your existing slice + footer logic here
-  }
-}
+        const elRect = element.getBoundingClientRect();
+        const elCssWidth = elRect.width || element.scrollWidth || 1024;
+        const targetDpi = 180;
+        const targetPxWidth = (pdfWidth / 25.4) * targetDpi;
+        const dynamicScale = Math.max(
+          2,
+          Math.min(4, targetPxWidth / elCssWidth)
+        );
+        const isPageOne = pageId === "ipo-dashboard-page1";
+
+        const canvas = await html2canvas(element, {
+          scale: isPageOne ? 2 : dynamicScale,
+          useCORS: true,
+          scrollY: -window.scrollY,
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight,
+          backgroundColor: "#ffffff",
+          ignoreElements: isPageOne
+            ? (el) => el.classList?.contains("pdf-hidden")
+            : undefined,
+        });
+
+        paginateCanvas(canvas);
+      }
 
       // Restore hidden UI controls
       hiddenEls.forEach(({ el, prev }) => (el.style.visibility = prev));
