@@ -452,6 +452,7 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
               <Box
                 mt={2}
                 p={1.5}
+                className="pdf-hidden"
                 sx={{
                   borderRadius: 1,
                   border: "1px dashed #ccc",
