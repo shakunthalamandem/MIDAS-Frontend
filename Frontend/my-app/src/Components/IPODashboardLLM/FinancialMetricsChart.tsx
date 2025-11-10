@@ -117,6 +117,30 @@ const BAR_COLORS = [
 // Accent for the selected ticker line
 const SELECTED_LINE_COLOR = "#e42d36ff";
 
+const roundToTwoDecimals = (
+  value: number | null | undefined
+): number | undefined => {
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+  return Math.round(value * 100) / 100;
+};
+
+const formatValueLabel = (
+  value: number | string | null | undefined
+): string => {
+  if (value === null || value === undefined) {
+    return "-";
+  }
+
+  const numericValue = typeof value === "number" ? value : Number(value);
+  if (Number.isNaN(numericValue)) {
+    return "-";
+  }
+
+  return numericValue.toFixed(2);
+};
+
 const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -201,7 +225,9 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
       data.forEach((row) => {
         const key = `${metric}_${year}` as keyof MetricsRow;
         const value = row[key];
-        entry[row.fs_ticker] = value === null ? undefined : value;
+        entry[row.fs_ticker] = roundToTwoDecimals(
+          value as number | null | undefined
+        );
       });
 
       return entry;
@@ -319,7 +345,7 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
                       >
                         <XAxis dataKey="year" />
                         <YAxis
-                          tickFormatter={(v) => `${v}`}
+                          tickFormatter={(v) => formatValueLabel(v)}
                           label={{
                             value: metric.yAxisLabel,
                             angle: -90,
@@ -330,7 +356,7 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
                         />
                         <Tooltip
                           formatter={(value: any, name: string) => [
-                            value,
+                            formatValueLabel(value),
                             name,
                           ]}
                         />
