@@ -11,13 +11,14 @@ import {
 } from "@mui/material";
 import {
   Bar,
-  BarChart,
   CartesianGrid,
   Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
+  ComposedChart,
+  Line,
 } from "recharts";
 
 interface MetricsRow {
@@ -91,16 +92,22 @@ const METRICS: MetricConfig[] = [
 
 const YEARS = [2024, 2025, 2026];
 
-const COLORS = [
-  "#1976d2",
-  "#9c27b0",
-  "#ff9800",
-  "#2e7d32",
-  "#d32f2f",
-  "#00838f",
-  "#7b1fa2",
-  "#f57c00",
+// 10 distinct, clean colors for peers (matplotlib default palette style)
+const BAR_COLORS = [
+  "#264653", // deep teal blue
+  "#2A9D8F", // dark turquoise green
+  "#8E3B46", // dark rose red
+  "#E76F51", // muted coral
+  "#6D597A", // dark mauve purple
+  "#457B9D", // slate blue
+  "#1D3557", // navy blue
+  "#7B904B", // olive green
+  "#B56576", // warm plum
+  "#3D5A80", // steel blue
 ];
+
+// Accent for the selected ticker line
+const SELECTED_LINE_COLOR = "#e42d36ff";
 
 const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -150,10 +157,29 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
     fetchData();
   }, [ticker, apiUrl, token]);
 
-  // Get all companies from response
+  // All fs_ticker strings
   const companies = useMemo(
     () => Array.from(new Set(data.map((row) => row.fs_ticker))),
     [data]
+  );
+
+  const selectedBaseTicker = ticker.toUpperCase();
+
+  // Find which fs_ticker corresponds to the selected ticker (e.g. LIFE -> LIFE-US)
+  const selectedCompanyKey = useMemo(() => {
+    const match = data.find(
+      (row) => row.fs_ticker.split("-")[0].toUpperCase() === selectedBaseTicker
+    );
+    return match ? match.fs_ticker : null;
+  }, [data, selectedBaseTicker]);
+
+  // Peer companies = all except the selected one
+  const peerCompanies = useMemo(
+    () =>
+      companies.filter(
+        (c) => !selectedCompanyKey || c !== selectedCompanyKey
+      ),
+    [companies, selectedCompanyKey]
   );
 
   // Helper: build chart data per metric
@@ -166,13 +192,25 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
       data.forEach((row) => {
         const key = `${metric}_${year}` as keyof MetricsRow;
         const value = row[key];
-
-        // Use undefined instead of null so Recharts can render cleanly
         entry[row.fs_ticker] = value === null ? undefined : value;
       });
 
       return entry;
     });
+  };
+
+  // Helper: check if this metric has at least one non-null value
+  const metricHasData = (metric: MetricPrefix): boolean => {
+    for (const row of data) {
+      for (const year of YEARS) {
+        const key = `${metric}_${year}` as keyof MetricsRow;
+        const value = row[key];
+        if (value !== null && value !== undefined) {
+          return true;
+        }
+      }
+    }
+    return false;
   };
 
   if (loading) {
@@ -203,26 +241,43 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
 
   return (
     <Box mt={3}>
-      <Typography variant="h6" gutterBottom>
+      <Typography
+        variant="h6"
+        gutterBottom
+        sx={{ fontWeight: 600, textAlign: "center", mb: 3 }}
+      >
         Key Financial Metrics – Peer Comparison ({ticker.toUpperCase()})
       </Typography>
 
       <Grid container spacing={3}>
-        {METRICS.map((metric, index) => {
+        {METRICS.filter((m) => metricHasData(m.key)).map((metric) => {
           const chartData = buildMetricChartData(metric.key);
 
           return (
             <Grid item xs={12} md={6} key={metric.key}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography variant="subtitle1" gutterBottom>
+              <Card
+                variant="outlined"
+                sx={{
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  backgroundColor: "#fafafa",
+                  borderColor: "#e0e0e0",
+                }}
+              >
+                <CardContent sx={{ pb: 2 }}>
+                  <Typography
+                    variant="subtitle1"
+                    gutterBottom
+                    align="center"
+                    sx={{ fontWeight: 600, color: "#424242" }}
+                  >
                     {metric.title}
                   </Typography>
                   <Box height={320}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
+                      <ComposedChart
                         data={chartData}
-                        margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
+                        margin={{ top: 20, right: 20, left: 50, bottom: 20 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="year" />
@@ -232,6 +287,8 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
                             value: metric.yAxisLabel,
                             angle: -90,
                             position: "insideLeft",
+                            offset: 10,
+                            style: { fontSize: 11 },
                           }}
                         />
                         <Tooltip
@@ -242,17 +299,30 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
                         />
                         <Legend />
 
-                        {companies.map((company, idx) => (
+                        {/* Bars for peers */}
+                        {peerCompanies.map((company, idx) => (
                           <Bar
                             key={`${metric.key}-${company}`}
                             dataKey={company}
                             name={company}
-                            // each company has consistent color across metrics
-                            fill={COLORS[idx % COLORS.length]}
+                            fill={BAR_COLORS[idx % BAR_COLORS.length]}
                             barSize={18}
                           />
                         ))}
-                      </BarChart>
+
+                        {/* Line for the selected ticker */}
+                        {selectedCompanyKey && (
+                          <Line
+                            type="monotone"
+                            dataKey={selectedCompanyKey}
+                            name={`${selectedCompanyKey}`}
+                            stroke={SELECTED_LINE_COLOR}
+                            strokeWidth={3}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 5 }}
+                          />
+                        )}
+                      </ComposedChart>
                     </ResponsiveContainer>
                   </Box>
                 </CardContent>
