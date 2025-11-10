@@ -97,20 +97,50 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <>
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>
-          <Typography variant="h6" fontWeight="bold" color="primary">
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        PaperProps={{
+          style: {
+            padding: "1.5rem",
+            borderRadius: 24,
+            background: "linear-gradient(135deg, #0f172a 0%, #1e40af 60%, #2dd4bf 120%)",
+            color: "#f8fafc",
+            boxShadow: "0 20px 45px rgba(2, 6, 23, 0.45)",
+          },
+        }}
+        BackdropProps={{
+          style: {
+            backdropFilter: "blur(10px)",
+            backgroundColor: "rgba(15, 23, 42, 0.55)",
+          },
+        }}
+      >
+        <DialogTitle sx={{ textAlign: "center", pb: 0 }}>
+          <Typography variant="h5" fontWeight={700} letterSpacing={0.5}>
             Session Ended
           </Typography>
         </DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">
-            Your session has ended. Please log in again to continue.
+        <DialogContent sx={{ textAlign: "center" }}>
+          <Typography variant="body1" sx={{ color: "#e0f2fe", mt: 1, mb: 2 }}>
+            Your session has timed out for security reasons. Please log in again to continue.
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button variant="contained" color="primary" onClick={handleDialogClose}>
-            Okay
+        <DialogActions sx={{ justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            onClick={handleDialogClose}
+            sx={{
+              px: 4,
+              py: 1,
+              borderRadius: 999,
+              backgroundColor: "#f97316",
+              fontWeight: 600,
+              textTransform: "none",
+              "&:hover": { backgroundColor: "#ea580c" },
+            }}
+          >
+            Go to Login
           </Button>
         </DialogActions>
       </Dialog>
