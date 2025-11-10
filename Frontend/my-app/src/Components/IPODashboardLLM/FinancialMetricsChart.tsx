@@ -103,6 +103,13 @@ const BAR_COLORS = [
   "#7B904B", // olive green
   "#B56576", // warm plum
   "#3D5A80", // steel blue
+  "#F4A261", // sandy orange
+  "#E9C46A", // mustard yellow  
+  "#90BE6D", // soft green
+  "#F3722C", // vibrant orange
+  "#F9C74F", // bright yellow
+  "#43AA8B", // teal
+  "#577590", // cool blue
 ];
 
 // Accent for the selected ticker line
@@ -270,7 +277,7 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
                     variant="subtitle1"
                     gutterBottom
                     align="center"
-                    sx={{ fontWeight: 600, color: "#424242" }}
+                    sx={{ fontWeight: 600, color: "#002060" }}
                   >
                     {metric.title}
                   </Typography>
