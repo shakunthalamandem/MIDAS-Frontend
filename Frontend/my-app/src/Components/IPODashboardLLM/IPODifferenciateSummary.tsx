@@ -8,15 +8,12 @@ import {
   TextField,
   IconButton,
   Container,
-
 } from "@mui/material";
-import {
-
-  FaClipboardList,
-} from "react-icons/fa";
+import { FaClipboardList } from "react-icons/fa";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
+import ValuationImagePanel from "./ValuationImagePanel";
 
 
 
@@ -27,6 +24,7 @@ type DealData = {
   monashee_score: number;
   differentiated_summary: string;
   internal_notes: string;
+  differentiated_summary_image_url?: string | null;
 };
 
 
@@ -47,6 +45,9 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({ selec
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editedDealData, setEditedDealData] = useState<DealData | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -112,48 +113,115 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({ selec
     if (!editedDealData) return;
 
     try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
-
       if (!apiUrl) throw new Error("API URL not defined");
+      if (!selectedData?.ticker_name) throw new Error("Ticker name is missing");
 
-      const response = await fetch(`${apiUrl}/api/ipo_deal_data_fairvalues/`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({
-          ticker: selectedData.ticker_name,
-          ...editedDealData,
-        }),
-      });
+      setSaving(true);
+      setError(null);
+      setUploadError(null);
 
-      if (!response.ok) {
-        throw new Error("Failed to save deal data");
+      const basePayload = {
+        ticker: selectedData.ticker_name,
+        fair_value_estimate: editedDealData.fair_value_estimate,
+        indication_of_interest: editedDealData.indication_of_interest,
+        after_market_threshold: editedDealData.after_market_threshold,
+        monashee_score: editedDealData.monashee_score,
+        differentiated_summary: editedDealData.differentiated_summary ?? "",
+        internal_notes: editedDealData.internal_notes,
+      };
+
+      let response: Response;
+      if (imageFile) {
+        const formData = new FormData();
+        Object.entries(basePayload).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            formData.append(key, String(value));
+          }
+        });
+        formData.append("differentiated_summary_image", imageFile);
+
+        response = await fetch(`${apiUrl}/api/ipo_deal_data_fairvalues/`, {
+          method: "PATCH",
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: formData,
+        });
+      } else {
+        response = await fetch(`${apiUrl}/api/ipo_deal_data_fairvalues/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify(basePayload),
+        });
       }
 
-      setDealData(editedDealData);
+      let responseJson: any = null;
+      try {
+        responseJson = await response.json();
+      } catch {
+        responseJson = null;
+      }
+
+      if (!response.ok) {
+        const message =
+          responseJson?.message ||
+          responseJson?.error ||
+          "Failed to save deal data";
+        throw new Error(message);
+      }
+
+      const newImageUrl =
+        responseJson?.differentiated_summary_image_url ??
+        dealData?.differentiated_summary_image_url ??
+        null;
+
+      setDealData((prev) => {
+        const base = prev ?? editedDealData;
+        return {
+          ...base,
+          ...editedDealData,
+          differentiated_summary_image_url: newImageUrl,
+        };
+      });
       setEditMode(false);
       setEditedDealData(null);
+      setImageFile(null);
+      setUploadError(null);
     } catch (err: any) {
       setError(err.message || "Unknown error occurred");
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleCancelEdit = () => {
+    if (saving) return;
     setEditedDealData(null);
+    setImageFile(null);
+    setUploadError(null);
     setEditMode(false);
   };
 
   const enterEditMode = () => {
-    if (dealData) setEditedDealData(dealData);
-    setEditMode(true);
+    if (dealData) {
+      setEditedDealData(dealData);
+      setImageFile(null);
+      setUploadError(null);
+      setEditMode(true);
+    }
   };
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!dealData) return <Typography>No deal data found.</Typography>;
+
+  const showImageColumn =
+    editMode ||
+    Boolean(dealData.differentiated_summary_image_url) ||
+    Boolean(imageFile);
 
   return (
     <>
@@ -203,10 +271,18 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({ selec
               <Box ml="auto">
                 {editMode ? (
                   <>
-                    <IconButton color="primary" onClick={handleSaveDealData}>
-                      <SaveIcon />
+                    <IconButton
+                      color="primary"
+                      onClick={handleSaveDealData}
+                      disabled={saving}
+                    >
+                      {saving ? <CircularProgress size={20} /> : <SaveIcon />}
                     </IconButton>
-                    <IconButton color="secondary" onClick={handleCancelEdit}>
+                    <IconButton
+                      color="secondary"
+                      onClick={handleCancelEdit}
+                      disabled={saving}
+                    >
                       <CancelIcon />
                     </IconButton>
                   </>
@@ -218,33 +294,96 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({ selec
               </Box>
             </Box>
 
-            {/* Body */}
-            {editMode ? (
-              <TextField
-                fullWidth
-                size="small"
-                multiline
-                minRows={4}
-                placeholder="Enter differentiated summary..."
-                value={
-                  editedDealData?.differentiated_summary ??
-                  dealData.differentiated_summary ??
-                  ""
-                }
-                onChange={(e) =>
-                  setEditedDealData((prev) => ({
-                    ...prev!,
-                    differentiated_summary: e.target.value,
-                  }))
-                }
-              />
-            ) : (
-              <Typography
-                sx={{ color: "#333", whiteSpace: "pre-line", mt: 2 }}
+            {saving && (
+              <Box
+                display="flex"
+                justifyContent="flex-end"
+                alignItems="center"
+                mb={2}
               >
-                {dealData.differentiated_summary || "No differentiated summary provided."}
-              </Typography>
+                <Typography variant="caption" sx={{ color: "#555" }}>
+                  Saving summary & media... Please wait.
+                </Typography>
+              </Box>
             )}
+
+            {/* Body */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: 2,
+                minHeight: 220,
+              }}
+            >
+              <Box
+                sx={{
+                  flex: showImageColumn ? 7 : 1,
+                }}
+              >
+                {editMode ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    multiline
+                    minRows={4}
+                    placeholder="Enter differentiated summary..."
+                    value={
+                      editedDealData?.differentiated_summary ??
+                      dealData.differentiated_summary ??
+                      ""
+                    }
+                    onChange={(e) =>
+                      setEditedDealData((prev) => ({
+                        ...prev!,
+                        differentiated_summary: e.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <Typography
+                    sx={{ color: "#333", whiteSpace: "pre-line", mt: 2 }}
+                  >
+                    {dealData.differentiated_summary ||
+                      "No differentiated summary provided."}
+                  </Typography>
+                )}
+
+                {uploadError && (
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ mt: 1, display: "block" }}
+                  >
+                    {uploadError}
+                  </Typography>
+                )}
+              </Box>
+
+              {showImageColumn && (
+                <Box
+                  sx={{
+                    flex: 3,
+                    mt: { xs: 2, md: 0 },
+                  }}
+                >
+                  <ValuationImagePanel
+                    editMode={editMode}
+                    valuationImageId={
+                      dealData.differentiated_summary_image_url ?? null
+                    }
+                    apiUrl={apiUrl}
+                    token={token}
+                    imageFile={imageFile}
+                    onImageFileChange={setImageFile}
+                    setUploadError={setUploadError}
+                    title="Differentiated Summary Image"
+                    altText="Differentiated summary visual"
+                  />
+                </Box>
+              )}
+            </Box>
+
           </CardContent>
         </Card>
       </Container>

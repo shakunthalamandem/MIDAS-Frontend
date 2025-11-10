@@ -10,6 +10,8 @@ type Props = {
   imageFile: File | null;
   onImageFileChange: (file: File | null) => void;
   setUploadError: (msg: string | null) => void;
+  title?: string;
+  altText?: string;
 };
 
 const ValuationImagePanel: React.FC<Props> = ({
@@ -20,6 +22,8 @@ const ValuationImagePanel: React.FC<Props> = ({
   imageFile,
   onImageFileChange,
   setUploadError,
+  title = "Supporting Valuation Image",
+  altText = "Valuation visual",
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [imageScale, setImageScale] = useState<number>(100);
@@ -117,7 +121,7 @@ const ValuationImagePanel: React.FC<Props> = ({
       }}
     >
       <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
-        Supporting Valuation Image
+        {title}
       </Typography>
 
       {editMode && (
@@ -139,7 +143,7 @@ const ValuationImagePanel: React.FC<Props> = ({
 
       {loading && (
         <Typography variant="caption" sx={{ mt: 1 }}>
-          Loading image…
+          Loading image...
         </Typography>
       )}
 
@@ -160,7 +164,7 @@ const ValuationImagePanel: React.FC<Props> = ({
           >
             <img
               src={previewUrl!}
-              alt="Valuation"
+              alt={altText}
               style={{
                 maxHeight: "100%",
                 width: editMode ? `${imageScale}%` : "100%",
