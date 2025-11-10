@@ -8,6 +8,8 @@ import {
   Grid,
   Typography,
   Alert,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import {
   Bar,
@@ -122,6 +124,7 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
   const [data, setData] = useState<MetricsRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [includeInPdf, setIncludeInPdf] = useState<boolean>(false);
 
   // Fetch data from API when ticker changes
   useEffect(() => {
@@ -246,8 +249,20 @@ const FinancialMetricsChart: React.FC<Props> = ({ ticker }) => {
   }
 
   return (
-    <Card>
+    <Card className={includeInPdf ? "" : "pdf-hidden"}>
     <Box mt={3}>
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={includeInPdf}
+              onChange={(event) => setIncludeInPdf(event.target.checked)}
+              size="small"
+            />
+          }
+          label="Include in the PDF"
+        />
+      </Box>
       <Typography
         variant="h6"
         color="#002060"
