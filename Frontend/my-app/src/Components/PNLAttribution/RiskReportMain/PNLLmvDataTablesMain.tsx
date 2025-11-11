@@ -68,7 +68,11 @@ const coerceToNumber = (value: number | string): number | null => {
   return null;
 };
 
-const formatValue = (key: string, value: number | string): string => {
+const formatValue = (
+  key: string,
+  value: number | string,
+  fractionDigits = 1
+): string => {
   const numericValue = coerceToNumber(value);
   if (numericValue === null) return String(value ?? "");
 
@@ -85,8 +89,8 @@ const formatValue = (key: string, value: number | string): string => {
   }
 
   const num = numericValue.toLocaleString(undefined, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
   });
   return isPercentKey(key) ? `${num}%` : num;
 };
@@ -240,7 +244,7 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
                     {RISK_REPORT_LABELS[key] || key}
                   </TableCell>
                   <TableCell align="right" sx={{ fontWeight: 600, py: 0.4 }}>
-                    {formatValue(key, value)}
+                    {formatValue(key, value, index === 2 ? 2 : 1)}
                   </TableCell>
                 </TableRow>
               ))}
