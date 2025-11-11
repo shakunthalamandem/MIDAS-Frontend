@@ -85,8 +85,8 @@ const formatValue = (key: string, value: number | string): string => {
   }
 
   const num = numericValue.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
   });
   return isPercentKey(key) ? `${num}%` : num;
 };
