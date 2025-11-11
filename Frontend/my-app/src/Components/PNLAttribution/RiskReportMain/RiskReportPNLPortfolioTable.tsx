@@ -325,29 +325,22 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
           initialState={{
             pagination: { paginationModel: { pageSize: 25 } },
           }}
-          sx={{
-            border: 0,
-            backgroundColor: "white",
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#e1eaff",
-              fontWeight: "bold",
-              color: "#002060",
-              textAlign: "left",
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              justifyContent: "flex-start",
-            },
-            "& .MuiDataGrid-row": {
-              alignItems: "center",
-            },
-            "& .MuiDataGrid-cell": {
-              justifyContent: "flex-start",
-              textAlign: "left",
-            },
-            "& .MuiDataGrid-row:nth-of-type(odd)": {
-              backgroundColor: "#f5f7ff",
-            },
-          }}
+            sx={{
+    "& .MuiDataGrid-container--top [role='row']": {
+      backgroundColor: "#002060",
+      fontWeight: "bold",
+      color: "#FFFFFF",
+      alignItems: "center",
+    },
+    "& .Mui-selected": {
+      backgroundColor: "#cad0f1ff !important",
+    },
+    "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
+      color: "#FFFFFF",
+    },
+    cursor: "pointer",
+    border: "1px solid #ccccccff",
+  }}
         />
       </div>
     </Paper>
