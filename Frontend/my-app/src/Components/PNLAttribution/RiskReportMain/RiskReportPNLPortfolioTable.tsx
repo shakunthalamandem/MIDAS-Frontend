@@ -19,6 +19,31 @@ interface PortfolioData {
   beta_adj_exposure_lmv: number;
 }
 
+const getOrdinalSuffix = (day: number) => {
+  if (day >= 11 && day <= 13) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDateWithOrdinal = (value: string) => {
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  const day = parsed.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = parsed.toLocaleString(undefined, { month: "short" });
+  const year = parsed.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
+
 const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = ({
   fund,
   showAllRows = false,
@@ -205,9 +230,8 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
             sx={{ fontWeight: "bold" }}
             align="center"
           >
-            {fund}: Long Analysis as{" "}
-            {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
-          </Typography>
+        {fund}: Long Analysis | Data As of: {formatDateWithOrdinal(reportDate)}
+      </Typography>
           <Typography variant="body2" align="center" color="#5a5a5a">
             No portfolio rows available for export.
           </Typography>
@@ -240,8 +264,7 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
               sx={{ fontWeight: "bold" }}
               align="center"
             >
-              {fund}: Long Analysis as{" "}
-              {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
+              {fund}: Long Analysis | Data As of: {formatDateWithOrdinal(reportDate)}
             </Typography>
             <Typography
               variant="body2"
@@ -337,8 +360,7 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
         sx={{ fontWeight: "bold" }}
         align="center"
       >
-        {fund}: Long Analysis as{" "}
-        {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
+        {fund}: Long Analysis | Data As of: {formatDateWithOrdinal(reportDate)}
       </Typography>
 
       {/* Increased height */}

@@ -27,6 +27,31 @@ interface RiskReportDailyPnlVsVarPoint {
   one_year_var_percent_lmv_neg: number;
 }
 
+const getOrdinalSuffix = (day: number) => {
+  if (day >= 11 && day <= 13) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDateWithOrdinal = (value: string) => {
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  const day = parsed.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = parsed.toLocaleString(undefined, { month: "short" });
+  const year = parsed.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
+
 const parseNumber = (value: unknown): number => {
   if (typeof value === "number") return value;
   if (typeof value === "string") {
@@ -107,11 +132,12 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
     );
   }
 
+  const formattedReportDate = formatDateWithOrdinal(reportDate);
+
   return (
     <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9", mt: 2 }}>
       <Typography variant="body1" gutterBottom color="#002060" sx={{ fontWeight: "bold" }} align="center">
-        Daily Net of Hedge P&L (%) vs. 1Yr 1% VaR (% of LMV) as of{" "}
-        {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
+        Daily Net of Hedge P&L (%) vs. 1Yr 1% VaR (% of LMV) | Data As of: {formattedReportDate}
       </Typography>
 
       <ResponsiveContainer width="100%" height={400}>

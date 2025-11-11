@@ -37,6 +37,31 @@ interface DtdTopBottomMainPNLProps {
   date?: string;
 }
 
+const getOrdinalSuffix = (day: number) => {
+  if (day >= 11 && day <= 13) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDateWithOrdinal = (value: string) => {
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  const day = parsed.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = parsed.toLocaleString(undefined, { month: "short" });
+  const year = parsed.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
+
 const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({
   fund,
   date,
@@ -115,6 +140,8 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({
     );
   }
 
+  const formattedReportDate = formatDateWithOrdinal(reportDate);
+
   return (
     <Paper
       elevation={3}
@@ -190,7 +217,7 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({
             align="center"
             bgcolor={"#e6f0ff"}
           >
-            Top P&L as on {reportDate}
+            Top P&L | Data As of: {formattedReportDate}
           </Typography>
           <TableContainer component={Paper}>
             <Table size="small" stickyHeader>
@@ -237,7 +264,7 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({
             align="center"
             bgcolor={"#e6f0ff"}
           >
-            Bottom P&L as on {reportDate}
+            Bottom P&L | Data As of: {formattedReportDate}
           </Typography>
           <TableContainer component={Paper}>
             <Table size="small" stickyHeader>
