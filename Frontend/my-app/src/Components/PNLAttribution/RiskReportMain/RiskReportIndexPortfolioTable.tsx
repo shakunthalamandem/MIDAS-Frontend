@@ -16,6 +16,31 @@ interface RiskReportIndexPortfolioTableProps {
   fund: string;
 }
 
+const getOrdinalSuffix = (day: number) => {
+  if (day >= 11 && day <= 13) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDateWithOrdinal = (value: string) => {
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  const day = parsed.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = parsed.toLocaleString(undefined, { month: "short" });
+  const year = parsed.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
+
 interface IndexPortfolioData {
   ticker: string;
   company: string;
@@ -97,7 +122,7 @@ const RiskReportIndexPortfolioTable: React.FC<
         align="center"
       >
         {fund}: Short Analysis as{" "}
-        {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
+        {reportDate ? formatDateWithOrdinal(reportDate) : "-"}
       </Typography>
       <TableContainer>
         <Table size="small">
