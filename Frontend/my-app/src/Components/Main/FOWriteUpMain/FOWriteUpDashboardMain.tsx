@@ -45,23 +45,16 @@ const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({
         const json: FOData[] = await response.json();
         setRows(json);
 
-        // ✅ Select ticker from props if available, else fallback to first row
-        // ✅ Select ticker from props if available, else fallback to last row
+        // Default selection: prefer prop ticker, otherwise use the first row
         if (ticker) {
           const match = json.find((item) => item.ticker === ticker);
           if (match) {
             setSelected({ ticker: match.ticker, deal_id: match.deal_id });
           } else if (json.length > 0) {
-            setSelected({
-              ticker: json[json.length - 1].ticker,
-              deal_id: json[json.length - 1].deal_id,
-            });
+            setSelected({ ticker: json[0].ticker, deal_id: json[0].deal_id });
           }
         } else if (json.length > 0) {
-          setSelected({
-            ticker: json[json.length - 1].ticker,
-            deal_id: json[json.length - 1].deal_id,
-          });
+          setSelected({ ticker: json[0].ticker, deal_id: json[0].deal_id });
         }
       } catch (err) {
         console.error("Error fetching FO data:", err);

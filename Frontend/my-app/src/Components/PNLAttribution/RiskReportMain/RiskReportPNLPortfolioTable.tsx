@@ -19,6 +19,31 @@ interface PortfolioData {
   beta_adj_exposure_lmv: number;
 }
 
+const getOrdinalSuffix = (day: number) => {
+  if (day >= 11 && day <= 13) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDateWithOrdinal = (value: string) => {
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  const day = parsed.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = parsed.toLocaleString(undefined, { month: "short" });
+  const year = parsed.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
+
 const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = ({
   fund,
   showAllRows = false,
@@ -66,14 +91,30 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
   }, [fund]);
 
   const columns: GridColDef[] = [
-    { field: "ticker", headerName: "Ticker", flex: 1, minWidth: 100 },
-    { field: "company", headerName: "Company", flex: 1.5, minWidth: 150 },
+    {
+      field: "ticker",
+      headerName: "Ticker",
+      flex: 1,
+      minWidth: 100,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "company",
+      headerName: "Company",
+      flex: 1.5,
+      minWidth: 150,
+      headerAlign: "center",
+      align: "center",
+    },
     {
       field: "net_of_hedge_pnl",
       headerName: "Net Of Hedge P&L",
       flex: 1,
       minWidth: 150,
       type: "number",
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => {
         const value = params.value as number;
         if (value == null) return "—";
@@ -90,12 +131,16 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
       headerName: "Net Of Hedge P&L (bps)",
       flex: 1,
       minWidth: 150,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "long_exposure",
       headerName: "Long Exp/LMV (%)",
       flex: 1,
       minWidth: 150,
+      headerAlign: "center",
+      align: "center",
       valueFormatter: (params) => `${params}%`,
     },
     {
@@ -103,6 +148,8 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
       headerName: "Beta",
       flex: 0.7,
       minWidth: 100,
+      headerAlign: "center",
+      align: "center",
       valueFormatter: (params) => (params != null ? params : "—"),
     },
     {
@@ -110,11 +157,17 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
       headerName: "Beta Adj.Long Exp. / LMV (%)",
       flex: 1.3,
       minWidth: 180,
+      headerAlign: "center",
+      align: "center",
       valueFormatter: (params) => `${params}%`,
     },
   ];
 
   const rowsPerPage = 50;
+  const centeredCellStyle: React.CSSProperties = {
+    padding: "8px",
+    textAlign: "center",
+  };
 
   const paginatedData = useMemo(() => {
     if (!showAllRows) {
@@ -177,9 +230,8 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
             sx={{ fontWeight: "bold" }}
             align="center"
           >
-            {fund}: Long Analysis as{" "}
-            {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
-          </Typography>
+        {fund}: Long Analysis | Data As of: {formatDateWithOrdinal(reportDate)}
+      </Typography>
           <Typography variant="body2" align="center" color="#5a5a5a">
             No portfolio rows available for export.
           </Typography>
@@ -212,8 +264,7 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
               sx={{ fontWeight: "bold" }}
               align="center"
             >
-              {fund}: Long Analysis as{" "}
-              {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
+              {fund}: Long Analysis | Data As of: {formatDateWithOrdinal(reportDate)}
             </Typography>
             <Typography
               variant="body2"
@@ -236,16 +287,16 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
                   style={{
                     backgroundColor: "#e1eaff",
                     color: "#002060",
-                    textAlign: "left",
+                    textAlign: "center",
                   }}
                 >
-                  <th style={{ padding: "8px" }}>Ticker</th>
-                  <th style={{ padding: "8px" }}>Company</th>
-                  <th style={{ padding: "8px" }}>Net Of Hedge P&amp;L</th>
-                  <th style={{ padding: "8px" }}>Net Of Hedge P&amp;L (bps)</th>
-                  <th style={{ padding: "8px" }}>Long Exp/LMV (%)</th>
-                  <th style={{ padding: "8px" }}>Beta</th>
-                  <th style={{ padding: "8px" }}>Beta Adj.Long Exp. / LMV (%)</th>
+                  <th style={centeredCellStyle}>Ticker</th>
+                  <th style={centeredCellStyle}>Company</th>
+                  <th style={centeredCellStyle}>Net Of Hedge P&amp;L</th>
+                  <th style={centeredCellStyle}>Net Of Hedge P&amp;L (bps)</th>
+                  <th style={centeredCellStyle}>Long Exp/LMV (%)</th>
+                  <th style={centeredCellStyle}>Beta</th>
+                  <th style={centeredCellStyle}>Beta Adj.Long Exp. / LMV (%)</th>
                 </tr>
               </thead>
               <tbody>
@@ -257,27 +308,27 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
                         rowIndex % 2 === 0 ? "#f5f7ff" : "white",
                     }}
                   >
-                    <td style={{ padding: "8px" }}>{row.ticker}</td>
-                    <td style={{ padding: "8px" }}>{row.company}</td>
+                    <td style={centeredCellStyle}>{row.ticker}</td>
+                    <td style={centeredCellStyle}>{row.company}</td>
                     <td
                       style={{
-                        padding: "8px",
+                        ...centeredCellStyle,
                         color: row.net_of_hedge_pnl < 0 ? "red" : "green",
                         fontWeight: 500,
                       }}
                     >
                       {formatCurrency(row.net_of_hedge_pnl)}
                     </td>
-                    <td style={{ padding: "8px" }}>
+                    <td style={centeredCellStyle}>
                       {formatNumber(row.net_of_hedge_pnl_bps)}
                     </td>
-                    <td style={{ padding: "8px" }}>
+                    <td style={centeredCellStyle}>
                       {formatNumber(row.long_exposure, "%")}
                     </td>
-                    <td style={{ padding: "8px" }}>
+                    <td style={centeredCellStyle}>
                       {row.beta == null ? "-" : row.beta}
                     </td>
-                    <td style={{ padding: "8px" }}>
+                    <td style={centeredCellStyle}>
                       {formatNumber(row.beta_adj_exposure_lmv, "%")}
                     </td>
                   </tr>
@@ -309,8 +360,7 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
         sx={{ fontWeight: "bold" }}
         align="center"
       >
-        {fund}: Long Analysis as{" "}
-        {reportDate ? new Date(reportDate).toLocaleDateString() : "-"}
+        {fund}: Long Analysis | Data As of: {formatDateWithOrdinal(reportDate)}
       </Typography>
 
       {/* Increased height */}
@@ -325,29 +375,22 @@ const RiskReportPNLPortfolioTable: React.FC<RiskReportPNLPortfolioTableProps> = 
           initialState={{
             pagination: { paginationModel: { pageSize: 25 } },
           }}
-          sx={{
-            border: 0,
-            backgroundColor: "white",
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#e1eaff",
-              fontWeight: "bold",
-              color: "#002060",
-              textAlign: "left",
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              justifyContent: "flex-start",
-            },
-            "& .MuiDataGrid-row": {
-              alignItems: "center",
-            },
-            "& .MuiDataGrid-cell": {
-              justifyContent: "flex-start",
-              textAlign: "left",
-            },
-            "& .MuiDataGrid-row:nth-of-type(odd)": {
-              backgroundColor: "#f5f7ff",
-            },
-          }}
+            sx={{
+    "& .MuiDataGrid-container--top [role='row']": {
+      backgroundColor: "#002060",
+      fontWeight: "bold",
+      color: "#FFFFFF",
+      alignItems: "center",
+    },
+    "& .Mui-selected": {
+      backgroundColor: "#cad0f1ff !important",
+    },
+    "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
+      color: "#FFFFFF",
+    },
+    cursor: "pointer",
+    border: "1px solid #ccccccff",
+  }}
         />
       </div>
     </Paper>
