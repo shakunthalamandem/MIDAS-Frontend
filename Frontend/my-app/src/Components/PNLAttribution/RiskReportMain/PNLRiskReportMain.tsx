@@ -24,6 +24,30 @@ interface PNLRiskReportMainProps {
   fund?: string;
 }
 
+const getOrdinalSuffix = (day: number) => {
+  if (day >= 11 && day <= 13) {
+    return "th";
+  }
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDateWithOrdinal = (date: Date) => {
+  const day = date.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = date.toLocaleString(undefined, { month: "short" });
+  const year = date.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
+
 const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
   const fundOptions = [
     "BEMAP2",
@@ -81,11 +105,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
     if (Number.isNaN(parsed.getTime())) {
       return maxTradeDate;
     }
-    return parsed.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    return formatDateWithOrdinal(parsed);
   }, [maxTradeDate]);
 
 	const pdfCardStyles = {
@@ -137,8 +157,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="h6" color="#002060" fontWeight={600}>
-              {selectedFund}: Summary as of{" "}
-              {formattedTradeDate}
+              {selectedFund} |Summary as of: {formattedTradeDate}
             </Typography>
           </Grid>
 
