@@ -8,6 +8,7 @@ import {
   Container,
   Divider,
   Grid,
+  MenuItem,
   TextField,
   Typography,
 } from '@mui/material';
@@ -34,6 +35,8 @@ const discountFields: Array<{
   { key: 'emergingMkt', label: 'Emerging mkt', helper: 'Share the emerging market focus or notes.' },
 ];
 
+const yesNoOptions = ['Yes', 'No'] as const;
+
 const gradientShift = {
   '@keyframes gradientShift': {
     '0%': { backgroundPosition: '0% 50%' },
@@ -42,52 +45,44 @@ const gradientShift = {
   },
 };
 
-const floatRise = {
-  '@keyframes floatRise': {
-    '0%': { transform: 'translateY(0px)' },
-    '50%': { transform: 'translateY(-6px)' },
-    '100%': { transform: 'translateY(0px)' },
+const subtlePulse = {
+  '@keyframes subtlePulse': {
+    '0%': { transform: 'translateY(0px)', opacity: 0.95 },
+    '50%': { transform: 'translateY(-3px)', opacity: 1 },
+    '100%': { transform: 'translateY(0px)', opacity: 0.95 },
   },
 };
 
 const formFieldBase = {
-  background: 'rgba(255,255,255,0.18)',
-  borderRadius: '14px',
-  border: '1px solid rgba(255,255,255,0.4)',
-  boxShadow: '0 8px 24px rgba(0,0,0,0.11)',
-  transition: 'transform 0.3s ease, border 0.3s ease',
-  backdropFilter: 'blur(14px)',
+  background: 'rgba(255,255,255,0.95)',
+  borderRadius: '10px',
+  border: '1px solid rgba(2,32,96,0.15)',
+  transition: 'transform 0.15s ease, border 0.15s ease',
   '& .MuiOutlinedInput-root': {
     borderRadius: 'inherit',
     '& fieldset': {
       borderColor: 'transparent',
     },
-    '&:hover fieldset': {
-      borderColor: 'rgba(0,32,96,0.35)',
-    },
     '&.Mui-focused fieldset': {
-      borderColor: 'rgba(0,32,96,0.75)',
+      borderColor: 'rgba(2,32,96,0.5)',
+    },
+    '&:hover fieldset': {
+      borderColor: 'rgba(2,32,96,0.25)',
     },
   },
   '&:hover': {
-    transform: 'translateY(-2px)',
+    transform: 'translateY(-1px)',
   },
 };
 
 const summaryBoxBase = {
-  borderRadius: '14px',
-  padding: '1rem',
-  minWidth: '160px',
-  flex: '1 1 160px',
-  background:
-    'linear-gradient(145deg, rgba(255,255,255,0.92), rgba(223,235,255,0.85), rgba(255,255,255,0.68))',
-  border: '1px solid rgba(0,32,96,0.11)',
-  boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: '0 18px 40px rgba(0,32,96,0.22)',
-  },
+  borderRadius: '10px',
+  padding: '0.75rem',
+  minWidth: '140px',
+  flex: '1 1 150px',
+  background: 'rgba(255,255,255,0.95)',
+  border: '1px solid rgba(2,32,96,0.08)',
+  boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
 };
 
 const ABBDiscountDataMainFunction: React.FC = () => {
@@ -192,33 +187,33 @@ const ABBDiscountDataMainFunction: React.FC = () => {
     <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
       <Card
         sx={{
-          borderRadius: '28px',
-          boxShadow: '0 30px 60px rgba(2,32,96,0.25)',
-          border: '1px solid rgba(255,255,255,0.4)',
-          background: 'linear-gradient(135deg, rgba(235,247,255,0.95), rgba(218,229,255,0.93))',
+          borderRadius: '26px',
           position: 'relative',
           overflow: 'hidden',
+          border: '1px solid rgba(2,32,96,0.12)',
+          background: 'linear-gradient(145deg, #fdfdfd 0%, #eef2ff 90%)',
+          color: '#041434',
+          boxShadow: '0 20px 40px rgba(2,32,96,0.15)',
           ...gradientShift,
-          backgroundSize: '300% 300%',
-          animation: 'gradientShift 14s ease-in-out infinite',
+          backgroundSize: '360% 360%',
+          animation: 'gradientShift 24s ease-in-out infinite',
         }}
       >
         <CardContent
           sx={{
             position: 'relative',
             zIndex: 2,
-            color: '#041434',
+            background: 'rgba(255,255,255,0.95)',
+            borderRadius: '26px',
+            padding: { xs: 3, md: 4 },
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
             ABB Discount Data
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#0d1c49', mb: 3 }}>
-            Enter the richer discount profile you want to push to ABB.
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2}>
+            <Grid container spacing={{ xs: 2, md: 3 }}>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -229,7 +224,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
                   required
                   InputLabelProps={{
                     shrink: true,
-                    sx: { color: '#0c1d3f', fontWeight: 600 },
+                    sx: { color: '#1d2b54', fontWeight: 600 },
                   }}
                   sx={{
                     ...formFieldBase,
@@ -247,40 +242,76 @@ const ABBDiscountDataMainFunction: React.FC = () => {
                   required
                   InputLabelProps={{
                     shrink: true,
-                    sx: { color: '#0c1d3f', fontWeight: 600 },
+                    sx: { color: '#1d2b54', fontWeight: 600 },
                   }}
                   sx={{
                     ...formFieldBase,
                   }}
                 />
               </Grid>
-
-              {discountFields.map((field) => (
-                <Grid item xs={12} sm={6} md={4} key={field.key}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    label={field.label}
-                    placeholder={field.helper}
-                    value={formValues[field.key]}
-                    onChange={handleFieldChange(field.key)}
-                    helperText={field.helper}
-                    InputLabelProps={{ sx: { color: '#0c1d3f', fontWeight: 600 } }}
-                    sx={{
-                      ...formFieldBase,
-                    }}
-                  />
-                </Grid>
-              ))}
             </Grid>
 
             <Box
               sx={{
                 display: 'flex',
-                justifyContent: { xs: 'center', sm: 'space-between' },
-                alignItems: 'center',
+                flexWrap: 'nowrap',
                 gap: 2,
                 mt: 3,
+                overflowX: 'auto',
+                pb: 1,
+                '&::-webkit-scrollbar': {
+                  height: 4,
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: '#cfd5ec',
+                  borderRadius: 2,
+                },
+              }}
+            >
+              {discountFields.map((field) => (
+                <TextField
+                  key={field.key}
+                  select
+                  variant="outlined"
+                  label={field.label}
+                  value={formValues[field.key]}
+                  onChange={handleFieldChange(field.key)}
+                  InputLabelProps={{
+                    shrink: true,
+                    sx: { color: '#1d2b54', fontWeight: 600 },
+                  }}
+                  SelectProps={{
+                    displayEmpty: true,
+                  }}
+                  sx={{
+                    ...formFieldBase,
+                    flex: '1 1 18%',
+                    minWidth: { xs: 150, md: 170 },
+                    '& .MuiSelect-select': {
+                      paddingTop: 1.25,
+                      paddingBottom: 1.25,
+                    },
+                  }}
+                >
+                  <MenuItem value="" disabled>
+                    Select option
+                  </MenuItem>
+                  {yesNoOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              ))}
+            </Box>
+
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: { xs: 'center', md: 'flex-start' },
+                alignItems: 'center',
+                gap: 2,
+                mt: { xs: 3, md: 4 },
                 flexWrap: 'wrap',
               }}
             >
@@ -289,42 +320,47 @@ const ABBDiscountDataMainFunction: React.FC = () => {
                 type="submit"
                 disabled={loading || isSubmitDisabled}
                 sx={{
-                  ...floatRise,
-                  animation: 'floatRise 6.5s ease-in-out infinite',
-                  background: 'linear-gradient(145deg, #002060, #0060c8)',
-                  borderRadius: '16px',
-                  paddingX: 3.5,
-                  paddingY: 1.4,
-                  boxShadow: '0 10px 30px rgba(0,32,96,0.45)',
+                  ...subtlePulse,
+                  animation: 'subtlePulse 6s ease-in-out infinite',
+                  background: 'linear-gradient(135deg, #00b4ff, #0045ff)',
+                  borderRadius: '20px',
+                  paddingX: 4,
+                  paddingY: 1.5,
+                  boxShadow: '0 12px 36px rgba(0,69,255,0.35)',
                   textTransform: 'capitalize',
+                  fontWeight: 600,
+                  color: '#fff',
+                  '&:hover': {
+                    boxShadow: '0 18px 42px rgba(0,69,255,0.55)',
+                  },
                   '&.Mui-disabled': {
-                    background: 'rgba(0,32,96,0.4)',
-                    boxShadow: '0 6px 20px rgba(0,32,96,0.25)',
+                    background: 'rgba(0,69,255,0.3)',
+                    boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
                   },
                 }}
               >
                 {loading ? 'Processing...' : 'Submit to ABB API'}
               </Button>
 
-              <Box sx={{ flexGrow: 1, maxWidth: 320 }}>
-                <Typography variant="body2" sx={{ color: '#0f1b3f' }}>
-                  The payload includes the discount labels you define above plus the ticker and trade
-                  date.
+              <Box sx={{ flexGrow: 1, maxWidth: 320, pl: { md: 4 } }}>
+          <Typography variant="body2" sx={{ color: '#1d2b54' }}>
+                  The payload contains the discount flags above plus the ticker and trade date
+                  submitted.
                 </Typography>
               </Box>
             </Box>
           </Box>
 
-          <Divider sx={{ my: 3, borderColor: 'rgba(0,32,96,0.25)' }} />
+          <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.15)' }} />
 
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, mt: 1 }}>
             {summaryRows.map((row) => (
               <Box key={row.label} sx={{ ...summaryBoxBase }}>
-                <Typography variant="caption" sx={{ color: '#00183b' }}>
+                <Typography variant="caption" sx={{ color: '#0f1f43' }}>
                   {row.label}
                 </Typography>
-                <Typography variant="subtitle2" sx={{ color: '#002060', fontWeight: 600 }}>
-                  {row.value || 'N/A'}
+                <Typography variant="subtitle2" sx={{ color: '#021b4c', fontWeight: 600, mt: 0.25 }}>
+                  {row.value || 'Not set'}
                 </Typography>
               </Box>
             ))}
@@ -335,9 +371,9 @@ const ABBDiscountDataMainFunction: React.FC = () => {
               severity="error"
               sx={{
                 mt: 3,
-                borderRadius: '12px',
-                backgroundColor: 'rgba(255,231,231,0.9)',
-                border: '1px solid rgba(192,42,42,0.3)',
+                borderRadius: '14px',
+                backgroundColor: 'rgba(255,203,203,0.95)',
+                border: '1px solid rgba(192,42,42,0.4)',
               }}
             >
               {error}
@@ -349,9 +385,9 @@ const ABBDiscountDataMainFunction: React.FC = () => {
               severity="success"
               sx={{
                 mt: 3,
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, rgba(208,248,255,0.8), rgba(235,255,241,0.9))',
-                border: '1px solid rgba(0,96,155,0.3)',
+                borderRadius: '14px',
+                background: 'linear-gradient(135deg, rgba(183,241,255,0.7), rgba(216,255,229,0.85))',
+                border: '1px solid rgba(0,96,155,0.35)',
               }}
             >
               {serverResponse.detail
@@ -360,17 +396,6 @@ const ABBDiscountDataMainFunction: React.FC = () => {
             </Alert>
           )}
         </CardContent>
-
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'radial-gradient(circle at 20% 20%, rgba(0,96,255,0.18), transparent 60%), radial-gradient(circle at 80% 0%, rgba(0,32,96,0.22), transparent 55%)',
-            opacity: 0.8,
-            pointerEvents: 'none',
-          }}
-        />
       </Card>
     </Container>
   );
