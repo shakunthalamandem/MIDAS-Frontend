@@ -48,6 +48,63 @@ const formatDateWithOrdinal = (date: Date) => {
   return `${day}${suffix} ${month} ${year}`;
 };
 
+const SectionFootnote: React.FC<{ text?: string; hidden?: boolean }> = ({
+  text = "",
+  hidden = false,
+}) => {
+  const lines = useMemo(
+    () =>
+      text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0),
+    [text]
+  );
+
+  if (!lines.length) {
+    return null;
+  }
+
+  return (
+    <Box
+      mt={2}
+      pt={1.5}
+      sx={{
+        borderTop: "1px dashed rgba(0, 32, 96, 0.2)",
+        display: hidden ? "none" : "block",
+      }}
+      aria-hidden={hidden}
+    >
+      {lines.map((line, index) => (
+        <Typography
+          key={`section-footnote-${index}`}
+          variant="caption"
+          color="#5a5a5a"
+          display="block"
+          sx={{ lineHeight: 1.4 }}
+        >
+          {(() => {
+            const separatorIndex = line.indexOf(":");
+            if (separatorIndex === -1) {
+              return line;
+            }
+            const heading = line.slice(0, separatorIndex).trim();
+            const description = line.slice(separatorIndex + 1).trimStart();
+            return (
+              <>
+                <Box component="span" fontWeight={600}>
+                  {heading}
+                </Box>
+                {description ? `: ${description}` : ":"}
+              </>
+            );
+          })()}
+        </Typography>
+      ))}
+    </Box>
+  );
+};
+
 const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
   const fundOptions = [
     "BEMAP2",
@@ -207,8 +264,13 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 
         <Grid container spacing={3} mt={2}>
 			<Grid item xs={12}>
-				<Box className="pdf-section" sx={pdfCardStyles} data-footnote={footnoteRegion}>
+				<Box
+					className="pdf-section"
+					sx={pdfCardStyles}
+					data-footnote={pdfMode ? footnoteRegion : undefined}
+				>
 					<RiskReportRegionWiseTable fund={selectedFund} />
+					<SectionFootnote text={footnoteRegion} hidden={pdfMode} />
 				</Box>
 			</Grid>
 
@@ -229,8 +291,13 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 				</Box>
 			</Grid>
 			<Grid item xs={12} md={pdfMode ? 12 : 6}>
-				<Box className="pdf-section" sx={pdfCardStyles} data-footnote={footnoteVaR}>
+				<Box
+					className="pdf-section"
+					sx={pdfCardStyles}
+					data-footnote={pdfMode ? footnoteVaR : undefined}
+				>
 					<RiskReportDailyPnlvsVarChart fund={selectedFund} />
+					<SectionFootnote text={footnoteVaR} hidden={pdfMode} />
 				</Box>
 			</Grid>
           <Grid item xs={12}>
@@ -248,19 +315,26 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 				<Box
 					className={pdfMode ? undefined : "pdf-section"}
 					sx={pdfCardStyles}
-					data-footnote={pdfMode ? undefined : footnotePortfolio}
 				>
 					<RiskReportPNLPortfolioTable
 						fund={selectedFund}
 						showAllRows={pdfMode}
 						footnote={footnotePortfolio}
 					/>
+					{!pdfMode && (
+						<SectionFootnote text={footnotePortfolio} hidden={pdfMode} />
+					)}
 				</Box>
 			</Grid>
 
 			<Grid item xs={12}>
-				<Box className="pdf-section" sx={pdfCardStyles} data-footnote={footnoteIndex}>
+				<Box
+					className="pdf-section"
+					sx={pdfCardStyles}
+					data-footnote={pdfMode ? footnoteIndex : undefined}
+				>
 					<RiskReportIndexPortfolioTable fund={selectedFund} />
+					<SectionFootnote text={footnoteIndex} hidden={pdfMode} />
 				</Box>
 			</Grid>
         </Grid>
