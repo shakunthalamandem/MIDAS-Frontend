@@ -45,44 +45,30 @@ const gradientShift = {
   },
 };
 
-const subtlePulse = {
-  '@keyframes subtlePulse': {
-    '0%': { transform: 'translateY(0px)', opacity: 0.95 },
-    '50%': { transform: 'translateY(-3px)', opacity: 1 },
-    '100%': { transform: 'translateY(0px)', opacity: 0.95 },
-  },
-};
-
 const formFieldBase = {
-  background: 'rgba(255,255,255,0.95)',
-  borderRadius: '10px',
-  border: '1px solid rgba(2,32,96,0.15)',
-  transition: 'transform 0.15s ease, border 0.15s ease',
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 'inherit',
-    '& fieldset': {
-      borderColor: 'transparent',
+  background: 'transparent',
+  borderRadius: 0,
+  '& .MuiInput-root': {
+    fontSize: '0.95rem',
+    '&:before': {
+      borderBottomColor: 'rgba(2,32,96,0.25)',
     },
-    '&.Mui-focused fieldset': {
-      borderColor: 'rgba(2,32,96,0.5)',
-    },
-    '&:hover fieldset': {
-      borderColor: 'rgba(2,32,96,0.25)',
+    '&:after': {
+      borderBottomColor: 'rgba(0,90,255,0.95)',
     },
   },
-  '&:hover': {
-    transform: 'translateY(-1px)',
+  '& .MuiInput-root.Mui-focused:after': {
+    borderBottomColor: 'rgba(0,90,255,0.95)',
   },
 };
 
 const summaryBoxBase = {
-  borderRadius: '10px',
-  padding: '0.75rem',
+  borderRadius: '8px',
+  padding: '0.65rem',
   minWidth: '140px',
   flex: '1 1 150px',
-  background: 'rgba(255,255,255,0.95)',
-  border: '1px solid rgba(2,32,96,0.08)',
-  boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+  background: 'transparent',
+  borderBottom: '1px solid rgba(0,0,0,0.12)',
 };
 
 const ABBDiscountDataMainFunction: React.FC = () => {
@@ -187,28 +173,28 @@ const ABBDiscountDataMainFunction: React.FC = () => {
     <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
       <Card
         sx={{
-          borderRadius: '26px',
+          borderRadius: '32px',
           position: 'relative',
           overflow: 'hidden',
-          border: '1px solid rgba(2,32,96,0.12)',
-          background: 'linear-gradient(145deg, #fdfdfd 0%, #eef2ff 90%)',
+          border: '1px solid rgba(2,32,96,0.1)',
+          background: 'linear-gradient(145deg, #dbefff 0%, #e6f6ff 60%, #fcfdff 100%)',
           color: '#041434',
-          boxShadow: '0 20px 40px rgba(2,32,96,0.15)',
+          boxShadow: '0 15px 45px rgba(2,32,96,0.18)',
           ...gradientShift,
-          backgroundSize: '360% 360%',
-          animation: 'gradientShift 24s ease-in-out infinite',
+          backgroundSize: '380% 380%',
+          animation: 'gradientShift 28s ease-in-out infinite',
         }}
       >
         <CardContent
           sx={{
             position: 'relative',
             zIndex: 2,
-            background: 'rgba(255,255,255,0.95)',
-            borderRadius: '26px',
+            background: 'transparent',
+            borderRadius: '32px',
             padding: { xs: 3, md: 4 },
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: '#0b2b57' }}>
             ABB Discount Data
           </Typography>
 
@@ -217,7 +203,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  variant="outlined"
+                  variant="standard"
                   label="Ticker"
                   value={formValues.ticker}
                   onChange={handleFieldChange('ticker')}
@@ -234,7 +220,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  variant="outlined"
+                  variant="standard"
                   type="date"
                   label="Trade Date"
                   value={formValues.tradeDate}
@@ -272,7 +258,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
                 <TextField
                   key={field.key}
                   select
-                  variant="outlined"
+                  variant="standard"
                   label={field.label}
                   value={formValues[field.key]}
                   onChange={handleFieldChange(field.key)}
@@ -320,22 +306,16 @@ const ABBDiscountDataMainFunction: React.FC = () => {
                 type="submit"
                 disabled={loading || isSubmitDisabled}
                 sx={{
-                  ...subtlePulse,
-                  animation: 'subtlePulse 6s ease-in-out infinite',
-                  background: 'linear-gradient(135deg, #00b4ff, #0045ff)',
-                  borderRadius: '20px',
-                  paddingX: 4,
-                  paddingY: 1.5,
-                  boxShadow: '0 12px 36px rgba(0,69,255,0.35)',
-                  textTransform: 'capitalize',
+                  background: '#0b2b57',
+                  borderRadius: '18px',
+                  paddingX: 3.5,
+                  paddingY: 1.25,
+                  boxShadow: '0 12px 30px rgba(11,43,87,0.18)',
+                  textTransform: 'none',
                   fontWeight: 600,
                   color: '#fff',
                   '&:hover': {
-                    boxShadow: '0 18px 42px rgba(0,69,255,0.55)',
-                  },
-                  '&.Mui-disabled': {
-                    background: 'rgba(0,69,255,0.3)',
-                    boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
+                    background: '#0a264d',
                   },
                 }}
               >
@@ -343,15 +323,14 @@ const ABBDiscountDataMainFunction: React.FC = () => {
               </Button>
 
               <Box sx={{ flexGrow: 1, maxWidth: 320, pl: { md: 4 } }}>
-          <Typography variant="body2" sx={{ color: '#1d2b54' }}>
-                  The payload contains the discount flags above plus the ticker and trade date
-                  submitted.
+                <Typography variant="body2" sx={{ color: '#1d2b54' }}>
+                  The payload contains the discount flags above plus the ticker and trade date submitted.
                 </Typography>
               </Box>
             </Box>
           </Box>
 
-          <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.15)' }} />
+          <Divider sx={{ my: 3, borderColor: 'rgba(2,32,96,0.15)' }} />
 
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, mt: 1 }}>
             {summaryRows.map((row) => (
