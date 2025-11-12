@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Paper,
   Typography,
@@ -23,6 +23,28 @@ interface SectorExposure {
   long_exposure: number;
   beta_adj_long_Exp_lmv: number;
 }
+
+const getOrdinalSuffix = (day: number) => {
+  if (day >= 11 && day <= 13) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDateWithOrdinal = (date: Date) => {
+  const day = date.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = date.toLocaleString(undefined, { month: "short" });
+  const year = date.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
 
 const PNLSectorWiseFundDetails: React.FC<PNLSectorWiseFundDetailsProps> = ({
   fund,
@@ -63,6 +85,13 @@ const PNLSectorWiseFundDetails: React.FC<PNLSectorWiseFundDetailsProps> = ({
 
     fetchSectorExposure();
   }, [fund]);
+
+  const formattedReportDate = useMemo(() => {
+    if (!reportDate) return "N/A";
+    const parsedDate = new Date(reportDate);
+    if (Number.isNaN(parsedDate.getTime())) return reportDate;
+    return formatDateWithOrdinal(parsedDate);
+  }, [reportDate]);
 
   if (loading) {
     return (
@@ -106,8 +135,7 @@ const PNLSectorWiseFundDetails: React.FC<PNLSectorWiseFundDetailsProps> = ({
         sx={{ fontWeight: "bold" }}
         align="center"
       >
-        {fund}: Summary by category as of{" "}
-        {reportDate ? new Date(reportDate).toLocaleDateString() : "—"}
+        {fund}: Data As of: {formattedReportDate}
       </Typography>
 
       <TableContainer>

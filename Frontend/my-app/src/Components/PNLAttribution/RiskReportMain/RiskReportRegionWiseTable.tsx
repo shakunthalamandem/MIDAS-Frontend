@@ -24,7 +24,7 @@ interface RegionWiseData {
   netOfHedgePnl: number | string;
 }
 
-const REGION_ORDER = ["US",  "EMEA","APAC", "Non-US America", "Total"];
+const REGION_ORDER = ["US", "EMEA", "APAC", "Non-US America"];
 
 const formatPercent = (value: number | string) => {
   if (value === "–" || value === null || value === undefined) return "–";
@@ -148,49 +148,28 @@ const RiskReportRegionWiseTable: React.FC<RiskReportRegionWiseTableProps> = ({
             </TableRow>
           </TableHead>
 <TableBody>
-  {tableData.map((row, index) => {
-    const isTotal = row.region === "Total"; // Last row
-    return (
-      <TableRow
-        key={row.region}
-        sx={{
-          backgroundColor: isTotal ? "#d8e2dbff" : "inherit", // light background for Total
-          height: 26, // reduce row height
-          "& .MuiTableCell-root": {
-            fontWeight: isTotal ? 600 : 400, // bold for Total
-          },
-        }}
-      >
-        <TableCell align="center" sx={{ color: isTotal ? "#002060" : "inherit" }}>
-          {row.region}
-        </TableCell>
-        <TableCell
-          align="center"
-          sx={{ color: isTotal ? "#002060" : "inherit" }}
-        >
-          {formatPercent(row.netOfHedgePnlPercent)}
-        </TableCell>
-        <TableCell
-          align="center"
-          sx={{ color: isTotal ? "#002060" : "inherit" }}
-        >
-          {formatPercentlmv(row.longExposure)}
-        </TableCell>
-        <TableCell
-          align="center"
-          sx={{ color: isTotal ? "#002060" : "inherit" }}
-        >
-          {formatPercentlmv(row.betaAdjLongExp)}
-        </TableCell>
-        <TableCell
-          align="center"
-          sx={{ color: isTotal ? "#002060" : "inherit" }}
-        >
-          {formatDollarK(row.netOfHedgePnl)}
-        </TableCell>
-      </TableRow>
-    );
-  })}
+  {tableData.map((row) => (
+    <TableRow
+      key={row.region}
+      sx={{
+        height: 26,
+      }}
+    >
+      <TableCell align="center">{row.region}</TableCell>
+      <TableCell align="center">
+        {formatPercent(row.netOfHedgePnlPercent)}
+      </TableCell>
+      <TableCell align="center">
+        {formatPercentlmv(row.longExposure)}
+      </TableCell>
+      <TableCell align="center">
+        {formatPercentlmv(row.betaAdjLongExp)}
+      </TableCell>
+      <TableCell align="center">
+        {formatDollarK(row.netOfHedgePnl)}
+      </TableCell>
+    </TableRow>
+  ))}
 </TableBody>
 
 

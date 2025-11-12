@@ -68,7 +68,39 @@ const coerceToNumber = (value: number | string): number | null => {
   return null;
 };
 
-const formatValue = (key: string, value: number | string): string => {
+interface FormatValueOptions {
+  fractionDigits?: number;
+  compactNetOfHedge?: boolean;
+}
+
+const formatCompactNetOfHedge = (value: number) => {
+  const magnitude = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+  const format = (num: number, suffix: string) => {
+    const formatted = num.toLocaleString(undefined, {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    });
+    return `${sign}$${formatted}${suffix}`;
+  };
+
+  if (magnitude >= 1_000_000) {
+    return format(magnitude / 1_000_000, "M");
+  }
+  if (magnitude >= 1_000) {
+    return format(magnitude / 1_000, "K");
+  }
+  return `${sign}$${magnitude.toLocaleString()}`;
+};
+
+const formatValue = (
+  key: string,
+  value: number | string,
+  options: number | FormatValueOptions = {}
+): string => {
+  const normalizedOptions: FormatValueOptions =
+    typeof options === "number" ? { fractionDigits: options } : options;
+  const { fractionDigits = 1, compactNetOfHedge = false } = normalizedOptions;
   const numericValue = coerceToNumber(value);
   if (numericValue === null) return String(value ?? "");
 
@@ -79,14 +111,17 @@ const formatValue = (key: string, value: number | string): string => {
   }
 
   if (NET_OF_HEDGE_KEYS.has(key)) {
+    if (compactNetOfHedge) {
+      return formatCompactNetOfHedge(numericValue);
+    }
     const sign = numericValue < 0 ? "-" : "";
     const magnitude = Math.abs(numericValue);
     return `${sign}$${magnitude.toLocaleString()}`;
   }
 
   const num = numericValue.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
   });
   return isPercentKey(key) ? `${num}%` : num;
 };
@@ -240,7 +275,10 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
                     {RISK_REPORT_LABELS[key] || key}
                   </TableCell>
                   <TableCell align="right" sx={{ fontWeight: 600, py: 0.4 }}>
-                    {formatValue(key, value)}
+                    {formatValue(key, value, {
+                      fractionDigits: index === 2 ? 2 : 1,
+                      compactNetOfHedge: index === 0 || index === 1,
+                    })}
                   </TableCell>
                 </TableRow>
               ))}

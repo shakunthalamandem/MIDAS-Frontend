@@ -142,7 +142,7 @@ const PNLTabMain = () => {
                 </Box>
               }
             />
-             {/* <FormControlLabel
+             <FormControlLabel
               value="pnl_risk_report"
               control={
                 <Radio
@@ -158,7 +158,7 @@ const PNLTabMain = () => {
                   <Typography variant="h6">Risk Report to Fund</Typography>
                 </Box>
               }
-            /> */}
+            />
           </RadioGroup>
         </FormControl>
       </Box>
