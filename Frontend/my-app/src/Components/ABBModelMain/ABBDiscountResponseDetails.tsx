@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Grid, Typography } from '@mui/material';
+import { Box, Card, CardContent, Grid, Typography } from '@mui/material';
 
 const formatLabel = (key: string) =>
   key
@@ -27,8 +27,11 @@ const ABBDiscountResponseDetails: React.FC<ABBDiscountResponseDetailsProps> = ({
     payload && Array.isArray(payload.data) && payload.data.length ? payload.data[0] : payload;
   if (!detail || typeof detail !== 'object') return null;
 
-  const entries = Object.entries(detail).filter(([, value]) => value !== undefined && value !== null);
+  const entries = Object.entries(detail);
   if (!entries.length) return null;
+
+  const descriptionEntry = entries.find(([key]) => key === 'company_description');
+  const visibleEntries = entries.filter(([key]) => key !== 'company_description');
 
   return (
     <Card
@@ -45,7 +48,7 @@ const ABBDiscountResponseDetails: React.FC<ABBDiscountResponseDetailsProps> = ({
           Live ABB Response
         </Typography>
         <Grid container spacing={2}>
-          {entries.slice(0, 8).map(([key, value]) => (
+          {visibleEntries.map(([key, value]) => (
             <Grid item xs={12} sm={6} md={3} key={key}>
               <Typography variant="caption" sx={{ color: '#344155' }}>
                 {formatLabel(key)}
@@ -56,6 +59,19 @@ const ABBDiscountResponseDetails: React.FC<ABBDiscountResponseDetailsProps> = ({
             </Grid>
           ))}
         </Grid>
+        {descriptionEntry && (
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="caption" sx={{ color: '#344155' }}>
+              {formatLabel(descriptionEntry[0])}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 400, color: '#0b2b57', mt: 0.5, lineHeight: 1.6 }}
+            >
+              {formatValue(descriptionEntry[1])}
+            </Typography>
+          </Box>
+        )}
       </CardContent>
     </Card>
   );
