@@ -13,6 +13,8 @@ import {
   Typography,
 } from '@mui/material';
 
+import ABBDiscountResponseDetails from './ABBDiscountResponseDetails';
+
 interface DiscountFormValues {
   ticker: string;
   tradeDate: string;
@@ -194,7 +196,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
             padding: { xs: 3, md: 4 },
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: '#0b2b57' }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: '#0b2b57' }} align='center'>
             ABB Discount Data
           </Typography>
 
@@ -376,6 +378,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
           )}
         </CardContent>
       </Card>
+      <ABBDiscountResponseDetails payload={serverResponse} />
     </Container>
   );
 };
