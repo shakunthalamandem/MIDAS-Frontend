@@ -360,7 +360,7 @@ const IPOS1FileUpload: React.FC = () => {
                   color="primary"
                   disabled={
                     loading ||
-                    isEMEA ||
+                    // isEMEA ||
                     files.length === 0 ||
                     !ticker.trim() ||
                     !sector.trim()
