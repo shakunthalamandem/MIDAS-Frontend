@@ -22,14 +22,14 @@ import { SelectChangeEvent } from "@mui/material";
 type Region = "US" | "HK" | "EMEA";
 type USDocType = "S1" | "Report Card";
 type HKDocType = "A1" | "Additional Documents";
-type EMEADocType = "All Analytic Documents";
+type EMEADocType = "S1" ;
 type DocType = USDocType | HKDocType | EMEADocType;
 
 const REGION_OPTIONS: Region[] = ["US", "HK", "EMEA"];
 const REGION_TO_TYPES: Record<Region, DocType[]> = {
   US: ["S1", "Report Card"],
   HK: ["A1", "Additional Documents"],
-  EMEA: ["All Analytic Documents"],
+  EMEA: ["S1" ],
 };
 
 // 🔽 Common sector list (adjust as needed to match your backend enums/values)
@@ -52,7 +52,8 @@ const SECTOR_OPTIONS = [
 
 const isSingleFileDoc = (region: Region, docType?: DocType) =>
   (region === "US" && docType === "S1") ||
-  (region === "HK" && docType === "A1");
+  (region === "HK" && docType === "A1")||
+  (region === "EMEA" && docType === "S1");
 
 const endpointFor = (region: Region, docType?: DocType) => {
   if (region === "US" && docType === "S1") return "upload_s1";
@@ -61,6 +62,8 @@ const endpointFor = (region: Region, docType?: DocType) => {
   if (region === "HK" && docType === "A1") return "upload_s1";
   if (region === "HK" && docType === "Additional Documents")
     return "update_ipo_s1_ai";
+  if (region === "EMEA" && docType === "S1") return "upload_s1";
+
   return undefined;
 };
 
@@ -133,12 +136,12 @@ const IPOS1FileUpload: React.FC = () => {
   };
 
   const validate = () => {
-    if (isEMEA) {
-      setMessage("EMEA uploads are coming soon.");
-      setSeverity("info");
-      setSnackbarOpen(true);
-      return false;
-    }
+    // if (isEMEA) {
+    //   setMessage("please select a region other than EMEA.");
+    //   setSeverity("info");
+    //   setSnackbarOpen(true);
+    //   return false;
+    // }
     if (!files.length) {
       setMessage("Please select PDF file(s).");
       setSeverity("error");
@@ -261,14 +264,14 @@ const IPOS1FileUpload: React.FC = () => {
               </Select>
             </FormControl>
           </Stack>
-
+{/* 
           {isEMEA && (
             <Alert severity="info" sx={{ mb: 2 }}>
               EMEA uploads are <strong>coming soon</strong>.
             </Alert>
-          )}
+          )} */}
 
-          {!isEMEA && (
+          { (
             <>
               <Stack
                 direction={{ xs: "column", sm: "row" }}
