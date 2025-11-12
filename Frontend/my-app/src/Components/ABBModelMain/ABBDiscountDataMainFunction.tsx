@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   CardContent,
+  Container,
   Divider,
   Grid,
   TextField,
@@ -132,6 +133,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
   }, [formValues]);
 
   return (
+    <Container sx={{ py: 4 }} maxWidth="xl">
     <Card
       sx={{
         borderRadius: 3,
@@ -152,9 +154,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
           <Typography variant="h5" sx={{ fontWeight: 700 }}>
             ABB Discount Model
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.85, mt: 0.5 }}>
-            Provide the discount-driving inputs and trade context to generate the ABB insights.
-          </Typography>
+          
         </Box>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1 }}>
@@ -275,6 +275,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
         )}
       </CardContent>
     </Card>
+    </Container>
   );
 };
 
