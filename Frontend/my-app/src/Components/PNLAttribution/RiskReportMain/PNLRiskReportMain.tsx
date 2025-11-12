@@ -178,7 +178,7 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 		[
 			"P&L (%): Calculated as P&L ($) / LMV ($) for a day. For a date range calculated as {Sum of P&L ($) of the date range} / {Average of LMV ($) over the date range}.",
 			"Net of Hedge P&L is calculated as: Long only P&L + Hedge P&L (allocated to each deal on the basis of exposure). This may result in some amount of unallocated Hedge P&L, which will not be captured here.",
-			"Beta Adj Net: Beta adjusted net is sum of beta of portfolio securities in dollars (exposure x beta against S&P TR Index) divided by LMV.",
+			"Beta Adj Net:Beta adjusted is taking from the LK File.",
 			"VaR: Calculated as historical simulated 1 year Value-at-Risk value for 5% confidence level  ",
 		].join("\n");
 
@@ -193,13 +193,13 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 		[
 			"P&L (%): Calculated as P&L ($) / LMV ($) for a day. For a date range calculated as {Sum of P&L ($) of the date range} / {Average of LMV ($) over the date range}.",
 			"Net of Hedge P&L is calculated as: Long only P&L + Hedge P&L (allocated to each deal on the basis of exposure). This may result in some amount of unallocated Hedge P&L, which will not be captured here.",
-			"Beta Adj Net: Beta adjusted net is sum of beta of portfolio securities in dollars (exposure x beta against S&P TR Index) divided by LMV.",
+			"Beta Adj Net:Beta adjusted is taking from the LK File.",
 		].join("\n");
 
 	const footnoteIndex =
 		[
 			"P&L (%): Calculated as P&L ($) / LMV ($) for a day. For a date range calculated as {Sum of P&L ($) of the date range} / {Average of LMV ($) over the date range}.",
-			"Beta Adj Net: Beta adjusted net is sum of beta of portfolio securities in dollars (exposure x beta against S&P TR Index) divided by LMV.",
+			"Beta Adj Net:Beta adjusted is taking from the LK File.",
 		].join("\n");
 
 	const pdfHeaderTitle =
