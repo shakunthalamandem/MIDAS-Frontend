@@ -2,65 +2,22 @@ import React, { FormEvent, useCallback, useMemo, useState } from 'react';
 import {
   Alert,
   Box,
-  Button,
   Card,
   CardContent,
   Container,
   Divider,
-  Grid,
-  MenuItem,
-  TextField,
   Typography,
 } from '@mui/material';
 
+import { DiscountFormValues, discountFields, blockDealFields } from './ABBDiscountConfig';
+import ABBDiscountForm from './ABBDiscountForm';
 import ABBDiscountResponseDetails from './ABBDiscountResponseDetails';
-
-interface DiscountFormValues {
-  ticker: string;
-  tradeDate: string;
-  seasoned: string;
-  timing: string;
-  cleanUp: string;
-  primary: string;
-  emergingMkt: string;
-}
-
-const discountFields: Array<{
-  key: keyof Omit<DiscountFormValues, 'ticker' | 'tradeDate'>;
-  label: string;
-  helper: string;
-}> = [
-  { key: 'seasoned', label: 'Seasoned', helper: 'Input the seasoned capital detail or score.' },
-  { key: 'timing', label: 'Timing', helper: 'Describe the targeted entry timing plan.' },
-  { key: 'cleanUp', label: 'Clean Up', helper: 'Mention any clean-up phases or checkpoints.' },
-  { key: 'primary', label: 'Primary', helper: 'Explain the primary market focus or thesis.' },
-  { key: 'emergingMkt', label: 'Emerging mkt', helper: 'Share the emerging market focus or notes.' },
-];
-
-const yesNoOptions = ['Yes', 'No'] as const;
 
 const gradientShift = {
   '@keyframes gradientShift': {
     '0%': { backgroundPosition: '0% 50%' },
     '50%': { backgroundPosition: '100% 50%' },
     '100%': { backgroundPosition: '0% 50%' },
-  },
-};
-
-const formFieldBase = {
-  background: 'transparent',
-  borderRadius: 0,
-  '& .MuiInput-root': {
-    fontSize: '0.95rem',
-    '&:before': {
-      borderBottomColor: 'rgba(2,32,96,0.25)',
-    },
-    '&:after': {
-      borderBottomColor: 'rgba(0,90,255,0.95)',
-    },
-  },
-  '& .MuiInput-root.Mui-focused:after': {
-    borderBottomColor: 'rgba(0,90,255,0.95)',
   },
 };
 
@@ -82,6 +39,10 @@ const ABBDiscountDataMainFunction: React.FC = () => {
     cleanUp: '',
     primary: '',
     emergingMkt: '',
+    blockDealShares: '',
+    blockDealPercentageOfMarketCap: '',
+    blockDealValueLocal: '',
+    blockDealValueDollar: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,15 +81,19 @@ const ABBDiscountDataMainFunction: React.FC = () => {
       }
 
       const token = localStorage.getItem('access_token');
-      const payload = {
-        ticker: formValues.ticker.trim(),
-        trade_date: formValues.tradeDate,
-        seasoned: formValues.seasoned.trim(),
-        timing: formValues.timing.trim(),
-        clean_up: formValues.cleanUp.trim(),
-        primary: formValues.primary.trim(),
-        emerging_mkt: formValues.emergingMkt.trim(),
-      };
+        const payload = {
+          ticker: formValues.ticker.trim(),
+          trade_date: formValues.tradeDate,
+          seasoned: formValues.seasoned.trim(),
+          timing: formValues.timing.trim(),
+          clean_up: formValues.cleanUp.trim(),
+          primary: formValues.primary.trim(),
+          emerging_mkt: formValues.emergingMkt.trim(),
+          block_deal_shares: formValues.blockDealShares.trim(),
+          block_deal_percentage_of_market_cap: formValues.blockDealPercentageOfMarketCap.trim(),
+          block_deal_value_in_local_currency: formValues.blockDealValueLocal.trim(),
+          block_deal_value_in_dollar: formValues.blockDealValueDollar.trim(),
+        };
 
       try {
         setLoading(true);
@@ -168,6 +133,10 @@ const ABBDiscountDataMainFunction: React.FC = () => {
         label: field.label,
         value: formValues[field.key],
       })),
+      ...blockDealFields.map((field) => ({
+        label: field.label,
+        value: formValues[field.key],
+      })),
     ];
   }, [formValues]);
 
@@ -200,137 +169,13 @@ const ABBDiscountDataMainFunction: React.FC = () => {
             ABB Discount Data
           </Typography>
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1 }}>
-            <Grid container spacing={{ xs: 2, md: 3 }}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  variant="standard"
-                  label="Ticker"
-                  value={formValues.ticker}
-                  onChange={handleFieldChange('ticker')}
-                  required
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: { color: '#1d2b54', fontWeight: 600 },
-                  }}
-                  sx={{
-                    ...formFieldBase,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  variant="standard"
-                  type="date"
-                  label="Trade Date"
-                  value={formValues.tradeDate}
-                  onChange={handleFieldChange('tradeDate')}
-                  required
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: { color: '#1d2b54', fontWeight: 600 },
-                  }}
-                  sx={{
-                    ...formFieldBase,
-                  }}
-                />
-              </Grid>
-            </Grid>
-
-            <Box
-              sx={{
-                display: 'flex',
-                flexWrap: 'nowrap',
-                gap: 2,
-                mt: 3,
-                overflowX: 'auto',
-                pb: 1,
-                '&::-webkit-scrollbar': {
-                  height: 4,
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: '#cfd5ec',
-                  borderRadius: 2,
-                },
-              }}
-            >
-              {discountFields.map((field) => (
-                <TextField
-                  key={field.key}
-                  select
-                  variant="standard"
-                  label={field.label}
-                  value={formValues[field.key]}
-                  onChange={handleFieldChange(field.key)}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: { color: '#1d2b54', fontWeight: 600 },
-                  }}
-                  SelectProps={{
-                    displayEmpty: true,
-                  }}
-                  sx={{
-                    ...formFieldBase,
-                    flex: '1 1 18%',
-                    minWidth: { xs: 150, md: 170 },
-                    '& .MuiSelect-select': {
-                      paddingTop: 1.25,
-                      paddingBottom: 1.25,
-                    },
-                  }}
-                >
-                  <MenuItem value="" disabled>
-                    Select option
-                  </MenuItem>
-                  {yesNoOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              ))}
-            </Box>
-
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: { xs: 'center', md: 'flex-start' },
-                alignItems: 'center',
-                gap: 2,
-                mt: { xs: 3, md: 4 },
-                flexWrap: 'wrap',
-              }}
-            >
-              <Button
-                variant="contained"
-                type="submit"
-                disabled={loading || isSubmitDisabled}
-                sx={{
-                  background: '#0b2b57',
-                  borderRadius: '18px',
-                  paddingX: 3.5,
-                  paddingY: 1.25,
-                  boxShadow: '0 12px 30px rgba(11,43,87,0.18)',
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  color: '#fff',
-                  '&:hover': {
-                    background: '#0a264d',
-                  },
-                }}
-              >
-                {loading ? 'Processing...' : 'Submit to ABB API'}
-              </Button>
-
-              <Box sx={{ flexGrow: 1, maxWidth: 320, pl: { md: 4 } }}>
-                <Typography variant="body2" sx={{ color: '#1d2b54' }}>
-                  The payload contains the discount flags above plus the ticker and trade date submitted.
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+          <ABBDiscountForm
+            formValues={formValues}
+            handleFieldChange={handleFieldChange}
+            handleSubmit={handleSubmit}
+            loading={loading}
+            isSubmitDisabled={isSubmitDisabled}
+          />
 
           <Divider sx={{ my: 3, borderColor: 'rgba(2,32,96,0.15)' }} />
 
