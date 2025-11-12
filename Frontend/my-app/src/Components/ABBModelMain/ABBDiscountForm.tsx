@@ -46,7 +46,7 @@ const ABBDiscountForm: React.FC<ABBDiscountFormProps> = ({
           fullWidth
           variant="standard"
           type="date"
-          label="Trade Date"
+          label="Launch Date"
           value={formValues.tradeDate}
           onChange={handleFieldChange('tradeDate')}
           required
@@ -166,7 +166,7 @@ const ABBDiscountForm: React.FC<ABBDiscountFormProps> = ({
 
       <Box sx={{ flexGrow: 1, maxWidth: 320, pl: { md: 4 } }}>
         <Typography variant="body2" sx={{ color: '#1d2b54' }}>
-          The payload contains the discount flags above plus the ticker and trade date submitted.
+          The payload contains the discount flags above plus the ticker, launch date, and block deal details submitted.
         </Typography>
       </Box>
     </Box>

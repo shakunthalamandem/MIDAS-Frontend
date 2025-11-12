@@ -50,6 +50,16 @@ const formatMetric = (value: unknown, options?: Intl.NumberFormatOptions) => {
   return value.toLocaleString(undefined, { maximumFractionDigits: 2, ...options });
 };
 
+const normalizeYesNoValue = (value: string) => {
+  const normalized = value?.trim().toLowerCase();
+  return normalized === 'yes' ? 'yes' : 'no';
+};
+
+const parseNumberOrDefault = (value: string) => {
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 const ResponseInsightCards: React.FC<{ detail: Record<string, unknown> }> = ({ detail }) => {
   const liquidity = typeof detail.liquidity_model_discount === 'number' ? detail.liquidity_model_discount : null;
   const totalDiscount = typeof detail.total_discount === 'number' ? detail.total_discount : null;
@@ -228,7 +238,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
       }
 
       if (!formValues.tradeDate) {
-        setError('Trade date is required.');
+        setError('Launch date is required.');
         return;
       }
 
@@ -238,19 +248,22 @@ const ABBDiscountDataMainFunction: React.FC = () => {
       }
 
       const token = localStorage.getItem('access_token');
-        const payload = {
-          ticker: formValues.ticker.trim(),
-          trade_date: formValues.tradeDate,
-          seasoned: formValues.seasoned.trim(),
-          timing: formValues.timing.trim(),
-          clean_up: formValues.cleanUp.trim(),
-          primary: formValues.primary.trim(),
-          emerging_mkt: formValues.emergingMkt.trim(),
-          block_deal_shares: formValues.blockDealShares.trim(),
-          block_deal_percentage_of_market_cap: formValues.blockDealPercentageOfMarketCap.trim(),
-          block_deal_value_in_local_currency: formValues.blockDealValueLocal.trim(),
-          block_deal_value_in_dollar: formValues.blockDealValueDollar.trim(),
-        };
+      const payload = {
+        ticker: formValues.ticker.trim(),
+        trade_date: formValues.tradeDate,
+        launch_date: formValues.tradeDate,
+        clean_up: normalizeYesNoValue(formValues.cleanUp),
+        seasoned: normalizeYesNoValue(formValues.seasoned),
+        timing: normalizeYesNoValue(formValues.timing),
+        primary: normalizeYesNoValue(formValues.primary),
+        emerging_mkt: normalizeYesNoValue(formValues.emergingMkt),
+        block_deal_shares: parseNumberOrDefault(formValues.blockDealShares),
+        block_deal_percentage_of_market_cap: parseNumberOrDefault(
+          formValues.blockDealPercentageOfMarketCap,
+        ),
+        block_deal_value_in_local_currency: parseNumberOrDefault(formValues.blockDealValueLocal),
+        block_deal_value_in_dollar: parseNumberOrDefault(formValues.blockDealValueDollar),
+      };
 
       try {
         setLoading(true);
@@ -285,7 +298,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
   const summaryRows = useMemo(() => {
     return [
       { label: 'Ticker', value: formValues.ticker },
-      { label: 'Trade Date', value: formValues.tradeDate },
+      { label: 'Launch Date', value: formValues.tradeDate },
       ...discountFields.map((field) => ({
         label: field.label,
         value: formValues[field.key],
