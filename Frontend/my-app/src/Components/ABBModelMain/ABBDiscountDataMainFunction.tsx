@@ -34,6 +34,62 @@ const discountFields: Array<{
   { key: 'emergingMkt', label: 'Emerging mkt', helper: 'Share the emerging market focus or notes.' },
 ];
 
+const gradientShift = {
+  '@keyframes gradientShift': {
+    '0%': { backgroundPosition: '0% 50%' },
+    '50%': { backgroundPosition: '100% 50%' },
+    '100%': { backgroundPosition: '0% 50%' },
+  },
+};
+
+const floatRise = {
+  '@keyframes floatRise': {
+    '0%': { transform: 'translateY(0px)' },
+    '50%': { transform: 'translateY(-6px)' },
+    '100%': { transform: 'translateY(0px)' },
+  },
+};
+
+const formFieldBase = {
+  background: 'rgba(255,255,255,0.18)',
+  borderRadius: '14px',
+  border: '1px solid rgba(255,255,255,0.4)',
+  boxShadow: '0 8px 24px rgba(0,0,0,0.11)',
+  transition: 'transform 0.3s ease, border 0.3s ease',
+  backdropFilter: 'blur(14px)',
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 'inherit',
+    '& fieldset': {
+      borderColor: 'transparent',
+    },
+    '&:hover fieldset': {
+      borderColor: 'rgba(0,32,96,0.35)',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: 'rgba(0,32,96,0.75)',
+    },
+  },
+  '&:hover': {
+    transform: 'translateY(-2px)',
+  },
+};
+
+const summaryBoxBase = {
+  borderRadius: '14px',
+  padding: '1rem',
+  minWidth: '160px',
+  flex: '1 1 160px',
+  background:
+    'linear-gradient(145deg, rgba(255,255,255,0.92), rgba(223,235,255,0.85), rgba(255,255,255,0.68))',
+  border: '1px solid rgba(0,32,96,0.11)',
+  boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: '0 18px 40px rgba(0,32,96,0.22)',
+  },
+};
+
 const ABBDiscountDataMainFunction: React.FC = () => {
   const [formValues, setFormValues] = useState<DiscountFormValues>({
     ticker: 'AAPL-US',
@@ -127,154 +183,195 @@ const ABBDiscountDataMainFunction: React.FC = () => {
       { label: 'Trade Date', value: formValues.tradeDate },
       ...discountFields.map((field) => ({
         label: field.label,
-        value: formValues[field.key] || '—',
+        value: formValues[field.key],
       })),
     ];
   }, [formValues]);
 
   return (
-    <Container sx={{ py: 4 }} maxWidth="xl">
-    <Card
-      sx={{
-        borderRadius: 3,
-        boxShadow: '0 20px 50px rgba(0, 32, 96, 0.2)',
-        background: 'linear-gradient(155deg, #f5f7ff 0%, #ffffff 60%)',
-        border: '1px solid rgba(0, 32, 96, 0.15)',
-      }}
-    >
-      <CardContent sx={{ minHeight: 420, display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Box
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
+      <Card
+        sx={{
+          borderRadius: '28px',
+          boxShadow: '0 30px 60px rgba(2,32,96,0.25)',
+          border: '1px solid rgba(255,255,255,0.4)',
+          background: 'linear-gradient(135deg, rgba(235,247,255,0.95), rgba(218,229,255,0.93))',
+          position: 'relative',
+          overflow: 'hidden',
+          ...gradientShift,
+          backgroundSize: '300% 300%',
+          animation: 'gradientShift 14s ease-in-out infinite',
+        }}
+      >
+        <CardContent
           sx={{
-            background: 'linear-gradient(135deg, #002060, rgba(0, 32, 96, 0.65))',
-            borderRadius: '18px',
-            padding: 2,
-            color: '#fff',
+            position: 'relative',
+            zIndex: 2,
+            color: '#041434',
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
-            ABB Discount Model
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+            ABB Discount Data
           </Typography>
-          
-        </Box>
+          <Typography variant="body2" sx={{ color: '#0d1c49', mb: 3 }}>
+            Enter the richer discount profile you want to push to ABB.
+          </Typography>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Ticker"
-                value={formValues.ticker}
-                onChange={handleFieldChange('ticker')}
-                required
-                InputLabelProps={{ shrink: true }}
-                sx={{
-                  backgroundColor: '#ffffff',
-                  borderRadius: '12px',
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                type="date"
-                label="Trade Date"
-                value={formValues.tradeDate}
-                onChange={handleFieldChange('tradeDate')}
-                required
-                InputLabelProps={{ shrink: true }}
-                sx={{ borderRadius: '12px', backgroundColor: '#ffffff' }}
-              />
-            </Grid>
-
-            {discountFields.map((field) => (
-              <Grid item xs={12} sm={6} md={4} key={field.key}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={field.label}
-                  placeholder={field.helper}
-                  value={formValues[field.key]}
-                  onChange={handleFieldChange(field.key)}
-                  helperText={field.helper}
+                  variant="outlined"
+                  label="Ticker"
+                  value={formValues.ticker}
+                  onChange={handleFieldChange('ticker')}
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                    sx: { color: '#0c1d3f', fontWeight: 600 },
+                  }}
                   sx={{
-                    backgroundColor: '#ffffff',
-                    borderRadius: '12px',
+                    ...formFieldBase,
                   }}
                 />
               </Grid>
-            ))}
-          </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  type="date"
+                  label="Trade Date"
+                  value={formValues.tradeDate}
+                  onChange={handleFieldChange('tradeDate')}
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                    sx: { color: '#0c1d3f', fontWeight: 600 },
+                  }}
+                  sx={{
+                    ...formFieldBase,
+                  }}
+                />
+              </Grid>
 
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: { xs: 'center', sm: 'space-between' },
-              alignItems: 'center',
-              gap: 2,
-              mt: 3,
-              flexWrap: 'wrap',
-            }}
-          >
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={loading || isSubmitDisabled}
+              {discountFields.map((field) => (
+                <Grid item xs={12} sm={6} md={4} key={field.key}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label={field.label}
+                    placeholder={field.helper}
+                    value={formValues[field.key]}
+                    onChange={handleFieldChange(field.key)}
+                    helperText={field.helper}
+                    InputLabelProps={{ sx: { color: '#0c1d3f', fontWeight: 600 } }}
+                    sx={{
+                      ...formFieldBase,
+                    }}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+
+            <Box
               sx={{
-                backgroundColor: '#002060',
-                color: '#fff',
-                paddingX: 3,
-                paddingY: 1.25,
-                borderRadius: '14px',
-                '&:hover': {
-                  backgroundColor: '#001a4f',
-                },
+                display: 'flex',
+                justifyContent: { xs: 'center', sm: 'space-between' },
+                alignItems: 'center',
+                gap: 2,
+                mt: 3,
+                flexWrap: 'wrap',
               }}
             >
-              {loading ? 'Processing...' : 'Submit to ABB API'}
-            </Button>
+              <Button
+                variant="contained"
+                type="submit"
+                disabled={loading || isSubmitDisabled}
+                sx={{
+                  ...floatRise,
+                  animation: 'floatRise 6.5s ease-in-out infinite',
+                  background: 'linear-gradient(145deg, #002060, #0060c8)',
+                  borderRadius: '16px',
+                  paddingX: 3.5,
+                  paddingY: 1.4,
+                  boxShadow: '0 10px 30px rgba(0,32,96,0.45)',
+                  textTransform: 'capitalize',
+                  '&.Mui-disabled': {
+                    background: 'rgba(0,32,96,0.4)',
+                    boxShadow: '0 6px 20px rgba(0,32,96,0.25)',
+                  },
+                }}
+              >
+                {loading ? 'Processing...' : 'Submit to ABB API'}
+              </Button>
 
-            <Box sx={{ flexGrow: 1, maxWidth: 320 }}>
-              <Typography variant="body2" sx={{ color: '#0f1b3f' }}>
-                The payload includes the discount labels you define above plus the ticker and trade
-                date.
-              </Typography>
+              <Box sx={{ flexGrow: 1, maxWidth: 320 }}>
+                <Typography variant="body2" sx={{ color: '#0f1b3f' }}>
+                  The payload includes the discount labels you define above plus the ticker and trade
+                  date.
+                </Typography>
+              </Box>
             </Box>
           </Box>
-        </Box>
 
-        <Divider sx={{ my: 1 }} />
+          <Divider sx={{ my: 3, borderColor: 'rgba(0,32,96,0.25)' }} />
 
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {summaryRows.map((row) => (
-            <Box
-              key={row.label}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {summaryRows.map((row) => (
+              <Box key={row.label} sx={{ ...summaryBoxBase }}>
+                <Typography variant="caption" sx={{ color: '#00183b' }}>
+                  {row.label}
+                </Typography>
+                <Typography variant="subtitle2" sx={{ color: '#002060', fontWeight: 600 }}>
+                  {row.value || 'N/A'}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+
+          {error && !loading && (
+            <Alert
+              severity="error"
               sx={{
-                flex: '1 1 160px',
-                padding: 1.25,
+                mt: 3,
                 borderRadius: '12px',
-                background: 'rgba(0, 32, 96, 0.05)',
+                backgroundColor: 'rgba(255,231,231,0.9)',
+                border: '1px solid rgba(192,42,42,0.3)',
               }}
             >
-              <Typography variant="caption" sx={{ color: '#00183b' }}>
-                {row.label}
-              </Typography>
-              <Typography variant="subtitle2" sx={{ color: '#002060' }}>
-                {row.value || '—'}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
+              {error}
+            </Alert>
+          )}
 
-        {error && !loading && <Alert severity="error">{error}</Alert>}
+          {serverResponse && (
+            <Alert
+              severity="success"
+              sx={{
+                mt: 3,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(208,248,255,0.8), rgba(235,255,241,0.9))',
+                border: '1px solid rgba(0,96,155,0.3)',
+              }}
+            >
+              {serverResponse.detail
+                ? String(serverResponse.detail)
+                : 'Discount payload delivered to ABB API successfully.'}
+            </Alert>
+          )}
+        </CardContent>
 
-        {serverResponse && (
-          <Alert severity="success">
-            {serverResponse.detail
-              ? String(serverResponse.detail)
-              : 'Discount payload delivered to ABB API successfully.'}
-          </Alert>
-        )}
-      </CardContent>
-    </Card>
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'radial-gradient(circle at 20% 20%, rgba(0,96,255,0.18), transparent 60%), radial-gradient(circle at 80% 0%, rgba(0,32,96,0.22), transparent 55%)',
+            opacity: 0.8,
+            pointerEvents: 'none',
+          }}
+        />
+      </Card>
     </Container>
   );
 };
