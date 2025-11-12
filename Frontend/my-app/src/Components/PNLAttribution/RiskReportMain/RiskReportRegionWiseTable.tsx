@@ -135,7 +135,7 @@ const RiskReportRegionWiseTable: React.FC<RiskReportRegionWiseTableProps> = ({
           bgcolor="#e6f0ff"
           fontWeight={600}
         >
-           Region-wise Fund Details
+           Region-wise Fund Details (DTD)
         </Typography>
         <Table>
           <TableHead>
