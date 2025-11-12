@@ -43,6 +43,85 @@ const RiskPDFExporter: React.FC<RiskPDFExporterProps> = ({
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const bottomMargin = 20;
+      const footnoteLineHeight = 4;
+      const contentMarginX = 12;
+      const contentWidth = pdfWidth - contentMarginX * 2;
+
+      interface FootnoteEntry {
+        heading: string;
+        descriptionLines: string[];
+        headingWidth: number;
+      }
+
+      const buildFootnoteEntries = (footnoteText: string) => {
+        const previousFont = pdf.getFont();
+        const previousFontSize = pdf.getFontSize();
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(8);
+
+        const sanitizedLines = footnoteText
+          .split("\n")
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0);
+
+        if (!sanitizedLines.length) {
+          return { entries: [] as FootnoteEntry[], lineCount: 0 };
+        }
+
+        const structured = sanitizedLines
+          .map((line) => {
+            const separatorIndex = line.indexOf(":");
+            if (separatorIndex === -1) {
+              return { heading: "", description: line };
+            }
+            return {
+              heading: line.slice(0, separatorIndex).trim(),
+              description: line.slice(separatorIndex + 1).trim(),
+            };
+          })
+          .filter((entry) => entry.heading || entry.description);
+
+        if (!structured.length) {
+          return { entries: [] as FootnoteEntry[], lineCount: 0 };
+        }
+
+        const entries = structured.map((entry) => {
+          let headingWidth = 0;
+          if (entry.heading) {
+            pdf.setFont("helvetica", "bold");
+            headingWidth = pdf.getTextWidth(`${entry.heading}: `);
+            pdf.setFont("helvetica", "normal");
+          }
+          const availableWidth = entry.heading
+            ? Math.max(20, contentWidth - headingWidth)
+            : contentWidth;
+          const descriptionLines = entry.description
+            ? pdf.splitTextToSize(entry.description, availableWidth)
+            : [];
+          return {
+            heading: entry.heading,
+            descriptionLines,
+            headingWidth,
+          };
+        });
+
+        const lineCount = entries.reduce((sum, entry, index) => {
+          const descriptionCount = entry.descriptionLines.length;
+          const entryLines =
+            descriptionCount > 0
+              ? descriptionCount
+              : entry.heading
+              ? 1
+              : 0;
+          const spacing = index < entries.length - 1 ? 1 : 0;
+          return sum + entryLines + spacing;
+        }, 0);
+
+        pdf.setFont(previousFont.fontName, previousFont.fontStyle);
+        pdf.setFontSize(previousFontSize);
+
+        return { entries, lineCount };
+      };
 
       const drawHeader = () => {
         pdf.setFont("helvetica", "bold");
@@ -66,15 +145,11 @@ const RiskPDFExporter: React.FC<RiskPDFExporterProps> = ({
       for (let i = 0; i < sections.length; i++) {
         const section = sections[i];
         const footnote = section.dataset.footnote ?? "";
-        const footnoteLines = footnote
-          ? footnote
-              .split("\n")
-              .flatMap((line) =>
-                pdf.splitTextToSize(line.trim(), pdfWidth - 24)
-              )
-              .filter((line) => line.trim().length > 0)
-          : [];
-        const footnoteHeight = footnoteLines.length ? footnoteLines.length * 4 + 4 : 0;
+        const { entries: footnoteEntries, lineCount: footnoteLineCount } =
+          buildFootnoteEntries(footnote);
+        const footnoteHeight = footnoteLineCount
+          ? footnoteLineCount * footnoteLineHeight + 4
+          : 0;
 
         const canvas = await html2canvas(section, {
           scale: 1.5,
@@ -97,13 +172,51 @@ const RiskPDFExporter: React.FC<RiskPDFExporterProps> = ({
         pdf.addImage(imgData, "JPEG", 10, positionY, imgWidth, imgHeight);
         positionY += imgHeight + 6;
 
-        if (footnoteLines.length) {
+        if (footnoteEntries.length) {
+          const previousFont = pdf.getFont();
+          const previousFontSize = pdf.getFontSize();
           pdf.setFont("helvetica", "normal");
           pdf.setFontSize(8);
           pdf.setTextColor(90, 90, 90);
-          pdf.text(footnoteLines, 12, positionY);
+
+          let footnoteY = positionY;
+          const advanceLine = () => {
+            footnoteY += footnoteLineHeight;
+          };
+
+          footnoteEntries.forEach((entry, entryIndex) => {
+            const headingLabel = entry.heading ? `${entry.heading}:` : "";
+            if (headingLabel) {
+              pdf.setFont("helvetica", "bold");
+              pdf.text(headingLabel, contentMarginX, footnoteY);
+            }
+
+            const hasDescription = entry.descriptionLines.length > 0;
+            pdf.setFont("helvetica", "normal");
+
+            if (hasDescription) {
+              const firstLineX = headingLabel
+                ? contentMarginX + entry.headingWidth
+                : contentMarginX;
+              pdf.text(entry.descriptionLines[0], firstLineX, footnoteY);
+            }
+
+            advanceLine();
+
+            for (let j = 1; j < entry.descriptionLines.length; j++) {
+              pdf.text(entry.descriptionLines[j], contentMarginX, footnoteY);
+              advanceLine();
+            }
+
+            if (footnoteEntries.length > 1 && entryIndex < footnoteEntries.length - 1) {
+              advanceLine();
+            }
+          });
+
           pdf.setTextColor(0, 0, 0);
-          positionY += footnoteHeight + 4;
+          pdf.setFont(previousFont.fontName, previousFont.fontStyle);
+          pdf.setFontSize(previousFontSize);
+          positionY = footnoteY + 4;
         }
 
         positionY += 6;
