@@ -31,6 +31,31 @@ interface FundAttributionData {
   strategy: Record<string, { daily_net_of_hedge: number; mtd_net_of_hedge: number; daily_long_exposure: number }>;
 }
 
+const getOrdinalSuffix = (day: number) => {
+  if (day >= 11 && day <= 13) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const formatDateWithOrdinal = (value: string | undefined) => {
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  const day = parsed.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const month = parsed.toLocaleString(undefined, { month: "short" });
+  const year = parsed.getFullYear();
+  return `${day}${suffix} ${month} ${year}`;
+};
+
 const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({ fund }) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<FundAttributionData | null>(null);
@@ -162,10 +187,12 @@ const DailyNetOfHedgeChart: React.FC<DailyNetOfHedgeChartProps> = ({ fund }) => 
     </Paper>
   );
 
+  const formattedDate = formatDateWithOrdinal(data.date);
+
   return (
     <Paper sx={{ p: 2, mb: 3, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
       <Typography variant="h6" gutterBottom color="#002060" sx={{ fontWeight: "bold" }} align="center">
-        {fund}: Attribution as of {data.date ? new Date(data.date).toLocaleDateString() : "—"}
+        {fund}: Attribution | Data As of: {formattedDate}
       </Typography>
       {renderBarChart(mapChartData(data.sector), "GICS Sector")}
       {renderBarChart(mapChartData(data.region), "Region")}

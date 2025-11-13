@@ -3,8 +3,8 @@
 export const RISK_REPORT_LABELS: Record<string, string> = {
   // Section 1
   LMV: "LMV",
-  Net_of_Hedge_PnL: "Net of Hedge P&L",
-  Net_of_Hedge_PnL_Percent: "Net of Hedge P&L (%)",
+  Net_of_Hedge_PnL: "DTD Net of Hedge P&L",
+  Net_of_Hedge_PnL_Percent: "DTD Net of Hedge P&L (%)",
   SP_Total_Return_Percent: "S&P Total Return (%)",
   MSCI_Return_Percent: "MSCI Return (%)",
   net_exposure_lmv_percent: "Net Exp./LMV (%)",
