@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { DiscountFormValues, discountFields, blockDealFields } from './ABBDiscountConfig';
+import { DiscountFormValues } from './ABBDiscountConfig';
 import ABBDiscountForm from './ABBDiscountForm';
 import ABBDiscountResponseDetails from './ABBDiscountResponseDetails';
 
@@ -21,15 +21,6 @@ const gradientShift = {
     '50%': { backgroundPosition: '100% 50%' },
     '100%': { backgroundPosition: '0% 50%' },
   },
-};
-
-const summaryBoxBase = {
-  borderRadius: '8px',
-  padding: '0.65rem',
-  minWidth: '140px',
-  flex: '1 1 150px',
-  background: 'transparent',
-  borderBottom: '1px solid rgba(0,0,0,0.12)',
 };
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
@@ -48,6 +39,20 @@ const extractPrimaryResponse = (payload: Record<string, unknown> | null) => {
 const formatMetric = (value: unknown, options?: Intl.NumberFormatOptions) => {
   if (typeof value !== 'number') return 'N/A';
   return value.toLocaleString(undefined, { maximumFractionDigits: 2, ...options });
+};
+
+const formatLabel = (key: string) =>
+  key
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
+const formatValue = (value: unknown) => {
+  if (value === null || value === undefined) return 'N/A';
+  if (typeof value === 'number') {
+    return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+  return String(value);
 };
 
 const normalizeYesNoValue = (value: string) => {
@@ -70,14 +75,15 @@ const ResponseInsightCards: React.FC<{ detail: Record<string, unknown> }> = ({ d
     : [];
 
   const fsData = isPlainObject(detail.fs_data) ? detail.fs_data : {};
-  const snapshotFields = [
-    { key: 'share_price', label: 'Share Price' },
-    { key: 'market_cap', label: 'Enterprise Value' },
-    { key: 'vwap', label: 'VWAP' },
-    { key: 'three_m_adtv_local_value', label: '3M ADTV (Value)' },
-    { key: 'percent_from_52week_high', label: '% From 52W High' },
-    { key: 'date', label: 'Snapshot Date' },
-  ];
+  const { company_description, ...restFsData } = fsData;
+  const fsEntries = Object.entries(restFsData);
+  const generalEntries = Object.entries(detail).filter(
+    ([key]) =>
+      !['liquidity_model_discount', 'total_discount', 'final_discount', 'discounts', 'fs_data'].includes(
+        key,
+      ),
+  );
+  const responseEntries = [...generalEntries, ...fsEntries];
 
   return (
     <Grid container spacing={3} sx={{ mt: 3 }}>
@@ -167,28 +173,41 @@ const ResponseInsightCards: React.FC<{ detail: Record<string, unknown> }> = ({ d
           }}
         >
           <CardContent>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#0b6b57' }}>
-              Financial Snapshot
-            </Typography>
-            <Grid container spacing={1}>
-              {snapshotFields.map(({ key, label }) => {
-                const value = fsData[key];
-                return (
-                  <Grid item xs={12} key={key}>
+            <Stack spacing={2}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#0b6b57' }}>
+                Financial Snapshot
+              </Typography>
+              <Grid container spacing={2}>
+                {responseEntries.map(([key, value]) => (
+                  <Grid item xs={12} sm={6} key={`response-${key}`}>
                     <Typography variant="caption" sx={{ color: '#3a5846' }}>
-                      {label}
+                      {formatLabel(key)}
                     </Typography>
                     <Typography variant="body1" sx={{ fontWeight: 600, color: '#0b6b57' }}>
-                      {key === 'date'
-                        ? typeof value === 'string'
-                          ? value
-                          : 'N/A'
-                        : formatMetric(value)}
+                      {formatValue(value)}
                     </Typography>
                   </Grid>
-                );
-              })}
-            </Grid>
+                ))}
+              </Grid>
+              {company_description && (
+                <Box
+                  sx={{
+                    mt: 3,
+                    p: 2,
+                    borderRadius: '16px',
+                    background: 'rgba(255,255,255,0.8)',
+                    border: '1px solid rgba(11,43,87,0.1)',
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: '#3a5846' }}>
+                    {formatLabel('company_description')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 400, color: '#0b6b57', mt: 0.5, lineHeight: 1.6 }}>
+                    {formatValue(company_description)}
+                  </Typography>
+                </Box>
+              )}
+            </Stack>
           </CardContent>
         </Card>
       </Grid>
@@ -200,11 +219,11 @@ const ABBDiscountDataMainFunction: React.FC = () => {
   const [formValues, setFormValues] = useState<DiscountFormValues>({
     ticker: 'AAPL-US',
     tradeDate: '',
-    seasoned: '',
-    timing: '',
-    cleanUp: '',
-    primary: '',
-    emergingMkt: '',
+    seasoned: 'No',
+    timing: 'No',
+    cleanUp: 'No',
+    primary: 'No',
+    emergingMkt: 'No',
     blockDealShares: '',
     blockDealPercentageOfMarketCap: '',
     blockDealValueLocal: '',
@@ -295,21 +314,6 @@ const ABBDiscountDataMainFunction: React.FC = () => {
     [formValues],
   );
 
-  const summaryRows = useMemo(() => {
-    return [
-      { label: 'Ticker', value: formValues.ticker },
-      { label: 'Launch Date', value: formValues.tradeDate },
-      ...discountFields.map((field) => ({
-        label: field.label,
-        value: formValues[field.key],
-      })),
-      ...blockDealFields.map((field) => ({
-        label: field.label,
-        value: formValues[field.key],
-      })),
-    ];
-  }, [formValues]);
-
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
       <Card
@@ -349,19 +353,6 @@ const ABBDiscountDataMainFunction: React.FC = () => {
 
           <Divider sx={{ my: 3, borderColor: 'rgba(2,32,96,0.15)' }} />
 
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, mt: 1 }}>
-            {summaryRows.map((row) => (
-              <Box key={row.label} sx={{ ...summaryBoxBase }}>
-                <Typography variant="caption" sx={{ color: '#0f1f43' }}>
-                  {row.label}
-                </Typography>
-                <Typography variant="subtitle2" sx={{ color: '#021b4c', fontWeight: 600, mt: 0.25 }}>
-                  {row.value || 'Not set'}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-
           {error && !loading && (
             <Alert
               severity="error"
@@ -398,7 +389,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
           <ResponseInsightCards detail={responseDetail} />
         </Box>
       )}
-      <ABBDiscountResponseDetails payload={serverResponse} />
+      {/* <ABBDiscountResponseDetails payload={serverResponse} /> */}
     </Container>
   );
 };

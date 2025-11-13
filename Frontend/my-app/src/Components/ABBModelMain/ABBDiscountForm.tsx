@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { Box, Button, Grid, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, MenuItem, TextField } from '@mui/material';
 
 import {
   DiscountFormValues,
@@ -23,154 +23,118 @@ const ABBDiscountForm: React.FC<ABBDiscountFormProps> = ({
   handleSubmit,
   loading,
   isSubmitDisabled,
-}) => (
-  <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1 }}>
-    <Grid container spacing={{ xs: 2, md: 3 }}>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          variant="standard"
-          label="Ticker"
-          value={formValues.ticker}
-          onChange={handleFieldChange('ticker')}
-          required
-          InputLabelProps={{
-            shrink: true,
-            sx: { color: '#1d2b54', fontWeight: 600 },
-          }}
-          sx={formFieldBase}
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          variant="standard"
-          type="date"
-          label="Launch Date"
-          value={formValues.tradeDate}
-          onChange={handleFieldChange('tradeDate')}
-          required
-          InputLabelProps={{
-            shrink: true,
-            sx: { color: '#1d2b54', fontWeight: 600 },
-          }}
-          sx={formFieldBase}
-        />
-      </Grid>
-    </Grid>
+}) => {
+  const orderedFields = [
+    { key: 'ticker', label: 'Ticker', type: 'text', required: true },
+    { key: 'tradeDate', label: 'Launch Date', type: 'date', required: true },
+    ...discountFields.map((field) => ({ key: field.key, label: field.label, type: 'select' })),
+    ...blockDealFields.map((field) => ({ key: field.key, label: field.label, type: 'number' })),
+  ] as Array<{
+    key: keyof DiscountFormValues;
+    label: string;
+    type: 'text' | 'date' | 'select' | 'number';
+    required?: boolean;
+  }>;
 
-    <Box
-      sx={{
-        display: 'flex',
-        flexWrap: 'nowrap',
-        gap: 2,
-        mt: 3,
-        overflowX: 'auto',
-        pb: 1,
-        '&::-webkit-scrollbar': {
-          height: 4,
-        },
-        '&::-webkit-scrollbar-thumb': {
-          background: '#cfd5ec',
-          borderRadius: 2,
-        },
-      }}
-    >
-      {discountFields.map((field) => (
-        <TextField
-          key={field.key}
-          select
-          variant="standard"
-          label={field.label}
-          value={formValues[field.key]}
-          onChange={handleFieldChange(field.key)}
-          InputLabelProps={{
-            shrink: true,
-            sx: { color: '#1d2b54', fontWeight: 600 },
-          }}
-          SelectProps={{
-            displayEmpty: true,
-          }}
+  return (
+    <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} lg={8}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+              gap: 2,
+              alignItems: 'flex-start',
+            }}
+          >
+            {orderedFields.map((field) => {
+              const commonProps = {
+                fullWidth: true,
+                variant: 'standard' as const,
+                label: field.label,
+                value: formValues[field.key],
+                onChange: handleFieldChange(field.key),
+                required: field.required,
+                InputLabelProps: {
+                  shrink: true,
+                  sx: { color: '#1d2b54', fontWeight: 600 },
+                },
+                sx: {
+                  ...formFieldBase,
+                  minWidth: 0,
+                },
+              };
+
+              if (field.type === 'select') {
+                return (
+                  <TextField
+                    key={field.key}
+                    select
+                    {...commonProps}
+                    SelectProps={{
+                      displayEmpty: true,
+                      sx: {
+                        '& .MuiOutlinedInput-input': {
+                          paddingTop: 1.25,
+                          paddingBottom: 1.25,
+                        },
+                      },
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                      Select option
+                    </MenuItem>
+                    {yesNoOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }
+
+              return (
+                <TextField
+                  key={field.key}
+                  type={field.type === 'date' ? 'date' : field.type === 'number' ? 'number' : 'text'}
+                  {...commonProps}
+                />
+              );
+            })}
+          </Box>
+        </Grid>
+      </Grid>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          mt: 3,
+        }}
+      >
+        <Button
+          variant="contained"
+          type="submit"
+          disabled={loading || isSubmitDisabled}
           sx={{
-            ...formFieldBase,
-            flex: '1 1 18%',
-            minWidth: { xs: 150, md: 170 },
-            '& .MuiSelect-select': {
-              paddingTop: 1.25,
-              paddingBottom: 1.25,
+            background: '#0b2b57',
+            borderRadius: '18px',
+            paddingX: 3.5,
+            paddingY: 1.25,
+            boxShadow: '0 12px 30px rgba(11,43,87,0.18)',
+            textTransform: 'none',
+            fontWeight: 600,
+            color: '#fff',
+            '&:hover': {
+              background: '#0a264d',
             },
           }}
         >
-          <MenuItem value="" disabled>
-            Select option
-          </MenuItem>
-          {yesNoOptions.map((option) => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </TextField>
-      ))}
-    </Box>
-
-    <Grid container spacing={2} sx={{ mt: 2 }}>
-      {blockDealFields.map((field) => (
-        <Grid item key={field.key} xs={12} sm={6} md={3}>
-          <TextField
-            fullWidth
-            variant="standard"
-            label={field.label}
-            type="number"
-            value={formValues[field.key]}
-            onChange={handleFieldChange(field.key)}
-            InputLabelProps={{
-              shrink: true,
-              sx: { color: '#1d2b54', fontWeight: 600 },
-            }}
-            sx={formFieldBase}
-          />
-        </Grid>
-      ))}
-    </Grid>
-
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: { xs: 'center', md: 'flex-start' },
-        alignItems: 'center',
-        gap: 2,
-        mt: { xs: 3, md: 4 },
-        flexWrap: 'wrap',
-      }}
-    >
-      <Button
-        variant="contained"
-        type="submit"
-        disabled={loading || isSubmitDisabled}
-        sx={{
-          background: '#0b2b57',
-          borderRadius: '18px',
-          paddingX: 3.5,
-          paddingY: 1.25,
-          boxShadow: '0 12px 30px rgba(11,43,87,0.18)',
-          textTransform: 'none',
-          fontWeight: 600,
-          color: '#fff',
-          '&:hover': {
-            background: '#0a264d',
-          },
-        }}
-      >
-        {loading ? 'Processing...' : 'Submit to ABB API'}
-      </Button>
-
-      <Box sx={{ flexGrow: 1, maxWidth: 320, pl: { md: 4 } }}>
-        <Typography variant="body2" sx={{ color: '#1d2b54' }}>
-          The payload contains the discount flags above plus the ticker, launch date, and block deal details submitted.
-        </Typography>
+          {loading ? 'Processing...' : 'Submit to ABB API'}
+        </Button>
       </Box>
     </Box>
-  </Box>
-);
+  );
+};
 
 export default ABBDiscountForm;
