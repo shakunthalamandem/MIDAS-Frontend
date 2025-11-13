@@ -1,31 +1,14 @@
 import React, { FormEvent, useCallback, useMemo, useState } from 'react';
-import {
-  Alert,
-  Box,
-  Card,
-  CardContent,
-  Container,
-  Divider,
-  Grid,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Card, CardContent, Container, Divider, Grid, Stack, Typography } from '@mui/material';
 
 import { DiscountFormValues } from './ABBDiscountConfig';
 import ABBDiscountForm from './ABBDiscountForm';
-import ABBDiscountResponseDetails from './ABBDiscountResponseDetails';
 
-const gradientShift = {
-  '@keyframes gradientShift': {
-    '0%': { backgroundPosition: '0% 50%' },
-    '50%': { backgroundPosition: '100% 50%' },
-    '100%': { backgroundPosition: '0% 50%' },
-  },
-};
-
-const isPlainObject = (value: unknown): value is Record<string, unknown> => {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-};
+/************************************
+ * UTILITIES
+ ***********************************/
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const extractPrimaryResponse = (payload: Record<string, unknown> | null) => {
   if (!payload) return null;
@@ -49,173 +32,165 @@ const formatLabel = (key: string) =>
 
 const formatValue = (value: unknown) => {
   if (value === null || value === undefined) return 'N/A';
-  if (typeof value === 'number') {
-    return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
-  }
+  if (typeof value === 'number') return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
   return String(value);
 };
 
-const normalizeYesNoValue = (value: string) => {
-  const normalized = value?.trim().toLowerCase();
-  return normalized === 'yes' ? 'yes' : 'no';
-};
+const normalizeYesNoValue = (value: string) => (value?.trim().toLowerCase() === 'yes' ? 'yes' : 'no');
+const parseNumberOrDefault = (value: string) => (Number.isNaN(Number(value)) ? 0 : Number(value));
 
-const parseNumberOrDefault = (value: string) => {
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? 0 : parsed;
-};
+/************************************
+ * PRESENTATIONAL BUILDING BLOCKS
+ ***********************************/
 
-const ResponseInsightCards: React.FC<{ detail: Record<string, unknown> }> = ({ detail }) => {
+// Unified Card wrapper to keep visuals consistent and heights aligned
+const SectionCard: React.FC<{
+  title: string;
+  titleColor: string;
+  gradient: string;
+  children: React.ReactNode;
+}> = ({ title, titleColor, gradient, children }) => (
+  <Card
+    sx={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      borderRadius: '20px',
+      border: '1px solid rgba(2,32,96,0.15)',
+      boxShadow: '0 18px 40px rgba(4,28,70,0.15)',
+      background: gradient,
+    }}
+  >
+    <CardContent sx={{ flex: 1 }}>
+      <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: titleColor }}>
+        {title}
+      </Typography>
+      {children}
+    </CardContent>
+  </Card>
+);
+
+const MetricItem: React.FC<{ label: string; value: unknown; color?: string }> = ({ label, value, color = '#0b2b57' }) => (
+  <Box>
+    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+      {label}
+    </Typography>
+    <Typography variant="h5" sx={{ fontWeight: 700, color }}>
+      {formatMetric(value)}
+    </Typography>
+  </Box>
+);
+
+const KeyValueRow: React.FC<{ label: string; value: unknown; valueColor?: string }> = ({ label, value, valueColor = 'inherit' }) => (
+  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Typography variant="body2" sx={{ textTransform: 'capitalize', color: 'text.primary' }}>
+      {label}
+    </Typography>
+    <Typography variant="body1" sx={{ fontWeight: 700, color: valueColor }}>
+      {formatMetric(typeof value === 'number' ? value : (Number.NaN as unknown as number)) || formatValue(value)}
+    </Typography>
+  </Box>
+);
+
+/************************************
+ * DOMAIN CARDS (3 HORIZONTAL CARDS)
+ ***********************************/
+
+const DiscountOverviewCard: React.FC<{ liquidity: number | null; total: number | null; final: number | null }>
+= ({ liquidity, total, final }) => (
+  <SectionCard title="Discount Overview" titleColor="#0b2b57" gradient="linear-gradient(145deg, #f1f6ff, #e6f2ff)">
+    <Stack spacing={1}>
+      <MetricItem label="Liquidity Model Discount" value={liquidity} />
+      <MetricItem label="Total Discount" value={total} />
+      <MetricItem label="Final Discount" value={final} />
+    </Stack>
+  </SectionCard>
+);
+
+const DiscountBreakdownCard: React.FC<{ discountEntries: [string, number][] }>= ({ discountEntries }) => (
+  <SectionCard title="Discount Breakdown" titleColor="#9e3c00" gradient="linear-gradient(145deg, #fff7f0, #ffe8d9)">
+    {discountEntries.length ? (
+      <Stack spacing={1}>
+        {discountEntries.map(([key, value]) => (
+          <KeyValueRow key={key} label={key.replace(/_/g, ' ')} value={value} valueColor="#a53d00" />
+        ))}
+      </Stack>
+    ) : (
+      <Typography variant="body2" color="text.secondary">
+        No discount data available.
+      </Typography>
+    )}
+  </SectionCard>
+);
+
+const FactsetDataCard: React.FC<{ entries: [string, unknown][] }>= ({ entries }) => (
+  <SectionCard title="Factset Data" titleColor="#0b6b57" gradient="linear-gradient(145deg, #f5fff9, #e6fff0)">
+    <Grid container spacing={1.5}>
+      {entries.map(([k, v]) => (
+        <Grid item xs={12} sm={6} key={k}>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>{formatLabel(k)}</Typography>
+          <Typography variant="body1" sx={{ fontWeight: 600, color: '#0b6b57' }}>{formatValue(v)}</Typography>
+        </Grid>
+      ))}
+    </Grid>
+  </SectionCard>
+);
+
+/************************************
+ * INSIGHTS STRIP (HORIZONTAL ALIGNMENT)
+ ***********************************/
+
+const InsightsStrip: React.FC<{ detail: Record<string, unknown> }> = ({ detail }) => {
   const liquidity = typeof detail.liquidity_model_discount === 'number' ? detail.liquidity_model_discount : null;
-  const totalDiscount = typeof detail.total_discount === 'number' ? detail.total_discount : null;
-  const finalDiscount = typeof detail.final_discount === 'number' ? detail.final_discount : null;
+  const total = typeof detail.total_discount === 'number' ? detail.total_discount : null;
+  const final = typeof detail.final_discount === 'number' ? detail.final_discount : null;
 
   const discountEntries = isPlainObject(detail.discounts)
-    ? Object.entries(detail.discounts).filter(([, value]) => typeof value === 'number') as [string, number][]
+    ? (Object.entries(detail.discounts).filter(([, v]) => typeof v === 'number') as [string, number][])
     : [];
 
   const fsData = isPlainObject(detail.fs_data) ? detail.fs_data : {};
-  const { company_description, ...restFsData } = fsData;
-  const fsEntries = Object.entries(restFsData);
+  const { company_description, ...restFsData } = fsData as Record<string, unknown>;
+
   const generalEntries = Object.entries(detail).filter(
-    ([key]) =>
-      !['liquidity_model_discount', 'total_discount', 'final_discount', 'discounts', 'fs_data'].includes(
-        key,
-      ),
+    ([key]) => !['liquidity_model_discount', 'total_discount', 'final_discount', 'discounts', 'fs_data'].includes(key),
   );
-  const responseEntries = [...generalEntries, ...fsEntries];
+
+  const factsetEntries: [string, unknown][] = [...generalEntries, ...Object.entries(restFsData)];
 
   return (
-    <Grid container spacing={3} sx={{ mt: 3 }}>
-      <Grid item xs={12} md={4}>
-        <Card
-          sx={{
-            borderRadius: '20px',
-            border: '1px solid rgba(2,32,96,0.15)',
-            boxShadow: '0 18px 40px rgba(4,28,70,0.15)',
-            background: 'linear-gradient(145deg, #f1f6ff, #e6f2ff)',
-          }}
-        >
-          <CardContent>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#0b2b57' }}>
-              Discount Overview
-            </Typography>
-            <Stack spacing={1}>
-              <Box>
-                <Typography variant="caption" sx={{ color: '#4f5b74' }}>
-                  Liquidity Model Discount
-                </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 700, color: '#0b2b57' }}>
-                  {formatMetric(liquidity)}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" sx={{ color: '#4f5b74' }}>
-                  Total Discount
-                </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 700, color: '#0b2b57' }}>
-                  {formatMetric(totalDiscount)}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" sx={{ color: '#4f5b74' }}>
-                  Final Discount
-                </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 700, color: '#0b2b57' }}>
-                  {formatMetric(finalDiscount)}
-                </Typography>
-              </Box>
-            </Stack>
-          </CardContent>
-        </Card>
+    <Grid
+      container
+      spacing={3}
+      alignItems="stretch"
+      sx={{ mt: 3 }}
+    >
+      <Grid item xs={12} md={4} display="flex">
+        <DiscountOverviewCard liquidity={liquidity} total={total} final={final} />
       </Grid>
-      <Grid item xs={12} md={4}>
-        <Card
-          sx={{
-            borderRadius: '20px',
-            border: '1px solid rgba(2,32,96,0.15)',
-            boxShadow: '0 18px 40px rgba(4,28,70,0.15)',
-            background: 'linear-gradient(145deg, #fff7f0, #ffe8d9)',
-          }}
-        >
-          <CardContent>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#9e3c00' }}>
-              Discount Breakdown
-            </Typography>
-            <Stack spacing={1} sx={{ mt: 1 }}>
-              {discountEntries.length ? (
-                discountEntries.map(([key, value]) => (
-                  <Box key={key} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" sx={{ color: '#3d1c00', textTransform: 'capitalize' }}>
-                      {key.replace(/_/g, ' ')}
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 700, color: '#a53d00' }}>
-                      {formatMetric(value)}
-                    </Typography>
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2" sx={{ color: '#7f5b3d' }}>
-                  No discount data available.
-                </Typography>
-              )}
-            </Stack>
-          </CardContent>
-        </Card>
+      <Grid item xs={12} md={4} display="flex">
+        <DiscountBreakdownCard discountEntries={discountEntries} />
       </Grid>
-      <Grid item xs={12} md={4}>
-        <Card
-          sx={{
-            borderRadius: '20px',
-            border: '1px solid rgba(2,32,96,0.15)',
-            boxShadow: '0 18px 40px rgba(4,28,70,0.15)',
-            background: 'linear-gradient(145deg, #f5fff9, #e6fff0)',
-          }}
-        >
-          <Box sx={{ px: { xs: 2, md: 3 }, py: { xs: 2, md: 3 } }}>
-            <Stack spacing={2}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#0b6b57' }}>
-                Financial Snapshot
-              </Typography>
-              <Grid container spacing={2}>
-                {responseEntries.map(([key, value]) => (
-                  <Grid item xs={12} sm={6} key={`response-${key}`}>
-                    <Typography variant="caption" sx={{ color: '#3a5846' }}>
-                      {formatLabel(key)}
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 600, color: '#0b6b57' }}>
-                      {formatValue(value)}
-                    </Typography>
-                  </Grid>
-                ))}
-              </Grid>
-              {/* {company_description && (
-                <Box
-                  sx={{
-                    mt: 3,
-                    p: 2,
-                    borderRadius: '16px',
-                    background: 'rgba(255,255,255,0.8)',
-                    border: '1px solid rgba(11,43,87,0.1)',
-                  }}
-                >
-                  <Typography variant="caption" sx={{ color: '#3a5846' }}>
-                    {formatLabel('company_description')}
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 400, color: '#0b6b57', mt: 0.5, lineHeight: 1.6 }}>
-                    {formatValue(company_description)}
-                  </Typography>
-                </Box>
-              )} */}
-            </Stack>
-          </Box>
-        </Card>
+      <Grid item xs={12} md={4} display="flex">
+        <FactsetDataCard entries={factsetEntries} />
       </Grid>
     </Grid>
   );
 };
 
-const ABBDiscountDataMainFunction: React.FC = () => {
+/************************************
+ * PAGE
+ ***********************************/
+
+const gradientShift = {
+  '@keyframes gradientShift': {
+    '0%': { backgroundPosition: '0% 50%' },
+    '50%': { backgroundPosition: '100% 50%' },
+    '100%': { backgroundPosition: '0% 50%' },
+  },
+};
+
+const ABBDiscountDataPage: React.FC = () => {
   const [formValues, setFormValues] = useState<DiscountFormValues>({
     ticker: 'AAPL-US',
     tradeDate: '',
@@ -232,18 +207,16 @@ const ABBDiscountDataMainFunction: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [serverResponse, setServerResponse] = useState<Record<string, unknown> | null>(null);
+
   const responseDetail = useMemo(() => extractPrimaryResponse(serverResponse), [serverResponse]);
 
   const handleFieldChange = useCallback(
-    (field: keyof DiscountFormValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setFormValues((prev) => ({ ...prev, [field]: event.target.value }));
-    },
+    (field: keyof DiscountFormValues) => (event: React.ChangeEvent<HTMLInputElement>) =>
+      setFormValues((prev) => ({ ...prev, [field]: event.target.value })),
     [],
   );
 
-  const isSubmitDisabled = useMemo(() => {
-    return !formValues.ticker.trim() || !formValues.tradeDate;
-  }, [formValues.ticker, formValues.tradeDate]);
+  const isSubmitDisabled = useMemo(() => !formValues.ticker.trim() || !formValues.tradeDate, [formValues.ticker, formValues.tradeDate]);
 
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -251,20 +224,11 @@ const ABBDiscountDataMainFunction: React.FC = () => {
       setError(null);
       setServerResponse(null);
 
-      if (!formValues.ticker.trim()) {
-        setError('Ticker is required.');
-        return;
-      }
-
-      if (!formValues.tradeDate) {
-        setError('Launch date is required.');
-        return;
-      }
+      if (!formValues.ticker.trim()) return setError('Ticker is required.');
+      if (!formValues.tradeDate) return setError('Launch date is required.');
 
       const apiUrl = process.env.REACT_APP_API_URL;
-      if (!apiUrl) {
-        throw new Error('API URL is not defined in environment variables');
-      }
+      if (!apiUrl) throw new Error('API URL is not defined in environment variables');
 
       const token = localStorage.getItem('access_token');
       const payload = {
@@ -277,16 +241,13 @@ const ABBDiscountDataMainFunction: React.FC = () => {
         primary: normalizeYesNoValue(formValues.primary),
         emerging_mkt: normalizeYesNoValue(formValues.emergingMkt),
         block_deal_shares: parseNumberOrDefault(formValues.blockDealShares),
-        block_deal_percentage_of_market_cap: parseNumberOrDefault(
-          formValues.blockDealPercentageOfMarketCap,
-        ),
+        block_deal_percentage_of_market_cap: parseNumberOrDefault(formValues.blockDealPercentageOfMarketCap),
         block_deal_value_in_local_currency: parseNumberOrDefault(formValues.blockDealValueLocal),
         block_deal_value_in_dollar: parseNumberOrDefault(formValues.blockDealValueDollar),
       };
 
       try {
         setLoading(true);
-
         const response = await fetch(`${apiUrl}/api/abb_factset_data/`, {
           method: 'POST',
           headers: {
@@ -305,7 +266,7 @@ const ABBDiscountDataMainFunction: React.FC = () => {
         }
 
         setServerResponse(json ?? { message: 'Discount data submitted successfully.' });
-      } catch (submitError) {
+      } catch (e) {
         setError('Unexpected error while submitting discount data.');
       } finally {
         setLoading(false);
@@ -330,16 +291,8 @@ const ABBDiscountDataMainFunction: React.FC = () => {
           animation: 'gradientShift 28s ease-in-out infinite',
         }}
       >
-        <CardContent
-          sx={{
-            position: 'relative',
-            zIndex: 2,
-            background: 'transparent',
-            borderRadius: '32px',
-            padding: { xs: 3, md: 4 },
-          }}
-        >
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: '#0b2b57' }} align='center'>
+        <CardContent sx={{ position: 'relative', zIndex: 2, background: 'transparent', borderRadius: '32px', p: { xs: 3, md: 4 } }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: '#0b2b57' }} align="center">
             ABB Discount Data
           </Typography>
 
@@ -354,44 +307,27 @@ const ABBDiscountDataMainFunction: React.FC = () => {
           <Divider sx={{ my: 3, borderColor: 'rgba(2,32,96,0.15)' }} />
 
           {error && !loading && (
-            <Alert
-              severity="error"
-              sx={{
-                mt: 3,
-                borderRadius: '14px',
-                backgroundColor: 'rgba(255,203,203,0.95)',
-                border: '1px solid rgba(192,42,42,0.4)',
-              }}
-            >
+            <Alert severity="error" sx={{ mt: 3, borderRadius: '14px', backgroundColor: 'rgba(255,203,203,0.95)', border: '1px solid rgba(192,42,42,0.4)' }}>
               {error}
             </Alert>
           )}
 
           {serverResponse && (
-            <Alert
-              severity="success"
-              sx={{
-                mt: 3,
-                borderRadius: '14px',
-                background: 'linear-gradient(135deg, rgba(183,241,255,0.7), rgba(216,255,229,0.85))',
-                border: '1px solid rgba(0,96,155,0.35)',
-              }}
-            >
-              {serverResponse.detail
-                ? String(serverResponse.detail)
-                : 'Discount payload delivered to ABB API successfully.'}
+            <Alert severity="success" sx={{ mt: 3, borderRadius: '14px', background: 'linear-gradient(135deg, rgba(183,241,255,0.7), rgba(216,255,229,0.85))', border: '1px solid rgba(0,96,155,0.35)' }}>
+              {serverResponse.detail ? String((serverResponse as any).detail) : 'Discount payload delivered to ABB API successfully.'}
             </Alert>
           )}
         </CardContent>
       </Card>
+
+      {/* INSIGHTS: three cards in one horizontal strip */}
       {responseDetail && (
         <Box sx={{ mt: 4 }}>
-          <ResponseInsightCards detail={responseDetail} />
+          <InsightsStrip detail={responseDetail} />
         </Box>
       )}
-      {/* <ABBDiscountResponseDetails payload={serverResponse} /> */}
     </Container>
   );
 };
 
-export default ABBDiscountDataMainFunction;
+export default ABBDiscountDataPage;
