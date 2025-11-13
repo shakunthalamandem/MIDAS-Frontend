@@ -37,21 +37,23 @@ const ABBDiscountForm: React.FC<ABBDiscountFormProps> = ({
   }>;
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ flexGrow: 1 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
       <Grid container spacing={3}>
-        <Grid item xs={12} lg={8}>
+        <Grid item xs={12} lg={12}>
+          {/* Responsive, equal-width field grid */}
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+              // Each field gets at least 220px; they auto-flow to keep rows aligned
+              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
               gap: 2,
-              alignItems: 'flex-start',
+              alignItems: 'start',
             }}
           >
             {orderedFields.map((field) => {
               const commonProps = {
                 fullWidth: true,
-                variant: 'standard' as const,
+                variant: 'standard' as const, // keep your existing style; change to 'outlined' if you prefer
                 label: field.label,
                 value: formValues[field.key],
                 onChange: handleFieldChange(field.key),
@@ -69,13 +71,13 @@ const ABBDiscountForm: React.FC<ABBDiscountFormProps> = ({
               if (field.type === 'select') {
                 return (
                   <TextField
-                    key={field.key}
+                    key={String(field.key)}
                     select
                     {...commonProps}
                     SelectProps={{
                       displayEmpty: true,
                       sx: {
-                        '& .MuiOutlinedInput-input': {
+                        '& .MuiOutlinedInput-input, & .MuiInputBase-input': {
                           paddingTop: 1.25,
                           paddingBottom: 1.25,
                         },
@@ -96,43 +98,41 @@ const ABBDiscountForm: React.FC<ABBDiscountFormProps> = ({
 
               return (
                 <TextField
-                  key={field.key}
-                  type={field.type === 'date' ? 'date' : field.type === 'number' ? 'number' : 'text'}
+                  key={String(field.key)}
+                  type={
+                    field.type === 'date' ? 'date' : field.type === 'number' ? 'number' : 'text'
+                  }
                   {...commonProps}
                 />
               );
             })}
           </Box>
         </Grid>
+
+        {/* Submit button aligned to the right, placed last */}
+        <Grid item xs={12}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={loading || isSubmitDisabled}
+              sx={{
+                background: '#0b2b57',
+                borderRadius: '18px',
+                px: 3.5,
+                py: 1.25,
+                boxShadow: '0 12px 30px rgba(11,43,87,0.18)',
+                textTransform: 'none',
+                fontWeight: 600,
+                color: '#fff',
+                '&:hover': { background: '#0a264d' },
+              }}
+            >
+              {loading ? 'Processing...' : 'Submit to ABB API'}
+            </Button>
+          </Box>
+        </Grid>
       </Grid>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          mt: 3,
-        }}
-      >
-        <Button
-          variant="contained"
-          type="submit"
-          disabled={loading || isSubmitDisabled}
-          sx={{
-            background: '#0b2b57',
-            borderRadius: '18px',
-            paddingX: 3.5,
-            paddingY: 1.25,
-            boxShadow: '0 12px 30px rgba(11,43,87,0.18)',
-            textTransform: 'none',
-            fontWeight: 600,
-            color: '#fff',
-            '&:hover': {
-              background: '#0a264d',
-            },
-          }}
-        >
-          {loading ? 'Processing...' : 'Submit to ABB API'}
-        </Button>
-      </Box>
     </Box>
   );
 };
