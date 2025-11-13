@@ -15,6 +15,7 @@ interface ABBDiscountFormProps {
   handleSubmit: (event: FormEvent<HTMLFormElement>) => void;
   loading: boolean;
   isSubmitDisabled: boolean;
+  handleReset: () => void;
 }
 
 const ABBDiscountForm: React.FC<ABBDiscountFormProps> = ({
@@ -23,6 +24,7 @@ const ABBDiscountForm: React.FC<ABBDiscountFormProps> = ({
   handleSubmit,
   loading,
   isSubmitDisabled,
+  handleReset,
 }) => {
   const orderedFields = [
     { key: 'ticker', label: 'Ticker', type: 'text', required: true },
@@ -111,7 +113,25 @@ const ABBDiscountForm: React.FC<ABBDiscountFormProps> = ({
 
         {/* Submit button aligned to the right, placed last */}
         <Grid item xs={12}>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1, gap: 2 }}>
+            <Button
+              variant="outlined"
+              type="button"
+              onClick={handleReset}
+              disabled={loading}
+              sx={{
+                borderColor: 'rgba(11,43,87,0.4)',
+                color: '#0b2b57',
+                borderRadius: '18px',
+                px: 3.5,
+                py: 1.25,
+                textTransform: 'none',
+                fontWeight: 600,
+                '&:hover': { borderColor: '#0b2b57' },
+              }}
+            >
+              Reset
+            </Button>
             <Button
               variant="contained"
               type="submit"
