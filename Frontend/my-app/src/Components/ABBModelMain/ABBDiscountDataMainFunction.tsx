@@ -172,7 +172,7 @@ const ResponseInsightCards: React.FC<{ detail: Record<string, unknown> }> = ({ d
             background: 'linear-gradient(145deg, #f5fff9, #e6fff0)',
           }}
         >
-          <CardContent>
+          <Box sx={{ px: { xs: 2, md: 3 }, py: { xs: 2, md: 3 } }}>
             <Stack spacing={2}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#0b6b57' }}>
                 Financial Snapshot
@@ -189,7 +189,7 @@ const ResponseInsightCards: React.FC<{ detail: Record<string, unknown> }> = ({ d
                   </Grid>
                 ))}
               </Grid>
-              {company_description && (
+              {/* {company_description && (
                 <Box
                   sx={{
                     mt: 3,
@@ -206,9 +206,9 @@ const ResponseInsightCards: React.FC<{ detail: Record<string, unknown> }> = ({ d
                     {formatValue(company_description)}
                   </Typography>
                 </Box>
-              )}
+              )} */}
             </Stack>
-          </CardContent>
+          </Box>
         </Card>
       </Grid>
     </Grid>
