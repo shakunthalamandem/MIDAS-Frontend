@@ -79,7 +79,7 @@ import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTic
 import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
 import PNLRiskReportMain from "../Components/PNLAttribution/RiskReportMain/PNLRiskReportMain";
 import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
-import ABBDiscountDataMainFunction from "../Components/DiscountDataModel/ABBDiscountDataMainFunction";
+import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountDataModel/ABBDiscountDataMainFunction";
 
 const AppRouters: React.FC = () => {
   return (
