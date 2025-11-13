@@ -364,7 +364,7 @@ const ABBDiscountDataPage: React.FC = () => {
 
           {serverResponse && (
             <Alert severity="success" sx={{ mt: 3, borderRadius: '14px', background: 'linear-gradient(135deg, rgba(183,241,255,0.7), rgba(216,255,229,0.85))', border: '1px solid rgba(0,96,155,0.35)' }}>
-              {(serverResponse as any).detail ? String((serverResponse as any).detail) : 'Discount payload delivered to ABB API successfully.'}
+              {(serverResponse as any).detail ? String((serverResponse as any).detail) : 'Discount successfully Generated.'}
             </Alert>
           )}
         </CardContent>
