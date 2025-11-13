@@ -4,7 +4,6 @@ import ABBSection1 from './ABBSection1';
 import ABBSection2 from './ABBSection2';
 import ABBSection3 from './ABBSection3';
 import type { ABBFactsetResponse, ABBSectionProps } from './ABBSection.types';
-import './ABBModelSectionMain.css';
 
 const sectionData: ABBSectionProps[] = [
   {

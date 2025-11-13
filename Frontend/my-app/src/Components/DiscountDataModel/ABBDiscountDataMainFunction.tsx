@@ -104,7 +104,7 @@ const KeyValueRow: React.FC<{ label: string; value: unknown; valueColor?: string
 };
 
 const FactsetDataCard: React.FC<{ entries: [string, unknown][] }> = ({ entries }) => (
-  <DiscountTile title="FactSet Data" titleColor="#0b6b57" gradient="linear-gradient(145deg, #f5fff9, #e6fff0)">
+  <DiscountTile title="Public Market Data" titleColor="#0b6b57" gradient="linear-gradient(145deg, #f5fff9, #e6fff0)">
     {entries.length ? (
       <Box
         sx={{
@@ -138,7 +138,7 @@ const FactsetDataCard: React.FC<{ entries: [string, unknown][] }> = ({ entries }
       </Box>
     ) : (
       <Typography variant="body2" color="text.secondary">
-        No FactSet data available.
+        No Public Market Data available.
       </Typography>
     )}
   </DiscountTile>
