@@ -61,25 +61,26 @@ const initialFormValues: DiscountFormValues = {
  ***********************************/
 
 // Unified Card wrapper to keep visuals consistent and heights aligned
+const formatPercentValue = (value: unknown) =>
+  typeof value === 'number' ? `${formatMetric(value)}%` : 'N/A';
+
 const DiscountTile: React.FC<{
   title: string;
   gradient: string;
   titleColor: string;
   children: React.ReactNode;
-  dense?: boolean;
-}> = ({ title, gradient, titleColor, children, dense = false }) => (
+}> = ({ title, gradient, titleColor, children }) => (
   <Box
     sx={{
-      flex: 1,
       borderRadius: '18px',
-      padding: dense ? 1.5 : 2,
+      padding: 2,
       background: gradient,
       border: '1px solid rgba(2, 32, 96, 0.15)',
       boxShadow: '0 12px 30px rgba(4,28,70,0.1)',
       display: 'flex',
       flexDirection: 'column',
-      gap: 1.5,
-      minHeight: dense ? 'auto' : 160,
+      gap: 1,
+      minHeight: 160,
     }}
   >
     <Typography variant="body1" sx={{ fontWeight: 700, color: titleColor }}>
@@ -89,7 +90,12 @@ const DiscountTile: React.FC<{
   </Box>
 );
 
-const KeyValueRow: React.FC<{ label: string; value: unknown; valueColor?: string }> = ({ label, value, valueColor = 'inherit' }) => {
+const KeyValueRow: React.FC<{
+  label: string;
+  value: unknown;
+  valueColor?: string;
+  suffix?: string;
+}> = ({ label, value, valueColor = 'inherit', suffix = '' }) => {
   const isNum = typeof value === 'number' && Number.isFinite(value);
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 0.5 }}>
@@ -97,7 +103,7 @@ const KeyValueRow: React.FC<{ label: string; value: unknown; valueColor?: string
         {formatLabel(label)}
       </Typography>
       <Typography variant="body1" sx={{ fontWeight: 600, color: valueColor }}>
-        {isNum ? formatMetric(value) : formatValue(value)}
+        {isNum ? `${formatMetric(value)}${suffix}` : formatValue(value)}
       </Typography>
     </Box>
   );
@@ -144,14 +150,49 @@ const FactsetDataCard: React.FC<{ entries: [string, unknown][] }> = ({ entries }
   </DiscountTile>
 );
 
+const DiscountsListCard: React.FC<{ entries: [string, number][] }> = ({ entries }) => (
+  <Box
+    sx={{
+      borderRadius: '20px',
+      border: '1px solid rgba(11, 43, 87, 0.15)',
+      background: 'linear-gradient(145deg, #fff7f0, #ffe8d9)',
+      boxShadow: '0 18px 40px rgba(4,28,70,0.12)',
+      padding: { xs: 2, sm: 3 },
+      minHeight: 240,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 1,
+    }}
+  >
+    <Typography variant="body1" sx={{ fontWeight: 700, color: '#9e3c00' }}>
+      Discounts
+    </Typography>
+        {entries.length ? (
+          <Stack spacing={0.75} sx={{ flex: 1 }}>
+            {entries.map(([key, value]) => (
+              <KeyValueRow
+                key={key}
+                label={key}
+                value={value}
+                suffix="%"
+                valueColor={typeof value === 'number' && value < 0 ? '#a53d00' : '#0b6b57'}
+              />
+            ))}
+          </Stack>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No discount data available.
+          </Typography>
+    )}
+  </Box>
+);
+
 const InsightsStrip: React.FC<{ detail: Record<string, unknown> }> = ({ detail }) => {
   const liquidity = typeof detail.liquidity_model_discount === 'number' ? (detail.liquidity_model_discount as number) : null;
   const total = typeof detail.total_discount === 'number' ? (detail.total_discount as number) : null;
 
   const discountsRaw = isPlainObject(detail.discounts) ? (detail.discounts as Record<string, unknown>) : {};
   const discountEntries = Object.entries(discountsRaw).filter(([, v]) => typeof v === 'number') as [string, number][];
-
-  const d1DiscountEntries = discountEntries.filter(([key]) => /d1/i.test(key));
   const standardDiscountEntries = discountEntries.filter(([key]) => !/d1/i.test(key));
 
   const fsData = isPlainObject(detail.fs_data) ? (detail.fs_data as Record<string, unknown>) : {};
@@ -174,7 +215,7 @@ const InsightsStrip: React.FC<{ detail: Record<string, unknown> }> = ({ detail }
         }}
       >
         <CardContent sx={{ px: { xs: 1, sm: 2 }, py: { xs: 1.5, sm: 2 } }}>
-          <Grid container spacing={1}>
+          <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <DiscountTile
                 title="Liquidity Model Discount"
@@ -182,46 +223,23 @@ const InsightsStrip: React.FC<{ detail: Record<string, unknown> }> = ({ detail }
                 gradient="linear-gradient(145deg, #f1f6ff, #deeaff)"
               >
                 <Typography variant="h3" sx={{ fontWeight: 800, color: '#0b2b57' }}>
-                  {formatMetric(liquidity)}
+                  {formatPercentValue(liquidity)}
                 </Typography>
               </DiscountTile>
             </Grid>
             <Grid item xs={12} md={6}>
-              <DiscountTile title="Total Discount" titleColor="#0b6b57" gradient="linear-gradient(145deg, #eafbf1, #d4fff0)">
+              <DiscountTile
+                title="Total Discount"
+                titleColor="#0b6b57"
+                gradient="linear-gradient(145deg, #eafbf1, #d4fff0)"
+              >
                 <Typography variant="h3" sx={{ fontWeight: 800, color: '#0b6b57' }}>
-                  {formatMetric(total)}
+                  {formatPercentValue(total)}
                 </Typography>
               </DiscountTile>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <DiscountTile title="D1 Discounts" titleColor="#9e3c00" gradient="linear-gradient(145deg, #fff7f0, #ffe8d9)" dense>
-                {d1DiscountEntries.length ? (
-                  <Stack spacing={0.4}>
-                    {d1DiscountEntries.map(([key, value]) => (
-                      <KeyValueRow key={key} label={key} value={value} valueColor={typeof value === 'number' && value < 0 ? '#a53d00' : '#0b6b57'} />
-                    ))}
-                  </Stack>
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    No D1 discount data.
-                  </Typography>
-                )}
-              </DiscountTile>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <DiscountTile title="Discounts" titleColor="#0b6b57" gradient="linear-gradient(145deg, #f5fff9, #e6fff0)" dense>
-                {standardDiscountEntries.length ? (
-                  <Stack spacing={0.4}>
-                    {standardDiscountEntries.map(([key, value]) => (
-                      <KeyValueRow key={key} label={key} value={value} valueColor={typeof value === 'number' && value < 0 ? '#a53d00' : '#0b6b57'} />
-                    ))}
-                  </Stack>
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    No discount breakdown yet.
-                  </Typography>
-                )}
-              </DiscountTile>
+            <Grid item xs={12}>
+              <DiscountsListCard entries={standardDiscountEntries} />
             </Grid>
           </Grid>
         </CardContent>
