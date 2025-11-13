@@ -253,8 +253,10 @@ const ABBDiscountDataPage: React.FC = () => {
   const responseDetail = useMemo(() => extractPrimaryResponse(serverResponse), [serverResponse]);
 
   const handleFieldChange = useCallback(
-    (field: keyof DiscountFormValues) => (event: React.ChangeEvent<HTMLInputElement>) =>
-      setFormValues((prev) => ({ ...prev, [field]: event.target.value })),
+    (field: keyof DiscountFormValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = field === 'ticker' ? event.target.value.toUpperCase() : event.target.value;
+      setFormValues((prev) => ({ ...prev, [field]: newValue }));
+    },
     [],
   );
 
@@ -342,7 +344,7 @@ const ABBDiscountDataPage: React.FC = () => {
       >
         <CardContent sx={{ position: 'relative', zIndex: 2, background: 'transparent', borderRadius: '32px', p: { xs: 3, md: 4 } }}>
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: '#0b2b57' }} align="center">
-            ABB Discount Data
+            ABB Model Discount (Data Submission)
           </Typography>
 
           <ABBDiscountForm
