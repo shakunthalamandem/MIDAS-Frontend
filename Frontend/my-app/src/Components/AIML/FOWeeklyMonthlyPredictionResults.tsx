@@ -244,7 +244,7 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
     { key: "negative_model", label: "High Negative Return Risk" },
   ];
 
-  const timeFrames = ["Weekly", "Monthly"];
+  const timeFrames = ["Week", "Month"];
   const showTable =
     predictionResult && Object.keys(predictionResult).length > 0;
 
@@ -340,7 +340,7 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
                             bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6",
                           }}
                         >
-                          T+1 {frame}(AM) from T+1D Close
+                          1st {frame}(AM) from 1st Day Close
                         </TableCell>
                         <TableCell
                           sx={{
