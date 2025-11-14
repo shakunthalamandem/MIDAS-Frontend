@@ -261,12 +261,12 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
               color="primary.main"
               fontWeight="bold"
             >
-              T+1W & T+1M - Model Predictions
+              1 Week & 1 Month from 1st Day Close- Model Predictions
             </Typography>
           </Box>
           <Box display="flex" alignItems="flex-end" gap={2}>
             <TextField
-              label="T+1D Close Return (%)"
+              label="1st Day Close Return (%)"
               variant="outlined"
               size="small"
               type="number"
@@ -292,9 +292,9 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
         <Divider sx={{ my: 3 }} />
         <Box>
           <Typography>
-            A long with the above parameters that are considered for T+1Day, We
-            are adding T+1Day close return as additional parameter for T+1 week
-            and T+1 Month.
+            A long with the above parameters that are considered for 1st Day, We
+            are adding 1st Day close return as additional parameter for 1 week
+            and 1 Month.
           </Typography>
         </Box>
         <Divider sx={{ my: 3 }} />
@@ -435,8 +435,8 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
         ) : (
           <Box sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="h6" color="text.secondary">
-              Enter the <b>T+1D Close Return (%)</b> to predict the T+1W and
-              T+1M outcomes.
+              Enter the <b>1st Day Close Return (%)</b> to predict the 1W and
+              1M outcomes.
             </Typography>
           </Box>
         )}
