@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Paper,
@@ -178,6 +178,17 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
     fetchData();
   }, [payload]);
 
+  const AbbDataCreation = useMemo(() => {
+    if (!data) {
+      return null;
+    }
+
+    return {
+      payload,
+      apiResponse: data,
+    };
+  }, [payload, data]);
+
   if (loading) {
     return (
       <Box sx={{ mt: 3 }}>
@@ -203,13 +214,6 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
   }
 
   const rows = flattenData(data);
-
-  // Combine payload and API response data
-  const AbbDataCreation = {
-    payload,
-    apiResponse: data,
-  };
-
   return (
     <>
       <TableContainer
