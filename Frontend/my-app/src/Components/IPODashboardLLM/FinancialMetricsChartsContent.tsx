@@ -8,6 +8,9 @@ import {
   Typography,
   Checkbox,
   FormControlLabel,
+  Chip,
+  Paper,
+  Stack,
 } from "@mui/material";
 import {
   Bar,
@@ -64,12 +67,10 @@ const METRICS: MetricConfig[] = [
 
 const YEARS = [2024, 2025, 2026];
 
-// 10+ distinct darker colors for peers
+// Distinct darker colors for peers
 const BAR_COLORS = [
   "#264653", // deep teal blue
   "#2A9D8F", // dark turquoise green
-  "#8E3B46", // dark rose red
-  "#E76F51", // muted coral
   "#6D597A", // dark mauve purple
   "#457B9D", // slate blue
   "#1D3557", // navy blue
@@ -79,7 +80,6 @@ const BAR_COLORS = [
   "#F4A261", // sandy orange
   "#E9C46A", // mustard yellow
   "#90BE6D", // soft green
-  "#F3722C", // vibrant orange
   "#F9C74F", // bright yellow
   "#43AA8B", // teal
   "#577590", // cool blue
@@ -89,7 +89,7 @@ const BAR_COLORS = [
 const SELECTED_LINE_COLOR = "#e42d36ff";
 
 // Max number of peers to show at once
-const MAX_SELECTED_PEERS = 4;
+const MAX_SELECTED_PEERS = 5;
 
 const roundToTwoDecimals = (
   value: number | null | undefined
@@ -257,41 +257,111 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
           </Box>
         </Box>
 
-        {/* Peer ticker selector */}
-        <Box mb={2}>
+        {/* Peer ticker selector - enhanced UI */}
+        <Paper
+          elevation={0}
+          sx={{
+            mb: 3,
+            px: 2.5,
+            py: 2,
+            borderRadius: 2,
+            bgcolor: "#f3f6fb",
+            border: "1px solid #dde3f0",
+          }}
+        >
           <Typography
             variant="subtitle2"
-            sx={{ fontWeight: 600, mb: 1, color: "#002060" }}
+            align="center"
+            sx={{ fontWeight: 700, color: "#002060", textTransform: "uppercase", letterSpacing: 0.5 }}
           >
-            Peer Tickers (select up to {MAX_SELECTED_PEERS})
+            Peer Tickers
           </Typography>
-          <Box display="flex" flexWrap="wrap" gap={1}>
+          <Typography
+            variant="caption"
+            align="center"
+            display="block"
+            sx={{ mt: 0.5, color: "text.secondary" }}
+          >
+            Select up to {MAX_SELECTED_PEERS} peers to compare
+          </Typography>
+
+          <Stack
+            direction="row"
+            flexWrap="wrap"
+            justifyContent="center"
+            gap={1}
+            mt={1.5}
+          >
             {peerCompanies.map((company) => {
-              const checked = selectedPeers.includes(company);
-              const disableCheckbox =
-                !checked && selectedPeers.length >= MAX_SELECTED_PEERS;
+              const isSelected = selectedPeers.includes(company);
+              const disable =
+                !isSelected && selectedPeers.length >= MAX_SELECTED_PEERS;
+
+              const colorIndex = peerCompanies.indexOf(company);
+              const baseColor =
+                BAR_COLORS[colorIndex % BAR_COLORS.length];
 
               return (
-                <FormControlLabel
+                <Chip
                   key={company}
-                  control={
-                    <Checkbox
-                      size="small"
-                      checked={checked}
-                      onChange={() => handlePeerToggle(company)}
-                      disabled={disableCheckbox}
+                  label={company}
+                  onClick={() => {
+                    if (!disable) {
+                      handlePeerToggle(company);
+                    }
+                  }}
+                  clickable={!disable}
+                  sx={{
+                    fontWeight: 600,
+                    borderRadius: "999px",
+                    px: 1.5,
+                    py: 0.25,
+                    borderWidth: 1,
+                    borderStyle: "solid",
+                    borderColor: isSelected ? baseColor : "#c5ccd9",
+                    bgcolor: isSelected ? baseColor : "#ffffff",
+                    color: isSelected ? "#ffffff" : "#1b2433",
+                    opacity: disable ? 0.4 : 1,
+                    transition: "all 0.15s ease-in-out",
+                    "& .MuiChip-label": {
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.75,
+                    },
+                    "&:hover": {
+                      boxShadow: disable
+                        ? "none"
+                        : "0 0 0 2px rgba(0, 0, 0, 0.06)",
+                      transform: disable ? "none" : "translateY(-1px)",
+                    },
+                  }}
+                  icon={
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        bgcolor: baseColor,
+                        boxShadow: isSelected
+                          ? "0 0 0 2px rgba(255,255,255,0.7)"
+                          : "none",
+                      }}
                     />
                   }
-                  label={company}
                 />
               );
             })}
-          </Box>
-          <Typography variant="caption" color="text.secondary">
-            To compare another peer, uncheck one of the selected tickers if you
-            have already selected {MAX_SELECTED_PEERS}.
+          </Stack>
+
+          <Typography
+            variant="caption"
+            align="center"
+            display="block"
+            sx={{ mt: 1, color: "text.disabled" }}
+          >
+            To compare another peer, unselect one of the chosen tickers if you&apos;ve already selected {MAX_SELECTED_PEERS}.
           </Typography>
-        </Box>
+        </Paper>
 
         {/* Charts */}
         <Grid container spacing={3}>
@@ -353,9 +423,7 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
                               const colorIndex =
                                 peerCompanies.indexOf(company);
                               const fillColor =
-                                BAR_COLORS[
-                                  colorIndex % BAR_COLORS.length
-                                ];
+                                BAR_COLORS[colorIndex % BAR_COLORS.length];
 
                               return (
                                 <Bar
