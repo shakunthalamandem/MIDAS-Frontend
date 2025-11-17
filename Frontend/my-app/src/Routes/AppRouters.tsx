@@ -249,6 +249,8 @@ const AppRouters: React.FC = () => {
         <Route path="/daily_note" element={<AuthGuard><DailyNoteDeleteTickersData /></AuthGuard>} />
 
         <Route path="/equity/abb_model" element={<AuthGuard><ABBModelMain /></AuthGuard>} />
+                {/* <Route path="/equity/abb_model" element={<AuthGuard><ABBDiscountDataMainFunction /></AuthGuard>} /> */}
+
 
 
 
