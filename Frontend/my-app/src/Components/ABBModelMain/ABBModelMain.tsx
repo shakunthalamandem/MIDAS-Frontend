@@ -32,16 +32,16 @@ const baseTextFieldProps = {
 const ABBModelMain = () => {
   const [formValues, setFormValues] = useState<any>({
     ticker: "",
-    tradeDate: "",
-    cleanUp: "",
-    seasoned: "",
-    timing: "",
-    primary: "",
-    emergingMkt: "",
-    blockDealShares: "",
-    blockDealPercentageOfMarketCap: "",
-    blockDealValueLocal: "",
-    blockDealValueDollar: "",
+    tradeDate: "", // Initialize as string
+    cleanUp: "no", // Default value is "no"
+    seasoned: "no", // Default value is "no"
+    timing: "no", // Default value is "no"
+    primary: "no", // Default value is "no"
+    emergingMkt: "no", // Default value is "no"
+    blockDealShares: 0, // Initialize as number
+    blockDealPercentageOfMarketCap: 0, // Initialize as number
+    blockDealValueLocal: 0, // Initialize as number
+    blockDealValueDollar: 0, // Initialize as number
   });
 
   const [companyOptions, setCompanyOptions] = useState([]);
@@ -82,10 +82,50 @@ const ABBModelMain = () => {
 
   // --------------------------- FIELD HANDLER -----------------------------
   const handleFieldChange = (key: string) => (e: any) => {
-    setFormValues((prev: any) => ({
-      ...prev,
-      [key]: e.target.value,
-    }));
+    const value = e.target.value;
+
+    // Handle date fields separately
+    if (key === "tradeDate") {
+      setFormValues((prev: any) => ({
+        ...prev,
+        [key]: value,
+      }));
+    }
+
+    // Handle numeric fields
+    else if (
+      key === "blockDealShares" ||
+      key === "blockDealPercentageOfMarketCap" ||
+      key === "blockDealValueLocal" ||
+      key === "blockDealValueDollar"
+    ) {
+      setFormValues((prev: any) => ({
+        ...prev,
+        [key]: parseFloat(value) || 0,
+      }));
+    }
+
+    // Handle Yes/No boolean fields
+    else if (
+      key === "cleanUp" ||
+      key === "seasoned" ||
+      key === "timing" ||
+      key === "primary" ||
+      key === "emergingMkt"
+    ) {
+      setFormValues((prev: any) => ({
+        ...prev,
+        [key]: value === "yes", // Convert "yes"/"no" into boolean values
+      }));
+    }
+
+    // Default for string fields
+    else {
+      setFormValues((prev: any) => ({
+        ...prev,
+        [key]: value,
+      }));
+    }
   };
 
   // --------------------------- SUBMIT -----------------------------
@@ -95,15 +135,14 @@ const ABBModelMain = () => {
     const payload = {
       ticker: formValues.ticker,
       trade_date: formValues.tradeDate,
-      launch_date: formValues.tradeDate,
+      launch_date: formValues.tradeDate, // Assuming launch date is the same as trade date
       clean_up: formValues.cleanUp,
       seasoned: formValues.seasoned,
       timing: formValues.timing,
       primary: formValues.primary,
       emerging_mkt: formValues.emergingMkt,
       block_deal_shares: formValues.blockDealShares,
-      block_deal_percentage_of_market_cap:
-        formValues.blockDealPercentageOfMarketCap,
+      block_deal_percentage_of_market_cap: formValues.blockDealPercentageOfMarketCap,
       block_deal_value_in_local_currency: formValues.blockDealValueLocal,
       block_deal_value_in_dollar: formValues.blockDealValueDollar,
     };
@@ -116,15 +155,15 @@ const ABBModelMain = () => {
     setFormValues({
       ticker: "",
       tradeDate: "",
-      cleanUp: "",
-      seasoned: "",
-      timing: "",
-      primary: "",
-      emergingMkt: "",
-      blockDealShares: "",
-      blockDealPercentageOfMarketCap: "",
-      blockDealValueLocal: "",
-      blockDealValueDollar: "",
+      cleanUp: "no", // Reset default value to "no"
+      seasoned: "no", // Reset default value to "no"
+      timing: "no", // Reset default value to "no"
+      primary: "no", // Reset default value to "no"
+      emergingMkt: "no", // Reset default value to "no"
+      blockDealShares: 0,
+      blockDealPercentageOfMarketCap: 0,
+      blockDealValueLocal: 0,
+      blockDealValueDollar: 0,
     });
     setSubmittedPayload(null);
   };
@@ -190,6 +229,7 @@ const ABBModelMain = () => {
                           shrink: true,
                           sx: inputLabelSx,
                         }}
+                        required
                       />
                     )}
                   />
@@ -203,6 +243,7 @@ const ABBModelMain = () => {
                     value={formValues.tradeDate}
                     onChange={handleFieldChange("tradeDate")}
                     {...baseTextFieldProps}
+                    required
                   />
                 </Grid>
 
@@ -215,6 +256,7 @@ const ABBModelMain = () => {
                       value={formValues[field.key]}
                       onChange={handleFieldChange(field.key)}
                       {...baseTextFieldProps}
+                      required
                     >
                       {yesNoOptions.map((opt) => (
                         <MenuItem key={opt} value={opt}>
@@ -234,6 +276,7 @@ const ABBModelMain = () => {
                       value={formValues[field.key]}
                       onChange={handleFieldChange(field.key)}
                       {...baseTextFieldProps}
+                      required={field.key === "blockDealShares"}
                     />
                   </Grid>
                 ))}
