@@ -78,6 +78,7 @@ import DeleteUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/Delet
 import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTickersData";
 import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
 import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountDataModel/ABBDiscountDataMainFunction";
+import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
 
 const AppRouters: React.FC = () => {
   return (
@@ -247,7 +248,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/daily_note" element={<AuthGuard><DailyNoteDeleteTickersData /></AuthGuard>} />
 
-        <Route path="/equity/abb_model" element={<AuthGuard><ABBDiscountDataMainFunction /></AuthGuard>} />
+        <Route path="/equity/abb_model" element={<AuthGuard><ABBModelMain /></AuthGuard>} />
 
 
 
