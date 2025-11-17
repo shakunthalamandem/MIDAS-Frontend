@@ -254,16 +254,37 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
           mb={2}
         >
           <Box display="flex" alignItems="center">
+            {/* Number Badge */}
+            <Box
+              sx={{
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                bgcolor: "#002060",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                mr: 2,
+                fontSize: "16px",
+              }}
+            >
+              3
+            </Box>
+
             <BarChartIcon color="primary" sx={{ mr: 1.5 }} />
+
             <Typography
               variant="h6"
               component="h2"
               color="primary.main"
               fontWeight="bold"
             >
-              1 Week & 1 Month from 1st Day Close- Model Predictions
+              1 Week & 1 Month from 1st Day Close - Model Predictions
             </Typography>
           </Box>
+
           <Box display="flex" alignItems="flex-end" gap={2}>
             <TextField
               label="1st Day Close Return (%)"
@@ -417,8 +438,8 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                                 >
                                   {renderConfidenceLevel(
                                     modelData.confidence ??
-                                      (modelData as any)?.Confidence ??
-                                      null
+                                    (modelData as any)?.Confidence ??
+                                    null
                                   )}
                                 </Box>
                               </TableCell>

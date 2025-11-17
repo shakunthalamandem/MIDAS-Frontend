@@ -246,7 +246,9 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
   const renderSingleVersionTable = (
     version: string,
     headerTitle: string,
-    showRepredict: boolean
+    showRepredict: boolean,
+    tableNumber: number
+
   ) => {
     const headerBg = version.includes("open") ? "#ede7f6" : "#e3f2fd";
     const columnLabel = version.includes("open")
@@ -255,17 +257,28 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
 
     return (
       <Paper
-        sx={{
-          p: 3,
-          mt: 4,
-          bgcolor: "#f9fafb",
-          borderRadius: 3,
-          boxShadow: 3,
-        }}
+        sx={{ p: 3, mt: 4, bgcolor: "#f9fafb", borderRadius: 3, boxShadow: 3 }}
       >
-        {/* Header */}
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+        {/* HEADER WITH TABLE NUMBER */}
+        <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
+            {/* Numbered Circle */}
+            <Box
+              sx={{
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                bgcolor: "#002060",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 600,
+                mr: 2,
+              }}
+            >
+              {tableNumber}
+            </Box>
             <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
             <Typography
               variant="h6"
@@ -377,7 +390,8 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
         renderSingleVersionTable(
           issueVersions[0],
           "1st Day Close from Issue Price - Model Predictions ",
-          false
+          false,
+          1
         )}
 
       {/* Table 2: From T+1D Open (Repredict shown) */}
@@ -385,7 +399,8 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
         renderSingleVersionTable(
           openVersions[0],
           "1st Day Close from Open- Model Predictions",
-          true
+          true,
+          2
         )}
     </Container>
   );

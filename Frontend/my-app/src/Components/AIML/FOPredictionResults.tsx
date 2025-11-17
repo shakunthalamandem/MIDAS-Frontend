@@ -210,7 +210,8 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
   const renderTableForVersions = (
     versions: string[],
     headerTitle: string,
-    showRepredictControls: boolean
+    showRepredictControls: boolean,
+    tableNumber: number
   ) => {
     if (versions.length === 0) return null;
 
@@ -218,17 +219,29 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
 
     return (
       <Paper
-        sx={{
-          p: 3,
-          mt: 4,
-          bgcolor: "#f9fafb",
-          borderRadius: 3,
-          boxShadow: 3,
-        }}
+        sx={{ p: 3, mt: 4, bgcolor: "#f9fafb", borderRadius: 3, boxShadow: 3 }}
       >
-        {/* ---- Header ---- */}
+        {/* HEADER WITH TABLE NUMBER */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
+            {/* Numbered Circle */}
+            <Box
+              sx={{
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                bgcolor: "#002060",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 600,
+                mr: 2,
+              }}
+            >
+              {tableNumber}
+            </Box>
+
             <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
             <Typography variant="h6" fontWeight="bold" color="primary.main">
               {headerTitle}
@@ -243,14 +256,10 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
                 size="small"
                 value={price}
                 onChange={handlePriceChange}
-                sx={{
-                  mr: 2,
-                  width: 220,
-                  backgroundColor: "#ede7f6",
-                  borderRadius: 1,
-                }}
+                sx={{ mr: 2, width: 220, backgroundColor: "#ede7f6", borderRadius: 1 }}
                 type="number"
               />
+
               <Button
                 variant="outlined"
                 onClick={handleRepredict}
@@ -349,15 +358,17 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
       {/* Table 1: Issue Price */}
       {renderTableForVersions(
         issueVersions,
-          "1st Day Close from Issue Price - Model Predictions ",
-        false // no repredict here
+        "1st Day Close from Issue Price - Model Predictions",
+        false,
+        1
       )}
 
       {/* Table 2: From T+1D Open (with Repredict) */}
       {renderTableForVersions(
         openVersions,
-          "1st Day Close from Open Price- Model Predictions",
-        true // show repredict here only
+        "1st Day Close from Open Price - Model Predictions",
+        true,
+        2
       )}
     </Container>
   );
