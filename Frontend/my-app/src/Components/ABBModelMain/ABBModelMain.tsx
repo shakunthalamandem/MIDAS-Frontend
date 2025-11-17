@@ -33,11 +33,11 @@ const ABBModelMain = () => {
   const [formValues, setFormValues] = useState<any>({
     ticker: "",
     tradeDate: "", // Initialize as string
-    cleanUp: "no", // Default value is "no"
-    seasoned: "no", // Default value is "no"
-    timing: "no", // Default value is "no"
-    primary: "no", // Default value is "no"
-    emergingMkt: "no", // Default value is "no"
+    cleanUp: "No", // Default to the available option
+    seasoned: "No", // Default to the available option
+    timing: "No", // Default to the available option
+    primary: "No", // Default to the available option
+    emergingMkt: "No", // Default to the available option
     blockDealShares: 0, // Initialize as number
     blockDealPercentageOfMarketCap: 0, // Initialize as number
     blockDealValueLocal: 0, // Initialize as number
@@ -105,7 +105,7 @@ const ABBModelMain = () => {
       }));
     }
 
-    // Handle Yes/No boolean fields
+    // Handle Yes/No dropdowns
     else if (
       key === "cleanUp" ||
       key === "seasoned" ||
@@ -115,7 +115,7 @@ const ABBModelMain = () => {
     ) {
       setFormValues((prev: any) => ({
         ...prev,
-        [key]: value === "yes", // Convert "yes"/"no" into boolean values
+        [key]: value, // Keep the label so the dropdown shows the choice
       }));
     }
 
@@ -129,6 +129,8 @@ const ABBModelMain = () => {
   };
 
   // --------------------------- SUBMIT -----------------------------
+  const mapYesNoToBool = (value: string) => value === "Yes";
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -136,11 +138,11 @@ const ABBModelMain = () => {
       ticker: formValues.ticker,
       trade_date: formValues.tradeDate,
       launch_date: formValues.tradeDate, // Assuming launch date is the same as trade date
-      clean_up: formValues.cleanUp,
-      seasoned: formValues.seasoned,
-      timing: formValues.timing,
-      primary: formValues.primary,
-      emerging_mkt: formValues.emergingMkt,
+      clean_up: mapYesNoToBool(formValues.cleanUp),
+      seasoned: mapYesNoToBool(formValues.seasoned),
+      timing: mapYesNoToBool(formValues.timing),
+      primary: mapYesNoToBool(formValues.primary),
+      emerging_mkt: mapYesNoToBool(formValues.emergingMkt),
       block_deal_shares: formValues.blockDealShares,
       block_deal_percentage_of_market_cap: formValues.blockDealPercentageOfMarketCap,
       block_deal_value_in_local_currency: formValues.blockDealValueLocal,
@@ -155,11 +157,11 @@ const ABBModelMain = () => {
     setFormValues({
       ticker: "",
       tradeDate: "",
-      cleanUp: "no", // Reset default value to "no"
-      seasoned: "no", // Reset default value to "no"
-      timing: "no", // Reset default value to "no"
-      primary: "no", // Reset default value to "no"
-      emergingMkt: "no", // Reset default value to "no"
+      cleanUp: "No", // Reset default to match dropdown options
+      seasoned: "No", // Reset default to match dropdown options
+      timing: "No", // Reset default to match dropdown options
+      primary: "No", // Reset default to match dropdown options
+      emergingMkt: "No", // Reset default to match dropdown options
       blockDealShares: 0,
       blockDealPercentageOfMarketCap: 0,
       blockDealValueLocal: 0,

@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import { green, red, blue } from "@mui/material/colors";
 
 interface Payload {
@@ -16,6 +26,120 @@ interface Payload {
   block_deal_value_in_local_currency: number;
   block_deal_value_in_dollar: number;
 }
+
+interface FlattenedRow {
+  keyPath: string;
+  label: string;
+  displayValue: string | null;
+  depth: number;
+  isGroupHeader: boolean;
+  rawValue: any;
+}
+
+const formatLabel = (key: string) =>
+  key
+    .split(/[_\s]+/)
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+
+const formatValue = (value: any, key: string) => {
+  if (
+    value === null ||
+    value === undefined ||
+    (typeof value === "string" && value.trim() === "")
+  ) {
+    return "-";
+  }
+
+  if (typeof value === "boolean") {
+    return value ? "Yes" : "No";
+  }
+
+  if (Array.isArray(value)) {
+    return value.length ? value.join(", ") : "-";
+  }
+
+  if (typeof value === "number") {
+    const lowerKey = key.toLowerCase();
+    const percentKeys = ["percent", "rsi", "volatility"];
+    const currencyKeys = [
+      "price",
+      "value",
+      "cap",
+      "market",
+      "vwap",
+      "adtv",
+      "dividend",
+      "yield",
+      "enterprise",
+    ];
+
+    if (percentKeys.some((term) => lowerKey.includes(term))) {
+      return `${value.toFixed(2)}%`;
+    }
+
+    if (currencyKeys.some((term) => lowerKey.includes(term))) {
+      return `$${value.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`;
+    }
+
+    return value.toLocaleString(undefined, { maximumFractionDigits: 3 });
+  }
+
+  return String(value);
+};
+
+const flattenData = (
+  payload: any,
+  depth = 0,
+  parentPath = ""
+): FlattenedRow[] => {
+  if (!payload || typeof payload !== "object") {
+    return [];
+  }
+
+  return Object.entries(payload).flatMap(([key, value]) => {
+    const keyPath = parentPath ? `${parentPath}.${key}` : key;
+    const label = formatLabel(key);
+
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      return [
+        {
+          keyPath,
+          label,
+          displayValue: null,
+          depth,
+          isGroupHeader: true,
+          rawValue: value,
+        },
+        ...flattenData(value, depth + 1, keyPath),
+      ];
+    }
+
+    return [
+      {
+        keyPath,
+        label,
+        displayValue: formatValue(value, key),
+        depth,
+        isGroupHeader: false,
+        rawValue: value,
+      },
+    ];
+  });
+};
+
+const getValueColor = (value: any) => {
+  if (typeof value === "number") {
+    if (value > 0) return green[600];
+    if (value < 0) return red[600];
+    return blue[700];
+  }
+  return blue[900];
+};
 
 const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
   const [data, setData] = useState<any | null>(null);
@@ -53,55 +177,124 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
     fetchData();
   }, [payload]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) {
+    return (
+      <Box sx={{ mt: 3 }}>
+        <Typography variant="body2" color="text.secondary">
+          Loading ABB response...
+        </Typography>
+      </Box>
+    );
+  }
 
-  const formatNumber = (num: any, type: string) => {
-    if (type === "currency") {
-      return `$${num.toLocaleString()}`;
-    } else if (type === "percent") {
-      return `${num.toFixed(2)}%`;
-    } else {
-      return num.toLocaleString();
-    }
-  };
+  if (error) {
+    return (
+      <Box sx={{ mt: 3 }}>
+        <Typography variant="body2" color="error">
+          Error: {error}
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const rows = flattenData(data);
 
   return (
-    <TableContainer component={Paper} sx={{ mt: 4, borderRadius: 2 }}>
-      <Table sx={{ minWidth: 650 }} aria-label="response-data-table">
-        <TableBody>
-          {Object.entries(data).map(([key, value]) => {
-            let label: string = key.replace(/_/g, " ");
-            const isNumber = typeof value === "number";
+    <TableContainer
+      component={Paper}
+      sx={{
+        mt: 4,
+        borderRadius: 3,
+        overflow: "hidden",
+        boxShadow: "0 25px 60px rgba(15, 52, 163, 0.15)",
+        border: "1px solid rgba(15, 52, 163, 0.16)",
+      }}
+    >
+      <Box
+        sx={{
+          px: { xs: 2.5, md: 3 },
+          py: 2.5,
+          background: "linear-gradient(135deg, #d9e8ff 0%, #eef3ff 100%)",
+        }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 700, color: blue[900] }}>
+          ABB Response Summary
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          Complete payload delivered by the ABB scoring service
+        </Typography>
+      </Box>
 
-            // Example: Formatting specific fields
-            let valueFormatted: string = "";
-            if (key.includes("percent")) {
-              valueFormatted = formatNumber(value, "percent");
-            } else if (key.includes("share_price") || key.includes("market_cap") || key.includes("value")) {
-              valueFormatted = formatNumber(value, "currency");
-            } else if (isNumber) {
-              valueFormatted = formatNumber(value, "default");
-            } else {
-              valueFormatted = String(value);  // Ensure valueFormatted is always a string
-            }
+      <Table size="small" sx={{ minWidth: 640 }}>
+        <TableHead>
+          <TableRow>
+            <TableCell
+              sx={{
+                fontWeight: 700,
+                color: blue[900],
+                borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
+              }}
+            >
+              Metric
+            </TableCell>
+            <TableCell
+              align="right"
+              sx={{
+                fontWeight: 700,
+                color: blue[900],
+                borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
+              }}
+            >
+              Value
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => {
+            const groupFieldCount =
+              row.isGroupHeader && row.rawValue && typeof row.rawValue === "object"
+                ? Object.keys(row.rawValue).length
+                : 0;
 
             return (
-              <TableRow key={key}>
-                <TableCell sx={{ fontWeight: 700, color: blue[800] }}>
-                  <Typography variant="body2">{label}</Typography>
+              <TableRow
+                key={row.keyPath}
+                sx={{
+                  backgroundColor: row.isGroupHeader
+                    ? "rgba(195, 217, 255, 0.6)"
+                    : row.depth % 2 === 0
+                      ? "#ffffff"
+                      : "#f7f9ff",
+                  "&:last-child td": { borderBottom: "none" },
+                }}
+              >
+                <TableCell
+                  component="th"
+                  scope="row"
+                  sx={{
+                    py: 1.25,
+                    fontWeight: row.isGroupHeader ? 700 : 600,
+                    color: row.isGroupHeader ? blue[900] : "#0b1b3a",
+                    pl: row.depth * 3 + 1,
+                    borderBottom: "none",
+                  }}
+                >
+                  {row.label}
                 </TableCell>
-                <TableCell>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: valueFormatted.includes('%') && parseFloat(valueFormatted) > 0
-                        ? green[500]
-                        : red[500],
-                    }}
-                  >
-                    {valueFormatted}
-                  </Typography>
+                <TableCell align="right" sx={{ py: 1.25, borderBottom: "none" }}>
+                  {row.isGroupHeader ? (
+                    <Typography variant="body2" color="text.secondary">
+                      {groupFieldCount ? `Contains ${groupFieldCount} fields` : "Details"}
+                    </Typography>
+                  ) : (
+                    <Typography variant="body2" sx={{ color: getValueColor(row.rawValue) }}>
+                      {row.displayValue}
+                    </Typography>
+                  )}
                 </TableCell>
               </TableRow>
             );
