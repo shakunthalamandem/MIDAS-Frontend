@@ -204,6 +204,7 @@ const NavbarMain: React.FC = () => {
                 { label: "FO Write-Up", path: "/equity/fo_dashboard" },
                 { label: "New Deal Form", path: "/deals/new_deal_form" },
                 { label: "AI-ML Model", path: "/equity/ai_ml_models" },
+                { label: "ABB Model", path: "/equity/abb_model" },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}

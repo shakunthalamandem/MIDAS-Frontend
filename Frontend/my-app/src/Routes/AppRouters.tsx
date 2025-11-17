@@ -249,8 +249,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/daily_note" element={<AuthGuard><DailyNoteDeleteTickersData /></AuthGuard>} />
 
-        <Route path="/riskreport" element={<AuthGuard><PNLRiskReportMain /></AuthGuard>} />
-        <Route path="/abbmodel" element={<AuthGuard><ABBDiscountDataMainFunction /></AuthGuard>} />
+        <Route path="/equity/abb_model" element={<AuthGuard><ABBDiscountDataMainFunction /></AuthGuard>} />
 
 
 
