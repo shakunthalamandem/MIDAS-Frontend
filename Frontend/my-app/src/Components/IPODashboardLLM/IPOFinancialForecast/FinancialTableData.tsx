@@ -109,54 +109,56 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
           </TableRow>
         </TableHead>
 
-        <TableBody>
-            {orderedMetrics.map((metricName: string, rowIndex: number) => {
-            const isOddRow = rowIndex % 2 === 1;
+       <TableBody>
+  {orderedMetrics.map((metricName: string, rowIndex: number) => {
+    const isOddRow = rowIndex % 2 === 1;
 
-            return (
-              <TableRow key={metricName}>
-                <TableCell
-                  sx={{
-                    border: "1px solid #000000",
-                    fontWeight: "bold",
-                    fontStyle: isOddRow ? "italic" : "normal",
-                    fontSize: isOddRow ? "1rem" : "1.3rem",
-                    backgroundColor: isOddRow ? "" : "#ebebeb",
-                  }}
-                >
-                  {metricName}
-                </TableCell>
+    return (
+      <TableRow key={metricName}>
+        <TableCell
+          sx={{
+            border: "1px solid #000000",
+            fontWeight: "bold",
+            fontStyle: isOddRow ? "italic" : "normal",
+            fontSize: isOddRow ? "1rem" : "1.3rem",
+            backgroundColor: isOddRow ? "" : "#ebebeb",
+          }}
+        >
+          {metricName}
+        </TableCell>
 
-                {forecastYearKeys.map((yearKey) => {
-                  const isEditableCell =
+        {forecastYearKeys.map((yearKey) => {
+          const isEditableCell =
                     editing &&
-                    (yearKey === "current_year" || yearKey === "one_year_later") &&
-                    !isOddRow;
-                  const isHighlightColumn =
-                    yearKey === "current_year" || yearKey === "one_year_later";
-                  const renderAsPercent =
-                    metricName.toLowerCase().includes("margin") ||
-                    metricName.toLowerCase().includes("growth");
+                    (yearKey === "current_year" || yearKey === "one_year_later") 
+                    // &&
+                    // !isOddRow;
+          const isHighlightColumn =
+            yearKey === "current_year" || yearKey === "one_year_later";
+          const renderAsPercent =
+            metricName.toLowerCase().includes("margin") ||
+            metricName.toLowerCase().includes("growth");
 
-                  const value = data?.[metricName]?.[yearKey];
+          const value = data?.[metricName]?.[yearKey];
 
-                  return (
-                    <EditableCell
-                      key={yearKey}
-                      isEditable={isEditableCell}
-                      value={value}
-                      onChange={(val) => onChange(metricName, yearKey, val)}
-                      isEvenRow={!isOddRow}
-                      isHighlightColumn={isHighlightColumn}
-                      renderAsPercent={renderAsPercent}
-                      formatter={renderAsPercent ? formatFinancialMargin : formatFinancialValue}
-                    />
-                  );
-                })}
-              </TableRow>
-            );
-          })}
-        </TableBody>
+          return (
+            <EditableCell
+              key={yearKey}
+              isEditable={isEditableCell}
+              value={value}
+              onChange={(val) => onChange(metricName, yearKey, val)}
+              isEvenRow={!isOddRow}
+              isHighlightColumn={isHighlightColumn}
+              renderAsPercent={renderAsPercent}
+              formatter={renderAsPercent ? formatFinancialMargin : formatFinancialValue}
+            />
+          );
+        })}
+      </TableRow>
+    );
+  })}
+</TableBody>
+
       </Table>
     </TableContainer>
   );
