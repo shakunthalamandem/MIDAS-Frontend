@@ -148,9 +148,15 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchData = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
+
+      setLoading(true);
+      setError(null);
+      setData(null);
 
       try {
         const res = await fetch(`${apiUrl}/api/abb_factset_data/`, {
@@ -160,6 +166,7 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
             Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(payload),
+          signal: controller.signal,
         });
 
         if (!res.ok) {
@@ -169,17 +176,24 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
         const result = await res.json();
         setData(result);
       } catch (err: any) {
-        setError(err.message);
+        if (err?.name === "AbortError") {
+          return;
+        }
+        setError(err?.message ?? "Failed to fetch data");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+
+    return () => controller.abort();
   }, [payload]);
 
   const AbbDataCreation = useMemo(() => {
-    if (!data) {
+    if (loading || !data) {
       return null;
     }
 
@@ -187,7 +201,7 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
       payload,
       apiResponse: data,
     };
-  }, [payload, data]);
+  }, [payload, data, loading]);
 
   if (loading) {
     return (
