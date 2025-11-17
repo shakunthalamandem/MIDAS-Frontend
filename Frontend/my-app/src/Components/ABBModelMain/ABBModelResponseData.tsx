@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import { green, red, blue } from "@mui/material/colors";
+import ABBDataInsertion from "./ABBDataInsertion";
 
 interface Payload {
   ticker: string;
@@ -203,105 +204,118 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
 
   const rows = flattenData(data);
 
+  // Combine payload and API response data
+  const AbbDataCreation = {
+    payload,
+    apiResponse: data,
+  };
+
   return (
-    <TableContainer
-      component={Paper}
-      sx={{
-        mt: 4,
-        borderRadius: 3,
-        overflow: "hidden",
-        boxShadow: "0 25px 60px rgba(15, 52, 163, 0.15)",
-        border: "1px solid rgba(15, 52, 163, 0.16)",
-      }}
-    >
-      <Box
+    <>
+      <TableContainer
+        component={Paper}
         sx={{
-          px: { xs: 2.5, md: 3 },
-          py: 2.5,
-          background: "linear-gradient(135deg, #d9e8ff 0%, #eef3ff 100%)",
+          mt: 4,
+          borderRadius: 3,
+          overflow: "hidden",
+          boxShadow: "0 25px 60px rgba(15, 52, 163, 0.15)",
+          border: "1px solid rgba(15, 52, 163, 0.16)",
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 700, color: blue[900] }}>
-          ABB Response Summary
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-          Complete payload delivered by the ABB scoring service
-        </Typography>
-      </Box>
+        <Box
+          sx={{
+            px: { xs: 2.5, md: 3 },
+            py: 2.5,
+            background: "linear-gradient(135deg, #d9e8ff 0%, #eef3ff 100%)",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, color: blue[900] }}>
+            ABB Response Summary
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            Complete payload delivered by the ABB scoring service
+          </Typography>
+        </Box>
 
-      <Table size="small" sx={{ minWidth: 640 }}>
-        <TableHead>
-          <TableRow>
-            <TableCell
-              sx={{
-                fontWeight: 700,
-                color: blue[900],
-                borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
-              }}
-            >
-              Metric
-            </TableCell>
-            <TableCell
-              align="right"
-              sx={{
-                fontWeight: 700,
-                color: blue[900],
-                borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
-              }}
-            >
-              Value
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => {
-            const groupFieldCount =
-              row.isGroupHeader && row.rawValue && typeof row.rawValue === "object"
-                ? Object.keys(row.rawValue).length
-                : 0;
-
-            return (
-              <TableRow
-                key={row.keyPath}
+        <Table size="small" sx={{ minWidth: 640 }}>
+          <TableHead>
+            <TableRow>
+              <TableCell
                 sx={{
-                  backgroundColor: row.isGroupHeader
-                    ? "rgba(195, 217, 255, 0.6)"
-                    : row.depth % 2 === 0
-                      ? "#ffffff"
-                      : "#f7f9ff",
-                  "&:last-child td": { borderBottom: "none" },
+                  fontWeight: 700,
+                  color: blue[900],
+                  borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
                 }}
               >
-                <TableCell
-                  component="th"
-                  scope="row"
+                Metric
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  fontWeight: 700,
+                  color: blue[900],
+                  borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
+                }}
+              >
+                Value
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => {
+              const groupFieldCount =
+                row.isGroupHeader && row.rawValue && typeof row.rawValue === "object"
+                  ? Object.keys(row.rawValue).length
+                  : 0;
+
+              return (
+                <TableRow
+                  key={row.keyPath}
                   sx={{
-                    py: 1.25,
-                    fontWeight: row.isGroupHeader ? 700 : 600,
-                    color: row.isGroupHeader ? blue[900] : "#0b1b3a",
-                    pl: row.depth * 3 + 1,
-                    borderBottom: "none",
+                    backgroundColor: row.isGroupHeader
+                      ? "rgba(195, 217, 255, 0.6)"
+                      : row.depth % 2 === 0
+                      ? "#ffffff"
+                      : "#f7f9ff",
+                    "&:last-child td": { borderBottom: "none" },
                   }}
                 >
-                  {row.label}
-                </TableCell>
-                <TableCell align="right" sx={{ py: 1.25, borderBottom: "none" }}>
-                  {row.isGroupHeader ? (
-                    <Typography variant="body2" color="text.secondary">
-                      {groupFieldCount ? `Contains ${groupFieldCount} fields` : "Details"}
-                    </Typography>
-                  ) : (
-                    <Typography variant="body2" sx={{ color: getValueColor(row.rawValue) }}>
-                      {row.displayValue}
-                    </Typography>
-                  )}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    sx={{
+                      py: 1.25,
+                      fontWeight: row.isGroupHeader ? 700 : 600,
+                      color: row.isGroupHeader ? blue[900] : "#0b1b3a",
+                      pl: row.depth * 3 + 1,
+                      borderBottom: "none",
+                    }}
+                  >
+                    {row.label}
+                  </TableCell>
+                  <TableCell align="right" sx={{ py: 1.25, borderBottom: "none" }}>
+                    {row.isGroupHeader ? (
+                      <Typography variant="body2" color="text.secondary">
+                        {groupFieldCount ? `Contains ${groupFieldCount} fields` : "Details"}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body2" sx={{ color: getValueColor(row.rawValue) }}>
+                        {row.displayValue}
+                      </Typography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Box>
+        {/* Pass the combined data (payload + apiResponse) to ABBDataInsertion */}
+        <ABBDataInsertion AbbDataCreation={AbbDataCreation} />
+      </Box>
+    </>
   );
 };
 

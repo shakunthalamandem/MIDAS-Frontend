@@ -330,9 +330,11 @@ const ABBModelMain = () => {
 
         {/* ----------------- RESPONSE COMPONENT ----------------- */}
         {submittedPayload && (
+          <>
           <Box sx={{ mt: 3 }}>
             <ABBModelResponseData payload={submittedPayload} />
           </Box>
+</>
         )}
       </Box>
     </Container>
