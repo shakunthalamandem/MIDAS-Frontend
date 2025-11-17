@@ -12,12 +12,16 @@ import {
   Container,
 } from "@mui/material";
 import ABBModelResponseData from "./ABBModelResponseData";
-import { blockDealFields, discountFields, yesNoOptions } from "./DiscountDataModel/ABBDiscountConfig";
+import {
+  blockDealFields,
+  discountFields,
+  yesNoOptions,
+} from "./DiscountDataModel/ABBDiscountConfig";
 
 const gridItemProps = { xs: 12, sm: 6, md: 3 };
 const inputLabelSx = { color: "#1d2b54", fontWeight: 600 };
 const baseTextFieldProps = {
-  variant: "standard",
+  variant: "standard" as const, // Explicitly cast to the correct type
   fullWidth: true,
   InputLabelProps: {
     shrink: true,
@@ -57,12 +61,15 @@ const ABBModelMain = () => {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
-      const res = await fetch(`${apiUrl}/api/fs_ticker_search/?search=${query}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
+      const res = await fetch(
+        `${apiUrl}/api/fs_ticker_search/?search=${query}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
 
       const data = await res.json();
       setCompanyOptions(data);
@@ -95,7 +102,8 @@ const ABBModelMain = () => {
       primary: formValues.primary,
       emerging_mkt: formValues.emergingMkt,
       block_deal_shares: formValues.blockDealShares,
-      block_deal_percentage_of_market_cap: formValues.blockDealPercentageOfMarketCap,
+      block_deal_percentage_of_market_cap:
+        formValues.blockDealPercentageOfMarketCap,
       block_deal_value_in_local_currency: formValues.blockDealValueLocal,
       block_deal_value_in_dollar: formValues.blockDealValueDollar,
     };
@@ -164,9 +172,7 @@ const ABBModelMain = () => {
                   <Autocomplete
                     options={companyOptions}
                     loading={searchLoading}
-                    getOptionLabel={(opt: any) =>
-                      `${opt.ticker} - ${opt.name}`
-                    }
+                    getOptionLabel={(opt: any) => `${opt.ticker} - ${opt.name}`}
                     onInputChange={(e, value) => handleSearch(value)}
                     onChange={(e, value: any) =>
                       setFormValues((prev: any) => ({
@@ -268,7 +274,7 @@ const ABBModelMain = () => {
                         color: "#fff",
                       }}
                     >
-                      Submit to ABB API
+                      Get Estimate Discount{" "}
                     </Button>
                   </Box>
                 </Grid>

@@ -1,7 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableRow, Paper } from "@mui/material";
-
-const ABBModelResponseData = ({ payload }) => {
+interface Payload {
+  ticker: string;
+  trade_date: string;
+  launch_date: string;
+  clean_up: string;
+  seasoned: string;
+  timing: string;
+  primary: string;
+  emerging_mkt: string;
+  block_deal_shares: string;
+  block_deal_percentage_of_market_cap: string;
+  block_deal_value_in_local_currency: string;
+  block_deal_value_in_dollar: string;
+}
+const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
   const [data, setData] = useState<any | null>(null);
 
   useEffect(() => {
