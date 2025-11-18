@@ -47,6 +47,10 @@ const defaultFOValues = {
   issue_to_pre_day_close_return_category: 0,
   t1d_open_return_category: null as number | null,
   t1d_return_from_bloomberg_category: null as number | null,
+
+  // create new record flag
+  request_from: "ai_ml",
+  create_new_record: true,
 };
 
 const defaultIPOValues = {
@@ -70,6 +74,10 @@ const defaultIPOValues = {
   revenue_growth_category: "",
   net_profit_margin_category: "",
   t1d_return_from_bloomberg_category: null as number | null,
+
+  // create new record flag
+  request_from: "ai_ml",
+  create_new_record: true,
 };
 
 interface OptionsData {
