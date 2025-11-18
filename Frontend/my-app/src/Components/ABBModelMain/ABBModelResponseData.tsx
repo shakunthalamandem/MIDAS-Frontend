@@ -243,7 +243,7 @@ if (!data) {
 
   // Extract highlighted rows
   const liquidityRow = discountRows.find(r => r.label === "Liquidity Model Discount");
-  const totalRow = discountRows.find(r => r.label === "Final  Discount");
+  const totalRow = discountRows.find(r => r.label === "Final Discount");
 
   // Remaining rows for the two small tables
   const remainingRows = discountRows.filter(

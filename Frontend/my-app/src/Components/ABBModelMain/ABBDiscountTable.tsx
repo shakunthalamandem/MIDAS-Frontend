@@ -30,9 +30,7 @@ const ABBDiscountTable = ({
         <Typography variant="h6" sx={{ fontWeight: 700, color: "#fff" }}>
           Discount Overview
         </Typography>
-        <Typography variant="body2" sx={{ mt: 0.5, color: "rgba(255,255,255,0.75)" }}>
-          Breakdown of every discount component returned by the model
-        </Typography>
+
       </Box>
 
       {/* HIGHLIGHT CARDS */}
