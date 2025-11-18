@@ -228,8 +228,106 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
   }
 
   const rows = flattenData(data);
+  const discountRows = rows.filter(
+    (row) => !row.isGroupHeader && row.keyPath.toLowerCase().includes("discount")
+  );
+  const overviewRows = rows.filter(
+    (row) => !row.keyPath.toLowerCase().includes("discount")
+  );
   return (
     <>
+      <TableContainer
+        component={Paper}
+        sx={{
+          mt: 4,
+          borderRadius: 3,
+          overflow: "hidden",
+          boxShadow: "0 25px 50px rgba(0,0,0,0.08)",
+          border: "1px solid rgba(15, 52, 163, 0.16)",
+        }}
+      >
+        <Box
+          sx={{
+            px: { xs: 2.5, md: 3 },
+            py: 2.5,
+            background: "linear-gradient(135deg, #081c3c 0%, #0c3980 100%)",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#fff" }}>
+            Discount Overview
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 0.5, color: "rgba(255,255,255,0.75)" }}>
+            Breakdown of every discount component returned by the model
+          </Typography>
+        </Box>
+
+        <Table size="small" sx={{ minWidth: 640 }}>
+          <TableHead>
+            <TableRow>
+              <TableCell
+                sx={{
+                  fontWeight: 700,
+                  color: blue[900],
+                  borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
+                }}
+              >
+                Discount Metric
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  fontWeight: 700,
+                  color: blue[900],
+                  borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
+                }}
+              >
+                Value
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {discountRows.length ? (
+              discountRows.map((row) => (
+                <TableRow
+                  key={row.keyPath}
+                  sx={{
+                    backgroundColor: row.depth % 2 === 0 ? "#ffffff" : "#f4f7ff",
+                    "&:last-child td": { borderBottom: "none" },
+                  }}
+                >
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    sx={{
+                      py: 1.25,
+                      fontWeight: 600,
+                      color: "#0b1b3a",
+                      pl: 2,
+                      borderBottom: "none",
+                    }}
+                  >
+                    {row.label}
+                  </TableCell>
+                  <TableCell align="right" sx={{ py: 1.25, borderBottom: "none" }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: getValueColor(row.rawValue) }}>
+                      {row.displayValue}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={2} align="center" sx={{ py: 3 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    No discount metrics returned for this request.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
       <TableContainer
         component={Paper}
         sx={{
@@ -248,7 +346,7 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 700, color: blue[900] }}>
-            ABB Response Summary
+            Additional Fundamentals
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
             Complete payload delivered by the ABB scoring service
@@ -280,7 +378,7 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => {
+            {overviewRows.map((row) => {
               const groupFieldCount =
                 row.isGroupHeader && row.rawValue && typeof row.rawValue === "object"
                   ? Object.keys(row.rawValue).length
