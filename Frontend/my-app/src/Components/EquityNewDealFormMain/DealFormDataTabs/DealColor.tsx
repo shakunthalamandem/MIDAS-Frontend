@@ -138,7 +138,7 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
             {/* Slider with Input: Long Only */}
             <Grid item xs={12} sm={6}>
               <Typography gutterBottom color="#002060">
-                Long Only Aldddlocation (%)
+                Long Only Allocation (%)
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginLeft: "8px" }}>
                 <BlueSlider
