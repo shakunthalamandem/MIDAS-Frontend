@@ -507,7 +507,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
           {fields.map((field, idx) => {
             let value: any;
             if (field.name === "target_variable") {
-              value = "T+1 Day Return (close)";
+              value = "1st Day Return (close)";
             } else {
               value = values[field.name as keyof IPOFormValues] ?? "";
             }
