@@ -1,43 +1,14 @@
 // Full updated ABBModelMain.tsx with search bar replacing the subtitle text
 
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Grid,
-  TextField,
-  MenuItem,
-  Button,
-  Card,
-  CardContent,
-  Typography,
-  Autocomplete,
-  Container,
-} from "@mui/material";
+import { Box, Card, CardContent, Typography, Container } from "@mui/material";
 import ABBModelResponseData from "./ABBModelResponseData";
 import {
   blockDealFields,
-  discountFields,
   DiscountFormValues,
-  yesNoOptions,
 } from "./DiscountDataModel/ABBDiscountConfig";
-
-const gridItemProps = { xs: 12, sm: 6, md: 3 };
-const inputLabelSx = { color: "#1d2b54", fontWeight: 600 };
-const baseTextFieldProps = {
-  variant: "standard" as const,
-  fullWidth: true,
-  InputLabelProps: {
-    shrink: true,
-    sx: inputLabelSx,
-  },
-};
-const selectMenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: 240,
-    },
-  },
-};
+import DiscountForm from "./DiscountForm";
+import SearchHeader from "./SearchHeader";
 
 const blockDealFieldKeys: Array<keyof DiscountFormValues> =
   blockDealFields.map((field) => field.key);
@@ -80,6 +51,93 @@ const extractDistinctOptions = (data: any[], key: string): string[] => {
     return config.options.map((option: any) => String(option));
   }
   return [];
+};
+
+const toYesNoString = (value: unknown): string | undefined => {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return undefined;
+    if (["yes", "y", "true", "1"].includes(normalized)) return "Yes";
+    if (["no", "n", "false", "0"].includes(normalized)) return "No";
+    return undefined;
+  }
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (typeof value === "number") return value === 1 ? "Yes" : "No";
+  return undefined;
+};
+
+const selectionFieldMappings: Array<{
+  target: keyof DiscountFormValues;
+  sources: string[];
+  formatter?: (value: unknown) => string | undefined;
+  allowEmptyString?: boolean;
+}> = [
+  { target: "ticker", sources: ["ticker", "symbol", "ticker_symbol"] },
+  { target: "tradeDate", sources: ["launch_date", "trade_date"] },
+  { target: "cleanUp", sources: ["clean_up", "cleanUp"], formatter: toYesNoString },
+  { target: "seasoned", sources: ["seasoned"], formatter: toYesNoString },
+  { target: "timing", sources: ["timing"], formatter: toYesNoString },
+  { target: "primary", sources: ["primary"], formatter: toYesNoString },
+  {
+    target: "emergingMkt",
+    sources: ["emerging_mkt", "emergingMkt"],
+    formatter: toYesNoString,
+  },
+  { target: "dealCaptain", sources: ["deal_captain", "dealCaptain"] },
+  { target: "gicsSector", sources: ["gics_sector", "sector", "gicsSector"] },
+  {
+    target: "blockDealShares",
+    sources: ["block_deal_shares", "blockDealShares"],
+    allowEmptyString: true,
+  },
+  {
+    target: "blockDealPercentageOfMarketCap",
+    sources: [
+      "block_deal_percentage_of_market_cap",
+      "blockDealPercentageOfMarketCap",
+    ],
+    allowEmptyString: true,
+  },
+  {
+    target: "blockDealValueLocal",
+    sources: [
+      "block_deal_value_in_local_currency",
+      "blockDealValueLocal",
+    ],
+    allowEmptyString: true,
+  },
+  {
+    target: "blockDealValueDollar",
+    sources: ["block_deal_value_in_dollar", "blockDealValueDollar"],
+    allowEmptyString: true,
+  },
+];
+
+const fillFormValuesFromPayload = (
+  payload: Record<string, unknown>
+): Partial<DiscountFormValues> => {
+  const normalized: Partial<DiscountFormValues> = {};
+
+  selectionFieldMappings.forEach(
+    ({ target, sources, formatter, allowEmptyString }) => {
+      for (const source of sources) {
+        if (!Object.prototype.hasOwnProperty.call(payload, source)) continue;
+        const rawValue = payload[source];
+        if (rawValue === null || rawValue === undefined) continue;
+        if (!allowEmptyString && rawValue === "") continue;
+        const formatted =
+          formatter === undefined
+            ? String(rawValue)
+            : formatter(rawValue);
+        if (formatted === undefined) continue;
+        normalized[target] = formatted;
+        break;
+      }
+    }
+  );
+
+  return normalized;
 };
 
 const ABBModelMain = () => {
@@ -223,6 +281,91 @@ const ABBModelMain = () => {
     }
   };
 
+  const clearErrorsForKeys = (keys: Array<keyof DiscountFormValues>) => {
+    if (!keys.length) return;
+    setFormErrors((prevErrors) => {
+      if (!prevErrors || !Object.keys(prevErrors).length) return prevErrors;
+      const nextErrors = { ...prevErrors };
+      keys.forEach((key) => {
+        if (nextErrors[key]) {
+          delete nextErrors[key];
+        }
+      });
+      return nextErrors;
+    });
+  };
+
+  const applyPayloadToFormValues = (payload: Record<string, unknown>) => {
+    const updates = fillFormValuesFromPayload(payload);
+    if (!updates.ticker) {
+      const fallbackTicker =
+        (typeof payload.ticker === "string" && payload.ticker) ||
+        (typeof payload.symbol === "string" && payload.symbol) ||
+        (typeof payload.ticker_symbol === "string" &&
+          payload.ticker_symbol);
+      if (fallbackTicker) {
+        updates.ticker = fallbackTicker;
+      }
+    }
+    if (!Object.keys(updates).length) return updates;
+
+    setFormValues((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+    clearErrorsForKeys(
+      Object.keys(updates) as Array<keyof DiscountFormValues>
+    );
+    return updates;
+  };
+
+  const handleCompanySelect = (value: any | null) => {
+    if (!value) {
+      setFormValues((prev) => ({ ...prev, ticker: "" }));
+      return;
+    }
+    applyPayloadToFormValues(value);
+  };
+
+  const handleEmeaSelect = async (value: any | null) => {
+    setSelectedEmea(value);
+    if (!value) {
+      setPrefetchedResponse(null);
+      setSubmittedPayload(null);
+      return;
+    }
+
+    setPrefetchedResponse(null);
+    applyPayloadToFormValues(value);
+
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const payloadToSend = {
+        ticker: value.ticker,
+        deal_id: value.deal_id,
+      };
+
+      const res = await fetch(`${apiUrl}/api/emea_abb_model_data_fetch/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payloadToSend),
+      });
+
+      const responseData = await res.json();
+
+      setSubmittedPayload(null);
+      setPrefetchedResponse(responseData);
+    } catch (err) {
+      console.error("EMEA fetch failed:", err);
+      setPrefetchedResponse(null);
+    }
+  };
+
   const handleFieldChange = (key: keyof DiscountFormValues) => (e: any) => {
     const value = e.target.value;
 
@@ -341,297 +484,30 @@ const ABBModelMain = () => {
               <Typography variant="h5" sx={{ fontWeight: 700, color: "#0b2b57" }}>
                 ABB Discount Data
               </Typography>
-              <Box sx={{ width: { xs: "100%", md: 350 } }}>
-                <Autocomplete
-                  options={emeaOptions}
-                  loading={emeaLoading}
-                  getOptionLabel={(opt: any) =>
-                    `${opt.ticker || ""} (${opt.deal_id || "TBA"})`
-                  }
-                  popupIcon={<></>}
-                  onInputChange={(e, value) => fetchEmeaTickers(value)}
-                  onChange={async (e, value: any) => {
-                    setSelectedEmea(value);
-
-                    if (value) {
-                      setPrefetchedResponse(null);
-
-                      // Auto-populate input fields
-                      setFormValues((prev) => ({
-                        ...prev,
-                        ticker: value.ticker,
-                        tradeDate: value.launch_date,
-                        blockDealShares: value.block_deal_shares,
-                        blockDealPercentageOfMarketCap:
-                          value.block_deal_percentage_of_market_cap,
-                        blockDealValueLocal: value.block_deal_value_in_local_currency,
-                        blockDealValueDollar: value.block_deal_value_in_dollar,
-                      }));
-
-                      // ⭐ CALL POST API TO FETCH DEAL DATA
-                      try {
-                        const apiUrl = process.env.REACT_APP_API_URL;
-                        const token = localStorage.getItem("access_token");
-
-                        const payloadToSend = {
-                          ticker: value.ticker,
-                          deal_id: value.deal_id,
-                        };
-
-                        const res = await fetch(`${apiUrl}/api/emea_abb_model_data_fetch/`, {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            Authorization: token ? `Bearer ${token}` : "",
-                          },
-                          body: JSON.stringify(payloadToSend),
-                        });
-
-                        const responseData = await res.json();
-
-                        setSubmittedPayload(null);
-                        setPrefetchedResponse(responseData);
-                      } catch (err) {
-                        console.error("EMEA fetch failed:", err);
-                        setPrefetchedResponse(null);
-                      }
-                    } else {
-                      setPrefetchedResponse(null);
-                      setSubmittedPayload(null);
-                    }
-                  }}
-
-
-                  // ⭐ CUSTOM OPTION UI
-                  renderOption={(props, option: any) => (
-                    <li {...props} style={{ padding: "10px 12px" }}>
-                      <div style={{ display: "flex", flexDirection: "column" }}>
-
-                        {/* Line 1 */}
-                        <span style={{ fontWeight: 600, fontSize: "14px" }}>
-                          {option.ticker}({option.launch_date || "N/A"})
-                        </span>
-
-                        {/* Line 2 */}
-                        <span style={{ fontSize: "13px", color: "#333" }}>
-                          Discount: {option.final_discount ?? "N/A"}%
-                        </span>
-                      </div>
-                    </li>
-                  )}
-
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Search ABB Deals"
-                      variant="outlined"
-                      InputProps={{
-                        ...params.InputProps,
-                        startAdornment: (
-                          <span style={{ marginRight: 8, opacity: 0.7 }}>🔍</span>
-                        ),
-                        sx: {
-                          borderRadius: "10px",
-                          paddingY: "2px",
-                          backgroundColor: "#fff",
-                        },
-                      }}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: "10px",
-                        },
-                      }}
-                    />
-                  )}
-                />
-              </Box>
-
-
+              <SearchHeader
+                options={emeaOptions}
+                loading={emeaLoading}
+                value={selectedEmea}
+                onInputChange={fetchEmeaTickers}
+                onSelect={handleEmeaSelect}
+              />
             </Box>
 
-            <Box component="form" onSubmit={handleSubmit} noValidate>
-              <Grid container spacing={3}>
-                {/* ----------------- COMPANY AUTOCOMPLETE ----------------- */}
-                <Grid item {...gridItemProps}>
-                  <Autocomplete
-                    options={companyOptions}
-                    loading={searchLoading}
-                    getOptionLabel={(opt: any) => `${opt.ticker}`}
-                    onInputChange={(e, value) => handleSearch(value)}
-                    onChange={(e, value: any) =>
-                      setFormValues((prev: DiscountFormValues) => {
-                        const updatedFormValues = {
-                          ...prev,
-                          ticker: value ? value.ticker : "",
-                        };
-
-                        if (value?.ticker) {
-                          setFormErrors((prevErrors) => {
-                            if (!prevErrors.ticker) {
-                              return prevErrors;
-                            }
-                            const nextErrors = { ...prevErrors };
-                            delete nextErrors.ticker;
-                            return nextErrors;
-                          });
-                        }
-
-                        return updatedFormValues;
-                      })
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Ticker "
-                        variant="standard"
-                        fullWidth
-                        InputLabelProps={{
-                          shrink: true,
-                          sx: inputLabelSx,
-                        }}
-                        required
-                        error={Boolean(formErrors.ticker)}
-                        helperText={formErrors.ticker || ""}
-                      />
-                    )}
-                  />
-                </Grid>
-
-                {/* ----------------- DATE FIELD ----------------- */}
-                <Grid item {...gridItemProps}>
-                  <TextField
-                    type="date"
-                    label="Launch Date"
-                    value={formValues.tradeDate}
-                    onChange={handleFieldChange("tradeDate")}
-                    {...baseTextFieldProps}
-                    required
-                    error={Boolean(formErrors.tradeDate)}
-                    helperText={formErrors.tradeDate || ""}
-                  />
-                </Grid>
-
-                {/* ----------------- YES/NO FIELDS ----------------- */}
-                {discountFields.map((field) => (
-                  <Grid item {...gridItemProps} key={field.key}>
-                    <TextField
-                      select
-                      label={field.label}
-                      value={formValues[field.key]}
-                      onChange={handleFieldChange(field.key)}
-                      {...baseTextFieldProps}
-                      required
-                    >
-                      {yesNoOptions.map((opt) => (
-                        <MenuItem key={opt} value={opt}>
-                          {opt}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                ))}
-
-                <Grid item {...gridItemProps}>
-                  <TextField
-                    select
-                    label="Deal Captain"
-                    value={formValues.dealCaptain}
-                    onChange={handleFieldChange("dealCaptain")}
-                    {...baseTextFieldProps}
-                    SelectProps={{ MenuProps: selectMenuProps }}
-                    required
-                    error={Boolean(formErrors.dealCaptain)}
-                    helperText={formErrors.dealCaptain || ""}
-                  >
-                    <MenuItem value="">Select Deal Captain</MenuItem>
-                    {dealCaptainOptions.map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-
-                <Grid item {...gridItemProps}>
-                  <TextField
-                    select
-                    label="Sector"
-                    value={formValues.gicsSector}
-                    onChange={handleFieldChange("gicsSector")}
-                    {...baseTextFieldProps}
-                    SelectProps={{ MenuProps: selectMenuProps }}
-                    required
-                    error={Boolean(formErrors.gicsSector)}
-                    helperText={formErrors.gicsSector || ""}
-                  >
-                    <MenuItem value="">Select Sector</MenuItem>
-                    {sectorOptions.map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-
-                {/* ----------------- BLOCK DEAL FIELDS ----------------- */}
-                {blockDealFields.map((field) => (
-                  <Grid item {...gridItemProps} key={field.key}>
-                    <TextField
-                      type="number"
-                      label={field.label}
-                      value={formValues[field.key]}
-                      onChange={handleFieldChange(field.key)}
-                      {...baseTextFieldProps}
-                      required
-                      error={Boolean(formErrors[field.key])}
-                      helperText={formErrors[field.key] || ""}
-                    />
-                  </Grid>
-                ))}
-
-                {/* ----------------- BUTTONS ----------------- */}
-                <Grid item xs={12}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      gap: 2,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <Button
-                      variant="outlined"
-                      type="button"
-                      onClick={handleReset}
-                      sx={{
-                        borderRadius: "18px",
-                        px: 3.5,
-                        color: "#0b2b57",
-                        borderColor: "rgba(11,43,87,0.4)",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Reset
-                    </Button>
-
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      sx={{
-                        borderRadius: "18px",
-                        px: 3.5,
-                        background: "#0b2b57",
-                        fontWeight: 600,
-                        color: "#fff",
-                      }}
-                    >
-                      Get Estimate Discount{" "}
-                    </Button>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
+            <DiscountForm
+              formValues={formValues}
+              formErrors={formErrors}
+              companyOptions={companyOptions}
+              searchLoading={searchLoading}
+              dealCaptainOptions={dealCaptainOptions}
+              sectorOptions={sectorOptions}
+              onSearchInput={handleSearch}
+              onCompanySelect={handleCompanySelect}
+              onFieldChange={handleFieldChange}
+              onSubmit={handleSubmit}
+              onReset={handleReset}
+            />
           </CardContent>
+
         </Card>
 
         {/* ----------------- RESPONSE COMPONENT ----------------- */}
