@@ -24,7 +24,7 @@ const convertToBinaryFlag = (value: any) => {
     value === 1 ||
     value === "1"
   ) {
-    return 1;
+    return "Yes";
   }
 
   if (
@@ -37,7 +37,7 @@ const convertToBinaryFlag = (value: any) => {
     value === 0 ||
     value === "0"
   ) {
-    return 0;
+    return "No";
   }
 
   return value;

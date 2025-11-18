@@ -292,7 +292,7 @@ const ABBModelMain = () => {
       primary: mapYesNoToBool(formValues.primary),
       emerging_mkt: mapYesNoToBool(formValues.emergingMkt),
       deal_captain: formValues.dealCaptain,
-      gics_sector: formValues.gicsSector,
+      sector: formValues.gicsSector,
       block_deal_shares: parseBlockValue(formValues.blockDealShares),
       block_deal_percentage_of_market_cap: parseBlockValue(
         formValues.blockDealPercentageOfMarketCap
