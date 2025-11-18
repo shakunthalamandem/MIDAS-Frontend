@@ -31,6 +31,13 @@ const baseTextFieldProps = {
     sx: inputLabelSx,
   },
 };
+const selectMenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: 240,
+    },
+  },
+};
 
 const blockDealFieldKeys: Array<keyof DiscountFormValues> =
   blockDealFields.map((field) => field.key);
@@ -45,10 +52,10 @@ const getInitialFormValues = (): DiscountFormValues => ({
   emergingMkt: "No",
   dealCaptain: "",
   gicsSector: "",
-  blockDealShares: "0",
-  blockDealPercentageOfMarketCap: "0",
-  blockDealValueLocal: "0",
-  blockDealValueDollar: "0",
+  blockDealShares: "",
+  blockDealPercentageOfMarketCap: "",
+  blockDealValueLocal: "",
+  blockDealValueDollar: "",
 });
 
 const hasBlockValue = (value: string | number) => {
@@ -284,7 +291,7 @@ const ABBModelMain = () => {
   };
 
   return (
-    <Container >
+    <Container maxWidth="xl">
       <Box sx={{ p: { xs: 2, md: 4 } }}>
         <Card
           sx={{
@@ -469,6 +476,7 @@ const ABBModelMain = () => {
                     value={formValues.dealCaptain}
                     onChange={handleFieldChange("dealCaptain")}
                     {...baseTextFieldProps}
+                    SelectProps={{ MenuProps: selectMenuProps }}
                     required
                     error={Boolean(formErrors.dealCaptain)}
                     helperText={formErrors.dealCaptain || ""}
@@ -489,6 +497,7 @@ const ABBModelMain = () => {
                     value={formValues.gicsSector}
                     onChange={handleFieldChange("gicsSector")}
                     {...baseTextFieldProps}
+                    SelectProps={{ MenuProps: selectMenuProps }}
                     required
                     error={Boolean(formErrors.gicsSector)}
                     helperText={formErrors.gicsSector || ""}
