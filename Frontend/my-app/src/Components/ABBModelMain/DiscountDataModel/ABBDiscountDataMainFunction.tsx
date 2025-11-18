@@ -191,7 +191,7 @@ const DiscountsListCard: React.FC<{ entries: [string, number][] }> = ({ entries 
 
 const InsightsStrip: React.FC<{ detail: Record<string, unknown> }> = ({ detail }) => {
   const liquidity = typeof detail.liquidity_model_discount === 'number' ? (detail.liquidity_model_discount as number) : null;
-  const total = typeof detail.total_discount === 'number' ? (detail.total_discount as number) : null;
+  const total = typeof detail.final_discount === 'number' ? (detail.final_discount as number) : null;
 
   const discountsRaw = isPlainObject(detail.discounts) ? (detail.discounts as Record<string, unknown>) : {};
   const discountEntries = Object.entries(discountsRaw).filter(([, v]) => typeof v === 'number') as [string, number][];
@@ -201,7 +201,7 @@ const InsightsStrip: React.FC<{ detail: Record<string, unknown> }> = ({ detail }
   const { company_description, ...restFsData } = fsData;
 
   const generalEntries = Object.entries(detail).filter(
-    ([key]) => !['liquidity_model_discount', 'total_discount', 'final_discount', 'discounts', 'fs_data'].includes(key),
+    ([key]) => !['liquidity_model_discount', 'final_discount', 'discounts', 'fs_data'].includes(key),
   );
 
   const factsetEntries: [string, unknown][] = [...generalEntries, ...Object.entries(restFsData)];
@@ -231,7 +231,7 @@ const InsightsStrip: React.FC<{ detail: Record<string, unknown> }> = ({ detail }
             </Grid>
             <Grid item xs={12} md={6}>
               <DiscountTile
-                title="Total Discount"
+                title="Final Discount"
                 titleColor="#0b6b57"
                 gradient="linear-gradient(145deg, #eafbf1, #d4fff0)"
               >
