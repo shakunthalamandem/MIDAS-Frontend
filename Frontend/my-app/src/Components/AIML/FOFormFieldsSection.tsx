@@ -1,23 +1,13 @@
-import React, { useEffect, useState } from "react";
 import {
-  Paper,
   Grid,
   Typography,
   TextField,
   MenuItem,
-  Button,
   InputAdornment,
-  Snackbar,
-  Alert,
-  CircularProgress,
   Box,
   IconButton,
   Tooltip,
-  Checkbox,
-  FormControlLabel,
 } from "@mui/material";
-import FOWeeklyMonthlyPredictionResults from "./FOWeeklyMonthlyPredictionResults";
-import FOPredictionResults from "./FOPredictionResults";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 

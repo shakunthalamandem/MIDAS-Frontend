@@ -1,22 +1,11 @@
-import React, { useEffect, useState } from "react";
 import {
-  Paper,
   Grid,
   Typography,
   TextField,
   MenuItem,
-  Button,
   InputAdornment,
-  Snackbar,
-  Alert,
-  CircularProgress,
   Box,
-  Checkbox,
-  FormControlLabel,
 } from "@mui/material";
-import IPOPredictionResults from "./IPOPredictionResults";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import IPOWeeklyMonthlyPredictionResults from "./IPOWeeklyMonthlyPredictionResults";
 
 interface OptionsData {
   region: string[];

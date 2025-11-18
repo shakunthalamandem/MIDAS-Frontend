@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   Paper,
-  Grid,
   Typography,
-  TextField,
-  MenuItem,
   Button,
-  InputAdornment,
   Snackbar,
   Alert,
   CircularProgress,
@@ -72,14 +68,6 @@ interface IPOFormProps {
   onAutoPredictComplete?: () => void;
   onPredicted?: () => void;
 }
-
-/* ===========================
-   Fields section (child component)
-   =========================== */
-
-/* ===========================
-   Main IPOForm component
-   =========================== */
 
 const IPOForm: React.FC<IPOFormProps> = ({
   values,
