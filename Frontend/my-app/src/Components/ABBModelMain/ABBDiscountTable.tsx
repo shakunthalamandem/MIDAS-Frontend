@@ -24,10 +24,10 @@ const ABBDiscountTable = ({
         sx={{
           px: 3,
           py: 2.5,
-          background: "linear-gradient(135deg, #081c3c 0%, #0c3980 100%)",
+          background: "linear-gradient(135deg, #d9e8ff 0%, #eef3ff 100%)",
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#fff" }}>
+        <Typography variant="h6" align="center" sx={{ fontWeight: 700, color: blue[900] }}>
           Discount Overview
         </Typography>
 

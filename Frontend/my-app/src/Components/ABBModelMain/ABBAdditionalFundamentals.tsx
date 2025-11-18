@@ -22,8 +22,9 @@ const ABBAdditionalFundamentals = ({ leftRows, rightRows, getValueColor }: any) 
           background: "linear-gradient(135deg, #d9e8ff 0%, #eef3ff 100%)",
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 700, color: blue[900] }}>
-          Additional Fundamentals
+        <Typography variant="h6" align="center" sx={{ fontWeight: 700, color: blue[900] }}>
+Public Market Data
+
         </Typography>
  
       </Box>

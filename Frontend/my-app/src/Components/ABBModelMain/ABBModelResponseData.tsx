@@ -1,13 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Container,
   Typography,
 } from "@mui/material";
 import { green, red, blue } from "@mui/material/colors";
@@ -259,6 +253,7 @@ if (!data) {
 
 return (
   <>
+  <Container>
     <ABBDiscountTable
       liquidityRow={liquidityRow}
       totalRow={totalRow}
@@ -276,6 +271,7 @@ return (
     <Box>
       <ABBDataInsertion AbbDataCreation={AbbDataCreation} />
     </Box>
+    </Container>
   </>
 );
 
