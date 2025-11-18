@@ -37,15 +37,29 @@ const technicalDataFields = [
 
 const ABBAdditionalFundamentals = ({ leftRows, rightRows, getValueColor }: any) => {
   const allRows = [...leftRows, ...rightRows];
-  const rowLookup = new Map(
-    allRows
-      .filter((row: any) => !row.isGroupHeader)
-      .map((row: any) => [row.keyPath.toLowerCase(), row])
-  );
+  const flattenedRows = allRows.filter((row: any) => !row.isGroupHeader);
+
+  const findRowForKey = (key: string) => {
+    const normalizedKey = key.toLowerCase();
+
+    const exactMatch = flattenedRows.find(
+      (row: any) => row.keyPath.toLowerCase() === normalizedKey
+    );
+    if (exactMatch) return exactMatch;
+
+    const suffixMatch = flattenedRows.find((row: any) =>
+      row.keyPath.toLowerCase().endsWith(normalizedKey)
+    );
+    if (suffixMatch) return suffixMatch;
+
+    return flattenedRows.find((row: any) =>
+      row.keyPath.toLowerCase().includes(normalizedKey)
+    );
+  };
 
   const buildRows = (fields: { key: string; label: string }[]) =>
     fields.map((field) => {
-      const row = rowLookup.get(field.key.toLowerCase());
+      const row = findRowForKey(field.key);
       return {
         ...field,
         displayValue: row?.displayValue ?? "-",
