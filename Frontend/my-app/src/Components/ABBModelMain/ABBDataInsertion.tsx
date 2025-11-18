@@ -146,7 +146,7 @@ const ABBDataInsertion = ({ AbbDataCreation }: { AbbDataCreation: ABBDataCreatio
     <Box sx={{ mt: 3, textAlign: 'center' }}>
       {loading && <CircularProgress />}
 
-      {success && responseData && (
+      {/* {success && responseData && (
         <Box sx={{ mt: 2 }}>
           <Typography variant="h6" color="green">
             Success!
@@ -156,7 +156,7 @@ const ABBDataInsertion = ({ AbbDataCreation }: { AbbDataCreation: ABBDataCreatio
           </Typography>
           <pre>{JSON.stringify(responseData, null, 2)}</pre>
         </Box>
-      )}
+      )} */}
 
       {error && (
         <Box sx={{ mt: 2 }}>
