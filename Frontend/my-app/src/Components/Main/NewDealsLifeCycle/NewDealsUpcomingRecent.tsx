@@ -47,7 +47,6 @@ const token = localStorage.getItem("access_token");
       setLoading(false);
     }
   };
-console.log("ddddd",selectedDeal);
   useEffect(() => {
     fetchData(selectedOp);
   }, [selectedOp]);
