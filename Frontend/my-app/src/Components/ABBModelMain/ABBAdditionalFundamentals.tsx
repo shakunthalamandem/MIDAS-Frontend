@@ -57,12 +57,30 @@ const ABBAdditionalFundamentals = ({ leftRows, rightRows, getValueColor }: any) 
     );
   };
 
+  const cleanNumber = (value: unknown) => {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+    if (typeof value === "string") {
+      const numeric = Number(value.replace(/[^0-9.-]/g, "").trim());
+      return Number.isNaN(numeric) ? undefined : numeric;
+    }
+    return undefined;
+  };
+
+  const formatTwoDecimals = (value: unknown) => {
+    const numeric = cleanNumber(value);
+    if (numeric === undefined) return undefined;
+    return numeric.toFixed(2);
+  };
+
   const buildRows = (fields: { key: string; label: string }[]) =>
     fields.map((field) => {
       const row = findRowForKey(field.key);
+      const roundedValue = formatTwoDecimals(row?.rawValue);
       return {
         ...field,
-        displayValue: row?.displayValue ?? "-",
+        displayValue: roundedValue ?? row?.displayValue ?? "-",
         rawValue: row?.rawValue,
       };
     });
