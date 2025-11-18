@@ -60,7 +60,7 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
                 textAlign: "center",
               }}
             >
-              ($US M)
+              Metric Name
             </TableCell>
             {forecastYearLabels.map((label, index) => {
               const yearKey = forecastYearKeys[index];
