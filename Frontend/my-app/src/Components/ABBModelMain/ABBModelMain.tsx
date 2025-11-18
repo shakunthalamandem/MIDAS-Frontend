@@ -287,7 +287,7 @@ const ABBModelMain = () => {
   };
 
   return (
-    <Container maxWidth="xl">
+    <Container >
       <Box sx={{ p: { xs: 2, md: 4 } }}>
         <Card
           sx={{
