@@ -94,11 +94,35 @@ const ABBModelMain = () => {
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
   const [submittedPayload, setSubmittedPayload] = useState<any | null>(null);
+  const [prefetchedResponse, setPrefetchedResponse] = useState<any | null>(null);
 
   // New states for top search bar
   const [emeaOptions, setEmeaOptions] = useState<any[]>([]);
   const [emeaLoading, setEmeaLoading] = useState(false);
   const [selectedEmea, setSelectedEmea] = useState<any | null>(null);
+  useEffect(() => {
+    const fetchAllEmeaData = async () => {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      try {
+        const res = await fetch(`${apiUrl}/api/get_emeaabb_model_data/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+        const data = await res.json();
+        setEmeaOptions(data);
+      } catch (err) {
+        console.error("Failed to load EMEA form data", err);
+      }
+    };
+
+    fetchAllEmeaData();
+  }, []);
+
+
 
   // Fetch distinct values
   useEffect(() => {
@@ -281,6 +305,7 @@ const ABBModelMain = () => {
       ),
     };
 
+    setPrefetchedResponse(null);
     setSubmittedPayload(payload);
   };
 
@@ -288,6 +313,7 @@ const ABBModelMain = () => {
     setFormValues(getInitialFormValues());
     setFormErrors({});
     setSubmittedPayload(null);
+    setPrefetchedResponse(null);
   };
 
   return (
@@ -324,9 +350,13 @@ const ABBModelMain = () => {
                   }
                   popupIcon={<></>}
                   onInputChange={(e, value) => fetchEmeaTickers(value)}
-                  onChange={(e, value: any) => {
+                  onChange={async (e, value: any) => {
                     setSelectedEmea(value);
+
                     if (value) {
+                      setPrefetchedResponse(null);
+
+                      // Auto-populate input fields
                       setFormValues((prev) => ({
                         ...prev,
                         ticker: value.ticker,
@@ -337,8 +367,40 @@ const ABBModelMain = () => {
                         blockDealValueLocal: value.block_deal_value_in_local_currency,
                         blockDealValueDollar: value.block_deal_value_in_dollar,
                       }));
+
+                      // ⭐ CALL POST API TO FETCH DEAL DATA
+                      try {
+                        const apiUrl = process.env.REACT_APP_API_URL;
+                        const token = localStorage.getItem("access_token");
+
+                        const payloadToSend = {
+                          ticker: value.ticker,
+                          deal_id: value.deal_id,
+                        };
+
+                        const res = await fetch(`${apiUrl}/api/emea_abb_model_data_fetch/`, {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            Authorization: token ? `Bearer ${token}` : "",
+                          },
+                          body: JSON.stringify(payloadToSend),
+                        });
+
+                        const responseData = await res.json();
+
+                        setSubmittedPayload(null);
+                        setPrefetchedResponse(responseData);
+                      } catch (err) {
+                        console.error("EMEA fetch failed:", err);
+                        setPrefetchedResponse(null);
+                      }
+                    } else {
+                      setPrefetchedResponse(null);
+                      setSubmittedPayload(null);
                     }
                   }}
+
 
                   // ⭐ CUSTOM OPTION UI
                   renderOption={(props, option: any) => (
@@ -573,9 +635,12 @@ const ABBModelMain = () => {
         </Card>
 
         {/* ----------------- RESPONSE COMPONENT ----------------- */}
-        {submittedPayload && (
+        {(submittedPayload || prefetchedResponse) && (
           <Box sx={{ mt: 3 }}>
-            <ABBModelResponseData payload={submittedPayload} />
+            <ABBModelResponseData
+              payload={submittedPayload}
+              prefetchedData={prefetchedResponse}
+            />
           </Box>
         )}
       </Box>

@@ -33,6 +33,11 @@ interface FlattenedRow {
   rawValue: any;
 }
 
+interface ABBModelResponseDataProps {
+  payload: Payload | null;
+  prefetchedData?: any | null;
+}
+
 const formatLabel = (key: string) =>
   key
     .split(/[_\s]+/)
@@ -142,12 +147,29 @@ const getValueColor = (value: any) => {
   return blue[900];
 };
 
-const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
-  const [data, setData] = useState<any | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+const ABBModelResponseData = ({
+  payload,
+  prefetchedData = null,
+}: ABBModelResponseDataProps) => {
+  const [data, setData] = useState<any | null>(prefetchedData ?? null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (prefetchedData) {
+      setData(prefetchedData);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    if (!payload) {
+      setData(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     const controller = new AbortController();
 
     const fetchData = async () => {
@@ -190,7 +212,7 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
     fetchData();
 
     return () => controller.abort();
-  }, [payload]);
+  }, [payload, prefetchedData]);
 
   const AbbDataCreation = useMemo(() => {
     if (loading || !data) {
