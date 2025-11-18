@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Grid,
@@ -30,11 +30,10 @@ const baseTextFieldProps = {
   },
 };
 
-const blockDealFieldKeys: Array<keyof DiscountFormValues> = blockDealFields.map(
-  (field) => field.key
-);
+const blockDealFieldKeys: Array<keyof DiscountFormValues> =
+  blockDealFields.map((field) => field.key);
 
-const getInitialFormValues = () => ({
+const getInitialFormValues = (): DiscountFormValues => ({
   ticker: "",
   tradeDate: "",
   cleanUp: "No",
@@ -42,6 +41,8 @@ const getInitialFormValues = () => ({
   timing: "No",
   primary: "No",
   emergingMkt: "No",
+  dealCaptain: "",
+  gicsSector: "",
   blockDealShares: "0",
   blockDealPercentageOfMarketCap: "0",
   blockDealValueLocal: "0",
@@ -62,14 +63,77 @@ const parseBlockValue = (value: string | number) => {
   return Number.isNaN(numericValue) ? 0 : numericValue;
 };
 
+const extractDistinctOptions = (data: any[], key: string): string[] => {
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  const matchingEntry = data.find(
+    (entry) => entry && typeof entry === "object" && entry[key]
+  );
+
+  if (!matchingEntry) {
+    return [];
+  }
+
+  const config = matchingEntry[key];
+  if (config && Array.isArray(config.options)) {
+    return config.options.map((option: any) => String(option));
+  }
+
+  return [];
+};
+
 const ABBModelMain = () => {
-  const [formValues, setFormValues] = useState<any>(getInitialFormValues());
+  const [formValues, setFormValues] =
+    useState<DiscountFormValues>(getInitialFormValues());
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const [companyOptions, setCompanyOptions] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
 
+  const [dealCaptainOptions, setDealCaptainOptions] = useState<string[]>([]);
+  const [sectorOptions, setSectorOptions] = useState<string[]>([]);
+
   const [submittedPayload, setSubmittedPayload] = useState<any | null>(null);
+
+  useEffect(() => {
+    const fetchDistinctValues = async () => {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem("access_token");
+        const response = await fetch(`${apiUrl}/api/mdd_distinct_values/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch distinct values");
+        }
+
+        const data = await response.json();
+        const normalizedData = Array.isArray(data)
+          ? data
+          : data?.screener || [];
+
+        setSectorOptions(extractDistinctOptions(normalizedData, "gics_sector"));
+        setDealCaptainOptions(
+          extractDistinctOptions(normalizedData, "deal_captain")
+        );
+      } catch (error) {
+        setSectorOptions([]);
+        setDealCaptainOptions([]);
+      }
+    };
+
+    fetchDistinctValues();
+  }, []);
 
   // --------------------------- SEARCH API -----------------------------
   const handleSearch = async (query: string) => {
@@ -106,7 +170,7 @@ const ABBModelMain = () => {
   const handleFieldChange = (key: keyof DiscountFormValues) => (e: any) => {
     const value = e.target.value;
 
-    setFormValues((prev: any) => {
+    setFormValues((prev: DiscountFormValues) => {
       const updatedValue = blockDealFieldKeys.includes(key)
         ? value === ""
           ? ""
@@ -164,6 +228,14 @@ const ABBModelMain = () => {
       validationErrors.tradeDate = "Launch date is required";
     }
 
+    // if (!formValues.dealCaptain) {
+    //   validationErrors.dealCaptain = "Deal captain is required";
+    // }
+
+    // if (!formValues.gicsSector) {
+    //   validationErrors.gicsSector = "Sector is required";
+    // }
+
     const hasAnyBlockValue = blockDealFieldKeys.some((key) =>
       hasBlockValue(formValues[key])
     );
@@ -190,6 +262,8 @@ const ABBModelMain = () => {
       timing: mapYesNoToBool(formValues.timing),
       primary: mapYesNoToBool(formValues.primary),
       emerging_mkt: mapYesNoToBool(formValues.emergingMkt),
+      deal_captain: formValues.dealCaptain,
+      gics_sector: formValues.gicsSector,
       block_deal_shares: parseBlockValue(formValues.blockDealShares),
       block_deal_percentage_of_market_cap: parseBlockValue(
         formValues.blockDealPercentageOfMarketCap
@@ -258,7 +332,7 @@ const ABBModelMain = () => {
                     getOptionLabel={(opt: any) => `${opt.ticker}`}
                     onInputChange={(e, value) => handleSearch(value)}
                     onChange={(e, value: any) =>
-                      setFormValues((prev: any) => {
+                      setFormValues((prev: DiscountFormValues) => {
                         const updatedFormValues = {
                           ...prev,
                           ticker: value ? value.ticker : "",
@@ -329,6 +403,46 @@ const ABBModelMain = () => {
                     </TextField>
                   </Grid>
                 ))}
+
+                <Grid item {...gridItemProps}>
+                  <TextField
+                    select
+                    label="Deal Captain"
+                    value={formValues.dealCaptain}
+                    onChange={handleFieldChange("dealCaptain")}
+                    {...baseTextFieldProps}
+                    required
+                    error={Boolean(formErrors.dealCaptain)}
+                    helperText={formErrors.dealCaptain || ""}
+                  >
+                    <MenuItem value="">Select Deal Captain</MenuItem>
+                    {dealCaptainOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid item {...gridItemProps}>
+                  <TextField
+                    select
+                    label="Sector"
+                    value={formValues.gicsSector}
+                    onChange={handleFieldChange("gicsSector")}
+                    {...baseTextFieldProps}
+                    required
+                    error={Boolean(formErrors.gicsSector)}
+                    helperText={formErrors.gicsSector || ""}
+                  >
+                    <MenuItem value="">Select Sector</MenuItem>
+                    {sectorOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
 
                 {/* ----------------- BLOCK DEAL FIELDS ----------------- */}
                 {blockDealFields.map((field) => (

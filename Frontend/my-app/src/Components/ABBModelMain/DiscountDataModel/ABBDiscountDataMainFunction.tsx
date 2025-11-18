@@ -50,6 +50,8 @@ const initialFormValues: DiscountFormValues = {
   cleanUp: 'No',
   primary: 'No',
   emergingMkt: 'No',
+  dealCaptain: '',
+  gicsSector: '',
   blockDealShares: '',
   blockDealPercentageOfMarketCap: '',
   blockDealValueLocal: '',
