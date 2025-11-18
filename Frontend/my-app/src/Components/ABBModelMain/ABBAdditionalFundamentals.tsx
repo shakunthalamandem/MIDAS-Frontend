@@ -25,9 +25,7 @@ const ABBAdditionalFundamentals = ({ leftRows, rightRows, getValueColor }: any) 
         <Typography variant="h6" sx={{ fontWeight: 700, color: blue[900] }}>
           Additional Fundamentals
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Complete payload delivered by the ABB scoring service
-        </Typography>
+ 
       </Box>
 
       {/* SPLIT TWO TABLES */}

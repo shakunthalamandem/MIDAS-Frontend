@@ -105,6 +105,10 @@ const flattenData = (
   }
 
   return Object.entries(payload).flatMap(([key, value]) => {
+    if (key.toLowerCase() === "company_description") {
+      return [];
+    }
+
     const keyPath = parentPath ? `${parentPath}.${key}` : key;
     const label = formatLabel(key);
 
