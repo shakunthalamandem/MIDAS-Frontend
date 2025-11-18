@@ -6,6 +6,8 @@ export interface DiscountFormValues {
   cleanUp: string;
   primary: string;
   emergingMkt: string;
+  dealCaptain: string;
+  gicsSector: string;
   blockDealShares: string;
   blockDealPercentageOfMarketCap: string;
   blockDealValueLocal: string;
