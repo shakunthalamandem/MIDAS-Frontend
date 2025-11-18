@@ -10,7 +10,7 @@ export interface ABBFactsetRecord {
   three_m_adtv_local_value: number | null;
   '52_week_high': number | null;
   '52_week_low': number | null;
-  company_description: string | null;
+  // company_description: string | null;
   beta_benchmark: number | null;
   '3m_volatility': number | null;
   rsi_30d: number | null;

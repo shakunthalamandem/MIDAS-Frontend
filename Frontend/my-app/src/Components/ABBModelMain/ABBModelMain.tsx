@@ -255,7 +255,7 @@ const ABBModelMain = () => {
                   <Autocomplete
                     options={companyOptions}
                     loading={searchLoading}
-                    getOptionLabel={(opt: any) => `${opt.ticker} - ${opt.name}`}
+                    getOptionLabel={(opt: any) => `${opt.ticker}`}
                     onInputChange={(e, value) => handleSearch(value)}
                     onChange={(e, value: any) =>
                       setFormValues((prev: any) => {

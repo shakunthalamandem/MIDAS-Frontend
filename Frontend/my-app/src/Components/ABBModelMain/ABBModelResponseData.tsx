@@ -223,7 +223,7 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
     );
   }
 
-  if (!data) {
+if (!data) {
     return null;
   }
 
@@ -234,6 +234,23 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
   const overviewRows = rows.filter(
     (row) => !row.keyPath.toLowerCase().includes("discount")
   );
+
+  const mid = Math.ceil(overviewRows.length / 2);
+  const leftRows = overviewRows.slice(0, mid);
+  const rightRows = overviewRows.slice(mid);
+
+  // Extract highlighted rows
+  const liquidityRow = discountRows.find(r => r.label === "Liquidity Model Discount");
+  const totalRow = discountRows.find(r => r.label === "Total Discount");
+
+  // Remaining rows for the two small tables
+  const remainingRows = discountRows.filter(
+    r => r.label !== "Liquidity Model Discount" && r.label !== "Total Discount"
+  );
+
+  const leftTableRows = remainingRows.slice(0, 5);
+  const rightTableRows = remainingRows.slice(5, 10);
+
   return (
     <>
       <TableContainer
@@ -246,6 +263,8 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
           border: "1px solid rgba(15, 52, 163, 0.16)",
         }}
       >
+
+        {/* HEADER */}
         <Box
           sx={{
             px: { xs: 2.5, md: 3 },
@@ -261,171 +280,294 @@ const ABBModelResponseData = ({ payload }: { payload: Payload }) => {
           </Typography>
         </Box>
 
-        <Table size="small" sx={{ minWidth: 640 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell
-                sx={{
-                  fontWeight: 700,
-                  color: blue[900],
-                  borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
-                }}
-              >
-                Discount Metric
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{
-                  fontWeight: 700,
-                  color: blue[900],
-                  borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
-                }}
-              >
-                Value
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {discountRows.length ? (
-              discountRows.map((row) => (
-                <TableRow
-                  key={row.keyPath}
-                  sx={{
-                    backgroundColor: row.depth % 2 === 0 ? "#ffffff" : "#f4f7ff",
-                    "&:last-child td": { borderBottom: "none" },
-                  }}
-                >
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    sx={{
-                      py: 1.25,
-                      fontWeight: 600,
-                      color: "#0b1b3a",
-                      pl: 2,
-                      borderBottom: "none",
-                    }}
-                  >
-                    {row.label}
-                  </TableCell>
-                  <TableCell align="right" sx={{ py: 1.25, borderBottom: "none" }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: getValueColor(row.rawValue) }}>
-                      {row.displayValue}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={2} align="center" sx={{ py: 3 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    No discount metrics returned for this request.
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        {/* 🔵 HIGHLIGHTED TOP DISCOUNTS */}
+        <Box sx={{ p: 3, display: "flex", gap: 3 }}>
+          {liquidityRow && (
+            <Paper
+              sx={{
+                flex: 1,
+                p: 2.5,
+                borderRadius: 2,
+                background: "#f0f6ff",
+                border: "1px solid rgba(15, 52, 163, 0.2)",
+              }}
+            >
+              <Typography sx={{ fontSize: 14, fontWeight: 600, color: "#0b1b3a" }}>
+                Liquidity Model Discount
+              </Typography>
+              <Typography sx={{ fontSize: 22, mt: 0.5, fontWeight: 700, color: getValueColor(liquidityRow.rawValue) }}>
+                {liquidityRow.displayValue}
+              </Typography>
+            </Paper>
+          )}
 
-      <TableContainer
-        component={Paper}
-        sx={{
-          mt: 4,
-          borderRadius: 3,
-          overflow: "hidden",
-          boxShadow: "0 25px 60px rgba(15, 52, 163, 0.15)",
-          border: "1px solid rgba(15, 52, 163, 0.16)",
-        }}
-      >
-        <Box
-          sx={{
-            px: { xs: 2.5, md: 3 },
-            py: 2.5,
-            background: "linear-gradient(135deg, #d9e8ff 0%, #eef3ff 100%)",
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 700, color: blue[900] }}>
-            Additional Fundamentals
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Complete payload delivered by the ABB scoring service
-          </Typography>
+          {totalRow && (
+            <Paper
+              sx={{
+                flex: 1,
+                p: 2.5,
+                borderRadius: 2,
+                background: "#e8fff1",
+                border: "1px solid rgba(15, 163, 52, 0.2)",
+              }}
+            >
+              <Typography sx={{ fontSize: 14, fontWeight: 600, color: "#0b3a19" }}>
+                Total Discount
+              </Typography>
+              <Typography sx={{ fontSize: 22, mt: 0.5, fontWeight: 700, color: getValueColor(totalRow.rawValue) }}>
+                {totalRow.displayValue}
+              </Typography>
+            </Paper>
+          )}
         </Box>
 
-        <Table size="small" sx={{ minWidth: 640 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell
-                sx={{
-                  fontWeight: 700,
-                  color: blue[900],
-                  borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
-                }}
-              >
-                Metric
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{
-                  fontWeight: 700,
-                  color: blue[900],
-                  borderBottom: "1px solid rgba(15, 52, 163, 0.2)",
-                }}
-              >
-                Value
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {overviewRows.map((row) => {
-              const groupFieldCount =
-                row.isGroupHeader && row.rawValue && typeof row.rawValue === "object"
-                  ? Object.keys(row.rawValue).length
-                  : 0;
+        {/* 🟦 TWO SIDE-BY-SIDE SMALL TABLES */}
+        <Box
+          sx={{
+            px: 3,
+            pb: 3,
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            gap: 3,
+          }}
+        >
+          {/* LEFT TABLE */}
+          <Paper
+            sx={{
+              borderRadius: 2,
+              overflow: "hidden",
+              border: "1px solid rgba(15, 52, 163, 0.16)",
+            }}
+          >
+            <Table size="small">
+              <TableBody>
+                {leftTableRows.map((row) => (
+                  <TableRow key={row.keyPath}>
+                    <TableCell sx={{ fontWeight: 600, color: "#0b1b3a" }}>{row.label}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 700, color: getValueColor(row.rawValue) }}>
+                      {row.displayValue}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
 
-              return (
-                <TableRow
-                  key={row.keyPath}
-                  sx={{
-                    backgroundColor: row.isGroupHeader
-                      ? "rgba(195, 217, 255, 0.6)"
-                      : row.depth % 2 === 0
+          {/* RIGHT TABLE */}
+          <Paper
+            sx={{
+              borderRadius: 2,
+              overflow: "hidden",
+              border: "1px solid rgba(15, 52, 163, 0.16)",
+            }}
+          >
+            <Table size="small">
+              <TableBody>
+                {rightTableRows.map((row) => (
+                  <TableRow key={row.keyPath}>
+                    <TableCell sx={{ fontWeight: 600, color: "#0b1b3a" }}>{row.label}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 700, color: getValueColor(row.rawValue) }}>
+                      {row.displayValue}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
+        </Box>
+
+        {/* ⭐ FINAL TOTAL DISCOUNT HIGHLIGHT AT BOTTOM */}
+        {totalRow && (
+          <Box
+            sx={{
+              m: 3,
+              p: 2.5,
+              borderRadius: 2,
+              textAlign: "center",
+              background: "linear-gradient(90deg, #0b3a19 0%, #1c7c3a 100%)",
+              color: "#fff",
+            }}
+          >
+            <Typography sx={{ fontSize: 18, fontWeight: 700 }}>
+              Final Total Discount: {totalRow.displayValue}
+            </Typography>
+          </Box>
+        )}
+
+      </TableContainer>
+
+
+<TableContainer
+  component={Paper}
+  sx={{
+    mt: 4,
+    borderRadius: 3,
+    overflow: "hidden",
+    boxShadow: "0 25px 60px rgba(15, 52, 163, 0.15)",
+    border: "1px solid rgba(15, 52, 163, 0.16)",
+  }}
+>
+  {/* HEADER */}
+  <Box
+    sx={{
+      px: { xs: 2.5, md: 3 },
+      py: 2.5,
+      background: "linear-gradient(135deg, #d9e8ff 0%, #eef3ff 100%)",
+    }}
+  >
+    <Typography variant="h6" sx={{ fontWeight: 700, color: blue[900] }}>
+      Additional Fundamentals
+    </Typography>
+    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+      Complete payload delivered by the ABB scoring service
+    </Typography>
+  </Box>
+
+  {/* TWO SIDE-BY-SIDE TABLES */}
+  <Box
+    sx={{
+      p: 3,
+      display: "grid",
+      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+      gap: 3,
+    }}
+  >
+    {/* LEFT TABLE */}
+    <Paper
+      sx={{
+        borderRadius: 2,
+        overflow: "hidden",
+        border: "1px solid rgba(15, 52, 163, 0.16)",
+      }}
+    >
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 700, color: blue[900] }}>Metric</TableCell>
+            <TableCell sx={{ fontWeight: 700, color: blue[900] }} align="right">
+              Value
+            </TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {leftRows.map((row) => {
+            const groupCount =
+              row.isGroupHeader && typeof row.rawValue === "object"
+                ? Object.keys(row.rawValue).length
+                : 0;
+
+            return (
+              <TableRow
+                key={row.keyPath}
+                sx={{
+                  backgroundColor: row.isGroupHeader
+                    ? "rgba(195, 217, 255, 0.6)"
+                    : row.depth % 2 === 0
                       ? "#ffffff"
                       : "#f7f9ff",
-                    "&:last-child td": { borderBottom: "none" },
+                  "&:last-child td": { borderBottom: "none" },
+                }}
+              >
+                <TableCell
+                  sx={{
+                    py: 1.25,
+                    fontWeight: row.isGroupHeader ? 700 : 600,
+                    color: row.isGroupHeader ? blue[900] : "#0b1b3a",
+                    pl: row.depth * 3 + 1,
+                    borderBottom: "none",
                   }}
                 >
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    sx={{
-                      py: 1.25,
-                      fontWeight: row.isGroupHeader ? 700 : 600,
-                      color: row.isGroupHeader ? blue[900] : "#0b1b3a",
-                      pl: row.depth * 3 + 1,
-                      borderBottom: "none",
-                    }}
-                  >
-                    {row.label}
-                  </TableCell>
-                  <TableCell align="right" sx={{ py: 1.25, borderBottom: "none" }}>
-                    {row.isGroupHeader ? (
-                      <Typography variant="body2" color="text.secondary">
-                        {groupFieldCount ? `Contains ${groupFieldCount} fields` : "Details"}
-                      </Typography>
-                    ) : (
-                      <Typography variant="body2" sx={{ color: getValueColor(row.rawValue) }}>
-                        {row.displayValue}
-                      </Typography>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  {row.label}
+                </TableCell>
+
+                <TableCell align="right" sx={{ py: 1.25, borderBottom: "none" }}>
+                  {row.isGroupHeader ? (
+                    <Typography variant="body2" color="text.secondary">
+                      {groupCount ? `Contains ${groupCount} fields` : "Details"}
+                    </Typography>
+                  ) : (
+                    <Typography variant="body2" sx={{ color: getValueColor(row.rawValue) }}>
+                      {row.displayValue}
+                    </Typography>
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </Paper>
+
+    {/* RIGHT TABLE */}
+    <Paper
+      sx={{
+        borderRadius: 2,
+        overflow: "hidden",
+        border: "1px solid rgba(15, 52, 163, 0.16)",
+      }}
+    >
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 700, color: blue[900] }}>Metric</TableCell>
+            <TableCell sx={{ fontWeight: 700, color: blue[900] }} align="right">
+              Value
+            </TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {rightRows.map((row) => {
+            const groupCount =
+              row.isGroupHeader && typeof row.rawValue === "object"
+                ? Object.keys(row.rawValue).length
+                : 0;
+
+            return (
+              <TableRow
+                key={row.keyPath}
+                sx={{
+                  backgroundColor: row.isGroupHeader
+                    ? "rgba(195, 217, 255, 0.6)"
+                    : row.depth % 2 === 0
+                      ? "#ffffff"
+                      : "#f7f9ff",
+                  "&:last-child td": { borderBottom: "none" },
+                }}
+              >
+                <TableCell
+                  sx={{
+                    py: 1.25,
+                    fontWeight: row.isGroupHeader ? 700 : 600,
+                    color: row.isGroupHeader ? blue[900] : "#0b1b3a",
+                    pl: row.depth * 3 + 1,
+                    borderBottom: "none",
+                  }}
+                >
+                  {row.label}
+                </TableCell>
+
+                <TableCell align="right" sx={{ py: 1.25, borderBottom: "none" }}>
+                  {row.isGroupHeader ? (
+                    <Typography variant="body2" color="text.secondary">
+                      {groupCount ? `Contains ${groupCount} fields` : "Details"}
+                    </Typography>
+                  ) : (
+                    <Typography variant="body2" sx={{ color: getValueColor(row.rawValue) }}>
+                      {row.displayValue}
+                    </Typography>
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </Paper>
+  </Box>
+</TableContainer>
+
 
       <Box>
         {/* Pass the combined data (payload + apiResponse) to ABBDataInsertion */}
