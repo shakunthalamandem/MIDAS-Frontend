@@ -54,7 +54,7 @@ const normalizeBooleanFields = (source: Record<string, any>) => {
 };
 
 interface ABBDataCreation {
-  payload: Record<string, any>;
+  payload: Record<string, any> | null;
   apiResponse: Record<string, any>;
 }
 

@@ -1,3 +1,5 @@
+// Full updated ABBModelMain.tsx with search bar replacing the subtitle text
+
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -22,11 +24,18 @@ import {
 const gridItemProps = { xs: 12, sm: 6, md: 3 };
 const inputLabelSx = { color: "#1d2b54", fontWeight: 600 };
 const baseTextFieldProps = {
-  variant: "standard" as const, // Explicitly cast to the correct type
+  variant: "standard" as const,
   fullWidth: true,
   InputLabelProps: {
     shrink: true,
     sx: inputLabelSx,
+  },
+};
+const selectMenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: 240,
+    },
   },
 };
 
@@ -43,17 +52,14 @@ const getInitialFormValues = (): DiscountFormValues => ({
   emergingMkt: "No",
   dealCaptain: "",
   gicsSector: "",
-  blockDealShares: "0",
-  blockDealPercentageOfMarketCap: "0",
-  blockDealValueLocal: "0",
-  blockDealValueDollar: "0",
+  blockDealShares: "",
+  blockDealPercentageOfMarketCap: "",
+  blockDealValueLocal: "",
+  blockDealValueDollar: "",
 });
 
 const hasBlockValue = (value: string | number) => {
-  if (value === "" || value === null || value === undefined) {
-    return false;
-  }
-
+  if (value === "" || value === null || value === undefined) return false;
   const numericValue = Number(value);
   return !Number.isNaN(numericValue) && numericValue !== 0;
 };
@@ -64,23 +70,15 @@ const parseBlockValue = (value: string | number) => {
 };
 
 const extractDistinctOptions = (data: any[], key: string): string[] => {
-  if (!Array.isArray(data)) {
-    return [];
-  }
-
+  if (!Array.isArray(data)) return [];
   const matchingEntry = data.find(
     (entry) => entry && typeof entry === "object" && entry[key]
   );
-
-  if (!matchingEntry) {
-    return [];
-  }
-
+  if (!matchingEntry) return [];
   const config = matchingEntry[key];
   if (config && Array.isArray(config.options)) {
     return config.options.map((option: any) => String(option));
   }
-
   return [];
 };
 
@@ -96,13 +94,41 @@ const ABBModelMain = () => {
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
 
   const [submittedPayload, setSubmittedPayload] = useState<any | null>(null);
+  const [prefetchedResponse, setPrefetchedResponse] = useState<any | null>(null);
 
+  // New states for top search bar
+  const [emeaOptions, setEmeaOptions] = useState<any[]>([]);
+  const [emeaLoading, setEmeaLoading] = useState(false);
+  const [selectedEmea, setSelectedEmea] = useState<any | null>(null);
+  useEffect(() => {
+    const fetchAllEmeaData = async () => {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      try {
+        const res = await fetch(`${apiUrl}/api/get_emeaabb_model_data/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+        const data = await res.json();
+        setEmeaOptions(data);
+      } catch (err) {
+        console.error("Failed to load EMEA form data", err);
+      }
+    };
+
+    fetchAllEmeaData();
+  }, []);
+
+
+
+  // Fetch distinct values
   useEffect(() => {
     const fetchDistinctValues = async () => {
       const apiUrl = process.env.REACT_APP_API_URL;
-      if (!apiUrl) {
-        return;
-      }
+      if (!apiUrl) return;
 
       try {
         const token = localStorage.getItem("access_token");
@@ -113,9 +139,7 @@ const ABBModelMain = () => {
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch distinct values");
-        }
+        if (!response.ok) throw new Error("Failed to fetch distinct values");
 
         const data = await response.json();
         const normalizedData = Array.isArray(data)
@@ -135,7 +159,40 @@ const ABBModelMain = () => {
     fetchDistinctValues();
   }, []);
 
-  // --------------------------- SEARCH API -----------------------------
+  // New: Fetch EMEA tickers for search bar
+  const fetchEmeaTickers = async (query: string) => {
+    if (!query) {
+      setEmeaOptions([]);
+      return;
+    }
+
+    setEmeaLoading(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const res = await fetch(`${apiUrl}/api/get_emeaabb_model_data/`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+
+      let data = await res.json();
+
+      const filtered = data.filter((item: any) =>
+        item.ticker.toLowerCase().includes(query.toLowerCase())
+      );
+
+      setEmeaOptions(filtered);
+    } catch (err) {
+      setEmeaOptions([]);
+    } finally {
+      setEmeaLoading(false);
+    }
+  };
+
+  // Ticker search
   const handleSearch = async (query: string) => {
     if (!query) {
       setCompanyOptions([]);
@@ -166,42 +223,28 @@ const ABBModelMain = () => {
     }
   };
 
-  // --------------------------- FIELD HANDLER -----------------------------
   const handleFieldChange = (key: keyof DiscountFormValues) => (e: any) => {
     const value = e.target.value;
 
     setFormValues((prev: DiscountFormValues) => {
       const updatedValue = blockDealFieldKeys.includes(key)
-        ? value === ""
-          ? ""
-          : value
+        ? value === "" ? "" : value
         : value;
 
-      const updatedFormValues = {
-        ...prev,
-        [key]: updatedValue,
-      };
+      const updatedFormValues = { ...prev, [key]: updatedValue };
 
       setFormErrors((prevErrors) => {
-        if (!prevErrors || Object.keys(prevErrors).length === 0) {
-          return prevErrors;
-        }
-
+        if (!prevErrors || Object.keys(prevErrors).length === 0) return prevErrors;
         const nextErrors = { ...prevErrors };
 
-        if (updatedValue && nextErrors[key]) {
-          delete nextErrors[key];
-        }
+        if (updatedValue && nextErrors[key]) delete nextErrors[key];
 
         if (blockDealFieldKeys.includes(key)) {
           const hasAnyBlockValue = blockDealFieldKeys.some((fieldKey) =>
             hasBlockValue(updatedFormValues[fieldKey])
           );
-
           if (hasAnyBlockValue) {
-            blockDealFieldKeys.forEach((fieldKey) => {
-              delete nextErrors[fieldKey];
-            });
+            blockDealFieldKeys.forEach((fieldKey) => delete nextErrors[fieldKey]);
           }
         }
 
@@ -212,7 +255,6 @@ const ABBModelMain = () => {
     });
   };
 
-  // --------------------------- SUBMIT -----------------------------
   const mapYesNoToBool = (value: string) => value === "Yes";
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -220,21 +262,8 @@ const ABBModelMain = () => {
 
     const validationErrors: Record<string, string> = {};
 
-    if (!formValues.ticker) {
-      validationErrors.ticker = "Ticker is required";
-    }
-
-    if (!formValues.tradeDate) {
-      validationErrors.tradeDate = "Launch date is required";
-    }
-
-    // if (!formValues.dealCaptain) {
-    //   validationErrors.dealCaptain = "Deal captain is required";
-    // }
-
-    // if (!formValues.gicsSector) {
-    //   validationErrors.gicsSector = "Sector is required";
-    // }
+    if (!formValues.ticker) validationErrors.ticker = "Ticker is required";
+    if (!formValues.tradeDate) validationErrors.tradeDate = "Launch date is required";
 
     const hasAnyBlockValue = blockDealFieldKeys.some((key) =>
       hasBlockValue(formValues[key])
@@ -256,7 +285,7 @@ const ABBModelMain = () => {
     const payload = {
       ticker: formValues.ticker,
       trade_date: formValues.tradeDate,
-      launch_date: formValues.tradeDate, // Assuming launch date is the same as trade date
+      launch_date: formValues.tradeDate,
       clean_up: mapYesNoToBool(formValues.cleanUp),
       seasoned: mapYesNoToBool(formValues.seasoned),
       timing: mapYesNoToBool(formValues.timing),
@@ -276,18 +305,19 @@ const ABBModelMain = () => {
       ),
     };
 
-    setSubmittedPayload(payload); // Send payload to child
+    setPrefetchedResponse(null);
+    setSubmittedPayload(payload);
   };
 
-  // --------------------------- RESET -----------------------------
   const handleReset = () => {
     setFormValues(getInitialFormValues());
     setFormErrors({});
     setSubmittedPayload(null);
+    setPrefetchedResponse(null);
   };
 
   return (
-    <Container >
+    <Container maxWidth="xl">
       <Box sx={{ p: { xs: 2, md: 4 } }}>
         <Card
           sx={{
@@ -308,18 +338,115 @@ const ABBModelMain = () => {
                 gap: 2,
               }}
             >
-              <Typography
-                variant="h5"
-                sx={{ fontWeight: 700, color: "#0b2b57" }}
-              >
+              <Typography variant="h5" sx={{ fontWeight: 700, color: "#0b2b57" }}>
                 ABB Discount Data
               </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "#285384", fontWeight: 500 }}
-              >
-                Provide the inputs below and submit for ABB scoring.
-              </Typography>
+              <Box sx={{ width: { xs: "100%", md: 350 } }}>
+                <Autocomplete
+                  options={emeaOptions}
+                  loading={emeaLoading}
+                  getOptionLabel={(opt: any) =>
+                    `${opt.ticker || ""} (${opt.deal_id || "TBA"})`
+                  }
+                  popupIcon={<></>}
+                  onInputChange={(e, value) => fetchEmeaTickers(value)}
+                  onChange={async (e, value: any) => {
+                    setSelectedEmea(value);
+
+                    if (value) {
+                      setPrefetchedResponse(null);
+
+                      // Auto-populate input fields
+                      setFormValues((prev) => ({
+                        ...prev,
+                        ticker: value.ticker,
+                        tradeDate: value.launch_date,
+                        blockDealShares: value.block_deal_shares,
+                        blockDealPercentageOfMarketCap:
+                          value.block_deal_percentage_of_market_cap,
+                        blockDealValueLocal: value.block_deal_value_in_local_currency,
+                        blockDealValueDollar: value.block_deal_value_in_dollar,
+                      }));
+
+                      // ⭐ CALL POST API TO FETCH DEAL DATA
+                      try {
+                        const apiUrl = process.env.REACT_APP_API_URL;
+                        const token = localStorage.getItem("access_token");
+
+                        const payloadToSend = {
+                          ticker: value.ticker,
+                          deal_id: value.deal_id,
+                        };
+
+                        const res = await fetch(`${apiUrl}/api/emea_abb_model_data_fetch/`, {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            Authorization: token ? `Bearer ${token}` : "",
+                          },
+                          body: JSON.stringify(payloadToSend),
+                        });
+
+                        const responseData = await res.json();
+
+                        setSubmittedPayload(null);
+                        setPrefetchedResponse(responseData);
+                      } catch (err) {
+                        console.error("EMEA fetch failed:", err);
+                        setPrefetchedResponse(null);
+                      }
+                    } else {
+                      setPrefetchedResponse(null);
+                      setSubmittedPayload(null);
+                    }
+                  }}
+
+
+                  // ⭐ CUSTOM OPTION UI
+                  renderOption={(props, option: any) => (
+                    <li {...props} style={{ padding: "10px 12px" }}>
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+
+                        {/* Line 1 */}
+                        <span style={{ fontWeight: 600, fontSize: "14px" }}>
+                          {option.ticker}({option.launch_date || "N/A"})
+                        </span>
+
+                        {/* Line 2 */}
+                        <span style={{ fontSize: "13px", color: "#333" }}>
+                          Discount: {option.final_discount ?? "N/A"}%
+                        </span>
+                      </div>
+                    </li>
+                  )}
+
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder="Search ABB Deals"
+                      variant="outlined"
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <span style={{ marginRight: 8, opacity: 0.7 }}>🔍</span>
+                        ),
+                        sx: {
+                          borderRadius: "10px",
+                          paddingY: "2px",
+                          backgroundColor: "#fff",
+                        },
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "10px",
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </Box>
+
+
             </Box>
 
             <Box component="form" onSubmit={handleSubmit} noValidate>
@@ -411,6 +538,7 @@ const ABBModelMain = () => {
                     value={formValues.dealCaptain}
                     onChange={handleFieldChange("dealCaptain")}
                     {...baseTextFieldProps}
+                    SelectProps={{ MenuProps: selectMenuProps }}
                     required
                     error={Boolean(formErrors.dealCaptain)}
                     helperText={formErrors.dealCaptain || ""}
@@ -431,6 +559,7 @@ const ABBModelMain = () => {
                     value={formValues.gicsSector}
                     onChange={handleFieldChange("gicsSector")}
                     {...baseTextFieldProps}
+                    SelectProps={{ MenuProps: selectMenuProps }}
                     required
                     error={Boolean(formErrors.gicsSector)}
                     helperText={formErrors.gicsSector || ""}
@@ -506,9 +635,12 @@ const ABBModelMain = () => {
         </Card>
 
         {/* ----------------- RESPONSE COMPONENT ----------------- */}
-        {submittedPayload && (
+        {(submittedPayload || prefetchedResponse) && (
           <Box sx={{ mt: 3 }}>
-            <ABBModelResponseData payload={submittedPayload} />
+            <ABBModelResponseData
+              payload={submittedPayload}
+              prefetchedData={prefetchedResponse}
+            />
           </Box>
         )}
       </Box>
