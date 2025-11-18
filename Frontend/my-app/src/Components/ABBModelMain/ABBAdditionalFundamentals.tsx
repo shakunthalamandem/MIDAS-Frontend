@@ -1,8 +1,102 @@
 // ABBAdditionalFundamentals.tsx
-import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import { blue } from "@mui/material/colors";
 
+const marketDataFields = [
+  { key: "launch_date", label: "Launch Date" },
+  { key: "trade_date", label: "Trade Date" },
+  { key: "market_cap", label: "Market Cap ($M)" },
+  { key: "_52week_high", label: "52 Week High (Lcl)" },
+  { key: "percent_from_52week_high", label: "% Below 52 Week High" },
+  { key: "fcf_yield_ltm", label: "LTM FCF Yield" },
+  { key: "fcf_dividend_yield", label: "LTM Dividend Yield" },
+  { key: "shares_outstanding", label: "Shares Outstanding" },
+  { key: "percent_free_float", label: "% of Free Float" },
+];
+
+const technicalDataFields = [
+  { key: "_3_m_adtv_local_value", label: "3-Month ADTV (M) (lcl)" },
+  { key: "_3_m_adtv_shares", label: "3-Month ADTV Shares" },
+  { key: "beta_benchmark", label: "Beta (S&P500)" },
+  { key: "_3_m_volatility", label: "3-Month Volatility" },
+  { key: "rsi_14d", label: "RSI 14D" },
+  { key: "rsi_30d", label: "RSI 30D" },
+  { key: "macd_9d", label: "MACD 9D" },
+  { key: "_10_dma", label: "DMA 100" },
+];
+
 const ABBAdditionalFundamentals = ({ leftRows, rightRows, getValueColor }: any) => {
+  const allRows = [...leftRows, ...rightRows];
+  const rowLookup = new Map(
+    allRows
+      .filter((row: any) => !row.isGroupHeader)
+      .map((row: any) => [row.keyPath.toLowerCase(), row])
+  );
+
+  const buildRows = (fields: { key: string; label: string }[]) =>
+    fields.map((field) => {
+      const row = rowLookup.get(field.key.toLowerCase());
+      return {
+        ...field,
+        displayValue: row?.displayValue ?? "-",
+        rawValue: row?.rawValue,
+      };
+    });
+
+  const marketRows = buildRows(marketDataFields);
+  const technicalRows = buildRows(technicalDataFields);
+
+  const renderTable = (title: string, rows: any[]) => (
+    <Paper sx={{ borderRadius: 2, overflow: "hidden", border: "1px solid rgba(15,52,163,0.14)" }}>
+      <Box
+        sx={{
+          px: 2,
+          py: 1.5,
+          background: "linear-gradient(135deg, #f0f5ff 0%, #dfe9ff 100%)",
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: blue[900] }}>
+          {title}
+        </Typography>
+      </Box>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 700 }}>Metric</TableCell>
+            <TableCell sx={{ fontWeight: 700 }} align="right">
+              Value
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow key={row.key}>
+              <TableCell sx={{ fontWeight: 600 }}>{row.label}</TableCell>
+              <TableCell align="right">
+                <Typography
+                  variant="body2"
+                  sx={{ color: row.rawValue !== undefined ? getValueColor(row.rawValue) : blue[900] }}
+                >
+                  {row.displayValue}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Paper>
+  );
+
   return (
     <TableContainer
       component={Paper}
@@ -14,7 +108,6 @@ const ABBAdditionalFundamentals = ({ leftRows, rightRows, getValueColor }: any) 
         border: "1px solid rgba(15, 52, 163, 0.16)",
       }}
     >
-      {/* HEADER */}
       <Box
         sx={{
           px: 3,
@@ -23,13 +116,10 @@ const ABBAdditionalFundamentals = ({ leftRows, rightRows, getValueColor }: any) 
         }}
       >
         <Typography variant="h6" align="center" sx={{ fontWeight: 700, color: blue[900] }}>
-Public Market Data
-
+          Public Market Data
         </Typography>
- 
       </Box>
 
-      {/* SPLIT TWO TABLES */}
       <Box
         sx={{
           p: 3,
@@ -38,85 +128,8 @@ Public Market Data
           gap: 3,
         }}
       >
-        {/* LEFT TABLE */}
-        <Paper sx={{ borderRadius: 2, overflow: "hidden" }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 700 }}>Metric</TableCell>
-                <TableCell sx={{ fontWeight: 700 }} align="right">Value</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {leftRows.map((row: any) => (
-                <TableRow
-                  key={row.keyPath}
-                  sx={{
-                    backgroundColor: row.isGroupHeader ? "rgba(195, 217, 255, 0.6)"
-                      : row.depth % 2 === 0 ? "#fff" : "#f7f9ff",
-                  }}
-                >
-                  <TableCell sx={{ fontWeight: row.isGroupHeader ? 700 : 600, pl: row.depth * 3 + 1 }}>
-                    {row.label}
-                  </TableCell>
-
-                  <TableCell align="right">
-                    {row.isGroupHeader ? (
-                      <Typography variant="body2" color="text.secondary">
-                        Contains {Object.keys(row.rawValue || {}).length} fields
-                      </Typography>
-                    ) : (
-                      <Typography variant="body2" sx={{ color: getValueColor(row.rawValue) }}>
-                        {row.displayValue}
-                      </Typography>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
-
-        {/* RIGHT TABLE - identical */}
-        <Paper sx={{ borderRadius: 2, overflow: "hidden" }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 700 }}>Metric</TableCell>
-                <TableCell sx={{ fontWeight: 700 }} align="right">Value</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {rightRows.map((row: any) => (
-                <TableRow
-                  key={row.keyPath}
-                  sx={{
-                    backgroundColor: row.isGroupHeader ? "rgba(195, 217, 255, 0.6)"
-                      : row.depth % 2 === 0 ? "#fff" : "#f7f9ff",
-                  }}
-                >
-                  <TableCell sx={{ fontWeight: row.isGroupHeader ? 700 : 600, pl: row.depth * 3 + 1 }}>
-                    {row.label}
-                  </TableCell>
-
-                  <TableCell align="right">
-                    {row.isGroupHeader ? (
-                      <Typography variant="body2" color="text.secondary">
-                        Contains {Object.keys(row.rawValue || {}).length} fields
-                      </Typography>
-                    ) : (
-                      <Typography variant="body2" sx={{ color: getValueColor(row.rawValue) }}>
-                        {row.displayValue}
-                      </Typography>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
+        {renderTable("Market Data", marketRows)}
+        {renderTable("Technical Market Data", technicalRows)}
       </Box>
     </TableContainer>
   );
