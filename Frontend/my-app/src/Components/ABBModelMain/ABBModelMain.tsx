@@ -15,6 +15,7 @@ import ABBModelResponseData from "./ABBModelResponseData";
 import {
   blockDealFields,
   discountFields,
+  DiscountFormValues,
   yesNoOptions,
 } from "./DiscountDataModel/ABBDiscountConfig";
 
@@ -29,20 +30,41 @@ const baseTextFieldProps = {
   },
 };
 
+const blockDealFieldKeys: Array<keyof DiscountFormValues> = blockDealFields.map(
+  (field) => field.key
+);
+
+const getInitialFormValues = () => ({
+  ticker: "",
+  tradeDate: "",
+  cleanUp: "No",
+  seasoned: "No",
+  timing: "No",
+  primary: "No",
+  emergingMkt: "No",
+  blockDealShares: "0",
+  blockDealPercentageOfMarketCap: "0",
+  blockDealValueLocal: "0",
+  blockDealValueDollar: "0",
+});
+
+const hasBlockValue = (value: string | number) => {
+  if (value === "" || value === null || value === undefined) {
+    return false;
+  }
+
+  const numericValue = Number(value);
+  return !Number.isNaN(numericValue) && numericValue !== 0;
+};
+
+const parseBlockValue = (value: string | number) => {
+  const numericValue = Number(value);
+  return Number.isNaN(numericValue) ? 0 : numericValue;
+};
+
 const ABBModelMain = () => {
-  const [formValues, setFormValues] = useState<any>({
-    ticker: "",
-    tradeDate: "", // Initialize as string
-    cleanUp: "No", // Default to the available option
-    seasoned: "No", // Default to the available option
-    timing: "No", // Default to the available option
-    primary: "No", // Default to the available option
-    emergingMkt: "No", // Default to the available option
-    blockDealShares: 0, // Initialize as number
-    blockDealPercentageOfMarketCap: 0, // Initialize as number
-    blockDealValueLocal: 0, // Initialize as number
-    blockDealValueDollar: 0, // Initialize as number
-  });
+  const [formValues, setFormValues] = useState<any>(getInitialFormValues());
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const [companyOptions, setCompanyOptions] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -81,51 +103,49 @@ const ABBModelMain = () => {
   };
 
   // --------------------------- FIELD HANDLER -----------------------------
-  const handleFieldChange = (key: string) => (e: any) => {
+  const handleFieldChange = (key: keyof DiscountFormValues) => (e: any) => {
     const value = e.target.value;
 
-    // Handle date fields separately
-    if (key === "tradeDate") {
-      setFormValues((prev: any) => ({
-        ...prev,
-        [key]: value,
-      }));
-    }
+    setFormValues((prev: any) => {
+      const updatedValue = blockDealFieldKeys.includes(key)
+        ? value === ""
+          ? ""
+          : value
+        : value;
 
-    // Handle numeric fields
-    else if (
-      key === "blockDealShares" ||
-      key === "blockDealPercentageOfMarketCap" ||
-      key === "blockDealValueLocal" ||
-      key === "blockDealValueDollar"
-    ) {
-      setFormValues((prev: any) => ({
+      const updatedFormValues = {
         ...prev,
-        [key]: parseFloat(value) || 0,
-      }));
-    }
+        [key]: updatedValue,
+      };
 
-    // Handle Yes/No dropdowns
-    else if (
-      key === "cleanUp" ||
-      key === "seasoned" ||
-      key === "timing" ||
-      key === "primary" ||
-      key === "emergingMkt"
-    ) {
-      setFormValues((prev: any) => ({
-        ...prev,
-        [key]: value, // Keep the label so the dropdown shows the choice
-      }));
-    }
+      setFormErrors((prevErrors) => {
+        if (!prevErrors || Object.keys(prevErrors).length === 0) {
+          return prevErrors;
+        }
 
-    // Default for string fields
-    else {
-      setFormValues((prev: any) => ({
-        ...prev,
-        [key]: value,
-      }));
-    }
+        const nextErrors = { ...prevErrors };
+
+        if (updatedValue && nextErrors[key]) {
+          delete nextErrors[key];
+        }
+
+        if (blockDealFieldKeys.includes(key)) {
+          const hasAnyBlockValue = blockDealFieldKeys.some((fieldKey) =>
+            hasBlockValue(updatedFormValues[fieldKey])
+          );
+
+          if (hasAnyBlockValue) {
+            blockDealFieldKeys.forEach((fieldKey) => {
+              delete nextErrors[fieldKey];
+            });
+          }
+        }
+
+        return nextErrors;
+      });
+
+      return updatedFormValues;
+    });
   };
 
   // --------------------------- SUBMIT -----------------------------
@@ -133,6 +153,33 @@ const ABBModelMain = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const validationErrors: Record<string, string> = {};
+
+    if (!formValues.ticker) {
+      validationErrors.ticker = "Ticker is required";
+    }
+
+    if (!formValues.tradeDate) {
+      validationErrors.tradeDate = "Launch date is required";
+    }
+
+    const hasAnyBlockValue = blockDealFieldKeys.some((key) =>
+      hasBlockValue(formValues[key])
+    );
+
+    if (!hasAnyBlockValue) {
+      blockDealFieldKeys.forEach((key) => {
+        validationErrors[key] = "Enter at least one block deal value";
+      });
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setFormErrors(validationErrors);
+      return;
+    }
+
+    setFormErrors({});
 
     const payload = {
       ticker: formValues.ticker,
@@ -143,10 +190,16 @@ const ABBModelMain = () => {
       timing: mapYesNoToBool(formValues.timing),
       primary: mapYesNoToBool(formValues.primary),
       emerging_mkt: mapYesNoToBool(formValues.emergingMkt),
-      block_deal_shares: formValues.blockDealShares,
-      block_deal_percentage_of_market_cap: formValues.blockDealPercentageOfMarketCap,
-      block_deal_value_in_local_currency: formValues.blockDealValueLocal,
-      block_deal_value_in_dollar: formValues.blockDealValueDollar,
+      block_deal_shares: parseBlockValue(formValues.blockDealShares),
+      block_deal_percentage_of_market_cap: parseBlockValue(
+        formValues.blockDealPercentageOfMarketCap
+      ),
+      block_deal_value_in_local_currency: parseBlockValue(
+        formValues.blockDealValueLocal
+      ),
+      block_deal_value_in_dollar: parseBlockValue(
+        formValues.blockDealValueDollar
+      ),
     };
 
     setSubmittedPayload(payload); // Send payload to child
@@ -154,19 +207,8 @@ const ABBModelMain = () => {
 
   // --------------------------- RESET -----------------------------
   const handleReset = () => {
-    setFormValues({
-      ticker: "",
-      tradeDate: "",
-      cleanUp: "No", // Reset default to match dropdown options
-      seasoned: "No", // Reset default to match dropdown options
-      timing: "No", // Reset default to match dropdown options
-      primary: "No", // Reset default to match dropdown options
-      emergingMkt: "No", // Reset default to match dropdown options
-      blockDealShares: 0,
-      blockDealPercentageOfMarketCap: 0,
-      blockDealValueLocal: 0,
-      blockDealValueDollar: 0,
-    });
+    setFormValues(getInitialFormValues());
+    setFormErrors({});
     setSubmittedPayload(null);
   };
 
@@ -206,7 +248,7 @@ const ABBModelMain = () => {
               </Typography>
             </Box>
 
-            <Box component="form" onSubmit={handleSubmit}>
+            <Box component="form" onSubmit={handleSubmit} noValidate>
               <Grid container spacing={3}>
                 {/* ----------------- COMPANY AUTOCOMPLETE ----------------- */}
                 <Grid item {...gridItemProps}>
@@ -216,15 +258,30 @@ const ABBModelMain = () => {
                     getOptionLabel={(opt: any) => `${opt.ticker} - ${opt.name}`}
                     onInputChange={(e, value) => handleSearch(value)}
                     onChange={(e, value: any) =>
-                      setFormValues((prev: any) => ({
-                        ...prev,
-                        ticker: value ? value.ticker : "",
-                      }))
+                      setFormValues((prev: any) => {
+                        const updatedFormValues = {
+                          ...prev,
+                          ticker: value ? value.ticker : "",
+                        };
+
+                        if (value?.ticker) {
+                          setFormErrors((prevErrors) => {
+                            if (!prevErrors.ticker) {
+                              return prevErrors;
+                            }
+                            const nextErrors = { ...prevErrors };
+                            delete nextErrors.ticker;
+                            return nextErrors;
+                          });
+                        }
+
+                        return updatedFormValues;
+                      })
                     }
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Ticker *"
+                        label="Ticker "
                         variant="standard"
                         fullWidth
                         InputLabelProps={{
@@ -232,6 +289,8 @@ const ABBModelMain = () => {
                           sx: inputLabelSx,
                         }}
                         required
+                        error={Boolean(formErrors.ticker)}
+                        helperText={formErrors.ticker || ""}
                       />
                     )}
                   />
@@ -241,11 +300,13 @@ const ABBModelMain = () => {
                 <Grid item {...gridItemProps}>
                   <TextField
                     type="date"
-                    label="Launch Date *"
+                    label="Launch Date"
                     value={formValues.tradeDate}
                     onChange={handleFieldChange("tradeDate")}
                     {...baseTextFieldProps}
                     required
+                    error={Boolean(formErrors.tradeDate)}
+                    helperText={formErrors.tradeDate || ""}
                   />
                 </Grid>
 
@@ -278,7 +339,9 @@ const ABBModelMain = () => {
                       value={formValues[field.key]}
                       onChange={handleFieldChange(field.key)}
                       {...baseTextFieldProps}
-                      required={field.key === "blockDealShares"}
+                      required
+                      error={Boolean(formErrors[field.key])}
+                      helperText={formErrors[field.key] || ""}
                     />
                   </Grid>
                 ))}
@@ -330,11 +393,9 @@ const ABBModelMain = () => {
 
         {/* ----------------- RESPONSE COMPONENT ----------------- */}
         {submittedPayload && (
-          <>
           <Box sx={{ mt: 3 }}>
             <ABBModelResponseData payload={submittedPayload} />
           </Box>
-</>
         )}
       </Box>
     </Container>
