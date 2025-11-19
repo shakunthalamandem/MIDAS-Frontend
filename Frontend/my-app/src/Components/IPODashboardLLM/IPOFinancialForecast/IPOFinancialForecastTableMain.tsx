@@ -151,105 +151,105 @@ const IPOFinancialForecastTableMain: React.FC<
       const data = updated[forecastsTicker.toUpperCase()];
 
       // ---------------- Growth recalculation ----------------
-      const recalcGrowthFor = (baseMetric: string) => {
-        const growthMetric = growthPairs[baseMetric];
-        if (!growthMetric) return;
-        if (!data[baseMetric] || !data[growthMetric]) return; // only recalc if both exist
+      // const recalcGrowthFor = (baseMetric: string) => {
+      //   const growthMetric = growthPairs[baseMetric];
+      //   if (!growthMetric) return;
+      //   if (!data[baseMetric] || !data[growthMetric]) return; // only recalc if both exist
 
-        const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
-        const currVal = safeNumber(data[baseMetric]?.["current_year"]);
-        const nextVal = safeNumber(data[baseMetric]?.["one_year_later"]);
+      //   const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
+      //   const currVal = safeNumber(data[baseMetric]?.["current_year"]);
+      //   const nextVal = safeNumber(data[baseMetric]?.["one_year_later"]);
 
-        if (data[growthMetric]) {
-          data[growthMetric]["current_year"] = prevVal
-            ? computeGrowthPct(prevVal, currVal)
-            : data[growthMetric]["current_year"];
-          data[growthMetric]["one_year_later"] = currVal
-            ? computeGrowthPct(currVal, nextVal)
-            : data[growthMetric]["one_year_later"];
-        }
-      };
+      //   if (data[growthMetric]) {
+      //     data[growthMetric]["current_year"] = prevVal
+      //       ? computeGrowthPct(prevVal, currVal)
+      //       : data[growthMetric]["current_year"];
+      //     data[growthMetric]["one_year_later"] = currVal
+      //       ? computeGrowthPct(currVal, nextVal)
+      //       : data[growthMetric]["one_year_later"];
+      //   }
+      // };
 
-      const recalcBaseFromGrowth = (
-        baseMetric: string,
-        growthMetric: string
-      ) => {
-        if (!data[baseMetric] || !data[growthMetric]) return; // only if both exist
+      // const recalcBaseFromGrowth = (
+      //   baseMetric: string,
+      //   growthMetric: string
+      // ) => {
+      //   if (!data[baseMetric] || !data[growthMetric]) return; // only if both exist
 
-        const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
-        const currBase = safeNumber(data[baseMetric]?.["current_year"]);
-        const growthCurr = data[growthMetric]?.["current_year"];
-        const growthNext = data[growthMetric]?.["one_year_later"];
+      //   const prevVal = safeNumber(data[baseMetric]?.["one_year_before"]);
+      //   const currBase = safeNumber(data[baseMetric]?.["current_year"]);
+      //   const growthCurr = data[growthMetric]?.["current_year"];
+      //   const growthNext = data[growthMetric]?.["one_year_later"];
 
-        if (yearKey === "current_year" && prevVal && growthCurr != null) {
-          data[baseMetric]["current_year"] = computeValueFromGrowth(
-            prevVal,
-            Number(growthCurr)
-          );
-        }
-        if (yearKey === "one_year_later" && currBase && growthNext != null) {
-          data[baseMetric]["one_year_later"] = computeValueFromGrowth(
-            currBase,
-            Number(growthNext)
-          );
-        }
-      };
+      //   if (yearKey === "current_year" && prevVal && growthCurr != null) {
+      //     data[baseMetric]["current_year"] = computeValueFromGrowth(
+      //       prevVal,
+      //       Number(growthCurr)
+      //     );
+      //   }
+      //   if (yearKey === "one_year_later" && currBase && growthNext != null) {
+      //     data[baseMetric]["one_year_later"] = computeValueFromGrowth(
+      //       currBase,
+      //       Number(growthNext)
+      //     );
+      //   }
+      // };
 
-      // ---------------- Margin recalculation ----------------
-      const recalcMarginFor = (baseMetric: string, key: string) => {
-        const marginMetric = marginPairs[baseMetric];
-        if (!marginMetric) return;
-        if (!data["Sales"] || !data[baseMetric] || !data[marginMetric]) return; // only if all exist
+      // // ---------------- Margin recalculation ----------------
+      // const recalcMarginFor = (baseMetric: string, key: string) => {
+      //   const marginMetric = marginPairs[baseMetric];
+      //   if (!marginMetric) return;
+      //   if (!data["Sales"] || !data[baseMetric] || !data[marginMetric]) return; // only if all exist
 
-        const s = safeNumber(data["Sales"]?.[key]);
-        const b = safeNumber(data[baseMetric]?.[key]);
-        data[marginMetric][key] = s ? (b / s) * 100 : data[marginMetric][key];
-      };
+      //   const s = safeNumber(data["Sales"]?.[key]);
+      //   const b = safeNumber(data[baseMetric]?.[key]);
+      //   data[marginMetric][key] = s ? (b / s) * 100 : data[marginMetric][key];
+      // };
 
-      const applyMarginEdit = (marginMetric: string, key: string) => {
-        const baseMetric = Object.keys(marginPairs).find(
-          (b) => marginPairs[b] === marginMetric
-        );
-        if (!baseMetric) return;
-        if (!data["Sales"] || !data[baseMetric] || !data[marginMetric]) return;
+      // const applyMarginEdit = (marginMetric: string, key: string) => {
+      //   const baseMetric = Object.keys(marginPairs).find(
+      //     (b) => marginPairs[b] === marginMetric
+      //   );
+      //   if (!baseMetric) return;
+      //   if (!data["Sales"] || !data[baseMetric] || !data[marginMetric]) return;
 
-        const s = safeNumber(data["Sales"]?.[key]);
-        const m = Number(data[marginMetric]?.[key]);
-        if (s && !isNaN(m)) {
-          data[baseMetric][key] = (s * m) / 100;
-          if (growthPairs[baseMetric]) recalcGrowthFor(baseMetric);
-        }
-      };
+      //   const s = safeNumber(data["Sales"]?.[key]);
+      //   const m = Number(data[marginMetric]?.[key]);
+      //   if (s && !isNaN(m)) {
+      //     data[baseMetric][key] = (s * m) / 100;
+      //     if (growthPairs[baseMetric]) recalcGrowthFor(baseMetric);
+      //   }
+      // };
 
       // ---------------- Apply rules ----------------
-      if (metricName in growthPairs) {
-        recalcGrowthFor(metricName);
-      } else {
-        const baseForThisGrowth = Object.keys(growthPairs).find(
-          (b) => growthPairs[b] === metricName
-        );
-        if (baseForThisGrowth)
-          recalcBaseFromGrowth(baseForThisGrowth, metricName);
-      }
+      // if (metricName in growthPairs) {
+      //   recalcGrowthFor(metricName);
+      // } else {
+      //   const baseForThisGrowth = Object.keys(growthPairs).find(
+      //     (b) => growthPairs[b] === metricName
+      //   );
+      //   if (baseForThisGrowth)
+      //     recalcBaseFromGrowth(baseForThisGrowth, metricName);
+      // }
 
-      if (metricName in marginPairs) {
-        recalcMarginFor(metricName, yearKey);
-      } else {
-        const baseForThisMargin = Object.keys(marginPairs).find(
-          (b) => marginPairs[b] === metricName
-        );
-        if (baseForThisMargin) applyMarginEdit(metricName, yearKey);
-      }
+      // if (metricName in marginPairs) {
+      //   recalcMarginFor(metricName, yearKey);
+      // } else {
+      //   const baseForThisMargin = Object.keys(marginPairs).find(
+      //     (b) => marginPairs[b] === metricName
+      //   );
+      //   if (baseForThisMargin) applyMarginEdit(metricName, yearKey);
+      // }
 
-      if (metricName === "Sales") {
-        for (const [base, margin] of Object.entries(marginPairs)) {
-          if (data[base] && data[margin]) {
-            const s = safeNumber(data["Sales"]?.[yearKey]);
-            const b = safeNumber(data[base]?.[yearKey]);
-            data[margin][yearKey] = s ? (b / s) * 100 : data[margin][yearKey];
-          }
-        }
-      }
+      // if (metricName === "Sales") {
+      //   for (const [base, margin] of Object.entries(marginPairs)) {
+      //     if (data[base] && data[margin]) {
+      //       const s = safeNumber(data["Sales"]?.[yearKey]);
+      //       const b = safeNumber(data[base]?.[yearKey]);
+      //       data[margin][yearKey] = s ? (b / s) * 100 : data[margin][yearKey];
+      //     }
+      //   }
+      // }
 
       updated[forecastsTicker.toUpperCase()] = data;
       return updated;

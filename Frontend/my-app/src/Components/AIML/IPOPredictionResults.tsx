@@ -11,6 +11,9 @@ import {
   Divider,
   LinearProgress,
   Container,
+  Button,
+  TextField,
+  CircularProgress,
 } from "@mui/material";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
@@ -19,7 +22,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import IPOModelMethodologyAccordion from "./IPOModelMethodologyAccordion";
-// import MethodologyAccordion1Day from "./MethodologyAccordion1Day";
 
 interface PredictionModel {
   prediction: string | null;
@@ -49,38 +51,33 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
 
   const handleRepredict = async () => {
     if (typeof price === "number" && onRepredict) {
-      onRepredict(price);
       setIsLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await onRepredict(price);
       } finally {
         setIsLoading(false);
       }
     }
   };
 
-  // versions are like ["t1d", "t1d_open"]
+  // versions like ["t1d", "t1d_open"]
   const modelVersions = Array.from(
     new Set(
       Object.keys(result).map((key) => {
         const parts = key.split("_");
-        // handle "t1d_main_model" => version = "t1d"
-        // handle "t1d_open_main_model" => version = "t1d_open"
         return parts[1] === "open" ? `${parts[0]}_${parts[1]}` : parts[0];
       })
     )
   );
 
-  const modelTypes = [
-    "main",
-    // , "positive", "negative"
-  ];
+  const issueVersions = modelVersions.filter((v) => !v.includes("open")); // "t1d"
+  const openVersions = modelVersions.filter((v) => v.includes("open")); // "t1d_open"
+
+  // We only show the "main" row for this component (as in your code)
+  const modelTypes = ["main"];
 
   const getModelKey = (version: string, type: string): string => {
-    // direct construction of key ensures correct mapping
-    return version.includes("open")
-      ? `${version}_${type}_model` // e.g. "t1d_open_main_model"
-      : `${version}_${type}_model`; // e.g. "t1d_main_model"
+    return `${version}_${type}_model`; // works for both "t1d_main_model" & "t1d_open_main_model"
   };
 
   const getOutcomeCategory = (
@@ -182,18 +179,6 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
 
     return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        {/* <LinearProgress
-          variant="determinate"
-          value={accuracy}
-          sx={{
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: "rgba(0,0,0,0.05)",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: color,
-            },
-          }}
-        /> */}
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
           <Typography
             variant="caption"
@@ -255,28 +240,45 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
 
   const rowLabels: Record<string, string> = {
     main: "Overall Return Category",
-    // positive: "High Positive Return Probability",
-    // negative: "High Negative Return Risk",
   };
 
-  return (
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
+  /** Single-version table renderer (used twice) */
+  const renderSingleVersionTable = (
+    version: string,
+    headerTitle: string,
+    showRepredict: boolean,
+    tableNumber: number
+
+  ) => {
+    const headerBg = version.includes("open") ? "#ede7f6" : "#e3f2fd";
+    const columnLabel = version.includes("open")
+      ? "1st Day Close from Open price"
+      : "1st Day Close from Issue Price";
+
+    return (
       <Paper
-        sx={{
-          p: 3,
-          mt: 4,
-          bgcolor: "#f9fafb",
-          borderRadius: 3,
-          boxShadow: 3,
-        }}
+        sx={{ p: 3, mt: 4, bgcolor: "#f9fafb", borderRadius: 3, boxShadow: 3 }}
       >
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={2}
-        >
+        {/* HEADER WITH TABLE NUMBER */}
+        <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
+            {/* Numbered Circle */}
+            <Box
+              sx={{
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                bgcolor: "#002060",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 600,
+                mr: 2,
+              }}
+            >
+              {tableNumber}
+            </Box>
             <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
             <Typography
               variant="h6"
@@ -284,14 +286,14 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
               color="primary.main"
               fontWeight="bold"
             >
-              T+1D Close - Model Predictions
+              {headerTitle}
             </Typography>
           </Box>
 
-          {/* {onRepredict && (
+          {showRepredict && onRepredict && (
             <Box display="flex" alignItems="center">
               <TextField
-                label="T+1D Open Return (%)"
+                label="1st Day Open Return (%)"
                 variant="outlined"
                 value={price}
                 onChange={handlePriceChange}
@@ -299,8 +301,6 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
                 sx={{
                   mr: 2,
                   width: "194px",
-                  position: "relative",
-                  top: "18px",
                   backgroundColor: "#ede7f6",
                   borderRadius: "4px",
                 }}
@@ -309,10 +309,8 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
               <Button
                 variant="outlined"
                 onClick={handleRepredict}
-                disabled={isLoading}
+                disabled={isLoading || price === ""}
                 sx={{
-                  position: "relative",
-                  top: "18px",
                   backgroundColor: "#ede7f6",
                   color: "#002060",
                   border: "1px solid #B99976",
@@ -326,105 +324,84 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
                 )}
               </Button>
             </Box>
-          )} */}
+          )}
         </Box>
 
         <Divider sx={{ my: 3 }} />
-        <IPOModelMethodologyAccordion />
-        <Divider sx={{ my: 3 }} />
-
-        {/* <Box mb={2}>
-          <MethodologyAccordion1Day />
-        </Box> */}
 
         <TableContainer>
           <Table>
             <TableBody>
+              {/* Header row */}
               <TableRow sx={{ bgcolor: "#f0f4f8" }}>
                 <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
-                {modelVersions.map((version, idx) => {
-                  const label = version.includes("open")
-                    ? "T+1D Close from T+1D Open"
-                    : "T+1D Close from Issue Price";
-                  const cellBgColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
-
-                  return (
-                    <React.Fragment key={version}>
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          bgcolor: cellBgColor,
-                        }}
-                      >
-                        {label}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          bgcolor: cellBgColor,
-                        }}
-                      >
-                        Confidence
-                      </TableCell>
-                    </React.Fragment>
-                  );
-                })}
+                <TableCell sx={{ fontWeight: 600, bgcolor: headerBg }}>
+                  {columnLabel}
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, bgcolor: headerBg }}>
+                  Confidence
+                </TableCell>
               </TableRow>
 
-              {modelTypes.map((type) => (
-                <TableRow key={type}>
-                  <TableCell>{rowLabels[type]}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2" whiteSpace="pre-line">
-                      {result[getModelKey(modelVersions[0], type)]
-                        ?.explanation || ""}
-                    </Typography>
-                  </TableCell>
+              {modelTypes.map((type) => {
+                const key = getModelKey(version, type);
+                const modelData = result[key];
 
-                  {modelVersions.map((version, idx) => {
-                    const key = getModelKey(version, type);
-                    const modelData = result[key];
-                    const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
+                return (
+                  <TableRow key={`${version}-${type}`}>
+                    <TableCell>{rowLabels[type]}</TableCell>
+                    <TableCell>
+                      <Typography variant="body2" whiteSpace="pre-line">
+                        {modelData?.explanation || ""}
+                      </Typography>
+                    </TableCell>
 
-                    if (!modelData) {
-                      return (
-                        <React.Fragment key={version}>
-                          <TableCell sx={{ bgcolor: cellColor }}>
-                            <Box color="text.disabled">N/A</Box>
-                          </TableCell>
-                          <TableCell sx={{ bgcolor: cellColor }}>
-                            <Box color="text.disabled">N/A</Box>
-                          </TableCell>
-                        </React.Fragment>
-                      );
-                    }
+                    {/* Prediction */}
+                    <TableCell sx={{ bgcolor: headerBg }}>
+                      {type === "main"
+                        ? renderOutcome(modelData?.prediction)
+                        : renderBinaryResult(modelData?.prediction)}
+                    </TableCell>
 
-                    const renderResult =
-                      type === "main"
-                        ? renderOutcome(modelData.prediction)
-                        : renderBinaryResult(modelData.prediction);
-
-                    return (
-                      <React.Fragment key={version}>
-                        <TableCell sx={{ bgcolor: cellColor }}>
-                          {renderResult}
-                        </TableCell>
-                        <TableCell sx={{ bgcolor: cellColor }}>
-                          <Box display="flex" flexDirection="column" gap={1}>
-                            {/* {renderAccuracyLevel(modelData.accuracy)} */}
-                            {renderConfidenceLevel(modelData.confidence)}
-                          </Box>
-                        </TableCell>
-                      </React.Fragment>
-                    );
-                  })}
-                </TableRow>
-              ))}
+                    {/* Confidence */}
+                    <TableCell sx={{ bgcolor: headerBg }}>
+                      <Box display="flex" flexDirection="column" gap={1}>
+                        {/* {renderAccuracyLevel(modelData?.accuracy)}  // keep if you want to show accuracy */}
+                        {renderConfidenceLevel(modelData?.confidence)}
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
+    );
+  };
+
+  return (
+    <Container maxWidth="xl" sx={{ mt: 4 }}>
+      <IPOModelMethodologyAccordion />
+
+      {/* Table 1: Issue Price (no Repredict) */}
+      {issueVersions.length > 0 &&
+        renderSingleVersionTable(
+          issueVersions[0],
+          "1st Day Close from Issue Price - Model Predictions ",
+          false,
+          1
+        )}
+
+      {/* Table 2: From T+1D Open (Repredict shown) */}
+      {openVersions.length > 0 &&
+        renderSingleVersionTable(
+          openVersions[0],
+          "1st Day Close from Open- Model Predictions",
+          true,
+          2
+        )}
     </Container>
   );
 };
