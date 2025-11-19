@@ -14,7 +14,7 @@ import { blue } from "@mui/material/colors";
 
 const marketDataFields = [
   { key: "launch_date", label: "Launch Date" },
-  { key: "trade_date", label: "Trade Date" },
+  // { key: "trade_date", label: "Trade Date" },
   { key: "market_cap", label: "Market Cap ($M)" },
   { key: "_52week_high", label: "52 Week High (Lcl)" },
   { key: "percent_from_52week_high", label: "% Below 52 Week High" },
