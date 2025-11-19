@@ -47,7 +47,7 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
   const [price, setPrice] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // NEW: hydrate input whenever prop changes (allow 0; clear when null/undefined)
+  // hydrate input whenever prop changes (allow 0; clear when null/undefined)
   useEffect(() => {
     if (initialT1dOpenReturn === null || initialT1dOpenReturn === undefined) {
       setPrice("");
@@ -72,25 +72,23 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
     }
   };
 
-  /** 🔹 Identify model groups: baseline vs open */
+  /** Identify model groups: baseline vs open */
   const modelVersions = Array.from(
-    new Set(
-      Object.keys(result).map((key) =>
-        key.includes("open") ? "t1d_open" : "t1d"
-      )
-    )
+    new Set(Object.keys(result).map((key) => (key.includes("open") ? "t1d_open" : "t1d")))
   );
+  const issueVersions = modelVersions.filter((v) => !v.includes("open")); // "T+1D Close from Issue Price"
+  const openVersions = modelVersions.filter((v) => v.includes("open")); // "T+1D Close from T+1D Open"
 
   const modelTypes = ["main", "positive", "negative"];
 
-  /** 🔹 Helper to pick the right key for a version + type */
+  /** Helper to pick the right key for a version + type */
   const getModelKey = (version: string, type: string) => {
     const regex = new RegExp(`^${version}.*${type}_model$`);
     const keys = Object.keys(result).filter((key) => regex.test(key));
     return keys[0] || "";
   };
 
-  /** 🔹 Normalize prediction outcome */
+  /** Normalize prediction outcome */
   const getOutcomeCategory = (
     prediction: string | null | undefined
   ): "Negative" | "Neutral" | "Positive" => {
@@ -102,23 +100,6 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
     return "Neutral";
   };
 
-  /** 🔹 Decide overall prediction (prefer open if price entered) */
-  const getOverallPrediction = (): "Negative" | "Neutral" | "Positive" => {
-    const mainModel = result["t1d_main_model"];
-    const openMainModel = result["t1d_open_main_model"];
-
-    if (openMainModel && typeof price === "number") {
-      return getOutcomeCategory(openMainModel.prediction);
-    }
-    if (mainModel) {
-      return getOutcomeCategory(mainModel.prediction);
-    }
-    return "Neutral";
-  };
-
-  const overallPrediction = getOverallPrediction();
-
-  /** 🔹 UI renderers */
   const renderOutcome = (prediction: string | null | undefined) => {
     const outcomeCategory = getOutcomeCategory(prediction);
     switch (outcomeCategory) {
@@ -183,16 +164,14 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
             "& .MuiLinearProgress-bar": { backgroundColor: color },
           }}
         />
-        <Typography
-          variant="caption"
-          sx={{ fontStyle: "italic", mt: 0.5 }}
-        >
+        <Typography variant="caption" sx={{ fontStyle: "italic", mt: 0.5 }}>
           Confidence: {confidence.toFixed(1)}%
         </Typography>
       </Box>
     );
   };
 
+  /** Build visible row labels once, same as before */
   const rowLabels: Record<string, { issue?: string; open?: string }> = (() => {
     const labels: Record<string, { issue?: string; open?: string }> = {
       main: {},
@@ -227,41 +206,60 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
     return labels;
   })();
 
-  return (
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
+  /** Helper to render a table for a specific version set */
+  const renderTableForVersions = (
+    versions: string[],
+    headerTitle: string,
+    showRepredictControls: boolean,
+    tableNumber: number
+  ) => {
+    if (versions.length === 0) return null;
+
+    const headerBg = versions[0].includes("open") ? "#ede7f6" : "#e3f2fd";
+
+    return (
       <Paper
-        sx={{
-          p: 3,
-          mt: 4,
-          bgcolor: "#f9fafb",
-          borderRadius: 3,
-          boxShadow: 3,
-        }}
+        sx={{ p: 3, mt: 4, bgcolor: "#f9fafb", borderRadius: 3, boxShadow: 3 }}
       >
-        {/* ---- Header ---- */}
+        {/* HEADER WITH TABLE NUMBER */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
+            {/* Numbered Circle */}
+            <Box
+              sx={{
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                bgcolor: "#002060",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 600,
+                mr: 2,
+              }}
+            >
+              {tableNumber}
+            </Box>
+
             <BarChartIcon sx={{ color: "primary.main", mr: 1 }} />
             <Typography variant="h6" fontWeight="bold" color="primary.main">
-              T+1D Close - Model Predictions
+              {headerTitle}
             </Typography>
           </Box>
-          {onRepredict && (
+
+          {showRepredictControls && onRepredict && (
             <Box display="flex" alignItems="center">
               <TextField
-                label="T+1D Open Return (%)"
+                label="1st Day Open Return (%)"
                 variant="outlined"
                 size="small"
                 value={price}
                 onChange={handlePriceChange}
-                sx={{
-                  mr: 2,
-                  width: 194,
-                  backgroundColor: "#ede7f6",
-                  borderRadius: 1,
-                }}
+                sx={{ mr: 2, width: 220, backgroundColor: "#ede7f6", borderRadius: 1 }}
                 type="number"
               />
+
               <Button
                 variant="outlined"
                 onClick={handleRepredict}
@@ -284,8 +282,6 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
         </Box>
 
         <Divider sx={{ my: 3 }} />
-        <FOModelMethodologyAccordion />
-        <Divider sx={{ my: 3 }} />
 
         {/* ---- Table ---- */}
         <TableContainer>
@@ -295,70 +291,56 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
               <TableRow sx={{ bgcolor: "#f0f4f8" }}>
                 <TableCell sx={{ fontWeight: 600 }}>Model</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Explanation</TableCell>
-                {modelVersions.map((version, idx) => {
-                  const label = version.includes("open")
-                    ? "T+1D Close from T+1D Open"
-                    : "T+1D Close from Issue Price";
-                  const cellBgColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
-                  return (
-                    <React.Fragment key={version}>
-                      <TableCell sx={{ fontWeight: 600, bgcolor: cellBgColor }}>
-                        {label}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 600, bgcolor: cellBgColor }}>
-                        Confidence
-                      </TableCell>
-                    </React.Fragment>
-                  );
-                })}
+                <TableCell sx={{ fontWeight: 600, bgcolor: headerBg }}>
+                  {versions[0].includes("open")
+                    ? "1st Day Close from Open Price"
+                    : "1st Day Close from Issue Price"}
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, bgcolor: headerBg }}>
+                  Confidence
+                </TableCell>
               </TableRow>
 
               {/* Dynamic Rows */}
               {Object.entries(rowLabels)
-                .filter(([_, label]) => Boolean(label.issue || label.open))
-                .filter(([type]) =>
-                  modelVersions.some((version) => {
-                    const key = getModelKey(version, type);
-                    return Boolean(result[key]);
-                  })
+                .filter(([_, label]) =>
+                  versions[0].includes("open") ? Boolean(label.open) : Boolean(label.issue)
                 )
+                .filter(([type]) => {
+                  const key = getModelKey(versions[0], type);
+                  return Boolean(result[key]);
+                })
                 .map(([type, label]) => {
-                  const labelText = label.issue || label.open || "";
+                  const labelText = versions[0].includes("open")
+                    ? label.open || ""
+                    : label.issue || "";
+
                   const explanation =
-                    result[getModelKey(modelVersions[0], type)]?.explanation || "";
+                    result[getModelKey(versions[0].includes("open") ? "t1d" : "t1d", type)]
+                      ?.explanation ||
+                    result[getModelKey(versions[0], type)]?.explanation ||
+                    "";
+
+                  const modelKey = getModelKey(versions[0], type);
+                  const modelData = result[modelKey];
+
+                  const rendered =
+                    type === "main"
+                      ? renderOutcome(modelData?.prediction)
+                      : renderBinaryResult(modelData?.prediction);
 
                   return (
-                    <TableRow key={type}>
+                    <TableRow key={`${versions[0]}-${type}`}>
                       <TableCell>{labelText}</TableCell>
                       <TableCell>
                         <Typography variant="body2" whiteSpace="pre-line">
                           {explanation}
                         </Typography>
                       </TableCell>
-
-                      {modelVersions.map((version, idx) => {
-                        const key = getModelKey(version, type);
-                        const modelData = result[key];
-                        const cellColor = idx === 0 ? "#e3f2fd" : "#ede7f6";
-
-                        if (!modelData) {
-                          return <React.Fragment key={version} />;
-                        }
-
-                        const rendered =
-                          type === "main"
-                            ? renderOutcome(modelData.prediction)
-                            : renderBinaryResult(modelData.prediction);
-
-                        return (
-                          <React.Fragment key={version}>
-                            <TableCell sx={{ bgcolor: cellColor }}>{rendered}</TableCell>
-                            <TableCell sx={{ bgcolor: cellColor }}>
-                              {renderConfidenceLevel(modelData.confidence)}
-                            </TableCell>
-                          </React.Fragment>
-                        );
-                      })}
+                      <TableCell sx={{ bgcolor: headerBg }}>{rendered}</TableCell>
+                      <TableCell sx={{ bgcolor: headerBg }}>
+                        {renderConfidenceLevel(modelData?.confidence)}
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -366,6 +348,28 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
           </Table>
         </TableContainer>
       </Paper>
+    );
+  };
+
+  return (
+    <Container maxWidth="xl" sx={{ mt: 4 }}>
+      <FOModelMethodologyAccordion />
+
+      {/* Table 1: Issue Price */}
+      {renderTableForVersions(
+        issueVersions,
+        "1st Day Close from Issue Price - Model Predictions",
+        false,
+        1
+      )}
+
+      {/* Table 2: From T+1D Open (with Repredict) */}
+      {renderTableForVersions(
+        openVersions,
+        "1st Day Close from Open Price - Model Predictions",
+        true,
+        2
+      )}
     </Container>
   );
 };

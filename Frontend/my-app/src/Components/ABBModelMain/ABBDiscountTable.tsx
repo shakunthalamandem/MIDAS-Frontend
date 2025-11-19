@@ -2,6 +2,25 @@
 import { Box, Paper, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 import { blue } from "@mui/material/colors";
 
+const parseNumericValue = (value: any) => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const numeric = Number(value.replace(/[^0-9.-]/g, "").trim());
+    return Number.isNaN(numeric) ? null : numeric;
+  }
+  return null;
+};
+
+const formatTwoDecimals = (value: any, fallback?: string) => {
+  const numeric = parseNumericValue(value);
+  if (numeric === null) {
+    return fallback ?? "-";
+  }
+return `${numeric.toFixed(2)} %`;
+};
+
 const ABBDiscountTable = ({
   liquidityRow,
   totalRow,
@@ -35,20 +54,19 @@ const ABBDiscountTable = ({
 
       {/* HIGHLIGHT CARDS */}
       <Box sx={{ p: 3, display: "flex", gap: 3 }}>
-        {liquidityRow && (
-          <Paper sx={{ flex: 1, p: 2.5, borderRadius: 2, background: "#f0f6ff" }}>
-            <Typography sx={{ fontWeight: 600 }}>Liquidity Model Discount</Typography>
-            <Typography sx={{ fontSize: 22, fontWeight: 700, color: getValueColor(liquidityRow.rawValue) }}>
-              {liquidityRow.displayValue}
-            </Typography>
-          </Paper>
-        )}
-
         {totalRow && (
           <Paper sx={{ flex: 1, p: 2.5, borderRadius: 2, background: "#e8fff1" }}>
             <Typography sx={{ fontWeight: 600 }}>Final Discount</Typography>
             <Typography sx={{ fontSize: 22, fontWeight: 700, color: getValueColor(totalRow.rawValue) }}>
-              {totalRow.displayValue}
+              {formatTwoDecimals(totalRow.rawValue, totalRow.displayValue)}
+            </Typography>
+          </Paper>
+        )}
+         {liquidityRow && (
+          <Paper sx={{ flex: 1, p: 2.5, borderRadius: 2, background: "#f0f6ff" }}>
+            <Typography sx={{ fontWeight: 600 }}>Liquidity Model Discount</Typography>
+            <Typography sx={{ fontSize: 22, fontWeight: 700, color: getValueColor(liquidityRow.rawValue) }}>
+              {formatTwoDecimals(liquidityRow.rawValue, liquidityRow.displayValue)}
             </Typography>
           </Paper>
         )}
@@ -72,7 +90,7 @@ const ABBDiscountTable = ({
                 <TableRow key={row.keyPath}>
                   <TableCell sx={{ fontWeight: 600 }}>{row.label}</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 700, color: getValueColor(row.rawValue) }}>
-                    {row.displayValue}
+                    {formatTwoDecimals(row.rawValue, row.displayValue)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -88,7 +106,7 @@ const ABBDiscountTable = ({
                 <TableRow key={row.keyPath}>
                   <TableCell sx={{ fontWeight: 600 }}>{row.label}</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 700, color: getValueColor(row.rawValue) }}>
-                    {row.displayValue}
+                    {formatTwoDecimals(row.rawValue, row.displayValue)}
                   </TableCell>
                 </TableRow>
               ))}

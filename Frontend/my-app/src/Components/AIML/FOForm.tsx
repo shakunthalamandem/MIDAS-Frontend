@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from "react";
 import {
   Paper,
-  Grid,
   Typography,
-  TextField,
-  MenuItem,
   Button,
-  InputAdornment,
   Snackbar,
   Alert,
   CircularProgress,
   Box,
-  IconButton,
-  Tooltip,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import FOWeeklyMonthlyPredictionResults from "./FOWeeklyMonthlyPredictionResults";
 import FOPredictionResults from "./FOPredictionResults";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import FOFormFieldsSection from "./FOFormFieldsSection";
 
 interface PredictionModel {
   prediction: string | null;
@@ -25,6 +22,15 @@ interface PredictionModel {
   model: string;
   range: string;
   explanation?: string;
+}
+
+interface FOFormProps {
+  values: FOFormValues;
+  setValues: React.Dispatch<React.SetStateAction<FOFormValues>>;
+  options: OptionsData;
+  autoPredict?: boolean;
+  onAutoPredictComplete?: () => void;
+  onPredicted?: () => void;
 }
 
 interface OptionsData {
@@ -62,15 +68,10 @@ interface FOFormValues {
   issue_to_pre_day_close_return_category: number; // %
   t1d_open_return_category: number | null; // %
   t1d_return_from_bloomberg_category: number | null; // %
-}
 
-interface FOFormProps {
-  values: FOFormValues;
-  setValues: React.Dispatch<React.SetStateAction<FOFormValues>>;
-  options: OptionsData;
-  autoPredict?: boolean;
-  onAutoPredictComplete?: () => void;
-  onPredicted?: () => void;
+  // create new record flag
+  request_from: string;
+  create_new_record: boolean;
 }
 
 const FOForm: React.FC<FOFormProps> = ({
@@ -88,24 +89,12 @@ const FOForm: React.FC<FOFormProps> = ({
     message: string;
     severity: "error" | "success";
   }>({ open: false, message: "", severity: "error" });
-  const [prediction, setPrediction] = useState<Record<
-    string,
-    PredictionModel
-  > | null>(null);
-  const [weeklyPrediction, setWeeklyPrediction] = useState<Record<
-    string,
-    PredictionModel
-  > | null>(null);
-
-  const formatSector = (sectorCode: string): string => {
-    if (!sectorCode) return "";
-    const cleaned = sectorCode.replace(/^(sp500_|nasdaq_|nyse_)/i, "");
-    return cleaned
-      .split("_")
-      .filter(Boolean)
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
-  };
+  const [prediction, setPrediction] = useState<
+    Record<string, PredictionModel> | null
+  >(null);
+  const [weeklyPrediction, setWeeklyPrediction] = useState<
+    Record<string, PredictionModel> | null
+  >(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -211,7 +200,7 @@ const FOForm: React.FC<FOFormProps> = ({
     return isValid;
   };
 
-  // ✅ FOForm: handlePredict (unchanged behavior; works with optional t1d field)
+  // ✅ FOForm: handlePredict (now includes create_new_record + request_from)
   const handlePredict = async () => {
     if (!validateForm()) {
       setSnackbar({
@@ -234,6 +223,8 @@ const FOForm: React.FC<FOFormProps> = ({
       Inflation: "Stable",
       Treasury: "Stable",
       expectations: ["T1D"],
+      request_from: "ai_ml", // always send this
+      create_new_record: values.create_new_record ?? false, // controlled by checkbox
     };
 
     try {
@@ -275,6 +266,8 @@ const FOForm: React.FC<FOFormProps> = ({
       Treasury: "Stable",
       t1d_open_return_category: openPrice,
       expectations: ["T1D"],
+      request_from: "ai_ml",
+      create_new_record: values.create_new_record ?? false,
     };
 
     try {
@@ -315,6 +308,8 @@ const FOForm: React.FC<FOFormProps> = ({
       Treasury: "Stable",
       t1d_return_from_bloomberg_category: t1dCloseReturn,
       expectations: ["T1W", "T1M"],
+      request_from: "ai_ml",
+      create_new_record: values.create_new_record ?? false,
     };
     try {
       const res = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
@@ -385,6 +380,12 @@ const FOForm: React.FC<FOFormProps> = ({
       revenue_growth_category: "",
       net_profit_margin_category: "",
       issue_to_pre_day_close_return_category: 0,
+      t1d_open_return_category: null,
+      t1d_return_from_bloomberg_category: null,
+
+      // NEW: reset create_new_record + request_from
+      create_new_record: false,
+      request_from: "ai_ml",
     }));
     setFormErrors({});
     setPrediction(null);
@@ -417,146 +418,6 @@ const FOForm: React.FC<FOFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoPredict]);
 
-  const fields: Array<{
-    label: string;
-    name: keyof FOFormValues | "target_variable";
-    type?: string;
-    placeholder?: string;
-    selectOptions?: string[];
-    adornment?: string;
-    disabled?: boolean;
-    tooltip?: React.ReactNode;
-  }> = [
-    { label: "Region", name: "region", disabled: true },
-    { label: "Target Variable", name: "target_variable", disabled: true },
-    {
-      label: "Ticker Symbol",
-      name: "ticker",
-      type: "string",
-      placeholder: "e.g., AAPL",
-    },
-    { label: "Pricing Date", name: "pricing_date", type: "date" },
-
-    {
-      label: "Deal Size ($ Million)",
-      name: "deal_size_category",
-      type: "number",
-      adornment: "$M",
-      placeholder: "e.g., 100",
-    },
-    {
-      label: "Sponsor (Y/N)",
-      name: "sponsor_yn_category",
-      selectOptions: options.sponsor,
-    },
-    {
-      label: "Discount from Announcement Price (%)",
-      name: "discount_from_announcement_price_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 2",
-    },
-    { label: "Sector", name: "sector_category", selectOptions: options.sector },
-    {
-      label: "Percentage Primary (%)",
-      name: "percentage_primary_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 100",
-    },
-    {
-      label: "Selected Bank",
-      name: "selected_bank_category",
-      selectOptions: options.selected_bank,
-    },
-    {
-      label: "Allocation as % of Deal Size",
-      name: "allocation_deal_size_percentage_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 0.5",
-    },
-    {
-      label: "Allocation as % of IOI",
-      name: "allocation_percentage_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 30",
-    },
-
-    // NEW: Fundamentals and price-feature
-    {
-      label: "Current Year Revenue ($ M)",
-      name: "revenue_category",
-      type: "number",
-      adornment: "$M",
-      placeholder: "e.g., 250",
-    },
-    {
-      label: "Revenue Growth (%) (YOY)",
-      name: "revenue_growth_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 12.5",
-    },
-    {
-      label: "Net Profit Margin",
-      name: "net_profit_margin_category",
-      selectOptions: ["Negative", "Positive"],
-    },
-    {
-      label: "Change in Price from T-1D to Issue(%)",
-      name: "issue_to_pre_day_close_return_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., -3.2",
-      tooltip: (
-        <Tooltip
-          title={
-            <Typography
-              variant="body2"
-              sx={{
-                fontSize: 13,
-                color: "#fff",
-              }}
-            >
-              • This value represents the percentage change in the stock price
-              from the previous day's close (T-1D) to the price at the time of
-              the issue. <br />
-              • The formula used is: <br />
-              ((T-1D Close Price / Issue Price) - 1) * 100.
-              <br />
-            </Typography>
-          }
-          arrow
-          placement="top"
-          slotProps={{
-            popper: {
-              sx: {
-                "& .MuiTooltip-tooltip": {
-                  backgroundColor: "#002060",
-                  borderRadius: 2,
-                  padding: "10px 14px",
-                  maxWidth: 320,
-                },
-              },
-            },
-          }}
-        >
-          <IconButton size="small" sx={{ verticalAlign: "middle" }}>
-            <InfoOutlinedIcon />
-          </IconButton>
-        </Tooltip>
-      ),
-    },
-
-    {
-      label: "Deal Status",
-      name: "deal_status",
-      selectOptions: options.deal_status,
-    },
-  ];
-
   return (
     <>
       <Snackbar
@@ -583,172 +444,92 @@ const FOForm: React.FC<FOFormProps> = ({
           boxShadow: "0px 4px 16px rgba(0,0,0,0.06)",
         }}
       >
-        <Grid container spacing={2}>
-          {fields.map((field, idx) => {
-            let value: any;
-            if (field.name === "target_variable") {
-              value = "T+1 Day Return (close)";
-            } else {
-              value = values[field.name as keyof FOFormValues] ?? "";
-            }
-            const isLastSingle =
-              idx === fields.length - 1 && fields.length % 2 === 1;
+        {/* Fields grid */}
+        <FOFormFieldsSection
+          values={values}
+          formErrors={formErrors}
+          options={options}
+          onChange={handleChange}
+        />
 
-            return (
-              <Grid
-                item
-                xs={12}
-                sm={isLastSingle ? 12 : 6}
-                key={String(field.name)}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: { xs: "column", sm: "row" },
-                    alignItems: { sm: "center" },
-                    gap: 1,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      width: { xs: "100%", sm: "180px", md: "200px" },
-                      minWidth: { sm: "180px", md: "200px" },
-                      fontWeight: 500,
-                    }}
-                  >
-                    <Typography component="span" sx={{ fontWeight: 500 }}>
-                      {field.label}
-                      {field.tooltip && (
-                        <Box component="span" sx={{ ml: 0.5 }}>
-                          {field.tooltip}
-                        </Box>
-                      )}
-                    </Typography>
-                  </Box>
+        {/* Info line */}
+        <Typography
+          variant="body2"
+          sx={{
+            mt: 2,
+            textAlign: { xs: "center", sm: "right" },
+            color: "text.secondary",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: { xs: "center", sm: "flex-end" },
+            gap: 0.5,
+          }}
+        >
+          <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
+          {values.deal_status === "Issued"
+            ? "Values treated as confirmed"
+            : "Values used for temporary assumptions"}
+        </Typography>
 
-                  {field.selectOptions ? (
-                    <TextField
-                      select
-                      size="small"
-                      name={String(field.name)}
-                      value={value}
-                      onChange={handleChange}
-                      disabled={!!field.disabled}
-                      error={!!formErrors[String(field.name)]}
-                      helperText={formErrors[String(field.name)]}
-                      fullWidth
-                      SelectProps={{
-                        MenuProps: {
-                          PaperProps: {
-                            sx: { maxHeight: 300, overflowY: "auto" },
-                          },
-                        },
-                      }}
-                    >
-                      {field.selectOptions.map((opt) => (
-                        <MenuItem key={opt} value={opt}>
-                          {field.name === "sector_category"
-                            ? formatSector(opt)
-                            : opt}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  ) : (
-                    <TextField
-                      size="small"
-                      name={String(field.name)}
-                      type={field.type || "text"}
-                      value={
-                        field.type === "date" && value
-                          ? new Date(value).toISOString().split("T")[0]
-                          : value
-                      }
-                      onChange={handleChange}
-                      placeholder={field.placeholder}
-                      disabled={!!field.disabled}
-                      error={!!formErrors[String(field.name)]}
-                      helperText={formErrors[String(field.name)]}
-                      fullWidth
-                      InputProps={{
-                        startAdornment:
-                          field.adornment && field.adornment.startsWith("$") ? (
-                            <InputAdornment position="start">$</InputAdornment>
-                          ) : undefined,
-                        endAdornment:
-                          field.adornment &&
-                          (field.adornment === "%" ||
-                            field.adornment === "M" ||
-                            field.adornment.endsWith("%") ||
-                            field.adornment.endsWith("M")) ? (
-                            <InputAdornment position="end">
-                              {field.adornment.replace("$", "")}
-                            </InputAdornment>
-                          ) : undefined,
-                      }}
-                    />
-                  )}
-                </Box>
-              </Grid>
-            );
-          })}
-
-          <Grid item xs={12}>
-            <Typography
-              variant="body2"
-              sx={{
-                mt: 1,
-                textAlign: { xs: "center", sm: "right" },
-                color: "text.secondary",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: { xs: "center", sm: "flex-end" },
-                gap: 0.5,
-              }}
-            >
-              <InfoOutlinedIcon
-                fontSize="small"
-                sx={{ color: "text.secondary" }}
-              />
-              {values.deal_status === "Issued"
-                ? "Values treated as confirmed"
-                : "Values used for temporary assumptions"}
-            </Typography>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: { xs: "center", sm: "flex-end" },
-                flexWrap: "wrap",
-                gap: 2,
-                mt: 2,
-              }}
-            >
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleReset}
-                disabled={loading}
-              >
-                Reset
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handlePredict}
-                disabled={loading}
-                startIcon={
-                  loading ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : undefined
+        {/* Bottom row: checkbox (left) + buttons (right) */}
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "flex-start", sm: "center" },
+            justifyContent: { xs: "center", sm: "space-between" },
+            flexWrap: "wrap",
+            gap: 2,
+          }}
+        >
+          {/* NEW: Create new record checkbox */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={values.create_new_record}
+                onChange={(e) =>
+                  setValues((prev) => ({
+                    ...prev,
+                    create_new_record: e.target.checked,
+                  }))
                 }
-              >
-                {loading ? "Predicting..." : "Predict"}
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
+                color="primary"
+              />
+            }
+            label="Create new record"
+          />
+
+          {/* Buttons */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: { xs: "center", sm: "flex-end" },
+              flexWrap: "wrap",
+              gap: 2,
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleReset}
+              disabled={loading}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handlePredict}
+              disabled={loading}
+              startIcon={
+                loading ? <CircularProgress size={20} color="inherit" /> : undefined
+              }
+            >
+              {loading ? "Predicting..." : "Predict"}
+            </Button>
+          </Box>
+        </Box>
       </Paper>
 
       {prediction && (
