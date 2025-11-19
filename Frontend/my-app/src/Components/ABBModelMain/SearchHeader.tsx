@@ -39,7 +39,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
             
             {/* Ticker (red) + Date (green) */}
             <span style={{ fontWeight: 600, fontSize: "14px" }}>
-              <span style={{ color: "#FF0000" }}>{option.ticker}</span>
+              <span style={{ color: "#002060" }}>{option.ticker}</span>
               (
               <span style={{ color: "#002060" }}>
                 {option.launch_date || "N/A"}
