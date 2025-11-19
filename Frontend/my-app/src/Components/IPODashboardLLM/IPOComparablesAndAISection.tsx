@@ -21,9 +21,14 @@ interface Props {
 
 const IPOComparablesAndAISection: React.FC<Props> = ({ selectedData }) => {
   const [showAIComparison, setShowAIComparison] = useState(false);
+  const [chartRefreshToken, setChartRefreshToken] = useState(0);
 
   const handleAIComparisonClick = () => {
     setShowAIComparison((prev) => !prev);
+  };
+
+  const handlePeersUpdated = () => {
+    setChartRefreshToken((prev) => prev + 1);
   };
 
   return (
@@ -36,6 +41,7 @@ const IPOComparablesAndAISection: React.FC<Props> = ({ selectedData }) => {
           >
             <IPODashboardMainTable
               ticker={selectedData?.ticker_name ?? ""}
+              onPeersUpdated={handlePeersUpdated}
             />
             <Typography
               variant="caption"
@@ -90,7 +96,10 @@ const IPOComparablesAndAISection: React.FC<Props> = ({ selectedData }) => {
 
       {/* Add a container for Financial Metrics Chart here  */}
             <Container maxWidth="xl" sx={{ mt: 4 }}>
-              <FinancialMetricsBarCharts ticker={selectedData?.ticker_name ?? ""} />
+              <FinancialMetricsBarCharts
+                ticker={selectedData?.ticker_name ?? ""}
+                refreshToken={chartRefreshToken}
+              />
             </Container>
     </>
   );

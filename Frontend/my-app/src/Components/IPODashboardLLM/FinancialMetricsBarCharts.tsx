@@ -29,9 +29,13 @@ interface ApiResponse {
 
 interface Props {
   ticker: string;
+  refreshToken?: number;
 }
 
-const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker }) => {
+const FinancialMetricsBarCharts: React.FC<Props> = ({
+  ticker,
+  refreshToken,
+}) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -77,7 +81,7 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker }) => {
     };
 
     fetchData();
-  }, [ticker, apiUrl, token]);
+  }, [ticker, apiUrl, token, refreshToken]);
 
   if (loading) {
     return (
