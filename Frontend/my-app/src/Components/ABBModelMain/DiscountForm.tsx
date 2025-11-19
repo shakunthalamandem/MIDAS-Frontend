@@ -50,28 +50,34 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
   <Box component="form" onSubmit={onSubmit} noValidate>
     <Grid container spacing={3}>
       <Grid item {...gridItemProps}>
-        <Autocomplete
-          options={companyOptions}
-          loading={searchLoading}
-          getOptionLabel={(opt: any) => `${opt.ticker}`}
-          onInputChange={(event, value) => onSearchInput(value)}
-          onChange={(event, value) => onCompanySelect(value)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Ticker "
-              variant="standard"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-                sx: inputLabelSx,
-              }}
-              required
-              error={Boolean(formErrors.ticker)}
-              helperText={formErrors.ticker || ""}
-            />
-          )}
-        />
+<Autocomplete
+  options={companyOptions}
+  loading={searchLoading}
+  value={formValues.ticker ? { ticker: formValues.ticker } : null}
+  inputValue={formValues.ticker}
+  getOptionLabel={(opt: any) => opt?.ticker || ""}
+  onInputChange={(event, value) => {
+    onSearchInput(value); 
+    onFieldChange("ticker")({ target: { value } } as any);
+  }}
+  onChange={(event, value) => onCompanySelect(value)}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Ticker"
+      variant="standard"
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+        sx: inputLabelSx,
+      }}
+      required
+      error={Boolean(formErrors.ticker)}
+      helperText={formErrors.ticker || ""}
+    />
+  )}
+/>
+
       </Grid>
 
       <Grid item {...gridItemProps}>
