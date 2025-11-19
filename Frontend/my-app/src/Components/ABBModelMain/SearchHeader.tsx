@@ -36,10 +36,19 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
       renderOption={(props, option: any) => (
         <li {...props} style={{ padding: "10px 12px" }}>
           <div style={{ display: "flex", flexDirection: "column" }}>
+            
+            {/* Ticker (red) + Date (green) */}
             <span style={{ fontWeight: 600, fontSize: "14px" }}>
-              {option.ticker}({option.launch_date || "N/A"})
+              <span style={{ color: "#FF0000" }}>{option.ticker}</span>
+              (
+              <span style={{ color: "#002060" }}>
+                {option.launch_date || "N/A"}
+              </span>
+              )
             </span>
-            <span style={{ fontSize: "13px", color: "#333" }}>
+
+            {/* Discount (blue #002060) */}
+            <span style={{ fontSize: "13px", color: "#008000" }}>
               Discount: {option.final_discount ?? "N/A"}%
             </span>
           </div>
