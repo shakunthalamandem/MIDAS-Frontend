@@ -18,21 +18,21 @@ const marketDataFields = [
   { key: "market_cap", label: "Market Cap ($M)" },
   { key: "_52week_high", label: "52 Week High (Lcl)" },
   { key: "percent_from_52week_high", label: "% Below 52 Week High" },
-  { key: "fcf_yield_ltm", label: "LTM FCF Yield" },
-  { key: "fcf_dividend_yield", label: "LTM Dividend Yield" },
+  { key: "fcf_yield_ltm", label: "LTM FCF Yield(%)" },
+  { key: "fcf_dividend_yield", label: "LTM Dividend Yield(%)" },
   { key: "shares_outstanding", label: "Shares Outstanding" },
   { key: "percent_free_float", label: "% of Free Float" },
 ];
 
 const technicalDataFields = [
   { key: "_3_m_adtv_local_value", label: "3-Month ADTV (M) (lcl)" },
-  { key: "_3_m_adtv_shares", label: "3-Month ADTV Shares" },
+  { key: "_3_m_adtv_shares", label: "3-Month ADTV Shares(M)" },
   { key: "beta_benchmark", label: "Beta (S&P500)" },
   { key: "_3_m_volatility", label: "3-Month Volatility" },
   { key: "rsi_14d", label: "RSI 14D" },
   { key: "rsi_30d", label: "RSI 30D" },
   { key: "macd_9d", label: "MACD 9D" },
-  { key: "_10_dma", label: "DMA 100" },
+  { key: "_10_dma", label: "DMA 10 (lcl)" },
 ];
 
 const ABBAdditionalFundamentals = ({ leftRows, rightRows, getValueColor }: any) => {

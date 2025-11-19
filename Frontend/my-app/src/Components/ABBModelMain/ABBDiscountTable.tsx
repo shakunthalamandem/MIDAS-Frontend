@@ -18,7 +18,7 @@ const formatTwoDecimals = (value: any, fallback?: string) => {
   if (numeric === null) {
     return fallback ?? "-";
   }
-  return numeric.toFixed(2);
+return `${numeric.toFixed(2)} %`;
 };
 
 const ABBDiscountTable = ({
@@ -54,20 +54,19 @@ const ABBDiscountTable = ({
 
       {/* HIGHLIGHT CARDS */}
       <Box sx={{ p: 3, display: "flex", gap: 3 }}>
-        {liquidityRow && (
-          <Paper sx={{ flex: 1, p: 2.5, borderRadius: 2, background: "#f0f6ff" }}>
-            <Typography sx={{ fontWeight: 600 }}>Liquidity Model Discount</Typography>
-            <Typography sx={{ fontSize: 22, fontWeight: 700, color: getValueColor(liquidityRow.rawValue) }}>
-              {formatTwoDecimals(liquidityRow.rawValue, liquidityRow.displayValue)}
-            </Typography>
-          </Paper>
-        )}
-
         {totalRow && (
           <Paper sx={{ flex: 1, p: 2.5, borderRadius: 2, background: "#e8fff1" }}>
             <Typography sx={{ fontWeight: 600 }}>Final Discount</Typography>
             <Typography sx={{ fontSize: 22, fontWeight: 700, color: getValueColor(totalRow.rawValue) }}>
               {formatTwoDecimals(totalRow.rawValue, totalRow.displayValue)}
+            </Typography>
+          </Paper>
+        )}
+         {liquidityRow && (
+          <Paper sx={{ flex: 1, p: 2.5, borderRadius: 2, background: "#f0f6ff" }}>
+            <Typography sx={{ fontWeight: 600 }}>Liquidity Model Discount</Typography>
+            <Typography sx={{ fontSize: 22, fontWeight: 700, color: getValueColor(liquidityRow.rawValue) }}>
+              {formatTwoDecimals(liquidityRow.rawValue, liquidityRow.displayValue)}
             </Typography>
           </Paper>
         )}
