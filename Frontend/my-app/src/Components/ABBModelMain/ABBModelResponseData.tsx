@@ -36,6 +36,7 @@ interface FlattenedRow {
 interface ABBModelResponseDataProps {
   payload: Payload | null;
   prefetchedData?: any | null;
+  onModelCreated?: () => void;
 }
 
 const formatLabel = (key: string) =>
@@ -150,6 +151,7 @@ const getValueColor = (value: any) => {
 const ABBModelResponseData = ({
   payload,
   prefetchedData = null,
+  onModelCreated,
 }: ABBModelResponseDataProps) => {
   const [data, setData] = useState<any | null>(prefetchedData ?? null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -291,7 +293,10 @@ return (
     />
 
     <Box>
-      <ABBDataInsertion AbbDataCreation={AbbDataCreation} />
+      <ABBDataInsertion
+        AbbDataCreation={AbbDataCreation}
+        onSuccess={onModelCreated}
+      />
     </Box>
     </Container>
   </>
