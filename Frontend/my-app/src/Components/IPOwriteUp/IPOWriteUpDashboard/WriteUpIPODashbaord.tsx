@@ -211,7 +211,7 @@ const WriteUpIPODashbaord: React.FC = () => {
                   borderRadius: 2,
                   "& .MuiToggleButton-root": {
                     px: 1.5,
-                    py: 0.5,
+                    py: 0.9,
                     fontSize: "0.8rem",
                     textTransform: "none",
                     borderColor: "#cbd5e1",
