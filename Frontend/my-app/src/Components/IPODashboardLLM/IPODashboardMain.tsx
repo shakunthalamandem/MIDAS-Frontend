@@ -20,10 +20,12 @@ interface TickerOption {
 }
 interface IPODashboardMainProps {
   selectedTicker?: string; // Optional: may be passed or derived from URL
+  onLoadComplete?: (status: "success" | "error") => void;
 }
 
 const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   selectedTicker,
+  onLoadComplete,
 }) => {
   // const { ticker: urlTicker } = useParams<{ ticker: string }>(); //
   const [ipoData, setIpoData] = useState<any>(null);
@@ -143,16 +145,18 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         setEditMode(editModes);
         setEditedContent(contents);
         setIpoData(formattedData);
+        onLoadComplete?.("success");
       } catch (err) {
         console.error("IPO data fetch failed", err);
         setError("Failed to fetch IPO data");
+        onLoadComplete?.("error");
       } finally {
         setLoading(false);
       }
     };
 
     if (currentTicker) fetchData();
-  }, [currentTicker]);
+  }, [currentTicker, onLoadComplete]);
 
   // Generate the Monashee PDF report
 
