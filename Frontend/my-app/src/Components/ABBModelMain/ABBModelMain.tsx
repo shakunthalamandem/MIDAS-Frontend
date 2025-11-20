@@ -1,6 +1,6 @@
 // Full updated ABBModelMain.tsx with search bar replacing the subtitle text
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Box, Card, CardContent, Typography, Container } from "@mui/material";
 import ABBModelResponseData from "./ABBModelResponseData";
 import {
@@ -159,27 +159,34 @@ const ABBModelMain = () => {
   const [emeaOptions, setEmeaOptions] = useState<any[]>([]);
   const [emeaLoading, setEmeaLoading] = useState(false);
   const [selectedEmea, setSelectedEmea] = useState<any | null>(null);
-  useEffect(() => {
-    const fetchAllEmeaData = async () => {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
 
-      try {
-        const res = await fetch(`${apiUrl}/api/get_emeaabb_model_data/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-        const data = await res.json();
-        setEmeaOptions(data);
-      } catch (err) {
-        console.error("Failed to load EMEA form data", err);
-      }
-    };
+  const fetchAllEmeaData = useCallback(async () => {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    if (!apiUrl) return;
 
-    fetchAllEmeaData();
+    const token = localStorage.getItem("access_token");
+    setEmeaLoading(true);
+
+    try {
+      const res = await fetch(`${apiUrl}/api/get_emeaabb_model_data/`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+      const data = await res.json();
+      setEmeaOptions(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load EMEA form data", err);
+      setEmeaOptions([]);
+    } finally {
+      setEmeaLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchAllEmeaData();
+  }, [fetchAllEmeaData]);
 
 
 
@@ -517,6 +524,7 @@ const ABBModelMain = () => {
             <ABBModelResponseData
               payload={submittedPayload}
               prefetchedData={prefetchedResponse}
+              onModelCreated={fetchAllEmeaData}
             />
           </Box>
         )}

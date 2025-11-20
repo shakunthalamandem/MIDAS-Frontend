@@ -58,7 +58,12 @@ interface ABBDataCreation {
   apiResponse: Record<string, any>;
 }
 
-const ABBDataInsertion = ({ AbbDataCreation }: { AbbDataCreation: ABBDataCreation | null }) => {
+interface ABBDataInsertionProps {
+  AbbDataCreation: ABBDataCreation | null;
+  onSuccess?: () => void;
+}
+
+const ABBDataInsertion = ({ AbbDataCreation, onSuccess }: ABBDataInsertionProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
@@ -118,6 +123,9 @@ const ABBDataInsertion = ({ AbbDataCreation }: { AbbDataCreation: ABBDataCreatio
       const data = await res.json();
       setResponseData(data);
       setSuccess(true);
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
