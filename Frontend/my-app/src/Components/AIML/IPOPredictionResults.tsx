@@ -81,7 +81,13 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
 
   const getOutcomeCategory = (
     prediction: string | null | undefined
-  ): "Low Return" | "Neutral Return" | "Positive Return" | "Extreme Return" | "Negative Return" | "Positive" => {
+  ):
+    | "Low Return"
+    | "Neutral Return"
+    | "Positive Return"
+    | "Extreme Return"
+    | "Negative Return"
+    | "Positive" => {
     const DEFAULT = "Neutral Return" as const;
     if (!prediction || typeof prediction !== "string") return DEFAULT;
     const lower = prediction.trim().toLowerCase();
@@ -92,71 +98,69 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
     if (lower.includes("negative return")) return "Negative Return";
     if (lower.includes("extreme")) return "Extreme Return";
 
-
     return DEFAULT;
   };
 
-const renderOutcome = (prediction: string | null | undefined) => {
-  if (!prediction) {
-    return (
-      <Box display="flex" alignItems="center" color="text.disabled">
-        N/A
-      </Box>
-    );
-  }
-
-  const outcomeCategory = getOutcomeCategory(prediction);
-
-  switch (outcomeCategory) {
-    case "Extreme Return":
-      return (
-        <Box display="flex" alignItems="center" color="warning.main">
-          <ChangeHistoryIcon sx={{ mr: 1, fontSize: 20 }} />
-          Extreme Positive or Negative Return Possible
-        </Box>
-      );
-
-    case "Low Return":
-      return (
-        <Box display="flex" alignItems="center" color="error.main">
-          <TrendingDownIcon sx={{ mr: 1 }} />
-          Low Return Deal
-        </Box>
-      );
-
-    case "Neutral Return":
-      return (
-        <Box display="flex" alignItems="center" color="text.secondary">
-          <TrendingFlatIcon sx={{ mr: 1 }} />
-          Neutral Return Deal
-        </Box>
-      );
-
-    case "Positive Return":
-      return (
-        <Box display="flex" alignItems="center" color="success.main">
-          <TrendingUpIcon sx={{ mr: 1 }} />
-          Positive Return Deal
-        </Box>
-      );
-
-    case "Negative Return":
-      return (
-        <Box display="flex" alignItems="center" color="error.main">
-          <TrendingDownIcon sx={{ mr: 1 }} />
-          Negative Return Deal
-        </Box>
-      );
-
-    default:
+  const renderOutcome = (prediction: string | null | undefined) => {
+    if (!prediction) {
       return (
         <Box display="flex" alignItems="center" color="text.disabled">
           N/A
         </Box>
       );
-  }
-};
+    }
 
+    const outcomeCategory = getOutcomeCategory(prediction);
+
+    switch (outcomeCategory) {
+      case "Extreme Return":
+        return (
+          <Box display="flex" alignItems="center" color="warning.main">
+            <ChangeHistoryIcon sx={{ mr: 1, fontSize: 22 }} />
+            Extreme Positive or Extreme Negative Return Possible
+          </Box>
+        );
+
+      case "Low Return":
+        return (
+          <Box display="flex" alignItems="center" color="error.main">
+            <TrendingDownIcon sx={{ mr: 1 }} />
+            Low Return Deal
+          </Box>
+        );
+
+      case "Neutral Return":
+        return (
+          <Box display="flex" alignItems="center" color="text.secondary">
+            <TrendingFlatIcon sx={{ mr: 1 }} />
+            Neutral Return Deal
+          </Box>
+        );
+
+      case "Positive Return":
+        return (
+          <Box display="flex" alignItems="center" color="success.main">
+            <TrendingUpIcon sx={{ mr: 1 }} />
+            Positive Return Deal
+          </Box>
+        );
+
+      case "Negative Return":
+        return (
+          <Box display="flex" alignItems="center" color="error.main">
+            <TrendingDownIcon sx={{ mr: 1 }} />
+            Negative Return Deal
+          </Box>
+        );
+
+      default:
+        return (
+          <Box display="flex" alignItems="center" color="text.disabled">
+            N/A
+          </Box>
+        );
+    }
+  };
 
   const renderBinaryResult = (value: string | null | undefined) => {
     if (!value) {
