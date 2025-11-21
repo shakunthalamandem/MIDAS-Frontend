@@ -22,6 +22,8 @@ import {
   Stack,
   TextField,
   InputAdornment,
+  MenuItem,            // ⬅️ add this
+
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SearchIcon from "@mui/icons-material/Search";
@@ -37,6 +39,7 @@ interface IpoData {
   ticker: string;
   company_name: string;
   sector: string | null;
+  region: string | null;
   pricing_date: string | null;
   pricing_range_min: number | null;
   pricing_range_max: number | null;
@@ -57,12 +60,20 @@ const WriteUpIPODashbaord: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [filterType, setFilterType] = useState<FilterType>("upcoming");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [regionFilter, setRegionFilter] = useState<string>("all"); // ⬅️ new
   const [dashboardLocked, setDashboardLocked] = useState<boolean>(
     Boolean(paramTicker)
   );
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const regionOptions = useMemo(() => {
+    const set = new Set<string>();
+    ipoData.forEach((row) => {
+      if (row.region) set.add(row.region);
+    });
+    return Array.from(set).sort();
+  }, [ipoData]);
 
   useEffect(() => {
     const fetchIpoData = async () => {
@@ -117,14 +128,23 @@ const WriteUpIPODashbaord: React.FC = () => {
 
   // Filter by ticker or company name
   const filteredData = useMemo(() => {
+    let data = ipoData;
+
+    // ✅ region filter
+    if (regionFilter !== "all") {
+      data = data.filter((row) => row.region === regionFilter);
+    }
+
+    // existing search filter
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return ipoData;
-    return ipoData.filter(
+    if (!q) return data;
+
+    return data.filter(
       (row) =>
         row.ticker.toLowerCase().includes(q) ||
         (row.company_name || "").toLowerCase().includes(q)
     );
-  }, [ipoData, searchQuery]);
+  }, [ipoData, searchQuery, regionFilter]);
 
   const headerTitle =
     filterType === "all"
@@ -224,7 +244,7 @@ const WriteUpIPODashbaord: React.FC = () => {
                   borderRadius: 2,
                   "& .MuiToggleButton-root": {
                     px: 1.5,
-                    py: 0.5,
+                    py: 0.9,
                     fontSize: "0.8rem",
                     textTransform: "none",
                     borderColor: "#cbd5e1",
@@ -239,6 +259,27 @@ const WriteUpIPODashbaord: React.FC = () => {
                 <ToggleButton value="upcoming">Upcoming</ToggleButton>
                 <ToggleButton value="all">All</ToggleButton>
               </ToggleButtonGroup>
+
+              {/* ⬇️ New Region filter (dropdown) */}
+              <TextField
+                select
+                size="small"
+                label="Region"
+                value={regionFilter}
+                onChange={(e) => setRegionFilter(e.target.value)}
+                sx={{
+                  minWidth: 150,
+                  backgroundColor: "#fff",
+                  borderRadius: 1,
+                }}
+              >
+                <MenuItem value="all">All Regions</MenuItem>
+                {regionOptions.map((region) => (
+                  <MenuItem key={region} value={region}>
+                    {region}
+                  </MenuItem>
+                ))}
+              </TextField>
 
               <TextField
                 placeholder="Search ticker or company…"
@@ -255,6 +296,7 @@ const WriteUpIPODashbaord: React.FC = () => {
                 }}
               />
             </Stack>
+
           </Stack>
 
           {loading ? (
@@ -414,7 +456,7 @@ const WriteUpIPODashbaord: React.FC = () => {
                           }}
                         >
                           {row.pricing_range_min !== null &&
-                          row.pricing_range_max !== null
+                            row.pricing_range_max !== null
                             ? `$${row.pricing_range_min} – $${row.pricing_range_max}`
                             : "TBA"}
                         </TableCell>
