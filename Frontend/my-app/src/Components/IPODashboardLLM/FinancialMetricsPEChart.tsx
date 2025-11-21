@@ -1,33 +1,40 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
   Paper,
   Typography,
   CircularProgress,
   Alert,
-  Chip,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  TextField,
-  Stack,
+  Card,
 } from "@mui/material";
 
-type TimePoint = { date: string; value: number };
+type TimePoint = { date: string; value: number | null };
 type TickerSeries = { ticker: string; data: TimePoint[] };
+type ApiResponse = { data: TickerSeries[] };
 
-type ApiResponse = {
-  data: TickerSeries[];
+type HoverItem = {
+  label: string;
+  value: number;
+  color: string;
+};
+
+type HoverState = {
+  x: number;        // inner chart x
+  y: number;        // rep y for tooltip anchor
+  date: string;
+  items: HoverItem[];
 };
 
 interface Props {
-  apiUrl: string; // base URL, e.g. https://example.com
+  apiUrl: string;
   token?: string | null;
-  fsTickers?: string[]; // default sample ["AAPL-US","FANG-US"]
-  pricingDate?: string; // "YYYY-MM-DD", default "2025-11-11" (sample)
+  fsTickers?: string[];
+  pricingDate?: string;
   height?: number;
   width?: number | "100%";
+
+  ticker?: string;
+  data?: any;
 }
 
 const PALETTE = [
@@ -40,27 +47,62 @@ const PALETTE = [
   "#e377c2",
 ];
 
-export default function FinancialMetricsPEchart({
+const getTodayIsoDate = () => {
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  return new Date(now.getTime() - offset * 60000).toISOString().split("T")[0];
+};
+
+const formatValue = (v: number) =>
+  v.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+const FinancialMetricsChartsContent: React.FC<Props> = ({
   apiUrl,
   token,
-  fsTickers = ["AAPL-US", "FANG-US"],
-  pricingDate = "2025-11-11",
+  fsTickers,
+  pricingDate,
   height = 320,
   width = "100%",
-}: Props) {
-  const [tickers, setTickers] = useState<string[]>(fsTickers);
-  const [dateInput, setDateInput] = useState<string>(pricingDate);
+}) => {
+  const [includeInPdf, setIncludeInPdf] = useState<boolean>(false);
+  const [selectedPeers, setSelectedPeers] = useState<string[]>([]); // for compatibility
+
+  const [tickers, setTickers] = useState<string[]>(
+    fsTickers && fsTickers.length ? fsTickers : ["AAPL-US", "FANG-US"]
+  );
+  const [dateInput, setDateInput] = useState<string>(
+    pricingDate || getTodayIsoDate()
+  );
   const [data, setData] = useState<TickerSeries[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [hover, setHover] = useState<{
-    x: number;
-    y: number;
-    label: string;
-    value: number;
-  } | null>(null);
+  const [hover, setHover] = useState<HoverState | null>(null);
 
-  // Fetch data effect - follows the pattern you gave (POST + JSON)
+  const lastFsTickerKey = useRef<string>("");
+  const svgRef = useRef<SVGSVGElement | null>(null);
+
+  useEffect(() => {
+    if (!fsTickers || !fsTickers.length) {
+      lastFsTickerKey.current = "";
+      return;
+    }
+    const nextKey = fsTickers.join("|");
+    if (nextKey !== lastFsTickerKey.current) {
+      lastFsTickerKey.current = nextKey;
+      setTickers(fsTickers);
+    }
+  }, [fsTickers]);
+
+  useEffect(() => {
+    if (pricingDate) {
+      setDateInput(pricingDate);
+    }
+  }, [pricingDate]);
+
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       if (!apiUrl) {
@@ -92,7 +134,6 @@ export default function FinancialMetricsPEchart({
         }
 
         const json: ApiResponse = await response.json();
-        // Normalize: ensure series sorted by date ascending
         const normalized = (json.data || []).map((s) => ({
           ticker: s.ticker,
           data: [...s.data].sort(
@@ -111,18 +152,18 @@ export default function FinancialMetricsPEchart({
     fetchData();
   }, [apiUrl, token, tickers, dateInput]);
 
-  // Derived values for chart scale
+  // Build scales – now anchored to 0 so the graph "starts" from the X-axis
   const { allDates, yMin, yMax } = useMemo(() => {
     const datesSet = new Set<string>();
-    let min = Number.POSITIVE_INFINITY;
-    let max = Number.NEGATIVE_INFINITY;
+    let dataMin = Number.POSITIVE_INFINITY;
+    let dataMax = Number.NEGATIVE_INFINITY;
 
     data.forEach((series) => {
       series.data.forEach((pt) => {
         datesSet.add(pt.date);
-        if (typeof pt.value === "number") {
-          if (pt.value < min) min = pt.value;
-          if (pt.value > max) max = pt.value;
+        if (typeof pt.value === "number" && !Number.isNaN(pt.value)) {
+          if (pt.value < dataMin) dataMin = pt.value;
+          if (pt.value > dataMax) dataMax = pt.value;
         }
       });
     });
@@ -131,52 +172,73 @@ export default function FinancialMetricsPEchart({
       (a, b) => new Date(a).getTime() - new Date(b).getTime()
     );
 
-    if (!isFinite(min)) {
+    if (!isFinite(dataMin)) {
+      // fallback if no numeric data
+      return { allDates: allDatesArr, yMin: 0, yMax: 1 };
+    }
+
+    let min: number;
+    let max: number;
+
+    if (dataMin >= 0 && dataMax >= 0) {
+      // all positive -> bottom at 0, some headroom on top
       min = 0;
-      max = 1;
-    } else if (min === max) {
-      // pad a bit if flat
+      max = dataMax * 1.1 || 1;
+    } else if (dataMin <= 0 && dataMax <= 0) {
+      // all negative -> top at 0, some room below
+      max = 0;
+      min = dataMin * 1.1;
+    } else {
+      // crosses zero: symmetric-ish padding
+      min = dataMin;
+      max = dataMax;
+      const pad = (max - min) * 0.08;
+      min -= pad;
+      max += pad;
+    }
+
+    if (min === max) {
       min = min - Math.abs(min * 0.05 || 1);
       max = max + Math.abs(max * 0.05 || 1);
-    } else {
-      const pad = (max - min) * 0.08;
-      min = min - pad;
-      max = max + pad;
     }
 
     return { allDates: allDatesArr, yMin: min, yMax: max };
   }, [data]);
 
-  // Chart geometry
-  const viewWidth = 800;
-  const viewHeight = 320;
-  const margin = { top: 20, right: 16, bottom: 36, left: 56 };
+  // Geometry
+  const viewWidth = 900;
+  const viewHeight = 340;
+  const margin = { top: 24, right: 24, bottom: 44, left: 70 };
   const innerWidth = viewWidth - margin.left - margin.right;
   const innerHeight = viewHeight - margin.top - margin.bottom;
 
-  // helpers to convert data->svg coords
   const xForIndex = (i: number) => {
-    if (allDates.length <= 1) return margin.left + innerWidth / 2;
+    if (allDates.length <= 1) return innerWidth / 2;
     const step = innerWidth / (allDates.length - 1);
-    return margin.left + i * step;
+    return i * step; // 0 is exactly on the Y-axis (left border)
   };
 
   const yForValue = (val: number) => {
-    // linear scale: y decreases as value increases
     const t = (val - yMin) / (yMax - yMin);
-    return margin.top + (1 - t) * innerHeight;
+    return (1 - t) * innerHeight;
   };
 
-  // Build polylines for each ticker
+  // Build polylines
   const polylines = useMemo(() => {
     return data.map((series, idx) => {
-      // map each series point to nearest x based on date index in allDates
       const points: { x: number; y: number; date: string; value: number }[] =
         series.data
           .map((pt) => {
+            if (typeof pt.value !== "number" || Number.isNaN(pt.value))
+              return null;
             const xIndex = allDates.indexOf(pt.date);
             if (xIndex === -1) return null;
-            return { x: xForIndex(xIndex), y: yForValue(pt.value), date: pt.date, value: pt.value };
+            return {
+              x: xForIndex(xIndex),
+              y: yForValue(pt.value),
+              date: pt.date,
+              value: pt.value,
+            };
           })
           .filter(Boolean) as {
           x: number;
@@ -189,273 +251,337 @@ export default function FinancialMetricsPEchart({
       const color = PALETTE[idx % PALETTE.length];
       return { ticker: series.ticker, points, d, color };
     });
-  }, [data, allDates]); // xForIndex and yForValue deterministic from same deps
+  }, [data, allDates, yMin, yMax]);
 
-  // Axis ticks (x: dates, y: numeric)
-  const xTicks = allDates.map((d, i) => ({ label: d, x: xForIndex(i) }));
-  const yTicks = (() => {
-    const ticks: number[] = [];
-    const approx = 5;
-    const range = yMax - yMin;
-    if (range <= 0) return [{ value: yMin, y: yForValue(yMin) }];
-    for (let i = 0; i <= approx; i++) {
-      const v = yMin + (i / approx) * range;
-      ticks.push(Number(v.toFixed(2)));
-    }
-    return ticks.map((v) => ({ value: v, y: yForValue(v) }));
-  })();
+  // Shared-tooltip hover logic (snap to nearest date)
+  const handleSvgMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    if (!svgRef.current || allDates.length === 0) return;
 
-  // handle hover: find nearest point across all polylines when mouse moves
-  const handleSvgMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-    const rect = (e.target as SVGElement).closest("svg")!.getBoundingClientRect();
-    const clientX = e.clientX - rect.left;
-    const clientY = e.clientY - rect.top;
+    const rect = svgRef.current.getBoundingClientRect();
+    const svgX = event.clientX - rect.left;
+    const svgY = event.clientY - rect.top;
+    const innerX = svgX - margin.left;
+    const innerY = svgY - margin.top;
 
-    let nearest: { dist: number; x: number; y: number; label: string; value: number } | null = null;
-    polylines.forEach((pl) =>
-      pl.points.forEach((p) => {
-        const dx = clientX - p.x;
-        const dy = clientY - p.y;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (!nearest || d < nearest.dist) {
-          nearest = {
-            dist: d,
-            x: p.x,
-            y: p.y,
-            label: `${pl.ticker} • ${p.date}`,
-            value: p.value,
-          };
-        }
-      })
-    );
-
-    if (nearest && nearest.dist < 18) {
-      setHover({
-        x: nearest.x,
-        y: nearest.y,
-        label: nearest.label,
-        value: Number(nearest.value.toFixed(4)),
-      });
-    } else {
+    if (innerX < 0 || innerX > innerWidth || innerY < 0 || innerY > innerHeight) {
       setHover(null);
+      return;
     }
+
+    const ratio = innerWidth === 0 ? 0 : innerX / innerWidth;
+    let idx = Math.round(ratio * (allDates.length - 1));
+    if (idx < 0) idx = 0;
+    if (idx > allDates.length - 1) idx = allDates.length - 1;
+
+    const date = allDates[idx];
+    const x = xForIndex(idx);
+
+    const items: HoverItem[] = [];
+    let representativeY = innerHeight / 2;
+
+    polylines.forEach((poly) => {
+      const point = poly.points.find((p) => p.date === date);
+      if (point) {
+        items.push({
+          label: poly.ticker,
+          value: point.value,
+          color: poly.color,
+        });
+        if (items.length === 1) {
+          representativeY = point.y;
+        }
+      }
+    });
+
+    if (items.length === 0) {
+      setHover(null);
+      return;
+    }
+
+    setHover({
+      x,
+      y: representativeY,
+      date,
+      items,
+    });
   };
 
-  const handleSvgMouseLeave = () => setHover(null);
+  const handleSvgMouseLeave = () => {
+    setHover(null);
+  };
+
+  // Tooltip screen position
+  let tooltipPosition: { top: number; left: number } | null = null;
+  if (hover && svgRef.current) {
+    const rect = svgRef.current.getBoundingClientRect();
+    tooltipPosition = {
+      top: rect.top + margin.top + hover.y - 40,
+      left: rect.left + margin.left + hover.x + 20,
+    };
+  }
+
+  const showTooltip = hover && hover.items.length > 0;
+
+  // Y position of 0 (for the main X-axis line), only if 0 in range
+  const zeroInRange = 0 >= yMin && 0 <= yMax;
+  const zeroY = zeroInRange ? yForValue(0) : null;
 
   return (
-    <>
-      <Paper elevation={3} sx={{ p: 2 }}>
-        <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
-          <Typography variant="h6">PE Time Series</Typography>
+    <Card className={includeInPdf ? "" : "pdf-hidden"}>
+      <Box mt={3}>
+        <Paper
+          elevation={4}
+          sx={{
+            p: 2.5,
+            position: "relative",
+          }}
+        >
+          <Typography variant="h6" align="center" gutterBottom>
+            PE Trend Chart
+          </Typography>
 
-          <Stack direction="row" spacing={1} alignItems="center">
-            <FormControl size="small">
-              <InputLabel id="ticker-select-label">Tickers</InputLabel>
-              <Select
-                labelId="ticker-select-label"
-                multiple
-                value={tickers}
-                label="Tickers"
-                onChange={(e) => {
-                  const v = e.target.value as string[];
-                  setTickers(v);
-                }}
-                sx={{ minWidth: 160 }}
-              >
-                {/* allow user to pick from initial sample + current selection */}
-                {Array.from(new Set([...fsTickers, ...tickers])).map((t) => (
-                  <MenuItem key={t} value={t}>
-                    {t}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <TextField
-              size="small"
-              label="Pricing date"
-              type="date"
-              value={dateInput}
-              onChange={(e) => setDateInput(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Stack>
-        </Stack>
-
-        <Box sx={{ mt: 2 }}>
           {loading && (
-            <Stack direction="row" spacing={1} alignItems="center">
-              <CircularProgress size={20} />
-              <Typography variant="body2">Loading series...</Typography>
-            </Stack>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height,
+              }}
+            >
+              <CircularProgress />
+            </Box>
           )}
 
-          {error && (
-            <Alert severity="error" sx={{ mt: 1 }}>
+          {!loading && error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
               {error}
             </Alert>
           )}
 
           {!loading && !error && data.length === 0 && (
-            <Alert severity="info" sx={{ mt: 1 }}>
-              No data to display for selected tickers / date.
-            </Alert>
+            <Typography variant="body2" align="center" sx={{ py: 4 }}>
+              No data available.
+            </Typography>
           )}
 
-          {/* Chart container: using Box as SVG (no <div>) */}
-          <Box
-            component="svg"
-            viewBox={`0 0 ${viewWidth} ${viewHeight}`}
-            preserveAspectRatio="xMidYMid meet"
-            role="img"
-            aria-label="PE Time Series chart"
-            sx={{ width: width, height: height, display: "block", mt: 2 }}
-            onMouseMove={handleSvgMouseMove}
-            onMouseLeave={handleSvgMouseLeave}
-          >
-            {/* background */}
-            <rect x={0} y={0} width={viewWidth} height={viewHeight} fill="transparent" />
-
-            {/* horizontal grid lines and y axis labels */}
-            {yTicks.map((t, i) => (
-              <g key={`y-${i}`}>
-                <line
-                  x1={margin.left}
-                  x2={viewWidth - margin.right}
-                  y1={t.y}
-                  y2={t.y}
-                  stroke="#e0e0e0"
-                  strokeWidth={1}
-                />
-                <text
-                  x={margin.left - 8}
-                  y={t.y + 4}
-                  fontSize={11}
-                  textAnchor="end"
-                  fill="#333"
+          {!loading && !error && data.length > 0 && (
+            <>
+              <Box sx={{ width: "100%", overflowX: "auto" }}>
+                <svg
+                  ref={svgRef}
+                  viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+                  style={{
+                    width: typeof width === "number" ? `${width}px` : width,
+                    height,
+                  }}
+                  onMouseMove={handleSvgMouseMove}
+                  onMouseLeave={handleSvgMouseLeave}
                 >
-                  {t.value.toFixed(2)}
-                </text>
-              </g>
-            ))}
+                  <g transform={`translate(${margin.left}, ${margin.top})`}>
+                    {/* Background + black border */}
+                    <rect
+                      x={0}
+                      y={0}
+                      width={innerWidth}
+                      height={innerHeight}
+                      fill="#ffffff"
+                      stroke="black"
+                      strokeWidth={1}
+                    />
 
-            {/* x axis ticks + labels */}
-            <line
-              x1={margin.left}
-              x2={viewWidth - margin.right}
-              y1={margin.top + innerHeight}
-              y2={margin.top + innerHeight}
-              stroke="#333"
-              strokeWidth={1}
-            />
-            {xTicks.map((xt, i) => (
-              <g key={`x-${i}`}>
-                <line
-                  x1={xt.x}
-                  x2={xt.x}
-                  y1={margin.top + innerHeight}
-                  y2={margin.top + innerHeight + 6}
-                  stroke="#333"
-                  strokeWidth={1}
-                />
-                <text
-                  x={xt.x}
-                  y={margin.top + innerHeight + 18}
-                  fontSize={10}
-                  textAnchor="middle"
-                  fill="#333"
-                >
-                  {xt.label}
-                </text>
-              </g>
-            ))}
+                    {/* Horizontal gridlines + Y labels */}
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const t = i / 4;
+                      const yVal = yMin + (yMax - yMin) * (1 - t);
+                      const y = innerHeight * t;
+                      return (
+                        <g key={i}>
+                          <line
+                            x1={0}
+                            y1={y}
+                            x2={innerWidth}
+                            y2={y}
+                            stroke="#e3e3e3"
+                            strokeWidth={1}
+                          />
+                          <text
+                            x={-10}
+                            y={y + 4}
+                            fontSize={11}
+                            textAnchor="end"
+                            fill="#555"
+                          >
+                            {yVal.toFixed(1)}
+                          </text>
+                        </g>
+                      );
+                    })}
 
-            {/* polylines */}
-            {polylines.map((pl, idx) => (
-              <g key={pl.ticker}>
-                <polyline
-                  points={pl.d}
-                  fill="none"
-                  stroke={pl.color}
-                  strokeWidth={2}
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                />
-                {/* markers */}
-                {pl.points.map((p, i) => (
-                  <circle
-                    key={`${pl.ticker}-pt-${i}`}
-                    cx={p.x}
-                    cy={p.y}
-                    r={3}
-                    fill={pl.color}
-                    stroke="#fff"
-                    strokeWidth={0.5}
-                  />
-                ))}
-              </g>
-            ))}
+                    {/* Vertical gridlines + X labels */}
+                    {allDates.map((date, idx) => {
+                      const x = xForIndex(idx);
+                      const showLabel =
+                        allDates.length <= 10 ||
+                        idx === 0 ||
+                        idx === allDates.length - 1 ||
+                        idx % Math.ceil(allDates.length / 8) === 0;
+                      return (
+                        <g key={date}>
+                          <line
+                            x1={x}
+                            y1={0}
+                            x2={x}
+                            y2={innerHeight}
+                            stroke="#f0f0f0"
+                            strokeWidth={1}
+                          />
+                          {showLabel && (
+                            <text
+                              x={x}
+                              y={innerHeight + 20}
+                              fontSize={11}
+                              textAnchor="middle"
+                              fill="#555"
+                            >
+                              {date}
+                            </text>
+                          )}
+                        </g>
+                      );
+                    })}
 
-            {/* hover crosshair & tooltip */}
-            {hover && (
-              <g>
-                <line
-                  x1={hover.x}
-                  x2={hover.x}
-                  y1={margin.top}
-                  y2={viewHeight - margin.bottom}
-                  stroke="#666"
-                  strokeWidth={1}
-                  strokeDasharray="3 3"
-                />
-                <rect
-                  x={Math.min(hover.x + 8, viewWidth - 140)}
-                  y={Math.max(12, hover.y - 36)}
-                  width={128}
-                  height={36}
-                  rx={6}
-                  ry={6}
-                  fill="#fff"
-                  stroke="#ccc"
-                  opacity={0.98}
-                />
-                <text
-                  x={Math.min(hover.x + 16, viewWidth - 132)}
-                  y={Math.max(28, hover.y - 20)}
-                  fontSize={12}
-                  fill="#111"
-                >
-                  {hover.label}
-                </text>
-                <text
-                  x={Math.min(hover.x + 16, viewWidth - 132)}
-                  y={Math.max(44, hover.y - 6)}
-                  fontSize={12}
-                  fill="#111"
-                >
-                  {hover.value}
-                </text>
-              </g>
-            )}
-          </Box>
+                    {/* Main X-axis at value 0 */}
+                    {zeroInRange && zeroY !== null && (
+                      <line
+                        x1={0}
+                        y1={zeroY}
+                        x2={innerWidth}
+                        y2={zeroY}
+                        stroke="#999"
+                        strokeWidth={1.5}
+                      />
+                    )}
 
-          {/* Legend */}
-          <Stack direction="row" spacing={1} sx={{ mt: 2 }} alignItems="center">
-            {polylines.map((pl, i) => (
-              <Chip
-                key={pl.ticker}
-                label={pl.ticker}
+                    {/* Data polylines */}
+                    {polylines.map((line) => (
+                      <polyline
+                        key={line.ticker}
+                        points={line.d}
+                        fill="none"
+                        stroke={line.color}
+                        strokeWidth={2}
+                      />
+                    ))}
+
+                    {/* Crosshair + markers for each series at hover x */}
+                    {showTooltip && hover && (
+                      <g>
+                        <line
+                          x1={hover.x}
+                          y1={0}
+                          x2={hover.x}
+                          y2={innerHeight}
+                          stroke="#c0c0c0"
+                          strokeDasharray="4 4"
+                          strokeWidth={1}
+                        />
+                        {hover.items.map((item) => (
+                          <circle
+                            key={item.label}
+                            cx={hover.x}
+                            cy={yForValue(item.value)}
+                            r={3.5}
+                            fill="#fff"
+                            stroke={item.color}
+                            strokeWidth={1.5}
+                          />
+                        ))}
+                      </g>
+                    )}
+                  </g>
+                </svg>
+              </Box>
+
+              {/* Legend at bottom */}
+              <Box
                 sx={{
-                  borderColor: pl.color,
-                  color: "text.primary",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 1.2,
+                  mt: 2,
+                  justifyContent: "center",
                 }}
-                size="small"
-              />
-            ))}
-          </Stack>
-        </Box>
-      </Paper>
-    </>
+              >
+                {polylines.map((line) => (
+                  <Box
+                    key={line.ticker}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.6,
+                      px: 1.4,
+                      py: 0.6,
+                      borderRadius: 999,
+                      border: "1px solid #e0e0e0",
+                      backgroundColor: "#fff",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        backgroundColor: line.color,
+                      }}
+                    />
+                    <Typography variant="caption">{line.ticker}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </>
+          )}
+
+          {/* Shared tooltip overlay */}
+          {showTooltip && hover && tooltipPosition && (
+            <Box
+              sx={{
+                position: "fixed",
+                top: tooltipPosition.top,
+                left: tooltipPosition.left,
+                backgroundColor: "#ffffff",
+                padding: "8px 10px",
+                borderRadius: "6px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                fontSize: "0.75rem",
+                pointerEvents: "none",
+                zIndex: 1300,
+                minWidth: 180,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ display: "block", mb: 0.5, fontWeight: 600 }}
+              >
+                {hover.date}
+              </Typography>
+              {hover.items.map((item) => (
+                <Box
+                  key={item.label}
+                  sx={{ display: "flex", justifyContent: "space-between", mb: 0.25 }}
+                >
+                  <span style={{ color: item.color, fontWeight: 600 }}>
+                    {item.label}
+                  </span>
+                  <span>{formatValue(item.value)}</span>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Paper>
+      </Box>
+    </Card>
   );
-}
+};
+
+export default FinancialMetricsChartsContent;
