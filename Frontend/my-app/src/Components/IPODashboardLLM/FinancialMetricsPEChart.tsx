@@ -8,8 +8,8 @@ import {
   Card,
 } from "@mui/material";
 
-type TimePoint = { date: string; value: number | null };
-type TickerSeries = { ticker: string; data: TimePoint[] };
+export type TimePoint = { date: string; value: number | null };
+export type TickerSeries = { ticker: string; data: TimePoint[] };
 type ApiResponse = { data: TickerSeries[] };
 
 type HoverItem = {
@@ -34,7 +34,9 @@ interface Props {
   width?: number | "100%";
 
   ticker?: string;
-  data?: any;
+  data?: TickerSeries[];
+  loading?: boolean;
+  error?: string | null;
 }
 
 const PALETTE = [
@@ -59,13 +61,16 @@ const formatValue = (v: number) =>
     maximumFractionDigits: 2,
   });
 
-const FinancialMetricsChartsContent: React.FC<Props> = ({
+const FinancialMetricsPEChart: React.FC<Props> = ({
   apiUrl,
   token,
   fsTickers,
   pricingDate,
   height = 320,
   width = "100%",
+  data: dataOverride,
+  loading: loadingOverride,
+  error: errorOverride,
 }) => {
   const [includeInPdf, setIncludeInPdf] = useState<boolean>(false);
   const [selectedPeers, setSelectedPeers] = useState<string[]>([]); // for compatibility
@@ -102,8 +107,21 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
     }
   }, [pricingDate]);
 
-  // Fetch data
+  // Fetch data unless it's provided by the caller
   useEffect(() => {
+    if (dataOverride) {
+      const normalized = dataOverride.map((s) => ({
+        ticker: s.ticker,
+        data: [...s.data].sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        ),
+      }));
+      setData(normalized);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     const fetchData = async () => {
       if (!apiUrl) {
         setError("API URL is not configured.");
@@ -150,7 +168,7 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
     };
 
     fetchData();
-  }, [apiUrl, token, tickers, dateInput]);
+  }, [apiUrl, token, tickers, dateInput, dataOverride]);
 
   // Build scales – now anchored to 0 so the graph "starts" from the X-axis
   const { allDates, yMin, yMax } = useMemo(() => {
@@ -253,6 +271,10 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
     });
   }, [data, allDates, yMin, yMax]);
 
+  const displayData = dataOverride || data;
+  const displayLoading = loadingOverride ?? loading;
+  const displayError = errorOverride ?? error;
+
   // Shared-tooltip hover logic (snap to nearest date)
   const handleSvgMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
     if (!svgRef.current || allDates.length === 0) return;
@@ -340,7 +362,7 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
             PE Trend Chart
           </Typography>
 
-          {loading && (
+          {displayLoading && (
             <Box
               sx={{
                 display: "flex",
@@ -353,19 +375,19 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
             </Box>
           )}
 
-          {!loading && error && (
+          {!displayLoading && displayError && (
             <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
+              {displayError}
             </Alert>
           )}
 
-          {!loading && !error && data.length === 0 && (
+          {!displayLoading && !displayError && displayData.length === 0 && (
             <Typography variant="body2" align="center" sx={{ py: 4 }}>
               No data available.
             </Typography>
           )}
 
-          {!loading && !error && data.length > 0 && (
+          {!displayLoading && !displayError && displayData.length > 0 && (
             <>
               <Box sx={{ width: "100%", overflowX: "auto" }}>
                 <svg
@@ -584,4 +606,4 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
   );
 };
 
-export default FinancialMetricsChartsContent;
+export default FinancialMetricsPEChart;
