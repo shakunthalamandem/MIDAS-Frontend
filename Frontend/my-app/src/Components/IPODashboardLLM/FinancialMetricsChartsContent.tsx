@@ -29,12 +29,23 @@ type MetricPrefix =
   | "gross_margin"
   | "ebitda_adj_margin"
   | "net_income_margin"
-  | "roe";
+  | "roe"
+  | "sales_estimate"
+  | "gross_income"
+  | "ebit"
+  | "adj_ebitda"
+  | "net_income"
+  | "net_interest_income"
+  | "pbt"
+  | "net_revenue_net_sales";
+
+type MetricFormat = "percentage" | "currency" | "number";
 
 interface MetricConfig {
   key: MetricPrefix;
   title: string;
   yAxisLabel: string;
+  format?: MetricFormat;
 }
 
 const METRICS: MetricConfig[] = [
@@ -42,26 +53,79 @@ const METRICS: MetricConfig[] = [
     key: "sales_growth",
     title: "Sales Growth",
     yAxisLabel: "Sales Growth (%)",
+    format: "percentage",
   },
   {
     key: "gross_margin",
     title: "Gross Margin",
     yAxisLabel: "Gross Margin (%)",
+    format: "percentage",
   },
   {
     key: "ebitda_adj_margin",
     title: "EBITDA Adj Margin",
     yAxisLabel: "EBITDA Adj Margin (%)",
+    format: "percentage",
   },
   {
     key: "net_income_margin",
     title: "Net Income Margin",
     yAxisLabel: "Net Income Margin (%)",
+    format: "percentage",
   },
   {
     key: "roe",
     title: "Return on Equity (ROE)",
     yAxisLabel: "ROE (%)",
+    format: "percentage",
+  },
+  {
+    key: "sales_estimate",
+    title: "Sales Estimate",
+    yAxisLabel: "Sales Estimate (USD)",
+    format: "currency",
+  },
+  {
+    key: "gross_income",
+    title: "Gross Income",
+    yAxisLabel: "Gross Income (USD)",
+    format: "currency",
+  },
+  {
+    key: "ebit",
+    title: "EBIT",
+    yAxisLabel: "EBIT (USD)",
+    format: "currency",
+  },
+  {
+    key: "adj_ebitda",
+    title: "Adjusted EBITDA",
+    yAxisLabel: "Adj. EBITDA (USD)",
+    format: "currency",
+  },
+  {
+    key: "net_income",
+    title: "Net Income",
+    yAxisLabel: "Net Income (USD)",
+    format: "currency",
+  },
+  {
+    key: "net_interest_income",
+    title: "Net Interest Income",
+    yAxisLabel: "Net Interest Income (USD)",
+    format: "currency",
+  },
+  {
+    key: "pbt",
+    title: "Profit Before Tax (PBT)",
+    yAxisLabel: "PBT (USD)",
+    format: "currency",
+  },
+  {
+    key: "net_revenue_net_sales",
+    title: "Revenue / Net Sales",
+    yAxisLabel: "Revenue / Net Sales (USD)",
+    format: "currency",
   },
 ];
 
@@ -91,6 +155,20 @@ const SELECTED_LINE_COLOR = "#e42d36ff";
 // Max number of peers to show at once
 const MAX_SELECTED_PEERS = 5;
 
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 2,
+});
+
+const decimalFormatter = new Intl.NumberFormat("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const formatCurrencyValue = (value?: number | null): string =>
+  value === null || value === undefined ? "-" : currencyFormatter.format(value);
+
 const roundToTwoDecimals = (
   value: number | null | undefined
 ): number | undefined => {
@@ -101,7 +179,8 @@ const roundToTwoDecimals = (
 };
 
 const formatValueLabel = (
-  value: number | string | null | undefined
+  value: number | string | null | undefined,
+  format?: MetricFormat
 ): string => {
   if (value === null || value === undefined) {
     return "-";
@@ -112,7 +191,11 @@ const formatValueLabel = (
     return "-";
   }
 
-  return numericValue.toFixed(2);
+  if (format === "currency") {
+    return currencyFormatter.format(numericValue);
+  }
+
+  return decimalFormatter.format(numericValue);
 };
 
 interface Props {
@@ -123,6 +206,12 @@ interface Props {
 const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
   const [includeInPdf, setIncludeInPdf] = useState<boolean>(false);
   const [selectedPeers, setSelectedPeers] = useState<string[]>([]);
+
+  const dataByTicker = useMemo(() => {
+    const map = new Map<string, MetricsRow>();
+    data.forEach((row) => map.set(row.fs_ticker, row));
+    return map;
+  }, [data]);
 
   // All fs_ticker strings
   const companies = useMemo(
@@ -139,6 +228,20 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
     );
     return match ? match.fs_ticker : null;
   }, [data, selectedBaseTicker]);
+
+  const selectedSnapshot = useMemo(() => {
+    if (!selectedCompanyKey) {
+      return null;
+    }
+    const snapshot = dataByTicker.get(selectedCompanyKey);
+    if (!snapshot) {
+      return null;
+    }
+    return {
+      date: snapshot.date,
+      price: snapshot.price,
+    };
+  }, [dataByTicker, selectedCompanyKey]);
 
   // Peer companies = all except the selected one
   const peerCompanies = useMemo(
@@ -257,6 +360,21 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
           </Box>
         </Box>
 
+        {selectedSnapshot && (
+          <Typography
+            variant="caption"
+            align="center"
+            display="block"
+            sx={{ color: "text.secondary", mb: 2, textAlign: "center" }}
+          >
+            Snapshot: {selectedSnapshot.date} · Price:{" "}
+            {selectedSnapshot.price !== null &&
+            selectedSnapshot.price !== undefined
+              ? formatCurrencyValue(selectedSnapshot.price)
+              : "N/A"}
+          </Typography>
+        )}
+
         {/* Peer ticker selector - enhanced UI */}
         <Paper
           elevation={0}
@@ -293,6 +411,13 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
             mt={1.5}
           >
             {peerCompanies.map((company) => {
+              const peerRow = dataByTicker.get(company);
+              const priceSuffix =
+                peerRow && peerRow.price !== null && peerRow.price !== undefined
+                  ? ` (${formatCurrencyValue(peerRow.price)})`
+                  : "";
+              const chipLabel = `${company}${priceSuffix}`;
+
               const isSelected = selectedPeers.includes(company);
               const disable =
                 !isSelected && selectedPeers.length >= MAX_SELECTED_PEERS;
@@ -304,7 +429,7 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
               return (
                 <Chip
                   key={company}
-                  label={company}
+                  label={chipLabel}
                   onClick={() => {
                     if (!disable) {
                       handlePeerToggle(company);
@@ -397,7 +522,9 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
                         >
                           <XAxis dataKey="year" />
                           <YAxis
-                            tickFormatter={(v) => formatValueLabel(v)}
+                            tickFormatter={(v) =>
+                              formatValueLabel(v, metric.format)
+                            }
                             label={{
                               value: metric.yAxisLabel,
                               angle: -90,
@@ -408,7 +535,7 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
                           />
                           <Tooltip
                             formatter={(value: any, name: string) => [
-                              formatValueLabel(value),
+                              formatValueLabel(value, metric.format),
                               name,
                             ]}
                           />
