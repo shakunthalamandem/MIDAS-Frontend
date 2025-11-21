@@ -28,9 +28,15 @@ interface Props {
   ticker: string;
   data: ApiResponse;
   onRefresh?: () => Promise<void> | void;
+  onPeersUpdated?: () => void;
 }
 
-const MetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
+const MetricsTableMain: React.FC<Props> = ({
+  ticker,
+  data,
+  onRefresh,
+  onPeersUpdated,
+}) => {
   const [rows, setRows] = useState<ComparableMetric[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState({
@@ -100,6 +106,7 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
       if (onRefresh) {
         try {
           await onRefresh();
+          onPeersUpdated?.();
         } catch (refreshErr: any) {
           console.error("Error refreshing competitor metrics:", refreshErr);
           setSnackbar({
@@ -114,6 +121,7 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
       } else {
         // fallback: update local state only
         setRows((prev) => prev.filter((_, idx) => idx !== deleteDialog.index));
+        onPeersUpdated?.();
       }
 
       setSnackbar({
@@ -149,6 +157,7 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
       if (onRefresh) {
         try {
           await onRefresh();
+          onPeersUpdated?.();
         } catch (refreshErr: any) {
           console.error("Error refreshing competitor metrics:", refreshErr);
           setSnackbar({
@@ -160,6 +169,8 @@ const MetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
           });
           return;
         }
+      } else {
+        onPeersUpdated?.();
       }
 
       setSnackbar({

@@ -38,11 +38,12 @@ type ApiResponse = {
 
 interface Props {
   ticker: string;
+  onPeersUpdated?: () => void;
 }
 
 type ViewMode = "table" | "chart";
 
-const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
+const IPODashboardMainTable: React.FC<Props> = ({ ticker, onPeersUpdated }) => {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,6 +104,7 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker }) => {
               ticker={ticker}
               data={data}
               onRefresh={fetchData}
+              onPeersUpdated={onPeersUpdated}
             />
           )}
 

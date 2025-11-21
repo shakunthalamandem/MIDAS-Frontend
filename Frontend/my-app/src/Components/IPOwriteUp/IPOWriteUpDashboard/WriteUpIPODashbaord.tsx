@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState, Suspense } from "react";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   Box,
   Container,
@@ -55,6 +61,9 @@ const WriteUpIPODashbaord: React.FC = () => {
   const [filterType, setFilterType] = useState<FilterType>("upcoming");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [regionFilter, setRegionFilter] = useState<string>("all"); // ⬅️ new
+  const [dashboardLocked, setDashboardLocked] = useState<boolean>(
+    Boolean(paramTicker)
+  );
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -109,6 +118,14 @@ const WriteUpIPODashbaord: React.FC = () => {
     // Note: exclude selectedTicker from deps to avoid re-fetch loops
   }, [apiUrl, token, paramTicker, filterType]);
 
+  useEffect(() => {
+    if (paramTicker) {
+      setDashboardLocked(true);
+    } else {
+      setDashboardLocked(false);
+    }
+  }, [paramTicker]);
+
   // Filter by ticker or company name
   const filteredData = useMemo(() => {
     let data = ipoData;
@@ -136,11 +153,27 @@ const WriteUpIPODashbaord: React.FC = () => {
 
   // ✅ When clicking any part of the row, update state + URL
   const handleRowClick = (ticker: string) => {
+    if (dashboardLocked && ticker !== selectedTicker) return;
+    if (ticker === selectedTicker) return;
+
+    setDashboardLocked(true);
     setSelectedTicker(ticker);
     navigate(`/equity/ipo_dashboard/${ticker}`, {
       state: { fromTickerClick: true },
     });
   };
+
+  const handleDashboardLoadComplete = useCallback(
+    (status: "success" | "error") => {
+      if (status === "success") {
+        setDashboardLocked(false);
+        return;
+      }
+      // Unlock so users can pick another ticker even if load failed.
+      setDashboardLocked(false);
+    },
+    []
+  );
 
   const isRowSelected = (ticker: string) => ticker === selectedTicker;
 
@@ -337,19 +370,22 @@ const WriteUpIPODashbaord: React.FC = () => {
                 </TableHead>
 
                 <TableBody>
-                  {filteredData.map((row, index) => {
-                    const selected = isRowSelected(row.ticker);
-                    return (
-                      <TableRow
-                        key={`${row.ticker}_${row.pricing_date}_${index}`}
-                        hover
-                        onClick={() => handleRowClick(row.ticker)}
-                        sx={{
-                          cursor: "pointer",
-                          backgroundColor: selected ? "#81e67eff" : "inherit",
-                          "&:hover": {
-                            backgroundColor: selected ? "#ffe9c2" : "#f3f8ff",
-                          },
+                {filteredData.map((row, index) => {
+                  const selected = isRowSelected(row.ticker);
+                  const rowDisabled =
+                    dashboardLocked && row.ticker !== selectedTicker;
+                  return (
+                    <TableRow
+                      key={`${row.ticker}_${row.pricing_date}_${index}`}
+                      hover
+                      onClick={() => handleRowClick(row.ticker)}
+                      sx={{
+                        cursor: rowDisabled ? "not-allowed" : "pointer",
+                        opacity: rowDisabled ? 0.55 : 1,
+                        backgroundColor: selected ? "#81e67eff" : "inherit",
+                        "&:hover": {
+                          backgroundColor: selected ? "#ffe9c2" : "#f3f8ff",
+                        },
                           border: "1px solid black",
                         }}
                       >
@@ -460,6 +496,17 @@ const WriteUpIPODashbaord: React.FC = () => {
           )}
         </Box>
 
+        {dashboardLocked && selectedTicker && (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            textAlign="center"
+            sx={{ display: "block", mt: 1 }}
+          >
+            Loading detailed view for {selectedTicker}...
+          </Typography>
+        )}
+
         {/* Info note */}
         <Typography
           variant="body2"
@@ -528,7 +575,10 @@ const WriteUpIPODashbaord: React.FC = () => {
               </Box>
             }
           >
-            <IPODashboardMain selectedTicker={selectedTicker} />
+            <IPODashboardMain
+              selectedTicker={selectedTicker}
+              onLoadComplete={handleDashboardLoadComplete}
+            />
           </Suspense>
         )}
       </Box>
