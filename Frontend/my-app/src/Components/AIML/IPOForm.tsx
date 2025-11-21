@@ -53,6 +53,7 @@ interface IPOFormValues {
   revenue_category: string; // number string ($M)
   revenue_growth_category: string; // number string (%), can be negative
   net_profit_margin_category: string; // number string (%), can be negative
+  t1d_open_return_category: number | null; // %
   t1d_return_from_bloomberg_category: number | null; // (%), can be negative
 
   // create new record flag
@@ -117,6 +118,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
       "GDP",
       "Inflation",
       "Treasury",
+      "t1d_open_return_category",
       "t1d_return_from_bloomberg_category", // <-- OPTIONAL
     ]);
 
@@ -240,6 +242,48 @@ const IPOForm: React.FC<IPOFormProps> = ({
     }
   };
 
+  const handleRepredictWithPrice = async (openPrice: number) => {
+    setLoading(true);
+    const apiUrl = process.env.REACT_APP_API_URL!;
+    const token = localStorage.getItem("access_token");
+
+    const payload = {
+      ...values,
+      deal_type: "IPO",
+      GDP: "Stable",
+      Inflation: "Stable",
+      Treasury: "Stable",
+      t1d_open_return_category: openPrice,
+      expectations: ["T1D"],
+      request_from: "ai_ml",
+      create_new_record: values.create_new_record ?? false,
+    };
+
+    try {
+      const res = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Repredict request failed");
+      const data = await res.json();
+      setPrediction(data.predictions);
+      onPredicted?.();
+    } catch (error) {
+      console.error("Repredict error:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to update prediction. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleWeeklyMonthlyRepredict = async (
     t1dCloseReturn: number
   ): Promise<Record<string, PredictionModel>> => {
@@ -299,47 +343,47 @@ const IPOForm: React.FC<IPOFormProps> = ({
     }
   };
 
-  const handleRepredictWithPrice = async (openPrice: number) => {
-    setLoading(true);
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem("access_token");
-    const payload = {
-      ...values,
-      deal_type: "IPO",
-      GDP: "Stable",
-      Inflation: "Stable",
-      Treasury: "Stable",
-      t1d_open_category: openPrice,
-      expectations: ["T1D"],
-      revenue_category: values.revenue_category,
-      revenue_growth_category: values.revenue_growth_category,
-      net_profit_margin_category: values.net_profit_margin_category,
-      request_from: "ai_ml",
-      create_new_record: values.create_new_record ?? false,
-    };
-    try {
-      const res = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("Repredict request failed");
-      const data = await res.json();
-      setPrediction(data.predictions);
-    } catch (error) {
-      console.error("Repredict error:", error);
-      setSnackbar({
-        open: true,
-        message: "Failed to update prediction. Please try again.",
-        severity: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleRepredictWithPrice = async (openPrice: number) => {
+  //   setLoading(true);
+  //   const apiUrl = process.env.REACT_APP_API_URL;
+  //   const token = localStorage.getItem("access_token");
+  //   const payload = {
+  //     ...values,
+  //     deal_type: "IPO",
+  //     GDP: "Stable",
+  //     Inflation: "Stable",
+  //     Treasury: "Stable",
+  //     t1d_open_category: openPrice,
+  //     expectations: ["T1D"],
+  //     revenue_category: values.revenue_category,
+  //     revenue_growth_category: values.revenue_growth_category,
+  //     net_profit_margin_category: values.net_profit_margin_category,
+  //     request_from: "ai_ml",
+  //     create_new_record: values.create_new_record ?? false,
+  //   };
+  //   try {
+  //     const res = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: token ? `Bearer ${token}` : "",
+  //       },
+  //       body: JSON.stringify(payload),
+  //     });
+  //     if (!res.ok) throw new Error("Repredict request failed");
+  //     const data = await res.json();
+  //     setPrediction(data.predictions);
+  //   } catch (error) {
+  //     console.error("Repredict error:", error);
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Failed to update prediction. Please try again.",
+  //       severity: "error",
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleReset = () => {
     setValues((prev) => ({
@@ -362,6 +406,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
       revenue_category: "",
       revenue_growth_category: "",
       net_profit_margin_category: "",
+      t1d_open_return_category: null,
       // keep t1d_return_from_bloomberg_category as-is or reset if you prefer:
       // t1d_return_from_bloomberg_category: null,
       create_new_record: false,
@@ -522,6 +567,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
           <IPOPredictionResults
             result={prediction}
             onRepredict={handleRepredictWithPrice}
+            initialT1dOpenReturn={values.t1d_open_return_category ?? null}
           />
           <IPOWeeklyMonthlyPredictionResults
             result={weeklyPrediction}

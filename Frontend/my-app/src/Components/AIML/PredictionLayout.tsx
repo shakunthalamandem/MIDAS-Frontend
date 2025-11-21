@@ -73,6 +73,7 @@ const defaultIPOValues = {
   revenue_category: "",
   revenue_growth_category: "",
   net_profit_margin_category: "",
+  t1d_open_return_category: null as number | null,
   t1d_return_from_bloomberg_category: null as number | null,
 
   // create new record flag
@@ -202,6 +203,9 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           item.revenue_growth != null ? String(item.revenue_growth) : "",
         net_profit_margin_category:
           item.net_profit_margin != null ? String(item.net_profit_margin) : "",
+          t1d_open_return_category: toNullableNumber(
+          pick(item, ["t1d_open_return", "t1d_open_return_category"])
+        ),
         t1d_return_from_bloomberg_category: toNullableNumber(
           pick(item, [
             "t1d_return_from_bloomberg_category",
