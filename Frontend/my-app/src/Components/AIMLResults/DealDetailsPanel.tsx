@@ -298,33 +298,44 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
               <SectionCard title="Deal economics" accent="primary">
                 <DetailRow
                   label="Deal size"
-                  value={formatNumber(deal.deal_size, { decimals: 0 })}
+                  value={
+                    formatNumber(deal.deal_size, { decimals: 0 })
+                      ? `$${formatNumber(deal.deal_size, { decimals: 0 })}`
+                      : undefined
+                  }
                 />
                 <DetailRow
                   label="Issue price"
-                  value={formatNumber(deal.issue_price, { decimals: 2 })}
+                  value={
+                    formatNumber(deal.issue_price, { decimals: 2 })
+                      ? `$${formatNumber(deal.issue_price, { decimals: 2 })}`
+                      : undefined
+                  }
                 />
-                <DetailRow
-                  label="Disc vs announcement"
-                  value={formatNumber(deal.discount_from_announcement_price, {
-                    suffix: "%",
-                    decimals: 2,
-                  })}
-                />
+                {deal.deal_type !== "IPO" &&
+                  formatNumber(deal.discount_from_announcement_price, { suffix: "%", decimals: 2 }) && (
+                    <DetailRow
+                      label="Disc vs announcement"
+                      value={formatNumber(deal.discount_from_announcement_price, {
+                        suffix: "%",
+                        decimals: 2,
+                      })}
+                    />
+                  )}
               </SectionCard>
             </Grid>
 
             <Grid item xs={12} md={4}>
               <SectionCard title="Allocations" accent="success">
                 <DetailRow
-                  label="Alloc · % of deal"
+                  label="Alloc as % of deal size"
                   value={formatNumber(
                     deal.allocation_as_percentage_of_deal_size,
                     { suffix: "%", decimals: 2 }
                   )}
                 />
                 <DetailRow
-                  label="Alloc · % of IOI"
+                  label="Alloc as % of IOI"
                   value={formatNumber(deal.allocation_as_percentage_of_ioi, {
                     suffix: "%",
                     decimals: 2,
