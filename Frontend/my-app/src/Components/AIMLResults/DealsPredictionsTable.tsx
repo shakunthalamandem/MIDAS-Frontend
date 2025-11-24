@@ -175,7 +175,7 @@ const DealsPredictionsTable: React.FC = () => {
     key: "pricing_date",
     direction: "desc",
   });
-  const [dealTypeFilter, setDealTypeFilter] = useState<DealTypeFilter>("IPO");
+  const [dealTypeFilter, setDealTypeFilter] = useState<DealTypeFilter>("FO");
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
