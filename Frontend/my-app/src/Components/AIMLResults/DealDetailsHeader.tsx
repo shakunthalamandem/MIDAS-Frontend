@@ -4,9 +4,31 @@ import { Box, Chip, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import type { DealRecord } from "./DealDetailsPanel";
 
+const getDaySuffix = (day: number): string => {
+  if (day >= 11 && day <= 13) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
 const formatPricingDate = (date: string | null | undefined): string => {
   if (!date || !date.trim()) return "TBD";
-  return date;
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return date; // fallback to raw string
+
+  const day = parsed.getDate();
+  const suffix = getDaySuffix(day);
+  const month = parsed.toLocaleString(undefined, { month: "long" });
+  const year = parsed.getFullYear();
+
+  return `${day}${suffix} ${month} ${year}`;
 };
 
 interface DealDetailsHeaderProps {
@@ -25,29 +47,10 @@ const DealDetailsHeader: React.FC<DealDetailsHeaderProps> = ({ deal }) => {
 
   const hasTBD = pricingDateText === "TBD";
 
-  const whenPhrase = hasTBD
-    ? "with pricing date yet to be confirmed"
-    : `priced on ${pricingDateText}`;
-
   const dealKindPhrase =
     foType && !dealType.toLowerCase().includes(foType.toLowerCase())
       ? `${dealType} – ${foType}`
       : dealType;
-
-  const regionPhrase = region ? `in the ${region} region` : "";
-  const sectorPhrase = sector ? `in the ${sector} sector` : "";
-
-  // Build the narrative sentence
-  const narrativeParts: string[] = [];
-
-  narrativeParts.push(
-    `${hasTBD ? "is planning" : "has recently priced"} a ${dealKindPhrase}`
-  );
-  narrativeParts.push(whenPhrase);
-  if (regionPhrase) narrativeParts.push(regionPhrase);
-  if (sectorPhrase) narrativeParts.push(sectorPhrase);
-
-  const narrativeRest = narrativeParts.join(" ");
 
   return (
     <Box
@@ -104,7 +107,36 @@ const DealDetailsHeader: React.FC<DealDetailsHeaderProps> = ({ deal }) => {
               {ticker}
             </Box>
           )}
-          {narrativeRest}.
+          {hasTBD ? " is planning a " : " has recently priced a "}
+          <Box component="span" sx={{ fontWeight: 700, color: "primary.main" }}>
+            {dealKindPhrase}
+          </Box>{" "}
+          {hasTBD ? "with pricing date " : "on "}
+          <Box component="span" sx={{ fontWeight: 700, color: "primary.main" }}>
+            {pricingDateText}
+          </Box>
+          {region && (
+            <>
+              {" "}
+              in the{" "}
+              <Box
+                component="span"
+                sx={{ fontWeight: 600, color: "secondary.main" }}
+              >
+                {region}
+              </Box>{" "}
+              region
+            </>
+          )}
+          {sector && (
+            <>
+              {" in the "}
+              <Box component="span" sx={{ fontWeight: 600, color: "#000000" }}>
+                {sector}
+              </Box>
+              {" sector."}
+            </>
+          )}
         </Typography>
       </Box>
 

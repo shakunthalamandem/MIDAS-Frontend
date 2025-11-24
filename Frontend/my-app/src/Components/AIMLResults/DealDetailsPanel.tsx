@@ -306,13 +306,10 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                 />
                 <DetailRow
                   label="Disc vs announcement"
-                  value={formatNumber(
-                    deal.discount_from_announcement_price,
-                    {
-                      suffix: "%",
-                      decimals: 2,
-                    }
-                  )}
+                  value={formatNumber(deal.discount_from_announcement_price, {
+                    suffix: "%",
+                    decimals: 2,
+                  })}
                 />
               </SectionCard>
             </Grid>
@@ -328,12 +325,10 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                 />
                 <DetailRow
                   label="Alloc · % of IOI"
-                  value={formatNumber(
-                    deal.allocation_as_percentage_of_ioi,
-                    {
-                      suffix: "%", decimals: 2,
-                    }
-                  )}
+                  value={formatNumber(deal.allocation_as_percentage_of_ioi, {
+                    suffix: "%",
+                    decimals: 2,
+                  })}
                 />
               </SectionCard>
             </Grid>
@@ -360,7 +355,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
-                title="1st Day Close"
+                title="1st Day Close from Issue Price"
                 subtitle="From issue price"
                 pred={deal.t1d_pred}
                 confidence={deal.t1d_confidence}
@@ -371,7 +366,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
 
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
-                title="1st Day Open → Close"
+                title="1st Day Close from Open Price"
                 subtitle="Intraday from open"
                 pred={deal.t1d_openprice_pred}
                 confidence={deal.t1d_openprice_confidence}
@@ -382,7 +377,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
 
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
-                title="1 Week"
+                title="1 Week Close from 1st Day Close"
                 subtitle="From 1st day close"
                 pred={deal.t1w_pred}
                 confidence={deal.t1w_confidence}
@@ -393,7 +388,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
 
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
-                title="1 Month"
+                title="1 Month Close from 1st Day Close"
                 subtitle="From 1st day close"
                 pred={deal.t1m_pred}
                 confidence={deal.t1m_confidence}
