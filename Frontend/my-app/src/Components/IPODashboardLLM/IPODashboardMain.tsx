@@ -322,7 +322,10 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         el.style.visibility = "hidden";
       });
 
-      const footerReserveMm = 32;
+      // Give extra breathing room between captured slices and the footer so visuals don't collide
+      const footerReserveMm = 36;
+      const topSlicePaddingMm = 8;
+      const bottomSlicePaddingMm = 10;
       const paginateCanvas = (canvas: HTMLCanvasElement) => {
         const imgWidth = pdfWidth;
         const mmPerPx = imgWidth / (canvas.width || 1);
@@ -332,7 +335,11 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
           pdf.addPage();
           const contentTopY = drawHeader();
           const availableHeight =
-            pdfHeight - contentTopY - footerReserveMm;
+            pdfHeight -
+            contentTopY -
+            footerReserveMm -
+            topSlicePaddingMm -
+            bottomSlicePaddingMm;
           const slicePx = Math.max(
             1,
             Math.floor(availableHeight / mmPerPx)
@@ -366,7 +373,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
             sliceImg,
             "PNG",
             0,
-            contentTopY,
+            contentTopY + topSlicePaddingMm,
             imgWidth,
             sliceHeightMm
           );
