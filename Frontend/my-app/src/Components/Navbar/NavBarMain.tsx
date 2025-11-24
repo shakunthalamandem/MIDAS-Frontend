@@ -216,6 +216,7 @@ const NavbarMain: React.FC = () => {
                   label: "US IPO & FO ML Model",
                   path: "/equity/ai_ml_models",
                 },
+                { label: "AI-ML Result Dashboard", path: "/equity/ai_ml_results" },
                 { label: "Gen AI Tool", path: "/gen_ai_tool" },
                 { label: "Portfolio Sentiment ", path: "/genai_data_set" },
                 { label: "Portfolio  News", path: "/macro/news-summary" },
