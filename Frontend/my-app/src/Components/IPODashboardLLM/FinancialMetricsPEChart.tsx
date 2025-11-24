@@ -36,6 +36,18 @@ interface Props {
   error: string | null;
 }
 
+// 🔹 Fixed bright color palette (approximating the style of your screenshot)
+const BRIGHT_COLORS = [
+  "#7F3FBF", // purple
+  "#8B4513", // brown
+  "#2E8B57", // green
+  "#283b00ff", // light green
+  "#1E90FF", // blue
+  "#8a0049ff", // pink
+  "#FF8C00", // orange
+  "#00CED1", // teal
+];
+
 const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
   // 1️⃣ Extract unique months (YYYY-MM)
   const monthKeys = React.useMemo(() => {
@@ -50,18 +62,24 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
   const chartData = React.useMemo(() => {
     return {
       labels: monthKeys.map((m) => formatMonth(m)),
-      datasets: data.map((series) => {
+      datasets: data.map((series, index) => {
         const map = new Map(
           series.data
             .filter((d) => d.date && d.value !== null)
             .map((d) => [d.date!.slice(0, 7), d.value!])
         );
 
+        const color = BRIGHT_COLORS[index % BRIGHT_COLORS.length];
+
         return {
           label: series.ticker,
           data: monthKeys.map((m) => map.get(m) ?? null),
-          borderColor: getRandomColor(),
+          borderColor: color,
+          backgroundColor: "transparent",
+          pointBackgroundColor: color,
+          pointBorderColor: color,
           pointRadius: 2,
+          borderWidth: 2,
           tension: 0.2,
         };
       }),
@@ -69,7 +87,10 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
   }, [data, monthKeys]);
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, backgroundColor: "#293f7912", borderRadius: 2, p: 2 }}>
+    <Container
+      maxWidth="xl"
+      sx={{ mt: 4, backgroundColor: "#293f7912", borderRadius: 2, p: 2 }}
+    >
       <Card elevation={0} sx={{ backgroundColor: "transparent" }}>
         <CardContent>
           <Typography
@@ -112,16 +133,6 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
       </Card>
     </Container>
   );
-};
-
-// Random color generator
-const getRandomColor = () => {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
 };
 
 // Format "YYYY-MM" → "Jan"
